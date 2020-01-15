@@ -2,62 +2,92 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE2B6C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 22:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B251EC32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 22:03:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 936A22465A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 22:00:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 936A22465A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 722B72465A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 22:03:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=livius-net.20150623.gappssmtp.com header.i=@livius-net.20150623.gappssmtp.com header.b="Czam+KsK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722B72465A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=livius.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irqi9-0006I9-Di
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 17:00:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59676)
+	id 1irqlL-0000ss-LQ
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 17:03:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1irqhJ-0005EU-8U
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 16:59:34 -0500
+ (envelope-from <ilg@livius.net>) id 1irqkK-0008Fm-5l
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 17:02:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1irqhH-0000TB-JV
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 16:59:32 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:51512)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1irqhH-0000R7-Dv
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 16:59:31 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 4785D7475F9;
- Wed, 15 Jan 2020 22:59:28 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 237DB74594E; Wed, 15 Jan 2020 22:59:28 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 223447456F8;
- Wed, 15 Jan 2020 22:59:28 +0100 (CET)
-Date: Wed, 15 Jan 2020 22:59:28 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 41/86] hw/hppa/machine: Correctly check the firmware
- is in PDC range
-In-Reply-To: <caded923-2daa-9ec2-8129-fb76a744042f@redhat.com>
-Message-ID: <alpine.BSF.2.21.99999.352.2001152238430.24151@zero.eik.bme.hu>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-42-git-send-email-imammedo@redhat.com>
- <alpine.BSF.2.21.99999.352.2001151914440.24151@zero.eik.bme.hu>
- <caded923-2daa-9ec2-8129-fb76a744042f@redhat.com>
-User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-823118792-1579125568=:24151"
+ (envelope-from <ilg@livius.net>) id 1irqkI-0002M4-7d
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 17:02:39 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:40666)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ilg@livius.net>) id 1irqkH-0002LP-OO
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 17:02:38 -0500
+Received: by mail-wm1-x335.google.com with SMTP id t14so1638321wmi.5
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 14:02:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=livius-net.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=BVP4NRhPFSHrJjIPjsLJjDTukdxB17WP9oLbQhCIBco=;
+ b=Czam+KsK9C95nTf5qjQT9KAkUSAzIcYuTDwzhpTwj6u9yRv9OyTZYG3l9tTQw3d2x+
+ zMjmX1KW86zl5B39fT73/mSd6Vwp6DYH7n+/zME4sFY3CNz2ikTffFv0/3ZvllRiP6pL
+ KypTnMzXip1BvG22i8d5TglYMtdZE2Xcf9hafFZTU0Ys87+Kkwr5Wbii7fC7c9iUR5bf
+ 33WxaoxlIgPgSBdiiQzdHCArFB7A+8l++1yXlVERq2ge34+bcevxQBYqrg9F6OBC3R1I
+ Uz9RMqy9TBIrdT1PdyJTxUbH523xcYqlaPcDN/033v7cxDL3C/a1EBNpGpl06bkc+Lo9
+ +mUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=BVP4NRhPFSHrJjIPjsLJjDTukdxB17WP9oLbQhCIBco=;
+ b=JM4fkiTqKkMjd32oPdE1KhmUo5eVXpU/+xsUhV2UFH0bCi7t4sta79Kw79Lf+1Yk0a
+ Wmt24ICWXSsRNYQ/SBhp79DrPSlgtEkCVA1M6C2lhNmIbeDdm/JgNtuMUWdw4Qn36MNc
+ Xny77wpIGctx6EUtvZQQHTjJMjSBpznaZqvzx4z+Ul8llbFJ1jLrd2n63ZMb8A+srKNl
+ tNF2hYlbgJDYMPjjLnTg0sl7Oz19FZW4FV1dCAzI9Sj4kjPid+BZoZ9ck+yDirdPOr4V
+ trGR844jApNMEp7ZgfSPUaJg4v5KpOGbVH+3051CXm/3N9/B1+eclOTVgWFWDrBd0OkO
+ Fdew==
+X-Gm-Message-State: APjAAAUv/DCtMOQmJLvBhF4L4q29Dzt/0pIAI+EstcIUUc4dZZ/dHiDF
+ HYLF5Pw2/Vl4ZzTjNJuYPxjCcQ==
+X-Google-Smtp-Source: APXvYqwc6ILREdvaPjw/6hgXNUkja5UGYqX1XBZwxQPckqc9HhSxHwL67CkmahIVcr4JRhvxsikXEA==
+X-Received: by 2002:a05:600c:211:: with SMTP id
+ 17mr2294170wmi.60.1579125756350; 
+ Wed, 15 Jan 2020 14:02:36 -0800 (PST)
+Received: from wks.local ([188.26.232.206])
+ by smtp.gmail.com with ESMTPSA id z4sm1665107wma.2.2020.01.15.14.02.35
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 15 Jan 2020 14:02:35 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: Semihosting, arm, riscv, ppc and common code
+From: Liviu Ionescu <ilg@livius.net>
+In-Reply-To: <81f25a9e-a52c-ca8d-4d4b-ca36fcee73ed@linaro.org>
+Date: Thu, 16 Jan 2020 00:02:34 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C4EE0480-C366-419B-84F1-3BEB794D1598@livius.net>
+References: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
+ <AE7841A1-B4D6-4D6D-9AFD-01C4604D7BC4@livius.net>
+ <cd9a2de94700a2781f176247131dceba690d8f31.camel@kernel.crashing.org>
+ <87sgkimkma.fsf@linaro.org>
+ <1309ca0ab6405d88cfd949c73130ad0f2af944a6.camel@kernel.crashing.org>
+ <87wo9tkjxz.fsf@linaro.org> <81f25a9e-a52c-ca8d-4d4b-ca36fcee73ed@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,69 +99,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: keithp@keithp.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
---3866299591-823118792-1579125568=:24151
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, 15 Jan 2020, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/15/20 7:15 PM, BALATON Zoltan wrote:
->> On Wed, 15 Jan 2020, Igor Mammedov wrote:
->>> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>=20
->>> The firmware has to reside in the PDC range. If the Elf file
->>> expects to load it below FIRMWARE_START, it is incorrect,
->>> regardless the RAM size.
->>>=20
->>> Acked-by: Helge Deller <deller@gmx.de>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>> ---
->>> hw/hppa/machine.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>>=20
->>> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
->>> index 5d0de26..6775d87 100644
->>> --- a/hw/hppa/machine.c
->>> +++ b/hw/hppa/machine.c
->>> @@ -155,7 +155,7 @@ static void machine_hppa_init(MachineState *machi=
-ne)
->>> =C2=A0=C2=A0=C2=A0 qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x=
-%08" PRIx64
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "-0x%08" PRIx64 ", entry at 0x%08" PRIx=
-64 ".\n",
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 firmware_low, firmware_high, firmware_e=
-ntry);
->>> -=C2=A0=C2=A0=C2=A0 if (firmware_low < ram_size || firmware_high >=3D=
- FIRMWARE_END) {
->>> +=C2=A0=C2=A0=C2=A0 if (firmware_low < FIRMWARE_START || firmware_hig=
-h >=3D FIRMWARE_END) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Firmware ove=
-rlaps with memory or IO space");
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
->>=20
->> Should this also be EXIT_FAILURE like in other places when you're chan=
-ging=20
->> the line nearby?
->
-> I didn't changed this line, this seems unrelated to the patch purpose.
+> On 15 Jan 2020, at 23:28, Richard Henderson =
+<richard.henderson@linaro.org> wrote:
+>=20
+> For risc-v, the odd nop-full semi-hosting call sequence
 
-Fair enough. Just thought because there was patch 85/86 making that chang=
-e=20
-to keep consistency. Maybe you can change this in that patch but I don't=20
-really mind just spotted it.
+That unfortunate call sequence was the least worst compromise that the =
+RISC-V design team could agree on. :-(
+
+The actual problem was that the RISC-V instruction set has a single =
+BREAK op code, without any way to parametrise it, and they refused to =
+spend another op code for an extra BREAK.
+
+> was chosen to work with
+> jtag debuggers on real silicon.
+
+Yes, I know at least two, SEGGER J-Link of OpenOCD.=20
+
+But again, there is nothing in the silicon related to the odd call =
+sequence or the ABI, everything is implemented in the debuggers. The =
+silicon has only to break to the debugger, then it's up to the debugger =
+to decide if this is a semihosting call or a regular break.
+
+> ... they did have the opportunity to do better, and did not.
+
+I don't know why you present Arm semihosting as a disaster. It is not =
+perfect, but it is functional, and common unit tests use only a small =
+subset of the calls.
+
+And there is no 'window of opportunity', if the RISC-V guys will ever =
+want to reinvent the wheel and come with an official 'RISC-V =
+semihosting' specs, they can do it at any time, and this will have no =
+impact on existing devices, everything will continue to work as before, =
+only the debuggers/emulators will need to be upgraded.
+
+But the only immediate effect such a move will have is that software =
+efforts in test frameworks will be increased, to support another =
+protocol, while the advantages will be minimal.
+
 
 Regards,
-BALATON Zoltan
---3866299591-823118792-1579125568=:24151--
+
+Liviu
+
 
