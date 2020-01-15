@@ -2,81 +2,79 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E57EC33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA61C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:12:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06C64214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACA9A214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:12:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="is0YlXKJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06C64214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GEtjmT3J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA9A214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56497 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irlGl-0003iv-VG
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:11:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51084)
+	id 1irlHR-00051C-HG
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:12:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1irkS6-0002zX-BN
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:19:27 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkL5-00011s-Dp
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1irkS4-0003zp-SQ
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:19:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49717
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1irkL4-0000W2-4F
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:11 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58437
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1irkS4-0003y7-OU
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:19:24 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkL3-0000Vc-V8
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101563;
+ s=mimecast20190719; t=1579101129;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=p8M3x154gZS4h9ERmUGr0bT0MkWCU8d0g3BjJP8cMpM=;
- b=is0YlXKJuaN/EcuhunY2qvoPjAt1qOyiYKilEmO9MHugUu5BIzrSLr8d9WoTz9fg0qoodh
- uL9KZu6ZmUH2pDREJ1JF7UD5XV5lvVwC8hcRraNXmg2F73IaonIRP+OigDNyYdJVGRO8yl
- JHmLwUtI3RsiENMKqjVTVb/+EBExRt4=
+ bh=z/Y+TeQhJLFvkD1utNmQya59Mk0HjE69BPP5CGsPWis=;
+ b=GEtjmT3JPcqj0MTBPwCmQm/wOTprzyBFS2bR9z718srMSoZEqXWD/AL4uMHibZ50UwQwH+
+ tf4RKM0mXhdWNBABfOF+ZebP6lmalKNK+UrcDK9g9HpDu7fDHeX9raLrlQnP+CjvjF/Uwl
+ 39dtrViikxRTnxWYWMF/j0VmoPU5mvc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-d09gOn4qO22zMvydk1AgmQ-1; Wed, 15 Jan 2020 10:19:21 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-139-ZSt2cz2cP3WoHArRq5o2jw-1; Wed, 15 Jan 2020 10:12:08 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00952193902D;
- Wed, 15 Jan 2020 15:19:20 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-87.ams2.redhat.com [10.36.117.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CABA1CB;
- Wed, 15 Jan 2020 15:19:13 +0000 (UTC)
-Date: Wed, 15 Jan 2020 16:19:12 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v6 6/8] blockdev: Acquire AioContext on dirty bitmap
- functions
-Message-ID: <20200115151912.GD5505@linux.fritz.box>
-References: <20200108143138.129909-1-slp@redhat.com>
- <20200108143138.129909-7-slp@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 508A3188ED9
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:12:07 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C999B19757
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:12:06 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 72/86] sparc:leon3: use memdev for RAM
+Date: Wed, 15 Jan 2020 16:07:27 +0100
+Message-Id: <1579100861-73692-73-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200108143138.129909-7-slp@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: d09gOn4qO22zMvydk1AgmQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: ZSt2cz2cP3WoHArRq5o2jw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,124 +86,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 08.01.2020 um 15:31 hat Sergio Lopez geschrieben:
-> Dirty map addition and removal functions are not acquiring to BDS
-> AioContext, while they may call to code that expects it to be
-> acquired.
->=20
-> This may trigger a crash with a stack trace like this one:
->=20
->  #0  0x00007f0ef146370f in __GI_raise (sig=3Dsig@entry=3D6)
->      at ../sysdeps/unix/sysv/linux/raise.c:50
->  #1  0x00007f0ef144db25 in __GI_abort () at abort.c:79
->  #2  0x0000565022294dce in error_exit
->      (err=3D<optimized out>, msg=3Dmsg@entry=3D0x56502243a730 <__func__.1=
-6350> "qemu_mutex_unlock_impl") at util/qemu-thread-posix.c:36
->  #3  0x00005650222950ba in qemu_mutex_unlock_impl
->      (mutex=3Dmutex@entry=3D0x5650244b0240, file=3Dfile@entry=3D0x5650224=
-39adf "util/async.c", line=3Dline@entry=3D526) at util/qemu-thread-posix.c:=
-108
->  #4  0x0000565022290029 in aio_context_release
->      (ctx=3Dctx@entry=3D0x5650244b01e0) at util/async.c:526
->  #5  0x000056502221cd08 in bdrv_can_store_new_dirty_bitmap
->      (bs=3Dbs@entry=3D0x5650244dc820, name=3Dname@entry=3D0x56502481d360 =
-"bitmap1", granularity=3Dgranularity@entry=3D65536, errp=3Derrp@entry=3D0x7=
-fff22831718)
->      at block/dirty-bitmap.c:542
->  #6  0x000056502206ae53 in qmp_block_dirty_bitmap_add
->      (errp=3D0x7fff22831718, disabled=3Dfalse, has_disabled=3D<optimized =
-out>, persistent=3D<optimized out>, has_persistent=3Dtrue, granularity=3D65=
-536, has_granularity=3D<optimized out>, name=3D0x56502481d360 "bitmap1", no=
-de=3D<optimized out>) at blockdev.c:2894
->  #7  0x000056502206ae53 in qmp_block_dirty_bitmap_add
->      (node=3D<optimized out>, name=3D0x56502481d360 "bitmap1", has_granul=
-arity=3D<optimized out>, granularity=3D<optimized out>, has_persistent=3Dtr=
-ue, persistent=3D<optimized out>, has_disabled=3Dfalse, disabled=3Dfalse, e=
-rrp=3D0x7fff22831718) at blockdev.c:2856
->  #8  0x00005650221847a3 in qmp_marshal_block_dirty_bitmap_add
->      (args=3D<optimized out>, ret=3D<optimized out>, errp=3D0x7fff2283179=
-8)
->      at qapi/qapi-commands-block-core.c:651
->  #9  0x0000565022247e6c in do_qmp_dispatch
->      (errp=3D0x7fff22831790, allow_oob=3D<optimized out>, request=3D<opti=
-mized out>, cmds=3D0x565022b32d60 <qmp_commands>) at qapi/qmp-dispatch.c:13=
-2
->  #10 0x0000565022247e6c in qmp_dispatch
->      (cmds=3D0x565022b32d60 <qmp_commands>, request=3D<optimized out>, al=
-low_oob=3D<optimized out>) at qapi/qmp-dispatch.c:175
->  #11 0x0000565022166061 in monitor_qmp_dispatch
->      (mon=3D0x56502450faa0, req=3D<optimized out>) at monitor/qmp.c:145
->  #12 0x00005650221666fa in monitor_qmp_bh_dispatcher
->      (data=3D<optimized out>) at monitor/qmp.c:234
->  #13 0x000056502228f866 in aio_bh_call (bh=3D0x56502440eae0)
->      at util/async.c:117
->  #14 0x000056502228f866 in aio_bh_poll (ctx=3Dctx@entry=3D0x56502440d7a0)
->      at util/async.c:117
->  #15 0x0000565022292c54 in aio_dispatch (ctx=3D0x56502440d7a0)
->      at util/aio-posix.c:459
->  #16 0x000056502228f742 in aio_ctx_dispatch
->      (source=3D<optimized out>, callback=3D<optimized out>, user_data=3D<=
-optimized out>) at util/async.c:260
->  #17 0x00007f0ef5ce667d in g_main_dispatch (context=3D0x56502449aa40)
->      at gmain.c:3176
->  #18 0x00007f0ef5ce667d in g_main_context_dispatch
->      (context=3Dcontext@entry=3D0x56502449aa40) at gmain.c:3829
->  #19 0x0000565022291d08 in glib_pollfds_poll () at util/main-loop.c:219
->  #20 0x0000565022291d08 in os_host_main_loop_wait
->      (timeout=3D<optimized out>) at util/main-loop.c:242
->  #21 0x0000565022291d08 in main_loop_wait (nonblocking=3D<optimized out>)
->      at util/main-loop.c:518
->  #22 0x00005650220743c1 in main_loop () at vl.c:1828
->  #23 0x0000565021f20a72 in main
->      (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimized o=
-ut>)
->      at vl.c:4504
->=20
-> Fix this by acquiring the AioContext at qmp_block_dirty_bitmap_add()
-> and qmp_block_dirty_bitmap_add().
->=20
-> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1782175
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-> @@ -3038,20 +3045,26 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_rem=
-ove(
->  {
->      BlockDriverState *bs;
->      BdrvDirtyBitmap *bitmap;
-> +    AioContext *aio_context;
-> =20
->      bitmap =3D block_dirty_bitmap_lookup(node, name, &bs, errp);
->      if (!bitmap || !bs) {
->          return NULL;
->      }
-> =20
-> +    aio_context =3D bdrv_get_aio_context(bs);
-> +    aio_context_acquire(aio_context);
-> +
->      if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_BUSY | BDRV_BITMAP_R=
-O,
->                                  errp)) {
-> +        aio_context_release(aio_context);
->          return NULL;
->      }
-> =20
->      if (bdrv_dirty_bitmap_get_persistence(bitmap) &&
->          bdrv_remove_persistent_dirty_bitmap(bs, name, errp) < 0)
->      {
-> +            aio_context_release(aio_context);
->              return NULL;
->      }
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/sparc/leon3.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Indentation is off here. It was already off before this patch, but
-rather than adding another incorrectly indented line, I think we should
-just fix it. I can do that while applying.
-
-Kevin
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 8038887..64399eb 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -189,7 +189,6 @@ static void leon3_generic_hw_init(MachineState *machine=
+)
+     SPARCCPU *cpu;
+     CPUSPARCState   *env;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *prom =3D g_new(MemoryRegion, 1);
+     int         ret;
+     char       *filename;
+@@ -251,8 +250,8 @@ static void leon3_generic_hw_init(MachineState *machine=
+)
+         exit(1);
+     }
+=20
+-    memory_region_allocate_system_memory(ram, NULL, "leon3.ram", ram_size)=
+;
+-    memory_region_add_subregion(address_space_mem, LEON3_RAM_OFFSET, ram);
++    memory_region_add_subregion(address_space_mem, LEON3_RAM_OFFSET,
++                                machine->ram);
+=20
+     /* Allocate BIOS */
+     prom_size =3D 8 * MiB;
+@@ -358,6 +357,7 @@ static void leon3_generic_machine_init(MachineClass *mc=
+)
+     mc->desc =3D "Leon-3 generic";
+     mc->init =3D leon3_generic_hw_init;
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("LEON3");
++    mc->default_ram_id =3D "leon3.ram";
+ }
+=20
+ DEFINE_MACHINE("leon3_generic", leon3_generic_machine_init)
+--=20
+2.7.4
 
 
