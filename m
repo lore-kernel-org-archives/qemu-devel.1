@@ -2,79 +2,59 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34617C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 657ACC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01DCB2187F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:03:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fiMxZeFK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DCB2187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 407AC2187F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:03:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407AC2187F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irl8a-0006zZ-2K
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:03:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50045)
+	id 1irl8o-0007GZ-3j
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:03:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkLB-0001GR-ET
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:18 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0P-0005xM-96
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkLA-0000bi-9a
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47341
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0L-0006Dp-7K
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:52 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:34153 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkLA-0000bb-6E
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101135;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=l713RKeNz2WRBUh4w65LjVDMnCQAt/QIhMyNh0acRgQ=;
- b=fiMxZeFKMINB6kKiz6KViqBNy336wMvjexB9nHM57KTn6Thr+OJbh89LNUI/IluwWl8htb
- PfShXlyP0PZ8DMF10ixe94Jqbllnpm0lwSCudLDpSckEKIytPllVi+RrqfRVkIqRWoU5bq
- d74hxxNRUY9mKCoIVTiOCQ7nHYuyfQ4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-DfNBKCd9ME2zheQw2-trYA-1; Wed, 15 Jan 2020 10:12:14 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BED8114291E;
- Wed, 15 Jan 2020 15:12:13 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9055119757;
- Wed, 15 Jan 2020 15:12:12 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1irl0K-0005h8-Rh
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:49 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id A14FF1A1F8E;
+ Wed, 15 Jan 2020 16:53:43 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 757CC1A2115;
+ Wed, 15 Jan 2020 16:53:43 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 78/86] exec: drop bogus mem_path from
- qemu_ram_alloc_from_fd()
-Date: Wed, 15 Jan 2020 16:07:33 +0100
-Message-Id: <1579100861-73692-79-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: DfNBKCd9ME2zheQw2-trYA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Subject: [PATCH 01/12] linux-user: Add support for enabling/disabling RTC
+ features using ioctls
+Date: Wed, 15 Jan 2020 16:53:27 +0100
+Message-Id: <1579103618-20217-2-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,58 +66,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, berrange@redhat.com, arnd@arndb.de,
+ richard.henderson@linaro.org, laurent@vivier.eu, jcmvbkbc@gmail.com,
+ amarkovic@wavecomp.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Function will report error that will mention global mem_path,
-which was valid the only if legacy -mem-path was used and
-only in case of main RAM.
+This patch implements functionalities of following ioctls:
 
-However it doesn't work with hostmem backends
-(for example:
-"
-  qemu: -object memory-backend-file,id=3Dram0,size=3D128M,mem-path=3Dfoo:
-    backing store (null) size 0x200000 does not match 'size' option 0x80000=
-00
-")
-and couldn't possibly work in general FD case the function
-is supposed to handle.
+RTC_AIE_ON, RTC_AIE_OFF - Alarm interrupt enabling on/off
 
-Taking in account that main RAM was converted into
-memory-backend-foo object, there is no point in printing
-file name (from inappropriate place) as failing path is
-a part of backend's error message.
+    Enable or disable the alarm interrupt, for RTCs that support
+    alarms.  The third ioctl's argument is ignored.
 
-Hence drop bogus mem_path usage from qemu_ram_alloc_from_fd(),
-it's a job of its user to add file name to error message if applicable.
+RTC_UIE_ON, RTC_UIE_OFF - Update interrupt enabling on/off
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+    Enable or disable the interrupt on every clock update, for
+    RTCs that support this once-per-second interrupt. The third
+    ioctl's argument is ignored.
+
+RTC_PIE_ON, RTC_PIE_OFF - Periodic interrupt enabling on/off
+
+    Enable or disable the periodic interrupt, for RTCs that sup=E2=80=90
+    port these periodic interrupts. The third ioctl's argument
+    is ignored. Only a privileged process (i.e., one having the
+    CAP_SYS_RESOURCE capability) can enable the periodic interrupt
+    if the frequency is currently set above the value specified in
+    /proc/sys/dev/rtc/max-user-freq.
+
+RTC_WIE_ON, RTC_WIE_OFF - Watchdog interrupt enabling on/off
+
+    Enable or disable the Watchdog interrupt, for RTCs that sup-
+    port this Watchdog interrupt. The third ioctl's argument is
+    ignored.
+
+Implementation notes:
+
+    Since all of involved ioctls have NULL as their third argument,
+    their implementation was straightforward.
+
+    The line '#include <linux/rtc.h>' was added to recognize
+    preprocessor definitions for these ioctls. This needs to be
+    done only once in this series of commits. Also, the content
+    of this file (with respect to ioctl definitions) remained
+    unchanged for a long time, therefore there is no need to
+    worry about supporting older Linux kernel version.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 ---
-CC: pbonzini@redhat.com
-CC: rth@twiddle.net
----
- exec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ linux-user/ioctls.h       |  9 +++++++++
+ linux-user/syscall.c      |  1 +
+ linux-user/syscall_defs.h | 10 ++++++++++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index 7b6e376..d0a7e7e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2308,9 +2308,9 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, Mem=
-oryRegion *mr,
-     size =3D HOST_PAGE_ALIGN(size);
-     file_size =3D get_file_size(fd);
-     if (file_size > 0 && file_size < size) {
--        error_setg(errp, "backing store %s size 0x%" PRIx64
-+        error_setg(errp, "backing store size 0x%" PRIx64
-                    " does not match 'size' option 0x" RAM_ADDR_FMT,
--                   mem_path, file_size, size);
-+                   file_size, size);
-         return NULL;
-     }
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index c6b9d6a..97741c7 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -69,6 +69,15 @@
+      IOCTL(KDSETLED, 0, TYPE_INT)
+      IOCTL_SPECIAL(KDSIGACCEPT, 0, do_ioctl_kdsigaccept, TYPE_INT)
 =20
++     IOCTL(RTC_AIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_AIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_UIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_UIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_PIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
++
+      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(BLKRRPART, 0, TYPE_NULL)
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index ce399a5..74c3c08 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -107,6 +107,7 @@
+ #include <netpacket/packet.h>
+ #include <linux/netlink.h>
+ #include <linux/if_alg.h>
++#include <linux/rtc.h>
+ #include "linux_loop.h"
+ #include "uname.h"
+=20
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 98c2119..f91579a 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -763,6 +763,16 @@ struct target_pollfd {
+ #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flag=
+s] */
+ #define TARGET_KDSIGACCEPT     0x4B4E
+=20
++/* real time clock ioctls */
++#define TARGET_RTC_AIE_ON           TARGET_IO('p', 0x01)
++#define TARGET_RTC_AIE_OFF          TARGET_IO('p', 0x02)
++#define TARGET_RTC_UIE_ON           TARGET_IO('p', 0x03)
++#define TARGET_RTC_UIE_OFF          TARGET_IO('p', 0x04)
++#define TARGET_RTC_PIE_ON           TARGET_IO('p', 0x05)
++#define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
++#define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
++#define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
++
+ #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)=
+ ||    \
+        defined(TARGET_XTENSA)
+ #define TARGET_FIOGETOWN       TARGET_IOR('f', 123, int)
 --=20
 2.7.4
 
