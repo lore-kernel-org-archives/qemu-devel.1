@@ -2,61 +2,57 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2105AC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 20:40:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53873C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 21:02:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDC022081E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 20:40:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDC022081E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 27ACC207FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 21:02:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27ACC207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irpTC-0000qK-W4
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 15:40:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46355)
+	id 1irpnk-0002Ix-6m
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 16:02:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49537)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1irpSE-0008VI-EW
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 15:39:55 -0500
+ (envelope-from <no-reply@patchew.org>) id 1irpn4-0001kS-Gf
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 16:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alxndr@bu.edu>) id 1irpSB-0004wK-BM
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 15:39:53 -0500
-Received: from relay64.bu.edu ([128.197.228.104]:34950)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1irpSB-0004tW-7P
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 15:39:51 -0500
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 00FKchHZ021456
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Wed, 15 Jan 2020 15:38:47 -0500
-Date: Wed, 15 Jan 2020 15:38:43 -0500
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v6 11/21] libqtest: make bufwrite rely on the TransportOps
-Message-ID: <20200115203843.w34q4wldlo6s6l7y@mozz.bu.edu>
-References: <20191129213424.6290-1-alxndr@bu.edu>
- <20191129213424.6290-12-alxndr@bu.edu>
- <3745422f-0b12-d1ba-4c7c-b51ddf734012@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1irpn0-0004ZJ-Bq
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 16:01:26 -0500
+Resent-Date: Wed, 15 Jan 2020 16:01:26 -0500
+Resent-Message-Id: <E1irpn0-0004ZJ-Bq@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21114)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1irpn0-0004YS-3t
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 16:01:22 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579122073202462.04402776036306;
+ Wed, 15 Jan 2020 13:01:13 -0800 (PST)
+In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [PATCH v2 00/86] refactor main RAM allocation to use hostmem
+ backend
+Message-ID: <157912207219.8290.12574147223674937177@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3745422f-0b12-d1ba-4c7c-b51ddf734012@redhat.com>
-User-Agent: NeoMutt/20180716
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by relay64.bu.edu id
- 00FKchHZ021456
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.6.x [fuzzy]
-X-Received-From: 128.197.228.104
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: imammedo@redhat.com
+Date: Wed, 15 Jan 2020 13:01:13 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,76 +64,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200103 1745, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 11/29/19 10:34 PM, Oleinik, Alexander wrote:
-> > When using qtest "in-process" communication, qtest_sendf directly cal=
-ls
-> > a function in the server (qtest.c). Previously, bufwrite used
-> > socket_send, which bypasses the TransportOps enabling the call into
-> > qtest.c. This change replaces the socket_send calls with ops->send,
-> > maintaining the benefits of the direct socket_send call, while adding
-> > support for in-process qtest calls.
-> >=20
-> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> > ---
-> >   tests/libqtest.c | 4 ++--
-> >   tests/libqtest.h | 3 +++
-> >   2 files changed, 5 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/tests/libqtest.c b/tests/libqtest.c
-> > index ac4b6ab5f0..a7df92319a 100644
-> > --- a/tests/libqtest.c
-> > +++ b/tests/libqtest.c
-> > @@ -1080,8 +1080,8 @@ void qtest_bufwrite(QTestState *s, uint64_t add=
-r, const void *data, size_t size)
-> >       bdata =3D g_base64_encode(data, size);
-> >       qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx ", addr, size);
-> > -    socket_send(s->fd, bdata, strlen(bdata));
-> > -    socket_send(s->fd, "\n", 1);
-> > +    s->ops.send(s, bdata);
-> > +    s->ops.send(s, "\n");
->=20
-> Ah, is this the send_line() from patch #5?
->=20
-> Now it makes sense to move the send("\n") there and call it send_line().
->=20
-> Moving the send(\n) we get this in patch #5:
->=20
->  static void qtest_client_socket_send_line(QTestState *s,
->                                            const char *bufline)
->  {
->      socket_send(s->fd, bufline, strlen(bufline));
->      socket_send(s->fd, "\n", 1);
->  }
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc5MTAwODYxLTczNjkyLTEt
+Z2l0LXNlbmQtZW1haWwtaW1hbW1lZG9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBm
+YWlsZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRo
+ZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERv
+Y2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNl
+bnRvczcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBT
+SE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1Qg
+ICAgaW90ZXN0LXFjb3cyOiAyMTcKc29ja2V0X2FjY2VwdCBmYWlsZWQ6IFJlc291cmNlIHRlbXBv
+cmFyaWx5IHVuYXZhaWxhYmxlCioqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVz
+dC9saWJxdGVzdC5jOjI3MjpxdGVzdF9pbml0X3dpdGhvdXRfcW1wX2hhbmRzaGFrZTogYXNzZXJ0
+aW9uIGZhaWxlZDogKHMtPmZkID49IDAgJiYgcy0+cW1wX2ZkID49IDApCi90bXAvcWVtdS10ZXN0
+L3NyYy90ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjE0MDoga2lsbF9xZW11KCkgdHJpZWQgdG8gdGVy
+bWluYXRlIFFFTVUgcHJvY2VzcyBidXQgZW5jb3VudGVyZWQgZXhpdCBzdGF0dXMgMSAoZXhwZWN0
+ZWQgMCkKRVJST1IgLSBCYWlsIG91dCEgRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0
+ZXN0L2xpYnF0ZXN0LmM6MjcyOnF0ZXN0X2luaXRfd2l0aG91dF9xbXBfaGFuZHNoYWtlOiBhc3Nl
+cnRpb24gZmFpbGVkOiAocy0+ZmQgPj0gMCAmJiBzLT5xbXBfZmQgPj0gMCkKbWFrZTogKioqIFtj
+aGVjay1xdGVzdC14ODZfNjRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNo
+ZWQgam9icy4uLi4KICBURVNUICAgIGNoZWNrLXF0ZXN0LWFhcmNoNjQ6IHRlc3RzL3F0ZXN0L3Rl
+c3QtaG1wCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDIyMAotLS0KICAgIHJhaXNlIENhbGxlZFBy
+b2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBD
+b21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5x
+ZW11Lmluc3RhbmNlLnV1aWQ9NzU1ZmNiZmQxNzFmNDBiMWIxNmQ2YWFjMzRlN2MwOWInLCAnLXUn
+LCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScs
+ICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
+JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEn
+LCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hl
+dzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcWQ1d3RhdG0vc3JjL2RvY2tlci1zcmMuMjAyMC0w
+MS0xNS0xNS41MC4xNC4yODY1MjovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3Jywg
+Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
+dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
+NzU1ZmNiZmQxNzFmNDBiMWIxNmQ2YWFjMzRlN2MwOWIKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
+XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtcWQ1d3RhdG0vc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0Bj
+ZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDExbTAuMjE5cwp1c2VyICAgIDBtOC4yNjdzCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTc5MTAw
+ODYxLTczNjkyLTEtZ2l0LXNlbmQtZW1haWwtaW1hbW1lZG9AcmVkaGF0LmNvbS90ZXN0aW5nLmRv
+Y2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Would this also involve changing all of the
-qtest_{clock_step,in,out,read,write...} functions to remove the '\n'
-from the calls to qtest_sendf? Not that it matters much, but it also
-seems to double the number of syscalls needed to send each qtest
-command.
-
-> >       qtest_rsp(s, 0);
-> >       g_free(bdata);
-> >   }
-> > diff --git a/tests/libqtest.h b/tests/libqtest.h
-> > index c9e21e05b3..0e9b8908ef 100644
-> > --- a/tests/libqtest.h
-> > +++ b/tests/libqtest.h
-> > @@ -729,4 +729,7 @@ bool qtest_probe_child(QTestState *s);
-> >    */
-> >   void qtest_set_expected_status(QTestState *s, int status);
-> > +QTestState *qtest_inproc_init(bool log, const char* arch,
-> > +                    void (*send)(void*, const char*));
-> > +void qtest_client_inproc_recv(void *opaque, const char *str);
-> >   #endif
-> >=20
->=20
 
