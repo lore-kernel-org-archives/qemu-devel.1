@@ -2,115 +2,101 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AA9C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 10:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5828EC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 10:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A8F42467A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 10:15:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A8F42467A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 2033424671
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 10:55:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gNV09hjY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2033424671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irfi6-0008A8-Aj
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 05:15:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59236)
+	id 1irgKB-00048k-8U
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 05:54:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irfhO-0007gj-JG
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 05:14:55 -0500
+ (envelope-from <mst@redhat.com>) id 1irgJK-0002vi-Vw
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 05:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irfhN-0007kb-Fk
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 05:14:54 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:41767)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irfhN-0007jC-6r
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 05:14:53 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MREqy-1j3iP32odg-00N9TW; Wed, 15 Jan 2020 11:14:37 +0100
-Subject: Re: [PATCH 0/3] linux-user: Implement x86_64 vsyscalls
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200114210921.11216-1-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <7f8c782f-6ee2-bc7c-db94-4b0784ed58eb@vivier.eu>
-Date: Wed, 15 Jan 2020 11:14:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <mst@redhat.com>) id 1irgJH-0008FK-Tc
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 05:54:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56402
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1irgJH-0008Ef-P2
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 05:54:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579085643;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NksUM4hspacjK/4iMmj7Sa/7sbBwnQesBUxmJw1Bnh4=;
+ b=gNV09hjYk9DVGZk0OZjowSid3lfbh/XlhXo7av55LCyLhEWbHF4whVLZ8UI/KB2tYmRF96
+ IRMJdrLYOxcPoKQGx6gJQ+Z2QciEMEZE0RuMuntINgUttHFeXGGyHUu0JnX/osutSgjYvv
+ +TtotmMg1O+iPuxugcBFqxFH0HqIyfM=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-4VWE11h6N3qakQeVtcp-hQ-1; Wed, 15 Jan 2020 05:54:01 -0500
+Received: by mail-qt1-f200.google.com with SMTP id m15so10965530qtc.18
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 02:54:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=BPyZXE8Eq7PsP1cXF8jGmH30gmdfC6rjgvJvdpXsPrw=;
+ b=oUypF1AFilmguPMDQRngCz0Fm75YcMav/S/Aw+q7RjkMSnksmxEmK91e0x7OL6BUO6
+ lRVHJczqkCXMsrddxcKe1AMRK2yFvDIJtxOmNa5tNWm4NBU6PFBmxaasr8hE6zMGNViu
+ df/6UVPZLjF88itzddFuhVRDVLo9XFhoqa7+/HdkjGy5LIVXtYy6UtONBaTgmmjpo60w
+ yq9YzkQNdRU7a77bLz0eXUhaQ5a5fgUPsVI1F8PTRPSBQC+99ZdcSqUnCoaXPphtE7lx
+ X513rkT3tADJMIxLqPqgQk7x1koLyKMSO/y4cxCq4/shq/8WU2VLOoqDmSnQVQtej8oW
+ apuw==
+X-Gm-Message-State: APjAAAWgID41RAjDxaER4cYl343k8nQD6b7+nKeQ9u6yCk8LjPdwQGPn
+ daLCuKDWkQo5ddGPWL7whr/cKqudK9gPdKcmp5u/mKt/krZdFqBq9EPBPB7GmPG52Ujvp1M2GEL
+ iXW8kZJ4Plt4fRoo=
+X-Received: by 2002:ac8:5513:: with SMTP id j19mr2881927qtq.143.1579085640814; 
+ Wed, 15 Jan 2020 02:54:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzPmU5b15KbMcxFOfRIvzZGBLu2KsSEtmip71B7sLoj4tGFchd+hEv0r+C10P/m6k5F4PYN9A==
+X-Received: by 2002:ac8:5513:: with SMTP id j19mr2881913qtq.143.1579085640579; 
+ Wed, 15 Jan 2020 02:54:00 -0800 (PST)
+Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
+ by smtp.gmail.com with ESMTPSA id u5sm8249255qkj.127.2020.01.15.02.53.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Jan 2020 02:53:59 -0800 (PST)
+Date: Wed, 15 Jan 2020 05:53:54 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Guoheyi <guoheyi@huawei.com>
+Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified
+ by _HID
+Message-ID: <20200115043355-mutt-send-email-mst@kernel.org>
+References: <20191219064759.35053-1-guoheyi@huawei.com>
+ <20191219064759.35053-3-guoheyi@huawei.com>
+ <20200105072504-mutt-send-email-mst@kernel.org>
+ <CAFEAcA-sduqVO3rrG2V1VsysE2chgd0SnSySvEXFfue-aZN8dg@mail.gmail.com>
+ <bbf347fe-c4a4-c5bb-19c2-3a18571b658f@huawei.com>
+ <20200115011412-mutt-send-email-mst@kernel.org>
+ <7732900c-5490-6483-ca10-71c565e81945@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200114210921.11216-1-richard.henderson@linaro.org>
+In-Reply-To: <7732900c-5490-6483-ca10-71c565e81945@huawei.com>
+X-MC-Unique: 4VWE11h6N3qakQeVtcp-hQ-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:3Ht1J5rxPmQt27JTSexsMAZXmAyGYzookMDNBiOzi9+qUeHuSvj
- Q6PIkU/T6ejy2AnUoMP1I7J5JZgpZ8HBUNxT2lQ4SHs2CzppJzLkPznIeQu8UtOYVHRHkgx
- uOprrnb3qNsZmWc/U47ZA+dGKxWk4BWI5QMJ/UiWGW+I9Xp9ZOH1G3lVpLhFnRtbr29JdxS
- l1+1pS3Aw88XwqA3mGM5g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:YyefoOZyIOI=:eAxW+7nC5ToeKW8VR8RtCB
- 5NFA9Ll8gYaoMGdYJTHV95A1Wiv/S6fLbqjJInh0TtUhLR2qeQGNH/UohUHshzD4e05X04UQc
- RxvUIs+m1GZU44SIxO13WYjbyx2ZllfuWPvo+CJUICOZ7HNjklDicEsjtDyUbt3KeU1TT9Qdo
- vFWVAXUQiWOeIqk8H5WwrjUxpRC2HnFEY6dIOphZFrELVArc8DA4/DzPloElGrOLWaUucR7kj
- 4enJUurOokPVCoGVRzlu1CKvq/vBI8ZGLCO/yKdnhdCy/SYTTd38RhtCh97ks4Zrl4PwKmUIH
- nN86nIiZUAlCsaXycT6Vw+LD8TOwUIQj7UShBrgVaik+CIa42WeY7jNSvYPLO9ARA3KMa5DVi
- f1AzePQjH1tb8Kd7TvV8dOn4CQ7i3tn15Qll7bm7MxRS2jOE+fdfK75TEoxD4IhXkeAn73rVr
- /oZe7V7XQJP/Tt7hWbaF6qyAId2hftUZkev2/m5o/YCj9U1UJR4m4HAxJGOjKjsc4jtZmdhrE
- cO2I7K/gEHzNEL3YUAlwfi9p3T1SRBUsNste3ZUY8m6+UKJq7BVTDXSYFoQKS5miQlkC57Ebi
- t/PxnMpu0SKl+Clv7Mv62yn/9nTMA6PYKCn3jD/J2x9PxXyNtg1jfw2PQ3kgcb54wzRfI1RBD
- +ib4hRcoWAMwQ5ETht1MO6R4wjI7uW8Hfriqx28QtX8wTM9tJ8WEBZ+a4PoarT4GSWVidqMEO
- 4dlqu/yb/BrKosFHJK/GyO+fQjbNJyuevcOs6xPH/r9lXhZskXGxgMRdd3ztPLWUQA1bfi651
- 8be445Ul7OKAiyMVURLG4rHI6rqDZQbmieWORWGgCdOsgzcty+uZvztp7XeLl5uAkfl4d9Pgd
- 5gy0tUe1osJqfH8+OAJA==
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.135
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,66 +108,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, riku.voipio@iki.fi, peter.maydell@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ wanghaibin.wang@huawei.com, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 14/01/2020 à 22:09, Richard Henderson a écrit :
-> The x86_64 abi has a legacy vsyscall page.  The kernel folk
-> have been trying to deprecate this since at least v3.1, but
-> 
-> (1) We don't implement the vdso that replaces vsyscalls,
-> (2) As of v5.5, the vsyscall page is still enabled by default.
-> 
-> This lack is affecting Peter's linux-user testing.
-> 
-> The dependency is not obvious because Peter is running the tests
-> on x86_64, so the host is providing a vsyscall page to qemu.
-> 
-> Because of how user-only memory operations are handled, with no
-> validation of guest vs host pages, so long as qemu chooses to
-> run with guest_base == 0, the guest may Just So Happen to read
-> the host's vsyscall page.
-> 
-> Complicating this, new OS releases may use a kernel configured
-> with CONFIG_LEGACY_VSYSCALL_XONLY=y, which means the the vsyscall
-> page cannot be read, only executed.  Which means that the guest
-> then cannot read the host vsyscall page during translation and
-> will SIGSEGV.
-> 
-> Exactly which of these many variables is affecting Peter's testing
-> with Ubuntu 18.04 of my TCG merge, I'm not exactly sure.  I suspect
-> that it is the change to drop the textseg_addr adjustment to user-only
-> static binaries.  IIRC bionic does not support -static-pie, which is
-> the preferred replacement.  This could mean that the host and guest
-> binaries overlap, which leads to guest_base != 0.
-> 
-> I vaguely remember someone (Paolo?) implementing something like
-> this many years ago, but clearly it never got merged.
-> 
-> In any case, this emulation has been missing for too long.
-> 
-> 
-> r~
-> 
-> 
-> Richard Henderson (3):
->   target/i386: Renumber EXCP_SYSCALL
->   linux-user/i386: Split out gen_signal
->   linux-user/i386: Emulate x86_64 vsyscalls
-> 
->  target/i386/cpu.h          |   6 +-
->  linux-user/i386/cpu_loop.c | 197 ++++++++++++++++++++++++++-----------
->  target/i386/translate.c    |  16 ++-
->  3 files changed, 155 insertions(+), 64 deletions(-)
-> 
+On Wed, Jan 15, 2020 at 05:25:50PM +0800, Guoheyi wrote:
+>=20
+> =E5=9C=A8 2020/1/15 14:30, Michael S. Tsirkin =E5=86=99=E9=81=93:
+> > Problem is IASL disassembler still doesn't work on all hosts
+> > we want to support. And its output isn't really stable enough
+> > to act as a golden master.
+> >=20
+> > Until we have a better tool, I propose the contributor just follows all
+> > steps 1-6.  The reason they have been listed as maintainer action items
+> > is really just so that multiple patches affecting same ACPI table
+> > can be applied, with maintainer resolving conflicts himself.
+> > But this job can be pushed to contributors if as in the case of ARM
+> > maintainer isn't really interested in reading ACPI code anyway.
+> >=20
+> > So I propose the following patch - comments?
+> >=20
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >=20
+> >=20
+> > diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-t=
+est.c
+> > index f1ac2d7e96..3a6a3e7257 100644
+> > --- a/tests/qtest/bios-tables-test.c
+> > +++ b/tests/qtest/bios-tables-test.c
+> > @@ -16,7 +16,10 @@
+> >    * 1. add empty files for new tables, if any, under tests/data/acpi
+> >    * 2. list any changed files in tests/bios-tables-test-allowed-diff.h
+> >    * 3. commit the above *before* making changes that affect the tables
+> > - * Maintainer:
+> > + *
+> > + * Contributor or ACPI Maintainer (steps 4-7 need to be redone to reso=
+lve conflicts
+> > + * in binary commit created in step 6):
+> > + *
+> >    * After 1-3 above tests will pass but ignore differences with the ex=
+pected files.
+> >    * You will also notice that tests/bios-tables-test-allowed-diff.h li=
+sts
+> >    * a bunch of files. This is your hint that you need to do the below:
+> > @@ -28,13 +31,17 @@
+> >    * output. If not - disassemble them yourself in any way you like.
+> >    * Look at the differences - make sure they make sense and match what=
+ the
+> >    * changes you are merging are supposed to do.
+> > + * Save the changes, preferably in form of ASL diff for the the commit=
+ log in
+> NIT: 2 "the" before commit log
+> > + * step 6.
+> >    *
+> >    * 5. From build directory, run:
+> >    *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
+> > - * 6. Now commit any changes.
+> > - * 7. Before doing a pull request, make sure tests/bios-tables-test-al=
+lowed-diff.h
+> > - *    is empty - this will ensure following changes to ACPI tables wil=
+l
+> > - *    be noticed.
+> > + * 6. Now commit any changes to the expected binary, include diff from=
+ step 4
+> > + *    in commit log.
+> > + * 7. Before sending patches to the list (Contributor)
+> > + *    or before doing a pull request (Maintainer), make sure
+> > + *    tests/bios-tables-test-allowed-diff.h is empty - this will ensur=
+e
+> > + *    following changes to ACPI tables will be noticed.
+> >    */
+>=20
+> For contributors doing the full work, does that mean the patchset sent to
+> the list contains the following parts?
+>=20
+> 1. patch 1: list changed files in tests/bios-tables-test-allowed-diff.h.
+>=20
+> 2. patches 2-n: real changes, may contain multiple patches.
+>=20
+> 3. patch n+1: update golden master binaries and empty
+> tests/bios-tables-test-allowed-diff.h
+>=20
+> Thanks,
+>=20
+> Heyi
 
-Thank you Richard.
+Yes.
 
-I'll take this series through the linux-user branch except if you prefer
-to do the pull request yourself via another branch (x86 tcg?).
+> >   #include "qemu/osdep.h"
+> >=20
+> >=20
+> > .
 
-Thanks,
-Laurent
 
