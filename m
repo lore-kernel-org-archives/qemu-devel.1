@@ -2,75 +2,75 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF065C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F47BC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C06E2187F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:57:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FC132187F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:58:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HOmcBgFu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C06E2187F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YdHftGJ5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FC132187F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56203 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irl2m-0000dT-TG
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:57:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49770)
+	id 1irl3Z-0001Uu-Pg
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:58:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49600)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkKx-0000o9-O5
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:07 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkKn-0000Qx-Lg
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkKv-0000PS-Pv
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:03 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51749
+ (envelope-from <imammedo@redhat.com>) id 1irkKk-0000Iv-Nu
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:53 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38792
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkKv-0000Ng-Ik
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:01 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkKk-0000Ii-KR
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101121;
+ s=mimecast20190719; t=1579101110;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2SYNha3X1HhMzztypPP7ZFvfrMyQgCZMN+0y5jbOdVU=;
- b=HOmcBgFuH54zJ+9ay2+quxsRpJlWEkB3yKDFQjk6c7Rw1RimkAU7gSyg0K6vMNtM3WZRk8
- 2nbmG/RYSVI7g1HqtPHg0sDR9o9/3+61Mn00qJ2BRc9hnZaBWsJuajepnJlIMKYgSHLZW1
- LxKElmssHhPhH61kDr36JB+i8CNZxYQ=
+ bh=UDdK4xL2H3P09ZIjZb6btMySQYNE2B4/e8N5Hq259EE=;
+ b=YdHftGJ5WTI6Uyb2j0EHlBqdhTHOTl6lq//GX6yMWhRxcBnmpok7Up0fDGwxsxHZfG8apY
+ UZoM0AsC/6owwyaSYqQjZwGta2Aq/E+orScRqWEsJBij0wNL48E8bk1CCyg4xncZs3yikD
+ qAwNLC4dXu5/xBbeVNqwuHvtcyzk7U4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-gZgL6WPnOWKH43eLdsTxpA-1; Wed, 15 Jan 2020 10:11:57 -0500
-X-MC-Unique: gZgL6WPnOWKH43eLdsTxpA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-345-SVlDFV_bNeWnTh4l-4obOA-1; Wed, 15 Jan 2020 10:11:46 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70597109E3FA;
- Wed, 15 Jan 2020 15:11:54 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E56CB5D9C9;
- Wed, 15 Jan 2020 15:11:50 +0000 (UTC)
-Date: Wed, 15 Jan 2020 16:11:49 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A03918B8B2D;
+ Wed, 15 Jan 2020 15:11:45 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B496196AE;
+ Wed, 15 Jan 2020 15:11:42 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v22 2/9] docs: APEI GHES generation and CPER record
- description
-Message-ID: <20200115161149.19481a4a@redhat.com>
-In-Reply-To: <1578483143-14905-3-git-send-email-gengdongjiu@huawei.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-3-git-send-email-gengdongjiu@huawei.com>
-MIME-Version: 1.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 54/86] mips:mips_fulong2e: use memdev for RAM
+Date: Wed, 15 Jan 2020 16:07:09 +0100
+Message-Id: <1579100861-73692-55-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: SVlDFV_bNeWnTh4l-4obOA-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -85,157 +85,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com,
- kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
- qemu-devel@nongnu.org, linuxarm@huawei.com, shannon.zhaosl@gmail.com,
- zhengxiang9@huawei.com, qemu-arm@nongnu.org, james.morse@arm.com,
- xuwei5@huawei.com, jonathan.cameron@huawei.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: aleksandar.rikalo@rt-rk.com, philmd@redhat.com, aurelien@aurel32.net,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 19:32:16 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-> Add APEI/GHES detailed design document
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+CC: philmd@redhat.com
+CC: amarkovic@wavecomp.com
+CC: aurelien@aurel32.net
+CC: aleksandar.rikalo@rt-rk.com
+---
+ hw/mips/mips_fulong2e.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  docs/specs/acpi_hest_ghes.rst | 110 ++++++++++++++++++++++++++++++++++++++++++
->  docs/specs/index.rst          |   1 +
->  2 files changed, 111 insertions(+)
->  create mode 100644 docs/specs/acpi_hest_ghes.rst
-> 
-> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
-> new file mode 100644
-> index 0000000..7a1aa90
-> --- /dev/null
-> +++ b/docs/specs/acpi_hest_ghes.rst
-> @@ -0,0 +1,110 @@
-> +APEI tables generating and CPER record
-> +======================================
-> +
-> +..
-> +   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
-> +
-> +   This work is licensed under the terms of the GNU GPL, version 2 or later.
-> +   See the COPYING file in the top-level directory.
-> +
-> +Design Details
-> +--------------
-> +
-> +::
-> +
-> +         etc/acpi/tables                           etc/hardware_errors
-> +      ====================                   ===============================
-> +  + +--------------------------+            +----------------------------+
-> +  | | HEST                     | +--------->|    error_block_address1    |------+
-> +  | +--------------------------+ |          +----------------------------+      |
-> +  | | GHES1                    | | +------->|    error_block_address2    |------+-+
-> +  | +--------------------------+ | |        +----------------------------+      | |
-> +  | | .................        | | |        |      ..............        |      | |
-> +  | | error_status_address-----+-+ |        -----------------------------+      | |
-> +  | | .................        |   |   +--->|    error_block_addressN    |------+-+---+
-> +  | | read_ack_register--------+-+ |   |    +----------------------------+      | |   |
-> +  | | read_ack_preserve        | +-+---+--->|     read_ack_register1     |      | |   |
-> +  | | read_ack_write           |   |   |    +----------------------------+      | |   |
-> +  + +--------------------------+   | +-+--->|     read_ack_register2     |      | |   |
-> +  | | GHES2                    |   | | |    +----------------------------+      | |   |
-> +  + +--------------------------+   | | |    |       .............        |      | |   |
-> +  | | .................        |   | | |    +----------------------------+      | |   |
-> +  | | error_status_address-----+---+ | | +->|     read_ack_registerN     |      | |   |
-> +  | | .................        |     | | |  +----------------------------+      | |   |
-> +  | | read_ack_register--------+-----+ | |  |Generic Error Status Block 1|<-----+ |   |
-> +  | | read_ack_preserve        |       | |  |-+------------------------+-+        |   |
-> +  | | read_ack_write           |       | |  | |          CPER          | |        |   |
-> +  + +--------------------------|       | |  | |          CPER          | |        |   |
-> +  | | ...............          |       | |  | |          ....          | |        |   |
-> +  + +--------------------------+       | |  | |          CPER          | |        |   |
-> +  | | GHESN                    |       | |  |-+------------------------+-|        |   |
-> +  + +--------------------------+       | |  |Generic Error Status Block 2|<-------+   |
-> +  | | .................        |       | |  |-+------------------------+-+            |
-> +  | | error_status_address-----+-------+ |  | |           CPER         | |            |
-> +  | | .................        |         |  | |           CPER         | |            |
-> +  | | read_ack_register--------+---------+  | |           ....         | |            |
-> +  | | read_ack_preserve        |            | |           CPER         | |            |
-> +  | | read_ack_write           |            +-+------------------------+-+            |
-> +  + +--------------------------+            |         ..........         |            |
-> +                                            |----------------------------+            |
-> +                                            |Generic Error Status Block N |<----------+
-> +                                            |-+-------------------------+-+
-> +                                            | |          CPER           | |
-> +                                            | |          CPER           | |
-> +                                            | |          ....           | |
-> +                                            | |          CPER           | |
-> +                                            +-+-------------------------+-+
-> +
-> +
-> +(1) QEMU generates the ACPI HEST table. This table goes in the current
-> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
-> +    notification types.
-> +
-> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
-> +    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
-> +    contains an address registers table and an Error Status Data Block table.
-> +
-> +(3) The address registers table contains N Error Block Address entries
-> +    and N Read Ack Register entries. The size for each entry is 8-byte.
-> +    The Error Status Data Block table contains N Error Status Data Block
-> +    entries. The size for each entry is 4096(0x1000) bytes. The total size
-> +    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
-> +    N is the number of the kinds of hardware error sources.
-> +
-> +(4) QEMU generates the ACPI linker/loader script for the firmware. The
-> +    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
-> +    and copies blob contents there.
-> +
-> +(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
-> +    "error_status_address" fields of the HEST table with a pointer to the
-> +    corresponding "address registers" in the "etc/hardware_errors" blob.
-> +
-> +(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
-> +    "read_ack_register" fields of the HEST table with a pointer to the
-> +    corresponding "read_ack_register" within the "etc/hardware_errors" blob.
-> +
-> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
-> +    addresses in the "error_block_address" fields with a pointer to the
-> +    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
-> +
-> +(8) QEMU defines a third and write-only fw_cfg blob which is called
-> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
-> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
-> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
-> +    for the firmware. The firmware will write back the start address of
-> +    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
-> +
-> +(9) When QEMU gets a SIGBUS from the kernel, QEMU writes CPER into corresponding
-> +    "Error Status Data Block", guest memory, and then injects platform specific
-> +    interrupt (in case of arm/virt machine it's Synchronous External Abort) as a
-> +    notification which is necessary for notifying the guest.
-> +
-> +(10) This notification (in virtual hardware) will be handled by the guest
-> +     kernel, on receiving notification, guest APEI driver could read the CPER error
-> +     and take appropriate action.
-> +
-> +(11) kvm_arch_on_sigbus_vcpu() uses source_id as index in "etc/hardware_errors" to
-> +     find out "Error Status Data Block" entry corresponding to error source. So supported
-> +     source_id values should be assigned here and not be changed afterwards to make sure
-> +     that guest will write error into expected "Error Status Data Block" even if guest was
-> +     migrated to a newer QEMU.
-> diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-> index 984ba44..3019b9c 100644
-> --- a/docs/specs/index.rst
-> +++ b/docs/specs/index.rst
-> @@ -13,3 +13,4 @@ Contents:
->     ppc-xive
->     ppc-spapr-xive
->     acpi_hw_reduced_hotplug
-> +   acpi_hest_ghes
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 7e7dcd6..5dc1166 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -294,7 +294,6 @@ static void mips_fulong2e_init(MachineState *machine)
+     const char *initrd_filename =3D machine->initrd_filename;
+     char *filename;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *bios =3D g_new(MemoryRegion, 1);
+     long bios_size;
+     uint8_t *spd_data;
+@@ -320,13 +319,11 @@ static void mips_fulong2e_init(MachineState *machine)
+     }
+=20
+     /* allocate RAM */
+-    memory_region_allocate_system_memory(ram, NULL, "fulong2e.ram",
+-                                         machine->ram_size);
+     memory_region_init_ram(bios, NULL, "fulong2e.bios", BIOS_SIZE,
+                            &error_fatal);
+     memory_region_set_readonly(bios, true);
+=20
+-    memory_region_add_subregion(address_space_mem, 0, ram);
++    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
+=20
+     /*
+@@ -402,6 +399,7 @@ static void mips_fulong2e_machine_init(MachineClass *mc=
+)
+     mc->block_default_type =3D IF_IDE;
+     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-2E");
+     mc->default_ram_size =3D 256 * MiB;
++    mc->default_ram_id =3D "fulong2e.ram";
+ }
+=20
+ DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
+--=20
+2.7.4
 
 
