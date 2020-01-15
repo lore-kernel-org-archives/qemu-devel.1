@@ -2,78 +2,82 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DC0C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 263BBC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:30:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47C84206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:29:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E30C7206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:30:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RWjIBUg8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C84206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+IZ15XU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E30C7206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irlXd-0000CQ-GL
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:29:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50198)
+	id 1irlYm-00025z-Lz
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:30:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkLV-0001wA-NE
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:39 -0500
+ (envelope-from <kwolf@redhat.com>) id 1irkUs-0007Ie-3g
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:22:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkLT-0000k4-DF
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55131
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1irkUq-0007a8-Eo
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:22:17 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26187
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkLT-0000jt-8I
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:35 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1irkUq-0007ZY-Ar
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:22:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101154;
+ s=mimecast20190719; t=1579101735;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AKnjtOY8DUXUVwClu7/uWC5tmfKokrbQR3L8oGOQb20=;
- b=RWjIBUg8RVVTVzhFWCpO1zQsYGaRndXAFn3UWfhiue8ARncyRQzND3mUakhUbnILWt1yJI
- dp44jFalMLbXJOSHa9oXLX4TgI3kGk9vcYxWcvAuS7zjeMbxf3+szTicVCDppQhkIKinpz
- Uk9avITGGc6S7Keap5mEhv3iHbFemaQ=
+ bh=XH6obng3uc1IHe/96IK+6tLvgyF32ZWcPTGsF1JiHrM=;
+ b=e+IZ15XUN918JC7ILGJ9QLOtUdI7AQ81/UTsej2pWsFAdE7m2axnAf4XgWBufsS2zZIyUm
+ BqX3FoghygKD/CmC6mIdtGli4Nnf6qVlJcoOhXIGBTZS4+L9WbXsub5MY4p9QqlZ6U2Ov4
+ fz7ev0Iqh90O2bLLlMuHsT6iCHCTST8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-l4Zhg2g6N22otx7sOFzx9A-1; Wed, 15 Jan 2020 10:12:30 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-172-KsLbGVYiPQS4BCppJZuIvw-1; Wed, 15 Jan 2020 10:22:12 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BB9C1005527;
- Wed, 15 Jan 2020 15:12:29 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A4C719757;
- Wed, 15 Jan 2020 15:12:27 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 86/86] numa: remove deprecated implicit RAM distribution
- between nodes
-Date: Wed, 15 Jan 2020 16:07:41 +0100
-Message-Id: <1579100861-73692-87-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: l4Zhg2g6N22otx7sOFzx9A-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FC7B8D80CE;
+ Wed, 15 Jan 2020 15:22:11 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-87.ams2.redhat.com [10.36.117.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C73265D9C9;
+ Wed, 15 Jan 2020 15:22:05 +0000 (UTC)
+Date: Wed, 15 Jan 2020 16:22:03 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v6 7/8] blockdev: Return bs to the proper context on
+ snapshot abort
+Message-ID: <20200115152203.GE5505@linux.fritz.box>
+References: <20200108143138.129909-1-slp@redhat.com>
+ <20200108143138.129909-8-slp@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20200108143138.129909-8-slp@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: KsLbGVYiPQS4BCppJZuIvw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,346 +89,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, libvir-list@redhat.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, rth@twiddle.net,
- david@gibson.dropbear.id.au
+Cc: Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Feature has been deprecated since 4.1 (4bb4a273),
-remove it.
+Am 08.01.2020 um 15:31 hat Sergio Lopez geschrieben:
+> external_snapshot_abort() calls to bdrv_set_backing_hd(), which
+> returns state->old_bs to the main AioContext, as it's intended to be
+> used then the BDS is going to be released. As that's not the case when
+> aborting an external snapshot, return it to the AioContext it was
+> before the call.
+>=20
+> This issue can be triggered by issuing a transaction with two actions,
+> a proper blockdev-snapshot-sync and a bogus one, so the second will
+> trigger a transaction abort. This results in a crash with an stack
+> trace like this one:
+>=20
+>  #0  0x00007fa1048b28df in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps=
+/unix/sysv/linux/raise.c:50
+>  #1  0x00007fa10489ccf5 in __GI_abort () at abort.c:79
+>  #2  0x00007fa10489cbc9 in __assert_fail_base
+>      (fmt=3D0x7fa104a03300 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", a=
+ssertion=3D0x5572240b44d8 "bdrv_get_aio_context(old_bs) =3D=3D bdrv_get_aio=
+_context(new_bs)", file=3D0x557224014d30 "block.c", line=3D2240, function=
+=3D<optimized out>) at assert.c:92
+>  #3  0x00007fa1048aae96 in __GI___assert_fail
+>      (assertion=3Dassertion@entry=3D0x5572240b44d8 "bdrv_get_aio_context(=
+old_bs) =3D=3D bdrv_get_aio_context(new_bs)", file=3Dfile@entry=3D0x5572240=
+14d30 "block.c", line=3Dline@entry=3D2240, function=3Dfunction@entry=3D0x55=
+72240b5d60 <__PRETTY_FUNCTION__.31620> "bdrv_replace_child_noperm") at asse=
+rt.c:101
+>  #4  0x0000557223e631f8 in bdrv_replace_child_noperm (child=3D0x557225b9c=
+980, new_bs=3Dnew_bs@entry=3D0x557225c42e40) at block.c:2240
+>  #5  0x0000557223e68be7 in bdrv_replace_node (from=3D0x557226951a60, to=
+=3D0x557225c42e40, errp=3D0x5572247d6138 <error_abort>) at block.c:4196
+>  #6  0x0000557223d069c4 in external_snapshot_abort (common=3D0x557225d7e1=
+70) at blockdev.c:1731
+>  #7  0x0000557223d069c4 in external_snapshot_abort (common=3D0x557225d7e1=
+70) at blockdev.c:1717
+>  #8  0x0000557223d09013 in qmp_transaction (dev_list=3D<optimized out>, h=
+as_props=3D<optimized out>, props=3D0x557225cc7d70, errp=3Derrp@entry=3D0x7=
+ffe704c0c98) at blockdev.c:2360
+>  #9  0x0000557223e32085 in qmp_marshal_transaction (args=3D<optimized out=
+>, ret=3D<optimized out>, errp=3D0x7ffe704c0d08) at qapi/qapi-commands-tran=
+saction.c:44
+>  #10 0x0000557223ee798c in do_qmp_dispatch (errp=3D0x7ffe704c0d00, allow_=
+oob=3D<optimized out>, request=3D<optimized out>, cmds=3D0x5572247d3cc0 <qm=
+p_commands>) at qapi/qmp-dispatch.c:132
+>  #11 0x0000557223ee798c in qmp_dispatch (cmds=3D0x5572247d3cc0 <qmp_comma=
+nds>, request=3D<optimized out>, allow_oob=3D<optimized out>) at qapi/qmp-d=
+ispatch.c:175
+>  #12 0x0000557223e06141 in monitor_qmp_dispatch (mon=3D0x557225c69ff0, re=
+q=3D<optimized out>) at monitor/qmp.c:120
+>  #13 0x0000557223e0678a in monitor_qmp_bh_dispatcher (data=3D<optimized o=
+ut>) at monitor/qmp.c:209
+>  #14 0x0000557223f2f366 in aio_bh_call (bh=3D0x557225b9dc60) at util/asyn=
+c.c:117
+>  #15 0x0000557223f2f366 in aio_bh_poll (ctx=3Dctx@entry=3D0x557225b9c840)=
+ at util/async.c:117
+>  #16 0x0000557223f32754 in aio_dispatch (ctx=3D0x557225b9c840) at util/ai=
+o-posix.c:459
+>  #17 0x0000557223f2f242 in aio_ctx_dispatch (source=3D<optimized out>, ca=
+llback=3D<optimized out>, user_data=3D<optimized out>) at util/async.c:260
+>  #18 0x00007fa10913467d in g_main_dispatch (context=3D0x557225c28e80) at =
+gmain.c:3176
+>  #19 0x00007fa10913467d in g_main_context_dispatch (context=3Dcontext@ent=
+ry=3D0x557225c28e80) at gmain.c:3829
+>  #20 0x0000557223f31808 in glib_pollfds_poll () at util/main-loop.c:219
+>  #21 0x0000557223f31808 in os_host_main_loop_wait (timeout=3D<optimized o=
+ut>) at util/main-loop.c:242
+>  #22 0x0000557223f31808 in main_loop_wait (nonblocking=3D<optimized out>)=
+ at util/main-loop.c:518
+>  #23 0x0000557223d13201 in main_loop () at vl.c:1828
+>  #24 0x0000557223bbfb82 in main (argc=3D<optimized out>, argv=3D<optimize=
+d out>, envp=3D<optimized out>) at vl.c:4504
+>=20
+> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1779036
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  blockdev.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>=20
+> diff --git a/blockdev.c b/blockdev.c
+> index 292961a88d..cfed87f434 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -1731,6 +1731,8 @@ static void external_snapshot_abort(BlkActionState =
+*common)
+>      if (state->new_bs) {
+>          if (state->overlay_appended) {
+>              AioContext *aio_context;
+> +            AioContext *tmp_context;
+> +            int ret;
+> =20
+>              aio_context =3D bdrv_get_aio_context(state->old_bs);
+>              aio_context_acquire(aio_context);
+> @@ -1738,6 +1740,25 @@ static void external_snapshot_abort(BlkActionState=
+ *common)
+>              bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backind_=
+hd()
+>                                            close state->old_bs; we need i=
+t */
+>              bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
+> +
+> +            /*
+> +             * The call to bdrv_set_backing_hd() above returns state->ol=
+d_bs to
+> +             * the main AioContext. As we're still going to be using it,=
+ return
+> +             * it to the AioContext it was before.
+> +             */
+> +            tmp_context =3D bdrv_get_aio_context(state->old_bs);
+> +            if (aio_context !=3D tmp_context) {
+> +                aio_context_release(aio_context);
+> +                aio_context_acquire(tmp_context);
+> +
+> +                ret =3D bdrv_try_set_aio_context(state->old_bs,
+> +                                               aio_context, NULL);
+> +                assert(ret =3D=3D 0);
+> +
+> +                aio_context_release(tmp_context);
+> +                aio_context_acquire(aio_context);
+> +            }
+> +
+>              bdrv_replace_node(state->new_bs, state->old_bs, &error_abort=
+);
+>              bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed old=
+_bs */
 
-As result if RAM distribution wasn't specified explicitly,
-the machine won't start and CLI should be changed to explicitly
-assign RAM to nodes using options:
-  -node node,memdev  (5.0 and newer machine types)
-  -node node,mem     (4.2 and older machine types)
-It's recommended to use "memdev" variant for new virtual machines
-and use "mem" only when it's necessary to migrate already existing
-virtual machine started with implicit RAM distribution.
+Arguably, bdrv_replace_node() should share the AioContext-switching
+logic with bdrv_root_attach_child() so that the general case is solved.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-CC: ehabkost@redhat.com
-CC: marcel.apfelbaum@gmail.com
-CC: mst@redhat.com
-CC: pbonzini@redhat.com
-CC: david@gibson.dropbear.id.au
-CC: libvir-list@redhat.com
-CC: qemu-ppc@nongnu.org
-CC: rth@twiddle.net
----
- include/hw/boards.h   |  3 ---
- include/sysemu/numa.h |  4 ----
- hw/core/machine.c     |  6 -----
- hw/core/numa.c        | 61 +++++------------------------------------------=
-----
- hw/i386/pc_piix.c     |  1 -
- hw/i386/pc_q35.c      |  1 -
- hw/ppc/spapr.c        |  7 ------
- qemu-deprecated.texi  |  8 -------
- qemu-options.hx       | 16 +++++++-------
- 9 files changed, 13 insertions(+), 94 deletions(-)
+I guess this patch is simple enough and solves a relevant special case,
+so no objection. But it might not be the final fix.
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 7f09bc9..916bb50 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -192,12 +192,9 @@ struct MachineClass {
-     int minimum_page_bits;
-     bool has_hotpluggable_cpus;
-     bool ignore_memory_transaction_failures;
--    int numa_mem_align_shift;
-     const char **valid_cpu_types;
-     strList *allowed_dynamic_sysbus_devices;
-     bool auto_enable_numa_with_memhp;
--    void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
--                                 int nb_nodes, ram_addr_t size);
-     bool ignore_boot_device_suffixes;
-     bool smbus_no_migration_support;
-     bool nvdimm_supported;
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index ad58ee8..4173ef2 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -106,10 +106,6 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatC=
-acheOptions *node,
- void numa_complete_configuration(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
- extern QemuOptsList qemu_numa_opts;
--void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
--                                 int nb_nodes, ram_addr_t size);
--void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
--                                  int nb_nodes, ram_addr_t size);
- void numa_cpu_pre_plug(const struct CPUArchId *slot, DeviceState *dev,
-                        Error **errp);
- bool numa_uses_legacy_mem(void);
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index d8fa45c..0862f45 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -747,12 +747,6 @@ static void machine_class_init(ObjectClass *oc, void *=
-data)
-     mc->rom_file_has_mr =3D true;
-     mc->smp_parse =3D smp_parse;
-=20
--    /* numa node memory size aligned on 8MB by default.
--     * On Linux, each node's border has to be 8MB aligned
--     */
--    mc->numa_mem_align_shift =3D 23;
--    mc->numa_auto_assign_ram =3D numa_default_auto_assign_ram;
--
-     object_class_property_add_str(oc, "kernel",
-         machine_get_kernel, machine_set_kernel, &error_abort);
-     object_class_property_set_description(oc, "kernel",
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 47d5ea1..591e62a 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -627,42 +627,6 @@ static void complete_init_numa_distance(MachineState *=
-ms)
-     }
- }
-=20
--void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
--                                 int nb_nodes, ram_addr_t size)
--{
--    int i;
--    uint64_t usedmem =3D 0;
--
--    /* Align each node according to the alignment
--     * requirements of the machine class
--     */
--
--    for (i =3D 0; i < nb_nodes - 1; i++) {
--        nodes[i].node_mem =3D (size / nb_nodes) &
--                            ~((1 << mc->numa_mem_align_shift) - 1);
--        usedmem +=3D nodes[i].node_mem;
--    }
--    nodes[i].node_mem =3D size - usedmem;
--}
--
--void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
--                                  int nb_nodes, ram_addr_t size)
--{
--    int i;
--    uint64_t usedmem =3D 0, node_mem;
--    uint64_t granularity =3D size / nb_nodes;
--    uint64_t propagate =3D 0;
--
--    for (i =3D 0; i < nb_nodes - 1; i++) {
--        node_mem =3D (granularity + propagate) &
--                   ~((1 << mc->numa_mem_align_shift) - 1);
--        propagate =3D granularity + propagate - node_mem;
--        nodes[i].node_mem =3D node_mem;
--        usedmem +=3D node_mem;
--    }
--    nodes[i].node_mem =3D size - usedmem;
--}
--
- static void numa_init_memdev_container(MachineState *ms, MemoryRegion *ram=
-)
- {
-     int i;
-@@ -732,30 +696,15 @@ void numa_complete_configuration(MachineState *ms)
-             ms->numa_state->num_nodes =3D MAX_NODES;
-         }
-=20
--        /* If no memory size is given for any node, assume the default cas=
-e
--         * and distribute the available memory equally across all nodes
--         */
--        for (i =3D 0; i < ms->numa_state->num_nodes; i++) {
--            if (numa_info[i].node_mem !=3D 0) {
--                break;
--            }
--        }
--        if (i =3D=3D ms->numa_state->num_nodes) {
--            assert(mc->numa_auto_assign_ram);
--            mc->numa_auto_assign_ram(mc, numa_info,
--                                     ms->numa_state->num_nodes, ram_size);
--            if (!qtest_enabled()) {
--                warn_report("Default splitting of RAM between nodes is dep=
-recated,"
--                            " Use '-numa node,memdev' to explictly define =
-RAM"
--                            " allocation per node");
--            }
--        }
--
-         numa_total =3D 0;
-         for (i =3D 0; i < ms->numa_state->num_nodes; i++) {
-             numa_total +=3D numa_info[i].node_mem;
-         }
--        if (numa_total !=3D ram_size) {
-+        if (numa_total =3D=3D 0) {
-+            error_report(" Use '-numa node,memdev' to explictly assign RAM=
-"
-+                         " to node");
-+            exit(EXIT_FAILURE);
-+        } else if (numa_total !=3D ram_size) {
-             error_report("total memory for NUMA nodes (0x%" PRIx64 ")"
-                          " should equal RAM size (0x" RAM_ADDR_FMT ")",
-                          numa_total, ram_size);
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 0a9b9e0..7941b0d 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -532,7 +532,6 @@ static void pc_i440fx_2_9_machine_options(MachineClass =
-*m)
-     pc_i440fx_2_10_machine_options(m);
-     compat_props_add(m->compat_props, hw_compat_2_9, hw_compat_2_9_len);
-     compat_props_add(m->compat_props, pc_compat_2_9, pc_compat_2_9_len);
--    m->numa_auto_assign_ram =3D numa_legacy_auto_assign_ram;
- }
-=20
- DEFINE_I440FX_MACHINE(v2_9, "pc-i440fx-2.9", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 4d6e2be..9715413 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -466,7 +466,6 @@ static void pc_q35_2_10_machine_options(MachineClass *m=
-)
-     pc_q35_2_11_machine_options(m);
-     compat_props_add(m->compat_props, hw_compat_2_10, hw_compat_2_10_len);
-     compat_props_add(m->compat_props, pc_compat_2_10, pc_compat_2_10_len);
--    m->numa_auto_assign_ram =3D numa_legacy_auto_assign_ram;
-     m->auto_enable_numa_with_memhp =3D false;
- }
-=20
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 2686b73..712548f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4378,11 +4378,6 @@ static void spapr_machine_class_init(ObjectClass *oc=
-, void *data)
-     xic->ics_resend =3D spapr_ics_resend;
-     xic->icp_get =3D spapr_icp_get;
-     ispc->print_info =3D spapr_pic_print_info;
--    /* Force NUMA node memory size to be a multiple of
--     * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
--     * in which LMBs are represented and hot-added
--     */
--    mc->numa_mem_align_shift =3D 28;
-     mc->auto_enable_numa =3D true;
-=20
-     smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
-@@ -4635,7 +4630,6 @@ static void spapr_machine_2_9_class_options(MachineCl=
-ass *mc)
-     spapr_machine_2_10_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_2_9, hw_compat_2_9_len);
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
--    mc->numa_auto_assign_ram =3D numa_legacy_auto_assign_ram;
-     smc->pre_2_10_has_unused_icps =3D true;
-     smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_DISABLED;
- }
-@@ -4655,7 +4649,6 @@ static void spapr_machine_2_8_class_options(MachineCl=
-ass *mc)
-     spapr_machine_2_9_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_2_8, hw_compat_2_8_len);
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
--    mc->numa_mem_align_shift =3D 23;
- }
-=20
- DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 17a0e1d..9ad6778 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -89,14 +89,6 @@ error in the future.
- The @code{-realtime mlock=3Don|off} argument has been replaced by the
- @code{-overcommit mem-lock=3Don|off} argument.
-=20
--@subsection -numa node (without memory specified) (since 4.1)
--
--Splitting RAM by default between NUMA nodes has the same issues as @option=
-{mem}
--parameter described above with the difference that the role of the user pl=
-ays
--QEMU using implicit generic or board specific splitting rule.
--Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} =
-(if
--it's supported by used machine type) to define mapping explictly instead.
--
- @subsection RISC-V -bios (since 4.1)
-=20
- QEMU 4.1 introduced support for the -bios option in QEMU for RISC-V for th=
-e
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 55500bd..f959bbe 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -172,16 +172,16 @@ If any on the three values is given, the total number=
- of CPUs @var{n} can be omi
- ETEXI
-=20
- DEF("numa", HAS_ARG, QEMU_OPTION_numa,
--    "-numa node[,mem=3Dsize][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode][,=
-initiator=3Dnode]\n"
--    "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode][=
-,initiator=3Dnode]\n"
-+    "-numa node,mem=3Dsize[,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode][,in=
-itiator=3Dnode]\n"
-+    "-numa node,memdev=3Did[,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode][,i=
-nitiator=3Dnode]\n"
-     "-numa dist,src=3Dsource,dst=3Ddestination,val=3Ddistance\n"
-     "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=3Dz=
-]\n"
-     "-numa hmat-lb,initiator=3Dnode,target=3Dnode,hierarchy=3Dmemory|first=
--level|second-level|third-level,data-type=3Daccess-latency|read-latency|wri=
-te-latency[,latency=3Dlat][,bandwidth=3Dbw]\n"
-     "-numa hmat-cache,node-id=3Dnode,size=3Dsize,level=3Dlevel[,associativ=
-ity=3Dnone|direct|complex][,policy=3Dnone|write-back|write-through][,line=
-=3Dsize]\n",
-     QEMU_ARCH_ALL)
- STEXI
--@item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{lastcpu}]=
-][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
--@itemx -numa node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{lastcpu=
-}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
-+@item -numa node,mem=3D@var{size}[,cpus=3D@var{firstcpu}[-@var{lastcpu}]][=
-,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
-+@itemx -numa node,memdev=3D@var{id}[,cpus=3D@var{firstcpu}[-@var{lastcpu}]=
-][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
- @itemx -numa dist,src=3D@var{source},dst=3D@var{destination},val=3D@var{di=
-stance}
- @itemx -numa cpu,node-id=3D@var{node}[,socket-id=3D@var{x}][,core-id=3D@va=
-r{y}][,thread-id=3D@var{z}]
- @itemx -numa hmat-lb,initiator=3D@var{node},target=3D@var{node},hierarchy=
-=3D@var{hierarchy},data-type=3D@var{tpye}[,latency=3D@var{lat}][,bandwidth=
-=3D@var{bw}]
-@@ -202,7 +202,7 @@ split between them.
- For example, the following option assigns VCPUs 0, 1, 2 and 5 to
- a NUMA node:
- @example
---numa node,cpus=3D0-2,cpus=3D5
-+-numa node,cpus=3D0-2,cpus=3D5,memdev=3Dram-backend-id
- @end example
-=20
- @samp{cpu} option is a new alternative to @samp{cpus} option
-@@ -219,14 +219,14 @@ For example:
- @example
- -M pc \
- -smp 1,sockets=3D2,maxcpus=3D2 \
---numa node,nodeid=3D0 -numa node,nodeid=3D1 \
-+-m 512M -object memory-backend-ram,id=3Dmem,size=3D512M \
-+-numa node,nodeid=3D0,memdev=3Dmem -numa node,nodeid=3D1 \
- -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D1,socket-id=3D1
- @end example
-=20
- Legacy @samp{mem} assigns a given RAM amount to a node (not supported for =
-5.0
- and newer machine types). @samp{memdev} assigns RAM from a given memory ba=
-ckend
--device to a node. If @samp{mem} and @samp{memdev} are omitted in all nodes=
-, RAM
--is split equally between them.
-+device to a node.
-=20
- @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
- if one node uses @samp{memdev}, all of them have to use it.
---=20
-2.7.4
+Kevin
 
 
