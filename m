@@ -7,91 +7,92 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4BBC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F48C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:55:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1D9520728
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:38:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 448A52084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:55:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eb5xE+f+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D9520728
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LT/KcZ8X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448A52084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irnYh-0004WN-UM
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:38:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56256)
+	id 1irnos-00040q-CG
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:55:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1irnXR-000343-UX
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:37:11 -0500
+ (envelope-from <philmd@redhat.com>) id 1irnoD-0002xk-EP
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:54:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1irnXQ-0006WP-Mh
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:37:09 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20247
+ (envelope-from <philmd@redhat.com>) id 1irno9-0000pX-V9
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:54:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54353
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1irnXQ-0006Vz-IV
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:37:08 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1irno9-0000op-HA
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:54:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579113427;
+ s=mimecast20190719; t=1579114464;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ktBjTFU5DdGzj3F48wGGEPQ5sC6+P8g9eFwZ/qRFx9c=;
- b=eb5xE+f+H/0ZNTuDaIrIB9ZkgI3LgtHpAiVVpnFuj2mpu74muyjfTlAjZcHhBzx6haT2dP
- QpEG/HhhpD2YstkVY/DaykeXPTIdjU450OOnpQQgfiucqHVV+HNvS9giXiniqcc+SnGjFI
- gHmhvqO5F29IZAbx/nV7ZF0s0auLV+A=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-czKdZdTINLyc5uAk60Ycmw-1; Wed, 15 Jan 2020 13:37:04 -0500
-Received: by mail-wr1-f70.google.com with SMTP id j4so8300528wrs.13
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 10:37:04 -0800 (PST)
+ bh=vXmjnJTn1zUB2fY68K6xyRliaxaK2UKU8jj0T+N5QPg=;
+ b=LT/KcZ8XYmxu6kEAntJRqlwQ4J8+OZdyvICWzWlBLz824tImKVH3jkaEtWhRaDmcvBbuuI
+ t7IMRmotRNGKKDjDZNT40AQyN5aGxbJRhNhxWgWpaau1I/jTfRBjYEq4WWYsFDGJsmYAtO
+ Vqbn57IcjfNcyj7Y8/V66hAZ50aWvr4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-iIgEeoEAMaKJXgSK-mlUbg-1; Wed, 15 Jan 2020 13:54:20 -0500
+Received: by mail-wm1-f72.google.com with SMTP id w205so268269wmb.5
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 10:54:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=o5k7mYxCHvyJX1wwWgb9fmQfjKGZq1O5mO/Hegd748I=;
- b=ULzPBJwwmwwffv4TznMHJr6orlgIKiF9h8p4F9XUEUjdMGX2Ns17Q3p0xGAyN/d4w7
- tSkF/cd96dUQ43H/SFYSev6GHxjJEXCUmyJQw6i7thpaJd9peUe8SRpREALl20VfOHPl
- YxkAuTUm7uedMw8zv3QOd2mnlwwDhKZGhBgkFkh0B6JbjS7/mb7EH7hpeUSexCrAy86j
- 4gxvqWT4W7Hc/GVTW0ibh7Dswta23Mu7dpZ1AuNsb3awLb5N0aI7p7oSrUQt1wmj871f
- 56d3OyZeSdZGxK1tEgOiBgd4YO8y5EhWzPCJVTSmP2fxaawlyUr+WcwS8Z9LxXFdL05P
- TTXA==
-X-Gm-Message-State: APjAAAU65PHgRr6+R6jAFoeOTgggqxI0EnqyH//HSwxPxQV/TQubb3TK
- RZ/r37g0ocGYPLx7vmVtrVH979gmYsanVsVao6/eci/5M6quBEVl09C0C6xkVx8+ROMkn1E9gRi
- LVTCQ+rbJE9vZhZY=
-X-Received: by 2002:adf:f1c6:: with SMTP id z6mr34250821wro.279.1579113423609; 
- Wed, 15 Jan 2020 10:37:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzYP/TfXV83q3XwA+4urMXrq9P17ZJo12OANKmWEsZNkcBs2SGj8ET1x7BbUozk5PFFa4FVSA==
-X-Received: by 2002:adf:f1c6:: with SMTP id z6mr34250800wro.279.1579113423410; 
- Wed, 15 Jan 2020 10:37:03 -0800 (PST)
+ bh=vXmjnJTn1zUB2fY68K6xyRliaxaK2UKU8jj0T+N5QPg=;
+ b=UiqlF/2HcLEL/WETr1o20iW8wOGHZt1N6SPWbb/SaNjZE6O0eG8CG8Scma1LhGhx+r
+ t2ipkU9u7iauaQA0i/h5tXO0WNASsFtpgCadzQ2H+7WIhYSOsWRGYyZwxp8zVs7LxQ8v
+ VSYpWd5LViDm1INd9Xwz4zQFyVVMvApkEjVnCM4uxOpP7j45hXOMaVnSWnGqISwL5VNS
+ N/wB1grwNWUxLu2dNcKSCJJ9p59xqgxdHC1RyrBbt+V8EEt1zH+12UDa34PPXjUGy3HQ
+ 2QmzaCGwFV61dg0El66SbW9uCMuo07pqLHrqhwFJ0sUlT1i9+KhLvZVMQp29J7StyF/e
+ ebmg==
+X-Gm-Message-State: APjAAAUzLec/BC0dQNbdv6LGsRVCRK5sELfRx2XvJbr7hbnFMSqwrhNM
+ eNYhELRfyJEkuT28pmwAy5qSKDJY7/NqfZS6lvrycF7yf7T0errNOERl6zK8MIayXT3U3W14g9k
+ S+P60ibgqwEJYKo8=
+X-Received: by 2002:a1c:7d92:: with SMTP id y140mr1300271wmc.145.1579114459877; 
+ Wed, 15 Jan 2020 10:54:19 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyNRP9TzAhLt+DnVSIhybmEXfZ60TLMUlKkVXL5/FUMCNj8XN0c+F64Mkayij3NOdw1LaJ89w==
+X-Received: by 2002:a1c:7d92:: with SMTP id y140mr1300253wmc.145.1579114459663; 
+ Wed, 15 Jan 2020 10:54:19 -0800 (PST)
 Received: from ?IPv6:2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9?
  ([2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9])
- by smtp.gmail.com with ESMTPSA id r5sm25419020wrt.43.2020.01.15.10.37.02
+ by smtp.gmail.com with ESMTPSA id t25sm967390wmj.19.2020.01.15.10.54.18
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Jan 2020 10:37:02 -0800 (PST)
-Subject: Re: [PATCH v2 71/86] ppc:virtex_ml507: use memdev for RAM
+ Wed, 15 Jan 2020 10:54:19 -0800 (PST)
+Subject: Re: [PATCH v2 03/86] machine: alias -mem-path and -mem-prealloc into
+ memory-foo backend
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-72-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-4-git-send-email-imammedo@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b11ecc71-4916-0a65-d46c-c3cf85288647@redhat.com>
-Date: Wed, 15 Jan 2020 19:37:02 +0100
+Message-ID: <f2e2e568-d114-8b89-9605-020b5f18f597@redhat.com>
+Date: Wed, 15 Jan 2020 19:54:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1579100861-73692-72-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1579100861-73692-4-git-send-email-imammedo@redhat.com>
 Content-Language: en-US
-X-MC-Unique: czKdZdTINLyc5uAk60Ycmw-1
+X-MC-Unique: iIgEeoEAMaKJXgSK-mlUbg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -106,100 +107,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@gmail.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: pbonzini@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/15/20 4:07 PM, Igor Mammedov wrote:
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
+On 1/15/20 4:06 PM, Igor Mammedov wrote:
+> Allow a machine to opt in for hostmem backend based initial
+> RAM even if user used old -mem-path/prealloc options by providing
 >    MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
->=20
+> Follow up patches will incrementally convert machines to new API,
+> by dropping memory_region_allocate_system_memory() and setting
+> default_ram_id that board used to use before conversion to keep
+> migration stream the same.
+> 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
-> CC: david@gibson.dropbear.id.au
-> CC: qemu-ppc@nongnu.org
-> CC: edgar.iglesias@gmail.com
+> CC: ehabkost@redhat.com
+> CC: pbonzini@redhat.com
 > ---
->   hw/ppc/virtex_ml507.c | 12 +++++-------
->   1 file changed, 5 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-> index 651d8db..b74a269 100644
-> --- a/hw/ppc/virtex_ml507.c
-> +++ b/hw/ppc/virtex_ml507.c
-> @@ -193,7 +193,6 @@ static int xilinx_load_device_tree(hwaddr addr,
->  =20
->   static void virtex_init(MachineState *machine)
+>   include/hw/boards.h      |  5 +++++
+>   include/sysemu/hostmem.h | 16 ++++++++++++++++
+>   backends/hostmem-file.c  |  7 -------
+>   backends/hostmem-ram.c   |  2 --
+>   vl.c                     | 25 +++++++++++++++++++++++++
+>   5 files changed, 46 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 6aa01b8..e3ea8b0 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -170,6 +170,10 @@ typedef struct {
+>    *    false is returned, an error must be set to show the reason of
+>    *    the rejection.  If the hook is not provided, all hotplug will be
+>    *    allowed.
+> + * @default_ram_id:
+> + *    Specifies inital RAM MemoryRegion name to be used for default backend
+> + *    creation if user explicitly hasn't specified backend with "ram-memdev"
+> + *    property.
+>    */
+>   struct MachineClass {
+>       /*< private >*/
+> @@ -226,6 +230,7 @@ struct MachineClass {
+>       bool nvdimm_supported;
+>       bool numa_mem_supported;
+>       bool auto_enable_numa;
+> +    const char *default_ram_id;
+>   
+>       HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>                                              DeviceState *dev);
+> diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+> index 4dbdadd..5db0d66 100644
+> --- a/include/sysemu/hostmem.h
+> +++ b/include/sysemu/hostmem.h
+> @@ -27,6 +27,22 @@
+>   #define MEMORY_BACKEND_CLASS(klass) \
+>       OBJECT_CLASS_CHECK(HostMemoryBackendClass, (klass), TYPE_MEMORY_BACKEND)
+>   
+> +/* hostmem-ram.c */
+> +/**
+> + * @TYPE_MEMORY_BACKEND_RAM:
+> + * name of backend that uses mmap on the anonymous RAM
+> + */
+> +
+> +#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
+> +
+> +/* hostmem-file.c */
+> +/**
+> + * @TYPE_MEMORY_BACKEND_FILE:
+> + * name of backend that uses mmap on a file descriptor
+> + */
+> +#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
+> +
+> +typedef struct HostMemoryBackend HostMemoryBackend;
+>   typedef struct HostMemoryBackendClass HostMemoryBackendClass;
+>   
+>   /**
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index be64020..cb319a9 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -18,13 +18,6 @@
+>   #include "sysemu/sysemu.h"
+>   #include "qom/object_interfaces.h"
+>   
+> -/* hostmem-file.c */
+> -/**
+> - * @TYPE_MEMORY_BACKEND_FILE:
+> - * name of backend that uses mmap on a file descriptor
+> - */
+> -#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
+> -
+>   #define MEMORY_BACKEND_FILE(obj) \
+>       OBJECT_CHECK(HostMemoryBackendFile, (obj), TYPE_MEMORY_BACKEND_FILE)
+>   
+> diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
+> index 6aab8d3..5cc53e7 100644
+> --- a/backends/hostmem-ram.c
+> +++ b/backends/hostmem-ram.c
+> @@ -16,8 +16,6 @@
+>   #include "qemu/module.h"
+>   #include "qom/object_interfaces.h"
+>   
+> -#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
+> -
+>   static void
+>   ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
 >   {
-> -    ram_addr_t ram_size =3D machine->ram_size;
->       const char *kernel_filename =3D machine->kernel_filename;
->       const char *kernel_cmdline =3D machine->kernel_cmdline;
->       hwaddr initrd_base =3D 0;
-> @@ -204,7 +203,6 @@ static void virtex_init(MachineState *machine)
->       CPUPPCState *env;
->       hwaddr ram_base =3D 0;
->       DriveInfo *dinfo;
-> -    MemoryRegion *phys_ram =3D g_new(MemoryRegion, 1);
->       qemu_irq irq[32], *cpu_irq;
->       int kernel_size;
->       int i;
-> @@ -221,8 +219,7 @@ static void virtex_init(MachineState *machine)
->  =20
->       qemu_register_reset(main_cpu_reset, cpu);
->  =20
-> -    memory_region_allocate_system_memory(phys_ram, NULL, "ram", ram_size=
-);
-> -    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
-> +    memory_region_add_subregion(address_space_mem, ram_base, machine->ra=
-m);
->  =20
->       dinfo =3D drive_get(IF_PFLASH, 0, 0);
->       pflash_cfi01_register(PFLASH_BASEADDR, "virtex.flash", FLASH_SIZE,
-> @@ -265,7 +262,7 @@ static void virtex_init(MachineState *machine)
->               /* If we failed loading ELF's try a raw image.  */
->               kernel_size =3D load_image_targphys(kernel_filename,
->                                                 boot_offset,
-> -                                              ram_size);
-> +                                              machine->ram_size);
->               boot_info.bootstrap_pc =3D boot_offset;
->               high =3D boot_info.bootstrap_pc + kernel_size + 8192;
->           }
-> @@ -276,7 +273,7 @@ static void virtex_init(MachineState *machine)
->           if (machine->initrd_filename) {
->               initrd_base =3D high =3D ROUND_UP(high, 4);
->               initrd_size =3D load_image_targphys(machine->initrd_filenam=
-e,
-> -                                              high, ram_size - high);
-> +                                              high, machine->ram_size - =
-high);
->  =20
->               if (initrd_size < 0) {
->                   error_report("couldn't load ram disk '%s'",
-> @@ -290,7 +287,7 @@ static void virtex_init(MachineState *machine)
->           boot_info.fdt =3D high + (8192 * 2);
->           boot_info.fdt &=3D ~8191;
->  =20
-> -        xilinx_load_device_tree(boot_info.fdt, ram_size,
-> +        xilinx_load_device_tree(boot_info.fdt, machine->ram_size,
->                                   initrd_base, initrd_size,
->                                   kernel_cmdline);
+> diff --git a/vl.c b/vl.c
+> index 7514012..d36a857 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -75,6 +75,7 @@ int main(int argc, char **argv)
+>   #include "ui/input.h"
+>   #include "sysemu/sysemu.h"
+>   #include "sysemu/numa.h"
+> +#include "sysemu/hostmem.h"
+>   #include "exec/gdbstub.h"
+>   #include "qemu/timer.h"
+>   #include "chardev/char.h"
+> @@ -2820,6 +2821,25 @@ static void configure_accelerators(const char *progname)
 >       }
-> @@ -302,6 +299,7 @@ static void virtex_machine_init(MachineClass *mc)
->       mc->desc =3D "Xilinx Virtex ML507 reference design";
->       mc->init =3D virtex_init;
->       mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("440-xilinx");
-> +    mc->default_ram_id =3D "ram";
 >   }
->  =20
->   DEFINE_MACHINE("virtex-ml507", virtex_machine_init)
->=20
+>   
+> +static void create_default_memdev(MachineState *ms, const char *path,
+> +                                  bool prealloc)
+> +{
+> +    Object *obj;
+> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +
+> +    obj = object_new(path ? TYPE_MEMORY_BACKEND_FILE : TYPE_MEMORY_BACKEND_RAM);
+> +    if (path) {
+> +        object_property_set_str(obj, path, "mem-path", &error_fatal);
+> +    }
+> +    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
+> +    object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
+> +    object_property_add_child(object_get_objects_root(), mc->default_ram_id,
+> +                              obj, &error_fatal);
+> +    user_creatable_complete(USER_CREATABLE(obj), &error_fatal);
+> +    object_unref(obj);
+> +    object_property_set_link(OBJECT(ms), obj, "ram-memdev", &error_fatal);
+> +}
+> +
+>   int main(int argc, char **argv, char **envp)
+>   {
+>       int i;
+> @@ -4283,6 +4303,11 @@ int main(int argc, char **argv, char **envp)
+>       }
+>       parse_numa_opts(current_machine);
+>   
+> +    if (!current_machine->ram_memdev &&
+> +         machine_class->default_ram_size &&
+> +         machine_class->default_ram_id) {
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Do we really need for its presence?
+
+Can we instead set it to "ram" if NULL?
+
+> +        create_default_memdev(current_machine, mem_path, mem_prealloc);
+> +    }
+>       /* do monitor/qmp handling at preconfig state if requested */
+>       main_loop();
+>   
+> 
 
 
