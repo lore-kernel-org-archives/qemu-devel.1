@@ -2,64 +2,71 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54956C33C9E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 02:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8CBC33C9E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 02:05:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A35E222C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 02:04:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A35E222C3
+	by mail.kernel.org (Postfix) with ESMTPS id 9FAAC222C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 02:05:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FAAC222C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irY2j-0006oO-JL
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 21:04:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48533)
+	id 1irY3s-00087H-Qr
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 21:05:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1irY1r-0005we-1Y
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 21:03:32 -0500
+ (envelope-from <fengzhimin1@huawei.com>) id 1irY3D-0007gR-Dj
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 21:04:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1irY1p-0000UM-Te
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 21:03:30 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:47968 helo=huawei.com)
+ (envelope-from <fengzhimin1@huawei.com>) id 1irY3C-0001cQ-BX
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 21:04:55 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2429 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1irY1n-0000NH-9m; Tue, 14 Jan 2020 21:03:27 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id A6DF7FA05AC0B4B78E44;
- Wed, 15 Jan 2020 10:03:23 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Wed, 15 Jan 2020
- 10:03:15 +0800
-Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified by
- _HID
-To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin"
- <mst@redhat.com>
-References: <20191219064759.35053-1-guoheyi@huawei.com>
- <20191219064759.35053-3-guoheyi@huawei.com>
- <20200105072504-mutt-send-email-mst@kernel.org>
- <CAFEAcA-sduqVO3rrG2V1VsysE2chgd0SnSySvEXFfue-aZN8dg@mail.gmail.com>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <bbf347fe-c4a4-c5bb-19c2-3a18571b658f@huawei.com>
-Date: Wed, 15 Jan 2020 10:03:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <fengzhimin1@huawei.com>)
+ id 1irY3C-0001bM-1L
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 21:04:54 -0500
+Received: from dggemi402-hub.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id D4729E2448E14F5A03A2;
+ Wed, 15 Jan 2020 10:04:50 +0800 (CST)
+Received: from DGGEMI423-HUB.china.huawei.com (10.1.199.152) by
+ dggemi402-hub.china.huawei.com (10.3.17.135) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 15 Jan 2020 10:04:50 +0800
+Received: from DGGEMI529-MBX.china.huawei.com ([169.254.6.126]) by
+ dggemi423-hub.china.huawei.com ([10.1.199.152]) with mapi id 14.03.0439.000;
+ Wed, 15 Jan 2020 10:04:41 +0800
+From: fengzhimin <fengzhimin1@huawei.com>
+To: Eric Blake <eblake@redhat.com>, "quintela@redhat.com"
+ <quintela@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>
+Subject: RE: [PATCH RFC 01/12] migration: Add multiRDMA capability support
+Thread-Topic: [PATCH RFC 01/12] migration: Add multiRDMA capability support
+Thread-Index: AQHVxqmaVHxXEfJM4USLZDsbao0TcafoSQEAgAK3+PA=
+Date: Wed, 15 Jan 2020 02:04:41 +0000
+Message-ID: <03C2A65461456D4EBE9E6D4D0D96C583FBC7DE@DGGEMI529-MBX.china.huawei.com>
+References: <20200109045922.904-1-fengzhimin1@huawei.com>
+ <20200109045922.904-2-fengzhimin1@huawei.com>
+ <dddb1f19-381f-ea7e-5200-46f03b1fa0a2@redhat.com>
+In-Reply-To: <dddb1f19-381f-ea7e-5200-46f03b1fa0a2@redhat.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.220.198]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-sduqVO3rrG2V1VsysE2chgd0SnSySvEXFfue-aZN8dg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-X-Originating-IP: [10.133.216.73]
 X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 45.249.212.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,64 +78,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Igor
- Mammedov <imammedo@redhat.com>, wanghaibin.wang@huawei.com
+Cc: "jemmy858585@gmail.com" <jemmy858585@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter, Michael,
-
-Have we come to conclusion on how to submit patches for ARM ACPI tables?
-
-Some rough thoughts: is it possible to use the disassembled ASL file as=20
-the 'golden master' data? One problem I can imagine is that this may=20
-introduce dependency on the version of iASL tool. If so, how about=20
-adding acpica source code as a submodule, just like what we did for the=20
-device tree compile "dtc".
-
-There may be much more which I missed; looking forward to your comments.
-
-Thanks,
-
-Heyi
-
-=E5=9C=A8 2020/1/6 23:51, Peter Maydell =E5=86=99=E9=81=93:
-> On Sun, 5 Jan 2020 at 12:34, Michael S. Tsirkin <mst@redhat.com> wrote:
->> On Thu, Dec 19, 2019 at 02:47:59PM +0800, Heyi Guo wrote:
->>>   hw/arm/virt-acpi-build.c          |   8 --------
->>>   tests/data/acpi/virt/DSDT         | Bin 18449 -> 18426 bytes
->>>   tests/data/acpi/virt/DSDT.memhp   | Bin 19786 -> 19763 bytes
->>>   tests/data/acpi/virt/DSDT.numamem | Bin 18449 -> 18426 bytes
->>>   4 files changed, 8 deletions(-)
->> Please do not include binary changes in acpi patches.
->>
->> See comment at the top of tests/bios-tables-test.c for documentation
->> on how to update these.
-> If you want the patches not to include binary changes then
-> you will need to take these yourself through your own tree.
-> As the Arm subtree maintainer I am not going to follow a
-> specific process for acpi related patches that requires me
->   to do anything other than "apply patches from email, test
-> them, send pull request". I also have no way to
-> identify whether any differences that I might see if I
-> disassembled the ACPI tables make sense, as that comment
-> suggests I should be doing. The differences in the tables need
-> to be checked by the people reviewing the patches, which will
-> not be me for anything ACPI related -- I just don't know
-> enough about the ACPI specs.
->
-> Patches should be self contained, including updating test
-> cases as required. The underlying problem here is that
-> the 'golden master' data for the acpi tests is a pile
-> of binary blobs rather than something that's human
-> readable and reviewable as part of a patch.
->
-> thanks
-> -- PMM
->
-> .
-
+VGhhbmtzIGZvciB5b3VyIHJldmlldy4gSSB3aWxsIGZpeCB0aGVzZSBlcnJvcnMgaW4gdGhlIG5l
+eHQgdmVyc2lvbihWMikuDQpJIGhvcGUgeW91IGNhbiBidXN5IHNjaGVkdWxlIHRvIGZpbmQgdGlt
+ZSB0byBjaGVjayBvdGhlciBwYXRjaGVzIGFib3V0IE11bHRpLVJETUEuDQoNCi0tLS0tT3JpZ2lu
+YWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86ZWJsYWtlQHJlZGhhdC5j
+b21dIA0KU2VudDogVHVlc2RheSwgSmFudWFyeSAxNCwgMjAyMCAxMjoyNyBBTQ0KVG86IGZlbmd6
+aGltaW4gPGZlbmd6aGltaW4xQGh1YXdlaS5jb20+OyBxdWludGVsYUByZWRoYXQuY29tOyBkZ2ls
+YmVydEByZWRoYXQuY29tOyBhcm1icnVAcmVkaGF0LmNvbQ0KQ2M6IHFlbXUtZGV2ZWxAbm9uZ251
+Lm9yZzsgWmhhbmdoYWlsaWFuZyA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPjsgamVt
+bXk4NTg1ODVAZ21haWwuY29tDQpTdWJqZWN0OiBSZTogW1BBVENIIFJGQyAwMS8xMl0gbWlncmF0
+aW9uOiBBZGQgbXVsdGlSRE1BIGNhcGFiaWxpdHkgc3VwcG9ydA0KDQpPbiAxLzgvMjAgMTA6NTkg
+UE0sIFpoaW1pbiBGZW5nIHdyb3RlOg0KPiBGcm9tOiBmZW5nemhpbWluIDxmZW5nemhpbWluMUBo
+dWF3ZWkuY29tPg0KPiANCj4gU2lnbmVkLW9mZi1ieTogZmVuZ3poaW1pbiA8ZmVuZ3poaW1pbjFA
+aHVhd2VpLmNvbT4NCj4gLS0tDQoNCj4gKysrIGIvcWFwaS9taWdyYXRpb24uanNvbg0KPiBAQCAt
+NDIxLDYgKzQyMSw4IEBADQo+ICAgIyBAdmFsaWRhdGUtdXVpZDogU2VuZCB0aGUgVVVJRCBvZiB0
+aGUgc291cmNlIHRvIGFsbG93IHRoZSBkZXN0aW5hdGlvbg0KPiAgICMgICAgICAgICAgICAgICAg
+IHRvIGVuc3VyZSBpdCBpcyB0aGUgc2FtZS4gKHNpbmNlIDQuMikNCj4gICAjDQo+ICsjIEBtdWx0
+aXJkbWE6IFVzZSBtb3JlIHRoYW4gb25lIGNoYW5uZWxzIGZvciByZG1hIG1pZ3JhdGlvbi4gKHNp
+bmNlIDQuMikNCg0KV2UndmUgbWlzc2VkIDQuMjsgdGhlIG5leHQgcmVsZWFzZSB3aWxsIGJlIDUu
+MC4NCg0KPiArIw0KPiAgICMgU2luY2U6IDEuMg0KPiAgICMjDQo+ICAgeyAnZW51bSc6ICdNaWdy
+YXRpb25DYXBhYmlsaXR5JywNCj4gQEAgLTQyOCw3ICs0MzAsNyBAQA0KPiAgICAgICAgICAgICAg
+J2NvbXByZXNzJywgJ2V2ZW50cycsICdwb3N0Y29weS1yYW0nLCAneC1jb2xvJywgJ3JlbGVhc2Ut
+cmFtJywNCj4gICAgICAgICAgICAgICdibG9jaycsICdyZXR1cm4tcGF0aCcsICdwYXVzZS1iZWZv
+cmUtc3dpdGNob3ZlcicsICdtdWx0aWZkJywNCj4gICAgICAgICAgICAgICdkaXJ0eS1iaXRtYXBz
+JywgJ3Bvc3Rjb3B5LWJsb2NrdGltZScsICdsYXRlLWJsb2NrLWFjdGl2YXRlJywNCj4gLSAgICAg
+ICAgICAgJ3gtaWdub3JlLXNoYXJlZCcsICd2YWxpZGF0ZS11dWlkJyBdIH0NCj4gKyAgICAgICAg
+ICAgJ3gtaWdub3JlLXNoYXJlZCcsICd2YWxpZGF0ZS11dWlkJywgJ211bHRpcmRtYScgXSB9DQo+
+ICAgDQo+ICAgIyMNCj4gICAjIEBNaWdyYXRpb25DYXBhYmlsaXR5U3RhdHVzOg0KPiANCg0KLS0g
+DQpFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5naW5lZXINClJlZCBIYXQsIEluYy4g
+ICAgICAgICAgICsxLTkxOS0zMDEtMzIyNg0KVmlydHVhbGl6YXRpb246ICBxZW11Lm9yZyB8IGxp
+YnZpcnQub3JnDQoNCg==
 
