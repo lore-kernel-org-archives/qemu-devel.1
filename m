@@ -2,79 +2,77 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45103C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F92C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F2542465A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:18:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F176F2465A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:18:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zji1QqJr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2542465A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6gDzrUb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F176F2465A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irkQi-0000aL-8k
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:18:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48697)
+	id 1irkQt-0000o0-H5
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:18:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkJs-0007Qx-Iv
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:57 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkJg-00073o-4M
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkJr-00081V-8l
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48811
+ (envelope-from <imammedo@redhat.com>) id 1irkJe-0007uL-Jm
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42306
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkJr-000815-4f
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:55 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkJe-0007u6-F0
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101054;
+ s=mimecast20190719; t=1579101042;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rUlnYNueS8jddAQ+SP4gjg91935JfzLTka12JcrM6P0=;
- b=Zji1QqJrwElgtDhHL6GLXGGZXygMMprJO5FZLCTjx+Ktj88AaIx+jhZrp/z8GuvYYZuAy4
- Pfn2XNhOhlnIS8YaHfR2BsZifUBFV0GPgL92nWzG4kiN2WYEepPKpgsOzGt5QhGonLlC4P
- tM8pmRnaEzoK5tBS/M7FQvNT/ztlKcw=
+ bh=M3XNzRJS0AhLMIFtql+yWA2PB7T+9ILZtcAKnErzEEA=;
+ b=Y6gDzrUbqQCeo0kkzBQYcQMIm0TxGsx6f8PyUnyySmn6xUx+9FgMqVdkBwOVr/b2xu6QhQ
+ RnRjo8hmiIzuyoPlZZqu3tyH9dvmZOr8CVJYWTI0C0iW+oDueYJ0UOk0VjTJ0Px8xNPkYo
+ 0JOkgo5jvZsbm0RCg0+EEHOmNqLf7pg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-lqhQ8JvyMounTqkBd2ihfQ-1; Wed, 15 Jan 2020 10:10:51 -0500
+ us-mta-345-_78XFB98NRqfi-3hi3aTiA-1; Wed, 15 Jan 2020 10:10:40 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D2EC8DDCC6;
- Wed, 15 Jan 2020 15:10:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B67F1089CF1
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:10:39 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 564A6289A3;
- Wed, 15 Jan 2020 15:10:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A09128DD8;
+ Wed, 15 Jan 2020 15:10:38 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/86] arm:cubieboard: use memdev for RAM
-Date: Wed, 15 Jan 2020 16:06:27 +0100
-Message-Id: <1579100861-73692-13-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v2 05/86] initialize MachineState::ram in NUMA case
+Date: Wed, 15 Jan 2020 16:06:20 +0100
+Message-Id: <1579100861-73692-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: lqhQ8JvyMounTqkBd2ihfQ-1
+X-MC-Unique: _78XFB98NRqfi-3hi3aTiA-1
 X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,107 +84,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: b.galvani@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: pbonzini@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+In case of NUMA there are 2 cases to consider:
+ 1. '-numa node,memdev', the only one that will be available
+    for 5.0 and newer machine types.
 
-PS:
-While at it, get rid of no longer needed CubieBoardState wrapper.
+    In this case reuse current behavior, with only difference
+    memdevs are put into MachineState::ram container +
+    a temporary glue to keep memory_region_allocate_system_memory()
+    working until all boards converted.
+
+ 2. fake NUMA ("-numa node mem" and default RAM splitting)
+    the later has been deprecated and is removed but the former
+    is going to stay available for compat reasons from 4.2 and
+    older machine types (libvirt was heavy user of this)
+
+    it takes allocate_system_memory_nonnuma() path, like non-NUMA
+    case and falls under conversion to memdev.  So extend non-NUMA
+    MachineState::ram initialization introduced in previous patch
+    to take care of fake NUMA case.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: b.galvani@gmail.com
-CC: peter.maydell@linaro.org
-CC: qemu-arm@nongnu.org
+CC: ehabkost@redhat.com
+CC: pbonzini@redhat.com
 ---
- hw/arm/cubieboard.c | 25 ++++++++-----------------
- 1 file changed, 8 insertions(+), 17 deletions(-)
+ include/sysemu/numa.h |  1 +
+ hw/core/numa.c        | 43 ++++++++++++++++++++++++++++++-------------
+ vl.c                  |  7 ++++---
+ 3 files changed, 35 insertions(+), 16 deletions(-)
 
-diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-index 6dc2f1d..089f9a3 100644
---- a/hw/arm/cubieboard.c
-+++ b/hw/arm/cubieboard.c
-@@ -28,52 +28,42 @@ static struct arm_boot_info cubieboard_binfo =3D {
-     .board_id =3D 0x1008,
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index ba693cc..ad58ee8 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -112,5 +112,6 @@ void numa_default_auto_assign_ram(MachineClass *mc, Nod=
+eInfo *nodes,
+                                   int nb_nodes, ram_addr_t size);
+ void numa_cpu_pre_plug(const struct CPUArchId *slot, DeviceState *dev,
+                        Error **errp);
++bool numa_uses_legacy_mem(void);
+=20
+ #endif
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 8264336..e6baf2c 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -52,6 +52,11 @@ QemuOptsList qemu_numa_opts =3D {
  };
 =20
--typedef struct CubieBoardState {
--    AwA10State *a10;
--    MemoryRegion sdram;
--} CubieBoardState;
--
- static void cubieboard_init(MachineState *machine)
+ static int have_memdevs;
++bool numa_uses_legacy_mem(void)
++{
++    return !have_memdevs;
++}
++
+ static int have_mem;
+ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+                              * For all nodes, nodeid < max_numa_nodeid
+@@ -652,6 +657,23 @@ void numa_default_auto_assign_ram(MachineClass *mc, No=
+deInfo *nodes,
+     nodes[i].node_mem =3D size - usedmem;
+ }
+=20
++static void numa_init_memdev_container(MachineState *ms, MemoryRegion *ram=
+)
++{
++    int i;
++    uint64_t addr =3D 0;
++
++    for (i =3D 0; i < ms->numa_state->num_nodes; i++) {
++        uint64_t size =3D ms->numa_state->nodes[i].node_mem;
++        HostMemoryBackend *backend =3D ms->numa_state->nodes[i].node_memde=
+v;
++        if (!backend) {
++            continue;
++        }
++        MemoryRegion *seg =3D machine_consume_memdev(ms, backend);
++        memory_region_add_subregion(ram, addr, seg);
++        addr +=3D size;
++    }
++}
++
+ void numa_complete_configuration(MachineState *ms)
  {
--    CubieBoardState *s =3D g_new(CubieBoardState, 1);
-+    AwA10State *a10 =3D AW_A10(object_new(TYPE_AW_A10));
-     Error *err =3D NULL;
+     int i;
+@@ -734,6 +756,12 @@ void numa_complete_configuration(MachineState *ms)
+             exit(1);
+         }
 =20
--    s->a10 =3D AW_A10(object_new(TYPE_AW_A10));
--
--    object_property_set_int(OBJECT(&s->a10->emac), 1, "phy-addr", &err);
-+    object_property_set_int(OBJECT(&a10->emac), 1, "phy-addr", &err);
-     if (err !=3D NULL) {
-         error_reportf_err(err, "Couldn't set phy address: ");
-         exit(1);
++        if (!numa_uses_legacy_mem() && mc->default_ram_id) {
++            ms->ram =3D g_new(MemoryRegion, 1);
++            memory_region_init(ms->ram, OBJECT(ms), mc->default_ram_id,
++                               ram_size);
++            numa_init_memdev_container(ms, ms->ram);
++        }
+         /* QEMU needs at least all unique node pair distances to build
+          * the whole NUMA distance table. QEMU treats the distance table
+          * as symmetric by default, i.e. distance A->B =3D=3D distance B->=
+A.
+@@ -800,27 +828,16 @@ void memory_region_allocate_system_memory(MemoryRegio=
+n *mr, Object *owner,
+                                           const char *name,
+                                           uint64_t ram_size)
+ {
+-    uint64_t addr =3D 0;
+-    int i;
+     MachineState *ms =3D MACHINE(qdev_get_machine());
+=20
+     if (ms->numa_state =3D=3D NULL ||
+-        ms->numa_state->num_nodes =3D=3D 0 || !have_memdevs) {
++        ms->numa_state->num_nodes =3D=3D 0 || numa_uses_legacy_mem()) {
+         allocate_system_memory_nonnuma(mr, owner, name, ram_size);
+         return;
      }
 =20
--    object_property_set_int(OBJECT(&s->a10->timer), 32768, "clk0-freq", &e=
-rr);
-+    object_property_set_int(OBJECT(&a10->timer), 32768, "clk0-freq", &err)=
-;
-     if (err !=3D NULL) {
-         error_reportf_err(err, "Couldn't set clk0 frequency: ");
-         exit(1);
-     }
-=20
--    object_property_set_int(OBJECT(&s->a10->timer), 24000000, "clk1-freq",
--                            &err);
-+    object_property_set_int(OBJECT(&a10->timer), 24000000, "clk1-freq", &e=
-rr);
-     if (err !=3D NULL) {
-         error_reportf_err(err, "Couldn't set clk1 frequency: ");
-         exit(1);
-     }
-=20
--    object_property_set_bool(OBJECT(s->a10), true, "realized", &err);
-+    object_property_set_bool(OBJECT(a10), true, "realized", &err);
-     if (err !=3D NULL) {
-         error_reportf_err(err, "Couldn't realize Allwinner A10: ");
-         exit(1);
-     }
-=20
--    memory_region_allocate_system_memory(&s->sdram, NULL, "cubieboard.ram"=
-,
--                                         machine->ram_size);
-     memory_region_add_subregion(get_system_memory(), AW_A10_SDRAM_BASE,
--                                &s->sdram);
-+                                machine->ram);
-=20
-     /* TODO create and connect IDE devices for ide_drive_get() */
-=20
-     cubieboard_binfo.ram_size =3D machine->ram_size;
--    arm_load_kernel(&s->a10->cpu, machine, &cubieboard_binfo);
-+    arm_load_kernel(&a10->cpu, machine, &cubieboard_binfo);
+     memory_region_init(mr, owner, name, ram_size);
+-    for (i =3D 0; i < ms->numa_state->num_nodes; i++) {
+-        uint64_t size =3D ms->numa_state->nodes[i].node_mem;
+-        HostMemoryBackend *backend =3D ms->numa_state->nodes[i].node_memde=
+v;
+-        if (!backend) {
+-            continue;
+-        }
+-        MemoryRegion *seg =3D machine_consume_memdev(ms, backend);
+-        memory_region_add_subregion(mr, addr, seg);
+-        addr +=3D size;
+-    }
++    numa_init_memdev_container(ms, mr);
  }
 =20
- static void cubieboard_machine_init(MachineClass *mc)
-@@ -84,6 +74,7 @@ static void cubieboard_machine_init(MachineClass *mc)
-     mc->block_default_type =3D IF_IDE;
-     mc->units_per_default_bus =3D 1;
-     mc->ignore_memory_transaction_failures =3D true;
-+    mc->default_ram_id =3D "cubieboard.ram";
- }
+ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+diff --git a/vl.c b/vl.c
+index d36a857..cf13987 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4303,9 +4303,10 @@ int main(int argc, char **argv, char **envp)
+     }
+     parse_numa_opts(current_machine);
 =20
- DEFINE_MACHINE("cubieboard", cubieboard_machine_init)
+-    if (!current_machine->ram_memdev &&
+-         machine_class->default_ram_size &&
+-         machine_class->default_ram_id) {
++    if (numa_uses_legacy_mem() &&
++        machine_class->default_ram_size &&
++        machine_class->default_ram_id &&
++        !current_machine->ram_memdev) {
+         create_default_memdev(current_machine, mem_path, mem_prealloc);
+     }
+     /* do monitor/qmp handling at preconfig state if requested */
 --=20
 2.7.4
 
