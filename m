@@ -2,56 +2,57 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B274C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8065C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:44:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25A262081E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:42:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25A262081E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id BECC02081E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:44:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BECC02081E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irlki-0002a2-7b
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:42:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57116)
+	id 1irlm6-0004Uf-RM
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:44:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0Q-0005zs-Eh
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:58 -0500
+ (envelope-from <no-reply@patchew.org>) id 1irlkm-0002wp-KN
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 11:42:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0M-0006FN-NY
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:54 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34675 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1irl0M-0006EI-Bz
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:50 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id F25271A2173;
- Wed, 15 Jan 2020 16:53:44 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
- [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id C023E1A1F87;
- Wed, 15 Jan 2020 16:53:44 +0100 (CET)
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 12/12] linux-user: Add support for selected alsa timer
- instructions using ioctls
-Date: Wed, 15 Jan 2020 16:53:38 +0100
-Message-Id: <1579103618-20217-13-git-send-email-Filip.Bozuta@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
-References: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (envelope-from <no-reply@patchew.org>) id 1irlki-00005t-QD
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 11:42:48 -0500
+Resent-Date: Wed, 15 Jan 2020 11:42:48 -0500
+Resent-Message-Id: <E1irlki-00005t-QD@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21176)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1irlki-00004s-Id
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 11:42:44 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579106555404743.3051766154573;
+ Wed, 15 Jan 2020 08:42:35 -0800 (PST)
+In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [PATCH v2 00/86] refactor main RAM allocation to use hostmem
+ backend
+Message-ID: <157910655419.7467.10684433461943845070@37313f22b938>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: imammedo@redhat.com
+Date: Wed, 15 Jan 2020 08:42:35 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,89 +64,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, arnd@arndb.de,
- richard.henderson@linaro.org, laurent@vivier.eu, jcmvbkbc@gmail.com,
- amarkovic@wavecomp.com, philmd@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionalities of following ioctls:
-
-SNDRV_TIMER_IOCTL_START - Start selected alsa timer
-
-    Starts the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be started. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
-
-SNDRV_TIMER_IOCTL_STOP - Stop selected alsa timer
-
-    Stops the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be stopped. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
-
-SNDRV_TIMER_IOCTL_CONTINUE - Continue selected alsa timer
-
-    Continues the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be continued. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
-
-SNDRV_TIMER_IOCTL_PAUSE - Pause selected alsa timer
-
-    Pauses the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be paused. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
-
-Implementation notes:
-
-    Since all of the implemented ioctls have NULL as their third argument,
-    their implementation was straightforward.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
----
- linux-user/ioctls.h       | 4 ++++
- linux-user/syscall_defs.h | 4 ++++
- 2 files changed, 8 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 43e7e5d..75a2f0e 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -466,6 +466,10 @@
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_params)))
-   IOCTL(SNDRV_TIMER_IOCTL_STATUS, IOC_R,
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_status)))
-+  IOCTL(SNDRV_TIMER_IOCTL_START, 0, TYPE_NULL)
-+  IOCTL(SNDRV_TIMER_IOCTL_STOP, 0, TYPE_NULL)
-+  IOCTL(SNDRV_TIMER_IOCTL_CONTINUE, 0, TYPE_NULL)
-+  IOCTL(SNDRV_TIMER_IOCTL_PAUSE, 0, TYPE_NULL)
- 
-   IOCTL(HDIO_GETGEO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_hd_geometry)))
-   IOCTL(HDIO_GET_UNMASKINTR, IOC_R, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index d76124d..311aec0 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -2505,6 +2505,10 @@ struct target_snd_timer_status {
-                                                          struct snd_timer_params)
- #define TARGET_SNDRV_TIMER_IOCTL_STATUS       TARGET_IOR('T', 0x14,                      \
-                                                          struct target_snd_timer_status)
-+#define TARGET_SNDRV_TIMER_IOCTL_START        TARGET_IO('T', 0xa0)
-+#define TARGET_SNDRV_TIMER_IOCTL_STOP         TARGET_IO('T', 0xa1)
-+#define TARGET_SNDRV_TIMER_IOCTL_CONTINUE     TARGET_IO('T', 0xa2)
-+#define TARGET_SNDRV_TIMER_IOCTL_PAUSE        TARGET_IO('T', 0xa3)
- 
- /* vfat ioctls */
- #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
--- 
-2.7.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc5MTAwODYxLTczNjkyLTEt
+Z2l0LXNlbmQtZW1haWwtaW1hbW1lZG9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBm
+YWlsZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRo
+ZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERv
+Y2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNl
+bnRvczcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBT
+SE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1Qg
+ICAgaW90ZXN0LXFjb3cyOiAyMTcKc29ja2V0X2FjY2VwdCBmYWlsZWQ6IFJlc291cmNlIHRlbXBv
+cmFyaWx5IHVuYXZhaWxhYmxlCioqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVz
+dC9saWJxdGVzdC5jOjI3MjpxdGVzdF9pbml0X3dpdGhvdXRfcW1wX2hhbmRzaGFrZTogYXNzZXJ0
+aW9uIGZhaWxlZDogKHMtPmZkID49IDAgJiYgcy0+cW1wX2ZkID49IDApCi90bXAvcWVtdS10ZXN0
+L3NyYy90ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjE0MDoga2lsbF9xZW11KCkgdHJpZWQgdG8gdGVy
+bWluYXRlIFFFTVUgcHJvY2VzcyBidXQgZW5jb3VudGVyZWQgZXhpdCBzdGF0dXMgMSAoZXhwZWN0
+ZWQgMCkKRVJST1IgLSBCYWlsIG91dCEgRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0
+ZXN0L2xpYnF0ZXN0LmM6MjcyOnF0ZXN0X2luaXRfd2l0aG91dF9xbXBfaGFuZHNoYWtlOiBhc3Nl
+cnRpb24gZmFpbGVkOiAocy0+ZmQgPj0gMCAmJiBzLT5xbXBfZmQgPj0gMCkKbWFrZTogKioqIFtj
+aGVjay1xdGVzdC14ODZfNjRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNo
+ZWQgam9icy4uLi4KICBURVNUICAgIGNoZWNrLXF0ZXN0LWFhcmNoNjQ6IHRlc3RzL3F0ZXN0L3Rl
+c3QtaG1wCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDIyMAotLS0KICAgIHJhaXNlIENhbGxlZFBy
+b2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBD
+b21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5x
+ZW11Lmluc3RhbmNlLnV1aWQ9MTJjOWRkOTM1OTM0NDkwZWFmYWQ5NDNiYTAyMzYyMjYnLCAnLXUn
+LCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScs
+ICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
+JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEn
+LCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hl
+dzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcjdieTBrczMvc3JjL2RvY2tlci1zcmMuMjAyMC0w
+MS0xNS0xMS4zMC4zMi4yMzk4MDovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3Jywg
+Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
+dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
+MTJjOWRkOTM1OTM0NDkwZWFmYWQ5NDNiYTAyMzYyMjYKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
+XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtcjdieTBrczMvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0Bj
+ZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDEybTEuNTIxcwp1c2VyICAgIDBtOC44MjJzCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTc5MTAw
+ODYxLTczNjkyLTEtZ2l0LXNlbmQtZW1haWwtaW1hbW1lZG9AcmVkaGF0LmNvbS90ZXN0aW5nLmRv
+Y2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
