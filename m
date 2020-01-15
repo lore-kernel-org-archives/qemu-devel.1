@@ -2,91 +2,79 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FAE8C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 492A6C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:39:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A21C214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:31:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1489A2467C
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:39:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=livius-net.20150623.gappssmtp.com header.i=@livius-net.20150623.gappssmtp.com header.b="C2AccYPI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A21C214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=livius.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="4Z3boid5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1489A2467C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53121 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irhpl-00076G-6q
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:31:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48544)
+	id 1irhxY-0003xt-2s
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:39:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ilg@livius.net>) id 1irhoU-0006CF-Dw
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:30:23 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1irhuf-0002IM-2N
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ilg@livius.net>) id 1irhoT-0006Ou-AU
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:30:22 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:53140)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <ilg@livius.net>) id 1irhoS-0006NR-V1
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:30:21 -0500
-Received: by mail-wm1-x333.google.com with SMTP id p9so17696481wmc.2
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 04:30:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=livius-net.20150623.gappssmtp.com; s=20150623;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=eYNFa5Bhv7qJOtgJ+6RxiiiCas0UwA2leU9uE/w4vwY=;
- b=C2AccYPIm40rpRFDdroGPZrPtVU4PQexww4orANUnz5q/JQID5fw3+tYMEU3PRgCLd
- z2vXghvvfzivNppbf1ngfFykCTukXgoxnycAlmkMrfhqSsCiCl4Ngi298P7v68rfWK+P
- bTrHG5r8/8WydBMLFFDkpMIFru/tXhPQTNQU/V0yVDMofoKz00AwVqulEonIN0uxWI9X
- wa7dxgVy1BicqKaJ+6iOiGBUG0zsvBDM7N2hHp9q7rVSi+9FnUeTDSTNJcosCDXD/qp+
- 9epfWSdgkMh8XXm1RTqEznKst5Ed42kpEAvhhzmJYUxC9wVrNFmW8UdEdSijxQQfVTcZ
- oKlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=eYNFa5Bhv7qJOtgJ+6RxiiiCas0UwA2leU9uE/w4vwY=;
- b=WPuulyD5SSNNQSM4VtrbP4xgcgL9Jjs/NT/ZXh9ZnhMSWstfMF/oHnA41dPQe9tJRG
- +5Rbkc2Y+n0xsLK1yk3e86y3vwjwu3JOHEplFlqplMzEzr+WtzfS+qYiBepHBsJvp3JG
- Vu7fsXYLfFPs83NOPLedoax5pOugXSj3AlUC0wxDp3DXA6tVrjv4QQrJaMcMddsIRLa6
- aRcCASL/8zDHBIsdn2mBNeq72HNrN6xUlkvF4SjRJnFWC70cRaGNvr9TfCG1HwsMRWxl
- CPs5AUp4OW2vTGU3rDrVXN+RAYyrPo6cDGz1R0bFTYlXFGaQAiCbQtiZBOrSg2HftMdQ
- OyYQ==
-X-Gm-Message-State: APjAAAUki5gc0kRWmIkU4c1p1B4ktolUqCjLnP//LwrjhynYwWyR3xF2
- VfK4yGq/Rgem76/ORQ8Iuycm/Q==
-X-Google-Smtp-Source: APXvYqxStILxOScGAQfctRoXwkjDQsxIAAkEZeLzqQQHTXPk56pPD8OsENdEVjQX4DO8x0kkoypHLQ==
-X-Received: by 2002:a7b:cb01:: with SMTP id u1mr31185594wmj.156.1579091419272; 
- Wed, 15 Jan 2020 04:30:19 -0800 (PST)
-Received: from wks.local ([188.26.232.206])
- by smtp.gmail.com with ESMTPSA id i16sm24405210wmb.36.2020.01.15.04.30.18
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 15 Jan 2020 04:30:18 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: Semihosting, arm, riscv, ppc and common code
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <87wo9tkjxz.fsf@linaro.org>
-Date: Wed, 15 Jan 2020 14:30:17 +0200
+ (envelope-from <damien.hedde@greensocs.com>) id 1irhud-00030J-F7
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:44 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:53462)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1irhuc-0002yA-Sa; Wed, 15 Jan 2020 07:36:43 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 62AB096EF0;
+ Wed, 15 Jan 2020 12:36:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1579091799;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Is+3y8PyaoD3fDrqFoTeD1QYkefQzBDvYY5F/IE0UQo=;
+ b=4Z3boid5krYexeLVtzS+fAve/wRgSuSlHS2gvMcodDNDg88cSRhUWQkWqun6jv5qMsJOYh
+ dFFmUSHWZ/g7GJeQ6aMNox5Q56OFi5aG/CmevIP2iBp0YQb9nSzZ8jqQG6dwvSeA+08D+d
+ wu0mCAmebVTzXckHiN+HJL+T4UMiznE=
+From: Damien Hedde <damien.hedde@greensocs.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 00/11] Multi-phase reset mechanism
+Date: Wed, 15 Jan 2020 13:36:09 +0100
+Message-Id: <20200115123620.250132-1-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1579091800;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Is+3y8PyaoD3fDrqFoTeD1QYkefQzBDvYY5F/IE0UQo=;
+ b=WmuAWdB0pNIOSGH2GW3nzVvFXx+GxdBYFyRLjv+eFDMdxrFaa0rK9hJggChQ7AY0j/VkfE
+ aPX69lZltSBCPwIJdkD0C0Icax1imyRQZma1Ua2/zXaqty/Pdx+Rp6e3bR+gZYlpjS6DAl
+ qyXluGZHo0AwnEUTTYy+qUdVhUYAzAw=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579091800; a=rsa-sha256; cv=none;
+ b=pAbxOlmo684UrwMrggGbZZKzviipff0epGxXObNAFy8Z15ZQ5Ooriyr9Q5VDijy0/ZzlmU
+ 70gEYh3fw6p037zSBrR3rVWt3YNJ216yXbkaLD/XOBEOFq3fCKXeyvqsHFss5CuMImXO+X
+ GIyfbyp0/11KS5auLZDL2YAUQ896xdA=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <58DE85E5-2A72-4073-AF02-6B944AB05889@livius.net>
-References: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
- <AE7841A1-B4D6-4D6D-9AFD-01C4604D7BC4@livius.net>
- <cd9a2de94700a2781f176247131dceba690d8f31.camel@kernel.crashing.org>
- <87sgkimkma.fsf@linaro.org>
- <1309ca0ab6405d88cfd949c73130ad0f2af944a6.camel@kernel.crashing.org>
- <87wo9tkjxz.fsf@linaro.org>
-To: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,47 +86,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: keithp@keithp.com, qemu-arm@nongnu.org,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com, cohuck@redhat.com,
+ mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
+ pbonzini@redhat.com, philmd@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi all,
 
+The purpose of this series is to split the current reset procedure
+into multiple phases. This will help to solve some ordering
+difficulties we have during reset.
 
-> On 15 Jan 2020, at 14:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->=20
-> ... AFAIK the main users of arm linux user
-> are compiler test cases for M-profile CPUs.=20
+This is a ready to merge version. I've rebased on master and followed
+Richard's remarks on v6. All patches have been reviewed by.
 
-I confirm, generally unit tests.
+This series adds resettable interface and transitions base Device and
+Bus classes (sysbus subclasses are ok too). It provides new reset
+functions but does not switch anymore the old functions
+(device_reset() and qdev/qbus_reset_all()) to resettable interface.
+These functions keep the exact same behavior as before.
 
-But not necessarily, I used QEMU as the main development platform for =
-the Cortex-M port of =C2=B5OS++, a C/C++ framework/RTOS, and it was very =
-convenient.
+The series also transition the main reset handlers registration which
+has no impact until devices and buses are transitioned.
 
-> ... Is semihosting even
-> going to be a thing on real RiscV/Power silicon?
+The series is organized as follows:
+Patch 1 is unmodified. Patch 2 adds some utility trace events.
+Patches 3 to 8 adds resettable api in devices and buses. Patch 9 adds
+some documentation. Patches 10 and 11 transition the call sites of
+qemu_register_reset(qdev/qbus_reset_all_fn, ...).
 
-Even for Arm it is a thing of debuggers and development environments, =
-not of silicon itself, since it requires no special hardware support, a =
-BRK instruction is enough.
+After this series, the plan is then to transition devices, buses and
+legacy reset call sites. Devices and buses have to be transitioned
+from mother class to daughter classes order but until the final
+(daughter) class is transitioned, old monolitic reset behavior will
+be kept for this class.
 
-=46rom a software point of view it would be beneficial to use the same =
-semihosting protocol on other non-Arm architectures too, even if it is =
-far from perfect.
+Thanks,
+Damien
 
-I pushed hard for adopting the Arm semihosting for RISC-V, and even =
-contributed the semihosting code for OpenOCD RISC-V, but officially the =
-only mention of semihosting in the RISC-V specs is in the notes =
-sections, where it is mentioned how to use the BRK instruction to invoke =
-semihosting calls (RISC-V has a single BREAK instructions, and to make =
-it unique it must be surrounded by some hint NOPs).
+v7:
+  + patch 1
+    - new device_reset occurrence (rebase)
+  + patch 3
+    - ResettablePhases un-nest (Richard)
+    - warnings (Richard)
+  + patch 7
+    - inline resettable_state_clear (Richard)
 
+v6:
+https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04664.html
+  + patch 1
+    - update (microvm machine) (rebase)
+  + patch 2
+    - added more info in trace_qdev_update_parent_bus (Philippe)
+  + patch 3
+    - typos (Peter)
+    - missing gpl header in header (Peter)
+    - clarify global entry_in_progress flag (Peter)
+  + patch 4
+    -  parent/child terminology (Peter)
+  + patch 5
+    - typos (Peter)
+    - comment about global exit_in_progress flag (Peter)
+  + patch 6
+    -  update list of qdev_set_parent_bus() call sites (rebase)
+  + patch 7
+    - clear reset state in realize before doing the hotplug reset
+  + patch 9
+    - added entry in index.rst
+    - fix commit message and various improvements (Peter)
+    - do parent phase method before child actions (Peter)
+    - clarify "Polling the reset state" paragraph=20
+  + patch 12&13
+    - removed (follow-up series to cleanup the raspi sd)
 
-Regards,
+v5:
+https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04730.html
+  + various improvement in the resettable interface (regarding
+    transition, robustness and several reset types)
+  + better handling of transition from legacy reset to resettable
+  + device hotplug and parent bus 'hot' change support
+  + improved doc with examples and converted to rst format
 
-Liviu
+v4:
+https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg04359.html
+
+Damien Hedde (11):
+  add device_legacy_reset function to prepare for reset api change
+  hw/core/qdev: add trace events to help with resettable transition
+  hw/core: create Resettable QOM interface
+  hw/core: add Resettable support to BusClass and DeviceClass
+  hw/core/resettable: add support for changing parent
+  hw/core/qdev: handle parent bus change regarding resettable
+  hw/core/qdev: update hotplug reset regarding resettable
+  hw/core: deprecate old reset functions and introduce new ones
+  docs/devel/reset.rst: add doc about Resettable interface
+  vl: replace deprecated qbus_reset_all registration
+  hw/s390x/ipl: replace deprecated qdev_reset_all registration
+
+ docs/devel/index.rst     |   1 +
+ docs/devel/reset.rst     | 289 +++++++++++++++++++++++++++++++++++++
+ Makefile.objs            |   1 +
+ include/hw/qdev-core.h   |  58 +++++++-
+ include/hw/resettable.h  | 247 ++++++++++++++++++++++++++++++++
+ hw/audio/intel-hda.c     |   2 +-
+ hw/core/bus.c            | 102 +++++++++++++
+ hw/core/qdev.c           | 160 +++++++++++++++++++--
+ hw/core/resettable.c     | 301 +++++++++++++++++++++++++++++++++++++++
+ hw/hyperv/hyperv.c       |   2 +-
+ hw/i386/microvm.c        |   2 +-
+ hw/i386/pc.c             |   2 +-
+ hw/ide/microdrive.c      |   8 +-
+ hw/intc/spapr_xive.c     |   2 +-
+ hw/ppc/pnv_psi.c         |   4 +-
+ hw/ppc/spapr_pci.c       |   2 +-
+ hw/ppc/spapr_vio.c       |   2 +-
+ hw/s390x/ipl.c           |  10 +-
+ hw/s390x/s390-pci-inst.c |   2 +-
+ hw/scsi/vmw_pvscsi.c     |   2 +-
+ hw/sd/omap_mmc.c         |   2 +-
+ hw/sd/pl181.c            |   2 +-
+ vl.c                     |  10 +-
+ hw/core/Makefile.objs    |   1 +
+ hw/core/trace-events     |  27 ++++
+ tests/Makefile.include   |   1 +
+ 26 files changed, 1211 insertions(+), 31 deletions(-)
+ create mode 100644 docs/devel/reset.rst
+ create mode 100644 include/hw/resettable.h
+ create mode 100644 hw/core/resettable.c
+
+--=20
+2.24.1
 
 
