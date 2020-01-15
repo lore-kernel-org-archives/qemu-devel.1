@@ -2,59 +2,59 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D1AC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98FC7C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:25:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B683214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:25:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B683214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+	by mail.kernel.org (Postfix) with ESMTPS id 31DA4214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:25:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31DA4214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irnLH-0000wU-P5
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:24:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53069)
+	id 1irnMS-00026V-UM
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:25:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54433)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1irnCl-0006ab-1B
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:15:48 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1irnLL-00018x-8I
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:24:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert@linux-m68k.org>) id 1irnCj-0003cO-H2
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:15:46 -0500
-Received: from andre.telenet-ops.be ([2a02:1800:120:4::f00:15]:55968)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
- id 1irnCj-0003b6-AB
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:15:45 -0500
-Received: from ramsan ([84.195.182.253]) by andre.telenet-ops.be with bizsmtp
- id qiFR2100X5USYZQ01iFRme; Wed, 15 Jan 2020 19:15:43 +0100
-Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1irnCP-00012Z-G2; Wed, 15 Jan 2020 19:15:25 +0100
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1irnCP-000694-EY; Wed, 15 Jan 2020 19:15:25 +0100
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- Eugeniu Rosca <erosca@de.adit-jv.com>
-Subject: [PATCH v4 2/5] gpiolib: Add support for GPIO line table lookup
-Date: Wed, 15 Jan 2020 19:15:20 +0100
-Message-Id: <20200115181523.23556-3-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200115181523.23556-1-geert+renesas@glider.be>
-References: <20200115181523.23556-1-geert+renesas@glider.be>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:1800:120:4::f00:15
+ (envelope-from <balaton@eik.bme.hu>) id 1irnLJ-0007vs-SP
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:24:39 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:26906)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1irnLJ-0007uy-Iv; Wed, 15 Jan 2020 13:24:37 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 0D94A748DC6;
+ Wed, 15 Jan 2020 19:24:35 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id ACA01748DC5; Wed, 15 Jan 2020 19:24:34 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id AB3877482D3;
+ Wed, 15 Jan 2020 19:24:34 +0100 (CET)
+Date: Wed, 15 Jan 2020 19:24:34 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH v2 64/86] ppc:ppc405_boards: add RAM size checks
+In-Reply-To: <1579100861-73692-65-git-send-email-imammedo@redhat.com>
+Message-ID: <alpine.BSF.2.21.99999.352.2001151923450.24151@zero.eik.bme.hu>
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-65-git-send-email-imammedo@redhat.com>
+User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="3866299591-607929231-1579112674=:24151"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,145 +66,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Geert Uytterhoeven <geert+renesas@glider.be>, linux-doc@vger.kernel.org,
- Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- Rob Herring <robh+dt@kernel.org>, Alexander Graf <graf@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Phil Reid <preid@electromag.com.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently GPIOs can only be referred to by GPIO controller and offset in
-GPIO lookup tables.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Add support for looking them up by line name.
-Rename gpiod_lookup.chip_label to gpiod_lookup.key, to make it clear
-that this field can have two meanings, and update the kerneldoc and
-GPIO_LOOKUP*() macros.
+--3866299591-607929231-1579112674=:24151
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Reviewed-by: Ulrich Hecht <uli+renesas@fpond.eu>
----
-v4:
-  - Add Reviewed-by,
-  - Rename gpiod_lookup.chip_label.
-  - Use U16_MAX instead of (u16)-1,
+On Wed, 15 Jan 2020, Igor Mammedov wrote:
+> If user provided non-sense RAM size, board will ignore it
+> and continue running with fixed RAM size.
+>
+> Also RAM is going to be allocated by generic code, so it
+> won't be possible for board to fix CLI.
+>
+> Make it error message and exit to force user fix CLI,
+> instead of accepting non-sense CLI values.
+>
+> PS:
+> move fixed RAM size into mc->default_ram_size, so that
+> generic code will know how much to allocate.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>  * fix format string causing build failure on 32-bit host
+>    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+>
+> CC: david@gibson.dropbear.id.au
+> CC: qemu-ppc@nongnu.org
+> ---
+> hw/ppc/ppc405_boards.c | 36 +++++++++++++++++++++++-------------
+> 1 file changed, 23 insertions(+), 13 deletions(-)
+>
+> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> index 1f721fe..a7a432d 100644
+> --- a/hw/ppc/ppc405_boards.c
+> +++ b/hw/ppc/ppc405_boards.c
+> @@ -137,7 +137,7 @@ static void ref405ep_fpga_init(MemoryRegion *sysmem=
+, uint32_t base)
+>
+> static void ref405ep_init(MachineState *machine)
+> {
+> -    ram_addr_t ram_size =3D machine->ram_size;
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>     const char *kernel_filename =3D machine->kernel_filename;
+>     const char *kernel_cmdline =3D machine->kernel_cmdline;
+>     const char *initrd_filename =3D machine->initrd_filename;
+> @@ -161,15 +161,20 @@ static void ref405ep_init(MachineState *machine)
+>     DriveInfo *dinfo;
+>     MemoryRegion *sysmem =3D get_system_memory();
+>
+> +    if (machine->ram_size !=3D mc->default_ram_size) {
+> +        error_report("Invalid RAM size, should be " RAM_ADDR_UFMT " By=
+tes",
+> +                     mc->default_ram_size);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+>     /* XXX: fix this */
+>     memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405=
+ep.ram",
+> -                                         0x08000000);
+> +                                         machine->ram_size);
+>     ram_bases[0] =3D 0;
+> -    ram_sizes[0] =3D 0x08000000;
+> +    ram_sizes[0] =3D machine->ram_size;
+>     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
+>     ram_bases[1] =3D 0x00000000;
+>     ram_sizes[1] =3D 0x00000000;
+> -    ram_size =3D 128 * MiB;
+>     env =3D ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
+>                         33333333, &pic, kernel_filename =3D=3D NULL ? 0=
+ : 1);
+>     /* allocate SRAM */
+> @@ -227,7 +232,7 @@ static void ref405ep_init(MachineState *machine)
+>     if (linux_boot) {
+>         memset(&bd, 0, sizeof(bd));
+>         bd.bi_memstart =3D 0x00000000;
+> -        bd.bi_memsize =3D ram_size;
+> +        bd.bi_memsize =3D machine->ram_size;
+>         bd.bi_flashstart =3D -bios_size;
+>         bd.bi_flashsize =3D -bios_size;
+>         bd.bi_flashoffset =3D 0;
+> @@ -255,7 +260,7 @@ static void ref405ep_init(MachineState *machine)
+>         kernel_base =3D KERNEL_LOAD_ADDR;
+>         /* now we can load the kernel */
+>         kernel_size =3D load_image_targphys(kernel_filename, kernel_bas=
+e,
+> -                                          ram_size - kernel_base);
+> +                                          machine->ram_size - kernel_b=
+ase);
+>         if (kernel_size < 0) {
+>             error_report("could not load kernel '%s'", kernel_filename)=
+;
+>             exit(1);
+> @@ -266,7 +271,7 @@ static void ref405ep_init(MachineState *machine)
+>         if (initrd_filename) {
+>             initrd_base =3D INITRD_LOAD_ADDR;
+>             initrd_size =3D load_image_targphys(initrd_filename, initrd=
+_base,
+> -                                              ram_size - initrd_base);
+> +                                              machine->ram_size - init=
+rd_base);
+>             if (initrd_size < 0) {
+>                 error_report("could not load initial ram disk '%s'",
+>                              initrd_filename);
+> @@ -304,6 +309,7 @@ static void ref405ep_class_init(ObjectClass *oc, vo=
+id *data)
+>
+>     mc->desc =3D "ref405ep";
+>     mc->init =3D ref405ep_init;
+> +    mc->default_ram_size =3D 0x08000000;
+> }
+>
+> static const TypeInfo ref405ep_type =3D {
+> @@ -408,7 +414,7 @@ static void taihu_cpld_init(MemoryRegion *sysmem, u=
+int32_t base)
+>
+> static void taihu_405ep_init(MachineState *machine)
+> {
+> -    ram_addr_t ram_size =3D machine->ram_size;
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>     const char *kernel_filename =3D machine->kernel_filename;
+>     const char *initrd_filename =3D machine->initrd_filename;
+>     char *filename;
+> @@ -425,10 +431,13 @@ static void taihu_405ep_init(MachineState *machin=
+e)
+>     int fl_idx;
+>     DriveInfo *dinfo;
+>
+> -    /* RAM is soldered to the board so the size cannot be changed */
+> -    ram_size =3D 0x08000000;
+> +    if (machine->ram_size !=3D mc->default_ram_size) {
+> +        error_report("Invalid RAM size, should be " RAM_ADDR_UFMT " By=
+tes",
 
-v3:
-  - New.
----
- drivers/gpio/gpiolib.c       | 22 +++++++++++++++++-----
- include/linux/gpio/machine.h | 15 ++++++++-------
- 2 files changed, 25 insertions(+), 12 deletions(-)
+Likewise, should this rather print valid value in M instead of bytes?
 
-diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
-index 114325b366ae33d5..48fc6cf9a020f4ff 100644
---- a/drivers/gpio/gpiolib.c
-+++ b/drivers/gpio/gpiolib.c
-@@ -4457,7 +4457,7 @@ static struct gpio_desc *gpiod_find(struct device *dev, const char *con_id,
- 	if (!table)
- 		return desc;
- 
--	for (p = &table->table[0]; p->chip_label; p++) {
-+	for (p = &table->table[0]; p->key; p++) {
- 		struct gpio_chip *chip;
- 
- 		/* idx must always match exactly */
-@@ -4468,18 +4468,30 @@ static struct gpio_desc *gpiod_find(struct device *dev, const char *con_id,
- 		if (p->con_id && (!con_id || strcmp(p->con_id, con_id)))
- 			continue;
- 
--		chip = find_chip_by_name(p->chip_label);
-+		if (p->chip_hwnum == U16_MAX) {
-+			desc = gpio_name_to_desc(p->key);
-+			if (desc) {
-+				*flags = p->flags;
-+				return desc;
-+			}
-+
-+			dev_warn(dev, "cannot find GPIO line %s, deferring\n",
-+				 p->key);
-+			return ERR_PTR(-EPROBE_DEFER);
-+		}
-+
-+		chip = find_chip_by_name(p->key);
- 
- 		if (!chip) {
- 			/*
- 			 * As the lookup table indicates a chip with
--			 * p->chip_label should exist, assume it may
-+			 * p->key should exist, assume it may
- 			 * still appear later and let the interested
- 			 * consumer be probed again or let the Deferred
- 			 * Probe infrastructure handle the error.
- 			 */
- 			dev_warn(dev, "cannot find GPIO chip %s, deferring\n",
--				 p->chip_label);
-+				 p->key);
- 			return ERR_PTR(-EPROBE_DEFER);
- 		}
- 
-@@ -4510,7 +4522,7 @@ static int platform_gpio_count(struct device *dev, const char *con_id)
- 	if (!table)
- 		return -ENOENT;
- 
--	for (p = &table->table[0]; p->chip_label; p++) {
-+	for (p = &table->table[0]; p->key; p++) {
- 		if ((con_id && p->con_id && !strcmp(con_id, p->con_id)) ||
- 		    (!con_id && !p->con_id))
- 			count++;
-diff --git a/include/linux/gpio/machine.h b/include/linux/gpio/machine.h
-index 1ebe5be05d5f81fa..84c66fbf54fd5811 100644
---- a/include/linux/gpio/machine.h
-+++ b/include/linux/gpio/machine.h
-@@ -20,8 +20,9 @@ enum gpio_lookup_flags {
- 
- /**
-  * struct gpiod_lookup - lookup table
-- * @chip_label: name of the chip the GPIO belongs to
-- * @chip_hwnum: hardware number (i.e. relative to the chip) of the GPIO
-+ * @key: either the name of the chip the GPIO belongs to, or the GPIO line name
-+ * @chip_hwnum: hardware number (i.e. relative to the chip) of the GPIO, or
-+ *              U16_MAX to indicate that @key is a GPIO line name
-  * @con_id: name of the GPIO from the device's point of view
-  * @idx: index of the GPIO in case several GPIOs share the same name
-  * @flags: bitmask of gpio_lookup_flags GPIO_* values
-@@ -30,7 +31,7 @@ enum gpio_lookup_flags {
-  * functions using platform data.
-  */
- struct gpiod_lookup {
--	const char *chip_label;
-+	const char *key;
- 	u16 chip_hwnum;
- 	const char *con_id;
- 	unsigned int idx;
-@@ -63,17 +64,17 @@ struct gpiod_hog {
- /*
-  * Simple definition of a single GPIO under a con_id
-  */
--#define GPIO_LOOKUP(_chip_label, _chip_hwnum, _con_id, _flags) \
--	GPIO_LOOKUP_IDX(_chip_label, _chip_hwnum, _con_id, 0, _flags)
-+#define GPIO_LOOKUP(_key, _chip_hwnum, _con_id, _flags) \
-+	GPIO_LOOKUP_IDX(_key, _chip_hwnum, _con_id, 0, _flags)
- 
- /*
-  * Use this macro if you need to have several GPIOs under the same con_id.
-  * Each GPIO needs to use a different index and can be accessed using
-  * gpiod_get_index()
-  */
--#define GPIO_LOOKUP_IDX(_chip_label, _chip_hwnum, _con_id, _idx, _flags)  \
-+#define GPIO_LOOKUP_IDX(_key, _chip_hwnum, _con_id, _idx, _flags)         \
- {                                                                         \
--	.chip_label = _chip_label,                                        \
-+	.key = _key,                                                      \
- 	.chip_hwnum = _chip_hwnum,                                        \
- 	.con_id = _con_id,                                                \
- 	.idx = _idx,                                                      \
--- 
-2.17.1
+Regards,
+BALATON Zoltan
 
+> +                     mc->default_ram_size);
+> +        exit(EXIT_FAILURE);
+> +    }
+>     memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
+> -                                         ram_size);
+> +                                         machine->ram_size);
+>
+>     ram_bases[0] =3D 0;
+>     ram_sizes[0] =3D 0x04000000;
+> @@ -500,7 +509,7 @@ static void taihu_405ep_init(MachineState *machine)
+>         kernel_base =3D KERNEL_LOAD_ADDR;
+>         /* now we can load the kernel */
+>         kernel_size =3D load_image_targphys(kernel_filename, kernel_bas=
+e,
+> -                                          ram_size - kernel_base);
+> +                                          machine->ram_size - kernel_b=
+ase);
+>         if (kernel_size < 0) {
+>             error_report("could not load kernel '%s'", kernel_filename)=
+;
+>             exit(1);
+> @@ -509,7 +518,7 @@ static void taihu_405ep_init(MachineState *machine)
+>         if (initrd_filename) {
+>             initrd_base =3D INITRD_LOAD_ADDR;
+>             initrd_size =3D load_image_targphys(initrd_filename, initrd=
+_base,
+> -                                              ram_size - initrd_base);
+> +                                              machine->ram_size - init=
+rd_base);
+>             if (initrd_size < 0) {
+>                 error_report("could not load initial ram disk '%s'",
+>                              initrd_filename);
+> @@ -533,6 +542,7 @@ static void taihu_class_init(ObjectClass *oc, void =
+*data)
+>
+>     mc->desc =3D "taihu";
+>     mc->init =3D taihu_405ep_init;
+> +    mc->default_ram_size =3D 0x08000000;
+> }
+>
+> static const TypeInfo taihu_type =3D {
+>
+--3866299591-607929231-1579112674=:24151--
 
