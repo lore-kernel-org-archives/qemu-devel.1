@@ -2,68 +2,92 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15927C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 11:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02FD6C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:02:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD7B92187F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 11:58:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD7B92187F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id C1B532187F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:02:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mSv9Z1rc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1B532187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irhJz-00016H-Th
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 06:58:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44148)
+	id 1irhNZ-0002y4-UK
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:02:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1irhJM-0000Qd-MH
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 06:58:16 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1irhML-0001wm-SY
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:01:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1irhJI-00016I-85
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 06:58:11 -0500
-Received: from mgwym02.jp.fujitsu.com ([211.128.242.41]:29689)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
- id 1irhJH-0000z2-19
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 06:58:07 -0500
-Received: from yt-mxoi2.gw.nic.fujitsu.com (unknown [192.168.229.69]) by
- mgwym02.jp.fujitsu.com with smtp
- id 1aca_0abf_86652398_8fcd_422b_a265_83d25c042966;
- Wed, 15 Jan 2020 20:57:55 +0900
-Received: from g01jpfmpwyt03.exch.g01.fujitsu.local
- (g01jpfmpwyt03.exch.g01.fujitsu.local [10.128.193.57])
- by yt-mxoi2.gw.nic.fujitsu.com (Postfix) with ESMTP id B5D86AC00E0
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 20:57:54 +0900 (JST)
-Received: from G01JPEXCHYT13.g01.fujitsu.local
- (G01JPEXCHYT13.g01.fujitsu.local [10.128.194.52])
- by g01jpfmpwyt03.exch.g01.fujitsu.local (Postfix) with ESMTP id AD6206EA002;
- Wed, 15 Jan 2020 20:57:53 +0900 (JST)
-Received: from luna3.soft.fujitsu.com (10.124.196.199) by
- G01JPEXCHYT13.g01.fujitsu.local (10.128.194.52) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 15 Jan 2020 20:57:53 +0900
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-To: <dgilbert@redhat.com>
-Subject: Re: [PATCH 051/104] virtiofsd: Parse flag FUSE_WRITE_KILL_PRIV
-Date: Wed, 15 Jan 2020 21:06:03 +0900
-Message-ID: <20200115120603.3191-1-misono.tomohiro@jp.fujitsu.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20191212163904.159893-52-dgilbert@redhat.com>
-References: <20191212163904.159893-52-dgilbert@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1irhMK-0003Vu-Pr
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:01:17 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42797)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1irhMK-0003U7-Jb
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:01:16 -0500
+Received: by mail-wr1-x444.google.com with SMTP id q6so15400363wro.9
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 04:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=jgLIybfd4cvMOOCKA2HZPMjU82OQBor48llZsuJcEBU=;
+ b=mSv9Z1rccBbo319qom1P7NXY9V1XvtYkjXYNzWfhPX+AUjLc4klqux1rQOcEUoiHXJ
+ hWf+20H3CwmnjqNVxi2mrPdybzlxGbZKzLE2QoEKAR0ppgpF2FHTUxSLq/nsH99sndPW
+ x+27uRJwrw3ZWhXgw2efEUaXyI7li6W7qipmX40XkU3pJQyJdacRJWrlbiqDWVd6vkY4
+ yFhfe+Rh2GF4fiNFFu8mTmJUiWilLFo9ZgWNtZAznwpo7UvGYOgxsAdLhXLB0kzgeGEk
+ mogJ8RQArZ9I0FxDn3raKP28W1LZ5K9SNJWurnkYDerhQ1UOd8dC/3Wi+zF2Irr34CBe
+ Yh8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=jgLIybfd4cvMOOCKA2HZPMjU82OQBor48llZsuJcEBU=;
+ b=pW5O517jjvy8rwh1JjygcOFNjQ/UrBqf7sNAhVZAvWVV+xuHpfD8u/OYz5MYAfkzjK
+ 2X3ggFx/9TrfaiAltqBj9JtdKrYZoBd8XSTNYt84+tkeLf8EjtqCfbK41hWXVR25eNQt
+ zX5gSLoWwjXJpxDEy9skJFFbyThcEFpZV9PYXTCRZpoSXNo7Xf0SsfEolbcN/xj4hPXy
+ B7yIFK4N1hUiNbKcJEP0kpUOasI8ZYDWFiG51n6zK2LnYOAgWufrthP14b4fqtyAmTb/
+ aHfStaPGnBFlnslSfO6y91kg/W6PbaepQYQvJDOjbot5Ygm1+5l4GPwOshlrfG0kiD65
+ aCSQ==
+X-Gm-Message-State: APjAAAV3MD0BvPP+dWMH5bGAYWC3m1HZ/r0PTm9N6shOHXboiBivrWTo
+ HM11QM0bzZwozf1783WEo3tmgQ==
+X-Google-Smtp-Source: APXvYqwZ4EpVv36doa86mU1mmWBgXC+Kdt3F9Vp5oZrj2E+yP4QXXCZYGKbepE4eoQFkeDpdWknM0A==
+X-Received: by 2002:adf:a308:: with SMTP id c8mr30207481wrb.240.1579089674043; 
+ Wed, 15 Jan 2020 04:01:14 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n187sm23393313wme.28.2020.01.15.04.01.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Jan 2020 04:01:12 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 356D11FF87;
+ Wed, 15 Jan 2020 12:01:12 +0000 (GMT)
+References: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
+ <AE7841A1-B4D6-4D6D-9AFD-01C4604D7BC4@livius.net>
+ <cd9a2de94700a2781f176247131dceba690d8f31.camel@kernel.crashing.org>
+ <87sgkimkma.fsf@linaro.org>
+ <1309ca0ab6405d88cfd949c73130ad0f2af944a6.camel@kernel.crashing.org>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Subject: Re: Semihosting, arm, riscv, ppc and common code
+In-reply-to: <1309ca0ab6405d88cfd949c73130ad0f2af944a6.camel@kernel.crashing.org>
+Date: Wed, 15 Jan 2020 12:01:12 +0000
+Message-ID: <87wo9tkjxz.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-SecurityPolicyCheck-GC: OK by FENCE-Mail
-X-TM-AS-GCONF: 00
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 211.128.242.41
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,68 +99,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: misono.tomohiro@jp.fujitsu.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- vgoyal@redhat.com
+Cc: Liviu Ionescu <ilg@livius.net>, keithp@keithp.com, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Vivek Goyal <vgoyal@redhat.com>
-> 
-> Caller can set FUSE_WRITE_KILL_PRIV in write_flags. Parse it and pass it
-> to the filesystem.
-> 
-> Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-> ---
->  tools/virtiofsd/fuse_common.h   | 6 +++++-
->  tools/virtiofsd/fuse_lowlevel.c | 4 +++-
->  2 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
-> index 147c043bd9..1e8191b7a6 100644
-> --- a/tools/virtiofsd/fuse_common.h
-> +++ b/tools/virtiofsd/fuse_common.h
-> @@ -93,8 +93,12 @@ struct fuse_file_info {
->       */
->      unsigned int cache_readdir:1;
->  
-> +    /* Indicates that suid/sgid bits should be removed upon write */
-> +    unsigned int kill_priv:1;
-> +
-> +
->      /** Padding.  Reserved for future use*/
-> -    unsigned int padding:25;
-> +    unsigned int padding:24;
->      unsigned int padding2:32;
->  
->      /*
-> diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
-> index bd5ca2f157..c8a3b1597a 100644
-> --- a/tools/virtiofsd/fuse_lowlevel.c
-> +++ b/tools/virtiofsd/fuse_lowlevel.c
-> @@ -1144,6 +1144,7 @@ static void do_write(fuse_req_t req, fuse_ino_t nodeid,
->      memset(&fi, 0, sizeof(fi));
->      fi.fh = arg->fh;
->      fi.writepage = (arg->write_flags & FUSE_WRITE_CACHE) != 0;
-> +    fi.kill_priv = !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
->  
->      fi.lock_owner = arg->lock_owner;
->      fi.flags = arg->flags;
-> @@ -1179,7 +1180,8 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t nodeid,
->      fi.lock_owner = arg->lock_owner;
->      fi.flags = arg->flags;
->      fi.fh = arg->fh;
-> -    fi.writepage = arg->write_flags & FUSE_WRITE_CACHE;
-> +    fi.writepage = !!(arg->write_flags & FUSE_WRITE_CACHE);
-> +    fi.kill_priv = !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
->  
->      if (ibufv->count == 1) {
->          assert(!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD));
-> -- 
-> 2.23.0
 
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Benjamin Herrenschmidt <benh@kernel.crashing.org> writes:
 
-side-note: virtiofs uses write_buf() and therefore do_write() is never called.
-How about cleanup the function?
+> On Tue, 2020-01-14 at 09:51 +0000, Alex Benn=C3=A9e wrote:
+>> > Well, one of the LCA talks wasn't that interesting so I started
+>> > doing
+>> > it and am almost done :-)
+>> >=20
+>> > I'll look at doing something for arm, riscv and ppc and send
+>> > patches
+>> > once I get it working.
+>>=20
+>> Cool. Are you considering linux-user as well or are these only things
+>> that make sense for system emulation?
+>
+> There seem to be some linux-user stuff in there, I'm mostly considering
+> whatever ARM does today but we can certainly extend later.
+
+Depends on if it is to be used. AFAIK the main users of arm linux user
+are compiler test cases for M-profile CPUs.=20
+
+> The idea is to make sure ARM, RiscV and POWER use the same protocol and
+> code base to make picolibc (and others) life easier. Bug compatible
+> :-)
+
+Hmm, I'm not so sure. QEMU tries to emulate real HW although I
+appreciate that is a somewhat loose definition once you get to things
+like -M virt and other such SW like abstractions. Is semihosting even
+going to be a thing on real RiscV/Power silicon?
+
+>
+> Cheers,
+> Ben.
+
+
+--=20
+Alex Benn=C3=A9e
 
