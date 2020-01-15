@@ -2,154 +2,82 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74192C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BD7C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 20:03:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B2B422522
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2A4A222C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 20:03:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=data61.csiro.au header.i=@data61.csiro.au header.b="lyu1l2N8";
-	dkim=pass (1024-bit key) header.d=CSIROAU.onmicrosoft.com header.i=@CSIROAU.onmicrosoft.com header.b="nKoSEj8Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B2B422522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=data61.csiro.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8elG9tA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A4A222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iropW-0004mR-6M
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 14:59:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41177)
+	id 1irot2-0006zy-Vv
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 15:03:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=27638d3c8=Peter.Chubb@data61.csiro.au>)
- id 1irook-0004D5-7x
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:59:07 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1irokI-0001cp-LJ
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:54:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=27638d3c8=Peter.Chubb@data61.csiro.au>)
- id 1irooi-0002g6-V1
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:59:05 -0500
-Received: from act-mtaout1.csiro.au ([2405:b000:e00:257::7:37]:23059)
+ (envelope-from <dgilbert@redhat.com>) id 1irokE-0007AS-8C
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:54:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38476
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71)
- (envelope-from <prvs=27638d3c8=Peter.Chubb@data61.csiro.au>)
- id 1irooh-0002Xh-LD; Wed, 15 Jan 2020 14:59:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=data61.csiro.au; i=@data61.csiro.au; q=dns/txt;
- s=dkim; t=1579118343; x=1610654343;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-id:content-transfer-encoding: mime-version;
- bh=xU/vRVlP3E8EtJf9QNbYIs/iKX0dZCxMDHL2nr37pp4=;
- b=lyu1l2N89RBARSt1Oo/FV/kLN0vRls+db8GJfm+jwhXg8byePUVCwnJ/
- wgyBSEvjR89f25qvbmvC1sFPUpP7XuQ6OCLg94mzVEklY+516KMdHKJIW
- XIqeL5zYge5B3FDZTWRPX3+fTKsKkXHvcYI0tWurlNLvV+FHq43gOd7Zj 0=;
-IronPort-SDR: vNYw3oi4mAWOuqBjEOT9SKxKrQia23R1hKcAtBDKlWYsEeaW6NMGrYKoZ6goie6hnrkcttxIGt
- exzAOE+2Pjkg==
-X-SBRS: 5.1
-IronPort-PHdr: =?us-ascii?q?9a23=3AKABb9B9OdWdknf9uRHGN82YQeigqvan1NQcJ65?=
- =?us-ascii?q?0hzqhDabmn44+9ZB7E/fs4iljPUM2b8P9Ch+fM+4HYEW0bqdfk0jgZdYBUER?=
- =?us-ascii?q?oMiMEYhQslVfaIFUDhatXqciYwNMhLSFY7pjewKklPH4D3eg6arw=3D=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-Anti-Spam-Result: =?us-ascii?q?A+F6AQCxbR9elwCwBSSwhIATAJKcgDR?=
- =?us-ascii?q?lHAEBAQEBBwEBEQEEBAEBgXuBVFBegQsENQqHSwOKeJ0/A1QJAQEBDQEtAgE?=
- =?us-ascii?q?BAoQ+AoIAJDgTAgMBAQsBAQUBAQEBAQUEAgIQAQEBAQEeBoVnDINOcQEBAQE?=
- =?us-ascii?q?BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQUCgQw+AgEDEhUTBgE?=
- =?us-ascii?q?BNwEPAgEIDigQECIlAgQOBSKDBIJLAy0BAQICnV0CgTiIYAEBgXMzgn8BAQW?=
- =?us-ascii?q?FGBiCDQkJAYEsjBiCGoFHgl0+hEmFbq9IBwECgjiWMBuabqlcAgQCBAUCDgE?=
- =?us-ascii?q?BBYFpIYFaHU+DQFAYDYgBGoNZilN0gSmLJQGBDwEB?=
-X-IPAS-Result: =?us-ascii?q?A+F6AQCxbR9elwCwBSSwhIATAJKcgDRlHAEBAQEBBwEBE?=
- =?us-ascii?q?QEEBAEBgXuBVFBegQsENQqHSwOKeJ0/A1QJAQEBDQEtAgEBAoQ+AoIAJDgTA?=
- =?us-ascii?q?gMBAQsBAQUBAQEBAQUEAgIQAQEBAQEeBoVnDINOcQEBAQEBAQEBAQEBAQEBA?=
- =?us-ascii?q?QEBAQEBAQEBAQEBAQEBAQEBAQEBAQUCgQw+AgEDEhUTBgEBNwEPAgEIDigQE?=
- =?us-ascii?q?CIlAgQOBSKDBIJLAy0BAQICnV0CgTiIYAEBgXMzgn8BAQWFGBiCDQkJAYEsj?=
- =?us-ascii?q?BiCGoFHgl0+hEmFbq9IBwECgjiWMBuabqlcAgQCBAUCDgEBBYFpIYFaHU+DQ?=
- =?us-ascii?q?FAYDYgBGoNZilN0gSmLJQGBDwEB?=
-Received: from exch4-cdc.nexus.csiro.au ([IPv6:2405:b000:601:13::247:34])
- by act-ironport-int.csiro.au with ESMTP/TLS/ECDHE-RSA-AES256-SHA384;
- 16 Jan 2020 06:58:53 +1100
-Received: from exch3-cdc.nexus.csiro.au (2405:b000:601:13::247:33) by
- exch4-cdc.nexus.csiro.au (2405:b000:601:13::247:34) with Microsoft SMTP
- Server (TLS) id 15.0.1497.2; Thu, 16 Jan 2020 06:58:53 +1100
-Received: from ExEdge1.csiro.au (150.229.7.34) by exch3-cdc.nexus.csiro.au
- (152.83.247.33) with Microsoft SMTP Server (TLS) id 15.0.1497.2 via Frontend
- Transport; Thu, 16 Jan 2020 06:58:53 +1100
-Received: from AUS01-ME1-obe.outbound.protection.outlook.com (104.47.116.51)
- by ExEdge1.csiro.au (150.229.7.34) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Thu, 16 Jan 2020 06:58:49 +1100
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J1whZd3HpW/ZtjId1GNL7gfZ27qH5VsxTR+mwTxvfAfT4mpSPkUyyQVjoRSPkH3Pej5DtZqVtMz+zq0NG1l3SlgG38PdC3de+O1yIb51R9bAdHSX2epoB40LvebsgruPg17omVzSBpIx18S7nqXet8AXC1JHUojKFGEC+UgXJPy/GIU32vEEZ2whqgOm+lMRHac1mG2GAyl0hUxWO/x1uNgr1TVQeFhMD6Z8wW0gw2JzfSKhMtxheRRTDqPXQUpIInJdAzUpUylfttXwkMi1OfuGsQ6pDPLkcChNjhG0hLC+7dDb0dddRuQHo6zlLzTe5lfx7gtL6SCB9YdV+FpMtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pk6cRetLriHldrYHWBqAYTYPQdYFJZZczFB/GdaJBP4=;
- b=IjTCYNLKG7pqb2uQ/UomTwkfcMStMWA/DXK40g94W4tW8zNmF5SrjeE2/pxMAj1jTR46KOC+INPav9DRnmDg5lbcZCtxjQeAqTOzytFMgfJyTshUP45yZ32N0pEPn/7HAWcTU4eiAIcrH1Xl4z7a2UVd1nkCdOOO828XuXrFbCMVrVeCnyBcfyQ+db1DgZaedbmGGW78ubZPGBzDZbfPwhA4vcYMDtny5PmehFLOGgPo+xvuWkZFrvgUNTSlboebE6rL1rBdMwWKcdqqMOWz+xbEd7y+s+7YHzS8RwAfVviWY9md17OEeS6lFq52yyfl6pPhil4rGpHcI+yGMel4/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=data61.csiro.au; dmarc=pass action=none
- header.from=data61.csiro.au; dkim=pass header.d=data61.csiro.au; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=CSIROAU.onmicrosoft.com; s=selector1-CSIROAU-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pk6cRetLriHldrYHWBqAYTYPQdYFJZZczFB/GdaJBP4=;
- b=nKoSEj8QWs4VUrLgjYOwHFQ+jTt7zySVoTjtrL5PoxTXnrpHa8fXvLeuOh/C3R/AwbOosRBp68i2qOJW5CtKQXL7nc0BDJZQN4/pzv6I8Tl0LX/v5WUmn3ZJpXKXSKSCCK0Kbal3qlF7Xpl9Y/6do7gJjpuASaMbT2M25zLVXBs=
-Received: from MEAPR01MB3734.ausprd01.prod.outlook.com (52.134.217.84) by
- MEAPR01MB4422.ausprd01.prod.outlook.com (20.178.177.141) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2623.9; Wed, 15 Jan 2020 19:58:52 +0000
-Received: from MEAPR01MB3734.ausprd01.prod.outlook.com
- ([fe80::195f:37a0:9e0e:2362]) by MEAPR01MB3734.ausprd01.prod.outlook.com
- ([fe80::195f:37a0:9e0e:2362%4]) with mapi id 15.20.2623.017; Wed, 15 Jan 2020
- 19:58:51 +0000
-From: "Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v2 18/86] arm:kzm: drop RAM size fixup
-Thread-Topic: [PATCH v2 18/86] arm:kzm: drop RAM size fixup
-Thread-Index: AQHVy7YGPyWxMmQ210ObJ3DYpTCKKKfsJPwA
-Date: Wed, 15 Jan 2020 19:58:51 +0000
-Message-ID: <87sgkgv6dh.wl-Peter.Chubb@data61.csiro.au>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-19-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579100861-73692-19-git-send-email-imammedo@redhat.com>
-Accept-Language: en-AU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Peter.Chubb@data61.csiro.au; 
-x-originating-ip: [221.199.209.25]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e57b94dc-ed47-4c30-0b98-08d799f557fc
-x-ms-traffictypediagnostic: MEAPR01MB4422:
-x-microsoft-antispam-prvs: <MEAPR01MB442215044A13B2F14608C9C8BB370@MEAPR01MB4422.ausprd01.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 02830F0362
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10009020)(4636009)(346002)(136003)(39840400004)(366004)(376002)(396003)(199004)(189003)(54906003)(66446008)(64756008)(316002)(66946007)(26005)(76116006)(66556008)(66476007)(4326008)(91956017)(6916009)(8676002)(2906002)(81166006)(81156014)(8936002)(478600001)(71200400001)(5660300002)(6506007)(2616005)(6512007)(86362001)(186003)(6486002);
- DIR:OUT; SFP:1101; SCL:1; SRVR:MEAPR01MB4422;
- H:MEAPR01MB3734.ausprd01.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZwA0X+rBadMtS+Ysw2IEn8nifj+F5sxHy56BrAuSByaShuZ1wr6eEVXLHmLBNREbSYqKY7YK5C45Hyczkp4sj/UnwPS/Vtzmc8mT+uRzcauNthIdGi9dfTY4Z1ZCCZWD80uWsO2f4jvjNU1OwXsqXXQm638AyGevJq2fbhuNAuU4THNYKY7wLElA7flRu4kKcpp6WrCdwtJ0imy/KDd+dQjTW9x01s/KxaycS1Ix1fyJkitpPnaU0tGK7F6TAMcyTH9jHns5l2gD0av+UOwuNiRzKnIVuWxj9zGGjUyf3SA/X56BiAYiIDFKx6jF0xV3eX6pH6YU1ads0aKORlyD4x8Q0zbCgNzesXk/RxfvacOd6APoEV2YfzRH7ktwwh/wwO8wCWsuV52AF2Xa/NT3lnj+PIJMtDVQ26EAGnkJ3j2PS/wpSmbMs67qetCnYPf9
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <100683064CB705438E6D80FB8FFBDC4E@ausprd01.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1irokE-0007A8-2r
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:54:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579118065;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BvGd84JFW0WAaFH0CMmrtYBvCuDoUjxnRK30ACHAi0Q=;
+ b=A8elG9tAbLFElyTkVdGf6b1J3KtU7Q7cxeXm4oN4kUkkoYEDo091ltlnBTMPxIkeNTq8YC
+ d4ahZE8EHP433NWM9IyBeO7m89NYWs72WyPTTf7Na+Gu2vfWoXD1fF9La5xGpdmxyTWDUc
+ UilQcGwl4iGFOEJ74gwY0TU3IoHEhc8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-fA0exs2rPIWoNLWpWpud1A-1; Wed, 15 Jan 2020 14:54:24 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4A87800D41;
+ Wed, 15 Jan 2020 19:54:22 +0000 (UTC)
+Received: from work-vm (ovpn-117-231.ams2.redhat.com [10.36.117.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A3C9460BE0;
+ Wed, 15 Jan 2020 19:54:20 +0000 (UTC)
+Date: Wed, 15 Jan 2020 19:54:17 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Zhimin Feng <fengzhimin1@huawei.com>
+Subject: Re: [PATCH RFC 05/12] migration/rdma: Create the multiRDMA channels
+Message-ID: <20200115195417.GK3811@work-vm>
+References: <20200109045922.904-1-fengzhimin1@huawei.com>
+ <20200109045922.904-6-fengzhimin1@huawei.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: e57b94dc-ed47-4c30-0b98-08d799f557fc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2020 19:58:51.6488 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0fe05593-19ac-4f98-adbf-0375fce7f160
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: C2viptLCsZoxXm6M0IpRrk2zOwwtx9SwtbQMENgwp6UGTN7K7CkSpn6uck4e7TQB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEAPR01MB4422
-X-OriginatorOrg: data61.csiro.au
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2405:b000:e00:257::7:37
+In-Reply-To: <20200109045922.904-6-fengzhimin1@huawei.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: fA0exs2rPIWoNLWpWpud1A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -161,44 +89,437 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "peter.chubb@nicta.com.au" <peter.chubb@nicta.com.au>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, jemmy858585@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
->>>>> "Igor" =3D=3D Igor Mammedov <imammedo@redhat.com> writes:
+* Zhimin Feng (fengzhimin1@huawei.com) wrote:
+> From: fengzhimin <fengzhimin1@huawei.com>
+>=20
+> In both sides. We still don't transmit anything through them,
+> and we only build the RDMA connections.
+>=20
+> Signed-off-by: fengzhimin <fengzhimin1@huawei.com>
+> ---
+>  migration/rdma.c | 253 +++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 223 insertions(+), 30 deletions(-)
+>=20
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index 992e5abfed..5b780bef36 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -403,6 +403,10 @@ typedef struct {
+>      char *name;
+>      /* channel thread id */
+>      QemuThread thread;
+> +    /* RDMAContext channel */
+> +    RDMAContext *rdma;
+> +    /* communication channel */
+> +    QEMUFile *file;
+>      /* sem where to wait for more work */
+>      QemuSemaphore sem;
+>      /* this mutex protects the following parameters */
+> @@ -429,6 +433,10 @@ typedef struct {
+>      char *name;
+>      /* channel thread id */
+>      QemuThread thread;
+> +    /* RDMAContext channel */
+> +    RDMAContext *rdma;
+> +    /* communication channel */
+> +    QEMUFile *file;
+>      /* sem where to wait for more work */
+>      QemuSemaphore sem;
+>      /* this mutex protects the following parameters */
+> @@ -3417,6 +3425,27 @@ static int qemu_rdma_accept(RDMAContext *rdma)
+>          qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migr=
+ation,
+>                              NULL,
+>                              (void *)(intptr_t)rdma->return_path);
+> +    } else if (migrate_use_multiRDMA()) {
+> +        int thread_count;
+> +        int i;
+> +        RDMAContext *multi_rdma =3D NULL;
+> +        thread_count =3D migrate_multiRDMA_channels();
+> +        /* create the multi Thread RDMA channels */
+> +        for (i =3D 0; i < thread_count; i++) {
+> +            if (multiRDMA_recv_state->params[i].rdma->cm_id =3D=3D NULL)=
+ {
+> +                multi_rdma =3D multiRDMA_recv_state->params[i].rdma;
+> +                break;
+> +            }
+> +        }
+> +
+> +        if (multi_rdma) {
+> +            qemu_set_fd_handler(rdma->channel->fd,
+> +                                rdma_accept_incoming_migration,
+> +                                NULL, (void *)(intptr_t)multi_rdma);
+> +        } else {
+> +            qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
+> +                                NULL, rdma);
+> +        }
+>      } else {
+>          qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
+>                              NULL, rdma);
+> @@ -4029,6 +4058,58 @@ static QEMUFile *qemu_fopen_rdma(RDMAContext *rdma=
+, const char *mode)
+>      return rioc->file;
+>  }
+> =20
+> +static void *multiRDMA_recv_thread(void *opaque)
+> +{
+> +    MultiRDMARecvParams *p =3D opaque;
+> +
+> +    while (true) {
+> +        qemu_mutex_lock(&p->mutex);
+> +        if (p->quit) {
+> +            qemu_mutex_unlock(&p->mutex);
+> +            break;
+> +        }
+> +        qemu_mutex_unlock(&p->mutex);
+> +        qemu_sem_wait(&p->sem);
+> +    }
+> +
+> +    qemu_mutex_lock(&p->mutex);
+> +    p->running =3D false;
+> +    qemu_mutex_unlock(&p->mutex);
+> +
+> +    return NULL;
+> +}
+> +
+> +static void multiRDMA_recv_new_channel(QEMUFile *f, int id)
+> +{
+> +    MultiRDMARecvParams *p;
+> +    Error *local_err =3D NULL;
+> +
+> +    p =3D &multiRDMA_recv_state->params[id];
+> +    if (p->file !=3D NULL) {
+> +        error_setg(&local_err,
+> +                   "multiRDMA: received id '%d' already setup'", id);
+> +        return ;
+> +    }
+> +    p->file =3D f;
+> +
+> +    qemu_thread_create(&p->thread, p->name, multiRDMA_recv_thread, p,
+> +                       QEMU_THREAD_JOINABLE);
+> +    atomic_inc(&multiRDMA_recv_state->count);
+> +}
+> +
+> +static void migration_multiRDMA_process_incoming(QEMUFile *f, RDMAContex=
+t *rdma)
+> +{
+> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
+> +
+> +    if (!mis->from_src_file) {
+> +        rdma->migration_started_on_destination =3D 1;
+> +        migration_incoming_setup(f);
+> +        migration_incoming_process();
+> +    } else {
+> +        multiRDMA_recv_new_channel(f, multiRDMA_recv_state->count);
+> +    }
+> +}
+> +
+>  static void rdma_accept_incoming_migration(void *opaque)
+>  {
+>      RDMAContext *rdma =3D opaque;
+> @@ -4057,29 +4138,13 @@ static void rdma_accept_incoming_migration(void *=
+opaque)
+>          return;
+>      }
+> =20
+> -    rdma->migration_started_on_destination =3D 1;
+> -    migration_fd_process_incoming(f);
+> -}
+> -
+> -static void *multiRDMA_recv_thread(void *opaque)
+> -{
+> -    MultiRDMARecvParams *p =3D opaque;
+> -
+> -    while (true) {
+> -        qemu_mutex_lock(&p->mutex);
+> -        if (p->quit) {
+> -            qemu_mutex_unlock(&p->mutex);
+> -            break;
+> -        }
+> -        qemu_mutex_unlock(&p->mutex);
+> -        qemu_sem_wait(&p->sem);
+> +    if (migrate_use_multiRDMA()) {
+> +        /* build the multiRDMA channels */
+> +        migration_multiRDMA_process_incoming(f, rdma);
+> +    } else {
+> +        rdma->migration_started_on_destination =3D 1;
+> +        migration_fd_process_incoming(f);
+>      }
+> -
+> -    qemu_mutex_lock(&p->mutex);
+> -    p->running =3D false;
+> -    qemu_mutex_unlock(&p->mutex);
+> -
+> -    return NULL;
+>  }
+> =20
+>  static int multiRDMA_load_setup(const char *host_port, RDMAContext *rdma=
+,
+> @@ -4087,6 +4152,7 @@ static int multiRDMA_load_setup(const char *host_po=
+rt, RDMAContext *rdma,
+>  {
+>      uint8_t i;
+>      int thread_count;
+> +    int idx;
+> =20
+>      thread_count =3D migrate_multiRDMA_channels();
+>      if (multiRDMA_recv_state =3D=3D NULL) {
+> @@ -4099,15 +4165,21 @@ static int multiRDMA_load_setup(const char *host_=
+port, RDMAContext *rdma,
+>          for (i =3D 0; i < thread_count; i++) {
+>              MultiRDMARecvParams *p =3D &multiRDMA_recv_state->params[i];
+> =20
+> +            p->rdma =3D qemu_rdma_data_init(host_port, errp);
+> +            for (idx =3D 0; idx < RDMA_WRID_MAX; idx++) {
+> +                p->rdma->wr_data[idx].control_len =3D 0;
+> +                p->rdma->wr_data[idx].control_curr =3D NULL;
+> +            }
+> +            /* the CM channel and CM id is shared */
+> +            p->rdma->channel =3D rdma->channel;
+> +            p->rdma->listen_id =3D rdma->listen_id;
+> +
+>              qemu_mutex_init(&p->mutex);
+>              qemu_sem_init(&p->sem, 0);
+>              p->quit =3D false;
+>              p->id =3D i;
+>              p->running =3D true;
+>              p->name =3D g_strdup_printf("multiRDMARecv_%d", i);
+> -            qemu_thread_create(&p->thread, p->name, multiRDMA_recv_threa=
+d,
+> -                               p, QEMU_THREAD_JOINABLE);
+> -            atomic_inc(&multiRDMA_recv_state->count);
+>          }
+>      }
+> =20
+> @@ -4155,6 +4227,7 @@ void rdma_start_incoming_migration(const char *host=
+_port, Error **errp)
+>          qemu_rdma_return_path_dest_init(rdma_return_path, rdma);
+>      }
+> =20
+> +    /* initialize the RDMAContext for multiRDMA */
+>      if (migrate_use_multiRDMA()) {
+>          if (multiRDMA_load_setup(host_port, rdma, &local_err) !=3D 0) {
+>              ERROR(errp, "init multiRDMA failure!");
+> @@ -4193,10 +4266,29 @@ static void *multiRDMA_send_thread(void *opaque)
+>      return NULL;
+>  }
+> =20
+> +static void multiRDMA_send_new_channel(QEMUFile *f, int id)
+> +{
+> +    MultiRDMASendParams *p;
+> +    Error *local_err =3D NULL;
+> +
+> +    p =3D &multiRDMA_send_state->params[id];
+> +    if (p->file !=3D NULL) {
+> +        error_setg(&local_err,
+> +                   "multiRDMA: send id '%d' already setup'", id);
+> +        return ;
+> +    }
+> +    p->file =3D f;
+> +
+> +    qemu_thread_create(&p->thread, p->name, multiRDMA_send_thread,
+> +                       p, QEMU_THREAD_JOINABLE);
+> +    atomic_inc(&multiRDMA_send_state->count);
+> +}
+> +
+>  static int multiRDMA_save_setup(const char *host_port, Error **errp)
+>  {
+>      int thread_count;
+>      uint8_t i;
+> +    int ret;
+> =20
+>      thread_count =3D migrate_multiRDMA_channels();
+>      multiRDMA_send_state =3D g_malloc0(sizeof(*multiRDMA_send_state));
+> @@ -4207,6 +4299,27 @@ static int multiRDMA_save_setup(const char *host_p=
+ort, Error **errp)
+> =20
+>      for (i =3D 0; i < thread_count; i++) {
+>          MultiRDMASendParams *p =3D &multiRDMA_send_state->params[i];
+> +        QEMUFile *f =3D NULL;
+> +
+> +        p->rdma =3D qemu_rdma_data_init(host_port, errp);
+> +        if (p->rdma =3D=3D NULL) {
+> +            ERROR(errp, "init RDMA data failure for multi channel %d!", =
+i);
+> +            goto err;
+> +        }
+> +
+> +        ret =3D qemu_rdma_source_init(p->rdma, migrate_use_rdma_pin_all(=
+), errp);
+> +        if (ret) {
+> +            ERROR(errp, "init RDMA source failure for multi channel %d!"=
+, i);
+> +            goto err;
+> +        }
+> +
+> +        ret =3D qemu_rdma_connect(p->rdma, errp);
+> +        if (ret) {
+> +            ERROR(errp, "connect multi channel %d failure!", i);
+> +            goto err;
+> +        }
+> +
+> +        f =3D qemu_fopen_rdma(multiRDMA_send_state->params[i].rdma, "wb"=
+);
+>          qemu_mutex_init(&p->mutex);
+>          qemu_sem_init(&p->sem, 0);
+>          p->quit =3D false;
+> @@ -4214,12 +4327,20 @@ static int multiRDMA_save_setup(const char *host_=
+port, Error **errp)
+>          p->running =3D true;
+>          p->name =3D g_strdup_printf("multiRDMASend_%d", i);
+> =20
+> -        qemu_thread_create(&p->thread, p->name, multiRDMA_send_thread, p=
+,
+> -                           QEMU_THREAD_JOINABLE);
+> -        atomic_inc(&multiRDMA_send_state->count);
+> +        multiRDMA_send_new_channel(f, i);
+>      }
+> =20
+>      return 0;
+> +
+> +err:
+> +    for (i =3D 0; i < thread_count; i++) {
+> +        g_free(multiRDMA_send_state->params[i].rdma);
+> +    }
+> +
+> +    g_free(multiRDMA_send_state->params);
+> +    g_free(multiRDMA_send_state);
+> +
+> +    return -1;
 
-Igor> If user provided non-sense RAM size, board will complain and
-Igor> continue running with max RAM size supported.  Also RAM is going
-Igor> to be allocated by generic code, so it won't be possible for
-Igor> board to fix things up for user.
+This err path doesn't look enough - don't you have to do the equivalent
+of qemu_rdma_cleanup for each channel that did succesfully connect,
+and then also the one that's failed (perhaps after the first step)?
 
-Igor> Make it error message and exit to force user fix CLI, instead of
-Igor> accepting non-sense CLI values.
- I think this comment needs rewording a little.  Maybe:
-   If the user provided too large a RAM size, the code used to
-   complain and trim it to the max size.  Now tht RAM is allocated by
-   generic code, that's no longer possible, so generate an error and
-   exit instead.
+>  }
+> =20
+>  static void multiRDMA_send_terminate_threads(void)
+> @@ -4268,6 +4389,8 @@ int multiRDMA_save_cleanup(void)
+>          qemu_sem_destroy(&p->sem);
+>          g_free(p->name);
+>          p->name =3D NULL;
+> +        qemu_rdma_cleanup(multiRDMA_send_state->params[i].rdma);
+> +        g_free(multiRDMA_send_state->params[i].rdma);
+>      }
+> =20
+>      qemu_sem_destroy(&multiRDMA_send_state->sem_sync);
+> @@ -4292,6 +4415,71 @@ static void multiRDMA_recv_terminate_threads(void)
+>      }
+>  }
+> =20
+> +static void qemu_multiRDMA_load_cleanup(RDMAContext *rdma)
+> +{
+> +    int idx;
+> +
+> +    if (rdma->cm_id && rdma->connected) {
+> +        if ((rdma->error_state ||
+> +             migrate_get_current()->state =3D=3D MIGRATION_STATUS_CANCEL=
+LING) &&
+> +            !rdma->received_error) {
+> +            RDMAControlHeader head =3D { .len =3D 0,
+> +                                       .type =3D RDMA_CONTROL_ERROR,
+> +                                       .repeat =3D 1,
+> +                                     };
+> +            error_report("Early error. Sending error.");
+> +            qemu_rdma_post_send_control(rdma, NULL, &head);
+> +        }
+> +
+> +        rdma_disconnect(rdma->cm_id);
+> +        trace_qemu_rdma_cleanup_disconnect();
+> +        rdma->connected =3D false;
+> +    }
+> +
+> +    g_free(rdma->dest_blocks);
+> +    rdma->dest_blocks =3D NULL;
+> +
+> +    for (idx =3D 0; idx < RDMA_WRID_MAX; idx++) {
+> +        if (rdma->wr_data[idx].control_mr) {
+> +            rdma->total_registrations--;
+> +            ibv_dereg_mr(rdma->wr_data[idx].control_mr);
+> +        }
+> +        rdma->wr_data[idx].control_mr =3D NULL;
+> +    }
+> +
+> +    if (rdma->local_ram_blocks.block) {
+> +        while (rdma->local_ram_blocks.nb_blocks) {
+> +            rdma_delete_block(rdma, &rdma->local_ram_blocks.block[0]);
+> +        }
+> +    }
+> +
+> +    if (rdma->qp) {
+> +        rdma_destroy_qp(rdma->cm_id);
+> +        rdma->qp =3D NULL;
+> +    }
+> +    if (rdma->cq) {
+> +        ibv_destroy_cq(rdma->cq);
+> +        rdma->cq =3D NULL;
+> +    }
+> +    if (rdma->comp_channel) {
+> +        ibv_destroy_comp_channel(rdma->comp_channel);
+> +        rdma->comp_channel =3D NULL;
+> +    }
+> +    if (rdma->pd) {
+> +        ibv_dealloc_pd(rdma->pd);
+> +        rdma->pd =3D NULL;
+> +    }
+> +    if (rdma->cm_id) {
+> +        rdma_destroy_id(rdma->cm_id);
+> +        rdma->cm_id =3D NULL;
+> +    }
+> +
+> +    rdma->listen_id =3D NULL;
+> +    rdma->channel =3D NULL;
+> +    g_free(rdma->host);
+> +    rdma->host =3D NULL;
+> +}
+> +
+>  int multiRDMA_load_cleanup(void)
+>  {
+>      int i;
+> @@ -4323,6 +4511,8 @@ int multiRDMA_load_cleanup(void)
+>          qemu_sem_destroy(&p->sem);
+>          g_free(p->name);
+>          p->name =3D NULL;
+> +        qemu_multiRDMA_load_cleanup(multiRDMA_recv_state->params[i].rdma=
+);
+> +        g_free(multiRDMA_recv_state->params[i].rdma);
+>      }
+> =20
+>      qemu_sem_destroy(&multiRDMA_recv_state->sem_sync);
+> @@ -4386,15 +4576,18 @@ void rdma_start_outgoing_migration(void *opaque,
+> =20
+>      trace_rdma_start_outgoing_migration_after_rdma_connect();
+> =20
+> +    s->to_dst_file =3D qemu_fopen_rdma(rdma, "wb");
+> +    /* create multiRDMA channel */
+>      if (migrate_use_multiRDMA()) {
+>          if (multiRDMA_save_setup(host_port, errp) !=3D 0) {
+>              ERROR(errp, "init multiRDMA channels failure!");
+>              goto err;
+>          }
+> +        migrate_fd_connect(s, NULL);
+> +    } else {
+> +        migrate_fd_connect(s, NULL);
+>      }
 
+If that's on both sides of the 'if' then it should move to here.
 
-Igor>    /* Check the amount of memory is compatible with the SOC */
-Igor>   if (machine->ram_size > (FSL_IMX31_SDRAM0_SIZE +
-Igor>   FSL_IMX31_SDRAM1_SIZE)) {
-Igor> - warn_report("RAM size " RAM_ADDR_FMT " above max supported, "
-Igor> + error_report("RAM size " RAM_ADDR_FMT " above max supported, "
-Igor>                "reduced to %x", machine->ram_size,
-Igor>                FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE);
+> -    s->to_dst_file =3D qemu_fopen_rdma(rdma, "wb");
+> -    migrate_fd_connect(s, NULL);
+>      return;
+>  err:
+>      g_free(rdma);
+> --=20
+> 2.19.1
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-        This needs to be changed so it doesn't say that the RAM size
-	is reduced, just what the maximum is.  Maybe:
-	error_report("RAM size " RAM_ADDR_FMT " above max (%x) supported.",
-	machine->ram_size, FSL_IMX31_SDRAM0_SIZE +
-	FSL_IMX31_SDRAM1_SIZE);
-
-
-Peter C=
 
