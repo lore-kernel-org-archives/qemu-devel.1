@@ -2,77 +2,77 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C271C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB494C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:14:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B0282465A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:14:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 938072465A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:14:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NL52oUBN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0282465A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAo5WLwT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 938072465A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irkNQ-0004tc-NA
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:14:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48624)
+	id 1irkNZ-0005FH-8M
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:14:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkJo-0007KL-HH
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:54 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkJM-0006cQ-Lv
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkJj-0007wN-26
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44409
+ (envelope-from <imammedo@redhat.com>) id 1irkJK-0007jf-LC
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34766
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkJi-0007w6-Um
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:47 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkJK-0007jQ-GR
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:10:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101046;
+ s=mimecast20190719; t=1579101022;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ypFRqS+a3wlU2LOPkBoPKegZFlXkDsukESJrS6Z+0aw=;
- b=NL52oUBNu3PjPxWYquCmt93vlfYCn6fKdT4s/cXXqgpEUtTpBRBVFO0xnz8XOXfMQzZpcF
- jhPQBNa4jd3zi7jK+d5NxeD4ett+1vvCbXKHB5piyX6SIoV2VRBZ/hbAT0KAwFugWTV5lz
- wPgL0CfP4fQDzn+ZMmh4S45Dl7Mtk9Q=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=IG7nN06Am7OeNB5SCNLvdkS6L+pqnHmZz8vQUQtN2o8=;
+ b=DAo5WLwTPMsJGTuY4CVhb9nXFz+teBtY3t0odTZDDBX+oa5jxBoCnUHr1eQGKc3PENlIRn
+ 9HrF1bUiuTXTvJmVew7Qm8vDyB3bOxUGMrRJM52dPuhK0KMNj3RFcBuvaduqg3AwtiJGBa
+ 6MAWhEhnPsdDl8hgLdRE9B1j968CPYI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-Y74NKRvLNCSQRSds83KvPw-1; Wed, 15 Jan 2020 10:10:43 -0500
+ us-mta-38-LybvIuRzPRqCmEqvHYT1kQ-1; Wed, 15 Jan 2020 10:10:06 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B58BB061A;
- Wed, 15 Jan 2020 15:10:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5276E1011B64
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:10:05 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 86B1728997;
- Wed, 15 Jan 2020 15:10:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A1400289AA
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:10:04 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/86] arm:aspeed: convert valid RAM sizes to data
-Date: Wed, 15 Jan 2020 16:06:22 +0100
-Message-Id: <1579100861-73692-8-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v2 00/86] refactor main RAM allocation to use hostmem backend
+Date: Wed, 15 Jan 2020 16:06:15 +0100
+Message-Id: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Y74NKRvLNCSQRSds83KvPw-1
+X-MC-Unique: LybvIuRzPRqCmEqvHYT1kQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,251 +84,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: andrew@aj.id.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- clg@kaod.org, joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-various foo_rambits() hardcode mapping of RAM sizes to RAM feature bits,
-which is hard to reuse and repeats over and over.
 
-Convert maps into GLib's hash tables and perform mapping using
-common mapping function.
+v2:
+  - fix compile errors on mingw32 host by introducing RAM_ADDR_UFMT [11/86]
+  - replace "[PATCH 43/86] hppa: drop RAM size fixup" with alternative
+    patches made by Philippe (which effectively do the same thing but other
+    way around)
+  - ppc440: fix crash and add suggested valid RAM size in error output.
+    s/ppc4xx_sdram_adjust/ppc4xx_sdram_prep/ and simplify it by removing
+    not necessary nested loop
+  - rebase on current master due to new conflicts
 
-Follow up patch will reuse tables for actually checking ram-size
-property.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-CC: clg@kaod.org
-CC: peter.maydell@linaro.org
-CC: andrew@aj.id.au
-CC: joel@jms.id.au
-CC: qemu-arm@nongnu.org
----
+Series removes ad hoc RAM allocation API (memory_region_allocate_system_mem=
+ory)
+and consolidates it around hostmem backend. It allows to
+ * resolve conflicts between global -mem-prealloc and hostmem's "policy" op=
+tion
+   fixing premature allocation before binding policy is applied
+ * simplify complicated memory allocation routines which had to deal with 2=
+ ways
+   to allocate RAM.
+ * it allows to reuse hostmem backends of a choice for main RAM without add=
+ing
+   extra CLI options to duplicate hostmem features.
+   Recent case was -mem-shared, to enable vhost-user on targets that don't
+   support hostmem backends [1] (ex: s390)
+ * move RAM allocation from individual boards into generic machine code and
+   provide them with prepared MemoryRegion.
+ * clean up deprecated NUMA features which were tied to the old API (see pa=
+tches)
+    - "numa: remove deprecated -mem-path fallback to anonymous RAM"
+    - "numa: remove deprecated implicit RAM distribution between nodes"
+    - "forbid '-numa node,mem' for 5.0 and newer machine types"
+
+Conversion introduces a new machine.ram-memdev property and wrapper code th=
+at
+aliases global -mem-path and -mem-alloc into automatically created hostmem
+backend properties (provided ram-memdev was not set explicitly given by use=
+r).
+And then follows bulk of trivial patches that incrementally convert individ=
+ual
+boards to using machine.ram-memdev provided MemoryRegion.
+
+Board conversion typically involves:
+ * providing MachineClass::default_ram_size and MachineClass::default_ram_i=
+d
+   so generic code could create default backend if user didn't explicitly p=
+rovide
+   ram-memdev or -m options
+ * dropping memory_region_allocate_system_memory() call
+ * using convenience MachineState::ram MemoryRegion, which points to Memory=
+Region
+   allocated by ram-memdev
+On top of that for some boards:
+ * added missing ram_size checks (typically it were boards with fixed ram s=
+ize)
+ * ram_size fixups were replaced by checks and hard errors, forcing user to
+   provide correct "-m" values instead of ignoring it and continuing runnin=
+g.
+  =20
+After all boards are converted the old API is removed and memory allocation
+routines are cleaned up.
+
+git tree for testing:
+  https://github.com/imammedo/qemu convert_main_ram_to_memdev_v2
+
+previous rev:
+  https://github.com/imammedo/qemu convert_main_ram_to_memdev_v2
+  https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg05409.html
+
+Igor Mammedov (83):
+  numa: remove deprecated -mem-path fallback to anonymous RAM
+  machine: introduce ram-memdev property
+  machine: alias -mem-path and -mem-prealloc into memory-foo backend
+  machine: introduce convenience MachineState::ram
+  initialize MachineState::ram in NUMA case
+  alpha:dp264: use memdev for RAM
+  arm:aspeed: convert valid RAM sizes to data
+  arm:aspeed: actually check RAM size
+  hw:aspeed: drop warning and bogus ram_size fixup
+  arm:aspeed: use memdev for RAM
+  arm:collie: use memdev for RAM
+  arm:cubieboard: use memdev for RAM
+  arm:digic_boards: use memdev for RAM
+  arm:highbank: use memdev for RAM
+  arm:imx25_pdk: drop RAM size fixup
+  arm:imx25_pdk: use memdev for RAM
+  arm:integratorcp: use memdev for RAM
+  arm:kzm: drop RAM size fixup
+  arm:kzm: use memdev for RAM
+  arm:mcimx6ul-evk: use memdev for RAM
+  arm:mcimx7d-sabre: use memdev for RAM
+  arm:mps2-tz: use memdev for RAM
+  arm:mps2: use memdev for RAM
+  arm:musicpal: use memdev for RAM
+  arm:nseries: use memdev for RAM
+  arm:omap_sx1: use memdev for RAM
+  arm:palm: use memdev for RAM
+  arm:raspi: use memdev for RAM
+  arm:sabrelite: use memdev for RAM
+  arm:sbsa-ref: use memdev for RAM
+  arm:versatilepb: use memdev for RAM
+  arm:vexpress: use memdev for RAM
+  arm:virt: use memdev for RAM
+  arm:xilinx_zynq: drop RAM size fixup
+  arm:xilinx_zynq: use memdev for RAM
+  arm:xlnx-versal-virt: use memdev for RAM
+  arm:xlnx-zcu102: use memdev for RAM
+  s390x:s390-virtio-ccw: use memdev for RAM
+  null-machine: use memdev for RAM
+  cris:axis_dev88: use memdev for RAM
+  hppa: use memdev for RAM
+  x86:microvm: use memdev for RAM
+  x86:pc: use memdev for RAM
+  lm32:lm32_boards: use memdev for RAM
+  lm32:milkymist: use memdev for RAM
+  m68k:an5206: use memdev for RAM
+  m68k:mcf5208: use memdev for RAM
+  m68k:next-cube: use memdev for RAM
+  mips:boston-cube: use memdev for RAM
+  mips:mips_fulong2e: drop RAM size fixup
+  mips:mips_fulong2e: use memdev for RAM
+  mips:mips_jazz: use memdev for RAM
+  mips:mips_malta: use memdev for RAM
+  mips:mips_mipssim: use memdev for RAM
+  mips:mips_r4k: use memdev for RAM
+  ppc:e500: drop RAM size fixup
+  ppc:e500: use memdev for RAM
+  ppc:mac_newworld: use memdev for RAM
+  ppc:mac_oldworld: use memdev for RAM
+  ppc:pnv: use memdev for RAM
+  ppc:ppc405_boards: add RAM size checks
+  ppc:ppc405_boards: use memdev for RAM
+  ppc/{ppc440_bamboo,sam460x}: drop RAM size fixup
+  ppc:ppc440_bamboo/sam460ex: use memdev for RAM
+  ppc:prep: use memdev for RAM
+  ppc:spapr: use memdev for RAM
+  ppc:virtex_ml507: remove unused arguments
+  ppc:virtex_ml507: use memdev for RAM
+  sparc:leon3: use memdev for RAM
+  sparc:sun4m: use memdev for RAM
+  sparc:niagara: use memdev for RAM
+  remove no longer used memory_region_allocate_system_memory()
+  post conversion default_ram_id cleanup
+  exec: cleanup qemu_minrampagesize()/qemu_maxrampagesize()
+  exec: drop bogus mem_path from qemu_ram_alloc_from_fd()
+  make mem_path local variable
+  hostmem: introduce "prealloc-threads" property
+  hostmem: fix strict bind policy
+  numa: forbid '-numa node,mem' for 5.0 and newer machine types
+  tests:numa-test: make top level args dynamic and g_autofree(cli)
+    cleanups
+  tests:numa-test: use explicit memdev to specify node RAM
+  numa: make exit() usage consistent
+  numa: remove deprecated implicit RAM distribution between nodes
+
+Philippe Mathieu-Daud=C3=A9 (3):
+  hw/hppa/machine: Correctly check the firmware is in PDC range
+  hw/hppa/machine: Restrict the total memory size to 3GB
+  hw/hppa/machine: Map the PDC memory region with higher priority
+
+ hw/alpha/alpha_sys.h          |   2 +-
+ include/exec/cpu-common.h     |   2 +
+ include/hw/boards.h           |  51 ++++----------
  include/hw/misc/aspeed_sdmc.h |   2 +
- hw/misc/aspeed_sdmc.c         | 116 ++++++++++++++++----------------------=
+ include/hw/ppc/ppc4xx.h       |   9 ++-
+ include/sysemu/hostmem.h      |  20 +++++-
+ include/sysemu/numa.h         |   5 +-
+ include/sysemu/sysemu.h       |   2 -
+ backends/hostmem-file.c       |   8 ---
+ backends/hostmem-memfd.c      |   1 -
+ backends/hostmem-ram.c        |   2 -
+ backends/hostmem.c            |  53 ++++++++++----
+ exec.c                        |  66 ++---------------
+ hw/alpha/dp264.c              |   2 +-
+ hw/alpha/typhoon.c            |   8 +--
+ hw/arm/aspeed.c               |  13 +---
+ hw/arm/collie.c               |  15 ++--
+ hw/arm/cubieboard.c           |  25 +++----
+ hw/arm/digic_boards.c         |  35 +++++----
+ hw/arm/highbank.c             |  10 ++-
+ hw/arm/imx25_pdk.c            |  13 ++--
+ hw/arm/integratorcp.c         |   9 ++-
+ hw/arm/kzm.c                  |  13 ++--
+ hw/arm/mcimx6ul-evk.c         |  25 +++----
+ hw/arm/mcimx7d-sabre.c        |  25 +++----
+ hw/arm/mps2-tz.c              |  13 ++--
+ hw/arm/mps2.c                 |  13 ++--
+ hw/arm/musicpal.c             |  16 +++--
+ hw/arm/nseries.c              |  31 ++++----
+ hw/arm/omap_sx1.c             |  18 +++--
+ hw/arm/palm.c                 |  18 +++--
+ hw/arm/raspi.c                |  32 +++------
+ hw/arm/sabrelite.c            |  23 +++---
+ hw/arm/sbsa-ref.c             |   7 +-
+ hw/arm/versatilepb.c          |   7 +-
+ hw/arm/vexpress.c             |  14 ++--
+ hw/arm/virt.c                 |   9 ++-
+ hw/arm/xilinx_zynq.c          |  20 +++---
+ hw/arm/xlnx-versal-virt.c     |   7 +-
+ hw/arm/xlnx-zcu102.c          |   7 +-
+ hw/core/machine.c             |  37 ++++++++--
+ hw/core/null-machine.c        |   7 +-
+ hw/core/numa.c                | 160 +++++++++-----------------------------=
 ----
- 2 files changed, 47 insertions(+), 71 deletions(-)
+ hw/cris/axis_dev88.c          |   8 +--
+ hw/hppa/machine.c             |  18 ++---
+ hw/i386/microvm.c             |  12 ++--
+ hw/i386/pc.c                  |  20 +++---
+ hw/i386/pc_piix.c             |   2 +-
+ hw/i386/pc_q35.c              |   2 +-
+ hw/lm32/lm32_boards.c         |  36 ++++++----
+ hw/lm32/milkymist.c           |  19 +++--
+ hw/m68k/an5206.c              |   5 +-
+ hw/m68k/mcf5208.c             |   5 +-
+ hw/m68k/next-cube.c           |   5 +-
+ hw/mips/boston.c              |  11 ++-
+ hw/mips/mips_fulong2e.c       |  15 ++--
+ hw/mips/mips_jazz.c           |   7 +-
+ hw/mips/mips_malta.c          |  10 ++-
+ hw/mips/mips_mipssim.c        |   9 +--
+ hw/mips/mips_r4k.c            |  12 ++--
+ hw/misc/aspeed_sdmc.c         | 112 +++++++++++------------------
+ hw/ppc/e500.c                 |  17 +++--
+ hw/ppc/e500plat.c             |   1 +
+ hw/ppc/mac_newworld.c         |   6 +-
+ hw/ppc/mac_oldworld.c         |   6 +-
+ hw/ppc/mpc8544ds.c            |   1 +
+ hw/ppc/pnv.c                  |   8 +--
+ hw/ppc/ppc405_boards.c        |  45 +++++++-----
+ hw/ppc/ppc440_bamboo.c        |  12 ++--
+ hw/ppc/ppc4xx_devs.c          |  59 ++++++++--------
+ hw/ppc/prep.c                 |  15 ++--
+ hw/ppc/sam460ex.c             |   6 +-
+ hw/ppc/spapr.c                |  17 ++---
+ hw/ppc/virtex_ml507.c         |  18 ++---
+ hw/s390x/s390-virtio-ccw.c    |   7 +-
+ hw/sparc/leon3.c              |   6 +-
+ hw/sparc/sun4m.c              |  73 ++++++++++---------
+ hw/sparc64/niagara.c          |   7 +-
+ qemu-deprecated.texi          |  33 ---------
+ qemu-options.hx               |  20 +++---
+ tests/qtest/numa-test.c       |  90 ++++++++++++++----------
+ vl.c                          |  37 +++++++++-
+ 82 files changed, 727 insertions(+), 920 deletions(-)
 
-diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-index 5dbde59..de1501f 100644
---- a/include/hw/misc/aspeed_sdmc.h
-+++ b/include/hw/misc/aspeed_sdmc.h
-@@ -39,6 +39,8 @@ typedef struct AspeedSDMCState {
- typedef struct AspeedSDMCClass {
-     SysBusDeviceClass parent_class;
-=20
-+    GHashTable *ram2feat;
-+    int fallback_ram_size;
-     uint64_t max_ram_size;
-     uint32_t (*compute_conf)(AspeedSDMCState *s, uint32_t data);
-     void (*write)(AspeedSDMCState *s, uint32_t reg, uint32_t data);
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index 2df3244..3fc80f0 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -148,72 +148,6 @@ static const MemoryRegionOps aspeed_sdmc_ops =3D {
-     .valid.max_access_size =3D 4,
- };
-=20
--static int ast2400_rambits(AspeedSDMCState *s)
--{
--    switch (s->ram_size >> 20) {
--    case 64:
--        return ASPEED_SDMC_DRAM_64MB;
--    case 128:
--        return ASPEED_SDMC_DRAM_128MB;
--    case 256:
--        return ASPEED_SDMC_DRAM_256MB;
--    case 512:
--        return ASPEED_SDMC_DRAM_512MB;
--    default:
--        break;
--    }
--
--    /* use a common default */
--    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 256M",
--                s->ram_size);
--    s->ram_size =3D 256 << 20;
--    return ASPEED_SDMC_DRAM_256MB;
--}
--
--static int ast2500_rambits(AspeedSDMCState *s)
--{
--    switch (s->ram_size >> 20) {
--    case 128:
--        return ASPEED_SDMC_AST2500_128MB;
--    case 256:
--        return ASPEED_SDMC_AST2500_256MB;
--    case 512:
--        return ASPEED_SDMC_AST2500_512MB;
--    case 1024:
--        return ASPEED_SDMC_AST2500_1024MB;
--    default:
--        break;
--    }
--
--    /* use a common default */
--    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 512M",
--                s->ram_size);
--    s->ram_size =3D 512 << 20;
--    return ASPEED_SDMC_AST2500_512MB;
--}
--
--static int ast2600_rambits(AspeedSDMCState *s)
--{
--    switch (s->ram_size >> 20) {
--    case 256:
--        return ASPEED_SDMC_AST2600_256MB;
--    case 512:
--        return ASPEED_SDMC_AST2600_512MB;
--    case 1024:
--        return ASPEED_SDMC_AST2600_1024MB;
--    case 2048:
--        return ASPEED_SDMC_AST2600_2048MB;
--    default:
--        break;
--    }
--
--    /* use a common default */
--    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 1024M",
--                s->ram_size);
--    s->ram_size =3D 1024 << 20;
--    return ASPEED_SDMC_AST2600_1024MB;
--}
--
- static void aspeed_sdmc_reset(DeviceState *dev)
- {
-     AspeedSDMCState *s =3D ASPEED_SDMC(dev);
-@@ -257,11 +191,14 @@ static Property aspeed_sdmc_properties[] =3D {
- static void aspeed_sdmc_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedSDMCClass *asc =3D ASPEED_SDMC_CLASS(klass);
-+
-     dc->realize =3D aspeed_sdmc_realize;
-     dc->reset =3D aspeed_sdmc_reset;
-     dc->desc =3D "ASPEED SDRAM Memory Controller";
-     dc->vmsd =3D &vmstate_aspeed_sdmc;
-     dc->props =3D aspeed_sdmc_properties;
-+    asc->ram2feat =3D g_hash_table_new(g_direct_hash, g_direct_equal);
- }
-=20
- static const TypeInfo aspeed_sdmc_info =3D {
-@@ -273,10 +210,28 @@ static const TypeInfo aspeed_sdmc_info =3D {
-     .abstract   =3D true,
- };
-=20
-+static int aspeed_get_ram_feat(AspeedSDMCState *s)
-+{
-+    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
-+    int ram_mb =3D s->ram_size >> 20;
-+    gpointer val;
-+
-+    if (g_hash_table_contains(asc->ram2feat, GINT_TO_POINTER(ram_mb))) {
-+        val =3D g_hash_table_lookup(asc->ram2feat, GINT_TO_POINTER(ram_mb)=
-);
-+        return GPOINTER_TO_INT(val);
-+    }
-+
-+    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default %dM",
-+                 s->ram_size, asc->fallback_ram_size);
-+    s->ram_size =3D asc->fallback_ram_size << 20;
-+    val =3D g_hash_table_lookup(asc->ram2feat, &asc->fallback_ram_size);
-+    return GPOINTER_TO_INT(val);
-+}
-+
- static uint32_t aspeed_2400_sdmc_compute_conf(AspeedSDMCState *s, uint32_t=
- data)
- {
--    uint32_t fixed_conf =3D ASPEED_SDMC_VGA_COMPAT |
--        ASPEED_SDMC_DRAM_SIZE(ast2400_rambits(s));
-+    int ram_f =3D aspeed_get_ram_feat(s);
-+    uint32_t fixed_conf =3D ASPEED_SDMC_VGA_COMPAT | ASPEED_SDMC_DRAM_SIZE=
-(ram_f);
-=20
-     /* Make sure readonly bits are kept */
-     data &=3D ~ASPEED_SDMC_READONLY_MASK;
-@@ -298,6 +253,9 @@ static void aspeed_2400_sdmc_write(AspeedSDMCState *s, =
-uint32_t reg,
-     s->regs[reg] =3D data;
- }
-=20
-+#define REGISTER_RAM_SIZE(h, k, v) \
-+    g_hash_table_insert(h->ram2feat, GINT_TO_POINTER(k), GINT_TO_POINTER(v=
-))
-+
- static void aspeed_2400_sdmc_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -307,6 +265,11 @@ static void aspeed_2400_sdmc_class_init(ObjectClass *k=
-lass, void *data)
-     asc->max_ram_size =3D 512 << 20;
-     asc->compute_conf =3D aspeed_2400_sdmc_compute_conf;
-     asc->write =3D aspeed_2400_sdmc_write;
-+    asc->fallback_ram_size =3D 256;
-+    REGISTER_RAM_SIZE(asc, 64, ASPEED_SDMC_DRAM_64MB);
-+    REGISTER_RAM_SIZE(asc, 128, ASPEED_SDMC_DRAM_128MB);
-+    REGISTER_RAM_SIZE(asc, 256, ASPEED_SDMC_DRAM_256MB);
-+    REGISTER_RAM_SIZE(asc, 512, ASPEED_SDMC_DRAM_512MB);
- }
-=20
- static const TypeInfo aspeed_2400_sdmc_info =3D {
-@@ -317,10 +280,10 @@ static const TypeInfo aspeed_2400_sdmc_info =3D {
-=20
- static uint32_t aspeed_2500_sdmc_compute_conf(AspeedSDMCState *s, uint32_t=
- data)
- {
-+    int ram_f =3D aspeed_get_ram_feat(s);
-     uint32_t fixed_conf =3D ASPEED_SDMC_HW_VERSION(1) |
-         ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
--        ASPEED_SDMC_CACHE_INITIAL_DONE |
--        ASPEED_SDMC_DRAM_SIZE(ast2500_rambits(s));
-+        ASPEED_SDMC_CACHE_INITIAL_DONE | ASPEED_SDMC_DRAM_SIZE(ram_f);
-=20
-     /* Make sure readonly bits are kept */
-     data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
-@@ -360,6 +323,11 @@ static void aspeed_2500_sdmc_class_init(ObjectClass *k=
-lass, void *data)
-     asc->max_ram_size =3D 1024 << 20;
-     asc->compute_conf =3D aspeed_2500_sdmc_compute_conf;
-     asc->write =3D aspeed_2500_sdmc_write;
-+    asc->fallback_ram_size =3D 512;
-+    REGISTER_RAM_SIZE(asc, 128, ASPEED_SDMC_AST2500_128MB);
-+    REGISTER_RAM_SIZE(asc, 256, ASPEED_SDMC_AST2500_256MB);
-+    REGISTER_RAM_SIZE(asc, 512, ASPEED_SDMC_AST2500_512MB);
-+    REGISTER_RAM_SIZE(asc, 1024, ASPEED_SDMC_AST2500_1024MB);
- }
-=20
- static const TypeInfo aspeed_2500_sdmc_info =3D {
-@@ -370,9 +338,10 @@ static const TypeInfo aspeed_2500_sdmc_info =3D {
-=20
- static uint32_t aspeed_2600_sdmc_compute_conf(AspeedSDMCState *s, uint32_t=
- data)
- {
-+    int ram_f =3D aspeed_get_ram_feat(s);
-     uint32_t fixed_conf =3D ASPEED_SDMC_HW_VERSION(3) |
-         ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
--        ASPEED_SDMC_DRAM_SIZE(ast2600_rambits(s));
-+        ASPEED_SDMC_DRAM_SIZE(ram_f);
-=20
-     /* Make sure readonly bits are kept (use ast2500 mask) */
-     data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
-@@ -413,6 +382,11 @@ static void aspeed_2600_sdmc_class_init(ObjectClass *k=
-lass, void *data)
-     asc->max_ram_size =3D 2048 << 20;
-     asc->compute_conf =3D aspeed_2600_sdmc_compute_conf;
-     asc->write =3D aspeed_2600_sdmc_write;
-+    asc->fallback_ram_size =3D 512;
-+    REGISTER_RAM_SIZE(asc, 256, ASPEED_SDMC_AST2600_256MB);
-+    REGISTER_RAM_SIZE(asc, 512, ASPEED_SDMC_AST2600_512MB);
-+    REGISTER_RAM_SIZE(asc, 1024, ASPEED_SDMC_AST2600_1024MB);
-+    REGISTER_RAM_SIZE(asc, 2048, ASPEED_SDMC_AST2600_2048MB);
- }
-=20
- static const TypeInfo aspeed_2600_sdmc_info =3D {
 --=20
 2.7.4
 
