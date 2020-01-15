@@ -2,57 +2,56 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C98C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A7DC33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF6232084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:44:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6232084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E29AB2084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:45:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E29AB2084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irob4-0000OW-1W
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 14:44:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39006)
+	id 1irob7-0000U5-4O
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 14:45:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38592)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iroW3-0001Je-EP
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:39:48 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iroTU-0005en-M4
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iroW1-00066i-90
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:39:47 -0500
-Resent-Date: Wed, 15 Jan 2020 14:39:47 -0500
-Resent-Message-Id: <E1iroW1-00066i-90@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21157)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iroW1-00065T-1N
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:39:45 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 157911717475746.28844896268515;
- Wed, 15 Jan 2020 11:39:34 -0800 (PST)
-In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [PATCH v2 00/86] refactor main RAM allocation to use hostmem
- backend
-Message-ID: <157911717375.8290.17349808340085664729@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: imammedo@redhat.com
-Date: Wed, 15 Jan 2020 11:39:34 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iroTQ-0004nU-Q8
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:08 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:43211 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1iroTP-0004hy-HS
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:04 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 26F3A1A20B7;
+ Wed, 15 Jan 2020 20:36:53 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 014C41A2158;
+ Wed, 15 Jan 2020 20:36:53 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 05/13] linux-user: Add support for getting/setting RTC PLL
+ correction using ioctls
+Date: Wed, 15 Jan 2020 20:36:39 +0100
+Message-Id: <1579117007-7565-6-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1579117007-7565-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1579117007-7565-1-git-send-email-Filip.Bozuta@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,52 +63,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, berrange@redhat.com, arnd@arndb.de,
+ richard.henderson@linaro.org, laurent@vivier.eu, jcmvbkbc@gmail.com,
+ amarkovic@wavecomp.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc5MTAwODYxLTczNjkyLTEt
-Z2l0LXNlbmQtZW1haWwtaW1hbW1lZG9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBm
-YWlsZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRo
-ZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERv
-Y2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNl
-bnRvczcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBT
-SE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1Qg
-ICAgaW90ZXN0LXFjb3cyOiAxODQKc29ja2V0X2FjY2VwdCBmYWlsZWQ6IFJlc291cmNlIHRlbXBv
-cmFyaWx5IHVuYXZhaWxhYmxlCioqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVz
-dC9saWJxdGVzdC5jOjI3MjpxdGVzdF9pbml0X3dpdGhvdXRfcW1wX2hhbmRzaGFrZTogYXNzZXJ0
-aW9uIGZhaWxlZDogKHMtPmZkID49IDAgJiYgcy0+cW1wX2ZkID49IDApCi90bXAvcWVtdS10ZXN0
-L3NyYy90ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjE0MDoga2lsbF9xZW11KCkgdHJpZWQgdG8gdGVy
-bWluYXRlIFFFTVUgcHJvY2VzcyBidXQgZW5jb3VudGVyZWQgZXhpdCBzdGF0dXMgMSAoZXhwZWN0
-ZWQgMCkKRVJST1IgLSBCYWlsIG91dCEgRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0
-ZXN0L2xpYnF0ZXN0LmM6MjcyOnF0ZXN0X2luaXRfd2l0aG91dF9xbXBfaGFuZHNoYWtlOiBhc3Nl
-cnRpb24gZmFpbGVkOiAocy0+ZmQgPj0gMCAmJiBzLT5xbXBfZmQgPj0gMCkKICBURVNUICAgIGlv
-dGVzdC1xY293MjogMTg2Cm1ha2U6ICoqKiBbY2hlY2stcXRlc3QteDg2XzY0XSBFcnJvciAxCm1h
-a2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3Qt
-cWNvdzI6IDE4NwogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAxOTAKLS0tCiAgICByYWlzZSBDYWxs
-ZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJv
-cjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdj
-b20ucWVtdS5pbnN0YW5jZS51dWlkPTIyNjY2YjMzZjg2OTQ1NTM4NjExMWI4MzliNGQ0OTRjJywg
-Jy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0t
-cm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScs
-ICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VO
-Vj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3Bh
-dGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYn
-LCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTJ0YW5vczhfL3NyYy9kb2NrZXItc3JjLjIw
-MjAtMDEtMTUtMTQuMjguNDYuNDg0NDovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3
-JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8g
-ZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1
-aWQ9MjI2NjZiMzNmODY5NDU1Mzg2MTExYjgzOWI0ZDQ5NGMKbWFrZVsxXTogKioqIFtkb2NrZXIt
-cnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAtMnRhbm9zOF8vc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlj
-a0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDEwbTQ3LjU2M3MKdXNlciAgICAwbTguMjgzcwoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU3
-OTEwMDg2MS03MzY5Mi0xLWdpdC1zZW5kLWVtYWlsLWltYW1tZWRvQHJlZGhhdC5jb20vdGVzdGlu
-Zy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This patch implements functionalities of following ioctls:
+
+RTC_PLL_GET - Getting PLL correction
+
+    Read the PLL correction for RTCs that support PLL. The PLL correction
+    is returned in the following structure:
+
+        struct rtc_pll_info {
+            int pll_ctrl;        /* placeholder for fancier control */
+            int pll_value;       /* get/set correction value */
+            int pll_max;         /* max +ve (faster) adjustment value */
+            int pll_min;         /* max -ve (slower) adjustment value */
+            int pll_posmult;     /* factor for +ve correction */
+            int pll_negmult;     /* factor for -ve correction */
+            long pll_clock;      /* base PLL frequency */
+        };
+
+    A pointer to this structure should be passed as the third
+    ioctl's argument.
+
+RTC_PLL_SET - Setting PLL correction
+
+    Sets the PLL correction for RTCs that support PLL. The PLL correction
+    that is set is specified by the rtc_pll_info structure pointed to by
+    the third ioctl's' argument.
+
+Implementation notes:
+
+    All ioctls in this patch have a pointer to a structure rtc_pll_info
+    as their third argument. All elements of this structure are of
+    type 'int', except the last one that is of type 'long'. That is
+    the reason why a separate target structure (target_rtc_pll_info)
+    is defined in linux-user/syscall_defs. The rest of the
+    implementation is straightforward.
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+---
+ linux-user/ioctls.h        |  2 ++
+ linux-user/syscall_defs.h  | 14 ++++++++++++++
+ linux-user/syscall_types.h |  9 +++++++++
+ 3 files changed, 25 insertions(+)
+
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index b09396e..0a4e3f1 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -87,6 +87,8 @@
+      IOCTL(RTC_EPOCH_SET, IOC_W, TYPE_ULONG)
+      IOCTL(RTC_WKALM_RD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
+      IOCTL(RTC_WKALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
++     IOCTL(RTC_PLL_GET, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_pll_info)))
++     IOCTL(RTC_PLL_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_pll_info)))
+ 
+      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 37504a2..8370f41 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -763,6 +763,16 @@ struct target_pollfd {
+ #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
+ #define TARGET_KDSIGACCEPT     0x4B4E
+ 
++struct target_rtc_pll_info {
++    int pll_ctrl;
++    int pll_value;
++    int pll_max;
++    int pll_min;
++    int pll_posmult;
++    int pll_negmult;
++    abi_long pll_clock;
++};
++
+ /* real time clock ioctls */
+ #define TARGET_RTC_AIE_ON           TARGET_IO('p', 0x01)
+ #define TARGET_RTC_AIE_OFF          TARGET_IO('p', 0x02)
+@@ -782,6 +792,10 @@ struct target_pollfd {
+ #define TARGET_RTC_EPOCH_SET        TARGET_IOW('p', 0x0e, abi_ulong)
+ #define TARGET_RTC_WKALM_RD         TARGET_IOR('p', 0x10, struct rtc_wkalrm)
+ #define TARGET_RTC_WKALM_SET        TARGET_IOW('p', 0x0f, struct rtc_wkalrm)
++#define TARGET_RTC_PLL_GET          TARGET_IOR('p', 0x11,                      \
++                                               struct target_rtc_pll_info)
++#define TARGET_RTC_PLL_SET          TARGET_IOW('p', 0x12,                      \
++                                               struct target_rtc_pll_info)
+ 
+ #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
+        defined(TARGET_XTENSA)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 820bc8e..4027272 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -271,6 +271,15 @@ STRUCT(rtc_wkalrm,
+        TYPE_CHAR, /* pending */
+        MK_STRUCT(STRUCT_rtc_time)) /* time */
+ 
++STRUCT(rtc_pll_info,
++       TYPE_INT, /* pll_ctrl */
++       TYPE_INT, /* pll_value */
++       TYPE_INT, /* pll_max */
++       TYPE_INT, /* pll_min */
++       TYPE_INT, /* pll_posmult */
++       TYPE_INT, /* pll_negmult */
++       TYPE_LONG) /* pll_clock */
++
+ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* op */
+        TYPE_INT, /* flags */
+-- 
+2.7.4
 
 
