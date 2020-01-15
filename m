@@ -2,79 +2,100 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A68BAC33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 06:31:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F5F8C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 06:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D25124656
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 06:31:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4953E24656
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 06:32:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VUjufHui"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D25124656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWg0kNpM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4953E24656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ircDZ-0008KH-E5
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 01:31:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60661)
+	id 1ircE9-0000ZH-8T
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 01:32:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1ircC7-0007PF-2u
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 01:30:24 -0500
+ (envelope-from <mst@redhat.com>) id 1ircCz-0007wH-I3
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 01:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1ircC5-0001uG-26
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 01:30:23 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46307)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1ircC1-0001rM-4e; Wed, 15 Jan 2020 01:30:17 -0500
-Received: by mail-lj1-x244.google.com with SMTP id m26so17153738ljc.13;
- Tue, 14 Jan 2020 22:30:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BBDFz10dNP9KBcZ/NwD9W/X3GBIY4HIJ8Uqwl6EJlnk=;
- b=VUjufHuiHergk/WvyxPr/ERZT+G3Wh3J2LrHBKXKVUQCc57d9ssKG79/p1L71xWsAF
- upLzvoDp5VAWV7QuoU9NK7ypGHw5x9Ckl+Q6diueKUN4taJ3ZjhU/VirmyNy2G6M+vSK
- q+TTCFRxROStiEaMPbRrsb0VIlbin7OR6Wsj2yQMRr7/U5Xvl3ak0IJZIwmtahI1cSDO
- /vSm0N+VrfAeDqEpNUdEVIPFnwJntWwTCkVUmbtUOdQ4PtgvlOLKc8WsieQzuKR88FGs
- p01+92lV21D0plR3Cpl4BmEeJjqkIV3g5RbXNUkxoi6879pnvhXqLPxhen4e6+p42JDn
- hp3w==
+ (envelope-from <mst@redhat.com>) id 1ircCr-0002Qk-PK
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 01:31:15 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38284
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ircCo-0002OD-GC
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 01:31:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579069865;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ah7YO5ihS+llvpQStMerRSYuJLi8vPRLqxeROsrfTwU=;
+ b=WWg0kNpMCYlmsX1oBg1xJwvx8YKEWLrLQpEsHhym0d90aeENhJp8x+GL1o6vnW7CJkmGqz
+ Em/a0x9CCxCFjBc9jj4mUGyFsgv5xwDc/NM5rZQwZQegeupt0mM4RHadnwKGoWV2as7hlD
+ /FSgNLY5q6MIW/FKURbQQIt1xmmMWr8=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-InxOm8c3OUigrIWorCoDDQ-1; Wed, 15 Jan 2020 01:31:04 -0500
+Received: by mail-qt1-f200.google.com with SMTP id d18so10598038qtp.16
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 22:31:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BBDFz10dNP9KBcZ/NwD9W/X3GBIY4HIJ8Uqwl6EJlnk=;
- b=krZa1chIzmfTOVMpYY18KlvOTjuvn3mX7ir/DmPoYyH5eqwE1ZOvGe/8TkjTWNF/Tp
- osF+U8GtZENqc6YbXizTDlpkr72VHd8aa5lA0CBnyX4nJTV38gRfYchHvQkjKz7KyDmq
- NiYJs8LyI9AlwEKDy3E9TOhKOAflUtlGUKxg3E38owmaulMfcMs0+ADSatLFuKr0F64q
- R+Rdwl4uKro6uKsHTiEWzhqXUkOoxtNC6ncO2drmjBoi6bVCJok/FWDY/eoHB6a6jpJ3
- QoXo0ZHh7/3CUaoTZPtKSe0gNVwkNjR9f2ygwwPMaHb1nitMSPRnJnwxjD6mJorhBUIO
- Fxzw==
-X-Gm-Message-State: APjAAAUWCCaomyhPSq79h854NSzzB1r7l/brinhOtgWjnfLrrQGNXRqR
- 2NMVkY9/fbpR7K8fDQJ3/cUUKJld2g4jqS4yNM9o2XL+cig=
-X-Google-Smtp-Source: APXvYqy8cdeBw4e830uUKIITNAnNbDAYjJszbesm/5gs0cVO1Qovf0ivhDeVasQKBJyeFJ9bL/LOsq8DlE5HFVv30Zw=
-X-Received: by 2002:a2e:8946:: with SMTP id b6mr761437ljk.1.1579069816062;
- Tue, 14 Jan 2020 22:30:16 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wyTusgh69XEfBhc65/d3WUkzIkz6FnK9MLw53Bk1Xf4=;
+ b=hAKmQ85JR85xRoTYmB5rJkBGn5iqTXT96ZgJ1Y6wziw4JhaiWJLO7ovvGOWA3YIs4p
+ TFDUsu2MTK78QLOrArwIU3QscGLus3VWI2la8S69VRjqSlZJo1dPVaG2V32a1lspLggh
+ 7AVpibWBjptEprYz/nBcK2hee1irnzC9+wnr9oQF9CLFAd5r8WwABJUFp8bKbRpYSOjp
+ 7yS0TX2EJ6pn0f5bNXQ5s9pXvB6r2fQQbJiHOGXZOuQ36UNBH1hOj1Id1Okm9jHcI7p4
+ V7WJTqlg92swVDEmNzD7Ddieai96Q/IS5hlJ/AeSG1n9Y+zTyMunsy+xCFO/Jei8hcIN
+ Lqxg==
+X-Gm-Message-State: APjAAAXWaGS8uVnPdJqxox/2ky32qP3XL1/i1476K++Wt0dqgRYx+4mi
+ qZQy48FkpM9lIOnciTXieMgrDcNS7rX4bdxaXSpHYsKx6aNe7/eykncTJ9vyFd3H6Kee9XxGSMz
+ qCGstBj9t3q6oyzk=
+X-Received: by 2002:a05:620a:899:: with SMTP id
+ b25mr25974583qka.197.1579069863537; 
+ Tue, 14 Jan 2020 22:31:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzYZ9DvDvhAtc7phoL6dn98nMgC1DLHfOoNbL/P1CZuRUNEI/FEZLS9rbQIo0mfQg3xiwcEMw==
+X-Received: by 2002:a05:620a:899:: with SMTP id
+ b25mr25974568qka.197.1579069863308; 
+ Tue, 14 Jan 2020 22:31:03 -0800 (PST)
+Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
+ by smtp.gmail.com with ESMTPSA id u16sm7948257qku.19.2020.01.14.22.31.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jan 2020 22:31:02 -0800 (PST)
+Date: Wed, 15 Jan 2020 01:30:57 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Guoheyi <guoheyi@huawei.com>
+Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified
+ by _HID
+Message-ID: <20200115011412-mutt-send-email-mst@kernel.org>
+References: <20191219064759.35053-1-guoheyi@huawei.com>
+ <20191219064759.35053-3-guoheyi@huawei.com>
+ <20200105072504-mutt-send-email-mst@kernel.org>
+ <CAFEAcA-sduqVO3rrG2V1VsysE2chgd0SnSySvEXFfue-aZN8dg@mail.gmail.com>
+ <bbf347fe-c4a4-c5bb-19c2-3a18571b658f@huawei.com>
 MIME-Version: 1.0
-References: <1579069053-22190-1-git-send-email-shihpo.hung@sifive.com>
- <1579069053-22190-2-git-send-email-shihpo.hung@sifive.com>
-In-Reply-To: <1579069053-22190-2-git-send-email-shihpo.hung@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 15 Jan 2020 16:29:49 +1000
-Message-ID: <CAKmqyKOm_kA5LG6aodo5G9=-zn1z1=2_gF1qYJrGXfVg_VAmxA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] target/riscv: fsd/fsw doesn't dirty FP state
-To: shihpo.hung@sifive.com
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
+In-Reply-To: <bbf347fe-c4a4-c5bb-19c2-3a18571b658f@huawei.com>
+X-MC-Unique: InxOm8c3OUigrIWorCoDDQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,57 +107,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ wanghaibin.wang@huawei.com, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 15, 2020 at 4:18 PM <shihpo.hung@sifive.com> wrote:
->
-> Signed-off-by: ShihPo Hung <shihpo.hung@sifive.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Problem is IASL disassembler still doesn't work on all hosts
+we want to support. And its output isn't really stable enough
+to act as a golden master.
 
-Alistair
+Until we have a better tool, I propose the contributor just follows all
+steps 1-6.  The reason they have been listed as maintainer action items
+is really just so that multiple patches affecting same ACPI table
+can be applied, with maintainer resolving conflicts himself.
+But this job can be pushed to contributors if as in the case of ARM
+maintainer isn't really interested in reading ACPI code anyway.
 
-> ---
->  target/riscv/insn_trans/trans_rvd.inc.c | 1 -
->  target/riscv/insn_trans/trans_rvf.inc.c | 1 -
->  2 files changed, 2 deletions(-)
->
-> diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc.c
-> index 393fa02..ea1044f 100644
-> --- a/target/riscv/insn_trans/trans_rvd.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvd.inc.c
-> @@ -43,7 +43,6 @@ static bool trans_fsd(DisasContext *ctx, arg_fsd *a)
->
->      tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEQ);
->
-> -    mark_fs_dirty(ctx);
->      tcg_temp_free(t0);
->      return true;
->  }
-> diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-> index 172dbfa..e23cd63 100644
-> --- a/target/riscv/insn_trans/trans_rvf.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvf.inc.c
-> @@ -52,7 +52,6 @@ static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
->      tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
->
->      tcg_temp_free(t0);
-> -    mark_fs_dirty(ctx);
->      return true;
->  }
->
-> --
-> 2.7.4
->
->
+So I propose the following patch - comments?
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.=
+c
+index f1ac2d7e96..3a6a3e7257 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -16,7 +16,10 @@
+  * 1. add empty files for new tables, if any, under tests/data/acpi
+  * 2. list any changed files in tests/bios-tables-test-allowed-diff.h
+  * 3. commit the above *before* making changes that affect the tables
+- * Maintainer:
++ *
++ * Contributor or ACPI Maintainer (steps 4-7 need to be redone to resolve =
+conflicts
++ * in binary commit created in step 6):
++ *
+  * After 1-3 above tests will pass but ignore differences with the expecte=
+d files.
+  * You will also notice that tests/bios-tables-test-allowed-diff.h lists
+  * a bunch of files. This is your hint that you need to do the below:
+@@ -28,13 +31,17 @@
+  * output. If not - disassemble them yourself in any way you like.
+  * Look at the differences - make sure they make sense and match what the
+  * changes you are merging are supposed to do.
++ * Save the changes, preferably in form of ASL diff for the the commit log=
+ in
++ * step 6.
+  *
+  * 5. From build directory, run:
+  *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
+- * 6. Now commit any changes.
+- * 7. Before doing a pull request, make sure tests/bios-tables-test-allowe=
+d-diff.h
+- *    is empty - this will ensure following changes to ACPI tables will
+- *    be noticed.
++ * 6. Now commit any changes to the expected binary, include diff from ste=
+p 4
++ *    in commit log.
++ * 7. Before sending patches to the list (Contributor)
++ *    or before doing a pull request (Maintainer), make sure
++ *    tests/bios-tables-test-allowed-diff.h is empty - this will ensure
++ *    following changes to ACPI tables will be noticed.
+  */
+=20
+ #include "qemu/osdep.h"
+
 
