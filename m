@@ -2,158 +2,78 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82AD0C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58314C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:19:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EE08214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28CFE214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:19:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jTTlM0ac"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE08214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WoOR+C5M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28CFE214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irmJq-0003u0-4s
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 12:19:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43361)
+	id 1irmKQ-0004ji-5K
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 12:19:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1irmHc-0002Mw-O5
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:16:48 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irmIs-0003Bh-Au
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:18:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1irmHY-0001cO-TG
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:16:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23933
+ (envelope-from <imammedo@redhat.com>) id 1irmIq-0003Eu-RP
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:18:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24747
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1irmHY-0001Zx-PF
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:16:40 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irmIq-0003Dy-NP
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:18:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579108599;
+ s=mimecast20190719; t=1579108680;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=6EwvG2oGT3Nz+H0vTfgrkgaRDf+FVVbEnDp37g1KEHg=;
- b=jTTlM0ac+vXBq8G3Ry3a8sxwwsvSeIEgl1qrV2Q0b+tjgWHdTMmwiMkTD/c/L4w47/wIaB
- X7TcQBiyVIfR4Z5hZLg/JdTvcWLwOdz87U1ITbfvnNTp+QMXBGZBxcsmQUoTsVkUeev7c0
- mXZZed/CJSuplGq4xRqmj23+6V/rFu4=
+ in-reply-to:in-reply-to:references:references;
+ bh=OEHELzOfHGEKCGtI5YdbI6lbPwqC0SGBtXAEvzK5oX8=;
+ b=WoOR+C5M8dGg8FSrFCTPRAwKFHQynVykyQiu7n2RjfHcsAx71rJd/xDUCZkrXgXgjbVxg2
+ VgiK5q0VztjPaUSoLFzAAGq6Ven5nNgm1kihWVvCH06FxJIrAQerhNSJg4PRlMVchzyyNS
+ dwjAg49w5f7UnKx+WMp8bHTO3Lr9DWM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-KPdRjMhyMyWh7kWdvnJgvg-1; Wed, 15 Jan 2020 12:16:35 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-292-dWIEX9BFMgWR8OuGtbkxqA-1; Wed, 15 Jan 2020 12:17:57 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3C35102C868;
- Wed, 15 Jan 2020 17:16:34 +0000 (UTC)
-Received: from [10.10.124.69] (ovpn-124-69.rdu2.redhat.com [10.10.124.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C593E66834;
- Wed, 15 Jan 2020 17:16:33 +0000 (UTC)
-Subject: Re: [PATCH] qemu-deprecated: Remove text about Python 2
-To: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200109095116.18201-1-thuth@redhat.com>
- <5883bc34-926e-70e3-6402-32dfb5d92ab2@redhat.com>
- <e1ae4e63-626c-cc6d-5117-4b4fbd1ad436@redhat.com>
- <20200114102031.GE4071034@redhat.com> <874kww7lk3.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <efe0d310-1c48-4f1b-2ffe-46eea85af871@redhat.com>
-Date: Wed, 15 Jan 2020 12:16:32 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
-MIME-Version: 1.0
-In-Reply-To: <874kww7lk3.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: KPdRjMhyMyWh7kWdvnJgvg-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4FB2100550E
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 17:17:56 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F06BA10842A9;
+ Wed, 15 Jan 2020 17:17:55 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 80/86] hostmem: introduce "prealloc-threads" property
+Date: Wed, 15 Jan 2020 18:15:33 +0100
+Message-Id: <1579108533-162236-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <128a6dc6-4dcd-0d60-2112-d495426b184d@redhat.com>
+References: <128a6dc6-4dcd-0d60-2112-d495426b184d@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: dWIEX9BFMgWR8OuGtbkxqA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -165,75 +85,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+the property will allow user to specify number of threads to use
+in pre-allocation stage. It also will allow to reduce implicit
+hostmem dependency on current_machine.
+On object creation it will default to 1, but via machine
+compat property it will be updated to MachineState::smp::cpus
+to keep current behavior for hostmem and main RAM (which is
+now also hostmem based).
 
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v3:
+  - use object_register_sugar_prop() instead of directly hacking
+    compat_props (Paolo Bonzini <pbonzini@redhat.com>)
 
-On 1/15/20 11:04 AM, Markus Armbruster wrote:
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->=20
->> On Tue, Jan 14, 2020 at 11:08:16AM +0100, Thomas Huth wrote:
->>> On 13/01/2020 23.36, John Snow wrote:
->>>> Right now, we don't
->>>> really have these docs hosted in a searchable way online in a
->>>> per-version format. Once the notice is gone, it's gone from the mirror=
-.
->>>>
->>>> I removed some bitmap functionality not too long ago and I created a
->>>> "Recently Removed" section as a bit of a troubleshooting guide should =
-it
->>>> be needed.
->>>>
->>>> - Do we want this section?
->>>> - Should I remove it?
->>>> - Can we add historical docs to the website to see previous deprecated
->>>> docs in a searchable manner?
->>>
->>> I also once started a page in the Wiki here:
->>>
->>>  https://wiki.qemu.org/Features/RemovedFeatures
->>>
->>> ... but apparently, it did not get enough attention yet, otherwise you
->>> would have noticed it before introducing the new chapter into the
->>> qemu-doc ...
->>>
->>> We definitely need one spot where we can document removed features. I
->>> don't mind which way we do it, either the qemu-doc or the wiki, but we
->>> should unify on one of the two. I guess the qemu-doc is the better plac=
-e
->>> since we are tracking the deprecated features there already and one mor=
-e
->>> or less just has to move the text to the other chapter when things get
->>> finally removed?
->>
->> Yeah, I've said in the past that we should not be deleting deprecations
->> from the docs entirely.
->>
->> If you look at GTK docs for example, you'll see they keep a record of
->> all incompatible or noteworth changes between release:
->>
->>   https://developer.gnome.org/gtk3/stable/gtk-migrating-3-x-to-y.html
->>
->> IMHO, we should follow this and have an appendix of removed features,
->> with sub-sections per QEMU release listing each removed feature. Thus
->> deprecation docs just get moved to this appendix at the right time.
->=20
-> This is exactly the "Recently Removed" appendix John added in commit
-> 3264ffced3d.
->=20
-> Now we need a sucker^Wvolunteer to restore all the stuff we dropped from
-> appendix "Deprecated features" to this appendix.  John, you were
-> incautious enough to signal you care; what about you?
->=20
+CC: pbonzini@redhat.com
+CC: ehabkost@redhat.com
+---
+ include/sysemu/hostmem.h |  2 ++
+ backends/hostmem.c       | 43 +++++++++++++++++++++++++++++++++++++++----
+ vl.c                     | 14 ++++++++++----
+ 3 files changed, 51 insertions(+), 8 deletions(-)
 
-Can add to the pile, but admittedly I am a little backlogged trying to
-recover from the holidays. I can't promise any time to it right this minute=
-.
-
-I can try next week, if I don't forget.
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 5db0d66..bdf8666 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -61,6 +61,7 @@ struct HostMemoryBackendClass {
+  * @parent: opaque parent object container
+  * @size: amount of memory backend provides
+  * @mr: MemoryRegion representing host memory belonging to backend
++ * @prealloc_threads: number of threads to be used for preallocatining RAM
+  */
+ struct HostMemoryBackend {
+     /* private */
+@@ -70,6 +71,7 @@ struct HostMemoryBackend {
+     uint64_t size;
+     bool merge, dump, use_canonical_path;
+     bool prealloc, force_prealloc, is_mapped, share;
++    uint32_t prealloc_threads;
+     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
+     HostMemPolicy policy;
+=20
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index e773bdf..4c23c77 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -223,7 +223,6 @@ static void host_memory_backend_set_prealloc(Object *ob=
+j, bool value,
+ {
+     Error *local_err =3D NULL;
+     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
+-    MachineState *ms =3D MACHINE(qdev_get_machine());
+=20
+     if (backend->force_prealloc) {
+         if (value) {
+@@ -243,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *ob=
+j, bool value,
+         void *ptr =3D memory_region_get_ram_ptr(&backend->mr);
+         uint64_t sz =3D memory_region_size(&backend->mr);
+=20
+-        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
++        os_mem_prealloc(fd, ptr, sz, backend->prealloc_threads, &local_err=
+);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+@@ -252,14 +251,45 @@ static void host_memory_backend_set_prealloc(Object *=
+obj, bool value,
+     }
+ }
+=20
++static void host_memory_backend_get_prealloc_threads(Object *obj, Visitor =
+*v,
++    const char *name, void *opaque, Error **errp)
++{
++    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
++    visit_type_uint32(v, name, &backend->prealloc_threads, errp);
++}
++
++static void host_memory_backend_set_prealloc_threads(Object *obj, Visitor =
+*v,
++    const char *name, void *opaque, Error **errp)
++{
++    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
++    Error *local_err =3D NULL;
++    uint32_t value;
++
++    visit_type_uint32(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    if (value <=3D 0) {
++        error_setg(&local_err,
++                   "property '%s' of %s doesn't take value '%d'",
++                   name, object_get_typename(obj), value);
++        goto out;
++    }
++    backend->prealloc_threads =3D value;
++out:
++    error_propagate(errp, local_err);
++}
++
+ static void host_memory_backend_init(Object *obj)
+ {
+     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+=20
++    /* TODO: convert this compat properties */
+     backend->merge =3D machine_mem_merge(machine);
+     backend->dump =3D machine_dump_guest_core(machine);
+     backend->prealloc =3D mem_prealloc;
++    backend->prealloc_threads =3D 1;
+ }
+=20
+ static void host_memory_backend_post_init(Object *obj)
+@@ -313,7 +343,6 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
+Error **errp)
+ {
+     HostMemoryBackend *backend =3D MEMORY_BACKEND(uc);
+     HostMemoryBackendClass *bc =3D MEMORY_BACKEND_GET_CLASS(uc);
+-    MachineState *ms =3D MACHINE(qdev_get_machine());
+     Error *local_err =3D NULL;
+     void *ptr;
+     uint64_t sz;
+@@ -378,7 +407,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
+Error **errp)
+          */
+         if (backend->prealloc) {
+             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
+-                            ms->smp.cpus, &local_err);
++                            backend->prealloc_threads, &local_err);
+             if (local_err) {
+                 goto out;
+             }
+@@ -456,6 +485,12 @@ host_memory_backend_class_init(ObjectClass *oc, void *=
+data)
+         host_memory_backend_set_prealloc, &error_abort);
+     object_class_property_set_description(oc, "prealloc",
+         "Preallocate memory", &error_abort);
++    object_class_property_add(oc, "prealloc-threads", "int",
++        host_memory_backend_get_prealloc_threads,
++        host_memory_backend_set_prealloc_threads,
++        NULL, NULL, &error_abort);
++    object_class_property_set_description(oc, "prealloc-threads",
++        "Number of CPU threads to use for prealloc", &error_abort);
+     object_class_property_add(oc, "size", "int",
+         host_memory_backend_get_size,
+         host_memory_backend_set_size,
+diff --git a/vl.c b/vl.c
+index 7a4533c..8a047bd 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2820,8 +2820,7 @@ static void configure_accelerators(const char *progna=
+me)
+     }
+ }
+=20
+-static void create_default_memdev(MachineState *ms, const char *path,
+-                                  bool prealloc)
++static void create_default_memdev(MachineState *ms, const char *path)
+ {
+     Object *obj;
+     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+@@ -2830,7 +2829,6 @@ static void create_default_memdev(MachineState *ms, c=
+onst char *path,
+     if (path) {
+         object_property_set_str(obj, path, "mem-path", &error_fatal);
+     }
+-    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
+     object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
+     object_property_add_child(object_get_objects_root(), mc->default_ram_i=
+d,
+                               obj, &error_fatal);
+@@ -3973,6 +3971,14 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
+     }
+=20
++    if (mem_prealloc) {
++        char *val;
++
++        val =3D g_strdup_printf("%d", current_machine->smp.cpus);
++        object_register_sugar_prop("memory-backend", "prealloc-threads", v=
+al);
++        g_free(val);
++    }
++
+     /*
+      * Get the default machine options from the machine if it is not alrea=
+dy
+      * specified either by the configuration file or by the command line.
+@@ -4306,7 +4312,7 @@ int main(int argc, char **argv, char **envp)
+     if (numa_uses_legacy_mem() &&
+         machine_class->default_ram_size &&
+         !current_machine->ram_memdev) {
+-        create_default_memdev(current_machine, mem_path, mem_prealloc);
++        create_default_memdev(current_machine, mem_path);
+     }
+     /* do monitor/qmp handling at preconfig state if requested */
+     main_loop();
+--=20
+2.7.4
 
 
