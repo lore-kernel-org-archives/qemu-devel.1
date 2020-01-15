@@ -2,135 +2,102 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55DDCC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC130C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:33:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 229D724656
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:27:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8223214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:33:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mqh603n8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 229D724656
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Utv0sA1j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8223214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irnOQ-0004ps-85
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:27:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54760)
+	id 1irnTx-0000E7-P9
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:33:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1irnNB-0003qf-66
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:26:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1irnSy-0007sW-Tk
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:32:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1irnN6-0000VV-Tg
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:26:32 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41092
+ (envelope-from <philmd@redhat.com>) id 1irnSu-00044o-JN
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:32:32 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27471
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1irnN6-0000UU-A7
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:26:28 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1irnSu-00044O-D1
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:32:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579112787;
+ s=mimecast20190719; t=1579113147;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+jBPZtzHHrA4OuaU4hKD0xnwoW/KuNLEhzY/ch75b+E=;
- b=Mqh603n8BXa6bMtNq5xJWKSNDd+NEMeCxzBMi+jSVff9MmEyT9XE1vqDZ/LGTlmtT2q8rY
- KXbpeFS+958zGGHKSX+jNfdolhvN4N1adECXX8wA70SjxwA3+sJScz8k847jA7dRnQ10n7
- LA+rum54JkX4uYV55QduFkxeo/whXiY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-tEF5F5zHOy-nQszBnGnCgQ-1; Wed, 15 Jan 2020 13:26:24 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48F6DDB61;
- Wed, 15 Jan 2020 18:26:22 +0000 (UTC)
-Received: from [10.40.204.119] (ovpn-204-119.brq.redhat.com [10.40.204.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CB7515C219;
- Wed, 15 Jan 2020 18:26:19 +0000 (UTC)
-Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
-From: Laurent Vivier <lvivier@redhat.com>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
- <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <58c966da-45a6-3c31-589b-ebce5a489ff3@redhat.com>
-Date: Wed, 15 Jan 2020 19:26:18 +0100
+ in-reply-to:in-reply-to:references:references;
+ bh=Zk2tpiHxs7vkP1cq5FnDgSiS8dZZC7lPopxsgD0DNdk=;
+ b=Utv0sA1jcu9vtLh7VwnhGiHoRbYU3CxjgP786eNsbC6rlE434b7P4VYdi2RLY+No2EHamJ
+ iDaVkbC02R1sZWkNJ0hJfptyFO2/5sPU2UplQSWOX1m8g4Da3pyfTOMz+/+xHvW2jOod7E
+ FlBiQmbIhmA1gwa7j9v8UOF583DDMnU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-rv0hf5LPN76N8RsmQ5iiuw-1; Wed, 15 Jan 2020 13:32:25 -0500
+Received: by mail-wm1-f70.google.com with SMTP id t4so258272wmf.2
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 10:32:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qMnrRJbXJ6T1PwaEYvlyg3ewvRhs61nzLfkthkkaKHI=;
+ b=C18Z16le3MZJy1dg8n89E5nCuWn3VapUl7UnpKmnICTU02VaS5bO8FqfCVDTtbHq68
+ ryEJAhC/qCQ3qCanO3Ogk0PsGHWzgiDMkKzcSUW7ZgC107pA2GDQKmrRdEyXgi2/QK83
+ 0rc4wTt03rd+4mfKHDIfptlVyUvHs7KMXIY33X7ZTL6Z3BwD9smc8goMYuqqIE+UOmD/
+ URxX8g1wWK2eMiGOTUycOLqpbPGr0L+nhVY4N+VRwI3Eihoo2NtEvSYIos7yVxAPJa6K
+ 6D0f1ekuYBkvaxpBIUoV1XSNTOb3QtpPw2BOfNNMfwDU+pF3oRDXUvtR7qyg0qqnHPPr
+ Ir1w==
+X-Gm-Message-State: APjAAAWIcir7Aq/sM0nSYnbRsWZuqOtjr7midEB53cEdm4snlnKIMfCM
+ 8mkLfzFuWNeAPXNQBbK5wC92lXdgkDh7rTxeZSGSawljhZeCTA9JWHTwfDzaq387TjJ85utZ7xl
+ hfQqV1cNUXiUIfZY=
+X-Received: by 2002:a05:600c:1009:: with SMTP id
+ c9mr1386799wmc.162.1579113144476; 
+ Wed, 15 Jan 2020 10:32:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwcPImJg+60pbCDuQysqn+zCDhJRMk29C7XdIX8Z/+ps54uYBKulyO/KLegXV3Wem1byG/qpw==
+X-Received: by 2002:a05:600c:1009:: with SMTP id
+ c9mr1386779wmc.162.1579113144258; 
+ Wed, 15 Jan 2020 10:32:24 -0800 (PST)
+Received: from ?IPv6:2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9?
+ ([2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9])
+ by smtp.gmail.com with ESMTPSA id g18sm775145wmh.48.2020.01.15.10.32.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Jan 2020 10:32:23 -0800 (PST)
+Subject: Re: [PATCH v2 48/86] lm32:milkymist: use memdev for RAM
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-49-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <131b0631-7afd-8b1b-641c-2806248f704c@redhat.com>
+Date: Wed, 15 Jan 2020 19:32:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
+In-Reply-To: <1579100861-73692-49-git-send-email-imammedo@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: tEF5F5zHOy-nQszBnGnCgQ-1
+X-MC-Unique: rv0hf5LPN76N8RsmQ5iiuw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -142,71 +109,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lukas Doktor <ldoktor@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: michael@walle.cc
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/01/2020 19:10, Laurent Vivier wrote:
-> Hi,
+On 1/15/20 4:07 PM, Igor Mammedov wrote:
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>    MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
 >=20
-> On 15/01/2020 18:48, Greg Kurz wrote:
->> Migration can potentially race with CAS reboot. If the migration thread
->> completes migration after CAS has set spapr->cas_reboot but before the
->> mainloop could pick up the reset request and reset the machine, the
->> guest is migrated unrebooted and the destination doesn't reboot it
->> either because it isn't aware a CAS reboot was needed (eg, because a
->> device was added before CAS). This likely result in a broken or hung
->> guest.
->>
->> Even if it is small, the window between CAS and CAS reboot is enough to
->> re-qualify spapr->cas_reboot as state that we should migrate. Add a new
->> subsection for that and always send it when a CAS reboot is pending.
->> This may cause migration to older QEMUs to fail but it is still better
->> than end up with a broken guest.
->>
->> The destination cannot honour the CAS reboot request from a post load
->> handler because this must be done after the guest is fully restored.
->> It is thus done from a VM change state handler.
->>
->> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
->> Signed-off-by: Greg Kurz <groug@kaod.org>
->> ---
->>
+> PS:
+>   while at it add check for user supplied RAM size and error
+>   out if it mismatches board expected value.
 >=20
-> I'm wondering if the problem can be related with the fact that
-> main_loop_should_exit() could release qemu_global_mutex in
-> pause_all_vcpus() in the reset case?
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>    * fix format string causing build failure on 32-bit host
+>      (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 >=20
-> 1602 static bool main_loop_should_exit(void)
-> 1603 {
-> ...
-> 1633     request =3D qemu_reset_requested();
-> 1634     if (request) {
-> 1635         pause_all_vcpus();
-> 1636         qemu_system_reset(request);
-> 1637         resume_all_vcpus();
-> 1638         if (!runstate_check(RUN_STATE_RUNNING) &&
-> 1639                 !runstate_check(RUN_STATE_INMIGRATE)) {
-> 1640             runstate_set(RUN_STATE_PRELAUNCH);
-> 1641         }
-> 1642     }
-> ...
+> CC: michael@walle.cc
+> ---
+>   hw/lm32/milkymist.c | 19 ++++++++++++-------
+>   1 file changed, 12 insertions(+), 7 deletions(-)
 >=20
-> I already sent a patch for this kind of problem (in current Juan pull
-> request):
->=20
-> "runstate: ignore finishmigrate -> prelaunch transition"
->=20
-> but I don't know if it could fix this one.
+> diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+> index 460d322..73c28f4 100644
+> --- a/hw/lm32/milkymist.c
+> +++ b/hw/lm32/milkymist.c
+> @@ -82,6 +82,7 @@ static void main_cpu_reset(void *opaque)
+>   static void
+>   milkymist_init(MachineState *machine)
+>   {
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>       const char *kernel_filename =3D machine->kernel_filename;
+>       const char *kernel_cmdline =3D machine->kernel_cmdline;
+>       const char *initrd_filename =3D machine->initrd_filename;
+> @@ -90,22 +91,26 @@ milkymist_init(MachineState *machine)
+>       int kernel_size;
+>       DriveInfo *dinfo;
+>       MemoryRegion *address_space_mem =3D get_system_memory();
+> -    MemoryRegion *phys_sdram =3D g_new(MemoryRegion, 1);
+>       qemu_irq irq[32];
+>       int i;
+>       char *bios_filename;
+>       ResetInfo *reset_info;
+>  =20
+> +    if (machine->ram_size !=3D mc->default_ram_size) {
+> +        error_report("Invalid RAM size, should be " RAM_ADDR_UFMT " Byte=
+s",
+> +                     mc->default_ram_size);
 
-I think it should be interesting to have the state transition on source
-and destination when the problem occurs (with something like "-trace
-runstate_set").
+I'd be displayed nicer using size_to_str(). Can be improved later.
 
-Thanks,
-Laurent
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+>       /* memory map */
+>       hwaddr flash_base   =3D 0x00000000;
+>       size_t flash_sector_size        =3D 128 * KiB;
+>       size_t flash_size               =3D 32 * MiB;
+>       hwaddr sdram_base   =3D 0x40000000;
+> -    size_t sdram_size               =3D 128 * MiB;
+>  =20
+>       hwaddr initrd_base  =3D sdram_base + 0x1002000;
+>       hwaddr cmdline_base =3D sdram_base + 0x1000000;
+> -    size_t initrd_max =3D sdram_size - 0x1002000;
+> +    size_t initrd_max =3D machine->ram_size - 0x1002000;
+>  =20
+>       reset_info =3D g_malloc0(sizeof(ResetInfo));
+>  =20
+> @@ -116,9 +121,7 @@ milkymist_init(MachineState *machine)
+>  =20
+>       cpu_lm32_set_phys_msb_ignore(env, 1);
+>  =20
+> -    memory_region_allocate_system_memory(phys_sdram, NULL, "milkymist.sd=
+ram",
+> -                                         sdram_size);
+> -    memory_region_add_subregion(address_space_mem, sdram_base, phys_sdra=
+m);
+> +    memory_region_add_subregion(address_space_mem, sdram_base, machine->=
+ram);
+>  =20
+>       dinfo =3D drive_get(IF_PFLASH, 0, 0);
+>       /* Numonyx JS28F256J3F105 */
+> @@ -183,7 +186,7 @@ milkymist_init(MachineState *machine)
+>  =20
+>           if (kernel_size < 0) {
+>               kernel_size =3D load_image_targphys(kernel_filename, sdram_=
+base,
+> -                                              sdram_size);
+> +                                              machine->ram_size);
+>               reset_info->bootstrap_pc =3D sdram_base;
+>           }
+>  =20
+> @@ -216,6 +219,8 @@ static void milkymist_machine_init(MachineClass *mc)
+>       mc->init =3D milkymist_init;
+>       mc->is_default =3D 0;
+>       mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
+> +    mc->default_ram_size =3D 128 * MiB;
+> +    mc->default_ram_id =3D "milkymist.sdram";
+>   }
+>  =20
+>   DEFINE_MACHINE("milkymist", milkymist_machine_init)
+>=20
 
 
