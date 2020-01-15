@@ -2,78 +2,78 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D13ACC33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB70DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D89A2073A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:24:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5E6E2073A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ST5eTm0x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D89A2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rh4B461o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5E6E2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irlSm-0001SO-Jy
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:24:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50077)
+	id 1irlT5-0001sx-OG
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:24:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkLE-0001M2-AB
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:21 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkLO-0001he-Kq
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkLC-0000cu-G3
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:20 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54954
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1irkLN-0000hf-2L
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21263
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkLC-0000cc-Bl
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:18 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkLM-0000hR-V6
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101137;
+ s=mimecast20190719; t=1579101148;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bOHqL/zFLc1Mo/PD+9KTlpg/mCLrWKTVD1qbV6xcvOc=;
- b=ST5eTm0x1DSqG4TOpnqe/eT+cuEnz788vwxT671I4qw/8p/FSSRZ03j5IAWvZhiM+v4RxB
- +2exQPRH92JKyN85qUOU9w0Or3oxi0JY76YwYPoQEkzhCPqQkq/gKXUM22dinks/ucUu//
- XkoHfprZe5a0+FsRDI/a+Hxz2UsK3dc=
+ bh=RYwuaRf7QSb72c9iSmfSb+rO2tJO/VYOiBm0aUBATX4=;
+ b=Rh4B461oVaLdS8f/FgA7rkOIwhLrHipcfHPXtJS/rLKoZim0lPVCWKMODqcvhOyl3WoV8+
+ FJHgTonDgor/ks44o7N3yJA0SifLos7/lSn2aZobUjPNltLpwLg20RBLEoYmhvie9lkMjy
+ 9sLqVPi6+JfRO8wvz/WBmqWTfX7F9yM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-ljaHc1CXOB6h4hWJL0lBrg-1; Wed, 15 Jan 2020 10:12:16 -0500
+ us-mta-377-qlBphB-vM6i87SD6ESet_Q-1; Wed, 15 Jan 2020 10:12:27 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8184E1007315
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:12:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AC3A917313
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:12:26 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A8834196AE;
- Wed, 15 Jan 2020 15:12:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 740FC196AE;
+ Wed, 15 Jan 2020 15:12:25 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 80/86] hostmem: introduce "prealloc-threads" property
-Date: Wed, 15 Jan 2020 16:07:35 +0100
-Message-Id: <1579100861-73692-81-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v2 84/86] tests:numa-test: use explicit memdev to specify node
+ RAM
+Date: Wed, 15 Jan 2020 16:07:39 +0100
+Message-Id: <1579100861-73692-85-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: ljaHc1CXOB6h4hWJL0lBrg-1
+X-MC-Unique: qlBphB-vM6i87SD6ESet_Q-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,206 +85,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, ehabkost@redhat.com
+Cc: lvivier@redhat.com, thuth@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-the property will allow user to specify number of threads to use
-in pre-allocation stage. It also will allow to reduce implicit
-hostmem dependency on current_machine.
-On object creation it will default to 1, but via machine
-compat property it will be updated to MachineState::smp::cpus
-to keep current behavior for hostmem and main RAM (which is
-now also hostmem based).
+Follow up patches will remove automatic RAM distribution
+between nodes and will make default machine types require
+"memdev" option instead of legacy "mem" option.
+
+Make tests to follow new rules and add an additional test
+for legacy "mem" option on old machine type, to make sure
+it won't regress in the future.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: pbonzini@redhat.com
-CC: ehabkost@redhat.com
+CC: thuth@redhat.com
+CC: lvivier@redhat.com
 ---
- include/sysemu/hostmem.h |  2 ++
- backends/hostmem.c       | 43 +++++++++++++++++++++++++++++++++++++++----
- vl.c                     | 15 +++++++++++----
- 3 files changed, 52 insertions(+), 8 deletions(-)
+ tests/qtest/numa-test.c | 52 ++++++++++++++++++++++++++++++++++++---------=
+----
+ 1 file changed, 38 insertions(+), 14 deletions(-)
 
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 5db0d66..bdf8666 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -61,6 +61,7 @@ struct HostMemoryBackendClass {
-  * @parent: opaque parent object container
-  * @size: amount of memory backend provides
-  * @mr: MemoryRegion representing host memory belonging to backend
-+ * @prealloc_threads: number of threads to be used for preallocatining RAM
-  */
- struct HostMemoryBackend {
-     /* private */
-@@ -70,6 +71,7 @@ struct HostMemoryBackend {
-     uint64_t size;
-     bool merge, dump, use_canonical_path;
-     bool prealloc, force_prealloc, is_mapped, share;
-+    uint32_t prealloc_threads;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-     HostMemPolicy policy;
+diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
+index a696dfd..322d2ef 100644
+--- a/tests/qtest/numa-test.c
++++ b/tests/qtest/numa-test.c
+@@ -25,9 +25,8 @@ static void test_mon_explicit(const void *data)
+     g_autofree char *s =3D NULL;
+     g_autofree char *cli =3D NULL;
 =20
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index e773bdf..4c23c77 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -223,7 +223,6 @@ static void host_memory_backend_set_prealloc(Object *ob=
-j, bool value,
+-    cli =3D make_cli(data, "-smp 8 "
+-                   "-numa node,nodeid=3D0,cpus=3D0-3 "
+-                   "-numa node,nodeid=3D1,cpus=3D4-7 ");
++    cli =3D make_cli(data, "-smp 8 -numa node,nodeid=3D0,memdev=3Dram,cpus=
+=3D0-3 "
++                         "-numa node,nodeid=3D1,cpus=3D4-7");
+     qts =3D qtest_init(cli);
+=20
+     s =3D qtest_hmp(qts, "info numa");
+@@ -37,13 +36,13 @@ static void test_mon_explicit(const void *data)
+     qtest_quit(qts);
+ }
+=20
+-static void test_mon_default(const void *data)
++static void test_def_cpu_split(const void *data)
  {
-     Error *local_err =3D NULL;
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
--    MachineState *ms =3D MACHINE(qdev_get_machine());
+     QTestState *qts;
+     g_autofree char *s =3D NULL;
+     g_autofree char *cli =3D NULL;
 =20
-     if (backend->force_prealloc) {
-         if (value) {
-@@ -243,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *ob=
-j, bool value,
-         void *ptr =3D memory_region_get_ram_ptr(&backend->mr);
-         uint64_t sz =3D memory_region_size(&backend->mr);
+-    cli =3D make_cli(data, "-smp 8 -numa node -numa node");
++    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram -numa node");
+     qts =3D qtest_init(cli);
 =20
--        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
-+        os_mem_prealloc(fd, ptr, sz, backend->prealloc_threads, &local_err=
+     s =3D qtest_hmp(qts, "info numa");
+@@ -53,6 +52,23 @@ static void test_mon_default(const void *data)
+     qtest_quit(qts);
+ }
+=20
++static void test_pc_legacy_mem(const void *data)
++{
++    QTestState *qts;
++    g_autofree char *s =3D NULL;
++    g_autofree char *cli =3D NULL;
++
++    cli =3D make_cli(data, "-M pc-i440fx-4.2 -smp 8 "
++                         "-numa node,mem=3D64M -numa node,mem=3D64M");
++    qts =3D qtest_init(cli);
++
++    s =3D qtest_hmp(qts, "info numa");
++    g_assert(strstr(s, "node 0 size: 64 MB"));
++    g_assert(strstr(s, "node 1 size: 64 MB"));
++
++    qtest_quit(qts);
++}
++
+ static void test_mon_partial(const void *data)
+ {
+     QTestState *qts;
+@@ -60,7 +76,7 @@ static void test_mon_partial(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 8 "
+-                   "-numa node,nodeid=3D0,cpus=3D0-1 "
++                   "-numa node,nodeid=3D0,memdev=3Dram,cpus=3D0-1 "
+                    "-numa node,nodeid=3D1,cpus=3D4-5 ");
+     qts =3D qtest_init(cli);
+=20
+@@ -87,7 +103,8 @@ static void test_query_cpus(const void *data)
+     QTestState *qts;
+     g_autofree char *cli =3D NULL;
+=20
+-    cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
+=3D4-7");
++    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram,cpus=3D0-3 "
++                         "-numa node,cpus=3D4-7");
+     qts =3D qtest_init(cli);
+     cpus =3D get_cpus(qts, &resp);
+     g_assert(cpus);
+@@ -125,7 +142,7 @@ static void pc_numa_cpu(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,thre=
+ads=3D2 "
+-        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
++        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
+         "-numa cpu,node-id=3D1,socket-id=3D0 "
+         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
+         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
+@@ -178,7 +195,7 @@ static void spapr_numa_cpu(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 4,cores=3D4 "
+-        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
++        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
+         "-numa cpu,node-id=3D0,core-id=3D0 "
+         "-numa cpu,node-id=3D0,core-id=3D1 "
+         "-numa cpu,node-id=3D0,core-id=3D2 "
+@@ -223,7 +240,7 @@ static void aarch64_numa_cpu(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 2 "
+-        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
++        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
+         "-numa cpu,node-id=3D1,thread-id=3D0 "
+         "-numa cpu,node-id=3D0,thread-id=3D1");
+     qts =3D qtest_init(cli);
+@@ -263,13 +280,14 @@ static void pc_dynamic_cpu_cfg(const void *data)
+     QDict *resp;
+     QList *cpus;
+     QTestState *qs;
++    g_autofree char *cli =3D NULL;
+=20
+-    qs =3D qtest_initf("%s -nodefaults --preconfig -smp 2",
+-                     data ? (char *)data : "");
++    cli =3D make_cli(data, "-nodefaults --preconfig -smp 2");
++    qs =3D qtest_init(cli);
+=20
+     /* create 2 numa nodes */
+     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
+-        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
++        " 'arguments': { 'type': 'node', 'nodeid': 0, 'memdev': 'ram' } }"=
+)));
+     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
+         " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
+=20
+@@ -535,10 +553,15 @@ int main(int argc, char **argv)
+     if (strcmp(arch, "aarch64") =3D=3D 0) {
+         g_string_append(args, " -machine virt");
+     }
++    if (!strcmp(arch, "ppc64")) {
++        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
+=3D512M");
++    } else {
++        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
+=3D128M");
++    }
+=20
+     g_test_init(&argc, &argv, NULL);
+=20
+-    qtest_add_data_func("/numa/mon/default", args, test_mon_default);
++    qtest_add_data_func("/numa/mon/cpus/default", args, test_def_cpu_split=
 );
-         if (local_err) {
-             error_propagate(errp, local_err);
-             return;
-@@ -252,14 +251,45 @@ static void host_memory_backend_set_prealloc(Object *=
-obj, bool value,
-     }
- }
-=20
-+static void host_memory_backend_get_prealloc_threads(Object *obj, Visitor =
-*v,
-+    const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+    visit_type_uint32(v, name, &backend->prealloc_threads, errp);
-+}
-+
-+static void host_memory_backend_set_prealloc_threads(Object *obj, Visitor =
-*v,
-+    const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+    Error *local_err =3D NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    if (value <=3D 0) {
-+        error_setg(&local_err,
-+                   "property '%s' of %s doesn't take value '%d'",
-+                   name, object_get_typename(obj), value);
-+        goto out;
-+    }
-+    backend->prealloc_threads =3D value;
-+out:
-+    error_propagate(errp, local_err);
-+}
-+
- static void host_memory_backend_init(Object *obj)
- {
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-=20
-+    /* TODO: convert this compat properties */
-     backend->merge =3D machine_mem_merge(machine);
-     backend->dump =3D machine_dump_guest_core(machine);
-     backend->prealloc =3D mem_prealloc;
-+    backend->prealloc_threads =3D 1;
- }
-=20
- static void host_memory_backend_post_init(Object *obj)
-@@ -313,7 +343,6 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
-Error **errp)
- {
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(uc);
-     HostMemoryBackendClass *bc =3D MEMORY_BACKEND_GET_CLASS(uc);
--    MachineState *ms =3D MACHINE(qdev_get_machine());
-     Error *local_err =3D NULL;
-     void *ptr;
-     uint64_t sz;
-@@ -378,7 +407,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
-Error **errp)
-          */
-         if (backend->prealloc) {
-             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
--                            ms->smp.cpus, &local_err);
-+                            backend->prealloc_threads, &local_err);
-             if (local_err) {
-                 goto out;
-             }
-@@ -456,6 +485,12 @@ host_memory_backend_class_init(ObjectClass *oc, void *=
-data)
-         host_memory_backend_set_prealloc, &error_abort);
-     object_class_property_set_description(oc, "prealloc",
-         "Preallocate memory", &error_abort);
-+    object_class_property_add(oc, "prealloc-threads", "int",
-+        host_memory_backend_get_prealloc_threads,
-+        host_memory_backend_set_prealloc_threads,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, "prealloc-threads",
-+        "Number of CPU threads to use for prealloc", &error_abort);
-     object_class_property_add(oc, "size", "int",
-         host_memory_backend_get_size,
-         host_memory_backend_set_size,
-diff --git a/vl.c b/vl.c
-index 7a4533c..39d78a9 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2820,8 +2820,7 @@ static void configure_accelerators(const char *progna=
-me)
-     }
- }
-=20
--static void create_default_memdev(MachineState *ms, const char *path,
--                                  bool prealloc)
-+static void create_default_memdev(MachineState *ms, const char *path)
- {
-     Object *obj;
-     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-@@ -2830,7 +2829,6 @@ static void create_default_memdev(MachineState *ms, c=
-onst char *path,
-     if (path) {
-         object_property_set_str(obj, path, "mem-path", &error_fatal);
-     }
--    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
-     object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
-     object_property_add_child(object_get_objects_root(), mc->default_ram_i=
-d,
-                               obj, &error_fatal);
-@@ -3973,6 +3971,15 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
+     qtest_add_data_func("/numa/mon/cpus/explicit", args, test_mon_explicit=
+);
+     qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
+     qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cpus=
+);
+@@ -549,6 +572,7 @@ int main(int argc, char **argv)
+         qtest_add_data_func("/numa/pc/hmat/build", args, pc_hmat_build_cfg=
+);
+         qtest_add_data_func("/numa/pc/hmat/off", args, pc_hmat_off_cfg);
+         qtest_add_data_func("/numa/pc/hmat/erange", args, pc_hmat_erange_c=
+fg);
++        qtest_add_data_func("/numa/pc/legacy/mem", args, test_pc_legacy_me=
+m);
      }
 =20
-+    if (mem_prealloc) {
-+        static GlobalProperty p[] =3D {
-+            {"memory-backend", "prealloc-threads", NULL},
-+        };
-+
-+        p[0].value =3D g_strdup_printf("%d", current_machine->smp.cpus);
-+        compat_props_add(machine_class->compat_props, p, G_N_ELEMENTS(p));
-+    }
-+
-     /*
-      * Get the default machine options from the machine if it is not alrea=
-dy
-      * specified either by the configuration file or by the command line.
-@@ -4306,7 +4313,7 @@ int main(int argc, char **argv, char **envp)
-     if (numa_uses_legacy_mem() &&
-         machine_class->default_ram_size &&
-         !current_machine->ram_memdev) {
--        create_default_memdev(current_machine, mem_path, mem_prealloc);
-+        create_default_memdev(current_machine, mem_path);
-     }
-     /* do monitor/qmp handling at preconfig state if requested */
-     main_loop();
+     if (!strcmp(arch, "ppc64")) {
 --=20
 2.7.4
 
