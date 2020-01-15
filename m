@@ -2,95 +2,74 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6D3C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 13:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FDFC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 13:13:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 040A02084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 13:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCCB92084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 13:12:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Go5Z/TEb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 040A02084D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ONxYPAxj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCCB92084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iriSa-0002uD-5S
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 08:11:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54854)
+	id 1iriTj-0003yb-2z
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 08:12:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iriRv-0002L8-Jc
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:11:08 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iriRy-0002NP-6S
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iriRt-0003lT-LJ
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:11:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45574
+ (envelope-from <stefanha@redhat.com>) id 1iriRx-0003pr-3l
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:11:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48301
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iriRt-0003kq-Hy
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:11:05 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iriRw-0003pP-W9
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:11:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579093864;
+ s=mimecast20190719; t=1579093868;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ghYAhUlcaHszEgi7Olz7AZkocCBLSOKwcNeMAplEE6Y=;
- b=Go5Z/TEbSGWCN0JfjJaxKeiUeE4zPC0E/hEmPlLIZCWE1DtyCLpCcuGPUklZrW91fTc8z5
- nseIU0LnGPKk+SZnX43j0ijIEpSNmZASpZAri3g9506Ocsk+MOZm2yJG6GnwZ9UV9xsvUb
- yizvzCl5KAR29dvp/at966krhv7ZBj8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-SnfsodPeN7Kb1hUBf3ro-Q-1; Wed, 15 Jan 2020 08:11:01 -0500
-Received: by mail-wr1-f71.google.com with SMTP id f15so8055821wrr.2
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 05:11:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ghYAhUlcaHszEgi7Olz7AZkocCBLSOKwcNeMAplEE6Y=;
- b=Rcl9B1KnPNCMM09S2Ra0zkR104NADe6y3DAXPf0GCjjjjqbL1qtjkRWmV8Ceolp13v
- 0zw0Ba5r3XeJv6iujahfl661+/4v+w6QcHWwrQqaZBAfsZw7LQA0C2TA0BI/UUbzcVgZ
- yctXvbkJq4AqCTK8wpwUGnmzZWw2yji28Wr8dNjHyOa9vOzV3sDnkGStuo77cL6UJ1pH
- ayjRY2+gm61/Aytgzv4nWzQzArjft2sMrfm5/vYtQSY0AdvDNxpuBbTIqrSVW2n97mXF
- q8gdaTI/Uuw5dwGyDeGp91gkoslRy1PyAyV9vnZfzuabEmaL3UlklNj6pTaTD9gUZa3L
- B2Nw==
-X-Gm-Message-State: APjAAAU5+1C5/hgxaUccvES4XJncqTMopkEIh0vkfgoLeOpQblPU/epp
- usN0GaPtlV4H7AnBSnuiApzFh6Vo+CqSSeYQnx3xGwdKUUP2Fg9Vi28f5IWmsc01sfP06tv+yt/
- MobIArsK4oREtEMY=
-X-Received: by 2002:adf:ca07:: with SMTP id o7mr31919189wrh.49.1579093860480; 
- Wed, 15 Jan 2020 05:11:00 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxqnKdC2op8Nz78/c73+WtSnksMAoS8in5OTnxsS56+zdlXSNY7IcGLmlyAw5N4xnMK/hQlIA==
-X-Received: by 2002:adf:ca07:: with SMTP id o7mr31919159wrh.49.1579093860158; 
- Wed, 15 Jan 2020 05:11:00 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:436:e17d:1fd9:d92a?
- ([2001:b07:6468:f312:436:e17d:1fd9:d92a])
- by smtp.gmail.com with ESMTPSA id z124sm25421666wmc.20.2020.01.15.05.10.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Jan 2020 05:10:59 -0800 (PST)
-Subject: Re: [PATCH] hw/input: Do not enable CONFIG_PCKBD by default
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20200115113748.24757-1-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d0552e1f-1e05-c761-d69a-b73f7bd0a118@redhat.com>
-Date: Wed, 15 Jan 2020 14:10:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=bJJvs7HeTuvZKSsSq+jzYgZAAXsEEe3tM6wVhZy250w=;
+ b=ONxYPAxjGqDUjfSg2IGPAw7YZy8N8wQtMeruGF4M48O1Oz0JcSRNjoQ9RIFxi0dnKUObZo
+ EvUvg/V3bjZ+lcOf6FxFiaG41RM83CJ6uPuCxL10CG/8NAp0Ta1YkKgOWWHIqlmT/jQbnn
+ SH4tP7uvohCegW7pQx8yLgN+uvChLdU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-jytadgYBPIyxIzOymo45CQ-1; Wed, 15 Jan 2020 08:11:05 -0500
+X-MC-Unique: jytadgYBPIyxIzOymo45CQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBBBF800D41;
+ Wed, 15 Jan 2020 13:11:03 +0000 (UTC)
+Received: from localhost (ovpn-117-209.ams2.redhat.com [10.36.117.209])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 813E686CB7;
+ Wed, 15 Jan 2020 13:11:03 +0000 (UTC)
+Date: Wed, 15 Jan 2020 13:11:02 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v2 0/4] qmp: Optionally run handlers in coroutines
+Message-ID: <20200115131102.GF163546@stefanha-x1.localdomain>
+References: <20200114182735.5553-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200115113748.24757-1-thuth@redhat.com>
-Content-Language: en-US
-X-MC-Unique: SnfsodPeN7Kb1hUBf3ro-Q-1
+In-Reply-To: <20200114182735.5553-1-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="IvGM3kKqwtniy32b"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -105,51 +84,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Philippe Mathieu-Daude <philmd@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/01/20 12:37, Thomas Huth wrote:
-> The i8042 device is part of the chipset of a machine, so it should
-> be selected by the machines or chipsets (e.g. SuperIO chipsets),
-> and not be enabled by default.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/input/Kconfig | 1 -
->  hw/isa/Kconfig   | 1 +
->  2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-> index 287f08887b..a2f25725be 100644
-> --- a/hw/input/Kconfig
-> +++ b/hw/input/Kconfig
-> @@ -7,7 +7,6 @@ config LM832X
->  
->  config PCKBD
->      bool
-> -    default y
->      select PS2
->      depends on ISA_BUS
->  
-> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-> index 8a38813cc1..c7f07854f7 100644
-> --- a/hw/isa/Kconfig
-> +++ b/hw/isa/Kconfig
-> @@ -16,6 +16,7 @@ config I82378
->  config ISA_SUPERIO
->      bool
->      select ISA_BUS
-> +    select PCKBD
->  
->  config PC87312
->      bool
-> 
+--IvGM3kKqwtniy32b
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Since you CCed qemu-trivial,
+On Tue, Jan 14, 2020 at 07:27:31PM +0100, Kevin Wolf wrote:
+> Some QMP command handlers can block the main loop for a relatively long
+> time, for example because they perform some I/O. This is quite nasty.
+> Allowing such handlers to run in a coroutine where they can yield (and
+> therefore release the BQL) while waiting for an event such as I/O
+> completion solves the problem.
+>=20
+> This series adds the infrastructure to allow this and switches
+> block_resize to run in a coroutine as a first example.
+>=20
+> This is an alternative solution to Marc-Andr=E9's "monitor: add
+> asynchronous command type" series.
+>=20
+> v2:
+> - Fix typo in a commit message [Eric]
+> - Use hyphen instead of underscore for the test command [Eric]
+> - Mark qmp_block_resize() as coroutine_fn [Stefan]
+>=20
+>=20
+> Kevin Wolf (4):
+>   qapi: Add a 'coroutine' flag for commands
+>   vl: Initialise main loop earlier
+>   qmp: Move dispatcher to a coroutine
+>   block: Mark 'block_resize' as coroutine
+>=20
+>  qapi/block-core.json                    |  3 +-
+>  tests/qapi-schema/qapi-schema-test.json |  1 +
+>  docs/devel/qapi-code-gen.txt            |  4 ++
+>  include/qapi/qmp/dispatch.h             |  3 +
+>  monitor/monitor-internal.h              |  5 +-
+>  blockdev.c                              |  6 +-
+>  monitor/monitor.c                       | 24 ++++---
+>  monitor/qmp.c                           | 83 ++++++++++++++++---------
+>  qapi/qmp-dispatch.c                     | 38 ++++++++++-
+>  tests/test-qmp-cmds.c                   |  4 ++
+>  vl.c                                    | 10 +--
+>  scripts/qapi/commands.py                | 17 +++--
+>  scripts/qapi/doc.py                     |  2 +-
+>  scripts/qapi/expr.py                    |  4 +-
+>  scripts/qapi/introspect.py              |  2 +-
+>  scripts/qapi/schema.py                  |  9 ++-
+>  tests/qapi-schema/qapi-schema-test.out  |  2 +
+>  tests/qapi-schema/test-qapi.py          |  7 ++-
+>  18 files changed, 158 insertions(+), 66 deletions(-)
+>=20
+> --=20
+> 2.20.1
+>=20
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--IvGM3kKqwtniy32b
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4fD2YACgkQnKSrs4Gr
+c8iNvgf/bY69FFuq4vUZhsyugPkrQetFxo4y4cJ5jYFeJSEzdvzLc3knbmX0tM7o
+8ow4Q9NhA87yIUsOO725yK7OqhSXVb4ZYzfMg/3Aqn6H2aGpls7xxXLaT/TQORl5
+pMYxqHt5998SO2b4WQwjDQqtQUjK8dbwQUAGHIhA2M6XDTEyJzDbuIppq7S5gspB
+35P+t7JlJmSpDg6SMgIHRl9O0aCxyANnB6WMx38Mr1L0Iiysu557TOmBIMpuH/05
+usjf+mOZr0P4oV1c194gvxpymC78gYYNlj2q9kY8Ed3V7BGtkoRuDMmVFxTyR0eL
+gFPlfCD14hbq/uDIivlGzMc4hU3WSw==
+=Q+IL
+-----END PGP SIGNATURE-----
+
+--IvGM3kKqwtniy32b--
 
 
