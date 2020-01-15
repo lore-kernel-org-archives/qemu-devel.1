@@ -2,80 +2,93 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB29C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 23:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6362AC33CB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 23:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 314BC222C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 23:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32700222C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 23:08:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="luTRAq+Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 314BC222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hXL34IWL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32700222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irrlc-0006Sl-Cw
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 18:08:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46588)
+	id 1irrmJ-0007Q9-C9
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 18:08:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1irrks-00060s-Hh
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 18:07:19 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1irrlc-0006b5-9s
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 18:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1irrkr-0007M3-DV
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 18:07:18 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:33851)
+ (envelope-from <richard.henderson@linaro.org>) id 1irrlb-0007ri-2s
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 18:08:03 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46835)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1irrko-0007K1-Vc; Wed, 15 Jan 2020 18:07:15 -0500
-Received: by mail-lj1-x244.google.com with SMTP id z22so20471699ljg.1;
- Wed, 15 Jan 2020 15:07:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AVWycBN+UnjNQg37ENptLAweD7Domm2t4W/Oj6IcFsY=;
- b=luTRAq+ZyGZ7n/VCVEzwXljQfP59CNoMroNZu4raSk1qECK7CD1s0Wo0af262A7vPG
- AYS7obSQaOI7zsK+c8J3CCtbkDAzHSHzEfTB9xt1yAtVyMyXEKtdvvJDMOidEW004iEu
- jg6g9wTp8OFGUm/U2+C2aBocAGnubGyCvJqC2X9Fu0sfLi4lqD1mcZFQBx85Fo/O71tK
- 6i0SUEG3ARfQA/m7JSTxTlA3KxkyDlZf9lxachYiUARxWKTmotaX3vF+beX+Y/dyy+3q
- D0p7HQKQsBWIH/zMKPwmjw/tm0H1uXlqZ7CYInT3HweBHq/ivUzYZn1c72X7gD/TWPF7
- SdrA==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1irrla-0007qT-RQ
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 18:08:03 -0500
+Received: by mail-pf1-x442.google.com with SMTP id n9so9210452pff.13
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:08:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=BQHJvRoCxkMjIFqwUcXROLAq68d80gqdA++H8mJBCr4=;
+ b=hXL34IWLMSBwFLd+Eu0glsfzsNbl3L2cvoX0mWx4yUOvxsY9ElD6ieUEmz3wU4CdaB
+ HCS2TTMRzlcM+yHPGtDabBm3FdwQa1GreQ+4SvS8BItohyIf4Uw0Fi/fTaw82jZIwBf6
+ cdvPgLc/cr0vBSQGK84L1gMHFRLnG+7vCB96Mt3ve9hUX9psL0aftxckEeOGL1+6PjQA
+ +sr/A60nuOHpaR29U16kBPpHKaahef/vlob8msAm6iO3xu6K2h1HCzwi35xKio055935
+ 86fzL/o3FJhs/ge2RHuiuijv4iQNTUWgNGVdb8YCv7rK8R6wL6IxqIt66oNq2TfPIfid
+ HzWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AVWycBN+UnjNQg37ENptLAweD7Domm2t4W/Oj6IcFsY=;
- b=Wu080W7dZBx0On6Cn33EegU/e1YlbiLQlSNww5QZECwLa14DFQHZ6Q8z1NZHkOw2g1
- lvQWkwN3i2o7NvuwOKORbZhzzATkhHKAImKvrmv5ba51Tm1fViDiTZvIv1QWwt1044ZQ
- ZvpMSOqlEzt8I+SXniZRGGls8nEj7DxeHtqgWRtK5mhV7kl4RXmU5TQmkro2JCOP0UUq
- 4/cw4Qs5GOZOmvcX9dM2BpsqX46EIK/ump4ektwtlGiifcRF1JcK2k1yTLNnMS9lkPlX
- gHvkObh6Q6OYMdgmlsgd9XdrBx2oemUoh1fdPTdGyhB0WT95sr9LsmehoKepEI2b6q2A
- bLjg==
-X-Gm-Message-State: APjAAAXkduxe3H3FJJqzuQggKehPBdYBGQnGfS5MMHkImFV86zc5PAGq
- OA8PuzLjVVhg/zfULf+H1OH5drzOwAB4F5xvq1g=
-X-Google-Smtp-Source: APXvYqzIKpg5HcVrHiupiZtgwyJOv3RBK/lxuIW3WbKXMmRBKBeQCQWtzCLA3bcodRghJHT1K4FTITTxUDDW4maeKm8=
-X-Received: by 2002:a2e:8755:: with SMTP id q21mr438329ljj.156.1579129633255; 
- Wed, 15 Jan 2020 15:07:13 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=BQHJvRoCxkMjIFqwUcXROLAq68d80gqdA++H8mJBCr4=;
+ b=qbfqxMWR/21VED+LD3bYh+so+rckzIpCea8sB9vpMqzmvNzw5E8oBnuKG2qm1bekEO
+ uyNbyQbTTY/vytx5LBiBKXTcFfoZE/ZEt7qS+vC9o48jnuxbBuelKCoMFGgK2ICSMgyT
+ Q7N3EHh+gSY9L9g6NqHcYPwI8IaMKOWFje3Isqrost0WlblliSnaHTCv8xmK9Q5i6hkf
+ 8T8v0hGWK1lzsLMj2P3T6NKuRQD4mch7W/wxq7TEkN6gEotrsLIYpfQNt/ia3iXIwcoF
+ +m3lhthB2RlJxq90myabVtfXPn1fmdRZ3lRZMV92mgOyW/SX5agMbQaCAYo3Fh4JyXqD
+ vAWg==
+X-Gm-Message-State: APjAAAVlb1gpaFo2bu/SKFGgAmRyNIVMsaDwcUTVvbgdKsZTxu/4bIPo
+ UlMRLT5YoYLZLdnRmg5Y9nlEuQ==
+X-Google-Smtp-Source: APXvYqwcd7V6ZrIjsmiYqjJb+0dsNFwOAxtRMVG8M9hu19uu8mbtJFH09zfchCJANwmhH4xWJWIN9Q==
+X-Received: by 2002:a62:ac03:: with SMTP id v3mr33774883pfe.17.1579129681571; 
+ Wed, 15 Jan 2020 15:08:01 -0800 (PST)
+Received: from [192.168.3.43] (rrcs-66-91-136-155.west.biz.rr.com.
+ [66.91.136.155])
+ by smtp.gmail.com with ESMTPSA id 136sm21322699pgg.74.2020.01.15.15.08.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Jan 2020 15:08:00 -0800 (PST)
+Subject: Re: [PATCH v5 20/22] tests/tcg/aarch64: add test-sve-ioctl
+ guest-debug test
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200114150953.27659-1-alex.bennee@linaro.org>
+ <20200114150953.27659-21-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2731815f-9a72-390b-0a8e-73b77c4b62b6@linaro.org>
+Date: Wed, 15 Jan 2020 13:07:57 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <1579069053-22190-1-git-send-email-shihpo.hung@sifive.com>
- <CAKmqyKNeAFRP7eCLtw1b0P53ub3k--+dROpPRynzCwM8DF15ng@mail.gmail.com>
- <8d63e90b-0779-6432-3a35-1b759f5ae279@linaro.org>
-In-Reply-To: <8d63e90b-0779-6432-3a35-1b759f5ae279@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 16 Jan 2020 09:06:46 +1000
-Message-ID: <CAKmqyKPQQPJsTiBmRtQ7hZOk0Ly62qKSmmFY_m8G2S9Pw20k5Q@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] target/riscv: Fix tb->flags FS status
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200114150953.27659-21-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,90 +100,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, shihpo.hung@sifive.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 16, 2020 at 7:46 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 1/14/20 8:28 PM, Alistair Francis wrote:
-> > On Wed, Jan 15, 2020 at 4:18 PM <shihpo.hung@sifive.com> wrote:
-> >>
-> >> It was found that running libquantum on riscv-linux qemu produced an
-> >> incorrect result. After investigation, FP registers are not saved
-> >> during context switch due to incorrect mstatus.FS.
-> >>
-> >> In current implementation tb->flags merges all non-disabled state to
-> >> dirty. This means the code in mark_fs_dirty in translate.c that
-> >> handles initial and clean states is unreachable.
-> >>
-> >> This patch fixes it and is successfully tested with:
-> >>   libquantum
-> >>
-> >> Thanks to Richard for pointing out the actual bug.
-> >>
-> >> v3: remove the redundant condition
-> >> v2: root cause FS problem
-> >>
-> >> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> >> Signed-off-by: ShihPo Hung <shihpo.hung@sifive.com>
-> >> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> >> ---
-> >>  target/riscv/cpu.h | 5 +----
-> >>  1 file changed, 1 insertion(+), 4 deletions(-)
-> >>
-> >> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> >> index e59343e..de0a8d8 100644
-> >> --- a/target/riscv/cpu.h
-> >> +++ b/target/riscv/cpu.h
-> >> @@ -293,10 +293,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
-> >>  #ifdef CONFIG_USER_ONLY
-> >>      *flags = TB_FLAGS_MSTATUS_FS;
-> >>  #else
-> >> -    *flags = cpu_mmu_index(env, 0);
-> >> -    if (riscv_cpu_fp_enabled(env)) {
-> >> -        *flags |= TB_FLAGS_MSTATUS_FS;
-> >> -    }
-> >> +    *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
-> >
-> > I don't think this is right, you should use the riscv_cpu_fp_enabled() function.
-> >
-> > Right now it's the same as env->mstatus & MSTATUS_FS but when the
-> > Hypervisor extension goes in riscv_cpu_fp_enabled() will be more
-> > complex.
->
-> Hmm.  Are you sure something like
->
->   flags |= riscv_cpu_effective_mstatus(env) & MSTATUS_FS;
->
-> wouldn't be more appropriate for the hypervisor extension?
+On 1/14/20 5:09 AM, Alex Bennée wrote:
+> This test exercises the gdbstub while runing the sve-iotcl test. I
+> haven't plubmed it into make system as we need a way of verifying if
+> gdb has the right support for SVE.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v4
+>   - interrogate ZCR_EL1 directly as no longer have vg
 
-I was more thinking:
+Note that ZCR_EL1 does not give you the correct answer if the hypervisor has
+set ZCR_EL2 to something lower.  Also, ZCR_EL1 it itself not correct if the
+hardware does not support all vector sizes.
 
-    if (riscv_cpu_fp_enabled(env)) {
-        *flags |= env->mstatus & MSTATUS_FS;
-    }
+See some of Andrew Jones' qemu command-line work.  Try -cpu max,sve512=on and
+then use the ioctl to set vq to 3 (sve384).  The result will be an effective vq
+of 2 (sve256).
 
-as floating point can be disabled from multiple places when we have
-the H extension.
+We *really* need vg, as computed from sve_zcr_len_for_el().
 
->
-> I guess I should have another browse through your hv patchset, but I worry now
-> about bare uses of env->mstatus, if they no longer mean what they appear to mean.
 
-That was why this was all refacted in the first place as we now need
-to check against env->vsstatus as well (depending on virt status).
-
-Alistair
-
->
->
-> r~
+r~
 
