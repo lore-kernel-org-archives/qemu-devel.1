@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3596DC32771
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E5F9C33CB3
 	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:43:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CB2B2084D
+	by mail.kernel.org (Postfix) with ESMTPS id 49CD02084D
 	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 19:43:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB2B2084D
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CD02084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iroZN-000620-QN
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 14:43:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38725)
+	id 1iroZP-0005zf-AB
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 14:43:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iroTh-0005kX-FM
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:29 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iroTU-0005em-MC
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iroTc-0004uq-Th
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:20 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:43311 helo=mail.rt-rk.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iroTQ-0004nV-Q9
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:08 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:43196 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1iroTc-0004oO-JN
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:16 -0500
+ id 1iroTP-0004hs-HR
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 14:37:04 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 7FEA31A2158;
+ by mail.rt-rk.com (Postfix) with ESMTP id 0A6891A219F;
  Wed, 15 Jan 2020 20:36:53 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
  [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 4945A1A21E3;
- Wed, 15 Jan 2020 20:36:53 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id D7E801A20B0;
+ Wed, 15 Jan 2020 20:36:52 +0100 (CET)
 From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 12/13] linux-user: Add support for selected alsa timer
- instructions using ioctls
-Date: Wed, 15 Jan 2020 20:36:46 +0100
-Message-Id: <1579117007-7565-13-git-send-email-Filip.Bozuta@rt-rk.com>
+Subject: [PATCH v8 02/13] linux-user: Add support for getting/setting RTC time
+ and alarm using ioctls
+Date: Wed, 15 Jan 2020 20:36:36 +0100
+Message-Id: <1579117007-7565-3-git-send-email-Filip.Bozuta@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1579117007-7565-1-git-send-email-Filip.Bozuta@rt-rk.com>
 References: <1579117007-7565-1-git-send-email-Filip.Bozuta@rt-rk.com>
@@ -72,80 +72,110 @@ Sender: "Qemu-devel"
 
 This patch implements functionalities of following ioctls:
 
-SNDRV_TIMER_IOCTL_START - Start selected alsa timer
+RTC_RD_TIME - Getting RTC time
 
-    Starts the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be started. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
+    Returns this RTC's time in the following structure:
 
-SNDRV_TIMER_IOCTL_STOP - Stop selected alsa timer
+        struct rtc_time {
+            int tm_sec;
+            int tm_min;
+            int tm_hour;
+            int tm_mday;
+            int tm_mon;
+            int tm_year;
+            int tm_wday;     /* unused */
+            int tm_yday;     /* unused */
+            int tm_isdst;    /* unused */
+        };
 
-    Stops the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be stopped. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
+    The fields in this structure have the same meaning and ranges
+    as the tm structure described in gmtime man page. A pointer
+    to this structure should be passed as the third ioctl's argument.
 
-SNDRV_TIMER_IOCTL_CONTINUE - Continue selected alsa timer
+RTC_SET_TIME - Setting RTC time
 
-    Continues the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be continued. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
+    Sets this RTC's time to the time specified by the rtc_time
+    structure pointed to by the third ioctl's argument. To set
+    the RTC's time the process must be privileged (i.e., have the
+    CAP_SYS_TIME capability).
 
-SNDRV_TIMER_IOCTL_PAUSE - Pause selected alsa timer
+RTC_ALM_READ, RTC_ALM_SET - Getting/Setting alarm time
 
-    Pauses the timer device that is selected. The third ioctl's argument is
-    ignored. Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT"
-    should be called first to select the timer that is to be paused. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape")
-    is returned.
+    Read and set the alarm time, for RTCs that support alarms.
+    The alarm interrupt must be separately enabled or disabled
+    using the RTC_AIE_ON, RTC_AIE_OFF requests. The third
+    ioctl's argument is a pointer to a rtc_time structure. Only
+    the tm_sec, tm_min, and tm_hour fields of this structure are
+    used.
 
 Implementation notes:
 
-    Since all of the implemented ioctls have NULL as their third argument,
-    their implementation was straightforward.
+    All ioctls in this patch have pointer to a structure rtc_time
+    as their third argument. That is the reason why corresponding
+    definition is added in linux-user/syscall_types.h. Since all
+    elements of this structure are of type 'int', the rest of the
+    implementation is straightforward.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 ---
- linux-user/ioctls.h       | 4 ++++
- linux-user/syscall_defs.h | 4 ++++
- 2 files changed, 8 insertions(+)
+ linux-user/ioctls.h        |  4 ++++
+ linux-user/syscall_defs.h  |  4 ++++
+ linux-user/syscall_types.h | 11 +++++++++++
+ 3 files changed, 19 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 43e7e5d..75a2f0e 100644
+index 97741c7..f472794 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -466,6 +466,10 @@
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_params)))
-   IOCTL(SNDRV_TIMER_IOCTL_STATUS, IOC_R,
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_status)))
-+  IOCTL(SNDRV_TIMER_IOCTL_START, 0, TYPE_NULL)
-+  IOCTL(SNDRV_TIMER_IOCTL_STOP, 0, TYPE_NULL)
-+  IOCTL(SNDRV_TIMER_IOCTL_CONTINUE, 0, TYPE_NULL)
-+  IOCTL(SNDRV_TIMER_IOCTL_PAUSE, 0, TYPE_NULL)
+@@ -77,6 +77,10 @@
+      IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
+      IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
+      IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_ALM_READ, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
++     IOCTL(RTC_ALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
++     IOCTL(RTC_RD_TIME, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
++     IOCTL(RTC_SET_TIME, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
  
-   IOCTL(HDIO_GETGEO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_hd_geometry)))
-   IOCTL(HDIO_GET_UNMASKINTR, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index d5f5cad..2d86d78 100644
+index f91579a..f0bf09d 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -2505,6 +2505,10 @@ struct target_snd_timer_status {
-                                                 struct snd_timer_params)
- #define TARGET_SNDRV_TIMER_IOCTL_STATUS       TARGET_IOR('T', 0x14,            \
-                                                 struct target_snd_timer_status)
-+#define TARGET_SNDRV_TIMER_IOCTL_START        TARGET_IO('T', 0xa0)
-+#define TARGET_SNDRV_TIMER_IOCTL_STOP         TARGET_IO('T', 0xa1)
-+#define TARGET_SNDRV_TIMER_IOCTL_CONTINUE     TARGET_IO('T', 0xa2)
-+#define TARGET_SNDRV_TIMER_IOCTL_PAUSE        TARGET_IO('T', 0xa3)
+@@ -772,6 +772,10 @@ struct target_pollfd {
+ #define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
+ #define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
+ #define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
++#define TARGET_RTC_ALM_READ         TARGET_IOR('p', 0x08, struct rtc_time)
++#define TARGET_RTC_ALM_SET          TARGET_IOW('p', 0x07, struct rtc_time)
++#define TARGET_RTC_RD_TIME          TARGET_IOR('p', 0x09, struct rtc_time)
++#define TARGET_RTC_SET_TIME         TARGET_IOW('p', 0x0a, struct rtc_time)
  
- /* vfat ioctls */
- #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
+ #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
+        defined(TARGET_XTENSA)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 4e36983..a35072a 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -255,6 +255,17 @@ STRUCT(blkpg_partition,
+        MK_ARRAY(TYPE_CHAR, BLKPG_DEVNAMELTH), /* devname */
+        MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
+ 
++STRUCT(rtc_time,
++       TYPE_INT, /* tm_sec */
++       TYPE_INT, /* tm_min */
++       TYPE_INT, /* tm_hour */
++       TYPE_INT, /* tm_mday */
++       TYPE_INT, /* tm_mon */
++       TYPE_INT, /* tm_year */
++       TYPE_INT, /* tm_wday */
++       TYPE_INT, /* tm_yday */
++       TYPE_INT) /* tm_isdst */
++
+ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* op */
+        TYPE_INT, /* flags */
 -- 
 2.7.4
 
