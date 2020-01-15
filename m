@@ -2,84 +2,101 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 563E9C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55480C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:08:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2162B214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:08:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24123214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 17:08:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cQGRRetP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2162B214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KOpxAOxI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24123214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irm9Q-0000Ca-81
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 12:08:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42161)
+	id 1irm9m-0000mz-9J
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 12:08:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1irm85-0006ZD-1d
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:06:54 -0500
+ (envelope-from <philmd@redhat.com>) id 1irm8v-00087Q-CG
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:07:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1irm83-0002SV-HV
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:06:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24656
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1irm8u-0002ld-4s
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:07:45 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60690
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1irm83-0002SE-EQ
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:06:51 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1irm8u-0002lW-1g
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 12:07:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579108010;
+ s=mimecast20190719; t=1579108063;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6p4uggDCt/f34JsVrVngOTTs30NPXpBqv0x/z7CxQGg=;
- b=cQGRRetPnXc7chpmO+f2lhj3HOADfQJTGvQ9W1Iq/X4XQadgsE8v0zNc9WDOxSjMMfRKKu
- P3l3g7K3veqlcxySO9YpzX5rgVdUG3P+FYtXbyJZroAV4qUneVNu19IDpJw1h+tunHHOYg
- CdtnKh0fbtZ0jN8A91KzA5KU/gsxXW8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-yP4roz_QOmyLQiCrGedwuQ-1; Wed, 15 Jan 2020 12:06:47 -0500
-X-MC-Unique: yP4roz_QOmyLQiCrGedwuQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0F4B10054E3;
- Wed, 15 Jan 2020 17:06:45 +0000 (UTC)
-Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D09387C3A2;
- Wed, 15 Jan 2020 17:06:42 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 16/16] arm/arm64: ITS: pending table
- migration test
-To: Andrew Jones <drjones@redhat.com>
-References: <20200110145412.14937-1-eric.auger@redhat.com>
- <20200110145412.14937-17-eric.auger@redhat.com>
- <20200113184547.zqilrexm27hpkkou@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <dd919bb9-6e1e-501f-b369-eb0d8dfbbcbc@redhat.com>
-Date: Wed, 15 Jan 2020 18:06:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ bh=dO7wnpMCGwzlSeew0BxHPdU1KB8zB+amZi4fqdOTeRk=;
+ b=KOpxAOxIyth106zByu0KHpCbX2BmF3EVbaUh8KXb9JvOXUGuqwlovqH23p+61ifSH8QSCJ
+ Ysgdd87DYzhPJnFt84uLPmK9viRlNaGKEJinOZNEA+wQT/FdMZspQmVdFK6XEsRGeE9JP4
+ SxUQ2P9Esg78UbKILEzTmoO+anpuL9M=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-xCPBRYOHPe2GTIC62jhRqA-1; Wed, 15 Jan 2020 12:07:42 -0500
+Received: by mail-wm1-f70.google.com with SMTP id 7so93781wmf.9
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 09:07:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bYD7jgIlCqamDnccIAOWMNutaPuNMDEMGvJtCtaEwYY=;
+ b=QsR9nfuzM9gq0/X2UKdLaktCbfLdhn2oV4vb0qsc8IiR/o3V83lMHoZ/hNjJ99E24P
+ 8EH25RJdUcS2s+5Nx5iK9aBbdmDgW8bnFAlGJPoF6JmijAZin7FO8/hqSF29pjreAzwV
+ j1eaSCYWznPOS+4YLdsGaQlCx2p80St7F9hzc/l97fMSlsHO5RW5cyq0RNpJZuDvi6LV
+ E1AgPilD8iuOz6Mpy007fXaDYWwSyITUKFR1LIvGkaBZIHSlgYFJxzmMQdAhazOleawg
+ Gc7a4I6szB6uJF5MWSqW5OdVtffUBFRcI8EIDhngGMxjxskasoICOEceUcgl0gm8AlEa
+ nodg==
+X-Gm-Message-State: APjAAAXZoVpi7i+S9eFV/BcFZbdp2fYmcYgOXFdPfauufGg4J8Fu38/+
+ Eb6UViokx4QAC/tkYQNI2Ee8Atimpd22WuNGvCPKHoeSmRWVnwBTjXmw6xSa67CiNPUxVPQyDiW
+ Bvew0jw2J9QNDsm8=
+X-Received: by 2002:a5d:4b47:: with SMTP id w7mr33868173wrs.276.1579108061445; 
+ Wed, 15 Jan 2020 09:07:41 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyt2zKcPjMkVRBT4HM4VMe778T3mAw9pC4rph/xvjVSwLemk1fnnahmivhC2dWE28u47Db4EA==
+X-Received: by 2002:a5d:4b47:: with SMTP id w7mr33868151wrs.276.1579108061237; 
+ Wed, 15 Jan 2020 09:07:41 -0800 (PST)
+Received: from [192.168.1.24] (lfbn-mon-1-1519-115.w92-167.abo.wanadoo.fr.
+ [92.167.83.115])
+ by smtp.gmail.com with ESMTPSA id l7sm25681482wrq.61.2020.01.15.09.07.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Jan 2020 09:07:40 -0800 (PST)
+Subject: Re: [PATCH 055/104] virtiofsd: fix libfuse information leaks
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-56-dgilbert@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0f69156f-8950-c4bd-5bc7-613e121a206b@redhat.com>
+Date: Wed, 15 Jan 2020 18:07:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200113184547.zqilrexm27hpkkou@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191212163904.159893-56-dgilbert@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: xCPBRYOHPe2GTIC62jhRqA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,256 +108,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
+On 12/12/19 5:38 PM, Dr. David Alan Gilbert (git) wrote:
+> From: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Some FUSE message replies contain padding fields that are not
+> initialized by libfuse.  This is fine in traditional FUSE applications
+> because the kernel is trusted.  virtiofsd does not trust the guest and
+> must not expose uninitialized memory.
+>=20
+> Use C struct initializers to automatically zero out memory.  Not all of
+> these code changes are strictly necessary but they will prevent future
+> information leaks if the structs are extended.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   tools/virtiofsd/fuse_lowlevel.c | 150 ++++++++++++++++----------------
+>   1 file changed, 76 insertions(+), 74 deletions(-)
 
-On 1/13/20 7:45 PM, Andrew Jones wrote:
-> On Fri, Jan 10, 2020 at 03:54:12PM +0100, Eric Auger wrote:
->> Add two new migration tests. One testing the migration of
->> a topology where collection were unmapped. The second test
->> checks the migration of the pending table.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  arm/gic.c         | 148 ++++++++++++++++++++++++++++++++++++++++++++++
->>  arm/unittests.cfg |  16 ++++-
->>  2 files changed, 163 insertions(+), 1 deletion(-)
->>
->> diff --git a/arm/gic.c b/arm/gic.c
->> index bf4b5ba..cb976c3 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -170,6 +170,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
->>  	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
->>  	lpi_stats.observed.cpu_id = smp_processor_id();
->>  	lpi_stats.observed.lpi_id = irqnr;
->> +	acked[lpi_stats.observed.cpu_id]++;
->>  	smp_wmb(); /* pairs with rmb in check_lpi_stats */
->>  }
->>  
->> @@ -207,6 +208,18 @@ static void check_lpi_stats(void)
->>  	}
->>  }
->>  
->> +static void check_lpi_hits(int *expected)
->> +{
->> +	int i;
->> +
->> +	for (i = 0; i < nr_cpus; i++) {
->> +		if (acked[i] != expected[i])
->> +			report(false, "expected %d LPIs on PE #%d, %d observed",
->> +			       expected[i], i, acked[i]);
->> +		}
->> +	report(true, "check LPI on all vcpus");
->> +}
->> +
->>  static void gicv2_ipi_send_self(void)
->>  {
->>  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
->> @@ -641,6 +654,18 @@ static int its_prerequisites(int nb_cpus)
->>  	return 0;
->>  }
->>  
->> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
->> +		    struct its_collection *col)
->> +{
->> +	if (!dev || !col)
->> +		report_abort("wrong device or collection");
->> +
->> +	its_send_mapti(dev, physid, eventid, col);
->> +
->> +	set_lpi_config(physid, LPI_PROP_DEFAULT);
->> +	its_send_invall(col);
->> +}
->> +
->>  /*
->>   * Setup the configuration for those mappings:
->>   * dev_id=2 event=20 -> vcpu 3, intid=8195
->> @@ -765,6 +790,121 @@ static void test_its_migration(void)
->>  	check_lpi_stats();
->>  }
->>  
->> +static void test_migrate_unmapped_collection(void)
->> +{
->> +	struct its_collection *col;
->> +	struct its_device *dev2, *dev7;
->> +	u8 config;
->> +
->> +	if (its_setup1())
->> +		return;
->> +
->> +	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
->> +	dev2 = its_get_device(2);
->> +	dev7 = its_get_device(7);
->> +
->> +	/* MAPTI with the collection unmapped */
->> +	set_lpi(dev2, 0, 8192, col);
->> +
->> +	puts("Now migrate the VM, then press a key to continue...\n");
->> +	(void)getchar();
->> +	report(true, "Migration complete");
->> +
->> +	/* on the destination, map the collection */
->> +	its_send_mapc(col, true);
->> +
->> +	lpi_stats_expect(2, 8196);
->> +	its_send_int(dev7, 255);
->> +	check_lpi_stats();
->> +
->> +	config = get_lpi_config(8192);
->> +	report(config == LPI_PROP_DEFAULT,
->> +	       "Config of LPI 8192 was properly migrated");
->> +
->> +	lpi_stats_expect(nr_cpus - 1, 8192);
->> +	its_send_int(dev2, 0);
->> +	check_lpi_stats();
->> +
->> +	/* unmap the collection */
->> +	its_send_mapc(col, false);
->> +
->> +	lpi_stats_expect(-1, -1);
->> +	its_send_int(dev2, 0);
->> +	check_lpi_stats();
->> +
->> +	/* remap event 0 onto lpiid 8193 */
->> +	set_lpi(dev2, 0, 8193, col);
->> +	lpi_stats_expect(-1, -1);
->> +	its_send_int(dev2, 0);
->> +	check_lpi_stats();
->> +
->> +	/* remap the collection */
->> +	its_send_mapc(col, true);
->> +	lpi_stats_expect(nr_cpus - 1, 8193);
->> +}
->> +
->> +static void test_its_pending_migration(void)
->> +{
->> +	struct its_device *dev;
->> +	struct its_collection *collection[2];
->> +	int expected[NR_CPUS];
->> +	u64 pendbaser;
->> +	void *ptr;
->> +	int i;
->> +
->> +	if (its_prerequisites(4))
->> +		return;
->> +
->> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
->> +	its_send_mapd(dev, true);
->> +
->> +	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
->> +	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
->> +	its_send_mapc(collection[0], true);
->> +	its_send_mapc(collection[1], true);
->> +
->> +	/* disable lpi at redist level */
->> +	gicv3_rdist_ctrl_lpi(nr_cpus - 1, false);
->> +	gicv3_rdist_ctrl_lpi(nr_cpus - 2, false);
->> +
->> +	/* even lpis are assigned to even cpu */
->> +	for (i = 0; i < 256; i++) {
->> +		struct its_collection *col = i % 2 ? collection[0] :
->> +						     collection[1];
->> +		int vcpu = col->target_address >> 16;
->> +
->> +		its_send_mapti(dev, 8192 + i, i, col);
->> +		set_lpi_config(8192 + i, LPI_PROP_DEFAULT);
->> +		set_pending_table_bit(vcpu, 8192 + i, true);
->> +	}
->> +	its_send_invall(collection[0]);
->> +	its_send_invall(collection[1]);
->> +
->> +	/* Set the PTZ bit on each pendbaser */
->> +
->> +	expected[nr_cpus - 1] = 128;
->> +	expected[nr_cpus - 2] = 128;
->> +
->> +	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
->> +	pendbaser = readq(ptr);
->> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
->> +	pendbaser = readq(ptr);
->> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +	gicv3_rdist_ctrl_lpi(nr_cpus - 1, true);
->> +	gicv3_rdist_ctrl_lpi(nr_cpus - 2, true);
->> +
->> +	puts("Now migrate the VM, then press a key to continue...\n");
->> +	(void)getchar();
->> +	report(true, "Migration complete");
->> +
->> +	mdelay(1000);
->> +
->> +	check_lpi_hits(expected);
->> +}
->> +
->>  int main(int argc, char **argv)
->>  {
->>  	if (!gic_init()) {
->> @@ -803,6 +943,14 @@ int main(int argc, char **argv)
->>  		report_prefix_push(argv[1]);
->>  		test_its_migration();
->>  		report_prefix_pop();
->> +	} else if (!strcmp(argv[1], "its-pending-migration")) {
->> +		report_prefix_push(argv[1]);
->> +		test_its_pending_migration();
->> +		report_prefix_pop();
->> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
->> +		report_prefix_push(argv[1]);
->> +		test_migrate_unmapped_collection();
->> +		report_prefix_pop();
->>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
->>  		report_prefix_push(argv[1]);
->>  		test_its_introspection();
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 29e2efc..911f0b7 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -145,7 +145,21 @@ file = gic.flat
->>  smp = $MAX_SMP
->>  accel = kvm
->>  extra_params = -machine gic-version=3 -append 'its-migration'
->> -groups = its migration
->> +groups = migration
->> +
->> +[its-pending-migration]
->> +file = gic.flat
->> +smp = $MAX_SMP
->> +accel = kvm
->> +extra_params = -machine gic-version=3 -append 'its-pending-migration'
->> +groups = migration
->> +
->> +[its-migrate-unmapped-collection]
->> +file = gic.flat
->> +smp = $MAX_SMP
->> +accel = kvm
->> +extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
->> +groups = migration
-> 
-> Why drop the 'its' group?
-I think the test only works with the migration group. Otherwise it
-stalls due to the migration infrastructure. I will double check.
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> drew
-> 
->>  
->>  # Test PSCI emulation
->>  [psci]
->> -- 
->> 2.20.1
->>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
