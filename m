@@ -2,85 +2,86 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C85B1C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 143FBC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 13:02:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92A652073A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D31D22073A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 13:02:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="KPMTWVfM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92A652073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EvKfgq3Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D31D22073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iriFy-0001DP-LB
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:58:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49755)
+	id 1iriJ8-00048m-So
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 08:02:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1irhuk-0002NF-5p
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:51 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iriID-0003S2-0Z
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:01:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1irhui-00037t-Nz
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:50 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:53600)
+ (envelope-from <eric.auger@redhat.com>) id 1iriI7-0004tb-7r
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:01:03 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25049
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1irhui-00036G-Cw; Wed, 15 Jan 2020 07:36:48 -0500
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id C228C96F57;
- Wed, 15 Jan 2020 12:36:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1579091807;
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iriI7-0004tN-3v
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 08:00:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579093258;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ByZlpBg1Ioa2n8uk60WzpeK2/nY478exBwfI3pflHII=;
- b=KPMTWVfMzkcm5jcBEV6/y169evlaYcOPmJub5oX57w2r9kje6jnbHfyhafOfJMNvMDXShn
- qImQIiYDZoRh9q5BYSjLO5cQh2YX00QSF/7lW9tmKl47i1wfLW0vB7G3Jo1Mgl9ebV/yfZ
- co7ynud8EeRp3Y+vHbTlrUQFPbLbUKI=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 08/11] hw/core: deprecate old reset functions and introduce
- new ones
-Date: Wed, 15 Jan 2020 13:36:17 +0100
-Message-Id: <20200115123620.250132-9-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200115123620.250132-1-damien.hedde@greensocs.com>
-References: <20200115123620.250132-1-damien.hedde@greensocs.com>
+ bh=lhHfVSTcsWupZx5t9Q77V1EutuWIjWNixQEVTQNjDXQ=;
+ b=EvKfgq3Y5rN2zKtIQ8c2oAq0+UFQt/uRMCRj7eJGHwGjk4aGSArI36ENqN2vFZNnrAsNmI
+ s1OhEl/jbrmH6/IoL/gRl+me5FklubZhWd9WmSoi/otKRHpvNAEzwISyWoWHgqjyt2Mv33
+ n6kanUXXK5XLB4S5GueludOOEaIAGJg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421-yhqN1cNdPdWu_fbEWrot8Q-1; Wed, 15 Jan 2020 08:00:55 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5235801F74;
+ Wed, 15 Jan 2020 13:00:53 +0000 (UTC)
+Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B483010841AB;
+ Wed, 15 Jan 2020 13:00:23 +0000 (UTC)
+Subject: Re: [PATCH v12 05/13] virtio-iommu: Endpoint and domains structs and
+ helpers
+To: Peter Xu <peterx@redhat.com>
+References: <20200109144319.15912-1-eric.auger@redhat.com>
+ <20200109144319.15912-6-eric.auger@redhat.com>
+ <20200113202301.GD201624@xz-x1>
+ <51267d84-c805-a4a1-8084-b278721a5b3f@redhat.com>
+ <20200114180734.GB225163@xz-x1>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f3da181d-094b-a647-31ea-bdb47eab5c1b@redhat.com>
+Date: Wed, 15 Jan 2020 14:00:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1579091807;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ByZlpBg1Ioa2n8uk60WzpeK2/nY478exBwfI3pflHII=;
- b=GQNNq3S1QwTqmVNziEzqgPaeiMYubVkq5PpmLjs0wGKsIAfKWkkkWlwEfNU+WjvQa9nZgz
- hAJjhBCByaRl1Bf0/tErQGaJ4tSKwzdaMALs4rjvYjb9j2vhjdp5zpP0/4HWv8NGu3lnlL
- eIOSJa/Vp8jwkdc93pvkMVhrLv0KzA0=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579091807; a=rsa-sha256; cv=none;
- b=bpARWuzcFn/F9NbmwUMimAmCzVT0NSCDcmGHtuLSM1uTLWugTLMUv5OJPwR4B9JZOkELGl
- J9S4S5RWeZwScoC5YxmnYdPufzJayHkAd4OYFxGrXyPQQEdmbRLckmVrl1umZX/o9bSYDK
- lbgwy2aeOUsfY63rqE0b7Ar3T8ACa/Y=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
+In-Reply-To: <20200114180734.GB225163@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: yhqN1cNdPdWu_fbEWrot8Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,172 +93,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- berrange@redhat.com, ehabkost@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
- mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
- pbonzini@redhat.com, philmd@redhat.com, david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
+ jean-philippe@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ mst@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Deprecate device_legacy_reset(), qdev_reset_all() and
-qbus_reset_all() to be replaced by new functions
-device_cold_reset() and bus_cold_reset() which uses resettable API.
+Hi Peter,
 
-Also introduce resettable_cold_reset_fn() which may be used as a
-replacement for qdev_reset_all_fn and qbus_reset_all_fn().
 
-Following patches will be needed to look at legacy reset call sites
-and switch to resettable api. The legacy functions will be removed
-when unused.
+On 1/14/20 7:07 PM, Peter Xu wrote:
+> On Tue, Jan 14, 2020 at 09:51:59AM +0100, Auger Eric wrote:
+>> Hi Peter,
+>=20
+> Hi, Eric,
+>=20
+> [...]
+>=20
+>>>
+>>>> +{
+>>>> +    VirtIOIOMMUEndpoint *ep;
+>>>> +
+>>>> +    ep =3D g_tree_lookup(s->endpoints, GUINT_TO_POINTER(ep_id));
+>>>> +    if (ep) {
+>>>> +        return ep;
+>>>> +    }
+>>>> +    if (!virtio_iommu_mr(s, ep_id)) {
+>>>
+>>> Could I ask when this will trigger?
+>>
+>> This can happen when a device is attached to a domain and its RID does
+>> not correspond to one of the devices protected by the iommu.
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/hw/qdev-core.h  | 27 +++++++++++++++++++++++++++
- include/hw/resettable.h |  9 +++++++++
- hw/core/bus.c           |  5 +++++
- hw/core/qdev.c          |  5 +++++
- hw/core/resettable.c    |  5 +++++
- 5 files changed, 51 insertions(+)
+>=20
+> So will it happen only because of a kernel driver bug?
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 1b4b420617..b84fcc32bf 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -406,6 +406,13 @@ int qdev_walk_children(DeviceState *dev,
-                        qdev_walkerfn *post_devfn, qbus_walkerfn *post_bu=
-sfn,
-                        void *opaque);
-=20
-+/**
-+ * @qdev_reset_all:
-+ * Reset @dev. See @qbus_reset_all() for more details.
-+ *
-+ * Note: This function is deprecated and will be removed when it becomes=
- unused.
-+ * Please use device_cold_reset() now.
-+ */
- void qdev_reset_all(DeviceState *dev);
- void qdev_reset_all_fn(void *opaque);
-=20
-@@ -418,10 +425,28 @@ void qdev_reset_all_fn(void *opaque);
-  * hard reset means that qbus_reset_all will reset all state of the devi=
-ce.
-  * For PCI devices, for example, this will include the base address regi=
-sters
-  * or configuration space.
-+ *
-+ * Note: This function is deprecated and will be removed when it becomes=
- unused.
-+ * Please use bus_cold_reset() now.
-  */
- void qbus_reset_all(BusState *bus);
- void qbus_reset_all_fn(void *opaque);
-=20
-+/**
-+ * device_cold_reset:
-+ * Reset device @dev and perform a recursive processing using the resett=
-able
-+ * interface. It triggers a RESET_TYPE_COLD.
-+ */
-+void device_cold_reset(DeviceState *dev);
-+
-+/**
-+ * bus_cold_reset:
-+ *
-+ * Reset bus @bus and perform a recursive processing using the resettabl=
-e
-+ * interface. It triggers a RESET_TYPE_COLD.
-+ */
-+void bus_cold_reset(BusState *bus);
-+
- /**
-  * device_is_in_reset:
-  * Return true if the device @dev is currently being reset.
-@@ -452,6 +477,8 @@ void qdev_machine_init(void);
-  * device_legacy_reset:
-  *
-  * Reset a single device (by calling the reset method).
-+ * Note: This function is deprecated and will be removed when it becomes=
- unused.
-+ * Please use device_cold_reset() now.
-  */
- void device_legacy_reset(DeviceState *dev);
-=20
-diff --git a/include/hw/resettable.h b/include/hw/resettable.h
-index 3f90da5b5b..0c1adf49ee 100644
---- a/include/hw/resettable.h
-+++ b/include/hw/resettable.h
-@@ -221,6 +221,15 @@ bool resettable_is_in_reset(Object *obj);
-  */
- void resettable_change_parent(Object *obj, Object *newp, Object *oldp);
-=20
-+/**
-+ * resettable_cold_reset_fn:
-+ * Helper to call resettable_reset((Object *) opaque, RESET_TYPE_COLD).
-+ *
-+ * This function is typically useful to register a reset handler with
-+ * qemu_register_reset.
-+ */
-+void resettable_cold_reset_fn(void *opaque);
-+
- /**
-  * resettable_class_set_parent_phases:
-  *
-diff --git a/hw/core/bus.c b/hw/core/bus.c
-index 2698f715bd..3dc0a825f0 100644
---- a/hw/core/bus.c
-+++ b/hw/core/bus.c
-@@ -68,6 +68,11 @@ int qbus_walk_children(BusState *bus,
-     return 0;
- }
-=20
-+void bus_cold_reset(BusState *bus)
-+{
-+    resettable_reset(OBJECT(bus), RESET_TYPE_COLD);
-+}
-+
- bool bus_is_in_reset(BusState *bus)
- {
-     return resettable_is_in_reset(OBJECT(bus));
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 5fac4cd8fc..a7a7abe569 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -361,6 +361,11 @@ void qbus_reset_all_fn(void *opaque)
-     qbus_reset_all(bus);
- }
-=20
-+void device_cold_reset(DeviceState *dev)
-+{
-+    resettable_reset(OBJECT(dev), RESET_TYPE_COLD);
-+}
-+
- bool device_is_in_reset(DeviceState *dev)
- {
-     return resettable_is_in_reset(OBJECT(dev));
-diff --git a/hw/core/resettable.c b/hw/core/resettable.c
-index e99bb30058..7647ef6863 100644
---- a/hw/core/resettable.c
-+++ b/hw/core/resettable.c
-@@ -264,6 +264,11 @@ void resettable_change_parent(Object *obj, Object *n=
-ewp, Object *oldp)
-     }
- }
-=20
-+void resettable_cold_reset_fn(void *opaque)
-+{
-+    resettable_reset((Object *) opaque, RESET_TYPE_COLD);
-+}
-+
- void resettable_class_set_parent_phases(ResettableClass *rc,
-                                         ResettableEnterPhase enter,
-                                         ResettableHoldPhase hold,
---=20
-2.24.1
+Yes, at the moment, because virtio_iommu_mr() only gets called on device
+attach to a domain.
+
+The spec says:
+"If the endpoint identified by endpoint doesn=E2=80=99t exist, the device M=
+UST
+reject the request and set status to VIRTIO_IOMMU_S_NOENT"
+>=20
+> Also, I think the name of "virtio_iommu_mr" is confusing on that it
+> returned explicitly a MemoryRegion however it's never been used:
+
+I use the same prototype as for smmu_iommu_mr(). Returning the iommu mr
+will allow to proceed with further RID based operations like invalidations.
+
+The same logic is used in vtd_context_device_invalidate.
+
+
+>=20
+> (since they're not in the same patch I'm pasting)
+>=20
+> static IOMMUMemoryRegion *virtio_iommu_mr(VirtIOIOMMU *s, uint32_t sid)
+> {
+>     uint8_t bus_n, devfn;
+>     IOMMUPciBus *iommu_pci_bus;
+>     IOMMUDevice *dev;
+>=20
+>     bus_n =3D PCI_BUS_NUM(sid);
+>     iommu_pci_bus =3D iommu_find_iommu_pcibus(s, bus_n);
+>     if (iommu_pci_bus) {
+>         devfn =3D sid & 0xFF;
+>         dev =3D iommu_pci_bus->pbdev[devfn];
+>         if (dev) {
+>             return &dev->iommu_mr;
+>         }
+>     }
+>     return NULL;
+> }
+>=20
+> Maybe "return !!dev" would be enough, then make the return a boolean?
+> Then we can rename it to virtio_iommu_has_device().
+>=20
+> PS. I think we can also drop IOMMU_PCI_DEVFN_MAX (after all you even
+> didn't use it here!) and use PCI_DEVFN_MAX, and replace 0xFF.
+well intel iommu and smmu use a similar constant (PCI_DEVFN_MAX,
+SMMU_PCI_DEVFN_MAX resp.). I use it in virtio_iommu_find_add_as
+
+Thanks
+
+Eric
+
+
+>=20
+> Thanks,
+>=20
 
 
