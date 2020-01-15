@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4DAC33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99044C33CB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2761420728
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6731C20728
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:49:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="0kYyqs1s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2761420728
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="y4E2ODTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6731C20728
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iri6m-0003LM-SR
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:49:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49689)
+	id 1iri6p-0003OA-8g
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:49:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1irhui-0002Ko-4H
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:49 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1irhul-0002OO-MT
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1irhug-00034N-Gp
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:48 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:53568)
+ (envelope-from <damien.hedde@greensocs.com>) id 1irhuk-0003A1-5o
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:36:51 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:53632)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1irhug-000336-7e; Wed, 15 Jan 2020 07:36:46 -0500
+ id 1irhuj-00038H-RB; Wed, 15 Jan 2020 07:36:50 -0500
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id B394A96F53;
- Wed, 15 Jan 2020 12:36:44 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 377D596F59;
+ Wed, 15 Jan 2020 12:36:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1579091805;
+ s=mail; t=1579091808;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2DZj/wOSTOFt2Fnd3NkJtSxT2iD4ESGX6Ww6KzcyT0o=;
- b=0kYyqs1sbfmOF9VfjNX1VFZB7xLwxM8qcHyhsLPJT6j/z0Zq8qQL8XY70bUMgoWFLhWToF
- aXZCXfm2nviEDPIxPRcq6Ukow6RV8ADk6TIhDQyIybnE4gzxIuXqd2Pf74bBbAO57t1wSK
- nI1ANDXlXQ6AYBi0RZh/raoYO4Wpc4Y=
+ bh=PU1ZxUE7d3iu7/38+fBqpfQ/iPdaI4G6S9CtKCw10J4=;
+ b=y4E2ODTIGnpgoS7L/PpDp/4kgtIY+nuCQSPXVYW4VnKbPP7SiOvPTNpwSAVn1GGXykggAl
+ JzVRO5nPyk356IpRwSZ2Jmiimq4LxrkqS/dJy/FkSSK0x0CZ+YOulC/xwOuS26FRFpfy8q
+ YDeeWi4vL1VxEpdO3+TV8RwqXDJ04b0=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 05/11] hw/core/resettable: add support for changing parent
-Date: Wed, 15 Jan 2020 13:36:14 +0100
-Message-Id: <20200115123620.250132-6-damien.hedde@greensocs.com>
+Subject: [PATCH v7 10/11] vl: replace deprecated qbus_reset_all registration
+Date: Wed, 15 Jan 2020 13:36:19 +0100
+Message-Id: <20200115123620.250132-11-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200115123620.250132-1-damien.hedde@greensocs.com>
 References: <20200115123620.250132-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1579091805;
+ s=mail; t=1579091808;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2DZj/wOSTOFt2Fnd3NkJtSxT2iD4ESGX6Ww6KzcyT0o=;
- b=wYDSLsxOI4xqY2KgOByV/dPfvVJ7nHlie3HNHJ4mor50IMH/qUfKJnkJvrxElUgVKpE0nt
- e8MSa6GFTS7IGkFU8qcaOXlpVWAcYwOQJgYbwl2vtKm6CDISFe3ev218b23fhq81E/pcjy
- Aelpw5eyahbGSTVdvwRn5+nn8whWbtY=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579091805; a=rsa-sha256; cv=none;
- b=3lqe6nblxUIS33HPTvxOFSW+5GyEVdDuaUjdc1Ihs8P2j8oariIpciId2LtKTKEU1gFQiP
- JWZRvD49S0Fa4awLdZU8GpmserRlQkOK874h2VeivEfl9brsv/jMKJdt5CUNKOKr52u8DI
- 88kDIIfJVt64YyKw6+rXi+8Pw+iKPfk=
+ bh=PU1ZxUE7d3iu7/38+fBqpfQ/iPdaI4G6S9CtKCw10J4=;
+ b=Wdimckom2ruXxwoKB0cXx5WJYV6NlPJ54f0vpEN8Sekv1tE/gy9UJbQ9vaNIuGPUL4YZwR
+ tN9ewFbz1pHjOU/wfy8YVwf5pBoE77O1KmotUA0ohnhCDaemTZXmeEqezxj3qskkl1AtiS
+ NVTrkue75EHJhKNLajuSGkaBHu6b/6o=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579091808; a=rsa-sha256; cv=none;
+ b=M7eVeq+44rakfbE74L/XQTzF58RC4i1L8ncwmcQbeQHk9uNJkr9P5ZzJx5M7bwJ57Q2aqM
+ xP1RaUgwOLG09xWBXwn7lj7UCQj92Q+IMRxqbsRvF9hi1rNK8EQ3PUiwLLXHOMdKN9EwPp
+ L/97TIJLMDbzehyjm3whdraQi/NUajo=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -99,185 +99,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a function resettable_change_parent() to do the required
-plumbing when changing the parent a of Resettable object.
+Replace deprecated qbus_reset_all by resettable_cold_reset_fn for
+the sysbus reset registration.
 
-We need to make sure that the reset state of the object remains
-coherent with the reset state of the new parent.
+Apart for the raspi machines, this does not impact the behavior
+because:
++ at this point resettable just calls the old reset methods of devices
+  and buses in the same order as qdev/qbus.
++ resettable handlers registered with qemu_register_reset are
+  serialized; there is no interleaving.
++ eventual explicit calls to legacy reset API (device_reset or
+  qdev/qbus_reset) inside this reset handler will not be masked out
+  by resettable mechanism; they do not go through resettable api.
 
-We make the 2 following hypothesis:
-+ when an object is put in a parent under reset, the object goes in
-reset.
-+ when an object is removed from a parent under reset, the object
-leaves reset.
-
-The added function avoids any glitch if both old and new parent are
-already in reset.
+For the raspi machines, during the sysbus reset the sd-card is not
+reset twice anymore but only once. This is a consequence of switching
+both sysbus reset and changing parent to resettable; it detects the
+second reset is not needed. This has no impact on the state after
+reset; the sd-card reset method only reset local state and query
+information from the block backend.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/hw/resettable.h | 16 +++++++++++
- hw/core/resettable.c    | 62 +++++++++++++++++++++++++++++++++++++++--
- hw/core/trace-events    |  1 +
- 3 files changed, 77 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/resettable.h b/include/hw/resettable.h
-index 58b3df4c22..3c87ab86c7 100644
---- a/include/hw/resettable.h
-+++ b/include/hw/resettable.h
-@@ -194,6 +194,22 @@ void resettable_release_reset(Object *obj, ResetType=
- type);
-  */
- bool resettable_is_in_reset(Object *obj);
+The raspi reset change can be observed by using the following command
+(reset will occurs, then do Ctrl-C to end qemu; no firmware is
+given here).
+qemu-system-aarch64 -M raspi3 \
+    -trace resettable_phase_hold_exec \
+    -trace qdev_update_parent_bus \
+    -trace resettable_change_parent \
+    -trace qdev_reset -trace qbus_reset
+
+Before the patch, the qdev/qbus_reset traces show when reset method are
+called. After the patch, the resettable_phase_hold_exec show when reset
+method are called.
+
+The traced reset order of the raspi3 is listed below. I've added empty
+lines and the tree structure.
+
+ +->bcm2835-peripherals reset
+ |
+ |       +->sd-card reset
+ |   +->sd-bus reset
+ +->bcm2835_gpio reset
+ |      -> dev_update_parent_bus (move the sd-card on the sdhci-bus)
+ |      -> resettable_change_parent
+ |
+ +->bcm2835-dma reset
+ |
+ |   +->bcm2835-sdhost-bus reset
+ +->bcm2835-sdhost reset
+ |
+ |       +->sd-card (reset ONLY BEFORE BEFORE THE PATCH)
+ |   +->sdhci-bus reset
+ +->generic-sdhci reset
+ |
+ +->bcm2835-rng reset
+ +->bcm2835-property reset
+ +->bcm2835-fb reset
+ +->bcm2835-mbox reset
+ +->bcm2835-aux reset
+ +->pl011 reset
+ +->bcm2835-ic reset
+ +->bcm2836-control reset
+System reset
+
+In both case, the sd-card is reset (being on bcm2835_gpio/sd-bus) then mo=
+ved
+to generic-sdhci/sdhci-bus by the bcm2835_gpio reset method.
+
+Before the patch, it is then reset again being part of generic-sdhci/sdhc=
+i-bus.
+After the patch, it considered again for reset but its reset method is no=
+t
+called because it is already flagged as reset.
+---
+ vl.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/vl.c b/vl.c
+index 751401214c..e5a537d4f9 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4362,7 +4362,15 @@ int main(int argc, char **argv, char **envp)
 =20
-+/**
-+ * resettable_change_parent:
-+ * Indicate that the parent of Ressettable @obj is changing from @oldp t=
-o @newp.
-+ * All 3 objects must implement resettable interface. @oldp or @newp may=
- be
-+ * NULL.
-+ *
-+ * This function will adapt the reset state of @obj so that it is cohere=
-nt
-+ * with the reset state of @newp. It may trigger @resettable_assert_rese=
-t()
-+ * or @resettable_release_reset(). It will do such things only if the re=
-set
-+ * state of @newp and @oldp are different.
-+ *
-+ * When using this function during reset, it must only be called during
-+ * a hold phase method. Calling this during enter or exit phase is an er=
-ror.
-+ */
-+void resettable_change_parent(Object *obj, Object *newp, Object *oldp);
-+
- /**
-  * resettable_class_set_parent_phases:
-  *
-diff --git a/hw/core/resettable.c b/hw/core/resettable.c
-index 9133208487..e99bb30058 100644
---- a/hw/core/resettable.c
-+++ b/hw/core/resettable.c
-@@ -28,12 +28,16 @@ static void resettable_phase_exit(Object *obj, void *=
-opaque, ResetType type);
-  * enter_phase_in_progress:
-  * True if we are currently in reset enter phase.
-  *
-- * Note: This flag is only used to guarantee (using asserts) that the re=
-set
-- * API is used correctly. We can use a global variable because we rely o=
-n the
-+ * exit_phase_in_progress:
-+ * count the number of exit phase we are in.
-+ *
-+ * Note: These flags are only used to guarantee (using asserts) that the=
- reset
-+ * API is used correctly. We can use global variables because we rely on=
- the
-  * iothread mutex to ensure only one reset operation is in a progress at=
- a
-  * given time.
-  */
- static bool enter_phase_in_progress;
-+static unsigned exit_phase_in_progress;
-=20
- void resettable_reset(Object *obj, ResetType type)
- {
-@@ -65,7 +69,9 @@ void resettable_release_reset(Object *obj, ResetType ty=
-pe)
-     trace_resettable_reset_release_begin(obj, type);
-     assert(!enter_phase_in_progress);
-=20
-+    exit_phase_in_progress +=3D 1;
-     resettable_phase_exit(obj, NULL, type);
-+    exit_phase_in_progress -=3D 1;
-=20
-     trace_resettable_reset_release_end(obj);
- }
-@@ -206,6 +212,58 @@ static void resettable_phase_exit(Object *obj, void =
-*opaque, ResetType type)
-     trace_resettable_phase_exit_end(obj, obj_typename, s->count);
- }
-=20
-+/*
-+ * resettable_get_count:
-+ * Get the count of the Resettable object @obj. Return 0 if @obj is NULL=
-.
-+ */
-+static uint32_t resettable_get_count(Object *obj)
-+{
-+    if (obj) {
-+        ResettableClass *rc =3D RESETTABLE_GET_CLASS(obj);
-+        return rc->get_state(obj)->count;
-+    }
-+    return 0;
-+}
-+
-+void resettable_change_parent(Object *obj, Object *newp, Object *oldp)
-+{
-+    ResettableClass *rc =3D RESETTABLE_GET_CLASS(obj);
-+    ResettableState *s =3D rc->get_state(obj);
-+    uint32_t newp_count =3D resettable_get_count(newp);
-+    uint32_t oldp_count =3D resettable_get_count(oldp);
-+
+     /* TODO: once all bus devices are qdevified, this should be done
+      * when bus is created by qdev.c */
+-    qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
 +    /*
-+     * Ensure we do not change parent when in enter or exit phase.
-+     * During these phases, the reset subtree being updated is partly in=
- reset
-+     * and partly not in reset (it depends on the actual position in
-+     * resettable_child_foreach()s). We are not able to tell in which pa=
-rt is a
-+     * leaving or arriving device. Thus we cannot set the reset count of=
- the
-+     * moving device to the proper value.
++     * TODO: If we had a main 'reset container' that the whole system
++     * lived in, we could reset that using the multi-phase reset
++     * APIs. For the moment, we just reset the sysbus, which will cause
++     * all devices hanging off it (and all their child buses, recursivel=
+y)
++     * to be reset. Note that this will *not* reset any Device objects
++     * which are not attached to some part of the qbus tree!
 +     */
-+    assert(!enter_phase_in_progress && !exit_phase_in_progress);
-+    trace_resettable_change_parent(obj, oldp, oldp_count, newp, newp_cou=
-nt);
-+
-+    /*
-+     * At most one of the two 'for' loops will be executed below
-+     * in order to cope with the difference between the two counts.
-+     */
-+    /* if newp is more reset than oldp */
-+    for (uint32_t i =3D oldp_count; i < newp_count; i++) {
-+        resettable_assert_reset(obj, RESET_TYPE_COLD);
-+    }
-+    /*
-+     * if obj is leaving a bus under reset, we need to ensure
-+     * hold phase is not pending.
-+     */
-+    if (oldp_count && s->hold_phase_pending) {
-+        resettable_phase_hold(obj, NULL, RESET_TYPE_COLD);
-+    }
-+    /* if oldp is more reset than newp */
-+    for (uint32_t i =3D newp_count; i < oldp_count; i++) {
-+        resettable_release_reset(obj, RESET_TYPE_COLD);
-+    }
-+}
-+
- void resettable_class_set_parent_phases(ResettableClass *rc,
-                                         ResettableEnterPhase enter,
-                                         ResettableHoldPhase hold,
-diff --git a/hw/core/trace-events b/hw/core/trace-events
-index a2e43f1120..80e6325ab0 100644
---- a/hw/core/trace-events
-+++ b/hw/core/trace-events
-@@ -16,6 +16,7 @@ resettable_reset_assert_begin(void *obj, int cold) "obj=
-=3D%p cold=3D%d"
- resettable_reset_assert_end(void *obj) "obj=3D%p"
- resettable_reset_release_begin(void *obj, int cold) "obj=3D%p cold=3D%d"
- resettable_reset_release_end(void *obj) "obj=3D%p"
-+resettable_change_parent(void *obj, void *o, uint32_t oc, void *n, uint3=
-2_t nc) "obj=3D%p from=3D%p(%" PRIu32 ") to=3D%p(%" PRIu32 ")"
- resettable_phase_enter_begin(void *obj, const char *objtype, uint32_t co=
-unt, int type) "obj=3D%p(%s) count=3D%" PRIu32 " type=3D%d"
- resettable_phase_enter_exec(void *obj, const char *objtype, int type, in=
-t has_method) "obj=3D%p(%s) type=3D%d method=3D%d"
- resettable_phase_enter_end(void *obj, const char *objtype, uint32_t coun=
-t) "obj=3D%p(%s) count=3D%" PRIu32
++    qemu_register_reset(resettable_cold_reset_fn, sysbus_get_default());
+     qemu_run_machine_init_done_notifiers();
+=20
+     if (rom_check_and_register_reset() !=3D 0) {
 --=20
 2.24.1
 
