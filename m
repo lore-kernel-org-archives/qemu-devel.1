@@ -2,79 +2,78 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C5FC33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78067C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:26:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6795206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4426C206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:26:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RWfBYJu6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6795206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUpnqlZc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4426C206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irlUU-0003Zc-A7
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:25:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50080)
+	id 1irlUm-00043E-8D
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:26:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkLE-0001Ms-Le
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:22 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkLW-0001xv-OW
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkLD-0000dD-68
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:20 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31010
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1irkLV-0000l7-EB
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55335
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkLD-0000d0-2F
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:19 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkLV-0000kx-AD
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101138;
+ s=mimecast20190719; t=1579101156;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YedslTwBoHvUmfX+NIW8rMZmHZTonTrsyDycYsi1jy0=;
- b=RWfBYJu67r+VLd4dTZttmj+tZwEHgAHnK4eM84MB44ambEGp12xPJIxcJr5bFUxPq4JjGd
- xYe5kyPtYKmRfIJ2bkujy8EIW6UFkh4PqBgtBD0LLUxopWoExRyme4QR6d6Bj7PAuP8mI5
- Fe2yML52lkANUXXNprFuINZJGAHbM7I=
+ bh=U+lowBzoIY0dDCl+bQ5sJ8da8WshYhW4HCkTZVjSGac=;
+ b=jUpnqlZc2oNk4t9uloVcv5FMmOGN8jSZRNIO/YDzbqXcl82o7feraKhRHAMoQAKWYtCxTL
+ qSvb8yQL3pZHW4XRlg0+asXo0lEIhKz8FbUKfuUYt32PfNWHoKLAqcK8h4SqaJz/PBvara
+ 5/RacKxRzJuuATDNkXpkt6icodcZWmI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-Tbk6Wgk9PHexGqSmmsbMdQ-1; Wed, 15 Jan 2020 10:12:12 -0500
+ us-mta-285-gTSNLX0NN72C6BFnUslEOg-1; Wed, 15 Jan 2020 10:12:26 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AA65114290E
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:12:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C95218B641A
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:12:25 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A441C194B2
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:12:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 55D8E381;
+ Wed, 15 Jan 2020 15:12:24 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 76/86] post conversion default_ram_id cleanup
-Date: Wed, 15 Jan 2020 16:07:31 +0100
-Message-Id: <1579100861-73692-77-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v2 83/86] tests:numa-test: make top level args dynamic and
+ g_autofree(cli) cleanups
+Date: Wed, 15 Jan 2020 16:07:38 +0100
+Message-Id: <1579100861-73692-84-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Tbk6Wgk9PHexGqSmmsbMdQ-1
+X-MC-Unique: gTSNLX0NN72C6BFnUslEOg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,165 +85,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: lvivier@redhat.com, thuth@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With default_ram_id is always defined, simplify
-'if' conditions in vl.c and numa.c
+Use GString to pass argument to make_cli() so that it would be easy
+to dynamically change test case arguments from main(). The follow up
+patch will use it to change RAM size options depending on target.
 
-while at it set
-  MachineClass::default_ram_id =3D "ram"
-and clean up several boards that use "ram" id
+While at it cleanup 'cli' freeing, using g_autofree annotation.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/alpha/dp264.c       | 1 -
- hw/arm/aspeed.c        | 1 -
- hw/arm/digic_boards.c  | 1 -
- hw/arm/raspi.c         | 2 --
- hw/core/machine.c      | 1 +
- hw/core/null-machine.c | 1 -
- hw/core/numa.c         | 2 +-
- hw/hppa/machine.c      | 1 -
- hw/ppc/virtex_ml507.c  | 1 -
- vl.c                   | 1 -
- 10 files changed, 2 insertions(+), 10 deletions(-)
+PS:
+  made as a separate patch so it won't clutter followup testcase changes.
 
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 29439c7..f6b9e50 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -183,7 +183,6 @@ static void clipper_machine_init(MachineClass *mc)
-     mc->max_cpus =3D 4;
-     mc->is_default =3D 1;
-     mc->default_cpu_type =3D ALPHA_CPU_TYPE_NAME("ev67");
--    mc->default_ram_id =3D "ram";
+CC: thuth@redhat.com
+CC: lvivier@redhat.com
+---
+ tests/qtest/numa-test.c | 38 ++++++++++++++------------------------
+ 1 file changed, 14 insertions(+), 24 deletions(-)
+
+diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
+index 17dd807..a696dfd 100644
+--- a/tests/qtest/numa-test.c
++++ b/tests/qtest/numa-test.c
+@@ -14,16 +14,16 @@
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
+=20
+-static char *make_cli(const char *generic_cli, const char *test_cli)
++static char *make_cli(const GString *generic_cli, const char *test_cli)
+ {
+-    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test_c=
+li);
++    return g_strdup_printf("%s %s", generic_cli->str, test_cli);
  }
 =20
- DEFINE_MACHINE("clipper", clipper_machine_init)
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 330254b..188d42f 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -391,7 +391,6 @@ static void aspeed_machine_class_init(ObjectClass *oc, =
-void *data)
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
--    mc->default_ram_id =3D "ram";
+ static void test_mon_explicit(const void *data)
+ {
+-    char *s;
+-    char *cli;
+     QTestState *qts;
++    g_autofree char *s =3D NULL;
++    g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 8 "
+                    "-numa node,nodeid=3D0,cpus=3D0-3 "
+@@ -33,17 +33,15 @@ static void test_mon_explicit(const void *data)
+     s =3D qtest_hmp(qts, "info numa");
+     g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
+     g_assert(strstr(s, "node 1 cpus: 4 5 6 7"));
+-    g_free(s);
+=20
+     qtest_quit(qts);
+-    g_free(cli);
  }
 =20
- static void aspeed_machine_palmetto_class_init(ObjectClass *oc, void *data=
-)
-diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
-index 9f094d4..a0fb189 100644
---- a/hw/arm/digic_boards.c
-+++ b/hw/arm/digic_boards.c
-@@ -149,7 +149,6 @@ static void canon_a1100_machine_init(MachineClass *mc)
-     mc->init =3D &canon_a1100_init;
-     mc->ignore_memory_transaction_failures =3D true;
-     mc->default_ram_size =3D 64 * MiB;
--    mc->default_ram_id =3D "ram";
+ static void test_mon_default(const void *data)
+ {
+-    char *s;
+-    char *cli;
+     QTestState *qts;
++    g_autofree char *s =3D NULL;
++    g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 8 -numa node -numa node");
+     qts =3D qtest_init(cli);
+@@ -51,17 +49,15 @@ static void test_mon_default(const void *data)
+     s =3D qtest_hmp(qts, "info numa");
+     g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
+     g_assert(strstr(s, "node 1 cpus: 1 3 5 7"));
+-    g_free(s);
+=20
+     qtest_quit(qts);
+-    g_free(cli);
  }
 =20
- DEFINE_MACHINE("canon-a1100", canon_a1100_machine_init)
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 33ace66..3d49dcc 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -223,7 +223,6 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->min_cpus =3D BCM283X_NCPUS;
-     mc->default_cpus =3D BCM283X_NCPUS;
-     mc->default_ram_size =3D 1 * GiB;
--    mc->default_ram_id =3D "ram";
-     mc->ignore_memory_transaction_failures =3D true;
- };
- DEFINE_MACHINE("raspi2", raspi2_machine_init)
-@@ -246,7 +245,6 @@ static void raspi3_machine_init(MachineClass *mc)
-     mc->min_cpus =3D BCM283X_NCPUS;
-     mc->default_cpus =3D BCM283X_NCPUS;
-     mc->default_ram_size =3D 1 * GiB;
--    mc->default_ram_id =3D "ram";
- }
- DEFINE_MACHINE("raspi3", raspi3_machine_init)
- #endif
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 9a43081..d8fa45c 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -743,6 +743,7 @@ static void machine_class_init(ObjectClass *oc, void *d=
-ata)
+ static void test_mon_partial(const void *data)
+ {
+-    char *s;
+-    char *cli;
+     QTestState *qts;
++    g_autofree char *s =3D NULL;
++    g_autofree char *cli =3D NULL;
 =20
-     /* Default 128 MB as guest ram size */
-     mc->default_ram_size =3D 128 * MiB;
-+    mc->default_ram_id =3D "ram";
-     mc->rom_file_has_mr =3D true;
-     mc->smp_parse =3D smp_parse;
+     cli =3D make_cli(data, "-smp 8 "
+                    "-numa node,nodeid=3D0,cpus=3D0-1 "
+@@ -71,10 +67,8 @@ static void test_mon_partial(const void *data)
+     s =3D qtest_hmp(qts, "info numa");
+     g_assert(strstr(s, "node 0 cpus: 0 1 2 3 6 7"));
+     g_assert(strstr(s, "node 1 cpus: 4 5"));
+-    g_free(s);
 =20
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index cb47d9d..08c6109 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -49,7 +49,6 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->init =3D machine_none_init;
-     mc->max_cpus =3D 1;
-     mc->default_ram_size =3D 0;
--    mc->default_ram_id =3D "ram";
+     qtest_quit(qts);
+-    g_free(cli);
  }
 =20
- DEFINE_MACHINE("none", machine_none_machine_init)
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 316bc50..0970a30 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -756,7 +756,7 @@ void numa_complete_configuration(MachineState *ms)
-             exit(1);
-         }
+ static QList *get_cpus(QTestState *qts, QDict **resp)
+@@ -87,11 +81,11 @@ static QList *get_cpus(QTestState *qts, QDict **resp)
 =20
--        if (!numa_uses_legacy_mem() && mc->default_ram_id) {
-+        if (!numa_uses_legacy_mem()) {
-             ms->ram =3D g_new(MemoryRegion, 1);
-             memory_region_init(ms->ram, OBJECT(ms), mc->default_ram_id,
-                                ram_size);
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 7e0c0ca..69316ac 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -277,7 +277,6 @@ static void machine_hppa_machine_init(MachineClass *mc)
-     mc->is_default =3D 1;
-     mc->default_ram_size =3D 512 * MiB;
-     mc->default_boot_order =3D "cd";
--    mc->default_ram_id =3D "ram";
+ static void test_query_cpus(const void *data)
+ {
+-    char *cli;
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
+     QTestState *qts;
++    g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
+=3D4-7");
+     qts =3D qtest_init(cli);
+@@ -120,16 +114,15 @@ static void test_query_cpus(const void *data)
+=20
+     qobject_unref(resp);
+     qtest_quit(qts);
+-    g_free(cli);
  }
 =20
- DEFINE_MACHINE("hppa", machine_hppa_machine_init)
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index b74a269..b31f1cf 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -299,7 +299,6 @@ static void virtex_machine_init(MachineClass *mc)
-     mc->desc =3D "Xilinx Virtex ML507 reference design";
-     mc->init =3D virtex_init;
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("440-xilinx");
--    mc->default_ram_id =3D "ram";
+ static void pc_numa_cpu(const void *data)
+ {
+-    char *cli;
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
+     QTestState *qts;
++    g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,thre=
+ads=3D2 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -174,16 +167,15 @@ static void pc_numa_cpu(const void *data)
+=20
+     qobject_unref(resp);
+     qtest_quit(qts);
+-    g_free(cli);
  }
 =20
- DEFINE_MACHINE("virtex-ml507", virtex_machine_init)
-diff --git a/vl.c b/vl.c
-index cf13987..789d54e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4305,7 +4305,6 @@ int main(int argc, char **argv, char **envp)
+ static void spapr_numa_cpu(const void *data)
+ {
+-    char *cli;
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
+     QTestState *qts;
++    g_autofree char *cli =3D NULL;
 =20
-     if (numa_uses_legacy_mem() &&
-         machine_class->default_ram_size &&
--        machine_class->default_ram_id &&
-         !current_machine->ram_memdev) {
-         create_default_memdev(current_machine, mem_path, mem_prealloc);
+     cli =3D make_cli(data, "-smp 4,cores=3D4 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -220,16 +212,15 @@ static void spapr_numa_cpu(const void *data)
+=20
+     qobject_unref(resp);
+     qtest_quit(qts);
+-    g_free(cli);
+ }
+=20
+ static void aarch64_numa_cpu(const void *data)
+ {
+-    char *cli;
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
+     QTestState *qts;
++    g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 2 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -264,7 +255,6 @@ static void aarch64_numa_cpu(const void *data)
+=20
+     qobject_unref(resp);
+     qtest_quit(qts);
+-    g_free(cli);
+ }
+=20
+ static void pc_dynamic_cpu_cfg(const void *data)
+@@ -539,11 +529,11 @@ static void pc_hmat_erange_cfg(const void *data)
+=20
+ int main(int argc, char **argv)
+ {
+-    const char *args =3D NULL;
++    g_autoptr(GString) args =3D g_string_new("");
+     const char *arch =3D qtest_get_arch();
+=20
+     if (strcmp(arch, "aarch64") =3D=3D 0) {
+-        args =3D "-machine virt";
++        g_string_append(args, " -machine virt");
      }
+=20
+     g_test_init(&argc, &argv, NULL);
 --=20
 2.7.4
 
