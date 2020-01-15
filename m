@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87277C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF678C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:31:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56BC92053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99AB62053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:31:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UZhIITiH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56BC92053B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OrY+HDUo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99AB62053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irkct-0003ax-MU
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:30:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49167)
+	id 1irke3-0004zb-So
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:31:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkKH-00082x-Jf
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:22 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkK5-0007iy-9p
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkKE-0008NB-RP
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:21 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32691
+ (envelope-from <imammedo@redhat.com>) id 1irkK3-0008C2-Ts
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:09 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29012
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkKE-0008MI-79
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:18 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkK3-0008BV-QD
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101077;
+ s=mimecast20190719; t=1579101067;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zgHH2SwpVB9yr1iiztjM3jhFax+dJqyn+USZPKYKRxI=;
- b=UZhIITiHJtGIrMr9kie80rLfNxnrqGECGWA0BRSlkCrDtRzn+AvVm17nO99gjVt/l2nXx8
- NY6iA91Cyas2Md3CxX6C3oI3miKqzR8xXLUhPvmbsD6/ghXr8fdtQ7uTnYmgjSnInkoI7C
- Ooz6thJ6PCotnM9nJIJP+z66CJdk6cI=
+ bh=ZTCjJPgQpHfnZZ1nXbLsFiLhwDWvpB7MKlP26piVLe0=;
+ b=OrY+HDUod7akTRIr7nHrYm7lso9L5Bk74eyI4w/IRNWVyUk1W4fINprMoWFPoS9ciZhSmg
+ pv1U8HYBxlrIIdeHwu2tFRPKpbgCJZ2z7SD49Ca/5J7hoZiOPM3wWweFqSt0S1o+XqQn0Q
+ IP/n15aYRH0ildaY6i5zV+LpBlfyxVo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-Oo6bPFHjMa6JKyKgYniv2A-1; Wed, 15 Jan 2020 10:11:16 -0500
+ us-mta-373-2giqHw8kN52rOfwvCV5NIg-1; Wed, 15 Jan 2020 10:11:03 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80A65176F89;
- Wed, 15 Jan 2020 15:11:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC5D21933B22;
+ Wed, 15 Jan 2020 15:11:02 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACE4E28992;
- Wed, 15 Jan 2020 15:11:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1870196AE;
+ Wed, 15 Jan 2020 15:11:01 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 31/86] arm:versatilepb: use memdev for RAM
-Date: Wed, 15 Jan 2020 16:06:46 +0100
-Message-Id: <1579100861-73692-32-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v2 21/86] arm:mcimx7d-sabre: use memdev for RAM
+Date: Wed, 15 Jan 2020 16:06:36 +0100
+Message-Id: <1579100861-73692-22-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Oo6bPFHjMa6JKyKgYniv2A-1
+X-MC-Unique: 2giqHw8kN52rOfwvCV5NIg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -85,7 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: andrew.smirnov@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -98,59 +98,88 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
+PS:
+ remove no longer needed MCIMX7Sabre
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
+CC: andrew.smirnov@gmail.com
 CC: peter.maydell@linaro.org
 CC: qemu-arm@nongnu.org
 ---
- hw/arm/versatilepb.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/arm/mcimx7d-sabre.c | 25 +++++++++----------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
 
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index e86af01..f3c4a50 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -184,7 +184,6 @@ static void versatile_init(MachineState *machine, int b=
-oard_id)
-     Object *cpuobj;
-     ARMCPU *cpu;
-     MemoryRegion *sysmem =3D get_system_memory();
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     qemu_irq pic[32];
-     qemu_irq sic[32];
-     DeviceState *dev, *sysctl;
-@@ -220,11 +219,9 @@ static void versatile_init(MachineState *machine, int =
-board_id)
+diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
+index 0d1f62d..de1e264 100644
+--- a/hw/arm/mcimx7d-sabre.c
++++ b/hw/arm/mcimx7d-sabre.c
+@@ -21,15 +21,10 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
 =20
-     cpu =3D ARM_CPU(cpuobj);
+-typedef struct {
+-    FslIMX7State soc;
+-    MemoryRegion ram;
+-} MCIMX7Sabre;
+-
+ static void mcimx7d_sabre_init(MachineState *machine)
+ {
+     static struct arm_boot_info boot_info;
+-    MCIMX7Sabre *s =3D g_new0(MCIMX7Sabre, 1);
++    FslIMX7State *s;
+     int i;
 =20
--    memory_region_allocate_system_memory(ram, NULL, "versatile.ram",
+     if (machine->ram_size > FSL_IMX7_MMDC_SIZE) {
+@@ -45,15 +40,12 @@ static void mcimx7d_sabre_init(MachineState *machine)
+         .nb_cpus =3D machine->smp.cpus,
+     };
+=20
+-    object_initialize_child(OBJECT(machine), "soc",
+-                            &s->soc, sizeof(s->soc),
+-                            TYPE_FSL_IMX7, &error_fatal, NULL);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fat=
+al);
++    s =3D FSL_IMX7(object_new(TYPE_FSL_IMX7));
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(s), &error_fa=
+tal);
++    object_property_set_bool(OBJECT(s), true, "realized", &error_fatal);
+=20
+-    memory_region_allocate_system_memory(&s->ram, NULL, "mcimx7d-sabre.ram=
+",
 -                                         machine->ram_size);
-     /* ??? RAM should repeat to fill physical memory space.  */
-     /* SDRAM at address zero.  */
--    memory_region_add_subregion(sysmem, 0, ram);
-+    memory_region_add_subregion(sysmem, 0, machine->ram);
+-    memory_region_add_subregion(get_system_memory(),
+-                                FSL_IMX7_MMDC_ADDR, &s->ram);
++    memory_region_add_subregion(get_system_memory(), FSL_IMX7_MMDC_ADDR,
++                                machine->ram);
 =20
-     sysctl =3D qdev_create(NULL, "realview_sysctl");
-     qdev_prop_set_uint32(sysctl, "sys_id", 0x41007004);
-@@ -398,6 +395,7 @@ static void versatilepb_class_init(ObjectClass *oc, voi=
-d *data)
-     mc->block_default_type =3D IF_SCSI;
-     mc->ignore_memory_transaction_failures =3D true;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("arm926");
-+    mc->default_ram_id =3D "versatile.ram";
+     for (i =3D 0; i < FSL_IMX7_NUM_USDHCS; i++) {
+         BusState *bus;
+@@ -63,7 +55,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
+=20
+         di =3D drive_get_next(IF_SD);
+         blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
+-        bus =3D qdev_get_child_bus(DEVICE(&s->soc.usdhc[i]), "sd-bus");
++        bus =3D qdev_get_child_bus(DEVICE(&s->usdhc[i]), "sd-bus");
+         carddev =3D qdev_create(bus, TYPE_SD_CARD);
+         qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
+         object_property_set_bool(OBJECT(carddev), true,
+@@ -71,7 +63,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
+     }
+=20
+     if (!qtest_enabled()) {
+-        arm_load_kernel(&s->soc.cpu[0], machine, &boot_info);
++        arm_load_kernel(&s->cpu[0], machine, &boot_info);
+     }
  }
 =20
- static const TypeInfo versatilepb_type =3D {
-@@ -415,6 +413,7 @@ static void versatileab_class_init(ObjectClass *oc, voi=
-d *data)
-     mc->block_default_type =3D IF_SCSI;
-     mc->ignore_memory_transaction_failures =3D true;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("arm926");
-+    mc->default_ram_id =3D "versatile.ram";
+@@ -80,5 +72,6 @@ static void mcimx7d_sabre_machine_init(MachineClass *mc)
+     mc->desc =3D "Freescale i.MX7 DUAL SABRE (Cortex A7)";
+     mc->init =3D mcimx7d_sabre_init;
+     mc->max_cpus =3D FSL_IMX7_NUM_CPUS;
++    mc->default_ram_id =3D "mcimx7d-sabre.ram";
  }
-=20
- static const TypeInfo versatileab_type =3D {
+ DEFINE_MACHINE("mcimx7d-sabre", mcimx7d_sabre_machine_init)
 --=20
 2.7.4
 
