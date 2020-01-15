@@ -2,67 +2,74 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DAB8C33C9E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 01:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF05FC33C9E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 01:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55C612467D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 01:35:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C612467D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 81A2A24671
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 01:51:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81A2A24671
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irXar-0000Yk-IC
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 20:35:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42262)
+	id 1irXq2-0007EB-KO
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 20:51:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1irXaC-0008MP-Em
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 20:34:57 -0500
+ (envelope-from <bounces@canonical.com>) id 1irXpJ-0006gh-IL
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 20:50:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1irXa9-0007Qw-KE
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 20:34:56 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:59966 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1irXa9-0007OM-9W
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 20:34:53 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 1668C6D4435996E50868;
- Wed, 15 Jan 2020 09:34:50 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.209) with Microsoft SMTP Server (TLS) id 14.3.439.0; Wed, 15 Jan
- 2020 09:34:40 +0800
-Subject: Re: [PATCH] vhost-vsock: delete vqs in vhost_vsock_unrealize to avoid
- memleaks
-To: Stefano Garzarella <sgarzare@redhat.com>, Stefan Hajnoczi
- <stefanha@gmail.com>
-References: <20200114075229.40520-1-pannengyuan@huawei.com>
- <20200114164441.GG132666@stefanha-x1.localdomain>
- <CAGxU2F7CC2bjUg=6P0UDYehKqyCq+kHc=hoyvSV8rPSj8oFAZg@mail.gmail.com>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <a92d4fbc-b97b-132e-7061-176a93367335@huawei.com>
-Date: Wed, 15 Jan 2020 09:34:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <bounces@canonical.com>) id 1irXpI-00011c-6X
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 20:50:33 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39158)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1irXpI-00010Y-0x
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 20:50:32 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1irXpG-0005qw-6q
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 01:50:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2C7A02E80C8
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 01:50:30 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAGxU2F7CC2bjUg=6P0UDYehKqyCq+kHc=hoyvSV8rPSj8oFAZg@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Jan 2020 01:43:09 -0000
+From: yuchenlin <1849644@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange npes87184 samuel-t
+X-Launchpad-Bug-Reporter: Samuel (samuel-t)
+X-Launchpad-Bug-Modifier: yuchenlin (npes87184)
+References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
+Message-Id: <157905258989.5668.11428164904957148992.malone@gac.canonical.com>
+Subject: [Bug 1849644] Re: QEMU VNC websocket proxy requires non-standard
+ 'binary' subprotocol
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0e98bbea6e2cbb085ab84e1ed088fe3849d8b394
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,88 +78,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Michael
- Tsirkin <mst@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Euler Robot <euler.robot@huawei.com>
+Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Samuel
 
+This patch has been viewed by Daniel.
+Please see https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg0026=
+4.html
 
-On 1/15/2020 12:59 AM, Stefano Garzarella wrote:
-> On Tue, Jan 14, 2020 at 5:45 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
->>
->> On Tue, Jan 14, 2020 at 03:52:29PM +0800, pannengyuan@huawei.com wrote:
->>> From: Pan Nengyuan <pannengyuan@huawei.com>
->>>
->>> Receive/transmit/event vqs forgot to cleanup in vhost_vsock_unrealize. This
->>> patch save receive/transmit vq pointer in realize() and cleanup vqs
->>> through those vq pointers in unrealize(). The leak stack is as follow:
->>>
->>> Direct leak of 21504 byte(s) in 3 object(s) allocated from:
->>>   #0 0x7f86a1356970 (/lib64/libasan.so.5+0xef970)  ??:?
->>>   #1 0x7f86a09aa49d (/lib64/libglib-2.0.so.0+0x5249d)  ??:?
->>>   #2 0x5604852f85ca (./x86_64-softmmu/qemu-system-x86_64+0x2c3e5ca)  /mnt/sdb/qemu/hw/virtio/virtio.c:2333
->>>   #3 0x560485356208 (./x86_64-softmmu/qemu-system-x86_64+0x2c9c208)  /mnt/sdb/qemu/hw/virtio/vhost-vsock.c:339
->>>   #4 0x560485305a17 (./x86_64-softmmu/qemu-system-x86_64+0x2c4ba17)  /mnt/sdb/qemu/hw/virtio/virtio.c:3531
->>>   #5 0x5604858e6b65 (./x86_64-softmmu/qemu-system-x86_64+0x322cb65)  /mnt/sdb/qemu/hw/core/qdev.c:865
->>>   #6 0x5604861e6c41 (./x86_64-softmmu/qemu-system-x86_64+0x3b2cc41)  /mnt/sdb/qemu/qom/object.c:2102
->>>
->>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->>> ---
->>>  hw/virtio/vhost-vsock.c         | 9 +++++++--
->>>  include/hw/virtio/vhost-vsock.h | 2 ++
->>>  2 files changed, 9 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
->>> index f5744363a8..896c0174c1 100644
->>> --- a/hw/virtio/vhost-vsock.c
->>> +++ b/hw/virtio/vhost-vsock.c
->>> @@ -335,8 +335,10 @@ static void vhost_vsock_device_realize(DeviceState *dev, Error **errp)
->>>                  sizeof(struct virtio_vsock_config));
->>>
->>>      /* Receive and transmit queues belong to vhost */
->>> -    virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE, vhost_vsock_handle_output);
->>> -    virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE, vhost_vsock_handle_output);
->>> +    vsock->recv_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
->>> +                                      vhost_vsock_handle_output);
->>> +    vsock->trans_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
->>> +                                       vhost_vsock_handle_output);
->>>
->>>      /* The event queue belongs to QEMU */
->>>      vsock->event_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
->>> @@ -378,6 +380,9 @@ static void vhost_vsock_device_unrealize(DeviceState *dev, Error **errp)
->>>      /* This will stop vhost backend if appropriate. */
->>>      vhost_vsock_set_status(vdev, 0);
->>>
->>> +    virtio_delete_queue(vsock->recv_vq);
->>> +    virtio_delete_queue(vsock->trans_vq);
->>> +    virtio_delete_queue(vsock->event_vq);
->>>      vhost_dev_cleanup(&vsock->vhost_dev);
->>>      virtio_cleanup(vdev);
->>>  }
->>
->> Please delete the virtqueues after vhost cleanup (the reverse
->> initialization order).  There is currently no reason why it has to be
->> done in reverse initialization order, your patch should work too, but
->> it's a good default for avoiding user-after-free bugs.
->>
-> 
-> Agree!
-> 
-> Since we are here, should we delete the queues also in the error path
-> of vhost_vsock_device_realize()?
-
-Yes, I will change the cleanup order and aslo delete in the error path.
+However, Daniel has not sent a PR which includes this patch.
 
 Thanks.
 
-> 
-> Thanks,
-> Stefano
-> 
-> .
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1849644
+
+Title:
+  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
+
+Status in QEMU:
+  New
+
+Bug description:
+  When running a machine using "-vnc" and the "websocket" option QEMU
+  seems to require the subprotocol called 'binary'. This subprotocol
+  does not exist in the WebSocket specification. In fact it has never
+  existed in the spec, in one of the very early drafts of WebSockets it
+  was briefly mentioned but it never made it to a final version.
+
+  When the WebSocket server requires a non-standard subprotocol any
+  WebSocket client that works correctly won't be able to connect.
+
+  One example of such a client is noVNC, it tells the server that it
+  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
+  let noVNC connect. If noVNC is modified to ask for 'binary' it will
+  work, this is, however, incorrect behavior.
+
+  Looking at the code in "io/channel-websock.c" it seems it's quite
+  hard-coded to binary:
+
+  Look at line 58 and 433 here:
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
+
+  This code has to be made more dynamic, and shouldn't require binary.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
 
