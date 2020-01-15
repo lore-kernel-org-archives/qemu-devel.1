@@ -2,57 +2,57 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D495C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8DEC32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:21:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3ADC2187F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:18:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3ADC2187F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9907F2187F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 18:21:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9907F2187F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58567 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irnFh-0000jN-Gz
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:18:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53217)
+	id 1irnHw-0003ex-5V
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 13:21:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1irnDe-0007QP-AH
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:16:44 -0500
+ (envelope-from <geert@linux-m68k.org>) id 1irnCi-0006Zl-Ed
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:15:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1irnDc-0004LW-0Y
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:16:42 -0500
-Resent-Date: Wed, 15 Jan 2020 13:16:42 -0500
-Resent-Message-Id: <E1irnDc-0004LW-0Y@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21173)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1irnDb-0004IQ-Oq
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:16:39 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1579112188807449.3722551506746;
- Wed, 15 Jan 2020 10:16:28 -0800 (PST)
-In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [PATCH v2 00/86] refactor main RAM allocation to use hostmem
- backend
-Message-ID: <157911218821.8290.9862305033991176637@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: imammedo@redhat.com
-Date: Wed, 15 Jan 2020 10:16:28 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+ (envelope-from <geert@linux-m68k.org>) id 1irnCg-0003a2-Oj
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:15:44 -0500
+Received: from laurent.telenet-ops.be ([2a02:1800:110:4::f00:19]:56406)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
+ id 1irnCg-0003Xw-Et
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 13:15:42 -0500
+Received: from ramsan ([84.195.182.253]) by laurent.telenet-ops.be with bizsmtp
+ id qiFR2100G5USYZQ01iFRFR; Wed, 15 Jan 2020 19:15:37 +0100
+Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1irnCP-00012V-EX; Wed, 15 Jan 2020 19:15:25 +0100
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1irnCP-00068y-Bs; Wed, 15 Jan 2020 19:15:25 +0100
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
+Subject: [PATCH v4 0/5] gpio: Add GPIO Aggregator
+Date: Wed, 15 Jan 2020 19:15:18 +0100
+Message-Id: <20200115181523.23556-1-geert+renesas@glider.be>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:1800:110:4::f00:19
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,223 +64,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Geert Uytterhoeven <geert+renesas@glider.be>, linux-doc@vger.kernel.org,
+ Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
+ Rob Herring <robh+dt@kernel.org>, Alexander Graf <graf@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Phil Reid <preid@electromag.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc5MTAwODYxLTczNjkyLTEt
-Z2l0LXNlbmQtZW1haWwtaW1hbW1lZG9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyIDAwLzg2XSByZWZhY3Rv
-ciBtYWluIFJBTSBhbGxvY2F0aW9uIHRvIHVzZSBob3N0bWVtIGJhY2tlbmQKVHlwZTogc2VyaWVz
-Ck1lc3NhZ2UtaWQ6IDE1NzkxMDA4NjEtNzM2OTItMS1naXQtc2VuZC1lbWFpbC1pbWFtbWVkb0By
-ZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
-cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjBiNGQ2NzIgbnVtYTogcmVtb3ZlIGRlcHJlY2F0ZWQgaW1wbGljaXQg
-UkFNIGRpc3RyaWJ1dGlvbiBiZXR3ZWVuIG5vZGVzCjEwOTgwMTEgbnVtYTogbWFrZSBleGl0KCkg
-dXNhZ2UgY29uc2lzdGVudAowMmIzODZmIHRlc3RzOm51bWEtdGVzdDogdXNlIGV4cGxpY2l0IG1l
-bWRldiB0byBzcGVjaWZ5IG5vZGUgUkFNCjY2YTIyMjUgdGVzdHM6bnVtYS10ZXN0OiBtYWtlIHRv
-cCBsZXZlbCBhcmdzIGR5bmFtaWMgYW5kIGdfYXV0b2ZyZWUoY2xpKSBjbGVhbnVwcwpiMjBiMmZm
-IG51bWE6IGZvcmJpZCAnLW51bWEgbm9kZSwgbWVtJyBmb3IgNS4wIGFuZCBuZXdlciBtYWNoaW5l
-IHR5cGVzCmExM2FhNjggaG9zdG1lbTogZml4IHN0cmljdCBiaW5kIHBvbGljeQo4M2E3ZDg3IGhv
-c3RtZW06IGludHJvZHVjZSAicHJlYWxsb2MtdGhyZWFkcyIgcHJvcGVydHkKNzI1N2QxMiBtYWtl
-IG1lbV9wYXRoIGxvY2FsIHZhcmlhYmxlCjA0ZDRjNmYgZXhlYzogZHJvcCBib2d1cyBtZW1fcGF0
-aCBmcm9tIHFlbXVfcmFtX2FsbG9jX2Zyb21fZmQoKQplYjZkYWVjIGV4ZWM6IGNsZWFudXAgcWVt
-dV9taW5yYW1wYWdlc2l6ZSgpL3FlbXVfbWF4cmFtcGFnZXNpemUoKQowN2JmYmQ5IHBvc3QgY29u
-dmVyc2lvbiBkZWZhdWx0X3JhbV9pZCBjbGVhbnVwCmMwYmY2MWYgcmVtb3ZlIG5vIGxvbmdlciB1
-c2VkIG1lbW9yeV9yZWdpb25fYWxsb2NhdGVfc3lzdGVtX21lbW9yeSgpCmE5MTJmOGIgc3BhcmM6
-bmlhZ2FyYTogdXNlIG1lbWRldiBmb3IgUkFNCmI3NDRiY2Qgc3BhcmM6c3VuNG06IHVzZSBtZW1k
-ZXYgZm9yIFJBTQo0OWVhMGVjIHNwYXJjOmxlb24zOiB1c2UgbWVtZGV2IGZvciBSQU0KMGMzNTZm
-MCBwcGM6dmlydGV4X21sNTA3OiB1c2UgbWVtZGV2IGZvciBSQU0KZjM2MWUwOCBwcGM6dmlydGV4
-X21sNTA3OiByZW1vdmUgdW51c2VkIGFyZ3VtZW50cwozNTIzZTdiIHBwYzpzcGFwcjogdXNlIG1l
-bWRldiBmb3IgUkFNCjdkZjg4Y2UgcHBjOnByZXA6IHVzZSBtZW1kZXYgZm9yIFJBTQozMTU4YmNm
-IHBwYzpwcGM0NDBfYmFtYm9vL3NhbTQ2MGV4OiB1c2UgbWVtZGV2IGZvciBSQU0KYzA1YWI2ZCBw
-cGMve3BwYzQ0MF9iYW1ib28sc2FtNDYweH06IGRyb3AgUkFNIHNpemUgZml4dXAKNzFkZWIzNCBw
-cGM6cHBjNDA1X2JvYXJkczogdXNlIG1lbWRldiBmb3IgUkFNCjA0YjUwNWRiIHBwYzpwcGM0MDVf
-Ym9hcmRzOiBhZGQgUkFNIHNpemUgY2hlY2tzCmRmZmJkZGUgcHBjOnBudjogdXNlIG1lbWRldiBm
-b3IgUkFNCjAyOTM2ZjcgcHBjOm1hY19vbGR3b3JsZDogdXNlIG1lbWRldiBmb3IgUkFNCjE4MTM0
-NWEgcHBjOm1hY19uZXd3b3JsZDogdXNlIG1lbWRldiBmb3IgUkFNCjU4MTA5ODMgcHBjOmU1MDA6
-IHVzZSBtZW1kZXYgZm9yIFJBTQoyNzUzZTcyIHBwYzplNTAwOiBkcm9wIFJBTSBzaXplIGZpeHVw
-CmIyZWMzNzEgbWlwczptaXBzX3I0azogdXNlIG1lbWRldiBmb3IgUkFNCmJlYjAzNGQgbWlwczpt
-aXBzX21pcHNzaW06IHVzZSBtZW1kZXYgZm9yIFJBTQo2MDhkNzhiIG1pcHM6bWlwc19tYWx0YTog
-dXNlIG1lbWRldiBmb3IgUkFNCmI4MjM3OTQgbWlwczptaXBzX2pheno6IHVzZSBtZW1kZXYgZm9y
-IFJBTQo4OTE2Mzc0IG1pcHM6bWlwc19mdWxvbmcyZTogdXNlIG1lbWRldiBmb3IgUkFNCmQ0YTM0
-ZGMgbWlwczptaXBzX2Z1bG9uZzJlOiBkcm9wIFJBTSBzaXplIGZpeHVwCjE1MTUzMGUgbWlwczpi
-b3N0b24tY3ViZTogdXNlIG1lbWRldiBmb3IgUkFNCjZlODRiYWQgbTY4azpuZXh0LWN1YmU6IHVz
-ZSBtZW1kZXYgZm9yIFJBTQowMGRhZjg1IG02OGs6bWNmNTIwODogdXNlIG1lbWRldiBmb3IgUkFN
-CjYxZDM1OTcgbTY4azphbjUyMDY6IHVzZSBtZW1kZXYgZm9yIFJBTQpmZjlhY2NkIGxtMzI6bWls
-a3ltaXN0OiB1c2UgbWVtZGV2IGZvciBSQU0KNGQwNWNjNCBsbTMyOmxtMzJfYm9hcmRzOiB1c2Ug
-bWVtZGV2IGZvciBSQU0KOTZlZjY4ZCB4ODY6cGM6IHVzZSBtZW1kZXYgZm9yIFJBTQpjY2IyODFj
-IHg4NjptaWNyb3ZtOiB1c2UgbWVtZGV2IGZvciBSQU0KZGU3NDVjZSBocHBhOiB1c2UgbWVtZGV2
-IGZvciBSQU0KODFkN2JiNSBody9ocHBhL21hY2hpbmU6IE1hcCB0aGUgUERDIG1lbW9yeSByZWdp
-b24gd2l0aCBoaWdoZXIgcHJpb3JpdHkKMDE3MmZlNyBody9ocHBhL21hY2hpbmU6IFJlc3RyaWN0
-IHRoZSB0b3RhbCBtZW1vcnkgc2l6ZSB0byAzR0IKZWMwYzJjMiBody9ocHBhL21hY2hpbmU6IENv
-cnJlY3RseSBjaGVjayB0aGUgZmlybXdhcmUgaXMgaW4gUERDIHJhbmdlCjc5ZDY3NDIgY3Jpczph
-eGlzX2Rldjg4OiB1c2UgbWVtZGV2IGZvciBSQU0KNGExYjZhMyBudWxsLW1hY2hpbmU6IHVzZSBt
-ZW1kZXYgZm9yIFJBTQpkZjhjN2IzIHMzOTB4OnMzOTAtdmlydGlvLWNjdzogdXNlIG1lbWRldiBm
-b3IgUkFNCjhiMjhmYjggYXJtOnhsbngtemN1MTAyOiB1c2UgbWVtZGV2IGZvciBSQU0KYmNmMTli
-NiBhcm06eGxueC12ZXJzYWwtdmlydDogdXNlIG1lbWRldiBmb3IgUkFNCmEwZTE0YzAgYXJtOnhp
-bGlueF96eW5xOiB1c2UgbWVtZGV2IGZvciBSQU0KN2FhY2Y0NiBhcm06eGlsaW54X3p5bnE6IGRy
-b3AgUkFNIHNpemUgZml4dXAKNTg2MDJmNSBhcm06dmlydDogdXNlIG1lbWRldiBmb3IgUkFNCjZm
-YjBkMzMgYXJtOnZleHByZXNzOiB1c2UgbWVtZGV2IGZvciBSQU0KOWE2ZTA2NCBhcm06dmVyc2F0
-aWxlcGI6IHVzZSBtZW1kZXYgZm9yIFJBTQpkMzY1ZjcxIGFybTpzYnNhLXJlZjogdXNlIG1lbWRl
-diBmb3IgUkFNCjYyM2U2MWMgYXJtOnNhYnJlbGl0ZTogdXNlIG1lbWRldiBmb3IgUkFNCjMzODJi
-M2IgYXJtOnJhc3BpOiB1c2UgbWVtZGV2IGZvciBSQU0KNDZhNWJlZiBhcm06cGFsbTogdXNlIG1l
-bWRldiBmb3IgUkFNCjUwYmVmMmEgYXJtOm9tYXBfc3gxOiB1c2UgbWVtZGV2IGZvciBSQU0KZWRi
-YTRmYyBhcm06bnNlcmllczogdXNlIG1lbWRldiBmb3IgUkFNCjFlODgwY2IgYXJtOm11c2ljcGFs
-OiB1c2UgbWVtZGV2IGZvciBSQU0KNTAwYmRiMCBhcm06bXBzMjogdXNlIG1lbWRldiBmb3IgUkFN
-CjI2ZjYxMDkgYXJtOm1wczItdHo6IHVzZSBtZW1kZXYgZm9yIFJBTQozMTE1NDc5IGFybTptY2lt
-eDdkLXNhYnJlOiB1c2UgbWVtZGV2IGZvciBSQU0KNWFlOWQ2NiBhcm06bWNpbXg2dWwtZXZrOiB1
-c2UgbWVtZGV2IGZvciBSQU0KZjYwYTkzMSBhcm06a3ptOiB1c2UgbWVtZGV2IGZvciBSQU0KNWNh
-ZjI4YSBhcm06a3ptOiBkcm9wIFJBTSBzaXplIGZpeHVwCmJiY2U1NDYgYXJtOmludGVncmF0b3Jj
-cDogdXNlIG1lbWRldiBmb3IgUkFNCmY2Y2Q3MTIgYXJtOmlteDI1X3BkazogdXNlIG1lbWRldiBm
-b3IgUkFNCjMxZDA5MmUgYXJtOmlteDI1X3BkazogZHJvcCBSQU0gc2l6ZSBmaXh1cAoyYzFlMWZj
-IGFybTpoaWdoYmFuazogdXNlIG1lbWRldiBmb3IgUkFNCjIxYzBhYjAgYXJtOmRpZ2ljX2JvYXJk
-czogdXNlIG1lbWRldiBmb3IgUkFNCmUxZTM1ZGQgYXJtOmN1YmllYm9hcmQ6IHVzZSBtZW1kZXYg
-Zm9yIFJBTQpjMjE4YzMzIGFybTpjb2xsaWU6IHVzZSBtZW1kZXYgZm9yIFJBTQpmMDdjZWIxIGFy
-bTphc3BlZWQ6IHVzZSBtZW1kZXYgZm9yIFJBTQpiZGI1YWQ3IGh3OmFzcGVlZDogZHJvcCB3YXJu
-aW5nIGFuZCBib2d1cyByYW1fc2l6ZSBmaXh1cAo2NjdhMWE5IGFybTphc3BlZWQ6IGFjdHVhbGx5
-IGNoZWNrIFJBTSBzaXplCmZmNDk4YWYgYXJtOmFzcGVlZDogY29udmVydCB2YWxpZCBSQU0gc2l6
-ZXMgdG8gZGF0YQphYjJhOTY1IGFscGhhOmRwMjY0OiB1c2UgbWVtZGV2IGZvciBSQU0KNDgzNmE2
-NyBpbml0aWFsaXplIE1hY2hpbmVTdGF0ZTo6cmFtIGluIE5VTUEgY2FzZQplM2ZjZTgyIG1hY2hp
-bmU6IGludHJvZHVjZSBjb252ZW5pZW5jZSBNYWNoaW5lU3RhdGU6OnJhbQpmMjk1NDlmIG1hY2hp
-bmU6IGFsaWFzIC1tZW0tcGF0aCBhbmQgLW1lbS1wcmVhbGxvYyBpbnRvIG1lbW9yeS1mb28gYmFj
-a2VuZAo3OGQ4MjljIG1hY2hpbmU6IGludHJvZHVjZSByYW0tbWVtZGV2IHByb3BlcnR5CmFhMWZj
-MTYgbnVtYTogcmVtb3ZlIGRlcHJlY2F0ZWQgLW1lbS1wYXRoIGZhbGxiYWNrIHRvIGFub255bW91
-cyBSQU0KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvODYgQ2hlY2tpbmcgY29tbWl0IGFhMWZjMTZi
-MGMzOCAobnVtYTogcmVtb3ZlIGRlcHJlY2F0ZWQgLW1lbS1wYXRoIGZhbGxiYWNrIHRvIGFub255
-bW91cyBSQU0pCjIvODYgQ2hlY2tpbmcgY29tbWl0IDc4ZDgyOWMxNjc5MiAobWFjaGluZTogaW50
-cm9kdWNlIHJhbS1tZW1kZXYgcHJvcGVydHkpCjMvODYgQ2hlY2tpbmcgY29tbWl0IGYyOTU0OWZj
-MzQ0NiAobWFjaGluZTogYWxpYXMgLW1lbS1wYXRoIGFuZCAtbWVtLXByZWFsbG9jIGludG8gbWVt
-b3J5LWZvbyBiYWNrZW5kKQo0Lzg2IENoZWNraW5nIGNvbW1pdCBlM2ZjZTgyZjhiMGEgKG1hY2hp
-bmU6IGludHJvZHVjZSBjb252ZW5pZW5jZSBNYWNoaW5lU3RhdGU6OnJhbSkKNS84NiBDaGVja2lu
-ZyBjb21taXQgNDgzNmE2N2I0OTJjIChpbml0aWFsaXplIE1hY2hpbmVTdGF0ZTo6cmFtIGluIE5V
-TUEgY2FzZSkKNi84NiBDaGVja2luZyBjb21taXQgYWIyYTk2NWFlY2YyIChhbHBoYTpkcDI2NDog
-dXNlIG1lbWRldiBmb3IgUkFNKQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcq
-JyAoY3R4Old4VikKIzMwOiBGSUxFOiBody9hbHBoYS9hbHBoYV9zeXMuaDoxNDoKK1BDSUJ1cyAq
-dHlwaG9vbl9pbml0KE1lbW9yeVJlZ2lvbiAqLCBJU0FCdXMgKiosIHFlbXVfaXJxICosIEFscGhh
-Q1BVICpbNF0sCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ5
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvODYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjcv
-ODYgQ2hlY2tpbmcgY29tbWl0IGZmNDk4YWZlMjM5NyAoYXJtOmFzcGVlZDogY29udmVydCB2YWxp
-ZCBSQU0gc2l6ZXMgdG8gZGF0YSkKOC84NiBDaGVja2luZyBjb21taXQgNjY3YTFhOTY4OWViIChh
-cm06YXNwZWVkOiBhY3R1YWxseSBjaGVjayBSQU0gc2l6ZSkKOS84NiBDaGVja2luZyBjb21taXQg
-YmRiNWFkN2M2NjkwIChodzphc3BlZWQ6IGRyb3Agd2FybmluZyBhbmQgYm9ndXMgcmFtX3NpemUg
-Zml4dXApCjEwLzg2IENoZWNraW5nIGNvbW1pdCBmMDdjZWIxNWUzZDAgKGFybTphc3BlZWQ6IHVz
-ZSBtZW1kZXYgZm9yIFJBTSkKMTEvODYgQ2hlY2tpbmcgY29tbWl0IGMyMThjMzNjMmMxZCAoYXJt
-OmNvbGxpZTogdXNlIG1lbWRldiBmb3IgUkFNKQoxMi84NiBDaGVja2luZyBjb21taXQgZTFlMzVk
-ZGRmZDY4IChhcm06Y3ViaWVib2FyZDogdXNlIG1lbWRldiBmb3IgUkFNKQoxMy84NiBDaGVja2lu
-ZyBjb21taXQgMjFjMGFiMDJjY2EwIChhcm06ZGlnaWNfYm9hcmRzOiB1c2UgbWVtZGV2IGZvciBS
-QU0pCjE0Lzg2IENoZWNraW5nIGNvbW1pdCAyYzFlMWZjNzNlNDQgKGFybTpoaWdoYmFuazogdXNl
-IG1lbWRldiBmb3IgUkFNKQoxNS84NiBDaGVja2luZyBjb21taXQgMzFkMDkyZTI2M2RhIChhcm06
-aW14MjVfcGRrOiBkcm9wIFJBTSBzaXplIGZpeHVwKQoxNi84NiBDaGVja2luZyBjb21taXQgZjZj
-ZDcxMjU1MTVlIChhcm06aW14MjVfcGRrOiB1c2UgbWVtZGV2IGZvciBSQU0pCjE3Lzg2IENoZWNr
-aW5nIGNvbW1pdCBiYmNlNTQ2ODNkZTQgKGFybTppbnRlZ3JhdG9yY3A6IHVzZSBtZW1kZXYgZm9y
-IFJBTSkKMTgvODYgQ2hlY2tpbmcgY29tbWl0IDVjYWYyOGExNTdhOSAoYXJtOmt6bTogZHJvcCBS
-QU0gc2l6ZSBmaXh1cCkKMTkvODYgQ2hlY2tpbmcgY29tbWl0IGY2MGE5MzExYTAzZCAoYXJtOmt6
-bTogdXNlIG1lbWRldiBmb3IgUkFNKQoyMC84NiBDaGVja2luZyBjb21taXQgNWFlOWQ2NmRlMmNk
-IChhcm06bWNpbXg2dWwtZXZrOiB1c2UgbWVtZGV2IGZvciBSQU0pCjIxLzg2IENoZWNraW5nIGNv
-bW1pdCAzMTE1NDc5NzAxYjggKGFybTptY2lteDdkLXNhYnJlOiB1c2UgbWVtZGV2IGZvciBSQU0p
-CjIyLzg2IENoZWNraW5nIGNvbW1pdCAyNmY2MTA5MTk5OTEgKGFybTptcHMyLXR6OiB1c2UgbWVt
-ZGV2IGZvciBSQU0pCjIzLzg2IENoZWNraW5nIGNvbW1pdCA1MDBiZGIwMTJhMGMgKGFybTptcHMy
-OiB1c2UgbWVtZGV2IGZvciBSQU0pCjI0Lzg2IENoZWNraW5nIGNvbW1pdCAxZTg4MGNiNmVkMjcg
-KGFybTptdXNpY3BhbDogdXNlIG1lbWRldiBmb3IgUkFNKQoyNS84NiBDaGVja2luZyBjb21taXQg
-ZWRiYTRmYzUxOTA3IChhcm06bnNlcmllczogdXNlIG1lbWRldiBmb3IgUkFNKQoyNi84NiBDaGVj
-a2luZyBjb21taXQgNTBiZWYyYTFmZjhiIChhcm06b21hcF9zeDE6IHVzZSBtZW1kZXYgZm9yIFJB
-TSkKMjcvODYgQ2hlY2tpbmcgY29tbWl0IDQ2YTViZWYwYjM1NSAoYXJtOnBhbG06IHVzZSBtZW1k
-ZXYgZm9yIFJBTSkKMjgvODYgQ2hlY2tpbmcgY29tbWl0IDMzODJiM2JhNGY4ZiAoYXJtOnJhc3Bp
-OiB1c2UgbWVtZGV2IGZvciBSQU0pCjI5Lzg2IENoZWNraW5nIGNvbW1pdCA2MjNlNjFjNjFlZjEg
-KGFybTpzYWJyZWxpdGU6IHVzZSBtZW1kZXYgZm9yIFJBTSkKMzAvODYgQ2hlY2tpbmcgY29tbWl0
-IGQzNjVmNzFlNmY2MSAoYXJtOnNic2EtcmVmOiB1c2UgbWVtZGV2IGZvciBSQU0pCjMxLzg2IENo
-ZWNraW5nIGNvbW1pdCA5YTZlMDY0MWU3ZGUgKGFybTp2ZXJzYXRpbGVwYjogdXNlIG1lbWRldiBm
-b3IgUkFNKQozMi84NiBDaGVja2luZyBjb21taXQgNmZiMGQzMzFjNzFmIChhcm06dmV4cHJlc3M6
-IHVzZSBtZW1kZXYgZm9yIFJBTSkKMzMvODYgQ2hlY2tpbmcgY29tbWl0IDU4NjAyZjVhMzEzZCAo
-YXJtOnZpcnQ6IHVzZSBtZW1kZXYgZm9yIFJBTSkKMzQvODYgQ2hlY2tpbmcgY29tbWl0IDdhYWNm
-NDY5ODI2MiAoYXJtOnhpbGlueF96eW5xOiBkcm9wIFJBTSBzaXplIGZpeHVwKQozNS84NiBDaGVj
-a2luZyBjb21taXQgYTBlMTRjMDMyYTIxIChhcm06eGlsaW54X3p5bnE6IHVzZSBtZW1kZXYgZm9y
-IFJBTSkKMzYvODYgQ2hlY2tpbmcgY29tbWl0IGJjZjE5YjY1NzlhNCAoYXJtOnhsbngtdmVyc2Fs
-LXZpcnQ6IHVzZSBtZW1kZXYgZm9yIFJBTSkKMzcvODYgQ2hlY2tpbmcgY29tbWl0IDhiMjhmYjhj
-ZGM3YyAoYXJtOnhsbngtemN1MTAyOiB1c2UgbWVtZGV2IGZvciBSQU0pCjM4Lzg2IENoZWNraW5n
-IGNvbW1pdCBkZjhjN2IzZDFjYWEgKHMzOTB4OnMzOTAtdmlydGlvLWNjdzogdXNlIG1lbWRldiBm
-b3IgUkFNKQozOS84NiBDaGVja2luZyBjb21taXQgNGExYjZhMzZmZjBiIChudWxsLW1hY2hpbmU6
-IHVzZSBtZW1kZXYgZm9yIFJBTSkKNDAvODYgQ2hlY2tpbmcgY29tbWl0IDc5ZDY3NDJjNjhmNyAo
-Y3JpczpheGlzX2Rldjg4OiB1c2UgbWVtZGV2IGZvciBSQU0pCjQxLzg2IENoZWNraW5nIGNvbW1p
-dCBlYzBjMmMyOTk0OTMgKGh3L2hwcGEvbWFjaGluZTogQ29ycmVjdGx5IGNoZWNrIHRoZSBmaXJt
-d2FyZSBpcyBpbiBQREMgcmFuZ2UpCjQyLzg2IENoZWNraW5nIGNvbW1pdCAwMTcyZmU3MTU4ZWEg
-KGh3L2hwcGEvbWFjaGluZTogUmVzdHJpY3QgdGhlIHRvdGFsIG1lbW9yeSBzaXplIHRvIDNHQikK
-NDMvODYgQ2hlY2tpbmcgY29tbWl0IDgxZDdiYjU3YzEyNSAoaHcvaHBwYS9tYWNoaW5lOiBNYXAg
-dGhlIFBEQyBtZW1vcnkgcmVnaW9uIHdpdGggaGlnaGVyIHByaW9yaXR5KQo0NC84NiBDaGVja2lu
-ZyBjb21taXQgZGU3NDVjZWYxMmVkIChocHBhOiB1c2UgbWVtZGV2IGZvciBSQU0pCjQ1Lzg2IENo
-ZWNraW5nIGNvbW1pdCBjY2IyODFjYTQyOGIgKHg4NjptaWNyb3ZtOiB1c2UgbWVtZGV2IGZvciBS
-QU0pCjQ2Lzg2IENoZWNraW5nIGNvbW1pdCA5NmVmNjhkYmNiNWQgKHg4NjpwYzogdXNlIG1lbWRl
-diBmb3IgUkFNKQo0Ny84NiBDaGVja2luZyBjb21taXQgNGQwNWNjNGIxMjhhIChsbTMyOmxtMzJf
-Ym9hcmRzOiB1c2UgbWVtZGV2IGZvciBSQU0pCjQ4Lzg2IENoZWNraW5nIGNvbW1pdCBmZjlhY2Nk
-ODJlNzQgKGxtMzI6bWlsa3ltaXN0OiB1c2UgbWVtZGV2IGZvciBSQU0pCjQ5Lzg2IENoZWNraW5n
-IGNvbW1pdCA2MWQzNTk3YTkyMjQgKG02OGs6YW41MjA2OiB1c2UgbWVtZGV2IGZvciBSQU0pCjUw
-Lzg2IENoZWNraW5nIGNvbW1pdCAwMGRhZjg1ZTQ0YWYgKG02OGs6bWNmNTIwODogdXNlIG1lbWRl
-diBmb3IgUkFNKQo1MS84NiBDaGVja2luZyBjb21taXQgNmU4NGJhZDNmYmE2IChtNjhrOm5leHQt
-Y3ViZTogdXNlIG1lbWRldiBmb3IgUkFNKQo1Mi84NiBDaGVja2luZyBjb21taXQgMTUxNTMwZWNi
-NmEwIChtaXBzOmJvc3Rvbi1jdWJlOiB1c2UgbWVtZGV2IGZvciBSQU0pCjUzLzg2IENoZWNraW5n
-IGNvbW1pdCBkNGEzNGRjYjFhN2YgKG1pcHM6bWlwc19mdWxvbmcyZTogZHJvcCBSQU0gc2l6ZSBm
-aXh1cCkKNTQvODYgQ2hlY2tpbmcgY29tbWl0IDg5MTYzNzQ5ODEzMCAobWlwczptaXBzX2Z1bG9u
-ZzJlOiB1c2UgbWVtZGV2IGZvciBSQU0pCjU1Lzg2IENoZWNraW5nIGNvbW1pdCBiODIzNzk0ZmE0
-ZGIgKG1pcHM6bWlwc19qYXp6OiB1c2UgbWVtZGV2IGZvciBSQU0pCjU2Lzg2IENoZWNraW5nIGNv
-bW1pdCA2MDhkNzhiZGI1NjAgKG1pcHM6bWlwc19tYWx0YTogdXNlIG1lbWRldiBmb3IgUkFNKQo1
-Ny84NiBDaGVja2luZyBjb21taXQgYmViMDM0ZDQ2NGM3IChtaXBzOm1pcHNfbWlwc3NpbTogdXNl
-IG1lbWRldiBmb3IgUkFNKQo1OC84NiBDaGVja2luZyBjb21taXQgYjJlYzM3MTY1OGEyIChtaXBz
-Om1pcHNfcjRrOiB1c2UgbWVtZGV2IGZvciBSQU0pCjU5Lzg2IENoZWNraW5nIGNvbW1pdCAyNzUz
-ZTcyNTFkYmYgKHBwYzplNTAwOiBkcm9wIFJBTSBzaXplIGZpeHVwKQo2MC84NiBDaGVja2luZyBj
-b21taXQgNTgxMDk4M2UwNWQ5IChwcGM6ZTUwMDogdXNlIG1lbWRldiBmb3IgUkFNKQo2MS84NiBD
-aGVja2luZyBjb21taXQgMTgxMzQ1YTE0MDMyIChwcGM6bWFjX25ld3dvcmxkOiB1c2UgbWVtZGV2
-IGZvciBSQU0pCjYyLzg2IENoZWNraW5nIGNvbW1pdCAwMjkzNmY3MTE5MDAgKHBwYzptYWNfb2xk
-d29ybGQ6IHVzZSBtZW1kZXYgZm9yIFJBTSkKNjMvODYgQ2hlY2tpbmcgY29tbWl0IGRmZmJkZGVj
-NzQ4NCAocHBjOnBudjogdXNlIG1lbWRldiBmb3IgUkFNKQo2NC84NiBDaGVja2luZyBjb21taXQg
-MDRiNTA1ZGI1M2M2IChwcGM6cHBjNDA1X2JvYXJkczogYWRkIFJBTSBzaXplIGNoZWNrcykKNjUv
-ODYgQ2hlY2tpbmcgY29tbWl0IDcxZGViMzRkYTE2ZCAocHBjOnBwYzQwNV9ib2FyZHM6IHVzZSBt
-ZW1kZXYgZm9yIFJBTSkKNjYvODYgQ2hlY2tpbmcgY29tbWl0IGMwNWFiNmRiYzQwMCAocHBjL3tw
-cGM0NDBfYmFtYm9vLHNhbTQ2MHh9OiBkcm9wIFJBTSBzaXplIGZpeHVwKQo2Ny84NiBDaGVja2lu
-ZyBjb21taXQgMzE1OGJjZjJhMjg2IChwcGM6cHBjNDQwX2JhbWJvby9zYW00NjBleDogdXNlIG1l
-bWRldiBmb3IgUkFNKQo2OC84NiBDaGVja2luZyBjb21taXQgN2RmODhjZWRiMjEwIChwcGM6cHJl
-cDogdXNlIG1lbWRldiBmb3IgUkFNKQo2OS84NiBDaGVja2luZyBjb21taXQgMzUyM2U3YmExNWEz
-IChwcGM6c3BhcHI6IHVzZSBtZW1kZXYgZm9yIFJBTSkKNzAvODYgQ2hlY2tpbmcgY29tbWl0IGYz
-NjFlMDg5OWJlNiAocHBjOnZpcnRleF9tbDUwNzogcmVtb3ZlIHVudXNlZCBhcmd1bWVudHMpCjcx
-Lzg2IENoZWNraW5nIGNvbW1pdCAwYzM1NmYwZjRjMjIgKHBwYzp2aXJ0ZXhfbWw1MDc6IHVzZSBt
-ZW1kZXYgZm9yIFJBTSkKNzIvODYgQ2hlY2tpbmcgY29tbWl0IDQ5ZWEwZWNiZWVjYiAoc3BhcmM6
-bGVvbjM6IHVzZSBtZW1kZXYgZm9yIFJBTSkKNzMvODYgQ2hlY2tpbmcgY29tbWl0IGI3NDRiY2Qy
-NzY5NSAoc3BhcmM6c3VuNG06IHVzZSBtZW1kZXYgZm9yIFJBTSkKNzQvODYgQ2hlY2tpbmcgY29t
-bWl0IGE5MTJmOGJjOGM2MSAoc3BhcmM6bmlhZ2FyYTogdXNlIG1lbWRldiBmb3IgUkFNKQo3NS84
-NiBDaGVja2luZyBjb21taXQgYzBiZjYxZjQ1MTgzIChyZW1vdmUgbm8gbG9uZ2VyIHVzZWQgbWVt
-b3J5X3JlZ2lvbl9hbGxvY2F0ZV9zeXN0ZW1fbWVtb3J5KCkpCjc2Lzg2IENoZWNraW5nIGNvbW1p
-dCAwN2JmYmQ5NmMwOGMgKHBvc3QgY29udmVyc2lvbiBkZWZhdWx0X3JhbV9pZCBjbGVhbnVwKQo3
-Ny84NiBDaGVja2luZyBjb21taXQgZWI2ZGFlYzg4YThhIChleGVjOiBjbGVhbnVwIHFlbXVfbWlu
-cmFtcGFnZXNpemUoKS9xZW11X21heHJhbXBhZ2VzaXplKCkpCjc4Lzg2IENoZWNraW5nIGNvbW1p
-dCAwNGQ0YzZmYWFjYTIgKGV4ZWM6IGRyb3AgYm9ndXMgbWVtX3BhdGggZnJvbSBxZW11X3JhbV9h
-bGxvY19mcm9tX2ZkKCkpCjc5Lzg2IENoZWNraW5nIGNvbW1pdCA3MjU3ZDEyNjNhNWQgKG1ha2Ug
-bWVtX3BhdGggbG9jYWwgdmFyaWFibGUpCjgwLzg2IENoZWNraW5nIGNvbW1pdCA4M2E3ZDg3YzFm
-Y2UgKGhvc3RtZW06IGludHJvZHVjZSAicHJlYWxsb2MtdGhyZWFkcyIgcHJvcGVydHkpCjgxLzg2
-IENoZWNraW5nIGNvbW1pdCBhMTNhYTY4MjU1MjcgKGhvc3RtZW06IGZpeCBzdHJpY3QgYmluZCBw
-b2xpY3kpCjgyLzg2IENoZWNraW5nIGNvbW1pdCBiMjBiMmZmNGNkYWMgKG51bWE6IGZvcmJpZCAn
-LW51bWEgbm9kZSwgbWVtJyBmb3IgNS4wIGFuZCBuZXdlciBtYWNoaW5lIHR5cGVzKQo4My84NiBD
-aGVja2luZyBjb21taXQgNjZhMjIyNTBiNWMxICh0ZXN0czpudW1hLXRlc3Q6IG1ha2UgdG9wIGxl
-dmVsIGFyZ3MgZHluYW1pYyBhbmQgZ19hdXRvZnJlZShjbGkpIGNsZWFudXBzKQo4NC84NiBDaGVj
-a2luZyBjb21taXQgMDJiMzg2ZjcxYWI5ICh0ZXN0czpudW1hLXRlc3Q6IHVzZSBleHBsaWNpdCBt
-ZW1kZXYgdG8gc3BlY2lmeSBub2RlIFJBTSkKODUvODYgQ2hlY2tpbmcgY29tbWl0IDEwOTgwMTFl
-ZmNkYSAobnVtYTogbWFrZSBleGl0KCkgdXNhZ2UgY29uc2lzdGVudCkKODYvODYgQ2hlY2tpbmcg
-Y29tbWl0IDBiNGQ2NzJmMWI5OSAobnVtYTogcmVtb3ZlIGRlcHJlY2F0ZWQgaW1wbGljaXQgUkFN
-IGRpc3RyaWJ1dGlvbiBiZXR3ZWVuIG5vZGVzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTc5MTAwODYxLTczNjkyLTEtZ2l0LXNlbmQtZW1haWwt
-aW1hbW1lZG9AcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+	Hi all,
 
+GPIO controllers are exported to userspace using /dev/gpiochip*
+character devices.  Access control to these devices is provided by
+standard UNIX file system permissions, on an all-or-nothing basis:
+either a GPIO controller is accessible for a user, or it is not.
+Currently no mechanism exists to control access to individual GPIOs.
+
+Hence this adds a GPIO driver to aggregate existing GPIOs, and expose
+them as a new gpiochip.  This is useful for implementing access control,
+and assigning a set of GPIOs to a specific user.  Furthermore, this
+simplifies and hardens exporting GPIOs to a virtual machine, as the VM
+can just grab the full GPIO controller, and no longer needs to care
+about which GPIOs to grab and which not, reducing the attack surface.
+
+Recently, other use cases have been discovered[1]:
+  - Describing simple GPIO-operated devices in DT, and using the GPIO
+    Aggregator as a generic GPIO driver for userspace, which is useful
+    for industrial control.
+
+Changes compared to v3[2] (more details in the individual patches):
+  - Drop controversial GPIO repeater,
+  - Drop support for legacy sysfs interface based name matching,
+  - Drop applied "gpiolib: Add GPIOCHIP_NAME definition",
+  - Documentation improvements,
+  - Lots of small cleanups.
+
+Changes compared to v2[3] (more details in the individual patches):
+  - Integrate GPIO Repeater functionality,
+  - Absorb GPIO forwarder library, as the Aggregator and Repeater are
+    now a single driver,
+  - Use the aggregator parameters to create a GPIO lookup table instead
+    of an array of GPIO descriptors,
+  - Add documentation,
+  - New patches:
+      - "gpiolib: Add GPIOCHIP_NAME definition",
+      - "gpiolib: Add support for gpiochipN-based table lookup",
+      - "gpiolib: Add support for GPIO line table lookup",
+      - "dt-bindings: gpio: Add gpio-repeater bindings",
+      - "docs: gpio: Add GPIO Aggregator/Repeater documentation",
+      - "MAINTAINERS: Add GPIO Aggregator/Repeater section".
+  - Dropped patches:
+      - "gpio: Export gpiod_{request,free}() to modular GPIO code",
+      - "gpio: Export gpiochip_get_desc() to modular GPIO code",
+      - "gpio: Export gpio_name_to_desc() to modular GPIO code",
+      - "gpio: Add GPIO Forwarder Helper".
+
+Changes compared to v1[4]:
+  - Drop "virtual", rename to gpio-aggregator,
+  - Create and use new GPIO Forwarder Helper, to allow sharing code with
+    the GPIO inverter,
+  - Lift limit on the maximum number of GPIOs,
+  - Improve parsing of GPIO specifiers,
+  - Fix modular build.
+
+Aggregating GPIOs and exposing them as a new gpiochip was suggested in
+response to my proof-of-concept for GPIO virtualization with QEMU[5][6].
+
+For the first use case, aggregated GPIO controllers are instantiated and
+destroyed by writing to atribute files in sysfs.
+Sample session on the Renesas Koelsch development board:
+
+  - Unbind LEDs from leds-gpio driver:
+
+        echo leds > /sys/bus/platform/drivers/leds-gpio/unbind
+
+  - Create aggregators:
+
+    $ echo e6052000.gpio 19,20 \
+        > /sys/bus/platform/drivers/gpio-aggregator/new_device
+
+    gpio-aggregator gpio-aggregator.0: gpio 0 => gpio-953 (gpio-aggregator.0)
+    gpio-aggregator gpio-aggregator.0: gpio 1 => gpio-954 (gpio-aggregator.0)
+    gpiochip_find_base: found new base at 778
+    gpio gpiochip8: (gpio-aggregator.0): added GPIO chardev (254:8)
+    gpiochip_setup_dev: registered GPIOs 778 to 779 on device: gpiochip8 (gpio-aggregator.0)
+
+    $ echo e6052000.gpio 21 e6050000.gpio 20-22 \
+        > /sys/bus/platform/drivers/gpio-aggregator/new_device
+
+    gpio-aggregator gpio-aggregator.1: gpio 0 => gpio-955 (gpio-aggregator.1)
+    gpio-aggregator gpio-aggregator.1: gpio 1 => gpio-1012 (gpio-aggregator.1)
+    gpio-aggregator gpio-aggregator.1: gpio 2 => gpio-1013 (gpio-aggregator.1)
+    gpio-aggregator gpio-aggregator.1: gpio 3 => gpio-1014 (gpio-aggregator.1)
+    gpiochip_find_base: found new base at 774
+    gpio gpiochip9: (gpio-aggregator.1): added GPIO chardev (254:9)
+    gpiochip_setup_dev: registered GPIOs 774 to 777 on device: gpiochip9 (gpio-aggregator.1)
+
+  - Adjust permissions on /dev/gpiochip[89] (optional)
+
+  - Control LEDs:
+
+    $ gpioset gpiochip8 0=0 1=1 # LED6 OFF, LED7 ON
+    $ gpioset gpiochip8 0=1 1=0 # LED6 ON, LED7 OFF
+    $ gpioset gpiochip9 0=0     # LED8 OFF
+    $ gpioset gpiochip9 0=1     # LED8 ON
+
+  - Destroy aggregators:
+
+    $ echo gpio-aggregator.0 \
+            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
+    $ echo gpio-aggregator.1 \
+            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
+
+Thanks!
+
+References:
+  [1] "[PATCH V4 2/2] gpio: inverter: document the inverter bindings"
+      (https://lore.kernel.org/linux-gpio/1561699236-18620-3-git-send-email-harish_kandiga@mentor.com/)
+  [2] "[PATCH v3 0/7] gpio: Add GPIO Aggregator/Repeater"
+      (https://lore.kernel.org/lkml/20191127084253.16356-1-geert+renesas@glider.be/)
+  [3] "[PATCH/RFC v2 0/5] gpio: Add GPIO Aggregator Driver"
+      (https://lore.kernel.org/linux-gpio/20190911143858.13024-1-geert+renesas@glider.be/)
+  [4] "[PATCH RFC] gpio: Add Virtual Aggregator GPIO Driver"
+      (https://lore.kernel.org/lkml/20190705160536.12047-1-geert+renesas@glider.be/)
+  [5] "[PATCH QEMU POC] Add a GPIO backend"
+      (https://lore.kernel.org/linux-renesas-soc/20181003152521.23144-1-geert+renesas@glider.be/)
+  [6] "Getting To Blinky: Virt Edition / Making device pass-through
+       work on embedded ARM"
+      (https://fosdem.org/2019/schedule/event/vai_getting_to_blinky/)
+
+Geert Uytterhoeven (5):
+  gpiolib: Add support for gpiochipN-based table lookup
+  gpiolib: Add support for GPIO line table lookup
+  gpio: Add GPIO Aggregator
+  docs: gpio: Add GPIO Aggregator documentation
+  MAINTAINERS: Add GPIO Aggregator section
+
+ .../admin-guide/gpio/gpio-aggregator.rst      | 102 ++++
+ Documentation/admin-guide/gpio/index.rst      |   1 +
+ MAINTAINERS                                   |   7 +
+ drivers/gpio/Kconfig                          |  12 +
+ drivers/gpio/Makefile                         |   1 +
+ drivers/gpio/gpio-aggregator.c                | 574 ++++++++++++++++++
+ drivers/gpio/gpiolib.c                        |  33 +-
+ include/linux/gpio/machine.h                  |  15 +-
+ 8 files changed, 732 insertions(+), 13 deletions(-)
+ create mode 100644 Documentation/admin-guide/gpio/gpio-aggregator.rst
+ create mode 100644 drivers/gpio/gpio-aggregator.c
+
+-- 
+2.17.1
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
 
