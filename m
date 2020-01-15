@@ -2,80 +2,78 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFC8C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AD0C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C91F12053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:45:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40AFC2072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:47:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PN0jvUPg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C91F12053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf97JAEH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40AFC2072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irkrg-0007qZ-JK
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:45:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49407)
+	id 1irktO-0001aG-FF
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:47:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkKS-0008NV-7O
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:33 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkL2-0000ui-1G
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkKR-00007W-58
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35268
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1irkKx-0000Qx-Bu
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58587
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkKR-00006I-1M
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:31 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkKx-0000QQ-7V
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101090;
+ s=mimecast20190719; t=1579101122;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1ld594RNSU9tNCy7tXud1+L/+Y2NAqw7B+ndTpuJVPA=;
- b=PN0jvUPglruPlHszJpUqMURBHSWmE/DijiQiQbhnQVrnzmiLRGSBd83Rdrl02UwhWjOLyO
- IhC77XqVrFxpYhLc/mGslLmUPOklrZ10mAMGKnBhKMpdfc7BHevfXZGvj5Hq9/hZgbKJSR
- TgEwvbbLgfv7qpLhAUB6412YhEXGMwk=
+ bh=gjtDcTLkJi7lSKoreI9kV98fpwKzQn4B89YPAJOriIE=;
+ b=Zf97JAEHN4LW7Z4n76Iz4rYndj3Tumslm+SURFlK2EYojsgP5GThn5Oix9A17RdqLjZ4DU
+ /d+VO7FlwDTWfq5iy0+6VKzve9n8MfwN0HPBV8Dto8Y6ElSaslxM1QzxAcajdbHIYK5GTH
+ 8ca7y2RIu9c4Kq/PfEz7F1TrJxdZwi8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-UEFSBwcGO5eMRqErqriofw-1; Wed, 15 Jan 2020 10:11:29 -0500
+ us-mta-63-IXCdFYoTMRyMKpBNhG5vog-1; Wed, 15 Jan 2020 10:11:59 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97E501136A67
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:11:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BB5D1852AE;
+ Wed, 15 Jan 2020 15:11:58 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1893828579
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 15:11:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5593319757;
+ Wed, 15 Jan 2020 15:11:57 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 41/86] hw/hppa/machine: Correctly check the firmware is in
- PDC range
-Date: Wed, 15 Jan 2020 16:06:56 +0100
-Message-Id: <1579100861-73692-42-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v2 65/86] ppc:ppc405_boards: use memdev for RAM
+Date: Wed, 15 Jan 2020 16:07:20 +0100
+Message-Id: <1579100861-73692-66-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: UEFSBwcGO5eMRqErqriofw-1
+X-MC-Unique: IXCdFYoTMRyMKpBNhG5vog-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,38 +85,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-The firmware has to reside in the PDC range. If the Elf file
-expects to load it below FIRMWARE_START, it is incorrect,
-regardless the RAM size.
+PS:
+in ref405ep alias RAM into ram_memories[] to avoid re-factoring
+its user ppc405ep_init(), which would be invasive and out of
+scope this patch.
 
-Acked-by: Helge Deller <deller@gmx.de>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/hppa/machine.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+CC: david@gibson.dropbear.id.au
+CC: qemu-ppc@nongnu.org
+---
+ hw/ppc/ppc405_boards.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 5d0de26..6775d87 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -155,7 +155,7 @@ static void machine_hppa_init(MachineState *machine)
-     qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x%08" PRIx64
-                   "-0x%08" PRIx64 ", entry at 0x%08" PRIx64 ".\n",
-                   firmware_low, firmware_high, firmware_entry);
--    if (firmware_low < ram_size || firmware_high >=3D FIRMWARE_END) {
-+    if (firmware_low < FIRMWARE_START || firmware_high >=3D FIRMWARE_END) =
-{
-         error_report("Firmware overlaps with memory or IO space");
-         exit(1);
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index a7a432d..f447e6e 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -168,8 +168,8 @@ static void ref405ep_init(MachineState *machine)
      }
+=20
+     /* XXX: fix this */
+-    memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.=
+ram",
+-                                         machine->ram_size);
++    memory_region_init_alias(&ram_memories[0], NULL, "ef405ep.ram.alias",
++                             machine->ram, 0, machine->ram_size);
+     ram_bases[0] =3D 0;
+     ram_sizes[0] =3D machine->ram_size;
+     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
+@@ -310,6 +310,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *=
+data)
+     mc->desc =3D "ref405ep";
+     mc->init =3D ref405ep_init;
+     mc->default_ram_size =3D 0x08000000;
++    mc->default_ram_id =3D "ef405ep.ram";
+ }
+=20
+ static const TypeInfo ref405ep_type =3D {
+@@ -422,7 +423,6 @@ static void taihu_405ep_init(MachineState *machine)
+     MemoryRegion *sysmem =3D get_system_memory();
+     MemoryRegion *bios;
+     MemoryRegion *ram_memories =3D g_new(MemoryRegion, 2);
+-    MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
+     hwaddr ram_bases[2], ram_sizes[2];
+     long bios_size;
+     target_ulong kernel_base, initrd_base;
+@@ -436,18 +436,16 @@ static void taihu_405ep_init(MachineState *machine)
+                      mc->default_ram_size);
+         exit(EXIT_FAILURE);
+     }
+-    memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
+-                                         machine->ram_size);
+=20
+     ram_bases[0] =3D 0;
+     ram_sizes[0] =3D 0x04000000;
+     memory_region_init_alias(&ram_memories[0], NULL,
+-                             "taihu_405ep.ram-0", ram, ram_bases[0],
++                             "taihu_405ep.ram-0", machine->ram, ram_bases[=
+0],
+                              ram_sizes[0]);
+     ram_bases[1] =3D 0x04000000;
+     ram_sizes[1] =3D 0x04000000;
+     memory_region_init_alias(&ram_memories[1], NULL,
+-                             "taihu_405ep.ram-1", ram, ram_bases[1],
++                             "taihu_405ep.ram-1", machine->ram, ram_bases[=
+1],
+                              ram_sizes[1]);
+     ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
+                   33333333, &pic, kernel_filename =3D=3D NULL ? 0 : 1);
+@@ -543,6 +541,7 @@ static void taihu_class_init(ObjectClass *oc, void *dat=
+a)
+     mc->desc =3D "taihu";
+     mc->init =3D taihu_405ep_init;
+     mc->default_ram_size =3D 0x08000000;
++    mc->default_ram_id =3D "ef405ep.ram";
+ }
+=20
+ static const TypeInfo taihu_type =3D {
 --=20
 2.7.4
 
