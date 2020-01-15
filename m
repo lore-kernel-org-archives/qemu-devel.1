@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AD0C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C61C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:48:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40AFC2072B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:47:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0B342072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 15:48:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf97JAEH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40AFC2072B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EFbaZBQU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B342072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irktO-0001aG-FF
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:47:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49797)
+	id 1irkuf-0004Ig-9x
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 10:48:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1irkL2-0000ui-1G
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:09 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irkKY-0008TR-Ue
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1irkKx-0000Qx-Bu
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:07 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58587
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1irkKX-0000CU-Ng
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28725
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkKx-0000QQ-7V
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:12:03 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irkKX-0000C3-KB
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:11:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579101122;
+ s=mimecast20190719; t=1579101097;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gjtDcTLkJi7lSKoreI9kV98fpwKzQn4B89YPAJOriIE=;
- b=Zf97JAEHN4LW7Z4n76Iz4rYndj3Tumslm+SURFlK2EYojsgP5GThn5Oix9A17RdqLjZ4DU
- /d+VO7FlwDTWfq5iy0+6VKzve9n8MfwN0HPBV8Dto8Y6ElSaslxM1QzxAcajdbHIYK5GTH
- 8ca7y2RIu9c4Kq/PfEz7F1TrJxdZwi8=
+ bh=upnn6TZ2z+RGb5mRcWQbvzFreS/ItZVM5qv6MZwdjto=;
+ b=EFbaZBQUCIngwOgnWSyOhJfdC4i1pq9BGDUwGOju6RQ6Od43Xq7yFY83788iR7frHKiy/O
+ 7jQ4+NJAj5u3gjyHCP8CH4Wuf7BRRQAc+mWlsi01hHHokoqHD6WKbgb4AIPh9nSiViOzun
+ 8/SHijDpxJFCHyCw5zjHPkyqazQ0sCQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-IXCdFYoTMRyMKpBNhG5vog-1; Wed, 15 Jan 2020 10:11:59 -0500
+ us-mta-72-t5z0U2NHPiaBUxcnE7tcCg-1; Wed, 15 Jan 2020 10:11:35 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BB5D1852AE;
- Wed, 15 Jan 2020 15:11:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 965D611393DB;
+ Wed, 15 Jan 2020 15:11:34 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5593319757;
- Wed, 15 Jan 2020 15:11:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7200C386;
+ Wed, 15 Jan 2020 15:11:32 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 65/86] ppc:ppc405_boards: use memdev for RAM
-Date: Wed, 15 Jan 2020 16:07:20 +0100
-Message-Id: <1579100861-73692-66-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v2 46/86] x86:pc: use memdev for RAM
+Date: Wed, 15 Jan 2020 16:07:01 +0100
+Message-Id: <1579100861-73692-47-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: IXCdFYoTMRyMKpBNhG5vog-1
+X-MC-Unique: t5z0U2NHPiaBUxcnE7tcCg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,7 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -98,84 +98,71 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-PS:
-in ref405ep alias RAM into ram_memories[] to avoid re-factoring
-its user ppc405ep_init(), which would be invasive and out of
-scope this patch.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: david@gibson.dropbear.id.au
-CC: qemu-ppc@nongnu.org
+CC: mst@redhat.com
+CC: pbonzini@redhat.com
+CC: rth@twiddle.net
+CC: ehabkost@redhat.com
 ---
- hw/ppc/ppc405_boards.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ hw/i386/pc.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index a7a432d..f447e6e 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -168,8 +168,8 @@ static void ref405ep_init(MachineState *machine)
-     }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 8054bc4..21b8290 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -935,7 +935,7 @@ void pc_memory_init(PCMachineState *pcms,
+                     MemoryRegion **ram_memory)
+ {
+     int linux_boot, i;
+-    MemoryRegion *ram, *option_rom_mr;
++    MemoryRegion *option_rom_mr;
+     MemoryRegion *ram_below_4g, *ram_above_4g;
+     FWCfgState *fw_cfg;
+     MachineState *machine =3D MACHINE(pcms);
+@@ -948,22 +948,20 @@ void pc_memory_init(PCMachineState *pcms,
 =20
-     /* XXX: fix this */
--    memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.=
-ram",
+     linux_boot =3D (machine->kernel_filename !=3D NULL);
+=20
+-    /* Allocate RAM.  We allocate it as a single memory region and use
+-     * aliases to address portions of it, mostly for backwards compatibili=
+ty
+-     * with older qemus that used qemu_ram_alloc().
++    /*
++     * Split single memory region and use aliases to address portions of i=
+t,
++     * done for backwards compatibility with older qemus.
+      */
+-    ram =3D g_malloc(sizeof(*ram));
+-    memory_region_allocate_system_memory(ram, NULL, "pc.ram",
 -                                         machine->ram_size);
-+    memory_region_init_alias(&ram_memories[0], NULL, "ef405ep.ram.alias",
-+                             machine->ram, 0, machine->ram_size);
-     ram_bases[0] =3D 0;
-     ram_sizes[0] =3D machine->ram_size;
-     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
-@@ -310,6 +310,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *=
-data)
-     mc->desc =3D "ref405ep";
-     mc->init =3D ref405ep_init;
-     mc->default_ram_size =3D 0x08000000;
-+    mc->default_ram_id =3D "ef405ep.ram";
- }
+-    *ram_memory =3D ram;
++    *ram_memory =3D machine->ram;
+     ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
+-    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
++    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", machine->=
+ram,
+                              0, x86ms->below_4g_mem_size);
+     memory_region_add_subregion(system_memory, 0, ram_below_4g);
+     e820_add_entry(0, x86ms->below_4g_mem_size, E820_RAM);
+     if (x86ms->above_4g_mem_size > 0) {
+         ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
+-        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
++        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g",
++                                 machine->ram,
+                                  x86ms->below_4g_mem_size,
+                                  x86ms->above_4g_mem_size);
+         memory_region_add_subregion(system_memory, 0x100000000ULL,
+@@ -1950,6 +1948,7 @@ static void pc_machine_class_init(ObjectClass *oc, vo=
+id *data)
+     mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported =3D true;
+     mc->numa_mem_supported =3D true;
++    mc->default_ram_id =3D "pc.ram";
 =20
- static const TypeInfo ref405ep_type =3D {
-@@ -422,7 +423,6 @@ static void taihu_405ep_init(MachineState *machine)
-     MemoryRegion *sysmem =3D get_system_memory();
-     MemoryRegion *bios;
-     MemoryRegion *ram_memories =3D g_new(MemoryRegion, 2);
--    MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
-     hwaddr ram_bases[2], ram_sizes[2];
-     long bios_size;
-     target_ulong kernel_base, initrd_base;
-@@ -436,18 +436,16 @@ static void taihu_405ep_init(MachineState *machine)
-                      mc->default_ram_size);
-         exit(EXIT_FAILURE);
-     }
--    memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
--                                         machine->ram_size);
-=20
-     ram_bases[0] =3D 0;
-     ram_sizes[0] =3D 0x04000000;
-     memory_region_init_alias(&ram_memories[0], NULL,
--                             "taihu_405ep.ram-0", ram, ram_bases[0],
-+                             "taihu_405ep.ram-0", machine->ram, ram_bases[=
-0],
-                              ram_sizes[0]);
-     ram_bases[1] =3D 0x04000000;
-     ram_sizes[1] =3D 0x04000000;
-     memory_region_init_alias(&ram_memories[1], NULL,
--                             "taihu_405ep.ram-1", ram, ram_bases[1],
-+                             "taihu_405ep.ram-1", machine->ram, ram_bases[=
-1],
-                              ram_sizes[1]);
-     ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
-                   33333333, &pic, kernel_filename =3D=3D NULL ? 0 : 1);
-@@ -543,6 +541,7 @@ static void taihu_class_init(ObjectClass *oc, void *dat=
-a)
-     mc->desc =3D "taihu";
-     mc->init =3D taihu_405ep_init;
-     mc->default_ram_size =3D 0x08000000;
-+    mc->default_ram_id =3D "ef405ep.ram";
- }
-=20
- static const TypeInfo taihu_type =3D {
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
 --=20
 2.7.4
 
