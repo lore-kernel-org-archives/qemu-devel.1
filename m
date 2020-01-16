@@ -2,62 +2,63 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 159F4C32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73522C32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D31542081E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:10:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Wu+OI3b7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D31542081E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 4763A2081E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:10:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4763A2081E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irubl-0006gV-S2
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 21:10:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42444)
+	id 1irucK-0007tk-E5
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 21:10:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iruaj-0005Or-Kf
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:09:03 -0500
+ (envelope-from <benh@kernel.crashing.org>) id 1iruWd-0007p0-70
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:04:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iruah-0004pX-UV
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:09:01 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:54347)
+ (envelope-from <benh@kernel.crashing.org>) id 1iruWb-0001Nz-4J
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:04:46 -0500
+Received: from kernel.crashing.org ([76.164.61.194]:55086)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iruah-0004o4-Jb; Wed, 15 Jan 2020 21:08:59 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47yngD2bSTz9sR0; Thu, 16 Jan 2020 13:08:55 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1579140536;
- bh=A8CzjItVEQVG/28ImSxm3nZRKrfcapiCgBvREBz2jwg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Wu+OI3b7+Hc5ymZizNxNc8dSOw/isPDKDkMWePWA/6MHQt1V5st4OVz90v+LV6+xQ
- bclc+cL3bIFpQfCyhEl4LmZXDdVMIUPeDJXd5b587U8EIMuMIhLCH+Y3uYh7IwsDzE
- O3kEfp3hoUlRdPRFluiI5nPPS8lto7s3OzayIzXc=
-Date: Thu, 16 Jan 2020 12:03:06 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v2 63/86] ppc:pnv: use memdev for RAM
-Message-ID: <20200116020306.GH54439@umbus>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-64-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="svZFHVx8/dhPCe52"
-Content-Disposition: inline
-In-Reply-To: <1579100861-73692-64-git-send-email-imammedo@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+ (Exim 4.71) (envelope-from <benh@kernel.crashing.org>)
+ id 1iruWa-0001MI-Km; Wed, 15 Jan 2020 21:04:44 -0500
+Received: from localhost (gate.crashing.org [63.228.1.57])
+ (authenticated bits=0)
+ by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 00G24M64024805
+ (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 15 Jan 2020 20:04:25 -0600
+Message-ID: <1a1cecb5128134e681b9145b9c6bc10a8db00ea9.camel@kernel.crashing.org>
+Subject: Re: Semihosting, arm, riscv, ppc and common code
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Liviu Ionescu <ilg@livius.net>, Richard Henderson
+ <richard.henderson@linaro.org>
+Date: Thu, 16 Jan 2020 13:04:20 +1100
+In-Reply-To: <C4EE0480-C366-419B-84F1-3BEB794D1598@livius.net>
+References: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
+ <AE7841A1-B4D6-4D6D-9AFD-01C4604D7BC4@livius.net>
+ <cd9a2de94700a2781f176247131dceba690d8f31.camel@kernel.crashing.org>
+ <87sgkimkma.fsf@linaro.org>
+ <1309ca0ab6405d88cfd949c73130ad0f2af944a6.camel@kernel.crashing.org>
+ <87wo9tkjxz.fsf@linaro.org>
+ <81f25a9e-a52c-ca8d-4d4b-ca36fcee73ed@linaro.org>
+ <C4EE0480-C366-419B-84F1-3BEB794D1598@livius.net>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 76.164.61.194
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,55 +70,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, keithp@keithp.com, qemu-arm@nongnu.org,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 2020-01-16 at 00:02 +0200, Liviu Ionescu wrote:
+> > ... they did have the opportunity to do better, and did not.
+> 
+> I don't know why you present Arm semihosting as a disaster. It is not
+> perfect, but it is functional, and common unit tests use only a small
+> subset of the calls.
+> 
+> And there is no 'window of opportunity', if the RISC-V guys will ever
+> want to reinvent the wheel and come with an official 'RISC-V
+> semihosting' specs, they can do it at any time, and this will have no
+> impact on existing devices, everything will continue to work as
+> before, only the debuggers/emulators will need to be upgraded.
+> 
+> But the only immediate effect such a move will have is that software
+> efforts in test frameworks will be increased, to support another
+> protocol, while the advantages will be minimal.
 
---svZFHVx8/dhPCe52
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I agree, which is also why I want to use the same interface for
+powerpc, it will simply make life easier for everybody. The calls
+aren't perfect but they do work sufficiently well to be useful and I
+haven't yet been convinced that it can't be extended if necessary.
 
-On Wed, Jan 15, 2020 at 04:07:18PM +0100, Igor Mammedov wrote:
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->   MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Cheers,
+Ben.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---svZFHVx8/dhPCe52
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4fxFoACgkQbDjKyiDZ
-s5JBOA/9Gk1uHB3MosF6yd0b/fOgdB4g8HIt3ikki1NP6b2kBoT849NnKD5YKedR
-5vj8FIXph+0QPI/mMzVR8IJv6lcyLDv24pzc9IC3I5MimyOZpccdJ57x8iE3JvIh
-TWWIR89DNxNaE0q5fRfRqTqJR+xzOZqZS1VEaySL/Cd///jOPrA97+WFXbNUSVWs
-pC0CVfWldtR7R7jcLxCbcE9eBki4B+DReczlogS/BBmsmk9v1LOmPL58NtPAkdiH
-j6HDJyhqWkpESWpRUvKKbBKnep8Ld4ohI6XJOZoiUH8uBDW6MHkN5Y1Fb327dDLN
-IkpqEbtpTBtGVefCersgwvSlpLuz8qpOXXtsFpp4yb/0hElpatsa9cCYp60CjByO
-EhPyl7oQVrhrevUSpBLqAlwQLpyWhHki8OP9V3NhX2JOmKUuicfIp3S9STaEkTbl
-TwEk1eMtERGCiAoiCHuVyZOjPganhMMZE90X6xhFMXWYPMqzfMVBat8Z2iAajiNw
-MqFEIbLp9KKT4jFXUXzfqUJh2rVDwN/sno2mdcxICAokbKoUmHYXfIgYDfJyI9aN
-ymqPb8ga3FyP7gwmbaPiEU0dpAalwgJnRoItVkj/4ogF+aq5o2Vc+OyLBKGbVUCq
-0yuB7KNibh0DC3NS7wZeSGOZgpxV9WqEBtPHd3KquwKRZXZQ54o=
-=ow6B
------END PGP SIGNATURE-----
-
---svZFHVx8/dhPCe52--
 
