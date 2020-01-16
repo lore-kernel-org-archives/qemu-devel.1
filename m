@@ -2,79 +2,123 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9BDC33CB2
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 00:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851D2C32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 00:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0DFB207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 00:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F69624656
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 00:56:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nq1Ll5Qo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DFB207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=fujitsu.onmicrosoft.com header.i=@fujitsu.onmicrosoft.com header.b="jy8kTh3S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F69624656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fujitsu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irsui-0003pD-4w
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 19:21:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58212)
+	id 1irtSg-00031E-ER
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 19:56:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1irsu2-0003E0-I9
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 19:20:51 -0500
+ (envelope-from <misono.tomohiro@fujitsu.com>) id 1irtRp-0002Zq-3Z
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 19:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1irsu1-0005dI-EV
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 19:20:50 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:37637)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1irsu1-0005cn-7b; Wed, 15 Jan 2020 19:20:49 -0500
-Received: by mail-lj1-x242.google.com with SMTP id o13so20582671ljg.4;
- Wed, 15 Jan 2020 16:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=x6priJw6+QrEtabMGVbDfowA8nF2er6fYbgYQFpCTGs=;
- b=nq1Ll5QofaeXwzrT+Cg4HWWsTpP3TR5yiU2nnYzmffpQQFNx5hhpUcExnrC9hq0n6i
- Et61UHK+6b4TJuuq5821W/QjfLrV6kEzgeJgeNh/SlQLGhkDlh3/YzAg7HhxtZioQ4h5
- wzN/OCrSy57jIpTbvNqF4QtR47Qr0WTRlxEhr3M5Yj7YA9BcCZHb30OKcmWOlr4IBVg+
- BH6xVwxCMNrSz1LP6xF8kmuYdNPuTqGJAcH9j1/edM6LU8cWia+2m91RIqfKgbCF5sAa
- DwZ14VUBapeSfYeYXWnnLzY77Y0l18B5+Ts4ki/qf4s3A+WO/dWNMvOcxB/Hg2brV+7F
- jhFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=x6priJw6+QrEtabMGVbDfowA8nF2er6fYbgYQFpCTGs=;
- b=cFsjaUFeWbZ1VejPDSnsnN5EGVX/wJslevej/PiLGg4QSa5LSXQP/OhG1DhLBDewok
- eqPVgEkpctLR2QHlDvYh7QUHv6Ji3B+vT8eQ/JsBu0r31OzPs/rzaJbfVVYdZw7rn16h
- nTt6OJuffgrFYz6mBm45NjpClWtyslPmmh2BlVti7ZDrDhRIqco+ARDU1FdMSJFjHLJ2
- uG99npDd555dX/w28sPITMO1YpDQkKn0Fifp2vqgj+illBuWXIc52Dy92QZhXX0N1tfg
- cxihi1FNWFdcvQ5kJ2lq2CiA9Ptpe3J2PQ7/j6TfyORGrsKxy8puz/HSFgj3rFru7Vjl
- JFbw==
-X-Gm-Message-State: APjAAAUZhjdG4hn1I7GQwuJ5wjc5tdl/zxq8c2WVAvZa7MYqYJth/YzO
- L6Lv2uk0yv6VC+4PSL/XY1Tusyxs4/99elZTIuM=
-X-Google-Smtp-Source: APXvYqzF7aNKfA+Tv62TQjV+AhwJBcWB6xTb5jxoh1Qdcd3Fh4m2oQ2y7IAXo+NWLEFnxbM9b0U6dc/E67TPSOf9JlI=
-X-Received: by 2002:a2e:461a:: with SMTP id t26mr572786lja.204.1579134047672; 
- Wed, 15 Jan 2020 16:20:47 -0800 (PST)
+ (envelope-from <misono.tomohiro@fujitsu.com>) id 1irtRn-0005eM-9D
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 19:55:44 -0500
+Received: from esa14.fujitsucc.c3s2.iphmx.com ([68.232.156.101]:19976)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
+ id 1irtRm-0005cd-PC
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 19:55:43 -0500
+IronPort-SDR: Q1ZwBQxWT+G2hJGuFzkbecpKun72uTGgOTW/EQF5oCgzCvMl0Q3Ur5w09jAP72xXXvci+kAiSM
+ gKzpH5Zx6pJXeZWwXZ+cuT7OfJ+Lzltzt/LgcZ3j3AmjCWLK8P83a8CsA4MgtCEB1qmYkoDcZU
+ PFG/I9uo19EefYJpPqG8/dsBRb1DbpBY562LlpJUGakBw0xH6W/MNoGodRY5SpAV/1TParUC2o
+ eN9R/6jRg9ICIo9qLPKkNeXnLRdRssdGiZdaGdzHDJ+pfb2j4LF3ehYPSBGXuMe2i7E8HlQMmR
+ hkA=
+X-IronPort-AV: E=McAfee;i="6000,8403,9501"; a="9405482"
+X-IronPort-AV: E=Sophos;i="5.70,323,1574089200"; 
+   d="scan'208";a="9405482"
+Received: from mail-os2jpn01lp2055.outbound.protection.outlook.com (HELO
+ JPN01-OS2-obe.outbound.protection.outlook.com) ([104.47.92.55])
+ by ob1.fujitsucc.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 16 Jan 2020 09:55:38 +0900
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CudERjj1B9PYWKz64B59UcdYTZXSOrTZI6JhEMEE+KbtJP5sKdEOKFRRRjscC2mrp5m2g8KaEmqE2JsCp1I0ydBbLhh7zVRS+L1j1Iffa5lkm8Zw4Vi9VbdV35iprLhABV8rmH5dFUL1dutVVaPJ/F9jkT+Xz/7xkZJmdOM54Ikkm9XcY1hcuwIKEi8o2j8wjySL9AXagftoh8q4QYJPMrFXD6D8z6oq9o1lLOsO8DKS5DNaLXjfugXA+nTyapDPv+xtligL0/NjKpJCOzzrGms8hmnIhJ4SNdw+5N/hw0JuDWMPlL1ow+ERXsXgCMrs00f9Ioh1MdUTby5XbG/pRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6Yf+fZ4mCg9/whppBYdP24EDDYJlXCj7kybGpS68cP4=;
+ b=ZIxQHi/y+k6ipsG7pH4MFC1DlNbLpSJGp5KOEMJOnPsch8BycqExh/jKu8Y8VeVEVjP8du9P2SJyMj3MTpkWDb9FbYlrzGIAa1S9670SROCNQ2RhHoM4EloCTEYzFrUopHuSsvop/TNFcIiT7Xc6tuw71Z1QIGsERbGMZn0HtnibWF8GCzYVrNUKFc875Yzli36mgQEaWZtJh6IZlLrlLIwJ5UZe8TbjmmPFuZamiHB33nbRPcp1dWuJYWScT8VmYBRmD7UR3iM+DB6fjY5/38SA5AmGwWt4WyddzDGTzeBsbOQ0YEaK83hLoOg/D2KJL5OXp7cxMoMhOpZhHyojCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
+ dkim=pass header.d=fujitsu.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=fujitsu.onmicrosoft.com; s=selector2-fujitsu-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6Yf+fZ4mCg9/whppBYdP24EDDYJlXCj7kybGpS68cP4=;
+ b=jy8kTh3SM5lz8GelkHlUlSDPkkm8tTsSQMTe6kw3ttQmQgcUcWzvZWK+g82+525pvUyAQF2dkDOBazT5hDkSCeWabHZSkrwYeJEgE0ZyDqBdFUpqapjgz8bGY69RQpFg2iwg3dOgQPfEvbx9MEtvs6M2BxjbDzsaVVydUlOiq0g=
+Received: from OSBPR01MB4582.jpnprd01.prod.outlook.com (20.179.181.21) by
+ OSBPR01MB4805.jpnprd01.prod.outlook.com (20.179.182.209) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.10; Thu, 16 Jan 2020 00:55:34 +0000
+Received: from OSBPR01MB4582.jpnprd01.prod.outlook.com
+ ([fe80::1127:602f:66e2:ba38]) by OSBPR01MB4582.jpnprd01.prod.outlook.com
+ ([fe80::1127:602f:66e2:ba38%4]) with mapi id 15.20.2623.017; Thu, 16 Jan 2020
+ 00:55:34 +0000
+From: "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>
+To: "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>
+Subject: RE: [PATCH 084/104] Virtiofsd: fix memory leak on fuse queueinfo
+Thread-Topic: [PATCH 084/104] Virtiofsd: fix memory leak on fuse queueinfo
+Thread-Index: AQHVy5Sip5x02RmsOEiCFdeq59uyeafr8oAAgACD55A=
+Date: Thu, 16 Jan 2020 00:54:24 +0000
+Deferred-Delivery: Thu, 16 Jan 2020 00:55:24 +0000
+Message-ID: <OSBPR01MB4582846F726005E9405A84C2E5360@OSBPR01MB4582.jpnprd01.prod.outlook.com>
+References: <20191212163904.159893-85-dgilbert@redhat.com>
+ <20200115112006.32659-1-misono.tomohiro@jp.fujitsu.com>
+ <20200115165712.GE3811@work-vm>
+In-Reply-To: <20200115165712.GE3811@work-vm>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-shieldmailcheckermailid: dfc70c58aecc4cc297d3bfd1412c569a
+x-securitypolicycheck: OK by SHieldMailChecker v2.6.3
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=misono.tomohiro@fujitsu.com; 
+x-originating-ip: [210.170.118.190]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 392dd01a-9802-44ca-7998-08d79a1ecb50
+x-ms-traffictypediagnostic: OSBPR01MB4805:
+x-microsoft-antispam-prvs: <OSBPR01MB4805BA3FEEE4136B3D0C78BDE5360@OSBPR01MB4805.jpnprd01.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1751;
+x-forefront-prvs: 02843AA9E0
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(396003)(346002)(366004)(376002)(39860400002)(136003)(189003)(199004)(7696005)(85182001)(33656002)(8936002)(478600001)(66476007)(66556008)(55016002)(5660300002)(6916009)(6666004)(81156014)(64756008)(66446008)(52536014)(4326008)(6506007)(8676002)(316002)(54906003)(71200400001)(66946007)(186003)(26005)(86362001)(81166006)(2906002)(9686003)(76116006)(777600001);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:OSBPR01MB4805;
+ H:OSBPR01MB4582.jpnprd01.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: KmLx9TA2Pzhj1LpXUvF2uKqE86Yt61dMV+o2R80k2lEB7zdLOvu048Z9ZTN+jUU43FN2TwNQgbo8cptevGWB4fdw8xYaU2v7xnMmjJedZgkclBVoUIJv8EDmeLThWeFZhFDKLG9mPJDz+axasqb2Bc3g3FYmJKGsNwLXf8bnimWOx2uJzKT9xoqyRGWDZJYkUkVhOjPOZ0gETu9qX9Lf/ctJMzDoPNaYXka6ct+QCeqVvuwnvm7wuUizI1iHpfhbxXumfW68Dg+cMr2ICPFEEFPglHbiR7iThMGKcf44CycU3DifFwxa7jc8eoISArQj+PKfAPdgi1FE3hEiUUNco1boPLCWq7WoxqM+eOKfUXX0j6R0ByWKrGksZWD5TLo40x1RwUOQz8jUfGSZsZt4xEy04HZrILabSx51wiu6zYN3Ilm8p5mrfZR0SaJGuG0HSHKcw3VWLDm0Qi2pm21WHo/iMpiY1k2Sr7zbrdqVvDuJvmcY1HGfJVsIbg0OKX4a
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-36-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579100861-73692-36-git-send-email-imammedo@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 16 Jan 2020 10:20:20 +1000
-Message-ID: <CAKmqyKPS0i5P1Tgsu6bVidsAD-JjHMxE-10Pa72Z+dbXJWowdg@mail.gmail.com>
-Subject: Re: [PATCH v2 35/86] arm:xilinx_zynq: use memdev for RAM
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-OriginatorOrg: fujitsu.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 392dd01a-9802-44ca-7998-08d79a1ecb50
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2020 00:55:34.6280 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0k6wnIHdwNqN/JviFG/1QdtFoHvp6EEFwkhdXgtIIcrPSAq7HA3UsLbtd7IzPdPQ2cs6YQSEVeVwbsWRtRF75TZbUqAC+ijBf8L5IT8VOKs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSBPR01MB4805
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.156.101
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,72 +130,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>,
- Edgar Iglesias <edgar.iglesias@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "vgoyal@redhat.com" <vgoyal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 16, 2020 at 1:29 AM Igor Mammedov <imammedo@redhat.com> wrote:
->
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->   MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
->
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> * Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
+> > > From: Liu Bo <bo.liu@linux.alibaba.com>
+> > >
+> > > For fuse's queueinfo, both queueinfo array and queueinfos are
+> > > allocated in
+> > > fv_queue_set_started() but not cleaned up when the daemon process qui=
+ts.
+> > >
+> > > This fixes the leak in proper places.
+> > >
+> > > Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+> > > Signed-off-by: Eric Ren <renzhen@linux.alibaba.com>
+> > > ---
+> > >  tools/virtiofsd/fuse_virtio.c | 9 +++++++++
+> > >  1 file changed, 9 insertions(+)
+> > >
+> > > diff --git a/tools/virtiofsd/fuse_virtio.c
+> > > b/tools/virtiofsd/fuse_virtio.c index 7b22ae8d4f..a364f23d5d 100644
+> > > --- a/tools/virtiofsd/fuse_virtio.c
+> > > +++ b/tools/virtiofsd/fuse_virtio.c
+> > > @@ -671,6 +671,8 @@ static void fv_queue_set_started(VuDev *dev, int =
+qidx, bool started)
+> > >          }
+> > >          close(ourqi->kill_fd);
+> > >          ourqi->kick_fd =3D -1;
+> > > +        free(vud->qi[qidx]);
+> > > +        vud->qi[qidx] =3D NULL;
+> > >      }
+> > >  }
+> > >
+> > > @@ -878,6 +880,13 @@ int virtio_session_mount(struct fuse_session
+> > > *se)  void virtio_session_close(struct fuse_session *se)  {
+> > >      close(se->vu_socketfd);
+> >
+> > I beleve above close() should be removed as it is called 6 line below.
+>=20
+> You're right, I think that's my fault from when I merged this patch with =
+'Virtiofsd: fix segfault when quit before dev init'.
+>=20
+> Fixed.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Given that:
+ Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
-Alistair
+Thanks.
 
-> ---
-> CC: peter.maydell@linaro.org
-> CC: qemu-arm@nongnu.org
-> CC: edgar.iglesias@gmail.com
-> CC: alistair@alistair23.me
-> ---
->  hw/arm/xilinx_zynq.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-> index df950fc..0ef9688 100644
-> --- a/hw/arm/xilinx_zynq.c
-> +++ b/hw/arm/xilinx_zynq.c
-> @@ -160,7 +160,6 @@ static void zynq_init(MachineState *machine)
->  {
->      ARMCPU *cpu;
->      MemoryRegion *address_space_mem = get_system_memory();
-> -    MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
->      MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
->      DeviceState *dev;
->      SysBusDevice *busdev;
-> @@ -190,9 +189,7 @@ static void zynq_init(MachineState *machine)
->      object_property_set_bool(OBJECT(cpu), true, "realized", &error_fatal);
->
->      /* DDR remapped to address zero.  */
-> -    memory_region_allocate_system_memory(ext_ram, NULL, "zynq.ext_ram",
-> -                                         machine->ram_size);
-> -    memory_region_add_subregion(address_space_mem, 0, ext_ram);
-> +    memory_region_add_subregion(address_space_mem, 0, machine->ram);
->
->      /* 256K of on-chip memory */
->      memory_region_init_ram(ocm_ram, NULL, "zynq.ocm_ram", 256 * KiB,
-> @@ -318,6 +315,7 @@ static void zynq_machine_init(MachineClass *mc)
->      mc->no_sdcard = 1;
->      mc->ignore_memory_transaction_failures = true;
->      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
-> +    mc->default_ram_id = "zynq.ext_ram";
->  }
->
->  DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
+> Thanks.
+>=20
+> Dave
+>=20
+> > > +
+> > > +    if (!se->virtio_dev) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    close(se->vu_socketfd);
+> > > +    free(se->virtio_dev->qi);
+> > >      free(se->virtio_dev);
+> > >      se->virtio_dev =3D NULL;
+> > >  }
+> > > --
+> > > 2.23.0
+> >
 > --
-> 2.7.4
->
->
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
