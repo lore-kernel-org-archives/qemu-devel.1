@@ -7,64 +7,61 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A809CC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8859AC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:37:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7191A20748
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CAB32087E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:37:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iqx3DFPD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7191A20748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bU6SK8iO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CAB32087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40997 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is4Gw-0000YA-Gm
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:29:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34271)
+	id 1is4P4-0005YN-4E
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:37:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35337)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1is4Fw-000828-KJ
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:28:14 -0500
+ (envelope-from <david@redhat.com>) id 1is4Np-0004nu-5Y
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1is4Fv-0003IF-8C
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:28:12 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30182
+ (envelope-from <david@redhat.com>) id 1is4No-0006lc-0Z
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:21 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36060
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1is4Fv-0003Hz-26
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:28:11 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1is4Nn-0006l0-SE
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579177690;
+ s=mimecast20190719; t=1579178179;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=/RYiatNKVDFyV08ubrXjM+Vf0oDqdzCuuxF06rG8yRc=;
- b=Iqx3DFPDYWkHi4wrykPGiAoNKLzVcOpHXNIENAV8GhI6qyiMkBObwJA6Bjjh0EL31Q8nGU
- XB76hdH3QG9cTfvRnQXPmsXPF5IusYyZ2qrtYoSK4kFggELs4S2J06I2kRCHbzlMkC1ePh
- vhWPD8FjZ83hTG7YHrX47FgDrZCIjYc=
+ bh=I2HwFpqf8FrV9KQyHAeRIU+fr8DuJdzXvXyWLT0rDbs=;
+ b=bU6SK8iOsxy7/mp1vSY8R+/3M3yjrVwta7jYef2Z2VJ5XUCrqvVKHCQ1AF7tJtDdUDbfSu
+ /5NpyhpU6dV8LOJ3mTs3cPgtVwEqPdbWTZEgKWuguuVifpXK1E4e6VcJAl3cCrOZ3vY249
+ ImK1g5efLeEyptXK2tof3XBYtJGB/dE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-uoaOqyNtNsCjo76ke3_7fw-1; Thu, 16 Jan 2020 07:28:07 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-27-QNL0TxpjMWaaWM0Mv8hVoA-1; Thu, 16 Jan 2020 07:36:16 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03F59DB21;
- Thu, 16 Jan 2020 12:28:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C6571B18BC1
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 12:36:15 +0000 (UTC)
 Received: from [10.36.116.136] (ovpn-116-136.ams2.redhat.com [10.36.116.136])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9F1AE811FA;
- Thu, 16 Jan 2020 12:28:04 +0000 (UTC)
-Subject: Re: [PATCH] target/s390x/kvm: Enable adapter interruption suppression
- again
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200116122026.5804-1-thuth@redhat.com>
- <7c5da42a-2de0-d9e6-f838-f2b0757cbcaa@redhat.com>
- <6d489327-b37d-73ae-6706-03f1e4c6b495@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 13F0760C63;
+ Thu, 16 Jan 2020 12:36:03 +0000 (UTC)
+Subject: Re: [PATCH 2/2] virtio-balloon: Reject qmp_balloon during hot-unplug
+To: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org
+References: <20200115224025.538368-1-jusual@redhat.com>
+ <20200115224025.538368-3-jusual@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -110,22 +107,22 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <cbffb011-a725-70d7-5921-d489769630d2@redhat.com>
-Date: Thu, 16 Jan 2020 13:28:03 +0100
+Message-ID: <38fdd88d-1399-effb-b74b-e02b7343f044@redhat.com>
+Date: Thu, 16 Jan 2020 13:36:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <6d489327-b37d-73ae-6706-03f1e4c6b495@redhat.com>
+In-Reply-To: <20200115224025.538368-3-jusual@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: uoaOqyNtNsCjo76ke3_7fw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: QNL0TxpjMWaaWM0Mv8hVoA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,115 +134,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16.01.20 13:26, Thomas Huth wrote:
-> On 16/01/2020 13.23, David Hildenbrand wrote:
->> On 16.01.20 13:20, Thomas Huth wrote:
->>> The AIS feature has been disabled late in the v2.10 development
->>> cycle since there were some issues with migration (see commit
->>> 3f2d07b3b01ea61126b - "s390x/ais: for 2.10 stable: disable ais
->>> facility"). We originally wanted to enable it again for newer
->>> machine types, but apparently we forgot to do this so far. Let's
->>> do it for the new s390-ccw-virtio-5.0 machine now.
->>>
->>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  hw/s390x/s390-virtio-ccw.c         |  4 ++++
->>>  include/hw/s390x/s390-virtio-ccw.h |  4 ++++
->>>  target/s390x/kvm.c                 | 11 ++++++++---
->>>  3 files changed, 16 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->>> index e7eadd14e8..6f43136396 100644
->>> --- a/hw/s390x/s390-virtio-ccw.c
->>> +++ b/hw/s390x/s390-virtio-ccw.c
->>> @@ -456,6 +456,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->>>      s390mc->cpu_model_allowed = true;
->>>      s390mc->css_migration_enabled = true;
->>>      s390mc->hpage_1m_allowed = true;
->>> +    s390mc->kvm_ais_allowed = true;
->>>      mc->init = ccw_init;
->>>      mc->reset = s390_machine_reset;
->>>      mc->hot_add_cpu = s390_hot_add_cpu;
->>> @@ -662,6 +663,9 @@ static void ccw_machine_4_2_instance_options(MachineState *machine)
->>>  
->>>  static void ccw_machine_4_2_class_options(MachineClass *mc)
->>>  {
->>> +    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
->>> +
->>> +    s390mc->kvm_ais_allowed = false;
->>>      ccw_machine_5_0_class_options(mc);
->>>      compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
->>>  }
->>> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
->>> index 8aa27199c9..f142d379c6 100644
->>> --- a/include/hw/s390x/s390-virtio-ccw.h
->>> +++ b/include/hw/s390x/s390-virtio-ccw.h
->>> @@ -21,6 +21,9 @@
->>>  #define S390_MACHINE_CLASS(klass) \
->>>      OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MACHINE)
->>>  
->>> +#define S390_CCW_MACHINE_OBJ_GET_CLASS(obj) \
->>> +    OBJECT_GET_CLASS(S390CcwMachineClass, obj, TYPE_S390_CCW_MACHINE)
->>> +
->>>  typedef struct S390CcwMachineState {
->>>      /*< private >*/
->>>      MachineState parent_obj;
->>> @@ -40,6 +43,7 @@ typedef struct S390CcwMachineClass {
->>>      bool cpu_model_allowed;
->>>      bool css_migration_enabled;
->>>      bool hpage_1m_allowed;
->>> +    bool kvm_ais_allowed;
->>>  } S390CcwMachineClass;
->>>  
->>>  /* runtime-instrumentation allowed by the machine */
->>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->>> index 15260aeb9a..4c1c8c0208 100644
->>> --- a/target/s390x/kvm.c
->>> +++ b/target/s390x/kvm.c
->>> @@ -329,6 +329,8 @@ static void ccw_machine_class_foreach(ObjectClass *oc, void *opaque)
->>>  
->>>  int kvm_arch_init(MachineState *ms, KVMState *s)
->>>  {
->>> +    S390CcwMachineClass *smc = S390_CCW_MACHINE_OBJ_GET_CLASS(ms);
->>> +
->>>      object_class_foreach(ccw_machine_class_foreach, TYPE_S390_CCW_MACHINE,
->>>                           false, NULL);
->>>  
->>> @@ -365,10 +367,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>>      /*
->>>       * The migration interface for ais was introduced with kernel 4.13
->>>       * but the capability itself had been active since 4.12. As migration
->>> -     * support is considered necessary let's disable ais in the 2.10
->>> -     * machine.
->>> +     * support is considered necessary we only enable this for newer
->>> +     * machine types and if KVM_CAP_S390_AIS_MIGRATION is available.
->>>       */
->>> -    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
->>> +    if (smc->kvm_ais_allowed &&
->>> +        kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
->>> +        kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
->>> +    }
->>>  
->>>      kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
->>>      return 0;
->>>
->>
->> We have ri_allowed(), cpu_model_allowed(), hpage_1m_allowed().
->>
->> Care to create a similar wrapper?
+On 15.01.20 23:40, Julia Suvorova wrote:
+> Hot-unplug takes some time due to communication with the guest.
+> Do not change the device while freeing up resources.
 > 
-> Honestly, why do we need these wrappers at all? They look cumbersome to
-> me. I'd rather remove them in case they are not urgently needed (so far
-> I don't see the point... could someone enlighten me why we have them?).
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> ---
+>  balloon.c                  | 2 +-
+>  hw/virtio/virtio-balloon.c | 9 ++++++++-
+>  include/sysemu/balloon.h   | 2 +-
+>  3 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/balloon.c b/balloon.c
+> index f104b42961..998ec53a0f 100644
+> --- a/balloon.c
+> +++ b/balloon.c
+> @@ -119,5 +119,5 @@ void qmp_balloon(int64_t target, Error **errp)
+>      }
+>  
+>      trace_balloon_event(balloon_opaque, target);
+> -    balloon_event_fn(balloon_opaque, target);
+> +    balloon_event_fn(balloon_opaque, target, errp);
+>  }
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 57f3b9f22d..0fa4e4454b 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -717,12 +717,19 @@ static void virtio_balloon_stat(void *opaque, BalloonInfo *info)
+>                                               VIRTIO_BALLOON_PFN_SHIFT);
+>  }
+>  
+> -static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
+> +static void virtio_balloon_to_target(void *opaque, ram_addr_t target,
+> +                                     Error **errp)
+>  {
+> +    DeviceState *bus_dev = qdev_get_bus_device(DEVICE(opaque));
+>      VirtIOBalloon *dev = VIRTIO_BALLOON(opaque);
+>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>      ram_addr_t vm_ram_size = get_current_ram_size();
+>  
+> +    if (bus_dev && bus_dev->pending_deleted_event) {
+> +        error_setg(errp, "Hot-unplug of %s is in progress", vdev->name);
+> +        return;
+> +    }
+> +
 
-I assume to minimize the number of places you have to lookup the
-machine/machine class.
+How exactly does this help? The guest is free to inflate/deflate
+whenever it wants.
+
 
 -- 
 Thanks,
