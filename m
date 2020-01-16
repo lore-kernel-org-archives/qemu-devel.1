@@ -2,88 +2,81 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 479A8C33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 20:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24885C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 20:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DC0F2072E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 20:27:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E39482072E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 20:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gq5TZr9u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DC0F2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NTUNG8Wj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39482072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isBk0-0003al-UI
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 15:27:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56106)
+	id 1isBkx-0005pQ-3c
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 15:28:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1isBif-0001WI-LS
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 15:26:25 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1isBia-00082D-L8
+ (envelope-from <cohuck@redhat.com>) id 1isBia-0001NZ-En
  for qemu-devel@nongnu.org; Thu, 16 Jan 2020 15:26:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58544
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1isBia-00080l-Gu
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <cohuck@redhat.com>) id 1isBiV-000802-Tr
  for qemu-devel@nongnu.org; Thu, 16 Jan 2020 15:26:16 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30731
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1isBiV-0007zX-Py
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 15:26:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579206373;
+ s=mimecast20190719; t=1579206371;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ATwMHOBFnMkoUL0Ov4nqFQfte3qrWcDlKu/r7xNwBZg=;
- b=Gq5TZr9uaE0KjdK6ukesb1CR/s18/ZhLDVA1YIz6ep4dF4HzewOEQFOP9RuX1V3KM3crdx
- E8QuK4XUTuGgldwyF42J1JrOSm8xOln9z1bqo2NG9jPQdWgvyz/RlF+9c0iBq6FbjCY1yI
- 0Dv3Tkp/rR/auWqhMkRqzvv00FI/99w=
+ bh=0rqVGRILNo70f5s2riP8PdeGcTeWDi+5nsXAFTslb3w=;
+ b=NTUNG8WjfN3zOvPJAm9WqHh2euboBXVzHBNQYP5W0pFMXlRh2AjLFJhxsSNIzbIbh5AxpH
+ pygD0Y3ur9MrJkxC2vDiZrC+IaQd8zvA/fINdT3rVEDlOEw7hbC8Fyu/urIKs9LgtcWwxu
+ /qsZrUC77cti7HKWiI3sSjcju1OYqR4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-Zd-Q2NpaO--SeAbPwNmNSg-1; Thu, 16 Jan 2020 15:26:10 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-194-AOt3LJ4fMHWtTGP2e86tqQ-1; Thu, 16 Jan 2020 15:26:09 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 082EDA0CC1;
- Thu, 16 Jan 2020 20:26:09 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 56FF326172;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48A521005510;
  Thu, 16 Jan 2020 20:26:08 +0000 (UTC)
-Date: Thu, 16 Jan 2020 20:26:05 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Lieven <pl@kamp.de>
-Subject: Re: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior
- to previous a0000
-Message-ID: <20200116202605.GN3108@work-vm>
-References: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
- <20200108150458.GC3184@work-vm>
- <ca222a5f-1ec6-477c-ed83-6ef52ea9e97f@kamp.de>
- <20200109184440.GR6795@work-vm>
- <b89e8ba2-49e9-8c0d-1129-116afa76366a@kamp.de>
- <cd316fb8-b56b-2913-8b57-f085ca4426d7@kamp.de>
- <11bd7f7a-9022-6c35-3b92-27d6e66f3295@kamp.de>
+Received: from gondolin (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5EBC98177F;
+ Thu, 16 Jan 2020 20:26:04 +0000 (UTC)
+Date: Thu, 16 Jan 2020 21:26:01 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Matthew Rosato <mjrosato@linux.ibm.com>
+Subject: Re: [PATCH] target/s390x/kvm: Enable adapter interruption
+ suppression again
+Message-ID: <20200116212601.0fcd3be6.cohuck@redhat.com>
+In-Reply-To: <ad421fc1-8241-3c73-e597-aebb3fc8a309@linux.ibm.com>
+References: <20200116122026.5804-1-thuth@redhat.com>
+ <ad421fc1-8241-3c73-e597-aebb3fc8a309@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <11bd7f7a-9022-6c35-3b92-27d6e66f3295@kamp.de>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Zd-Q2NpaO--SeAbPwNmNSg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: AOt3LJ4fMHWtTGP2e86tqQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,82 +88,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Lieven (pl@kamp.de) wrote:
-> Am 16.01.20 um 13:47 schrieb Peter Lieven:
-> > Am 13.01.20 um 17:25 schrieb Peter Lieven:
-> > > Am 09.01.20 um 19:44 schrieb Dr. David Alan Gilbert:
-> > > > * Peter Lieven (pl@kamp.de) wrote:
-> > > > > Am 08.01.20 um 16:04 schrieb Dr. David Alan Gilbert:
-> > > > > > * Peter Lieven (pl@kamp.de) wrote:
-> > > > > > > Hi,
-> > > > > > >=20
-> > > > > > >=20
-> > > > > > > I have a Qemu 4.0.1 machine with vhost-net network adapter, t=
-hats polluting the log with the above message.
-> > > > > > >=20
-> > > > > > > Is this something known? Googling revealed the following patc=
-h in Nemu (with seems to be a Qemu fork from Intel):
-> > > > > > >=20
-> > > > > > > https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619=
-dccced114ef7f56e
-> > > > > > >=20
-> > > > > > >=20
-> > > > > > > The network stopped functioning. After a live-migration the v=
-Server is reachable again.
-> > > > > > >=20
-> > > > > > >=20
-> > > > > > > Any ideas?
-> > > > > > What guest are you running and what does your qemu commandline =
-look
-> > > > > > like?
-> > > > >=20
-> > > > > Its running debian9. We have hundreds of other VMs with identical=
- setup. Do not know why this one makes trouble.
-> > > > Could you extract an 'info mtree' from it - particularly the
-> > > > 'address-space: memory' near the top.
-> > >=20
-> > >=20
-> > > Here we go:
-> > >=20
-> > >=20
-> > > address-space: memory
-> > > =A0 0000000000000000-ffffffffffffffff (prio 0, i/o): system
-> > > =A0=A0=A0 0000000000000000-000000003fffffff (prio 0, i/o): alias ram-=
-below-4g @pc.ram 0000000000000000-000000003fffffff
-> > > =A0=A0=A0 0000000000000000-ffffffffffffffff (prio -1, i/o): pci
-> > > =A0=A0=A0=A0=A0 00000000000a0000-00000000000affff (prio 2, i/o): alia=
-s vga.chain4 @vga.vram 0000000000000000-000000000000ffff
-> > > =A0=A0=A0=A0=A0 00000000000a0000-00000000000bffff (prio 1, i/o): vga-=
-lowmem
-> >=20
-> >=20
-> > What seems special is that the RAM area is prio2. Any idea if this make=
-s trouble?
->=20
->=20
-> Update from my side. This happens when I have Debian 10 with XFCE when th=
-e Graphical User Interface is initialized.
->=20
-> I see the log message when I specify -M pc-i440fx-2.9. If I obmit the mac=
-hine type the error does not appear.
+On Thu, 16 Jan 2020 15:19:13 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-I can't persuade this to reproduce here on the images I currently have;
-but if you can rebuild, can you try the v3 of 'Fix hyperv synic on
-vhost' I've just posted?  It turns off the alignment code that's
-spitting that error in vhost-kernel cases, so should go away.
+> On 1/16/20 7:20 AM, Thomas Huth wrote:
+> > The AIS feature has been disabled late in the v2.10 development
+> > cycle since there were some issues with migration (see commit
+> > 3f2d07b3b01ea61126b - "s390x/ais: for 2.10 stable: disable ais
+> > facility"). We originally wanted to enable it again for newer
+> > machine types, but apparently we forgot to do this so far. Let's
+> > do it for the new s390-ccw-virtio-5.0 machine now.
+> > 
+> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >   hw/s390x/s390-virtio-ccw.c         |  4 ++++
+> >   include/hw/s390x/s390-virtio-ccw.h |  4 ++++
+> >   target/s390x/kvm.c                 | 11 ++++++++---
+> >   3 files changed, 16 insertions(+), 3 deletions(-)
 
-Dave
+(...)
 
->=20
-> Peter
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> > index 15260aeb9a..4c1c8c0208 100644
+> > --- a/target/s390x/kvm.c
+> > +++ b/target/s390x/kvm.c
+> > @@ -329,6 +329,8 @@ static void ccw_machine_class_foreach(ObjectClass *oc, void *opaque)
+> >   
+> >   int kvm_arch_init(MachineState *ms, KVMState *s)
+> >   {
+> > +    S390CcwMachineClass *smc = S390_CCW_MACHINE_OBJ_GET_CLASS(ms);
+> > +  
+> 
+> I still can't run a proper test due to unavailable hw but in the 
+> meantime I tried to virsh define a libvirt guest pointed at qemu (master 
+> + this patch).  Regardless of machine type (s390-ccw-virtio-5.0 or 
+> s390-ccw-virtio-4.2) I get:
+> 
+> virsh define guest.xml
+> error: Failed to define domain from /path/to/guest.xml
+> error: invalid argument: could not find capabilities for arch=s390x 
+> domaintype=kvm
+> 
+> Similarly:
+> 
+> virsh domcapabilities
+> error: failed to get emulator capabilities
+> error: invalid argument: unable to find any emulator to serve 's390x' 
+> architecture
+> 
+> Rolling back to qemu master, the define and domcapabilities work (with 
+> no ais of course).
+> 
+> So: there is some incompatibility between the way libvirt invokes qemu 
+> to detect capabilities and this code.  The above line seems to be the 
+> root problem - if I take your patch and remove 'smc' then libvirt works 
+> as expected and I can see ais in the domcapabilities.
+> 
+> Looking at those wrappers David mentioned...  I suspect you need this 
+> for the 'none' machine case.  I tried a quick hack with the following:
+> 
+> bool ais_allowed(void)
+> {
+>      /* for "none" machine this results in true */
+>      return get_machine_class()->kvm_ais_allowed;
+> }
+> 
+> and
+> 
+> if (ais_allowed() &&
+>      kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
+>      kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> }
+> 
+> This works and doesn't break libvirt compatibility detection.
+
+Oh, "none" machine fun again... I think you're on the right track, and
+we really need a wrapper.
 
 
