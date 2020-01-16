@@ -2,127 +2,64 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4DEC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472F6C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:42:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B43C520748
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:23:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EkbnZ1Qj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B43C520748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1CF402073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:42:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF402073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is0Qj-0005Cl-SM
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 03:23:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57235)
+	id 1is0jA-0006cf-95
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 03:42:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1is0Q9-0004mU-CH
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:22:30 -0500
+ (envelope-from <clg@kaod.org>) id 1is0iM-0005yD-LY
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:41:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1is0Q7-0007AA-Cu
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:22:28 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56274
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1is0iJ-0007Jf-3K
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:41:18 -0500
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:47668)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1is0Q7-00079d-1R
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:22:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579162946;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=lJ3sEewc45HIvSnluVJVOBhKglVZi4/E86YH0gUB/AA=;
- b=EkbnZ1Qj3gikwRPA1Z7N59UDcY9y2YJKQiJaCnk3BRSMEpO5K1zn8bUrIOibPiBcE/6TSM
- lqJlijBwNJDFI7T7MSf+SnNlwNgVU6QBixfcet9Ssm2xQ6CtpcRIsI+Cz7hjy44A5ECKpd
- Ivn/DECoLvGxfjGwnhVzSezf2sIxXp4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-Tq0A5OlfM4u7fRk5jrySOw-1; Thu, 16 Jan 2020 03:22:22 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDE97107ACCA;
- Thu, 16 Jan 2020 08:22:20 +0000 (UTC)
-Received: from [10.36.117.84] (ovpn-117-84.ams2.redhat.com [10.36.117.84])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7EDB580617;
- Thu, 16 Jan 2020 08:22:17 +0000 (UTC)
-Subject: Re: [PATCH v2 38/86] s390x:s390-virtio-ccw: use memdev for RAM
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1is0iI-0007IM-Rl
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:41:15 -0500
+Received: from player735.ha.ovh.net (unknown [10.108.42.119])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 52B631BEA32
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 09:41:12 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player735.ha.ovh.net (Postfix) with ESMTPSA id 39B60E10C1F7;
+ Thu, 16 Jan 2020 08:41:04 +0000 (UTC)
+Subject: Re: [PATCH v2 08/86] arm:aspeed: actually check RAM size
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-39-git-send-email-imammedo@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <a412a4fe-b51d-7aa4-a99c-96a353b35606@redhat.com>
-Date: Thu, 16 Jan 2020 09:22:16 +0100
+ <1579100861-73692-9-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <83481ccb-38e4-d0a2-18b5-66fcd7248521@kaod.org>
+Date: Thu, 16 Jan 2020 09:41:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1579100861-73692-39-git-send-email-imammedo@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Tq0A5OlfM4u7fRk5jrySOw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <1579100861-73692-9-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 2424906926064176048
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdeggdduudekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 188.165.48.182
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,77 +71,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- cohuck@redhat.com, rth@twiddle.net
+Cc: andrew@aj.id.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15.01.20 16:06, Igor Mammedov wrote:
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->   MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
+On 1/15/20 4:06 PM, Igor Mammedov wrote:
+> It's supposed that SOC will check if "-m" provided
+> RAM size is valid by setting "ram-size" property and
+> then board would read back valid (possibly corrected
+> value) to map RAM MemoryReging with valid size.
+> Well it isn't doing so, since check is called only
+> indirectly from
+>   aspeed_sdmc_reset()->asc->compute_conf()
+> or much later when guest writes to configuration
+> register.
+> 
+> So depending on "-m" value QEMU end-ups with a warning
+> and an invalid MemoryRegion size allocated and mapped.
+> (examples:
+>  -M ast2500-evb -m 1M
+>     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
+>       0000000080000000-00000000800fffff (prio 0, ram): ram
+>       0000000080100000-00000000bfffffff (prio 0, i/o): max_ram
+>  -M ast2500-evb -m 3G
+>     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
+>       0000000080000000-000000013fffffff (prio 0, ram): ram
+>       [DETECTED OVERFLOW!] 0000000140000000-00000000bfffffff (prio 0, i/o): max_ram
+> )
+> On top of that sdmc falls back and reports to guest
+> "default" size, it thinks machine should have.>
+> I don't know how hardware is supposed to work so
+> I've kept it as is.
+
+The HW is hardwired and the modeling is trying to accommodate with
+the '-m' option, the machine definition and the SDRAM controller
+limits and register definitions for a given SoC. The result is not 
+that good it seems :/ 
+
+> But as for CLI side machine should honor whatever
+> user configured or error out to make user fix CLI.
+> 
+> This patch makes ram-size check actually work and
+> changes behavior from a warning later on during
+> machine reset to error_fatal at the moment SOC is
+> realized so user will have to fix RAM size on CLI
+> to start machine.
+
+commit 8e00d1a97d1d ("aspeed/sdmc: Introduce an object class per SoC") 
+moved some calls from the realize handler to reset handler and it
+broke the checks on the RAM size.
+
+I think we should introduce get/set handlers on the "ram-size" property
+that would look for a matching size in an AspeedSDMCClass array of valid
+RAM sizes. The default size of the machine would be a valid default and
+bogus user defined sizes would be fatal to QEMU.  
+
+We could get rid of the code :
+
+    /* use a common default */
+    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 512M",
+                s->ram_size);
+    s->ram_size = 512 << 20;
+    return ASPEED_SDMC_AST2500_512MB;
+
+
+'max_ram_size' would be the last entry of the AspeedSDMCClass array
+and, anyhow, we need to check bmc->max_ram is really needed. I am not 
+sure anymore. 
+
+Thanks,
+
+C. 
+
+> It also gets out of the way mutable ram-size logic,
+> so we could consolidate RAM allocation logic around
+> pre-allocated hostmem backend (supplied by user or
+> auto created by generic machine code depending on
+> supplied -m/mem-path/mem-prealloc options.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
-> CC: rth@twiddle.net
-> CC: david@redhat.com
-> CC: cohuck@redhat.com
-> CC: pasic@linux.ibm.com
-> CC: borntraeger@de.ibm.com
-> CC: qemu-s390x@nongnu.org
+> CC: clg@kaod.org
+> CC: peter.maydell@linaro.org
+> CC: andrew@aj.id.au
+> CC: joel@jms.id.au
+> CC: qemu-arm@nongnu.org
 > ---
->  hw/s390x/s390-virtio-ccw.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  hw/arm/aspeed.c       | 9 +--------
+>  hw/misc/aspeed_sdmc.c | 5 +++++
+>  2 files changed, 6 insertions(+), 8 deletions(-)
 > 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index e0e2813..cbdd4ba 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -154,14 +154,12 @@ static void virtio_ccw_register_hcalls(void)
->                                     virtio_ccw_hcall_early_printk);
->  }
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index cc06af4..525c547 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -213,14 +213,7 @@ static void aspeed_machine_init(MachineState *machine)
+>                                  "hw-prot-key", &error_abort);
+>      }
+>      object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
+> -                             &error_abort);
+> -
+> -    /*
+> -     * Allocate RAM after the memory controller has checked the size
+> -     * was valid. If not, a default value is used.
+> -     */
+> -    ram_size = object_property_get_uint(OBJECT(&bmc->soc), "ram-size",
+> -                                        &error_abort);
+> +                             &error_fatal);
 >  
-> -static void s390_memory_init(ram_addr_t mem_size)
-> +static void s390_memory_init(MemoryRegion *ram)
->  {
->      MemoryRegion *sysmem = get_system_memory();
-> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
->      Error *local_err = NULL;
+>      memory_region_allocate_system_memory(&bmc->ram, NULL, "ram", ram_size);
+>      memory_region_add_subregion(&bmc->ram_container, 0, &bmc->ram);
+> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+> index 3fc80f0..b398e36 100644
+> --- a/hw/misc/aspeed_sdmc.c
+> +++ b/hw/misc/aspeed_sdmc.c
+> @@ -165,6 +165,11 @@ static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
+>      AspeedSDMCState *s = ASPEED_SDMC(dev);
+>      AspeedSDMCClass *asc = ASPEED_SDMC_GET_CLASS(s);
 >  
->      /* allocate RAM for core */
-> -    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
->      memory_region_add_subregion(sysmem, 0, ram);
+> +    if (!g_hash_table_contains(asc->ram2feat,
+> +                               GINT_TO_POINTER(s->ram_size >> 20))) {
+> +        error_setg(errp, "Invalid RAM size 0x%" PRIx64, s->ram_size);
+> +        return;
+> +    }
+>      s->max_ram_size = asc->max_ram_size;
 >  
->      /*
-> @@ -245,7 +243,7 @@ static void ccw_init(MachineState *machine)
->  
->      s390_sclp_init();
->      /* init memory + setup max page size. Required for the CPU model */
-> -    s390_memory_init(machine->ram_size);
-> +    s390_memory_init(machine->ram);
->  
->      /* init CPUs (incl. CPU model) early so s390_has_feature() works */
->      s390_init_cpus(machine);
-> @@ -471,6 +469,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      hc->plug = s390_machine_device_plug;
->      hc->unplug_request = s390_machine_device_unplug_request;
->      nc->nmi_monitor_handler = s390_nmi;
-> +    mc->default_ram_id = "s390.ram";
->  }
->  
->  static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
+>      memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_sdmc_ops, s,
 > 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
 
 
