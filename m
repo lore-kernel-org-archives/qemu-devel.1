@@ -2,75 +2,59 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 066C5C33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5980C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:52:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBEEB20728
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:51:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBEEB20728
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id A658020728
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:52:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A658020728
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isDz6-0008Fq-8n
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 17:51:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48939)
+	id 1isE0L-0001cs-72
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 17:52:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1isDyL-0007pn-Mf
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:50:42 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isDyz-0008ML-9g
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1isDyK-0002Ia-E3
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:50:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47134)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1isDyK-0002IC-8S
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:50:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1isDyI-00038V-Mg
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 22:50:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7A7CF2E80C9
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 22:50:38 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Jan 2020 22:43:44 -0000
-From: Richard Henderson <rth@twiddle.net>
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isDyx-0002fP-Ql
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:20 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:52004 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1isDyv-00024S-VE
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:18 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id C4EC71A21A0;
+ Thu, 16 Jan 2020 23:50:13 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 2592D1A21BC;
+ Thu, 16 Jan 2020 23:50:12 +0100 (CET)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=rth@twiddle.net; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: grassead rth vdehors
-X-Launchpad-Bug-Reporter: Adrien Grassein (grassead)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <157903678645.2454.11578772527064917210.malonedeb@soybean.canonical.com>
-Message-Id: <157921462448.23052.5158907176044518918.malone@gac.canonical.com>
-Subject: [Bug 1859713] Re: ARM v8.3a pauth not working
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: da22ba6a75cbdeb4cb1162e54bde3352b2f8a6cb
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Subject: [PATCH 02/12] linux-user: Add support for FS_IOC32_<GET|SET>FLAGS
+ ioctls
+Date: Thu, 16 Jan 2020 23:49:41 +0100
+Message-Id: <1579214991-19602-3-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1579214991-19602-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1579214991-19602-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,56 +63,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859713 <1859713@bugs.launchpad.net>
+Cc: laurent@vivier.eu, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Oops again.  The test case has the parts of the key the wrong way around.
-I'll submit the pair of patches to the mailing list.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
--- =
+These FS_IOC32_<GET|SET>FLAGS ioctls are identical to
+FS_IOC_<GET|SET>FLAGS ioctls, but without the anomaly of their
+number defined as if their third argument is of type long, while
+it is treated internally in kernel as is of type int.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859713
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall_defs.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-Title:
-  ARM v8.3a pauth not working
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index c44f42e..4fd6939 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -140,6 +140,8 @@
+      IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+ 
+ #ifdef CONFIG_USBFS
+   /* USB ioctls */
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index f68a8b6..964b2b4 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -920,6 +920,8 @@ struct target_pollfd {
+ #define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
+ #define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+ #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
++#define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
++#define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
+ 
+ /* usb ioctls */
+ #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
+-- 
+2.7.4
 
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Host: Ubuntu 19.10 - x86_64 machine
-  QEMU version: 3a63b24a1bbf166e6f455fe43a6bbd8dea413d92 (master)
-
-  ARMV8.3 pauth is not working well.
-
-  With a test code containing two pauth instructions:
-      - paciasp that sign LR with A key and sp as context;
-      - autiasp that verify the signature.
-
-  Test:
-      - Run the program and corrupt LR just before autiasp (ex 0x3e00000400=
-660 instead of 0x3e000000400664)
-
-  Expected:
-      - autiasp places an invalid pointer in LR
-
-  Result:
-      - autiasp successfully auth the pointer and places 0x0400660 in LR.
-
-  Further explanations:
-      Adding traces in qemu code shows that "pauth_computepac" is not robus=
-t enough against truncating.
-      With 0x31000000400664 as input of pauth_auth, we obtain "0x55b1d65b2c=
-138e14" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
-      With 0x310040008743ec as input of pauth (with same key), we obtain "0=
-x55b1d65b2c138ef4" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
-      Values of top_bit and bottom_bit are strictly the same and it should =
-not.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859713/+subscriptions
 
