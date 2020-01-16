@@ -2,78 +2,94 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D879C33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7CAC33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 19:38:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 424292053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:56:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424292053B
+	by mail.kernel.org (Postfix) with ESMTPS id 2CA162053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 19:38:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XGYXd+Zi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA162053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isAJz-0005hZ-5b
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:56:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40695)
+	id 1isAy3-0000PA-Co
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 14:38:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49236)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1isAJ5-0004pY-Ka
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:55:55 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1isAxN-0008Iw-CA
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:37:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1isAJ0-0002HO-W6
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:55:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35968)
+ (envelope-from <richard.henderson@linaro.org>) id 1isAxM-0002vj-2t
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:37:28 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41547)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1isAJ0-0002GD-OX
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:55:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1isAIz-0001Tb-5J
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 18:55:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 24F892E80CB
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 18:55:45 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1isAxL-0002ux-RP
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:37:28 -0500
+Received: by mail-pf1-x443.google.com with SMTP id w62so10717626pfw.8
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:37:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=UXxTG7rpZERHU0+nNveHy4MlWEWUoaB79PkykwUjZhs=;
+ b=XGYXd+Zi4A/G/KITe0BU1h7b2IL4DuWNWkogGtTrsJHf8t4uR3qoXNkjQgloHuUP7e
+ sNBqC+r9dAUTlpTIrpzDFquVWoqZ8m23mrgGdc3bn7kvT+fj9hsadTOUcltTofARcaeg
+ 3LFUbKdqOPo84S+eSzYIulXbi44hMVRPKLmK3wj/5YBH2ctWI1cBrfW+d1BsnS5b+7I+
+ BBHtjx1X1RBiLEBrLkX1LOXGKa9fXolUfOPB+dTmLuB2/jVXkSQub/sAahNiWQ8ttPj9
+ aNvfOEJRnF2ZihO77N6hr4cgsIHgRLfk+zdxK76VruRYB+Wd00JYJOCT/4T/jjqf9Hs/
+ 4o+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UXxTG7rpZERHU0+nNveHy4MlWEWUoaB79PkykwUjZhs=;
+ b=ULRXD6JDSjDzlPrGmyaqiskMNG+oC6odusbcxrdyiR3I3/AtSvBWRRsTWMBEiacWja
+ ZrqkTS7wi9hLxX02+2ZBumSPX2ekdtuYJVsqf1ape5Ukw4f+xt1MscfM5lXs7NFdg0qo
+ C0oGLNGV4AW10PNUPWeTilRfOupMUzA0xoclsX8IRa2G4mvTaZ4Vyb5BlMtUpROy0SVw
+ Xb8aytzOmwC4TlSUKHQQLi+4E6slJgCwbl+j0LNNbmRbcKigDQiPh+RSsdnUBkWz/47n
+ LwV1VSNQMXMfGJ2LNqYzLat12sLEM1pgOL0TzOF1PJA52UZXWIN8GCXkhfEp3fs3vsh3
+ dTcQ==
+X-Gm-Message-State: APjAAAXGYf7uHsDkdHhNWwn1r/TBFyiTGHsA8JayrSfG5/p5ov1o/Djj
+ Qk/Or4C8Ja3qTygVdqlDMOAmSDuheU8=
+X-Google-Smtp-Source: APXvYqyjDb27Wbt8W64y41TFuuXaEFxi8VyjrNWmpXJUjGHPOxbVfiX22CsBqRfFltM4QLr7CNsdyw==
+X-Received: by 2002:a63:3404:: with SMTP id b4mr40705879pga.438.1579203446087; 
+ Thu, 16 Jan 2020 11:37:26 -0800 (PST)
+Received: from [192.168.3.43] (rrcs-66-91-136-155.west.biz.rr.com.
+ [66.91.136.155])
+ by smtp.gmail.com with ESMTPSA id 133sm26494491pfy.14.2020.01.16.11.37.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 16 Jan 2020 11:37:25 -0800 (PST)
+Subject: Re: [PATCH 0/3] linux-user: Implement x86_64 vsyscalls
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200114210921.11216-1-richard.henderson@linaro.org>
+ <87lfq7lcns.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <8aca9cc6-4224-55f7-cd9b-b0553a92e9d1@linaro.org>
+Date: Thu, 16 Jan 2020 09:37:21 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Jan 2020 18:45:12 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=alex.bennee@linaro.org; 
-X-Launchpad-Bug-Tags: arm tcg testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
-X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <157857629827.5165.2496570379985305724.malonedeb@gac.canonical.com>
- <20200110161626.31943-2-alex.bennee@linaro.org>
-Message-Id:
- <CAFEAcA9nNH9pu+8E_YYkiNtzePjZdrEBjK_9zJv+XJaSvcnhmA@mail.gmail.com>
-Subject: [Bug 1859021] Re: [PATCH v1 1/2] target/arm: detect 64 bit overflow
- caused by high cval + voff
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2a64c832864dfbf31298643d31a00b7664c75c23
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+In-Reply-To: <87lfq7lcns.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,134 +98,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859021 <1859021@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, riku.voipio@iki.fi,
+ laurent@vivier.eu, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200116184512.-GhyoV50p1lAQuquaf1g3NHI4JxuTU5gwvHnbV2-jwA@z>
 
-On Fri, 10 Jan 2020 at 16:16, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> If we don't detect this we will be stuck in a busy loop as we schedule
-> a timer for before now which will continually trigger gt_recalc_timer
-> even though we haven't reached the state required to trigger the IRQ.
->
-> Bug: https://bugs.launchpad.net/bugs/1859021
-> Cc: 1859021@bugs.launchpad.net
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  target/arm/helper.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 19a57a17da5..eb17106f7bd 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -2481,6 +2481,9 @@ static void gt_recalc_timer(ARMCPU *cpu, int timeri=
-dx)
->          } else {
->              /* Next transition is when we hit cval */
->              nexttick =3D gt->cval + offset;
-> +            if (nexttick < gt->cval) {
-> +                nexttick =3D UINT64_MAX;
-> +            }
->          }
+On 1/16/20 4:05 AM, Alex Bennée wrote:
+> It turns out the /sbin/ldconfig crash is a regression w.r.t from
+> stretch->buster so unrelated to these patches. However I've been giving
+> them a spin with the linux vdso selftests and stuff is breaking which I
+> guess means it's incomplete?
+...
+> Also from selftests/vDSO:
+> 
+> alex@23eb55f27ff8:~/lsrc/linux.git/tools/testing/selftests/vDSO$ ./vdso_test 
+> AT_SYSINFO_EHDR is not present!
 
-There's something odd going on with this code. Adding a bit of context:
+This patch set is for vsyscall only, not vdso.
 
-        uint64_t offset =3D timeridx =3D=3D GTIMER_VIRT ?
-                                      cpu->env.cp15.cntvoff_el2 : 0;
-        uint64_t count =3D gt_get_countervalue(&cpu->env);
-        /* Note that this must be unsigned 64 bit arithmetic: */
-        int istatus =3D count - offset >=3D gt->cval;
-        [...]
-        if (istatus) {
-            /* Next transition is when count rolls back over to zero */
-            nexttick =3D UINT64_MAX;
-        } else {
-            /* Next transition is when we hit cval */
-            nexttick =3D gt->cval + offset;
-        }
 
-I think this patch is correct, in that the 'nexttick' values
-are all absolute and this cval/offset combination implies
-that the next timer interrupt is going to be in a future
-so distant we can't even fit the duration in a uint64_t.
-
-But the other half of the 'if' also looks wrong: that's
-for the case of "timer has fired, how long until the
-wraparound causes the interrupt line to go low again?".
-UINT64_MAX is right for the EL1 case where offset is 0,
-but the offset might actually be set such that the wrap
-around happens fairly soon. We want to calculate the
-tick when (count - offset) hits 0, saturated to
-UINT64_MAX. It's getting late here and I couldn't figure
-out what that expression should be with 15 minutes of
-fiddling around with pen and paper diagrams. I'll have another
-go tomorrow if nobody else gets there first...
-
-thanks
--- PMM
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859021
-
-Title:
-  qemu-system-aarch64 (tcg):  cval + voff overflow not handled, causes
-  qemu to hang
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  The Armv8 architecture reference manual states that for any timer set
-  (e.g. CNTP* and CNTV*), the condition for such timer to generate an
-  interrupt (if enabled & unmasked) is:
-
-  CVAL <=3D CNT(P/V)CT
-
-  Although this is arguably sloppy coding, I have seen code that is
-  therefore assuming it can set CVAL to a very high value (e.g.
-  UINT64_MAX) and leave the interrupt enabled in CTL, and never get the
-  interrupt.
-
-  On latest master commit as the time of writing, there is an integer
-  overflow in target/arm/helper.c gt_recalc_timer affecting the virtual
-  timer when the interrupt is enabled in CTL:
-
-      /* Next transition is when we hit cval */
-      nexttick =3D gt->cval + offset;
-
-  When this overflow happens, I notice that qemu is no longer responsive an=
-d that I have to SIGKILL the process:
-      - qemu takes nearly all the cpu time of the cores it is running on (e=
-.g. 50% cpu usage if running on half the cores) and is completely unrespons=
-ive
-      - no guest interrupt (reported via -d int) is generated
-
-  Here the minimal code example to reproduce the issue:
-
-      mov     x0, #1
-      msr     cntvoff_el2, x0
-      mov     x0, #-1
-      msr     cntv_cval_el0, x0
-      mov     x0, #1
-      msr     cntv_ctl_el0, x0 // interrupt generation enabled, not masked;=
- qemu will start to hang here
-
-  Options used:
-  -nographic -machine virt,virtualization=3Don,gic-version=3D2,accel=3Dtcg =
--cpu cortex-a57
-  -smp 4 -m 1024 -kernel whatever.elf -d unimp,guest_errors,int -semihostin=
-g-config enable,target=3Dnative
-  -serial mon:stdio
-
-  Version used: 4.2
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859021/+subscriptions
+r~
 
