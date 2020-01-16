@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6B8C33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 17:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 123CCC33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:01:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 407FA24681
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 17:59:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA2862464B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:01:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gzntHbHN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407FA24681
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FQDyLvos"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA2862464B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is9Q4-00057P-8m
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 12:59:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33097)
+	id 1is9SI-0007g4-2I
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:01:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1is9PQ-00049A-3b
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:58:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1is9RT-00075e-9T
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:00:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1is9PO-0000eS-VP
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:58:19 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42828)
+ (envelope-from <peter.maydell@linaro.org>) id 1is9RS-0002Xc-8z
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:00:27 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43294)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1is9PO-0000dJ-NI
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:58:18 -0500
-Received: by mail-ot1-x341.google.com with SMTP id 66so20174426otd.9
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 09:58:18 -0800 (PST)
+ id 1is9RS-0002Wf-51
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:00:26 -0500
+Received: by mail-ot1-x344.google.com with SMTP id p8so20158625oth.10
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 10:00:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LaGzoLaCaPaWKUIyizELR2Z8xWinEiB9Q1ve7KEjYyo=;
- b=gzntHbHN1qrvDBzVHh5HYSGkjiDVZ3inM2zCfI9W5IpztBV/7uc13he4OTqZ7BbajY
- uS2P8Zo4AT1rRNuqG9P/shyx65KGXlURlc22swsdghugBgyESX98c5nr9VRut3B/4Tmu
- xozyc/3QxLjYhXgB5tsbSpl+H0RcpHzD9nPhkIe1oUdOlCtW5DqVUFn6Rb77Q1xEMo2G
- Is5weJSGm4xE2NkTlln+5mE0EeyOY9wM5iRmfWD0xfbMw2+BoNghZNYtiBP16vFcZbVz
- B4gWt04kVLBWY64/CottCyNFAvPzokbyG7pnv/kgZNwpWfmdd4Hu+9qO7GP983xihUan
- 1LqA==
+ :cc; bh=kJxILsF4SiOaMkqCzpZ49tewmt0Vuw9F+FxGG9I7Ngo=;
+ b=FQDyLvosUM+6b+kQwv5RyhY1UG+OEASXM7O+Rm4Ps0qRh9G7/BB6++qxqmjQKJ+jv/
+ ASBm6r0DIgr8aHYSMkZVZsC/T2AsqLa59GETiW6cuVxGxsIiwff3jpg4joDSBuhWG6zI
+ T8OUd9iJHvpcbUZah6opj/B2MTC73Z1zgHKlAgdxINGT+spT9D+hu6RuWCqB972h9FE/
+ RuKwKTu5nmMU7zbAkkzR7e3KM+kiY+s8d0XHKT8t5icJNWcF7fHJkrAhM386CQhcYzfr
+ hEh9VScSXx+WapykNd0Nbh9J2ALWPLbw4FfviuJi5iZzKB4w/QJQJigfjGHFpsS+3Xe9
+ YYBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=LaGzoLaCaPaWKUIyizELR2Z8xWinEiB9Q1ve7KEjYyo=;
- b=fk+3CqUx70DQxEsohsk72eF/Gg20UXxf67t3wVH8quAVdxbx2Xei7B4d4k/Oea47xq
- s14k8Yc+b3iFp5rGtpnYmmCMmCJdiHrmm5lC/nN6XCSvhX3P1DTAxyAL9npTmwVxz2ks
- 3VLCGXZ0NL00OCP0m0p10AI6q1DK5keBL3no2ajqm6Wl2GTRBHXWU/mzKoo0cndrFGEz
- yihW5F+2wrIhKffbwnjBBseW3ntal47JTZ5ROEEDzt2upfivEbN9U/KJnMSljmCf+Log
- FEH+TBevnDzcMTpu1c0pS8uuaqiac5JwCrUHvQYQxQ2GGpU/mAPQRxeWscoZ7PSChbTX
- oRHA==
-X-Gm-Message-State: APjAAAV6jB23Ex3vAzu49O84fgnG2WE6/wt+uxfWHRL+gK8f9X1ap8Vd
- /OmRppTXCYBVTz3b2nzeATr2sgca9y1DQcEI8uK5Bw==
-X-Google-Smtp-Source: APXvYqwAXoxulwi/nvZUjVM5tPW6ohG1vKLlmQzXiblCddINrmVSyHB4QUjvSAykUl0K2vOU4IDhBajv9N75DvMgru4=
-X-Received: by 2002:a05:6830:1586:: with SMTP id
- i6mr2865433otr.221.1579197497389; 
- Thu, 16 Jan 2020 09:58:17 -0800 (PST)
+ bh=kJxILsF4SiOaMkqCzpZ49tewmt0Vuw9F+FxGG9I7Ngo=;
+ b=r6vlKWyT/tCBm5ziWp/heKSiYrH8FY/TMx3HE5ZbQVb5Yg1zH0NDzYvH8jxdLnSxUO
+ EWg3zq6G2O71qByDw1ooGnaIC7gz26R8xHOKWIwnpYYLMBtMa+aOJeTjXb1NrQeo6pbw
+ QSUuasPilRvbBCD9X61x4BNGR1uuyO+v63Pu2UvHkzDFsnYa0CPQqBOYwNZqCJMzfe4z
+ bL99zW1q55q3C+v0g4hgrAoOaFSsw6Ksb6ObBX3fSn0V65nKOK4ylgiMKTUZ8yM9Powe
+ M8zYwzIehJ1EenXhvdC4f3442p5Zi+ylWRgu1h5hXenEPvYOucys0l3jisU8O5WxNVS/
+ O5/g==
+X-Gm-Message-State: APjAAAWPYpufkzzq09ZBMgVJWKw4kuoGNxCPTVPhYfuGtGMJaa3/CrCy
+ 7KYC96zR2Z7F6eX+9k7didZt6cLXKSTR1Xo16SkKQw==
+X-Google-Smtp-Source: APXvYqzOZqIld2EirXI5snf2XKTwvKcyVRu6Rkq8vVKQgQs1HPgDQCliUqN3qgVeP2Gfzt8/Kh63H3PC+7OPjPBl7Vg=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr3046385otd.91.1579197625271; 
+ Thu, 16 Jan 2020 10:00:25 -0800 (PST)
 MIME-Version: 1.0
-References: <20191226175132.28116-1-martin@kaiser.cx>
- <20200108084604.28173-1-martin@kaiser.cx>
-In-Reply-To: <20200108084604.28173-1-martin@kaiser.cx>
+References: <20200113155934.97572-1-jeff.kubascik@dornerworks.com>
+In-Reply-To: <20200113155934.97572-1-jeff.kubascik@dornerworks.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Jan 2020 17:58:06 +0000
-Message-ID: <CAFEAcA-z7gCkowOqWQx-0=N_0hW6nm69NgDbDHLKnqwsrjmV3g@mail.gmail.com>
-Subject: Re: [PATCH v2] i.MX: add an emulation for RNGC
-To: Martin Kaiser <martin@kaiser.cx>
+Date: Thu, 16 Jan 2020 18:00:14 +0000
+Message-ID: <CAFEAcA8NFO0_ZuezUbzFe7yFFN8G3JAF-c43evFbcZgvhn2UBA@mail.gmail.com>
+Subject: Re: [PATCH v2] target/arm: adjust program counter for wfi exception
+ in AArch32
+To: Jeff Kubascik <jeff.kubascik@dornerworks.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,28 +87,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jarvis Roach <Jarvis.Roach@dornerworks.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 at 08:46, Martin Kaiser <martin@kaiser.cx> wrote:
+On Mon, 13 Jan 2020 at 15:59, Jeff Kubascik
+<jeff.kubascik@dornerworks.com> wrote:
 >
-> Add an emulation for the RNGC random number generator and the compatible
-> RNGB variant. These peripherals are included (at least) in imx25 and
-> imx35 chipsets.
+> The wfi instruction can be configured to be trapped by a higher exception
+> level, such as the EL2 hypervisor. When the instruction is trapped, the
+> program counter should contain the address of the wfi instruction that
+> caused the exception. The program counter is adjusted for this in the wfi op
+> helper function.
 >
-> The emulation supports the initial self test, reseeding the prng and
-> reading random numbers.
+> However, this correction is done to env->pc, which only applies to AArch64
+> mode. For AArch32, the program counter is stored in env->regs[15]. This
+> adds an if-else statement to modify the correct program counter location
+> based on the the current CPU mode.
 >
-> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+> Signed-off-by: Jeff Kubascik <jeff.kubascik@dornerworks.com>
 > ---
-> changes in v2
->  add a VMStateDescription
->  rename __imx_rngc_reset to imx_rngc_do_reset
->  fix a typo
+> Hello,
+>
+> I am using the ARMv8 version of QEMU to run the Xen hypervisor with a guest
+> virtual machine compiled for AArch32/Thumb code. I have noticed that when
+> the AArch32 guest VM executes the wfi instruction, the hypervisor trap of
+> the wfi instruction sees the program counter contain the address of the
+> instruction following the wfi. This does not occur for an AARch64 guest VM;
+> in this case, the program counter contains the address of the wfi
+> instruction. I am confident the correct behavior in both cases is for the
+> program counter to contain the address of the wfi instruction, as this works
+> on actual hardware (Xilinx Zynq UltraScale+ MPSoC).
+>
+> I have tested the above patch and it works for Xen with both an AArch64
+> guest (Linux) and an AArch32 guest (RTEMS). I'm still getting accustomed to
+> the QEMU code base, so it may not be correct. Any feedback would be greatly
+> appreciated.
+>
+> Sincerely,
+> Jeff Kubascik
+>
+> Changes in v2:
+> - Added braces {} to if-else statement, per patchew feedback
+> ---
 
 
 
