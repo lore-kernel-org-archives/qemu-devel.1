@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 991CFC33CB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0430C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:52:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EE7B20728
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:52:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EE7B20728
+	by mail.kernel.org (Postfix) with ESMTPS id A338020728
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:52:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A338020728
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isE0N-0001e2-29
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 17:52:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49035)
+	id 1isE0Q-0001iS-4d
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 17:52:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isDyz-0008MM-9S
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:22 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isDz0-0008NO-8e
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isDyx-0002fF-QV
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:20 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:52008 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isDyz-0002hC-7Q
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:22 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:53726 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1isDyv-00024f-VH
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:18 -0500
+ id 1isDyy-0002fk-Un
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:51:21 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D91A51A21FF;
- Thu, 16 Jan 2020 23:50:13 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 7D5761A21C4;
+ Thu, 16 Jan 2020 23:50:16 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 5197A1A2160;
- Thu, 16 Jan 2020 23:50:12 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 174641A21DD;
+ Thu, 16 Jan 2020 23:50:14 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/12] linux-user: Add support for FS_IOC32_<GET|SET>VERSION
- ioctls
-Date: Thu, 16 Jan 2020 23:49:42 +0100
-Message-Id: <1579214991-19602-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH 12/12] linux-user: Add support for KCOV_INIT_TRACE ioctl
+Date: Thu, 16 Jan 2020 23:49:51 +0100
+Message-Id: <1579214991-19602-13-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1579214991-19602-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1579214991-19602-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -70,44 +69,39 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-These FS_IOC32_<GET|SET>VERSION ioctls are identical to
-FS_IOC_<GET|SET>VERSION ioctls, but without the anomaly of their
-number defined as if their third argument is of type long, while
-it is treated internally in kernel as is of type int.
+KCOV_INIT_TRACE ioctl plays the role in kernel coverage tracing.
+This ioctl's third argument is of type 'unsigned long', and the
+implementation in QEMU is straightforward.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/ioctls.h       | 1 +
+ linux-user/syscall_defs.h | 1 +
+ 2 files changed, 2 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 4fd6939..3affd88 100644
+index 39b3825..1da71dd 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -142,6 +142,8 @@
-      IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
- 
- #ifdef CONFIG_USBFS
-   /* USB ioctls */
+@@ -556,4 +556,5 @@
+ #ifdef CONFIG_KCOV
+   IOCTL(KCOV_ENABLE, 0, TYPE_NULL)
+   IOCTL(KCOV_DISABLE, 0, TYPE_NULL)
++  IOCTL(KCOV_INIT_TRACE, IOC_R, TYPE_ULONG)
+ #endif
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 964b2b4..a73cc3d 100644
+index c8999ef..bf71b3a 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -922,6 +922,8 @@ struct target_pollfd {
- #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
- #define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
- #define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
-+#define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
-+#define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
+@@ -2464,6 +2464,7 @@ struct target_mtpos {
+ /* kcov ioctls */
+ #define TARGET_KCOV_ENABLE     TARGET_IO('c', 100)
+ #define TARGET_KCOV_DISABLE    TARGET_IO('c', 101)
++#define TARGET_KCOV_INIT_TRACE TARGET_IOR('c', 1, abi_ulong)
  
- /* usb ioctls */
- #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
+ struct target_sysinfo {
+     abi_long uptime;                /* Seconds since boot */
 -- 
 2.7.4
 
