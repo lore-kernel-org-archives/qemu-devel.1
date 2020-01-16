@@ -2,78 +2,79 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD8CC33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 17:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E961C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 17:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFD832470B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 17:29:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BFB624683
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 17:34:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RcbMMt05"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFD832470B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZRDE4TWG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BFB624683
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is8xg-0000zv-Vl
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 12:29:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57467)
+	id 1is92S-0004T1-4A
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 12:34:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1is8wh-0000PT-0n
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:28:42 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1is91H-0003aW-Me
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:33:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1is8wc-00055d-UO
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:28:38 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50486
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1is8wc-00054u-R4
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:28:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579195713;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8r6vKouu1XQ5cUrQGHdc87L4Vg/2yU0zGmekPp7zaw4=;
- b=RcbMMt05WjmFBe7DllHa38vPqvJivvanjMfceNbT5QVb8EWlkfkFwCn9hjtcixRXxBDIS4
- cTEk7S6p9OtLAWMPpsIiPPkkhI22n556HwdhYxkG8X4QIBmpVEYOwH3HXTv9UGaaYk1lwl
- QIGNl8wQC9QnNHAfsBLLP0d7Le1jBBM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-g4e7CGdqOu2r6nw8Zze9QQ-1; Thu, 16 Jan 2020 12:28:29 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2486D8017CC;
- Thu, 16 Jan 2020 17:28:28 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C603A7DB4F;
- Thu, 16 Jan 2020 17:28:26 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 18/86] arm:kzm: drop RAM size fixup
-Date: Thu, 16 Jan 2020 18:26:04 +0100
-Message-Id: <1579195564-95459-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <87sgkgv6dh.wl-Peter.Chubb@data61.csiro.au>
-References: <87sgkgv6dh.wl-Peter.Chubb@data61.csiro.au>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: g4e7CGdqOu2r6nw8Zze9QQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <peter.maydell@linaro.org>) id 1is91G-0007pm-Ct
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:33:23 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33990)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1is91G-0007pJ-7X
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 12:33:22 -0500
+Received: by mail-oi1-x243.google.com with SMTP id l136so19588224oig.1
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 09:33:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0ZPDZo0jMU1ikuXpVDiiyq0aSPvd42ukajRTz1Bdats=;
+ b=ZRDE4TWGmwxZIi/9SHI7x3kquTv9WHQ60uRhPs9+KM32HVYmUxnbD6sZyijh+Cagb3
+ ruhdjm8AT17Cz4BAYCf5cbxAZ44I/JSQjVIEeDIJ4zmz8kOxBjcZHbYP1qTTrkyDrcn6
+ frm6JPg0aZKFbUXEqz96C0MJTvJCNYb4Hug7bHIA/okQNroHer3y1MOlaEFy/XJAq0+i
+ be4Tu+l40KP1qAqbvKyNPJ6HD19Hp0MmfTl0P9/RSbt63u/8Tv+tmfot68Kcf+qBMuon
+ enFWrfzRbDgyXg39u4onqHcyYUWcaH8hVeNxnOYXLPyKqYkto2u0XoCR2qkX6O14wjW7
+ z+dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0ZPDZo0jMU1ikuXpVDiiyq0aSPvd42ukajRTz1Bdats=;
+ b=eEim7KzAmT25KavePDNXXiMjEKL0NvCB+jtaU54OQ+qIAHz9qZDYv7y4bJSFOE7RxJ
+ mLoa+gxYrb3rW9mOlQUcgfhQfa68R/17OLGaX9kzmXgDZ0G5514EDJ4Y9eJxPk1HB93g
+ o8ICDkWbSPKQuk3RDH3jzJpIVkAIjP2cqmD7p5VQDSYDQWE7i3lnhZAjglgGFnf3dz73
+ 3b1f+ctUM+MGIvFExS8YKMgT5S0+KVK1wicUiRM315qFzXeNWqrh0N1WY09osfeLk6g0
+ 4+PeHPZInSFbJABk8yovd3lH6QrR5SX9F3VT9kW5pZR9xFS/DP37QB7pXlSRG0qwhdSR
+ bOhg==
+X-Gm-Message-State: APjAAAVpvctUBAO6GDuleG71hGFszuUIXndazVRf1CN8945wFjpHibVy
+ 1jPHcTXkS0R1dgkrupkG+CoTap4yT3qjdiYsuN/qIA==
+X-Google-Smtp-Source: APXvYqw64hFrvoILnDE+AajhKI6PNO2eeX/wZ/NFbURRGCHaHDCvLtaWphrvbc2/AAgzpQcRoBKmMLOLH1yZ0qUYO7g=
+X-Received: by 2002:aca:d78b:: with SMTP id o133mr108518oig.163.1579196000981; 
+ Thu, 16 Jan 2020 09:33:20 -0800 (PST)
+MIME-Version: 1.0
+References: <20200109041228.10131-1-masahiroy@kernel.org>
+In-Reply-To: <20200109041228.10131-1-masahiroy@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Jan 2020 17:33:10 +0000
+Message-ID: <CAFEAcA8Z486dBHo-zkjw4eqLWRD9ukSdMmxqCk_rsV-oAkWcAA@mail.gmail.com>
+Subject: Re: [PATCH] target/arm/arm-semi: fix SYS_OPEN to return nonzero
+ filehandle
+To: Masahiro Yamada <masahiroy@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,64 +86,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter.Chubb@data61.csiro.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- peter.chubb@nicta.com.au
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the user provided too large a RAM size, the code used to
-complain and trim it to the max size.  Now tht RAM is allocated by
-generic code, that's no longer possible, so generate an error and
-exit instead.
+On Thu, 9 Jan 2020 at 04:13, Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> According to the specification "Semihosting for AArch32 and Aarch64",
+> the SYS_OPEN operation should return:
+>
+>  - A nonzero handle if the call is successful
+>  - -1 if the call is not successful
+>
+> So, it should never return 0.
+>
+> Prior to commit 35e9a0a8ce4b ("target/arm/arm-semi: Make semihosting
+> code hand out its own file descriptors"), the guest fd matched to the
+> host fd. It returned a nonzero handle on success since the fd 0 is
+> already used for stdin.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v3:
- * rephrase commit message in nicer way
-   ("Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>)
- * reword error message and use size_to_str() to pretty print suggested siz=
-e
-   ("Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>)
+I think this bug existed even prior to that commit, because
+in the old implementation we would handle the ":tt" magic
+file by returning STDIN_FILENO or STDOUT_FILENO, and
+STDIN_FILENO is zero.
 
-CC: peter.chubb@nicta.com.au
-CC: peter.maydell@linaro.org
-CC: qemu-arm@nongnu.org
----
- hw/arm/kzm.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+So although I agree we should fix this bug, it would probably
+be wise if your code using the API treated 0 as a success,
+because QEMU's probably not the only implementation that
+decided to use "just pass through the host fd"...
 
-diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
-index 1d5ef28..94cbac1 100644
---- a/hw/arm/kzm.c
-+++ b/hw/arm/kzm.c
-@@ -25,6 +25,7 @@
- #include "hw/char/serial.h"
- #include "sysemu/qtest.h"
- #include "sysemu/sysemu.h"
-+#include "qemu/cutils.h"
-=20
- /* Memory map for Kzm Emulation Baseboard:
-  * 0x00000000-0x7fffffff See i.MX31 SOC for support
-@@ -78,10 +79,10 @@ static void kzm_init(MachineState *machine)
-=20
-     /* Check the amount of memory is compatible with the SOC */
-     if (machine->ram_size > (FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE=
-)) {
--        warn_report("RAM size " RAM_ADDR_FMT " above max supported, "
--                    "reduced to %x", machine->ram_size,
--                    FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE);
--        machine->ram_size =3D FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZ=
-E;
-+        char *sz =3D size_to_str(FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_=
-SIZE);
-+        error_report("RAM size more than %s is not supported", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-     }
-=20
-     memory_region_allocate_system_memory(&s->ram, NULL, "kzm.ram",
---=20
-2.7.4
+> Basically, there are two ways to fix this:
+>
+>   - Use (guestfd - 1) as the index of guestfs_arrary. We need to insert
+>     increment/decrement to convert the guestfd and the array index back
+>     and forth.
+>
+>   - Keep using guestfd as the index of guestfs_array. The first entry
+>     of guestfs_array is left unused.
+>
+> I thought the latter is simpler. We end up with wasting a small piece
+> of memory for the unused first entry of guestfd_array, but this is
+> probably not a big deal.
 
+Yeah, I guess so.
+
+Applied to target-arm.next.
+
+(This also reminds me that I never got round to fixing a bug where
+if the guest does a SYS_OPEN on :tt and then a SYS_CLOSE then
+we close the host stdin/stdout, which we should not...)
+
+thanks
+-- PMM
 
