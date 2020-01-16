@@ -6,73 +6,58 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B30C32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 01:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8231C32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 01:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4328222C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 01:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E47C222C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 01:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YY3bS4gl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4328222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="i7/g4jdy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E47C222C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irtj0-00006F-UF
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 20:13:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36088)
+	id 1irtke-00017C-Qs
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 20:15:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1irtiC-00086R-Nk
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 20:12:42 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1irtk0-0000bB-3F
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 20:14:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1irti8-00064V-U9
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 20:12:38 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27946
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1irtjy-0007E8-Kc
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 20:14:31 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60011 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1irti8-00063Q-NJ
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 20:12:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579137155;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=uZf4xXGSrgu0iJ1m2di8r/o8rrTh6BO8CM7Fjof1QBs=;
- b=YY3bS4glBzMwHC/r6WhnNQaUGfkDLLoiMx7hnMQ4xAt+XwrB9bQoaRlkGseqKNBfE/RKJR
- E+UJHFaFYb82mkxCbZKYdODJLwuojMoJ82QvznWI5sLb8PHWc4UhJh+dbRTZ2O69hEShAC
- yWfO+AFQsy0QG0I7EaX7RbIj1aM+C40=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-DmSoJL1JOlO5PRQOokNapw-1; Wed, 15 Jan 2020 20:12:32 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA7CB100550E;
- Thu, 16 Jan 2020 01:12:30 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-18.brq.redhat.com [10.40.204.18])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 41F875D9C9;
- Thu, 16 Jan 2020 01:12:19 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH] ui/gtk: Get display refresh rate with GDK version 3.22 or
- later
-Date: Thu, 16 Jan 2020 02:12:17 +0100
-Message-Id: <20200116011217.2144-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1irtjx-0007BC-Of; Wed, 15 Jan 2020 20:14:30 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47ymSK1NKHz9sR0; Thu, 16 Jan 2020 12:14:25 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1579137265;
+ bh=clS9+EvTnJAgbcn8Qk58XBFuVl4DOoKbCYc+GfSkwkc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=i7/g4jdy1IEwx9cK6kGs3MzQW0Gi/F7/QwhMeSRWeedGnm9X9qc59/Dzb3c6ZLSPK
+ 4nf8LsfpXK1fjBq6T8JmLnWjUKDpZjk13StTVrRO3OmOkuSm4yRfE08a7BOcwAVM4f
+ 5McdKJDP9PifElo8YFcLJ8MaByBm7ze2rN4oKBmo=
+Date: Thu, 16 Jan 2020 11:08:10 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH v2 59/86] ppc:e500: drop RAM size fixup
+Message-ID: <20200116010810.GC54439@umbus>
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-60-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: DmSoJL1JOlO5PRQOokNapw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="4jXrM3lyYWu4nBt5"
+Content-Disposition: inline
+In-Reply-To: <1579100861-73692-60-git-send-email-imammedo@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,128 +69,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Nikola Pavlica <pavlica.nikola@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The GdkMonitor was introduced in GTK+ 3.22:
-https://developer.gnome.org/gdk3/stable/api-index-3-22.html#api-index-3.22
 
-If we build with older GTK+, the build fails:
+--4jXrM3lyYWu4nBt5
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-    CC      ui/gtk.o
-  qemu/ui/gtk.c: In function =E2=80=98gd_vc_gfx_init=E2=80=99:
-  qemu/ui/gtk.c:1973:5: error: unknown type name =E2=80=98GdkMonitor=E2=80=
-=99
-       GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win);
-       ^
-  qemu/ui/gtk.c:1973:27: error: implicit declaration of function =E2=80=98g=
-dk_display_get_monitor_at_window=E2=80=99 [-Werror=3Dimplicit-function-decl=
-aration]
-       GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win);
-                             ^
-  qemu/ui/gtk.c:1973:5: error: nested extern declaration of =E2=80=98gdk_di=
-splay_get_monitor_at_window=E2=80=99 [-Werror=3Dnested-externs]
-       GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win);
-       ^
-  qemu/ui/gtk.c:1973:27: error: initialization makes pointer from integer w=
-ithout a cast [-Werror=3Dint-conversion]
-       GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win);
-                             ^
-  qemu/ui/gtk.c:2035:28: error: implicit declaration of function =E2=80=98g=
-dk_monitor_get_refresh_rate=E2=80=99 [-Werror=3Dimplicit-function-declarati=
-on]
-       refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
-                              ^
-  qemu/ui/gtk.c:2035:5: error: nested extern declaration of =E2=80=98gdk_mo=
-nitor_get_refresh_rate=E2=80=99 [-Werror=3Dnested-externs]
-       refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
-       ^
-  cc1: all warnings being treated as errors
-  qemu/rules.mak:69: recipe for target 'ui/gtk.o' failed
-  make: *** [ui/gtk.o] Error 1
+On Wed, Jan 15, 2020 at 04:07:14PM +0100, Igor Mammedov wrote:
+> If user provided non-sense RAM size, board will complain and
+> continue running with max RAM size supported.
+> Also RAM is going to be allocated by generic code, so it won't be
+> possible for board to fix things up for user.
+>=20
+> Make it error message and exit to force user fix CLI,
+> instead of accepting non-sense CLI values.
+>=20
+> While at it, replace usage of global ram_size with
+> machine->ram_size
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-We only use the GdkMonitor API to get the monitor refresh rate.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-GTK+ provides convenient definition in <gdk/gdkversionmacros.h>
-(already include by <gdk/gdk.h>) to check which API are available.
+>=20
+> ---
+> v2:
+>  * fix format string cousing build failure on 32-bit host
+>    (Philippe Mathieu-Daud=E9 <philmd@redhat.com>)
+>=20
+> CC: david@gibson.dropbear.id.au
+> CC: qemu-ppc@nongnu.org
+> ---
+>  hw/ppc/e500.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 12b6a5b..6d119fe 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -906,12 +906,14 @@ void ppce500_init(MachineState *machine)
+> =20
+>      env =3D firstenv;
+> =20
+> -    /* Fixup Memory size on a alignment boundary */
+> -    ram_size &=3D ~(RAM_SIZES_ALIGN - 1);
+> -    machine->ram_size =3D ram_size;
+> +    if (!QEMU_IS_ALIGNED(machine->ram_size, RAM_SIZES_ALIGN)) {
+> +        error_report("RAM size must be multiple of %" PRIu64, RAM_SIZES_=
+ALIGN);
+> +        exit(EXIT_FAILURE);
+> +    }
+> =20
+>      /* Register Memory */
+> -    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram", ram=
+_size);
+> +    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram",
+> +                                         machine->ram_size);
+>      memory_region_add_subregion(address_space_mem, 0, ram);
+> =20
+>      dev =3D qdev_create(NULL, "e500-ccsr");
+> @@ -1083,7 +1085,7 @@ void ppce500_init(MachineState *machine)
+>          kernel_base =3D cur_base;
+>          kernel_size =3D load_image_targphys(machine->kernel_filename,
+>                                            cur_base,
+> -                                          ram_size - cur_base);
+> +                                          machine->ram_size - cur_base);
+>          if (kernel_size < 0) {
+>              error_report("could not load kernel '%s'",
+>                           machine->kernel_filename);
+> @@ -1097,7 +1099,7 @@ void ppce500_init(MachineState *machine)
+>      if (machine->initrd_filename) {
+>          initrd_base =3D (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+>          initrd_size =3D load_image_targphys(machine->initrd_filename, in=
+itrd_base,
+> -                                          ram_size - initrd_base);
+> +                                          machine->ram_size - initrd_bas=
+e);
+> =20
+>          if (initrd_size < 0) {
+>              error_report("could not load initial ram disk '%s'",
+> @@ -1115,7 +1117,7 @@ void ppce500_init(MachineState *machine)
+>       * ensures enough space between kernel and initrd.
+>       */
+>      dt_base =3D (loadaddr + payload_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
+> -    if (dt_base + DTB_MAX_SIZE > ram_size) {
+> +    if (dt_base + DTB_MAX_SIZE > machine->ram_size) {
+>              error_report("not enough memory for device tree");
+>              exit(1);
+>      }
 
-Extract this code as a new gd_refresh_rate_millihz() function,
-and check GDK_VERSION_3_22 is defined before calling its API.
-If it is not defined, return 0. This is safe and fixes our build
-failure.
-
-Fixes: c4c00922cc (display/gtk: get proper refreshrate)
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Sorry I missed that, I only tested Nikola's patch on my workstation
-which runs Fedora 30:
-
-  $ pkg-config --modversion gtk+-3.0
-  3.24.11
-
-If Gerd acks this patch, we might consider having it directly
-applied as a build fix.
----
- ui/gtk.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
-
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 7355d34fcf..d18892d1de 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1961,6 +1961,23 @@ static GtkWidget *gd_create_menu_machine(GtkDisplayS=
-tate *s)
-     return machine_menu;
- }
-=20
-+/*
-+ * If available, return the refresh rate of the display in milli-Hertz,
-+ * else return 0.
-+ */
-+static int gd_refresh_rate_millihz(GtkDisplayState *s)
-+{
-+#ifdef GDK_VERSION_3_22
-+    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
-+    GdkWindow *win =3D gtk_widget_get_window(s->window);
-+    GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win);
-+
-+    return gdk_monitor_get_refresh_rate(monitor);
-+#else
-+    return 0;
-+#endif
-+}
-+
- static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
-                               QemuConsole *con, int idx,
-                               GSList *group, GtkWidget *view_menu)
-@@ -1968,10 +1985,6 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, Vi=
-rtualConsole *vc,
-     bool zoom_to_fit =3D false;
-     int refresh_rate_millihz;
-=20
--    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
--    GdkWindow *win =3D gtk_widget_get_window(s->window);
--    GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win);
--
-     vc->label =3D qemu_console_get_label(con);
-     vc->s =3D s;
-     vc->gfx.scale_x =3D 1.0;
-@@ -2032,7 +2045,7 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, Vir=
-tualConsole *vc,
-     vc->gfx.kbd =3D qkbd_state_init(con);
-     vc->gfx.dcl.con =3D con;
-=20
--    refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
-+    refresh_rate_millihz =3D gd_refresh_rate_millihz(s);
-     if (refresh_rate_millihz) {
-         vc->gfx.dcl.update_interval =3D MILLISEC_PER_SEC / refresh_rate_mi=
-llihz;
-     }
 --=20
-2.21.1
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--4jXrM3lyYWu4nBt5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4ft3gACgkQbDjKyiDZ
+s5IrYg//SrrO46Wf7Z0+3YxdCa/nJYPM55RRcorJnM4tu6AYerusdHLvk+AHZn8V
++pdfIYaFOM5DHnxjKZsR5vcGNFaPS1C/LMZTVfebX/IC88Dv8bG4azwZo0JjtFqY
+TVLiJNlouXLgS8gbK6Wy1JBBiU96siEeb6epBTNWUgPaIT7F2OD4rR+xx1p/jVDC
+r9CsTYj4BSL5BRi9oPWqKUzuq6rYZ8fv484tELvF3pqFmp5NFj/zhP6sOfxIBr2F
+M5AOTHQ6kBAL9KB4syogg8x5EI3g32CrD2vJPVwMXmSfn2cbKV6PQoLPgw9IOb0i
+2GihFECLShWLgjKzsHVNIZuNYgDczIFDTYC+w5JZPn2oyJxbX6g+kP3Af1l7swyS
+I4VkBL/zJ9r+Kyg0tXnG7DkwBHydCizHAqVQeqUveq+n3ArxhL56pRUMLmEZKsT3
+QhkV/gFII7DhHKFcJqd+nqpkPMYAaqaE4vovqNXkjllLLZxUYYTnPWIcSp+rRhru
+1TZOi+6s/IP7eqiYYge+Imy//jm+NdXo8QDcJnvAlpJWuOs799BTjja3PW6EKXWz
+hWDMKfHwRFFwTdHVHw4k70o6zdqK0WuB5g3l8HwlDNf7Svhw16+K46n88PDPIEz4
+VkGgaI0GQxfq+axUgsHtBwSQuzhse3o4W+yHaqOSVwXzAIlaaQI=
+=dTyj
+-----END PGP SIGNATURE-----
+
+--4jXrM3lyYWu4nBt5--
 
