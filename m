@@ -2,81 +2,74 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85198C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E54C33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:45:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 505D92077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A81A02077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:45:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJI6d5Kn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505D92077B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HLFpTaAy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A81A02077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is2cq-0004dD-HA
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 05:43:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48224)
+	id 1is2eY-0005aL-Oq
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 05:45:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48825)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mprivozn@redhat.com>) id 1is2bZ-0002pR-H2
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:42:28 -0500
+ (envelope-from <imammedo@redhat.com>) id 1is2ds-00059w-Rl
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:44:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mprivozn@redhat.com>) id 1is2bW-0005Vg-4T
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:42:25 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47717
+ (envelope-from <imammedo@redhat.com>) id 1is2dp-000848-9U
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:44:48 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60920
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1is2bW-0005Ug-1V
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:42:22 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1is2dp-00083P-59
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:44:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579171341;
+ s=mimecast20190719; t=1579171484;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NLLo3ClTCfYupTw8b+mbsY6ZFKgrkR58WKCRiZyYhYc=;
- b=WJI6d5KnGV+n/TFDa8Y7awCsKxA8ZhMrezu5Z6maOFI2UnvR8gtPDtQdRvxyCUTEZtHwK+
- coVhvplGAo9sd0yqriMcbJdPK2uFWcjhKTz9UXASEvrFHWTcuBhFsqTiqZ4xv0KVF3jDn3
- DKii/kDtPozLL2B5Oz/NjzqVloVozQI=
+ bh=AtCeJ0Csack3tJv9RQ0iunfDJjP3QtH4z4TjL/5aBzQ=;
+ b=HLFpTaAyzCvBSFjmQjlWytc3392aKjhmN5u8tKnmLL6/zQ+H6IB9uaYSrv59YmB/spfE2b
+ eVa3IHT2Cu3MmIejk8aGtPymaulauQ/i2idksnwQ4JGVLGCH8GtPgIDUczrlqPRvBgQHPP
+ 9AZcRqlEiiUbHDtAhUYJEfH90FI+MfE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-CCspmgHUNv6FQtY0xwlLiw-1; Thu, 16 Jan 2020 05:42:20 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-225-fo-pwvUMNHmHrVDxJVOUWA-1; Thu, 16 Jan 2020 05:44:41 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E6CA100550E;
- Thu, 16 Jan 2020 10:42:18 +0000 (UTC)
-Received: from [10.43.2.30] (unknown [10.43.2.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0720C84345;
- Thu, 16 Jan 2020 10:42:10 +0000 (UTC)
-Subject: Re: [libvirt] [PATCH v2 82/86] numa: forbid '-numa node, mem' for 5.0
- and newer machine types
-To: Igor Mammedov <imammedo@redhat.com>, Peter Krempa <pkrempa@redhat.com>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-83-git-send-email-imammedo@redhat.com>
- <20200115153453.GL3243410@angien.pipo.sk>
- <20200115175237.325055f3@redhat.com>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <8b9be103-d550-853a-86ff-1dc504daab64@redhat.com>
-Date: Thu, 16 Jan 2020 11:42:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5239310054E3;
+ Thu, 16 Jan 2020 10:44:40 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D4FEAA4B60;
+ Thu, 16 Jan 2020 10:44:36 +0000 (UTC)
+Date: Thu, 16 Jan 2020 11:44:35 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH] hw/arm: Adjust some coding styles about memory hotplug
+Message-ID: <20200116114435.189402e6@redhat.com>
+In-Reply-To: <20200116074029.45952-1-zhukeqian1@huawei.com>
+References: <20200116074029.45952-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200115175237.325055f3@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: CCspmgHUNv6FQtY0xwlLiw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: fo-pwvUMNHmHrVDxJVOUWA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -92,60 +85,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
- libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, rth@twiddle.net,
- david@gibson.dropbear.id.au
+Cc: wanghaibin.wang@huawei.com, qemu-devel@nongnu.org, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/15/20 5:52 PM, Igor Mammedov wrote:
-> On Wed, 15 Jan 2020 16:34:53 +0100
-> Peter Krempa <pkrempa@redhat.com> wrote:
-> 
->> On Wed, Jan 15, 2020 at 16:07:37 +0100, Igor Mammedov wrote:
->>> Deprecation period is ran out and it's a time to flip the switch
->>> introduced by cd5ff8333a.
->>> Disable legacy option for new machine types and amend documentation.
->>>
->>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>> ---
->>> CC: peter.maydell@linaro.org
->>> CC: ehabkost@redhat.com
->>> CC: marcel.apfelbaum@gmail.com
->>> CC: mst@redhat.com
->>> CC: pbonzini@redhat.com
->>> CC: rth@twiddle.net
->>> CC: david@gibson.dropbear.id.au
->>> CC: libvir-list@redhat.com
->>> CC: qemu-arm@nongnu.org
->>> CC: qemu-ppc@nongnu.org
->>> ---
->>>   hw/arm/virt.c        |  2 +-
->>>   hw/core/numa.c       |  6 ++++++
->>>   hw/i386/pc.c         |  1 -
->>>   hw/i386/pc_piix.c    |  1 +
->>>   hw/i386/pc_q35.c     |  1 +
->>>   hw/ppc/spapr.c       |  2 +-
->>>   qemu-deprecated.texi | 16 ----------------
->>>   qemu-options.hx      |  8 ++++----
->>>   8 files changed, 14 insertions(+), 23 deletions(-)
->>
->> I'm afraid nobody bothered to fix it yet:
->>
->> https://bugzilla.redhat.com/show_bug.cgi?id=1783355
-> 
-> It's time to start working on it :)
-> (looks like just deprecating stuff isn't sufficient motivation,
-> maybe actual switch flipping would work out better)
-> 
+On Thu, 16 Jan 2020 15:40:29 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 
-So how was the upgrade from older to newer version resolved? I mean, if 
-the old qemu used -numa node,mem=XXX and it is migrated to a host with 
-newer qemu, the cmd line can't be switched to -numa node,memdev=node0, 
-can it? I'm asking because I've just started working on this.
+> From: zhukeqian <zhukeqian1@huawei.com>
+> 
+> There is extra indent in ACPI GED plug cb. And we can use
+> existing helper function to trigger hotplug handler plug.
+> 
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
 
-Michal
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/acpi/generic_event_device.c | 2 +-
+>  hw/arm/virt.c                  | 6 +++---
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+> index 9cee90cc70..55eb29d80a 100644
+> --- a/hw/acpi/generic_event_device.c
+> +++ b/hw/acpi/generic_event_device.c
+> @@ -175,7 +175,7 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
+>      AcpiGedState *s = ACPI_GED(hotplug_dev);
+>  
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
+> +        acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
+>      } else {
+>          error_setg(errp, "virt: device plug request for unsupported device"
+>                     " type: %s", object_get_typename(OBJECT(dev)));
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 39ab5f47e0..656b0081c2 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1934,7 +1934,6 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>                               DeviceState *dev, Error **errp)
+>  {
+> -    HotplugHandlerClass *hhc;
+>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+>      Error *local_err = NULL;
+>  
+> @@ -1943,8 +1942,9 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>          goto out;
+>      }
+>  
+> -    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
+> -    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &error_abort);
+> +    hotplug_handler_plug(HOTPLUG_HANDLER(vms->acpi_dev),
+> +                         dev, &error_abort);
+> +
+>  out:
+>      error_propagate(errp, local_err);
+>  }
 
 
