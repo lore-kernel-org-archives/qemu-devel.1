@@ -3,73 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 358E2C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 05:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4181DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 06:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ADD62075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 05:11:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ADD62075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mentor.com
+	by mail.kernel.org (Postfix) with ESMTPS id 156942075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 06:34:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 156942075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irxQw-0008Dr-2T
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 00:11:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60983)
+	id 1iryjr-0007Vk-Df
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 01:34:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43429)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Harish_Kandiga@mentor.com>) id 1irxQ8-0007iX-W6
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 00:10:18 -0500
+ (envelope-from <benh@kernel.crashing.org>) id 1iryjF-0006Ul-KU
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Harish_Kandiga@mentor.com>) id 1irxQ6-0003gJ-HV
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 00:10:16 -0500
-Received: from esa3.mentor.iphmx.com ([68.232.137.180]:3690)
+ (envelope-from <benh@kernel.crashing.org>) id 1iryjE-00075G-L1
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:34:05 -0500
+Received: from kernel.crashing.org ([76.164.61.194]:55218)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Harish_Kandiga@mentor.com>)
- id 1irxQ6-0003as-7K
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 00:10:14 -0500
-IronPort-SDR: X7MUc0ciqpeXAvdUSfpLDHAYzWQcEt+IB82eyJNdk2PnKA5v1NCCMvopXasepsqLBBOxWY9UA9
- kWTcgVs7sdrVhEKqYQrKTXl3E1DubaakfeYHzbsHlm0eAqfmUmEXo7OG/370k0Wpm4Yuh3x86P
- Io44T8WRs2QNU8BfiO40kmXXZRSQMvJgiU1Lt28wNUADg/vGXGyNbPeIjLArVwAW+PVIqjYpFG
- YOww9eLGxl05cqCBquYmMiiU9bAkeIc7THUEvwZQiaiochGSB1Kc+d//xHQax4rz3fBvsZ1L//
- CL4=
-X-IronPort-AV: E=Sophos;i="5.70,325,1574150400"; d="scan'208";a="44919887"
-Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
- by esa3.mentor.iphmx.com with ESMTP; 15 Jan 2020 21:10:10 -0800
-IronPort-SDR: CHHfjXsW/HCOjvakfqh9V09To9kzoQTZOG4Rcz17cazoVVdFgLqd3Hm7/2PrOdBpfxeRRbAU/a
- tyu49+9J2KA96RnqRs33qh5KKl3ZGAIhlW6qFvMSyJLtyTqKy/+emp9dROwp3CW8EpNe6ALtH0
- SARCIu3JMQjkMDnmMial2ExZ+SGnCclmQ57YnlJnQFubmsCxQCTv0aZdDgWmw0eXaiFs0NtnTV
- TpcfPnhsiFcu1Y3MKfOPf8c8sojt2X1/cucTpepI+k7iCGMoerw/G6jfPzaVLRe/MXAD4Ff9fQ
- Ac8=
-Subject: Re: [PATCH v3 4/7] dt-bindings: gpio: Add gpio-repeater bindings
-From: Harish Jenny K N <harish_kandiga@mentor.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>, Rob Herring <robh@kernel.org>
-References: <20191127084253.16356-1-geert+renesas@glider.be>
- <20191127084253.16356-5-geert+renesas@glider.be>
- <20191205210653.GA29969@bogus>
- <CAMuHMdXKPC7-XaezodwL1Dhvke6PUVSZEbvN-sm3Uh6T61qbhQ@mail.gmail.com>
- <CAL_JsqJLJPSYroX0mbBUpgWPV0oEvKEUNC-VZt4XFDF8tLuNFA@mail.gmail.com>
- <CAMuHMdXOJSZUDmn8aeTynN0TKCS5hJR+uMSinOmgbmA8YmsQjw@mail.gmail.com>
- <bb5fb539-0d0d-6356-35c2-8ba47cb9fcbf@mentor.com>
-Message-ID: <4dccaf48-c652-a5f4-49f3-ccc279d5548e@mentor.com>
-Date: Thu, 16 Jan 2020 10:39:50 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <bb5fb539-0d0d-6356-35c2-8ba47cb9fcbf@mentor.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: SVR-IES-MBX-08.mgc.mentorg.com (139.181.222.8) To
- svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 68.232.137.180
+ (Exim 4.71) (envelope-from <benh@kernel.crashing.org>)
+ id 1iryjC-00071X-5g; Thu, 16 Jan 2020 01:34:02 -0500
+Received: from localhost (gate.crashing.org [63.228.1.57])
+ (authenticated bits=0)
+ by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 00G6XiWk027019
+ (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+ Thu, 16 Jan 2020 00:33:48 -0600
+Message-ID: <15ba2e1f782eec69173fe9c0f85a4dcff1d57f14.camel@kernel.crashing.org>
+Subject: Re: Semihosting, arm, riscv, ppc and common code
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Date: Thu, 16 Jan 2020 17:33:41 +1100
+In-Reply-To: <87wo9tkjxz.fsf@linaro.org>
+References: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
+ <AE7841A1-B4D6-4D6D-9AFD-01C4604D7BC4@livius.net>
+ <cd9a2de94700a2781f176247131dceba690d8f31.camel@kernel.crashing.org>
+ <87sgkimkma.fsf@linaro.org>
+ <1309ca0ab6405d88cfd949c73130ad0f2af944a6.camel@kernel.crashing.org>
+ <87wo9tkjxz.fsf@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by kernel.crashing.org id
+ 00G6XiWk027019
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 76.164.61.194
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,180 +69,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
- Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE
- TREE BINDINGS" <devicetree@vger.kernel.org>, Alexander Graf <graf@amazon.com>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Eugeniu Rosca <erosca@de.adit-jv.com>
+Cc: Liviu Ionescu <ilg@livius.net>, keithp@keithp.com, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Linus,
+On Wed, 2020-01-15 at 12:01 +0000, Alex Benn=C3=A9e wrote:
+>=20
+> > There seem to be some linux-user stuff in there, I'm mostly consideri=
+ng
+> > whatever ARM does today but we can certainly extend later.
+>=20
+> Depends on if it is to be used. AFAIK the main users of arm linux user
+> are compiler test cases for M-profile CPUs.=20
 
+For microwatt I was going to implement HW support as well via JTAG
+but the user linux-user bits are less obviously useful to me.
 
-On 07/01/20 2:52 PM, Harish Jenny K N wrote:
-> On 06/01/20 1:42 PM, Geert Uytterhoeven wrote:
->> Hi Rob,
->>
->> On Fri, Dec 6, 2019 at 4:04 PM Rob Herring <robh@kernel.org> wrote:
->>> On Fri, Dec 6, 2019 at 3:17 AM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->>>> On Thu, Dec 5, 2019 at 10:06 PM Rob Herring <robh@kernel.org> wrote:
->>>>> On Wed, Nov 27, 2019 at 09:42:50AM +0100, Geert Uytterhoeven wrote:
->>>>>> Add Device Tree bindings for a GPIO repeater, with optional translation
->>>>>> of physical signal properties.  This is useful for describing explicitly
->>>>>> the presence of e.g. an inverter on a GPIO line, and was inspired by the
->>>>>> non-YAML gpio-inverter bindings by Harish Jenny K N
->>>>>> <harish_kandiga@mentor.com>[1].
->>>>>>
->>>>>> Note that this is different from a GPIO Nexus Node[2], which cannot do
->>>>>> physical signal property translation.
->>>>> It can't? Why not? The point of the passthru mask is to not do
->>>>> translation of flags, but without it you are always doing translation of
->>>>> cells.
->>>> Thanks for pushing me deeper into nexuses!
->>>> You're right, you can map from one type to another.
->>>> However, you cannot handle the "double inversion" of an ACTIVE_LOW
->>>> signal with a physical inverter added:
->>>>
->>>>         nexus: led-nexus {
->>>>                 #gpio-cells = <2>;
->>>>                 gpio-map = <0 0 &gpio2 19 GPIO_ACTIVE_LOW>,     // inverted
->>>>                            <1 0 &gpio2 20 GPIO_ACTIVE_HIGH>,    // noninverted
->>>>                            <2 0 &gpio2 21 GPIO_ACTIVE_LOW>;     // inverted
->>>>                 gpio-map-mask = <3 0>;
->>>>                 // default gpio-map-pass-thru = <0 0>;
->>>>         };
->>>>
->>>>         leds {
->>>>                 compatible = "gpio-leds";
->>>>                 led6-inverted {
->>>>                         gpios = <&nexus 0 GPIO_ACTIVE_HIGH>;
->>>>                 };
->>>>                 led7-noninverted {
->>>>                         gpios = <&nexus 1 GPIO_ACTIVE_HIGH>;
->>>>                 };
->>>>                 led8-double-inverted {  // FAILS: still inverted
->>>>                         gpios = <&nexus 2 GPIO_ACTIVE_LOW>;
->>>>                 };
->>>>         };
->>>>
->>>> It "works" if the last entry in gpio-map is changed to GPIO_ACTIVE_HIGH.
->>>> Still, the consumer would see the final translated polarity, and not the
->>>> actual one it needs to program the consumer for.
->>> I'm not really following. Why isn't a double inversion just the same
->>> as no inversion?
->> Because the nexus can only mask and/or substitute bits.
->> It cannot do a XOR operation on the GPIO flags.
->>
->>>>>> While an inverter can be described implicitly by exchanging the
->>>>>> GPIO_ACTIVE_HIGH and GPIO_ACTIVE_LOW flags, this has its limitations.
->>>>>> Each GPIO line has only a single GPIO_ACTIVE_* flag, but applies to both
->>>>>> th provider and consumer sides:
->>>>>>   1. The GPIO provider (controller) looks at the flags to know the
->>>>>>      polarity, so it can translate between logical (active/not active)
->>>>>>      and physical (high/low) signal levels.
->>>>>>   2. While the signal polarity is usually fixed on the GPIO consumer
->>>>>>      side (e.g. an LED is tied to either the supply voltage or GND),
->>>>>>      it may be configurable on some devices, and both sides need to
->>>>>>      agree.  Hence the GPIO_ACTIVE_* flag as seen by the consumer must
->>>>>>      match the actual polarity.
->>>>>>      There exists a similar issue with interrupt flags, where both the
->>>>>>      interrupt controller and the device generating the interrupt need
->>>>>>      to agree, which breaks in the presence of a physical inverter not
->>>>>>      described in DT (see e.g. [3]).
->>>>> Adding an inverted flag as I've suggested would also solve this issue.
->>>> As per your suggestion in "Re: [PATCH V4 2/2] gpio: inverter: document
->>>> the inverter bindings"?
->>>> https://lore.kernel.org/linux-devicetree/CAL_JsqLp___2O-naU+2PPQy0QmJX6+aN3hByz-OB9+qFvWgN9Q@mail.gmail.com/
->>>>
->>>> Oh, now I understand. I was misguided by Harish' interpretation
->>>> https://lore.kernel.org/linux-devicetree/dde73334-a26d-b53f-6b97-4101c1cdc185@mentor.com/
->>>> which assumed an "inverted" property, e.g.
->>>>
->>>>     inverted = /bits/ 8 <0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0>;
->>>>
->>>> But you actually meant a new GPIO_INVERTED flag, to be ORed into the 2nd
->>>> cell of a GPIO specifier? I.e. add to include/dt-bindings/gpio/gpio.h"
->>>>
->>>>     /* Bit 6 expresses the presence of a physical inverter */
->>>>     #define GPIO_INVERTED 64
->>> Exactly.
->> OK, makes sense.
->
-> The reason I went for "inverted" property is because, we can specify this for gpios at provider side.
->
-> The usecase needed to define the polarity which did not have kernel space consumer driver.
->
->
-> I am not sure how do we achieve this using GPIO_INVERTED flag. We need some sort of node/gpio-hog to specify these
->
-> type of properties? Otherwise gpio-pin will be held by kernel or the module using the hog property and the user space application will not be able to access pin.
->
->
-> or please let me know if I am missing something.
->
->
->>>> We need to be very careful in defining to which side the GPIO_ACTIVE_*
->>>> applies to (consumer?), and which side the GPIO_INVERTED flag (provider?).
->>>> Still, this doesn't help if e.g. a FET is used instead of a push-pull
->>>> inverter, as the former needs translation of other flags (which the
->>>> nexus can do, the caveats above still applies, though).
->>> Yes. Historically the cells values are meaningful to the provider and
->>> opaque to the consumer. Standardized cell values changes that
->>> somewhat. I think we want the active flag to be from the provider's
->>> prospective because the provider always needs to know. The consumer
->>> often doesn't need to know. That also means things work without the
->>> GPIO_INVERTED flag if the consumer doesn't care which is what we have
->>> today already and we can't go back in time.
->>>
-> Things will work without GPIO_INVERTED flag for consumers which can specify GPIO_ACTIVE_* flags.
->
->
->
->>>> Same for adding IRQ_TYPE_INVERTED.
->>> I suppose so, yes.
->>>
->>>> Related issue: how to handle physical inverters on SPI chip select lines,
->>>> if the SPI slave can be configured for both polarities?
->>> Good question. Perhaps in a different way because we have to handle
->>> both h/w controlled and gpio chip selects.
->>>
->>> However, how would one configure the polarity in the device in the
->>> first place? You have to assert the CS first to give a command to
->>> reprogram it.
->> That's indeed true for a simple SPI slave.
->> But if it is a smarter device (e.g. a generic micro controller), it may use the
->> system's DTB to configure itself.
->>
->> Gr{oetje,eeting}s,
->>
->>                         Geert
->>
+That said, most of that code can trivially be made arch neutral by
+replacing the use of the arch specific CPU type with CPUState as
+the first argument to most functions. There are only a handful of arch
+specific helpers needed from there to extract the op & arg, set the
+result etc..
 
+> > The idea is to make sure ARM, RiscV and POWER use the same protocol a=
+nd
+> > code base to make picolibc (and others) life easier. Bug compatible
+> > :-)
+>=20
+> Hmm, I'm not so sure. QEMU tries to emulate real HW although I
+> appreciate that is a somewhat loose definition once you get to things
+> like -M virt and other such SW like abstractions. Is semihosting even
+> going to be a thing on real RiscV/Power silicon?
 
-Can you please let me know your inputs on this ?
+It will be on microwatt once I add support for it. We could probably
+make it work on real power9 if the systems give access to the external
+debug facilities of the processor as well. I'm no longer involved with
+powerpc in a professional capacity but I can ask Anton or Paul to help
+there.
 
+Cheers,
+Ben.
 
-Now that Geert has sent v4 patch of GPIO Aggregator by "Dropping controversial GPIO repeater", I do not see the above mentioned inverter usecase can be handled anymore.
-
-
-Is the observation/patch submitted in https://lore.kernel.org/linux-devicetree/dde73334-a26d-b53f-6b97-4101c1cdc185@mentor.com/ still not acceptable?
-
-
-
-Thanks,
-
-Harish
 
 
