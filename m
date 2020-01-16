@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33AAAC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 06:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E4FC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 06:46:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0302C2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 06:36:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0302C2075B
+	by mail.kernel.org (Postfix) with ESMTPS id 7B52A206D9
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 06:46:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B52A206D9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irylX-0000Mg-7D
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 01:36:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43524)
+	id 1iryvc-0004Cj-J1
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 01:46:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iryki-0008NA-91
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:35:37 -0500
+ (envelope-from <bounces@canonical.com>) id 1iryuk-0002ip-0G
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:46:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1irykg-0007ja-UW
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:35:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33064)
+ (envelope-from <bounces@canonical.com>) id 1iryua-0003yn-TK
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:45:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34580)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1irykg-0007ii-OY
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:35:34 -0500
+ id 1iryuZ-0003xB-D3
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 01:45:47 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1irykf-00032K-Go
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 06:35:33 +0000
+ id 1iryuY-0003uG-3E
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 06:45:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7955A2E8042
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 06:35:33 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 175D62E80C0
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 06:45:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Jan 2020 06:25:30 -0000
-From: JS <1859916@bugs.launchpad.net>
+Date: Thu, 16 Jan 2020 06:34:37 -0000
+From: JS <1859920@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -54,15 +54,15 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: js1943
 X-Launchpad-Bug-Reporter: JS (js1943)
 X-Launchpad-Bug-Modifier: JS (js1943)
-Message-Id: <157915593050.14807.16939354364023930380.malonedeb@wampee.canonical.com>
-Subject: [Bug 1859916] [NEW] coreaudio not working on MacOS
+Message-Id: <157915647770.15306.7117337280333115892.malonedeb@wampee.canonical.com>
+Subject: [Bug 1859920] [NEW] daemoniz not working on MacOS
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c4be049fec0ea77fccb6b84f9809d63a388651fa
+X-Launchpad-Hash: c1436278af91eec48ee9a48cbef29a5d62561e03
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -76,7 +76,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859916 <1859916@bugs.launchpad.net>
+Reply-To: Bug 1859920 <1859920@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -84,16 +84,15 @@ Sender: "Qemu-devel"
 Public bug reported:
 
 OS: MacOS Catalina 10.15.2
+Qemu install via brew: brew install qemu
 
 qemu-system-x86_64 -version
 QEMU emulator version 4.2.50 (v4.2.0-13-g084a398bf8-dirty)
 Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
 
-Qemu install via brew: brew install qemu
-
 ---
 
-I use following to install Ubuntu 18.04 desktop successfully:-
+Start Ubuntu Desktop 18.04 client as follow:
 
 IMG_CD=3D$HOME/Downloads/iso/ubuntu-18.04.3-desktop-amd64.iso
 IMG_FILE=3D$HOME/code/vm/qemu/u64d01.qcow2
@@ -123,21 +122,20 @@ qemu-system-x86_64 \
 -device hda-output,id=3Dsnd-codec0,bus=3Dsnd.0,cad=3D0,audiodev=3Dsnd0 \
 -audiodev coreaudio,id=3Dsnd0,out.buffer-count=3D10000 \
 \
--cdrom $IMG_CD
+-daemonize
 
-Removing the last -cdrom line Ubuntu desktop boot up and everything work
-perfectly except the audio.
+Give following error:
 
-I test with wav audio driver by replacing the -audiodev line as follow,
-which save the client audio to a wave file, like below and it work
-perfectly:
+objc[3432]: +[NSNumber initialize] may have been in progress in another thr=
+ead when fork() was called.
+objc[3432]: +[NSNumber initialize] may have been in progress in another thr=
+ead when fork() was called. We cannot safely call it or ignore it in the fo=
+rk() child process. Crashing instead. Set a breakpoint on objc_initializeAf=
+terForkError to debug.
 
--audiodev wav,id=3Dsnd0,path=3D$HOME/qemu.wav
 
-I start the vm, open firefox and play a few video, then shutdown the vm.
-Then I can play the qemu.wav file and all the audio was recorded there.
-
-However, I can't get audio directly with coreaudio.
+I checked "ps -ef|grep qemu" before and after the command, there was no qem=
+u process running.
 
 ** Affects: qemu
      Importance: Undecided
@@ -147,26 +145,25 @@ However, I can't get audio directly with coreaudio.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859916
+https://bugs.launchpad.net/bugs/1859920
 
 Title:
-  coreaudio not working on MacOS
+  daemoniz not working on MacOS
 
 Status in QEMU:
   New
 
 Bug description:
   OS: MacOS Catalina 10.15.2
+  Qemu install via brew: brew install qemu
 
   qemu-system-x86_64 -version
   QEMU emulator version 4.2.50 (v4.2.0-13-g084a398bf8-dirty)
   Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
 
-  Qemu install via brew: brew install qemu
-
   ---
 
-  I use following to install Ubuntu 18.04 desktop successfully:-
+  Start Ubuntu Desktop 18.04 client as follow:
 
   IMG_CD=3D$HOME/Downloads/iso/ubuntu-18.04.3-desktop-amd64.iso
   IMG_FILE=3D$HOME/code/vm/qemu/u64d01.qcow2
@@ -196,23 +193,22 @@ p::2222-:22 \
   -device hda-output,id=3Dsnd-codec0,bus=3Dsnd.0,cad=3D0,audiodev=3Dsnd0 \
   -audiodev coreaudio,id=3Dsnd0,out.buffer-count=3D10000 \
   \
-  -cdrom $IMG_CD
+  -daemonize
 
-  Removing the last -cdrom line Ubuntu desktop boot up and everything
-  work perfectly except the audio.
+  Give following error:
 
-  I test with wav audio driver by replacing the -audiodev line as
-  follow, which save the client audio to a wave file, like below and it
-  work perfectly:
+  objc[3432]: +[NSNumber initialize] may have been in progress in another t=
+hread when fork() was called.
+  objc[3432]: +[NSNumber initialize] may have been in progress in another t=
+hread when fork() was called. We cannot safely call it or ignore it in the =
+fork() child process. Crashing instead. Set a breakpoint on objc_initialize=
+AfterForkError to debug.
 
-  -audiodev wav,id=3Dsnd0,path=3D$HOME/qemu.wav
+  =
 
-  I start the vm, open firefox and play a few video, then shutdown the
-  vm. Then I can play the qemu.wav file and all the audio was recorded
-  there.
-
-  However, I can't get audio directly with coreaudio.
+  I checked "ps -ef|grep qemu" before and after the command, there was no q=
+emu process running.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859916/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1859920/+subscriptions
 
