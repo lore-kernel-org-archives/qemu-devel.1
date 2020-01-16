@@ -2,80 +2,69 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D09C33CB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E34C33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:55:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C150621582
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:53:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ze19MaB/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C150621582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 092612467C
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:55:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 092612467C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is8OZ-000209-S2
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:53:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46821)
+	id 1is8QE-0003G9-4t
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:55:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1is8Fh-0005Ac-Hs
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:44:14 -0500
+ (envelope-from <laurent@vivier.eu>) id 1is8PV-0002ox-Qn
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:54:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1is8Fg-0000G6-DJ
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:44:13 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43870)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1is8Fg-0000F0-7R
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:44:12 -0500
-Received: by mail-oi1-x243.google.com with SMTP id p125so19413029oif.10
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 08:44:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nbt9ZpWqqdD6vIQRKy1qyLMQca6b/HxDSA+FsokmcTw=;
- b=Ze19MaB/y1XsL4yRJAYS7+aOJ29PUXv+3+2hmEqRDnag03+g1ye3cgUk7xQcL0z7Pf
- TlNX68znKCEYKCfow5hxU6VaTzw1i6KdPA/nB9h2H2P8z8BO0CncLNsMvxjdPU8QI0Cu
- AWKu15pI+kuTXZKA9AJtmfk6xPJIOrxvOsMA+ATDNwHDvqT8BxqsAN1uo0ANE/q6gWzY
- ANkjYzCzeq7V/JsFD8tay9ko/THXZO6gxV8rxKD4BZ1Jp+dISbjr1Sn9LfpfCZK3E1Pu
- 7gXzmonJl+xa8QW281fmbxr9EhWik8NrHPvDiIkmm8AxdxGUfP6Ffg2qpDOtLbCI5RO0
- Ii5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nbt9ZpWqqdD6vIQRKy1qyLMQca6b/HxDSA+FsokmcTw=;
- b=gc5J7XzAtZCSnSbrhmDoNuuSvw1afaNRB2mDbaQE6Rvli7OwPOcgVdxQKElfJssjwv
- XvVXPHCTwya/WYoX444oAVd/rULXSwxRWdWrnhTo+0u0bkWXUejcTWQS/vDWAH3RDYiJ
- elUnMtp97W1S5RV3gnRO8gv3NAhMaG7sXf+1BdVtiLyN9jKRJzx5wklstiABUfXRwj2x
- uIFpac6FnEaH2UzD5aPk+0kN2z/FEwRhTwMFljUOEfm4JDQWQbTQr/M84QMDqX4CO5XN
- bWstEgFeLP1FqgDBQEjo4eF6u/koMz1SOO0TPTfMnw78+ZnaUSLfBERoZVPMgoi1Cn6r
- PrfA==
-X-Gm-Message-State: APjAAAWGmjy6OyFAubLg2SPe48Uur3B2qzLFGPBchHSQdoKczl16BWll
- SRlnuoigPDCiSoQU9sJZa05MnsheXLNoS6VHnBk7IA==
-X-Google-Smtp-Source: APXvYqy2Ea0ZSpaXvRx0kSDWa4cAPhZR203J8lHCxJ4EET5zN+o2QBNrDh+pFMTnItNoG/JnqzuXjV62Cr3+/XULQqo=
-X-Received: by 2002:aca:d78b:: with SMTP id o133mr4860165oig.163.1579193051335; 
- Thu, 16 Jan 2020 08:44:11 -0800 (PST)
+ (envelope-from <laurent@vivier.eu>) id 1is8PR-0000ci-T5
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:54:21 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:58801)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1is8PR-0000bk-JO
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:54:17 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MqK6l-1jNdey2JMZ-00nQdW; Thu, 16 Jan 2020 17:54:11 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] m68k: Fix regression causing Single-Step via GDB/RSP to
+ not single step
+Date: Thu, 16 Jan 2020 17:54:10 +0100
+Message-Id: <20200116165410.2076012-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
-In-Reply-To: <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Jan 2020 16:44:00 +0000
-Message-ID: <CAFEAcA9z9KDHmvh6WsrCPj_FTvNmOfhatxNQDftNG+ZKZN0wAA@mail.gmail.com>
-Subject: Re: [PATCH v22 5/9] ACPI: Record the Generic Error Status Block
- address
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Wni8AbMesIINrO+TEM6raf3K+aRP38wOKuwnqyEMaxQtbGh8Mm5
+ 309PsLNqKmjkuY9/tdjOrSrtphdOKSteXfT1tgYmasprtSHCHRQJOuRYG5CVQyy4mjsZd/j
+ 7M10MlFg+YSmax3aBfULjp659V1JUF5o11Il/X3KjJ8cJZkYmYqQsdam9VNowm5qzeoZ8vM
+ WEXz7uGwxaf4cdO4r7n9A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:GGVtj4xCsGs=:7gbu4KYtD2o+RWWoOrAj+M
+ 9cY0+eiIJBnxfaMX8jEj1O3UmnYxeyX0VqIhLzMC9ayN0+OpzAg2e78+cb6ukz+voyt6keKBg
+ F5s33DizPW3ZQv1u4FITbuMLe6v46Trleu7Fp+MpSkZ+v6umCMW5ZV9Lbh/zo17MHr/A4SMfC
+ u0hg3gudD3uyW0XeU7G0axQhBECDw2oMf6eoPKhHcJEx1sx2mICsr7URfvV7y8exhREwYieAc
+ GJC0h9dd9BD9QGzze+LE/lBhgBr1J7pbYKZPlbNXL2qma38SHE6nTrhE+Dc30M5dpaufWtC4Z
+ abYm8YQJwwPzXJmMec56wPMGqn1E3Z54P7Blrh0r9/QnUJ52AxHrdzLNi0MIiiEEuvfIZnAHs
+ bOkeMKq/LwAyAAC+/Cyj/pS64FZ7F0GkCT+ywKBoIAEAzGBtoqMMREF74LnO3vX9XRuMCKypW
+ 0YAIDt+aEP5W+izpONsndKAhKtgf6Gja7cfSavotRWRMkFJGWl6BFkRxJSHm1NmfiyVRFbcX3
+ BkhgKC+qw6dqCGSKogJlQkNHwd06rgBfABL0MUA2VwbnquqR7HdCrwgZT1MVfN8NgRKumKges
+ Aejhwer+GhDxKbwjoysTb3SaBaUe5cwdj6sjWJNa/T2n3jneb4eRDwDb94Df6UprjcZ1rfBHM
+ WVsKSCcuYgorTkkHh5NkpGDbU/iHeMq+NGzpSp/MZIXCag+6qk+qZ6KpIT/kYybZPMdvBY9Z0
+ enlMy2Pt+T4rvAZax/3F6EstwVSMoMgtWT6Hud8GTOVxY8AVkukK36l+OghHdl2lwIHtFTXkm
+ Iu+kpSNlEstUM/3XxyPo+GZWe+s0hhJfQPf24+DUYryfX3rCnXY2iO2lR5yiJVOlvbfQ6gbkJ
+ jPBfjVMBjL5FVaYMJ5bA==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,74 +76,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- Zheng Xiang <zhengxiang9@huawei.com>, qemu-arm <qemu-arm@nongnu.org>,
- James Morse <james.morse@arm.com>, "xuwei \(O\)" <xuwei5@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 at 11:33, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->
-> Record the GHEB address via fw_cfg file, when recording
-> a error to CPER, it will use this address to find out
-> Generic Error Data Entries and write the error.
->
-> Make the HEST GHES to a GED device.
->
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> ---
->  hw/acpi/generic_event_device.c         | 15 ++++++++++++++-
->  hw/acpi/ghes.c                         | 16 ++++++++++++++++
->  hw/arm/virt-acpi-build.c               | 13 ++++++++++++-
->  include/hw/acpi/generic_event_device.h |  2 ++
->  include/hw/acpi/ghes.h                 |  6 ++++++
->  5 files changed, 50 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 9cee90c..9bf37e4 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -234,12 +234,25 @@ static const VMStateDescription vmstate_ged_state = {
->      }
->  };
->
-> +static const VMStateDescription vmstate_ghes_state = {
-> +    .name = "acpi-ghes-state",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_UINT64(ghes_addr_le, AcpiGhesState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_acpi_ged = {
->      .name = "acpi-ged",
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .fields = (VMStateField[]) {
-> -        VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
-> +        VMSTATE_STRUCT(ged_state, AcpiGedState, 1,
-> +                       vmstate_ged_state, GEDState),
-> +        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
-> +                       vmstate_ghes_state, AcpiGhesState),
->          VMSTATE_END_OF_LIST(),
->      },
->      .subsections = (const VMStateDescription * []) {
+A regression that was introduced, with the refactor to TranslatorOps,
+drops two lines that update the PC when single-stepping is being performed.
 
-You can't just add fields to an existing VMStateDescription
-like this -- it will break migration compatibility. Instead you
-need to add a new subsection to this vmstate, with a '.needed'
-function which indicates when the subsection should be present.
+Fixes: 11ab74b01e0a ("target/m68k: Convert to TranslatorOps")
+Reported-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
+Suggested-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
 
-thanks
--- PMM
+Notes:
+    v3: introduce gen_raise_exception() (Richard)
+    
+    v2: update patch from Lucien with changes from Richard
+        update subject to prefix it with "m68k:"
+        rebase
+
+ target/m68k/translate.c | 42 ++++++++++++++++++++++++++---------------
+ 1 file changed, 27 insertions(+), 15 deletions(-)
+
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index fcdb7bc8e4..16fae5ac9e 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -289,16 +289,21 @@ static void gen_jmp(DisasContext *s, TCGv dest)
+     s->base.is_jmp = DISAS_JUMP;
+ }
+ 
+-static void gen_exception(DisasContext *s, uint32_t dest, int nr)
++static void gen_raise_exception(int nr)
+ {
+     TCGv_i32 tmp;
+ 
+-    update_cc_op(s);
+-    tcg_gen_movi_i32(QREG_PC, dest);
+-
+     tmp = tcg_const_i32(nr);
+     gen_helper_raise_exception(cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
++}
++
++static void gen_exception(DisasContext *s, uint32_t dest, int nr)
++{
++    update_cc_op(s);
++    tcg_gen_movi_i32(QREG_PC, dest);
++
++    gen_raise_exception(nr);
+ 
+     s->base.is_jmp = DISAS_NORETURN;
+ }
+@@ -6198,29 +6203,36 @@ static void m68k_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+ 
+-    if (dc->base.is_jmp == DISAS_NORETURN) {
+-        return;
+-    }
+-    if (dc->base.singlestep_enabled) {
+-        gen_helper_raise_exception(cpu_env, tcg_const_i32(EXCP_DEBUG));
+-        return;
+-    }
+-
+     switch (dc->base.is_jmp) {
++    case DISAS_NORETURN:
++        break;
+     case DISAS_TOO_MANY:
+         update_cc_op(dc);
+-        gen_jmp_tb(dc, 0, dc->pc);
++        if (dc->base.singlestep_enabled) {
++            tcg_gen_movi_i32(QREG_PC, dc->pc);
++            gen_raise_exception(EXCP_DEBUG);
++        } else {
++            gen_jmp_tb(dc, 0, dc->pc);
++        }
+         break;
+     case DISAS_JUMP:
+         /* We updated CC_OP and PC in gen_jmp/gen_jmp_im.  */
+-        tcg_gen_lookup_and_goto_ptr();
++        if (dc->base.singlestep_enabled) {
++            gen_raise_exception(EXCP_DEBUG);
++        } else {
++            tcg_gen_lookup_and_goto_ptr();
++        }
+         break;
+     case DISAS_EXIT:
+         /*
+          * We updated CC_OP and PC in gen_exit_tb, but also modified
+          * other state that may require returning to the main loop.
+          */
+-        tcg_gen_exit_tb(NULL, 0);
++        if (dc->base.singlestep_enabled) {
++            gen_raise_exception(EXCP_DEBUG);
++        } else {
++            tcg_gen_exit_tb(NULL, 0);
++        }
+         break;
+     default:
+         g_assert_not_reached();
+-- 
+2.24.1
+
 
