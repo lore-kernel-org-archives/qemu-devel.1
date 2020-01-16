@@ -7,95 +7,95 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C1FC32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF7DC32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:07:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3AE52081E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:07:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30B2D2081E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 02:07:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxRzt4QR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3AE52081E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDcHvnX1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30B2D2081E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iruZY-0003EZ-Q7
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 21:07:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42030)
+	id 1iruZb-0003Ix-4A
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 21:07:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iruXd-0000hH-RM
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:05:52 -0500
+ (envelope-from <philmd@redhat.com>) id 1iruVO-0006dx-5e
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:03:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iruXb-0002Ps-FG
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:05:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28511
+ (envelope-from <philmd@redhat.com>) id 1iruVL-0008Ku-Eb
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:03:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36700
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iruXb-0002Pc-Bj
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:05:47 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iruVL-0008Kd-AV
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 21:03:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579140347;
+ s=mimecast20190719; t=1579140206;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ju8sALBC7a/8+LxQjUeUVX8WJegzsZ7RS9n2mNvylRE=;
- b=TxRzt4QRDAbr2qvWImIll0oPM3mlyTNe/F2gv8CF5+8ugEDF0QdoiH/2Xfqn0wyZnbr1vi
- vtRkGsjI4Bt7QOSFCQ5LnhbizOpuucZuAUpuV/G7OrftVHL2VOE1Z5TEgfiocQB6mKEIdV
- CTDR6iQwPYaq2rHTWz6Cl21FMHg3h+o=
+ bh=Pb7NxdrKtl1ZsmZy9UDKj9StA4/BB8DZ6pa+tqNMLZ0=;
+ b=EDcHvnX1h6nGSWsmcM9GQYTAwmJ2OQGxW/tI3IUx7ekc/Ew7E7Xop1XqCMShpW7QiOT7LS
+ lA6acM110xHJNyCIOEc5sUF+lMr5bAExyT5ZpHgPbKmSCpW8Z6IxlC2vbv8eGTrhEaYbUU
+ vca3OTb77i/Kog9RGMHxpSLlZlZy4TQ=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-mpJsfZ9pM_Gmy387yddMSA-1; Wed, 15 Jan 2020 21:05:44 -0500
-Received: by mail-wr1-f70.google.com with SMTP id u12so8671488wrt.15
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 18:05:44 -0800 (PST)
+ us-mta-292-7iSVMgdSPjajJB7ttkZmPw-1; Wed, 15 Jan 2020 21:03:23 -0500
+Received: by mail-wr1-f70.google.com with SMTP id j13so8636327wrr.20
+ for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 18:03:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Twoj1AAB72O/56W4q6C4e/wUA7Ex0j39DYbw33DZHl0=;
- b=GajOPdIFsNZekcYO+TFeq+kUWOxJfJs/i62Ce1DmTJo6gW4qfqH8NA9P4rWe0Qmf1s
- oabbQc+arfN1r9jbykkQ/jvu7YLq7XZ1PdCzdF8wwkPL5NPl3UyBry0vABztfAWM5bv9
- Vs0nVAEYnjD+BgNwFMldZGgf08Xar0GtwN7UBaZhLGm2IbvrGdSVmjlsArX8TGx2JdKz
- nL2baQTCFkR0pPJAY6Fpp0bHI+49RREe/RitRTsa81kQRJGCCa/7ln0Q+2zFRyo/Q/Po
- tfP/oI9c3BZ6yzDrYyGf79lmqFdf9MOpjCna4DRcBtfTBlLzsY+6VL10nDASZXpEprXD
- 3oGA==
-X-Gm-Message-State: APjAAAV13MTfwRtuT3n4309NXkHEdgwG950lHk3+yMIUgqbBHapXka9Y
- s6cQ7z/XMWkEyp154WVP+EzcgRkn3nbG+pbhLeL6OP0qx6c0efYj9jwRFVpnpBEV4F9XWpy4NAf
- mBeKybX/flO0hDe8=
-X-Received: by 2002:adf:ce87:: with SMTP id r7mr313815wrn.245.1579140343311;
- Wed, 15 Jan 2020 18:05:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxlPHSEw16IFHssTBf/MRNH5mS5cEbdRhAsSwzB5O4dZc/1CCnltxYF1BJxLaPLS8zGojerOQ==
-X-Received: by 2002:adf:ce87:: with SMTP id r7mr313798wrn.245.1579140343054;
- Wed, 15 Jan 2020 18:05:43 -0800 (PST)
+ bh=+q5CnnkjTvAUmDhTO7IIXQSFEqmScXvfdRulcwshp0k=;
+ b=A3lfpePkSmie2YPr6UbWm+TEZqcFsLa3EV+nPPmcNiAhIUGsrm/bogK2QUf9fe1H4R
+ nNwIp1YkXpXc5RP7uz7nHdxLQuDqbwNxAGqKEIW2Ofd5I60/XPf9WUvDPTdS4IUd4B1B
+ mBOuhN91KmGtdQFID1JjvLc3HTAjdAnlKOrIv63pyM3KbldwWaKRdtPHeRKP1CPoI3DM
+ JOWdUSYf/orH7Dl5PLPwS422NTp0bc+n5+0LNn7vML4Cr1cn475xmwz40VCcdyAyhP/0
+ kIlrG7SElIHi/VQfyjdKOFZatjQusTw+WaCiXe8BjNpznMAUEstJDqNRc0KMuppYpnrf
+ 2kUQ==
+X-Gm-Message-State: APjAAAWPB/3kgtWomp9ieDdow0WnXODqaA0Y6s+GDaYc/R5q5zUao0x3
+ kPHL+lqfi/aapZc0HJ6qTbvWbSA0b+k1gSe9NUjGWZhkB8mohFtqA3++P3yrrOcrhPw7a2pDSLa
+ andK9a5I+vmg5k4g=
+X-Received: by 2002:a7b:cd07:: with SMTP id f7mr3135022wmj.37.1579140202250;
+ Wed, 15 Jan 2020 18:03:22 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwXQrXQyhqK/0RonLKwNKigClNNNdF9OajuIDq11whyuJFdAdqelLz36T0Rx7g3BfpChfBkfQ==
+X-Received: by 2002:a7b:cd07:: with SMTP id f7mr3134986wmj.37.1579140201867;
+ Wed, 15 Jan 2020 18:03:21 -0800 (PST)
 Received: from [192.168.1.24] (lfbn-mon-1-1519-115.w92-167.abo.wanadoo.fr.
  [92.167.83.115])
- by smtp.gmail.com with ESMTPSA id c5sm2470232wmb.9.2020.01.15.18.05.41
+ by smtp.gmail.com with ESMTPSA id m7sm1823282wma.39.2020.01.15.18.03.20
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Jan 2020 18:05:42 -0800 (PST)
-Subject: Re: [PATCH v7 06/11] hw/core/qdev: handle parent bus change regarding
- resettable
+ Wed, 15 Jan 2020 18:03:21 -0800 (PST)
+Subject: Re: [PATCH v7 04/11] hw/core: add Resettable support to BusClass and
+ DeviceClass
 To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
 References: <20200115123620.250132-1-damien.hedde@greensocs.com>
- <20200115123620.250132-7-damien.hedde@greensocs.com>
+ <20200115123620.250132-5-damien.hedde@greensocs.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8409ff44-d658-097e-0225-76231b4162b1@redhat.com>
-Date: Thu, 16 Jan 2020 03:05:41 +0100
+Message-ID: <1a84731f-d183-02de-19ce-62d11cd552d6@redhat.com>
+Date: Thu, 16 Jan 2020 03:02:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200115123620.250132-7-damien.hedde@greensocs.com>
+In-Reply-To: <20200115123620.250132-5-damien.hedde@greensocs.com>
 Content-Language: en-US
-X-MC-Unique: mpJsfZ9pM_Gmy387yddMSA-1
+X-MC-Unique: 7iSVMgdSPjajJB7ttkZmPw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,163 +116,417 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 1/15/20 1:36 PM, Damien Hedde wrote:
-> In qdev_set_parent_bus(), when changing the parent bus of a
-> realized device, if the source and destination buses are not in the
-> same reset state, some adaptations are required. This patch adds
-> needed call to resettable_change_parent() to make sure a device reset
-> state stays coherent with its parent bus.
+> This commit adds support of Resettable interface to buses and devices:
+> + ResettableState structure is added in the Bus/Device state
+> + Resettable methods are implemented.
+> + device/bus_is_in_reset function defined
 >=20
-> The addition is a no-op if:
-> 1. the device being parented is not realized.
-> 2. the device is realized, but both buses are not under reset.
+> This commit allows to transition the objects to the new
+> multi-phase interface without changing the reset behavior at all.
+> Object single reset method can be split into the 3 different phases
+> but the 3 phases are still executed in a row for a given object.
+>  From the qdev/qbus reset api point of view, nothing is changed.
+> qdev_reset_all() and qbus_reset_all() are not modified as well as
+> device_legacy_reset().
 >=20
-> Case 2 means that as long as qdev_set_parent_bus() is called
-> during the machine realization procedure (which is before the
-> machine reset so nothing is in reset), it is a no op.
->=20
-> There are 52 call sites of qdev_set_parent_bus(). All but one fall
-> into the no-op case:
-> + 29 trivial calls related to virtio (in hw/{s390x,display,virtio}/
->    {vhost,virtio}-xxx.c) to set a vdev(or vgpu) composing device
->    parent bus just before realizing the same vdev(vgpu).
-> + hw/core/qdev.c: when creating a device in qdev_try_create()
-> + hw/core/sysbus.c: when initializing a device in the sysbus
-> + hw/i386/amd_iommu.c: before realizing AMDVIState/pci
-> + hw/isa/piix4.c: before realizing PIIX4State/rtc
-> + hw/misc/auxbus.c: when creating an AUXBus
-> + hw/misc/auxbus.c: when creating an AUXBus child
-> + hw/misc/macio/macio.c: when initializing a MACIOState child
-> + hw/misc/macio/macio.c: before realizing NewWorldMacIOState/pmu
-> + hw/misc/macio/macio.c: before realizing NewWorldMacIOState/cuda
-> + hw/net/virtio-net.c: Used for migration when using the failover
->                         mechanism to migration a vfio-pci/net. It is
->                         a no-op because at this point the device is
->                         already on the bus.
-> + hw/pci-host/designware.c: before realizing DesignwarePCIEHost/root
-> + hw/pci-host/gpex.c: before realizing GPEXHost/root
-> + hw/pci-host/prep.c: when initializaing PREPPCIState/pci_dev
-
-typo "initializing"
-
-> + hw/pci-host/q35.c: before realizing Q35PCIHost/mch
-> + hw/pci-host/versatile.c: when initializing PCIVPBState/pci_dev
-> + hw/pci-host/xilinx-pcie.c: before realizing XilinxPCIEHost/root
-> + hw/s390x/event-facility.c: when creating SCLPEventFacility/
->                               TYPE_SCLP_QUIESCE
-> + hw/s390x/event-facility.c: ditto with SCLPEventFacility/
->                               TYPE_SCLP_CPU_HOTPLUG
-> + hw/s390x/sclp.c: Not trivial because it is called on a SLCPDevice
->    just after realizing it. Ok because at this point the destination
->    bus (sysbus) is not in reset; the realize step is before the
->    machine reset.
-> + hw/sd/core.c: Not OK. Used in sdbus_reparent_card(). See below.
-> + hw/ssi/ssi.c: Used to put spi slave on spi bus and connect the cs
->    line in ssi_auto_connect_slave(). Ok because this function is only
->    used in realize step in hw/ssi/aspeed_smc.ci, hw/ssi/imx_spi.c,
->    hw/ssi/mss-spi.c, hw/ssi/xilinx_spi.c and hw/ssi/xilinx_spips.c.
-> + hw/xen/xen-legacy-backend.c: when creating a XenLegacyDevice device
-> + qdev-monitor.c: in device hotplug creation procedure before realize
->=20
-> Note that this commit alone will have no effect, right now there is no
-> use of resettable API to reset anything. So a bus will never be tagged
-> as in-reset by this same API.
->=20
-> The one place where side-effect will occurs is in hw/sd/core.c in
-> sdbus_reparent_card(). This function is only used in the raspi machines,
-> including during the sysbus reset procedure. This case will be
-> carrefully handled when doing the multiple phase reset transition.
+> Transition of an object must be done from parent class to child class.
+> Care has been taken to allow the transition of a parent class
+> without requiring the child classes to be transitioned at the same
+> time. Note that SysBus and SysBusDevice class do not need any transition
+> because they do not override the legacy reset method.
 >=20
 > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 > ---
+>   include/hw/qdev-core.h | 27 ++++++++++++
+>   hw/core/bus.c          | 97 ++++++++++++++++++++++++++++++++++++++++++
+>   hw/core/qdev.c         | 93 ++++++++++++++++++++++++++++++++++++++++
+>   tests/Makefile.include |  1 +
+>   4 files changed, 218 insertions(+)
 >=20
-> v6 update: there are now 3 more call sites (52 instead of 49).
-> + hw/isa/piix4.c
-> + hw/net/virtio-net.c
-> + hw/virtio/vhost-user-fs-pci.c (in list below)
->=20
-> Exhaustive list of the 29 "virtio" caller to qdev_set_parent_bus():
-> + hw/display/virtio-gpu-pci.c:     VirtIOGPUPCIBase/vgpu realize
-> + hw/display/virtio-vga.c:         VirtIOVGABase/vgpu realize
-> + hw/s390x/vhost-vsock-ccw.c:      VHostVSockCCWState/vdev realize
-> + hw/s390x/virtio-ccw-9p.c:        V9fsCCWState/vdev realize
-> + hw/s390x/virtio-ccw-balloon.c:   VirtIOBalloonCcw/vdev realize
-> + hw/s390x/virtio-ccw-blk.c:       VirtIOBlkCcw/vdev realize
-> + hw/s390x/virtio-ccw-crypto.c:    VirtIOCryptoCcw/vdev realize
-> + hw/s390x/virtio-ccw-gpu.c:       VirtIOGPUCcw/vdev realize
-> + hw/s390x/virtio-ccw-input.c:     VirtIOInputCcw/vdev realize
-> + hw/s390x/virtio-ccw-net.c:       VirtIONetCcw/vdev realize
-> + hw/s390x/virtio-ccw-rng.c:       VirtIORNGCcw/vdev realize
-> + hw/s390x/virtio-ccw-scsi.c:      VirtIOSCSICcw/vdev realize
-> + hw/s390x/virtio-ccw-scsi.c:      VHostSCSICcw/vdev realize
-> + hw/s390x/virtio-ccw-serial.c:    VirtioSerialCcw/vdev realize
-> + hw/virtio/vhost-scsi-pci.c:      VHostSCSIPCI/vdev realize
-> + hw/virtio/vhost-user-blk-pci.c:  VHostUserBlkPCI/vdev realize
-> + hw/virtio/vhost-user-fs-pci.c:   VHostUserFSPCI/vdev realize
-> + hw/virtio/vhost-user-scsi-pci.c: VHostUserSCSIPCI/vdev realize
-> + hw/virtio/vhost-vsock-pci.c:     VHostVSockPCI/vdev realize
-> + hw/virtio/virtio-9p-pci.c:       V9fsPCIState/vdev realize
-> + hw/virtio/virtio-balloon-pci.c:  VirtIOBalloonPCI/vdev realize
-> + hw/virtio/virtio-blk-pci.c:      VirtIOBlkPCI/vdev realize
-> + hw/virtio/virtio-crypto-pci.c:   VirtIOCryptoPCI/vdev realize
-> + hw/virtio/virtio-input-pci.c:    VirtIOInputPCI/vdev realize
-> + hw/virtio/virtio-net-pci.c:      VirtIONetPCI/vdev realize
-> + hw/virtio/virtio-pmem-pci.c:     VirtIOPMEMPCI/vdev realize
-> + hw/virtio/virtio-rng-pci.c:      VirtIORngPCI/vdev realize
-> + hw/virtio/virtio-scsi-pci.c:     VirtIOSCSIPCI/vdev realize
-> + hw/virtio/virtio-serial-pci.c:   VirtIOSerialPCI/vdev realize
-> ---
->   hw/core/qdev.c | 16 +++++++++++-----
->   1 file changed, 11 insertions(+), 5 deletions(-)
->=20
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index b8341b0fb0..1b4b420617 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -5,6 +5,7 @@
+>   #include "qemu/bitmap.h"
+>   #include "qom/object.h"
+>   #include "hw/hotplug.h"
+> +#include "hw/resettable.h"
+>  =20
+>   enum {
+>       DEV_NVECTORS_UNSPECIFIED =3D -1,
+> @@ -117,6 +118,11 @@ typedef struct DeviceClass {
+>       bool hotpluggable;
+>  =20
+>       /* callbacks */
+> +    /*
+> +     * Reset method here is deprecated and replaced by methods in the
+> +     * resettable class interface to implement a multi-phase reset.
+> +     * TODO: remove once every reset callback is unused
+> +     */
+>       DeviceReset reset;
+>       DeviceRealize realize;
+>       DeviceUnrealize unrealize;
+> @@ -141,6 +147,7 @@ struct NamedGPIOList {
+>   /**
+>    * DeviceState:
+>    * @realized: Indicates whether the device has been fully constructed.
+> + * @reset: ResettableState for the device; handled by Resettable interfa=
+ce.
+>    *
+>    * This structure should not be accessed directly.  We declare it here
+>    * so that it can be embedded in individual device state structures.
+> @@ -163,6 +170,7 @@ struct DeviceState {
+>       int num_child_bus;
+>       int instance_id_alias;
+>       int alias_required_for_version;
+> +    ResettableState reset;
+>   };
+>  =20
+>   struct DeviceListener {
+> @@ -215,6 +223,7 @@ typedef struct BusChild {
+>   /**
+>    * BusState:
+>    * @hotplug_handler: link to a hotplug handler associated with bus.
+> + * @reset: ResettableState for the bus; handled by Resettable interface.
+>    */
+>   struct BusState {
+>       Object obj;
+> @@ -226,6 +235,7 @@ struct BusState {
+>       int num_children;
+>       QTAILQ_HEAD(, BusChild) children;
+>       QLIST_ENTRY(BusState) sibling;
+> +    ResettableState reset;
+>   };
+>  =20
+>   /**
+> @@ -412,6 +422,18 @@ void qdev_reset_all_fn(void *opaque);
+>   void qbus_reset_all(BusState *bus);
+>   void qbus_reset_all_fn(void *opaque);
+>  =20
+> +/**
+> + * device_is_in_reset:
+> + * Return true if the device @dev is currently being reset.
+> + */
+> +bool device_is_in_reset(DeviceState *dev);
+> +
+> +/**
+> + * bus_is_in_reset:
+> + * Return true if the bus @bus is currently being reset.
+> + */
+> +bool bus_is_in_reset(BusState *bus);
+> +
+>   /* This should go away once we get rid of the NULL bus hack */
+>   BusState *sysbus_get_default(void);
+>  =20
+> @@ -433,6 +455,11 @@ void qdev_machine_init(void);
+>    */
+>   void device_legacy_reset(DeviceState *dev);
+>  =20
+> +/**
+> + * device_class_set_parent_reset:
+> + * TODO: remove the function when DeviceClass's reset method
+> + * is not used anymore.
+> + */
+>   void device_class_set_parent_reset(DeviceClass *dc,
+>                                      DeviceReset dev_reset,
+>                                      DeviceReset *parent_reset);
+> diff --git a/hw/core/bus.c b/hw/core/bus.c
+> index 7f3d2a3dbd..2698f715bd 100644
+> --- a/hw/core/bus.c
+> +++ b/hw/core/bus.c
+> @@ -68,6 +68,28 @@ int qbus_walk_children(BusState *bus,
+>       return 0;
+>   }
+>  =20
+> +bool bus_is_in_reset(BusState *bus)
+> +{
+> +    return resettable_is_in_reset(OBJECT(bus));
+> +}
+> +
+> +static ResettableState *bus_get_reset_state(Object *obj)
+> +{
+> +    BusState *bus =3D BUS(obj);
+> +    return &bus->reset;
+> +}
+> +
+> +static void bus_reset_child_foreach(Object *obj, ResettableChildCallback=
+ cb,
+> +                                    void *opaque, ResetType type)
+> +{
+> +    BusState *bus =3D BUS(obj);
+> +    BusChild *kid;
+> +
+> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
+> +        cb(OBJECT(kid->child), opaque, type);
+> +    }
+> +}
+> +
+>   static void qbus_realize(BusState *bus, DeviceState *parent, const char=
+ *name)
+>   {
+>       const char *typename =3D object_get_typename(OBJECT(bus));
+> @@ -199,12 +221,83 @@ static char *default_bus_get_fw_dev_path(DeviceStat=
+e *dev)
+>       return g_strdup(object_get_typename(OBJECT(dev)));
+>   }
+>  =20
+> +/**
+> + * bus_phases_reset:
+> + * Transition reset method for buses to allow moving
+> + * smoothly from legacy reset method to multi-phases
+> + */
+> +static void bus_phases_reset(BusState *bus)
+> +{
+> +    ResettableClass *rc =3D RESETTABLE_GET_CLASS(bus);
+> +
+> +    if (rc->phases.enter) {
+> +        rc->phases.enter(OBJECT(bus), RESET_TYPE_COLD);
+> +    }
+> +    if (rc->phases.hold) {
+> +        rc->phases.hold(OBJECT(bus));
+> +    }
+> +    if (rc->phases.exit) {
+> +        rc->phases.exit(OBJECT(bus));
+> +    }
+> +}
+> +
+> +static void bus_transitional_reset(Object *obj)
+> +{
+> +    BusClass *bc =3D BUS_GET_CLASS(obj);
+> +
+> +    /*
+> +     * This will call either @bus_phases_reset (for multi-phases transit=
+ioned
+> +     * buses) or a bus's specific method for not-yet transitioned buses.
+> +     * In both case, it does not reset children.
+> +     */
+> +    if (bc->reset) {
+> +        bc->reset(BUS(obj));
+> +    }
+> +}
+> +
+> +/**
+> + * bus_get_transitional_reset:
+> + * check if the bus's class is ready for multi-phase
+> + */
+> +static ResettableTrFunction bus_get_transitional_reset(Object *obj)
+> +{
+> +    BusClass *dc =3D BUS_GET_CLASS(obj);
+> +    if (dc->reset !=3D bus_phases_reset) {
+> +        /*
+> +         * dc->reset has been overridden by a subclass,
+> +         * the bus is not ready for multi phase yet.
+> +         */
+> +        return bus_transitional_reset;
+> +    }
+> +    return NULL;
+> +}
+> +
+>   static void bus_class_init(ObjectClass *class, void *data)
+>   {
+>       BusClass *bc =3D BUS_CLASS(class);
+> +    ResettableClass *rc =3D RESETTABLE_CLASS(class);
+>  =20
+>       class->unparent =3D bus_unparent;
+>       bc->get_fw_dev_path =3D default_bus_get_fw_dev_path;
+> +
+> +    rc->get_state =3D bus_get_reset_state;
+> +    rc->child_foreach =3D bus_reset_child_foreach;
+> +
+> +    /*
+> +     * @bus_phases_reset is put as the default reset method below, allow=
+ing
+> +     * to do the multi-phase transition from base classes to leaf classe=
+s. It
+> +     * allows a legacy-reset Bus class to extend a multi-phases-reset
+> +     * Bus class for the following reason:
+> +     * + If a base class B has been moved to multi-phase, then it does n=
+ot
+> +     *   override this default reset method and may have defined phase m=
+ethods.
+> +     * + A child class C (extending class B) which uses
+> +     *   bus_class_set_parent_reset() (or similar means) to override the
+> +     *   reset method will still work as expected. @bus_phases_reset fun=
+ction
+> +     *   will be registered as the parent reset method and effectively c=
+all
+> +     *   parent reset phases.
+> +     */
+> +    bc->reset =3D bus_phases_reset;
+> +    rc->get_transitional_function =3D bus_get_transitional_reset;
+>   }
+>  =20
+>   static void qbus_finalize(Object *obj)
+> @@ -223,6 +316,10 @@ static const TypeInfo bus_info =3D {
+>       .instance_init =3D qbus_initfn,
+>       .instance_finalize =3D qbus_finalize,
+>       .class_init =3D bus_class_init,
+> +    .interfaces =3D (InterfaceInfo[]) {
+> +        { TYPE_RESETTABLE_INTERFACE },
+> +        { }
+> +    },
+>   };
+>  =20
+>   static void bus_register_types(void)
 > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index d431a020fc..310b87e25a 100644
+> index 5cb03136b5..d431a020fc 100644
 > --- a/hw/core/qdev.c
 > +++ b/hw/core/qdev.c
-> @@ -96,25 +96,31 @@ static void bus_add_child(BusState *bus, DeviceState =
-*child)
->  =20
->   void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
->   {
-> -    bool replugging =3D dev->parent_bus !=3D NULL;
-> +    BusState *old_parent_bus =3D dev->parent_bus;
->  =20
-> -    if (replugging) {
-> +    if (old_parent_bus) {
->           trace_qdev_update_parent_bus(dev, object_get_typename(OBJECT(de=
-v)),
-> -            dev->parent_bus, object_get_typename(OBJECT(dev->parent_bus)=
-),
-> +            old_parent_bus, object_get_typename(OBJECT(old_parent_bus)),
->               OBJECT(bus), object_get_typename(OBJECT(bus)));
->           /*
->            * Keep a reference to the device while it's not plugged into
->            * any bus, to avoid it potentially evaporating when it is
->            * dereffed in bus_remove_child().
-> +         * Also keep the ref of the parent bus until the end, so that
-> +         * we can safely call resettable_change_parent() below.
->            */
->           object_ref(OBJECT(dev));
->           bus_remove_child(dev->parent_bus, dev);
-> -        object_unref(OBJECT(dev->parent_bus));
->       }
->       dev->parent_bus =3D bus;
->       object_ref(OBJECT(bus));
->       bus_add_child(bus, dev);
-> -    if (replugging) {
-> +    if (dev->realized) {
-> +        resettable_change_parent(OBJECT(dev), OBJECT(bus),
-> +                                 OBJECT(old_parent_bus));
-> +    }
-> +    if (old_parent_bus) {
-> +        object_unref(OBJECT(old_parent_bus));
->           object_unref(OBJECT(dev));
->       }
+> @@ -355,6 +355,28 @@ void qbus_reset_all_fn(void *opaque)
+>       qbus_reset_all(bus);
 >   }
+>  =20
+> +bool device_is_in_reset(DeviceState *dev)
+> +{
+> +    return resettable_is_in_reset(OBJECT(dev));
+> +}
+> +
+> +static ResettableState *device_get_reset_state(Object *obj)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    return &dev->reset;
+> +}
+> +
+> +static void device_reset_child_foreach(Object *obj, ResettableChildCallb=
+ack cb,
+> +                                       void *opaque, ResetType type)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    BusState *bus;
+> +
+> +    QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+> +        cb(OBJECT(bus), opaque, type);
+> +    }
+> +}
+> +
+>   /* can be used as ->unplug() callback for the simple cases */
+>   void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+>                                     DeviceState *dev, Error **errp)
+> @@ -1107,10 +1129,62 @@ device_vmstate_if_get_id(VMStateIf *obj)
+>       return qdev_get_dev_path(dev);
+>   }
+>  =20
+> +/**
+> + * device_phases_reset:
+> + * Transition reset method for devices to allow moving
+> + * smoothly from legacy reset method to multi-phases
+> + */
+> +static void device_phases_reset(DeviceState *dev)
+> +{
+> +    ResettableClass *rc =3D RESETTABLE_GET_CLASS(dev);
+> +
+> +    if (rc->phases.enter) {
+> +        rc->phases.enter(OBJECT(dev), RESET_TYPE_COLD);
+> +    }
+> +    if (rc->phases.hold) {
+> +        rc->phases.hold(OBJECT(dev));
+> +    }
+> +    if (rc->phases.exit) {
+> +        rc->phases.exit(OBJECT(dev));
+> +    }
+> +}
+> +
+> +static void device_transitional_reset(Object *obj)
+> +{
+> +    DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
+> +
+> +    /*
+> +     * This will call either @device_phases_reset (for multi-phases tran=
+sitioned
+> +     * devices) or a device's specific method for not-yet transitioned d=
+evices.
+> +     * In both case, it does not reset children.
+> +     */
+> +    if (dc->reset) {
+> +        dc->reset(DEVICE(obj));
+> +    }
+> +}
+> +
+> +/**
+> + * device_get_transitional_reset:
+> + * check if the device's class is ready for multi-phase
+> + */
+> +static ResettableTrFunction device_get_transitional_reset(Object *obj)
+> +{
+> +    DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
+> +    if (dc->reset !=3D device_phases_reset) {
+> +        /*
+> +         * dc->reset has been overridden by a subclass,
+> +         * the device is not ready for multi phase yet.
+> +         */
+> +        return device_transitional_reset;
+> +    }
+> +    return NULL;
+> +}
+> +
+>   static void device_class_init(ObjectClass *class, void *data)
+>   {
+>       DeviceClass *dc =3D DEVICE_CLASS(class);
+>       VMStateIfClass *vc =3D VMSTATE_IF_CLASS(class);
+> +    ResettableClass *rc =3D RESETTABLE_CLASS(class);
+>  =20
+>       class->unparent =3D device_unparent;
+>  =20
+> @@ -1123,6 +1197,24 @@ static void device_class_init(ObjectClass *class, =
+void *data)
+>       dc->hotpluggable =3D true;
+>       dc->user_creatable =3D true;
+>       vc->get_id =3D device_vmstate_if_get_id;
+> +    rc->get_state =3D device_get_reset_state;
+> +    rc->child_foreach =3D device_reset_child_foreach;
+> +
+> +    /*
+> +     * @device_phases_reset is put as the default reset method below, al=
+lowing
+> +     * to do the multi-phase transition from base classes to leaf classe=
+s. It
+> +     * allows a legacy-reset Device class to extend a multi-phases-reset
+> +     * Device class for the following reason:
+> +     * + If a base class B has been moved to multi-phase, then it does n=
+ot
+> +     *   override this default reset method and may have defined phase m=
+ethods.
+> +     * + A child class C (extending class B) which uses
+> +     *   device_class_set_parent_reset() (or similar means) to override =
+the
+> +     *   reset method will still work as expected. @device_phases_reset =
+function
+> +     *   will be registered as the parent reset method and effectively c=
+all
+> +     *   parent reset phases.
+> +     */
+> +    dc->reset =3D device_phases_reset;
+> +    rc->get_transitional_function =3D device_get_transitional_reset;
+>   }
+>  =20
+>   void device_class_set_parent_reset(DeviceClass *dc,
+> @@ -1183,6 +1275,7 @@ static const TypeInfo device_type_info =3D {
+>       .class_size =3D sizeof(DeviceClass),
+>       .interfaces =3D (InterfaceInfo[]) {
+>           { TYPE_VMSTATE_IF },
+> +        { TYPE_RESETTABLE_INTERFACE },
+>           { }
+>       }
+>   };
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 1ae14a8b15..8ad07621b0 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -427,6 +427,7 @@ tests/fp/%:
+>   tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+>   =09hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+>   =09hw/core/bus.o \
+> +=09hw/core/resettable.o \
+>   =09hw/core/irq.o \
+>   =09hw/core/fw-path-provider.o \
+>   =09hw/core/reset.o \
 >=20
 
 
