@@ -2,93 +2,79 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04321C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 07:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4DCC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:10:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C462C207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 07:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7B4C2077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:10:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=livius-net.20150623.gappssmtp.com header.i=@livius-net.20150623.gappssmtp.com header.b="eWx8eefF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C462C207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=livius.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUDuyi0l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B4C2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is02N-0003t0-Op
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 02:57:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53093)
+	id 1is0E5-0005IF-Pj
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 03:10:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54686)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ilg@livius.net>) id 1is01Z-00039L-Hn
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 02:57:06 -0500
+ (envelope-from <drjones@redhat.com>) id 1is0Ah-0002KE-8u
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:06:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ilg@livius.net>) id 1is01Y-0000aC-BN
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 02:57:05 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:33840)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <ilg@livius.net>) id 1is01X-0000VG-Tc
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 02:57:04 -0500
-Received: by mail-wm1-x333.google.com with SMTP id w5so6521042wmi.1
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 23:57:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=livius-net.20150623.gappssmtp.com; s=20150623;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=f4mxqX9LLsSLzuRn9mQiTps97UO/GJpJd6GT88WP5as=;
- b=eWx8eefF7kMfRVqF5A5gY4hrH54bhDEPrVaCZkRBvACD9GXrTqyWzy8r8mfV4nbOK2
- ACjSv1HZcLtPNvPC1F3Qoq92VO6vvxZqURPO0OXPiOj0icCjvA9kVNXcuNAVC78t/d4H
- 9Cvfbv0JaH52ZES0mymQZG7hyWC+bNx04bxQW78G5sBsV8KFGLLYfXdmJEzqCJ/6Yno2
- gu/0NFNn0kebgi4CxaC5p45NjF1bV44cpkCA8JK/IU+7yMi7QmcGnDJYeShNNqV1gqlR
- 5BuuPzRlLfLhmYsv6DCLE8HNG4VLDKWzXX2zuKESzZICBANb0/OtV3iPxFgkYAEpxelk
- 30vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=f4mxqX9LLsSLzuRn9mQiTps97UO/GJpJd6GT88WP5as=;
- b=ME2oxCbJ6mhCzMOzoVf2u3aBvZQCkKruUwzkTs0WMEpSh8ZEUygkhrsHLiRzeGlV2w
- G7pmrzoIlI7Iv9xZJnhnt5A4TKu9KrGwiRHaLOp97y9DFvCJFvR/SHUvE8mS9Y8QEbDB
- X3oj+UoZpiqgEJ+GZkZxBurr8QgYpCTb/CcyS2wq6I7JK2zKEXWj5S/xGNthkcVJFoaq
- at7nNfERy8XUrt8IaYW8N0izjr1iZojbn9Vq87fr4BVB8A2j4/RLzZ7+kkNx0siGHOJ+
- R1CmgWbKJCsJ2WvnYTCjKxXU4URpIWxmswfIOgQWqsnLvbuoeuJPTsKjH8GjQF+XdH49
- HeIg==
-X-Gm-Message-State: APjAAAVkT44pyY46bbJp/l5bT0VpVh+l/FEeEWIVcRZEqb/NpCPaeFoN
- vvVYdx6zAZTrE90BgEh/hi4W7w==
-X-Google-Smtp-Source: APXvYqzZTNDvCFYCKFTGI8zeYUUtaiIHKereRkn7eyDQgAbvzQqZJLLhI3qnE1HRpAMmNxKW9qvZ+w==
-X-Received: by 2002:a1c:4008:: with SMTP id n8mr4388826wma.121.1579161422474; 
- Wed, 15 Jan 2020 23:57:02 -0800 (PST)
-Received: from wks.local ([188.26.232.206])
- by smtp.gmail.com with ESMTPSA id o15sm28550179wra.83.2020.01.15.23.57.01
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 15 Jan 2020 23:57:01 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: Semihosting, arm, riscv, ppc and common code
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <1a1cecb5128134e681b9145b9c6bc10a8db00ea9.camel@kernel.crashing.org>
-Date: Thu, 16 Jan 2020 09:57:00 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <3724D35F-AC4B-44A9-9537-FCCA930D463E@livius.net>
-References: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
- <AE7841A1-B4D6-4D6D-9AFD-01C4604D7BC4@livius.net>
- <cd9a2de94700a2781f176247131dceba690d8f31.camel@kernel.crashing.org>
- <87sgkimkma.fsf@linaro.org>
- <1309ca0ab6405d88cfd949c73130ad0f2af944a6.camel@kernel.crashing.org>
- <87wo9tkjxz.fsf@linaro.org> <81f25a9e-a52c-ca8d-4d4b-ca36fcee73ed@linaro.org>
- <C4EE0480-C366-419B-84F1-3BEB794D1598@livius.net>
- <1a1cecb5128134e681b9145b9c6bc10a8db00ea9.camel@kernel.crashing.org>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::333
+ (envelope-from <drjones@redhat.com>) id 1is0Ab-00085E-1y
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:06:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41624
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1is0Aa-00084U-NG
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:06:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579161983;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=T6hutKtjaQ1lNx4PJ3aLb67/cBy7jWlVyp/OF4XcnLo=;
+ b=PUDuyi0lXrKtbT6WBYpooyUgCwTW7BX9Of8BcX8x24O4SPVncl8jpq7YFd+RcdZoJ7LD8C
+ eSdzcNMQPExVe42quMABNRklrmP2S+egnFDUU03E4QwPPOI17Nmb8hBdDHPOioZPDZPtOq
+ bDNgxlvbCMhP0lo1S193qhnwt119s5g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-CiYYQcitPImWik046IWKbw-1; Thu, 16 Jan 2020 03:06:18 -0500
+X-MC-Unique: CiYYQcitPImWik046IWKbw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAA35800D55;
+ Thu, 16 Jan 2020 08:06:16 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EDB1C5DA70;
+ Thu, 16 Jan 2020 08:06:11 +0000 (UTC)
+Date: Thu, 16 Jan 2020 09:06:09 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 13/16] arm/arm64: ITS: INT functional
+ tests
+Message-ID: <20200116080609.thwiyi36rttnezxd@kamzik.brq.redhat.com>
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-14-eric.auger@redhat.com>
+ <20200113181701.jit3ywxoifduipew@kamzik.brq.redhat.com>
+ <1c046216-b873-a4c1-4a7a-374f10947d59@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c046216-b873-a4c1-4a7a-374f10947d59@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,73 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: keithp@keithp.com, Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Jan 15, 2020 at 06:11:23PM +0100, Auger Eric wrote:
+> >> +static int its_prerequisites(int nb_cpus)
+> >> +{
+> >> +	int cpu;
+> >> +
+> >> +	if (!gicv3_its_base()) {
+> >> +		report_skip("No ITS, skip ...");
+> >> +		return -1;
+> >> +	}
+> >> +
+> >> +	if (nr_cpus < 4) {
+> >> +		report_skip("Test requires at least %d vcpus", nb_cpus);
+> >> +		return -1;
+> > 
+> > We have nr_cpu_check() in arm/gic.c that does a report_abort for this
+> > case. Is there a reason to do report_skip instead of report_abort?
+> Why should we mandate 4 vcpus?
 
+I don't know. It's your test :-) afaict if there aren't 4 vcpus then you
+skip this test and exit, which is the same thing as report_abort'ing.
+If you intend to run multiple tests and only want to skip a few when there
+aren't enough vcpus, then I agree report_skip makes some sense.
 
-> On 16 Jan 2020, at 04:04, Benjamin Herrenschmidt =
-<benh@kernel.crashing.org> wrote:
->=20
-> ... I agree, which is also why I want to use the same interface for
-> powerpc, it will simply make life easier for everybody.
+On a related note, so far I've always tried to write tests that require
+more than one vcpu to be testable with only two, but then test even more
+if more are provided. Do you really need four for this test?
 
-
-I don't know the current implementation in QEMU, but I suggest you also =
-take a look at the current Arm specs:
-
-	https://static.docs.arm.com/100863/0200/semihosting.pdf
-
-The implementation in OpenOCD is:
-
-	=
-https://github.com/xpack-dev-tools/openocd/blob/xpack/src/target/semihosti=
-ng_common.c
-
-> The calls
-> aren't perfect but they do work sufficiently well to be useful and I
-> haven't yet been convinced that it can't be extended if necessary.
-
-In theory it can, in practice it'll not be easy.
-
-Imagine that you decide to use Arm semihosting for your architecture, =
-and implement it in QEMU.
-
-Then you try to convince other tool developers to do the same. If you =
-ask them nicely, they might copy/paste the Arm code, and you're done, =
-major commercial tools will have Arm semihosting support for your =
-architecture and it becomes a de facto standard.
-
-If at a later time you decide to extend the protocol, you have to go =
-again to all commercial tool vendors and ask them to implement the =
-extension. You'll need good reasons to convince them.
-
-In my case it was easier to convince SEGGER to add Arm semihosting =
-support to their RISC-V JTAG, because we had a long relationship, but =
-even so I doubt they'll be happy to implement extensions.
-
----
-
-Anyway, from my experience, for practical cases the Arm semihosting is =
-more than enough, once you have a functional implementation for the =
-client side you simply forget about it, and you can use it for any =
-architecture.
-
-My implementation is the following:
-
-	=
-https://github.com/micro-os-plus/semihosting-xpack/blob/xpack/src/syscalls=
--semihosting.cpp
-
-
-Regards,
-
-Liviu
-
+Thanks,
+drew
 
 
