@@ -2,89 +2,86 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0158AC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C83C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCD032073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:51:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD032073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id B7B952077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:56:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="3JVgHpXF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7B952077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is0sH-00059C-1l
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 03:51:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60815)
+	id 1is0we-0007bS-Oj
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 03:56:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32950)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1is0rS-0003mE-LG
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:50:43 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1is0u3-0006SR-0R
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:53:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1is0rR-0005X0-Dj
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:50:42 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38118
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1is0rO-0005VQ-GX; Thu, 16 Jan 2020 03:50:38 -0500
-Received: from host86-191-119-91.range86-191.btcentralplus.com
- ([86.191.119.91] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1is0rI-0005gM-3O; Thu, 16 Jan 2020 08:50:34 +0000
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-69-git-send-email-imammedo@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <f9614930-c04e-772d-2bb7-dd55a140e4c5@ilande.co.uk>
-Date: Thu, 16 Jan 2020 08:50:31 +0000
+ (envelope-from <damien.hedde@greensocs.com>) id 1is0tz-0006ob-85
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:53:22 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:59574)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1is0ty-0006nW-Mm; Thu, 16 Jan 2020 03:53:19 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 0DE8696EF0;
+ Thu, 16 Jan 2020 08:53:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1579164796;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q5IceCliV2lbMO7kG3HphU0YLo9JhsbNxMSaFmQXIDU=;
+ b=3JVgHpXFJxxzN7wJvkorYbjmn+bcpFaFUs71TE2+rLuwWOYXumsCBDSzetTaQCGgD876bW
+ Ju9vu+IvgLSGqA/uB431iPsFlliEmcDZVfRGtpreNVdbUx2+NO3zEUbpQa7OjRj8zwX+bX
+ xePKw3fKzb2H2melludgGL+DC294MkY=
+Subject: Re: [PATCH v7 03/11] hw/core: create Resettable QOM interface
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200115123620.250132-1-damien.hedde@greensocs.com>
+ <20200115123620.250132-4-damien.hedde@greensocs.com>
+ <656ee01a-54ad-273f-e71e-873328428565@redhat.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <42e9a018-0070-205b-65ed-1d7a6a1b1ff5@greensocs.com>
+Date: Thu, 16 Jan 2020 09:53:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <1579100861-73692-69-git-send-email-imammedo@redhat.com>
+In-Reply-To: <656ee01a-54ad-273f-e71e-873328428565@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.191.119.91
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 68/86] ppc:prep: use memdev for RAM
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: No (on mail.default.ilande.uk0.bigv.io); Unknown failure
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1579164796;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q5IceCliV2lbMO7kG3HphU0YLo9JhsbNxMSaFmQXIDU=;
+ b=qH8euC2K0S6jVJZzok8n/hRqT2uaHWvw685QaAyLKdLFmoE6y3h1is8ZwOY1/j58iw1PFq
+ rgeKAHDA2fyIcVf2VyTJS2Le/WePMf95UZABixY+oWr5SYgUIWBB4UPuomt/kwWkzPXHB8
+ 3bPzA9oM4VpeJzNSvbxJZuHJhkdCWm0=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579164796; a=rsa-sha256; cv=none;
+ b=5EcU/15nI28TKUkchNT3ygqAB3sE6Xw8sZf8CdDtz/LE/dEo6zvwdd6XXxBxuETRXmw08k
+ +MFEhbGRaPe+ddtWM/nXzXRrfb5ullu4OHCkjYUERBNfHiu+WCxB1dV/AYR+kgHx4exh0J
+ 9MiIrGhBIALriauZp5UNfQXOhzWA4hE=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,111 +93,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: hpoussin@reactos.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
+ mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
+ pbonzini@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/01/2020 15:07, Igor Mammedov wrote:
 
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->   MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+
+On 1/16/20 2:59 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/15/20 1:36 PM, Damien Hedde wrote:
+>> This commit defines an interface allowing multi-phase reset. This aims
+>> to solve a problem of the actual single-phase reset (built in
+>> DeviceClass and BusClass): reset behavior is dependent on the order
+>> in which reset handlers are called. In particular doing external
+>> side-effect (like setting an qemu_irq) is problematic because receivin=
+g
+>> object may not be reset yet.
+>>
+>> The Resettable interface divides the reset in 3 well defined phases.
+>> To reset an object tree, all 1st phases are executed then all 2nd then
+>> all 3rd. See the comments in include/hw/resettable.h for a more comple=
+te
+>> description. The interface defines 3 phases to let the future
+>> possibility of holding an object into reset for some time.
+>>
+>> The qdev/qbus reset in DeviceClass and BusClass will be modified in
+>> following commits to use this interface. A mechanism is provided
+>> to allow executing a transitional reset handler in place of the 2nd
+>> phase which is executed in children-then-parent order inside a tree.
+>> This will allow to transition devices and buses smoothly while
+>> keeping the exact current qdev/qbus reset behavior for now.
+>>
+>> Documentation will be added in a following commit.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>
+>> v7 update: un-nest struct ResettablePhases
+>> ---
+>> =C2=A0 Makefile.objs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |=C2=A0=C2=A0 1 +
+>> =C2=A0 include/hw/resettable.h | 211 +++++++++++++++++++++++++++++++++=
+++
+>> =C2=A0 hw/core/resettable.c=C2=A0=C2=A0=C2=A0 | 238 ++++++++++++++++++=
+++++++++++++++++++++++
+>> =C2=A0 hw/core/Makefile.objs=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
+>> =C2=A0 hw/core/trace-events=C2=A0=C2=A0=C2=A0 |=C2=A0 17 +++
+>> =C2=A0 5 files changed, 468 insertions(+)
+>> =C2=A0 create mode 100644 include/hw/resettable.h
+>> =C2=A0 create mode 100644 hw/core/resettable.c
+>>
+
+>=20
+> Something here breaks ./configure --enable-trace-backends=3Dust:
+>=20
+> =C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace-ust-all.o
+> In file included from trace-ust-all.h:13,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from trace-ust-all.c:13:
+> trace-ust-all.h:35151:1: error: redefinition of
+> =E2=80=98__tracepoint_cb_qemu___loader_write_rom=E2=80=99
+> 35151 | TRACEPOINT_EVENT(
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | ^~~~~~~~~~~~~~~~
+> trace-ust-all.h:31791:1: note: previous definition of
+> =E2=80=98__tracepoint_cb_qemu___loader_write_rom=E2=80=99 was here
+> 31791 | TRACEPOINT_EVENT(
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | ^~~~~~~~~~~~~~~~
+> ...
+> ./trace-ust-all.h:35388:1: error: redefinition of
+> =E2=80=98__tp_event_signature___qemu___resettable_transitional_function=
+=E2=80=99
+> 35388 | TRACEPOINT_EVENT(
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | ^~~~~~~~~~~~~~~~
+> ./trace-ust-all.h:32028:1: note: previous definition of
+> =E2=80=98__tp_event_signature___qemu___resettable_transitional_function=
+=E2=80=99 was here
+> 32028 | TRACEPOINT_EVENT(
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | ^~~~~~~~~~~~~~~~
+> In file included from /usr/include/lttng/tracepoint-event.h:58,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from trace-ust-all.h:35401,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 from trace-ust-all.c:13:
+>=20
+> Indeed:
+>=20
+> 32028 TRACEPOINT_EVENT(
+> 32029=C2=A0=C2=A0=C2=A0 qemu,
+> 32030=C2=A0=C2=A0=C2=A0 resettable_transitional_function,
+> 32031=C2=A0=C2=A0=C2=A0 TP_ARGS(void *, obj, const char *, objtype),
+> 32032=C2=A0=C2=A0=C2=A0 TP_FIELDS(
+> 32033=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ctf_integer_hex(void *,=
+ obj, obj)
+> 32034=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ctf_string(objtype, obj=
+type)
+> 32035=C2=A0=C2=A0=C2=A0 )
+> 32036 )
+> 32037
+> ...
+> 35388 TRACEPOINT_EVENT(
+> 35389=C2=A0=C2=A0=C2=A0 qemu,
+> 35390=C2=A0=C2=A0=C2=A0 resettable_transitional_function,
+> 35391=C2=A0=C2=A0=C2=A0 TP_ARGS(void *, obj, const char *, objtype),
+> 35392=C2=A0=C2=A0=C2=A0 TP_FIELDS(
+> 35393=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ctf_integer_hex(void *,=
+ obj, obj)
+> 35394=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ctf_string(objtype, obj=
+type)
+> 35395=C2=A0=C2=A0=C2=A0 )
+> 35396 )
+> 35397
+> 35398 #endif /* TRACE_ALL_GENERATED_UST_H */
+>=20
+> Ah! I was going to say "no clue what could be wrong, so Cc'ing Stefan"
+> but got it:
+>=20
+> $ git grep hw/core Makefile.objs
+> Makefile.objs:194:trace-events-subdirs +=3D hw/core
+> Makefile.objs:207:trace-events-subdirs +=3D hw/core
+>=20
+> We might already have a 'uniq' makefile function to do:
+>=20
+> trace-events-subdirs =3D $(call uniq $(trace-events-subdirs))
+>=20
+> or maybe was it with $filter? I can't find it/remember, too tired.
+
+You can use $sort to remove duplicates in make.
+
+>=20
+> So the fix is:
+>=20
+> -- >8 --
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -191,7 +191,6 @@ trace-events-subdirs +=3D migration
+> =C2=A0trace-events-subdirs +=3D net
+> =C2=A0trace-events-subdirs +=3D ui
+> =C2=A0endif
+> -trace-events-subdirs +=3D hw/core
+> =C2=A0trace-events-subdirs +=3D hw/display
+> =C2=A0trace-events-subdirs +=3D qapi
+> =C2=A0trace-events-subdirs +=3D qom
 > ---
-> CC: hpoussin@reactos.org
-> CC: david@gibson.dropbear.id.au
-> CC: qemu-ppc@nongnu.org
-> ---
->  hw/ppc/prep.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 862345c..bf75dde 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -400,7 +400,6 @@ static int PPC_NVRAM_set_params (Nvram *nvram, uint16_t NVRAM_size,
->  /* PowerPC PREP hardware initialisation */
->  static void ppc_prep_init(MachineState *machine)
->  {
-> -    ram_addr_t ram_size = machine->ram_size;
->      const char *kernel_filename = machine->kernel_filename;
->      const char *kernel_cmdline = machine->kernel_cmdline;
->      const char *initrd_filename = machine->initrd_filename;
-> @@ -413,7 +412,6 @@ static void ppc_prep_init(MachineState *machine)
->      MemoryRegion *xcsr = g_new(MemoryRegion, 1);
->  #endif
->      int linux_boot, i, nb_nics1;
-> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
->      uint32_t kernel_base, initrd_base;
->      long kernel_size, initrd_size;
->      DeviceState *dev;
-> @@ -444,15 +442,14 @@ static void ppc_prep_init(MachineState *machine)
->          qemu_register_reset(ppc_prep_reset, cpu);
->      }
->  
-> -    /* allocate RAM */
-> -    memory_region_allocate_system_memory(ram, NULL, "ppc_prep.ram", ram_size);
-> -    memory_region_add_subregion(sysmem, 0, ram);
-> +    /* map RAM */
-> +    memory_region_add_subregion(sysmem, 0, machine->ram);
->  
->      if (linux_boot) {
->          kernel_base = KERNEL_LOAD_ADDR;
->          /* now we can load the kernel */
->          kernel_size = load_image_targphys(kernel_filename, kernel_base,
-> -                                          ram_size - kernel_base);
-> +                                          machine->ram_size - kernel_base);
->          if (kernel_size < 0) {
->              error_report("could not load kernel '%s'", kernel_filename);
->              exit(1);
-> @@ -461,7 +458,7 @@ static void ppc_prep_init(MachineState *machine)
->          if (initrd_filename) {
->              initrd_base = INITRD_LOAD_ADDR;
->              initrd_size = load_image_targphys(initrd_filename, initrd_base,
-> -                                              ram_size - initrd_base);
-> +                                              machine->ram_size - initrd_base);
->              if (initrd_size < 0) {
->                  error_report("could not load initial ram disk '%s'",
->                               initrd_filename);
-> @@ -576,7 +573,7 @@ static void ppc_prep_init(MachineState *machine)
->      sysctrl->nvram = m48t59;
->  
->      /* Initialise NVRAM */
-> -    PPC_NVRAM_set_params(m48t59, NVRAM_SIZE, "PREP", ram_size,
-> +    PPC_NVRAM_set_params(m48t59, NVRAM_SIZE, "PREP", machine->ram_size,
->                           ppc_boot_device,
->                           kernel_base, kernel_size,
->                           kernel_cmdline,
-> @@ -596,6 +593,7 @@ static void prep_machine_init(MachineClass *mc)
->      mc->default_boot_order = "cad";
->      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("602");
->      mc->default_display = "std";
-> +    mc->default_ram_id = "ppc_prep.ram";
->  }
->  
->  static int prep_set_cmos_checksum(DeviceState *dev, void *opaque)
-> @@ -814,6 +812,7 @@ static void ibm_40p_machine_init(MachineClass *mc)
->      mc->init = ibm_40p_init;
->      mc->max_cpus = 1;
->      mc->default_ram_size = 128 * MiB;
-> +    mc->default_ram_id = "ppc_prep.ram";
->      mc->block_default_type = IF_SCSI;
->      mc->default_boot_order = "c";
->      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("604");
+>=20
 
-Note that the prep machine is scheduled for removal soon (I believe Thomas has posted
-a patch on-list for this), but the 40p part looks fine.
+I'll remove the duplicate entry.
+Thanks,
 
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-ATB,
-
-Mark.
+Damien
 
