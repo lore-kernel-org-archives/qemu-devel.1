@@ -2,81 +2,70 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EACDC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC82C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:18:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28981207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:16:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MyaraJY3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28981207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 958EC207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:18:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958EC207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is452-0003kR-Ae
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:16:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60654)
+	id 1is46V-0005BJ-Od
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:18:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1is43d-0002l1-FQ
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:15:32 -0500
+ (envelope-from <misono.tomohiro@fujitsu.com>) id 1is45j-0004EV-Gv
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:17:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1is43Z-0001bc-TW
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:15:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40585
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1is43Z-0001bI-PI
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:15:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579176925;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sZTfuR5hQ0jgjwm20RiJppftxSC8TRQablyMJCY8mO8=;
- b=MyaraJY3dzCbLRlZpmEMx8ZtO8IX2GvQ/ZIjhzBLyzwwrG0RsfDpSqrGgaGLlhaWCQRNUF
- y1Itnw4No1TPpKiu4EZcRwiuMEjEVb5zaZcz19JBjqJb5Mlpro4lZCcJzBDmA1DbrqU9Kk
- x9zaxRSmB6g0VCri8HPkHDLWldTCDfw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-5lNrKOaIPyyY6pHsgNx6fg-1; Thu, 16 Jan 2020 07:15:22 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4B61192296A;
- Thu, 16 Jan 2020 12:15:20 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8FA3480890;
- Thu, 16 Jan 2020 12:15:19 +0000 (UTC)
-Date: Thu, 16 Jan 2020 13:15:17 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v2 68/86] ppc:prep: use memdev for RAM
-Message-ID: <20200116131517.6133bdd4@redhat.com>
-In-Reply-To: <20200116042658.GL54439@umbus>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-69-git-send-email-imammedo@redhat.com>
- <20200116042658.GL54439@umbus>
+ (envelope-from <misono.tomohiro@fujitsu.com>) id 1is45f-000325-1E
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:17:38 -0500
+Received: from mgwkm02.jp.fujitsu.com ([202.219.69.169]:49005)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
+ id 1is45e-0002yV-B6
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:17:34 -0500
+Received: from kw-mxoi2.gw.nic.fujitsu.com (unknown [192.168.231.133]) by
+ mgwkm02.jp.fujitsu.com with smtp
+ id 11aa_1e22_ef0b02c8_72e1_49a6_954f_4dfbda4cf5b3;
+ Thu, 16 Jan 2020 21:17:23 +0900
+Received: from g01jpfmpwkw03.exch.g01.fujitsu.local
+ (g01jpfmpwkw03.exch.g01.fujitsu.local [10.0.193.57])
+ by kw-mxoi2.gw.nic.fujitsu.com (Postfix) with ESMTP id 740CCAC0058
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 21:17:22 +0900 (JST)
+Received: from G01JPEXCHKW14.g01.fujitsu.local
+ (G01JPEXCHKW14.g01.fujitsu.local [10.0.194.53])
+ by g01jpfmpwkw03.exch.g01.fujitsu.local (Postfix) with ESMTP id 68F1FBD675A;
+ Thu, 16 Jan 2020 21:17:21 +0900 (JST)
+Received: from luna3.soft.fujitsu.com (10.124.196.199) by
+ G01JPEXCHKW14.g01.fujitsu.local (10.0.194.53) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 16 Jan 2020 21:17:21 +0900
+From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+To: <dgilbert@redhat.com>
+Subject: Re: [PATCH 093/104] virtiofsd: introduce inode refcount to prevent
+ use-after-free
+Date: Thu, 16 Jan 2020 21:25:42 +0900
+Message-ID: <20200116122542.20873-1-misono.tomohiro@jp.fujitsu.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20191212163904.159893-94-dgilbert@redhat.com>
+References: <20191212163904.159893-94-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 5lNrKOaIPyyY6pHsgNx6fg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-SecurityPolicyCheck-GC: OK by FENCE-Mail
+X-TM-AS-GCONF: 00
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.219.69.169
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,115 +77,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: hpoussin@reactos.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: misono.tomohiro@jp.fujitsu.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Jan 2020 14:26:58 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Wed, Jan 15, 2020 at 04:07:23PM +0100, Igor Mammedov wrote:
-> > memory_region_allocate_system_memory() API is going away, so
-> > replace it with memdev allocated MemoryRegion. The later is
-> > initialized by generic code, so board only needs to opt in
-> > to memdev scheme by providing
-> >   MachineClass::default_ram_id
-> > and using MachineState::ram instead of manually initializing
-> > RAM memory region.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> From: Stefan Hajnoczi <stefanha@redhat.com>
 > 
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> If thread A is using an inode it must not be deleted by thread B when
+> processing a FUSE_FORGET request.
 > 
-> Although it's probably fairly pointless, since I'm looking to merge a
-> patch removing prep entirely soon.
-
-I know,
-if that gets merged first, I'll just drop these on respin
-
+> The FUSE protocol itself already has a counter called nlookup that is
+> used in FUSE_FORGET messages.  We cannot trust this counter since the
+> untrusted client can manipulate it via FUSE_FORGET messages.
 > 
-> > ---
-> > CC: hpoussin@reactos.org
-> > CC: david@gibson.dropbear.id.au
-> > CC: qemu-ppc@nongnu.org
-> > ---
-> >  hw/ppc/prep.c | 15 +++++++--------
-> >  1 file changed, 7 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> > index 862345c..bf75dde 100644
-> > --- a/hw/ppc/prep.c
-> > +++ b/hw/ppc/prep.c
-> > @@ -400,7 +400,6 @@ static int PPC_NVRAM_set_params (Nvram *nvram, uint16_t NVRAM_size,
-> >  /* PowerPC PREP hardware initialisation */
-> >  static void ppc_prep_init(MachineState *machine)
-> >  {
-> > -    ram_addr_t ram_size = machine->ram_size;
-> >      const char *kernel_filename = machine->kernel_filename;
-> >      const char *kernel_cmdline = machine->kernel_cmdline;
-> >      const char *initrd_filename = machine->initrd_filename;
-> > @@ -413,7 +412,6 @@ static void ppc_prep_init(MachineState *machine)
-> >      MemoryRegion *xcsr = g_new(MemoryRegion, 1);
-> >  #endif
-> >      int linux_boot, i, nb_nics1;
-> > -    MemoryRegion *ram = g_new(MemoryRegion, 1);
-> >      uint32_t kernel_base, initrd_base;
-> >      long kernel_size, initrd_size;
-> >      DeviceState *dev;
-> > @@ -444,15 +442,14 @@ static void ppc_prep_init(MachineState *machine)
-> >          qemu_register_reset(ppc_prep_reset, cpu);
-> >      }
-> >  
-> > -    /* allocate RAM */
-> > -    memory_region_allocate_system_memory(ram, NULL, "ppc_prep.ram", ram_size);
-> > -    memory_region_add_subregion(sysmem, 0, ram);
-> > +    /* map RAM */
-> > +    memory_region_add_subregion(sysmem, 0, machine->ram);
-> >  
-> >      if (linux_boot) {
-> >          kernel_base = KERNEL_LOAD_ADDR;
-> >          /* now we can load the kernel */
-> >          kernel_size = load_image_targphys(kernel_filename, kernel_base,
-> > -                                          ram_size - kernel_base);
-> > +                                          machine->ram_size - kernel_base);
-> >          if (kernel_size < 0) {
-> >              error_report("could not load kernel '%s'", kernel_filename);
-> >              exit(1);
-> > @@ -461,7 +458,7 @@ static void ppc_prep_init(MachineState *machine)
-> >          if (initrd_filename) {
-> >              initrd_base = INITRD_LOAD_ADDR;
-> >              initrd_size = load_image_targphys(initrd_filename, initrd_base,
-> > -                                              ram_size - initrd_base);
-> > +                                              machine->ram_size - initrd_base);
-> >              if (initrd_size < 0) {
-> >                  error_report("could not load initial ram disk '%s'",
-> >                               initrd_filename);
-> > @@ -576,7 +573,7 @@ static void ppc_prep_init(MachineState *machine)
-> >      sysctrl->nvram = m48t59;
-> >  
-> >      /* Initialise NVRAM */
-> > -    PPC_NVRAM_set_params(m48t59, NVRAM_SIZE, "PREP", ram_size,
-> > +    PPC_NVRAM_set_params(m48t59, NVRAM_SIZE, "PREP", machine->ram_size,
-> >                           ppc_boot_device,
-> >                           kernel_base, kernel_size,
-> >                           kernel_cmdline,
-> > @@ -596,6 +593,7 @@ static void prep_machine_init(MachineClass *mc)
-> >      mc->default_boot_order = "cad";
-> >      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("602");
-> >      mc->default_display = "std";
-> > +    mc->default_ram_id = "ppc_prep.ram";
-> >  }
-> >  
-> >  static int prep_set_cmos_checksum(DeviceState *dev, void *opaque)
-> > @@ -814,6 +812,7 @@ static void ibm_40p_machine_init(MachineClass *mc)
-> >      mc->init = ibm_40p_init;
-> >      mc->max_cpus = 1;
-> >      mc->default_ram_size = 128 * MiB;
-> > +    mc->default_ram_id = "ppc_prep.ram";
-> >      mc->block_default_type = IF_SCSI;
-> >      mc->default_boot_order = "c";
-> >      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("604");  
+> Introduce a new refcount to keep inodes alive for the required lifespan.
+> lo_inode_put() must be called to release a reference.  FUSE's nlookup
+> counter holds exactly one reference so that the inode stays alive as
+> long as the client still wants to remember it.
 > 
+> Note that the lo_inode->is_symlink field is moved to avoid creating a
+> hole in the struct due to struct field alignment.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 168 ++++++++++++++++++++++++++-----
+>  1 file changed, 145 insertions(+), 23 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index b19c9ee328..8f4ab8351c 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -99,7 +99,13 @@ struct lo_key {
+>  
+>  struct lo_inode {
+>      int fd;
+> -    bool is_symlink;
+> +
+> +    /*
+> +     * Atomic reference count for this object.  The nlookup field holds a
+> +     * reference and release it when nlookup reaches 0.
+> +     */
+> +    gint refcount;
+> +
+>      struct lo_key key;
+>  
+>      /*
+> @@ -118,6 +124,8 @@ struct lo_inode {
+>      fuse_ino_t fuse_ino;
+>      pthread_mutex_t plock_mutex;
+>      GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
+> +
+> +    bool is_symlink;
+>  };
+>  
+>  struct lo_cred {
+> @@ -473,6 +481,23 @@ static ssize_t lo_add_inode_mapping(fuse_req_t req, struct lo_inode *inode)
+>      return elem - lo_data(req)->ino_map.elems;
+>  }
+>  
+> +static void lo_inode_put(struct lo_data *lo, struct lo_inode **inodep)
+> +{
+> +    struct lo_inode *inode = *inodep;
+> +
+> +    if (!inode) {
+> +        return;
+> +    }
+> +
+> +    *inodep = NULL;
+> +
+> +    if (g_atomic_int_dec_and_test(&inode->refcount)) {
+> +        close(inode->fd);
+> +        free(inode);
+> +    }
+> +}
+> +
+> +/* Caller must release refcount using lo_inode_put() */
+>  static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
+>  {
+>      struct lo_data *lo = lo_data(req);
+> @@ -480,6 +505,9 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
+>  
+>      pthread_mutex_lock(&lo->mutex);
+>      elem = lo_map_get(&lo->ino_map, ino);
+> +    if (elem) {
+> +        g_atomic_int_inc(&elem->inode->refcount);
+> +    }
+>      pthread_mutex_unlock(&lo->mutex);
+>  
+>      if (!elem) {
+> @@ -489,10 +517,23 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
+>      return elem->inode;
+>  }
+>  
+> +/*
+> + * TODO Remove this helper and force callers to hold an inode refcount until
+> + * they are done with the fd.  This will be done in a later patch to make
+> + * review easier.
+> + */
+>  static int lo_fd(fuse_req_t req, fuse_ino_t ino)
+>  {
+>      struct lo_inode *inode = lo_inode(req, ino);
+> -    return inode ? inode->fd : -1;
+> +    int fd;
+> +
+> +    if (!inode) {
+> +        return -1;
+> +    }
+> +
+> +    fd = inode->fd;
+> +    lo_inode_put(lo_data(req), &inode);
+> +    return fd;
+>  }
+>  
+>  static void lo_init(void *userdata, struct fuse_conn_info *conn)
+> @@ -547,6 +588,10 @@ static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
+>      fuse_reply_attr(req, &buf, lo->timeout);
+>  }
+>  
+> +/*
+> + * Increments parent->nlookup and caller must release refcount using
+> + * lo_inode_put(&parent).
+> + */
+>  static int lo_parent_and_name(struct lo_data *lo, struct lo_inode *inode,
+>                                char path[PATH_MAX], struct lo_inode **parent)
+>  {
+> @@ -584,6 +629,7 @@ retry:
+>          p = &lo->root;
+>          pthread_mutex_lock(&lo->mutex);
+>          p->nlookup++;
+> +        g_atomic_int_inc(&p->refcount);
+>          pthread_mutex_unlock(&lo->mutex);
+>      } else {
+>          *last = '\0';
 
+We need lo_ionde_put() in error path, right?:
+https://gitlab.com/virtio-fs/qemu/blob/virtio-fs-as-posted-2019-12-12/tools/virtiofsd/passthrough_ll.c#L680
+
+nit: if yes, unref_inode_lolocked() is always paired with lo_inode_put().
+So how about combine them in one function? As p->nloockup and p->refcount
+are both incremented in one place (lo_find/lo_parent_and_name) in these case,
+it seems natural for me to decrement them in one function as well.
+
+Thanks,
+Misono
 
