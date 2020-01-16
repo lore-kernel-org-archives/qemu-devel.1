@@ -2,86 +2,65 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0699BC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 199AAC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:28:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C44E32087E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:27:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D90D020748
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:28:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TmZZEe7W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C44E32087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="X89Ia6qs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D90D020748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is4Fd-0007Ik-Uw
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:27:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34073)
+	id 1is4G3-0007td-Ko
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:28:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1is4Eo-0006fJ-Oe
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:27:04 -0500
+ (envelope-from <berto@igalia.com>) id 1is4F9-0006yu-Df
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:27:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1is4El-0002MD-GR
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:27:02 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52418
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1is4El-0002Lz-C0
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:26:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579177618;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=hoJ6cAvgWe/GOPmoU4dvaFYnBK3qXH2Bmi55JBpGKQg=;
- b=TmZZEe7WxbSqf3cz0pSfONnCRhUYsckamUJAaoURI/IqNB6dKK37g0jmEPW8baKSeNw2hq
- AVfRaEjQsp4tBJkLpo9UBalpLhxQJV9HjFeiZzRPdvnG5O9EPAQGAhPYwIBhHEI8FRoIT6
- rZDD0w+jl0uoJKTAtIcjGBc8O3FUAYk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-g_nM43bINpSoX3fcBv3_8Q-1; Thu, 16 Jan 2020 07:26:55 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F5E3195AD20;
- Thu, 16 Jan 2020 12:26:54 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-204-105.brq.redhat.com [10.40.204.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D2B960C63;
- Thu, 16 Jan 2020 12:26:49 +0000 (UTC)
-Subject: Re: [PATCH] target/s390x/kvm: Enable adapter interruption suppression
- again
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200116122026.5804-1-thuth@redhat.com>
- <7c5da42a-2de0-d9e6-f838-f2b0757cbcaa@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <6d489327-b37d-73ae-6706-03f1e4c6b495@redhat.com>
-Date: Thu, 16 Jan 2020 13:26:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <berto@igalia.com>) id 1is4F7-0002ix-AF
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:27:23 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:33529)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1is4F6-0002a7-Mh; Thu, 16 Jan 2020 07:27:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=CjqjOavh+h6FbIAOkCvSwZh5K5ofDT1pkDWoFvkw13w=; 
+ b=X89Ia6qsyUFgt0cpLi+0VIkqLJWXo0Q2BWDqEHNJRn1mJaTFCA+D+ATcE+J3kZaMDYeloWqq29Dib3UkpikfJma0ZhmwPGYqrN4xHkRn6goUHBteyfzPMrItSVWcEezBvUc5CxtzImJppsd5JIVW2YuP+ZHRD0/bzy3bwSpquNPfDGm2M45IqiQR9nMINHvbrBOFXD2reR7iZPOT9Dv5tSqkd1uI09wHQWF4E+sdM3Ov1mP5kGEhBIm8w6CwEKVLzYyFwZvfn3C0TXCjkuFohTS3JrAfeB/cXJdR4XhFk5vP+PnTbfshTOx58GizqKCauGqtslIcoEri2zuElbmPww==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1is4F2-0003Qt-77; Thu, 16 Jan 2020 13:27:16 +0100
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1is4F1-0006Xz-Ts; Thu, 16 Jan 2020 13:27:15 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v2] qcow2: Use a GString in report_unsupported_feature()
+In-Reply-To: <7dc5a8bf-bb1d-aeec-ef3e-6e60597bbcb8@redhat.com>
+References: <20200115135626.19442-1-berto@igalia.com>
+ <7dc5a8bf-bb1d-aeec-ef3e-6e60597bbcb8@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Thu, 16 Jan 2020 13:27:15 +0100
+Message-ID: <w51d0bjfuxo.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <7c5da42a-2de0-d9e6-f838-f2b0757cbcaa@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: g_nM43bINpSoX3fcBv3_8Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,112 +72,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Alex =?utf-8?Q?Benn?= =?utf-8?Q?=C3=A9e?= <alex.bennee@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/01/2020 13.23, David Hildenbrand wrote:
-> On 16.01.20 13:20, Thomas Huth wrote:
->> The AIS feature has been disabled late in the v2.10 development
->> cycle since there were some issues with migration (see commit
->> 3f2d07b3b01ea61126b - "s390x/ais: for 2.10 stable: disable ais
->> facility"). We originally wanted to enable it again for newer
->> machine types, but apparently we forgot to do this so far. Let's
->> do it for the new s390-ccw-virtio-5.0 machine now.
->>
->> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c         |  4 ++++
->>  include/hw/s390x/s390-virtio-ccw.h |  4 ++++
->>  target/s390x/kvm.c                 | 11 ++++++++---
->>  3 files changed, 16 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index e7eadd14e8..6f43136396 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -456,6 +456,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->>      s390mc->cpu_model_allowed = true;
->>      s390mc->css_migration_enabled = true;
->>      s390mc->hpage_1m_allowed = true;
->> +    s390mc->kvm_ais_allowed = true;
->>      mc->init = ccw_init;
->>      mc->reset = s390_machine_reset;
->>      mc->hot_add_cpu = s390_hot_add_cpu;
->> @@ -662,6 +663,9 @@ static void ccw_machine_4_2_instance_options(MachineState *machine)
->>  
->>  static void ccw_machine_4_2_class_options(MachineClass *mc)
->>  {
->> +    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
->> +
->> +    s390mc->kvm_ais_allowed = false;
->>      ccw_machine_5_0_class_options(mc);
->>      compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
->>  }
->> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
->> index 8aa27199c9..f142d379c6 100644
->> --- a/include/hw/s390x/s390-virtio-ccw.h
->> +++ b/include/hw/s390x/s390-virtio-ccw.h
->> @@ -21,6 +21,9 @@
->>  #define S390_MACHINE_CLASS(klass) \
->>      OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MACHINE)
->>  
->> +#define S390_CCW_MACHINE_OBJ_GET_CLASS(obj) \
->> +    OBJECT_GET_CLASS(S390CcwMachineClass, obj, TYPE_S390_CCW_MACHINE)
->> +
->>  typedef struct S390CcwMachineState {
->>      /*< private >*/
->>      MachineState parent_obj;
->> @@ -40,6 +43,7 @@ typedef struct S390CcwMachineClass {
->>      bool cpu_model_allowed;
->>      bool css_migration_enabled;
->>      bool hpage_1m_allowed;
->> +    bool kvm_ais_allowed;
->>  } S390CcwMachineClass;
->>  
->>  /* runtime-instrumentation allowed by the machine */
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index 15260aeb9a..4c1c8c0208 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -329,6 +329,8 @@ static void ccw_machine_class_foreach(ObjectClass *oc, void *opaque)
->>  
->>  int kvm_arch_init(MachineState *ms, KVMState *s)
->>  {
->> +    S390CcwMachineClass *smc = S390_CCW_MACHINE_OBJ_GET_CLASS(ms);
->> +
->>      object_class_foreach(ccw_machine_class_foreach, TYPE_S390_CCW_MACHINE,
->>                           false, NULL);
->>  
->> @@ -365,10 +367,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>      /*
->>       * The migration interface for ais was introduced with kernel 4.13
->>       * but the capability itself had been active since 4.12. As migration
->> -     * support is considered necessary let's disable ais in the 2.10
->> -     * machine.
->> +     * support is considered necessary we only enable this for newer
->> +     * machine types and if KVM_CAP_S390_AIS_MIGRATION is available.
->>       */
->> -    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
->> +    if (smc->kvm_ais_allowed &&
->> +        kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
->> +        kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
->> +    }
->>  
->>      kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
->>      return 0;
->>
-> 
-> We have ri_allowed(), cpu_model_allowed(), hpage_1m_allowed().
-> 
-> Care to create a similar wrapper?
+On Thu 16 Jan 2020 01:19:34 PM CET, Max Reitz wrote:
+> On 15.01.20 14:56, Alberto Garcia wrote:
+>> This is a bit more efficient than having to allocate and free memory
+>> for each item.
+>>=20
+>> The default size (60) is enough for all the existing incompatible
+>> features or the "Unknown incompatible feature" message.
+>
+> That doesn=E2=80=99t make sense to me.  The existing incompatible feature=
+s are
+> known to qemu, and as such will never be printed here.
 
-Honestly, why do we need these wrappers at all? They look cumbersome to
-me. I'd rather remove them in case they are not urgently needed (so far
-I don't see the point... could someone enlighten me why we have them?).
+I know, it's sort of an arbitrary number, I just chose a default size
+that is big enough for the strings we have.
 
- Thomas
+> ((I=E2=80=99d just have created an empty string.  Considering this is par=
+t of
+> the explanation for a fatal error, nobody cares whether this function
+> takes a couple of microseconds more.  Or maybe a length of 47, so it
+> can definitely hold exactly one incompatible feature name.))
 
+That would be fine with me as well, I don't think it matters so much
+either way. Feel free to change the default size or remove the
+explanation from the commit message if you want.
+
+Berto
 
