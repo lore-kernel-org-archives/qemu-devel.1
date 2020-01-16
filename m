@@ -2,79 +2,80 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE03C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C30C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:05:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8FF12075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A1F22075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:05:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QZiKyjo3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8FF12075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bg6hp2U/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A1F22075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is5lN-0000rD-1E
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:04:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47970)
+	id 1is5mP-0001qf-3U
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:05:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1is5kR-00005G-Rd
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:03:49 -0500
+ (envelope-from <stefanha@redhat.com>) id 1is5lL-0000z3-49
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:04:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1is5kM-0007Nl-Im
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:03:47 -0500
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:36032)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1is5kM-0007Mz-CY
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:03:42 -0500
-Received: by mail-oi1-x230.google.com with SMTP id c16so18950308oic.3
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 06:03:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VHjHSZeyddH2/dJdvpSQdT6RjGQaBZ3Y+7LxXdW/iLY=;
- b=QZiKyjo3wPDgug6+oXJEYEG2XhbpW8MqBpCDFQbtSOzIa1kaVLRc3KWxzOb19/P6Yy
- R+S6S30GlKiHuRDFyplR53ieUiNNUB9YmRc//c6joJmDd12kT7fSSgRllhiaeq0tMrRq
- d6NDIU85ali/sV32aveyxtWlEQII7moFA3ZXmAjGyAeJmO1ADuEOocbhc8qwTIx0uWni
- GWkPOEgTsHhkhIiOiiAfc+WfT4A1DC5QfTGHG1xVH/UatxeOtbsMzTJ7eUhv6f59+kM0
- 89/zU4xLIUQ+KzLAbhb7B1MwQeA6MHZ9LLP26BoUuDt/lNo0hV19EWNmY6g6uZXHKoTN
- qIeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VHjHSZeyddH2/dJdvpSQdT6RjGQaBZ3Y+7LxXdW/iLY=;
- b=BeFNY7vb/lU5NgHp8J+W5LQ+fj6gCPloCsm5roRBOe54JQnRfzRV+ls+tXhJDakakn
- xojLkD1Kr0n6oCip5wHpi3KwQi9lF8yEnMC6yKxjl8ioW40D/fHKzjku/RkDUNKxABHs
- zk6tbO8Uak3aUynBgbCtfVquQugiz8W5XHm/7gpr9rAT+moT0/CU1sRzdGcRHGZkovmj
- S1bRGkbSYQYQtOM/P8Tftqi0KCIKEQ+9nty40ojr7x/LUp9j3oSX2E4+0nY8dQnd6V7U
- +iGLBh3PfFq/q/P93PFQatFPp2Ptbyd3Yile3nf3vjMO3Kj0KIhQbPSEgrojimfz+DDp
- rpYg==
-X-Gm-Message-State: APjAAAXeOJngqNc0U+/rH2Ez5E98gmX6rM9+UDm/SmOjfK2lERVwUvzO
- mto7XNG4b+PG+k4tXTKeovNKTsCX3Q9VZOYhMk8ke2YymPE=
-X-Google-Smtp-Source: APXvYqxzk0Cr++Qkh/uQCJFpFgfkEjZqZ6E6zBiWQPoH6Tn8tVtpOlE9JPXCRHDNG36vrrbzbOJQSgwbMrpyr301qM8=
-X-Received: by 2002:aca:3d7:: with SMTP id 206mr4179780oid.98.1579183420896;
- Thu, 16 Jan 2020 06:03:40 -0800 (PST)
+ (envelope-from <stefanha@redhat.com>) id 1is5lG-0007wO-Hv
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:04:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55250
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1is5lG-0007w3-DL
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:04:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579183477;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=1SgnxguWrQRfZusyMQJOUoNWcC7bKp7UYOzQqqDaFn8=;
+ b=bg6hp2U/4YcFmRk7nCs6WQ2iJ1uMFZW1b02Edp0nmKCd1h0N8Jw4Yl9Woew7+wPhwo803R
+ xhfPqIDKyfPF/OhLYMCM1gL3sodoGLmG13EfBEFC+84EwfTj5gE6YSxJ/+BtPcXCh9VD0S
+ nP8kj0BWow4XLFTis6xND81uIKAn4tE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-szFA9iJ1MkW_0-B1yufd-w-1; Thu, 16 Jan 2020 09:04:36 -0500
+X-MC-Unique: szFA9iJ1MkW_0-B1yufd-w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A1328017CC;
+ Thu, 16 Jan 2020 14:04:35 +0000 (UTC)
+Received: from localhost (ovpn-117-207.ams2.redhat.com [10.36.117.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 430115DA87;
+ Thu, 16 Jan 2020 14:04:30 +0000 (UTC)
+Date: Thu, 16 Jan 2020 14:04:29 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Coiby Xu <coiby.xu@gmail.com>
+Subject: Re: [PATCH v2 3/5] a standone-alone tool to directly share disk
+ image file via vhost-user protocol
+Message-ID: <20200116140429.GJ163546@stefanha-x1.localdomain>
+References: <20200114140620.10385-1-coiby.xu@gmail.com>
+ <20200114140620.10385-4-coiby.xu@gmail.com>
 MIME-Version: 1.0
-References: <20200114102055.24058-1-armbru@redhat.com>
-In-Reply-To: <20200114102055.24058-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Jan 2020 14:03:29 +0000
-Message-ID: <CAFEAcA-xBy90PsLZWtzRG2qvd+Jq9XzdWGb-kPVF38dDwJvcbA@mail.gmail.com>
-Subject: Re: [PULL 0/6] QAPI patches for 2020-01-14
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::230
+In-Reply-To: <20200114140620.10385-4-coiby.xu@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="PEkEgRdBLZYkpbX2"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,45 +87,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jan 2020 at 10:22, Markus Armbruster <armbru@redhat.com> wrote:
->
-> My previous pull request failed tests with Python 2, which is now
-> gone.  Try again.
->
-> The following changes since commit dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into staging (2020-01-10 16:15:04 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2020-01-14
->
-> for you to fetch changes up to 3bef3aaec91815b75a78a4c12ca92ac3cec53faf:
->
->   qapi: Simplify QAPISchemaModularCVisitor (2020-01-14 11:01:58 +0100)
->
-> ----------------------------------------------------------------
-> QAPI patches for 2020-01-14
->
-> ----------------------------------------------------------------
-> Markus Armbruster (6):
->       qapi: Tweak "command returns a nice type" check for clarity
->       tests/Makefile.include: Fix missing test-qapi-emit-events.[ch]
->       qapi: Generate command registration stuff into separate files
->       qapi: Proper intermediate representation for modules
->       qapi: Fix code generation for empty modules
->       qapi: Simplify QAPISchemaModularCVisitor
+--PEkEgRdBLZYkpbX2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jan 14, 2020 at 10:06:18PM +0800, Coiby Xu wrote:
+> vhost-user-blk can have played as vhost-user backend but it only supports=
+ raw file and don't support VIRTIO_BLK_T_DISCARD and VIRTIO_BLK_T_WRITE_ZER=
+OES operations on raw file (ioctl(fd, BLKDISCARD) is only valid for real bl=
+ock device).
+>=20
+> Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+> ---
+>  qemu-vu.c | 264 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 264 insertions(+)
+>  create mode 100644 qemu-vu.c
 
-Applied, thanks.
+Kevin has been working on qemu-storage-daemon, a tool for running NBD
+exports, block jobs, and other storage features that are not part of a
+guest.  I think qemu-storage-daemon would be the appropriate tool for
+running vhost-user-blk servers.  A dedicated binary is not necessary.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Stefan
 
--- PMM
+--PEkEgRdBLZYkpbX2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4gbWwACgkQnKSrs4Gr
+c8iNUwf/RYjBnGzj8eAfP/WzlmnbMN/tClZwy6qzS+OLCpF4CAJysPxXLnZdyDFj
+mI0yfiGqdHQ59mYKHl15QQUajdADKi89nB6+MWhk2jSGJGXuau6XA0hj1itafcwf
+C5HyM/vxFtgOOXZa/hdOMOUqFvXmWxrnjkVHKTT2LZ+7oyhqlpB4dUC6D4YpSWCM
+EsC+wNsRfAKCXS0F4xpdIkrG7jxbitpL4uUD7DMjMMhKGAN88lkgQItWL7sXHHrX
+42/xI6Cv0ToJT2o7lVJv9IUjJXRTs4ucVRyABTgmPjlM/CS4dxKSEhhbxI1NMWhO
+cn8RNsuGRtMFMJh5JWP+tdxiNVGgNQ==
+=o1Ld
+-----END PGP SIGNATURE-----
+
+--PEkEgRdBLZYkpbX2--
+
 
