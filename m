@@ -2,98 +2,78 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7117C33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E3BC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B23892077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:51:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A24C206D9
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:51:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/SWG5ZK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B23892077C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BgBy/5Au"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A24C206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is7QD-0000YF-NA
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:51:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35679)
+	id 1is7QR-00013m-4f
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:51:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1is7MD-0003rn-Tq
+ (envelope-from <quintela@redhat.com>) id 1is7MD-0003rr-TX
  for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1is7MA-0004Wx-DK
+ (envelope-from <quintela@redhat.com>) id 1is7MC-0004Y7-BB
  for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32356
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24077
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1is7MA-0004Wi-9o
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:50 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1is7MC-0004Xt-7u
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579189609;
+ s=mimecast20190719; t=1579189611;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=v3HoVc7xv+KJtHHn6NKnlNPTo4XA5OiLoHvWdtECvAY=;
- b=K/SWG5ZKwtKHssJkZv3wAodFX5xyt6KTxGyfm1sTd5oq1v4dj4bz5HrmOFw1pqebwR+AJp
- dcGs1fm8mATIrL42CcDtsbSoKevG3ZQNLd8LNPkpZYcjDKd4Gpv0xeHgsFPoq2sMP7amXj
- 34nH46kdrkkmEFsOy3YKFv7zwrQyViY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-DxwDH2JJMHaT9mRp2WIE_A-1; Thu, 16 Jan 2020 10:46:48 -0500
-Received: by mail-wr1-f71.google.com with SMTP id w6so9339407wrm.16
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 07:46:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=f2zYStu2ck5cR/8DK54YTy4pUS0R3HFqp+k6jgDDUMg=;
- b=NFtprwFGuwtc8Fx3C8/dMHqGecfiFgCCOxbVk77Pl98UlVqaIYQAYoRp2TDAoVh46y
- sqMpaUJIkAB1R2lOrvaYwZPEO8Uyay/W/g9iPquMJkQnyNyxVRbPLU6c01vbS8hPlIPf
- QqfspvRBdDeRtUsXOGLbVJKxBq9dvIwtJTc6LnLqxkrlfuC6o/Vaizyq268n0I0tM3dp
- 442K/CFIvHE9HFFPWxMNFF+fzeUmErKGL1pjNUEcgLS2bFPedwnCrA2ieqnsEBZbLOD6
- J8NpJBt1Nb9kMZn4Y+SRqxec6Vc6sPax9+8wWz/3htDbNVAsQBFhcpw3/e8Y56CY1ZOn
- UkUg==
-X-Gm-Message-State: APjAAAVsxTfOFEE64bTKqyRxiwfVEReRiU1pKbX5ytSGa0nwWSZT+UAo
- 0OSJYP0PkfZI285dZahSFF856aqYOvjboILv9UsvDKmMx2U27Fi3/lrbylc72LQsf47b7GLKknH
- GqK+WaZjTNxtq1kU=
-X-Received: by 2002:a7b:cb01:: with SMTP id u1mr4715wmj.156.1579189607196;
- Thu, 16 Jan 2020 07:46:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzsoXkzJzxjR7csly048TJkwlGLqewTS6nIM567gGRroFWR8I6foAlMt+bbIIj1FfmzFGqH2Q==
-X-Received: by 2002:a7b:cb01:: with SMTP id u1mr4696wmj.156.1579189606984;
- Thu, 16 Jan 2020 07:46:46 -0800 (PST)
-Received: from [10.101.1.81] ([176.12.107.132])
- by smtp.gmail.com with ESMTPSA id x11sm810300wmg.46.2020.01.16.07.46.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Jan 2020 07:46:46 -0800 (PST)
-Subject: Re: [PATCH] tests/qtest/vhost-user-test: Fix memory leaks
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20200116140736.9498-1-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cac2dc95-9010-f901-c697-659308ece831@redhat.com>
-Date: Thu, 16 Jan 2020 16:46:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=NT34jybCSxqqhb9E0i6CiN4hh1ID9VIMQpr6EXCYNx4=;
+ b=BgBy/5AuZhmYd1yh8JY8NHK274YVyGf5QgQ3eHnXeJoLwoYh9aSItrUtkW2JSbca+Z5/CL
+ 1oUhDwsBA3Yh6P3+e1GCLycFqhCFrusgQXWI36bpiRY7JoplMOHkQd5U3h/Wb7Qpvv5O7w
+ 2m4FCmtuadnnzSiurPyD1psI+72DtI0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-LC64tN2XMmCqmcLC1PuU1g-1; Thu, 16 Jan 2020 10:46:50 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFF448BF0EF
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 15:46:49 +0000 (UTC)
+Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E15A6684B;
+ Thu, 16 Jan 2020 15:46:44 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 4/5] qemu-file: Don't do IO after shutdown
+Date: Thu, 16 Jan 2020 16:46:15 +0100
+Message-Id: <20200116154616.11569-5-quintela@redhat.com>
+In-Reply-To: <20200116154616.11569-1-quintela@redhat.com>
+References: <20200116154616.11569-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200116140736.9498-1-thuth@redhat.com>
-Content-Language: en-US
-X-MC-Unique: DxwDH2JJMHaT9mRp2WIE_A-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: LC64tN2XMmCqmcLC1PuU1g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,79 +86,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Pan Nengyuan <pannengyuan@huawei.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+ Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/16/20 3:07 PM, Thomas Huth wrote:
-> Do not allocate resources in case we return early, and make sure
-> to free dest_cmdline at the end.
->=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Reported-by: Pan Nengyuan <pannengyuan@huawei.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   Based on a similar patch by Pan Nengyuan:
->    https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg02183.html
->   ... but that was causing some very weird problems in the gitlab CI
->   for unknown reasons. This version now works fine in the gitlab CI.
+Be sure that we are not doing neither read/write after shutdown of the
+QEMUFile.
 
-Odd...
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 
->   =20
->   tests/qtest/vhost-user-test.c | 11 ++++++++---
->   1 file changed, 8 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.=
-c
-> index 2324b964ad..9ee0f1e4fd 100644
-> --- a/tests/qtest/vhost-user-test.c
-> +++ b/tests/qtest/vhost-user-test.c
-> @@ -707,9 +707,9 @@ static void test_read_guest_mem(void *obj, void *arg,=
- QGuestAllocator *alloc)
->   static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
->   {
->       TestServer *s =3D arg;
-> -    TestServer *dest =3D test_server_new("dest");
-> -    GString *dest_cmdline =3D g_string_new(qos_get_current_command_line(=
-));
-> -    char *uri =3D g_strdup_printf("%s%s", "unix:", dest->mig_path);
-> +    TestServer *dest;
-> +    GString *dest_cmdline;
-> +    char *uri;
->       QTestState *to;
->       GSource *source;
->       QDict *rsp;
-> @@ -720,6 +720,10 @@ static void test_migrate(void *obj, void *arg, QGues=
-tAllocator *alloc)
->           return;
->       }
->  =20
-> +    dest =3D test_server_new("dest");
-> +    dest_cmdline =3D g_string_new(qos_get_current_command_line());
-> +    uri =3D g_strdup_printf("%s%s", "unix:", dest->mig_path);
-> +
->       size =3D get_log_size(s);
->       g_assert_cmpint(size, =3D=3D, (256 * 1024 * 1024) / (VHOST_LOG_PAGE=
- * 8));
->  =20
-> @@ -778,6 +782,7 @@ static void test_migrate(void *obj, void *arg, QGuest=
-Allocator *alloc)
->       qtest_quit(to);
->       test_server_free(dest);
->       g_free(uri);
-> +    g_string_free(dest_cmdline, true);
+---
 
-Simpler, good.
+Set error in case that there is none (dave)
+---
+ migration/qemu-file.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->   }
->  =20
->   static void wait_for_rings_started(TestServer *s, size_t count)
->=20
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 26fb25ddc1..bbb2b63927 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -53,6 +53,8 @@ struct QEMUFile {
+=20
+     int last_error;
+     Error *last_error_obj;
++    /* has the file has been shutdown */
++    bool shutdown;
+ };
+=20
+ /*
+@@ -61,10 +63,18 @@ struct QEMUFile {
+  */
+ int qemu_file_shutdown(QEMUFile *f)
+ {
++    int ret;
++
++    f->shutdown =3D true;
+     if (!f->ops->shut_down) {
+         return -ENOSYS;
+     }
+-    return f->ops->shut_down(f->opaque, true, true, NULL);
++    ret =3D f->ops->shut_down(f->opaque, true, true, NULL);
++
++    if (!f->last_error) {
++        qemu_file_set_error(f, -EIO);
++    }
++    return ret;
+ }
+=20
+ /*
+@@ -214,6 +224,9 @@ void qemu_fflush(QEMUFile *f)
+         return;
+     }
+=20
++    if (f->shutdown) {
++        return;
++    }
+     if (f->iovcnt > 0) {
+         expect =3D iov_size(f->iov, f->iovcnt);
+         ret =3D f->ops->writev_buffer(f->opaque, f->iov, f->iovcnt, f->pos=
+,
+@@ -328,6 +341,10 @@ static ssize_t qemu_fill_buffer(QEMUFile *f)
+     f->buf_index =3D 0;
+     f->buf_size =3D pending;
+=20
++    if (f->shutdown) {
++        return 0;
++    }
++
+     len =3D f->ops->get_buffer(f->opaque, f->buf + pending, f->pos,
+                              IO_BUF_SIZE - pending, &local_error);
+     if (len > 0) {
+@@ -642,6 +659,9 @@ int64_t qemu_ftell(QEMUFile *f)
+=20
+ int qemu_file_rate_limit(QEMUFile *f)
+ {
++    if (f->shutdown) {
++        return 1;
++    }
+     if (qemu_file_get_error(f)) {
+         return 1;
+     }
+--=20
+2.24.1
 
 
