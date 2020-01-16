@@ -2,99 +2,102 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84375C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EE8C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:44:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FA81206D9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3BF62075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:44:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emzXO3K2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FA81206D9
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LtvA6IcJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3BF62075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is7HI-0007dO-9c
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:41:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34853)
+	id 1is7JT-0001ug-0s
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:44:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1is7GS-0006v0-9U
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:41:00 -0500
+ (envelope-from <philmd@redhat.com>) id 1is7Ij-0001TJ-CV
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:43:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1is7GO-0000YB-1R
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:40:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34701
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1is7Ih-00020D-PW
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:43:17 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44847
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1is7GN-0000Xk-UE
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:40:51 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1is7Ih-0001zk-L7
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:43:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579189251;
+ s=mimecast20190719; t=1579189395;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XsFhr/S1WfRkrVXz+qIVh16ki/lHWPt5GFVqVN55z8k=;
- b=emzXO3K23CXryjZ/5ZfIzIedUL71iOY8rRIk6ODZlroSM2LLD6bJvWJq5HqpYotOo4/ByL
- mDKY4pOnTjLNXGTT52i1jgUEKC4R1y94zx5YnzF3hnql182gRs0FfU+FXLwn/7mESUGZ7Q
- eOq7T8j2/lePU56DxClzs3ub9FeX31Q=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-g4AzFSwGMJOMSqa3Dtjbzw-1; Thu, 16 Jan 2020 10:40:48 -0500
-Received: by mail-wm1-f72.google.com with SMTP id p5so669504wmc.4
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 07:40:47 -0800 (PST)
+ bh=xP1b3XRjCaR23Gl9n9t2xLL3XcccUWCoYMwhtnBuh3c=;
+ b=LtvA6IcJXWim4VDo41rEbKgF4/elBKYOWWVREVfw65r0/85AEfb7aiwJ/239IHRmvnulBH
+ 1XOTQRoXSLQdtgEY+qqZ79Drv9vo6KDRvTAE6anx3Hx1zYDAuWv837/1/VnTPGNWaLXFbH
+ VXU8J54Jk0A8rRK1rlO1YdVlS0pxcq4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-CW9q0RmtNLuCxyC7r1wQWQ-1; Thu, 16 Jan 2020 10:43:11 -0500
+Received: by mail-wr1-f69.google.com with SMTP id z14so9490138wrs.4
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 07:43:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=gm/KQNE4HskqN2+o6koW9CGTcOg1ttrNyvJh/xwjYU0=;
- b=CQRk707xBUwTLDGWez+Vo5OBk5ommfLSBavsHgOmC2Gtffn2AQZKbpW1poQqiPaVC7
- 7sZvsoDACziBqNKmFHWyn5uM/Rx7vzOevDDJ6lRLQibdFGI3uCuDrMheRRr+B9vX46GM
- V8FPEEGqoDR9ldUAuK69wdgeuLcpB3xwZgEvng5jnaoxLp+R1NSJmG5kjvUe3CoTcLaT
- wQglbUAt4NDt4BxkJECddCUaKWAIiuvaMEPY6oedvwp70mSK1Pusm/k9TGhR0bJuf9eC
- IlewNR5HZhV1dK+7RK7dFbAvOXvqC8cIXNPGiuzC2lK667VKwJDS8zfxgND8CTkPmeQv
- 3gUA==
-X-Gm-Message-State: APjAAAVKHdNrN7H/HEDcpTrNq0ShRB9ZupEH7/AzCafQ9Y7aUH0qImeu
- zDD6yik38WI3W350UupXmQM6YrQPcQPHRDYd0K3xtJO3cVX5HIt+7zvqE3bI5YbvuyLKOpvUcuP
- Hc4SJuoZ2wZcsGE4=
-X-Received: by 2002:a5d:4847:: with SMTP id n7mr4018305wrs.30.1579189246842;
- Thu, 16 Jan 2020 07:40:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyRP/+1AsU8pvTNKIMyFy/4x0OICR1y+UMFOwZQJatg28ZbJ7zQ6S3vj3a2v87UN4lOM+Sv1w==
-X-Received: by 2002:a5d:4847:: with SMTP id n7mr4018286wrs.30.1579189246633;
- Thu, 16 Jan 2020 07:40:46 -0800 (PST)
+ bh=xP1b3XRjCaR23Gl9n9t2xLL3XcccUWCoYMwhtnBuh3c=;
+ b=Jj8klDhsB8p/PkAEoCavAbWtR7VaRQ+nlM/ADDNNoIfAOv4yjDpRSw0dpuvQEbj66E
+ tkscrm6U7ugAs8jzTsT7kfjrQEG+XEOHnB81nLalDC1hSvzQGGGL/y0fjDg62dWOlt0L
+ qZiBpAyOYmLscnPNVb85/WNd5kbRe1iTxYjH71Srkyg9fS7I+JDRZ+QXJKUP9a6EGmHa
+ aY6uSUH/vzPqsQd4xE0zopKwjjAf4L+8t/wOeZEk98snhAAisXqCd5g/3TupNDbXvQc5
+ xnIk4leNcC+vTZiJGRxytTRTOGfabG780rv0R8FYyV6iezbhV8X+BUN0EJBMw+CiIgAW
+ P9rg==
+X-Gm-Message-State: APjAAAWb97pYzcG8O4xUNMJaJ+mzaxcdujvw2B4JdIVTrF7TJoBq26dg
+ a86bJnSxYNhdwWSqK6D56wjhQaQEhBU+yoi4t/HhyMh3ghnmRebTMMvu3HXVfU8m4dGofId5Pys
+ JGaZ3nwGxAIhjrso=
+X-Received: by 2002:a05:600c:2298:: with SMTP id
+ 24mr6988416wmf.65.1579189390683; 
+ Thu, 16 Jan 2020 07:43:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxsQ22242W5u1MVJT6bH5QkJL4Hu7reSWAboapP47oMpZuRNhDY+ZKg6yDG5oX/k72JLrjYow==
+X-Received: by 2002:a05:600c:2298:: with SMTP id
+ 24mr6988396wmf.65.1579189390444; 
+ Thu, 16 Jan 2020 07:43:10 -0800 (PST)
 Received: from [10.101.1.81] ([176.12.107.132])
- by smtp.gmail.com with ESMTPSA id b18sm30025590wru.50.2020.01.16.07.40.45
+ by smtp.gmail.com with ESMTPSA id p15sm3076155wma.40.2020.01.16.07.43.08
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Jan 2020 07:40:46 -0800 (PST)
-Subject: Re: [PATCH v2 85/86] numa: make exit() usage consistent
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-86-git-send-email-imammedo@redhat.com>
+ Thu, 16 Jan 2020 07:43:09 -0800 (PST)
+Subject: Re: [PATCH v2 00/86] refactor main RAM allocation to use hostmem
+ backend
+To: qemu-devel@nongnu.org, no-reply@patchew.org, imammedo@redhat.com,
+ Markus Armbruster <armbru@redhat.com>
+References: <157912207219.8290.12574147223674937177@37313f22b938>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0243fb4a-298a-4211-46f4-db2f5a34b2c5@redhat.com>
-Date: Thu, 16 Jan 2020 16:40:43 +0100
+Message-ID: <b81ad35f-73d0-a333-d0fe-758e64242ca2@redhat.com>
+Date: Thu, 16 Jan 2020 16:43:07 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1579100861-73692-86-git-send-email-imammedo@redhat.com>
+In-Reply-To: <157912207219.8290.12574147223674937177@37313f22b938>
 Content-Language: en-US
-X-MC-Unique: g4AzFSwGMJOMSqa3Dtjbzw-1
+X-MC-Unique: CW9q0RmtNLuCxyC7r1wQWQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,45 +109,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/15/20 4:07 PM, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: ehabkost@redhat.com
-> ---
->   hw/core/numa.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index 3177066..47d5ea1 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -718,7 +718,7 @@ void numa_complete_configuration(MachineState *ms)
->           /* Report large node IDs first, to make mistakes easier to spot=
- */
->           if (!numa_info[i].present) {
->               error_report("numa: Node ID missing: %d", i);
-> -            exit(1);
-> +            exit(EXIT_FAILURE);
->           }
->       }
->  =20
-> @@ -759,7 +759,7 @@ void numa_complete_configuration(MachineState *ms)
->               error_report("total memory for NUMA nodes (0x%" PRIx64 ")"
->                            " should equal RAM size (0x" RAM_ADDR_FMT ")",
->                            numa_total, ram_size);
-> -            exit(1);
-> +            exit(EXIT_FAILURE);
->           }
->  =20
->           if (!numa_uses_legacy_mem()) {
->=20
+On 1/15/20 10:01 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/1579100861-73692-1-git-send-email-imammedo@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> make docker-image-centos7 V=1 NETWORK=1
+> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+> === TEST SCRIPT END ===
+> 
+>    TEST    iotest-qcow2: 217
+> socket_accept failed: Resource temporarily unavailable
+> **
+> ERROR:/tmp/qemu-test/src/tests/qtest/libqtest.c:272:qtest_init_without_qmp_handshake: assertion failed: (s->fd >= 0 && s->qmp_fd >= 0)
+> /tmp/qemu-test/src/tests/qtest/libqtest.c:140: kill_qemu() tried to terminate QEMU process but encountered exit status 1 (expected 0)
+> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/libqtest.c:272:qtest_init_without_qmp_handshake: assertion failed: (s->fd >= 0 && s->qmp_fd >= 0)
+> make: *** [check-qtest-x86_64] Error 1
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Is this something we should care about?
+
+> make: *** Waiting for unfinished jobs....
+>    TEST    check-qtest-aarch64: tests/qtest/test-hmp
+>    TEST    iotest-qcow2: 220
+> ---
+>      raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=755fcbfd171f40b1b16d6aac34e7c09b', '-u', '1003', '--security-opt', 'seccomp=unconfined', '--rm', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew2/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-qd5wtatm/src/docker-src.2020-01-15-15.50.14.28652:/var/tmp/qemu:z,ro', 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
+> filter=--filter=label=com.qemu.instance.uuid=755fcbfd171f40b1b16d6aac34e7c09b
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-qd5wtatm/src'
+> make: *** [docker-run-test-quick@centos7] Error 2
+> 
+> real    11m0.219s
+> user    0m8.267s
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/1579100861-73692-1-git-send-email-imammedo@redhat.com/testing.docker-quick@centos7/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
 
 
