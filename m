@@ -2,95 +2,83 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D89C33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 095D3C33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CAF2208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:46:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CAF2208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC13D24680
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:48:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CtCaSHZI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC13D24680
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is8I5-00089T-EO
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:46:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43703)
+	id 1is8Jz-0002Yh-9C
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:48:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1is8Cz-00015C-Uc
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:27 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1is8Gy-0007OU-Ch
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:45:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1is8Cw-0005z6-8o
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5092)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1is8Cw-0005y1-1a
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:22 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00GGcTbn146415
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:21 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xh8d6dhv8-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:20 -0500
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Thu, 16 Jan 2020 16:41:18 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 16 Jan 2020 16:41:15 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00GGfEDl34406652
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 16 Jan 2020 16:41:14 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5384AA405D;
- Thu, 16 Jan 2020 16:41:14 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2E73AA406B;
- Thu, 16 Jan 2020 16:41:12 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.199.49.154])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 16 Jan 2020 16:41:11 +0000 (GMT)
-From: Ganesh Goudar <ganeshgr@linux.ibm.com>
-To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
-Subject: [PATCH v19 6/7] migration: Include migration support for machine
- check handling
-Date: Thu, 16 Jan 2020 22:09:51 +0530
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
-References: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20011616-0012-0000-0000-0000037DF004
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011616-0013-0000-0000-000021BA2496
-Message-Id: <20200116163952.11090-7-ganeshgr@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-01-16_05:2020-01-16,
- 2020-01-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
- phishscore=0 suspectscore=2 adultscore=0 impostorscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001160136
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <dgilbert@redhat.com>) id 1is8Gr-0001WX-G6
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:45:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38284
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1is8Gp-0001TM-NV
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:45:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579193122;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q4pGY4zfLx97UvjWbeFH9Sa1S6YMGWpAMZ1qiLr+Zs0=;
+ b=CtCaSHZI8uxfXgr9/tYgDzuPUhGG59ooPe6yGHDgPA+lXDdtQPq3OyMLR2Q2p9i7fo5bB0
+ ZfskU3kSjcOOBMKw3C4i8SYEAlcp0Lz1vHYQ6EF2W+o2qojnlWptoVpPqWN77c6y42t7wM
+ K/J6d0PaDxmlsTNjqwf6ai8HAgUyol0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-136-gv1cLK_OMF26Iy2bY4gDeA-1; Thu, 16 Jan 2020 11:45:19 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32267800D4E;
+ Thu, 16 Jan 2020 16:45:18 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2318619C5B;
+ Thu, 16 Jan 2020 16:45:13 +0000 (UTC)
+Date: Thu, 16 Jan 2020 16:45:11 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>, mszeredi@redhat.com
+Subject: Re: [PATCH 072/104] virtiofsd: passthrough_ll: fix refcounting on
+ remove/rename
+Message-ID: <20200116164511.GJ3108@work-vm>
+References: <20191212163904.159893-73-dgilbert@redhat.com>
+ <20200116115603.5415-1-misono.tomohiro@jp.fujitsu.com>
+MIME-Version: 1.0
+In-Reply-To: <20200116115603.5415-1-misono.tomohiro@jp.fujitsu.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: gv1cLK_OMF26Iy2bY4gDeA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,194 +90,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
- Aravinda Prasad <arawinda.p@gmail.com>, groug@kaod.org
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aravinda Prasad <arawinda.p@gmail.com>
+* Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
+> > From: Miklos Szeredi <mszeredi@redhat.com>
+> >=20
+> > Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+>=20
+> I'm not familiar with qemu convention but shouldn't we put
+> at least one line of description like linux kernel?
 
-This patch includes migration support for machine check
-handling. Especially this patch blocks VM migration
-requests until the machine check error handling is
-complete as these errors are specific to the source
-hardware and is irrelevant on the target hardware.
+Miklos: would you like to suggest a better commit message?
 
-Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
-[Do not set FWNMI cap in post_load, now its done in .apply hook]
-Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
----
- hw/ppc/spapr.c         | 47 ++++++++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr_events.c  | 16 +++++++++++++-
- hw/ppc/spapr_rtas.c    |  4 ++++
- include/hw/ppc/spapr.h |  2 +-
- 4 files changed, 67 insertions(+), 2 deletions(-)
+> For code itself:
+>  Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 46bac1a83c..c8bc2fa9f3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -46,6 +46,7 @@
- #include "migration/qemu-file-types.h"
- #include "migration/global_state.h"
- #include "migration/register.h"
-+#include "migration/blocker.h"
- #include "mmu-hash64.h"
- #include "mmu-book3s-v3.h"
- #include "cpu-models.h"
-@@ -1683,6 +1684,8 @@ static void spapr_machine_reset(MachineState *machine)
- 
-     /* Signal all vCPUs waiting on this condition */
-     qemu_cond_broadcast(&spapr->mc_delivery_cond);
-+
-+    migrate_del_blocker(spapr->fwnmi_migration_blocker);
- }
- 
- static void spapr_create_nvram(SpaprMachineState *spapr)
-@@ -1965,6 +1968,42 @@ static const VMStateDescription vmstate_spapr_dtb = {
-     },
- };
- 
-+static bool spapr_fwnmi_needed(void *opaque)
-+{
-+    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
-+
-+    return spapr->guest_machine_check_addr != -1;
-+}
-+
-+static int spapr_fwnmi_pre_save(void *opaque)
-+{
-+    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
-+
-+    /*
-+     * Check if machine check handling is in progress and print a
-+     * warning message.
-+     */
-+    if (spapr->mc_status != -1) {
-+        warn_report("A machine check is being handled during migration. The"
-+                "handler may run and log hardware error on the destination");
-+    }
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_spapr_machine_check = {
-+    .name = "spapr_machine_check",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_fwnmi_needed,
-+    .pre_save = spapr_fwnmi_pre_save,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
-+        VMSTATE_INT32(mc_status, SpaprMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_spapr = {
-     .name = "spapr",
-     .version_id = 3,
-@@ -1999,6 +2038,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_cap_large_decr,
-         &vmstate_spapr_cap_ccf_assist,
-         &vmstate_spapr_cap_fwnmi,
-+        &vmstate_spapr_machine_check,
-         NULL
-     }
- };
-@@ -2814,6 +2854,13 @@ static void spapr_machine_init(MachineState *machine)
-         spapr_create_lmb_dr_connectors(spapr);
-     }
- 
-+    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_ON) {
-+        /* Create the error string for live migration blocker */
-+        error_setg(&spapr->fwnmi_migration_blocker,
-+            "A machine check is being handled during migration. The handler"
-+            "may run and log hardware error on the destination");
-+    }
-+
-     /* Set up RTAS event infrastructure */
-     spapr_events_init(spapr);
- 
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 54eaf28a9e..884e455f02 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -43,6 +43,7 @@
- #include "qemu/main-loop.h"
- #include "hw/ppc/spapr_ovec.h"
- #include <libfdt.h>
-+#include "migration/blocker.h"
- 
- #define RTAS_LOG_VERSION_MASK                   0xff000000
- #define   RTAS_LOG_VERSION_6                    0x06000000
-@@ -843,6 +844,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
- {
-     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     CPUState *cs = CPU(cpu);
-+    int ret;
-+    Error *local_err = NULL;
- 
-     if (spapr->guest_machine_check_addr == -1) {
-         /*
-@@ -872,8 +875,19 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
-             return;
-         }
-     }
--    spapr->mc_status = cpu->vcpu_id;
- 
-+    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
-+    if (ret == -EBUSY) {
-+        /*
-+         * We don't want to abort so we let the migration to continue.
-+         * In a rare case, the machine check handler will run on the target.
-+         * Though this is not preferable, it is better than aborting
-+         * the migration or killing the VM.
-+         */
-+        warn_report("Received a fwnmi while migration was in progress");
-+    }
-+
-+    spapr->mc_status = cpu->vcpu_id;
-     spapr_mce_dispatch_elog(cpu, recovered);
- }
- 
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 3f162d82f5..b1594443c7 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -50,6 +50,7 @@
- #include "hw/ppc/fdt.h"
- #include "target/ppc/mmu-hash64.h"
- #include "target/ppc/mmu-book3s-v3.h"
-+#include "migration/blocker.h"
- 
- static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                                    uint32_t token, uint32_t nargs,
-@@ -453,6 +454,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-     spapr->mc_status = -1;
-     qemu_cond_signal(&spapr->mc_delivery_cond);
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-+    migrate_del_blocker(spapr->fwnmi_migration_blocker);
-+    error_free(spapr->fwnmi_migration_blocker);
-+    spapr->fwnmi_migration_blocker = NULL;
- }
- 
- static struct rtas_call {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index a90e677cc3..12e7b1eddc 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -219,7 +219,7 @@ struct SpaprMachineState {
-     unsigned gpu_numa_id;
-     SpaprTpmProxy *tpm_proxy;
- 
--    bool fwnmi_calls_registered;
-+    Error *fwnmi_migration_blocker;
- };
- 
- #define H_SUCCESS         0
--- 
-2.17.2
+Thanks!
+
+>=20
+> > ---
+> >  tools/virtiofsd/passthrough_ll.c | 50 +++++++++++++++++++++++++++++++-
+> >  1 file changed, 49 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthr=
+ough_ll.c
+> > index 0f33c3c5e9..1b84d4f313 100644
+> > --- a/tools/virtiofsd/passthrough_ll.c
+> > +++ b/tools/virtiofsd/passthrough_ll.c
+> > @@ -1077,17 +1077,42 @@ out_err:
+> >      fuse_reply_err(req, saverr);
+> >  }
+> > =20
+> > +static struct lo_inode *lookup_name(fuse_req_t req, fuse_ino_t parent,
+> > +                                    const char *name)
+> > +{
+> > +    int res;
+> > +    struct stat attr;
+> > +
+> > +    res =3D fstatat(lo_fd(req, parent), name, &attr,
+> > +                  AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
+> > +    if (res =3D=3D -1) {
+> > +        return NULL;
+> > +    }
+> > +
+> > +    return lo_find(lo_data(req), &attr);
+> > +}
+> > +
+> >  static void lo_rmdir(fuse_req_t req, fuse_ino_t parent, const char *na=
+me)
+> >  {
+> >      int res;
+> > +    struct lo_inode *inode;
+> > +    struct lo_data *lo =3D lo_data(req);
+> > +
+> >      if (!is_safe_path_component(name)) {
+> >          fuse_reply_err(req, EINVAL);
+> >          return;
+> >      }
+> > =20
+> > +    inode =3D lookup_name(req, parent, name);
+> > +    if (!inode) {
+> > +        fuse_reply_err(req, EIO);
+> > +        return;
+> > +    }
+> > +
+> >      res =3D unlinkat(lo_fd(req, parent), name, AT_REMOVEDIR);
+> > =20
+> >      fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+> > +    unref_inode_lolocked(lo, inode, 1);
+> >  }
+> > =20
+> >  static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *n=
+ame,
+> > @@ -1095,12 +1120,23 @@ static void lo_rename(fuse_req_t req, fuse_ino_=
+t parent, const char *name,
+> >                        unsigned int flags)
+> >  {
+> >      int res;
+> > +    struct lo_inode *oldinode;
+> > +    struct lo_inode *newinode;
+> > +    struct lo_data *lo =3D lo_data(req);
+> > =20
+> >      if (!is_safe_path_component(name) || !is_safe_path_component(newna=
+me)) {
+> >          fuse_reply_err(req, EINVAL);
+> >          return;
+> >      }
+> > =20
+> > +    oldinode =3D lookup_name(req, parent, name);
+> > +    newinode =3D lookup_name(req, newparent, newname);
+> > +
+> > +    if (!oldinode) {
+> > +        fuse_reply_err(req, EIO);
+> > +        goto out;
+> > +    }
+> > +
+> >      if (flags) {
+> >  #ifndef SYS_renameat2
+> >          fuse_reply_err(req, EINVAL);
+> > @@ -1113,26 +1149,38 @@ static void lo_rename(fuse_req_t req, fuse_ino_=
+t parent, const char *name,
+> >              fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+> >          }
+> >  #endif
+> > -        return;
+> > +        goto out;
+> >      }
+> > =20
+> >      res =3D renameat(lo_fd(req, parent), name, lo_fd(req, newparent), =
+newname);
+> > =20
+> >      fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+> > +out:
+> > +    unref_inode_lolocked(lo, oldinode, 1);
+> > +    unref_inode_lolocked(lo, newinode, 1);
+> >  }
+> > =20
+> >  static void lo_unlink(fuse_req_t req, fuse_ino_t parent, const char *n=
+ame)
+> >  {
+> >      int res;
+> > +    struct lo_inode *inode;
+> > +    struct lo_data *lo =3D lo_data(req);
+> > =20
+> >      if (!is_safe_path_component(name)) {
+> >          fuse_reply_err(req, EINVAL);
+> >          return;
+> >      }
+> > =20
+> > +    inode =3D lookup_name(req, parent, name);
+> > +    if (!inode) {
+> > +        fuse_reply_err(req, EIO);
+> > +        return;
+> > +    }
+> > +
+> >      res =3D unlinkat(lo_fd(req, parent), name, 0);
+> > =20
+> >      fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+> > +    unref_inode_lolocked(lo, inode, 1);
+> >  }
+> > =20
+> >  static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *=
+inode,
+> > --=20
+> > 2.23.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
