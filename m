@@ -2,75 +2,69 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96508C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 11:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3D3C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 11:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6201A20748
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 11:44:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJIC0bYY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6201A20748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B6CA20730
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 11:48:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6CA20730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is3Zv-0008Gh-G4
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 06:44:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56907)
+	id 1is3dg-0002Cb-L5
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 06:48:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1is3Z9-0007k6-6l
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 06:44:02 -0500
+ (envelope-from <misono.tomohiro@fujitsu.com>) id 1is3d2-0001QR-W5
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 06:48:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1is3Z4-0000rj-2P
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 06:43:57 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27114
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1is3Z3-0000rM-Uk
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 06:43:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579175033;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=cyOezF3QCcWjBk5RuK5OHcuACdjuHTsHms5krZNBTco=;
- b=QJIC0bYYsn0kbONdvnBH+rifAevy3xgEeKcX34rhW8YOBndQFaSqxeevKCENyvQdn8s73r
- GqeHoex2Rcul2Ju37GyACss+t3c8gd2co29h97at3mCxKTrdt7b5TqE9Tk5NHhlLc7uTJh
- BHMsgWO7EApHMPX5s0FuLV0OM0FMnlY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-PJeiR2xMMw-eneHGpmqZEg-1; Thu, 16 Jan 2020 06:43:51 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01FD110054E3;
- Thu, 16 Jan 2020 11:43:50 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-187.brq.redhat.com [10.40.205.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 222F58886E;
- Thu, 16 Jan 2020 11:43:41 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] Makefile: Keep trace-events-subdirs ordered
-Date: Thu, 16 Jan 2020 12:43:39 +0100
-Message-Id: <20200116114339.30670-1-philmd@redhat.com>
+ (envelope-from <misono.tomohiro@fujitsu.com>) id 1is3cy-0002tD-Mg
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 06:48:00 -0500
+Received: from mgwym03.jp.fujitsu.com ([211.128.242.42]:24020)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
+ id 1is3cx-0002pP-WA
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 06:47:56 -0500
+Received: from yt-mxoi1.gw.nic.fujitsu.com (unknown [192.168.229.67]) by
+ mgwym03.jp.fujitsu.com with smtp
+ id 2a40_6602_fc948adb_3aa9_4dd4_a59b_c3ee697d68cc;
+ Thu, 16 Jan 2020 20:47:45 +0900
+Received: from g01jpfmpwyt01.exch.g01.fujitsu.local
+ (g01jpfmpwyt01.exch.g01.fujitsu.local [10.128.193.38])
+ by yt-mxoi1.gw.nic.fujitsu.com (Postfix) with ESMTP id 3708BAC010A
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 20:47:45 +0900 (JST)
+Received: from G01JPEXCHYT14.g01.fujitsu.local
+ (G01JPEXCHYT14.g01.fujitsu.local [10.128.194.53])
+ by g01jpfmpwyt01.exch.g01.fujitsu.local (Postfix) with ESMTP id 347396D677E;
+ Thu, 16 Jan 2020 20:47:44 +0900 (JST)
+Received: from luna3.soft.fujitsu.com (10.124.196.199) by
+ G01JPEXCHYT14.g01.fujitsu.local (10.128.194.53) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 16 Jan 2020 20:47:43 +0900
+From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+To: <dgilbert@redhat.com>
+Subject: Re: [PATCH 072/104] virtiofsd: passthrough_ll: fix refcounting on
+ remove/rename
+Date: Thu, 16 Jan 2020 20:56:03 +0900
+Message-ID: <20200116115603.5415-1-misono.tomohiro@jp.fujitsu.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20191212163904.159893-73-dgilbert@redhat.com>
+References: <20191212163904.159893-73-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: PJeiR2xMMw-eneHGpmqZEg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-SecurityPolicyCheck-GC: OK by FENCE-Mail
+X-TM-AS-GCONF: 00
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 211.128.242.42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,85 +76,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org,
- Alexey Kardashevskiy <aik@ozlabs.ru>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: misono.tomohiro@jp.fujitsu.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding the same directory multiple times to trace-events-subdirs
-might trigger build failures, in particular when using the LTTng
-Userspace Tracer library as backend.
+> From: Miklos Szeredi <mszeredi@redhat.com>
+> 
+> Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
 
-For example when using two times the hw/core/ directory:
+I'm not familiar with qemu convention but shouldn't we put
+at least one line of description like linux kernel?
 
-    $ ./configure --enable-trace-backends=3Dust && make
-   [...]
-     CC      trace-ust-all.o
-   In file included from trace-ust-all.h:13,
-                    from trace-ust-all.c:13:
-   trace-ust-all.h:35151:1: error: redefinition of =E2=80=98__tracepoint_cb=
-_qemu___loader_write_rom=E2=80=99
-   35151 | TRACEPOINT_EVENT(
-         | ^~~~~~~~~~~~~~~~
-   trace-ust-all.h:31791:1: note: previous definition of =E2=80=98__tracepo=
-int_cb_qemu___loader_write_rom=E2=80=99 was here
-   31791 | TRACEPOINT_EVENT(
-         | ^~~~~~~~~~~~~~~~
+For code itself:
+ Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
-To ease review and reduce likelihood of merge failures (see [*]),
-keep trace-events-subdirs ordered when possible, following eb7ccb3c0.
-
-[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg671007.html
-    Duplicate trace-events-subdirs entries generates duplicated
-    symbols when using the LTTng Userspace Tracer library.
-
-Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v2: Add build log error in commit description (lvivier)
-
-"Fixes: 26b8e6dc & 8d5d515a0"
-
-To be even safer we should use $(sort $(trace-events-subdirs))
----
- Makefile.objs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile.objs b/Makefile.objs
-index 7c1e50f9d6..d62f908965 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -142,8 +142,8 @@ trace-events-subdirs +=3D nbd
- trace-events-subdirs +=3D scsi
- endif
- ifeq ($(CONFIG_SOFTMMU),y)
--trace-events-subdirs +=3D chardev
- trace-events-subdirs +=3D audio
-+trace-events-subdirs +=3D chardev
- trace-events-subdirs +=3D hw/9pfs
- trace-events-subdirs +=3D hw/acpi
- trace-events-subdirs +=3D hw/alpha
-@@ -191,6 +191,7 @@ trace-events-subdirs +=3D migration
- trace-events-subdirs +=3D net
- trace-events-subdirs +=3D ui
- endif
-+trace-events-subdirs +=3D hw/core
- trace-events-subdirs +=3D hw/display
- trace-events-subdirs +=3D qapi
- trace-events-subdirs +=3D qom
-@@ -203,7 +204,6 @@ trace-events-subdirs +=3D target/riscv
- trace-events-subdirs +=3D target/s390x
- trace-events-subdirs +=3D target/sparc
- trace-events-subdirs +=3D util
--trace-events-subdirs +=3D hw/core
-=20
- trace-events-files =3D $(SRC_PATH)/trace-events $(trace-events-subdirs:%=
-=3D$(SRC_PATH)/%/trace-events)
-=20
---=20
-2.21.1
-
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 50 +++++++++++++++++++++++++++++++-
+>  1 file changed, 49 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index 0f33c3c5e9..1b84d4f313 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -1077,17 +1077,42 @@ out_err:
+>      fuse_reply_err(req, saverr);
+>  }
+>  
+> +static struct lo_inode *lookup_name(fuse_req_t req, fuse_ino_t parent,
+> +                                    const char *name)
+> +{
+> +    int res;
+> +    struct stat attr;
+> +
+> +    res = fstatat(lo_fd(req, parent), name, &attr,
+> +                  AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
+> +    if (res == -1) {
+> +        return NULL;
+> +    }
+> +
+> +    return lo_find(lo_data(req), &attr);
+> +}
+> +
+>  static void lo_rmdir(fuse_req_t req, fuse_ino_t parent, const char *name)
+>  {
+>      int res;
+> +    struct lo_inode *inode;
+> +    struct lo_data *lo = lo_data(req);
+> +
+>      if (!is_safe_path_component(name)) {
+>          fuse_reply_err(req, EINVAL);
+>          return;
+>      }
+>  
+> +    inode = lookup_name(req, parent, name);
+> +    if (!inode) {
+> +        fuse_reply_err(req, EIO);
+> +        return;
+> +    }
+> +
+>      res = unlinkat(lo_fd(req, parent), name, AT_REMOVEDIR);
+>  
+>      fuse_reply_err(req, res == -1 ? errno : 0);
+> +    unref_inode_lolocked(lo, inode, 1);
+>  }
+>  
+>  static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
+> @@ -1095,12 +1120,23 @@ static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
+>                        unsigned int flags)
+>  {
+>      int res;
+> +    struct lo_inode *oldinode;
+> +    struct lo_inode *newinode;
+> +    struct lo_data *lo = lo_data(req);
+>  
+>      if (!is_safe_path_component(name) || !is_safe_path_component(newname)) {
+>          fuse_reply_err(req, EINVAL);
+>          return;
+>      }
+>  
+> +    oldinode = lookup_name(req, parent, name);
+> +    newinode = lookup_name(req, newparent, newname);
+> +
+> +    if (!oldinode) {
+> +        fuse_reply_err(req, EIO);
+> +        goto out;
+> +    }
+> +
+>      if (flags) {
+>  #ifndef SYS_renameat2
+>          fuse_reply_err(req, EINVAL);
+> @@ -1113,26 +1149,38 @@ static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
+>              fuse_reply_err(req, res == -1 ? errno : 0);
+>          }
+>  #endif
+> -        return;
+> +        goto out;
+>      }
+>  
+>      res = renameat(lo_fd(req, parent), name, lo_fd(req, newparent), newname);
+>  
+>      fuse_reply_err(req, res == -1 ? errno : 0);
+> +out:
+> +    unref_inode_lolocked(lo, oldinode, 1);
+> +    unref_inode_lolocked(lo, newinode, 1);
+>  }
+>  
+>  static void lo_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+>  {
+>      int res;
+> +    struct lo_inode *inode;
+> +    struct lo_data *lo = lo_data(req);
+>  
+>      if (!is_safe_path_component(name)) {
+>          fuse_reply_err(req, EINVAL);
+>          return;
+>      }
+>  
+> +    inode = lookup_name(req, parent, name);
+> +    if (!inode) {
+> +        fuse_reply_err(req, EIO);
+> +        return;
+> +    }
+> +
+>      res = unlinkat(lo_fd(req, parent), name, 0);
+>  
+>      fuse_reply_err(req, res == -1 ? errno : 0);
+> +    unref_inode_lolocked(lo, inode, 1);
+>  }
+>  
+>  static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inode,
+> -- 
+> 2.23.0
 
