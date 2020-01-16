@@ -2,99 +2,98 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCEEEC33CB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC3DC3F68F
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:27:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B14032073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:24:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC969207E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:27:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOXx0fFm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B14032073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gL91XEDc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC969207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is9pA-0003Cc-M4
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:24:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36407)
+	id 1is9rP-0004Vp-TH
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:27:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1is9mc-0000h1-Qm
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:22:22 -0500
+ (envelope-from <philmd@redhat.com>) id 1is9qF-0003pq-K5
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:26:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1is9mZ-00013p-Bu
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:22:18 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22348
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1is9qC-0004hp-4Q
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:26:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32047
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1is9mZ-000138-7c
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:22:15 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1is9qC-0004hQ-0U
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:26:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579198934;
+ s=mimecast20190719; t=1579199159;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rhWoR3Ih7/md/kmjJ9inJ8JlkIrkEedEevUNAczPh9M=;
- b=EOXx0fFmigb+RrCdY9qUNesx0J7B198DPF4/OOVjOJ8WyWkSHdaAl7t9xXjN6MLhp1n72D
- ehHK+kMWA1jr9FHjS0bg4bGe1Uay46rcG64fy00piZC7xDReQI7CNrmeMJ1Zc2tNI7EoMv
- 3AXwldSok1CByeZ9CWG7wIT7Dbl5Qjs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-gFAVKRTDNdCSVax0UdXVWQ-1; Thu, 16 Jan 2020 13:22:13 -0500
-Received: by mail-wr1-f71.google.com with SMTP id z10so9473159wrt.21
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 10:22:13 -0800 (PST)
+ bh=6wb3uvWE//pbl5HIWjx8Nx0ie/6KPJsZZo9m0HmU93k=;
+ b=gL91XEDclLNsOXktfAhHWcJAU/DMslggevajXDZp08X7fVsLrzGa1QdhCKhqXBuge0ZlQd
+ hlZY256eaFFEKxw4cMEhY2XIno1stI4sQ/ag/HlH8raohGTY9yWmEw8xYgwUnH+EstkpAD
+ /biqw7YHZPuSfckq/ZRdx8IkhdSTvEI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-lvjVnEoAMvSh49Huf_V6Kw-1; Thu, 16 Jan 2020 13:25:58 -0500
+Received: by mail-wr1-f69.google.com with SMTP id u12so9544375wrt.15
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 10:25:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=qtCklIdwpPVYr8Ly0ddeLirsK2OiFfS7Z5uBy8Fp7LM=;
- b=BDexyzF59SKixWs1UsClq0BN7Gcz/INL0C7q5XduPj5ebdk1hYK9PaH8+2SyIOixG0
- xQNosC+qVVcDN9np4ZPhbwQiFASWrVqWY4CCfdU4rSGdwpQ6rdOubpKQSTCuPiiid/rE
- NgGMwhlqcV9AgK+YuI3M3Bfti3lznXOb0RzxpS0JKYtoMnkBvw/b+TrtKMb40+LgTVvq
- 3p1eQsH6kS3HXNHjNWmbqQi4PRIghHoZ6/vAw0oiO53j7twShYTYXngjOIV90FgeUJ76
- qThISaou5kp32mGm+4W6oJ1IIRF+X6QYNQLkiccVqvXLwGh8ObGZvagrkqq7c57L9Btv
- uD8g==
-X-Gm-Message-State: APjAAAWCIB+fZVeosjZ5e3pKjH5ox8ot3C2oQ3nn3CHZn4an1TTT2c1V
- HePCpEqQI7aySJMaqGu4fMu9ZjGZNtspgI94dfQHx/nopquNF6nVSrpFkJ/WMArRxr6Uv5XdaDB
- zxx88rAYZZj1qVAc=
-X-Received: by 2002:a05:600c:248:: with SMTP id 8mr300044wmj.175.1579198932402; 
- Thu, 16 Jan 2020 10:22:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzVf7cf9OViQS7i2j1VE5qIOsxIEk2vSX+ypOQLB9IrOb3Fhjbt9cRvzcfSrQmTU7l5qu2OoA==
-X-Received: by 2002:a05:600c:248:: with SMTP id 8mr300030wmj.175.1579198932228; 
- Thu, 16 Jan 2020 10:22:12 -0800 (PST)
+ bh=c/c8V5rf2/aAXQloIrsK2RPGfgbVJD1aae0hGkuaRUc=;
+ b=EX78x+RTWAndGcfmbP0Y8XQZcGTqZh58iTYa+jyh1jk5fv3Cu+5ZS8KTrdWO9WAQFX
+ jndielqdKhDbCyz3+KRcJrt0J49ckFKIKCMvvDwmlIkQ8ZZ+20NU6q9r/6FSF8DAXFht
+ CC2QaX6K1PyOSG0h1btviFqZTrEB8yxBU6mxDzEBXI7tpIX6k3EylbECRUvf1SsI6v9s
+ wINBdpLvLwof7Nnwfb3L2zpEq2Ioc+KgipZMGIsEITUmLx2N7ilNeMsoIewG213vFMip
+ YtETA3D9LO9f1Yq8p+D4WKRuoEjLxPQFvQYcGIPEmrql3HhcmyJAVTWj4m+RByeYTBkF
+ L1Jg==
+X-Gm-Message-State: APjAAAVN10pw5kYk7OR+Sx8nTsHklwR1N7ItemtW/i+vfhDlB6mvLzbj
+ QF3EOMwCADU/o1e5egoZVBFc0Q9coQJ39pQkavDBsGpj4xryrXKNhONviRdv293rlZGVbVJjjSN
+ AKqlLLTZQOy/+Mu4=
+X-Received: by 2002:adf:d184:: with SMTP id v4mr4652796wrc.76.1579199156875;
+ Thu, 16 Jan 2020 10:25:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw144x1PcEjEHgFGRI3gzp5sO/V4YEQxE/gobRDdPC6z+KmBEBwFmquqVfqE9Tt8QUptSbyJA==
+X-Received: by 2002:adf:d184:: with SMTP id v4mr4652773wrc.76.1579199156615;
+ Thu, 16 Jan 2020 10:25:56 -0800 (PST)
 Received: from [10.101.1.81] ([176.12.107.132])
- by smtp.gmail.com with ESMTPSA id 2sm29598142wrq.31.2020.01.16.10.22.10
+ by smtp.gmail.com with ESMTPSA id v17sm30106941wrt.91.2020.01.16.10.25.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Jan 2020 10:22:11 -0800 (PST)
-Subject: Re: [PATCH v3 18/86] arm:kzm: drop RAM size fixup
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <87sgkgv6dh.wl-Peter.Chubb@data61.csiro.au>
- <1579195564-95459-1-git-send-email-imammedo@redhat.com>
+ Thu, 16 Jan 2020 10:25:55 -0800 (PST)
+Subject: Re: [PATCH] MAINTAINERS: update Leif Lindholm's address
+To: Leif Lindholm <leif@nuviainc.com>, qemu-devel@nongnu.org
+References: <20200116174226.4780-1-leif@nuviainc.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <dc8d8594-0bf8-e6c2-9ce8-94bf5361bca3@redhat.com>
-Date: Thu, 16 Jan 2020 19:22:08 +0100
+Message-ID: <a2fc8a4f-0b56-7868-0e52-51c2abfd97f7@redhat.com>
+Date: Thu, 16 Jan 2020 19:25:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1579195564-95459-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <20200116174226.4780-1-leif@nuviainc.com>
 Content-Language: en-US
-X-MC-Unique: gFAVKRTDNdCSVax0UdXVWQ-1
+X-MC-Unique: lvjVnEoAMvSh49Huf_V6Kw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,76 +105,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter.Chubb@data61.csiro.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- peter.chubb@nicta.com.au
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Leif Lindholm <leif.lindholm@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/16/20 6:26 PM, Igor Mammedov wrote:
-> If the user provided too large a RAM size, the code used to
-> complain and trim it to the max size.  Now tht RAM is allocated by
-> generic code, that's no longer possible, so generate an error and
-> exit instead.
+On 1/16/20 6:42 PM, Leif Lindholm wrote:
+> Update address to reflect new employer.
 >=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Leif Lindholm <leif@nuviainc.com>
 > ---
-> v3:
->   * rephrase commit message in nicer way
->     ("Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au=
->)
->   * reword error message and use size_to_str() to pretty print suggested =
-size
->     ("Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au=
->)
+>   MAINTAINERS | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> CC: peter.chubb@nicta.com.au
-> CC: peter.maydell@linaro.org
-> CC: qemu-arm@nongnu.org
-> ---
->   hw/arm/kzm.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 483edfbc0b..3c8653f26f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -735,7 +735,7 @@ F: include/hw/ssi/imx_spi.h
+>   SBSA-REF
+>   M: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+>   M: Peter Maydell <peter.maydell@linaro.org>
+> -R: Leif Lindholm <leif.lindholm@linaro.org>
+> +R: Leif Lindholm <leif@nuviainc.com>
+>   L: qemu-arm@nongnu.org
+>   S: Maintained
+>   F: hw/arm/sbsa-ref.c
 >=20
-> diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
-> index 1d5ef28..94cbac1 100644
-> --- a/hw/arm/kzm.c
-> +++ b/hw/arm/kzm.c
-> @@ -25,6 +25,7 @@
->   #include "hw/char/serial.h"
->   #include "sysemu/qtest.h"
->   #include "sysemu/sysemu.h"
-> +#include "qemu/cutils.h"
->  =20
->   /* Memory map for Kzm Emulation Baseboard:
->    * 0x00000000-0x7fffffff See i.MX31 SOC for support
-> @@ -78,10 +79,10 @@ static void kzm_init(MachineState *machine)
->  =20
->       /* Check the amount of memory is compatible with the SOC */
->       if (machine->ram_size > (FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_S=
-IZE)) {
-> -        warn_report("RAM size " RAM_ADDR_FMT " above max supported, "
-> -                    "reduced to %x", machine->ram_size,
-> -                    FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE);
-> -        machine->ram_size =3D FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_S=
-IZE;
-> +        char *sz =3D size_to_str(FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM=
-1_SIZE);
-> +        error_report("RAM size more than %s is not supported", sz);
 
-Yay! Can you use this pattern the other patches too?
+You might want to add yourself a .mailmap entry too:
 
-You might want to add:
+-- >8 --
+diff --git a/.mailmap b/.mailmap
+index 3816e4effe..a521c17b44 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -44,6 +44,7 @@ Aleksandar Markovic <amarkovic@wavecomp.com>=20
+<aleksandar.markovic@imgtec.com>
+  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
+  Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori=20
+<aliguori@us.ibm.com>
+  James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
++Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
+  Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
+  Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
+  Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+---
 
-#define FSL_IMX31_SDRAM_SIZE_MAX \
-   (FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE)
+If you ack this snippet maybe a maintainer is willing to amend it to=20
+your patch :)
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-> +        g_free(sz);
-> +        exit(EXIT_FAILURE);
->       }
->  =20
->       memory_region_allocate_system_memory(&s->ram, NULL, "kzm.ram",
->=20
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
