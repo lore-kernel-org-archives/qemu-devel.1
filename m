@@ -2,138 +2,79 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC90C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CB4C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:52:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB1D12072B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:51:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EA4720730
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:52:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RVw+t2Gk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1D12072B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FHvyhhQH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EA4720730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is6UU-0007RV-Or
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:51:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55476)
+	id 1is6VA-0008VW-W6
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:52:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55787)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1is6TR-0006FZ-9c
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:50:21 -0500
+ (envelope-from <kwolf@redhat.com>) id 1is6U8-0007QM-PJ
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:51:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1is6TN-0001qS-Cv
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:50:17 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47267
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1is6U4-0002MP-TT
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:51:00 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53988)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1is6TN-0001qC-9I
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:50:13 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1is6U4-0002Lp-N0
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:50:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579186212;
+ s=mimecast20190719; t=1579186255;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=eIUz5Sd+GCots4ZOm84SkRp1fxPmjEbzwzPBfzPbPT0=;
- b=RVw+t2GkdMB/OvY0JwwBCiQtCYIxawIv0C/Axrhu8JBqWHn/QmoKei9Y6a3S6x/3ulvV0B
- krQnUv2gjJ8ZdL+ptvU1GF4mizp2TWYPjC4dynxVArKef628npE8WQjuH3U8CEiIOzGT58
- yVX4OdwEbZ8mEAdwnf3NA0z9VbMDnSU=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=IIX/D3lbWp9aCSHnuQ/f2BWGKDu+USFlyp9Wn/BEg4A=;
+ b=FHvyhhQHhulaUMfTA8Gl93NQeM1wwgR0tAPLE+TmmyxM5Kyz4HPiLAl3rFHgysMhx6rlDW
+ PGZRQH294HXYIwNRar36qjk0day5Fc4uTIZ9RVuzdnpNMNOwvtC2zn1JXurp1Oez1WPkAZ
+ tI+Q081V1piwHAA2XbLFjRogOWeHLfE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-oPMfkjSDPni2tyJbNhHlAw-1; Thu, 16 Jan 2020 09:50:11 -0500
+ us-mta-8-AnUDmJkFNYeqY8v_ixVx_Q-1; Thu, 16 Jan 2020 09:50:52 -0500
+X-MC-Unique: AnUDmJkFNYeqY8v_ixVx_Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A90718A6ED1
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 14:50:10 +0000 (UTC)
-Received: from [10.40.204.119] (ovpn-204-119.brq.redhat.com [10.40.204.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 93AE360C85;
- Thu, 16 Jan 2020 14:50:09 +0000 (UTC)
-Subject: Re: [PULL 20/87] vl: warn for unavailable accelerators, clarify
- messages
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
- <1576670573-48048-21-git-send-email-pbonzini@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <7378ae78-818f-723f-88a7-1556791135f2@redhat.com>
-Date: Thu, 16 Jan 2020 15:50:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7740A800D41;
+ Thu, 16 Jan 2020 14:50:51 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-48.ams2.redhat.com [10.36.117.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A9FD60C85;
+ Thu, 16 Jan 2020 14:50:49 +0000 (UTC)
+Date: Thu, 16 Jan 2020 15:50:48 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: Bug? qemu-img convert to preallocated image makes it sparse
+Message-ID: <20200116145048.GG9470@linux.fritz.box>
+References: <20200116141352.GA32053@redhat.com>
+ <7586b832-ecd2-e766-6781-3a25f382c9ed@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1576670573-48048-21-git-send-email-pbonzini@redhat.com>
-Content-Language: en-US
+In-Reply-To: <7586b832-ecd2-e766-6781-3a25f382c9ed@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: oPMfkjSDPni2tyJbNhHlAw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="uZ3hkaAS1mZxFaxD"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,77 +86,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: sgarzare@redhat.com, mlevitsk@redhat.com,
+ "Richard W.M. Jones" <rjones@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/12/2019 13:01, Paolo Bonzini wrote:
-> So far, specifying an accelerator that was not compiled in did not result
-> in an error; fix that.
+--uZ3hkaAS1mZxFaxD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 16.01.2020 um 15:37 hat Max Reitz geschrieben:
+> On 16.01.20 15:13, Richard W.M. Jones wrote:
+> > I'm not necessarily saying this is a bug, but a change in behaviour in
+> > qemu has caused virt-v2v to fail.  The reproducer is quite simple.
+> >=20
+> > Create sparse and preallocated qcow2 files of the same size:
+> >=20
+> >   $ qemu-img create -f qcow2 sparse.qcow2 50M
+> >   Formatting 'sparse.qcow2', fmt=3Dqcow2 size=3D52428800 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+> >=20
+> >   $ qemu-img create -f qcow2 prealloc.qcow2 50M -o preallocation=3Dfall=
+oc,compat=3D1.1
+> >   Formatting 'prealloc.qcow2', fmt=3Dqcow2 size=3D52428800 compat=3D1.1=
+ cluster_size=3D65536 preallocation=3Dfalloc lazy_refcounts=3Doff refcount_=
+bits=3D16
+> >=20
+> >   $ du -m sparse.qcow2 prealloc.qcow2=20
+> >   1 sparse.qcow2
+> >   51=09prealloc.qcow2
+> >=20
+> > Now copy the sparse file into the preallocated file using the -n
+> > option so qemu-img doesn't create the target:
+> >=20
+> >   $ qemu-img convert -p -n -f qcow2 -O qcow2 sparse.qcow2 prealloc.qcow=
+2
+> >       (100.00/100%)
+> >=20
+> > In new qemu that makes the target file sparse:
+> >=20
+> >   $ du -m sparse.qcow2 prealloc.qcow2=20
+> >   1 sparse.qcow2
+> >   1 prealloc.qcow2         <-- should still be 51
+> >=20
+> > In old qemu the target file remained preallocated, which is what
+> > I and virt-v2v are expecting.
+> >=20
+> > I bisected this to the following commit:
+> >=20
+> > 4d7c487eac1652dfe4498fe84f32900ad461d61b is the first bad commit
+> > commit 4d7c487eac1652dfe4498fe84f32900ad461d61b
+> > Author: Max Reitz <mreitz@redhat.com>
+> > Date:   Wed Jul 24 19:12:29 2019 +0200
+> >=20
+> >     qemu-img: Fix bdrv_has_zero_init() use in convert
+> >    =20
+> >     bdrv_has_zero_init() only has meaning for newly created images or i=
+mage
+> >     areas.  If qemu-img convert did not create the image itself, it can=
+not
+> >     rely on bdrv_has_zero_init()'s result to carry any meaning.
+> >    =20
+> >     Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >     Message-id: 20190724171239.8764-2-mreitz@redhat.com
+> >     Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> >     Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> >     Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >=20
+> >  qemu-img.c | 11 ++++++++---
+> >  1 file changed, 8 insertions(+), 3 deletions(-)
+> >=20
+> > Reverting this commit on the current master branch restores the
+> > expected behaviour.
 >=20
-> While at it, clarify the mysterious "Back to TCG" message.
-
-Every time I run a non native VM I have this message:
-
-$ uname -m
-x86_64
-$ ./ppc64-softmmu/qemu-system-ppc64
-qemu-system-ppc64: invalid accelerator kvm
-qemu-system-ppc64: falling back to tcg
-
-Is that expected?
-
-At least it's annoying... it was silently falling back to tcg before
-that patch.
-
-Should the default be set to tcg to avoid the fallback?
-
-Thanks,
-Laurent
-
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  vl.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+> The commit changed the behavior because now qemu-img realizes that it
+> cannot skip writing to areas that are supposed to be zero when it
+> converts to an existing image (because we have no idea what data that
+> existing image contains).  So that=E2=80=99s a bug fix, and I don=E2=80=
+=99t think we can
+> undo it without being wrong.
 >=20
-> diff --git a/vl.c b/vl.c
-> index 0f620be..c350eef 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2723,6 +2723,8 @@ static int do_configure_accelerator(void *opaque, Q=
-emuOpts *opts, Error **errp)
->      int ret;
-> =20
->      if (!ac) {
-> +        *p_init_failed =3D true;
-> +        error_report("invalid accelerator %s", acc);
->          return 0;
->      }
->      ret =3D accel_init_machine(ac, current_machine);
-> @@ -2777,6 +2779,9 @@ static void configure_accelerators(const char *prog=
-name)
->               */
->              if (accel_find(*tmp)) {
->                  qemu_opts_parse_noisily(qemu_find_opts("accel"), *tmp, t=
-rue);
-> +            } else {
-> +                init_failed =3D true;
-> +                error_report("invalid accelerator %s", *tmp);
->              }
->          }
->      } else {
-> @@ -2796,7 +2801,7 @@ static void configure_accelerators(const char *prog=
-name)
-> =20
->      if (init_failed) {
->          AccelClass *ac =3D ACCEL_GET_CLASS(current_machine->accelerator)=
-;
-> -        error_report("Back to %s accelerator", ac->name);
-> +        error_report("falling back to %s", ac->name);
->      }
-> =20
->      if (use_icount && !(tcg_enabled() || qtest_enabled())) {
+> The problem is that qemu-img will try to be quickthat about making these
+> areas zero, and so it does zero writes (actually, it even zeroes the
+> whole image) and in the process it will of course discard all preallocati=
+on.
 >=20
+> Now, about fixing the problem I=E2=80=99m not so sure.
+
+Wouldn't just passing -S 0 solve the problem? It should tell qemu-img
+convert that you don't want it to sparsify anything.
+
+Kevin
+
+--uZ3hkaAS1mZxFaxD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJeIHhIAAoJEH8JsnLIjy/WqDcP/0fFF4UXfxCIZs+aAs6W5/B6
+zQIxB1Vwzrkvn4o4WHfKlJ8TPt6+t6IbzpszCKOEZAQLqFmkKksAbwkMWQ2poffu
+SmWV/2m/jtQYseamYHvH8fMHgwqx+5U4WxAiAB9L0n3ztIaxfRtcLEBC6Q5Ju4EB
+oU2ymXsiMSVi7+0ZLJBE95iYUqjg8ThfFdKWF+xZrd0J5RdlMZcKDO5SZhxsAm+w
+1rmmD+D1a7VDMiYwTJHRKjvTjJ8OTBBy15ckpBZ+6c6yJzwJVROyCBMzl43biwYQ
+IoG5qk2O47ycsRhO5onUW6KaxriKzd1K9wNy96wYdtzrNh5Z2Eun0bMl1mTwGoxs
+JpLcYRaxpyyGSJZDgZ8yaZ079XnwL0RUMXPU0kSTGojlndyMyLr9R6WUkyuAA+xh
+9tq22oTamMOSsXI8l7fG+0fAjwiE8o2ldawKYwdYkriiygyL2Q4r8P8aORyuj1GY
+xKLkxPMhZJIK+S7Gxyu77StrQxQMka7hpnVe6rotrDHNv/3BVfwoZlp1+AfPD5RW
+hMyaCcGd20Dpz+zZ6WoPpXy8xml268Tbl5O7ukgUt+clN8DS4STPigXGSir0NAUe
+w+PqC3Zrdbi1gZJybg6fBTRIddfnU1ssr2xLVyR70h+LaDVCh61nhr1ifFOUnt3c
+3qrWyGsqJ9DgD/4UPq0W
+=aYsK
+-----END PGP SIGNATURE-----
+
+--uZ3hkaAS1mZxFaxD--
 
 
