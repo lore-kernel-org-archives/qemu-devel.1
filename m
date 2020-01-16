@@ -2,70 +2,106 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC82C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 886DBC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:21:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 958EC207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:18:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958EC207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57BAB207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:21:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iau89rHh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57BAB207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is46V-0005BJ-Od
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:18:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60922)
+	id 1is48y-00076J-Bo
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:21:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1is45j-0004EV-Gv
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:17:43 -0500
+ (envelope-from <mreitz@redhat.com>) id 1is47q-0006DF-NS
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:19:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1is45f-000325-1E
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:17:38 -0500
-Received: from mgwkm02.jp.fujitsu.com ([202.219.69.169]:49005)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
- id 1is45e-0002yV-B6
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:17:34 -0500
-Received: from kw-mxoi2.gw.nic.fujitsu.com (unknown [192.168.231.133]) by
- mgwkm02.jp.fujitsu.com with smtp
- id 11aa_1e22_ef0b02c8_72e1_49a6_954f_4dfbda4cf5b3;
- Thu, 16 Jan 2020 21:17:23 +0900
-Received: from g01jpfmpwkw03.exch.g01.fujitsu.local
- (g01jpfmpwkw03.exch.g01.fujitsu.local [10.0.193.57])
- by kw-mxoi2.gw.nic.fujitsu.com (Postfix) with ESMTP id 740CCAC0058
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 21:17:22 +0900 (JST)
-Received: from G01JPEXCHKW14.g01.fujitsu.local
- (G01JPEXCHKW14.g01.fujitsu.local [10.0.194.53])
- by g01jpfmpwkw03.exch.g01.fujitsu.local (Postfix) with ESMTP id 68F1FBD675A;
- Thu, 16 Jan 2020 21:17:21 +0900 (JST)
-Received: from luna3.soft.fujitsu.com (10.124.196.199) by
- G01JPEXCHKW14.g01.fujitsu.local (10.0.194.53) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 16 Jan 2020 21:17:21 +0900
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-To: <dgilbert@redhat.com>
-Subject: Re: [PATCH 093/104] virtiofsd: introduce inode refcount to prevent
- use-after-free
-Date: Thu, 16 Jan 2020 21:25:42 +0900
-Message-ID: <20200116122542.20873-1-misono.tomohiro@jp.fujitsu.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20191212163904.159893-94-dgilbert@redhat.com>
-References: <20191212163904.159893-94-dgilbert@redhat.com>
+ (envelope-from <mreitz@redhat.com>) id 1is47p-0004zg-D6
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:19:50 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26310
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1is47p-0004zI-8u
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:19:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579177188;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=v7z88CQx5KZUqnHeCpMFUUOvqarAVu0gAlSCF7hMOUI=;
+ b=iau89rHhBJOZ1wgxo1JeX8gAQUTCE070AxjypNH5HK8/FdgdnR/t2RZqWbQOyRT//vy9/G
+ sV6nFcXKSKNc9OIS5Z0J5XL+PG09+jxbc5fuwtahGq4G4Yerra0t+gTKF33dzl2pNGjtVv
+ jrvjdaC7+RN8wAqkMI3pexMyKN164hk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-130-t0PRHmgFMleR5p2ZsunmTg-1; Thu, 16 Jan 2020 07:19:41 -0500
+X-MC-Unique: t0PRHmgFMleR5p2ZsunmTg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 833F31800D48;
+ Thu, 16 Jan 2020 12:19:40 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-185.ams2.redhat.com
+ [10.36.117.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1182980890;
+ Thu, 16 Jan 2020 12:19:35 +0000 (UTC)
+Subject: Re: [PATCH v2] qcow2: Use a GString in report_unsupported_feature()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <20200115135626.19442-1-berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7dc5a8bf-bb1d-aeec-ef3e-6e60597bbcb8@redhat.com>
+Date: Thu, 16 Jan 2020 13:19:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-SecurityPolicyCheck-GC: OK by FENCE-Mail
-X-TM-AS-GCONF: 00
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.219.69.169
+In-Reply-To: <20200115135626.19442-1-berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="9Lppwuk5zBQWei7egBfiU2HYALZp2f52p"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,149 +113,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: misono.tomohiro@jp.fujitsu.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- vgoyal@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Stefan Hajnoczi <stefanha@redhat.com>
-> 
-> If thread A is using an inode it must not be deleted by thread B when
-> processing a FUSE_FORGET request.
-> 
-> The FUSE protocol itself already has a counter called nlookup that is
-> used in FUSE_FORGET messages.  We cannot trust this counter since the
-> untrusted client can manipulate it via FUSE_FORGET messages.
-> 
-> Introduce a new refcount to keep inodes alive for the required lifespan.
-> lo_inode_put() must be called to release a reference.  FUSE's nlookup
-> counter holds exactly one reference so that the inode stays alive as
-> long as the client still wants to remember it.
-> 
-> Note that the lo_inode->is_symlink field is moved to avoid creating a
-> hole in the struct due to struct field alignment.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9Lppwuk5zBQWei7egBfiU2HYALZp2f52p
+Content-Type: multipart/mixed; boundary="NFi3sdbdFXdEKT8OZgWLwQ5eEWiETX1Tz"
+
+--NFi3sdbdFXdEKT8OZgWLwQ5eEWiETX1Tz
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 15.01.20 14:56, Alberto Garcia wrote:
+> This is a bit more efficient than having to allocate and free memory
+> for each item.
+>=20
+> The default size (60) is enough for all the existing incompatible
+> features or the "Unknown incompatible feature" message.
+
+That doesn=E2=80=99t make sense to me.  The existing incompatible features =
+are
+known to qemu, and as such will never be printed here.
+
+But just because it doesn=E2=80=99t make sense doesn=E2=80=99t make it wron=
+g.  I suppose
+we can assume that if new features are added, they will have a similar
+length like the ones we have now.
+
+(Well, it does make =E2=80=9C60=E2=80=9D a weirdly specific number, but wha=
+tever.)
+
+((I=E2=80=99d just have created an empty string.  Considering this is part =
+of
+the explanation for a fatal error, nobody cares whether this function
+takes a couple of microseconds more.  Or maybe a length of 47, so it can
+definitely hold exactly one incompatible feature name.))
+
+> Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  tools/virtiofsd/passthrough_ll.c | 168 ++++++++++++++++++++++++++-----
->  1 file changed, 145 insertions(+), 23 deletions(-)
-> 
-> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-> index b19c9ee328..8f4ab8351c 100644
-> --- a/tools/virtiofsd/passthrough_ll.c
-> +++ b/tools/virtiofsd/passthrough_ll.c
-> @@ -99,7 +99,13 @@ struct lo_key {
->  
->  struct lo_inode {
->      int fd;
-> -    bool is_symlink;
-> +
-> +    /*
-> +     * Atomic reference count for this object.  The nlookup field holds a
-> +     * reference and release it when nlookup reaches 0.
-> +     */
-> +    gint refcount;
-> +
->      struct lo_key key;
->  
->      /*
-> @@ -118,6 +124,8 @@ struct lo_inode {
->      fuse_ino_t fuse_ino;
->      pthread_mutex_t plock_mutex;
->      GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
-> +
-> +    bool is_symlink;
->  };
->  
->  struct lo_cred {
-> @@ -473,6 +481,23 @@ static ssize_t lo_add_inode_mapping(fuse_req_t req, struct lo_inode *inode)
->      return elem - lo_data(req)->ino_map.elems;
->  }
->  
-> +static void lo_inode_put(struct lo_data *lo, struct lo_inode **inodep)
-> +{
-> +    struct lo_inode *inode = *inodep;
-> +
-> +    if (!inode) {
-> +        return;
-> +    }
-> +
-> +    *inodep = NULL;
-> +
-> +    if (g_atomic_int_dec_and_test(&inode->refcount)) {
-> +        close(inode->fd);
-> +        free(inode);
-> +    }
-> +}
-> +
-> +/* Caller must release refcount using lo_inode_put() */
->  static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
->  {
->      struct lo_data *lo = lo_data(req);
-> @@ -480,6 +505,9 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
->  
->      pthread_mutex_lock(&lo->mutex);
->      elem = lo_map_get(&lo->ino_map, ino);
-> +    if (elem) {
-> +        g_atomic_int_inc(&elem->inode->refcount);
-> +    }
->      pthread_mutex_unlock(&lo->mutex);
->  
->      if (!elem) {
-> @@ -489,10 +517,23 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
->      return elem->inode;
->  }
->  
-> +/*
-> + * TODO Remove this helper and force callers to hold an inode refcount until
-> + * they are done with the fd.  This will be done in a later patch to make
-> + * review easier.
-> + */
->  static int lo_fd(fuse_req_t req, fuse_ino_t ino)
->  {
->      struct lo_inode *inode = lo_inode(req, ino);
-> -    return inode ? inode->fd : -1;
-> +    int fd;
-> +
-> +    if (!inode) {
-> +        return -1;
-> +    }
-> +
-> +    fd = inode->fd;
-> +    lo_inode_put(lo_data(req), &inode);
-> +    return fd;
->  }
->  
->  static void lo_init(void *userdata, struct fuse_conn_info *conn)
-> @@ -547,6 +588,10 @@ static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
->      fuse_reply_attr(req, &buf, lo->timeout);
->  }
->  
-> +/*
-> + * Increments parent->nlookup and caller must release refcount using
-> + * lo_inode_put(&parent).
-> + */
->  static int lo_parent_and_name(struct lo_data *lo, struct lo_inode *inode,
->                                char path[PATH_MAX], struct lo_inode **parent)
->  {
-> @@ -584,6 +629,7 @@ retry:
->          p = &lo->root;
->          pthread_mutex_lock(&lo->mutex);
->          p->nlookup++;
-> +        g_atomic_int_inc(&p->refcount);
->          pthread_mutex_unlock(&lo->mutex);
->      } else {
->          *last = '\0';
+>  block/qcow2.c | 23 +++++++++++------------
+>  1 file changed, 11 insertions(+), 12 deletions(-)
 
-We need lo_ionde_put() in error path, right?:
-https://gitlab.com/virtio-fs/qemu/blob/virtio-fs-as-posted-2019-12-12/tools/virtiofsd/passthrough_ll.c#L680
+Thanks, applied to my block branch:
 
-nit: if yes, unref_inode_lolocked() is always paired with lo_inode_put().
-So how about combine them in one function? As p->nloockup and p->refcount
-are both incremented in one place (lo_find/lo_parent_and_name) in these case,
-it seems natural for me to decrement them in one function as well.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-Thanks,
-Misono
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index cef9d72b3a..e29fc07068 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+
+[...]
+
+> @@ -470,14 +469,14 @@ static void report_unsupported_feature(Error **errp=
+, Qcow2Feature *table,
+>      }
+> =20
+>      if (mask) {
+> -        old =3D features;
+> -        features =3D g_strdup_printf("%s%sUnknown incompatible feature: =
+%" PRIx64,
+> -                                   old, *old ? ", " : "", mask);
+> -        g_free(old);
+> +        if (features->len > 0) {
+> +            g_string_append(features, ", ");
+> +        }
+> +        g_string_append_printf(features,
+> +                               "Unknown incompatible feature: %" PRIx64,=
+ mask);
+
+Existing problem: This can lead to stuff like
+
+=E2=80=9CUnsupported qcow2 feature(s): feat1, feat2, Unknown incompatible
+feature: 0xec0=E2=80=9D
+
+(i.e., singular =E2=80=9Cfeature=E2=80=9D when there are multiple unknown f=
+eatures, and
+capitalization of =E2=80=9CUnknown=E2=80=9D)
+
+O:-)
+
+But whatever.  It=E2=80=99s unlikely there=E2=80=99s going to be more than =
+one
+incompatible feature, and it=E2=80=99s extremely unlikely it won=E2=80=99t =
+have a string
+description.
+
+Max
+
+
+--NFi3sdbdFXdEKT8OZgWLwQ5eEWiETX1Tz--
+
+--9Lppwuk5zBQWei7egBfiU2HYALZp2f52p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4gVNYACgkQ9AfbAGHV
+z0AtHQf/Xr7FuwsKB5CpUPNZhoPQyzeLsoPfqBu1j5jnYP6+QWfhmHDPd1O7jJSb
+lASgIli9OheUe7BXqjdDBKGaWhSo5Tc7RgpS1YgZOFbH6BLMZ2Xmi9PGYheslxWP
+SKbufcpBzZT0wOlwiH/DccIgHB25hT9uTQ8nGqdg8H5VR7OICpTSel+wX5/UtWJQ
+JHQZu3auKiM+rL56PbzJy5l7f/3TvqIzrLeq4ZXcEjf7sKroI6Tj9lY7DK67LQ1X
+WTbN75DAsdVjdHf1EHBg6oboo5S1Kzx+igOjr3pPo7VpNOx5DxIHLgOb2ZzQUMW/
+HelC2zF6Jy8g7YavOOAlmhlnrgNezw==
+=LzxC
+-----END PGP SIGNATURE-----
+
+--9Lppwuk5zBQWei7egBfiU2HYALZp2f52p--
+
 
