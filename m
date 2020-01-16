@@ -2,87 +2,64 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA2DC33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 21:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 940B4C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 21:12:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAC3720661
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 21:09:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q2nHp+7r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAC3720661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 66F8820728
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 21:12:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66F8820728
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isCOY-0007Pp-QJ
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 16:09:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33444)
+	id 1isCR4-00059l-GO
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 16:12:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1isCKg-0002TK-4O
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 16:05:39 -0500
+ (envelope-from <pl@kamp.de>) id 1isCPW-0001aB-7K
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 16:10:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1isCKf-0007Rr-0h
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 16:05:38 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44766)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1isCKe-0007RA-Q3
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 16:05:36 -0500
-Received: by mail-pf1-x441.google.com with SMTP id 62so4183767pfu.11
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 13:05:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=H4QnzckU0LL28w0wQX6tx5bhPXYdOpaHqvueD20Pzw4=;
- b=q2nHp+7rN05vWxg+MFugnxb6VHeo3d71Kz7sEa9Y80rwOml6ZLzDzLyE6VZFWXtMSH
- fFVXEyQzpKKC3QurcA2YzQIBlEWvKpI2ZtaY1qrbWflxHLX0vdCeFdDmSKhkLjCIauOV
- sRhlFs79N7tJyUl1DJE4ztmZ6IsAHzOuRKqDiQW1ryVr5LQqk56LDSDElByoaInxn/c3
- qgG5+RFWmi5THue7fMh9PmSrnDG1sfZFvKKXpI8mvHg8jT9LRS+jIcdpRez8ywxCkSaU
- xk0GEuAUetl/om/3eK/h1ek9M7r6u4+JIH7zjMuDeV7Z47ozuIkDyfJf3Q2Z87pObWW+
- B4ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=H4QnzckU0LL28w0wQX6tx5bhPXYdOpaHqvueD20Pzw4=;
- b=sT3ZjdBul0xIm4TDyUHjVCWpF7C+4HDSrtZjhDmt9mMf57v94IEXZmYR077/s8NDpn
- hKSh8nQB8vBh7zz7wYT5BGL7zpZJTfSttJPFojLPG73S2b2fcx0AxtTSZaeYkh8S2+8J
- JpfP29sJkkrYKnlhzJy9LsJj+IS4FLyTTC+CgnD+VKaLjljBA819WDStUVjxb87S5iXm
- 8bXwTwc0Wg4dr2S6yVAgaQETz1IpN++wYJLqm+V3NQ9a/5JSm15KibXg7zD6w8MnltUL
- e9dIGoRC1mfDXZKDmxjwhSuqjp65QpMZ06T4//HSRpCvEOWRTxAc2a52cEiBMf0vNhcr
- Shuw==
-X-Gm-Message-State: APjAAAXuH8oxGbG4fmKvX+WkOqiqBV+2Mb5YSM021CIJh6QAzvMK4C1U
- Qc3eonSbBZzx+LRRe7u7m4MCMvRJcR0=
-X-Google-Smtp-Source: APXvYqwqFuXXCilBqSrTe89hSNEV01TW/+DppEBq0VyayJcOCDDM2C1uSB9rMjPNFktRllxj3yhwVA==
-X-Received: by 2002:a63:1e47:: with SMTP id p7mr40886916pgm.339.1579208735554; 
- Thu, 16 Jan 2020 13:05:35 -0800 (PST)
-Received: from localhost.localdomain (rrcs-66-91-136-155.west.biz.rr.com.
- [66.91.136.155])
- by smtp.gmail.com with ESMTPSA id k21sm25494907pgt.22.2020.01.16.13.05.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jan 2020 13:05:34 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/4] vl: Reduce scope of variables in configure_accelerators
-Date: Thu, 16 Jan 2020 11:05:26 -1000
-Message-Id: <20200116210528.31953-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116210528.31953-1-richard.henderson@linaro.org>
-References: <20200116210528.31953-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+ (envelope-from <pl@kamp.de>) id 1isCPR-0003ni-TK
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 16:10:37 -0500
+Received: from kerio.kamp.de ([195.62.97.192]:51444)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pl@kamp.de>) id 1isCPQ-0003js-Ks
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 16:10:33 -0500
+X-Footer: a2FtcC5kZQ==
+Received: from [82.141.7.18] ([79.200.90.31]) (authenticated user pl@kamp.de)
+ by kerio.kamp.de with ESMTPSA
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
+ Thu, 16 Jan 2020 22:10:26 +0100
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior
+ to previous a0000
+From: Peter Lieven <pl@kamp.de>
+In-Reply-To: <20200116202605.GN3108@work-vm>
+Date: Thu, 16 Jan 2020 22:10:28 +0100
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <15F1B192-D4B2-4092-9B97-CA1BB4C95B9A@kamp.de>
+References: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
+ <20200108150458.GC3184@work-vm>
+ <ca222a5f-1ec6-477c-ed83-6ef52ea9e97f@kamp.de>
+ <20200109184440.GR6795@work-vm>
+ <b89e8ba2-49e9-8c0d-1129-116afa76366a@kamp.de>
+ <cd316fb8-b56b-2913-8b57-f085ca4426d7@kamp.de>
+ <11bd7f7a-9022-6c35-3b92-27d6e66f3295@kamp.de>
+ <20200116202605.GN3108@work-vm>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 195.62.97.192
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,47 +71,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, aleksandar.m.mail@gmail.com,
- philmd@redhat.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The accel_list and tmp variables are only used when manufacturing
--machine accel, options based on -accel.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: The freeing of accel_list was fixed in adb464ff671d.
----
- vl.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/vl.c b/vl.c
-index 6a5abf2f54..3e2b77a4e8 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2753,7 +2753,6 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
- static void configure_accelerators(const char *progname)
- {
-     const char *accel;
--    char **accel_list, **tmp;
-     bool init_failed = false;
- 
-     qemu_opts_foreach(qemu_find_opts("icount"),
-@@ -2761,6 +2760,8 @@ static void configure_accelerators(const char *progname)
- 
-     accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
-     if (QTAILQ_EMPTY(&qemu_accel_opts.head)) {
-+        char **accel_list, **tmp;
-+
-         if (accel == NULL) {
-             /* Select the default accelerator */
-             if (!accel_find("tcg") && !accel_find("kvm")) {
--- 
-2.20.1
+> Am 16.01.2020 um 21:26 schrieb Dr. David Alan Gilbert =
+<dgilbert@redhat.com>:
+>=20
+> * Peter Lieven (pl@kamp.de) wrote:
+>> Am 16.01.20 um 13:47 schrieb Peter Lieven:
+>>> Am 13.01.20 um 17:25 schrieb Peter Lieven:
+>>>> Am 09.01.20 um 19:44 schrieb Dr. David Alan Gilbert:
+>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>> Am 08.01.20 um 16:04 schrieb Dr. David Alan Gilbert:
+>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>>>> Hi,
+>>>>>>>>=20
+>>>>>>>>=20
+>>>>>>>> I have a Qemu 4.0.1 machine with vhost-net network adapter, =
+thats polluting the log with the above message.
+>>>>>>>>=20
+>>>>>>>> Is this something known? Googling revealed the following patch =
+in Nemu (with seems to be a Qemu fork from Intel):
+>>>>>>>>=20
+>>>>>>>> =
+https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619dccced114ef7f=
+56e
+>>>>>>>>=20
+>>>>>>>>=20
+>>>>>>>> The network stopped functioning. After a live-migration the =
+vServer is reachable again.
+>>>>>>>>=20
+>>>>>>>>=20
+>>>>>>>> Any ideas?
+>>>>>>> What guest are you running and what does your qemu commandline =
+look
+>>>>>>> like?
+>>>>>>=20
+>>>>>> Its running debian9. We have hundreds of other VMs with identical =
+setup. Do not know why this one makes trouble.
+>>>>> Could you extract an 'info mtree' from it - particularly the
+>>>>> 'address-space: memory' near the top.
+>>>>=20
+>>>>=20
+>>>> Here we go:
+>>>>=20
+>>>>=20
+>>>> address-space: memory
+>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>>>     0000000000000000-000000003fffffff (prio 0, i/o): alias =
+ram-below-4g @pc.ram 0000000000000000-000000003fffffff
+>>>>     0000000000000000-ffffffffffffffff (prio -1, i/o): pci
+>>>>       00000000000a0000-00000000000affff (prio 2, i/o): alias =
+vga.chain4 @vga.vram 0000000000000000-000000000000ffff
+>>>>       00000000000a0000-00000000000bffff (prio 1, i/o): vga-lowmem
+>>>=20
+>>>=20
+>>> What seems special is that the RAM area is prio2. Any idea if this =
+makes trouble?
+>>=20
+>>=20
+>> Update from my side. This happens when I have Debian 10 with XFCE =
+when the Graphical User Interface is initialized.
+>>=20
+>> I see the log message when I specify -M pc-i440fx-2.9. If I obmit the =
+machine type the error does not appear.
+>=20
+> I can't persuade this to reproduce here on the images I currently =
+have;
+> but if you can rebuild, can you try the v3 of 'Fix hyperv synic on
+> vhost' I've just posted?  It turns off the alignment code that's
+> spitting that error in vhost-kernel cases, so should go away.
+
+
+I will definitely give it a try tomorrow. The fix to change the machine =
+type was not working. I was too fast with my assumption.
+
+What I see is the following:
+
+Machine boots up (cold start), has network connectivity. As soon as the =
+Graphics are initialized, the vhost_region_add_section error pops up and
+Networking is interrupted. When I then migrate the vServer to another =
+host Networking works again. It even seems to keep working when I do a
+soft reset (shutdown -r). The only thing that breaks networking again =
+when the graphic is initialized is a hard reset (system reset via hmp or =
+amp).
+
+Thank you,
+Peter
+
 
 
