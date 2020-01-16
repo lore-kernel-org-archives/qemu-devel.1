@@ -6,90 +6,90 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01959C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D4AC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB320207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:43:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB320207FF
+	by mail.kernel.org (Postfix) with ESMTPS id DB5E2217F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:44:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB5E2217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is8Ea-00039i-6A
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:43:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43394)
+	id 1is8Fa-0004Q6-9x
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:44:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1is8Cs-0000tE-0E
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:21 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1is8Cl-0000iA-Qq
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1is8Co-0005pX-Dy
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2210)
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1is8Ci-0005jW-AP
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30326)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1is8Co-0005oL-69
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:14 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ id 1is8Ci-0005ii-4B
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:08 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00GGcAj2135078
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:13 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xfaw2mtus-1
+ 00GGcAwc035597
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:07 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xhfer8n63-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:13 -0500
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:07 -0500
 Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Thu, 16 Jan 2020 16:41:09 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Thu, 16 Jan 2020 16:41:05 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 16 Jan 2020 16:41:06 -0000
+ Thu, 16 Jan 2020 16:41:01 -0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
  [9.149.105.59])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00GGf6wT17563706
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00GGf0Zk41353342
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 16 Jan 2020 16:41:06 GMT
+ Thu, 16 Jan 2020 16:41:00 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D319CA4070;
- Thu, 16 Jan 2020 16:41:05 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 8D6FAA405E;
+ Thu, 16 Jan 2020 16:41:00 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C166BA406D;
- Thu, 16 Jan 2020 16:41:03 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4043AA407B;
+ Thu, 16 Jan 2020 16:40:58 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.199.49.154])
  by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 16 Jan 2020 16:41:03 +0000 (GMT)
+ Thu, 16 Jan 2020 16:40:58 +0000 (GMT)
 From: Ganesh Goudar <ganeshgr@linux.ibm.com>
 To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
  david@gibson.dropbear.id.au
-Subject: [PATCH v19 4/7] target/ppc: Build rtas error log upon an MCE
-Date: Thu, 16 Jan 2020 22:09:49 +0530
+Subject: [PATCH v19 3/7] target/ppc: Handle NMI guest exit
+Date: Thu, 16 Jan 2020 22:09:48 +0530
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
 References: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 20011616-0016-0000-0000-000002DDEEDB
+x-cbid: 20011616-0008-0000-0000-00000349F860
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011616-0017-0000-0000-0000334087AB
-Message-Id: <20200116163952.11090-5-ganeshgr@linux.ibm.com>
+x-cbparentid: 20011616-0009-0000-0000-00004A6A52A2
+Message-Id: <20200116163952.11090-4-ganeshgr@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-01-16_05:2020-01-16,
  2020-01-16 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0
- suspectscore=2 adultscore=0 priorityscore=1501 lowpriorityscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ malwarescore=0 phishscore=0
+ impostorscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 clxscore=1015 mlxlogscore=999 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-2001160136
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,358 +109,193 @@ Sender: "Qemu-devel"
 
 From: Aravinda Prasad <arawinda.p@gmail.com>
 
-Upon a machine check exception (MCE) in a guest address space,
-KVM causes a guest exit to enable QEMU to build and pass the
-error to the guest in the PAPR defined rtas error log format.
+Memory error such as bit flips that cannot be corrected
+by hardware are passed on to the kernel for handling.
+If the memory address in error belongs to guest then
+the guest kernel is responsible for taking suitable action.
+Patch [1] enhances KVM to exit guest with exit reason
+set to KVM_EXIT_NMI in such cases. This patch handles
+KVM_EXIT_NMI exit.
 
-This patch builds the rtas error log, copies it to the rtas_addr
-and then invokes the guest registered machine check handler. The
-handler in the guest takes suitable action(s) depending on the type
-and criticality of the error. For example, if an error is
-unrecoverable memory corruption in an application inside the
-guest, then the guest kernel sends a SIGBUS to the application.
-For recoverable errors, the guest performs recovery actions and
-logs the error.
+[1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
+    (e20bbd3d and related commits)
 
 Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
-[Assume SLOF has allocated enough room for rtas error log]
 Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_events.c  | 220 ++++++++++++++++++++++++++++++++++++++++-
- hw/ppc/spapr_rtas.c    |  26 +++++
- include/hw/ppc/spapr.h |   6 +-
- target/ppc/kvm.c       |   4 +-
- 4 files changed, 253 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c          |  8 ++++++++
+ hw/ppc/spapr_events.c   | 37 +++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h  | 10 ++++++++++
+ target/ppc/kvm.c        | 14 ++++++++++++++
+ target/ppc/kvm_ppc.h    |  2 ++
+ target/ppc/trace-events |  1 +
+ 6 files changed, 72 insertions(+)
 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f5c036d3d9..46bac1a83c 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1677,6 +1677,12 @@ static void spapr_machine_reset(MachineState *machine)
+     first_ppc_cpu->env.gpr[5] = 0;
+ 
+     spapr->cas_reboot = false;
++
++    spapr->mc_status = -1;
++    spapr->guest_machine_check_addr = -1;
++
++    /* Signal all vCPUs waiting on this condition */
++    qemu_cond_broadcast(&spapr->mc_delivery_cond);
+ }
+ 
+ static void spapr_create_nvram(SpaprMachineState *spapr)
+@@ -2971,6 +2977,8 @@ static void spapr_machine_init(MachineState *machine)
+ 
+         kvmppc_spapr_enable_inkernel_multitce();
+     }
++
++    qemu_cond_init(&spapr->mc_delivery_cond);
+ }
+ 
+ static int spapr_kvm_type(MachineState *machine, const char *vm_type)
 diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index dfc0de840a..54eaf28a9e 100644
+index e355e000d0..dfc0de840a 100644
 --- a/hw/ppc/spapr_events.c
 +++ b/hw/ppc/spapr_events.c
-@@ -214,6 +214,104 @@ struct hp_extended_log {
-     struct rtas_event_log_v6_hp hp;
- } QEMU_PACKED;
+@@ -40,6 +40,7 @@
+ #include "hw/ppc/spapr_drc.h"
+ #include "qemu/help_option.h"
+ #include "qemu/bcd.h"
++#include "qemu/main-loop.h"
+ #include "hw/ppc/spapr_ovec.h"
+ #include <libfdt.h>
  
-+struct rtas_event_log_v6_mc {
-+#define RTAS_LOG_V6_SECTION_ID_MC                   0x4D43 /* MC */
-+    struct rtas_event_log_v6_section_header hdr;
-+    uint32_t fru_id;
-+    uint32_t proc_id;
-+    uint8_t error_type;
-+#define RTAS_LOG_V6_MC_TYPE_UE                           0
-+#define RTAS_LOG_V6_MC_TYPE_SLB                          1
-+#define RTAS_LOG_V6_MC_TYPE_ERAT                         2
-+#define RTAS_LOG_V6_MC_TYPE_TLB                          4
-+#define RTAS_LOG_V6_MC_TYPE_D_CACHE                      5
-+#define RTAS_LOG_V6_MC_TYPE_I_CACHE                      7
-+    uint8_t sub_err_type;
-+#define RTAS_LOG_V6_MC_UE_INDETERMINATE                  0
-+#define RTAS_LOG_V6_MC_UE_IFETCH                         1
-+#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH         2
-+#define RTAS_LOG_V6_MC_UE_LOAD_STORE                     3
-+#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE     4
-+#define RTAS_LOG_V6_MC_SLB_PARITY                        0
-+#define RTAS_LOG_V6_MC_SLB_MULTIHIT                      1
-+#define RTAS_LOG_V6_MC_SLB_INDETERMINATE                 2
-+#define RTAS_LOG_V6_MC_ERAT_PARITY                       1
-+#define RTAS_LOG_V6_MC_ERAT_MULTIHIT                     2
-+#define RTAS_LOG_V6_MC_ERAT_INDETERMINATE                3
-+#define RTAS_LOG_V6_MC_TLB_PARITY                        1
-+#define RTAS_LOG_V6_MC_TLB_MULTIHIT                      2
-+#define RTAS_LOG_V6_MC_TLB_INDETERMINATE                 3
-+    uint8_t reserved_1[6];
-+    uint64_t effective_address;
-+    uint64_t logical_address;
-+} QEMU_PACKED;
-+
-+struct mc_extended_log {
-+    struct rtas_event_log_v6 v6hdr;
-+    struct rtas_event_log_v6_mc mc;
-+} QEMU_PACKED;
-+
-+struct MC_ierror_table {
-+    unsigned long srr1_mask;
-+    unsigned long srr1_value;
-+    bool nip_valid; /* nip is a valid indicator of faulting address */
-+    uint8_t error_type;
-+    uint8_t error_subtype;
-+    unsigned int initiator;
-+    unsigned int severity;
-+};
-+
-+static const struct MC_ierror_table mc_ierror_table[] = {
-+{ 0x00000000081c0000, 0x0000000000040000, true,
-+  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_IFETCH,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000000081c0000, 0x0000000000080000, true,
-+  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000000081c0000, 0x00000000000c0000, true,
-+  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000000081c0000, 0x0000000000100000, true,
-+  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000000081c0000, 0x0000000000140000, true,
-+  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000000081c0000, 0x0000000000180000, true,
-+  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, } };
-+
-+struct MC_derror_table {
-+    unsigned long dsisr_value;
-+    bool dar_valid; /* dar is a valid indicator of faulting address */
-+    uint8_t error_type;
-+    uint8_t error_subtype;
-+    unsigned int initiator;
-+    unsigned int severity;
-+};
-+
-+static const struct MC_derror_table mc_derror_table[] = {
-+{ 0x00008000, false,
-+  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_LOAD_STORE,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00004000, true,
-+  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000800, true,
-+  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000400, true,
-+  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000080, true,
-+  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,  /* Before PARITY */
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
-+{ 0x00000100, true,
-+  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
-+  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, } };
-+
-+#define SRR1_MC_LOADSTORE(srr1) ((srr1) & PPC_BIT(42))
-+
- typedef enum EventClass {
-     EVENT_CLASS_INTERNAL_ERRORS     = 0,
-     EVENT_CLASS_EPOW                = 1,
-@@ -623,7 +721,125 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
+@@ -622,6 +623,42 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
  }
  
--void spapr_mce_req_event(PowerPCCPU *cpu)
-+static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
-+                                        struct mc_extended_log *ext_elog)
-+{
-+    int i;
-+    CPUPPCState *env = &cpu->env;
-+    uint32_t summary;
-+    uint64_t dsisr = env->spr[SPR_DSISR];
-+
-+    summary = RTAS_LOG_VERSION_6 | RTAS_LOG_OPTIONAL_PART_PRESENT;
-+    if (recovered) {
-+        summary |= RTAS_LOG_DISPOSITION_FULLY_RECOVERED;
-+    } else {
-+        summary |= RTAS_LOG_DISPOSITION_NOT_RECOVERED;
-+    }
-+
-+    if (SRR1_MC_LOADSTORE(env->spr[SPR_SRR1])) {
-+        for (i = 0; i < ARRAY_SIZE(mc_derror_table); i++) {
-+            if (!(dsisr & mc_derror_table[i].dsisr_value)) {
-+                continue;
-+            }
-+
-+            ext_elog->mc.error_type = mc_derror_table[i].error_type;
-+            ext_elog->mc.sub_err_type = mc_derror_table[i].error_subtype;
-+            if (mc_derror_table[i].dar_valid) {
-+                ext_elog->mc.effective_address = cpu_to_be64(env->spr[SPR_DAR]);
-+            }
-+
-+            summary |= mc_derror_table[i].initiator
-+                        | mc_derror_table[i].severity;
-+
-+            return summary;
-+        }
-+    } else {
-+        for (i = 0; i < ARRAY_SIZE(mc_ierror_table); i++) {
-+            if ((env->spr[SPR_SRR1] & mc_ierror_table[i].srr1_mask) !=
-+                    mc_ierror_table[i].srr1_value) {
-+                continue;
-+            }
-+
-+            ext_elog->mc.error_type = mc_ierror_table[i].error_type;
-+            ext_elog->mc.sub_err_type = mc_ierror_table[i].error_subtype;
-+            if (mc_ierror_table[i].nip_valid) {
-+                ext_elog->mc.effective_address = cpu_to_be64(env->nip);
-+            }
-+
-+            summary |= mc_ierror_table[i].initiator
-+                        | mc_ierror_table[i].severity;
-+
-+            return summary;
-+        }
-+    }
-+
-+    summary |= RTAS_LOG_INITIATOR_CPU;
-+    return summary;
-+}
-+
-+static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
++void spapr_mce_req_event(PowerPCCPU *cpu)
 +{
 +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
 +    CPUState *cs = CPU(cpu);
-+    uint64_t rtas_addr;
-+    CPUPPCState *env = &cpu->env;
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+    target_ulong msr = 0;
-+    struct rtas_error_log log;
-+    struct mc_extended_log *ext_elog;
-+    uint32_t summary;
 +
-+    /*
-+     * Properly set bits in MSR before we invoke the handler.
-+     * SRR0/1, DAR and DSISR are properly set by KVM
-+     */
-+    if (!(*pcc->interrupts_big_endian)(cpu)) {
-+        msr |= (1ULL << MSR_LE);
-+    }
-+
-+    if (env->msr & (1ULL << MSR_SF)) {
-+        msr |= (1ULL << MSR_SF);
-+    }
-+
-+    msr |= (1ULL << MSR_ME);
-+
-+    ext_elog = g_malloc0(sizeof(*ext_elog));
-+    summary = spapr_mce_get_elog_type(cpu, recovered, ext_elog);
-+
-+    log.summary = cpu_to_be32(summary);
-+    log.extended_length = cpu_to_be32(sizeof(*ext_elog));
-+
-+    spapr_init_v6hdr(&ext_elog->v6hdr);
-+    ext_elog->mc.hdr.section_id = cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MC);
-+    ext_elog->mc.hdr.section_length =
-+                    cpu_to_be16(sizeof(struct rtas_event_log_v6_mc));
-+    ext_elog->mc.hdr.section_version = 1;
-+
-+    /* get rtas addr from fdt */
-+    rtas_addr = spapr_get_rtas_addr();
-+    if (!rtas_addr) {
-+        /* Unable to fetch rtas_addr. Hence reset the guest */
-+        ppc_cpu_do_system_reset(cs);
-+        g_free(ext_elog);
++    if (spapr->guest_machine_check_addr == -1) {
++        /*
++         * This implies that we have hit a machine check either when the
++         * guest has not registered FWNMI (i.e., "ibm,nmi-register" not
++         * called) or between system reset and "ibm,nmi-register".
++         * Fall back to the old machine check behavior in such cases.
++         */
++        cs->exception_index = POWERPC_EXCP_MCHECK;
++        ppc_cpu_do_interrupt(cs);
 +        return;
 +    }
 +
-+    stq_be_phys(&address_space_memory, rtas_addr + RTAS_ERROR_LOG_OFFSET,
-+                env->gpr[3]);
-+    cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
-+                              sizeof(env->gpr[3]), &log, sizeof(log));
-+    cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
-+                              sizeof(env->gpr[3]) + sizeof(log), ext_elog,
-+                              sizeof(*ext_elog));
-+
-+    env->gpr[3] = rtas_addr + RTAS_ERROR_LOG_OFFSET;
-+    env->msr = msr;
-+    env->nip = spapr->guest_machine_check_addr;
-+
-+    g_free(ext_elog);
++    while (spapr->mc_status != -1) {
++        /*
++         * Check whether the same CPU got machine check error
++         * while still handling the mc error (i.e., before
++         * that CPU called "ibm,nmi-interlock")
++         */
++        if (spapr->mc_status == cpu->vcpu_id) {
++            qemu_system_guest_panicked(NULL);
++            return;
++        }
++        qemu_cond_wait_iothread(&spapr->mc_delivery_cond);
++        /* Meanwhile if the system is reset, then just return */
++        if (spapr->guest_machine_check_addr == -1) {
++            return;
++        }
++    }
++    spapr->mc_status = cpu->vcpu_id;
 +}
 +
-+void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
- {
-     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     CPUState *cs = CPU(cpu);
-@@ -657,6 +873,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu)
-         }
-     }
-     spapr->mc_status = cpu->vcpu_id;
-+
-+    spapr_mce_dispatch_elog(cpu, recovered);
- }
- 
  static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 8d8d8cdfcb..2c066a372d 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -477,6 +477,32 @@ void spapr_dt_rtas_tokens(void *fdt, int rtas)
-     }
- }
- 
-+hwaddr spapr_get_rtas_addr(void)
-+{
-+    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-+    int rtas_node;
-+    const fdt32_t *rtas_data;
-+    void *fdt = spapr->fdt_blob;
-+
-+    /* fetch rtas addr from fdt */
-+    rtas_node = fdt_path_offset(fdt, "/rtas");
-+    if (rtas_node < 0) {
-+        return 0;
-+    }
-+
-+    rtas_data = fdt_getprop(fdt, rtas_node, "linux,rtas-base", NULL);
-+    if (!rtas_data) {
-+        return 0;
-+    }
-+
-+    /*
-+     * We assume that the OS called RTAS instantiate-rtas, but some other
-+     * OS might call RTAS instantiate-rtas-64 instead. This fine as of now
-+     * as SLOF only supports 32-bit variant.
-+     */
-+    return (hwaddr)fdt32_to_cpu(*rtas_data);
-+}
-+
- static void core_rtas_register_types(void)
- {
-     spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+                             uint32_t token, uint32_t nargs,
+                             target_ulong args,
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 909d3976f9..652a5514e8 100644
+index 7bc5fc3a9e..909d3976f9 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -727,6 +727,9 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr);
+@@ -191,6 +191,15 @@ struct SpaprMachineState {
+      * occurs during the unplug process. */
+     QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
  
- #define RTAS_ERROR_LOG_MAX      2048
- 
-+/* Offset from rtas-base where error log is placed */
-+#define RTAS_ERROR_LOG_OFFSET       0x30
++    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
++    target_ulong guest_machine_check_addr;
++    /*
++     * mc_status is set to -1 if mc is not in progress, else is set to the CPU
++     * handling the mc.
++     */
++    int mc_status;
++    QemuCond mc_delivery_cond;
 +
- #define RTAS_EVENT_SCAN_RATE    1
- 
- /* This helper should be used to encode interrupt specifiers when the related
-@@ -813,7 +816,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
+     /*< public >*/
+     char *kvm_type;
+     char *host_model;
+@@ -804,6 +813,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
  int spapr_max_server_number(SpaprMachineState *spapr);
  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
                        uint64_t pte0, uint64_t pte1);
--void spapr_mce_req_event(PowerPCCPU *cpu);
-+void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
++void spapr_mce_req_event(PowerPCCPU *cpu);
  
  /* DRC callbacks. */
  void spapr_core_release(DeviceState *dev);
-@@ -904,4 +907,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
- #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the platform */
- 
- void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
-+hwaddr spapr_get_rtas_addr(void);
- #endif /* HW_SPAPR_H */
 diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 21a4c79d41..8fd4298372 100644
+index 9161eea865..21a4c79d41 100644
 --- a/target/ppc/kvm.c
 +++ b/target/ppc/kvm.c
-@@ -2804,9 +2804,11 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+@@ -1702,6 +1702,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+         ret = 0;
+         break;
  
- int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
- {
-+    bool recovered = run->flags & KVM_RUN_PPC_NMI_DISP_FULLY_RECOV;
++    case KVM_EXIT_NMI:
++        trace_kvm_handle_nmi_exception();
++        ret = kvm_handle_nmi(cpu, run);
++        break;
 +
-     cpu_synchronize_state(CPU(cpu));
- 
--    spapr_mce_req_event(cpu);
-+    spapr_mce_req_event(cpu, recovered);
- 
-     return 0;
+     default:
+         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
+         ret = -1;
+@@ -2797,6 +2802,15 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+     return data & 0xffff;
  }
+ 
++int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
++{
++    cpu_synchronize_state(CPU(cpu));
++
++    spapr_mce_req_event(cpu);
++
++    return 0;
++}
++
+ int kvmppc_enable_hwrng(void)
+ {
+     if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_PPC_HWRNG)) {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 2c60dedd0d..9e4f2357cc 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -84,6 +84,8 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
+ void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
+ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset);
+ 
++int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
++
+ #else
+ 
+ static inline uint32_t kvmppc_get_tbfreq(void)
+diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+index 3dc6740706..6d15aa90b4 100644
+--- a/target/ppc/trace-events
++++ b/target/ppc/trace-events
+@@ -28,3 +28,4 @@ kvm_handle_papr_hcall(void) "handle PAPR hypercall"
+ kvm_handle_epr(void) "handle epr"
+ kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
+ kvm_handle_debug_exception(void) "handle debug exception"
++kvm_handle_nmi_exception(void) "handle NMI exception"
 -- 
 2.17.2
 
