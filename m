@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67882C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F43C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 325952051A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CFBE206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:36:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DmURarkE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 325952051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYnazV6g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CFBE206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is6E8-0005ha-C8
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:34:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52808)
+	id 1is6Ft-0007U1-DO
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:36:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1is6DM-00054J-ND
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:33:43 -0500
+ (envelope-from <slp@redhat.com>) id 1is6Ez-0006or-ML
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:35:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1is6DI-0001Bz-7O
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:33:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60155
+ (envelope-from <slp@redhat.com>) id 1is6Ev-0001x6-Rn
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:35:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20357
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1is6DI-0001BZ-2u
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:33:36 -0500
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1is6Ev-0001wY-Nf
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:35:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579185215;
+ s=mimecast20190719; t=1579185317;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=RzJlY9fKNrDLesRYTkPgbzkabvDvsep4+3VQJecLq+c=;
- b=DmURarkEu2noWXqoxHcZeuSsYec69WoeLIvJxoc5rNgVH+AX5mdPrG6snqBhgyKcprd7Le
- HYVh9ThVuu8N7mTHG5JKkQPC7avs63m7IMgzLKK8+qg1cDFWDv9ImYOfJByK8FMnsg5m4l
- RKdnH9ulMtVA+m26mptdD6L5/2ZpgvE=
+ bh=BCUO7kz03mNbQP5hTOasv/LzZOKf/dKpOhL/3eo/ptg=;
+ b=HYnazV6gtK8434bn9H9X0iv/osOtZZ5ZmlKg7Uo+NLI2mgZM+RpoFPy87ZMmLF1o7CgGBI
+ BXI+VkRUP6eEvILINdnfPDF4c5FDGtTox9kIH0S7iIjZSQTCMHJ1iZomUxe1mhDeEHbdUh
+ qs/E5CiMkdUKTUPPVv3KcS5+wz4jXck=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-YQ6Ckw6WMBqwCvVt5Q3GDA-1; Thu, 16 Jan 2020 09:33:33 -0500
-X-MC-Unique: YQ6Ckw6WMBqwCvVt5Q3GDA-1
+ us-mta-98-TGE1hDYUOJmXNNwJ--01hw-1; Thu, 16 Jan 2020 09:35:15 -0500
+X-MC-Unique: TGE1hDYUOJmXNNwJ--01hw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB192100550E
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 14:33:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C53D10B0F32
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 14:35:14 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C09D461069;
- Thu, 16 Jan 2020 14:33:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C6D3E61073;
+ Thu, 16 Jan 2020 14:35:12 +0000 (UTC)
 References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-45-dgilbert@redhat.com>
+ <20191212163904.159893-46-dgilbert@redhat.com>
 User-agent: mu4e 1.2.0; emacs 26.3
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 044/104] virtiofsd: prevent ".." escape in lo_do_lookup()
-In-reply-to: <20191212163904.159893-45-dgilbert@redhat.com>
-Date: Thu, 16 Jan 2020 15:33:24 +0100
-Message-ID: <87sgkfwjwr.fsf@redhat.com>
+Subject: Re: [PATCH 045/104] virtiofsd: prevent ".." escape in lo_do_readdir()
+Message-ID: <87r1zzwjua.fsf@redhat.com>
+In-reply-to: <20191212163904.159893-46-dgilbert@redhat.com>
+Date: Thu, 16 Jan 2020 15:35:10 +0100
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
@@ -101,10 +101,13 @@ Dr. David Alan Gilbert (git) <dgilbert@redhat.com> writes:
 
 > From: Stefan Hajnoczi <stefanha@redhat.com>
 >
+> Construct a fake dirent for the root directory's ".." entry.  This hides
+> the parent directory from the FUSE client.
+>
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  tools/virtiofsd/passthrough_ll.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  tools/virtiofsd/passthrough_ll.c | 36 +++++++++++++++++++-------------
+>  1 file changed, 22 insertions(+), 14 deletions(-)
 
 Reviewed-by: Sergio Lopez <slp@redhat.com>
 
@@ -113,19 +116,19 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl4gdDQACgkQ9GknjS8M
-AjUkRw/+MceC3rKGgNQ6c9XT6mcUr9jwS+dqr2kPGmpo9+7MN+DHpxQCVqNbetw1
-sxBdoxFZ7ggfFRYj0ktVSGkoyoqqCnlZj8Ea7Jpv6/zAHThizN0y2zoxYZJOBWYr
-FXUxajXyVm0xt8MlopDxzKS5oxV7vpnIOPSfIAkf1oykW+iua7/o41P+WxXTfIfA
-8pKYZaFtBMR7MFQ5cvgnR0PB/5KSCprDJN9SQgPs7n4dF7MC/M3sUb62yAIb9CU7
-q9p+Agt+Vt3DU+YNdfb4Ps+sB6Upk9Hq6dBWrLVJyJLV7E5UE5tsOJM87X7S+2tW
-VfHWksI3+JfRUZujZQfD5zo+gL94py/Oo9uSTtM33BdbWge7cLNbjtdlmLXore8p
-b42X9MQkiPkUBicYzjaF21p9H3w/Of08gr5XvbZggjA9EPp/BVRVkuKD0PhZd0mC
-HsZ/ueofjci72/8W5nmHXvWhnvNgsnQdBXZG1NayxdZa5/d1eM03egNOMg2Ogx6U
-CK/rIt1yHazvRV5AboMJWhJV99CDABXeroUkU49ykgaR4h+6mb4CowO36JPwkuh/
-/Sq2w5TQIU/MtzMLxnuTJlqmteeIVipGYS2R2n6lJqDofb+yBmAAcuKG8LI23ldd
-lf0lnwVNH2/8J93nnJ1oci9YmfgxPeY7uhqyQuakuthA960MsEo=
-=SyVZ
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl4gdJ4ACgkQ9GknjS8M
+AjWy0A/+IJzERmeIy07eUBC1F8qZy2GVFx02HP3fvCHAgO5ihAdHOz6WL4uJ87Xz
+KETknUuXBlLWG6c8RXzhGgCtJpZOjLuEyf6F8plhHuwTUdmcRFiRO+D87dkrd8lb
+C4v8X9lKYFRAzSjh6LAcxBGeVZToX3ne1UQ3YzBj7qA7xAr54PxtnR9+pMiiFXqF
+SrkIW1Y38PQF4mOuFpSXQ0DDVvm0MUAprLCXH9whSEklu4Ez38yNLwAOJCENEyBn
+frZ/9ED6JH08RMavryq+s51isjaNv4DHqOWOVBhLHFmagaPOkkuMeHAkmRkowqqd
+f9DuWe92a9PhTw/6bUEzbEPKvAo6To0f4iftzZLtuqj5LZxb/SkFFQ8cyR28if6P
+Su/471DiqLFoGVxEt6LCSjdwuTLFYGsYaqEt1G+SFu3HykLd+vV59Secr0ljPq0A
+qUclMLt0uoKVMfTSUlsrsWOi2CqPM8Zp9/QOdwlowKNjtKn8JBc9UbZtSUFY42TL
+7sJrxekJu/0J1xG7zO9IpsguUGZFr2ALPfTdcqucU/2kfvbX+0C75OejhoCF2yvs
+zPpVDIjnc8USUKDS2TkG7IoANL7Ct9ekOAnFa5Xo7LY6K86uHu9wBeOFi9MmNn9R
+uWdbaDNAM6nC7l5FDxEGTW2vRDuj9KrFAJ1Dp5WYG4anujFHm6M=
+=NXAe
 -----END PGP SIGNATURE-----
 --=-=-=--
 
