@@ -2,95 +2,63 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C31C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3351C33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:51:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C2A220663
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:49:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C2A220663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69BCF20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:51:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69BCF20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is8L9-0004YH-Qp
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:49:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43741)
+	id 1is8MP-0006ha-KW
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:51:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1is8D0-00016T-Nq
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:30 -0500
+ (envelope-from <pl@kamp.de>) id 1is8Fd-000545-Nn
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:44:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1is8Cz-00064a-Ha
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59374
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1is8Cz-00063u-D0
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:41:25 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00GGcHns105478
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:25 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2xjtumss5a-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:41:24 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Thu, 16 Jan 2020 16:41:23 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 16 Jan 2020 16:41:19 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00GGfISm58785964
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 16 Jan 2020 16:41:18 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CE883A4078;
- Thu, 16 Jan 2020 16:41:18 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7B565A4065;
- Thu, 16 Jan 2020 16:41:16 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.199.49.154])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 16 Jan 2020 16:41:16 +0000 (GMT)
-From: Ganesh Goudar <ganeshgr@linux.ibm.com>
-To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
-Subject: [PATCH v19 7/7] ppc: spapr: Activate the FWNMI functionality
-Date: Thu, 16 Jan 2020 22:09:52 +0530
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
-References: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20011616-0008-0000-0000-00000349F868
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011616-0009-0000-0000-00004A6A52A8
-Message-Id: <20200116163952.11090-8-ganeshgr@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-01-16_05:2020-01-16,
- 2020-01-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=848 bulkscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 adultscore=0 spamscore=0 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
- definitions=main-2001160136
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+ (envelope-from <pl@kamp.de>) id 1is8FZ-00007R-1K
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:44:09 -0500
+Received: from kerio.kamp.de ([195.62.97.192]:48995)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pl@kamp.de>) id 1is8FY-0008VQ-Qs
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:44:04 -0500
+X-Footer: a2FtcC5kZQ==
+Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
+ by kerio.kamp.de with ESMTPSA
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
+ Thu, 16 Jan 2020 17:43:59 +0100
+Subject: Re: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior
+ to previous a0000
+From: Peter Lieven <pl@kamp.de>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
+ <20200108150458.GC3184@work-vm>
+ <ca222a5f-1ec6-477c-ed83-6ef52ea9e97f@kamp.de>
+ <20200109184440.GR6795@work-vm>
+ <b89e8ba2-49e9-8c0d-1129-116afa76366a@kamp.de>
+ <cd316fb8-b56b-2913-8b57-f085ca4426d7@kamp.de>
+Message-ID: <11bd7f7a-9022-6c35-3b92-27d6e66f3295@kamp.de>
+Date: Thu, 16 Jan 2020 17:44:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <cd316fb8-b56b-2913-8b57-f085ca4426d7@kamp.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 195.62.97.192
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,45 +70,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
- Aravinda Prasad <arawinda.p@gmail.com>, groug@kaod.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aravinda Prasad <arawinda.p@gmail.com>
+Am 16.01.20 um 13:47 schrieb Peter Lieven:
+> Am 13.01.20 um 17:25 schrieb Peter Lieven:
+>> Am 09.01.20 um 19:44 schrieb Dr. David Alan Gilbert:
+>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>> Am 08.01.20 um 16:04 schrieb Dr. David Alan Gilbert:
+>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>>
+>>>>>> I have a Qemu 4.0.1 machine with vhost-net network adapter, thats polluting the log with the above message.
+>>>>>>
+>>>>>> Is this something known? Googling revealed the following patch in Nemu (with seems to be a Qemu fork from Intel):
+>>>>>>
+>>>>>> https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619dccced114ef7f56e
+>>>>>>
+>>>>>>
+>>>>>> The network stopped functioning. After a live-migration the vServer is reachable again.
+>>>>>>
+>>>>>>
+>>>>>> Any ideas?
+>>>>> What guest are you running and what does your qemu commandline look
+>>>>> like?
+>>>>
+>>>> Its running debian9. We have hundreds of other VMs with identical setup. Do not know why this one makes trouble.
+>>> Could you extract an 'info mtree' from it - particularly the
+>>> 'address-space: memory' near the top.
+>>
+>>
+>> Here we go:
+>>
+>>
+>> address-space: memory
+>>   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>     0000000000000000-000000003fffffff (prio 0, i/o): alias ram-below-4g @pc.ram 0000000000000000-000000003fffffff
+>>     0000000000000000-ffffffffffffffff (prio -1, i/o): pci
+>>       00000000000a0000-00000000000affff (prio 2, i/o): alias vga.chain4 @vga.vram 0000000000000000-000000000000ffff
+>>       00000000000a0000-00000000000bffff (prio 1, i/o): vga-lowmem
+>
+>
+> What seems special is that the RAM area is prio2. Any idea if this makes trouble?
 
-This patch sets the default value of SPAPR_CAP_FWNMI_MCE
-to SPAPR_CAP_ON for machine type 4.2.
 
-Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
-Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
----
- hw/ppc/spapr.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Update from my side. This happens when I have Debian 10 with XFCE when the Graphical User Interface is initialized.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c8bc2fa9f3..a81c18b6b6 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4454,7 +4454,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
--    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
-+    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_ON;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq = &spapr_irq_dual;
-     smc->dr_phb_enabled = true;
-@@ -4544,6 +4544,7 @@ static void spapr_machine_4_1_class_options(MachineClass *mc)
-     smc->smp_threads_vsmt = false;
-     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
- }
- 
- DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
--- 
-2.17.2
+I see the log message when I specify -M pc-i440fx-2.9. If I obmit the machine type the error does not appear.
+
+
+Peter
+
 
 
