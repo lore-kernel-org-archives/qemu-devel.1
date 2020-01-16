@@ -2,92 +2,83 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0CDAC33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7BCCC33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:22:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C096F2051A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE21820684
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:22:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rQazUcxW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C096F2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HddmxWFe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE21820684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is9l5-0007co-SQ
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:20:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36020)
+	id 1is9mK-0000CG-SC
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:22:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1is9kM-00076V-Dn
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:19:59 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1is9lU-00088Q-TU
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:21:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1is9kL-0007rY-6m
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:19:58 -0500
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55398)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1is9kK-0007qg-V0
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:19:57 -0500
-Received: by mail-pj1-x1041.google.com with SMTP id d5so1911440pjz.5
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 10:19:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Uk1M32o3N7gXBPZcXOLO/40xLC60g6xi0u9mr5yNsu8=;
- b=rQazUcxWRjI+BMERLrvdzFcWHAvhXKqLUS/MdTXOk9wg5JxrTUKWsLYp+Nb+Wou66R
- 5wYsIXiyQ+kVwsp+a3YA6l8iH6aznCjATzo5p8Wy+VCyjBWJyaclnXi5lifeaIXevckW
- tMUDQsu+ucHXmgSEJhxjsPHD/GPgo7vbY5QECTI66J6F8u96Tl2epXoVqrINy/0/buWz
- MyDKXUQstNSqjlEu85Igicb4FrtVNOEP3PGgkHmYWrCIFwN8Uf5+gtRPLmkgPolHJMYo
- xZbQUTLcFyuFOY29OBMqOqxIfPXmGtUIJ7xsyPDmSlj6iIZe0RvZfG4A6ICDXyz1Qb/n
- 5QIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Uk1M32o3N7gXBPZcXOLO/40xLC60g6xi0u9mr5yNsu8=;
- b=JDcgEuc1FdjYTR0LF9WTXCIwBS6y0uxF1RI/cdZEyZGKO1JAG6dv3UfOYmP/NmDRvw
- //4Y1zCmtmdaXrvX3Sq4eH2COKASdFoJ6cl+0SzsB33PSnIPHgoLq4rBYa5pv0aki/Ke
- ZbDhtwWD9VW6IoA9ozDv3qahw6J9yrQmcOiVi2VpAZRVBz5luXuYccgByYwGL2fG6wCB
- 7n09potFDKTVVO1eeprJQ3VC8vILvBxjC0nq5N2iq2XGpNvwqt1Qc8TfG8pFiZkcZm0L
- ihXOAc7MnssYksnaZOIKB58bzUliDRm71iLC9rX3Uo+TNJ6EQk7hRyv4C8o9Ukr9rIqc
- LHSA==
-X-Gm-Message-State: APjAAAVQUFzH+/mjjGkUdfVRcIguJFttQSy7fWUPvn1TpvE4CcfZ04Uw
- 98trkEBI2DwSbAEobYbncVvnucMT6d4=
-X-Google-Smtp-Source: APXvYqzaMVgpOse8E6gUcw1zhY18qNYAhI1as6RvLXyfn9YevVKRf2tvvZ+uqV5Zw8VzmgmdSvAnpQ==
-X-Received: by 2002:a17:902:b103:: with SMTP id
- q3mr33166696plr.37.1579198795130; 
- Thu, 16 Jan 2020 10:19:55 -0800 (PST)
-Received: from [192.168.3.43] (rrcs-66-91-136-155.west.biz.rr.com.
- [66.91.136.155])
- by smtp.gmail.com with ESMTPSA id j28sm26042867pgb.36.2020.01.16.10.19.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Jan 2020 10:19:54 -0800 (PST)
-Subject: Re: [PATCH 3/3] linux-user/i386: Emulate x86_64 vsyscalls
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200114210921.11216-1-richard.henderson@linaro.org>
- <20200114210921.11216-4-richard.henderson@linaro.org>
- <87ftgfl64x.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3733f2cd-9262-d7f9-ab9c-c8a3032732df@linaro.org>
-Date: Thu, 16 Jan 2020 08:19:49 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <dgilbert@redhat.com>) id 1is9lR-0000Gf-27
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:21:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30910
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1is9lQ-0000GA-UG
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:21:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579198864;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9IgRdZsHjR8wE/bAcN8Wfvtyqipw6ruE8fcINiAlIVA=;
+ b=HddmxWFep3AFLvUpZE7zMqMK90DVW13XFpgRGKySw8RV6L96jsuKMp/N3ICWBauPO9Rm7j
+ JfmnxVzRS12f1jlbXCGAI1EKjCGkWxi/tPLHhtelmXZmgTFoSy3z1HerynnoUSX8D3hCsH
+ rmOY4rAoVOYezBCi60CLjEWITU1jdk4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-uQ5WaPZcOKC6sC3UoPlfgw-1; Thu, 16 Jan 2020 13:21:00 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C3E9107ACC7
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 18:20:59 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5051160C87;
+ Thu, 16 Jan 2020 18:20:58 +0000 (UTC)
+Date: Thu, 16 Jan 2020 18:20:55 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v3 1/5] multifd: Make sure that we don't do any IO after
+ an error
+Message-ID: <20200116182055.GM3108@work-vm>
+References: <20200116154616.11569-1-quintela@redhat.com>
+ <20200116154616.11569-2-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87ftgfl64x.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+In-Reply-To: <20200116154616.11569-2-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: uQ5WaPZcOKC6sC3UoPlfgw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +90,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, riku.voipio@iki.fi,
- laurent@vivier.eu, peter.maydell@linaro.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/16/20 6:26 AM, Alex Bennée wrote:
->> +    /*
->> +     * Perform the syscall.  None of the vsyscalls should need restarting,
->> +     * and all faults should have been caught above.
->> +     */
->> +    ret = do_syscall(env, syscall, env->regs[R_EDI], env->regs[R_ESI],
->> +                     env->regs[R_EDX], env->regs[10], env->regs[8],
->> +                     env->regs[9], 0, 0);
-> 
-> How come the register ABI to the syscall is different to the others. I
-> can see why syscall doesn't come from EAX but the others are a different
-> set to normal syscalls which might be why:
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Cut and paste error, I assume.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-That said, the three syscalls have a maximum of 2 arguments,
-so I could really just pass EDI and ESI and 0 for the rest...
+> ---
+>  migration/ram.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index ba6e0eea15..8f9f3bba5b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -3442,7 +3442,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaq=
+ue)
+>  {
+>      RAMState **temp =3D opaque;
+>      RAMState *rs =3D *temp;
+> -    int ret;
+> +    int ret =3D 0;
+>      int i;
+>      int64_t t0;
+>      int done =3D 0;
+> @@ -3521,12 +3521,14 @@ static int ram_save_iterate(QEMUFile *f, void *op=
+aque)
+>      ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+> =20
+>  out:
+> -    multifd_send_sync_main(rs);
+> -    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> -    qemu_fflush(f);
+> -    ram_counters.transferred +=3D 8;
+> +    if (ret >=3D 0) {
+> +        multifd_send_sync_main(rs);
+> +        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> +        qemu_fflush(f);
+> +        ram_counters.transferred +=3D 8;
+> =20
+> -    ret =3D qemu_file_get_error(f);
+> +        ret =3D qemu_file_get_error(f);
+> +    }
+>      if (ret < 0) {
+>          return ret;
+>      }
+> @@ -3578,9 +3580,11 @@ static int ram_save_complete(QEMUFile *f, void *op=
+aque)
+>          ram_control_after_iterate(f, RAM_CONTROL_FINISH);
+>      }
+> =20
+> -    multifd_send_sync_main(rs);
+> -    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> -    qemu_fflush(f);
+> +    if (ret >=3D 0) {
+> +        multifd_send_sync_main(rs);
+> +        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> +        qemu_fflush(f);
+> +    }
+> =20
+>      return ret;
+>  }
+> --=20
+> 2.24.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-> I'm seeing a EFAULT on the gettimeofday failure:
-
-What getttimeofday failure?  Is this related to the mention of /sbin/ldconfig
-in your previous message?
-
->    #0  do_syscall (cpu_env=cpu_env@entry=0x5555577d2b10, num=num@entry=96, arg1=0, arg2=0, arg3=4211016, arg4=8, arg5=274888677184, arg6=274886295415, arg7=0, arg8=0) at /home/alex/lsrc/qemu.git/linux-user/syscall.c:12076                                               
->    #1  0x0000555555609b6e in emulate_vsyscall (env=0x5555577d2b10) at /home/alex/lsrc/qemu.git/linux-user/x86_64/../i386/cpu_loop.c:180
->    #2  cpu_loop (env=0x5555577d2b10) at /home/alex/lsrc/qemu.git/linux-user/x86_64/../i386/cpu_loop.c:246                              
->    #3  0x000055555559640e in main (argc=<optimized out>, argv=<optimized
->    #out>, envp=<optimized out>) at
->    #/home/alex/lsrc/qemu.git/linux-user/main.c:865
-> 
-> arg1/arg2 don't seem right here.
-
-Why?  NULL value for arg1 is legal, though semi-useless.
-
-Ah, I see that our implementation of gettimeofday doesn't honor NULL.
-
-
-r~
 
