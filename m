@@ -2,88 +2,62 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 252ABC33CB1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1997C33CB6
 	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:50:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE1E52073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:50:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE1E52073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8871A2073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 08:50:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8871A2073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is0r1-0002e1-Uy
+	id 1is0r2-0002fa-PJ
 	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 03:50:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60559)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60592)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1is0pr-0001Bl-2e
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:49:05 -0500
+ (envelope-from <groug@kaod.org>) id 1is0pz-0001JI-Jr
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:49:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1is0pp-0004aQ-VD
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:49:03 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38058
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1is0pn-0004Yc-Iv; Thu, 16 Jan 2020 03:48:59 -0500
-Received: from host86-191-119-91.range86-191.btcentralplus.com
- ([86.191.119.91] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1is0pk-0005fu-MY; Thu, 16 Jan 2020 08:48:58 +0000
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-63-git-send-email-imammedo@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <87ed6ca3-913f-aaab-9cdc-f725490417ba@ilande.co.uk>
-Date: Thu, 16 Jan 2020 08:48:55 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <groug@kaod.org>) id 1is0pv-0004el-QR
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:49:11 -0500
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:51089)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1is0pu-0004d5-Gv
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 03:49:07 -0500
+Received: from player746.ha.ovh.net (unknown [10.108.16.46])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id D6BD315650C
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 09:49:02 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player746.ha.ovh.net (Postfix) with ESMTPSA id 57B95E5AD7EF;
+ Thu, 16 Jan 2020 08:48:53 +0000 (UTC)
+Date: Thu, 16 Jan 2020 09:48:48 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
+Message-ID: <20200116094848.555c170d@bahia.lan>
+In-Reply-To: <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
+References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
+ <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <1579100861-73692-63-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.191.119.91
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 62/86] ppc:mac_oldworld: use memdev for RAM
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: No (on mail.default.ilande.uk0.bigv.io); Unknown failure
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 2557481640314116390
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdeggdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeegiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.76.148
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,65 +69,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: Lukas Doktor <ldoktor@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/01/2020 15:07, Igor Mammedov wrote:
+On Wed, 15 Jan 2020 19:10:37 +0100
+Laurent Vivier <lvivier@redhat.com> wrote:
 
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->   MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: mark.cave-ayland@ilande.co.uk
-> CC: david@gibson.dropbear.id.au
-> CC: qemu-ppc@nongnu.org
-> ---
->  hw/ppc/mac_oldworld.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index 0fa680b..2be0602 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -91,7 +91,6 @@ static void ppc_heathrow_init(MachineState *machine)
->      CPUPPCState *env = NULL;
->      char *filename;
->      int linux_boot, i;
-> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
->      MemoryRegion *bios = g_new(MemoryRegion, 1);
->      uint32_t kernel_base, initrd_base, cmdline_base = 0;
->      int32_t kernel_size, initrd_size;
-> @@ -127,9 +126,7 @@ static void ppc_heathrow_init(MachineState *machine)
->          exit(1);
->      }
->  
-> -    memory_region_allocate_system_memory(ram, NULL, "ppc_heathrow.ram",
-> -                                         ram_size);
-> -    memory_region_add_subregion(sysmem, 0, ram);
-> +    memory_region_add_subregion(sysmem, 0, machine->ram);
->  
->      /* allocate and load BIOS */
->      memory_region_init_ram(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
-> @@ -446,6 +443,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
->      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
->      mc->default_display = "std";
->      mc->ignore_boot_device_suffixes = true;
-> +    mc->default_ram_id = "ppc_heathrow.ram";
->      fwc->get_dev_path = heathrow_fw_dev_path;
->  }
+> Hi,
+>=20
+> On 15/01/2020 18:48, Greg Kurz wrote:
+> > Migration can potentially race with CAS reboot. If the migration thread
+> > completes migration after CAS has set spapr->cas_reboot but before the
+> > mainloop could pick up the reset request and reset the machine, the
+> > guest is migrated unrebooted and the destination doesn't reboot it
+> > either because it isn't aware a CAS reboot was needed (eg, because a
+> > device was added before CAS). This likely result in a broken or hung
+> > guest.
+> >=20
+> > Even if it is small, the window between CAS and CAS reboot is enough to
+> > re-qualify spapr->cas_reboot as state that we should migrate. Add a new
+> > subsection for that and always send it when a CAS reboot is pending.
+> > This may cause migration to older QEMUs to fail but it is still better
+> > than end up with a broken guest.
+> >=20
+> > The destination cannot honour the CAS reboot request from a post load
+> > handler because this must be done after the guest is fully restored.
+> > It is thus done from a VM change state handler.
+> >=20
+> > Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >=20
+>=20
+> I'm wondering if the problem can be related with the fact that
+> main_loop_should_exit() could release qemu_global_mutex in
+> pause_all_vcpus() in the reset case?
+>=20
+> 1602 static bool main_loop_should_exit(void)
+> 1603 {
+> ...
+> 1633     request =3D qemu_reset_requested();
+> 1634     if (request) {
+> 1635         pause_all_vcpus();
+> 1636         qemu_system_reset(request);
+> 1637         resume_all_vcpus();
+> 1638         if (!runstate_check(RUN_STATE_RUNNING) &&
+> 1639                 !runstate_check(RUN_STATE_INMIGRATE)) {
+> 1640             runstate_set(RUN_STATE_PRELAUNCH);
+> 1641         }
+> 1642     }
+> ...
+>=20
+> I already sent a patch for this kind of problem (in current Juan pull
+> request):
+>=20
+> "runstate: ignore finishmigrate -> prelaunch transition"
+>=20
 
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+IIUC your patch avoids an invalid 'prelaunch' -> 'postmigrate' runstate
+transition that can happen if the migration thread sets the runstate to
+'finishmigrate' when pause_all_vcpus() releases the main loop mutex.
 
+ie. symptom of the problem is QEMU aborting, correct ? The issue I'm
+trying to fix is a guest breakage caused by a discrepancy between
+QEMU and the guest after migration has succeeded.
 
-ATB,
+> but I don't know if it could fix this one.
+>=20
 
-Mark.
+I don't think so and your patch kinda illustrates it. If the runstate
+is 'finishmigrate' when returning from pause_all_vcpus(), this means
+that state was sent to the destination before we could actually reset
+the machine.
+
+> Thanks,
+> Laurent
+>=20
+
 
