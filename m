@@ -2,62 +2,83 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FA2C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C571EC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:19:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2453C206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:15:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2453C206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8DE0F206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:19:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BnGElqag"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE0F206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is505-0006vY-8X
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 08:15:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40642)
+	id 1is541-0001rG-MG
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 08:19:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1is4zR-0006QU-CG
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:15:14 -0500
+ (envelope-from <quintela@redhat.com>) id 1is52u-0000Sv-LY
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:18:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1is4zP-0002p8-P3
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:15:13 -0500
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:49636)
+ (envelope-from <quintela@redhat.com>) id 1is52p-0004Qd-48
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:18:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56339
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1is4zP-0002lp-Ia
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:15:11 -0500
-Received: from player688.ha.ovh.net (unknown [10.108.35.124])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4EA7911DF36
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 14:15:07 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id 5AAACE34C12A;
- Thu, 16 Jan 2020 13:15:05 +0000 (UTC)
-Date: Thu, 16 Jan 2020 14:15:03 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v3 02/11] 9pfs: require msize >= 4096
-Message-ID: <20200116141503.32e36561@bahia.lan>
-In-Reply-To: <49ff399635ccfd21858b15417a398df362ff0b90.1578957500.git.qemu_oss@crudebyte.com>
-References: <cover.1578957500.git.qemu_oss@crudebyte.com>
- <49ff399635ccfd21858b15417a398df362ff0b90.1578957500.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1is52o-0004Q8-Rx
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:18:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579180721;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0Njat9O9Yvf9BO3EutegTNopEQwKWREg6tK8Trl1cPQ=;
+ b=BnGElqagbIc7Yng2xtSdUjlNqVnRY/fD5dFs1C54yljsjvonh/ipl2VBbkO97fV0wPXuH4
+ tS3noIxeMzQ2nGOIxVoC7hAx00RmYL44X1kuEdnMkGPkK/sSuD46Sb2sFJsNlRW53jemWn
+ bGDJwXYvqRShsa9JkWnBiNCa6+3Qo3w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-Dby6_l_uNDiYEXrz89jNFg-1; Thu, 16 Jan 2020 08:18:38 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7442D8018A7;
+ Thu, 16 Jan 2020 13:18:36 +0000 (UTC)
+Received: from redhat.com (ovpn-117-192.ams2.redhat.com [10.36.117.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 47297811FF;
+ Thu, 16 Jan 2020 13:18:35 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH RFC 01/12] migration: Add multiRDMA capability support
+In-Reply-To: <20200115180907.GH3811@work-vm> (David Alan Gilbert's message of
+ "Wed, 15 Jan 2020 18:09:07 +0000")
+References: <20200109045922.904-1-fengzhimin1@huawei.com>
+ <20200109045922.904-2-fengzhimin1@huawei.com>
+ <20200115180907.GH3811@work-vm>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Thu, 16 Jan 2020 14:18:32 +0100
+Message-ID: <87r1zz8rpz.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 7050948170414201152
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdehgdegkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieekkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Dby6_l_uNDiYEXrz89jNFg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.37.72
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,123 +90,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: quintela@redhat.com
+Cc: zhang.zhanghailiang@huawei.com, Zhimin Feng <fengzhimin1@huawei.com>,
+ armbru@redhat.com, qemu-devel@nongnu.org, jemmy858585@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jan 2020 23:21:04 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Zhimin Feng (fengzhimin1@huawei.com) wrote:
+>> From: fengzhimin <fengzhimin1@huawei.com>
+>>=20
+>> Signed-off-by: fengzhimin <fengzhimin1@huawei.com>
+>
+> Instead of creating x-multirdma as a capability and the corresponding
+> parameter for the number of channels; it would be better just
+> to use the multifd parameters when used with an rdma transport;
+> as far as I know multifd doesn't work with rdma at the moment,
+> and to the user the idea of multifd over rdma is just the same thing.
 
-> A client establishes a session by sending a Tversion request along with
-> a 'msize' parameter which client uses to suggest server a maximum
-> message size ever to be used for communication (for both requests and
-> replies) between client and server during that session. If client
-> suggests a 'msize' smaller than 4096 then deny session by server
-> immediately with an error response (Rlerror for "9P2000.L" clients or
-> Rerror for "9P2000.u" clients) instead of replying with Rversion.
-> 
-> Introduction of a minimum msize is required to prevent issues in
-> responses to numerous individual request types. For instance with a
-> msize of < P9_IOHDRSZ no useful operations would be possible at all.
+I was about to suggest that.  We could setup both capabilities:
 
-P9_IOHDRSZ is really specific to write/read operations. 
-
-/*
- * ample room for Twrite/Rread header
- * size[4] Tread/Twrite tag[2] fid[4] offset[8] count[4]
- */
-#define P9_IOHDRSZ 24
-
-As you see P9_IOHDRSZ is approximately the size of a Twrite header.
-Its primary use is to inform the client about the 'count' to use for
-Twrite/Tread messages (see get_iounit()).
-
-Not sure it helps to mention P9_IOHDRSZ since we're going to choose
-something much greater. I'd personally drop this sentence.
-
-> Furthermore there are some responses which are not allowed by the 9p
-> protocol to be truncated like e.g. Rreadlink which may yield up to
-
-No message may be truncated in any way actually. The spec just allows
-an exception with the string part of Rerror.
-
-Maybe just mention that and say we choose 4096 to be able to send
-big Rreadlink messages.
-
-> a size of PATH_MAX which is usually 4096. Hence this size was chosen
-> as min. msize for server, which is already the minimum msize of the
-> Linux kernel's 9pfs client. By forcing a min. msize already at
-> session start (when handling Tversion) we don't have to check for a
-> minimum msize on a per request type basis later on during session,
-> which would be much harder and more error prone to maintain.
-> 
-> This is a user visible change which should be documented as such
-> (i.e. in public QEMU release changelog).
-> 
-
-This last sentence isn't informative in the commit message. This
-kind of indication should be added after the --- below.
-
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
-
-LGTM
-
-With an updated changelog,
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/9pfs/9p.c | 12 ++++++++++++
->  hw/9pfs/9p.h | 11 +++++++++++
->  2 files changed, 23 insertions(+)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 520177f40c..a5fbe821d4 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -1363,8 +1363,20 @@ static void coroutine_fn v9fs_version(void *opaque)
->          s->proto_version = V9FS_PROTO_2000L;
->      } else {
->          v9fs_string_sprintf(&version, "unknown");
-> +        /* skip min. msize check, reporting invalid version has priority */
-> +        goto marshal;
->      }
->  
-> +    if (s->msize < P9_MIN_MSIZE) {
-> +        err = -EMSGSIZE;
-> +        error_report(
-> +            "9pfs: Client requested msize < minimum msize ("
-> +            stringify(P9_MIN_MSIZE) ") supported by this server."
-> +        );
-> +        goto out;
-> +    }
-> +
-> +marshal:
->      err = pdu_marshal(pdu, offset, "ds", s->msize, &version);
->      if (err < 0) {
->          goto out;
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index 3904f82901..6fffe44f5a 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -100,6 +100,17 @@ typedef enum P9ProtoVersion {
->      V9FS_PROTO_2000L = 0x02,
->  } P9ProtoVersion;
->  
-> +/**
-> + * @brief Minimum message size supported by this 9pfs server.
-> + *
-> + * A client establishes a session by sending a Tversion request along with a
-> + * 'msize' parameter which suggests the server a maximum message size ever to be
-> + * used for communication (for both requests and replies) between client and
-> + * server during that session. If client suggests a 'msize' smaller than this
-> + * value then session is denied by server with an error response.
-> + */
-> +#define P9_MIN_MSIZE    4096
-> +
->  #define P9_NOTAG    UINT16_MAX
->  #define P9_NOFID    UINT32_MAX
->  #define P9_MAXWELEM 16
+multifd + rdma
 
 
