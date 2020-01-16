@@ -2,80 +2,84 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8865FC33CB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4927AC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:53:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5803A207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:51:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14E992073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:53:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjGzyILu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5803A207FF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKVCdrV0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14E992073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is4ci-0000lp-I5
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:51:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37422)
+	id 1is4e3-0002SQ-88
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:53:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37633)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1is4bu-0008Dm-QA
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:50:58 -0500
+ (envelope-from <thuth@redhat.com>) id 1is4dS-0001uH-4j
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:52:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1is4bq-00061l-TV
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:50:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37658
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1is4dR-0006x7-39
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:52:30 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43680
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1is4bq-00061L-PW
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:50:50 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1is4dQ-0006wd-VZ
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:52:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579179049;
+ s=mimecast20190719; t=1579179148;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8cHhkAlnHCmpRMbfimsb3m25Hqd+pmMxMB9VqbsIW4I=;
- b=UjGzyILucsneJ3t1p2z9x3jQx9KCbiewkFrLghzZGksRLiTGSLedY4HEMYst36eQ1NzYmY
- 7joMaykd9zBlYIYZRU02DVb0xDnK9P4ecqRvukoN4baHLAZ9SaN0RpVMMRwz6xPFscxIYg
- GCp9g2EsqyGBCJmZTMvr668exIgBiSs=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=TdSsp/RO9MofIu8PYTjx2kppGEEL4elHaAbRx0uxxfA=;
+ b=SKVCdrV0M7bhYSqrgL3fxOGGsKGobjR0X3B5wIppBntoVrfTVnuUqPOr+bN7b4yldYzy+/
+ K96b5SM0x3V3HchO2lmMg+bGYdD4bYeovmRgkUF0qtYaQVWfjPWtDCZpqFW7jUWWnNIZxq
+ fmrO7NYDLRWeDH+QEvg+f2Avv4hf7mc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-sl_PZpJtMRG2q8DYHXZTZw-1; Thu, 16 Jan 2020 07:50:46 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-191-w3MbmyMzPByd4VCgVBMKCw-1; Thu, 16 Jan 2020 07:52:27 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2957A183B526;
- Thu, 16 Jan 2020 12:50:45 +0000 (UTC)
-Received: from gondolin (unknown [10.36.117.255])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66DA3842BA;
- Thu, 16 Jan 2020 12:50:41 +0000 (UTC)
-Date: Thu, 16 Jan 2020 13:50:38 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] target/s390x/kvm: Enable adapter interruption
- suppression again
-Message-ID: <20200116135038.2c8cf3c6.cohuck@redhat.com>
-In-Reply-To: <20200116122026.5804-1-thuth@redhat.com>
-References: <20200116122026.5804-1-thuth@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CED861137842;
+ Thu, 16 Jan 2020 12:52:25 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-204-105.brq.redhat.com [10.40.204.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D55A75C1C3;
+ Thu, 16 Jan 2020 12:52:23 +0000 (UTC)
+Subject: Re: [PATCH] s390x/flic: adapter routes handling if !kernel_irqchip
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20200116123703.14624-1-cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <57df7c9b-ddd7-3a7a-1113-91f7c1355d10@redhat.com>
+Date: Thu, 16 Jan 2020 13:52:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: sl_PZpJtMRG2q8DYHXZTZw-1
+In-Reply-To: <20200116123703.14624-1-cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: w3MbmyMzPByd4VCgVBMKCw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,59 +91,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Jan 2020 13:20:26 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> The AIS feature has been disabled late in the v2.10 development
-> cycle since there were some issues with migration (see commit
-> 3f2d07b3b01ea61126b - "s390x/ais: for 2.10 stable: disable ais
-> facility"). We originally wanted to enable it again for newer
-> machine types, but apparently we forgot to do this so far. Let's
-> do it for the new s390-ccw-virtio-5.0 machine now.
-> 
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 16/01/2020 13.37, Cornelia Huck wrote:
+> If the kernel irqchip has been disabled, we don't want the
+> {add,release}_adapter_routes routines to call any kvm_irqchip_*
+> interfaces, as they may rely on an irqchip actually having been
+> created. Just take a quick exit in that case instead.
+>=20
+> Fixes: d426d9fba8ea ("s390x/virtio-ccw: wire up irq routing and irqfds")
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  hw/s390x/s390-virtio-ccw.c         |  4 ++++
->  include/hw/s390x/s390-virtio-ccw.h |  4 ++++
->  target/s390x/kvm.c                 | 11 ++++++++---
->  3 files changed, 16 insertions(+), 3 deletions(-)
-> 
-
-> @@ -365,10 +367,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      /*
->       * The migration interface for ais was introduced with kernel 4.13
->       * but the capability itself had been active since 4.12. As migration
-> -     * support is considered necessary let's disable ais in the 2.10
-> -     * machine.
-> +     * support is considered necessary we only enable this for newer
-
-s/necessary we only enable this/necessary, we only try to enable this/
-
-> +     * machine types and if KVM_CAP_S390_AIS_MIGRATION is available.
-
-maybe s/and if/if/
-
->       */
-> -    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
-> +    if (smc->kvm_ais_allowed &&
-> +        kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
-> +        kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+>=20
+> Without this patch, QEMU with kernel_irqchip=3Doff will crash in
+> kvm_irqchip_release_virq(), so alternatively, we could add a check
+> there. kvm_irqchip_add_adapter_route() is actually fine.
+>=20
+> ---
+>  hw/intc/s390_flic_kvm.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+> index dddd33ea61c8..44b7960ebcc8 100644
+> --- a/hw/intc/s390_flic_kvm.c
+> +++ b/hw/intc/s390_flic_kvm.c
+> @@ -331,6 +331,10 @@ static int kvm_s390_add_adapter_routes(S390FLICState=
+ *fs,
+>      int ret, i;
+>      uint64_t ind_offset =3D routes->adapter.ind_offset;
+> =20
+> +    if (!kvm_gsi_routing_enabled()) {
+> +        return -ENOSYS;
 > +    }
->  
->      kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
->      return 0;
 
-Looks good.
+As you wrote, this check is not really necessary since it is already
+done in  kvm_irqchip_add_adapter_route() ...
 
-Remind me again: ais only made a difference for pci devices, right? Is
-it enough to give this a quick whirl with virtio-pci devices?
+>      for (i =3D 0; i < routes->num_routes; i++) {
+>          ret =3D kvm_irqchip_add_adapter_route(kvm_state, &routes->adapte=
+r);
+>          if (ret < 0) {
+
+... so I wonder if it would be simply best to set
+
+               routes->gsi[i] =3D -1;
+
+before the "goto" instead to make sure that
+kvm_s390_release_adapter_routes() does not try to clean it up? That
+would also fix a potential crash in case kvm_irqchip_add_adapter_route()
+returned an error code in case of a different problem, I think.
+
+ Thomas
+
+
+> @@ -358,6 +362,10 @@ static void kvm_s390_release_adapter_routes(S390FLIC=
+State *fs,
+>  {
+>      int i;
+> =20
+> +    if (!kvm_gsi_routing_enabled()) {
+> +        return;
+> +    }
+> +
+>      for (i =3D 0; i < routes->num_routes; i++) {
+>          if (routes->gsi[i] >=3D 0) {
+>              kvm_irqchip_release_virq(kvm_state, routes->gsi[i]);
+>=20
 
 
