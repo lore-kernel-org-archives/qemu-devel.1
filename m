@@ -2,84 +2,81 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B95C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0201C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DFD020730
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:04:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A88D20748
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:05:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jKz5cMJp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DFD020730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B27mTyRj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A88D20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is6gv-0001xA-SI
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:04:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57932)
+	id 1is6hi-0002uQ-6m
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:05:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58010)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1is6fH-0000UY-6y
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:02:32 -0500
+ (envelope-from <cohuck@redhat.com>) id 1is6fl-00011y-QS
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:03:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1is6fD-0003aF-B3
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:02:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25897
+ (envelope-from <cohuck@redhat.com>) id 1is6fh-0003rG-RQ
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:03:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34088
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1is6fD-0003Zi-6t
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:02:27 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1is6fh-0003qk-NP
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:02:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579186946;
+ s=mimecast20190719; t=1579186977;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NW7PPPAdqnnJsmPouApanHPH3Yb4Z/0IPWbgTpYewA4=;
- b=jKz5cMJp3XuL0qEHM7V47PRs0LWjJGqIRhG1KqWZNJl6Qbe78uRe0PJxki29CcJihzFqYC
- dPzR/+P2Z1j7Yv14FcYpSZgGey+1NlrEkpg7XxVoOYQsuQEiBKA0xKtGofi6RekJpgR9fg
- C8ic6eAhknNSeJpa96AczjWeG0m597M=
+ bh=rOk3xK3CFzKz6I8avhZUakElSY2+RJyPNdQuqpVKTeU=;
+ b=B27mTyRjW41kMqHlSTi/fpx6f4Zk+W0yUezdY+h271xRwcah9UuOIn1cw0P3Ov1AwpbVZu
+ 6q4tk+R/K0H4WxWl5M5rOl2EEZGuWaM8ma5YrHh4oV+QJgASZL/pjEYVMFlwnkcYWBfbuZ
+ vcK0d28K5u2engoIo0aS4bpG6BmuKa0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-QkwydbuLMdib1P-RHx8P4g-1; Thu, 16 Jan 2020 10:02:20 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-93-KAmZeN-cMiSt6OXiFGWSaA-1; Thu, 16 Jan 2020 10:02:53 -0500
+X-MC-Unique: KAmZeN-cMiSt6OXiFGWSaA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C27B3E5D33;
- Thu, 16 Jan 2020 15:02:19 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-48.ams2.redhat.com [10.36.117.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D2F0A386;
- Thu, 16 Jan 2020 15:02:15 +0000 (UTC)
-Date: Thu, 16 Jan 2020 16:02:14 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v3 1/4] qapi: Add a 'coroutine' flag for commands
-Message-ID: <20200116150214.GH9470@linux.fritz.box>
-References: <20200115122326.26393-1-kwolf@redhat.com>
- <20200115122326.26393-2-kwolf@redhat.com>
- <875zhc9360.fsf@dusky.pond.sub.org>
- <20200115155850.GG5505@linux.fritz.box>
- <871rrzy2sg.fsf@dusky.pond.sub.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8EC114E0;
+ Thu, 16 Jan 2020 15:02:51 +0000 (UTC)
+Received: from gondolin (unknown [10.36.117.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D1DA260C63;
+ Thu, 16 Jan 2020 15:02:42 +0000 (UTC)
+Date: Thu, 16 Jan 2020 16:02:29 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 3/5] virtio-scsi: default num_queues to -smp N
+Message-ID: <20200116160230.37e9ff6c.cohuck@redhat.com>
+In-Reply-To: <20200116141654.GK163546@stefanha-x1.localdomain>
+References: <20200116105842.271179-1-stefanha@redhat.com>
+ <20200116105842.271179-4-stefanha@redhat.com>
+ <20200116125349.6a3aeaa9.cohuck@redhat.com>
+ <20200116141654.GK163546@stefanha-x1.localdomain>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <871rrzy2sg.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: QkwydbuLMdib1P-RHx8P4g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: multipart/signed; boundary="Sig_///2ZsY0GyEZtQ5B_KdZZ4ip";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,103 +88,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
- stefanha@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 16.01.2020 um 14:00 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
-> > I have no idea if we will eventually get a case where the command wants
-> > to behave different between the two modes and actually has use for a
-> > coroutine. I hope not.
-> >
-> > But using two bools rather than a single enum keeps the code simple and
-> > leaves us all options open if it turns out that we do have a use case.
->=20
-> I can buy the argument "the two are conceptually orthogonal, although we
-> don't haven't found a use for one of the four cases".
->=20
-> Let's review the four combinations of the two flags once more:
->=20
-> * allow-oob: false, coroutine: false
->=20
->   Handler runs in main loop, outside coroutine context.  Okay.
->=20
-> * allow-oob: false, coroutine: true
->=20
->   Handler runs in main loop, in coroutine context.  Okay.
->=20
-> * allow-oob: true, coroutine: false
->=20
->   Handler may run in main loop or in iothread, outside coroutine
->   context.  Okay.
->=20
-> * allow-oob: true, coroutine: true
->=20
->   Handler may run (in main loop, in coroutine context) or (in iothread,
->   outside coroutine context).  This "in coroutine context only with
->   execute, not with exec-oob" behavior is a bit surprising.
->=20
->   We could document it, noting that it may change to always run in
->   coroutine context.  Or we simply reject this case as "not
->   implemented".  Since we have no uses, I'm leaning towards reject.  One
->   fewer case to test then.
+--Sig_///2ZsY0GyEZtQ5B_KdZZ4ip
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-What would be the right mode of rejecting it?
+On Thu, 16 Jan 2020 14:16:54 +0000
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
-I assume we should catch it somewhere in the QAPI generator (where?) and
-then just assert in the C code that both flags aren't set at the same
-time?
+> On Thu, Jan 16, 2020 at 12:53:49PM +0100, Cornelia Huck wrote:
+> > On Thu, 16 Jan 2020 10:58:40 +0000
+> > Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >  =20
+> > > Automatically size the number of request virtqueues to match the numb=
+er
+> > > of vCPUs.  This ensures that completion interrupts are handled on the
+> > > same vCPU that submitted the request.  No IPI is necessary to complet=
+e
+> > > an I/O request and performance is improved.
+> > >=20
+> > > Remember that virtqueue numbering assumptions are being removed from =
+the
+> > > virtio-pci proxy object, so the Control and Event virtqueues are coun=
+ted
+> > > by ->get_num_virtqueues() and we only add 1 for the Configuration Cha=
+nge
+> > > interrupt:
+> > >=20
+> > >      if (vpci_dev->nvectors =3D=3D DEV_NVECTORS_UNSPECIFIED) {
+> > > -        vpci_dev->nvectors =3D vs->conf.num_queues + 3;
+> > > +        vpci_dev->nvectors =3D vdc->get_num_virtqueues(VIRTIO_DEVICE=
+(vdev)) + 1;
+> > >      }
+> > >=20
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > ---
+> > >  hw/core/machine.c               |  3 +++
+> > >  hw/scsi/vhost-scsi.c            |  2 ++
+> > >  hw/scsi/vhost-user-scsi.c       |  2 ++
+> > >  hw/scsi/virtio-scsi.c           | 18 ++++++++++++++++++
+> > >  hw/virtio/vhost-scsi-pci.c      |  4 ++--
+> > >  hw/virtio/vhost-user-scsi-pci.c |  4 ++--
+> > >  hw/virtio/virtio-scsi-pci.c     |  4 ++--
+> > >  include/hw/virtio/virtio-scsi.h |  1 +
+> > >  8 files changed, 32 insertions(+), 6 deletions(-)
+> > >  =20
+> >  =20
+> > > @@ -878,6 +879,18 @@ static struct SCSIBusInfo virtio_scsi_scsi_info =
+=3D {
+> > >      .load_request =3D virtio_scsi_load_request,
+> > >  };
+> > > =20
+> > > +static uint32_t virtio_scsi_get_num_virtqueues(VirtIODevice *vdev)
+> > > +{
+> > > +    VirtIOSCSICommon *s =3D VIRTIO_SCSI_COMMON(vdev);
+> > > +    uint32_t request_queues =3D s->conf.num_queues;
+> > > +
+> > > +    if (s->conf.num_queues =3D=3D 1 && s->conf.auto_num_queues) {
+> > > +        request_queues =3D current_machine->smp.cpus;
+> > > +    }
+> > > +
+> > > +    return VIRTIO_SCSI_VQ_NUM_FIXED + request_queues; =20
+> >=20
+> > I'm not sure doing this at the device level is the right thing to do.
+> > For now, only virtio-pci will call this function, and there basing the
+> > number of virtqueues off the number of cpus makes sense; but that's a
+> > property of the transport, not of the device.
+> >=20
+> > Consider e.g. a virtio-scsi-ccw device: If we wanted to introduce a way
+> > to automatically pick a good number of virtqueues there, this functions
+> > likely would not return a particularly useful value, as queue interrupt
+> > processing does not really relate to the number of cpus with adapter
+> > interrupts. It's not a problem right now, as only virtio-pci calls
+> > this, but someone looking at this callback is likely getting the
+> > impression that this is a generically useful function. =20
+>=20
+> That's a great point.  Maybe the direction should be reversed so that
+> the device asks the transport to suggest the optimal number of queues
+> when auto-num-queues is enabled.
 
-> >> > @@ -194,8 +195,9 @@ out:
-> >> >      return ret
-> >> > =20
-> >> > =20
-> >> > -def gen_register_command(name, success_response, allow_oob, allow_p=
-reconfig):
-> >> > -    options =3D []
-> >> > +def gen_register_command(name: str, success_response: bool, allow_o=
-ob: bool,
-> >> > +                         allow_preconfig: bool, coroutine: bool) ->=
- str:
-> >> > +    options =3D [] # type: List[str]
->=20
-> One more: this is a PEP 484 type hint.  With Python 3, we can use PEP
-> 526 instead:
->=20
->           options: List[str] =3D []
->=20
-> I think we should.
+Maybe the device also specifying that it needs at least m queues, and
+the transport can then return max(m, n) (with n being the number of
+cpus in the pci case).
 
-This requires Python 3.6, unfortunately. The minimum requirement for
-building QEMU is 3.5.
+My next problem is that I'm not sure what 'optimal number of queues'
+would mean from a ccw viewpoint. "Remaining free bits in the indicator
+area" will be way too much in the general case :) Giving an upper limit
+is easy, but not a value that we'd want to autoconfigure, and I really
+don't want to return 42 all the time. Would it make sense to make this
+feature opt-in per transport?
 
-> >> Some extra churn due to type hints here.  Distracting.  Suggest not to
-> >> mix adding type hints to existing code with feature work.
-> >
-> > If you would be open for a compromise, I could leave options
-> > unannotated, but keep the typed parameter list.
->=20
-> Keeping just the function annotation is much less distracting.  I can't
-> reject that with a "separate patches for separate things" argument.
->=20
-> I'd still prefer not to, because:
->=20
-> * If we do add systematic type hints in the near future, then delaying
->   this one until then shouldn't hurt your productivity.
->=20
-> * If we don't, this lone one won't help your productivity much, but
->   it'll look out of place.
->=20
-> I really don't want us to add type hints as we go, because such
-> open-ended "while we touch it anyway" conversions take forever and a
-> day.  Maximizes the confusion integral over time.
+--Sig_///2ZsY0GyEZtQ5B_KdZZ4ip
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-I think it's a first time that I'm asked not to document things, but
-I'll remove them.
+-----BEGIN PGP SIGNATURE-----
 
-Kevin
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl4gewYACgkQ3s9rk8bw
+L68ezw/8CV55W7cfK36KsdF6twvFk3cJp5nVAofReV95Fnv8m9UHMqNHkZIZFMzK
+6NcFj0zUhrK8EMzhfo9n+Au8FZggPFnbdBHsHHsScxyWCNcNegfJf/NU0RaIQSxK
+Px7yDcjbTTyJZ3oBFMNYrA0JBxKb2H6+B+Qjt9jK1/TprVnKGrX4J4+tWNBWpc3A
+j8NINAGbfcru0nRj8hyYPzD0ro4XnSbnyrxIYTT2F75S25VdU6tq9K5nzX5ISqwf
+v7ZdhBHmMR/GXGdmmpeNzJOtMbkmxdVtbjMDf0J2S/KfvfAqVGb2Fvv7T/bcXWXO
+shYsCkUrac/eppqwhdqGZg2ptGfAEmiHOBOKRmPQOYoOSyxKHNBZZWW9xs1eTAn/
+TQ8NI1dLHfxOsME7rbT1oy5yoRPbPSboMF1lE8FlRtqUI7pTQjjbIkNc0VATRqHP
+ml7gaTtyWPfMhfsU4hCUrDpdY2RYFunxIi5RBdbP+VsqUWR4WjkJQMJ2BTSUzvOI
+LOaEjVhauOQsFTgjty3mYFQkNCZjjtvziZLlhu3qRwYTBqhSqxoHj3m+ySFgKrdi
+4ZZBg6SBUXDWw4rcOovQF56LwuN7j3PSRCv9fck4a8JPaEna6tW6Ng+l3NEgCBse
+bWzavrm7/+Iede2LJvQUTTUOPNrkJNhDxDMQzlUd0zwoOSa4WmU=
+=LP12
+-----END PGP SIGNATURE-----
+
+--Sig_///2ZsY0GyEZtQ5B_KdZZ4ip--
 
 
