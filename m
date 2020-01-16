@@ -2,79 +2,82 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC95C33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D687DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E93572075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:52:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C84A2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 13:57:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyIHNVy1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E93572075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvIAn+1d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C84A2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is5ZH-0006O8-4E
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 08:52:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45302)
+	id 1is5e0-00011P-JQ
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 08:57:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46156)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1is5Yb-0005xx-FR
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:51:37 -0500
+ (envelope-from <kwolf@redhat.com>) id 1is5dH-0000Xo-BS
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:56:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1is5YX-0007Lm-HR
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:51:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52506
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1is5dD-0001yi-4z
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:56:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55124
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1is5YX-0007Ky-9B
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:51:29 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1is5dC-0001y8-SB
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 08:56:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579182687;
+ s=mimecast20190719; t=1579182977;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KdQRifYjvxTopg2ZA2Vqw8gMAksELnMdMZ1V3GJixQY=;
- b=VyIHNVy1YcQVHg86f2PgPuCOUsr9rnXD1a3EeFeTcNZp1c5ZNQJJ73ZfJT4VgtQQ802uZt
- il1uQ36Ge4LQmp8VnbW9KM71/Tcdn1TN3lPE1T9ib24yW3bYyzApaIIFm3lssXYXCKQVQ3
- fvAO9I3XOpPMKv32hs96PCY1EDN5T4c=
+ bh=pBp1c3Ei/tnKtkbn0qG7vsp2AmIzsJrXLY6Wp/olo2Y=;
+ b=hvIAn+1dVmodwFQ/nokjqaf20mNSR1vl+3ZJH6+/zBkGSKVcyi88XhggkIyEpvZlIUVmn4
+ cx54cHbGBUSoG5acKpGGEnI33Soj2vJmjCThu+kP7pIlR5NLaqoQmR/a+f6+lfnly5CZud
+ ZU/hhWh9++hYTzb6r8yJXh1UGLdZMF8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-vDgyud0lM5KtCLkXz1X48Q-1; Thu, 16 Jan 2020 08:51:26 -0500
-X-MC-Unique: vDgyud0lM5KtCLkXz1X48Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-436-BX10G4IHMlKucDXGM10Wcg-1; Thu, 16 Jan 2020 08:56:15 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3E388DF701;
- Thu, 16 Jan 2020 13:51:24 +0000 (UTC)
-Received: from localhost (ovpn-117-207.ams2.redhat.com [10.36.117.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CB7689CA3;
- Thu, 16 Jan 2020 13:51:23 +0000 (UTC)
-Date: Thu, 16 Jan 2020 13:51:22 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9F4AA16DD;
+ Thu, 16 Jan 2020 13:56:14 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-48.ams2.redhat.com [10.36.117.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D6DDB5C28D;
+ Thu, 16 Jan 2020 13:56:10 +0000 (UTC)
+Date: Thu, 16 Jan 2020 14:56:09 +0100
+From: Kevin Wolf <kwolf@redhat.com>
 To: Coiby Xu <coiby.xu@gmail.com>
 Subject: Re: [PATCH v2 1/5] vhost-user block device backend
-Message-ID: <20200116135122.GI163546@stefanha-x1.localdomain>
+Message-ID: <20200116135609.GD9470@linux.fritz.box>
 References: <20200114140620.10385-1-coiby.xu@gmail.com>
  <20200114140620.10385-2-coiby.xu@gmail.com>
 MIME-Version: 1.0
 In-Reply-To: <20200114140620.10385-2-coiby.xu@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: BX10G4IHMlKucDXGM10Wcg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UthUFkbMtH2ceUK2"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,46 +89,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
+Cc: bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---UthUFkbMtH2ceUK2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Tue, Jan 14, 2020 at 10:06:16PM +0800, Coiby Xu wrote:
+I'm only doing a quick first review pointing out the more obvious
+things while I familiarise myself with your code. I intend to review it
+in more detail later (either in a second pass for this series, or when
+you post v3).
+
+Am 14.01.2020 um 15:06 hat Coiby Xu geschrieben:
 > By making use of libvhost, multiple block device drives can be exported a=
 nd each drive can serve multiple clients simultaneously. Since vhost-user-s=
 erver needs a block drive to be created first, delay the creation of this o=
 bject.
 >=20
 > Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
-> ---
+
+Please wrap the commit message at 72 characters.
+
 >  blockdev-vu.c              | 1008 ++++++++++++++++++++++++++++++++++++
-
-This file contains both vhost-user-blk code and generic vhost-user
-protocol code.  Please split them into two files:
-1. backends/vhost-user-blk-server.c
-2. util/vhost-user-server.c
-
-(As I read and understand the code better I may have better suggestions
-about where to put these source files and how to name them.)
-
 >  include/block/vhost-user.h |   46 ++
 >  vl.c                       |    4 +
 >  3 files changed, 1058 insertions(+)
 >  create mode 100644 blockdev-vu.c
 >  create mode 100644 include/block/vhost-user.h
->=20
+
+This adds a single, relatively big source file. I see at least two
+parts: The generic vhost-user infrastructure with connection handling
+etc. and the implementation of the specific vhost-user-blk device.
+Separating these into two files is probably a good idea.
+
+I would also suggest to put the files in a new subdirectory
+block/export/ and call them vhost-user.c/vhost-user-blk.c. The new
+header file can be in the same directory as it shouldn't be used by
+anyone else.
+
 > diff --git a/blockdev-vu.c b/blockdev-vu.c
 > new file mode 100644
 > index 0000000000..45f0bb43a7
 > --- /dev/null
 > +++ b/blockdev-vu.c
 > @@ -0,0 +1,1008 @@
+
+The LICENSE file clarifies that files without a license header are
+GPLv2+, so it's not strictly a problem, but I think it is good style to
+include a license header that explicitly tells so.
+
 > +#include "qemu/osdep.h"
 > +#include "block/vhost-user.h"
 > +#include "qapi/error.h"
@@ -144,13 +157,19 @@ about where to put these source files and how to name them.)
 > +#include <sys/eventfd.h>
 > +
 > +#include "hw/qdev-properties.h"
+
+Does the order of includes and the empty lines between them signify
+anything? If not, I suggest just sorting them alphabetically (and maybe
+using empty lines between different subdirectories if you like this
+better than a single large block).
+
+According to CODING_STYLE.rst, system headers like <sys/eventfd.h> come
+before all QEMU headers (except qemu/osdep.h, which always must come
+first).
+
 > +enum {
 > +    VHOST_USER_BLK_MAX_QUEUES =3D 8,
 > +};
-
-The number of queues is hardcoded to 1 so this constant can be removed
-for now.
-
 > +
 > +struct virtio_blk_inhdr {
 > +    unsigned char status;
@@ -159,14 +178,15 @@ for now.
 > +
 > +static QTAILQ_HEAD(, VubDev) vub_devs =3D QTAILQ_HEAD_INITIALIZER(vub_de=
 vs);
-
-I'm not sure if this list will be necessary.  See my comments about
-replacing the "name" property with Object's built-in "id" property.
-
 > +
 > +
 > +typedef struct VubReq {
 > +    VuVirtqElement *elem;
+
+Maybe worth a comment that this was allocated with plain malloc(), so
+you must use free() rather than g_free() (which would be the default in
+QEMU)?
+
 > +    int64_t sector_num;
 > +    size_t size;
 > +    struct virtio_blk_inhdr *in;
@@ -174,7 +194,11 @@ replacing the "name" property with Object's built-in "id" property.
 > +    VuClient *client;
 > +    struct VuVirtq *vq;
 > +} VubReq;
-> +
+
+I'm not completely sure yet, but I think I would prefer VuBlock to Vub
+in the type names. Some may even prefer VhostUserBlock, but I can see
+that this would be quite lengthy.
+
 > +static void
 > +remove_watch(VuDev *vu_dev, int fd)
 > +{
@@ -192,6 +216,9 @@ LL);
 > +{
 > +    vu_deinit(&client->parent);
 > +    /** g_source_destroy(vub_device->parent.src); */
+
+Leftover from conversion?
+
 > +    client->sioc =3D NULL;
 > +    object_unref(OBJECT(client->ioc));
 > +    client->closed =3D true;
@@ -199,9 +226,19 @@ LL);
 > +}
 > +
 > +static void vub_panic_cb(VuDev *vu_dev, const char *buf)
+
+You use a lot of sprintf() before calling this function. Would it be
+worth taking a printf-like format parameter instead of buf and using a
+variable argument list?
+
 > +{
 > +    if (buf) {
 > +        g_warning("vu_panic: %s", buf);
+
+I think QEMU proper doesn't use g_warning() anywhere. This could be
+error_report() or warn_report(). (Or if you use a format string
+error_vreport() and warn_vreport().)
+
 > +    }
 > +
 > +    VuClient *client =3D container_of(vu_dev, VuClient, parent);
@@ -221,6 +258,9 @@ LL);
 > +    /* IO size with 1 extra status byte */
 > +    vu_queue_push(vu_dev, req->vq, req->elem,
 > +                  req->size + 1);
+
+I think this fits in a single line.
+
 > +    vu_queue_notify(vu_dev, req->vq);
 > +
 > +    if (req->elem) {
@@ -246,25 +286,39 @@ LL);
 > +        fprintf(stderr, "Invalid size %ld, expect %ld\n", size, sizeof(*=
 desc));
 > +        return -1;
+
+This would be error_report(), too. (More cases below, I'll ignore them
+now.)
+
+I would prefer consistent use of -errno instead of -1 for error cases if
+you don't mind. I guess this would be -EINVAL here. I won't mention it
+for all the other cases; if you want to make the change, you need to
+make it everywhere, obviously.
+
 > +    }
 > +    buf =3D g_new0(char, size);
 > +
 > +    iov_to_buf_full(iov, iovcnt, 0, buf, size);
 
-Simpler:
+I think uint8_t describes better than char what we want here: A buffer
+of bytes.
 
-  struct virtio_blk_discard_write_zeroes desc;
+The empty line would make more sense to me above the g_new0() line than
+after it because it starts a new section that deals with the buffer. In
+general, the use of empty lines feels a bit inconsistent in this patch.
+You may want to go over them again.
 
-  if (unlikely(iov_to_buf(iov, iovcnt, 0, &desc, sizeof(desc)) !=3D
-               sizeof(desc)) {
-      /* TODO handle error */
-  }
-
-No heap allocation.  One variable (desc) instead of two (desc and buf).
-
-> +
 > +
 > +    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
+
+Preprocessor directives should be unindented.
+
+However, I don't think any of this code actually depends on Linux,
+BLKDISCARD or BLKZEROOUT. You can just call blk_pdiscard() and
+blk_pwrite_zeroes() and they will do whatever is necessary to perform
+the operation on the backend (which might not be a Linux block device,
+but could be a regular file or even using a network protocol like NBD).
+
 > +    VubDev *vdev_blk;
 > +    VuClient *client =3D container_of(dev, VuClient, parent);
 > +    vdev_blk =3D client->blk;
@@ -282,6 +336,14 @@ No heap allocation.  One variable (desc) instead of two (desc and buf).
 > +            g_free(buf);
 > +            return 0;
 > +        }
+
+blk_pdiscard() and blk_pwrite_zeroes() are synchronous functions. In
+other words, the guest will be blocked until the I/O is complete. We
+cannot do this.
+
+I think you should let vub_virtio_process_req() run in a coroutine so
+that you can call blk_co_pdiscard() and blk_co_pwrite_zeroes() here.
+
 > +    }
 > +    #endif
 > +
@@ -295,13 +357,12 @@ No heap allocation.  One variable (desc) instead of two (desc and buf).
 > +{
 > +    VuClient *client =3D req->client;
 > +    blk_co_flush(client->blk->backend);
+
+You can't call blk_co_flush() from outside coroutine context. This code
+will be right after you move vub_virtio_process_req() to a coroutine,
+though (which will make this function a coroutine_fn).
+
 > +}
-
-Any function that calls a *_co_*() function must be marked coroutine_fn:
-
-  static void coroutine_fn
-  vub_flush(VubReq *req)
-
 > +
 > +
 > +#define NOT_DONE 0x7fffffff /* used while emulated sync operation in pro=
@@ -339,9 +400,6 @@ gress */
 > +static int blk_prw(BlockBackend *blk, QEMUIOVector *qiov, int64_t offset=
 ,
 > +                   CoroutineEntry co_entry, BdrvRequestFlags flags)
-
-Why is block/block-backend.c:blk_prw() duplicated here?
-
 > +{
 > +
 > +    BlkRwCo rwco =3D {
@@ -363,12 +421,24 @@ Why is block/block-backend.c:blk_prw() duplicated here?
 > +
 > +    return rwco.ret;
 > +}
-> +
+
+This is copy&paste from block-backend.c. We should certainly not do
+this. I think it will automatically go away when you can use
+blk_co_preadv() and blk_co_pwritev() directly.
+
+Note that the BDRV_POLL_WHILE() means that like above, we would be
+waiting for the request to complete. This would block the guest and
+would also not allow parallel requests, killing the I/O performance of
+our vhost-user export.
+
 > +
 > +static ssize_t
 > +vub_rwv(VubReq *req, struct iovec *iov,
 > +        uint32_t iovcnt,
 > +        CoroutineEntry co_entry)
+
+I don't understand the line wrapping here. :-)
+
 > +{
 > +    VuClient *client =3D req->client;
 > +    ssize_t rc;
@@ -384,6 +454,10 @@ Why is block/block-backend.c:blk_prw() duplicated here?
 > +    rc =3D blk_prw(client->blk->backend, qiov, offset, co_entry, 0);
 > +
 > +    req->size =3D iov_size(iov, iovcnt);
+
+You can use qiov->size instead of duplicating this information into a
+separate VubReq field.
+
 > +    if (rc < 0) {
 > +        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n=
 ",
@@ -397,6 +471,9 @@ Why is block/block-backend.c:blk_prw() duplicated here?
 > +
 > +static int vub_virtio_process_req(VuClient *client,
 > +                                     VuVirtq *vq)
+
+Indentation is off. This could be a single line anyway.
+
 > +{
 > +    VuDev *vu_dev =3D &client->parent;
 > +    VuVirtqElement *elem;
@@ -526,7 +603,18 @@ type);
 > +        }
 > +    }
 > +}
-> +
+
+I mentioned above moving vub_virtio_process_req() into a coroutine. Just
+creating a coroutine here and entering it wouldn't work, though.
+
+The best design is probably to get requests from the virtqueue in this
+function (what is currently the first half of vub_virtio_process_req())
+and then spawn a coroutine per request to actually execute them (roughly
+the switch in vub_virtio_process_req()).
+
+This way you'll get parallel requests and won't have to think about
+synchronising accesses to the virtqueue from multiple coroutines.
+
 > +
 > +static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
 > +{
@@ -624,6 +712,9 @@ BLKZEROOUT)
 > +
 > +/*
 > + * When the client disconnects, it send a VHOST_USER_NONE request
+
+s/send/sends/
+
 > + * and vu_process_message will simple call exit which cause the VM
 > + * to exit abruptly.
 > + * To avoid this issue,  process VHOST_USER_NONE request ahead
@@ -651,10 +742,6 @@ BLKZEROOUT)
 > +
 > +static bool
 > +vu_message_read_co(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
-
-Why is this function called *_co()?  It appears to be callable from
-outside coroutine context too.
-
 > +{
 > +    char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] =
 =3D { };
@@ -676,6 +763,10 @@ outside coroutine context too.
 > +    QIOChannel *ioc =3D client->ioc;
 > +    do {
 > +        rc =3D recvmsg(conn_fd, &msg, 0);
+
+This should certainly use qio_channel_readv_full() rather than working
+directly with a socket fd?
+
 > +        if (rc < 0) {
 > +            if (errno =3D=3D EAGAIN) {
 > +                if (qemu_in_coroutine()) {
@@ -698,7 +789,9 @@ outside coroutine context too.
 > +    }
 > +
 > +    assert(rc =3D=3D VHOST_USER_HDR_SIZE || rc =3D=3D 0);
-> +
+
+Why do you think that there can't be short reads?
+
 > +    vmsg->fd_num =3D 0;
 > +    for (cmsg =3D CMSG_FIRSTHDR(&msg);
 > +         cmsg !=3D NULL;
@@ -712,7 +805,13 @@ outside coroutine context too.
 > +            break;
 > +        }
 > +    }
-> +
+
+I think the fd passing part becomes easier when you use the proper
+qio_channel_readv_full() function. Its implementation is also a bit more
+careful than yours. For example, you forgot checking fd_size against
+VHOST_MEMORY_MAX_NREGIONS, allowing a buffer overflow in the memcpy(),
+and you don't adjust fd flags for the new file descriptors.
+
 > +    if (vmsg->size > sizeof(vmsg->payload)) {
 > +        sprintf(buffer,
 > +                "Error: too big message request: %d, size: vmsg->size: %=
@@ -726,6 +825,10 @@ u, "
 > +    if (vmsg->size) {
 > +        do {
 > +            rc =3D read(conn_fd, &vmsg->payload, vmsg->size);
+
+qio_channel_readv_all_eof() already implements this whole loop and
+correctly handles short reads, too.
+
 > +            if (rc < 0) {
 > +                if (errno =3D=3D EAGAIN) {
 > +                    if (qemu_in_coroutine()) {
@@ -781,10 +884,6 @@ u, "
 > +        }
 > +    }
 > +}
-
-This is a generic vhost-user function that is not specific to
-vhost-user-blk.  It should be in a different source file.
-
 > +
 > +static const VuDevIface vub_iface =3D {
 > +    .get_features =3D vub_get_features,
@@ -796,7 +895,9 @@ vhost-user-blk.  It should be in a different source file.
 > +    .read_msg =3D vu_message_read_co,
 > +    .kick_callback =3D vub_kick_cb,
 > +};
-> +
+
+I would prefer the =3D signs to be aligned to the same column.
+
 > +
 > +void vub_free(VubDev *vub_dev, bool called_by_QOM)
 > +{
@@ -835,6 +936,9 @@ vhost-user-blk.  It should be in a different source file.
 > +
 > +    QTAILQ_REMOVE(&client->blk->clients, client, next);
 > +
+
+Extra empty line.
+
 > +}
 > +
 > +static void vu_client_start(VuClient *client)
@@ -842,11 +946,6 @@ vhost-user-blk.  It should be in a different source file.
 > +    Coroutine *co =3D qemu_coroutine_create(vu_client_trip, client);
 > +    qemu_coroutine_enter(co);
 > +}
-
-What is the coroutine and threading model here?  This launches
-vu_client_trip() in the current thread's event loop but vu_dispatch()
-performs blocking I/O and will prevent the event loop from continuing.
-
 > +
 > +
 > +G_STATIC_ASSERT((int)G_IO_IN =3D=3D (int)VU_WATCH_IN);
@@ -883,11 +982,6 @@ performs blocking I/O and will prevent the event loop from continuing.
 > +    VuClient *client;
 > +    VubDev *vub_device =3D opaque;
 > +    client =3D g_new0(VuClient, 1);
-
-Is it helpful to have a separate VuClient struct even though only a
-single vhost-user client can be connected at a time?  It may be simpler
-to keep connection state directly in VubDev.
-
 > +
 > +    if (!vu_init_packed_data(&client->parent, VHOST_USER_BLK_MAX_QUEUES,
 > +                             sioc->fd, vub_panic_cb, set_watch,
@@ -924,24 +1018,8 @@ nfig)
 > +{
 > +    config->capacity =3D bdrv_getlength(bs) >> BDRV_SECTOR_BITS;
 > +    config->blk_size =3D BDRV_SECTOR_SIZE;
-
-At some point this should become a configuration parameter because using
-512B sectors on a native 4K sector image file results in poor
-performance.
-
 > +    config->size_max =3D 65536;
-
-Why 65536?  hw/block/virtio-blk.c sets it to 0.
-
 > +    config->seg_max =3D 128 - 2;
-
-This is okay for now but should be changed in the future.
-
-hw/block/virtio-blk.c was recently modified to calculate seg_max based
-on the virtqueue size (which is where the hardcoded 128 originally came
-from).  Applications that use large buffer sizes (128+ KB) benefit from
-larger virtqueue sizes and seg_max.
-
 > +    config->min_io_size =3D 1;
 > +    config->opt_io_size =3D 1;
 > +    config->num_queues =3D 1;
@@ -958,13 +1036,6 @@ larger virtqueue sizes and seg_max.
 > +static VubDev *vub_new(VubDev *vub_device, const char *name,
 > +                       const char *unix_socket, bool writable, Error **e=
 rrp)
-
-This function does not allocate and return a new VubDev, so vub_new() is
-not an accurate name for this function.  The name vub_init() is clearer.
-
-Why are name, unix_socket, and writable passed in?  They are already
-vub_device fields.
-
 > +{
 > +
 > +    BlockBackend *blk;
@@ -981,12 +1052,18 @@ vub_device fields.
 > +    BlockDriverState *bs =3D bdrv_lookup_bs(name,
 > +                                          name,
 > +                                          errp);
+
+This fits in a single line.
+
 > +
 > +    if (!bs) {
 > +        error_setg(errp,
 > +                   "No drive with name '%s'."
 > +                   " Please find the list of names with "
 > +                   "'info block'", name);
+
+This can probably be two lines instead of four.
+
 > +        return NULL;
 > +    }
 > +
@@ -1105,11 +1182,6 @@ _socket,
 > +                              "vhost-user-backend-listener");
 > +
 > +    SocketAddress *addr =3D g_new0(SocketAddress, 1);
-
-addr is never freed.  This variable could live on the stack instead:
-
-  SocketAddress addr =3D {};
-
 > +    addr->u.q_unix.path =3D (char *) unix_socket;
 > +    addr->type =3D SOCKET_ADDRESS_TYPE_UNIX;
 > +    if (qio_net_listener_open_sync(vub_device->listener, addr, 1, errp) =
@@ -1165,19 +1237,19 @@ addr is never freed.  This variable could live on the stack instead:
 > +    vus->unix_socket =3D g_strdup(value);
 > +    vhost_user_server_start(vus, value, vus->name,
 > +                            vus->writable, errp);
-
-Property setters should only perform input validation and store the
-data.  Actions like creating network connections, opening files, etc
-should happen later in a UserCreatableClass->complete() callback.
-
-This is necessary because vus->writable is also a property and may be
-set after unix_socket.  The ->complete() callback is called after all
-setters so it can access the final values of all properties.
-
-See iothread_class_init() and iothread_complete() for an example.
-
 > +}
-> +
+
+This makes the unix-socket property magic in that it starts the server
+with the properties specified at this point. This means that this
+property must always be specified last.
+
+Maybe it would be better to use a boolean property (similar to qdev's
+"realized") that explicitly start and possibly stops the export.
+
+Writing to other properties should probably result in an error while the
+server is already running because these property changes won't take
+effect any more then.
+
 > +static char *vu_get_unix_socket(Object *obj, Error **errp)
 > +{
 > +    VubDev *vus =3D VHOST_USER_SERVER(obj);;
@@ -1211,7 +1283,17 @@ See iothread_class_init() and iothread_complete() for an example.
 > +    object_property_add_str(obj, "unix_socket",
 > +                            vu_get_unix_socket,
 > +                            vu_set_unix_socket, NULL);
-> +
+
+These should probably be object_class_property_add_*() and be called in
+.class_init rather than .instance_init.
+
+"name" suggests that it's the name of the export rather than the block
+device to be exported. I would suggest "node-name" (and then actually
+only pass it as node-name to bdrv_lookup_bs()).
+
+I expect that in the long run, we'll want to accept a full SocketAddress
+rather than just a filename like in "unix_socket".
+
 > +}
 > +
 > +static void vhost_user_server_instance_finalize(Object *obj)
@@ -1241,103 +1323,12 @@ See iothread_class_init() and iothread_complete() for an example.
 > +
 > +type_init(vhost_user_server_register_types)
 > +
-> diff --git a/include/block/vhost-user.h b/include/block/vhost-user.h
-> new file mode 100644
-> index 0000000000..ef6d695244
-> --- /dev/null
-> +++ b/include/block/vhost-user.h
-> @@ -0,0 +1,46 @@
-> +#include "io/channel-socket.h"
-> +#include "io/net-listener.h"
-> +#include "contrib/libvhost-user/libvhost-user.h"
-> +#include "standard-headers/linux/virtio_blk.h"
-> +typedef struct VubDev VubDev;
-> +typedef struct VuClient VuClient;
-> +#define TYPE_VHOST_USER_SERVER "vhost-user-server"
-> +
-> +#define VHOST_USER_SERVER(obj) \
-> +   OBJECT_CHECK(VubDev, obj, TYPE_VHOST_USER_SERVER)
-> +/* vhost user block device */
-> +struct VubDev {
-> +    Object parent_obj;
-> +    char *name;
-> +    char *unix_socket;
-> +    bool exit_panic;
-> +    bool close;
-> +    BlockBackend *backend;
-> +    AioContext *ctx;
-> +    QIONetListener *listener;
-> +    QIOChannelSocket *sioc;
-> +    QTAILQ_HEAD(, VuClient) clients;
-> +    QTAILQ_ENTRY(VubDev) next;
-> +    struct virtio_blk_config blkcfg;
-> +    bool writable;
-> +};
-> +
-> +struct VuClient {
-> +    VuDev parent;
-> +    int refcount;
-> +    VubDev *blk;
-> +    QIOChannelSocket *sioc; /* The underlying data channel */
-> +    QIOChannel *ioc; /* The current I/O channel */
-> +    QTAILQ_ENTRY(VuClient) next;
-> +    bool closed;
-> +};
-> +VubDev *vub_dev_find(const char *name);
 
-All -object instances already have an id=3DID property.  There is no need
-to declare a separate "name" property.  Please look at iothread_by_id()
-and iothread_get_id() for examples.
+Extra empty line at the file end.
 
-> +
-> +void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM);
-> +void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
-> +                gpointer opaque);
-> +
-> +void vub_free(VubDev *vub_dev, bool called_by_QOM);
-> +
-> +void vub_initialize_config(BlockDriverState *bs,
-> +                           struct virtio_blk_config *config);
-> diff --git a/vl.c b/vl.c
-> index 86474a55c9..72ac506342 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2553,6 +2553,10 @@ static bool object_create_initial(const char *type=
-, QemuOpts *opts)
->      }
->  #endif
->=20
-> +    /* Reason: vhost-user-server property "name" */
-> +    if (g_str_equal(type, "vhost-user-server")) {
-> +        return false;
-> +    }
+In summary, I can see this going in the right direction, though in
+detail some more work will be needed.
 
-I don't understand why the "name" property introduces a creation order
-dependency.  It's just a string and has no dependency on other
-command-line objects.  Can you explain why this change is necessary?
-
->      /*
->       * Reason: filter-* property "netdev" etc.
->       */
-> --
-> 2.24.1
->=20
-
---UthUFkbMtH2ceUK2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4galoACgkQnKSrs4Gr
-c8jCdwf+Iz2e8j3WMdjXKNbq/qjU/9LlUFZ4eoA1dYx1DtthEbMoBYxITNydzxCm
-bgy0TcsNEei2DBSuuuKIbm7XG7UGYWrNesK2oBbGk0PiqNp/MYDCXBeuEgPloEOv
-uicS1IooJzXL/ZohsqnCdu1jIfNh0k4sQ6lFVFxa8tcKh98Xg6B+7ljyycyGNKeN
-7KCGIwdCmOXGVOZ7nHAeK383mYa4gr0HlyAedKmO74VKx+6lzuTqEAa5LJX/a/2e
-xW7zANDqWovL0t7zKvn64dWisKON9Y1CM0IjdiLdrQwVFbbD/l+yLRTFfiPLKooE
-MOuYDZkWTDNx0LdKGp+gs+DdEvLVhA==
-=W1iT
------END PGP SIGNATURE-----
-
---UthUFkbMtH2ceUK2--
+Kevin
 
 
