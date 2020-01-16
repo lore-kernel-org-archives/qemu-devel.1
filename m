@@ -2,70 +2,80 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDC1C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECAC8C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:22:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A3C4206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:17:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7B8C206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:22:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="i19iVcqe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A3C4206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bcEJ7fr9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7B8C206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is7pv-0005zl-5F
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:17:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39627)
+	id 1is7uf-0002St-S3
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:22:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1is7oa-0005Tc-Ie
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:16:14 -0500
+ (envelope-from <imammedo@redhat.com>) id 1is7tw-0001Q2-Mj
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1is7oZ-00071H-16
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:16:12 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:41287)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1is7oY-0006zE-IT
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:16:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=02TWnZHkJKxN+FHb0XyRdbekVWgKE2w3sqX1AAiYtmA=; b=i19iVcqe0/Db7NjCZn1oKf7ZpJ
- 9QKx1zKg6+psk2cWFfHtdDNu8yYcAO3Qx5/1wc00uJ06Ty0UpGXh24YSO08NmARCrlD0yq4HpXjDh
- OBxdGfsXjT0ri9ruuNoFD8zT8dnVt7TfR+4KG1SAAg4YR+HE2TvfpFK3x2w64c6h4JW9TGqG8HFjX
- YqXzw7f4mlGIEfECbWpvupCD5SKEDvT5MWdiAceaP7o4gqxLG2g+/noJYB+EvPqL1dze3n6iE0YoH
- aX3GV7wabZDJY5mlh79ksXluUbKbjAHy0EJ7DTavdf2LmtW9p48VH4Lp8hLV0wioML57z5LyaO5vs
- rTd8k4pTbRHNcs3XJigJQGGWxs2u+ZwrkdWtAxFNetj0TOSWuWuMo24VFuDX5aSR5htyn1iCu/X34
- rKIAWvFlJqSZbp8OdygV0D2MfpS6NSNfFDnKqOzd7EXuZFTrrvYwfDezh3RMxgXiB2HrINBfd6bf6
- 6JefQt7R+w6HUq5zzCJZ23b86BT7hjV35ogv6xUKnBlap7/KX1vPOeCuS6Z3fao2dFVznxmx8n+IV
- rhbcqfklOxps6EPhKx/atbg+06etCY2XplftgnmeoFvPvwlOuNXhAbQGa2Z/WuKns2LpCZYXNLq5s
- Xv/LQ6h0Oqx7SENITQ9VaHzlVooGdTEYBXSR/Ux60=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+ (envelope-from <imammedo@redhat.com>) id 1is7ts-000275-5q
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:21:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28713
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1is7ts-00026E-2j
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:21:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579191699;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+76V2msg3tzlGOCpR51XbXwexlhar+iqxL1JYUG8cw8=;
+ b=bcEJ7fr9iOIwuXm1ANCNsVV6Hy2iUXOL6khBgtiDFjOMldIJgF5HLVD/T8Uwoc2ksiP0S5
+ g80oCPowh7p1GyE7fGZ8DfOszOHGdanqdecl4lj3QB17meRMLAZLNupPKnSeL5ZP2V7dm/
+ JVIgO0Ayv2JNDD9wjkzBuV8RYC7heHw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244--xnt_iiEPTWt1DR8RYLx0A-1; Thu, 16 Jan 2020 11:21:35 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E2758010C9;
+ Thu, 16 Jan 2020 16:21:34 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B9C257C41A;
+ Thu, 16 Jan 2020 16:21:32 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v3 02/11] 9pfs: require msize >= 4096
-Date: Thu, 16 Jan 2020 17:16:07 +0100
-Message-ID: <2705438.6bQikqVx44@silver>
-In-Reply-To: <20200116141503.32e36561@bahia.lan>
-References: <cover.1578957500.git.qemu_oss@crudebyte.com>
- <49ff399635ccfd21858b15417a398df362ff0b90.1578957500.git.qemu_oss@crudebyte.com>
- <20200116141503.32e36561@bahia.lan>
+Subject: [PATCH v3 64/86] ppc:ppc405_boards: add RAM size checks
+Date: Thu, 16 Jan 2020 17:19:10 +0100
+Message-Id: <1579191550-184122-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <alpine.BSF.2.21.99999.352.2001151923450.24151@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.99999.352.2001151923450.24151@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: -xnt_iiEPTWt1DR8RYLx0A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.189.157.229
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,158 +87,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 16. Januar 2020 14:15:03 CET Greg Kurz wrote:
-> On Mon, 13 Jan 2020 23:21:04 +0100
-> 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > A client establishes a session by sending a Tversion request along with
-> > a 'msize' parameter which client uses to suggest server a maximum
-> > message size ever to be used for communication (for both requests and
-> > replies) between client and server during that session. If client
-> > suggests a 'msize' smaller than 4096 then deny session by server
-> > immediately with an error response (Rlerror for "9P2000.L" clients or
-> > Rerror for "9P2000.u" clients) instead of replying with Rversion.
-> > 
-> > Introduction of a minimum msize is required to prevent issues in
-> > responses to numerous individual request types. For instance with a
-> > msize of < P9_IOHDRSZ no useful operations would be possible at all.
-> 
-> P9_IOHDRSZ is really specific to write/read operations.
-> 
-> /*
->  * ample room for Twrite/Rread header
->  * size[4] Tread/Twrite tag[2] fid[4] offset[8] count[4]
->  */
-> #define P9_IOHDRSZ 24
-> 
-> As you see P9_IOHDRSZ is approximately the size of a Twrite header.
-> Its primary use is to inform the client about the 'count' to use for
-> Twrite/Tread messages (see get_iounit()).
-> 
-> Not sure it helps to mention P9_IOHDRSZ since we're going to choose
-> something much greater. I'd personally drop this sentence.
+If user provided non-sense RAM size, board will ignore it
+and continue running with fixed RAM size.
 
-The point here was that there must be some kind of absolute minimum msize, 
-even though the protocol specs officially don't mandate one. And if a client 
-choses a msize < P9_IOHDRSZ, what useful actions shall it be able to do? 
-That's why I mentioned P9_IOHDRSZ just in case somebody might come up later 
-asking to lower that minimum msize value for whatever reason.
+Also RAM is going to be allocated by generic code, so it
+won't be possible for board to fix CLI.
 
-But np, IMO this sentence makes the fundamental requirement for this patch 
-more clear, but I have no problem dropping this sentence.
+Make it error message and exit to force user fix CLI,
+instead of accepting non-sense CLI values.
 
-> > Furthermore there are some responses which are not allowed by the 9p
-> > protocol to be truncated like e.g. Rreadlink which may yield up to
-> 
-> No message may be truncated in any way actually. The spec just allows
-> an exception with the string part of Rerror.
+PS:
+move fixed RAM size into mc->default_ram_size, so that
+generic code will know how much to allocate.
 
-Rreaddir, Rread, Twrite, Rerror can be truncated. So I suggest I'll just 
-change that to s/some/most/ semantically.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+---
+v2:
+  * fix format string causing build failure on 32-bit host
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+v3:
+  * use size_to_str() to pretty print size in MiB
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>/
+     BALATON Zoltan <balaton@eik.bme.hu>)
 
-> Maybe just mention that and say we choose 4096 to be able to send
-> big Rreadlink messages.
+CC: david@gibson.dropbear.id.au
+CC: balaton@eik.bme.hu
+CC: qemu-ppc@nongnu.org
+---
+ hw/ppc/ppc405_boards.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
-That's not the point for this patch. The main purpose is to avoid having to 
-maintain individual error prone minimum msize checks all over the code base.
-If we would allow very small msizes (much smaller than 4096), then we would 
-need to add numerous error handlers all over the code base, each one checking 
-for different values (depending on the specific message type).
-
-> > a size of PATH_MAX which is usually 4096. Hence this size was chosen
-> > as min. msize for server, which is already the minimum msize of the
-> > Linux kernel's 9pfs client. By forcing a min. msize already at
-> > session start (when handling Tversion) we don't have to check for a
-> > minimum msize on a per request type basis later on during session,
-> > which would be much harder and more error prone to maintain.
-> > 
-> > This is a user visible change which should be documented as such
-> > (i.e. in public QEMU release changelog).
-> 
-> This last sentence isn't informative in the commit message. This
-> kind of indication should be added after the --- below.
-> 
-> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > ---
-
-np
-
-> 
-> LGTM
-> 
-> With an updated changelog,
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> 
-> >  hw/9pfs/9p.c | 12 ++++++++++++
-> >  hw/9pfs/9p.h | 11 +++++++++++
-> >  2 files changed, 23 insertions(+)
-> > 
-> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > index 520177f40c..a5fbe821d4 100644
-> > --- a/hw/9pfs/9p.c
-> > +++ b/hw/9pfs/9p.c
-> > @@ -1363,8 +1363,20 @@ static void coroutine_fn v9fs_version(void *opaque)
-> > 
-> >          s->proto_version = V9FS_PROTO_2000L;
-> >      
-> >      } else {
-> >      
-> >          v9fs_string_sprintf(&version, "unknown");
-> > 
-> > +        /* skip min. msize check, reporting invalid version has priority
-> > */ +        goto marshal;
-> > 
-> >      }
-> > 
-> > +    if (s->msize < P9_MIN_MSIZE) {
-> > +        err = -EMSGSIZE;
-> > +        error_report(
-> > +            "9pfs: Client requested msize < minimum msize ("
-> > +            stringify(P9_MIN_MSIZE) ") supported by this server."
-> > +        );
-> > +        goto out;
-> > +    }
-> > +
-> > 
-> > +marshal:
-> >      err = pdu_marshal(pdu, offset, "ds", s->msize, &version);
-> >      if (err < 0) {
-> >      
-> >          goto out;
-> > 
-> > diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> > index 3904f82901..6fffe44f5a 100644
-> > --- a/hw/9pfs/9p.h
-> > +++ b/hw/9pfs/9p.h
-> > @@ -100,6 +100,17 @@ typedef enum P9ProtoVersion {
-> > 
-> >      V9FS_PROTO_2000L = 0x02,
-> >  
-> >  } P9ProtoVersion;
-> > 
-> > +/**
-> > + * @brief Minimum message size supported by this 9pfs server.
-> > + *
-> > + * A client establishes a session by sending a Tversion request along
-> > with a + * 'msize' parameter which suggests the server a maximum message
-> > size ever to be + * used for communication (for both requests and
-> > replies) between client and + * server during that session. If client
-> > suggests a 'msize' smaller than this + * value then session is denied by
-> > server with an error response. + */
-> > +#define P9_MIN_MSIZE    4096
-> > +
-> > 
-> >  #define P9_NOTAG    UINT16_MAX
-> >  #define P9_NOFID    UINT32_MAX
-> >  #define P9_MAXWELEM 16
-
-Best regards,
-Christian Schoenebeck
-
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 1f721fe..057882a 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -40,6 +40,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
++#include "qemu/cutils.h"
+=20
+ #define BIOS_FILENAME "ppc405_rom.bin"
+ #define BIOS_SIZE (2 * MiB)
+@@ -137,7 +138,7 @@ static void ref405ep_fpga_init(MemoryRegion *sysmem, ui=
+nt32_t base)
+=20
+ static void ref405ep_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+@@ -161,15 +162,21 @@ static void ref405ep_init(MachineState *machine)
+     DriveInfo *dinfo;
+     MemoryRegion *sysmem =3D get_system_memory();
+=20
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
++
+     /* XXX: fix this */
+     memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.=
+ram",
+-                                         0x08000000);
++                                         machine->ram_size);
+     ram_bases[0] =3D 0;
+-    ram_sizes[0] =3D 0x08000000;
++    ram_sizes[0] =3D machine->ram_size;
+     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
+     ram_bases[1] =3D 0x00000000;
+     ram_sizes[1] =3D 0x00000000;
+-    ram_size =3D 128 * MiB;
+     env =3D ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
+                         33333333, &pic, kernel_filename =3D=3D NULL ? 0 : =
+1);
+     /* allocate SRAM */
+@@ -227,7 +234,7 @@ static void ref405ep_init(MachineState *machine)
+     if (linux_boot) {
+         memset(&bd, 0, sizeof(bd));
+         bd.bi_memstart =3D 0x00000000;
+-        bd.bi_memsize =3D ram_size;
++        bd.bi_memsize =3D machine->ram_size;
+         bd.bi_flashstart =3D -bios_size;
+         bd.bi_flashsize =3D -bios_size;
+         bd.bi_flashoffset =3D 0;
+@@ -255,7 +262,7 @@ static void ref405ep_init(MachineState *machine)
+         kernel_base =3D KERNEL_LOAD_ADDR;
+         /* now we can load the kernel */
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base,
+-                                          ram_size - kernel_base);
++                                          machine->ram_size - kernel_base)=
+;
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+@@ -266,7 +273,7 @@ static void ref405ep_init(MachineState *machine)
+         if (initrd_filename) {
+             initrd_base =3D INITRD_LOAD_ADDR;
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_ba=
+se,
+-                                              ram_size - initrd_base);
++                                              machine->ram_size - initrd_b=
+ase);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+                              initrd_filename);
+@@ -304,6 +311,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *=
+data)
+=20
+     mc->desc =3D "ref405ep";
+     mc->init =3D ref405ep_init;
++    mc->default_ram_size =3D 0x08000000;
+ }
+=20
+ static const TypeInfo ref405ep_type =3D {
+@@ -408,7 +416,7 @@ static void taihu_cpld_init(MemoryRegion *sysmem, uint3=
+2_t base)
+=20
+ static void taihu_405ep_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *initrd_filename =3D machine->initrd_filename;
+     char *filename;
+@@ -425,10 +433,14 @@ static void taihu_405ep_init(MachineState *machine)
+     int fl_idx;
+     DriveInfo *dinfo;
+=20
+-    /* RAM is soldered to the board so the size cannot be changed */
+-    ram_size =3D 0x08000000;
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
+     memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
+-                                         ram_size);
++                                         machine->ram_size);
+=20
+     ram_bases[0] =3D 0;
+     ram_sizes[0] =3D 0x04000000;
+@@ -500,7 +512,7 @@ static void taihu_405ep_init(MachineState *machine)
+         kernel_base =3D KERNEL_LOAD_ADDR;
+         /* now we can load the kernel */
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base,
+-                                          ram_size - kernel_base);
++                                          machine->ram_size - kernel_base)=
+;
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+@@ -509,7 +521,7 @@ static void taihu_405ep_init(MachineState *machine)
+         if (initrd_filename) {
+             initrd_base =3D INITRD_LOAD_ADDR;
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_ba=
+se,
+-                                              ram_size - initrd_base);
++                                              machine->ram_size - initrd_b=
+ase);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+                              initrd_filename);
+@@ -533,6 +545,7 @@ static void taihu_class_init(ObjectClass *oc, void *dat=
+a)
+=20
+     mc->desc =3D "taihu";
+     mc->init =3D taihu_405ep_init;
++    mc->default_ram_size =3D 0x08000000;
+ }
+=20
+ static const TypeInfo taihu_type =3D {
+--=20
+2.7.4
 
 
