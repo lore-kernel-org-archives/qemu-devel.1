@@ -2,71 +2,81 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB17C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E95C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75B6A2051A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FD402051A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 14:27:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="CoRONq8q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B6A2051A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KGUyYVAl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD402051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is66d-0006U9-DL
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:26:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51437)
+	id 1is67I-0007fK-PV
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 09:27:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1is64s-0004b0-Q1
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:24:56 -0500
+ (envelope-from <slp@redhat.com>) id 1is5zl-000663-F4
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:19:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1is64q-0004sL-0R
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:24:54 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:40077)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1is64p-0004lW-FJ; Thu, 16 Jan 2020 09:24:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=IiCaZziZPacMcbVQ9RLheo3fn4G5bGB8e0He/NJ7oBo=; 
- b=CoRONq8qbRFaBenkzgPOOXbWxRzzJaoQKXvq+YmnwA9HidmAd++zLX6HLaNQO3XCY/bmt5xjai8ZS3egQG/W7jvEKld4QLfUNnSa3fLLLpvomMdnBqrU17/lkcikmDM/kAAg6dLX9VUpiiR64z2kWIsX5JRqq/t8n7D6vLHLcvNNP0EcHWGUBxbMODvrIU4+6mXxYGsF9xLL+qpF51x1EqPAu42/gMb7P5K5I19nrfqoGJvozg5SGiLiPaJiCMU8L4oabuxWn1tSFWnM7EfAyf9f80oPTwLkaOArTNj8hv7Blh0u55vcg6fNdNscIoItPykxW/M8EwfeGey4h7wYKQ==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1is64X-0007QI-F7; Thu, 16 Jan 2020 15:24:33 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1is64W-0003s6-QL; Thu, 16 Jan 2020 15:24:32 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 1/4] qcow2: Require that the virtual size is a multiple
- of the sector size
-In-Reply-To: <70f3996c-e62d-c560-b7a3-e0653f38493d@redhat.com>
-References: <cover.1578596897.git.berto@igalia.com>
- <6a1cfcbb533b487bac96e1d2282ebf210954d27a.1578596897.git.berto@igalia.com>
- <bd6ca991-c2f7-0e27-5bee-07a7c53f8a8e@redhat.com>
- <w51v9peb2dz.fsf@maestria.local.igalia.com>
- <9f7ab60c-c9d4-527b-55dd-40f487a36895@redhat.com>
- <w51sgkib0n3.fsf@maestria.local.igalia.com>
- <70f3996c-e62d-c560-b7a3-e0653f38493d@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 16 Jan 2020 15:24:32 +0100
-Message-ID: <w51a76nfpi7.fsf@maestria.local.igalia.com>
+ (envelope-from <slp@redhat.com>) id 1is5zh-00024M-I7
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:19:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49065
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1is5zh-00024A-EM
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 09:19:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579184373;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ymcP5E+Xkkkoj7FWJgYJu0YhxEGReUCWZNO/PgXFfQA=;
+ b=KGUyYVAlERJaXaVQ33IUZLPuyeR0dY5MoU7WWzQ8rwBbpqsY6CwPTl8AQ8/uM6yMDUaG08
+ kGAJcQPdXCd35BjIMUZZaM+Ab8Wy8vt+SCv96uI6v4CqNv2Ex/zHANZJ14QDpbNkVrA16V
+ qY9XoyXJPRIXZbiVaz45nb2h1OfROs4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-StgQyL2UMzGWv_1wY2sRhA-1; Thu, 16 Jan 2020 09:19:31 -0500
+X-MC-Unique: StgQyL2UMzGWv_1wY2sRhA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDC87108121B
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 14:19:30 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 75201845A8;
+ Thu, 16 Jan 2020 14:19:24 +0000 (UTC)
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-43-dgilbert@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.3
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 042/104] virtiofsd: validate input buffer sizes in
+ do_write_buf()
+In-reply-to: <20191212163904.159893-43-dgilbert@redhat.com>
+Date: Thu, 16 Jan 2020 15:19:22 +0100
+Message-ID: <87v9pbwkk5.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,20 +88,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- qemu-block@nongnu.org
+Cc: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>, stefanha@redhat.com,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue 14 Jan 2020 03:03:31 PM CET, Max Reitz wrote:
->> 3. QEMU can open them but it gets the size wrong.
+--=-=-=
+Content-Type: text/plain
+
+
+Dr. David Alan Gilbert (git) <dgilbert@redhat.com> writes:
+
+> From: Stefan Hajnoczi <stefanha@redhat.com>
 >
-> Yes, but in a safe way.  The user simply doesn=E2=80=99t get access to th=
-ose
-> 13 bytes.
+> There is a small change in behavior: if fuse_write_in->size doesn't
+> match the input buffer size then the request is failed.  Previously
+> write requests with 1 fuse_buf element would truncate to
+> fuse_write_in->size.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tools/virtiofsd/fuse_lowlevel.c | 49 ++++++++++++++++++++-------------
+>  1 file changed, 30 insertions(+), 19 deletions(-)
 
-Ok, I think I'll withdraw the patch then :-)
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 
-Berto
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl4gcOoACgkQ9GknjS8M
+AjX83A/+MyX1lxmy1BZbDMZJh1wvqVxj4O/cQzshHcuXQtpMEcYyw8DjdWC7bEZY
+u962n0wo0Hnn40SHf/BBIUYpcQqwU4y24kfzpeOyw89CBzlczCPmUbxwxmFdk/Zr
+tny3ym23VRLVDRk/mRl7QhoMOk1qxadVx4vN7hv2u+GbCv6NTds/3udHBQ8y0//m
+qY64TAW+BIrxjIOytITDGYDfkZF1RZhFnJwsWxyTRtvsOguoSdsd1s9hAm4qhyFb
+5KMiqtcDbZy0rLauO+ybLS1uxLvqusOg2gLX28mRcTkJQeASo/iKWMdENyD/RnWx
+Xccyh1gkUCTLJSF+XQAhNiOfY0/6xhc7lP24IrcDs+3CHhiBJhsjYHgXlgbct/G4
+q6aDABA+zVucShIG9GKxZpRXKBcaboo2HOes0NWvopOokV9/CpDMWFAqD/nJzUVq
+JKcxWWTjCS877uQH4wMI17Kug9wiHD+CvhSuR9ENftBDUdx/he9LsfTLvo2aS/ku
+o4Guq+KqjpIt1hkZy3aT1R8T4ugvS8Dhmqt9h3ipe/4QyHd298W8dVf2LfxxOARQ
+TbEXm6iqsLYmMcfm0ns2TYL9wWkARiPkyg5Fvnf0cPVocpXvdVjpdPdUPUdjjqcL
+2zvQ2Y2kTayhd0TY45lx0dWQ4Y5TX1gJS0sUouqatE/eZx4fDks=
+=G2kR
+-----END PGP SIGNATURE-----
+--=-=-=--
+
 
