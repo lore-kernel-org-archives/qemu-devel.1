@@ -2,69 +2,128 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BA9C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 724FDC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3DA120748
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:23:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3DA120748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3F73A20748
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:24:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ED0eLuS/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F73A20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is4BC-0002pB-0U
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:23:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33347)
+	id 1is4C6-0003sh-Et
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:24:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1is49R-000865-1r
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:21:33 -0500
+ (envelope-from <david@redhat.com>) id 1is4BB-00037w-MQ
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:23:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1is49M-0006YI-Vw
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:21:28 -0500
-Received: from mgwkm02.jp.fujitsu.com ([202.219.69.169]:50083)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
- id 1is49M-0006Ws-F5
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:21:24 -0500
-Received: from kw-mxoi1.gw.nic.fujitsu.com (unknown [192.168.231.131]) by
- mgwkm02.jp.fujitsu.com with smtp
- id 11ae_b330_7961ab74_8604_4c4b_b58d_df9702d321f4;
- Thu, 16 Jan 2020 21:21:16 +0900
-Received: from g01jpfmpwyt01.exch.g01.fujitsu.local
- (g01jpfmpwyt01.exch.g01.fujitsu.local [10.128.193.38])
- by kw-mxoi1.gw.nic.fujitsu.com (Postfix) with ESMTP id 39769AC00D0
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 21:21:16 +0900 (JST)
-Received: from G01JPEXCHYT13.g01.fujitsu.local
- (G01JPEXCHYT13.g01.fujitsu.local [10.128.194.52])
- by g01jpfmpwyt01.exch.g01.fujitsu.local (Postfix) with ESMTP id 2F24B6D67A1;
- Thu, 16 Jan 2020 21:21:15 +0900 (JST)
-Received: from luna3.soft.fujitsu.com (10.124.196.199) by
- G01JPEXCHYT13.g01.fujitsu.local (10.128.194.52) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 16 Jan 2020 21:21:16 +0900
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-To: <dgilbert@redhat.com>
-Subject: Re: [PATCH 095/104] virtiofsd: convert more fprintf and perror to use
- fuse log infra
-Date: Thu, 16 Jan 2020 21:29:30 +0900
-Message-ID: <20200116122930.23078-1-misono.tomohiro@jp.fujitsu.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20191212163904.159893-96-dgilbert@redhat.com>
-References: <20191212163904.159893-96-dgilbert@redhat.com>
+ (envelope-from <david@redhat.com>) id 1is4B7-00086G-Pq
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:23:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22687
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1is4B7-00085b-M0
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:23:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579177393;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=CkHtlFNhkgnLgNPhKvISOsKlWzrq8IDkH4oW4FM61Yo=;
+ b=ED0eLuS/VOWWmyCAXBCKYaMNXdjedGJ1pi56Sdxou2eyT5QWA7282hSwTLDYX0Yzxk4jY5
+ vG6ydlWIF3Wcd8cozc4gvEDKYxZqyhAejH4GnCeNvUKYYjznuSE5ONCxQwAb8kXjEP/1ez
+ MlTJjnxrH460LsCeoLzVPelpKVfZnIU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-iHEraQ0lOO23c77DLHYdew-1; Thu, 16 Jan 2020 07:23:09 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A64F98F8A;
+ Thu, 16 Jan 2020 12:23:08 +0000 (UTC)
+Received: from [10.36.116.136] (ovpn-116-136.ams2.redhat.com [10.36.116.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4457884343;
+ Thu, 16 Jan 2020 12:23:07 +0000 (UTC)
+Subject: Re: [PATCH] target/s390x/kvm: Enable adapter interruption suppression
+ again
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+References: <20200116122026.5804-1-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <7c5da42a-2de0-d9e6-f838-f2b0757cbcaa@redhat.com>
+Date: Thu, 16 Jan 2020 13:23:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-SecurityPolicyCheck-GC: OK by FENCE-Mail
-X-TM-AS-GCONF: 00
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.219.69.169
+In-Reply-To: <20200116122026.5804-1-thuth@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: iHEraQ0lOO23c77DLHYdew-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,89 +135,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: misono.tomohiro@jp.fujitsu.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- vgoyal@redhat.com
+Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Eryu Guan <eguan@linux.alibaba.com>
+On 16.01.20 13:20, Thomas Huth wrote:
+> The AIS feature has been disabled late in the v2.10 development
+> cycle since there were some issues with migration (see commit
+> 3f2d07b3b01ea61126b - "s390x/ais: for 2.10 stable: disable ais
+> facility"). We originally wanted to enable it again for newer
+> machine types, but apparently we forgot to do this so far. Let's
+> do it for the new s390-ccw-virtio-5.0 machine now.
 > 
-> Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tools/virtiofsd/fuse_signals.c | 6 +++++-
->  tools/virtiofsd/helper.c       | 9 ++++++---
->  2 files changed, 11 insertions(+), 4 deletions(-)
+>  hw/s390x/s390-virtio-ccw.c         |  4 ++++
+>  include/hw/s390x/s390-virtio-ccw.h |  4 ++++
+>  target/s390x/kvm.c                 | 11 ++++++++---
+>  3 files changed, 16 insertions(+), 3 deletions(-)
 > 
-> diff --git a/tools/virtiofsd/fuse_signals.c b/tools/virtiofsd/fuse_signals.c
-> index 10a6f88088..edabf24e0d 100644
-> --- a/tools/virtiofsd/fuse_signals.c
-> +++ b/tools/virtiofsd/fuse_signals.c
-> @@ -11,6 +11,7 @@
->  #include "fuse_i.h"
->  #include "fuse_lowlevel.h"
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index e7eadd14e8..6f43136396 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -456,6 +456,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+>      s390mc->cpu_model_allowed = true;
+>      s390mc->css_migration_enabled = true;
+>      s390mc->hpage_1m_allowed = true;
+> +    s390mc->kvm_ais_allowed = true;
+>      mc->init = ccw_init;
+>      mc->reset = s390_machine_reset;
+>      mc->hot_add_cpu = s390_hot_add_cpu;
+> @@ -662,6 +663,9 @@ static void ccw_machine_4_2_instance_options(MachineState *machine)
 >  
-> +#include <errno.h>
->  #include <signal.h>
->  #include <stdio.h>
->  #include <stdlib.h>
-> @@ -46,12 +47,15 @@ static int set_one_signal_handler(int sig, void (*handler)(int), int remove)
->      sa.sa_flags = 0;
+>  static void ccw_machine_4_2_class_options(MachineClass *mc)
+>  {
+> +    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+> +
+> +    s390mc->kvm_ais_allowed = false;
+>      ccw_machine_5_0_class_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
+>  }
+> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+> index 8aa27199c9..f142d379c6 100644
+> --- a/include/hw/s390x/s390-virtio-ccw.h
+> +++ b/include/hw/s390x/s390-virtio-ccw.h
+> @@ -21,6 +21,9 @@
+>  #define S390_MACHINE_CLASS(klass) \
+>      OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MACHINE)
 >  
->      if (sigaction(sig, NULL, &old_sa) == -1) {
-> -        perror("fuse: cannot get old signal handler");
-> +        fuse_log(FUSE_LOG_ERR, "fuse: cannot get old signal handler: %s\n",
-> +                 strerror(errno));
->          return -1;
->      }
+> +#define S390_CCW_MACHINE_OBJ_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(S390CcwMachineClass, obj, TYPE_S390_CCW_MACHINE)
+> +
+>  typedef struct S390CcwMachineState {
+>      /*< private >*/
+>      MachineState parent_obj;
+> @@ -40,6 +43,7 @@ typedef struct S390CcwMachineClass {
+>      bool cpu_model_allowed;
+>      bool css_migration_enabled;
+>      bool hpage_1m_allowed;
+> +    bool kvm_ais_allowed;
+>  } S390CcwMachineClass;
 >  
->      if (old_sa.sa_handler == (remove ? handler : SIG_DFL) &&
->          sigaction(sig, &sa, NULL) == -1) {
-> +        fuse_log(FUSE_LOG_ERR, "fuse: cannot set signal handler: %s\n",
-> +                 strerror(errno));
+>  /* runtime-instrumentation allowed by the machine */
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 15260aeb9a..4c1c8c0208 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -329,6 +329,8 @@ static void ccw_machine_class_foreach(ObjectClass *oc, void *opaque)
+>  
+>  int kvm_arch_init(MachineState *ms, KVMState *s)
+>  {
+> +    S390CcwMachineClass *smc = S390_CCW_MACHINE_OBJ_GET_CLASS(ms);
+> +
+>      object_class_foreach(ccw_machine_class_foreach, TYPE_S390_CCW_MACHINE,
+>                           false, NULL);
+>  
+> @@ -365,10 +367,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      /*
+>       * The migration interface for ais was introduced with kernel 4.13
+>       * but the capability itself had been active since 4.12. As migration
+> -     * support is considered necessary let's disable ais in the 2.10
+> -     * machine.
+> +     * support is considered necessary we only enable this for newer
+> +     * machine types and if KVM_CAP_S390_AIS_MIGRATION is available.
+>       */
+> -    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
+> +    if (smc->kvm_ais_allowed &&
+> +        kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
+> +        kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> +    }
+>  
+>      kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
+>      return 0;
+> 
 
-I notice one perror is remaining:
->          perror("fuse: cannot set signal handler");
+We have ri_allowed(), cpu_model_allowed(), hpage_1m_allowed().
 
-other than that,
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Care to create a similar wrapper?
 
->          return -1;
->      }
-> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-> index 7b28507a38..bcb8c05063 100644
-> --- a/tools/virtiofsd/helper.c
-> +++ b/tools/virtiofsd/helper.c
-> @@ -200,7 +200,8 @@ int fuse_daemonize(int foreground)
->          char completed;
->  
->          if (pipe(waiter)) {
-> -            perror("fuse_daemonize: pipe");
-> +            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: pipe: %s\n",
-> +                     strerror(errno));
->              return -1;
->          }
->  
-> @@ -210,7 +211,8 @@ int fuse_daemonize(int foreground)
->           */
->          switch (fork()) {
->          case -1:
-> -            perror("fuse_daemonize: fork");
-> +            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: fork: %s\n",
-> +                     strerror(errno));
->              return -1;
->          case 0:
->              break;
-> @@ -220,7 +222,8 @@ int fuse_daemonize(int foreground)
->          }
->  
->          if (setsid() == -1) {
-> -            perror("fuse_daemonize: setsid");
-> +            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: setsid: %s\n",
-> +                     strerror(errno));
->              return -1;
->          }
->  
-> -- 
-> 2.23.0
+apart from that
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
