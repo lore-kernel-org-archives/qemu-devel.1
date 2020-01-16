@@ -7,83 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F93C33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 19:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68730C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 19:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C207820730
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 19:47:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35C4A20730
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 19:47:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ML24+9fN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C207820730
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LFuUOFE0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35C4A20730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isB76-0001Mb-3z
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 14:47:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50176)
+	id 1isB7C-0001es-In
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 14:47:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50262)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1isB3W-000512-JX
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:43:51 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1isB3c-00055x-1w
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1isB3V-0007NA-47
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:43:50 -0500
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51534)
+ (envelope-from <richard.henderson@linaro.org>) id 1isB3a-0007SU-RG
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:43:55 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46222)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1isB3U-0007MZ-V2
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:43:49 -0500
-Received: by mail-pj1-x1044.google.com with SMTP id d15so2036567pjw.1
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:43:48 -0800 (PST)
+ id 1isB3a-0007RY-LC
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 14:43:54 -0500
+Received: by mail-pg1-x543.google.com with SMTP id z124so10404163pgb.13
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 11:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dVQPchFReqgJ20ne23FViP6RomyZ4oPHwhQNUV4fK+E=;
- b=ML24+9fN/mPfbJl4KFpjnO4mg2OiA/FfkJksOrTBE2dNmyi92coy9UOVwd3u9wcrZV
- wVjiPVCMTXtfYWhmfs2DNg5DqE8F9rZRayB0FrRFmdRMdxsaqVIiwt0jpAotjSOjoHlx
- vzKt3bC7L41RVkZF5UtR7rDy1zxE9IKySrsLwCZiXJD0mS4x4LyFWsHDXBrACXNUwpRu
- KCjAfPvht2+PQs8ZWtYkGObJF9w+w2Yjd56u3vLm4XyCtfqMo1SAGKAlLeqFIdeNc2Zh
- 6ZVRMuK9htpMJmeKl9qt+mJCaIoQD4Oj9D7lhS7yQ01/VUPXbx2G4VIbAW2BS3ThoFxY
- kezg==
+ bh=mlmrkeJpIzrykZtBoNNBzf4mMw31J+DYkBhjDwHekRc=;
+ b=LFuUOFE0E970h9rzr6EFoFYOv2230PPKeJzHn3Ps17vThQ31K6HLEg5ZfQ4BL56/ql
+ ZT04Sb+WEUdedU2ESw0aw0quwzLJr/EZ84SupQvlyQINgClfZizfb5PrU5fNay6pzmYZ
+ lgxsfqE/G1V3MQmSJoUZjyy5eBhHf1AhTH4o2t+U+jAJzUqISOf1MQ4T29++dw+0CFW/
+ BEX5pSBsI8eF97oFxS31DkJEKV875CyMuCGFG5zaQTHStGeABteZfi8VC1GEa10xoiOD
+ XEN6cuAqe5eqqmJ5B3wOZBzkDtvO5YvVxokoqhG8J5UWahuKRi1rTLhvA0m1A5fTdPKz
+ mU5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dVQPchFReqgJ20ne23FViP6RomyZ4oPHwhQNUV4fK+E=;
- b=nyJdmPdNnXSp9jstQRcDgLs+Jhe18NP8WZpxSTOVe5GBHRstce3T2xPjYLmYPQp/Oi
- J0wANb1DJ8uq6qQup4PbjKFu9aPPPWWboZ9YTupp65t/KShwUnykRSETwxO6SmijLfID
- BemvL8F99RJ5c8iUtioEKVSUxgOZ56rCS1Yk4wZqWyajT1zWLQUFN3Kpz9/SONVP023r
- 95VvIfrys99eKjHD5XfBmuQITygbxqgJ59PqWAoM/Y6C0NnnEl+KxVrC2jSKkTX19MDw
- WB7D9TZyXML9ghwIHmMt+j8/KliEyKdUJCob2TUWmAZ1GqfTFNv2l7I4qPUlMTC8/Hre
- bV8g==
-X-Gm-Message-State: APjAAAXNQjsOyumhTb1FKeU+hIST6FHO9XU7ZyWNgjY768HH6bu0OdNT
- wkAecH4QRHUbaQOwfqU9J6qThrPkEVA=
-X-Google-Smtp-Source: APXvYqziYvnUGXcIGB5Hg5fLJjqx7KhOsgXGDzYJjQ3xf4dO9xZi+ufZfcQcg4FeYG3k6DWcEPp8JA==
-X-Received: by 2002:a17:90a:d205:: with SMTP id
- o5mr1015731pju.46.1579203827602; 
- Thu, 16 Jan 2020 11:43:47 -0800 (PST)
+ bh=mlmrkeJpIzrykZtBoNNBzf4mMw31J+DYkBhjDwHekRc=;
+ b=KVAhu35d0G+/eV3Bo6Txbzh3pSqep8bUPVMDfnmfdZ5YLjtlEv8i5P3YiHE1I0BSlI
+ v4DdFXoFSZ0BZFjUWhmpwkoBqRh9Yx5/c795XxIDZzPMKzWjMZoV+LONOmDB0XrF8A12
+ RzmISSkcTDTjpemiivNCfcxs171uBHsojh8xEHqI6jGYz+zbczYqAo3kROkEHnYoGdGG
+ sv+m6ZjcW+s4xbB8z11evQlO9ZUojKB0iq9kM9cesGKbMA9Aw+oQ1sPIaEN70wUcfwRe
+ FVSccq78E/fFatYTL7OCnNBBkek0KHq+udF6H8Ky99jONXhdR0Wiwoaoadoa0jYEWFmV
+ Jnow==
+X-Gm-Message-State: APjAAAVcGO4vnMRr7z2rFGCmmu0HPKq+49FKnIunoyPQcyo0VH2hk/pn
+ 2tt2dzY85+IgeUWNTekir/szMqAOYJE=
+X-Google-Smtp-Source: APXvYqzhrW9lxQeR8BHFha5JSUbw0KRD785JlC4MaJXnLIhGQcUBD3cbwCEKOjAn4wRwRILd9xcLIg==
+X-Received: by 2002:a62:1783:: with SMTP id 125mr39653076pfx.189.1579203833454; 
+ Thu, 16 Jan 2020 11:43:53 -0800 (PST)
 Received: from localhost.localdomain (rrcs-66-91-136-155.west.biz.rr.com.
  [66.91.136.155])
- by smtp.gmail.com with ESMTPSA id g2sm26411831pgn.59.2020.01.16.11.43.45
+ by smtp.gmail.com with ESMTPSA id g2sm26411831pgn.59.2020.01.16.11.43.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jan 2020 11:43:46 -0800 (PST)
+ Thu, 16 Jan 2020 11:43:52 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/5] target/i386: Renumber EXCP_SYSCALL
-Date: Thu, 16 Jan 2020 09:43:37 -1000
-Message-Id: <20200116194341.402-2-richard.henderson@linaro.org>
+Subject: [PATCH v2 4/5] linux-user: Add x86_64 vsyscall page to /proc/self/maps
+Date: Thu, 16 Jan 2020 09:43:40 -1000
+Message-Id: <20200116194341.402-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200116194341.402-1-richard.henderson@linaro.org>
 References: <20200116194341.402-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1044
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,41 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, alex.bennee@linaro.org,
- laurent@vivier.eu,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: alex.bennee@linaro.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are not short of numbers for EXCP_*.  There is no need to confuse things
-by having EXCP_VMEXIT and EXCP_SYSCALL overlap, even though the former is
-only used for system mode and the latter is only used for user mode.
+The page isn't (necessarily) present in the host /proc/self/maps,
+and even if it might be it isn't present in page_flags, and even
+if it was it might not have the same set of page permissions.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+The easiest thing to do, particularly when it comes to the
+"[vsyscall]" note at the end of line, is to special case it.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/i386/cpu.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ linux-user/syscall.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 594326a794..164d038d1f 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -998,9 +998,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- #define EXCP11_ALGN	17
- #define EXCP12_MCHK	18
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 171c0caef3..eb867a5296 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7005,6 +7005,15 @@ static int open_self_maps(void *cpu_env, int fd)
+         }
+     }
  
--#define EXCP_SYSCALL    0x100 /* only happens in user only emulation
--                                 for syscall instruction */
--#define EXCP_VMEXIT     0x100
-+#define EXCP_VMEXIT     0x100 /* only for system emulation */
-+#define EXCP_SYSCALL    0x101 /* only for user emulation */
++#ifdef TARGET_X86_64
++    /*
++     * We only support execution from the vsyscall page.
++     * This is as if CONFIG_LEGACY_VSYSCALL_XONLY=y from v5.3.
++     */
++    dprintf(fd, "ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0"
++                "          [vsyscall]\n");
++#endif
++
+     free(line);
+     fclose(fp);
  
- /* i386-specific interrupt pending bits.  */
- #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
 -- 
 2.20.1
 
