@@ -2,127 +2,62 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8859AC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9017AC33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:37:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CAB32087E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:37:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bU6SK8iO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CAB32087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 668D12087E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 12:37:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 668D12087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is4P4-0005YN-4E
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:37:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35337)
+	id 1is4PL-000651-Ar
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 07:37:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1is4Np-0004nu-5Y
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:22 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1is4OE-0004wn-IT
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1is4No-0006lc-0Z
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:21 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36060
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <guoheyi@huawei.com>) id 1is4OA-0006ui-VK
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:46 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:51472 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1is4Nn-0006l0-SE
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 07:36:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579178179;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=I2HwFpqf8FrV9KQyHAeRIU+fr8DuJdzXvXyWLT0rDbs=;
- b=bU6SK8iOsxy7/mp1vSY8R+/3M3yjrVwta7jYef2Z2VJ5XUCrqvVKHCQ1AF7tJtDdUDbfSu
- /5NpyhpU6dV8LOJ3mTs3cPgtVwEqPdbWTZEgKWuguuVifpXK1E4e6VcJAl3cCrOZ3vY249
- ImK1g5efLeEyptXK2tof3XBYtJGB/dE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-QNL0TxpjMWaaWM0Mv8hVoA-1; Thu, 16 Jan 2020 07:36:16 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C6571B18BC1
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 12:36:15 +0000 (UTC)
-Received: from [10.36.116.136] (ovpn-116-136.ams2.redhat.com [10.36.116.136])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 13F0760C63;
- Thu, 16 Jan 2020 12:36:03 +0000 (UTC)
-Subject: Re: [PATCH 2/2] virtio-balloon: Reject qmp_balloon during hot-unplug
-To: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org
-References: <20200115224025.538368-1-jusual@redhat.com>
- <20200115224025.538368-3-jusual@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <38fdd88d-1399-effb-b74b-e02b7343f044@redhat.com>
-Date: Thu, 16 Jan 2020 13:36:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1is4Ny-0006oL-5j; Thu, 16 Jan 2020 07:36:30 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 72E0A1E0430687E18D8E;
+ Thu, 16 Jan 2020 20:36:24 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Thu, 16 Jan 2020
+ 20:36:17 +0800
+Subject: Re: [PATCH 1/2] arm/virt/acpi: remove meaningless sub device "PR0"
+ from PCI0
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20191219064759.35053-1-guoheyi@huawei.com>
+ <20191219064759.35053-2-guoheyi@huawei.com>
+ <20200113133702.1dea867b@redhat.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <1089b0d5-548e-da54-b59d-484517843411@huawei.com>
+Date: Thu, 16 Jan 2020 20:36:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200115224025.538368-3-jusual@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: QNL0TxpjMWaaWM0Mv8hVoA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200113133702.1dea867b@redhat.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,65 +69,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ qemu-devel@nongnu.org, Shannon
+ Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15.01.20 23:40, Julia Suvorova wrote:
-> Hot-unplug takes some time due to communication with the guest.
-> Do not change the device while freeing up resources.
-> 
-> Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> ---
->  balloon.c                  | 2 +-
->  hw/virtio/virtio-balloon.c | 9 ++++++++-
->  include/sysemu/balloon.h   | 2 +-
->  3 files changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/balloon.c b/balloon.c
-> index f104b42961..998ec53a0f 100644
-> --- a/balloon.c
-> +++ b/balloon.c
-> @@ -119,5 +119,5 @@ void qmp_balloon(int64_t target, Error **errp)
->      }
->  
->      trace_balloon_event(balloon_opaque, target);
-> -    balloon_event_fn(balloon_opaque, target);
-> +    balloon_event_fn(balloon_opaque, target, errp);
->  }
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 57f3b9f22d..0fa4e4454b 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -717,12 +717,19 @@ static void virtio_balloon_stat(void *opaque, BalloonInfo *info)
->                                               VIRTIO_BALLOON_PFN_SHIFT);
->  }
->  
-> -static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
-> +static void virtio_balloon_to_target(void *opaque, ram_addr_t target,
-> +                                     Error **errp)
->  {
-> +    DeviceState *bus_dev = qdev_get_bus_device(DEVICE(opaque));
->      VirtIOBalloon *dev = VIRTIO_BALLOON(opaque);
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->      ram_addr_t vm_ram_size = get_current_ram_size();
->  
-> +    if (bus_dev && bus_dev->pending_deleted_event) {
-> +        error_setg(errp, "Hot-unplug of %s is in progress", vdev->name);
-> +        return;
-> +    }
-> +
 
-How exactly does this help? The guest is free to inflate/deflate
-whenever it wants.
+=D4=DA 2020/1/13 20:37, Igor Mammedov =D0=B4=B5=C0:
+> On Thu, 19 Dec 2019 14:47:58 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
+>
+>> The sub device "PR0" under PCI0 in ACPI/DSDT does not make any sense,
+>> so simply remote it.
+> Could you make commit message more concrete so it would say
+> why it doesn't make any sense.
 
+The reason I'd like to remove it is that I never see a reason that it=20
+should be there :)
 
--- 
+1. I searched through ACPI spec and PCI firmware spec, but didn't find=20
+any reason for its existance (might miss something).
+
+2. We don't have such "PR0" device on PCI host bridge object on physical=20
+arm64 machines and these platforms work well.
+
+3. The VM also works well after removing this device.
+
+4. This device looks strange to only have an identity (_ADR) but not any=20
+other attribute; also this device was introduced in the initial commit=20
+without any special comment.
+
 Thanks,
 
-David / dhildenb
+Heyi
+
+
+>
+> It seems to be there to describe root port,
+> I'd rather have PCI folk ack if it's ok to remove it.
+
+>
+>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>
+>> ---
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+>> Cc: qemu-arm@nongnu.org
+>> Cc: qemu-devel@nongnu.org
+>> ---
+>>   hw/arm/virt-acpi-build.c          |   4 ----
+>>   tests/data/acpi/virt/DSDT         | Bin 18462 -> 18449 bytes
+>>   tests/data/acpi/virt/DSDT.memhp   | Bin 19799 -> 19786 bytes
+>>   tests/data/acpi/virt/DSDT.numamem | Bin 18462 -> 18449 bytes
+>>   4 files changed, 4 deletions(-)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index bd5f771e9b..9f4c7d1889 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -317,10 +317,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const M=
+emMapEntry *memmap,
+>>       aml_append(method, aml_return(buf));
+>>       aml_append(dev, method);
+>>  =20
+>> -    Aml *dev_rp0 =3D aml_device("%s", "RP0");
+>> -    aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+>> -    aml_append(dev, dev_rp0);
+>> -
+>>       Aml *dev_res0 =3D aml_device("%s", "RES0");
+>>       aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")=
+));
+>>       crs =3D aml_resource_template();
+>> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
+>> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3=
+d32ec856feb388be4c 100644
+>> GIT binary patch
+>> delta 39
+>> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
+>>
+>> delta 50
+>> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
+>> G{V4!>hYx%J
+>>
+>> diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DS=
+DT.memhp
+>> index 41ccc6431b917252bcbaac86c33b340c796be5ce..69ad844f65d047973a3e55=
+198beecd45a35b8fce 100644
+>> GIT binary patch
+>> delta 40
+>> wcmcaUi}BPfMlP3Nmk=3D*s1_q}3iCof5t(P{ccXBfI+}XT|v(|RAjk`1(02g)*ivR!s
+>>
+>> delta 51
+>> zcmX>#i}Cs_MlP3NmymE@1_mbiiCof5O_w*ScXBdy-rc;3v(}c2J1D>)o+IATC1|sb
+>> HyBr$;t7;Fc
+>>
+>> diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/=
+DSDT.numamem
+>> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3=
+d32ec856feb388be4c 100644
+>> GIT binary patch
+>> delta 39
+>> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
+>>
+>> delta 50
+>> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
+>> G{V4!>hYx%J
+>>
+>
+> .
 
 
