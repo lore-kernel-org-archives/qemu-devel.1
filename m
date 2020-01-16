@@ -2,137 +2,96 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F90C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B12E1C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:42:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FACA2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:38:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C2462077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:42:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CyGXGxQG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FACA2075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BjcdJdAV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C2462077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is2Xe-0008Dv-Hw
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 05:38:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47701)
+	id 1is2b9-0001g2-GC
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 05:41:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47975)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1is2Wv-0007QR-0k
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:37:38 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1is2aH-0001AZ-5X
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:41:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1is2Wr-00076x-Ay
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:37:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24962
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <sgarzare@redhat.com>) id 1is2aD-00034k-N3
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:41:05 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45874
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1is2Wr-00076U-7n
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:37:33 -0500
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1is2aD-00033y-JL
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:41:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579171052;
+ s=mimecast20190719; t=1579171261;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=dSBFzJANbk4NIpXfHuLiNaCbWF5CjAgZkcC4O9Khp+o=;
- b=CyGXGxQGXpNauvADeuos/MqWAI9NPXRuO7P3js8H36mV+J3+QmKm3HchH2sfw0zzjhW5gc
- T6xCj+B6v2UBFDGFxzOcRw0iYCyjtCEMdnKC3w12qxfDjhgTgtQcP144ruUXaNJG3DnnFM
- lliKcfRCjZ3PYJ8bNDT+ipx9MJgGKs8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-pOlbcC1aOFarwIVPvE2iTA-1; Thu, 16 Jan 2020 05:37:29 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29015800D41;
- Thu, 16 Jan 2020 10:37:28 +0000 (UTC)
-Received: from [10.40.204.119] (ovpn-204-119.brq.redhat.com [10.40.204.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 847C660E3E;
- Thu, 16 Jan 2020 10:37:25 +0000 (UTC)
-Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
-To: Greg Kurz <groug@kaod.org>
-References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
- <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
- <20200116094848.555c170d@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <2dda458a-dfa1-ab23-4a97-d27d9266226b@redhat.com>
-Date: Thu, 16 Jan 2020 11:37:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ in-reply-to:in-reply-to:references:references;
+ bh=54n7jd5m5HlWOi5BydeTqPctLAGHF94eS1/AIz+t3ts=;
+ b=BjcdJdAVgYkdXcL0vbXU/XeDbUEz8udo8X9eh0VKTxy0HpxSR2CzY5fjXwef5NfIwlMsS8
+ g5UNXCoPyNXGVQq8Zbt7GEPDKHz0SJziYFz/NAwjhuz3SmZTonoziUMFJm22ppPY1oA0eD
+ /o+GU8O0V/gGZOOPAnENE1Oz649n2Vs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-CxGlFMQuMqSwnswVVwszWA-1; Thu, 16 Jan 2020 05:40:55 -0500
+Received: by mail-wr1-f72.google.com with SMTP id t3so9055464wrm.23
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 02:40:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=jOBeq9oLGHAOWtsNwC1uTyKB81KSk4igxkB932lludM=;
+ b=FGZcVvLxwlhspzLe4+dlf0bzwF87f/eK6RNPPoIkcMLvtupiIvosSq1qOCAJQxU7nD
+ vJxYCgxoGT7z7/1O8lhb56o8wB0kWZ9+Mg847dw8uxFMxoV2YgEzZOOBhnjOzQ/98YvE
+ B6vbm5qGJ3vN9EgXzLZfnAg/uu5G2F1Uk6Qqgl2mRCRU6pO6ReZZAyxb0jcgnSP3+bix
+ Z0ex4zHmhvwqsQlU3iuxUkPv22YmZ94jaOT6A+G53k2cliILkTKB7CVPHYrDaVW1yHuY
+ FDbeZUEBzxjXE2p6mxBNBJejxJwxUKLmaEsZpSr2hZVOwTpj4i9R3V8rIPidpPWutnNA
+ Nhsw==
+X-Gm-Message-State: APjAAAVu02lhaNscdAqvV2sEr21lVT/KXPq10cT1594JzPWt8h6FjYCM
+ 0uA4byE83M/fKHfZW1dBs1MfmMPw+3J+ri83jEQqnY6KpRmGrnEPKfniNXoT8gHSiD5kAUX/MRK
+ WY79fnk2+CU0fdYk=
+X-Received: by 2002:a5d:68cf:: with SMTP id p15mr2607373wrw.31.1579171254211; 
+ Thu, 16 Jan 2020 02:40:54 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxTzD+ujpzcsnwH6X47p1RGWmT9dFu/pCYjMSVpK8l7aLrOao2Qdd2y5yT1Z8AfwjlmUFoUYw==
+X-Received: by 2002:a5d:68cf:: with SMTP id p15mr2607355wrw.31.1579171253924; 
+ Thu, 16 Jan 2020 02:40:53 -0800 (PST)
+Received: from steredhat (host84-49-dynamic.31-79-r.retail.telecomitalia.it.
+ [79.31.49.84])
+ by smtp.gmail.com with ESMTPSA id t1sm3912834wma.43.2020.01.16.02.40.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 16 Jan 2020 02:40:53 -0800 (PST)
+Date: Thu, 16 Jan 2020 11:40:50 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Subject: Re: [PATCH v2] qcow2: Use a GString in report_unsupported_feature()
+Message-ID: <20200116104050.jz3fr3vovniyrywg@steredhat>
+References: <20200115135626.19442-1-berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200116094848.555c170d@bahia.lan>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: pOlbcC1aOFarwIVPvE2iTA-1
+In-Reply-To: <20200115135626.19442-1-berto@igalia.com>
+X-MC-Unique: CxGlFMQuMqSwnswVVwszWA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -144,94 +103,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lukas Doktor <ldoktor@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/01/2020 09:48, Greg Kurz wrote:
-> On Wed, 15 Jan 2020 19:10:37 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
+On Wed, Jan 15, 2020 at 02:56:26PM +0100, Alberto Garcia wrote:
+> This is a bit more efficient than having to allocate and free memory
+> for each item.
 >=20
->> Hi,
->>
->> On 15/01/2020 18:48, Greg Kurz wrote:
->>> Migration can potentially race with CAS reboot. If the migration thread
->>> completes migration after CAS has set spapr->cas_reboot but before the
->>> mainloop could pick up the reset request and reset the machine, the
->>> guest is migrated unrebooted and the destination doesn't reboot it
->>> either because it isn't aware a CAS reboot was needed (eg, because a
->>> device was added before CAS). This likely result in a broken or hung
->>> guest.
->>>
->>> Even if it is small, the window between CAS and CAS reboot is enough to
->>> re-qualify spapr->cas_reboot as state that we should migrate. Add a new
->>> subsection for that and always send it when a CAS reboot is pending.
->>> This may cause migration to older QEMUs to fail but it is still better
->>> than end up with a broken guest.
->>>
->>> The destination cannot honour the CAS reboot request from a post load
->>> handler because this must be done after the guest is fully restored.
->>> It is thus done from a VM change state handler.
->>>
->>> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
->>> Signed-off-by: Greg Kurz <groug@kaod.org>
->>> ---
->>>
->>
->> I'm wondering if the problem can be related with the fact that
->> main_loop_should_exit() could release qemu_global_mutex in
->> pause_all_vcpus() in the reset case?
->>
->> 1602 static bool main_loop_should_exit(void)
->> 1603 {
->> ...
->> 1633     request =3D qemu_reset_requested();
->> 1634     if (request) {
->> 1635         pause_all_vcpus();
->> 1636         qemu_system_reset(request);
->> 1637         resume_all_vcpus();
->> 1638         if (!runstate_check(RUN_STATE_RUNNING) &&
->> 1639                 !runstate_check(RUN_STATE_INMIGRATE)) {
->> 1640             runstate_set(RUN_STATE_PRELAUNCH);
->> 1641         }
->> 1642     }
->> ...
->>
->> I already sent a patch for this kind of problem (in current Juan pull
->> request):
->>
->> "runstate: ignore finishmigrate -> prelaunch transition"
->>
+> The default size (60) is enough for all the existing incompatible
+> features or the "Unknown incompatible feature" message.
 >=20
-> IIUC your patch avoids an invalid 'prelaunch' -> 'postmigrate' runstate
-> transition that can happen if the migration thread sets the runstate to
-> 'finishmigrate' when pause_all_vcpus() releases the main loop mutex.
->=20
-> ie. symptom of the problem is QEMU aborting, correct ? The issue I'm
-> trying to fix is a guest breakage caused by a discrepancy between
-> QEMU and the guest after migration has succeeded.
->=20
->> but I don't know if it could fix this one.
->>
->=20
-> I don't think so and your patch kinda illustrates it. If the runstate
-> is 'finishmigrate' when returning from pause_all_vcpus(), this means
-> that state was sent to the destination before we could actually reset
-> the machine.
+> Suggested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> ---
+>  block/qcow2.c | 23 +++++++++++------------
+>  1 file changed, 11 insertions(+), 12 deletions(-)
 
-Yes, you're right.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-But the question behind my comment was: is it expected to have a pending
-reset while we are migrating?
-
-Perhaps H_CAS can return H_BUSY and wait the end of the migration and
-then be fully executed on destination?
-
-Thanks,
-Laurent
+>=20
+> v2: Use g_autoptr and update commit message
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index cef9d72b3a..e29fc07068 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -453,16 +453,15 @@ static void cleanup_unknown_header_ext(BlockDriverS=
+tate *bs)
+>  static void report_unsupported_feature(Error **errp, Qcow2Feature *table=
+,
+>                                         uint64_t mask)
+>  {
+> -    char *features =3D g_strdup("");
+> -    char *old;
+> +    g_autoptr(GString) features =3D g_string_sized_new(60);
+> =20
+>      while (table && table->name[0] !=3D '\0') {
+>          if (table->type =3D=3D QCOW2_FEAT_TYPE_INCOMPATIBLE) {
+>              if (mask & (1ULL << table->bit)) {
+> -                old =3D features;
+> -                features =3D g_strdup_printf("%s%s%.46s", old, *old ? ",=
+ " : "",
+> -                                           table->name);
+> -                g_free(old);
+> +                if (features->len > 0) {
+> +                    g_string_append(features, ", ");
+> +                }
+> +                g_string_append_printf(features, "%.46s", table->name);
+>                  mask &=3D ~(1ULL << table->bit);
+>              }
+>          }
+> @@ -470,14 +469,14 @@ static void report_unsupported_feature(Error **errp=
+, Qcow2Feature *table,
+>      }
+> =20
+>      if (mask) {
+> -        old =3D features;
+> -        features =3D g_strdup_printf("%s%sUnknown incompatible feature: =
+%" PRIx64,
+> -                                   old, *old ? ", " : "", mask);
+> -        g_free(old);
+> +        if (features->len > 0) {
+> +            g_string_append(features, ", ");
+> +        }
+> +        g_string_append_printf(features,
+> +                               "Unknown incompatible feature: %" PRIx64,=
+ mask);
+>      }
+> =20
+> -    error_setg(errp, "Unsupported qcow2 feature(s): %s", features);
+> -    g_free(features);
+> +    error_setg(errp, "Unsupported qcow2 feature(s): %s", features->str);
+>  }
+> =20
+>  /*
+> --=20
+> 2.20.1
+>=20
+>=20
 
 
