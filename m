@@ -2,87 +2,67 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 623C8C33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 23:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA6ECC33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 23:27:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E40C2072B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 23:21:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A41392073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 23:27:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DHbB57yk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E40C2072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="QyTva4QV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41392073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isESA-0004t6-9Y
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 18:21:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51396)
+	id 1isEXU-0000oP-NC
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 18:27:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53362)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1isEFV-0002fa-IK
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 18:08:26 -0500
+ (envelope-from <berto@igalia.com>) id 1isEWg-0008Od-NJ
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 18:26:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1isEFU-000834-2y
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 18:08:25 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:54154)
+ (envelope-from <berto@igalia.com>) id 1isEWd-0004fY-Oe
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 18:26:10 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:44330)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1isEFT-00081v-SC
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 18:08:24 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id n96so2277576pjc.3
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 15:08:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=/Jxac41ScZ9wklqoaoJ1ujuvSIgK3pa8BvU4q8iE/qg=;
- b=DHbB57ykUvSpDmrZzJBQzelX/Q4mRPA0rkl9wlyr6Dbbn5Swd19bcjKOcquJO5bwMi
- EWZi4us5RfWM3PNg4C5hgS8l2j9x2LESi0HfNVIIDpzfaiqbEpGL+U6rCwH8DZ8LZhhZ
- VCkvemRaQd93b80ZS/f31nSZdwYb3OULptLLd4Zy/UEzNuc9/3olXCAsAT/Ghy3Y1+ek
- vjEcSxFYnbqRCMuTNMsQRUlL/vL4QDnGpsDJVN6G2tX4G6aVofuwWy4oVjq2Ev8exb5W
- yhyVXUdWLidb55BEf28JV/XMXYcp6YlufYxCWI6Gm9Y7aBpanha0hRxHgaa4gdmsKY48
- ieCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/Jxac41ScZ9wklqoaoJ1ujuvSIgK3pa8BvU4q8iE/qg=;
- b=VPdo7bmUsFQutVKVE+ZjFH7gTX9jal81i7dMmJexyCMy9lTY/gjORarYOBxHtXhGd7
- LaNH3yNZCWQdFcqACon9GE7tjoXbu7iLVqFYKLNpvBC4l89VMJrvwWcppJ2aP3Cug46i
- PA14GiKYIrWn8dZlt6eGJ9qlomdNbUfPbyTku6qimut3yjME/Oo4u6i9YNSSpRncXAdG
- om89lLb57HbJKJCa3yBEIIql4hs+chqK2lxMzYYqHOtFkpd1TvtMbUdCzQYMML9ixPO9
- zXOmLMea+jWxBOSd+5qnJ5gWGYRPAHM+sJskoi/UzpDHoT9l5L9N2cSNtFg8HvZxWfO7
- O39g==
-X-Gm-Message-State: APjAAAVQ6k4I29/CGyXKsJngaIC6X53u6Z99Bw92SeYVju+6tUQa/4yw
- IIIpgSHvAE4g99q9YLkB/SxQ04AUX5c=
-X-Google-Smtp-Source: APXvYqxenawD/zo7RWmeGAEuzpcNrQDUOQTMILLR2z+Zg/h+GrnMY0AumNfnwgJahG6Kt1f6i8aIcw==
-X-Received: by 2002:a17:90a:950b:: with SMTP id
- t11mr1987656pjo.79.1579216099560; 
- Thu, 16 Jan 2020 15:08:19 -0800 (PST)
-Received: from cloudburst.ASUS (rrcs-66-91-136-155.west.biz.rr.com.
- [66.91.136.155])
- by smtp.gmail.com with ESMTPSA id s7sm5111578pjk.22.2020.01.16.15.08.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jan 2020 15:08:18 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] target/arm: Fix PAuth sbox functions
-Date: Thu, 16 Jan 2020 13:08:06 -1000
-Message-Id: <20200116230809.19078-2-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116230809.19078-1-richard.henderson@linaro.org>
-References: <20200116230809.19078-1-richard.henderson@linaro.org>
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1isEWd-0004eC-5e; Thu, 16 Jan 2020 18:26:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=qWyxUFBqbTwOfxKgzmRMlH2LPLN1sPbaesWDG1PqPaI=; 
+ b=QyTva4QVk99afG0P3l2mnYP6/UOREsmhYQSGppoPy2l6xSVLUdo2Hy8e7mY7C5WTsu80IbmvstnkhGOMfdx3S8IGXAzqHk9lgdspsVnunOHR9LYyu7kDp10+tiY/VarAWi9CXlAqybJYRMNtNL3MxDsIJQlL8847Q27Wwc7DZUuZIRkCc40pNbGOk2uwvQ/bqa7oPc2D44fJf32cLM+oA/dR5GDzdhYXMKCevq08tmYx/NhfvqJplw3fdbDX47dOYnZHcwcHmT9vFACy7uFbreAaCzsDIHxsyn9BdNmQSRhIGDEc4YiDWkDp4i8DYodSJ9hAlYh2Guf8bvpWJ/Y4oQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1isEWZ-0002E7-Jq; Fri, 17 Jan 2020 00:26:03 +0100
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1isEWZ-0001Bn-AK; Fri, 17 Jan 2020 00:26:03 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 4/4] qcow2: Use BDRV_SECTOR_SIZE instead of the
+ hardcoded value
+In-Reply-To: <02552511-6fcf-d678-362c-707ce6d73659@redhat.com>
+References: <cover.1578596897.git.berto@igalia.com>
+ <e3982d5118a90db2442c6ac18f339ec8ba006df2.1578596897.git.berto@igalia.com>
+ <02552511-6fcf-d678-362c-707ce6d73659@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 17 Jan 2020 00:26:03 +0100
+Message-ID: <w517e1rf0fo.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,52 +74,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vincent.dehors@smile.fr, alex.bennee@linaro.org,
- adrien.grassein@smile.fr
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vincent Dehors <vincent.dehors@smile.fr>
+On Tue 14 Jan 2020 03:15:48 PM CET, Max Reitz wrote:
+>> @@ -219,7 +219,7 @@ static int l2_load(BlockDriverState *bs, uint64_t of=
+fset,
+>>   * Writes one sector of the L1 table to the disk (can't update single e=
+ntries
+>>   * and we really don't want bdrv_pread to perform a read-modify-write)
+>>   */
+>> -#define L1_ENTRIES_PER_SECTOR (512 / 8)
+>> +#define L1_ENTRIES_PER_SECTOR (BDRV_SECTOR_SIZE / 8)
+>>  int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index)
+>
+> Here it=E2=80=99s because the comment is wrong: =E2=80=9CCan=E2=80=99t up=
+date single entries=E2=80=9D =E2=80=93
+> yes, we can.  We=E2=80=99d just have to do a bdrv_pwrite() to a single en=
+try.
 
-In the PAC computation, sbox was applied over wrong bits.
-As this is a 4-bit sbox, bit index should be incremented by 4 instead of 16.
+What's the point of qcow2_write_l1_entry() then?
 
-Test vector from QARMA paper (https://eprint.iacr.org/2016/444.pdf) was
-used to verify one computation of the pauth_computepac() function which
-uses sbox2.
+>> @@ -3836,7 +3837,7 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
+>>          case QCOW2_CLUSTER_NORMAL:
+>>              child =3D s->data_file;
+>>              copy_offset +=3D offset_into_cluster(s, src_offset);
+>> -            if ((copy_offset & 511) !=3D 0) {
+>> +            if (!QEMU_IS_ALIGNED(copy_offset, BDRV_SECTOR_SIZE)) {
+>
+> Hm.  I don=E2=80=99t get this one.
 
-Launchpad: https://bugs.launchpad.net/bugs/1859713
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Vincent DEHORS <vincent.dehors@smile.fr>
-Signed-off-by: Adrien GRASSEIN <adrien.grassein@smile.fr>
----
- target/arm/pauth_helper.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Checking the code (e.g. block_copy_do_copy()) it seems that the whole
+chunk must be cluster aligned so I don't get this one either.
 
-diff --git a/target/arm/pauth_helper.c b/target/arm/pauth_helper.c
-index d3194f2043..0a5f41e10c 100644
---- a/target/arm/pauth_helper.c
-+++ b/target/arm/pauth_helper.c
-@@ -89,7 +89,7 @@ static uint64_t pac_sub(uint64_t i)
-     uint64_t o = 0;
-     int b;
- 
--    for (b = 0; b < 64; b += 16) {
-+    for (b = 0; b < 64; b += 4) {
-         o |= (uint64_t)sub[(i >> b) & 0xf] << b;
-     }
-     return o;
-@@ -104,7 +104,7 @@ static uint64_t pac_inv_sub(uint64_t i)
-     uint64_t o = 0;
-     int b;
- 
--    for (b = 0; b < 64; b += 16) {
-+    for (b = 0; b < 64; b += 4) {
-         o |= (uint64_t)inv_sub[(i >> b) & 0xf] << b;
-     }
-     return o;
--- 
-2.20.1
-
+Berto
 
