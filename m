@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7203AC33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 066C5C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED122073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:16:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED122073A
+	by mail.kernel.org (Postfix) with ESMTPS id CBEEB20728
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 22:51:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBEEB20728
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isDRI-000227-Aj
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 17:16:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43411)
+	id 1isDz6-0008Fq-8n
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 17:51:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1isDQe-0001Yr-Qb
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:15:53 -0500
+ (envelope-from <bounces@canonical.com>) id 1isDyL-0007pn-Mf
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1isDQd-0005Ww-Ey
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:15:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43930)
+ (envelope-from <bounces@canonical.com>) id 1isDyK-0002Ia-E3
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:50:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47134)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1isDQd-0005Vj-9C
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:15:51 -0500
+ id 1isDyK-0002IC-8S
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 17:50:40 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1isDQb-0000Oj-2r
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 22:15:49 +0000
+ id 1isDyI-00038V-Mg
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 22:50:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 12F422E80C7
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 22:15:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 7A7CF2E80C9
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 22:50:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Jan 2020 22:04:18 -0000
+Date: Thu, 16 Jan 2020 22:43:44 -0000
 From: Richard Henderson <rth@twiddle.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,7 +57,7 @@ X-Launchpad-Bug-Commenters: grassead rth vdehors
 X-Launchpad-Bug-Reporter: Adrien Grassein (grassead)
 X-Launchpad-Bug-Modifier: Richard Henderson (rth)
 References: <157903678645.2454.11578772527064917210.malonedeb@soybean.canonical.com>
-Message-Id: <157921225884.4224.13885199445639318230.malone@soybean.canonical.com>
+Message-Id: <157921462448.23052.5158907176044518918.malone@gac.canonical.com>
 Subject: [Bug 1859713] Re: ARM v8.3a pauth not working
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 79e5d76332b7ef371fef37a497f0ae36ceadfece
+X-Launchpad-Hash: da22ba6a75cbdeb4cb1162e54bde3352b2f8a6cb
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -84,16 +84,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ooof.  Good catch on the sbox error.
-
-That said, how did you test pauth_computepac?
-I still do not get the C5 result above, but 0x99d88f4472f3be39.
-
-The following test case sets up the parameters.
-
-** Patch added: "test case"
-   https://bugs.launchpad.net/qemu/+bug/1859713/+attachment/5320967/+files/=
-0001-tests-tcg-aarch64-Add-pauth-3.patch
+Oops again.  The test case has the parts of the key the wrong way around.
+I'll submit the pair of patches to the mailing list.
 
 -- =
 
