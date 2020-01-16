@@ -2,81 +2,81 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7003C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03471C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:02:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FACB207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:02:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0A98207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 16:02:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RheeNQJP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FACB207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XDuWS5Sa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A98207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is7av-0004Gr-2r
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:02:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37541)
+	id 1is7bT-0004vU-Sq
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 11:02:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37664)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1is7Z2-0003GE-CX
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:00:12 -0500
+ (envelope-from <rjones@redhat.com>) id 1is7Zq-0003jg-1U
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:00:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1is7Yy-00053P-FO
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:00:08 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30756
+ (envelope-from <rjones@redhat.com>) id 1is7Zm-0005aE-A2
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:00:57 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30264
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1is7Yy-00052k-At
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:00:04 -0500
+ (Exim 4.71) (envelope-from <rjones@redhat.com>) id 1is7Zm-0005a1-6H
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 11:00:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579190403;
+ s=mimecast20190719; t=1579190453;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=QWgV6uO6oFNTRR76lYateq6VTk8GZzNAnTDdOKK1pe0=;
- b=RheeNQJPpS3nJapDj0ThDR52XWTYK0kG7rB5TgLi0swUjX/xWin/FS9lbBxfU2fNLH7Qt6
- 9UxWeTSsSUso8nqAdTVrJQW8TO4/ZjtHPiRai6QA3n8Ye/NIkmIufoDgocZh3JoEE8dcoO
- kQqHToT2UHwRwmI/STuYrnY8abMUIRA=
+ in-reply-to:in-reply-to:references:references;
+ bh=QY3y3n8oMBLyjRhEFbm8Oi1kFEm7Eylb41TSMMKkUSM=;
+ b=XDuWS5SatEO4rLMMqh64Gxh/0Ik1F7sUJOTGRFfgMswLhP1FW9dmqZC1J62ZUe2f1av90V
+ 5v+KUJiwvdSGZlZPHHV3MFgwuD/qn7Yyf8HAk59Ddvdq/EluhoKeSW+aFkAVpMqG5RoGR9
+ Wm2JTVs8TdFpAj2HeC3yEAxYdrcgJtk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-zMmd9YL0PbWV4AuJPNVQiA-1; Thu, 16 Jan 2020 11:00:01 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-96-sclrRCzgOM-GPeoXmMafpg-1; Thu, 16 Jan 2020 11:00:46 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE5A4800D48
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 16:00:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-204-105.brq.redhat.com [10.40.204.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 227BD100194E;
- Thu, 16 Jan 2020 15:59:58 +0000 (UTC)
-Subject: Re: [PATCH v3 5/5] migration-test: Make sure that multifd and cancel
- works
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-References: <20200116154616.11569-1-quintela@redhat.com>
- <20200116154616.11569-6-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f6946359-28ca-7761-3a0b-9dc4385d3693@redhat.com>
-Date: Thu, 16 Jan 2020 16:59:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D47F5107ACC7;
+ Thu, 16 Jan 2020 16:00:45 +0000 (UTC)
+Received: from localhost (ovpn-117-237.ams2.redhat.com [10.36.117.237])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 69E0A60C84;
+ Thu, 16 Jan 2020 16:00:45 +0000 (UTC)
+Date: Thu, 16 Jan 2020 16:00:44 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: Bug? qemu-img convert to preallocated image makes it sparse
+Message-ID: <20200116160044.GS3888@redhat.com>
+References: <20200116141352.GA32053@redhat.com>
+ <7586b832-ecd2-e766-6781-3a25f382c9ed@redhat.com>
+ <20200116145048.GG9470@linux.fritz.box>
+ <5fcb531c-24ef-6e91-294d-517631c5a2cb@redhat.com>
+ <03ebf1f7ad780fca65dfc7486e860beb33c71d20.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200116154616.11569-6-quintela@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: zMmd9YL0PbWV4AuJPNVQiA-1
+In-Reply-To: <03ebf1f7ad780fca65dfc7486e860beb33c71d20.camel@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: sclrRCzgOM-GPeoXmMafpg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -91,126 +91,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, sgarzare@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/01/2020 16.46, Juan Quintela wrote:
-> Test that this sequerce works:
-> 
-> - launch source
-> - launch target
-> - start migration
-> - cancel migration
-> - relaunch target
-> - do migration again
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-[...]
-> +static void test_multifd_tcp_cancel(void)
-> +{
-> +    MigrateStart *args = migrate_start_new();
-> +    QTestState *from, *to, *to2;
-> +    QDict *rsp;
-> +    char *uri;
-> +
-> +    args->hide_stderr = true;
-> +
-> +    if (test_migrate_start(&from, &to, "defer", args)) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * We want to pick a speed slow enough that the test completes
-> +     * quickly, but that it doesn't complete precopy even on a slow
-> +     * machine, so also set the downtime.
-> +     */
-> +    /* 1 ms should make it not converge*/
-> +    migrate_set_parameter_int(from, "downtime-limit", 1);
-> +    /* 300MB/s */
-> +    migrate_set_parameter_int(from, "max-bandwidth", 30000000);
-> +
-> +    migrate_set_parameter_int(from, "multifd-channels", 16);
-> +    migrate_set_parameter_int(to, "multifd-channels", 16);
-> +
-> +    migrate_set_capability(from, "multifd", "true");
-> +    migrate_set_capability(to, "multifd", "true");
-> +
-> +    /* Start incoming migration from the 1st socket */
-> +    rsp = wait_command(to, "{ 'execute': 'migrate-incoming',"
-> +                           "  'arguments': { 'uri': 'tcp:127.0.0.1:0' }}");
-> +    qobject_unref(rsp);
-> +
-> +    /* Wait for the first serial output from the source */
-> +    wait_for_serial("src_serial");
-> +
-> +    uri = migrate_get_socket_address(to, "socket-address");
-> +
-> +    migrate_qmp(from, uri, "{}");
-> +
-> +    wait_for_migration_pass(from);
-> +
-> +    migrate_cancel(from);
-> +
-> +    args = migrate_start_new();
-> +    args->only_target = true;
-> +
-> +    if (test_migrate_start(&from, &to2, "defer", args)) {
-> +        return;
-> +    }
-> +
-> +    migrate_set_parameter_int(to2, "multifd-channels", 16);
-> +
-> +    migrate_set_capability(to2, "multifd", "true");
-> +
-> +    /* Start incoming migration from the 1st socket */
-> +    rsp = wait_command(to2, "{ 'execute': 'migrate-incoming',"
-> +                            "  'arguments': { 'uri': 'tcp:127.0.0.1:0' }}");
-> +    qobject_unref(rsp);
-> +
-> +    uri = migrate_get_socket_address(to2, "socket-address");
-> +
-> +    wait_for_migration_status(from, "cancelled", NULL);
-> +
-> +    /* 300ms it should converge */
-> +    migrate_set_parameter_int(from, "downtime-limit", 300);
-> +    /* 1GB/s */
-> +    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
-> +
-> +    migrate_qmp(from, uri, "{}");
-> +
-> +    wait_for_migration_pass(from);
-> +
-> +    if (!got_stop) {
-> +        qtest_qmp_eventwait(from, "STOP");
-> +    }
-> +    qtest_qmp_eventwait(to2, "RESUME");
-> +
-> +    wait_for_serial("dest_serial");
-> +    wait_for_migration_complete(from);
-> +    test_migrate_end(from, to2, true);
-> +    free(uri);
+On Thu, Jan 16, 2020 at 05:38:03PM +0200, Maxim Levitsky wrote:
+> How about doing write zeros without discard only in this particular case =
+(convert to existing image)
+> Basically omitting the BDRV_REQ_MAY_UNMAP flag to blk_co_pwrite_zeroes.
+> It will be slow, but maybe for this particular case, it is acceptable?
 
-That should be g_free(uri) instead, shouldn't it?
+I should probably say that we don't want to break the other case
+(which is likely more important) where we write a sparse source to a
+sparse target and want the target to contain only the union of the two
+sparse maps, not fully allocated :-)
 
- Thomas
+It would be fine, I think, to have a new "make this disk fully
+allocated" operation.  qemu-img resize could almost do it with a
+request to add 0 extra bytes, but the --preallocation flag only
+applies to the new space.
 
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      char template[] = "/tmp/migration-test-XXXXXX";
-> @@ -1359,6 +1468,7 @@ int main(int argc, char **argv)
->  
->      qtest_add_func("/migration/auto_converge", test_migrate_auto_converge);
->      qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
-> +    qtest_add_func("/migration/multifd/tcp/cancel", test_multifd_tcp_cancel);
->  
->      ret = g_test_run();
->  
-> 
+Rich.
+
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjon=
+es
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
 
 
