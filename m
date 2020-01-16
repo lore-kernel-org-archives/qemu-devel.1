@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE0FC33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 04:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C7D9C33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 04:40:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A194D20748
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 04:40:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E01FA20748
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 04:40:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="T1OsLs15"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A194D20748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="As4ZLFJV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E01FA20748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irwwz-0005Yf-RP
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 23:40:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58237)
+	id 1irwx0-0005Zs-6o
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 23:40:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58236)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1irwvs-0004Q8-DM
+ (envelope-from <dgibson@ozlabs.org>) id 1irwvs-0004Q7-Dw
  for qemu-devel@nongnu.org; Wed, 15 Jan 2020 23:39:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1irwvq-00057S-Qn
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 23:39:00 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:37557 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1irwvq-00057I-L3
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 23:38:59 -0500
+Received: from ozlabs.org ([203.11.71.1]:53081)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1irwvq-000549-G2; Wed, 15 Jan 2020 23:38:58 -0500
+ id 1irwvp-00054H-F5; Wed, 15 Jan 2020 23:38:58 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47ys0G1zMzz9sPW; Thu, 16 Jan 2020 15:38:54 +1100 (AEDT)
+ id 47ys0G1Vf4z9sR4; Thu, 16 Jan 2020 15:38:54 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1579149534;
- bh=oUHnwwu7WcE/N3uu6p5zlIgl+lbsLFqfu6FyFG7GL3M=;
+ bh=3R4iToycLP5I+1yHx+I3m8g3PTYnpri1s2I185rTIbw=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=T1OsLs15NuTrdhQc7NUBzJ5bt5OUAWaZXJbieUlhXwu8CIQHPuIYmlb2ruH3VERrL
- xPKHnrb3jpmLldWNjk8CkCTtwnVAeF6xGRLhCQiHy7VxtkQZQU9Y8MFPBECJmSejQc
- KnGl/gA3pOiO3FxS1MtBAvAWWaouzguVWJbolTs0=
-Date: Thu, 16 Jan 2020 14:35:15 +1000
+ b=As4ZLFJVAkjaKlyCpxGlg4bO3PWqWgmqyl8Jj4r7tQxBDNR9b5onx+gVJOLiN9Ena
+ RjHA7s5qS13uC+mageeH4yutZo4vhbBglXbc1V6V3dmqmdTfQSRR5EOHQk/CLCudjk
+ OsoANSlr7k7AI3ir9MB/uBVSbdeqU86omdo9qoyc=
+Date: Thu, 16 Jan 2020 14:31:57 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Igor Mammedov <imammedo@redhat.com>
 Subject: Re: [PATCH v2 71/86] ppc:virtex_ml507: use memdev for RAM
-Message-ID: <20200116043515.GO54439@umbus>
+Message-ID: <20200116043157.GN54439@umbus>
 References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
  <1579100861-73692-72-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8WA4ILJSyYAmUzbY"
+ protocol="application/pgp-signature"; boundary="UExESr5xZTMxdOWv"
 Content-Disposition: inline
 In-Reply-To: <1579100861-73692-72-git-send-email-imammedo@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,7 +75,7 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---8WA4ILJSyYAmUzbY
+--UExESr5xZTMxdOWv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -92,6 +92,10 @@ On Wed, Jan 15, 2020 at 04:07:26PM +0100, Igor Mammedov wrote:
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+Since this is (AFAICT) independent of the main purpose of your series,
+I've also applied it to my ppc-for-5.0 tree.  If we get a conflict
+because of that it should be easy to resolve.
 
 > ---
 > CC: david@gibson.dropbear.id.au
@@ -176,25 +180,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8WA4ILJSyYAmUzbY
+--UExESr5xZTMxdOWv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4f6AMACgkQbDjKyiDZ
-s5KBRBAAraPR79OWhM33LOPfMRKzKhF5GzaqL3hE/cWWL8Z5GrtToSCXYUfE7RX2
-0hF0ROUUcMv3HhxrbQBaXNCjFT7OdTweJJqvHTF2OmdYEToxgqcKvqHMnlPMNxzR
-mQvLZFAk53GzBeMX2BWA2XAGYkfhZck2k89syDussYyL/JA41WTWnYAc6AKjPHHY
-1jW/7tNjnr8mNLu4SnhQk8uuopxtVwhGy6bzb6cEooLF2/Z5QMVzbGy00OcjU62J
-ocd9zBK6D5CAn8vA0KVeteomOzwDPzh3pTecqkt2aCk36fLOwzxtI6o+DzuOct0V
-LxIyFgqL0c+/ail2pyBpyxorvwE1O3QgVPHPfqgjpLHzc/if0KVVqmA/NGk91K/7
-+7yZ/QkFRQElI4QM9YlzXCv5PnRHmJLuhJq2KNBP/hyAtRJDahd8+tmZXv5TuJhl
-o1CP+3feYAYq5coIPqcCbRUDTSny9LlG9as3Xa4Yt2BHLvh4rVeZSJST6vdunZAP
-9oW+/NYYi5Y5H9m7J49EyjjGoPn3XfnpzpsSV65VC1ia+p3ZB+rYR6udW/2J3esC
-7dlToBu2z5NoGrHgx/57e5tYGCtEvpL/XPlD5JEhXO5+loIh0JCnw4xx2UsBJwW4
-McB1D22iwmTZPoJZ0+P4UIf+CaSyd8GQPfQOtHNvo9skenIteuM=
-=IfUj
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4f5zwACgkQbDjKyiDZ
+s5KW+hAA3FbBwQyxbwuaPa2r7mRU7PqqgIGeYjqjI4Rrq1ahjIvG+bWWiyhWhyZ5
+NS0FUavCwUuks8lKYiuvFaKIafvLDSJuby02Lbr6Fp7GTkfOYjZkpY6O+6PZQByQ
+pnWfnrsOvV6/iTSwuaOE8hX/hS6XrAHPSMlo5OTlKSzFpmRjZExWgTuPt3IqGFw6
+dkHfbreP46+rm+g6PXsZmG617bvmLv7mSnctDzoePRUg5xok4pROaGTKe5W/tpAK
+Ny96Xqcah5F6+W4a158RLhTY1YR9eFNMrgdHRElBDg/NVtqVeOxhbWx/2phKnK4d
+huNGSmrb7+gHkgpOg6PMq5XCI45CqtFlPjrDyoRPfrfrPp0jIHUiX0yqmd9YEYiN
+igB4D54ALBNDp+9DqxTDQuF3cRuWYE4QdE4OSbY2ka+kaF8vX8544fDd3HtP86JN
+hbsrwQtxNCwZuu2SW1Mv1EgA+sMMX+dltlT5PKv9aXAJ0kyHw9Zqwfshty/OIvRK
+fnTxikdW9BhmV9zzPr7p9gcLrXb/br9nYvJiJw5t0Y2hpGziEHaSH7fqlg5bhZ8H
+aey0l/e2SzhrhJzTQX0Mx+BMzFFJMNBtNmLm/2qSF/RCe6jjWd4+aU7wv6g0KpJN
+m8p3PJFuMMX3BJ0hc592AoKFXjkgXKgO+IMCxTfJWZGYRInRXbE=
+=vGx0
 -----END PGP SIGNATURE-----
 
---8WA4ILJSyYAmUzbY--
+--UExESr5xZTMxdOWv--
 
