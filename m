@@ -2,75 +2,80 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C33C33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BACC33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:05:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDE74214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C2D12469F
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 18:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="jiuDkel4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDE74214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gOekvbUI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C2D12469F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is9VY-0001HB-RK
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:04:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33958)
+	id 1is9W9-0001vJ-E9
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 13:05:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <olaf@aepfle.de>) id 1is9Uc-0000jO-Te
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:03:44 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1is9V0-000137-CM
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:04:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <olaf@aepfle.de>) id 1is9Ub-0005JS-SB
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:03:42 -0500
-Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::10]:24953)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1is9Ub-0005GX-7E
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:03:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1579197816;
- s=strato-dkim-0002; d=aepfle.de;
- h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
- X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
- bh=J/NW60Cv4f1ZgEqIZPvWta41hVsdRAUs0eJjb8TKL4U=;
- b=jiuDkel4XGh95ZFiLXfRlOk+IclW284V7LAJ4G9bQtiBqXyU26RdrNFktpkaa8zp2g
- rZCfEwRn8hR6ewtX2MJddAC1UuFNTVIZYK86a9TqqzF1f+axjFUFm6SFaRzDhVVWUxKo
- I/mQ24NLiVBXrHkacfVncyILpT3zbvkv0tk0E1/fyIyapUQBhw6pvqsdLKD/3XpVyRTF
- j4kzZrNcXbzuIzBJnwmmQOZZwoDTzShkXX1DoMQTyyuaagRVKpNCo5JRaNtKOu2QpnUZ
- huYdlKQnMk87iykURbQTrtgXdoPg8veBXlLU8GPB3/trD9StFd1jnB0R+V/FvV3dOiea
- SZDA==
-X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QXkBR9MXjAuzBW/OdlBZQ4AHSS1G8g"
-X-RZG-CLASS-ID: mo00
-Received: from sender by smtp.strato.de (RZmta 46.1.4 SBL|AUTH)
- with ESMTPSA id j08473w0GI3ZU9m
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
- (Client did not present a certificate);
- Thu, 16 Jan 2020 19:03:35 +0100 (CET)
-From: Olaf Hering <olaf@aepfle.de>
-To: Stefano Stabellini <sstabellini@kernel.org>,
- Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul@xen.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org (open list:All patches CC here)
-Subject: [PATCH v2] hw/i386: disable smbus migration for xenfv
-Date: Thu, 16 Jan 2020 19:03:21 +0100
-Message-Id: <20200116180321.24968-1-olaf@aepfle.de>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200113174521.3336-1-olaf@aepfle.de>
-References: <20200113174521.3336-1-olaf@aepfle.de>
+ (envelope-from <peter.maydell@linaro.org>) id 1is9Uz-0005Zy-D2
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:04:06 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35030)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1is9Uz-0005ZP-7A
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 13:04:05 -0500
+Received: by mail-ot1-x343.google.com with SMTP id i15so20220176oto.2
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 10:04:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yRA7wz5NRRjS6oPC39LgwC/mStA7rG3T1ZcYLU8etI0=;
+ b=gOekvbUIGrG5y4LcrTMcaDUL2I6iSaIHkC8hVtDTkn0sYAZcPy/VEqVH1B3/g+2YL3
+ yBeB3jNfoHJLh8evrVYcZxX0VPC4dXw08BvC390BAz2ATaxP4cRNwbm0N7kupsqnpmkj
+ z2GdUJ5gTLRsfXlueNeGwdESN5cUKt9pXhYpMa6XQKhgM7mgHa68b7GqDWL3DlJv4AoT
+ J7o/q7XJVpZLTpAJ+eQx+uAw6YJW1tknwHRwPS9YfQDO/LXHVTtOn+EYRNXVKMRZN9GH
+ Afy4RUFliBh1Op4Ip+YEDFbhIYPMP8PUD4J2tEgnlPqmPFVks2ZfYmIGnTs/pn07hU7V
+ SBJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yRA7wz5NRRjS6oPC39LgwC/mStA7rG3T1ZcYLU8etI0=;
+ b=Ujk99I4hnQ7+tLpQrL16CRUaW5P+Gh+OK8GZB2eaQqEn6NA7WUTAJP7QgdXdepuWgN
+ 5v9WnfhSkF/Hc/PxCuV5XSO3ORK7j2ggmAsvswXuaKMT1o2b9ujPVxBdWHC7FrBWLy5R
+ 4tzZE1fyQpzKI1UIFMwmeIOhmVX5i97FyT95cvyeBszhUUmbxgxgZ2D5yyYofiNSogdX
+ ihro7yyp1xbQOj9b7XhvFzr5uphDAChaOVA0W+vdWSiexfh2uie6TPqMMFQUM3p1IewZ
+ s2Q+AK4laZIh5+Bpj51WCmwcKyPcIYUAEy/fFiMUq7Ef4813SMMv85Ur2GzSMx7MyKRo
+ yRGg==
+X-Gm-Message-State: APjAAAUHDhyYbSj97lwdYQS33PX2eWQYlM6eSlySMq7na5vwuDn/Sl+0
+ 7bTgzb0hOIiuA9+4JuqIfcjn3r+xDlkuLj8vEKFrvg==
+X-Google-Smtp-Source: APXvYqzLf97Nf+8cq2DgesmDashH2NKK/NKj2n2yx9zshoAdYyfeoX1+Mji6XK3gGJNIgFqQXOt+9R7SRxX8wwKp8Pw=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr3014621otq.135.1579197844448; 
+ Thu, 16 Jan 2020 10:04:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 2a01:238:20a:202:5301::10
+References: <20200113154607.97032-1-jeff.kubascik@dornerworks.com>
+In-Reply-To: <20200113154607.97032-1-jeff.kubascik@dornerworks.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Jan 2020 18:03:53 +0000
+Message-ID: <CAFEAcA-Y5EL5ty_9b1E8OwKEncxsZnyh24stnYVOnUQrrdjsSQ@mail.gmail.com>
+Subject: Re: [PATCH] arm/gicv3: update virtual irq state after IAR register
+ read
+To: Jeff Kubascik <jeff.kubascik@dornerworks.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,36 +87,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Olaf Hering <olaf@aepfle.de>
+Cc: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jarvis Roach <Jarvis.Roach@dornerworks.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With commit 7fccf2a06890e3bc3b30e29827ad3fb93fe88fea a new member
-smbus_no_migration_support was added, and enabled in two places.
-With commit 4ab2f2a8aabfea95cc53c64e13b3f67960b27fdf the vmstate_acpi
-got new elements, which are conditionally filled. As a result, an
-incoming migration expected smbus related data unless smbus migration
-was disabled for a given MachineClass.
+On Mon, 13 Jan 2020 at 15:46, Jeff Kubascik
+<jeff.kubascik@dornerworks.com> wrote:
+>
+> The IAR0/IAR1 register is used to acknowledge an interrupt - a read of the
+> register activates the highest priority pending interrupt and provides its
+> interrupt ID. Activating an interrupt can change the CPU's virtual interrupt
+> state - this change makes sure the virtual irq state is updated.
+>
+> Signed-off-by: Jeff Kubascik <jeff.kubascik@dornerworks.com>
+> ---
 
-Since commit 7fccf2a06890e3bc3b30e29827ad3fb93fe88fea forgot to handle
-xenfv, live migration to receiving hosts using qemu-4.0 and later is broken.
 
-Therefore this patch must be applied to stable-4.x as well.
 
-Signed-off-by: Olaf Hering <olaf@aepfle.de>
----
+Applied to target-arm.next, thanks.
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index fa12203079..e19716d0d3 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -952,6 +952,7 @@ static void xenfv_machine_options(MachineClass *m)
-     m->desc = "Xen Fully-virtualized PC";
-     m->max_cpus = HVM_MAX_VCPUS;
-     m->default_machine_opts = "accel=xen";
-+    m->smbus_no_migration_support = true;
- }
- 
- DEFINE_PC_MACHINE(xenfv, "xenfv", pc_xen_hvm_init,
+-- PMM
 
