@@ -2,100 +2,137 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A35EEC33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F90C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D2382075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:21:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FACA2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 10:38:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pmbq26lH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2382075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CyGXGxQG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FACA2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is2HH-0000lt-MT
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 05:21:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45771)
+	id 1is2Xe-0008Dv-Hw
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 05:38:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1is2Gf-0000Kx-Ui
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:20:51 -0500
+ (envelope-from <lvivier@redhat.com>) id 1is2Wv-0007QR-0k
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:37:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1is2Ge-00044k-SA
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:20:49 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50651
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1is2Wr-00076x-Ay
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:37:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24962
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1is2Ge-00044I-OI
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:20:48 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1is2Wr-00076U-7n
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 05:37:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579170048;
+ s=mimecast20190719; t=1579171052;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VzBfB4bfJPhVqu4rzNEwHeyiUfWmoRjTVRnofPlU71M=;
- b=Pmbq26lHx8dDxe5AceRv/FGxBCQjvVzC61B6J5BWmR7vFLbdcqCztlFZLiux/y20/DWUJn
- Cq6zGRX6vLyW5M8d5yXbQOVih82i0zpqGGaJTRhas9uNz+GWm0cfc3m7sWtDNHd2x4kC5S
- t5V2JYZxSaP6ebIEAqDEnb8/Taz0JjM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-X4zvmJKSNZK3VBdeuhoc_g-1; Thu, 16 Jan 2020 05:20:45 -0500
-Received: by mail-wm1-f69.google.com with SMTP id p5so472208wmc.4
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 02:20:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2KWy4Hb5BngdWHmUPWH0AQf3CqKvqV+JeWBzkVvusIA=;
- b=si0f3gWeATyXfs8k+oQFY/KYsrJs5r1DQdKWIFYbRMG06UxdLHCZaJZq3A+sBesQ5o
- EYhx8iMLJDQwpJJ6gpHg/9InjK7eAa7+yTa15xKdlYd55w8AOupmQR5lS2ZEjk9oHoOy
- VZvGjGQnsbhoTwgFAyv6xDSQqe28XwAV6mbM7tmP8nzY971oC3gnUbHOEUkPUa+H4Uip
- Uss2a3Lf8+LbemFCvxJs5t02ppD1pU5y6wDbTafMI7b+YZfTJyMNhrfo0PntD2ASRDQ3
- IQ22Cj7H/91fXD4QrcDQwMW7+epOFXTgTcbxrjgwBAGlGNzWmqI3kVoBE/vY9tqgCSRQ
- 0SEA==
-X-Gm-Message-State: APjAAAWNt7Xo+RirCfps8k0GN6ydeDKSl15+9Q+OXsuzsrCc5RCZFVUp
- Jux3o+oLNgoA5yapyXzp9FPALTZFIaUae1Tlu5Q1SjIKlRTTa/VtSxdAEAdLEt6lROqFniLymQY
- 0DsKWTJ3G1B6+DEk=
-X-Received: by 2002:adf:fa12:: with SMTP id m18mr2378584wrr.309.1579170043835; 
- Thu, 16 Jan 2020 02:20:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzKlCWqd3A3rstEdACLKORlKUBZ1N2yWNgsaaQlNqtSjPMOXCQgU5sdq82zjO9/fZU8C2JoCw==
-X-Received: by 2002:adf:fa12:: with SMTP id m18mr2378567wrr.309.1579170043610; 
- Thu, 16 Jan 2020 02:20:43 -0800 (PST)
-Received: from ?IPv6:2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9?
- ([2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9])
- by smtp.gmail.com with ESMTPSA id 2sm27942604wrq.31.2020.01.16.02.20.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Jan 2020 02:20:42 -0800 (PST)
-Subject: Re: [PATCH] ui/gtk: Get display refresh rate with GDK version 3.22 or
- later
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200116011217.2144-1-philmd@redhat.com>
- <20200116101606.GA533908@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <64afd282-6dde-43b3-d8de-a645b5f97802@redhat.com>
-Date: Thu, 16 Jan 2020 11:20:41 +0100
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=dSBFzJANbk4NIpXfHuLiNaCbWF5CjAgZkcC4O9Khp+o=;
+ b=CyGXGxQGXpNauvADeuos/MqWAI9NPXRuO7P3js8H36mV+J3+QmKm3HchH2sfw0zzjhW5gc
+ T6xCj+B6v2UBFDGFxzOcRw0iYCyjtCEMdnKC3w12qxfDjhgTgtQcP144ruUXaNJG3DnnFM
+ lliKcfRCjZ3PYJ8bNDT+ipx9MJgGKs8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-pOlbcC1aOFarwIVPvE2iTA-1; Thu, 16 Jan 2020 05:37:29 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29015800D41;
+ Thu, 16 Jan 2020 10:37:28 +0000 (UTC)
+Received: from [10.40.204.119] (ovpn-204-119.brq.redhat.com [10.40.204.119])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 847C660E3E;
+ Thu, 16 Jan 2020 10:37:25 +0000 (UTC)
+Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
+To: Greg Kurz <groug@kaod.org>
+References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
+ <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
+ <20200116094848.555c170d@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <2dda458a-dfa1-ab23-4a97-d27d9266226b@redhat.com>
+Date: Thu, 16 Jan 2020 11:37:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200116101606.GA533908@redhat.com>
+In-Reply-To: <20200116094848.555c170d@bahia.lan>
 Content-Language: en-US
-X-MC-Unique: X4zvmJKSNZK3VBdeuhoc_g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: pOlbcC1aOFarwIVPvE2iTA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,51 +144,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Nikola Pavlica <pavlica.nikola@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Lukas Doktor <ldoktor@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/16/20 11:16 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Jan 16, 2020 at 02:12:17AM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> The GdkMonitor was introduced in GTK+ 3.22:
->> https://developer.gnome.org/gdk3/stable/api-index-3-22.html#api-index-3.=
-22
+On 16/01/2020 09:48, Greg Kurz wrote:
+> On Wed, 15 Jan 2020 19:10:37 +0100
+> Laurent Vivier <lvivier@redhat.com> wrote:
+>=20
+>> Hi,
 >>
->> If we build with older GTK+, the build fails:
+>> On 15/01/2020 18:48, Greg Kurz wrote:
+>>> Migration can potentially race with CAS reboot. If the migration thread
+>>> completes migration after CAS has set spapr->cas_reboot but before the
+>>> mainloop could pick up the reset request and reset the machine, the
+>>> guest is migrated unrebooted and the destination doesn't reboot it
+>>> either because it isn't aware a CAS reboot was needed (eg, because a
+>>> device was added before CAS). This likely result in a broken or hung
+>>> guest.
+>>>
+>>> Even if it is small, the window between CAS and CAS reboot is enough to
+>>> re-qualify spapr->cas_reboot as state that we should migrate. Add a new
+>>> subsection for that and always send it when a CAS reboot is pending.
+>>> This may cause migration to older QEMUs to fail but it is still better
+>>> than end up with a broken guest.
+>>>
+>>> The destination cannot honour the CAS reboot request from a post load
+>>> handler because this must be done after the guest is fully restored.
+>>> It is thus done from a VM change state handler.
+>>>
+>>> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>> ---
+>>>
+>>
+>> I'm wondering if the problem can be related with the fact that
+>> main_loop_should_exit() could release qemu_global_mutex in
+>> pause_all_vcpus() in the reset case?
+>>
+>> 1602 static bool main_loop_should_exit(void)
+>> 1603 {
+>> ...
+>> 1633     request =3D qemu_reset_requested();
+>> 1634     if (request) {
+>> 1635         pause_all_vcpus();
+>> 1636         qemu_system_reset(request);
+>> 1637         resume_all_vcpus();
+>> 1638         if (!runstate_check(RUN_STATE_RUNNING) &&
+>> 1639                 !runstate_check(RUN_STATE_INMIGRATE)) {
+>> 1640             runstate_set(RUN_STATE_PRELAUNCH);
+>> 1641         }
+>> 1642     }
+>> ...
+>>
+>> I already sent a patch for this kind of problem (in current Juan pull
+>> request):
+>>
+>> "runstate: ignore finishmigrate -> prelaunch transition"
+>>
 >=20
-> Presumably the problem here is Ubuntu Xenial 16.04 which
-> only has 3.18.9 ?
+> IIUC your patch avoids an invalid 'prelaunch' -> 'postmigrate' runstate
+> transition that can happen if the migration thread sets the runstate to
+> 'finishmigrate' when pause_all_vcpus() releases the main loop mutex.
+>=20
+> ie. symptom of the problem is QEMU aborting, correct ? The issue I'm
+> trying to fix is a guest breakage caused by a discrepancy between
+> QEMU and the guest after migration has succeeded.
+>=20
+>> but I don't know if it could fix this one.
+>>
+>=20
+> I don't think so and your patch kinda illustrates it. If the runstate
+> is 'finishmigrate' when returning from pause_all_vcpus(), this means
+> that state was sent to the destination before we could actually reset
+> the machine.
 
-Indeed:
+Yes, you're right.
 
-   $ lsb_release -a
-   No LSB modules are available.
-   Distributor ID: Ubuntu
-   Description:    Ubuntu 16.04.5 LTS
-   Release:        16.04
-   Codename:       xenial
+But the question behind my comment was: is it expected to have a pending
+reset while we are migrating?
 
-   $ pkg-config --modversion gtk+-3.0
-   3.18.9
+Perhaps H_CAS can return H_BUSY and wait the end of the migration and
+then be fully executed on destination?
 
-> We should put in a sanity check for this against our min version
->=20
->   #define  GDK_VERSION_MIN_REQUIRED GDK_VERSION_3_14
->   #define  GDK_VERSION_MAX_ALLOWED GDK_VERSION_3_14
->=20
-> into glib-compat.h
->=20
-> For that matter we can update our min version to 3.18 I believe
-> since that looks like the oldest version any supported build
-> platform has.
->=20
-> Regards,
-> Daniel
->=20
+Thanks,
+Laurent
 
 
