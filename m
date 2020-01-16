@@ -2,68 +2,72 @@ Return-Path: <SRS0=QWrs=3F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDA0C33CB1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:48:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D22B4C33CB1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:48:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE6372075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:48:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E4AB2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jan 2020 15:48:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iiBterVA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE6372075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQ9tJe9m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4AB2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1is7Nc-0004zs-9z
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:48:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35605)
+	id 1is7Nv-0005LZ-2K
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 10:48:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35616)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1is7Lo-0003I8-Go
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:29 -0500
+ (envelope-from <quintela@redhat.com>) id 1is7Lt-0003Ld-BF
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1is7Ln-0004KR-Eb
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:28 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56055
+ (envelope-from <quintela@redhat.com>) id 1is7Ls-0004NO-82
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:33 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54628
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1is7Ln-0004K9-BA
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:27 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1is7Ls-0004N8-4v
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 10:46:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579189586;
+ s=mimecast20190719; t=1579189591;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=YfN4OvMuMhLfWmnUcjvz0Y38ObGnr4KhgpoUNU0OeuU=;
- b=iiBterVAfwPHrXoONrYMiqG5xhDJQ8FSorRFH0VbrivdZmT47nu85b6xztsC2ck2mTGLTe
- nFDlENUAwu+aWbD74PMfjoYmkLBlkMEbnrJAKqXlxy7Jp2UNheM4OIc5HLW447nCSAGBym
- VPNFpZuDRI5EBZkqSjx2f2XGcnhEDP8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=200X3mlNa/rGv52gHPrniHK4ytjGFbbPjb77rNZMFPs=;
+ b=JQ9tJe9mQpj9/08Tt3HafSzoeJToTVcNEmkNqMJYLp6z0f1MDjD+HTfcxJ2B1NM4P6+SaQ
+ Y+AumaQj964vNFNNl3y3dBuPvdh+E53O+F/eDLzBNx5uqYdcA2/01RwhRUxj8LqcHMeAyc
+ TZwOG4nVw1GPlCU8p5AFtmC1N5doZME=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-D-lTetRGPoyPH6k6kWPHUg-1; Thu, 16 Jan 2020 10:46:25 -0500
+ us-mta-197-oDXngIpTP5eVr7twbmnmpA-1; Thu, 16 Jan 2020 10:46:29 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D651B100550E
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 15:46:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF4298010DE
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 15:46:28 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76F411E2;
- Thu, 16 Jan 2020 15:46:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3479263148;
+ Thu, 16 Jan 2020 15:46:24 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/5] Fix multifd + cancel + multifd
-Date: Thu, 16 Jan 2020 16:46:11 +0100
-Message-Id: <20200116154616.11569-1-quintela@redhat.com>
+Subject: [PATCH v3 1/5] multifd: Make sure that we don't do any IO after an
+ error
+Date: Thu, 16 Jan 2020 16:46:12 +0100
+Message-Id: <20200116154616.11569-2-quintela@redhat.com>
+In-Reply-To: <20200116154616.11569-1-quintela@redhat.com>
+References: <20200116154616.11569-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: D-lTetRGPoyPH6k6kWPHUg-1
+X-MC-Unique: oDXngIpTP5eVr7twbmnmpA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -89,56 +93,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-In the v3 series:
-- Add back the ->shutdown fix
-  Dave found the problem, we need to setup an error if we do shutdown.
-- Make iotests to work back (we need to setup ->active for savevm)
-- So postcopy/recovery is fixed again.
-
-Please review, if there are not outstanding issues, I plan to push it.
-
-Thanks, Juan
-
-In the v2 series:
-- get the multifd test patch
-- drop the ->shutdown fix
-  it break postcopy recovery test.  Still trying to determine if the
-  problem is inside the recover test or the recover code.
-- upgrade the migrate_cancel test
-
-Please review.
-
-[v1]
-This series:
-- create a test that does:
-  launch multifd on target
-  migrate to target
-  cancel on source
-  create another target
-  migrate again
-
-- And fixes the cases that made it fail:
-* Make sure that we don't try ever IO after shutdown/error
-
-Please, review.
-
-Juan Quintela (5):
-  multifd: Make sure that we don't do any IO after an error
-  migration: Create MigrationState active field
-  migration: Don't wait in semaphore for thread we know has finished
-  qemu-file: Don't do IO after shutdown
-  migration-test: Make sure that multifd and cancel works
-
- migration/migration.c        |   5 ++
- migration/migration.h        |   5 ++
- migration/qemu-file.c        |  22 ++++++-
- migration/ram.c              |  28 ++++++---
- migration/savevm.c           |   2 +
- tests/qtest/migration-test.c | 112 ++++++++++++++++++++++++++++++++++-
- 6 files changed, 163 insertions(+), 11 deletions(-)
-
+diff --git a/migration/ram.c b/migration/ram.c
+index ba6e0eea15..8f9f3bba5b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3442,7 +3442,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque=
+)
+ {
+     RAMState **temp =3D opaque;
+     RAMState *rs =3D *temp;
+-    int ret;
++    int ret =3D 0;
+     int i;
+     int64_t t0;
+     int done =3D 0;
+@@ -3521,12 +3521,14 @@ static int ram_save_iterate(QEMUFile *f, void *opaq=
+ue)
+     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+=20
+ out:
+-    multifd_send_sync_main(rs);
+-    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+-    qemu_fflush(f);
+-    ram_counters.transferred +=3D 8;
++    if (ret >=3D 0) {
++        multifd_send_sync_main(rs);
++        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
++        qemu_fflush(f);
++        ram_counters.transferred +=3D 8;
+=20
+-    ret =3D qemu_file_get_error(f);
++        ret =3D qemu_file_get_error(f);
++    }
+     if (ret < 0) {
+         return ret;
+     }
+@@ -3578,9 +3580,11 @@ static int ram_save_complete(QEMUFile *f, void *opaq=
+ue)
+         ram_control_after_iterate(f, RAM_CONTROL_FINISH);
+     }
+=20
+-    multifd_send_sync_main(rs);
+-    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+-    qemu_fflush(f);
++    if (ret >=3D 0) {
++        multifd_send_sync_main(rs);
++        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
++        qemu_fflush(f);
++    }
+=20
+     return ret;
+ }
 --=20
 2.24.1
 
