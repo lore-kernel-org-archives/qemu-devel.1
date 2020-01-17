@@ -2,64 +2,92 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB61C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99717C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:20:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B022A2072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:18:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B022A2072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 669632072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:20:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RTUjTaV5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669632072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOho-0004Cq-RK
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:18:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54051)
+	id 1isOk7-0005T6-Jh
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:20:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1isOgl-0003aF-3s
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:17:16 -0500
+ (envelope-from <mszeredi@redhat.com>) id 1isOjS-00051P-GH
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1isOgk-00048M-0r
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:17:15 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:49332 helo=huawei.com)
+ (envelope-from <mszeredi@redhat.com>) id 1isOjO-0006ed-4f
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:01 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44942
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1isOgd-00040U-5o; Fri, 17 Jan 2020 05:17:07 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 0F497E896FAF0E365F54;
- Fri, 17 Jan 2020 18:17:02 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
- 18:16:53 +0800
-Subject: Re: [PATCH v22 9/9] MAINTAINERS: Add ACPI/HEST/GHES entries
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell
- <peter.maydell@linaro.org>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
- <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
- <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <d502bd34-79e4-45f8-e1b7-54265623db15@huawei.com>
-Date: Fri, 17 Jan 2020 18:16:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (Exim 4.71) (envelope-from <mszeredi@redhat.com>) id 1isOjN-0006dO-U4
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:19:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579256396;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iHCE37nFJLmVidUAZB6boOVKuBXUfksbG87JYOGeO+8=;
+ b=RTUjTaV5bmsaL8uu1DXl1q2JMwV6BonC24OrFPz1z0O6mgvGQcqDMHCJFkwRhjrCzPPEoC
+ zXnvSoJkSErkej+rik3N1loMaDSWefmsoqjl+OwQCDbzMSV8GitV9Kn+XG8YmH3XT6obsi
+ rhJ5Ojn4rl0vAkUNAbq1YRnpZlht2jM=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-gikY7e-hOdC_PLUctYQTBQ-1; Fri, 17 Jan 2020 05:19:55 -0500
+Received: by mail-io1-f71.google.com with SMTP id d10so14845698iod.19
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 02:19:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WjhOne+MEOOT/CkKKaKV+EI+4cHrZ5ufoDIXkZDsqNI=;
+ b=aqtEyVcRVRRDxpLY4ISUdF/GspSpWlNJ8/ai14cyJdXQnGVW+SFQu5cHG53sSLxXlX
+ dY5iNebyr0ZsUPCCAKH+eMgbBRYJKBH+qYVmniQrZQMt/d6qGMJEUBeW2bQOr+lm7/V0
+ NcquqtnwZ178k3pqb5pIJ9Nw3UDBSoOaIavEU02Vq1pgFx8gOrTU5RJjKxizhVLKddpa
+ 6oLy71EOHmYDVB28jTahpYX6OGOX8G0p4OKmpLr+WkAA4+kYloHBZPVP7TQb+gT5ucik
+ mUOPOIdEfstTkamv3iCjaACTWbWRksGUGXl5kIMfdq8bSyviCd3fnUl7QUentOiimxNg
+ gDPQ==
+X-Gm-Message-State: APjAAAWGsueJrg3BbG8yxVKA5/YKbbygmwN+4U1Qu2kh9YeQiDNA7T3P
+ hhlDA4ZuNYs5OxuOvspKjlgIhg8IADLvfb5+EBJVOhukDSzjqHXXUZ+XQ+lnm285bff6zFTUBuI
+ ZNjIRtNvokifsRboQ9ktV37UlIlfxT/I=
+X-Received: by 2002:a92:9c04:: with SMTP id h4mr2523839ili.6.1579256395193;
+ Fri, 17 Jan 2020 02:19:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwY4raw0OA2mIDE5tPBgp1K75idkOIdIHy0hQw9+Ob/WmSWDXwCd90bGmcUEUGYv448lx4bQi+Mmc5DQsPo3dg=
+X-Received: by 2002:a92:9c04:: with SMTP id h4mr2523830ili.6.1579256394969;
+ Fri, 17 Jan 2020 02:19:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+References: <20191212163904.159893-73-dgilbert@redhat.com>
+ <20200116115603.5415-1-misono.tomohiro@jp.fujitsu.com>
+ <20200116164511.GJ3108@work-vm>
+In-Reply-To: <20200116164511.GJ3108@work-vm>
+From: Miklos Szeredi <mszeredi@redhat.com>
+Date: Fri, 17 Jan 2020 11:19:43 +0100
+Message-ID: <CAOssrKfO1PZkR-Fonxae_b2oAOQMgx0=vU8A2UvCNKsgthKMbg@mail.gmail.com>
+Subject: Re: [PATCH 072/104] virtiofsd: passthrough_ll: fix refcounting on
+ remove/rename
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+X-MC-Unique: gikY7e-hOdC_PLUctYQTBQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,100 +99,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
- qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Vivek Goyal <vgoyal@redhat.com>,
+ Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/1/17 15:22, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Peter,
->=20
-> On 1/16/20 5:46 PM, Peter Maydell wrote:
->> On Wed, 8 Jan 2020 at 11:32, Dongjiu Geng <gengdongjiu@huawei.com> wro=
-te:
->>>
->>> I and Xiang are willing to review the APEI-related patches and
->>> volunteer as the reviewers for the HEST/GHES part.
->>>
->>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->>> ---
->>> =C2=A0 MAINTAINERS | 9 +++++++++
->>> =C2=A0 1 file changed, 9 insertions(+)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 387879a..5af70a5 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -1423,6 +1423,15 @@ F: tests/bios-tables-test.c
->>> =C2=A0 F: tests/acpi-utils.[hc]
->>> =C2=A0 F: tests/data/acpi/
->>>
->>> +ACPI/HEST/GHES
->>> +R: Dongjiu Geng <gengdongjiu@huawei.com>
->>> +R: Xiang Zheng <zhengxiang9@huawei.com>
->>> +L: qemu-arm@nongnu.org
->>> +S: Maintained
->>> +F: hw/acpi/ghes.c
->>> +F: include/hw/acpi/ghes.h
->>> +F: docs/specs/acpi_hest_ghes.rst
->>> +
->>> =C2=A0 ppc4xx
->>> =C2=A0 M: David Gibson <david@gibson.dropbear.id.au>
->>> =C2=A0 L: qemu-ppc@nongnu.org
->>> --=20
->>
->> Michael, Igor: since this new MAINTAINERS section is
->> moving files out of the 'ACPI/SMBIOS' section that you're
->> currently responsible for, do you want to provide an
->> acked-by: that you think this division of files makes sense?
->=20
-> The files are not 'moved out', Michael and Igor are still the maintaine=
-rs of the supported ACPI/SMBIOS subsystem:
->=20
-> ACPI/SMBIOS
-> M: Michael S. Tsirkin <mst@redhat.com>
-> M: Igor Mammedov <imammedo@redhat.com>
-> S: Supported
-> F: include/hw/acpi/*
-> F: hw/acpi/*
->=20
-> Dongjiu and Xiang only add themselves as reviewers to get notified on c=
-hanges on these specific files. The more eyes the better :)
->=20
-> The docs/specs/acpi_hest_ghes.rst document has no maintainer, as these =
-others too:
-If this file has no maintainer, may be it needs a M tag for this file, ot=
-herwise when people change this file, and use "./scripts/get_maintainer.p=
-l xxxxx" to get maintainer, it will be empty.
+On Thu, Jan 16, 2020 at 5:45 PM Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
+> > > From: Miklos Szeredi <mszeredi@redhat.com>
+> > >
+> > > Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+> >
+> > I'm not familiar with qemu convention but shouldn't we put
+> > at least one line of description like linux kernel?
+>
+> Miklos: would you like to suggest a better commit message?
 
->=20
-> - docs/specs/acpi_cpu_hotplug.txt
-> - docs/specs/acpi_hw_reduced_hotplug.rst
-> - docs/specs/acpi_mem_hotplug.txt
-> - docs/specs/acpi_nvdimm.txt
->=20
-> The only ACPI file reported as maintained in docs/specs/ is acpi_pci_ho=
-tplug.txt, from this entry:
->=20
-> PCI
-> M: Michael S. Tsirkin <mst@redhat.com>
-> M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> S: Supported
-> F: docs/specs/*pci*
->=20
-> FWIW:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> .
->=20
+Hmm, the patch doesn't really make sense, since the looked up inode is not =
+used.
+
+Not sure what happened here, this seems to be for supporting shared
+versions, and these changes are part of commit 06f78a397f00
+("virtiofsd: add initial support for shared versions") in our gitlab
+qemu tree.  Was this intentionally split out?
+
+Thanks,
+Miklos
 
 
