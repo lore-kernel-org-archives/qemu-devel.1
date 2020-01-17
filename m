@@ -2,84 +2,79 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F14C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D43C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:24:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04689206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:23:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1C74206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:24:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHcv3YJB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04689206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oTgXrAgK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C74206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isRbT-0005y6-1G
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:23:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47778)
+	id 1isRcJ-0006wn-Jl
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:24:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kchamart@redhat.com>) id 1isRao-0005Z8-AQ
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:23:22 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1isRbT-00069E-Ts
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:24:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kchamart@redhat.com>) id 1isRak-0006t2-1J
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:23:17 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59763
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1isRaj-0006nV-9G
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:23:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579267391;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9r27ABPOvVhS7P4SC5Jm3ZE+dkizbgXFevq5ijYW1Vc=;
- b=GHcv3YJBTeXoovoLaRURQ/rVxDprWu8AfKBX8vNsldL9Po28Cq7iy+14vdDuJoAVdEjPok
- t/+v61zjxH5WJXjGRrghRn72G3a5KCFV18gxU30e4itu4KPg5Y3Ts1axbvL/fSBbh7bm60
- Xu5Sq61vh7ZhGTfVZ5LGQ6kIScymWXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-OBakx1B3M4eOK1gpBgLd5Q-1; Fri, 17 Jan 2020 08:23:02 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5DF08017CC
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 13:23:01 +0000 (UTC)
-Received: from paraplu.localdomain (ovpn-117-116.ams2.redhat.com
- [10.36.117.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6709460C87;
- Fri, 17 Jan 2020 13:23:01 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
- id BE8733E0489; Fri, 17 Jan 2020 14:22:58 +0100 (CET)
-Date: Fri, 17 Jan 2020 14:22:58 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH] docs: qemu-cpu-models: Document '-noTSX' variants and
- 'mds-no'
-Message-ID: <20200117132258.GB24159@paraplu>
-References: <20200116173639.28524-1-kchamart@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1isRbS-0007ul-MX
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:23:59 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38028)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1isRbS-0007tx-Gn
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:23:58 -0500
+Received: by mail-oi1-x244.google.com with SMTP id l9so22129642oii.5
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 05:23:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=+zYS3Ud1rDBMQK54BEbf3637JZsB+MdOPqjMUZWYVTo=;
+ b=oTgXrAgKu93y78nHno3/sYxNzUyyZcj7j18x93jXfFkjeJZrCGZLMbZn602Nf8WMsV
+ 2hs/uXRv/F/SAS5X9ZycgFNcDICR3Jn9K1Qzed1ZroBKqAIulc1O4f8oaxN+R2Igy6Ji
+ PYytMGdvswT+MClLSKW5C8luW4PXoHiKkvqvWpZ7duN/5BBMCiBuOVXkaL9T0TNfboVd
+ Mugm7UKR7uyuue93v6/G1D9CeiDRZfH8apLoajdE/92qmdX7Iha9uhqP+fLR1b3jPicC
+ LrsrnLSIULjC7ruSsN5NXPz9PowFxQHO+LqCNqx7ePtrf4qZSER5w5lzih2AZVGx135o
+ DYog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+zYS3Ud1rDBMQK54BEbf3637JZsB+MdOPqjMUZWYVTo=;
+ b=duwbtrxAib1UJmH9fBxWNbMCKKh9q0AQp9+cSv2Q5p9MfqUcDCmHExoGcIuexgenIO
+ gJNdD6Sen1BMnBRxeNPKqcatJCSnHprhzGQDRr6zVBfH5+ngxLyZwQLNFT82szZgSbI8
+ 1YwH3jYRrieaOI6UyU6vZLfDmvOoWr7MnTTLc7nFlUZDGqtRk6Dkl/hP8kA/Xxkf8lGg
+ +OodC/wN7HZCojNvQqLMKr0nXTVog8041yjuvcZgdTwet0IPum6NtBEB/pHYkGQCpYma
+ Hhd8XZ6dlF0579EWXFDS4Aoj1WkcAGGHf/uy+Rz5vGhzB/wo9buyAAVRAUwolm/x0Ma4
+ XlIA==
+X-Gm-Message-State: APjAAAXmExfpMLDVKcNlfN2tMLVK4X5tpCmHjqOcXLriMVh0rn+X1m7H
+ 3l5e5cy0Sez351xyd3pqJrinYQ2ozDMt1vvn+oDkRQ==
+X-Google-Smtp-Source: APXvYqyqH3qPrXDpxCMo7ocDs9R5hor8HZk+8DTGrf27MfVxOr0NXByJQ+bVk2ZfBsqZDJ7TRVYnLtrFjOG6iQfr64c=
+X-Received: by 2002:aca:f484:: with SMTP id s126mr3234670oih.48.1579267437500; 
+ Fri, 17 Jan 2020 05:23:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200116173639.28524-1-kchamart@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: OBakx1B3M4eOK1gpBgLd5Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200110203942.5745-1-linux@roeck-us.net>
+ <20200110203942.5745-2-linux@roeck-us.net>
+In-Reply-To: <20200110203942.5745-2-linux@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Jan 2020 13:23:46 +0000
+Message-ID: <CAFEAcA_k8xdzmsgMK+m6wSgnBN53UjCNU4nTBx=hnHnHz+Su6g@mail.gmail.com>
+Subject: Re: [PATCH 1/6] dma/pl330: Convert to support tracing
+To: Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,59 +86,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 16, 2020 at 06:36:38PM +0100, Kashyap Chamarthy wrote:
-
-[...]
-
->   (2) There are _three_ variants[+] of CascadeLake CPUs, with different
->       stepping levels: 5, 6, and 7.  To quite wikichip.org[*]:
-
-s/quite/quote/
-
->=20
->         "note that while steppings 6 & 7 are fully mitigated, earlier
->         stepping 5 is not protected against MSBDS, MLPDS, nor MDSUM"
->=20
->       The above is also indicated in the Intel's manual itself[+], as
->       indicated by "No" under the three columns of MFBDS, MSBDS, and
->       MLPDS.
->=20
->       [+] https://software.intel.com/security-software-guidance/insights/=
-processors-affected-microarchitectural-data-sampling
->       [*] https://en.wikichip.org/wiki/intel/microarchitectures/cascade_l=
-ake#Key_changes_from_Skylake
->=20
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+On Fri, 10 Jan 2020 at 20:39, Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> Replace debug logging code with tracing.
+>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 > ---
-> TODO:
->  - I think I also need to add a note about 'tsx-ctrl' bit.  Here too,
->    same question as above -- does it show up in /proc/cpuinfo/?
+>  hw/dma/pl330.c      | 88 +++++++++++++++++++++++----------------------
+>  hw/dma/trace-events | 24 +++++++++++++
 
-While at it ... if I mention 'mds-no', then it would be inconsistent,
-and inaccurate, if I don't also mention 'taa-no' IA32_ARCH_CAPABILITIES
-MSR bit.
+> +static void pl330_hexdump(uint8_t *buf, size_t size)
+> +{
+> +    unsigned int b, i, len;
+> +    char tmpbuf[80];
+> +
+> +    for (b = 0; b < size; b += 16) {
+> +        len = size - b;
+> +        if (len > 16) {
+> +            len = 16;
+> +        }
+> +        tmpbuf[0] = '\0';
+> +        for (i = 0; i < len; i++) {
+> +            if ((i % 4) == 0) {
+> +                strcat(tmpbuf, " ");
+> +            }
+> +            sprintf(tmpbuf + strlen(tmpbuf), " %02x", buf[b + i]);
+> +        }
+> +        trace_pl330_hexdump(b, tmpbuf);
+> +    }
+> +}
+>
 
-In short, I should mention the following MSR bits, and their use, in
-context:
+> @@ -1175,11 +1186,8 @@ static int pl330_exec_cycle(PL330Chan *channel)
+>          int len = q->len - (q->addr & (q->len - 1));
+>
+>          dma_memory_read(&address_space_memory, q->addr, buf, len);
+> -        if (PL330_ERR_DEBUG > 1) {
+> -            DB_PRINT("PL330 read from memory @%08" PRIx32 " (size = %08x):\n",
+> -                      q->addr, len);
+> -            qemu_hexdump((char *)buf, stderr, "", len);
+> -        }
+> +        trace_pl330_exec_cycle(q->addr, len);
+> +        pl330_hexdump(buf, len);
 
-  - mds-no
-  - taa-no
-  - tsx-ctrl
+Won't this now do all the work of constructing the hexdump strings,
+even if tracing is disabled ?
 
-... while bearing in mind that none (?) of these MSR bits will show up
-under /proc/cpuinfo in the guest, rather they're used to populate the
-relevant vulnerability file in sysfs
-(/sys/devices/system/cpu/vulnerabilities/).
-
-
-[...]
-
---=20
-/kashyap
-
+thanks
+-- PMM
 
