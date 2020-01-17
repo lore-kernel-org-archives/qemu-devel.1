@@ -2,67 +2,84 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C5EC33CB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77625C33CAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAB7A20728
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:33:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAB7A20728
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42D032072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:54:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LtJuCvqY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D032072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isGVt-0004RE-Rq
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 20:33:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43790)
+	id 1isGqB-0006Gg-8C
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 20:54:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengzhimin1@huawei.com>) id 1isGV8-00040r-HY
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:32:43 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1isGpK-0005Xv-BB
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:53:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengzhimin1@huawei.com>) id 1isGV7-0003dM-Fk
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:32:42 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2489 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fengzhimin1@huawei.com>)
- id 1isGV7-0003Vx-5Q
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:32:41 -0500
-Received: from dggemi405-hub.china.huawei.com (unknown [172.30.72.57])
- by Forcepoint Email with ESMTP id 5C0981E403782D5E67FA;
- Fri, 17 Jan 2020 09:32:38 +0800 (CST)
-Received: from DGGEMI529-MBX.china.huawei.com ([169.254.6.126]) by
- dggemi405-hub.china.huawei.com ([10.3.17.143]) with mapi id 14.03.0439.000;
- Fri, 17 Jan 2020 09:32:31 +0800
-From: fengzhimin <fengzhimin1@huawei.com>
-To: "quintela@redhat.com" <quintela@redhat.com>
-Subject: RE: [PATCH RFC 04/12] migration/rdma: Create multiRDMA migration
- threads
-Thread-Topic: [PATCH RFC 04/12] migration/rdma: Create multiRDMA migration
- threads
-Thread-Index: AQHVzHBw2u69YrMCiUK29XN3EKy9JKfuErHg
-Date: Fri, 17 Jan 2020 01:32:30 +0000
-Message-ID: <03C2A65461456D4EBE9E6D4D0D96C583FBCAA4@DGGEMI529-MBX.china.huawei.com>
-References: <20200109045922.904-1-fengzhimin1@huawei.com>
- <20200109045922.904-5-fengzhimin1@huawei.com> <87eevz8ren.fsf@secure.laptop>
-In-Reply-To: <87eevz8ren.fsf@secure.laptop>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.220.198]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <richard.henderson@linaro.org>) id 1isGpI-0004J8-T2
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:53:33 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:45410)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1isGpI-0004BX-Kv
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:53:32 -0500
+Received: by mail-pg1-x541.google.com with SMTP id b9so10832098pgk.12
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 17:53:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/EsorkHRm7Bz/pt7Kle3XIoArmCPqgMmJgpsAFq7nlw=;
+ b=LtJuCvqYKn2KBKgKAJCB286fzZdQ5RqhnmE8uuLn41dmZcmaaHx/jCeY+OCKPUx4Lx
+ 2Ahf+YiWCrbBOt+3Yuwj4Tq5AO/9aaNb7b4Gtq1nWn9Sc1huiWhKYq4IRn4CWj4TSH18
+ pTakbgInozuXEyx1xZzPlNxzi/gTVD3E47Zgy/7ObAoh1v0zD1DoDgkXJ04VxgCsRuTG
+ MPNXoUOMxFAm7UJnYVHZCtJPjKYvzc76JpDbMMp56wll1OTWaKk69zYOSrhmYq58Dx93
+ 4ds+O+0Dut+c0l4YwBZ5szQ2FsJlW/AtUGXrvB7g9yw40KEJ0adIiiqzx3Ql7hqymHrp
+ nQtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/EsorkHRm7Bz/pt7Kle3XIoArmCPqgMmJgpsAFq7nlw=;
+ b=QMeI4eL23YuWkJOpSIB+wCkb7q72zuxQCFqKkuwtV1scbY0am1+bI4IjoEXPc6g1Vf
+ kelv8jIXf6UfNCUY/Uny/CQZZiSuIna2bS1eRwzORNii6MdZ0nkoajdOUw0eHFHXqnx6
+ dH0FuAs0lnSZHsH4B0CXQ/eBykfY4+f1eEVgvtdpCt885QyD+ZUwT5Mihs45YVQ+leuX
+ 9ErWU8AypLfUbEu48jqnqh4sHtVCl+aossehEttnxMD46pAo91eEcIjgR2i98R46vQ3i
+ 29pUuKtCfyJZejx7Hn89cQ0qSz7eMGirdwHz3QRao6UvwT5vbXS+0Hh7Y5PI0i8oGihy
+ Jbbg==
+X-Gm-Message-State: APjAAAVtRJLWEmCPBEDhYuXZVzBwkC5dVRxbQamATqqxOxREPKAzllfV
+ 8LKiIucgQSIJzX2etHGI6V5R9TLJyk8=
+X-Google-Smtp-Source: APXvYqzbSZ6zgT4zo2OmqOQVZnsqZIds+2VtgeqTYnUNGl39mtVBfW6wWxrD4zC8IvRhoVwquKuk2Q==
+X-Received: by 2002:a63:289:: with SMTP id 131mr43227717pgc.149.1579226007350; 
+ Thu, 16 Jan 2020 17:53:27 -0800 (PST)
+Received: from cloudburst.ASUS (rrcs-66-91-136-155.west.biz.rr.com.
+ [66.91.136.155])
+ by smtp.gmail.com with ESMTPSA id b22sm26385424pft.110.2020.01.16.17.53.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 16 Jan 2020 17:53:26 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] target/hppa: Allow, but diagnose, LDCW aligned only mod 4
+Date: Thu, 16 Jan 2020 15:53:22 -1000
+Message-Id: <20200117015322.12953-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.188
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,76 +91,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "jemmy858585@gmail.com" <jemmy858585@gmail.com>
+Cc: deller@gmx.de, dave.anglin@bell.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for your review. I will merge this with multifd.
+The PA-RISC 1.1 specification says that LDCW must be aligned mod 16
+or the operation is undefined.  However, real hardware only generates
+an unaligned access trap for unaligned mod 4.
 
------Original Message-----
-From: Juan Quintela [mailto:quintela@redhat.com]=20
-Sent: Thursday, January 16, 2020 9:25 PM
-To: fengzhimin <fengzhimin1@huawei.com>
-Cc: dgilbert@redhat.com; armbru@redhat.com; eblake@redhat.com; qemu-devel@n=
-ongnu.org; Zhanghailiang <zhang.zhanghailiang@huawei.com>; jemmy858585@gmai=
-l.com
-Subject: Re: [PATCH RFC 04/12] migration/rdma: Create multiRDMA migration t=
-hreads
+Match real hardware, but diagnose with GUEST_ERROR a violation of the
+specification.
 
-Zhimin Feng <fengzhimin1@huawei.com> wrote:
-> From: fengzhimin <fengzhimin1@huawei.com>
->
-> Creation of the RDMA threads, nothing inside yet.
->
-> Signed-off-by: fengzhimin <fengzhimin1@huawei.com>
+Reported-by: Helge Deller <deller@gmx.de>
+Suggested-by: John David Anglin <dave.anglin@bell.net>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-> ---
->  migration/migration.c |   1 +
->  migration/migration.h |   2 +
->  migration/rdma.c      | 283 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 286 insertions(+)
->
-> diff --git a/migration/migration.c b/migration/migration.c index=20
-> 5756a4806e..f8d4eb657e 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1546,6 +1546,7 @@ static void migrate_fd_cleanup(MigrationState *s)
->          qemu_mutex_lock_iothread();
-> =20
->          multifd_save_cleanup();
-> +        multiRDMA_save_cleanup();
-
-Can we merge this with multifd?
+Helge, can you please test this against your failing kernel?
+You will of course want to add -D logfile -d guest_errors to
+you qemu command-line.
 
 
-> +typedef struct {
-> +    /* this fields are not changed once the thread is created */
-> +    /* channel number */
-> +    uint8_t id;
-> +    /* channel thread name */
-> +    char *name;
-> +    /* channel thread id */
-> +    QemuThread thread;
-> +    /* sem where to wait for more work */
-> +    QemuSemaphore sem;
-> +    /* this mutex protects the following parameters */
-> +    QemuMutex mutex;
-> +    /* is this channel thread running */
-> +    bool running;
-> +    /* should this thread finish */
-> +    bool quit;
-> +}  MultiRDMASendParams;
+r~
 
-This is basically the same than MultiFBSendParams, same for the rest.
+---
+ target/hppa/helper.h    | 2 ++
+ target/hppa/op_helper.c | 9 +++++++++
+ target/hppa/translate.c | 6 +++++-
+ 3 files changed, 16 insertions(+), 1 deletion(-)
 
-I would very much preffer not to have two sets of threads that are really e=
-quivalent.
-
-Thanks, Juan.
+diff --git a/target/hppa/helper.h b/target/hppa/helper.h
+index 38d834ef6b..2d483aab58 100644
+--- a/target/hppa/helper.h
++++ b/target/hppa/helper.h
+@@ -17,6 +17,8 @@ DEF_HELPER_FLAGS_3(stby_b_parallel, TCG_CALL_NO_WG, void, env, tl, tr)
+ DEF_HELPER_FLAGS_3(stby_e, TCG_CALL_NO_WG, void, env, tl, tr)
+ DEF_HELPER_FLAGS_3(stby_e_parallel, TCG_CALL_NO_WG, void, env, tl, tr)
+ 
++DEF_HELPER_FLAGS_1(ldc_check, TCG_CALL_NO_RWG, void, tl)
++
+ DEF_HELPER_FLAGS_4(probe, TCG_CALL_NO_WG, tr, env, tl, i32, i32)
+ 
+ DEF_HELPER_FLAGS_1(loaded_fr0, TCG_CALL_NO_RWG, void, env)
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index f0516e81f1..345cef2c08 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -153,6 +153,15 @@ void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
+     do_stby_e(env, addr, val, true, GETPC());
+ }
+ 
++void HELPER(ldc_check)(target_ulong addr)
++{
++    if (unlikely(addr & 0xf)) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "Undefined ldc to address unaligned mod 16: "
++                      TARGET_FMT_lx "\n", addr);
++    }
++}
++
+ target_ureg HELPER(probe)(CPUHPPAState *env, target_ulong addr,
+                           uint32_t level, uint32_t want)
+ {
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 2f8d407a82..669381dc1d 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -2942,7 +2942,7 @@ static bool trans_st(DisasContext *ctx, arg_ldst *a)
+ 
+ static bool trans_ldc(DisasContext *ctx, arg_ldst *a)
+ {
+-    MemOp mop = MO_TEUL | MO_ALIGN_16 | a->size;
++    MemOp mop = MO_TE | MO_ALIGN | a->size;
+     TCGv_reg zero, dest, ofs;
+     TCGv_tl addr;
+ 
+@@ -2958,8 +2958,12 @@ static bool trans_ldc(DisasContext *ctx, arg_ldst *a)
+ 
+     form_gva(ctx, &addr, &ofs, a->b, a->x, a->scale ? a->size : 0,
+              a->disp, a->sp, a->m, ctx->mmu_idx == MMU_PHYS_IDX);
++
++    gen_helper_ldc_check(addr);
+     zero = tcg_const_reg(0);
+     tcg_gen_atomic_xchg_reg(dest, addr, zero, ctx->mmu_idx, mop);
++    tcg_temp_free(zero);
++
+     if (a->m) {
+         save_gpr(ctx, a->b, ofs);
+     }
+-- 
+2.20.1
 
 
