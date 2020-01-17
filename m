@@ -2,103 +2,142 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB41C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E085CC33CB3
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06D282082F
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:23:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IUXaI9rS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06D282082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B9D632073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:23:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D632073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isPit-00044p-3G
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 06:23:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34215)
+	id 1isPj5-0004OH-Tw
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 06:23:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1isPi8-0003Es-5m
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:22:45 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1isPiK-0003Wt-Pd
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:22:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1isPi7-00064w-1B
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:22:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45224
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1isPi6-00064g-UL
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:22:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579260162;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bmThgViCQ+XIJ18tN8Ie/gC+jlmG51PP0/YIsm26cFQ=;
- b=IUXaI9rSdfXlrM/CUrZG+jelfeO6bB90I8dL3HHZ27KNhNGEBurBD4P6kNaaBiJt1QA817
- C+3yQ9oooO+1rrflKrBOTTyiqUErYvwV1TwjX4J/v3ZzJNJtEF6LtW0Ejx+GRf2DOfLz7D
- AGde5RNetmndi5bk7juXOPbyvFwTwwY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-p75q2yB9ND2VE7jwpVfU8w-1; Fri, 17 Jan 2020 06:22:38 -0500
-Received: by mail-wm1-f69.google.com with SMTP id q26so1109592wmq.8
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 03:22:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1KvxUNp1KgYZrP3PTc7X6mLhbjCUmF5jCMS907NMjFw=;
- b=Ia6NY0l1RR+ArCLGK+WR1DIdbCsHqBUNVy74uHyolw7hoD+NxUmQlVyoUBO19UTSAB
- AfaZ/6czvcyv/XpYeQZjPCUSep7fuBpXGX2G960G1k5OJL3OwM6EUtSDfP6fZANl++iP
- T/wG0RNlCJFqD1s/NowwgxUrSK2Orucb3qGKlmdiNScBFInm+yjKAezC3TeR46RYuT3R
- xiWWrVySbZtvB+eGgdZk/HrVcS/aMHuGY6KFMyTD3FreL++4J0pTdpQvrg9Ac3ly0LJp
- d+fcFtXkprfqNrHjr1AlC47fE/PzNqEKOvznh39pHsG2Q+9zFWb2PQLoPxY+Q3jxEvgN
- PZfw==
-X-Gm-Message-State: APjAAAUtSk0CEXH9Vv2Ni36Izaz69UfqDcMcTRgKOK5C4FJDLjbSw4y5
- NzqUs8mZ/AEe1bknU0x4OYIFz4FjnA8BjBXK5zc76NM9KGM7cBbppYimuYLox/ijOtPJ2Nv6+P7
- FLnR87U5qchxc70M=
-X-Received: by 2002:a1c:7d93:: with SMTP id y141mr4010645wmc.111.1579260157432; 
- Fri, 17 Jan 2020 03:22:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxw6jG4sunKX8VtAdOpeF6yPeSU9Bg8VWVUzEvV9nwY1wrfKbeKrRfkjUOqNnf61HZxoUkhkw==
-X-Received: by 2002:a1c:7d93:: with SMTP id y141mr4010613wmc.111.1579260157141; 
- Fri, 17 Jan 2020 03:22:37 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id 5sm33742050wrh.5.2020.01.17.03.22.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Jan 2020 03:22:36 -0800 (PST)
-Subject: Re: [PATCH v22 9/9] MAINTAINERS: Add ACPI/HEST/GHES entries
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
- <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
- <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
- <CAFEAcA_QO1t10EJySQ5tbOHNuXgzQnJrN28n7fmZt_7aP=hvzA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <724fbf58-19df-593c-b665-2c2e9fe71189@redhat.com>
-Date: Fri, 17 Jan 2020 12:22:34 +0100
+ (envelope-from <borntraeger@de.ibm.com>) id 1isPiH-0006Bz-1V
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:22:56 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50404
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1isPiG-0006BT-Se
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:22:52 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00HBMYHY043946
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:22:52 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xk0qrhk42-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:22:51 -0500
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 17 Jan 2020 11:22:50 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 17 Jan 2020 11:22:47 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00HBMkt031129848
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 17 Jan 2020 11:22:46 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 365ADAE053;
+ Fri, 17 Jan 2020 11:22:46 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F2653AE04D;
+ Fri, 17 Jan 2020 11:22:45 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.42])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 17 Jan 2020 11:22:45 +0000 (GMT)
+Subject: Re: [PATCH v2] s390x: adapter routes error handling
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>
+References: <20200117111147.5006-1-cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
+ b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
+ gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
+ kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
+ NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
+ hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
+ QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
+ OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
+ tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
+ WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
+ DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
+ OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
+ t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
+ PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
+ Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
+ 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
+ PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
+ YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
+ REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
+ vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
+ DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
+ D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
+ 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
+ 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
+ v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
+ 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
+ JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
+ cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
+ i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
+ jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
+ ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Fri, 17 Jan 2020 12:22:45 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_QO1t10EJySQ5tbOHNuXgzQnJrN28n7fmZt_7aP=hvzA@mail.gmail.com>
+In-Reply-To: <20200117111147.5006-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: p75q2yB9ND2VE7jwpVfU8w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20011711-0012-0000-0000-0000037E3D50
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20011711-0013-0000-0000-000021BA73E9
+Message-Id: <528e1add-6a53-7c55-83a2-f10491be4e4d@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-17_03:2020-01-16,
+ 2020-01-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999
+ malwarescore=0 phishscore=0 mlxscore=0 bulkscore=0 impostorscore=0
+ priorityscore=1501 clxscore=1015 lowpriorityscore=0 adultscore=0
+ spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001170090
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,83 +149,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Linuxarm <linuxarm@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Dongjiu Geng <gengdongjiu@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- Zheng Xiang <zhengxiang9@huawei.com>, qemu-arm <qemu-arm@nongnu.org>,
- James Morse <james.morse@arm.com>, "xuwei \(O\)" <xuwei5@huawei.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/17/20 12:09 PM, Peter Maydell wrote:
-> On Fri, 17 Jan 2020 at 07:22, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->>
->> Hi Peter,
->>
->> On 1/16/20 5:46 PM, Peter Maydell wrote:
->>> On Wed, 8 Jan 2020 at 11:32, Dongjiu Geng <gengdongjiu@huawei.com> wrot=
-e:
->>>>
->>>> I and Xiang are willing to review the APEI-related patches and
->>>> volunteer as the reviewers for the HEST/GHES part.
->>>>
->>>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->>>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->>>> ---
->>>>    MAINTAINERS | 9 +++++++++
->>>>    1 file changed, 9 insertions(+)
->>>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index 387879a..5af70a5 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -1423,6 +1423,15 @@ F: tests/bios-tables-test.c
->>>>    F: tests/acpi-utils.[hc]
->>>>    F: tests/data/acpi/
->>>>
->>>> +ACPI/HEST/GHES
->>>> +R: Dongjiu Geng <gengdongjiu@huawei.com>
->>>> +R: Xiang Zheng <zhengxiang9@huawei.com>
->>>> +L: qemu-arm@nongnu.org
->>>> +S: Maintained
->>>> +F: hw/acpi/ghes.c
->>>> +F: include/hw/acpi/ghes.h
->>>> +F: docs/specs/acpi_hest_ghes.rst
->>>> +
->>>>    ppc4xx
->>>>    M: David Gibson <david@gibson.dropbear.id.au>
->>>>    L: qemu-ppc@nongnu.org
->>>> --
->>>
->>> Michael, Igor: since this new MAINTAINERS section is
->>> moving files out of the 'ACPI/SMBIOS' section that you're
->>> currently responsible for, do you want to provide an
->>> acked-by: that you think this division of files makes sense?
->>
->> The files are not 'moved out', Michael and Igor are still the
->> maintainers of the supported ACPI/SMBIOS subsystem:
->=20
-> Does get_maintainer.pl print the answers for all matching
-> sections, rather than just the most specific, then?
 
-Yes:
 
-$ ./scripts/get_maintainer.pl -f hw/acpi/ghes.c
-Dongjiu Geng <gengdongjiu@huawei.com> (reviewer:ACPI/HEST/GHES)
-Xiang Zheng <zhengxiang9@huawei.com> (reviewer:ACPI/HEST/GHES)
-"Michael S. Tsirkin" <mst@redhat.com> (supporter:ACPI/SMBIOS)
-Igor Mammedov <imammedo@redhat.com> (supporter:ACPI/SMBIOS)
-qemu-arm@nongnu.org (open list:ACPI/HEST/GHES)
-qemu-devel@nongnu.org (open list:All patches CC here)
+On 17.01.20 12:11, Cornelia Huck wrote:
+> If the kernel irqchip has been disabled, we don't want the
+> {add,release}_adapter_routes routines to call any kvm_irqchip_*
+> interfaces, as they may rely on an irqchip actually having been
+> created. Just take a quick exit in that case instead.
+> 
+> Also initialize routes->gsi[] with -1 in the virtio-ccw handling,
+> to make sure we don't trip over other errors, either. (Nobody
+> else uses the gsi array in that structure.)
+> 
+> Fixes: d426d9fba8ea ("s390x/virtio-ccw: wire up irq routing and irqfds")
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-> In any case, I'd still like an acked-by from them.
+I think it was actually quite good to see an error, because something went wrong
+(kvmirqchip being off). Now the error (crash) was certainly a bad one.
+What happens after this patch?
+To me it _looks_ like every caller of set_guest_notifiers would get the ENOSYS
+and bail out with an error so this should be ok, but it would be good
+to add something to the patch description that says so.
 
-Sure :)
+Something like "instead of crashing we now fail with an error message for vhost
+and friends"
+of course only if this is true.
+
+> ---
+> 
+> v1->v2:
+>   - also initialize the gsi array with -1
+> 
+> ---
+>  hw/intc/s390_flic_kvm.c | 8 ++++++++
+>  hw/s390x/virtio-ccw.c   | 4 ++++
+>  2 files changed, 12 insertions(+)
+> 
+> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+> index dddd33ea61c8..44b7960ebcc8 100644
+> --- a/hw/intc/s390_flic_kvm.c
+> +++ b/hw/intc/s390_flic_kvm.c
+> @@ -331,6 +331,10 @@ static int kvm_s390_add_adapter_routes(S390FLICState *fs,
+>      int ret, i;
+>      uint64_t ind_offset = routes->adapter.ind_offset;
+>  
+> +    if (!kvm_gsi_routing_enabled()) {
+> +        return -ENOSYS;
+> +    }
+> +
+>      for (i = 0; i < routes->num_routes; i++) {
+>          ret = kvm_irqchip_add_adapter_route(kvm_state, &routes->adapter);
+>          if (ret < 0) {
+> @@ -358,6 +362,10 @@ static void kvm_s390_release_adapter_routes(S390FLICState *fs,
+>  {
+>      int i;
+>  
+> +    if (!kvm_gsi_routing_enabled()) {
+> +        return;
+> +    }
+> +
+>      for (i = 0; i < routes->num_routes; i++) {
+>          if (routes->gsi[i] >= 0) {
+>              kvm_irqchip_release_virq(kvm_state, routes->gsi[i]);
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index 6580ce5907dd..13f57e7b67f1 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -697,6 +697,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+>      CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+>      SubchDev *sch;
+>      Error *err = NULL;
+> +    int i;
+>  
+>      sch = css_create_sch(ccw_dev->devno, errp);
+>      if (!sch) {
+> @@ -717,6 +718,9 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+>      ccw_dev->sch = sch;
+>      dev->indicators = NULL;
+>      dev->revision = -1;
+> +    for (i = 0; i < ADAPTER_ROUTES_MAX_GSI; i++) {
+> +        dev->routes.gsi[i] = -1;
+> +    }
+>      css_sch_build_virtual_schib(sch, 0, VIRTIO_CCW_CHPID_TYPE);
+>  
+>      trace_virtio_ccw_new_device(
+> 
 
 
