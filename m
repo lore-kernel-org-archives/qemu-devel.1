@@ -2,66 +2,77 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B19C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A8AC33CB3
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:17:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24FBC2064C
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:17:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24FBC2064C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3A07C2072E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:17:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A07C2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isTN5-0001qv-Sp
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 10:17:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34935)
+	id 1isTNA-0001vM-B9
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 10:17:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1isTLg-0000rn-VE
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:15:52 -0500
+ (envelope-from <bounces@canonical.com>) id 1isTLj-0000t3-DY
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1isTLc-0002pk-PB
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:15:48 -0500
-Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:34535)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1isTLb-0002o7-U4
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:15:44 -0500
-Received: from player771.ha.ovh.net (unknown [10.109.146.143])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 651691A8720
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 16:15:41 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player771.ha.ovh.net (Postfix) with ESMTPSA id 59E06E6CA98D;
- Fri, 17 Jan 2020 15:15:39 +0000 (UTC)
-Date: Fri, 17 Jan 2020 16:15:37 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v3 02/11] 9pfs: require msize >= 4096
-Message-ID: <20200117161537.14d6aed9@bahia.lan>
-In-Reply-To: <5046978.lqI2Hv0RVs@silver>
-References: <cover.1578957500.git.qemu_oss@crudebyte.com>
- <2330562.Ag4oC6Dxye@silver> <20200117112421.4311c21f@bahia.lan>
- <5046978.lqI2Hv0RVs@silver>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <bounces@canonical.com>) id 1isTLf-0002rV-8s
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:15:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38046)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1isTLf-0002qh-3S
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:15:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1isTLd-00031d-Eb
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 15:15:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 553CD2E80C8
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 15:15:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 14959832062457059648
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdejgdejfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpeifihhkihhpvgguihgrrdhorhhgnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Jan 2020 15:08:14 -0000
+From: Alex Longwall <1859384@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm gic testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
+X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
+X-Launchpad-Bug-Modifier: Alex Longwall (alexlngw)
+References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
+Message-Id: <157927369485.5209.11691422478244132214.launchpad@wampee.canonical.com>
+Subject: [Bug 1859384] Re: arm gic: gic_acknowledge_irq doesn't clear line
+ level for other cores for 1-n level-sensitive interrupts and
+ gic_clear_pending uses GIC_DIST_TEST_MODEL (even on v2 where it always read 0
+ - "N-N")
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: da3604e322bd626f74b038b1e9254d2db3bd4450
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.253.128
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,232 +81,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jan 2020 13:01:30 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+** Summary changed:
 
-> On Freitag, 17. Januar 2020 11:24:21 CET Greg Kurz wrote:
-> > On Thu, 16 Jan 2020 22:39:19 +0100
-> > 
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > On Donnerstag, 16. Januar 2020 19:07:48 CET Greg Kurz wrote:
-> > > > > The point here was that there must be some kind of absolute minimum
-> > > > > msize,
-> > > > 
-> > > > Then the absolute minimum size is 7, the size of the header part that is
-> > > > common to all messages:
-> > > > 
-> > > > size[4] Message tag[2]
-> > > > 
-> > > > > even though the protocol specs officially don't mandate one. And if a
-> > > > > client choses a msize < P9_IOHDRSZ, what useful actions shall it be
-> > > > > able
-> > > > > to do?
-> > > > 
-> > > > I haven't checked but I guess some messages can fit in 24 bytes.
-> > > > 
-> > > > > That's why I mentioned P9_IOHDRSZ just in case somebody might come up
-> > > > > later
-> > > > > asking to lower that minimum msize value for whatever reason.
-> > > > 
-> > > > That's precisely what I want to avoid. The semantic of P9_IOHDRSZ is
-> > > > that it is the header size of a Twrite message and as such it is used
-> > > > to compute the 'iounit' which the guest later uses to compute a
-> > > > suitable 'count' for Tread/Twrite messages only. It shouldn't be
-> > > > involved in msize considerations IMHO.
-> > > > 
-> > > > > But np, IMO this sentence makes the fundamental requirement for this
-> > > > > patch
-> > > > > more clear, but I have no problem dropping this sentence.
-> > > > 
-> > > > Then you can mention 7 has the true minimal size.
-> > > 
-> > > Ok, I'll drop P9_IOHDRSZ completely and mention literal 7 as absolute
-> > > theoretical minimum instead.
-> > > 
-> > > > > > > Furthermore there are some responses which are not allowed by the
-> > > > > > > 9p
-> > > > > > > protocol to be truncated like e.g. Rreadlink which may yield up to
-> > > > > > 
-> > > > > > No message may be truncated in any way actually. The spec just
-> > > > > > allows
-> > > > > > an exception with the string part of Rerror.
-> > > > > 
-> > > > > Rreaddir, Rread, Twrite, Rerror can be truncated. So I suggest I'll
-> > > > > just
-> > > > > change that to s/some/most/ semantically.
-> > > > 
-> > > > I mean truncate with loss of data. Rreaddir can return less than 'count'
-> > > > but it won't truncate an individual entry. It rewinds to the previous
-> > > > one and returns its offset for the next Treaddir. Same goes with Rread
-> > > > and Twrite, we always return a 'count' that can be used by the client
-> > > > to continue reading or writing.
-> > > 
-> > > Individual entries are not truncated, correct, but data loss: Example, you
-> > > have this directory and say server's fs would deliver entries by readdir()
-> > > in> 
-> > > this order (from top down):
-> > > 	.
-> > > 	..
-> > > 	a
-> > > 	1234567890
-> > > 	b
-> > > 	c
-> > > 	d
-> > > 
-> > > and say 37 >= msize < 45, then client would receive 3 entries ".", "..",
-> > > "a" and that's it.
-> > 
-> > Yes msize < 45 isn't enough to send the Rreaddir for "1234567890"
-> > and since it is forbidden to truncate, we bail out... but we
-> > did not send a truncated message still.
-> 
-> I really think we're discussing semantical interpretation details here which 
-> bring us nowhere.
-> 
+- arm gic: interrupt model never 1 on non-mpcore and race condition in gic_=
+acknowledge_irq
++ arm gic: gic_acknowledge_irq doesn't clear line level for other cores for=
+ 1-n level-sensitive interrupts and gic_clear_pending uses GIC_DIST_TEST_MO=
+DEL (even on v2 where it always read 0 - "N-N")
 
-Agreed.
+-- =
 
-> > > > Rerror is really the only message where we can deliberately drop
-> > > > data (but we actually don't do that).
-> > > > 
-> > > > > > Maybe just mention that and say we choose 4096 to be able to send
-> > > > > > big Rreadlink messages.
-> > > > > 
-> > > > > That's not the point for this patch. The main purpose is to avoid
-> > > > > having
-> > > > > to
-> > > > > maintain individual error prone minimum msize checks all over the code
-> > > > > base. If we would allow very small msizes (much smaller than 4096),
-> > > > > then
-> > > > > we would need to add numerous error handlers all over the code base,
-> > > > > each
-> > > > > one checking for different values (depending on the specific message
-> > > > > type).
-> > > > 
-> > > > I'm not sure what you mean by 'minimum msize checks all over the code
-> > > > base'... Please provide an example.
-> > > 
-> > > 1. Like done in this patch series: Treaddir has to limit client's 'count'
-> > > 
-> > >    parameter according to msize (by subtracting with msize).
-> > 
-> > Hmm... this patch does a sanity check on 'count', not on 'msize'... 
-> 
-> Yes ... :)
-> 
-> > I mean no matter what msize is, clipping count to msize - 11 gives a
-> > chance to stop processing the entries before overflowing the transport
-> > buffer.
-> 
-> ... and no, this cannot happen if minimum msize of 4096 is forced already by 
-> Tversion. Maybe you now get my point -> It is about avoiding exactly such kind 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859384
 
-I'm not sure to see how setting a minimum msize of 4096 at Tversion would
-prevent the client to pass a higher 'count' argument and lure the server
-into generating a bigger than msize response since it does not check
-count < msize - 11 without patch 3.
+Title:
+  arm gic: gic_acknowledge_irq doesn't clear line level for other cores
+  for 1-n level-sensitive interrupts and gic_clear_pending uses
+  GIC_DIST_TEST_MODEL (even on v2 where it always read 0 - "N-N")
 
-> of issues in the first place. Most file systems have a name limit of 255 
-> bytes:
-> 
-> https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits
-> 
-> So by forcing a minimum 'msize' of 4096 you avoid having to deal with this  
-> issue (and similar ones) on Treaddir request level (and other request type 
-> handlers), including ReiserFS BTW because 4032+35 < 4096.
-> 
+Status in QEMU:
+  New
 
-Good to know for ReiserFS.
+Bug description:
+  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
+  only one CPU can acknowledge the IRQ until it becomes inactive.
 
-> If you would allow smaller 'msize' values by Tversion, then you would need to 
-> suffer some kind of death when handling Treaddir with certain high file name 
-> length. Either a transport error (with an error message that a normal user 
-> would not be able to understand at all) or by returning an incomplete Treaddir 
-> response sequence with { Rreaddir count=0 }, or ... any other kind of death.
-> 
+  The TRM also mandates that SGIs and PPIs follow the N-N model and that
+  SPIs follow the 1-N model.
 
-Ahh I now understand at last your argument about Rreaddir loosing data.
-We may end up sending { Rreaddir count=0 } because the next entry is too
-large... and thus end the readdir sequence. Mentioning this explicitly
-from the start would have been more clear for me ;-)
+  However this is not currently the case with QEMU. I have locally (no
+  minimal test case) seen e.g. uart interrupts being acknowledged twice
+  before having been deactivated (expected: irqId on one CPU and 1023 on
+  the other instead).
 
-This looks like yet another bug to me. It looks wrong to return this
-special response if we have more entries to go. Also this could be the
-client's _fault_ if it provides a ridiculously small value for count.
-The current code will return count=0 all the same.
+  I have narrowed the issue down to the following:
 
-In any case, I think v9fs_do_readdir() should only return 0 if there
-are no more entries to read. It should error out otherwise, but I'm
-not sure how...
+  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
+  means all IRQ will use the N-N model, and if s->revision !=3D
+  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
 
-> No matter which death you would choose here, it would be horrible from 
-> usability perspective, because the system would most of the time work 
-> flawlessy, and an error case would just be triggered if guest hits a file/dir 
-> beyond some certain name length. It is not worth it! Force 4kiB already at 
-> Tversion and that's it.
-> 
-> > > 2. get_iounit() does this:
-> > > 		iounit = stbuf.f_bsize;
-> > > 		iounit *= (s->msize - P9_IOHDRSZ) / stbuf.f_bsize;
-> > > 		
-> > >    without checking anywhere for a potential negative outcome
-> > >    (i.e. when msize < P9_IOHDRSZ)
-> > 
-> > This function should even have an assert() for that, just to be
-> > sure no one tries to call it before s->msize is even set, which
-> > would clearly be a bug in QEMU. But this can be done in a
-> > follow-up patch.
-> > 
-> > > 3. Example of directory entry name length with Rreaddir above.
-> > 
-> > msize being too small to accommodate an Rreaddir with a single
-> > entry is a different problem as we cannot do anything about it
-> > at this point but fail... That's why the minimum msize should
-> > rather be chosen with file names in mind, which are likely to
-> > be longer than any message header. Rreadlink being the one with
-> > the higher potential since it will usually return a string
-> > containing a path name (while Rreaddir entries only contain
-> > a single path element).
-> > 
-> > > Individual issues that can easily be overlooked but also easily avoided by
-> > > not allowing small msizes in the first place.
-> > 
-> > My point is that we're not going to check msize in Tversion in
-> > order to to avoid multiple checks everywhere. We're going to do
-> > it there because it is the only place where it makes sense to
-> > do it.
-> 
-> Also yes and no. Of course it just makes sense to handle it already at 
-> Tversion. But no, you could theoretically also allow much smaller minimum 
-> 'msize' value << 4096 (i.e. somewhere closely >7 as we discussed), then you 
-> would indeed still need to add msize checks at other places of the code base 
-> as you just found out now. So forcing a minimum 'msize' which is high enough, 
-> avoids having to add such individual checks and having to deal with them in 
-> some kind of unpleasant way.
-> 
+  If ""fixed"" locally with a hackjob, I still have the following trace:
 
-We still don't understand each other I'm afraid... we actually have
-implicit 'msize' checks already for every single thing we write on
-the wire: v9fs_packunpack() which detects when we're trying to write
-passed the buffer. When this happens, it is propagated to the transport
-which then disconnects, which is the painful thing you've been
-experiencing with your readdir experiments. In the case of Rreaddir, it
-really does make sense to try to avoid the disconnection like you do in
-patch 3 because the readdir sequence allows _partial_ reads. Same goes
-for Rread. But that's it. No other message in the protocol allows that,
-so I've never thought of adding individual 'msize' checks anywhere else.
-What would they do better than v9fs_packunpack() already does ?
+  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
+21
+  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
 
-> I hope this makes it more clear now.
-> 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
+  This is because:
 
+  2) gic_acknowledge_irq calls gic_clear_pending which uses
+  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
+  sensitive interrupts.
+
+  With this often being a no-op (ie. assuming ispendr was not written
+  to), any 1-n level-sensitive interrupt is still improperly pending on
+  all the other cores.
+
+  (Also, I don't really know how the qemu thread model works, there
+  might be race conditions in the acknowledgment logic if
+  gic_acknowledge_irq is called by multiple threads, too.)
+
+  Option used:
+  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
+-cpu cortex-a57 -smp 4 -m 1024
+  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
+get=3Dnative
+  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
+te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+  -trace gic_set_irq
+
+  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+  staging"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
 
