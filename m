@@ -2,84 +2,65 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77625C33CAF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72ECFC33CAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:55:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42D032072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:54:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LtJuCvqY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D032072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 45D9D2072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 01:55:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45D9D2072B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isGqB-0006Gg-8C
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 20:54:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46397)
+	id 1isGre-0007jb-Ge
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 20:55:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1isGpK-0005Xv-BB
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:53:35 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1isGr1-00078d-Bh
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:55:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1isGpI-0004J8-T2
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:53:33 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:45410)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1isGpI-0004BX-Kv
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:53:32 -0500
-Received: by mail-pg1-x541.google.com with SMTP id b9so10832098pgk.12
- for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 17:53:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/EsorkHRm7Bz/pt7Kle3XIoArmCPqgMmJgpsAFq7nlw=;
- b=LtJuCvqYKn2KBKgKAJCB286fzZdQ5RqhnmE8uuLn41dmZcmaaHx/jCeY+OCKPUx4Lx
- 2Ahf+YiWCrbBOt+3Yuwj4Tq5AO/9aaNb7b4Gtq1nWn9Sc1huiWhKYq4IRn4CWj4TSH18
- pTakbgInozuXEyx1xZzPlNxzi/gTVD3E47Zgy/7ObAoh1v0zD1DoDgkXJ04VxgCsRuTG
- MPNXoUOMxFAm7UJnYVHZCtJPjKYvzc76JpDbMMp56wll1OTWaKk69zYOSrhmYq58Dx93
- 4ds+O+0Dut+c0l4YwBZ5szQ2FsJlW/AtUGXrvB7g9yw40KEJ0adIiiqzx3Ql7hqymHrp
- nQtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/EsorkHRm7Bz/pt7Kle3XIoArmCPqgMmJgpsAFq7nlw=;
- b=QMeI4eL23YuWkJOpSIB+wCkb7q72zuxQCFqKkuwtV1scbY0am1+bI4IjoEXPc6g1Vf
- kelv8jIXf6UfNCUY/Uny/CQZZiSuIna2bS1eRwzORNii6MdZ0nkoajdOUw0eHFHXqnx6
- dH0FuAs0lnSZHsH4B0CXQ/eBykfY4+f1eEVgvtdpCt885QyD+ZUwT5Mihs45YVQ+leuX
- 9ErWU8AypLfUbEu48jqnqh4sHtVCl+aossehEttnxMD46pAo91eEcIjgR2i98R46vQ3i
- 29pUuKtCfyJZejx7Hn89cQ0qSz7eMGirdwHz3QRao6UvwT5vbXS+0Hh7Y5PI0i8oGihy
- Jbbg==
-X-Gm-Message-State: APjAAAVtRJLWEmCPBEDhYuXZVzBwkC5dVRxbQamATqqxOxREPKAzllfV
- 8LKiIucgQSIJzX2etHGI6V5R9TLJyk8=
-X-Google-Smtp-Source: APXvYqzbSZ6zgT4zo2OmqOQVZnsqZIds+2VtgeqTYnUNGl39mtVBfW6wWxrD4zC8IvRhoVwquKuk2Q==
-X-Received: by 2002:a63:289:: with SMTP id 131mr43227717pgc.149.1579226007350; 
- Thu, 16 Jan 2020 17:53:27 -0800 (PST)
-Received: from cloudburst.ASUS (rrcs-66-91-136-155.west.biz.rr.com.
- [66.91.136.155])
- by smtp.gmail.com with ESMTPSA id b22sm26385424pft.110.2020.01.16.17.53.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jan 2020 17:53:26 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/hppa: Allow, but diagnose, LDCW aligned only mod 4
-Date: Thu, 16 Jan 2020 15:53:22 -1000
-Message-Id: <20200117015322.12953-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <guoheyi@huawei.com>) id 1isGqz-00071l-Lp
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 20:55:19 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2736 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1isGqw-0006qE-EE; Thu, 16 Jan 2020 20:55:14 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 3BDB247A1078ECE07340;
+ Fri, 17 Jan 2020 09:55:09 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
+ 09:55:00 +0800
+Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified by
+ _HID
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20191219064759.35053-1-guoheyi@huawei.com>
+ <20191219064759.35053-3-guoheyi@huawei.com>
+ <20200105072504-mutt-send-email-mst@kernel.org>
+ <20200105074308-mutt-send-email-mst@kernel.org>
+ <a4992b63-e8e7-7f54-341e-f7dd3d7e8880@huawei.com>
+ <20200116142508.1d82af31@redhat.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <ebbd5d5b-473d-149f-7937-b41c0e80c77d@huawei.com>
+Date: Fri, 17 Jan 2020 09:54:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+In-Reply-To: <20200116142508.1d82af31@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,96 +72,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: deller@gmx.de, dave.anglin@bell.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Corey
+ Minyard <cminyard@mvista.com>, wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PA-RISC 1.1 specification says that LDCW must be aligned mod 16
-or the operation is undefined.  However, real hardware only generates
-an unaligned access trap for unaligned mod 4.
 
-Match real hardware, but diagnose with GUEST_ERROR a violation of the
-specification.
+=E5=9C=A8 2020/1/16 21:25, Igor Mammedov =E5=86=99=E9=81=93:
+> On Thu, 16 Jan 2020 19:56:19 +0800
+> Guoheyi <guoheyi@huawei.com> wrote:
+>
+>> =E5=9C=A8 2020/1/5 20:53, Michael S. Tsirkin =E5=86=99=E9=81=93:
+>>> On Sun, Jan 05, 2020 at 07:34:01AM -0500, Michael S. Tsirkin wrote:
+>>>> On Thu, Dec 19, 2019 at 02:47:59PM +0800, Heyi Guo wrote:
+>>>>> According to ACPI spec, _ADR should be used for device which is on =
+a
+>>>>> bus that has a standard enumeration algorithm. It does not make sen=
+se
+>>>>> to have a _ADR object for devices which already have _HID and will =
+be
+>>>>> enumerated by OSPM.
+>>>>>
+>>>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>>> Are you sure? I would think this depends on the ID and the device
+>>>> really. E.g. PCI devices all are expected to have _ADR and some of t=
+hem
+>>>> have a _HID.
+>>> To clarify I am not commenting on patches.
+>>> The spec says this:
+>>> 	6.1.5 _HID (Hardware ID)
+>>>
+>>> 	This object is used to supply OSPM with the device=E2=80=99s PNP ID =
+or ACPI ID. 1
+>>>
+>>> 	When describing a platform, use of any _HID objects is optional. How=
+ever, a _HID object must be
+>>>
+>>> 	used to describe any device that will be enumerated by OSPM. OSPM on=
+ly enumerates a device
+>>>
+>>> 	when no bus enumerator can detect the device ID. For example, device=
+s on an ISA bus are
+>>>
+>>> 	enumerated by OSPM. Use the _ADR object to describe devices enumerat=
+ed by bus enumerators
+>>>
+>>> 	other than OSPM.
+>>>
+>>>
+>>> Note: "detect the device ID" not "enumerate the device" which I think
+>>> means there's a driver matching this vendor/device ID.
+>>>
+>>> So it seems fine to have _ADR so device is enumerated, and still have
+>>> _HID e.g. so ACPI driver can be loaded as fallback if there's
+>>> no bus driver.
+>>>
+>>>
+>>> Note I am not saying the patch itself is not correct.
+>>> Maybe these devices are not on any standard bus and that
+>>> is why they should not have _ADR? I have not looked.
+>>>
+>>> I am just saying that spec does not seem to imply _HID and _ADR
+>>> can't coexist.
+>> More reading on the spec, I found a statement as below
+>> (https://uefi.org/sites/default/files/resources/ACPI_6_3_May16.pdf,
+>> section 6.1, on top of page 343):
+> I'd replace 'It does not make sense ...' sentence with pointer to spec
+> and quote below in commit message.
 
-Reported-by: Helge Deller <deller@gmx.de>
-Suggested-by: John David Anglin <dave.anglin@bell.net>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
+Sure; actually I hadn't found this statement in the spec when making the=20
+patch :)
 
-Helge, can you please test this against your failing kernel?
-You will of course want to add -D logfile -d guest_errors to
-you qemu command-line.
+Thanks,
+
+Heyi
 
 
-r~
-
----
- target/hppa/helper.h    | 2 ++
- target/hppa/op_helper.c | 9 +++++++++
- target/hppa/translate.c | 6 +++++-
- 3 files changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 38d834ef6b..2d483aab58 100644
---- a/target/hppa/helper.h
-+++ b/target/hppa/helper.h
-@@ -17,6 +17,8 @@ DEF_HELPER_FLAGS_3(stby_b_parallel, TCG_CALL_NO_WG, void, env, tl, tr)
- DEF_HELPER_FLAGS_3(stby_e, TCG_CALL_NO_WG, void, env, tl, tr)
- DEF_HELPER_FLAGS_3(stby_e_parallel, TCG_CALL_NO_WG, void, env, tl, tr)
- 
-+DEF_HELPER_FLAGS_1(ldc_check, TCG_CALL_NO_RWG, void, tl)
-+
- DEF_HELPER_FLAGS_4(probe, TCG_CALL_NO_WG, tr, env, tl, i32, i32)
- 
- DEF_HELPER_FLAGS_1(loaded_fr0, TCG_CALL_NO_RWG, void, env)
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index f0516e81f1..345cef2c08 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -153,6 +153,15 @@ void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
-     do_stby_e(env, addr, val, true, GETPC());
- }
- 
-+void HELPER(ldc_check)(target_ulong addr)
-+{
-+    if (unlikely(addr & 0xf)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "Undefined ldc to address unaligned mod 16: "
-+                      TARGET_FMT_lx "\n", addr);
-+    }
-+}
-+
- target_ureg HELPER(probe)(CPUHPPAState *env, target_ulong addr,
-                           uint32_t level, uint32_t want)
- {
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 2f8d407a82..669381dc1d 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -2942,7 +2942,7 @@ static bool trans_st(DisasContext *ctx, arg_ldst *a)
- 
- static bool trans_ldc(DisasContext *ctx, arg_ldst *a)
- {
--    MemOp mop = MO_TEUL | MO_ALIGN_16 | a->size;
-+    MemOp mop = MO_TE | MO_ALIGN | a->size;
-     TCGv_reg zero, dest, ofs;
-     TCGv_tl addr;
- 
-@@ -2958,8 +2958,12 @@ static bool trans_ldc(DisasContext *ctx, arg_ldst *a)
- 
-     form_gva(ctx, &addr, &ofs, a->b, a->x, a->scale ? a->size : 0,
-              a->disp, a->sp, a->m, ctx->mmu_idx == MMU_PHYS_IDX);
-+
-+    gen_helper_ldc_check(addr);
-     zero = tcg_const_reg(0);
-     tcg_gen_atomic_xchg_reg(dest, addr, zero, ctx->mmu_idx, mop);
-+    tcg_temp_free(zero);
-+
-     if (a->m) {
-         save_gpr(ctx, a->b, ofs);
-     }
--- 
-2.20.1
+>
+>> A device object must contain either an _HID object or an _ADR object,
+>> but should not contain both
+> [...]
+>
+>
+> .
 
 
