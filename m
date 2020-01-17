@@ -2,88 +2,73 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C87DAC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64E3C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:01:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E0502073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:56:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aIowMuWG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E0502073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42B862073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:01:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42B862073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOMz-0004R2-N1
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:56:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51799)
+	id 1isORl-0005qF-4b
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:01:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1isOMA-0003vG-RE
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:56:04 -0500
+ (envelope-from <bounces@canonical.com>) id 1isOR4-0005Pz-Vn
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1isOM6-0003VH-VC
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:55:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35530
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1isOM6-0003Un-RG
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:55:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579254954;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=nMo9uVILltaja9uUxb1mJaklNZYYnDnYw9d4UEcgmpU=;
- b=aIowMuWGTgWbpHpymN+GW2uFUbB8v1ot2W392bulrfNY854FxiWdTNZ0gXAxS6L+0ZpZsW
- iDhdpmIwTQXClIsvZjZOaMFm+OhBVIKiJ8KXvxpi32c12MocIa9gtmggVlXMUx7N4B9qhM
- 8SbTBdUTXpIXXGJ5pWjl1yVyDMukBdo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-GfmOTGlTPNazxda-_s5Cpg-1; Fri, 17 Jan 2020 04:55:50 -0500
-X-MC-Unique: GfmOTGlTPNazxda-_s5Cpg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BC2B108BCDA;
- Fri, 17 Jan 2020 09:55:49 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11280845D3;
- Fri, 17 Jan 2020 09:55:39 +0000 (UTC)
-Date: Fri, 17 Jan 2020 10:55:38 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v2 4/4] qcow2: Use BDRV_SECTOR_SIZE instead of the
- hardcoded value
-Message-ID: <20200117095538.GB7394@dhcp-200-226.str.redhat.com>
-References: <cover.1578596897.git.berto@igalia.com>
- <e3982d5118a90db2442c6ac18f339ec8ba006df2.1578596897.git.berto@igalia.com>
- <02552511-6fcf-d678-362c-707ce6d73659@redhat.com>
- <w517e1rf0fo.fsf@maestria.local.igalia.com>
- <56ec1ead-bba9-f4de-5c87-e81f802dfc79@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1isOR1-0000aZ-C4
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:01:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39212)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1isOR1-0000ZA-6h
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:00:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1isOQz-0007H2-JM
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:00:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8D9BC2E80C9
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:00:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <56ec1ead-bba9-f4de-5c87-e81f802dfc79@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Jan 2020 09:54:21 -0000
+From: Max Reitz <1859989@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 5-plamen xanclic
+X-Launchpad-Bug-Reporter: pevogam (5-plamen)
+X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
+References: <157918316689.4864.12553262908100217782.malonedeb@wampee.canonical.com>
+Message-Id: <157925486126.22238.8438655040751396856.malone@gac.canonical.com>
+Subject: [Bug 1859989] Re: qemu-img has broken output with large snapshot names
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 45a8eafd2860d14fb26a1553d3cf2474c88eda93
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,110 +77,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nir Soffer <nsoffer@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Reply-To: Bug 1859989 <1859989@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---6TrnltStXW4iwmi0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Am 17.01.2020 um 10:12 hat Max Reitz geschrieben:
-> On 17.01.20 00:26, Alberto Garcia wrote:
-> > On Tue 14 Jan 2020 03:15:48 PM CET, Max Reitz wrote:
-> >>> @@ -219,7 +219,7 @@ static int l2_load(BlockDriverState *bs, uint64_t=
- offset,
-> >>>   * Writes one sector of the L1 table to the disk (can't update singl=
-e entries
-> >>>   * and we really don't want bdrv_pread to perform a read-modify-writ=
-e)
-> >>>   */
-> >>> -#define L1_ENTRIES_PER_SECTOR (512 / 8)
-> >>> +#define L1_ENTRIES_PER_SECTOR (BDRV_SECTOR_SIZE / 8)
-> >>>  int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index)
-> >>
-> >> Here it=E2=80=99s because the comment is wrong: =E2=80=9CCan=E2=80=99t=
- update single entries=E2=80=9D =E2=80=93
-> >> yes, we can.  We=E2=80=99d just have to do a bdrv_pwrite() to a single=
- entry.
-> >=20
-> > What's the point of qcow2_write_l1_entry() then?
->=20
-> I think the point was that we couldn=E2=80=99t, for a long time, because =
-the
-> block layer only provided sector-granularity access.  This function
-> simply was never changed when the block layer gained the ability to do
-> byte-granularity I/O.
->=20
-> (We=E2=80=99d still need this function, but only for the endian swap, I t=
-hink.)
+When did this work last for you?  I tried every .0 release down to
+2.12.0, and all showed this kind of broken output.  (I wasn=E2=80=99t able =
+to
+compile 2.11.0 and earlier.)
 
-We still can't do byte-granularity writes with O_DIRECT, because that's
-a kernel requirement.
+Here was my test case:
 
-The comment explains that we don't want to do a RMW cycle to write a
-single entry because that would be slower than just writing a whole
-sector. I think this is still accurate. Maybe we should change the
-comment to say "can't necessarily update". (The part that looks really
-wrong in the comment is "bdrv_pread", that should be "bdrv_pwrite"...)
+$ ./qemu-img create -f qcow2 foo.qcow2 64M
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D65536 la=
+zy_refcounts=3Doff refcount_bits=3D16
+$ ./qemu-img snapshot -c foofoofoofoofoofoofoofoofoofoo foo.qcow2
+$ ./qemu-img snapshot -l foo.qcow2 =
 
-Now, what's wrong about the logic to avoid the RMW is that it assumes
-a fixed required alignment of 512. What it should do is looking at
-bs->file->bl.request_alignment and rounding accordingly.
+Snapshot list:
+ID        TAG                 VM SIZE                DATE       VM CLOCK
+1         foofoofoofoofoofoofoofoofoofoo      0 2020-01-17 10:53:17   00:00=
+:00.000
+$ ./qemu-img --version
+qemu-img version 2.12.0 (v2.12.0)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
-> >>> @@ -3836,7 +3837,7 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
-> >>>          case QCOW2_CLUSTER_NORMAL:
-> >>>              child =3D s->data_file;
-> >>>              copy_offset +=3D offset_into_cluster(s, src_offset);
-> >>> -            if ((copy_offset & 511) !=3D 0) {
-> >>> +            if (!QEMU_IS_ALIGNED(copy_offset, BDRV_SECTOR_SIZE)) {
-> >>
-> >> Hm.  I don=E2=80=99t get this one.
-> >=20
-> > Checking the code (e.g. block_copy_do_copy()) it seems that the whole
-> > chunk must be cluster aligned so I don't get this one either.
->=20
-> Hm, how did you get to block_copy_do_copy()?  That=E2=80=99s part of the
-> block-copy infrastructure that=E2=80=99s only used for the backup job, as=
- far as
-> I=E2=80=99m aware.  It=E2=80=99s different from copy_range.
->=20
-> I don=E2=80=99t see any limitation for copy_range.  I suppose maybe it do=
-esn=E2=80=99t
-> work for anything that isn=E2=80=99t aligned to physical sectors?  But th=
-e qcow2
-> driver shouldn=E2=80=99t care about that.
->=20
-> On thing=E2=80=99s for sure, the raw driver doesn=E2=80=99t care about it=
-.
+Max
 
-I don't understand this one either.
+-- =
 
-Kevin
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859989
 
---6TrnltStXW4iwmi0
-Content-Type: application/pgp-signature; name="signature.asc"
+Title:
+  qemu-img has broken output with large snapshot names
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  New
 
-iQIcBAEBAgAGBQJeIYSaAAoJEH8JsnLIjy/WyQ0P/i3yv0wXYN7fIsk7mWWSOQXn
-ZRRwlJkPz83G1k68KKPcqiJxjLOI72vgdwwrMtPuTD3MWHdFGgX8/DelvPfaF/cw
-Fw0OFPsguLSz5S/5bsa7VuiBUAPO8DgeMb+S7gWhGuMTo698UlGXT5a2uoYsDUZP
-oHpAtXCW1g7bbyp2mZCw+cLPIN+Pru01pkxxv2RlRJcD9MD4Xm7W9Nyt7FegL34l
-8DOdfMSG7hNieweXHCJwQSoJWhnZyGq/aZMPnlvRas+1vb18xaiOZ7eNKssgkfTZ
-zO+RanVjnhIobiQCvGsK8CI3LDcboLVYH3nyyGw7d5fFR3vET18c5GWyRV/ID0LK
-1s6F2UymAZQyGsuxoXjR1RusHu2CAAdauKVihSkunHSQ9D0aZ/cwnwFJnTvhN7cT
-Lwzw580vliu7jB+Guztk1hyOYWUE0+JCedORd+BHB5z/Ippp0FeXkd2lmOAi+aIH
-XJm3TV7KkcKL0zrbV6u0qKDpojzE8kiAJnWeSgP2lDnqcIymn4j+1FTASzjgaDT0
-UziRsgsLm0Yn/RtM4stvAs30BRIwxFlyXQVsxYaJoaxy02D2UyjAPLEjum3bV8MO
-EhqxlYB8uXNhzkSgvAgcit4mLVAjru6MNAwkBggYVmnrwWX+u1ua2pEg1irNvgVs
-I4600aYycLhIIx0up892
-=8nKQ
------END PGP SIGNATURE-----
+Bug description:
+  On Qemu 4.1.1 the output of snapshots breaks if the chosen state name
+  is too long:
 
---6TrnltStXW4iwmi0--
+  ```
+  # qemu-img snapshot -l /mnt/local/some_image.qcow2
+  Snapshot list:
+  ID        TAG                 VM SIZE                DATE       VM CLOCK
+  1         online_provider_with_dhcp747 MiB 2020-01-15 12:05:01   00:00:45=
+.873
+  ```
 
+  Prior to 4.1.1 this used to work with extra tabs for the VM SIZE
+  values. The collision is also disabling us from using a regex on top
+  of this output to detect the snapshot.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859989/+subscriptions
 
