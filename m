@@ -2,87 +2,74 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E300FC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D874DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE15620748
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:28:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ffj40fWx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE15620748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF78820748
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:32:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF78820748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isNvZ-0003CT-N6
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:28:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48489)
+	id 1isNyx-0004aU-OD
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:31:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48748)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1isNv0-0002mL-74
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:27:55 -0500
+ (envelope-from <bounces@canonical.com>) id 1isNxs-00041j-1K
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1isNux-000652-KF
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:27:54 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43155
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1isNux-00064r-GT
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:27:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579253271;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jZZb60iD0ZDUBUORUGwv8YmDcSmN5NVD5fOBf3tCECo=;
- b=Ffj40fWxivrUxbjChGeJYc6xYmYBaJxGRrVc+01kZ2oKspIAYlU7k3HLkUWer9htXMT3L/
- JAitIKHdBr0ksGedrh7ZjmOCUcvVtgUXgvpkHe4A+VW0iq2XAbqN0lNznBq1W+8jdA2Y3S
- jIlGQ3F1ME3Gi4Gw4gJoSAkVY+j/lEo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-NLTapg_UOay8TBuCMxmh1w-1; Fri, 17 Jan 2020 04:27:48 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2686B800D41;
- Fri, 17 Jan 2020 09:27:47 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD5D410016EB;
- Fri, 17 Jan 2020 09:27:43 +0000 (UTC)
-Date: Fri, 17 Jan 2020 09:27:41 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: [PATCH 085/104] virtiofsd: Support remote posix locks
-Message-ID: <20200117092741.GA3209@work-vm>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-86-dgilbert@redhat.com>
- <20200115233831.mw6sttmepespg4kk@gabell>
- <20200116132631.GA25291@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1isNxo-0000Jw-90
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:30:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:32778)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1isNxo-0000JB-39
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:30:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1isNxm-00031Y-Mm
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 09:30:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A966D2E804B
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 09:30:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200116132631.GA25291@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: NLTapg_UOay8TBuCMxmh1w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Fri, 17 Jan 2020 09:19:45 -0000
+From: Thomas Huth <1859920@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: js1943 th-huth
+X-Launchpad-Bug-Reporter: JS (js1943)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <157915647770.15306.7117337280333115892.malonedeb@wampee.canonical.com>
+Message-Id: <157925278588.24858.9159429936306085930.malone@chaenomeles.canonical.com>
+Subject: [Bug 1859920] Re: daemoniz not working on MacOS
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 762595456bb217c71b12fd1616a59cc26459ebb9
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,81 +78,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Masayoshi Mizuma <msys.mizuma@gmail.com>, qemu-devel@nongnu.org,
- stefanha@redhat.com
+Reply-To: Bug 1859920 <1859920@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Vivek Goyal (vgoyal@redhat.com) wrote:
-> On Wed, Jan 15, 2020 at 06:38:31PM -0500, Masayoshi Mizuma wrote:
->=20
-> [..]
-> > > +/* Should be called with inode->plock_mutex held */
-> > > +static struct lo_inode_plock *lookup_create_plock_ctx(struct lo_data=
- *lo,
-> > > +                                                      struct lo_inod=
-e *inode,
-> > > +                                                      uint64_t lock_=
-owner,
-> > > +                                                      pid_t pid, int=
- *err)
-> > > +{
-> > > +    struct lo_inode_plock *plock;
-> > > +    char procname[64];
-> > > +    int fd;
-> > > +
-> > > +    plock =3D
-> > > +        g_hash_table_lookup(inode->posix_locks, GUINT_TO_POINTER(loc=
-k_owner));
-> > > +
-> > > +    if (plock) {
-> > > +        return plock;
-> > > +    }
-> > > +
-> > > +    plock =3D malloc(sizeof(struct lo_inode_plock));
-> > > +    if (!plock) {
-> > > +        *err =3D ENOMEM;
-> > > +        return NULL;
-> > > +    }
-> > > +
-> > > +    /* Open another instance of file which can be used for ofd locks=
-. */
-> > > +    sprintf(procname, "%i", inode->fd);
-> > > +
-> > > +    /* TODO: What if file is not writable? */
-> > > +    fd =3D openat(lo->proc_self_fd, procname, O_RDWR);
-> > > +    if (fd =3D=3D -1) {
-> >=20
-> > > +        *err =3D -errno;
-> >=20
-> > I think the errno is positive value, so the minus isn't needed?
-> >=20
-> >            *err =3D errno;
->=20
-> That's sounds right. Thanks.=20
->=20
-> David, will you be able to do this tweak in your tree or you want me to
-> send a separate fix patch.
+Have you tried to disable the GUI with "-display none" already?
 
-Fixed in my tree.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> Thanks
-> Vivek
->=20
-> >=20
-> > Otherwise looks good to me.
-> >=20
-> > Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+-- =
 
-Thanks!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859920
 
-Dave
+Title:
+  daemoniz not working on MacOS
 
-> > Thanks,
-> > Masa
-> >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  OS: MacOS Catalina 10.15.2
+  Qemu install via brew: brew install qemu
+
+  qemu-system-x86_64 -version
+  QEMU emulator version 4.2.50 (v4.2.0-13-g084a398bf8-dirty)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+  ---
+
+  Start Ubuntu Desktop 18.04 client as follow:
+
+  IMG_CD=3D$HOME/Downloads/iso/ubuntu-18.04.3-desktop-amd64.iso
+  IMG_FILE=3D$HOME/code/vm/qemu/u64d01.qcow2
+  MAC_ADDR=3Dxx:xx:xx:xx:xx:xx
+
+  qemu-system-x86_64 \
+  -no-user-config -nodefaults \
+  -show-cursor \
+  -name u64d01 \
+  -M q35,accel=3Dhvf,usb=3Doff,vmport=3Doff \
+  -cpu host -smp 4 -m 2048 \
+  -overcommit mem-lock=3Doff \
+  -overcommit cpu-pm=3Doff \
+  -rtc base=3Dutc,clock=3Dhost \
+  \
+  -device virtio-tablet-pci \
+  -device virtio-vga \
+  \
+  -device virtio-blk-pci,drive=3Dssd1 \
+  -drive id=3Dssd1,file=3D$IMG_FILE,if=3Dnone,format=3Dqcow2 \
+  \
+  -device virtio-net-pci,netdev=3Dnic1,mac=3D$MAC_ADDR \
+  -netdev user,id=3Dnic1,ipv4=3Don,ipv6=3Don,hostname=3Du64d01,hostfwd=3Dtc=
+p::2222-:22 \
+  \
+  -device ich9-intel-hda,id=3Dsnd,msi=3Don \
+  -device hda-output,id=3Dsnd-codec0,bus=3Dsnd.0,cad=3D0,audiodev=3Dsnd0 \
+  -audiodev coreaudio,id=3Dsnd0,out.buffer-count=3D10000 \
+  \
+  -daemonize
+
+  Give following error:
+
+  objc[3432]: +[NSNumber initialize] may have been in progress in another t=
+hread when fork() was called.
+  objc[3432]: +[NSNumber initialize] may have been in progress in another t=
+hread when fork() was called. We cannot safely call it or ignore it in the =
+fork() child process. Crashing instead. Set a breakpoint on objc_initialize=
+AfterForkError to debug.
+
+  =
+
+  I checked "ps -ef|grep qemu" before and after the command, there was no q=
+emu process running.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859920/+subscriptions
 
