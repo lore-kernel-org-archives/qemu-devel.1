@@ -2,78 +2,79 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255D4C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6911EC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:30:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D35DC2072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:30:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 345602072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:30:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PxO9zC4N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D35DC2072B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ONlRKys3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345602072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isSdS-0007yd-Ci
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:30:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56449)
+	id 1isSdW-00086d-Jn
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:30:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56513)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1isSbp-0006BQ-V6
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:27 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1isSbt-0006Hf-TE
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1isSbn-0006zG-U6
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:25 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:38522)
+ (envelope-from <peter.maydell@linaro.org>) id 1isSbs-00073d-B7
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:29 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:38527)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1isSbn-0006y9-Mk
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:23 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id y17so22923819wrh.5
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:28:23 -0800 (PST)
+ id 1isSbs-00072x-2m
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:28 -0500
+Received: by mail-wr1-x432.google.com with SMTP id y17so22924112wrh.5
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:28:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=ViQYn/SP2ktPLplWFaUP3JXDeUEzGxV2C5C4iuN2qjk=;
- b=PxO9zC4Nq3qzbdlXsojd0oorVAo3+gAeO24xr7dsfchR3XWGIsp+ghzY+3Lw24j/1M
- D4Pr0/jSfKqnOzvCEsOXauyKfwtBJ9zLDVDYn2wBFdRW+piwMZPq/sSepP8l/WEDfL56
- 0xbF5xnBE1GgsLj93aoYxp8SRY9V1FhfAyW9Dd+9JS/VjhxkNNO6l63+iXitcGun87ou
- Smufj048TcjCENp4tAoTBmaNugKRfcBWeM0fCTy9fXuiDYavu4ogOOV9jbjpUSgJycHI
- 7qWShXPBZDs6jS4fQPV5C8nr3+FzT/o8B31Rq30rFEafoihDyAQ8Jwl6JzIVJjcht9wW
- gRGw==
+ bh=UIJjBBrcEssCJUvEirLVLBLNjRWDmjlxVAfKAEb3+ko=;
+ b=ONlRKys3HFHCKhWX6oeBUJHN5I0VGkP31+9wB01e6rx7H2DMJhPuoS3fVdjl03URzk
+ 9dQf4V95ZothMFpJRgG53820RlYJxsfE5D4fmg86b+5N9iT7ZOWHDelrguQEQxtw/0bl
+ +f9Rk70R3sRlytHVJA7umHAXHevkWHE/X15SjLkZikspeitOdtnK1tslJWKWjI90wAnV
+ QFq5SPOnBx9R83Cs7av37VyKaf4y7P0blClyxdNR0hr0+9iV36DibEqh/XUW/VLva6Ji
+ dBk64KaacXxLjjjeRDXCbce0B++KYHpq7Iz+yvN3CU1AfCQqDw9GQdwLohGPA7hNYUAZ
+ UxTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ViQYn/SP2ktPLplWFaUP3JXDeUEzGxV2C5C4iuN2qjk=;
- b=HZ9mifZ8A30jdQapRzXmpKxVgX6mQ8md09ekq7GC/JPJjGq6P2RxzOqbRujm7Dt6nt
- 1FOk0GNGeX5nTA783oETEV/iiTtE6xf6VvbvdmyUOGsfHqFZmsVdu6BzAud3OYbCsu1n
- Za60OAj8ehHLug4789642HZjqStfipSbUuudXPAmaPbhuW3QsL3xjXV0KCUZ7s+9r5vI
- 5eTKPv6McawYDQep61ZO4WlecCmJJK/CBc+hFyZjI3bDSqVeJTNTSKPmEUavEJe+SRKI
- 9BDbTLiJ+DFViWPBesntyN8UR2uq+sv2itBO5VSOKPfQudZ+NmyO6Rp65SByobH3dD9A
- MkLg==
-X-Gm-Message-State: APjAAAXgYgTaszU1jU+zhpWk/ji4wn50fIKkozaVgnySKucHCjNy30in
- iNTSFGvXE4708Bcn4JWSDCQhbCjW1Wxemw==
-X-Google-Smtp-Source: APXvYqxOfzAM6XOHnWfvmeks+A+ETfIVuYkEztsULlnNSy3RjST2F3RyED6AnP6aZWlpUgo5C7k40Q==
-X-Received: by 2002:adf:df90:: with SMTP id z16mr3295131wrl.273.1579271302184; 
- Fri, 17 Jan 2020 06:28:22 -0800 (PST)
+ bh=UIJjBBrcEssCJUvEirLVLBLNjRWDmjlxVAfKAEb3+ko=;
+ b=Lz3tB3hluoJcHXUMEh+mF75O093NdDbG4HFiz5XgdJJrxeju4qtb3oD/v2pWVKutkM
+ aW6WqyiNyIl7YCi6Wsb4eheeyfPavQr/DyCAGYqwKZvgD7jovqzwxdLd8jqIoIogLZuG
+ NfVNGXeGnbICA5b1VbOBGWdPU2RExxZu81WEuFuX77H4LXoCruzEBkeNvZglJ27Lkuax
+ xK4ITOxi8soRAQ4DK95BxOomjE257RDnCoEuKYrvkbAUB/FhK8fO5rH1v0C1/FJ2CaRW
+ 1/Cryjkoc5oX2mwuO+TuDSJa6F3+GzVf0oRNOtDphD7lo0lEYb3cISQnIV3Y94qGdqI8
+ 1lVA==
+X-Gm-Message-State: APjAAAVYEaiIarV2Kae5bfjgyFAt/mNOyD2l+cn83izMZEp9OyCE0aJ3
+ UE2hMWE3KVVyaXFnWgZQQe7pP98nW2QN6w==
+X-Google-Smtp-Source: APXvYqyGw4XMZrozlx5SAwk3XyMZtH9DdY09VDOKWkeumXr1HXg8wXWUANs0iWZvd3NM/lK2bCYrnw==
+X-Received: by 2002:adf:cf12:: with SMTP id o18mr3361926wrj.361.1579271306700; 
+ Fri, 17 Jan 2020 06:28:26 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e18sm33811146wrw.70.2020.01.17.06.28.20
+ by smtp.gmail.com with ESMTPSA id e18sm33811146wrw.70.2020.01.17.06.28.25
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jan 2020 06:28:21 -0800 (PST)
+ Fri, 17 Jan 2020 06:28:25 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/15] hw/misc: Add the STM32F4xx EXTI device
-Date: Fri, 17 Jan 2020 14:28:03 +0000
-Message-Id: <20200117142816.15110-3-peter.maydell@linaro.org>
+Subject: [PULL 06/15] tests/boot_linux_console: Add a SD card test for the
+ CubieBoard
+Date: Fri, 17 Jan 2020 14:28:07 +0000
+Message-Id: <20200117142816.15110-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200117142816.15110-1-peter.maydell@linaro.org>
 References: <20200117142816.15110-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,338 +99,129 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair@alistair23.me>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Alistair Francis <alistair@alistair23.me>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: ef941d59fd8658589d34ed432e1d6dfdcf7fb1d0.1576658572.git.alistair@alistair23.me
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+The kernel image and DeviceTree blob are built by the Armbian
+project (based on Debian):
+https://docs.armbian.com/Developer-Guide_Build-Preparation/
+
+The cpio image used comes from the linux-build-test project:
+https://github.com/groeck/linux-build-test
+
+If ARM is a target being built, "make check-acceptance" will
+automatically include this test by the use of the "arch:arm" tags.
+
+Alternatively, this test can be run using:
+
+  $ avocado --show=console run -t machine:cubieboard tests/acceptance/boot_linux_console.py
+  console: Uncompressing Linux... done, booting the kernel.
+  console: Booting Linux on physical CPU 0x0
+  console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019
+  [...]
+  console: ahci-sunxi 1c18000.sata: Linked as a consumer to regulator.4
+  console: ahci-sunxi 1c18000.sata: controller can't do 64bit DMA, forcing 32bit
+  console: ahci-sunxi 1c18000.sata: AHCI 0001.0000 32 slots 1 ports 1.5 Gbps 0x1 impl platform mode
+  console: ahci-sunxi 1c18000.sata: flags: ncq only
+  console: scsi host0: ahci-sunxi
+  console: ata1: SATA max UDMA/133 mmio [mem 0x01c18000-0x01c18fff] port 0x100 irq 27
+  console: of_cfs_init
+  console: of_cfs_init: OK
+  console: vcc3v0: disabling
+  console: vcc5v0: disabling
+  console: usb1-vbus: disabling
+  console: usb2-vbus: disabling
+  console: ata1: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+  console: ata1.00: ATA-7: QEMU HARDDISK, 2.5+, max UDMA/100
+  console: ata1.00: 40960 sectors, multi 16: LBA48 NCQ (depth 32)
+  console: ata1.00: applying bridge limits
+  console: ata1.00: configured for UDMA/100
+  console: scsi 0:0:0:0: Direct-Access     ATA      QEMU HARDDISK    2.5+ PQ: 0 ANSI: 5
+  console: sd 0:0:0:0: Attached scsi generic sg0 type 0
+  console: sd 0:0:0:0: [sda] 40960 512-byte logical blocks: (21.0 MB/20.0 MiB)
+  console: sd 0:0:0:0: [sda] Write Protect is off
+  console: sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+  console: sd 0:0:0:0: [sda] Attached SCSI disk
+  console: EXT4-fs (sda): mounting ext2 file system using the ext4 subsystem
+  console: EXT4-fs (sda): mounted filesystem without journal. Opts: (null)
+  console: VFS: Mounted root (ext2 filesystem) readonly on device 8:0.
+  [...]
+  console: cat /proc/partitions
+  console: / # cat /proc/partitions
+  console: major minor  #blocks  name
+  console: 1        0       4096 ram0
+  console: 1        1       4096 ram1
+  console: 1        2       4096 ram2
+  console: 1        3       4096 ram3
+  console: 8        0      20480 sda
+  console: reboot
+  console: / # reboot
+  [...]
+  console: sd 0:0:0:0: [sda] Synchronizing SCSI cache
+  console: reboot: Restarting system
+  PASS (48.39 s)
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20191230110953.25496-3-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/Makefile.objs            |   1 +
- include/hw/misc/stm32f4xx_exti.h |  60 ++++++++++
- hw/misc/stm32f4xx_exti.c         | 188 +++++++++++++++++++++++++++++++
- hw/arm/Kconfig                   |   1 +
- hw/misc/Kconfig                  |   3 +
- hw/misc/trace-events             |   5 +
- 6 files changed, 258 insertions(+)
- create mode 100644 include/hw/misc/stm32f4xx_exti.h
- create mode 100644 hw/misc/stm32f4xx_exti.c
+ tests/acceptance/boot_linux_console.py | 44 ++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index ea8025e0bb1..c6ecbdd7b0e 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -59,6 +59,7 @@ common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
- common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
- common-obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
- common-obj-$(CONFIG_STM32F4XX_SYSCFG) += stm32f4xx_syscfg.o
-+common-obj-$(CONFIG_STM32F4XX_EXTI) += stm32f4xx_exti.o
- obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
- obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
-diff --git a/include/hw/misc/stm32f4xx_exti.h b/include/hw/misc/stm32f4xx_exti.h
-new file mode 100644
-index 00000000000..707036a41b1
---- /dev/null
-+++ b/include/hw/misc/stm32f4xx_exti.h
-@@ -0,0 +1,60 @@
-+/*
-+ * STM32F4XX EXTI
-+ *
-+ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HW_STM_EXTI_H
-+#define HW_STM_EXTI_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/hw.h"
-+
-+#define EXTI_IMR   0x00
-+#define EXTI_EMR   0x04
-+#define EXTI_RTSR  0x08
-+#define EXTI_FTSR  0x0C
-+#define EXTI_SWIER 0x10
-+#define EXTI_PR    0x14
-+
-+#define TYPE_STM32F4XX_EXTI "stm32f4xx-exti"
-+#define STM32F4XX_EXTI(obj) \
-+    OBJECT_CHECK(STM32F4xxExtiState, (obj), TYPE_STM32F4XX_EXTI)
-+
-+#define NUM_GPIO_EVENT_IN_LINES 16
-+#define NUM_INTERRUPT_OUT_LINES 16
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+
-+    uint32_t exti_imr;
-+    uint32_t exti_emr;
-+    uint32_t exti_rtsr;
-+    uint32_t exti_ftsr;
-+    uint32_t exti_swier;
-+    uint32_t exti_pr;
-+
-+    qemu_irq irq[NUM_INTERRUPT_OUT_LINES];
-+} STM32F4xxExtiState;
-+
-+#endif
-diff --git a/hw/misc/stm32f4xx_exti.c b/hw/misc/stm32f4xx_exti.c
-new file mode 100644
-index 00000000000..02e78100461
---- /dev/null
-+++ b/hw/misc/stm32f4xx_exti.c
-@@ -0,0 +1,188 @@
-+/*
-+ * STM32F4XX EXTI
-+ *
-+ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "hw/irq.h"
-+#include "migration/vmstate.h"
-+#include "hw/misc/stm32f4xx_exti.h"
-+
-+static void stm32f4xx_exti_reset(DeviceState *dev)
-+{
-+    STM32F4xxExtiState *s = STM32F4XX_EXTI(dev);
-+
-+    s->exti_imr = 0x00000000;
-+    s->exti_emr = 0x00000000;
-+    s->exti_rtsr = 0x00000000;
-+    s->exti_ftsr = 0x00000000;
-+    s->exti_swier = 0x00000000;
-+    s->exti_pr = 0x00000000;
-+}
-+
-+static void stm32f4xx_exti_set_irq(void *opaque, int irq, int level)
-+{
-+    STM32F4xxExtiState *s = opaque;
-+
-+    trace_stm32f4xx_exti_set_irq(irq, level);
-+
-+    if (((1 << irq) & s->exti_rtsr) && level) {
-+        /* Rising Edge */
-+        s->exti_pr |= 1 << irq;
-+    }
-+
-+    if (((1 << irq) & s->exti_ftsr) && !level) {
-+        /* Falling Edge */
-+        s->exti_pr |= 1 << irq;
-+    }
-+
-+    if (!((1 << irq) & s->exti_imr)) {
-+        /* Interrupt is masked */
-+        return;
-+    }
-+    qemu_irq_pulse(s->irq[irq]);
-+}
-+
-+static uint64_t stm32f4xx_exti_read(void *opaque, hwaddr addr,
-+                                     unsigned int size)
-+{
-+    STM32F4xxExtiState *s = opaque;
-+
-+    trace_stm32f4xx_exti_read(addr);
-+
-+    switch (addr) {
-+    case EXTI_IMR:
-+        return s->exti_imr;
-+    case EXTI_EMR:
-+        return s->exti_emr;
-+    case EXTI_RTSR:
-+        return s->exti_rtsr;
-+    case EXTI_FTSR:
-+        return s->exti_ftsr;
-+    case EXTI_SWIER:
-+        return s->exti_swier;
-+    case EXTI_PR:
-+        return s->exti_pr;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "STM32F4XX_exti_read: Bad offset %x\n", (int)addr);
-+        return 0;
-+    }
-+    return 0;
-+}
-+
-+static void stm32f4xx_exti_write(void *opaque, hwaddr addr,
-+                       uint64_t val64, unsigned int size)
-+{
-+    STM32F4xxExtiState *s = opaque;
-+    uint32_t value = (uint32_t) val64;
-+
-+    trace_stm32f4xx_exti_write(addr, value);
-+
-+    switch (addr) {
-+    case EXTI_IMR:
-+        s->exti_imr = value;
-+        return;
-+    case EXTI_EMR:
-+        s->exti_emr = value;
-+        return;
-+    case EXTI_RTSR:
-+        s->exti_rtsr = value;
-+        return;
-+    case EXTI_FTSR:
-+        s->exti_ftsr = value;
-+        return;
-+    case EXTI_SWIER:
-+        s->exti_swier = value;
-+        return;
-+    case EXTI_PR:
-+        /* This bit is cleared by writing a 1 to it */
-+        s->exti_pr &= ~value;
-+        return;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "STM32F4XX_exti_write: Bad offset %x\n", (int)addr);
-+    }
-+}
-+
-+static const MemoryRegionOps stm32f4xx_exti_ops = {
-+    .read = stm32f4xx_exti_read,
-+    .write = stm32f4xx_exti_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void stm32f4xx_exti_init(Object *obj)
-+{
-+    STM32F4xxExtiState *s = STM32F4XX_EXTI(obj);
-+    int i;
-+
-+    for (i = 0; i < NUM_INTERRUPT_OUT_LINES; i++) {
-+        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq[i]);
-+    }
-+
-+    memory_region_init_io(&s->mmio, obj, &stm32f4xx_exti_ops, s,
-+                          TYPE_STM32F4XX_EXTI, 0x400);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+
-+    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_exti_set_irq,
-+                      NUM_GPIO_EVENT_IN_LINES);
-+}
-+
-+static const VMStateDescription vmstate_stm32f4xx_exti = {
-+    .name = TYPE_STM32F4XX_EXTI,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(exti_imr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_emr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_rtsr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_ftsr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_swier, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_pr, STM32F4xxExtiState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void stm32f4xx_exti_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = stm32f4xx_exti_reset;
-+    dc->vmsd = &vmstate_stm32f4xx_exti;
-+}
-+
-+static const TypeInfo stm32f4xx_exti_info = {
-+    .name          = TYPE_STM32F4XX_EXTI,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(STM32F4xxExtiState),
-+    .instance_init = stm32f4xx_exti_init,
-+    .class_init    = stm32f4xx_exti_class_init,
-+};
-+
-+static void stm32f4xx_exti_register_types(void)
-+{
-+    type_register_static(&stm32f4xx_exti_info);
-+}
-+
-+type_init(stm32f4xx_exti_register_types)
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 4660d147156..3d86691ae0c 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -315,6 +315,7 @@ config STM32F405_SOC
-     bool
-     select ARM_V7M
-     select STM32F4XX_SYSCFG
-+    select STM32F4XX_EXTI
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 4643f60e376..e40b84651b0 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -441,6 +441,50 @@ class BootLinuxConsole(Test):
+         exec_command_and_wait_for_pattern(self, 'reboot',
+                                                 'reboot: Restarting system')
  
- config XLNX_ZYNQMP_ARM
-     bool
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 72609650b7a..bdd77d80205 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -85,6 +85,9 @@ config STM32F2XX_SYSCFG
- config STM32F4XX_SYSCFG
-     bool
- 
-+config STM32F4XX_EXTI
-+    bool
++    def test_arm_cubieboard_sata(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:cubieboard
++        """
++        deb_url = ('https://apt.armbian.com/pool/main/l/'
++                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
++        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
++        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
++        kernel_path = self.extract_from_deb(deb_path,
++                                            '/boot/vmlinuz-4.20.7-sunxi')
++        dtb_path = '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboard.dtb'
++        dtb_path = self.extract_from_deb(deb_path, dtb_path)
++        rootfs_url = ('https://github.com/groeck/linux-build-test/raw/'
++                      '2eb0a73b5d5a28df3170c546ddaaa9757e1e0848/rootfs/'
++                      'arm/rootfs-armv5.ext2.gz')
++        rootfs_hash = '093e89d2b4d982234bf528bc9fb2f2f17a9d1f93'
++        rootfs_path_gz = self.fetch_asset(rootfs_url, asset_hash=rootfs_hash)
++        rootfs_path = os.path.join(self.workdir, 'rootfs.cpio')
++        archive.gzip_uncompress(rootfs_path_gz, rootfs_path)
 +
- config MIPS_ITU
-     bool
- 
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 44b4f72f57f..7f0f5dff3a8 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -90,6 +90,11 @@ stm32f4xx_pulse_exti(int irq) "Pulse EXTI: %d"
- stm32f4xx_syscfg_read(uint64_t addr) "reg read: addr: 0x%" PRIx64 " "
- stm32f4xx_syscfg_write(uint64_t addr, uint64_t data) "reg write: addr: 0x%" PRIx64 " val: 0x%" PRIx64 ""
- 
-+# stm32f4xx_exti
-+stm32f4xx_exti_set_irq(int irq, int leve) "Set EXTI: %d to %d"
-+stm32f4xx_exti_read(uint64_t addr) "reg read: addr: 0x%" PRIx64 " "
-+stm32f4xx_exti_write(uint64_t addr, uint64_t data) "reg write: addr: 0x%" PRIx64 " val: 0x%" PRIx64 ""
++        self.vm.set_console()
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyS0,115200 '
++                               'usbcore.nousb '
++                               'root=/dev/sda ro '
++                               'panic=-1 noreboot')
++        self.vm.add_args('-kernel', kernel_path,
++                         '-dtb', dtb_path,
++                         '-drive', 'if=none,format=raw,id=disk0,file='
++                                   + rootfs_path,
++                         '-device', 'ide-hd,bus=ide.0,drive=disk0',
++                         '-append', kernel_command_line,
++                         '-no-reboot')
++        self.vm.launch()
++        self.wait_for_console_pattern('Boot successful.')
 +
- # tz-mpc.c
- tz_mpc_reg_read(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs read: offset 0x%x data 0x%" PRIx64 " size %u"
- tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs write: offset 0x%x data 0x%" PRIx64 " size %u"
++        exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
++                                                'Allwinner sun4i/sun5i')
++        exec_command_and_wait_for_pattern(self, 'cat /proc/partitions',
++                                                'sda')
++        exec_command_and_wait_for_pattern(self, 'reboot',
++                                                'reboot: Restarting system')
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
 -- 
 2.20.1
 
