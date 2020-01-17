@@ -2,70 +2,71 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4111C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 06:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1FC8C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FD872072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 06:51:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD872072B
+	by mail.kernel.org (Postfix) with ESMTPS id 82BDD20728
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:01:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82BDD20728
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isLTq-0002om-Cy
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 01:51:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54886)
+	id 1isLdi-0007Sk-L8
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 02:01:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1isLT4-0002Or-Mb
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:50:58 -0500
+ (envelope-from <bounces@canonical.com>) id 1isLcj-0006YR-TQ
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1isLT0-0004Za-E8
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:50:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37156)
+ (envelope-from <bounces@canonical.com>) id 1isLcd-0004Xt-L2
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:00:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37536)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1isLT0-0004UG-88
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:50:50 -0500
+ id 1isLcd-0004X9-FE
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:00:47 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1isLSx-0001jC-LM
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:50:47 +0000
+ id 1isLcc-0002ds-AN
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 07:00:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8C86B2E80C8
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:50:47 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 48B722E80C0
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 07:00:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jan 2020 06:36:07 -0000
-From: Mark Zealey <1859418@bugs.launchpad.net>
+Date: Fri, 17 Jan 2020 06:46:01 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1860053@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user ppc
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow mark.zealey
-X-Launchpad-Bug-Reporter: Mark Zealey (mark.zealey)
-X-Launchpad-Bug-Modifier: Mark Zealey (mark.zealey)
-References: <157890928787.14410.16804441855204869910.malonedeb@wampee.canonical.com>
-Message-Id: <157924296798.24902.6315244866407660439.malone@chaenomeles.canonical.com>
-Subject: [Bug 1859418] Re: disk driver with iothread setting hangs live
- migrations
+X-Launchpad-Bug-Commenters: patrickmeiring
+X-Launchpad-Bug-Reporter: Patrick Meiring (patrickmeiring)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <157921754479.22473.5594149461755090250.malonedeb@gac.canonical.com>
+Message-Id: <157924356233.4940.5683793718485548578.launchpad@soybean.canonical.com>
+Subject: [Bug 1860053] Re: Possible lack of precision when calling
+ clock_gettime via vDSO on user mode ppc64le
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a825fa446e94afb8f1bf6e06de4f140d9433ca66
+X-Launchpad-Hash: 1c4c9d3c3f731500f8c1857b917fe457a9d2d6d8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,62 +80,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859418 <1859418@bugs.launchpad.net>
+Reply-To: Bug 1860053 <1860053@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I will try the newest version as you suggest. However please note that
-this is a redhat/centos 2.12 version which means it has a load of the
-newest patches on it so probably closer to a 4-series than real 2.12...
-
-Mark
+** Tags added: linux-user ppc
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859418
+https://bugs.launchpad.net/bugs/1860053
 
 Title:
-  disk driver with iothread setting hangs live migrations
+  Possible lack of precision when calling clock_gettime via vDSO on user
+  mode ppc64le
 
 Status in QEMU:
-  Incomplete
+  New
 
 Bug description:
-  Per report raised at
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1790093
+  Occurs on QEMU v4.2.0 run on docker (via the qemu-user-static:v4.2.0-2
+  image) on an AMD64 Ubuntu 18.04.3 LTS machine provided by travis-
+  ci.org.
 
-  Description of problem:
+  From golang's https://github.com/golang/go/issues/36592:
 
-  A disk driver definition using iothread parameter causes live
-  migration with copy storage to hang during or just before the final
-  ram sync stage.
+  It was discovered that golang's time.NewTicker() and time.Sleep()
+  malfunction when a compiled application was run via QEMU's ppc64le
+  emulator in user mode.
 
-  Interestingly, having the scsi controller as a separate iothread does
-  not trigger the issue.
+  The methods did not malfunction on actual PowerPC hardware or when the
+  same golang application was compiled for golang's arm, arm64 or 386
+  targets and was run via user mode QEMU on the same system.
 
-  Version-Release number of selected component (if applicable):
+  Curiously, the methods also worked when the program was compiled under
+  go 1.11, but do malfunction in go 1.12 and 1.13.
 
-  I can reproduce this on centos7 with qemu-ev and with centos 8:
+  It was identified the change in behaviour was most likely attributable to=
+ golang switching to using vSDO for calling clock_gettime() on PowerPC 64 a=
+rchitectures in 1.12. I.E:
+  https://github.com/golang/go/commit/dbd8af74723d2c98cbdcc70f7e2801f69b57a=
+c5b
 
-  qemu-kvm-ev-2.12.0-33.1.el7_7.4.x86_64
-  qemu-kvm-2.12.0-65.module_el8.0.0+189+f9babebb.5.x86_64
+  We therefore suspect there may be a bug in QEMU's user-mode emulation
+  of ppc64le as relates to vDSO calls to clock_gettime().
 
-  Steps to Reproduce:
-  1. Create a definition with 1 iothread on the disk image:
+  The nature of the malfunction of time.NewTicker() and time.Sleep() is
+  such that sleeps or ticks with a granularity of less than one second
+  do not appear to be possible (they all revert to 1 second
+  sleeps/ticks). Could it be that the nanoseconds field of
+  clock_gettime() is getting lost in the vDSO version but not in the
+  syscall? Or some other issue calling these methods via vDSO?
 
-        <driver name=3D'qemu' type=3D'qcow2' iothread=3D'1' />
-
-  2. Issue a live migrate request like: virsh migrate --live --copy-storage=
--all vm qemu+tcp://remote/system
-  3. Live migrate on source copies storage and then hangs at 80-99%, I gues=
-s during the ram copy phase.
-
-  Keeping exactly the same config but without the iothread on the disk
-  driver has successful migrations every time.
+  Thanks in advance.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859418/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1860053/+subscriptions
 
