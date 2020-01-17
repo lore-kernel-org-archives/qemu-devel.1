@@ -2,78 +2,95 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A3FAC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF10C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:49:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13DE120730
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:48:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GroLfiWB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DE120730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 36B4020730
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:49:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36B4020730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOEq-0000MI-11
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:48:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50643)
+	id 1isOFa-0000xZ-W5
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:49:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1isODg-0007jB-6J
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:47:15 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1isO6W-0007MP-3B
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1isODc-0005Bq-Nu
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:47:12 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41699
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1isODc-0005B2-L0
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:47:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579254427;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SPkIXciK6E3wUC+dxJgDQm8p/aYfCKeUbCuWsiNqGHg=;
- b=GroLfiWBke8QcsnBuXYhVNY80KBxj9Vd9UaqFdsFhwWkAlO5BQ6snNfiBDRyxjpGEYb6Nh
- pfstJT+tpdQM2+atmbX22yC6alawlA34CZcc721ajFy8yo6mIsj11Up/+UrgxYOf+SjnCG
- 2mRM5CW0d2vMqEw7rVNZ6EHDO1DN6Pk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-kEQZXIRUMZ6lsoqqjxdrbQ-1; Fri, 17 Jan 2020 04:47:04 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28CB518FF660;
- Fri, 17 Jan 2020 09:47:03 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E05505C241;
- Fri, 17 Jan 2020 09:46:58 +0000 (UTC)
-Date: Fri, 17 Jan 2020 10:46:57 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v2] hw/arm: Adjust some coding styles about memory hotplug
-Message-ID: <20200117104657.583abb3d@redhat.com>
-In-Reply-To: <20200117063822.57918-1-zhukeqian1@huawei.com>
-References: <20200117063822.57918-1-zhukeqian1@huawei.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: kEQZXIRUMZ6lsoqqjxdrbQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1isO6S-0007FH-0u
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13542)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
+ id 1isO6R-0007EZ-P0
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:43 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00H9b9BX056888
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:43 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xk0qsxsyr-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:42 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
+ Fri, 17 Jan 2020 09:39:40 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 17 Jan 2020 09:39:37 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00H9dbX161145192
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 17 Jan 2020 09:39:37 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0B47FAE053;
+ Fri, 17 Jan 2020 09:39:37 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7E99AAE045;
+ Fri, 17 Jan 2020 09:39:35 +0000 (GMT)
+Received: from localhost.in.ibm.com (unknown [9.124.35.97])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 17 Jan 2020 09:39:35 +0000 (GMT)
+From: Ganesh Goudar <ganeshgr@linux.ibm.com>
+To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
+Subject: [PATCH v20 5/7] ppc: spapr: Handle "ibm, nmi-register" and "ibm,
+ nmi-interlock" RTAS calls
+Date: Fri, 17 Jan 2020 15:08:53 +0530
+X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
+References: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 20011709-0028-0000-0000-000003D1EF82
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20011709-0029-0000-0000-000024961A52
+Message-Id: <20200117093855.19074-6-ganeshgr@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-17_02:2020-01-16,
+ 2020-01-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=0 mlxlogscore=999
+ impostorscore=0 adultscore=0 mlxscore=0 priorityscore=1501 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001170074
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,79 +102,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, qemu-arm@nongnu.org,
- wanghaibin.wang@huawei.com
+Cc: paulus@ozlabs.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ Aravinda Prasad <arawinda.p@gmail.com>, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jan 2020 14:38:22 +0800
-Keqian Zhu <zhukeqian1@huawei.com> wrote:
+From: Aravinda Prasad <arawinda.p@gmail.com>
 
-> From: zhukeqian <zhukeqian1@huawei.com>
-> 
-> There is extra indent in ACPI GED plug cb. And we can use
-> existing helper function to trigger hotplug handler plug.
-> 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
-> 
-> v1->v2:
->  - Add Igor's R-b
+This patch adds support in QEMU to handle "ibm,nmi-register"
+and "ibm,nmi-interlock" RTAS calls.
 
-FYI one does not need to repost v2 for the purpose of
-picking up tags, usually maintainer takes care of that
-when patch is queued 
+The machine check notification address is saved when the
+OS issues "ibm,nmi-register" RTAS call.
 
-> 
-> Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/acpi/generic_event_device.c | 2 +-
->  hw/arm/virt.c                  | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 9cee90cc70..55eb29d80a 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -175,7 +175,7 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
->      AcpiGedState *s = ACPI_GED(hotplug_dev);
->  
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> -            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
-> +        acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
->      } else {
->          error_setg(errp, "virt: device plug request for unsupported device"
->                     " type: %s", object_get_typename(OBJECT(dev)));
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 39ab5f47e0..656b0081c2 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1934,7 +1934,6 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  static void virt_memory_plug(HotplugHandler *hotplug_dev,
->                               DeviceState *dev, Error **errp)
->  {
-> -    HotplugHandlerClass *hhc;
->      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->      Error *local_err = NULL;
->  
-> @@ -1943,8 +1942,9 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->          goto out;
->      }
->  
-> -    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
-> -    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &error_abort);
-> +    hotplug_handler_plug(HOTPLUG_HANDLER(vms->acpi_dev),
-> +                         dev, &error_abort);
-> +
->  out:
->      error_propagate(errp, local_err);
->  }
+This patch also handles the case when multiple processors
+experience machine check at or about the same time by
+handling "ibm,nmi-interlock" call. In such cases, as per
+PAPR, subsequent processors serialize waiting for the first
+processor to issue the "ibm,nmi-interlock" call. The second
+processor that also received a machine check error waits
+till the first processor is done reading the error log.
+The first processor issues "ibm,nmi-interlock" call
+when the error log is consumed.
+
+Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+[Register fwnmi RTAS calls in core_rtas_register_types()
+ where other RTAS calls are registered]
+Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
+---
+ hw/ppc/spapr_caps.c    |  7 +++++
+ hw/ppc/spapr_rtas.c    | 59 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  4 ++-
+ 3 files changed, 69 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 3001098601..c43498da49 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -502,6 +502,13 @@ static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
+     if (!val) {
+         return; /* Disabled by default */
+     }
++
++    if (kvm_enabled()) {
++        if (kvmppc_set_fwnmi() < 0) {
++            error_report("Could not enable fwnmi capability");
++            exit(1);
++        }
++    }
+ }
+ 
+ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 2c066a372d..3f162d82f5 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -400,6 +400,61 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     rtas_st(rets, 1, 100);
+ }
+ 
++static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
++                                  SpaprMachineState *spapr,
++                                  uint32_t token, uint32_t nargs,
++                                  target_ulong args,
++                                  uint32_t nret, target_ulong rets)
++{
++    hwaddr rtas_addr;
++
++    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
++        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
++        return;
++    }
++
++    rtas_addr = spapr_get_rtas_addr();
++    if (!rtas_addr) {
++        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
++        return;
++    }
++
++    spapr->guest_machine_check_addr = rtas_ld(args, 1);
++    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
++}
++
++static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
++                                   SpaprMachineState *spapr,
++                                   uint32_t token, uint32_t nargs,
++                                   target_ulong args,
++                                   uint32_t nret, target_ulong rets)
++{
++    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
++        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
++        return;
++    }
++
++    if (spapr->guest_machine_check_addr == -1) {
++        /* NMI register not called */
++        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
++        return;
++    }
++
++    if (spapr->mc_status != cpu->vcpu_id) {
++        /* The vCPU that hit the NMI should invoke "ibm,nmi-interlock" */
++        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
++        return;
++    }
++
++    /*
++     * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
++     * hence unset mc_status.
++     */
++    spapr->mc_status = -1;
++    qemu_cond_signal(&spapr->mc_delivery_cond);
++    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
++}
++
+ static struct rtas_call {
+     const char *name;
+     spapr_rtas_fn fn;
+@@ -528,6 +583,10 @@ static void core_rtas_register_types(void)
+                         rtas_set_power_level);
+     spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+                         rtas_get_power_level);
++    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
++                        rtas_ibm_nmi_register);
++    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
++                        rtas_ibm_nmi_interlock);
+ }
+ 
+ type_init(core_rtas_register_types)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 652a5514e8..f6f82d88aa 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -656,8 +656,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+ #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+ #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+ #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
++#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2B)
++#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2C)
+ 
+-#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
++#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2D)
+ 
+ /* RTAS ibm,get-system-parameter token values */
+ #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+-- 
+2.17.2
 
 
