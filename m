@@ -2,56 +2,101 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF082C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 06:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E66AC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 06:43:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 852CA20730
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 06:42:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 852CA20730
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0788D20730
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 06:43:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iudx1DaO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0788D20730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isLKZ-00050h-JP
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 01:42:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53872)
+	id 1isLLY-00074t-5n
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 01:43:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhukeqian1@huawei.com>) id 1isLJg-00040O-76
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:41:16 -0500
+ (envelope-from <philmd@redhat.com>) id 1isLKx-0006D0-4I
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:42:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhukeqian1@huawei.com>) id 1isLJc-0003SZ-Co
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:41:12 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:53562 helo=huawei.com)
+ (envelope-from <philmd@redhat.com>) id 1isLKw-0004Pc-5p
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:42:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37256
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhukeqian1@huawei.com>)
- id 1isLJT-0003Ju-Iz; Fri, 17 Jan 2020 01:40:59 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id A014D327BFE19E16D2E7;
- Fri, 17 Jan 2020 14:40:54 +0800 (CST)
-Received: from linux-TFkxOR.huawei.com (10.175.104.212) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 17 Jan 2020 14:40:46 +0800
-From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2] hw/arm: Adjust some coding styles about memory hotplug
-Date: Fri, 17 Jan 2020 14:38:22 +0800
-Message-ID: <20200117063822.57918-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.19.1
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1isLKw-0004P2-2E
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 01:42:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579243349;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cNh2iarTwW04r8WJLvqFdZ+tBa2yksb3g9CA+7+7gQ0=;
+ b=Iudx1DaOzrvpAea5acdIxE4DrgQ+EYmSPwYfx7LgLKgEo5bRIPhJBUYwqbkNFYz1wkn08L
+ o6xkKfeTzvf93V2M9pVCh1o1gAVUkhFqpOeCX8T8BEHY/CsFwpEePCC1SvRQbcROHyjN+5
+ BlGxglrvxGsD6UJYhKu0/6uA8drUw/0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-102-bjdK7SCoMECbABKVa3ap5A-1; Fri, 17 Jan 2020 01:42:28 -0500
+Received: by mail-wr1-f69.google.com with SMTP id 90so10092440wrq.6
+ for <qemu-devel@nongnu.org>; Thu, 16 Jan 2020 22:42:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+dEQQPJi6po0tnmAODXwZodY93cxaCQNnaOzieI1y7w=;
+ b=cYlkfgGraG1h8E8oIiau7Pi3YLolLWAzhVlL+IK19rGDDcSULrVd/y90CBNjch/Z0s
+ EBiikuNk3i1By7PBQOBfIT559dDSGqen5GIrOdMEdmTqvtqVcKn4cMw2zq5Sx90wZe8R
+ smIYcdwoVHDlWBxNbYyiYq8E+04szn8YgYueKp82Zi/TdYlo/yajVAjvTuYesLWHfmGW
+ CbVVeHLDC5PXnvUGTMvHTT5COBmmKr9MJYKUGMmX/nlbdAETk6FUE4/v207nsdPxesm5
+ 40f+ywqnnJJic5VykDGVMkV+u8tlR48rcDlFNYlAm9tOUnHbmLQkQsag7c5Ydu+kVsMV
+ Rifw==
+X-Gm-Message-State: APjAAAXOjtiZ2oC12yUXvbsexkqXOI7nswEbHdxTKxaB8fq7mx7w1fN7
+ IRzEzS2kmuoHDMStvXD+uGCAKrpHC2K8dO8cytTanA9nBtr6TJR22Rm4qEOWolUZGgGQjg+/b9C
+ nk+KQX7CpAg4Y9yg=
+X-Received: by 2002:a5d:4a91:: with SMTP id o17mr1281748wrq.232.1579243345678; 
+ Thu, 16 Jan 2020 22:42:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxHsz2C4fmT4EQWNmNVs8RQZu+oInSCVjhotLbabQhRYQu06mV6ceXEDOCmLbSfMCWqD8nwGg==
+X-Received: by 2002:a5d:4a91:: with SMTP id o17mr1281725wrq.232.1579243345418; 
+ Thu, 16 Jan 2020 22:42:25 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id b18sm33015548wru.50.2020.01.16.22.42.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 16 Jan 2020 22:42:24 -0800 (PST)
+Subject: Re: [PATCH 2/4] tests/tcg/aarch64: Fix compilation parameters for
+ pauth-%
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200116230809.19078-1-richard.henderson@linaro.org>
+ <20200116230809.19078-3-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <cbc8fdd9-ddc8-641d-2614-380ffab5d10f@redhat.com>
+Date: Fri, 17 Jan 2020 07:42:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.212]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200116230809.19078-3-richard.henderson@linaro.org>
+Content-Language: en-US
+X-MC-Unique: bjdK7SCoMECbABKVa3ap5A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,80 +108,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, qemu-arm@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, wanghaibin.wang@huawei.com,
- zhukeqian <zhukeqian1@huawei.com>
+Cc: peter.maydell@linaro.org, vincent.dehors@smile.fr, alex.bennee@linaro.org,
+ adrien.grassein@smile.fr
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: zhukeqian <zhukeqian1@huawei.com>
+On 1/17/20 12:08 AM, Richard Henderson wrote:
+> Hiding the required architecture within asm() is not correct.
+> Add it to the cflags of the (cross-) compiler.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>   tests/tcg/aarch64/pauth-1.c       | 2 --
+>   tests/tcg/aarch64/pauth-2.c       | 2 --
+>   tests/tcg/aarch64/Makefile.target | 1 +
+>   3 files changed, 1 insertion(+), 4 deletions(-)
+>=20
+> diff --git a/tests/tcg/aarch64/pauth-1.c b/tests/tcg/aarch64/pauth-1.c
+> index a3c1443cd0..ea0984ea82 100644
+> --- a/tests/tcg/aarch64/pauth-1.c
+> +++ b/tests/tcg/aarch64/pauth-1.c
+> @@ -2,8 +2,6 @@
+>   #include <sys/prctl.h>
+>   #include <stdio.h>
+>  =20
+> -asm(".arch armv8.4-a");
+> -
+>   #ifndef PR_PAC_RESET_KEYS
+>   #define PR_PAC_RESET_KEYS  54
+>   #define PR_PAC_APDAKEY     (1 << 2)
+> diff --git a/tests/tcg/aarch64/pauth-2.c b/tests/tcg/aarch64/pauth-2.c
+> index 2fe030ba3d..9bba0beb63 100644
+> --- a/tests/tcg/aarch64/pauth-2.c
+> +++ b/tests/tcg/aarch64/pauth-2.c
+> @@ -1,8 +1,6 @@
+>   #include <stdint.h>
+>   #include <assert.h>
+>  =20
+> -asm(".arch armv8.4-a");
+> -
+>   void do_test(uint64_t value)
+>   {
+>       uint64_t salt1, salt2;
+> diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefi=
+le.target
+> index df3fe8032c..374c8d6830 100644
+> --- a/tests/tcg/aarch64/Makefile.target
+> +++ b/tests/tcg/aarch64/Makefile.target
+> @@ -20,6 +20,7 @@ run-fcvt: fcvt
+>   # Pauth Tests
+>   AARCH64_TESTS +=3D pauth-1 pauth-2
+>   run-pauth-%: QEMU_OPTS +=3D -cpu max
+> +pauth-%: CFLAGS +=3D -march=3Darmv8.3-a
 
-There is extra indent in ACPI GED plug cb. And we can use
-existing helper function to trigger hotplug handler plug.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
-
-v1->v2:
- - Add Igor's R-b
-
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
----
- hw/acpi/generic_event_device.c | 2 +-
- hw/arm/virt.c                  | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_devic=
-e.c
-index 9cee90cc70..55eb29d80a 100644
---- a/hw/acpi/generic_event_device.c
-+++ b/hw/acpi/generic_event_device.c
-@@ -175,7 +175,7 @@ static void acpi_ged_device_plug_cb(HotplugHandler *h=
-otplug_dev,
-     AcpiGedState *s =3D ACPI_GED(hotplug_dev);
-=20
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp)=
-;
-+        acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
-     } else {
-         error_setg(errp, "virt: device plug request for unsupported devi=
-ce"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 39ab5f47e0..656b0081c2 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1934,7 +1934,6 @@ static void virt_memory_pre_plug(HotplugHandler *ho=
-tplug_dev, DeviceState *dev,
- static void virt_memory_plug(HotplugHandler *hotplug_dev,
-                              DeviceState *dev, Error **errp)
- {
--    HotplugHandlerClass *hhc;
-     VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-     Error *local_err =3D NULL;
-=20
-@@ -1943,8 +1942,9 @@ static void virt_memory_plug(HotplugHandler *hotplu=
-g_dev,
-         goto out;
-     }
-=20
--    hhc =3D HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
--    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &error_abort);
-+    hotplug_handler_plug(HOTPLUG_HANDLER(vms->acpi_dev),
-+                         dev, &error_abort);
-+
- out:
-     error_propagate(errp, local_err);
- }
---=20
-2.19.1
+>  =20
+>   # Semihosting smoke test for linux-user
+>   AARCH64_TESTS +=3D semihosting
+>=20
 
 
