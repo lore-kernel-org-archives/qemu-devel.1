@@ -2,84 +2,86 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E176DC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 923F8C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:26:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA29820842
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D46C206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:26:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GA+wgWj2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA29820842
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBW9OaN+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D46C206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isSTh-0000RM-Px
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:20:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55202)
+	id 1isSZf-0003NS-GZ
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:26:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1isSSe-0008IC-LM
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:18:58 -0500
+ (envelope-from <eblake@redhat.com>) id 1isSYj-0002jG-GU
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:25:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1isSSZ-0000rQ-OP
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:18:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51782
+ (envelope-from <eblake@redhat.com>) id 1isSYh-0004yG-JN
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:25:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44531
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1isSSZ-0000qg-LK
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:18:51 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1isSYh-0004xZ-Fc
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:25:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579270730;
+ s=mimecast20190719; t=1579271110;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=35qmtPvrRFjgXhduzB5j7ovXY4i2VhZtNdB1mTF6Ai0=;
- b=GA+wgWj2+fSji9XcSfz/1G924pHWBgasrYfzlLyGfaeSxM+4eozM/U0PgE9AEdCa+IrUnd
- laZ4+MZb7GydtKZ4NgV+OOlVagYgHsd0iVDEG9+KA/ZMlImnJtMKkVtD0fQn4rXHBoxJBb
- FrqhuGZuh0CuZy7FjUqpnh60VAq6eWs=
+ bh=8yNx0ZTf2K3z2aWImeXwFN8gQ+h7JLlcAwfIVJBV19w=;
+ b=UBW9OaN+G3F+eDJPFbTNeJ35j6t3F2wi26CndU/cXMG+kpdp9DPBoCSjAWTB6oHrr7IKS0
+ MjFcBuv72z4GPrQkhpdv4BacDqIQFoab3SxUkg69OSewOugeGMXB03WOacx0WhJDo8mS3a
+ VuCk2iERF+GD1bDs5PMQbT1AgV0ykho=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-YcGS1C0wO0yiTAf5oWf2oQ-1; Fri, 17 Jan 2020 09:18:47 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-175-UWirfdaMNpKL8xt8P9glKg-1; Fri, 17 Jan 2020 09:25:06 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 401741800D48;
- Fri, 17 Jan 2020 14:18:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60FBA800591;
+ Fri, 17 Jan 2020 14:25:04 +0000 (UTC)
 Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9174119481;
- Fri, 17 Jan 2020 14:18:36 +0000 (UTC)
-Subject: Re: [PATCH v6 02/11] error: auto propagated local_err
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A1AB56609E;
+ Fri, 17 Jan 2020 14:24:55 +0000 (UTC)
+Subject: Re: [PATCH v6 03/11] scripts: add coccinelle script to use auto
+ propagated errp
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
- <20200110194158.14190-3-vsementsov@virtuozzo.com>
+ <20200110194158.14190-4-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <d15df303-7152-d1e6-47b4-4a4c7d68ccf3@redhat.com>
-Date: Fri, 17 Jan 2020 08:18:35 -0600
+Message-ID: <4e41cb43-4efb-9cc9-c685-d25e4ddf8fbb@redhat.com>
+Date: Fri, 17 Jan 2020 08:24:55 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200110194158.14190-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20200110194158.14190-4-vsementsov@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: YcGS1C0wO0yiTAf5oWf2oQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: UWirfdaMNpKL8xt8P9glKg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,133 +107,84 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 1/10/20 1:41 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
-> functions with errp OUT parameter.
-
-s/with/with an/
-
-> 
-> It has three goals:
-> 
-> 1. Fix issue with error_fatal & error_prepend/error_append_hint: user
-
-maybe s/&/and/ so it doesn't look like the C & operator.
-
-> can't see this additional information, because exit() happens in
-> error_setg earlier than information is added. [Reported by Greg Kurz]
-> 
-> 2. Fix issue with error_abort & error_propagate: when we wrap
-
-and again
-
-> error_abort by local_err+error_propagate, resulting coredump will
-
-s/,/, the/
-
-> refer to error_propagate and not to the place where error happened.
-> (the macro itself doesn't fix the issue, but it allows to [3.] drop all
-
-s/allows/allows us/
-s/all/the/
-
-> local_err+error_propagate pattern, which will definitely fix the issue)
-> [Reported by Kevin Wolf]
-> 
-> 3. Drop local_err+error_propagate pattern, which is used to workaround
-> void functions with errp parameter, when caller wants to know resulting
-> status. (Note: actually these functions could be merely updated to
-> return int error code).
-> 
-> To achieve these goals, we need to add invocation of the macro at start
-> of functions, which needs error_prepend/error_append_hint (1.); add
-> invocation of the macro at start of functions which do
-> local_err+error_propagate scenario the check errors, drop local errors
-> from them and just use *errp instead (2., 3.).
-
-To achieve these goals, later patches will add invocations of this macro 
-at the start of functions with either use 
-error_prepend/error_append_hint (solving 1) or which use 
-local_err+error_propagate to check errors, switching those functions to 
-use *errp instead (solving 2 and 3).
-
-> 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-> 
 
-> - * Receive an error and pass it on to the caller:
-> + * Receive an error and pass it on to the caller (DEPRECATED*):
->    *     Error *err = NULL;
->    *     foo(arg, &err);
->    *     if (err) {
-> @@ -98,6 +98,50 @@
->    *     foo(arg, errp);
->    * for readability.
+Rather light on the commit message. If nothing else, a comment about 
+typical command-line usage would be helpful (yes, it's in the patch 
+body, but sometimes I just refer to git log).
+
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index 532b9afb9e..dcfb77e107 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -141,6 +141,9 @@
+>    *         ...
+>    *     }
 >    *
-> + * DEPRECATED* This pattern is deprecated now, use ERRP_AUTO_PROPAGATE macro
-
-s/use/use the/
-
-> + * instead (defined below).
-> + * It's deprecated because of two things:
+> + * For mass conversion use script
+> + *   scripts/coccinelle/auto-propagated-errp.cocci
 > + *
-> + * 1. Issue with error_abort & error_propagate: when we wrap error_abort by
+>    *
+>    * Receive and accumulate multiple errors (first one wins):
+>    *     Error *err = NULL, *local_err = NULL;
+> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/coccinelle/auto-propagated-errp.cocci
+> new file mode 100644
+> index 0000000000..6c72a5049f
+> --- /dev/null
+> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
+> @@ -0,0 +1,139 @@
+> +// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
+> +//
 
-s/&/and/
-
-> + * local_err+error_propagate, resulting coredump will refer to error_propagate
-
-s/,/, the/
-
-> + * and not to the place where error happened.
-> + *
-> + * 2. A lot of extra code of the same pattern
-> + *
-
-> +/*
-> + * ERRP_AUTO_PROPAGATE
-> + *
-> + * This macro is created to be the first line of a function which use
-> + * Error **errp parameter to report error. It's needed only in cases where we
-> + * want to use error_prepend, error_append_hint or dereference *errp. It's
-> + * still safe (but useless) in other cases.
-
-It doesn't _have_ to be the first line to compile (we require C99+ 
-compilers, which allow declarations after statements); but rather 
-because it makes it easier for our Coccinelle conversion script to catch 
-outliers.  But I think this text is okay, without calling out that extra 
-information (maybe the commit message should mention it, though).
-
-> + *
-> + * If errp is NULL or points to error_fatal, it is rewritten to point to a
-> + * local Error object, which will be automatically propagated to the original
-> + * errp on function exit (see error_propagator_cleanup).
-> + *
-> + * After invocation of this macro it is always safe to dereference errp
-> + * (as it's not NULL anymore) and to add information (by error_prepend or
-> + * error_append_hint)
-> + * (as, if it was error_fatal, we swapped it with a local_error to be
-> + * propagated on cleanup).
-
-double () () looks odd, as does the mid-sentence newline.
-
-> + *
-> + * Note: we don't wrap the error_abort case, as we want resulting coredump
-> + * to point to the place where the error happened, not to error_propagate.
-> + */
-> +#define ERRP_AUTO_PROPAGATE()                                  \
-> +    g_auto(ErrorPropagator) _auto_errp_prop = {.errp = errp};  \
-> +    errp = ((errp == NULL || *errp == error_fatal)             \
-> +            ? &_auto_errp_prop.local_err : errp)
+> +// Usage example:
+> +// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+> +//  --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
+> +//  blockdev-nbd.c qemu-nbd.c {block/nbd*,nbd/*,include/block/nbd*}.[hc]
 > +
->   /*
->    * Special error destination to abort on error.
->    * See error_setg() and error_propagate() for details.
-> 
+> +@@
+> +// Add invocation to errp-functions where necessary
+> +// We should skip functions with "Error *const *errp"
+> +// parameter, but how to do it with coccinelle?
+> +// I don't know, so, I skip them by function name regex.
+> +// It's safe: if we not skip some functions with
 
-The macro itself is fine, my comments are solely on the commit message 
-and comments.  Depending on how much cleanup Markus is willing to do 
-rather than require a respin, you can add:
+s/not/did not/
+
+> +// "Error *const *errp", ERRP_AUTO_PROPAGATE invocation
+> +// will fail to compile, because of const violation.
+> +identifier fn !~ "error_append_.*_hint";
+> +identifier local_err, errp;
+> +@@
+> +
+> + fn(..., Error **errp, ...)
+> + {
+> ++   ERRP_AUTO_PROPAGATE();
+> +    <+...
+> +        when != ERRP_AUTO_PROPAGATE();
+> +(
+> +    error_append_hint(errp, ...);
+> +|
+> +    error_prepend(errp, ...);
+> +|
+> +    Error *local_err = NULL;
+> +)
+> +    ...+>
+> + }
+> +
+
+Looks like it should catch all functions that require adding the macro.
+
+> +@rule1@
+> +// We do not inherit from previous rule, as we want to match
+> +// also functions, which already had ERRP_AUTO_PROPAGATE
+> +// invocation.
+
+Grammar suggestion:
+
+// We want to patch error propagation in functions regardless of
+// whether the function already uses ERRP_AUTO_PROPAGATE, hence
+// this one does not inherit from the first rule.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
