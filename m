@@ -6,91 +6,92 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A9BC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF58C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:41:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D77820842
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:41:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D77820842
+	by mail.kernel.org (Postfix) with ESMTPS id 15F0620730
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:41:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15F0620730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isO7z-00009K-9X
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:41:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49473)
+	id 1isO8X-00010l-Cq
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:41:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49650)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1isO67-0006vD-Ld
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:27 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1isO6b-0007WV-Oe
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1isO64-0006wZ-6B
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4974)
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1isO6Y-0007QV-3r
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:53 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35598
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1isO63-0006vj-Ub
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:20 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00H9b8i3056777
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:18 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xk0qsxsmy-1
+ id 1isO6X-0007Pm-Vm
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:50 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00H9b5M5159210
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:49 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2xk0qrpwgx-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:18 -0500
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:49 -0500
 Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Fri, 17 Jan 2020 09:39:16 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Fri, 17 Jan 2020 09:39:47 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 17 Jan 2020 09:39:12 -0000
+ Fri, 17 Jan 2020 09:39:44 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
  [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 00H9dBNp37028226
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00H9dhNu43909314
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 17 Jan 2020 09:39:11 GMT
+ Fri, 17 Jan 2020 09:39:43 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7714AAE045;
- Fri, 17 Jan 2020 09:39:11 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 5A31CAE057;
+ Fri, 17 Jan 2020 09:39:43 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E6089AE055;
- Fri, 17 Jan 2020 09:39:09 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CCF9DAE045;
+ Fri, 17 Jan 2020 09:39:41 +0000 (GMT)
 Received: from localhost.in.ibm.com (unknown [9.124.35.97])
  by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 17 Jan 2020 09:39:09 +0000 (GMT)
+ Fri, 17 Jan 2020 09:39:41 +0000 (GMT)
 From: Ganesh Goudar <ganeshgr@linux.ibm.com>
 To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
  david@gibson.dropbear.id.au
-Subject: [PATCH v20 1/7] Wrapper function to wait on condition for the main
- loop mutex
-Date: Fri, 17 Jan 2020 15:08:49 +0530
+Subject: [PATCH v20 6/7] migration: Include migration support for machine
+ check handling
+Date: Fri, 17 Jan 2020 15:08:54 +0530
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
 References: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 20011709-0016-0000-0000-000002DE32F9
+x-cbid: 20011709-0012-0000-0000-0000037E33B2
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011709-0017-0000-0000-00003340CE2C
-Message-Id: <20200117093855.19074-2-ganeshgr@linux.ibm.com>
+x-cbparentid: 20011709-0013-0000-0000-000021BA69FC
+Message-Id: <20200117093855.19074-7-ganeshgr@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-01-17_02:2020-01-16,
  2020-01-17 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 suspectscore=0 mlxlogscore=788
- impostorscore=0 adultscore=0 mlxscore=0 priorityscore=1501 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
+ priorityscore=1501 suspectscore=0 impostorscore=0 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-2001170074
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,56 +111,183 @@ Sender: "Qemu-devel"
 
 From: Aravinda Prasad <arawinda.p@gmail.com>
 
-Introduce a wrapper function to wait on condition for
-the main loop mutex. This function atomically releases
-the main loop mutex and causes the calling thread to
-block on the condition. This wrapper is required because
-qemu_global_mutex is a static variable.
+This patch includes migration support for machine check
+handling. Especially this patch blocks VM migration
+requests until the machine check error handling is
+complete as these errors are specific to the source
+hardware and is irrelevant on the target hardware.
 
 Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+[Do not set FWNMI cap in post_load, now its done in .apply hook]
 Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- cpus.c                   | 5 +++++
- include/qemu/main-loop.h | 8 ++++++++
- 2 files changed, 13 insertions(+)
+ hw/ppc/spapr.c         | 47 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_events.c  | 16 +++++++++++++-
+ hw/ppc/spapr_rtas.c    |  2 ++
+ include/hw/ppc/spapr.h |  2 ++
+ 4 files changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/cpus.c b/cpus.c
-index be2d655f37..c06a2ad20b 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1839,6 +1839,11 @@ void qemu_mutex_unlock_iothread(void)
-     qemu_mutex_unlock(&qemu_global_mutex);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 46bac1a83c..c8bc2fa9f3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -46,6 +46,7 @@
+ #include "migration/qemu-file-types.h"
+ #include "migration/global_state.h"
+ #include "migration/register.h"
++#include "migration/blocker.h"
+ #include "mmu-hash64.h"
+ #include "mmu-book3s-v3.h"
+ #include "cpu-models.h"
+@@ -1683,6 +1684,8 @@ static void spapr_machine_reset(MachineState *machine)
+ 
+     /* Signal all vCPUs waiting on this condition */
+     qemu_cond_broadcast(&spapr->mc_delivery_cond);
++
++    migrate_del_blocker(spapr->fwnmi_migration_blocker);
  }
  
-+void qemu_cond_wait_iothread(QemuCond *cond)
+ static void spapr_create_nvram(SpaprMachineState *spapr)
+@@ -1965,6 +1968,42 @@ static const VMStateDescription vmstate_spapr_dtb = {
+     },
+ };
+ 
++static bool spapr_fwnmi_needed(void *opaque)
 +{
-+    qemu_cond_wait(cond, &qemu_global_mutex);
++    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
++
++    return spapr->guest_machine_check_addr != -1;
 +}
 +
- static bool all_vcpus_paused(void)
- {
-     CPUState *cpu;
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index f6ba78ea73..a6d20b0719 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -295,6 +295,14 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line);
-  */
- void qemu_mutex_unlock_iothread(void);
- 
-+/*
-+ * qemu_cond_wait_iothread: Wait on condition for the main loop mutex
-+ *
-+ * This function atomically releases the main loop mutex and causes
-+ * the calling thread to block on the condition.
-+ */
-+void qemu_cond_wait_iothread(QemuCond *cond);
++static int spapr_fwnmi_pre_save(void *opaque)
++{
++    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
 +
- /* internal interfaces */
++    /*
++     * Check if machine check handling is in progress and print a
++     * warning message.
++     */
++    if (spapr->mc_status != -1) {
++        warn_report("A machine check is being handled during migration. The"
++                "handler may run and log hardware error on the destination");
++    }
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_spapr_machine_check = {
++    .name = "spapr_machine_check",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_fwnmi_needed,
++    .pre_save = spapr_fwnmi_pre_save,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
++        VMSTATE_INT32(mc_status, SpaprMachineState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static const VMStateDescription vmstate_spapr = {
+     .name = "spapr",
+     .version_id = 3,
+@@ -1999,6 +2038,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_cap_large_decr,
+         &vmstate_spapr_cap_ccf_assist,
+         &vmstate_spapr_cap_fwnmi,
++        &vmstate_spapr_machine_check,
+         NULL
+     }
+ };
+@@ -2814,6 +2854,13 @@ static void spapr_machine_init(MachineState *machine)
+         spapr_create_lmb_dr_connectors(spapr);
+     }
  
- void qemu_fd_register(int fd);
++    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_ON) {
++        /* Create the error string for live migration blocker */
++        error_setg(&spapr->fwnmi_migration_blocker,
++            "A machine check is being handled during migration. The handler"
++            "may run and log hardware error on the destination");
++    }
++
+     /* Set up RTAS event infrastructure */
+     spapr_events_init(spapr);
+ 
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 54eaf28a9e..884e455f02 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -43,6 +43,7 @@
+ #include "qemu/main-loop.h"
+ #include "hw/ppc/spapr_ovec.h"
+ #include <libfdt.h>
++#include "migration/blocker.h"
+ 
+ #define RTAS_LOG_VERSION_MASK                   0xff000000
+ #define   RTAS_LOG_VERSION_6                    0x06000000
+@@ -843,6 +844,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+ {
+     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     CPUState *cs = CPU(cpu);
++    int ret;
++    Error *local_err = NULL;
+ 
+     if (spapr->guest_machine_check_addr == -1) {
+         /*
+@@ -872,8 +875,19 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+             return;
+         }
+     }
+-    spapr->mc_status = cpu->vcpu_id;
+ 
++    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
++    if (ret == -EBUSY) {
++        /*
++         * We don't want to abort so we let the migration to continue.
++         * In a rare case, the machine check handler will run on the target.
++         * Though this is not preferable, it is better than aborting
++         * the migration or killing the VM.
++         */
++        warn_report("Received a fwnmi while migration was in progress");
++    }
++
++    spapr->mc_status = cpu->vcpu_id;
+     spapr_mce_dispatch_elog(cpu, recovered);
+ }
+ 
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 3f162d82f5..4ce8e48d2a 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -50,6 +50,7 @@
+ #include "hw/ppc/fdt.h"
+ #include "target/ppc/mmu-hash64.h"
+ #include "target/ppc/mmu-book3s-v3.h"
++#include "migration/blocker.h"
+ 
+ static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                                    uint32_t token, uint32_t nargs,
+@@ -453,6 +454,7 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+     spapr->mc_status = -1;
+     qemu_cond_signal(&spapr->mc_delivery_cond);
+     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
++    migrate_del_blocker(spapr->fwnmi_migration_blocker);
+ }
+ 
+ static struct rtas_call {
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f6f82d88aa..a1fba95c82 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -218,6 +218,8 @@ struct SpaprMachineState {
+ 
+     unsigned gpu_numa_id;
+     SpaprTpmProxy *tpm_proxy;
++
++    Error *fwnmi_migration_blocker;
+ };
+ 
+ #define H_SUCCESS         0
 -- 
 2.17.2
 
