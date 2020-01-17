@@ -2,97 +2,88 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11570C33C9E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 03:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A38AC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 05:46:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D11C620684
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 03:51:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14FE4206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 05:46:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="VENaEz4H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11C620684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JttnSgAk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14FE4206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isIfg-00066K-Vm
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 22:51:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32811)
+	id 1isKSP-0006nQ-7z
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 00:46:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty@apple.com>) id 1isIf3-0005fy-Ov
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 22:51:07 -0500
+ (envelope-from <armbru@redhat.com>) id 1isKRO-0006A9-S6
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 00:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty@apple.com>) id 1isIf2-0001et-Ae
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 22:51:05 -0500
-Received: from ma1-aaemail-dr-lapp02.apple.com ([17.171.2.68]:36008)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dirty@apple.com>) id 1isIf2-0001bE-2W
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 22:51:04 -0500
-Received: from pps.filterd (ma1-aaemail-dr-lapp02.apple.com [127.0.0.1])
- by ma1-aaemail-dr-lapp02.apple.com (8.16.0.27/8.16.0.27) with SMTP id
- 00H3l1um034979; Thu, 16 Jan 2020 19:51:02 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=sender : from : to :
- cc : subject : date : message-id : mime-version :
- content-transfer-encoding; s=20180706;
- bh=ysTX6Ekj3TXjwkEhy4GXIR9bRZ+TBaG8togQR/xp6qo=;
- b=VENaEz4HV0Hh6a1fWakM7J7HMBjGzHQzzZJNv0n9kjoBRPG+ftU8Z9NxAn7c8Kh/ocPn
- rLF9aUsbprI8wFLO3LV338hMN/9X2JZfRv2uvXtYsq9R57AnJ+e46y9DvLJVKGxwC4k2
- hMjAZZL11NXC9JsmAZphT2N6J4ThUYkq/cA/UWxb2K+fSc1H+fN3haqeLzcsHRxzm3SQ
- bYc3Pdp3DQ6IrcVumH0YPR2iUn1ithwPPirSu+NfSKWkNT1SgUZ3LR7A6xFprGuh9SSh
- jWNRPeBv/SBAfPd9X9Gm7/q3k6IgucsZ4ELFi4sT5CpRA9LezpYT1ekxslfMMXkmiKiB Lg== 
-Received: from mr2-mtap-s02.rno.apple.com (mr2-mtap-s02.rno.apple.com
- [17.179.226.134])
- by ma1-aaemail-dr-lapp02.apple.com with ESMTP id 2xfbwyt3ak-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Thu, 16 Jan 2020 19:51:02 -0800
-Received: from nwk-mmpp-sz09.apple.com
- (nwk-mmpp-sz09.apple.com [17.128.115.80]) by mr2-mtap-s02.rno.apple.com
- (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) with ESMTPS id <0Q4800GMZG11RY00@mr2-mtap-s02.rno.apple.com>; Thu,
- 16 Jan 2020 19:51:01 -0800 (PST)
-Received: from process_milters-daemon.nwk-mmpp-sz09.apple.com by
- nwk-mmpp-sz09.apple.com
- (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) id <0Q4800K00FPA4400@nwk-mmpp-sz09.apple.com>; Thu,
- 16 Jan 2020 19:51:01 -0800 (PST)
-X-Va-A: 
-X-Va-T-CD: c56cc4374afe9162bf6a337f3d661529
-X-Va-E-CD: 99bdbdec4301a27ac1e175977a8bf22e
-X-Va-R-CD: f8563a530fcb0f46f1d9cbaba620e3ac
-X-Va-CD: 0
-X-Va-ID: 59a1635c-034d-4505-9732-fad6544c7c9b
-X-V-A: 
-X-V-T-CD: c56cc4374afe9162bf6a337f3d661529
-X-V-E-CD: 99bdbdec4301a27ac1e175977a8bf22e
-X-V-R-CD: f8563a530fcb0f46f1d9cbaba620e3ac
-X-V-CD: 0
-X-V-ID: 6d42505b-3fa0-4094-9881-21d892bc15aa
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,,
- definitions=2020-01-16_06:,, signatures=0
-Received: from pontoon.com (unknown [17.234.88.206]) by nwk-mmpp-sz09.apple.com
- (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) with ESMTPSA id <0Q4800JHHG0Y7Q70@nwk-mmpp-sz09.apple.com>; Thu,
- 16 Jan 2020 19:50:59 -0800 (PST)
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
-Subject: [PATCH v1] vnc: fix VNC artifacts
-Date: Thu, 16 Jan 2020 19:50:58 -0800
-Message-id: <7cb1f22ef8d575238c84f091f03dee8e7fedb78d.1579232679.git.dirty@apple.com>
-X-Mailer: git-send-email 2.24.0
-MIME-version: 1.0
-Content-transfer-encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2020-01-16_06:, , signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 17.171.2.68
+ (envelope-from <armbru@redhat.com>) id 1isKRN-00029b-21
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 00:45:06 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33002
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1isKRM-00026U-VD
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 00:45:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579239903;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9NcNAvW0lJFuobri0ZOzkDoU6+9IqehkDDs0SJk5woo=;
+ b=JttnSgAkOkn3qxxksX58eNv7vr2ypmxB8Cv6xMfkd1kq14kmzhoE+/+LRPtA5lcpM4kee8
+ t5E6I3nkKWPq5jOiWsy4ZQGS+DROXnG6REPbGOMPMvCryZQkHvcnRXMj5MpudTUDWN7R8D
+ Nq5Zzog/EADcLQGO4CvFQjz4j6diOs8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-jAPs7XkvNw-znsmRhMsjzg-1; Fri, 17 Jan 2020 00:44:59 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C5CF8010C8;
+ Fri, 17 Jan 2020 05:44:58 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BA5684346;
+ Fri, 17 Jan 2020 05:44:55 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C52821138600; Fri, 17 Jan 2020 06:44:53 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v3 4/4] block: Mark 'block_resize' as coroutine
+References: <20200115122326.26393-1-kwolf@redhat.com>
+ <20200115122326.26393-5-kwolf@redhat.com>
+ <87tv4vzqd7.fsf@dusky.pond.sub.org>
+ <20200116101333.GA9470@linux.fritz.box>
+ <875zhbtox2.fsf@dusky.pond.sub.org>
+ <20200116152312.GI9470@linux.fritz.box>
+Date: Fri, 17 Jan 2020 06:44:53 +0100
+In-Reply-To: <20200116152312.GI9470@linux.fritz.box> (Kevin Wolf's message of
+ "Thu, 16 Jan 2020 16:23:12 +0100")
+Message-ID: <871rryr60a.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: jAPs7XkvNw-znsmRhMsjzg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,105 +95,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Cameron Esfahani <dirty@apple.com>
-From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-Remove VNC optimization to reencode framebuffer update as raw if it's
-smaller than the default encoding.  QEMU's implementation was naive and
-didn't account for the ZLIB z_stream mutating with each compression.  Just
-saving and restoring the output buffer offset wasn't sufficient to "rewind"
-the previous encoding.  Considering that ZRLE is never larger than raw and
-even though ZLIB can occasionally be fractionally larger than raw, the
-overhead of implementing this optimization correctly isn't worth it.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-In my investigation, ZRLE always compresses better than ZLIB so
-prioritize ZRLE over ZLIB, even if the client hints that ZLIB is
-preferred.
+> Am 16.01.2020 um 16:13 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>>=20
+>> > Am 16.01.2020 um 10:45 hat Markus Armbruster geschrieben:
+>> >> Kevin Wolf <kwolf@redhat.com> writes:
+>> >> > block_resize is safe to run in a coroutine, so use it as an example=
+ for
+>> >> > the new 'coroutine': true annotation in the QAPI schema.
+>> >> >
+>> >> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> >> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> >
+>> >> > diff --git a/blockdev.c b/blockdev.c
+>> >> > index 8e029e9c01..b5e5d1e072 100644
+>> >> > --- a/blockdev.c
+>> >> > +++ b/blockdev.c
+>> >> > @@ -3161,9 +3161,9 @@ void hmp_drive_del(Monitor *mon, const QDict =
+*qdict)
+>> >> >      aio_context_release(aio_context);
+>> >> >  }
+>> >> > =20
+>> >> > -void qmp_block_resize(bool has_device, const char *device,
+>> >> > -                      bool has_node_name, const char *node_name,
+>> >> > -                      int64_t size, Error **errp)
+>> >> > +void coroutine_fn qmp_block_resize(bool has_device, const char *de=
+vice,
+>> >> > +                                   bool has_node_name, const char =
+*node_name,
+>> >> > +                                   int64_t size, Error **errp)
+>> >> >  {
+>> >> >      Error *local_err =3D NULL;
+>> >> >      BlockBackend *blk =3D NULL;
+>> >>=20
+>> >> Pardon my ignorant question: what exactly makes a function a
+>> >> coroutine_fn?
+>> >
+>> > When Stefan requested adding the coroutine_fn marker, it seemed to mak=
+e
+>> > sense to me because the QMP dispatcher will always call it from
+>> > coroutine context now, and being always run in coroutine context makes=
+ a
+>> > function a coroutine_fn.
+>> >
+>> > However, it's also called from hmp_block_resize(), so at least for now
+>> > coroutine_fn is actually wrong.
+>>=20
+>> This answers the question when we mark a function a coroutine_fn.  I
+>> meant to ask what conditions the function itself must satisfy to be
+>> eligible for this mark.
+>
+> The requirement is actually not about the function itself, it's about
+> the callers, as stated above.
+>
+> But being a coroutine_fn allows the function to call other functions
+> that only work in coroutine context (other coroutine_fns). In the end
+> the reason why a function only works in coroutine context is usually
+> that it (or any other coroutine_fns called by it) could yield, which
+> obviously doesn't work outside of coroutine contest.
 
-Fixes: <de3f7de7f4e257> ("vnc: allow fall back to RAW encoding")
-Signed-off-by: Cameron Esfahani <dirty@apple.com>
----
- ui/vnc-enc-zrle.c |  4 ++--
- ui/vnc.c          | 30 +++++++++++-------------------
- 2 files changed, 13 insertions(+), 21 deletions(-)
+Thanks.
 
-diff --git a/ui/vnc-enc-zrle.c b/ui/vnc-enc-zrle.c
-index 17fd28a2e2..b4f71e32cf 100644
---- a/ui/vnc-enc-zrle.c
-+++ b/ui/vnc-enc-zrle.c
-@@ -98,8 +98,8 @@ static int zrle_compress_data(VncState *vs, int level)
-     /* set pointers */
-     zstream->next_in = vs->zrle->zrle.buffer;
-     zstream->avail_in = vs->zrle->zrle.offset;
--    zstream->next_out = vs->zrle->zlib.buffer + vs->zrle->zlib.offset;
--    zstream->avail_out = vs->zrle->zlib.capacity - vs->zrle->zlib.offset;
-+    zstream->next_out = vs->zrle->zlib.buffer;
-+    zstream->avail_out = vs->zrle->zlib.capacity;
-     zstream->data_type = Z_BINARY;
- 
-     /* start encoding */
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 4100d6e404..f085e1b747 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -898,8 +898,6 @@ int vnc_raw_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
- int vnc_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
- {
-     int n = 0;
--    bool encode_raw = false;
--    size_t saved_offs = vs->output.offset;
- 
-     switch(vs->vnc_encoding) {
-         case VNC_ENCODING_ZLIB:
-@@ -922,24 +920,11 @@ int vnc_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
-             n = vnc_zywrle_send_framebuffer_update(vs, x, y, w, h);
-             break;
-         default:
--            encode_raw = true;
-+            vnc_framebuffer_update(vs, x, y, w, h, VNC_ENCODING_RAW);
-+            n = vnc_raw_send_framebuffer_update(vs, x, y, w, h);
-             break;
-     }
- 
--    /* If the client has the same pixel format as our internal buffer and
--     * a RAW encoding would need less space fall back to RAW encoding to
--     * save bandwidth and processing power in the client. */
--    if (!encode_raw && vs->write_pixels == vnc_write_pixels_copy &&
--        12 + h * w * VNC_SERVER_FB_BYTES <= (vs->output.offset - saved_offs)) {
--        vs->output.offset = saved_offs;
--        encode_raw = true;
--    }
--
--    if (encode_raw) {
--        vnc_framebuffer_update(vs, x, y, w, h, VNC_ENCODING_RAW);
--        n = vnc_raw_send_framebuffer_update(vs, x, y, w, h);
--    }
--
-     return n;
- }
- 
-@@ -2087,8 +2072,15 @@ static void set_encodings(VncState *vs, int32_t *encodings, size_t n_encodings)
-             break;
- #endif
-         case VNC_ENCODING_ZLIB:
--            vs->features |= VNC_FEATURE_ZLIB_MASK;
--            vs->vnc_encoding = enc;
-+            /*
-+             * VNC_ENCODING_ZRLE compresses better than VNC_ENCODING_ZLIB.
-+             * So prioritize ZRLE, even if the client hints that it prefers
-+             * ZLIB.
-+             */
-+            if ((vs->features & VNC_FEATURE_ZRLE_MASK) == 0) {
-+                vs->features |= VNC_FEATURE_ZLIB_MASK;
-+                vs->vnc_encoding = enc;
-+            }
-             break;
-         case VNC_ENCODING_ZRLE:
-             vs->features |= VNC_FEATURE_ZRLE_MASK;
--- 
-2.24.0
+I think "being always run in coroutine context makes a function a
+coroutine_fn" is inaccurate.  It's "calling a coroutine_fn without
+switching to coroutine context first when not already in coroutine
+context".  The induction terminates at basic coroutine_fn like
+qemu_coroutine_yield().
+
+Pertinent:
+
+    /**
+     * Return whether or not currently inside a coroutine
+     *
+     * This can be used to write functions that work both when in coroutine=
+ context
+     * and when not in coroutine context.  Note that such functions cannot =
+use the
+     * coroutine_fn annotation since they work outside coroutine context.
+     */
+    bool qemu_in_coroutine(void);
+
+For qmp_block_resize(), it's used like this, in bdrv_truncate():
+
+    if (qemu_in_coroutine()) {
+        /* Fast-path if already in coroutine context */
+        bdrv_truncate_co_entry(&tco);
+    } else {
+        co =3D qemu_coroutine_create(bdrv_truncate_co_entry, &tco);
+        bdrv_coroutine_enter(child->bs, co);
+        BDRV_POLL_WHILE(child->bs, tco.ret =3D=3D NOT_DONE);
+    }
+
+where bdrv_truncate_co_entry() is a coroutine_fn.
 
 
