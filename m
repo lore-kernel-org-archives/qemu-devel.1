@@ -2,62 +2,146 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A701C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 603B7C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DE2820842
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:52:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DE2820842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2B85C2064C
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 15:54:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="NlP12gS3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B85C2064C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isTvK-0002MJ-H6
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 10:52:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40040)
+	id 1isTxG-0003YU-Qo
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 10:54:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1isTuP-0001Sj-B4
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:51:44 -0500
+ (envelope-from <deller@gmx.de>) id 1isTsU-0007yC-Jg
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:49:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1isTuL-0002ZW-Ll
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:51:41 -0500
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:49729)
+ (envelope-from <deller@gmx.de>) id 1isTsT-00010Y-39
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:49:42 -0500
+Received: from mout.gmx.net ([212.227.17.20]:38223)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1isTuL-0002Yg-EF
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:51:37 -0500
-Received: from player787.ha.ovh.net (unknown [10.108.35.110])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 9D0E28CE83
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 16:51:35 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id 64B5DE86F5D8;
- Fri, 17 Jan 2020 15:51:31 +0000 (UTC)
-Date: Fri, 17 Jan 2020 16:51:29 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v3 05/11] tests/virtio-9p: added readdir test
-Message-ID: <20200117165129.064fbb30@bahia.lan>
-In-Reply-To: <d48e21f83d8a8c766368190e872c7b72a5f7e881.1578957500.git.qemu_oss@crudebyte.com>
-References: <cover.1578957500.git.qemu_oss@crudebyte.com>
- <d48e21f83d8a8c766368190e872c7b72a5f7e881.1578957500.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1isTsS-0000uM-LL
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 10:49:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1579276174;
+ bh=2SUcImC9l/i24s+gkMXJYCZ/XZPC584l/C9I5BKCvMM=;
+ h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+ b=NlP12gS31MoeekC5engTzNVPLqTQrJb+0snkosvxvMdA+X4FC32SLBgSh3ZmkGbxc
+ jh/wOOJTySChxW8iWbA7YED7JsOKBXWdNaCYdenNr6yJMiuA1Dflz7Tncn2PX7S+3d
+ qwN+aX2TnxZU/8XVUtZi91tFIxZ95HplxIji/jhI=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [10.20.71.116] ([193.16.224.4]) by mail.gmx.com (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MGhuU-1ioe8S1wDi-00DrXR; Fri, 17
+ Jan 2020 16:49:34 +0100
+Subject: Re: [PATCH] target/hppa: Allow, but diagnose, LDCW aligned only mod 4
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200117015322.12953-1-richard.henderson@linaro.org>
+From: Helge Deller <deller@gmx.de>
+Autocrypt: addr=deller@gmx.de; keydata=
+ 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
+ c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
+Message-ID: <7b14c840-0d3f-0c67-06be-81b058c727fb@gmx.de>
+Date: Fri, 17 Jan 2020 16:49:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 15566410639475579200
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdejgdekudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+In-Reply-To: <20200117015322.12953-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:B5rov7XRMpttgCvEzppnvb1QJT+jlABY2wrXdleQqgLCawDpVn9
+ krqTglHu0TE9JqTKqyp5GzKVTYgnNCB7oBHV1e0wzp31IP5u8QvKLqZoucrMYeESX10BRz4
+ J+7g8n/A1Nti84N65ItuQ44hlfyYwDWq19fL2aYEnJWYfijy96Q18XvBt9mYrI4LPWYkd3B
+ wThNsOTA0+RChXANRFPlw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0tcmzAFIx00=:F8UTv5fPGxiF74u5nFd9LH
+ wWsRn33WuuZ/tLhm/Z+ws7aDz9J9+Q9BQwnElvLKetF9NnRhtKpIoP57t3SDiSqtp1mxXr2DO
+ nuCRFHe3E5guApkU0hkvRkg61UufX0PwtbJCLni5Ox4DhKVAWDcyVrplpv9A4RFNJFJ1xGd8Q
+ mrVwIt6jO+S0/CdTUem8S+ZpN8jZlGoY1UrOV7KAwlI8tetspSzFsxAsHZy9QX5pYZ+A4MUhl
+ KY/hysHLVwqNLd/b3yg2palOD/wa2r6kTVvLxylPQkv4bsY6jhBjZSFx8thkijBM7i5Ih4gcI
+ pPIRRvK5lVdXmTZ4vxr5oo5A1imm3LFh1UJqHRMRr3s2hpicBP6Lk1hVtox/PDrdhxRdeAja0
+ naTXbXHg6NIep7xdADVVbW/Uu9EyLtMSkdAF+aDahepeo203p0/GTzWLtog8YxOeig3B0+jRN
+ mRxRZw8Gus9WEENl0rsa+6ofjTyaYBx3ZFT+69BjdYaTSp4HARKPl23Q00jwd0of+wwlKiHpY
+ Lq9nLyzPXneZNz5vaCNFXJI+MVlu8Jfxgd57CFdiXnFpcdqApHyqgz/NVLauipGrXb2fpbDmN
+ VwbT4d1VeJhDXfWFiYL9gHlVbh5BSjIYEJIAi1coV7l8NuafkDXxna6D6E2LFZQ1nx3qjXpIt
+ jDxV4kzgNqZdfb3aYthVghuMZyvUn5qqA7DEMxEi+aLQ6RJi0T7+W1P+ltoAUzWqoQVGLPAb9
+ UiMZ/HGhuro81Q1OLhY3grUIdAAWR7WBpfSz4R8XfHCPYkv6Bwm4hdHFn9aSZYuZ5wsOnXaqv
+ q20Q+ClQ3a+DPUyne+2Q4C/dtjA5v16epQkxiK4T6NZhFRSOuPI022VztVQMdNqyz3OZu7hn/
+ Ld7Ovi0E7fL6jDKUk65RV+hZ7jmTIEr641EbxjGyHtfgm0t/GEYA2ihehHGRgG1rywujzQlf/
+ WYEhwaU3sQ0If7rJODgoow5d6ixBUBjLSE/ioH5t1zwfPkcR79+62xEEO96ETTEhsyXO1t7vl
+ yJ7Me6U49A0xT8Y4nTcHRxLwd5edNWkEJ5ksTKipkBRXGLbXAwffJuAO/nq+O3+//VAKrOiFq
+ IedUGIl/G7yCljjMVsIIqOwtDS10goS0ID5MlqHL+c3eRgqyat2YL4b1JmmNJxCtJaH2Iz1x7
+ MmWmy1wuGN2FK55QePaOeUVcAWIcPNEZdS7WWpWQT+3/MMxmyEOSrM9qSFIU70uq8KqHlCyxN
+ Z7qYxps5t6trXFEULx8jlVPON7sza/fz0G+U4kw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.251.53
+X-Received-From: 212.227.17.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,238 +153,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: dave.anglin@bell.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jan 2020 00:08:51 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+On 17.01.20 02:53, Richard Henderson wrote:
+> The PA-RISC 1.1 specification says that LDCW must be aligned mod 16
+> or the operation is undefined.  However, real hardware only generates
+> an unaligned access trap for unaligned mod 4.
+>
+> Match real hardware, but diagnose with GUEST_ERROR a violation of the
+> specification.
+>
+> Reported-by: Helge Deller <deller@gmx.de>
+> Suggested-by: John David Anglin <dave.anglin@bell.net>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> Helge, can you please test this against your failing kernel?
+> You will of course want to add -D logfile -d guest_errors to
+> you qemu command-line.
 
-> The first readdir test simply checks the amount of directory
-> entries returned by 9pfs server, according to the created amount
-> of virtual files on 9pfs synth driver side. Then the subsequent
-> readdir test also checks whether all directory entries have the
-> expected file names (as created on 9pfs synth driver side),
-> ignoring their precise order in result list though.
-> 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Yes, works as expected.
+Thanks!
+
+Please add:
+Tested-by: Helge Deller <deller@gmx.de>
+
+
+[deller]$ tail -f logfile
+Undefined ldc to address unaligned mod 16: 00000504fa6c7848
+Undefined ldc to address unaligned mod 16: 00000504fa6c7a48
+Undefined ldc to address unaligned mod 16: 00000506f9434848
+Undefined ldc to address unaligned mod 16: 00000506f9434a48
+Undefined ldc to address unaligned mod 16: 00000508fa036848
+Undefined ldc to address unaligned mod 16: 00000508fa036a48
+Undefined ldc to address unaligned mod 16: 0000050afa8c4848
+Undefined ldc to address unaligned mod 16: 0000050afa8c4a48
+Undefined ldc to address unaligned mod 16: 0000050cf94d1848
+Undefined ldc to address unaligned mod 16: 0000050cf94d1a48
+....
+
+
+
+>
+>
+> r~
+>
 > ---
-
-LGTM but I'm afraid this needs rebasing because virtio-9p-test.c got moved
-to tests/qtest/ by this commit (merged earlier this week):
-
-commit 1e8a1fae7464ef79c9e50aa0f807d2c511be3c8e
-Author: Thomas Huth <thuth@redhat.com>
-Date:   Mon Sep 9 12:04:01 2019 +0200
-
-    test: Move qtests to a separate directory
-    
-    The tests directory itself is pretty overcrowded, and it's hard to
-    see which test belongs to which test subsystem (unit, qtest, ...).
-    Let's move the qtests to a separate folder for more clarity.
-    
-    Message-Id: <20191218103059.11729-6-thuth@redhat.com>
-    Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-    Signed-off-by: Thomas Huth <thuth@redhat.com>
-
->  tests/virtio-9p-test.c | 149 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 149 insertions(+)
-> 
-> diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-> index 06263edb53..721f13c1fb 100644
-> --- a/tests/virtio-9p-test.c
-> +++ b/tests/virtio-9p-test.c
-> @@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t len)
->      req->r_off += len;
+>  target/hppa/helper.h    | 2 ++
+>  target/hppa/op_helper.c | 9 +++++++++
+>  target/hppa/translate.c | 6 +++++-
+>  3 files changed, 16 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/hppa/helper.h b/target/hppa/helper.h
+> index 38d834ef6b..2d483aab58 100644
+> --- a/target/hppa/helper.h
+> +++ b/target/hppa/helper.h
+> @@ -17,6 +17,8 @@ DEF_HELPER_FLAGS_3(stby_b_parallel, TCG_CALL_NO_WG, vo=
+id, env, tl, tr)
+>  DEF_HELPER_FLAGS_3(stby_e, TCG_CALL_NO_WG, void, env, tl, tr)
+>  DEF_HELPER_FLAGS_3(stby_e_parallel, TCG_CALL_NO_WG, void, env, tl, tr)
+>
+> +DEF_HELPER_FLAGS_1(ldc_check, TCG_CALL_NO_RWG, void, tl)
+> +
+>  DEF_HELPER_FLAGS_4(probe, TCG_CALL_NO_WG, tr, env, tl, i32, i32)
+>
+>  DEF_HELPER_FLAGS_1(loaded_fr0, TCG_CALL_NO_RWG, void, env)
+> diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+> index f0516e81f1..345cef2c08 100644
+> --- a/target/hppa/op_helper.c
+> +++ b/target/hppa/op_helper.c
+> @@ -153,6 +153,15 @@ void HELPER(stby_e_parallel)(CPUHPPAState *env, tar=
+get_ulong addr,
+>      do_stby_e(env, addr, val, true, GETPC());
 >  }
->  
-> +static void v9fs_uint8_read(P9Req *req, uint8_t *val)
+>
+> +void HELPER(ldc_check)(target_ulong addr)
 > +{
-> +    v9fs_memread(req, val, 1);
+> +    if (unlikely(addr & 0xf)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Undefined ldc to address unaligned mod 16: "
+> +                      TARGET_FMT_lx "\n", addr);
+> +    }
 > +}
 > +
->  static void v9fs_uint16_write(P9Req *req, uint16_t val)
+>  target_ureg HELPER(probe)(CPUHPPAState *env, target_ulong addr,
+>                            uint32_t level, uint32_t want)
 >  {
->      uint16_t le_val = cpu_to_le16(val);
-> @@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
->      le32_to_cpus(val);
->  }
->  
-> +static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-> +{
-> +    v9fs_memread(req, val, 8);
-> +    le64_to_cpus(val);
-> +}
-> +
->  /* len[2] string[len] */
->  static uint16_t v9fs_string_size(const char *string)
+> diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+> index 2f8d407a82..669381dc1d 100644
+> --- a/target/hppa/translate.c
+> +++ b/target/hppa/translate.c
+> @@ -2942,7 +2942,7 @@ static bool trans_st(DisasContext *ctx, arg_ldst *=
+a)
+>
+>  static bool trans_ldc(DisasContext *ctx, arg_ldst *a)
 >  {
-> @@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
->          id == P9_RLOPEN ? "RLOPEN" :
->          id == P9_RWRITE ? "RWRITE" :
->          id == P9_RFLUSH ? "RFLUSH" :
-> +        id == P9_RREADDIR ? "READDIR" :
->          "<unknown>";
->  }
->  
-> @@ -348,6 +360,82 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
->      v9fs_req_free(req);
->  }
->  
-> +/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-> +static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
-> +                            uint32_t count, uint16_t tag)
-> +{
-> +    P9Req *req;
+> -    MemOp mop =3D MO_TEUL | MO_ALIGN_16 | a->size;
+> +    MemOp mop =3D MO_TE | MO_ALIGN | a->size;
+>      TCGv_reg zero, dest, ofs;
+>      TCGv_tl addr;
+>
+> @@ -2958,8 +2958,12 @@ static bool trans_ldc(DisasContext *ctx, arg_ldst=
+ *a)
+>
+>      form_gva(ctx, &addr, &ofs, a->b, a->x, a->scale ? a->size : 0,
+>               a->disp, a->sp, a->m, ctx->mmu_idx =3D=3D MMU_PHYS_IDX);
 > +
-> +    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-> +    v9fs_uint32_write(req, fid);
-> +    v9fs_uint64_write(req, offset);
-> +    v9fs_uint32_write(req, count);
-> +    v9fs_req_send(req);
-> +    return req;
-> +}
+> +    gen_helper_ldc_check(addr);
+>      zero =3D tcg_const_reg(0);
+>      tcg_gen_atomic_xchg_reg(dest, addr, zero, ctx->mmu_idx, mop);
+> +    tcg_temp_free(zero);
 > +
-> +struct V9fsDirent {
-> +    v9fs_qid qid;
-> +    uint64_t offset;
-> +    uint8_t type;
-> +    char *name;
-> +    struct V9fsDirent *next;
-> +};
-> +
-> +/* size[4] Rreaddir tag[2] count[4] data[count] */
-> +static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
-> +                          struct V9fsDirent **entries)
-> +{
-> +    uint32_t local_count;
-> +    struct V9fsDirent *e = NULL;
-> +    uint16_t slen;
-> +    uint32_t n = 0;
-> +
-> +    v9fs_req_recv(req, P9_RREADDIR);
-> +    v9fs_uint32_read(req, &local_count);
-> +
-> +    if (count) {
-> +        *count = local_count;
-> +    }
-> +
-> +    for (int32_t togo = (int32_t)local_count;
-> +         togo >= 13 + 8 + 1 + 2;
-> +         togo -= 13 + 8 + 1 + 2 + slen, ++n)
-> +    {
-> +        if (!e) {
-> +            e = g_malloc(sizeof(struct V9fsDirent));
-> +            if (entries) {
-> +                *entries = e;
-> +            }
-> +        } else {
-> +            e = e->next = g_malloc(sizeof(struct V9fsDirent));
-> +        }
-> +        e->next = NULL;
-> +        /* qid[13] offset[8] type[1] name[s] */
-> +        v9fs_memread(req, &e->qid, 13);
-> +        v9fs_uint64_read(req, &e->offset);
-> +        v9fs_uint8_read(req, &e->type);
-> +        v9fs_string_read(req, &slen, &e->name);
-> +    }
-> +
-> +    if (nentries) {
-> +        *nentries = n;
-> +    }
-> +
-> +    v9fs_req_free(req);
-> +}
-> +
-> +static void v9fs_free_dirents(struct V9fsDirent *e)
-> +{
-> +    struct V9fsDirent *next = NULL;
-> +
-> +    for (; e; e = next) {
-> +        next = e->next;
-> +        g_free(e->name);
-> +        g_free(e);
-> +    }
-> +}
-> +
->  /* size[4] Tlopen tag[2] fid[4] flags[4] */
->  static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
->                            uint16_t tag)
-> @@ -480,6 +568,66 @@ static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
->      g_free(wqid);
->  }
->  
-> +static bool fs_dirents_contain_name(struct V9fsDirent *e, const char* name)
-> +{
-> +    for (; e; e = e->next) {
-> +        if (!strcmp(e->name, name)) {
-> +            return true;
-> +        }
-> +    }
-> +    return false;
-> +}
-> +
-> +static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-> +{
-> +    QVirtio9P *v9p = obj;
-> +    alloc = t_alloc;
-> +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-> +    uint16_t nqid;
-> +    v9fs_qid qid;
-> +    uint32_t count, nentries;
-> +    struct V9fsDirent *entries = NULL;
-> +    P9Req *req;
-> +
-> +    fs_attach(v9p, NULL, t_alloc);
-> +    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rwalk(req, &nqid, NULL);
-> +    g_assert_cmpint(nqid, ==, 1);
-> +
-> +    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rlopen(req, &qid, NULL);
-> +
-> +    req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - P9_IOHDRSZ, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rreaddir(req, &count, &nentries, &entries);
-> +
-> +    /*
-> +     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
-> +     * dir entries with only one readdir request.
-> +     */
-> +    g_assert_cmpint(
-> +        nentries, ==,
-> +        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-> +    );
-> +
-> +    /*
-> +     * Check all file names exist in returned entries, ignore their order
-> +     * though.
-> +     */
-> +    g_assert_cmpint(fs_dirents_contain_name(entries, "."), ==, true);
-> +    g_assert_cmpint(fs_dirents_contain_name(entries, ".."), ==, true);
-> +    for (int i = 0; i < QTEST_V9FS_SYNTH_READDIR_NFILES; ++i) {
-> +        char *name = g_strdup_printf(QTEST_V9FS_SYNTH_READDIR_FILE, i);
-> +        g_assert_cmpint(fs_dirents_contain_name(entries, name), ==, true);
-> +        g_free(name);
-> +    }
-> +
-> +    v9fs_free_dirents(entries);
-> +    g_free(wnames[0]);
-> +}
-> +
->  static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
->  {
->      QVirtio9P *v9p = obj;
-> @@ -658,6 +806,7 @@ static void register_virtio_9p_test(void)
->                   NULL);
->      qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
->                   NULL);
-> +    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
->  }
->  
->  libqos_init(register_virtio_9p_test);
+>      if (a->m) {
+>          save_gpr(ctx, a->b, ofs);
+>      }
+>
 
 
