@@ -2,73 +2,66 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36562C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB970C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:26:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08EE720730
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:21:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08EE720730
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8140520728
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:26:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8140520728
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOl2-0006Q5-6d
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:21:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54555)
+	id 1isOpD-0000aR-M4
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:25:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1isOk7-0005f3-7p
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:46 -0500
+ (envelope-from <groug@kaod.org>) id 1isOno-0007pm-BD
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1isOk3-0007PX-2c
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41188)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1isOk2-0007OQ-Sv
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1isOk1-00009v-F0
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:20:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6ED702E80C8
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:20:37 +0000 (UTC)
+ (envelope-from <groug@kaod.org>) id 1isOnk-0003NQ-Ce
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:24:31 -0500
+Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:47084)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1isOnk-0003JQ-61
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:24:28 -0500
+Received: from player794.ha.ovh.net (unknown [10.108.16.68])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 84C0223DCF4
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 11:24:25 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player794.ha.ovh.net (Postfix) with ESMTPSA id ADA28B52EA1A;
+ Fri, 17 Jan 2020 10:24:23 +0000 (UTC)
+Date: Fri, 17 Jan 2020 11:24:21 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v3 02/11] 9pfs: require msize >= 4096
+Message-ID: <20200117112421.4311c21f@bahia.lan>
+In-Reply-To: <2330562.Ag4oC6Dxye@silver>
+References: <cover.1578957500.git.qemu_oss@crudebyte.com>
+ <2705438.6bQikqVx44@silver> <20200116190748.6a656af8@bahia.lan>
+ <2330562.Ag4oC6Dxye@silver>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jan 2020 10:13:35 -0000
-From: Max Reitz <1859989@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 5-plamen xanclic
-X-Launchpad-Bug-Reporter: pevogam (5-plamen)
-X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
-References: <157918316689.4864.12553262908100217782.malonedeb@wampee.canonical.com>
-Message-Id: <157925601569.23128.14572633577549563237.malone@gac.canonical.com>
-Subject: [Bug 1859989] Re: qemu-img has broken output with large snapshot names
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4d8cfe4cbcde9dbc5bdd53d15cbcee9823e6ecf5
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 10041056846381029696
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdejgdduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 87.98.172.249
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,65 +70,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859989 <1859989@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I=E2=80=99ve just seen that launchpad collapses the spaces in the snapshot.=
-..
-All I can say is that diff tells me the output from 2.12.0 and 4.1.1 is
-exactly the same, with only one difference: 2.12.0 prints the VM SIZE as
-=E2=80=9C0=E2=80=9D (without a unit), whereas 4.1.1 prints =E2=80=9C0 B=E2=
-=80=9D.
+On Thu, 16 Jan 2020 22:39:19 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-But now I just realized you probably mean that there is no space between
-the snapshot name and the VM state size in your example.  OK, I thought
-you meant the fact that the headers are not aligned to the table body
-columns.
+> On Donnerstag, 16. Januar 2020 19:07:48 CET Greg Kurz wrote:
+> > > The point here was that there must be some kind of absolute minimum msize,
+> > 
+> > Then the absolute minimum size is 7, the size of the header part that is
+> > common to all messages:
+> > 
+> > size[4] Message tag[2]
+> > 
+> > > even though the protocol specs officially don't mandate one. And if a
+> > > client choses a msize < P9_IOHDRSZ, what useful actions shall it be able
+> > > to do?
+> > I haven't checked but I guess some messages can fit in 24 bytes.
+> > 
+> > > That's why I mentioned P9_IOHDRSZ just in case somebody might come up
+> > > later
+> > > asking to lower that minimum msize value for whatever reason.
+> > 
+> > That's precisely what I want to avoid. The semantic of P9_IOHDRSZ is
+> > that it is the header size of a Twrite message and as such it is used
+> > to compute the 'iounit' which the guest later uses to compute a
+> > suitable 'count' for Tread/Twrite messages only. It shouldn't be
+> > involved in msize considerations IMHO.
+> > 
+> > > But np, IMO this sentence makes the fundamental requirement for this patch
+> > > more clear, but I have no problem dropping this sentence.
+> > 
+> > Then you can mention 7 has the true minimal size.
+> 
+> Ok, I'll drop P9_IOHDRSZ completely and mention literal 7 as absolute 
+> theoretical minimum instead.
+> 
+> > > > > Furthermore there are some responses which are not allowed by the 9p
+> > > > > protocol to be truncated like e.g. Rreadlink which may yield up to
+> > > > 
+> > > > No message may be truncated in any way actually. The spec just allows
+> > > > an exception with the string part of Rerror.
+> > > 
+> > > Rreaddir, Rread, Twrite, Rerror can be truncated. So I suggest I'll just
+> > > change that to s/some/most/ semantically.
+> > 
+> > I mean truncate with loss of data. Rreaddir can return less than 'count'
+> > but it won't truncate an individual entry. It rewinds to the previous
+> > one and returns its offset for the next Treaddir. Same goes with Rread
+> > and Twrite, we always return a 'count' that can be used by the client
+> > to continue reading or writing.
+> 
+> Individual entries are not truncated, correct, but data loss: Example, you 
+> have this directory and say server's fs would deliver entries by readdir() in 
+> this order (from top down):
+> 
+> 	.
+> 	..
+> 	a
+> 	1234567890
+> 	b
+> 	c
+> 	d
+> 
+> and say 37 >= msize < 45, then client would receive 3 entries ".", "..", "a" 
+> and that's it.
+> 
 
-That seems to be because the size is printed in a 7-wide field, which
-isn=E2=80=99t sufficient for three-digit sizes with unit prefixes; so =E2=
-=80=9C747 MiB=E2=80=9D
-is not prefixed by a space.  I think de38b5005e9 is to blame which which
-(from what I can tell) effectively changed the output from using SI
-prefixes to IEC prefixes (which requires one more character), adds a
-space before and a =E2=80=9CB=E2=80=9D after the prefix (another two additi=
-onal
-characters), and by always printing three digits, which may require a
-decimal point (so another character).  But it didn=E2=80=99t grow the field
-width.  So I think we should do that.
+Yes msize < 45 isn't enough to send the Rreaddir for "1234567890"
+and since it is forbidden to truncate, we bail out... but we
+did not send a truncated message still.
 
-Max
+> > Rerror is really the only message where we can deliberately drop
+> > data (but we actually don't do that).
+> > 
+> > > > Maybe just mention that and say we choose 4096 to be able to send
+> > > > big Rreadlink messages.
+> > > 
+> > > That's not the point for this patch. The main purpose is to avoid having
+> > > to
+> > > maintain individual error prone minimum msize checks all over the code
+> > > base. If we would allow very small msizes (much smaller than 4096), then
+> > > we would need to add numerous error handlers all over the code base, each
+> > > one checking for different values (depending on the specific message
+> > > type).
+> > 
+> > I'm not sure what you mean by 'minimum msize checks all over the code
+> > base'... Please provide an example.
+> 
+> 1. Like done in this patch series: Treaddir has to limit client's 'count'
+>    parameter according to msize (by subtracting with msize).
+> 
 
--- =
+Hmm... this patch does a sanity check on 'count', not on 'msize'... I
+mean no matter what msize is, clipping count to msize - 11 gives a
+chance to stop processing the entries before overflowing the transport
+buffer.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859989
+> 2. get_iounit() does this:
+> 
+> 		iounit = stbuf.f_bsize;
+> 		iounit *= (s->msize - P9_IOHDRSZ) / stbuf.f_bsize;
+> 
+>    without checking anywhere for a potential negative outcome
+>    (i.e. when msize < P9_IOHDRSZ)
+> 
 
-Title:
-  qemu-img has broken output with large snapshot names
+This function should even have an assert() for that, just to be
+sure no one tries to call it before s->msize is even set, which
+would clearly be a bug in QEMU. But this can be done in a
+follow-up patch.
 
-Status in QEMU:
-  New
+> 3. Example of directory entry name length with Rreaddir above.
+> 
 
-Bug description:
-  On Qemu 4.1.1 the output of snapshots breaks if the chosen state name
-  is too long:
+msize being too small to accommodate an Rreaddir with a single
+entry is a different problem as we cannot do anything about it
+at this point but fail... That's why the minimum msize should
+rather be chosen with file names in mind, which are likely to
+be longer than any message header. Rreadlink being the one with
+the higher potential since it will usually return a string
+containing a path name (while Rreaddir entries only contain
+a single path element).
 
-  ```
-  # qemu-img snapshot -l /mnt/local/some_image.qcow2
-  Snapshot list:
-  ID        TAG                 VM SIZE                DATE       VM CLOCK
-  1         online_provider_with_dhcp747 MiB 2020-01-15 12:05:01   00:00:45=
-.873
-  ```
+> Individual issues that can easily be overlooked but also easily avoided by not 
+> allowing small msizes in the first place.
+> 
 
-  Prior to 4.1.1 this used to work with extra tabs for the VM SIZE
-  values. The collision is also disabling us from using a regex on top
-  of this output to detect the snapshot.
+My point is that we're not going to check msize in Tversion in
+order to to avoid multiple checks everywhere. We're going to do
+it there because it is the only place where it makes sense to
+do it.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859989/+subscriptions
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
+
 
