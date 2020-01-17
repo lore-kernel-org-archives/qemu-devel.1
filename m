@@ -2,68 +2,80 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDEDC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D7DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:06:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 168E920730
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:02:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FD0320730
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:06:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="lFrNEb5y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 168E920730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pg9N8Oel"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD0320730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isQKd-0003Dc-45
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:02:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38527)
+	id 1isQON-0005QD-78
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:06:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1isQJl-0002Zq-Jt
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:01:39 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1isQNW-0004VA-3g
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1isQJh-0004Qz-Tp
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:01:37 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:33869)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1isQJh-0004Pf-Bt
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:01:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=HCd3t52fvRoOe4w+g/Vc05i39HPz/PheR6OKWMgTXcU=; b=lFrNEb5yEUMmNLjLJ5oPqh2Pw9
- TkcuCoRjiBofv4CxHP2PBwXwESw3C4a7EqlqJxHG/g3KNbmpOHzgzfDGZcqm2WCHURp8v9++PXH1q
- or709evIHPyfRjeAOyGOzpgdb88AR7L9dYKfBuRLghyxlWB27e9TVzjo0nSDMJLJz7o/ckEX7l/ER
- +38ARY/cOpRhIigMFXbR3wGgDRbEhU0xy9pGxQrxamMjtyvL70Rij+szTcy4wW88eMcwP2i+DyKsG
- qfnVa1OYCw99RvwT9brG/PUF5KtmcI0bG8X3Zx72fk3mnu/gX72mwHgTveIrJ7FWVIpeTa2sgubU/
- omAVY2GzqIH2fGzU7flp/PdAuYfvZf6bmZXWqStHDuV+fykaug8lRcVIbUSVTJMJiKkDQ98xS0x5m
- sJfyRuxc8AQZDOlm1wCDNyLdpHQzWziQjbuVOQnb1JeA7NQ0Usw4Bh0QXqKQ82O6p+kBx/g522LYS
- n8jRnpBtwJDx3J1WBa+bt0FMjf453xb6qCzRdivAGEhqWKWVB4MlQVwVB13Gft1C4W9YdwlcEU46E
- 4TF1GscqGPj8Fa4P4oBnEdzI6XtloETyCVurTppusdrOK73WZJX930+rgH9clH2EbDknOWwrHFSen
- 53sL1CxkMPYqNa1nMjvhppAKS4PQJ6xotnH1avw/M=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v3 02/11] 9pfs: require msize >= 4096
-Date: Fri, 17 Jan 2020 13:01:30 +0100
-Message-ID: <5046978.lqI2Hv0RVs@silver>
-In-Reply-To: <20200117112421.4311c21f@bahia.lan>
-References: <cover.1578957500.git.qemu_oss@crudebyte.com>
- <2330562.Ag4oC6Dxye@silver> <20200117112421.4311c21f@bahia.lan>
+ (envelope-from <peter.maydell@linaro.org>) id 1isQNU-0007nn-F7
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:05:29 -0500
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:36103)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1isQNU-0007mj-7D
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:05:28 -0500
+Received: by mail-ot1-x32c.google.com with SMTP id m2so17489070otq.3
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:05:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=M20d0Hf43fKbmuZOZCOH7FvWeOyLBBNIu+LwLx817/Q=;
+ b=pg9N8OelLR9ZmNcr2BFl3AWVMihNEf1AhxwC02ug4t/xYQZzYWwBD7Ehn3hkqAFiHV
+ Q2cvHdQGTJHeWi/PGypmdUrM3Puje60rRL7i9OukemsE+A5YEFbOokslFyfoZzq2UKMj
+ 3E6L8hAC5DqmH8XNgssrFRjwBJnacirtsy92XpBh7Z4BzZgH1WuLkmyPCipl8ULcYuWM
+ O9TvfugOHOshJOeK5M+YbENGKluC4M02Zpqj0Nqlw05UHsMA+LWsKUHBp4vcFuRYRGta
+ DQ0Q9tNHdyjC3UrwtI9I1Fy8bbRh8MNwQSddOcGFIxksZobovKw1EtVWuHRYLGLvHGBx
+ w0pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=M20d0Hf43fKbmuZOZCOH7FvWeOyLBBNIu+LwLx817/Q=;
+ b=Xuhxwlxux0oURPLrtXqRcCc7xgPlbKd1nshofQkezwDtjJAEhIqvyoKUHjWziiZ8zM
+ PniYC6w72uitUG4bMiAUyA9gyjfKlnh9xTjIJTbIFrdvqQjhlbrHQTSrGkktuOwty0oU
+ nimHsKRrmWRgHA+s/8GXoG6NbpoPzwexrhCfVFj9hIpEqgvQYe+Ze5uDuamMg6a1wRR7
+ VsLaKiZQsKOq7GxbMKH47SiDmjqKcINiTy3nNlHAZ4M3GXY4PpTWS7206NQe+bB/BwWN
+ 4XjoDGYhnTFfAP4+9XpQsQ5pRm4R+oR63i6yrNmjlyI5jUMMcjnwoGiLN284WTtFpoBL
+ UFMQ==
+X-Gm-Message-State: APjAAAWrTgowEQyWK4xW8MjRwfBrrCTqQBCb/zpk1Tvwb+0bx5K7UU5H
+ f/IRLUinLn+h2fVp45Ytk8jwhwHC39CEqU6nPCQHgQ==
+X-Google-Smtp-Source: APXvYqy+b38DicrX69wtf62caGHpHt3FfQ4xAdJWDXF4AML82vmcmoKi7DAGs8QEmXocEgo/bjNlIA4Zsre96hanKi8=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr5759167otq.135.1579262726908; 
+ Fri, 17 Jan 2020 04:05:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.189.157.229
+References: <20200114125254.4515-1-quintela@redhat.com>
+In-Reply-To: <20200114125254.4515-1-quintela@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Jan 2020 12:05:16 +0000
+Message-ID: <CAFEAcA_n21bu1gk0fqbzSr7iwurYCVR+wS7-RpDAJWnrYdVQ5g@mail.gmail.com>
+Subject: Re: [PULL 00/30] Migration pull patches (take 4)
+To: Juan Quintela <quintela@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,187 +87,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 17. Januar 2020 11:24:21 CET Greg Kurz wrote:
-> On Thu, 16 Jan 2020 22:39:19 +0100
-> 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > On Donnerstag, 16. Januar 2020 19:07:48 CET Greg Kurz wrote:
-> > > > The point here was that there must be some kind of absolute minimum
-> > > > msize,
-> > > 
-> > > Then the absolute minimum size is 7, the size of the header part that is
-> > > common to all messages:
-> > > 
-> > > size[4] Message tag[2]
-> > > 
-> > > > even though the protocol specs officially don't mandate one. And if a
-> > > > client choses a msize < P9_IOHDRSZ, what useful actions shall it be
-> > > > able
-> > > > to do?
-> > > 
-> > > I haven't checked but I guess some messages can fit in 24 bytes.
-> > > 
-> > > > That's why I mentioned P9_IOHDRSZ just in case somebody might come up
-> > > > later
-> > > > asking to lower that minimum msize value for whatever reason.
-> > > 
-> > > That's precisely what I want to avoid. The semantic of P9_IOHDRSZ is
-> > > that it is the header size of a Twrite message and as such it is used
-> > > to compute the 'iounit' which the guest later uses to compute a
-> > > suitable 'count' for Tread/Twrite messages only. It shouldn't be
-> > > involved in msize considerations IMHO.
-> > > 
-> > > > But np, IMO this sentence makes the fundamental requirement for this
-> > > > patch
-> > > > more clear, but I have no problem dropping this sentence.
-> > > 
-> > > Then you can mention 7 has the true minimal size.
-> > 
-> > Ok, I'll drop P9_IOHDRSZ completely and mention literal 7 as absolute
-> > theoretical minimum instead.
-> > 
-> > > > > > Furthermore there are some responses which are not allowed by the
-> > > > > > 9p
-> > > > > > protocol to be truncated like e.g. Rreadlink which may yield up to
-> > > > > 
-> > > > > No message may be truncated in any way actually. The spec just
-> > > > > allows
-> > > > > an exception with the string part of Rerror.
-> > > > 
-> > > > Rreaddir, Rread, Twrite, Rerror can be truncated. So I suggest I'll
-> > > > just
-> > > > change that to s/some/most/ semantically.
-> > > 
-> > > I mean truncate with loss of data. Rreaddir can return less than 'count'
-> > > but it won't truncate an individual entry. It rewinds to the previous
-> > > one and returns its offset for the next Treaddir. Same goes with Rread
-> > > and Twrite, we always return a 'count' that can be used by the client
-> > > to continue reading or writing.
-> > 
-> > Individual entries are not truncated, correct, but data loss: Example, you
-> > have this directory and say server's fs would deliver entries by readdir()
-> > in> 
-> > this order (from top down):
-> > 	.
-> > 	..
-> > 	a
-> > 	1234567890
-> > 	b
-> > 	c
-> > 	d
-> > 
-> > and say 37 >= msize < 45, then client would receive 3 entries ".", "..",
-> > "a" and that's it.
-> 
-> Yes msize < 45 isn't enough to send the Rreaddir for "1234567890"
-> and since it is forbidden to truncate, we bail out... but we
-> did not send a truncated message still.
+On Tue, 14 Jan 2020 at 12:53, Juan Quintela <quintela@redhat.com> wrote:
+>
+> The following changes since commit 3c8a6575985b1652b45bfa670b5e1907d642cfa0:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200113-pull-request' into staging (2020-01-13 14:19:57 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/juanquintela/qemu.git tags/migration-pull-pull-request
+>
+> for you to fetch changes up to b039b02c25d1725cf0296721d98e35e024468b20:
+>
+>   migration: Support QLIST migration (2020-01-14 13:45:29 +0100)
+>
+> ----------------------------------------------------------------
+> Migration pull request (take 4)
+>
+> - both patches for x32 archs in
+> - reorder the pages to make git bisect happy
+>
+> Thanks a lot to Daniel for helping with the bugs.  Twice.
 
-I really think we're discussing semantical interpretation details here which 
-bring us nowhere.
+tests/qtest/migration-test seems to hang in the aarch32 environment:
 
-> > > Rerror is really the only message where we can deliberately drop
-> > > data (but we actually don't do that).
-> > > 
-> > > > > Maybe just mention that and say we choose 4096 to be able to send
-> > > > > big Rreadlink messages.
-> > > > 
-> > > > That's not the point for this patch. The main purpose is to avoid
-> > > > having
-> > > > to
-> > > > maintain individual error prone minimum msize checks all over the code
-> > > > base. If we would allow very small msizes (much smaller than 4096),
-> > > > then
-> > > > we would need to add numerous error handlers all over the code base,
-> > > > each
-> > > > one checking for different values (depending on the specific message
-> > > > type).
-> > > 
-> > > I'm not sure what you mean by 'minimum msize checks all over the code
-> > > base'... Please provide an example.
-> > 
-> > 1. Like done in this patch series: Treaddir has to limit client's 'count'
-> > 
-> >    parameter according to msize (by subtracting with msize).
-> 
-> Hmm... this patch does a sanity check on 'count', not on 'msize'... 
+peter.m+  3380  0.1  0.0  13484 12848 ?        S    11:10   0:03
+                   \_ make -C build/all-a32 check V=1 GCC_COLORS= -j9
+peter.m+  5471  0.0  0.0   1460   388 ?        S    11:11   0:00
+                       \_ /bin/sh -c
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RAND
+peter.m+  5472  0.3  0.0  12984  2228 ?        Sl   11:11   0:09
+                       |   \_ tests/qtest/migration-test -m=quick -k
+--tap
+peter.m+ 17798 99.8  0.9 646064 150512 ?       Sl   11:13  43:04
+                       |   |   \_ aarch64-softmmu/qemu-system-aarch64
+-qtest unix:
+peter.m+ 17814  0.0  0.0      0     0 ?        Z    11:13   0:00
+                       |   |   \_ [qemu-system-aar] <defunct>
+peter.m+  5473  0.0  0.0   8176  6652 ?        S    11:11   0:00
+                       |   \_ perl ./scripts/tap-driver.pl
+--test-name=migration-t
+peter.m+ 17200  0.0  0.0   1460   404 ?        S    11:13   0:00
+                       \_ /bin/sh -c
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RAND
+peter.m+ 17201  0.3  0.0  13080  2340 ?        Sl   11:13   0:08
+                       |   \_ tests/qtest/migration-test -m=quick -k
+--tap
+peter.m+ 24275  100  0.8 549340 144160 ?       Sl   11:15  41:32
+                       |   |   \_ i386-softmmu/qemu-system-i386 -qtest
+unix:/tmp/q
+peter.m+ 24308  0.0  0.0      0     0 ?        Z    11:15   0:00
+                       |   |   \_ [qemu-system-i38] <defunct>
+peter.m+ 17202  0.0  0.0   8172  6772 ?        S    11:13   0:00
+                       |   \_ perl ./scripts/tap-driver.pl
+--test-name=migration-t
+peter.m+ 25399  0.0  0.0   1460   384 ?        S    11:15   0:00
+                       \_ /bin/sh -c
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RAND
+peter.m+ 25400  0.3  0.0  13092  2280 ?        Sl   11:15   0:08
+                           \_ tests/qtest/migration-test -m=quick -k
+--tap
+peter.m+  2755  100  0.8 557600 145696 ?       Sl   11:17  39:20
+                           |   \_ x86_64-softmmu/qemu-system-x86_64
+-qtest unix:/t
+peter.m+  2763  0.0  0.0      0     0 ?        Z    11:17   0:00
+                           |   \_ [qemu-system-x86] <defunct>
+peter.m+ 25401  0.0  0.0   8172  6692 ?        S    11:15   0:00
+                           \_ perl ./scripts/tap-driver.pl
+--test-name=migration-t
 
-Yes ... :)
+(processes started 45 mins ago, unreaped processes in zombie state.)
 
-> I mean no matter what msize is, clipping count to msize - 11 gives a
-> chance to stop processing the entries before overflowing the transport
-> buffer.
+It looks like the multifd/tcp test fails, but doesn't manage to
+actually turn the failure into the test case exiting:
 
-... and no, this cannot happen if minimum msize of 4096 is forced already by 
-Tversion. Maybe you now get my point -> It is about avoiding exactly such kind 
-of issues in the first place. Most file systems have a name limit of 255 
-bytes:
+/i386/migration/multifd/tcp: qemu-system-i386: -accel kvm: invalid
+accelerator kvm
+qemu-system-i386: falling back to tcg
+qemu-system-i386: -accel kvm: invalid accelerator kvm
+qemu-system-i386: falling back to tcg
+qemu-system-i386: multifd_send_sync_main: multifd_send_pages fail
+qemu-system-i386: failed to save SaveStateEntry with id(name): 3(ram)
+qemu-system-i386: Unable to write to socket: Broken pipe
+qemu-system-i386: Unknown combination of migration flags: 0
+qemu-system-i386: error while loading state section id 3(ram)
+qemu-system-i386: load of migration failed: Invalid argument
+[hangs here]
 
-https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits
+I think you need to find a system which has 32-bit ram_addr_t
+and test this, because this is about the fourth time round
+for this patchset failing on this configuration.
 
-So by forcing a minimum 'msize' of 4096 you avoid having to deal with this  
-issue (and similar ones) on Treaddir request level (and other request type 
-handlers), including ReiserFS BTW because 4032+35 < 4096.
-
-If you would allow smaller 'msize' values by Tversion, then you would need to 
-suffer some kind of death when handling Treaddir with certain high file name 
-length. Either a transport error (with an error message that a normal user 
-would not be able to understand at all) or by returning an incomplete Treaddir 
-response sequence with { Rreaddir count=0 }, or ... any other kind of death.
-
-No matter which death you would choose here, it would be horrible from 
-usability perspective, because the system would most of the time work 
-flawlessy, and an error case would just be triggered if guest hits a file/dir 
-beyond some certain name length. It is not worth it! Force 4kiB already at 
-Tversion and that's it.
-
-> > 2. get_iounit() does this:
-> > 		iounit = stbuf.f_bsize;
-> > 		iounit *= (s->msize - P9_IOHDRSZ) / stbuf.f_bsize;
-> > 		
-> >    without checking anywhere for a potential negative outcome
-> >    (i.e. when msize < P9_IOHDRSZ)
-> 
-> This function should even have an assert() for that, just to be
-> sure no one tries to call it before s->msize is even set, which
-> would clearly be a bug in QEMU. But this can be done in a
-> follow-up patch.
-> 
-> > 3. Example of directory entry name length with Rreaddir above.
-> 
-> msize being too small to accommodate an Rreaddir with a single
-> entry is a different problem as we cannot do anything about it
-> at this point but fail... That's why the minimum msize should
-> rather be chosen with file names in mind, which are likely to
-> be longer than any message header. Rreadlink being the one with
-> the higher potential since it will usually return a string
-> containing a path name (while Rreaddir entries only contain
-> a single path element).
-> 
-> > Individual issues that can easily be overlooked but also easily avoided by
-> > not allowing small msizes in the first place.
-> 
-> My point is that we're not going to check msize in Tversion in
-> order to to avoid multiple checks everywhere. We're going to do
-> it there because it is the only place where it makes sense to
-> do it.
-
-Also yes and no. Of course it just makes sense to handle it already at 
-Tversion. But no, you could theoretically also allow much smaller minimum 
-'msize' value << 4096 (i.e. somewhere closely >7 as we discussed), then you 
-would indeed still need to add msize checks at other places of the code base 
-as you just found out now. So forcing a minimum 'msize' which is high enough, 
-avoids having to add such individual checks and having to deal with them in 
-some kind of unpleasant way.
-
-I hope this makes it more clear now.
-
-Best regards,
-Christian Schoenebeck
-
-
+thanks
+-- PMM
 
