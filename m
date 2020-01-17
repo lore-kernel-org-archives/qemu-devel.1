@@ -2,64 +2,82 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467E3C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B09C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:48:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B10620730
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:44:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B10620730
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 31E122087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:48:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H/MiL/My"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E122087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isQyt-00059c-6V
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:44:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43333)
+	id 1isR2s-00070O-7E
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:48:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1isQy2-0004Bk-DY
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:43:16 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1isR22-0006Xx-1z
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1isQxy-0003hD-5p
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:43:14 -0500
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:58433)
+ (envelope-from <dgilbert@redhat.com>) id 1isR1y-0007HG-7r
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:47:21 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28445
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1isQxx-0003cB-R9
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:43:10 -0500
-Received: from player715.ha.ovh.net (unknown [10.108.16.135])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id C5AFC156C01
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 13:43:03 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player715.ha.ovh.net (Postfix) with ESMTPSA id 1A9D4E277A80;
- Fri, 17 Jan 2020 12:42:57 +0000 (UTC)
-Subject: Re: [PATCH 1/2] target/ppc: Add privileged message send facilities
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200109163346.23062-1-clg@kaod.org>
- <20200109163346.23062-2-clg@kaod.org> <20200117094645.GA54439@umbus>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f724368e-e84e-421d-f163-22da87921ebe@kaod.org>
-Date: Fri, 17 Jan 2020 13:42:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1isR1y-0007FH-2u
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:47:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579265236;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rgYg++R7Yygnoy+yXR16YE4+XU6R+TF6MQvfEnWo4Lc=;
+ b=H/MiL/My49jKoadzu4xhl4oKteDV74yV3mxPSAUvoVRD1EoYEHltxgPZblBwj+VYlrIM2O
+ R1rDo9g4LFt+GN8xAcyVP2pXRoe7sAXAWQJng5Qpo7tIutLB38ylUdTk0NX7ExZF+V/Br9
+ FOKzhH4FeOSfgLq/QPqbwVdyt768e9c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-pFqwD3QxON2k1w6mONgicQ-1; Fri, 17 Jan 2020 07:47:14 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A507800D53
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 12:47:13 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C777B5E1AD;
+ Fri, 17 Jan 2020 12:47:09 +0000 (UTC)
+Date: Fri, 17 Jan 2020 12:47:07 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v3 0/2] Fix hyperv synic on vhost
+Message-ID: <20200117124707.GG3209@work-vm>
+References: <20200116202414.157959-1-dgilbert@redhat.com>
+ <157922066484.433.7316108748419062411@197193fa8d23>
 MIME-Version: 1.0
-In-Reply-To: <20200117094645.GA54439@umbus>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-X-Ovh-Tracer-Id: 12382365704281230232
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdejgdegfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeehnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+In-Reply-To: <157922066484.433.7316108748419062411@197193fa8d23>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: pFqwD3QxON2k1w6mONgicQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.43.140
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,398 +89,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vkuznets@redhat.com, jasowang@redhat.com,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/17/20 10:46 AM, David Gibson wrote:
-> On Thu, Jan 09, 2020 at 05:33:45PM +0100, C=E9dric Le Goater wrote:
->> The Processor Control facility POWER8 processors and later provides
->> a mechanism for the hypervisor to send messages to other threads
->> in the system (msgsnd instruction) and cause hypervisor-level
->> exceptions. Privileged non-hypervisor programs are also able to
->> send messages (msgsndp instruction) but are restricted to the
->> threads of the same core and cause privileged-level exceptions.
->>
->> The Directed Privileged Doorbell Exception State (DPDES) register
->> reflects the state of pending privileged doorbell exceptions and can
->> also be used to modify that state. The register can be used to read
->> and modify the state of privileged doorbell exceptions for all threads
->> of a subprocessor and thus is a shared facility for that subprocessor.
->> The register can be read/written by the hypervisor and read by the
->> supervisor if enabled in the HFSCR, otherwise a hypervisor facility
->> unavailable exception is generated.
->>
->> The privileged message send and clear instructions (msgsndp & msgclrp)
->> are used to generate and clear the presence of a directed privileged
->> doorbell exception, respectively. The msgsndp instruction can be used
->> to target any thread of the current subprocessor, msgclrp acts on the
->> thread issuing the instruction. These instructions are privileged, but
->> will generate a hypervisor facility unavailable exception if not
->> enabled in the HFSCR and executed in privileged non-hypervisor
->> state. The HV facility unavailable exception will be addressed in
->> other patch.
->>
->> Add and implement this register and instructions by reading or
->> modifying the pending interrupt state of the cpu.
->>
->> Note that TCG only supports one thread per core and so we only need to
->> worry about the cpu making the access.
->>
->> Based on previous work from Suraj Jitindar Singh.
->>
->> Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->> [clg: took ownership due to the amount of changes ]
+* no-reply@patchew.org (no-reply@patchew.org) wrote:
+> Patchew URL: https://patchew.org/QEMU/20200116202414.157959-1-dgilbert@re=
+dhat.com/
 >=20
-> Hrm, I think this need's Suraj's S-o-b as well.  AIUI the primary
-> purpose of S-o-b lines isn't about credit or ownership, but about
-> tracking where code came from in case of questions of providence.  So
-> even if you've taken ownership and reworked substantially, it would
-> retain the original author's S-o-b.
-
-ok. I was just tired of adding lines of changes. I can keep the
-S-o-b. np.
-
-
 >=20
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  target/ppc/cpu.h                |  1 +
->>  target/ppc/helper.h             |  4 ++
->>  target/ppc/excp_helper.c        | 68 +++++++++++++++++++++++++++-----=
--
->>  target/ppc/misc_helper.c        | 36 +++++++++++++++++
->>  target/ppc/translate.c          | 26 +++++++++++++
->>  target/ppc/translate_init.inc.c | 20 ++++++++--
->>  6 files changed, 140 insertions(+), 15 deletions(-)
->>
->> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
->> index 103bfe9dc274..d175ec9a641d 100644
->> --- a/target/ppc/cpu.h
->> +++ b/target/ppc/cpu.h
->> @@ -935,6 +935,7 @@ enum {
->>  #define DBELL_PIRTAG_MASK              0x3fff
->> =20
->>  #define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
->> +#define DBELL_TIRTAG_MASK              PPC_BITMASK(57, 63)
->> =20
->>  #define PPC_PAGE_SIZES_MAX_SZ   8
->> =20
->> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
->> index cd0dfe383a2a..cfb4c07085ca 100644
->> --- a/target/ppc/helper.h
->> +++ b/target/ppc/helper.h
->> @@ -657,6 +657,10 @@ DEF_HELPER_FLAGS_1(load_601_rtcu, TCG_CALL_NO_RWG=
-, tl, env)
->>  DEF_HELPER_FLAGS_1(load_purr, TCG_CALL_NO_RWG, tl, env)
->>  DEF_HELPER_FLAGS_2(store_purr, TCG_CALL_NO_RWG, void, env, tl)
->>  DEF_HELPER_2(store_ptcr, void, env, tl)
->> +DEF_HELPER_FLAGS_1(load_dpdes, TCG_CALL_NO_RWG, tl, env)
->> +DEF_HELPER_FLAGS_2(store_dpdes, TCG_CALL_NO_RWG, void, env, tl)
->> +DEF_HELPER_2(book3s_msgsndp, void, env, tl)
->> +DEF_HELPER_2(book3s_msgclrp, void, env, tl)
->>  #endif
->>  DEF_HELPER_2(store_sdr1, void, env, tl)
->>  DEF_HELPER_2(store_pidr, void, env, tl)
->> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
->> index 5752ed4a4d83..343f3a6b30c4 100644
->> --- a/target/ppc/excp_helper.c
->> +++ b/target/ppc/excp_helper.c
->> @@ -900,7 +900,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
->>          }
->>          if (env->pending_interrupts & (1 << PPC_INTERRUPT_DOORBELL)) =
-{
->>              env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_DOORBEL=
-L);
->> -            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
->> +            if (env->insns_flags & PPC_SEGMENT_64B) {
 >=20
-> I don't love detecting this based on insns_flags this way, but there
-> are lots of places we do similarly ugly things, so it's probably the
-> most expedient way forward in the short term.
-
-we should be using the is_book3s_arch2x() introduced by Greg in :
-d0db7caddb19 ("target/ppc: Consolidate 64-bit server processor detection=20
-in a helper")
-
+> Hi,
 >=20
->> +                powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR=
-);
->> +            } else {
->> +                powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI=
-);
->> +            }
->>              return;
->>          }
->>          if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL))=
- {
->> @@ -1221,7 +1225,7 @@ void helper_msgsnd(target_ulong rb)
->>  }
->> =20
->>  /* Server Processor Control */
->> -static int book3s_dbell2irq(target_ulong rb)
->> +static int book3s_dbell2irq(target_ulong rb, bool hv_dbell)
->>  {
->>      int msg =3D rb & DBELL_TYPE_MASK;
->> =20
->> @@ -1230,12 +1234,16 @@ static int book3s_dbell2irq(target_ulong rb)
->>       * message type is 5. All other types are reserved and the
->>       * instruction is a no-op
->>       */
->> -    return msg =3D=3D DBELL_TYPE_DBELL_SERVER ? PPC_INTERRUPT_HDOORBE=
-LL : -1;
->> +    if (msg =3D=3D DBELL_TYPE_DBELL_SERVER) {
->> +        return hv_dbell ? PPC_INTERRUPT_HDOORBELL : PPC_INTERRUPT_DOO=
-RBELL;
->> +    }
->> +
->> +    return -1;
->>  }
+> This series seems to have some coding style problems. See output below fo=
+r
+> more information:
 >=20
-> This function kind of seems like overkill, and also doesn't have a
-> great name.  Mostly it just tests if we're dealing with a doorbell at
-> all.  Selecting the right irq number here is a bit weird, since its
-> based only on hv_dbell, which is a literal parameter for all callers,
-> so they might as well just use the right doorbell irq inline.
-
-I Agree.=20
-
->> =20
->>  void helper_book3s_msgclr(CPUPPCState *env, target_ulong rb)
->>  {
->> -    int irq =3D book3s_dbell2irq(rb);
->> +    int irq =3D book3s_dbell2irq(rb, true);
->> =20
->>      if (irq < 0) {
->>          return;
->> @@ -1244,16 +1252,10 @@ void helper_book3s_msgclr(CPUPPCState *env, ta=
-rget_ulong rb)
->>      env->pending_interrupts &=3D ~(1 << irq);
->>  }
->> =20
->> -void helper_book3s_msgsnd(target_ulong rb)
->> +static void book3s_msgsnd_common(int pir, int irq)
->>  {
->> -    int irq =3D book3s_dbell2irq(rb);
->> -    int pir =3D rb & DBELL_PROCIDTAG_MASK;
->>      CPUState *cs;
->> =20
->> -    if (irq < 0) {
->> -        return;
->> -    }
->> -
->>      qemu_mutex_lock_iothread();
->>      CPU_FOREACH(cs) {
->>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> @@ -1267,6 +1269,50 @@ void helper_book3s_msgsnd(target_ulong rb)
->>      }
->>      qemu_mutex_unlock_iothread();
->>  }
->> +
->> +void helper_book3s_msgsnd(target_ulong rb)
->> +{
->> +    int pir =3D rb & DBELL_PROCIDTAG_MASK;
->> +    int irq =3D book3s_dbell2irq(rb, true);
->> +
->> +    if (irq < 0) {
->> +        return;
->> +    }
->> +
->> +    book3s_msgsnd_common(pir, irq);
->> +}
->> +
->> +#if defined(TARGET_PPC64)
->> +void helper_book3s_msgclrp(CPUPPCState *env, target_ulong rb)
->> +{
->> +    int irq =3D book3s_dbell2irq(rb, false);
->> +
->> +    if (irq < 0) {
->> +        return;
->> +    }
->> +
->> +    env->pending_interrupts &=3D ~(1 << irq);
->> +}
->> +
->> +/*
->> + * sends a message to other threads that are on the same
->> + * multi-threaded processor
->> + */
->> +void helper_book3s_msgsndp(CPUPPCState *env, target_ulong rb)
->> +{
->> +    int irq =3D book3s_dbell2irq(rb, false);
->> +    int pir =3D env->spr_cb[SPR_PIR].default_value;
->> +
->> +    if (irq < 0) {
->> +        return;
->> +    }
->> +
->> +    pir &=3D ~DBELL_TIRTAG_MASK;
->> +    pir |=3D rb & DBELL_TIRTAG_MASK;
+> Message-id: 20200116202414.157959-1-dgilbert@redhat.com
+> Type: series
+> Subject: [PATCH v3 0/2] Fix hyperv synic on vhost
 >=20
-> This seems overkill since we don't actually support > 1 thread/core.
-> Won't the answer always be equal to pir?
-
-yes but the mask is different from instruction msgsnd() and if SMT > 1
-is support one day, it will be correct.=20
-
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
 >=20
->> +
->> +    book3s_msgsnd_common(pir, irq);
->> +}
->> +#endif
->>  #endif
->> =20
->>  void ppc_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
->> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
->> index 2318f3ab45b2..66b5b0824208 100644
->> --- a/target/ppc/misc_helper.c
->> +++ b/target/ppc/misc_helper.c
->> @@ -105,6 +105,42 @@ void helper_store_pcr(CPUPPCState *env, target_ul=
-ong value)
->> =20
->>      env->spr[SPR_PCR] =3D value & pcc->pcr_mask;
->>  }
->> +
->> +/*
->> + * DPDES register is shared. Each bit reflects the state of the
->> + * doorbell interrupt of a thread of the same core.
->> + */
->> +target_ulong helper_load_dpdes(CPUPPCState *env)
->> +{
->> +    target_ulong dpdes =3D 0;
->> +
->> +    /* TODO: TCG supports only one thread */
->> +    if (env->pending_interrupts & (1 << PPC_INTERRUPT_DOORBELL)) {
->> +        dpdes |=3D (env->spr_cb[SPR_PIR].default_value & DBELL_TIRTAG=
-_MASK);
+> From https://github.com/patchew-project/qemu
+>  * [new tag]         patchew/20200116202414.157959-1-dgilbert@redhat.com =
+-> patchew/20200116202414.157959-1-dgilbert@redhat.com
+> Switched to a new branch 'test'
+> f7aeff2 vhost: Only align sections for vhost-user
+> 5bb467f vhost: Add names to section rounded warning
 >=20
-> Likewise, won't this just be 0 or 1?  I dislike half-measures to
-> achieve something we don't actually support at this stage.
-
-OK then. I will simplify and keep the TODOs.
-
-Thanks,
-
-C.
-
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> 1/2 Checking commit 5bb467f4ac3b (vhost: Add names to section rounded war=
+ning)
+> 2/2 Checking commit f7aeff24a99a (vhost: Only align sections for vhost-us=
+er)
+> ERROR: trailing whitespace
+> #45: FILE: hw/virtio/vhost.c:554:
+> +    if (dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER) {  =
+ $
 >=20
->> +    }
->> +
->> +    return dpdes;
->> +}
->> +
->> +void helper_store_dpdes(CPUPPCState *env, target_ulong val)
->> +{
->> +    PowerPCCPU *cpu =3D env_archcpu(env);
->> +    CPUState *cs =3D CPU(cpu);
->> +
->> +    /* TODO: TCG supports only one thread */
->> +    if (val & ~0x1) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "Invalid DPDES register value =
-"
->> +                      TARGET_FMT_lx"\n", val);
->> +        return;
->> +    }
->> +
->> +    if (val & 0x1) {
->> +        env->pending_interrupts |=3D 1 << PPC_INTERRUPT_DOORBELL;
->> +        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
->> +    } else {
->> +        env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_DOORBELL);
->> +    }
->> +}
->>  #endif /* defined(TARGET_PPC64) */
->> =20
->>  void helper_store_pidr(CPUPPCState *env, target_ulong val)
->> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->> index f5fe5d06118a..a3a4a95cdf53 100644
->> --- a/target/ppc/translate.c
->> +++ b/target/ppc/translate.c
->> @@ -6645,6 +6645,28 @@ static void gen_msgsnd(DisasContext *ctx)
->>  #endif /* defined(CONFIG_USER_ONLY) */
->>  }
->> =20
->> +#if defined(TARGET_PPC64)
->> +static void gen_msgclrp(DisasContext *ctx)
->> +{
->> +#if defined(CONFIG_USER_ONLY)
->> +    GEN_PRIV;
->> +#else
->> +    CHK_SV;
->> +    gen_helper_book3s_msgclrp(cpu_env, cpu_gpr[rB(ctx->opcode)]);
->> +#endif /* defined(CONFIG_USER_ONLY) */
->> +}
->> +
->> +static void gen_msgsndp(DisasContext *ctx)
->> +{
->> +#if defined(CONFIG_USER_ONLY)
->> +    GEN_PRIV;
->> +#else
->> +    CHK_SV;
->> +    gen_helper_book3s_msgsndp(cpu_env, cpu_gpr[rB(ctx->opcode)]);
->> +#endif /* defined(CONFIG_USER_ONLY) */
->> +}
->> +#endif
->> +
->>  static void gen_msgsync(DisasContext *ctx)
->>  {
->>  #if defined(CONFIG_USER_ONLY)
->> @@ -7187,6 +7209,10 @@ GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x0000=
-0000, PPC_ALTIVEC),
->>  GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, PPC_NONE,
->>                PPC2_ISA300),
->>  GEN_HANDLER_E(maddld, 0x04, 0x19, 0xFF, 0x00000000, PPC_NONE, PPC2_IS=
-A300),
->> +GEN_HANDLER2_E(msgsndp, "msgsndp", 0x1F, 0x0E, 0x04, 0x03ff0001,
->> +               PPC_NONE, PPC2_ISA207S),
->> +GEN_HANDLER2_E(msgclrp, "msgclrp", 0x1F, 0x0E, 0x05, 0x03ff0001,
->> +               PPC_NONE, PPC2_ISA207S),
->>  #endif
->> =20
->>  #undef GEN_INT_ARITH_ADD
->> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_in=
-it.inc.c
->> index d33d65dff702..9e2396a7b5a1 100644
->> --- a/target/ppc/translate_init.inc.c
->> +++ b/target/ppc/translate_init.inc.c
->> @@ -464,6 +464,17 @@ static void spr_write_pcr(DisasContext *ctx, int =
-sprn, int gprn)
->>  {
->>      gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
->>  }
->> +
->> +/* DPDES */
->> +static void spr_read_dpdes(DisasContext *ctx, int gprn, int sprn)
->> +{
->> +    gen_helper_load_dpdes(cpu_gpr[gprn], cpu_env);
->> +}
->> +
->> +static void spr_write_dpdes(DisasContext *ctx, int sprn, int gprn)
->> +{
->> +    gen_helper_store_dpdes(cpu_env, cpu_gpr[gprn]);
->> +}
->>  #endif
->>  #endif
->> =20
->> @@ -8238,10 +8249,11 @@ static void gen_spr_power8_dpdes(CPUPPCState *=
-env)
->>  {
->>  #if !defined(CONFIG_USER_ONLY)
->>      /* Directed Privileged Door-bell Exception State, used for IPI */
->> -    spr_register(env, SPR_DPDES, "DPDES",
->> -                 SPR_NOACCESS, SPR_NOACCESS,
->> -                 &spr_read_generic, SPR_NOACCESS,
->> -                 0x00000000);
->> +    spr_register_kvm_hv(env, SPR_DPDES, "DPDES",
->> +                        SPR_NOACCESS, SPR_NOACCESS,
->> +                        &spr_read_dpdes, SPR_NOACCESS,
->> +                        &spr_read_dpdes, &spr_write_dpdes,
->> +                        KVM_REG_PPC_DPDES, 0x00000000);
->>  #endif
->>  }
->> =20
+> WARNING: line over 80 characters
+> #60: FILE: hw/virtio/vhost.c:569:
+> +        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gp=
+a, mrs_size,
 >=20
+> total: 1 errors, 1 warnings, 43 lines checked
+
+Oops, minor whitespace; easy to fix if people actually like this fix.
+
+Dave
+
+> Patch 2/2 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 1
+>=20
+>=20
+> The full log is available at
+> http://patchew.org/logs/20200116202414.157959-1-dgilbert@redhat.com/testi=
+ng.checkpatch/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
