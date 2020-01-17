@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D81CCC33CAF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 02:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A3EC33CAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 02:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A249F2072E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 02:13:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A249F2072E
+	by mail.kernel.org (Postfix) with ESMTPS id C6ED82072E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 02:14:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6ED82072E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isH8j-00088u-E3
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 21:13:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49082)
+	id 1isH9x-0002Ec-UG
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jan 2020 21:14:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isH7S-0006nV-4i
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 21:12:20 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isH7R-0006nT-Nu
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 21:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isH7Q-0003Gm-5W
- for qemu-devel@nongnu.org; Thu, 16 Jan 2020 21:12:18 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:35010 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1isH7Q-0003Gn-5a
+ for qemu-devel@nongnu.org; Thu, 16 Jan 2020 21:12:17 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:35004 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1isH7P-0003Dm-QD
+ id 1isH7P-0003Dc-QC
  for qemu-devel@nongnu.org; Thu, 16 Jan 2020 21:12:16 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 269031A207E;
- Fri, 17 Jan 2020 03:12:12 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id F42171A2012;
+ Fri, 17 Jan 2020 03:12:11 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id CB1F91A210F;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id BF44F1A20EE;
  Fri, 17 Jan 2020 03:12:11 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/4] linux-user: xtensa: Fix some constants in termbits.h
-Date: Fri, 17 Jan 2020 03:11:56 +0100
-Message-Id: <1579227117-6310-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH 2/4] linux-user: mips: Synchronize termbits.h with kernel
+Date: Fri, 17 Jan 2020 03:11:55 +0100
+Message-Id: <1579227117-6310-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1579227117-6310-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1579227117-6310-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -69,289 +69,213 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Some constants were defined in terms of host, instead of target,
-as they should be.
+Synchronize all elements of mips' termbits.h with kernel and
+make sure that all applicable macros and other definitions are
+expressed in terms of target, not the host.
 
-Some additional trivial changes in this patch were forced by
-checkpatch.pl.
-
-Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/xtensa/termbits.h | 207 +++++++++++++++++++++++--------------------
- 1 file changed, 113 insertions(+), 94 deletions(-)
+ linux-user/mips/termbits.h | 140 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 89 insertions(+), 51 deletions(-)
 
-diff --git a/linux-user/xtensa/termbits.h b/linux-user/xtensa/termbits.h
-index d1e09e6..abc8666 100644
---- a/linux-user/xtensa/termbits.h
-+++ b/linux-user/xtensa/termbits.h
-@@ -15,40 +15,41 @@
+diff --git a/linux-user/mips/termbits.h b/linux-user/mips/termbits.h
+index 3287cf6..79a9b9b 100644
+--- a/linux-user/mips/termbits.h
++++ b/linux-user/mips/termbits.h
+@@ -3,33 +3,89 @@
+ #ifndef LINUX_USER_MIPS_TERMBITS_H
+ #define LINUX_USER_MIPS_TERMBITS_H
  
- #include <linux/posix_types.h>
- 
--typedef unsigned char   cc_t;
--typedef unsigned int    speed_t;
--typedef unsigned int    tcflag_t;
+-#define TARGET_NCCS 23
 +typedef unsigned char   target_cc_t;
 +typedef unsigned int    target_speed_t;
 +typedef unsigned int    target_tcflag_t;
  
- #define TARGET_NCCS 19
-+
++/*
++ * The ABI says nothing about NCC but seems to use NCCS as
++ * replacement for it in struct termio
++ */
++#define TARGET_NCCS 23
  struct target_termios {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_tcflag_t c_iflag;       /* input mode flags */
-+    target_tcflag_t c_oflag;       /* output mode flags */
-+    target_tcflag_t c_cflag;       /* control mode flags */
-+    target_tcflag_t c_lflag;       /* local mode flags */
-+    target_cc_t c_line;            /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;                    /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];                /* control characters */
++    target_tcflag_t c_iflag;            /* input mode flags */
++    target_tcflag_t c_oflag;            /* output mode flags */
++    target_tcflag_t c_cflag;            /* control mode flags */
++    target_tcflag_t c_lflag;            /* local mode flags */
++    target_cc_t c_line;                 /* line discipline */
++    target_cc_t c_cc[TARGET_NCCS];      /* control characters */
++};
++
++struct target_termios2 {
++    target_tcflag_t c_iflag;            /* input mode flags */
++    target_tcflag_t c_oflag;            /* output mode flags */
++    target_tcflag_t c_cflag;            /* control mode flags */
++    target_tcflag_t c_lflag;            /* local mode flags */
++    target_cc_t c_line;                 /* line discipline */
++    target_cc_t c_cc[TARGET_NCCS];      /* control characters */
++    target_speed_t c_ispeed;            /* input speed */
++    target_speed_t c_ospeed;            /* output speed */
++};
++
++struct target_ktermios {
++    target_tcflag_t c_iflag;            /* input mode flags */
++    target_tcflag_t c_oflag;            /* output mode flags */
++    target_tcflag_t c_cflag;            /* control mode flags */
++    target_tcflag_t c_lflag;            /* local mode flags */
++    target_cc_t c_line;                 /* line discipline */
++    target_cc_t c_cc[TARGET_NCCS];      /* control characters */
++    target_speed_t c_ispeed;            /* input speed */
++    target_speed_t c_ospeed;            /* output speed */
  };
  
- struct target_termios2 {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
--    speed_t c_ispeed;       /* input speed */
--    speed_t c_ospeed;       /* output speed */
-+    target_tcflag_t c_iflag;       /* input mode flags */
-+    target_tcflag_t c_oflag;       /* output mode flags */
-+    target_tcflag_t c_cflag;       /* control mode flags */
-+    target_tcflag_t c_lflag;       /* local mode flags */
-+    target_cc_t c_line;            /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_speed_t c_ispeed;       /* input speed */
-+    target_speed_t c_ospeed;       /* output speed */
- };
++/* c_cc character offsets */
++#define TARGET_VINTR    0       /* Interrupt character [ISIG].  */
++#define TARGET_VQUIT    1       /* Quit character [ISIG].  */
++#define TARGET_VERASE   2       /* Erase character [ICANON].  */
++#define TARGET_VKILL    3       /* Kill-line character [ICANON].  */
++#define TARGET_VMIN     4       /* Minimum number of bytes read at once */
++#define TARGET_VTIME    5       /* Time-out value (tenths of a second) */
++#define TARGET_VEOL2    6       /* Second EOL character [ICANON].  */
++#define TARGET_VSWTC    7       /* ??? */
++#define TARGET_VSWTCH   VSWTC
++#define TARGET_VSTART   8       /* Start (X-ON) character [IXON, IXOFF].  */
++#define TARGET_VSTOP    9       /* Stop (X-OFF) character [IXON, IXOFF].  */
++#define TARGET_VSUSP    10      /* Suspend character [ISIG].  */
++
++#if 0
++/*
++ * VDSUSP is not supported
++ */
++#define TARGET_VDSUSP      11   /* Delayed suspend character [ISIG].  */
++#endif
++#define TARGET_VREPRINT 12      /* Reprint-line character [ICANON].  */
++#define TARGET_VDISCARD 13      /* Discard character [IEXTEN].  */
++#define TARGET_VWERASE  14      /* Word-erase character [ICANON].  */
++#define TARGET_VLNEXT   15      /* Literal-next character [IEXTEN].  */
++#define TARGET_VEOF     16      /* End-of-file character [ICANON].  */
++#define TARGET_VEOL     17      /* End-of-line character [ICANON].  */
++
+ /* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
++#define TARGET_IGNBRK  0000001  /* Ignore break condition.  */
++#define TARGET_BRKINT  0000002  /* Signal interrupt on break.  */
++#define TARGET_IGNPAR  0000004  /* Ignore characters with parity errors.  */
++#define TARGET_PARMRK  0000010  /* Mark parity and framing errors.  */
++#define TARGET_INPCK   0000020  /* Enable input parity check.  */
++#define TARGET_ISTRIP  0000040  /* Strip 8th bit off characters.  */
++#define TARGET_INLCR   0000100  /* Map NL to CR on input.  */
++#define TARGET_IGNCR   0000200  /* Ignore CR.  */
++#define TARGET_ICRNL   0000400  /* Map CR to NL on input.  */
++#define TARGET_IUCLC   0001000  /* Map upper case to lower case on input.  */
++#define TARGET_IXON    0002000  /* Enable start/stop output control.  */
++#define TARGET_IXANY   0004000  /* Any character will restart after stop.  */
++#define TARGET_IXOFF   0010000  /* Enable start/stop input control.  */
++#define TARGET_IMAXBEL 0020000  /* Ring bell when input queue is full.  */
++#define TARGET_IUTF8   0040000  /* Input is UTF-8 */
  
- struct target_ktermios {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
--    speed_t c_ispeed;       /* input speed */
--    speed_t c_ospeed;       /* output speed */
-+    target_tcflag_t c_iflag;       /* input mode flags */
-+    target_tcflag_t c_oflag;       /* output mode flags */
-+    target_tcflag_t c_cflag;       /* control mode flags */
-+    target_tcflag_t c_lflag;       /* local mode flags */
-+    target_cc_t c_line;            /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_speed_t c_ispeed;       /* input speed */
-+    target_speed_t c_ospeed;       /* output speed */
- };
- 
- /* c_cc characters */
-@@ -142,8 +143,8 @@ struct target_ktermios {
- #define  TARGET_B9600   0000015
- #define  TARGET_B19200  0000016
- #define  TARGET_B38400  0000017
+ /* c_oflag bits */
+ #define TARGET_OPOST   0000001
+@@ -82,8 +138,8 @@ struct target_termios {
+ #define  TARGET_B9600  0000015
+ #define  TARGET_B19200 0000016
+ #define  TARGET_B38400 0000017
 -#define TARGET_EXTA B19200
 -#define TARGET_EXTB B38400
-+#define TARGET_EXTA     TARGET_B19200
-+#define TARGET_EXTB     TARGET_B38400
- #define TARGET_CSIZE    0000060
- #define   TARGET_CS5    0000000
- #define   TARGET_CS6    0000020
-@@ -217,13 +218,13 @@ struct target_ktermios {
++#define TARGET_EXTA    TARGET_B19200
++#define TARGET_EXTB    TARGET_B38400
+ #define TARGET_CSIZE   0000060
+ #define   TARGET_CS5   0000000
+ #define   TARGET_CS6   0000020
+@@ -134,26 +190,6 @@ struct target_termios {
+ #define TARGET_TOSTOP  0100000
+ #define TARGET_ITOSTOP TARGET_TOSTOP
  
- /* from arch/xtensa/include/uapi/asm/ioctls.h */
- 
--#define TARGET_FIOCLEX     _IO('f', 1)
--#define TARGET_FIONCLEX    _IO('f', 2)
--#define TARGET_FIOASYNC    _IOW('f', 125, int)
--#define TARGET_FIONBIO     _IOW('f', 126, int)
--#define TARGET_FIONREAD    _IOR('f', 127, int)
--#define TARGET_TIOCINQ     FIONREAD
--#define TARGET_FIOQSIZE    _IOR('f', 128, loff_t)
-+#define TARGET_FIOCLEX     TARGET_IO('f', 1)
-+#define TARGET_FIONCLEX    TARGET_IO('f', 2)
-+#define TARGET_FIOASYNC    TARGET_IOW('f', 125, int)
-+#define TARGET_FIONBIO     TARGET_IOW('f', 126, int)
-+#define TARGET_FIONREAD    TARGET_IOR('f', 127, int)
-+#define TARGET_TIOCINQ     TARGET_FIONREAD
-+#define TARGET_FIOQSIZE    TARGET_IOR('f', 128, loff_t)
- 
- #define TARGET_TCGETS      0x5401
- #define TARGET_TCSETS      0x5402
-@@ -235,28 +236,28 @@ struct target_ktermios {
- #define TARGET_TCSETAW     0x40127419  /* _IOW('t', 25, struct termio) */
- #define TARGET_TCSETAF     0x4012741C  /* _IOW('t', 28, struct termio) */
- 
--#define TARGET_TCSBRK      _IO('t', 29)
--#define TARGET_TCXONC      _IO('t', 30)
--#define TARGET_TCFLSH      _IO('t', 31)
-+#define TARGET_TCSBRK      TARGET_IO('t', 29)
-+#define TARGET_TCXONC      TARGET_IO('t', 30)
-+#define TARGET_TCFLSH      TARGET_IO('t', 31)
- 
- #define TARGET_TIOCSWINSZ  0x40087467  /* _IOW('t', 103, struct winsize) */
- #define TARGET_TIOCGWINSZ  0x80087468  /* _IOR('t', 104, struct winsize) */
--#define TARGET_TIOCSTART   _IO('t', 110)       /* start output, like ^Q */
--#define TARGET_TIOCSTOP    _IO('t', 111)       /* stop output, like ^S */
--#define TARGET_TIOCOUTQ        _IOR('t', 115, int)     /* output queue size */
+-/* c_cc character offsets */
+-#define TARGET_VINTR	0
+-#define TARGET_VQUIT	1
+-#define TARGET_VERASE	2
+-#define TARGET_VKILL	3
+-#define TARGET_VMIN	4
+-#define TARGET_VTIME	5
+-#define TARGET_VEOL2	6
+-#define TARGET_VSWTC	7
+-#define TARGET_VSTART	8
+-#define TARGET_VSTOP	9
+-#define TARGET_VSUSP	10
+-/* VDSUSP not supported */
+-#define TARGET_VREPRINT	12
+-#define TARGET_VDISCARD	13
+-#define TARGET_VWERASE	14
+-#define TARGET_VLNEXT	15
+-#define TARGET_VEOF	16
+-#define TARGET_VEOL	17
 -
--#define TARGET_TIOCSPGRP   _IOW('t', 118, int)
--#define TARGET_TIOCGPGRP   _IOR('t', 119, int)
--
--#define TARGET_TIOCEXCL    _IO('T', 12)
--#define TARGET_TIOCNXCL    _IO('T', 13)
--#define TARGET_TIOCSCTTY   _IO('T', 14)
--
--#define TARGET_TIOCSTI     _IOW('T', 18, char)
--#define TARGET_TIOCMGET    _IOR('T', 21, unsigned int)
--#define TARGET_TIOCMBIS    _IOW('T', 22, unsigned int)
--#define TARGET_TIOCMBIC    _IOW('T', 23, unsigned int)
--#define TARGET_TIOCMSET    _IOW('T', 24, unsigned int)
-+#define TARGET_TIOCSTART   TARGET_IO('t', 110)       /* start output, like ^Q */
-+#define TARGET_TIOCSTOP    TARGET_IO('t', 111)       /* stop output, like ^S */
-+#define TARGET_TIOCOUTQ    TARGET_IOR('t', 115, int) /* output queue size */
-+
-+#define TARGET_TIOCSPGRP   TARGET_IOW('t', 118, int)
-+#define TARGET_TIOCGPGRP   TARGET_IOR('t', 119, int)
-+
-+#define TARGET_TIOCEXCL    TARGET_IO('T', 12)
-+#define TARGET_TIOCNXCL    TARGET_IO('T', 13)
-+#define TARGET_TIOCSCTTY   TARGET_IO('T', 14)
-+
-+#define TARGET_TIOCSTI     TARGET_IOW('T', 18, char)
-+#define TARGET_TIOCMGET    TARGET_IOR('T', 21, unsigned int)
-+#define TARGET_TIOCMBIS    TARGET_IOW('T', 22, unsigned int)
-+#define TARGET_TIOCMBIC    TARGET_IOW('T', 23, unsigned int)
-+#define TARGET_TIOCMSET    TARGET_IOW('T', 24, unsigned int)
- # define TARGET_TIOCM_LE   0x001
- # define TARGET_TIOCM_DTR  0x002
- # define TARGET_TIOCM_RTS  0x004
-@@ -266,16 +267,16 @@ struct target_ktermios {
- # define TARGET_TIOCM_CAR  0x040
- # define TARGET_TIOCM_RNG  0x080
- # define TARGET_TIOCM_DSR  0x100
--# define TARGET_TIOCM_CD   TIOCM_CAR
--# define TARGET_TIOCM_RI   TIOCM_RNG
-+# define TARGET_TIOCM_CD   TARGET_TIOCM_CAR
-+# define TARGET_TIOCM_RI   TARGET_TIOCM_RNG
+ /* ioctls */
  
--#define TARGET_TIOCGSOFTCAR    _IOR('T', 25, unsigned int)
--#define TARGET_TIOCSSOFTCAR    _IOW('T', 26, unsigned int)
--#define TARGET_TIOCLINUX   _IOW('T', 28, char)
--#define TARGET_TIOCCONS    _IO('T', 29)
-+#define TARGET_TIOCGSOFTCAR    TARGET_IOR('T', 25, unsigned int)
-+#define TARGET_TIOCSSOFTCAR    TARGET_IOW('T', 26, unsigned int)
-+#define TARGET_TIOCLINUX   TARGET_IOW('T', 28, char)
-+#define TARGET_TIOCCONS    TARGET_IO('T', 29)
- #define TARGET_TIOCGSERIAL 0x803C541E  /*_IOR('T', 30, struct serial_struct)*/
- #define TARGET_TIOCSSERIAL 0x403C541F  /*_IOW('T', 31, struct serial_struct)*/
--#define TARGET_TIOCPKT     _IOW('T', 32, int)
-+#define TARGET_TIOCPKT     TARGET_IOW('T', 32, int)
- # define TARGET_TIOCPKT_DATA        0
- # define TARGET_TIOCPKT_FLUSHREAD   1
- # define TARGET_TIOCPKT_FLUSHWRITE  2
-@@ -286,43 +287,61 @@ struct target_ktermios {
- # define TARGET_TIOCPKT_IOCTL      64
+ #define TARGET_TCGETA		0x5401
+@@ -186,7 +222,7 @@ struct target_termios {
+ #define	 TARGET_TIOCPKT_START		0x08	/* start output */
+ #define	 TARGET_TIOCPKT_NOSTOP		0x10	/* no more ^S, ^Q */
+ #define	 TARGET_TIOCPKT_DOSTOP		0x20	/* now do ^S ^Q */
+-/* #define  TIOCPKT_IOCTL		0x40	state change of pty driver */
++#define  TARGET_TIOCPKT_IOCTL       0x40    /* state change of pty driver */
+ #define TARGET_TIOCSWINSZ	TARGET_IOW('t', 103, struct winsize)	/* set window size */
+ #define TARGET_TIOCGWINSZ	TARGET_IOR('t', 104, struct winsize)	/* get window size */
+ #define TARGET_TIOCNOTTY	0x5471		/* void tty association */
+@@ -205,8 +241,8 @@ struct target_termios {
+ #define TARGET_TIOCGPGRP	TARGET_IOR('t', 119, int)	/* get pgrp of tty */
+ #define TARGET_TIOCCONS	TARGET_IOW('t', 120, int)	/* become virtual console */
  
+-#define TARGET_FIONREAD	0x467f
+-#define TARGET_TIOCINQ		TARGET_FIONREAD
++#define TARGET_FIONREAD        0x467f
++#define TARGET_TIOCINQ         TARGET_FIONREAD
  
--#define TARGET_TIOCNOTTY   _IO('T', 34)
--#define TARGET_TIOCSETD    _IOW('T', 35, int)
--#define TARGET_TIOCGETD    _IOR('T', 36, int)
--#define TARGET_TCSBRKP     _IOW('T', 37, int)   /* Needed for POSIX tcsendbreak()*/
--#define TARGET_TIOCSBRK    _IO('T', 39)         /* BSD compatibility */
--#define TARGET_TIOCCBRK    _IO('T', 40)         /* BSD compatibility */
--#define TARGET_TIOCGSID    _IOR('T', 41, pid_t) /* Return the session ID of FD*/
--#define TARGET_TCGETS2     _IOR('T', 42, struct termios2)
--#define TARGET_TCSETS2     _IOW('T', 43, struct termios2)
--#define TARGET_TCSETSW2    _IOW('T', 44, struct termios2)
--#define TARGET_TCSETSF2    _IOW('T', 45, struct termios2)
--#define TARGET_TIOCGRS485  _IOR('T', 46, struct serial_rs485)
--#define TARGET_TIOCSRS485  _IOWR('T', 47, struct serial_rs485)
--#define TARGET_TIOCGPTN    _IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
--#define TARGET_TIOCSPTLCK  _IOW('T',0x31, int)  /* Lock/unlock Pty */
--#define TARGET_TIOCGDEV    _IOR('T',0x32, unsigned int) /* Get primary device node of /dev/console */
--#define TARGET_TIOCSIG     _IOW('T',0x36, int)  /* Generate signal on Pty slave */
--#define TARGET_TIOCVHANGUP _IO('T', 0x37)
--#define TARGET_TIOCGPKT    _IOR('T', 0x38, int) /* Get packet mode state */
--#define TARGET_TIOCGPTLCK  _IOR('T', 0x39, int) /* Get Pty lock state */
--#define TARGET_TIOCGEXCL   _IOR('T', 0x40, int) /* Get exclusive mode state */
--#define TARGET_TIOCGPTPEER _IO('T', 0x41) /* Safely open the slave */
--
--#define TARGET_TIOCSERCONFIG   _IO('T', 83)
--#define TARGET_TIOCSERGWILD    _IOR('T', 84,  int)
--#define TARGET_TIOCSERSWILD    _IOW('T', 85,  int)
-+#define TARGET_TIOCNOTTY   TARGET_IO('T', 34)
-+#define TARGET_TIOCSETD    TARGET_IOW('T', 35, int)
-+#define TARGET_TIOCGETD    TARGET_IOR('T', 36, int)
-+/* Needed for POSIX tcsendbreak()*/
-+#define TARGET_TCSBRKP     TARGET_IOW('T', 37, int)
-+/* BSD compatibility */
-+#define TARGET_TIOCSBRK    TARGET_IO('T', 39)
-+/* BSD compatibility */
-+#define TARGET_TIOCCBRK    TARGET_IO('T', 40)
-+/* Return the session ID of FD*/
-+#define TARGET_TIOCGSID    TARGET_IOR('T', 41, pid_t)
-+#define TARGET_TCGETS2     TARGET_IOR('T', 42, struct target_termios2)
-+#define TARGET_TCSETS2     TARGET_IOW('T', 43, struct target_termios2)
-+#define TARGET_TCSETSW2    TARGET_IOW('T', 44, struct target_termios2)
-+#define TARGET_TCSETSF2    TARGET_IOW('T', 45, struct target_termios2)
-+#define TARGET_TIOCGRS485  TARGET_IOR('T', 46, struct serial_rs485)
-+#define TARGET_TIOCSRS485  TARGET_IOWR('T', 47, struct serial_rs485)
-+/* Get Pty Number (of pty-mux device) */
-+#define TARGET_TIOCGPTN    TARGET_IOR('T', 0x30, unsigned int)
-+/* Lock/unlock Pty */
-+#define TARGET_TIOCSPTLCK  TARGET_IOW('T', 0x31, int)
-+/* Get primary device node of /dev/console */
-+#define TARGET_TIOCGDEV    TARGET_IOR('T', 0x32, unsigned int)
-+/* Generate signal on Pty slave */
-+#define TARGET_TIOCSIG     TARGET_IOW('T', 0x36, int)
-+#define TARGET_TIOCVHANGUP TARGET_IO('T', 0x37)
-+/* Get packet mode state */
-+#define TARGET_TIOCGPKT    TARGET_IOR('T', 0x38, int)
-+/* Get Pty lock state */
-+#define TARGET_TIOCGPTLCK  TARGET_IOR('T', 0x39, int)
-+/* Get exclusive mode state */
-+#define TARGET_TIOCGEXCL   TARGET_IOR('T', 0x40, int)
-+/* Safely open the slave */
-+#define TARGET_TIOCGPTPEER TARGET_IO('T', 0x41)
-+
-+#define TARGET_TIOCSERCONFIG   TARGET_IO('T', 83)
-+#define TARGET_TIOCSERGWILD    TARGET_IOR('T', 84,  int)
-+#define TARGET_TIOCSERSWILD    TARGET_IOW('T', 85,  int)
- #define TARGET_TIOCGLCKTRMIOS  0x5456
- #define TARGET_TIOCSLCKTRMIOS  0x5457
--#define TARGET_TIOCSERGSTRUCT  0x5458           /* For debugging only */
--#define TARGET_TIOCSERGETLSR   _IOR('T', 89, unsigned int) /* Get line status reg. */
-+/* For debugging only */
-+#define TARGET_TIOCSERGSTRUCT  0x5458
-+/* Get line status reg. */
-+#define TARGET_TIOCSERGETLSR   TARGET_IOR('T', 89, unsigned int)
- /* ioctl (fd, TIOCSERGETLSR, &result) where result may be as below */
--# define TARGET_TIOCSER_TEMT    0x01            /* Transmitter physically empty */
--#define TARGET_TIOCSERGETMULTI 0x80a8545a /* Get multiport config  */
-+/* Transmitter physically empty */
-+# define TARGET_TIOCSER_TEMT    0x01
-+/* Get multiport config  */
-+#define TARGET_TIOCSERGETMULTI 0x80a8545a
- /* _IOR('T', 90, struct serial_multiport_struct) */
--#define TARGET_TIOCSERSETMULTI 0x40a8545b /* Set multiport config */
-+/* Set multiport config */
-+#define TARGET_TIOCSERSETMULTI 0x40a8545b
- /* _IOW('T', 91, struct serial_multiport_struct) */
--
--#define TARGET_TIOCMIWAIT  _IO('T', 92) /* wait for a change on serial input line(s) */
--#define TARGET_TIOCGICOUNT 0x545D  /* read serial port inline interrupt counts */
-+/* wait for a change on serial input line(s) */
-+#define TARGET_TIOCMIWAIT      TARGET_IO('T', 92)
-+/* read serial port inline interrupt counts */
-+#define TARGET_TIOCGICOUNT 0x545D
- #endif /* XTENSA_TERMBITS_H */
+ #define TARGET_TIOCGETP        0x7408
+ #define TARGET_TIOCSETP        0x7409
+@@ -222,10 +258,10 @@ struct target_termios {
+ #define TARGET_TIOCSBRK	0x5427  /* BSD compatibility */
+ #define TARGET_TIOCCBRK	0x5428  /* BSD compatibility */
+ #define TARGET_TIOCGSID	0x7416  /* Return the session ID of FD */
+-#define TARGET_TCGETS2          TARGET_IOR('T', 0x2A, struct termios2)
+-#define TARGET_TCSETS2          TARGET_IOW('T', 0x2B, struct termios2)
+-#define TARGET_TCSETSW2         TARGET_IOW('T', 0x2C, struct termios2)
+-#define TARGET_TCSETSF2         TARGET_IOW('T', 0x2D, struct termios2)
++#define TARGET_TCGETS2          TARGET_IOR('T', 0x2A, struct target_termios2)
++#define TARGET_TCSETS2          TARGET_IOW('T', 0x2B, struct target_termios2)
++#define TARGET_TCSETSW2         TARGET_IOW('T', 0x2C, struct target_termios2)
++#define TARGET_TCSETSF2         TARGET_IOW('T', 0x2D, struct target_termios2)
+ #define TARGET_TIOCGRS485       TARGET_IOR('T', 0x2E, struct serial_rs485)
+ #define TARGET_TIOCSRS485       TARGET_IOWR('T', 0x2F, struct serial_rs485)
+ #define TARGET_TIOCGPTN	TARGET_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
+@@ -237,6 +273,8 @@ struct target_termios {
+ #define TARGET_TIOCGPTLCK       TARGET_IOR('T', 0x39, int)
+ #define TARGET_TIOCGEXCL        TARGET_IOR('T', 0x40, int)
+ #define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41)
++#define TARGET_TIOCGISO7816     TARGET_IOR('T', 0x42, struct serial_iso7816)
++#define TARGET_TIOCSISO7816     TARGET_IOWR('T', 0x43, struct serial_iso7816)
+ 
+ /* I hope the range from 0x5480 on is free ... */
+ #define TARGET_TIOCSCTTY	0x5480		/* become controlling tty */
 -- 
 2.7.4
 
