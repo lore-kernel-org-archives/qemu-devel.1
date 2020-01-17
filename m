@@ -1,74 +1,78 @@
 Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_IMAGE_ONLY_08,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 513CDC33C9E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5E6C33CB3
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F25C20748
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:14:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F25C20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bell.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2BBAB2083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:14:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SG+HgYet"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BBAB2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isYwf-00060j-8G
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 16:14:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53894)
+	id 1isYwg-00062g-Af
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 16:14:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dave.anglin@bell.net>) id 1isVUn-0002iY-LA
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:33:25 -0500
+ (envelope-from <fairouz.fsegs@gmail.com>) id 1isXKz-0007to-2E
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 14:31:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dave.anglin@bell.net>) id 1isVUj-0004Go-GU
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:33:21 -0500
-Received: from simcoe208srvr.owm.bell.net ([184.150.200.208]:38558
- helo=torfep02.bell.net)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dave.anglin@bell.net>)
- id 1isVUj-0004Eh-B3
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:33:17 -0500
-Received: from bell.net torfep02 184.150.200.158 by torfep02.bell.net
- with ESMTP
- id <20200117173313.RTBZ16761.torfep02.bell.net@torspm02.bell.net>
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 12:33:13 -0500
-Received: from [192.168.0.101] (really [65.95.37.184]) by torspm02.bell.net
- with ESMTP
- id <20200117173313.RWU16325.torspm02.bell.net@[192.168.0.101]>;
- Fri, 17 Jan 2020 12:33:13 -0500
-To: Helge Deller <deller@gmx.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200117015322.12953-1-richard.henderson@linaro.org>
- <7b14c840-0d3f-0c67-06be-81b058c727fb@gmx.de>
- <08c4bdcb-b07d-eb30-a38d-f27ed6400952@redhat.com>
- <2c0285e8-5919-e768-c191-f22b9c296208@gmx.de>
-From: John David Anglin <dave.anglin@bell.net>
-Openpgp: preference=signencrypt
-Subject: Re: [PATCH] target/hppa: Allow, but diagnose, LDCW aligned only mod 4
-Message-ID: <ca1f9390-aa77-6346-943d-1984899b43d7@bell.net>
-Date: Fri, 17 Jan 2020 12:33:13 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+ (envelope-from <fairouz.fsegs@gmail.com>) id 1isXKx-0006FD-Tw
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 14:31:20 -0500
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:45841)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <fairouz.fsegs@gmail.com>)
+ id 1isXKx-0006EF-PK
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 14:31:19 -0500
+Received: by mail-oi1-x231.google.com with SMTP id n16so23190311oie.12
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 11:31:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=/uBY9fCAQSyeZdYF9jAsudL5P9yVjLAeINdgiZzi03M=;
+ b=SG+HgYet7p2bHkuf1HXLgo/XVFdNimzJEACaBZB1Io2cyaYYOTx1F68cwujM4T4O0c
+ +TR4olqAr9fEqVctA5LUbrhMDZQRJuTDxHbRmK8KmgnVnrmYydKgOCH0g/ABV0lrgsUp
+ FBlbTShs7PRlDn4RLvfZJDBEQks5SRliUNKA7TgOp7VqqmxjR11rDs5wRkmHoUkkXJED
+ E/nk7TasAqdyOdF7WWfeMmTvdjudMgzmx3dZcBRvd248nKGsD1hgf9bHKLYgDM6fZNxF
+ hRogGCW4qFedUPs3xMuo4e1I/BTjtnpFtZgSnZvY7fiXVq0QwKDYpT2wTERFsk/FwZpW
+ aSHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=/uBY9fCAQSyeZdYF9jAsudL5P9yVjLAeINdgiZzi03M=;
+ b=Ra9rwVI2AnMFtYWBrDEo1xTeDu3jxMI7GOibxNE3DuiKKCWBikxTJaBoj9gE5oMNB/
+ Z51zEGr3IP0HbwnnTALhyLnMk2ZVrhAuCgVpPdUnN8gbL0M51TjA4JCh7PDoZTQ27u+m
+ LkK0T1ANellfjoESF8wPDPtF6tEmYr4tT1XYg7AaKNOb8fnuVGp4jq+jc8PuVo4Nk5hJ
+ 8FiLJk033ecfjPaJPTe1L4h1M3+l2oDar5jalcYN0a72a+7cHLVBbTi0lDYohMGbEbgK
+ 45PFi8ZVM24UoTSHjEnIM/9GuQLsx2ruzFsKjtGDw7sYhcKVMTbC/6ni6eBtvIkPhjjA
+ fk0w==
+X-Gm-Message-State: APjAAAWCJuXofkrB+WfOekVdUWk25dln9lhs0zAuyN0I6MhAk3dSJyZp
+ mD8rFin01R060HuL0nAblUfNh5BnnheUpuBcs6gqeeA4
+X-Google-Smtp-Source: APXvYqxa/CM8g4H/jGC9h4pFcmdK4Fb3eMWgntAw2lc3H0kmrKNmP+M2wmKXVwR6nH1YuimlgRVI1hAl9F6/7F/4a2g=
+X-Received: by 2002:a05:6808:a83:: with SMTP id q3mr4798066oij.0.1579289478123; 
+ Fri, 17 Jan 2020 11:31:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <2c0285e8-5919-e768-c191-f22b9c296208@gmx.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-CM-Analysis: v=2.3 cv=KfusTjQD c=1 sm=1 tr=0 a=DwDZ6JUTUl7ZyOFm/YZ6ZA==:117
- a=DwDZ6JUTUl7ZyOFm/YZ6ZA==:17 a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19
- a=IkcTkHD0fZMA:10 a=Jdjhy38mL1oA:10 a=FBHGMhGWAAAA:8 a=pLNHzyMZLHhJew_mZeAA:9
- a=QEXdDO2ut3YA:10 a=9gvnlMMaQFpL9xblJ6ne:22
-X-CM-Envelope: MS4wfOKK83ZiH686Y8whch9Xd+4p8xbpLqhezHBBepjx573VaiS1oj9YF316Ra9ylUPpbjfGtpgTKGi40bTzCjs9h0sO8lRyn6ZFpl7L30dJJ7wnZgVnQMkn
- DFpLl3LjmnStpcf5yRzN5LXoZ3M2MR54cC4e4AxQHrFgODn+rD/s7nppOD8W8uk8BkD+glhXOacnXg==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 184.150.200.208
+From: Fairouz Fakhfakh <fairouz.fsegs@gmail.com>
+Date: Fri, 17 Jan 2020 20:31:08 +0100
+Message-ID: <CABeOJJXwH05-fKDumR=vLV8aJvxyZhaqD7S+LMAqEz-53MOmYQ@mail.gmail.com>
+Subject: help
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="00000000000057533a059c5afc2a"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::231
 X-Mailman-Approved-At: Fri, 17 Jan 2020 16:13:05 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,25 +89,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is not related to the patch but there is one other corner issue with=
- the load and clear instructions.
+--00000000000057533a059c5afc2a
+Content-Type: text/plain; charset="UTF-8"
 
-When the target register is GR0, the instruction may be implemented as a =
-normal load and clear
-which clears memory, or it may be aliased to the equivalent-sized load in=
-struction, in which case
-it behaves exactly like that prefetch instruction and does not clear the =
-data in memory.
+Hello,
+I would like to use qemu to install a virtual machine (VM) in Ubuntu.
+I need a minimal VM  which contains only jdk (openjdk).
 
-See page 6-12 on PA 2.0 architecture.
+Can someone help me, please.
+Thank you in advance.
 
-Don't know what was actually done.
+--00000000000057533a059c5afc2a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Dave
+<div dir=3D"ltr"><div>Hello,</div><div>I would like to use qemu to install =
+a virtual machine (VM) in Ubuntu.<br>I need a minimal VM =C2=A0which contai=
+ns only jdk (openjdk).<br><br>Can someone help me, please.<br>Thank you in =
+advance.<br></div></div><img src=3D"https://my-email-signature.link/signatu=
+re.gif?u=3D43490&amp;e=3D82146786&amp;v=3Dac8ccdef42c4fd4b7d102b7c8d6f15c85=
+0fefb5c9a5bd6adaad6257e36bcd7cd" style=3D"width:2px;max-height:0;overflow:h=
+idden">
 
---=20
-John David Anglin  dave.anglin@bell.net
-
-
+--00000000000057533a059c5afc2a--
 
