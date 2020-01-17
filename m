@@ -2,86 +2,100 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05417C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC88C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:44:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5BED2073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:39:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 094242073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:44:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gI6o6rPM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5BED2073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LJ2ZefcZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 094242073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isP2G-0007KN-VU
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:39:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56840)
+	id 1isP7E-0000rW-02
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:44:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1isP1c-0006mX-UF
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:38:50 -0500
+ (envelope-from <david.edmondson@oracle.com>) id 1isP6B-00006C-FI
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:43:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1isP1X-0000Y4-2s
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:38:47 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54773
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1isP1W-0000X8-V3
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:38:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579257521;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=U8X9n06uJZY6RjTeyMV5eWA1WPy/toyNdJM2U6vh8+U=;
- b=gI6o6rPMUqfQLx6fq0N7ahpq+/c74dME8S17rsx97zjP18GQ3P7f4vMpCAtLDvVzILTij/
- dlNTTzDPS9uQgsAXiDqnCLV0fnLR2qBGLhBsDV26wC5t0oSOzh+nMhaO5Mhn9KttC6CgS+
- vddlXPSlowxxTLFyRf6HjA9DjEu/FjE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-u2zTjAl2PP2QejT9_RDp9w-1; Fri, 17 Jan 2020 05:38:40 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCDC0DB21;
- Fri, 17 Jan 2020 10:38:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-212.ams2.redhat.com [10.36.116.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA0D586CB7;
- Fri, 17 Jan 2020 10:38:32 +0000 (UTC)
-Subject: Re: [PATCH] target/s390x/kvm: Enable adapter interruption suppression
- again
-To: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
-References: <20200116122026.5804-1-thuth@redhat.com>
- <ad421fc1-8241-3c73-e597-aebb3fc8a309@linux.ibm.com>
- <20200116212601.0fcd3be6.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <d59cf080-bb0c-91af-08fc-1cfd7a32663e@redhat.com>
-Date: Fri, 17 Jan 2020 11:38:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <david.edmondson@oracle.com>) id 1isP67-0003t7-Mi
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:43:31 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:36742)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david.edmondson@oracle.com>)
+ id 1isP67-0003s9-EJ
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:43:27 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00HAXUe1177271
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:43:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2019-08-05;
+ bh=GwwlSnoVkavbdrMM6cWwlxzkg7OeFn735HfbnWHuxeA=;
+ b=LJ2ZefcZtsxHdbBpHckFbTl//xN6+1K5CFGAAOFuqfOYg/X2WJJJgodWBaV/foQkRr0+
+ YMflMXH2sbL7FwDdF3xyRhln6hk0sDGPRk0uzwD7Pp2mE+XIuoQZOqS1rglrjSyvvnVm
+ hjpzuKr6WqCVNsF9z4y3Z0a7bmzHuZKQU2SV7knH2HeLvoCSLMUmi5279h0qI90uwqah
+ L6ewsBnQhwvo8ZW70tIM+u38EhOD10tV0uwcqG7h8NpYnvzADi7iJQ9UKPyE3L6n3iC3
+ FfNs3OOAElE/rvGwihf20t4C/n28NOkJcufPRaHnZfjxl6hZ1/swkgY2QGZLZBe2wCaD lA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 2xf74000a3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:43:25 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00HAhEsj086350
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:43:25 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3020.oracle.com with ESMTP id 2xk231knsg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:43:17 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00HAggWe008501
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:42:42 GMT
+Received: from disaster-area.hh.sledj.net (/81.149.164.25)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 17 Jan 2020 02:42:42 -0800
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 752cccbe;
+ Fri, 17 Jan 2020 10:42:40 +0000 (UTC)
+From: David Edmondson <david.edmondson@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qemu-img: Add --target-is-zero to convert
+Date: Fri, 17 Jan 2020 10:41:57 +0000
+Message-Id: <20200117104156.1364069-1-david.edmondson@oracle.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <id:m21rryz8al.fsf@dme.org>
+References: <id:m21rryz8al.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <20200116212601.0fcd3be6.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: u2zTjAl2PP2QejT9_RDp9w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9502
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=914
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001170083
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9502
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=959 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001170082
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,97 +107,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: David Edmondson <david.edmondson@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/01/2020 21.26, Cornelia Huck wrote:
-> On Thu, 16 Jan 2020 15:19:13 -0500
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> 
->> On 1/16/20 7:20 AM, Thomas Huth wrote:
->>> The AIS feature has been disabled late in the v2.10 development
->>> cycle since there were some issues with migration (see commit
->>> 3f2d07b3b01ea61126b - "s390x/ais: for 2.10 stable: disable ais
->>> facility"). We originally wanted to enable it again for newer
->>> machine types, but apparently we forgot to do this so far. Let's
->>> do it for the new s390-ccw-virtio-5.0 machine now.
->>>
->>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>   hw/s390x/s390-virtio-ccw.c         |  4 ++++
->>>   include/hw/s390x/s390-virtio-ccw.h |  4 ++++
->>>   target/s390x/kvm.c                 | 11 ++++++++---
->>>   3 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> (...)
-> 
->>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->>> index 15260aeb9a..4c1c8c0208 100644
->>> --- a/target/s390x/kvm.c
->>> +++ b/target/s390x/kvm.c
->>> @@ -329,6 +329,8 @@ static void ccw_machine_class_foreach(ObjectClass *oc, void *opaque)
->>>   
->>>   int kvm_arch_init(MachineState *ms, KVMState *s)
->>>   {
->>> +    S390CcwMachineClass *smc = S390_CCW_MACHINE_OBJ_GET_CLASS(ms);
->>> +  
->>
->> I still can't run a proper test due to unavailable hw but in the 
->> meantime I tried to virsh define a libvirt guest pointed at qemu (master 
->> + this patch).  Regardless of machine type (s390-ccw-virtio-5.0 or 
->> s390-ccw-virtio-4.2) I get:
->>
->> virsh define guest.xml
->> error: Failed to define domain from /path/to/guest.xml
->> error: invalid argument: could not find capabilities for arch=s390x 
->> domaintype=kvm
->>
->> Similarly:
->>
->> virsh domcapabilities
->> error: failed to get emulator capabilities
->> error: invalid argument: unable to find any emulator to serve 's390x' 
->> architecture
->>
->> Rolling back to qemu master, the define and domcapabilities work (with 
->> no ais of course).
->>
->> So: there is some incompatibility between the way libvirt invokes qemu 
->> to detect capabilities and this code.  The above line seems to be the 
->> root problem - if I take your patch and remove 'smc' then libvirt works 
->> as expected and I can see ais in the domcapabilities.
->>
->> Looking at those wrappers David mentioned...  I suspect you need this 
->> for the 'none' machine case.  I tried a quick hack with the following:
->>
->> bool ais_allowed(void)
->> {
->>      /* for "none" machine this results in true */
->>      return get_machine_class()->kvm_ais_allowed;
->> }
->>
->> and
->>
->> if (ais_allowed() &&
->>      kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
->>      kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
->> }
->>
->> This works and doesn't break libvirt compatibility detection.
-> 
-> Oh, "none" machine fun again... I think you're on the right track, and
-> we really need a wrapper.
+In many cases the target of a convert operation is a newly provisioned
+target that the user knows is blank (filled with zeroes). In this
+situation there is no requirement for qemu-img to wastefully zero out
+the entire device.
 
-D'oh, so this is the real reason for the wrappers ... ok, I'll respin my
-patch accordingly.
+Add a new option, --target-is-zero, allowing the user to indicate that
+an existing target device is already zero filled.
+---
 
-Thanks a lot for the testing, Matthew!
+Apologies if this arrives twice - this From address wasn't subscribed
+the first time around.
 
- Thomas
+ qemu-img.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index 95a24b9762..56ca727e8c 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -70,6 +70,7 @@ enum {
+     OPTION_PREALLOCATION = 265,
+     OPTION_SHRINK = 266,
+     OPTION_SALVAGE = 267,
++    OPTION_TARGET_IS_ZERO = 268,
+ };
+ 
+ typedef enum OutputFormat {
+@@ -1593,6 +1594,7 @@ typedef struct ImgConvertState {
+     bool copy_range;
+     bool salvage;
+     bool quiet;
++    bool target_is_zero;
+     int min_sparse;
+     int alignment;
+     size_t cluster_sectors;
+@@ -1984,10 +1986,11 @@ static int convert_do_copy(ImgConvertState *s)
+     int64_t sector_num = 0;
+ 
+     /* Check whether we have zero initialisation or can get it efficiently */
+-    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
++    s->has_zero_init = s->target_is_zero;
++
++    if (!s->has_zero_init && s->target_is_new && s->min_sparse &&
++        !s->target_has_backing) {
+         s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
+-    } else {
+-        s->has_zero_init = false;
+     }
+ 
+     if (!s->has_zero_init && !s->target_has_backing &&
+@@ -2076,6 +2079,7 @@ static int img_convert(int argc, char **argv)
+         .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
+         .wr_in_order        = true,
+         .num_coroutines     = 8,
++        .target_is_zero     = false,
+     };
+ 
+     for(;;) {
+@@ -2086,6 +2090,7 @@ static int img_convert(int argc, char **argv)
+             {"force-share", no_argument, 0, 'U'},
+             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
+             {"salvage", no_argument, 0, OPTION_SALVAGE},
++            {"target-is-zero", no_argument, 0, OPTION_TARGET_IS_ZERO},
+             {0, 0, 0, 0}
+         };
+         c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
+@@ -2209,6 +2214,9 @@ static int img_convert(int argc, char **argv)
+         case OPTION_TARGET_IMAGE_OPTS:
+             tgt_image_opts = true;
+             break;
++        case OPTION_TARGET_IS_ZERO:
++            s.target_is_zero = true;
++            break;
+         }
+     }
+ 
+@@ -2247,6 +2255,11 @@ static int img_convert(int argc, char **argv)
+         warn_report("This will become an error in future QEMU versions.");
+     }
+ 
++    if (s.target_is_zero && !skip_create) {
++        error_report("--target-is-zero requires use of -n flag");
++        goto fail_getopt;
++    }
++
+     s.src_num = argc - optind - 1;
+     out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
+ 
+-- 
+2.24.1
 
 
