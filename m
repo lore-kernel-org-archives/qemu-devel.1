@@ -2,79 +2,69 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B89C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:12:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9F1C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:19:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 323242073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:12:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZGdL41dP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 323242073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FC4C2073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:19:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC4C2073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isQUk-0001OK-BV
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:12:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39896)
+	id 1isQaZ-00036C-Ns
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:18:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1isQU4-0000vi-Lq
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:12:17 -0500
+ (envelope-from <pl@kamp.de>) id 1isQZu-0002dE-3M
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:18:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1isQU3-00079o-EI
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:12:16 -0500
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:43602)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1isQU3-00078f-9s
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:12:15 -0500
-Received: by mail-oi1-x232.google.com with SMTP id p125so21965919oif.10
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:12:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lLadbbQrceG83V4N2CzOhiEUJQRbKUOQTgCWLqYJD4k=;
- b=ZGdL41dP0xpPKMDNGM1ZnYDoa3O9SxB4BsQ0JUljEP1z6t6ju6KN837UEmIZ8KV3XU
- m+RFJZQL82eokY5QtPC/uZvNonar8yEa5lgaa0xHEuQK0lpppvB9/XpoLbixOIhnr+Zi
- I/l2OM4b7VWY3CZ1kl2phP+SjiJRri8TMHd7z5qEdiVIvQ0AqaWw9zgBJdt6RIKzRNkc
- Z42+xA1GrHNOLAXkzQVRCIaA6mOeAUbhJ0ZncLQ3QcYkIrTVuO9x52qFoabzNZHYuG9y
- zY/0VCXAWmq0bYVgbjMezY1G/7ak11bGlpETrmfwAwajJIo7m3Mb9owmuTE8/gel4AFW
- 0zIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lLadbbQrceG83V4N2CzOhiEUJQRbKUOQTgCWLqYJD4k=;
- b=RWHLnLxcmWKsu0yEKD5tZgKxklYD3saDv/Ogx4eaRdEK6Nb4kQzHfrZxi4pZlKPBnN
- 1VT65He3yTay5oeIYA77sqKnBC1MaiuREva3W+QNVe7oiL37mlkZwpfyhOg8jJU/BcUJ
- vznsJYkwBRWmPEu+pMg9JR/9GeNGfwnnbYSHBKkAmu6x/79MWN0KbOyZ9fOtTIG2qtbe
- zv16R4yN0SzXvBfBllDoxEiPAAff4E7d4p0Cnx5yNgteq3tmAInV/LpJsqiqDLWB/NpK
- Z4Yrp6QngQcSHp6UN4jYVqP24tCtngdW/X0LHZjT5bGgxLxQ5/MVj/vLiSJwTYGPnO4S
- oFgw==
-X-Gm-Message-State: APjAAAWPMik0WWkjY058xAHuj8bje+ep050wte4IOPcVE1sOPj/SZzVZ
- nRyUS2c/qGrLNcLxJm28s2gKxQpJF/2SVC817eQliA==
-X-Google-Smtp-Source: APXvYqzzOwxqM652oSNNFSsD/jlScwmd1Q0oFYy8YNY5m25jzkJh6pR7Jq6kw5vMmFqGOxU/emg2uEzLeNfEgz0n2NQ=
-X-Received: by 2002:aca:f484:: with SMTP id s126mr3027665oih.48.1579263134230; 
- Fri, 17 Jan 2020 04:12:14 -0800 (PST)
+ (envelope-from <pl@kamp.de>) id 1isQZp-00059u-WD
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:18:17 -0500
+Received: from kerio.kamp.de ([195.62.97.192]:59666)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pl@kamp.de>) id 1isQZp-000585-QE
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:18:13 -0500
+X-Footer: a2FtcC5kZQ==
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 13:18:09 +0100
+Received: (qmail 31307 invoked from network); 17 Jan 2020 12:18:10 -0000
+Received: from ac1.vpn.kamp-intra.net (HELO ?172.20.250.1?)
+ (pl@kamp.de@::ffff:172.20.250.1)
+ by submission.kamp.de with ESMTPS (AES128-SHA encrypted) ESMTPA;
+ 17 Jan 2020 12:18:10 -0000
+Subject: Re: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior
+ to previous a0000
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
+ <20200108150458.GC3184@work-vm>
+ <ca222a5f-1ec6-477c-ed83-6ef52ea9e97f@kamp.de>
+ <20200109184440.GR6795@work-vm>
+ <b89e8ba2-49e9-8c0d-1129-116afa76366a@kamp.de>
+ <cd316fb8-b56b-2913-8b57-f085ca4426d7@kamp.de>
+ <11bd7f7a-9022-6c35-3b92-27d6e66f3295@kamp.de>
+ <20200116202605.GN3108@work-vm>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <a1bf5cc0-f32d-48eb-35e4-b895458f8ffe@kamp.de>
+Date: Fri, 17 Jan 2020 13:18:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20200114160235.308040-1-groug@kaod.org>
-In-Reply-To: <20200114160235.308040-1-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Jan 2020 12:12:03 +0000
-Message-ID: <CAFEAcA_64te7d16=8FnT9455vCwzqDxw+299voteTb7t3yZx8Q@mail.gmail.com>
-Subject: Re: [PULL 0/5] 9p patches 2020-01-14
-To: Greg Kurz <groug@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::232
+In-Reply-To: <20200116202605.GN3108@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 195.62.97.192
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +76,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jan 2020 at 16:02, Greg Kurz <groug@kaod.org> wrote:
->
-> The following changes since commit 3c8a6575985b1652b45bfa670b5e1907d642cfa0:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200113-pull-request' into staging (2020-01-13 14:19:57 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/gkurz/qemu.git tags/9p-next-2020-01-14
->
-> for you to fetch changes up to fa0f22026747fe0ea6ef4b86c4e73e2e0965f05b:
->
->   9pfs/9p.c: remove unneeded labels (2020-01-14 07:59:47 +0100)
->
-> ----------------------------------------------------------------
-> Assorted fixes and cleanups.
->
-> ----------------------------------------------------------------
+Am 16.01.20 um 21:26 schrieb Dr. David Alan Gilbert:
+> * Peter Lieven (pl@kamp.de) wrote:
+>> Am 16.01.20 um 13:47 schrieb Peter Lieven:
+>>> Am 13.01.20 um 17:25 schrieb Peter Lieven:
+>>>> Am 09.01.20 um 19:44 schrieb Dr. David Alan Gilbert:
+>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>> Am 08.01.20 um 16:04 schrieb Dr. David Alan Gilbert:
+>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>>>> Hi,
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> I have a Qemu 4.0.1 machine with vhost-net network adapter, thats polluting the log with the above message.
+>>>>>>>>
+>>>>>>>> Is this something known? Googling revealed the following patch in Nemu (with seems to be a Qemu fork from Intel):
+>>>>>>>>
+>>>>>>>> https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619dccced114ef7f56e
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> The network stopped functioning. After a live-migration the vServer is reachable again.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Any ideas?
+>>>>>>> What guest are you running and what does your qemu commandline look
+>>>>>>> like?
+>>>>>> Its running debian9. We have hundreds of other VMs with identical setup. Do not know why this one makes trouble.
+>>>>> Could you extract an 'info mtree' from it - particularly the
+>>>>> 'address-space: memory' near the top.
+>>>>
+>>>> Here we go:
+>>>>
+>>>>
+>>>> address-space: memory
+>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>>>     0000000000000000-000000003fffffff (prio 0, i/o): alias ram-below-4g @pc.ram 0000000000000000-000000003fffffff
+>>>>     0000000000000000-ffffffffffffffff (prio -1, i/o): pci
+>>>>       00000000000a0000-00000000000affff (prio 2, i/o): alias vga.chain4 @vga.vram 0000000000000000-000000000000ffff
+>>>>       00000000000a0000-00000000000bffff (prio 1, i/o): vga-lowmem
+>>>
+>>> What seems special is that the RAM area is prio2. Any idea if this makes trouble?
+>>
+>> Update from my side. This happens when I have Debian 10 with XFCE when the Graphical User Interface is initialized.
+>>
+>> I see the log message when I specify -M pc-i440fx-2.9. If I obmit the machine type the error does not appear.
+> I can't persuade this to reproduce here on the images I currently have;
+> but if you can rebuild, can you try the v3 of 'Fix hyperv synic on
+> vhost' I've just posted?  It turns off the alignment code that's
+> spitting that error in vhost-kernel cases, so should go away.
 
-Compile failure on 32-bit:
+Your patch also seems to fix also my issue. No more errors and the network keeps responding.
 
-/home/peter.maydell/qemu/hw/9pfs/9p.c: In function 'v9fs_xattr_read':
-/home/peter.maydell/qemu/hw/9pfs/9p.c:2140:54: error: passing argument
-4 of 'v9fs_init_qiov_from_pdu' from incompatible pointer type
-[-Werror=incompatible-pointer-types]
-     v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &read_count, false);
-                                                      ^
-/home/peter.maydell/qemu/hw/9pfs/9p.c:2092:13: note: expected 'size_t
-* {aka unsigned int *}' but argument is of type 'uint64_t * {aka long
-long unsigned int *}'
- static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
-             ^~~~~~~~~~~~~~~~~~~~~~~
 
-thanks
--- PMM
+Thanks
+
+Peter
+
+
 
