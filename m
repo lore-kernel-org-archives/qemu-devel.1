@@ -2,80 +2,80 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D9ECC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7A2C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28DF5206E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:09:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A0B220728
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:16:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GM/DfOFL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28DF5206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HpiFy5Af"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0B220728
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isRNe-00083O-9T
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:09:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46055)
+	id 1isRUd-00027W-R0
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:16:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1isRN1-0007dO-Kh
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:09:04 -0500
+ (envelope-from <cohuck@redhat.com>) id 1isRTU-0001ZI-Gz
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1isRN0-0001xd-93
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:09:03 -0500
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:40163)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1isRN0-0001wi-30
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:09:02 -0500
-Received: by mail-ot1-x332.google.com with SMTP id w21so22432033otj.7
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 05:09:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dRL5aheFult2l/QUcaADS2c4QmtdcS7THDxxywjrYkA=;
- b=GM/DfOFLJtlkT8yE0Yq/RKgj2phe8zSuL3Lr1oxDuzKxChaeAiaFjt3m1FtaSwdHpc
- GZkMteCJ1R7WSXNqBlILAJlBP4AzOe5+e7DH8kSsUTe9ilxNCV/zKaBymesO8MRhnMJN
- R4e+GEqCqc8798++byg9upNMDLBmgSbtcwMEWF9g36lu+LKKfy/HJe3zTLLB3Hc/Vbqg
- OwAkOZkx9I0EtviWnEh5MMXzw+YLtd9eqqUJiroRO1TIImNVBLDBlo/VWdSIsQt9m8xH
- Nj4PVGK+5goQnZMJERhKlWaWWomGH9ziNiUrFPIbfCr6SuSc6G985O5a9PSD8zXWLAl7
- 2mtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dRL5aheFult2l/QUcaADS2c4QmtdcS7THDxxywjrYkA=;
- b=QqQNm2J86VnUsC6kimmZGOGPJ3/tbWy8yMcrb0wxtY6yMoiQ85XTKwDjTtkmfhM6yN
- N1ivF8Xoof3EZyPn6wFhSuV3TYw9/9tzJvyelj6jwbH+py311zpjbpwk0c5kmOeHBoz5
- nVsfw+fvrOArpG95WWWn5RkDYC5SIYjDkovNcLSlUFun4UoQIUSwKdHnhYuOYq6U27H2
- Rg6VJ55kMx9+ZisvZIshMQi5YhFPD84Pa8p4VWm5Wey1JgT6B/+09ReMzF5ek8LM0upA
- ywNajrsjXyGeJ7ko5gcmBOvOsN7kT7xyqmmFbSxmmxfbJ2YF2lSLvZreAwmAUlWPuztu
- g+NQ==
-X-Gm-Message-State: APjAAAV0jvzp9AvFvoE3W3VDmqgARB2+vW0e7USz5g0iBK33BDyJUwOo
- QU9xoJBNhZzhDVM4Il9bbY87F9dPonaeAo558Sw3NQ==
-X-Google-Smtp-Source: APXvYqzdQy3BbhrDLcIrrZHcEWbdS77OxmQ/p1pxgEt/X+aVdEsh9OZn9fIJZSbgoSk2qw79S5YNjnIWI0qgZtoAW5o=
-X-Received: by 2002:a05:6830:184:: with SMTP id
- q4mr6058581ota.232.1579266539724; 
- Fri, 17 Jan 2020 05:08:59 -0800 (PST)
+ (envelope-from <cohuck@redhat.com>) id 1isRTQ-00005A-09
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:15:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45862
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1isRTP-0008Vc-Gv
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:15:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579266938;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iIBOlwwddxLm/wFmbClDgfBUiXwTJeo1h7DFwBHfUWM=;
+ b=HpiFy5AfbJZhdaXFSwOJsw5/AjIrHUlQIkSzcjKsR2Yp55xzGrZmUNdtkE/04Wo6Phy7ZK
+ uhQabgaCqDvS2Sf8h18seGSW7VcTC0iins1Tben6Nb/ad2GyfJalm7Xf/TE8HcJb6kkErv
+ o/So3OvgwnzuMDUF62sDjc2QjVvSvaE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-ltJOukHcOdScL78F8Q298Q-1; Fri, 17 Jan 2020 08:15:37 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B762DB60;
+ Fri, 17 Jan 2020 13:15:36 +0000 (UTC)
+Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 328D180895;
+ Fri, 17 Jan 2020 13:15:35 +0000 (UTC)
+Date: Fri, 17 Jan 2020 14:15:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@de.ibm.com>
+Subject: Re: [PATCH v2] s390x: adapter routes error handling
+Message-ID: <20200117141533.0e31b9f5.cohuck@redhat.com>
+In-Reply-To: <20200117111147.5006-1-cohuck@redhat.com>
+References: <20200117111147.5006-1-cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200116014052.17069-1-richard.henderson@linaro.org>
-In-Reply-To: <20200116014052.17069-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Jan 2020 13:08:48 +0000
-Message-ID: <CAFEAcA9gQG7rUdhEM7baq1zddjNCZd1VmWQSwvgeTTboObyuvQ@mail.gmail.com>
-Subject: Re: [PULL v2 00/34] tcg patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::332
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: ltJOukHcOdScL78F8Q298Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,48 +87,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Jan 2020 at 01:40, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> For version 2, drop the -static and -pie changes,
-> i.e. patches 1-7 from version 1.
->
-> I'll come back to those after the required linux-user changes are
-> upstream.  In the meantime, it's still a large enough set of patches.
->
->
-> r~
->
->
->
-> The following changes since commit 3a63b24a1bbf166e6f455fe43a6bbd8dea413d92:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20200114-pull-request' into staging (2020-01-14 16:00:31 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20200115
->
-> for you to fetch changes up to 3e5a01ef0268ee4c9d342a26dbf6624d6b5b20d6:
->
->   MAINTAINERS: Replace Claudio Fontana for tcg/aarch64 (2020-01-15 15:13:10 -1000)
->
-> ----------------------------------------------------------------
-> Add cpu_{ld,st}*_mmuidx_ra
-> Remove MMU_MODE*_SUFFIX
-> Move tcg headers under include/
->
+On Fri, 17 Jan 2020 12:11:47 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
+> If the kernel irqchip has been disabled, we don't want the
+> {add,release}_adapter_routes routines to call any kvm_irqchip_*
+> interfaces, as they may rely on an irqchip actually having been
+> created. Just take a quick exit in that case instead.
+> 
+> Also initialize routes->gsi[] with -1 in the virtio-ccw handling,
+> to make sure we don't trip over other errors, either. (Nobody
+> else uses the gsi array in that structure.)
+> 
+> Fixes: d426d9fba8ea ("s390x/virtio-ccw: wire up irq routing and irqfds")
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> 
+> v1->v2:
+>   - also initialize the gsi array with -1
+> 
+> ---
+>  hw/intc/s390_flic_kvm.c | 8 ++++++++
+>  hw/s390x/virtio-ccw.c   | 4 ++++
+>  2 files changed, 12 insertions(+)
 
-Applied, thanks.
+Queued (with amended commit message) to s390-next.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
