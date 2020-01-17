@@ -2,95 +2,73 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99717C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36562C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 669632072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:20:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RTUjTaV5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669632072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 08EE720730
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:21:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08EE720730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOk7-0005T6-Jh
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:20:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54409)
+	id 1isOl2-0006Q5-6d
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:21:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mszeredi@redhat.com>) id 1isOjS-00051P-GH
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:06 -0500
+ (envelope-from <bounces@canonical.com>) id 1isOk7-0005f3-7p
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mszeredi@redhat.com>) id 1isOjO-0006ed-4f
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:01 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44942
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mszeredi@redhat.com>) id 1isOjN-0006dO-U4
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:19:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579256396;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iHCE37nFJLmVidUAZB6boOVKuBXUfksbG87JYOGeO+8=;
- b=RTUjTaV5bmsaL8uu1DXl1q2JMwV6BonC24OrFPz1z0O6mgvGQcqDMHCJFkwRhjrCzPPEoC
- zXnvSoJkSErkej+rik3N1loMaDSWefmsoqjl+OwQCDbzMSV8GitV9Kn+XG8YmH3XT6obsi
- rhJ5Ojn4rl0vAkUNAbq1YRnpZlht2jM=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-gikY7e-hOdC_PLUctYQTBQ-1; Fri, 17 Jan 2020 05:19:55 -0500
-Received: by mail-io1-f71.google.com with SMTP id d10so14845698iod.19
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 02:19:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WjhOne+MEOOT/CkKKaKV+EI+4cHrZ5ufoDIXkZDsqNI=;
- b=aqtEyVcRVRRDxpLY4ISUdF/GspSpWlNJ8/ai14cyJdXQnGVW+SFQu5cHG53sSLxXlX
- dY5iNebyr0ZsUPCCAKH+eMgbBRYJKBH+qYVmniQrZQMt/d6qGMJEUBeW2bQOr+lm7/V0
- NcquqtnwZ178k3pqb5pIJ9Nw3UDBSoOaIavEU02Vq1pgFx8gOrTU5RJjKxizhVLKddpa
- 6oLy71EOHmYDVB28jTahpYX6OGOX8G0p4OKmpLr+WkAA4+kYloHBZPVP7TQb+gT5ucik
- mUOPOIdEfstTkamv3iCjaACTWbWRksGUGXl5kIMfdq8bSyviCd3fnUl7QUentOiimxNg
- gDPQ==
-X-Gm-Message-State: APjAAAWGsueJrg3BbG8yxVKA5/YKbbygmwN+4U1Qu2kh9YeQiDNA7T3P
- hhlDA4ZuNYs5OxuOvspKjlgIhg8IADLvfb5+EBJVOhukDSzjqHXXUZ+XQ+lnm285bff6zFTUBuI
- ZNjIRtNvokifsRboQ9ktV37UlIlfxT/I=
-X-Received: by 2002:a92:9c04:: with SMTP id h4mr2523839ili.6.1579256395193;
- Fri, 17 Jan 2020 02:19:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwY4raw0OA2mIDE5tPBgp1K75idkOIdIHy0hQw9+Ob/WmSWDXwCd90bGmcUEUGYv448lx4bQi+Mmc5DQsPo3dg=
-X-Received: by 2002:a92:9c04:: with SMTP id h4mr2523830ili.6.1579256394969;
- Fri, 17 Jan 2020 02:19:54 -0800 (PST)
+ (envelope-from <bounces@canonical.com>) id 1isOk3-0007PX-2c
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41188)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1isOk2-0007OQ-Sv
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:20:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1isOk1-00009v-F0
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:20:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6ED702E80C8
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 10:20:37 +0000 (UTC)
 MIME-Version: 1.0
-References: <20191212163904.159893-73-dgilbert@redhat.com>
- <20200116115603.5415-1-misono.tomohiro@jp.fujitsu.com>
- <20200116164511.GJ3108@work-vm>
-In-Reply-To: <20200116164511.GJ3108@work-vm>
-From: Miklos Szeredi <mszeredi@redhat.com>
-Date: Fri, 17 Jan 2020 11:19:43 +0100
-Message-ID: <CAOssrKfO1PZkR-Fonxae_b2oAOQMgx0=vU8A2UvCNKsgthKMbg@mail.gmail.com>
-Subject: Re: [PATCH 072/104] virtiofsd: passthrough_ll: fix refcounting on
- remove/rename
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-X-MC-Unique: gikY7e-hOdC_PLUctYQTBQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Jan 2020 10:13:35 -0000
+From: Max Reitz <1859989@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 5-plamen xanclic
+X-Launchpad-Bug-Reporter: pevogam (5-plamen)
+X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
+References: <157918316689.4864.12553262908100217782.malonedeb@wampee.canonical.com>
+Message-Id: <157925601569.23128.14572633577549563237.malone@gac.canonical.com>
+Subject: [Bug 1859989] Re: qemu-img has broken output with large snapshot names
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4d8cfe4cbcde9dbc5bdd53d15cbcee9823e6ecf5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,35 +77,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vivek Goyal <vgoyal@redhat.com>,
- Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1859989 <1859989@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 16, 2020 at 5:45 PM Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
->
-> * Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
-> > > From: Miklos Szeredi <mszeredi@redhat.com>
-> > >
-> > > Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
-> >
-> > I'm not familiar with qemu convention but shouldn't we put
-> > at least one line of description like linux kernel?
->
-> Miklos: would you like to suggest a better commit message?
+I=E2=80=99ve just seen that launchpad collapses the spaces in the snapshot.=
+..
+All I can say is that diff tells me the output from 2.12.0 and 4.1.1 is
+exactly the same, with only one difference: 2.12.0 prints the VM SIZE as
+=E2=80=9C0=E2=80=9D (without a unit), whereas 4.1.1 prints =E2=80=9C0 B=E2=
+=80=9D.
 
-Hmm, the patch doesn't really make sense, since the looked up inode is not =
-used.
+But now I just realized you probably mean that there is no space between
+the snapshot name and the VM state size in your example.  OK, I thought
+you meant the fact that the headers are not aligned to the table body
+columns.
 
-Not sure what happened here, this seems to be for supporting shared
-versions, and these changes are part of commit 06f78a397f00
-("virtiofsd: add initial support for shared versions") in our gitlab
-qemu tree.  Was this intentionally split out?
+That seems to be because the size is printed in a 7-wide field, which
+isn=E2=80=99t sufficient for three-digit sizes with unit prefixes; so =E2=
+=80=9C747 MiB=E2=80=9D
+is not prefixed by a space.  I think de38b5005e9 is to blame which which
+(from what I can tell) effectively changed the output from using SI
+prefixes to IEC prefixes (which requires one more character), adds a
+space before and a =E2=80=9CB=E2=80=9D after the prefix (another two additi=
+onal
+characters), and by always printing three digits, which may require a
+decimal point (so another character).  But it didn=E2=80=99t grow the field
+width.  So I think we should do that.
 
-Thanks,
-Miklos
+Max
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859989
+
+Title:
+  qemu-img has broken output with large snapshot names
+
+Status in QEMU:
+  New
+
+Bug description:
+  On Qemu 4.1.1 the output of snapshots breaks if the chosen state name
+  is too long:
+
+  ```
+  # qemu-img snapshot -l /mnt/local/some_image.qcow2
+  Snapshot list:
+  ID        TAG                 VM SIZE                DATE       VM CLOCK
+  1         online_provider_with_dhcp747 MiB 2020-01-15 12:05:01   00:00:45=
+.873
+  ```
+
+  Prior to 4.1.1 this used to work with extra tabs for the VM SIZE
+  values. The collision is also disabling us from using a regex on top
+  of this output to detect the snapshot.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859989/+subscriptions
 
