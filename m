@@ -2,86 +2,85 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A58A1C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7920C33CB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:30:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70EC92072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:28:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A64932072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:29:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U+9KhaMQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70EC92072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PNJDmKih"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A64932072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isSbj-0005fA-Gg
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:28:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56221)
+	id 1isSdK-0007p8-E8
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:29:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56421)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1isSaG-0004GX-Me
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:26:52 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1isSbn-00066o-1A
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1isSaC-0005xU-US
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:26:48 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51846
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1isSaC-0005ws-P7
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:26:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579271204;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qVsodtwfBrwij/miqS2ZlyIQ1UBHq7s6juid958JuAI=;
- b=U+9KhaMQsfH7IBfA0j7+ajqQQfG+BKiB5MAMJIGkr07o0R+oGzgRvEQetE01s4u8yOhOmp
- p1Voyr7ble3o0dGg8rlIXN9yY6VFdH9Bc5UCDMJ6gnHELpHArpFHrVsVk3RgDXLG7DgiYw
- ezKEu2PPUacBQQm+T/kvd4bythQqFU4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-P-DWsmVeMBiVTUn3Rg0y9Q-1; Fri, 17 Jan 2020 09:26:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 088581005514;
- Fri, 17 Jan 2020 14:26:40 +0000 (UTC)
-Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B8C395C1B2;
- Fri, 17 Jan 2020 14:26:37 +0000 (UTC)
-Subject: Re: [PATCH v6 04/11] hw/sd/ssi-sd: fix error handling in
- ssi_sd_realize
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
- <20200110194158.14190-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e6028fc5-81b9-8687-4fa1-3b4c4dab03fc@redhat.com>
-Date: Fri, 17 Jan 2020 08:26:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <peter.maydell@linaro.org>) id 1isSbl-0006wJ-HC
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:22 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:44149)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1isSbl-0006vY-AU
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:28:21 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id q10so22909273wrm.11
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:28:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=HjJC86jDrpR4P0xOPBsqjBhSbqX1xtk2MoFgZHvUW8U=;
+ b=PNJDmKih/6jItbaMEwLfR6A3CbxGxcRzYO89kU+B+pQq6sNmuzb+zjq4WKB4SpZ27v
+ rJfMCloRcfBjY6akBRH/30httW/c7Pngc7jgAMTEELFAnJ+ts8FPYh3afua7NQBZA+84
+ Ry2nHH0o8ciez2DogJ93XQRNRdRP+wEldjuQ3OQhYCfL4y2kzukL/kJvp4lv94kyU+A1
+ McKDkNV9bcHJNe5nqLtmXms+q7yq+aA6rgKjcrLj6mJ9w01L1qVTjKgONGgFynCuU0WW
+ tzN76w5py/ewM9OHNKnILyPp6qa+/6Q3CJCpJMs/9Tdy9JUS/mrqJ1zY23X1IAPqrNJK
+ XOPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=HjJC86jDrpR4P0xOPBsqjBhSbqX1xtk2MoFgZHvUW8U=;
+ b=nJR6qn4OvKcWJ8C5+mP9tUB2T5U4wcaV7ewI+YhixvqMQbaiLMXtHYG8DqbeX6V/RK
+ R++a6knTNR3reaqroZK2GMDc0dGVAZs+lBX297bSjJd8p83CvZC5TI1vwNT5YdnrZFH3
+ 0VLuT7ipvcNJP2voiM27nKD9s1LPV3HqbkiQuvYiXqDLm4qg3UlxPcMBB2O2oHqkihz0
+ AwGh8VOFBOsVmNGEeGrP8tAreDNF/PwNrvbouqJsZLzeZUzUUAZPgAkkTWfFkcu0mBms
+ mzkXmO6s563hkglaYfeyj69CWNaihoQjAByN8n31MuGUhjX/46194rWT8r3TJLDx2l5Z
+ TY6A==
+X-Gm-Message-State: APjAAAWi+ILA6Fpzx6+6fp4mqQ6b1g5Oj7Oh+1GfvJ47FedlWD+259W1
+ ZCttSq8Ckx97ogjZmugJWfjh4d3EIv7OxA==
+X-Google-Smtp-Source: APXvYqyjJfktcdeIQOJxGkA5vxjheJ9IZvHPRgWMldl1ndlCHLJ2JGMz7/q3bm/cH26iS+nd+DD2qA==
+X-Received: by 2002:adf:fe12:: with SMTP id n18mr3602869wrr.158.1579271299402; 
+ Fri, 17 Jan 2020 06:28:19 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id e18sm33811146wrw.70.2020.01.17.06.28.18
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Jan 2020 06:28:18 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/15] target-arm queue
+Date: Fri, 17 Jan 2020 14:28:01 +0000
+Message-Id: <20200117142816.15110-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200110194158.14190-5-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: P-DWsmVeMBiVTUn3Rg0y9Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,29 +92,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/10/20 1:41 PM, Vladimir Sementsov-Ogievskiy wrote:
-> It's wrong to use same err object as errp parameter for several
-> function calls without intermediate checking for error: we'll crash if
-> try to set err object twice.
-> 
-> Fix that, using new ERRP_AUTO_PROPAGATE macro.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   hw/sd/ssi-sd.c | 26 +++++++++++++++++++-------
->   1 file changed, 19 insertions(+), 7 deletions(-)
-> 
+Latest arm queue, a mixed bag of features and bug fixes.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+thanks
+-- PMM
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+The following changes since commit cbf01142b2aef0c0b4e995cecd7e79d342bbc47e:
 
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20200115' into staging (2020-01-17 12:13:17 +0000)
+
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200117-1
+
+for you to fetch changes up to 1a1fbc6cbb34c26d43d8360c66c1d21681af14a9:
+
+  target/arm: Set ISSIs16Bit in make_issinfo (2020-01-17 14:27:16 +0000)
+
+----------------------------------------------------------------
+Add model of the Netduino Plus 2 board
+Some allwinner-a10 code cleanup
+New test cases for cubieboard
+target/arm/arm-semi: fix SYS_OPEN to return nonzero filehandle
+i.MX: add an emulation for RNGC device
+target/arm: adjust program counter for wfi exception in AArch32
+arm/gicv3: update virtual irq state after IAR register read
+Set IL bit correctly for syndrome information for data aborts
+
+----------------------------------------------------------------
+Alistair Francis (4):
+      hw/misc: Add the STM32F4xx Sysconfig device
+      hw/misc: Add the STM32F4xx EXTI device
+      hw/arm: Add the STM32F4xx SoC
+      hw/arm: Add the Netduino Plus 2
+
+Jeff Kubascik (3):
+      target/arm: adjust program counter for wfi exception in AArch32
+      arm/gicv3: update virtual irq state after IAR register read
+      target/arm: Return correct IL bit in merge_syn_data_abort
+
+Martin Kaiser (1):
+      i.MX: add an emulation for RNGC
+
+Masahiro Yamada (1):
+      target/arm/arm-semi: fix SYS_OPEN to return nonzero filehandle
+
+Philippe Mathieu-Daudé (5):
+      tests/boot_linux_console: Add initrd test for the CubieBoard
+      tests/boot_linux_console: Add a SD card test for the CubieBoard
+      hw/arm/allwinner-a10: Move SoC definitions out of header
+      hw/arm/allwinner-a10: Simplify by passing IRQs with qdev_pass_gpios()
+      hw/arm/allwinner-a10: Remove local qemu_irq variables
+
+Richard Henderson (1):
+      target/arm: Set ISSIs16Bit in make_issinfo
+
+ hw/arm/Makefile.objs                   |   2 +
+ hw/misc/Makefile.objs                  |   3 +
+ include/hw/arm/allwinner-a10.h         |   7 -
+ include/hw/arm/fsl-imx25.h             |   5 +
+ include/hw/arm/stm32f405_soc.h         |  73 ++++++++
+ include/hw/misc/imx_rngc.h             |  35 ++++
+ include/hw/misc/stm32f4xx_exti.h       |  60 +++++++
+ include/hw/misc/stm32f4xx_syscfg.h     |  61 +++++++
+ hw/arm/allwinner-a10.c                 |  39 +++--
+ hw/arm/fsl-imx25.c                     |  11 ++
+ hw/arm/netduinoplus2.c                 |  52 ++++++
+ hw/arm/stm32f405_soc.c                 | 302 +++++++++++++++++++++++++++++++++
+ hw/intc/arm_gicv3_cpuif.c              |   3 +
+ hw/misc/imx_rngc.c                     | 278 ++++++++++++++++++++++++++++++
+ hw/misc/stm32f4xx_exti.c               | 188 ++++++++++++++++++++
+ hw/misc/stm32f4xx_syscfg.c             | 171 +++++++++++++++++++
+ target/arm/arm-semi.c                  |   5 +-
+ target/arm/op_helper.c                 |   7 +-
+ target/arm/tlb_helper.c                |   2 +-
+ target/arm/translate.c                 |   3 +
+ MAINTAINERS                            |  14 ++
+ default-configs/arm-softmmu.mak        |   1 +
+ hw/arm/Kconfig                         |  10 ++
+ hw/misc/Kconfig                        |   6 +
+ hw/misc/trace-events                   |  11 ++
+ tests/acceptance/boot_linux_console.py |  85 ++++++++++
+ 26 files changed, 1405 insertions(+), 29 deletions(-)
+ create mode 100644 include/hw/arm/stm32f405_soc.h
+ create mode 100644 include/hw/misc/imx_rngc.h
+ create mode 100644 include/hw/misc/stm32f4xx_exti.h
+ create mode 100644 include/hw/misc/stm32f4xx_syscfg.h
+ create mode 100644 hw/arm/netduinoplus2.c
+ create mode 100644 hw/arm/stm32f405_soc.c
+ create mode 100644 hw/misc/imx_rngc.c
+ create mode 100644 hw/misc/stm32f4xx_exti.c
+ create mode 100644 hw/misc/stm32f4xx_syscfg.c
 
