@@ -2,63 +2,101 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB970C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64882C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:29:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8140520728
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:26:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8140520728
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2E3EC2082F
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:29:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0mspWXv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E3EC2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOpD-0000aR-M4
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:25:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55034)
+	id 1isOsT-0003M9-Ca
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:29:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1isOno-0007pm-BD
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:24:35 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1isOrS-0002EK-8q
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:28:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1isOnk-0003NQ-Ce
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:24:31 -0500
-Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:47084)
+ (envelope-from <pbonzini@redhat.com>) id 1isOrM-00082J-Mo
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:28:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33392
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1isOnk-0003JQ-61
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:24:28 -0500
-Received: from player794.ha.ovh.net (unknown [10.108.16.68])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 84C0223DCF4
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 11:24:25 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player794.ha.ovh.net (Postfix) with ESMTPSA id ADA28B52EA1A;
- Fri, 17 Jan 2020 10:24:23 +0000 (UTC)
-Date: Fri, 17 Jan 2020 11:24:21 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v3 02/11] 9pfs: require msize >= 4096
-Message-ID: <20200117112421.4311c21f@bahia.lan>
-In-Reply-To: <2330562.Ag4oC6Dxye@silver>
-References: <cover.1578957500.git.qemu_oss@crudebyte.com>
- <2705438.6bQikqVx44@silver> <20200116190748.6a656af8@bahia.lan>
- <2330562.Ag4oC6Dxye@silver>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1isOrM-00081Z-Ap
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:28:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579256891;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=DMIDfk34oV+ffHzqhqhrJL1oPlkiq0tvGckbe4tNCeY=;
+ b=L0mspWXvRfgYsBSIEl47HEXX0nDrdAw5KgnIyjexJaJpYvog9u9wsqWGdnxkxgfTUtK3pY
+ 3wb4h50s0FKECVxdU5gKbKIt2jtLhkYU9OFZLAhpP3KE/eCUte22rdp2q3ImHc2uBTKj2h
+ 6Hk/aHbv/pEikGIvEUiuwHR5NknzZok=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-61e2bX-kMyeO2tKrMi92fA-1; Fri, 17 Jan 2020 05:28:05 -0500
+X-MC-Unique: 61e2bX-kMyeO2tKrMi92fA-1
+Received: by mail-wr1-f69.google.com with SMTP id t3so10295512wrm.23
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 02:28:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=/38p6Hl2WIrbMvBc8THYkENzVSbB2BMb4ZP4lWjv340=;
+ b=Qvo0D4l+5b23g0D3a0xGv9GrKtuCLigDEvGXrycCdJ/HchlsqTi54XDgyofux/Jwlw
+ 0CDGcMmPty52Dc3MGzA31NRvhGBxiUZQpDncZ73B5lApKEh/XtjcZ/PA/PB770N62aSM
+ 7uhMUo+uwl1KDHh81xYNCUJaOGvxW0rfXR87/A1fFFHC/7C1CxDOj7obu7+L0+ZuAcpG
+ kqE6nGZi/hsvFmQpSR33u/k5BLFksc9er8vtIaigzMEOjVs9YK5aezLoICMv7jY3CqfB
+ sbCbITYNB3PJmEziOWMVPae2ahrIOihisaz6kTO1gm25JldJ/coBZbclEKwBxuSp2WTx
+ tUvQ==
+X-Gm-Message-State: APjAAAWvpWRpCCGLvU9pEn/2axZQ5trcWaRbVELeevYXtFo4twmKjxDQ
+ zSVLWKD5iKj6HfMH3qOcYT3+oRXGhN6m79Grd+OtySfMtbwDIY1VUc7gCh1L7QRmMN8Zgwsr9wb
+ eFa1fpujRYJSTyu8=
+X-Received: by 2002:a05:600c:2c0b:: with SMTP id
+ q11mr3786622wmg.2.1579256883693; 
+ Fri, 17 Jan 2020 02:28:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz+/wXCtSzv60AuxRkBM/+3esw/PPCpEWNeOlkAYcXbmAFH3kOfovCR9TDj5gRvuPFm+Oc83Q==
+X-Received: by 2002:a05:600c:2c0b:: with SMTP id
+ q11mr3786604wmg.2.1579256883503; 
+ Fri, 17 Jan 2020 02:28:03 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:436:e17d:1fd9:d92a?
+ ([2001:b07:6468:f312:436:e17d:1fd9:d92a])
+ by smtp.gmail.com with ESMTPSA id b16sm34970695wrj.23.2020.01.17.02.28.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 17 Jan 2020 02:28:02 -0800 (PST)
+Subject: Re: [PATCH v2] hw/i386: disable smbus migration for xenfv
+To: Olaf Hering <olaf@aepfle.de>
+References: <20200113174521.3336-1-olaf@aepfle.de>
+ <20200116180321.24968-1-olaf@aepfle.de>
+ <0335edd2-3d33-88f8-2ab4-4791f7289885@redhat.com>
+ <20200117102244.22edd8a6.olaf@aepfle.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea3a65c3-bd69-7815-6893-cb1cd8b9cfd6@redhat.com>
+Date: Fri, 17 Jan 2020 11:27:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 10041056846381029696
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrtdejgdduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+In-Reply-To: <20200117102244.22edd8a6.olaf@aepfle.de>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="uEXOxKf3l6O71wuUhjZYiJ363CRxUIzR4"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.172.249
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,144 +108,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paul Durrant <paul@xen.org>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Jan 2020 22:39:19 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uEXOxKf3l6O71wuUhjZYiJ363CRxUIzR4
+Content-Type: multipart/mixed; boundary="NYc7u98H1MwD1MawDQ4fErJpAygClQOxH"
 
-> On Donnerstag, 16. Januar 2020 19:07:48 CET Greg Kurz wrote:
-> > > The point here was that there must be some kind of absolute minimum msize,
-> > 
-> > Then the absolute minimum size is 7, the size of the header part that is
-> > common to all messages:
-> > 
-> > size[4] Message tag[2]
-> > 
-> > > even though the protocol specs officially don't mandate one. And if a
-> > > client choses a msize < P9_IOHDRSZ, what useful actions shall it be able
-> > > to do?
-> > I haven't checked but I guess some messages can fit in 24 bytes.
-> > 
-> > > That's why I mentioned P9_IOHDRSZ just in case somebody might come up
-> > > later
-> > > asking to lower that minimum msize value for whatever reason.
-> > 
-> > That's precisely what I want to avoid. The semantic of P9_IOHDRSZ is
-> > that it is the header size of a Twrite message and as such it is used
-> > to compute the 'iounit' which the guest later uses to compute a
-> > suitable 'count' for Tread/Twrite messages only. It shouldn't be
-> > involved in msize considerations IMHO.
-> > 
-> > > But np, IMO this sentence makes the fundamental requirement for this patch
-> > > more clear, but I have no problem dropping this sentence.
-> > 
-> > Then you can mention 7 has the true minimal size.
-> 
-> Ok, I'll drop P9_IOHDRSZ completely and mention literal 7 as absolute 
-> theoretical minimum instead.
-> 
-> > > > > Furthermore there are some responses which are not allowed by the 9p
-> > > > > protocol to be truncated like e.g. Rreadlink which may yield up to
-> > > > 
-> > > > No message may be truncated in any way actually. The spec just allows
-> > > > an exception with the string part of Rerror.
-> > > 
-> > > Rreaddir, Rread, Twrite, Rerror can be truncated. So I suggest I'll just
-> > > change that to s/some/most/ semantically.
-> > 
-> > I mean truncate with loss of data. Rreaddir can return less than 'count'
-> > but it won't truncate an individual entry. It rewinds to the previous
-> > one and returns its offset for the next Treaddir. Same goes with Rread
-> > and Twrite, we always return a 'count' that can be used by the client
-> > to continue reading or writing.
-> 
-> Individual entries are not truncated, correct, but data loss: Example, you 
-> have this directory and say server's fs would deliver entries by readdir() in 
-> this order (from top down):
-> 
-> 	.
-> 	..
-> 	a
-> 	1234567890
-> 	b
-> 	c
-> 	d
-> 
-> and say 37 >= msize < 45, then client would receive 3 entries ".", "..", "a" 
-> and that's it.
-> 
+--NYc7u98H1MwD1MawDQ4fErJpAygClQOxH
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Yes msize < 45 isn't enough to send the Rreaddir for "1234567890"
-and since it is forbidden to truncate, we bail out... but we
-did not send a truncated message still.
+On 17/01/20 10:22, Olaf Hering wrote:
+> Am Thu, 16 Jan 2020 19:26:39 +0100
+> schrieb Paolo Bonzini <pbonzini@redhat.com>:
+>=20
+>> My understanding is that Xen is able to use "-M
+>> pc-i440fx-VERSION,accel=3Dxen".  The presence of the version in the
+>> machine type guarantees that the migration stream is compatible and that
+>> the hardware exposed to the guest is the same on the source and destinat=
+ion.
+>=20
+> It seems 'xenfv' is not a 'pc-i440fx-X.X', even with accel=3Dxen.
+> The "xen-platform" will not be created and as a result no PV driver can b=
+e used.
 
-> > Rerror is really the only message where we can deliberately drop
-> > data (but we actually don't do that).
-> > 
-> > > > Maybe just mention that and say we choose 4096 to be able to send
-> > > > big Rreadlink messages.
-> > > 
-> > > That's not the point for this patch. The main purpose is to avoid having
-> > > to
-> > > maintain individual error prone minimum msize checks all over the code
-> > > base. If we would allow very small msizes (much smaller than 4096), then
-> > > we would need to add numerous error handlers all over the code base, each
-> > > one checking for different values (depending on the specific message
-> > > type).
-> > 
-> > I'm not sure what you mean by 'minimum msize checks all over the code
-> > base'... Please provide an example.
-> 
-> 1. Like done in this patch series: Treaddir has to limit client's 'count'
->    parameter according to msize (by subtracting with msize).
-> 
+Just add "-device xen-platform" to the command line.
 
-Hmm... this patch does a sanity check on 'count', not on 'msize'... I
-mean no matter what msize is, clipping count to msize - 11 gives a
-chance to stop processing the entries before overflowing the transport
-buffer.
+> I do not know what a 'xenfv' is supposed to be, and how it is supposed to
+> behave compatible for all existing and future guests.
 
-> 2. get_iounit() does this:
-> 
-> 		iounit = stbuf.f_bsize;
-> 		iounit *= (s->msize - P9_IOHDRSZ) / stbuf.f_bsize;
-> 
->    without checking anywhere for a potential negative outcome
->    (i.e. when msize < P9_IOHDRSZ)
-> 
+It's nothing more than a synonym for "-machine pc -device xen-platform
+-accel xen" (plus some magic to support igd passthrough, which we could
+and should move to the pc machine type as well).  It doesn't even try to
+be compatible for all existing and future guests.
 
-This function should even have an assert() for that, just to be
-sure no one tries to call it before s->msize is even set, which
-would clearly be a bug in QEMU. But this can be done in a
-follow-up patch.
+Paolo
 
-> 3. Example of directory entry name length with Rreaddir above.
-> 
 
-msize being too small to accommodate an Rreaddir with a single
-entry is a different problem as we cannot do anything about it
-at this point but fail... That's why the minimum msize should
-rather be chosen with file names in mind, which are likely to
-be longer than any message header. Rreadlink being the one with
-the higher potential since it will usually return a string
-containing a path name (while Rreaddir entries only contain
-a single path element).
+--NYc7u98H1MwD1MawDQ4fErJpAygClQOxH--
 
-> Individual issues that can easily be overlooked but also easily avoided by not 
-> allowing small msizes in the first place.
-> 
+--uEXOxKf3l6O71wuUhjZYiJ363CRxUIzR4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-My point is that we're not going to check msize in Tversion in
-order to to avoid multiple checks everywhere. We're going to do
-it there because it is the only place where it makes sense to
-do it.
+-----BEGIN PGP SIGNATURE-----
 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl4hjDEACgkQv/vSX3jH
+roPM5gf/VphJL7BlnDm5TQtYvsDKyeXNRVlKCM64CkAFcZhuD87OgBC15Chu969o
+s7CUJ0kbn4wbrAG/n3x5cK/7ZBLAAbXJ0sp1BdzVwXC6AaZnOBRRFUPKgsHmGE/Z
+wnZG3pBdmiA1xuwJpRfZ6G9NoTgAHBNtVAPWuybYSv8dO7OFbqKlpQV54DH7Kcfn
+QxuNo8UplBdVTBr+i6nzQfQRFUiMAnMSJzcoI44ZjefnmqZqEr2AhWt+14WOK3gI
+t9WSusNAJr2sYX0xvHqvjjKdTNFJ3khdWWIuiAndUOjv2jz1wEMOp6FZp5e5jGJd
+SxYbpR2pKYmbzBHuUGaVax6bA6xj6w==
+=kPDV
+-----END PGP SIGNATURE-----
+
+--uEXOxKf3l6O71wuUhjZYiJ363CRxUIzR4--
 
 
