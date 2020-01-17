@@ -2,79 +2,103 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C1D3C33CB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB6BC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:59:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0511020730
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:56:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0511020730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C1C920730
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 11:59:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TZftuVED"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C1C920730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isQEx-00089T-5L
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 06:56:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37822)
+	id 1isQHu-0000vD-LF
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 06:59:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1isQE5-0007Qm-VM
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:55:49 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1isQHI-0000Uw-UB
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1isQE1-0007dv-8P
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:55:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55852)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1isQE0-0007bK-Ma
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:55:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1isQDy-0002kG-Vy
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 11:55:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EEF2F2E80C3
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 11:55:38 +0000 (UTC)
+ (envelope-from <pbonzini@redhat.com>) id 1isQHE-0002Nn-NR
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:59:04 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60264
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1isQHE-0002NQ-JD
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 06:59:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579262339;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E1WupT6ecj+fEkonJfMMq0eKozXvvoyyW0KybizD4OQ=;
+ b=TZftuVEDCzaP3tvO9svIyGfuGHQUUmIPWQCyRKLfB7EwzDhFADNhxjRSThMIZF83aOXeRT
+ DP1GtBsaSKH+4aKWA3wlskFVGyBV2VMmGYyanrWHpEWa/Y5aFdKqzCKCPlUQBdDuyjXY2B
+ hI20CpvowIARGVLXort8UtBTnQii+30=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-z6-HgOWHP3eoX5WudExZsA-1; Fri, 17 Jan 2020 06:58:56 -0500
+Received: by mail-wm1-f70.google.com with SMTP id h130so2174671wme.7
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 03:58:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=E1WupT6ecj+fEkonJfMMq0eKozXvvoyyW0KybizD4OQ=;
+ b=sXQBN0pMQ0qsrwaX3brVk78Pm7MC3xmHa6nXcVcntDpVs1RwvNQ2Rd1PouV3qpJcb8
+ tFmPw5SXvdsQS0HFVBOFdMnZ3AxxnRmVR1RkNp1lFIfxNXWqlUfvB18882EsnWlJEnyK
+ pAgf367L+wpfvHoi8dx70LjEiEq4PX6lIIbTb5zOkpfRC+QZioQhPRP+E4qLlbHf4c2x
+ U9Xo7dZhbjhDDCHbOLA40IBbHaQVyZj94UCJSWz5/S3gbq0WterIYBAGP/DOrd5YXAFf
+ cwCnJjZ4280PaDk9GHRV5N5pwBKE/i/4xhENCe7fR3+Kk5OyApSJprpo9I7SOU+M9/jn
+ N4CQ==
+X-Gm-Message-State: APjAAAXXMrCw9pBg6mramUGxEFageEq9v8jxT5RFZQQoMMSXWpZlYMVv
+ 22QhKWrrRFV9jAH4Gwytj+rmlLhoc0s0HIEVxZDo2JJQYx8kcCqb4AX9k7MLSCUUrDGk8EvsLO9
+ mvmZgbwUh5A2hj40=
+X-Received: by 2002:a05:600c:22d3:: with SMTP id
+ 19mr4332547wmg.92.1579262335735; 
+ Fri, 17 Jan 2020 03:58:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy6FQeSpF0PsLQsgl49hYy3tuNU0kZlLTLF2Osu5FPY04TG/5QV47+ojlV5r2mbrj4gpc59Mg==
+X-Received: by 2002:a05:600c:22d3:: with SMTP id
+ 19mr4332534wmg.92.1579262335542; 
+ Fri, 17 Jan 2020 03:58:55 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:436:e17d:1fd9:d92a?
+ ([2001:b07:6468:f312:436:e17d:1fd9:d92a])
+ by smtp.gmail.com with ESMTPSA id f16sm33591858wrm.65.2020.01.17.03.58.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 17 Jan 2020 03:58:54 -0800 (PST)
+Subject: Re: [PATCH v2 0/4] vl: Fixes for cleanups to -accel
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200116210528.31953-1-richard.henderson@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fa4fb940-6ece-58e8-2c37-61a677906581@redhat.com>
+Date: Fri, 17 Jan 2020 12:58:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jan 2020 11:50:33 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=alex.bennee@linaro.org; 
-X-Launchpad-Bug-Tags: arm tcg testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
-X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <157857629827.5165.2496570379985305724.malonedeb@gac.canonical.com>
- <20200110161626.31943-2-alex.bennee@linaro.org>
- <CAFEAcA9nNH9pu+8E_YYkiNtzePjZdrEBjK_9zJv+XJaSvcnhmA@mail.gmail.com>
-Message-Id:
- <CAFEAcA_0hHjkhKtVsQEsN=Xow=W6vPvGJPJdzHh=O6RG1=_mAQ@mail.gmail.com>
-Subject: [Bug 1859021] Re: [PATCH v1 1/2] target/arm: detect 64 bit overflow
- caused by high cval + voff
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c8af0e9ff1d323edb87310f71ba7969722a83bd8
+In-Reply-To: <20200116210528.31953-1-richard.henderson@linaro.org>
+Content-Language: en-US
+X-MC-Unique: z6-HgOWHP3eoX5WudExZsA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,121 +107,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859021 <1859021@bugs.launchpad.net>
+Cc: philmd@redhat.com, alex.bennee@linaro.org, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200117115033.wIF0a3wjL3YvRf8G4q6E-RJmoi7COrNjFkGiM5shN0g@z>
 
-On Thu, 16 Jan 2020 at 18:45, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
-> There's something odd going on with this code. Adding a bit of context:
->
->         uint64_t offset =3D timeridx =3D=3D GTIMER_VIRT ?
->                                       cpu->env.cp15.cntvoff_el2 : 0;
->         uint64_t count =3D gt_get_countervalue(&cpu->env);
->         /* Note that this must be unsigned 64 bit arithmetic: */
->         int istatus =3D count - offset >=3D gt->cval;
->         [...]
->         if (istatus) {
->             /* Next transition is when count rolls back over to zero */
->             nexttick =3D UINT64_MAX;
->         } else {
->             /* Next transition is when we hit cval */
->             nexttick =3D gt->cval + offset;
->         }
->
-> I think this patch is correct, in that the 'nexttick' values
-> are all absolute and this cval/offset combination implies
-> that the next timer interrupt is going to be in a future
-> so distant we can't even fit the duration in a uint64_t.
->
-> But the other half of the 'if' also looks wrong: that's
-> for the case of "timer has fired, how long until the
-> wraparound causes the interrupt line to go low again?".
-> UINT64_MAX is right for the EL1 case where offset is 0,
-> but the offset might actually be set such that the wrap
-> around happens fairly soon. We want to calculate the
-> tick when (count - offset) hits 0, saturated to
-> UINT64_MAX. It's getting late here and I couldn't figure
-> out what that expression should be with 15 minutes of
-> fiddling around with pen and paper diagrams. I'll have another
-> go tomorrow if nobody else gets there first...
+On 16/01/20 22:05, Richard Henderson wrote:
+> Running qemu-system-foo with no options should not generate
+> a warning for "invalid accelerator bar".
+> 
+> Changes in v2:
+>   * Rebase on master, getting the free accel_list fix from upstream.
+>     Re-word the resulting patch 2 to merely reduce the scope of the
+>     local variables.
+>   * Use g_str_has_suffix (ajb)
+> 
+> 
+> r~
+> 
+> 
+> Richard Henderson (4):
+>   vl: Remove unused variable in configure_accelerators
+>   vl: Reduce scope of variables in configure_accelerators
+>   vl: Remove useless test in configure_accelerators
+>   vl: Only choose enabled accelerators in configure_accelerators
+> 
+>  vl.c | 27 ++++++++++++++++-----------
+>  1 file changed, 16 insertions(+), 11 deletions(-)
+> 
 
-With a fresher brain:
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-For the if (istatus) branch we want the absolute tick
-when (count - offset) wraps round to 0, saturated to UINT64_MAX.
-I think this is:
-    if (offset <=3D count) {
-        nexttick =3D UINT64_MAX;
-    } else {
-        nexttick =3D offset;
-    }
-
-Should we consider this a separate bugfix to go in its own patch?
-
-thanks
--- PMM
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859021
-
-Title:
-  qemu-system-aarch64 (tcg):  cval + voff overflow not handled, causes
-  qemu to hang
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  The Armv8 architecture reference manual states that for any timer set
-  (e.g. CNTP* and CNTV*), the condition for such timer to generate an
-  interrupt (if enabled & unmasked) is:
-
-  CVAL <=3D CNT(P/V)CT
-
-  Although this is arguably sloppy coding, I have seen code that is
-  therefore assuming it can set CVAL to a very high value (e.g.
-  UINT64_MAX) and leave the interrupt enabled in CTL, and never get the
-  interrupt.
-
-  On latest master commit as the time of writing, there is an integer
-  overflow in target/arm/helper.c gt_recalc_timer affecting the virtual
-  timer when the interrupt is enabled in CTL:
-
-      /* Next transition is when we hit cval */
-      nexttick =3D gt->cval + offset;
-
-  When this overflow happens, I notice that qemu is no longer responsive an=
-d that I have to SIGKILL the process:
-      - qemu takes nearly all the cpu time of the cores it is running on (e=
-.g. 50% cpu usage if running on half the cores) and is completely unrespons=
-ive
-      - no guest interrupt (reported via -d int) is generated
-
-  Here the minimal code example to reproduce the issue:
-
-      mov     x0, #1
-      msr     cntvoff_el2, x0
-      mov     x0, #-1
-      msr     cntv_cval_el0, x0
-      mov     x0, #1
-      msr     cntv_ctl_el0, x0 // interrupt generation enabled, not masked;=
- qemu will start to hang here
-
-  Options used:
-  -nographic -machine virt,virtualization=3Don,gic-version=3D2,accel=3Dtcg =
--cpu cortex-a57
-  -smp 4 -m 1024 -kernel whatever.elf -d unimp,guest_errors,int -semihostin=
-g-config enable,target=3Dnative
-  -serial mon:stdio
-
-  Version used: 4.2
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859021/+subscriptions
 
