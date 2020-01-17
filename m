@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC59C33C9E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 20:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACADFC33C9E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 20:31:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 082692072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 20:16:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 082692072B
+	by mail.kernel.org (Postfix) with ESMTPS id 870C120748
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 20:31:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870C120748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isY2j-0006Cu-6l
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 15:16:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45793)
+	id 1isYHG-0001Tx-Mi
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 15:31:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1isY1v-0005lA-Ej
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 15:15:47 -0500
+ (envelope-from <bounces@canonical.com>) id 1isYGb-000148-0r
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 15:30:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1isY1q-000056-Mj
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 15:15:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46682)
+ (envelope-from <bounces@canonical.com>) id 1isYGW-0006CG-Sp
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 15:30:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48258)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1isY1q-0008SN-Bv
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 15:15:38 -0500
+ id 1isYGW-0006An-Ms
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 15:30:48 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1isY1o-0005Hj-6C
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 20:15:36 +0000
+ id 1isYGV-0006ib-3l
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 20:30:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 204112E802B
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 20:15:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 14D302E80C0
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 20:30:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jan 2020 20:05:39 -0000
+Date: Fri, 17 Jan 2020 20:25:09 -0000
 From: JS <1859920@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: js1943 th-huth
 X-Launchpad-Bug-Reporter: JS (js1943)
 X-Launchpad-Bug-Modifier: JS (js1943)
 References: <157915647770.15306.7117337280333115892.malonedeb@wampee.canonical.com>
-Message-Id: <157929153959.24101.3244699514526045714.malone@chaenomeles.canonical.com>
+Message-Id: <157929270996.24101.5297217721866763798.malone@chaenomeles.canonical.com>
 Subject: [Bug 1859920] Re: daemoniz not working on MacOS
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c7fb5e6ff30b6fc7be4c243541a25cfd8c6e644e
+X-Launchpad-Hash: 9be7ffcb104159207c1a9458b1bae1939ebde1e7
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -83,6 +83,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I mixed up some thing in #2 above. Please ignore it and use following:
+
+---
+
 I tried with following and it work:
 
 qemu-system-x86_64 -no-user-config -nodefaults -name u64d01 -M
@@ -97,6 +101,7 @@ user,id=3Dnic1,ipv4=3Don,ipv6=3Don,hostname=3Du64d01,hostfwd=3Dtcp::2222-:22
 -show-cursor
 
 The difference from my original command:
+
 (1) removed -audiodev
 (2) added -display none
 
@@ -104,11 +109,15 @@ So (1) and (2) together allow -daemonize work correctly.
 
 Other observation during testing:
 
-- If I only do (1), but not (2), the command will not exit, I cannot ssh
-into the vm. So it seems vm initialization is stuck. I can ctrl-c to
-break it.
+- If I only do (1), but not (2):
 
-- If I don't do (2), regardless of (1), I get following errors:
+  - The command will not exit. I can break it with ctrl-c.
+  - A qemu-system-x86_64 process is created in background, but I cannot ssh=
+ into the it. I have use 'kill' to kill it.
+
+- If I don't do (1), regardless of (2), I get following errors(as in my
+bug description):
+
 objc[1962]: +[NSNumber initialize] may have been in progress in another thr=
 ead when fork() was called.
 objc[1962]: +[NSNumber initialize] may have been in progress in another thr=
