@@ -2,97 +2,85 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3080BC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:54:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57658C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:55:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0284206E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:54:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 231EF206E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:55:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BstwlQ5w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0284206E6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2FKNt4e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 231EF206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isS4x-0008LJ-Qq
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:54:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51776)
+	id 1isS5l-0001Cm-Rn
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:55:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1isS3N-0006Si-Em
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:52:50 -0500
+ (envelope-from <thuth@redhat.com>) id 1isS3F-0006I1-WB
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:52:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1isS3K-0007kt-Ch
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:52:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59757
+ (envelope-from <thuth@redhat.com>) id 1isS3E-0007go-Oc
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:52:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41471
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1isS3K-0007kJ-65
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:52:46 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1isS3E-0007gA-L6
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:52:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579269165;
+ s=mimecast20190719; t=1579269160;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=N7eTtJqEAQfvfEUt6nFk+8B15m1B+zw/i44hn/2v7NQ=;
- b=BstwlQ5wh/+7gxSJ+gPjaGDrbSWaim8hxrp6zb2p3SMuhNTAOELyrRrBlhzaaNFyikNN+I
- BHPLejIK01V7eCY4FcfkPqtouhrLezKPG/z+apWLKJJtKGHKlJQ1+TW/rSR+rRs8Cqulm2
- cJl19/MkHSt91J2jyT2IT8CvNHQRmOg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-VGvPq0FSMbil6BCR-elsXQ-1; Fri, 17 Jan 2020 08:52:42 -0500
-Received: by mail-wm1-f71.google.com with SMTP id 7so1170017wmf.9
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 05:52:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZzM3gZR0JofKUoSKFb+dfja1apuSWx8c+ZWQR65GCPA=;
- b=VJtVdI0gnYDDaWM51hSL/s4qVKzJ1Fa/JdYeEnUJ7XBwTUWOYcv2nQ8dEuA3wKNlht
- +eqOJ4RXL4JD2dPIteQM6E7t5lvif8ZqQstUmJWVPFNOTRXvW9k3uNlJ621EGl7ZryFX
- QEQE6UPKbkZT30mYDz/mh5X2NeXwUAcSXmGUCNMkyqGFqoQ5IlIo1uFyWmR+07IoxEMO
- 3x4SM3W4sPIkaqTOpGFRq9iQcAJ3LlX11CC3Vu+0FpdcKI15hy+tUHPGZrIiiJR46Rvd
- 40yATgATdYW6HRaRz2o3JoNqUXY27ssgCsUIlNoyMX2H8eanW1Lvp08Jb3sUsOOqU6XV
- Bf3A==
-X-Gm-Message-State: APjAAAWmxtRIwG08dBJGJeK63O3oBaGtTpUKZhIMIJqM9mlV3YRayYaZ
- TtJLANYAZx08jdhEnGqtlZo0cPLBQk6JAYXj5+mkguQ2ZtTHdnToJu5bG1jU5m52NnwhkQCJxBr
- +FgnYw73HxqQ/q8g=
-X-Received: by 2002:a1c:4454:: with SMTP id r81mr4746655wma.117.1579269161695; 
- Fri, 17 Jan 2020 05:52:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzf43YHoqm1d+eMVEAu/7PzRGpG4n7JlXz68Gq+sd5Cr1sIES1GKm9vGWjRcxcJxl+fVBE+Bw==
-X-Received: by 2002:a1c:4454:: with SMTP id r81mr4746640wma.117.1579269161481; 
- Fri, 17 Jan 2020 05:52:41 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id n10sm33547379wrt.14.2020.01.17.05.52.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Jan 2020 05:52:40 -0800 (PST)
-Subject: Re: [PATCH 089/104] virtiofsd: prevent races with lo_dirp_put()
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-90-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8c4145c2-b4a3-bacc-b68e-9c2230765c4d@redhat.com>
-Date: Fri, 17 Jan 2020 14:52:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=xJ5Xjt5bIsbULo90MZvNBTLFFxonKOydO1ZV0fR72tk=;
+ b=X2FKNt4eO6GR/K32c9AOaQKGPHRVtE0v9WmUWYFE9BoyRmZsAKGAiwW0utYBYqbq4dMTL2
+ bQkkWfv2YT4BDHDvRttTILyKOIV3CROti/kZr7OYrGRaYdyyEGX1nsMBsocGPpBlRimEH+
+ Qom5Yu64VFOkReguDYI1AEhbF/maGBc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-bPHxyyZePh-KzRRrkla6hw-1; Fri, 17 Jan 2020 08:52:39 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 397E51800D48
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 13:52:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-212.ams2.redhat.com [10.36.116.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EBB45D9CD;
+ Fri, 17 Jan 2020 13:52:36 +0000 (UTC)
+Subject: Re: [PATCH v2 83/86] tests:numa-test: make top level args dynamic and
+ g_autofree(cli) cleanups
+To: Igor Mammedov <imammedo@redhat.com>
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-84-git-send-email-imammedo@redhat.com>
+ <20e88588-13b4-8c7d-3f97-cb2d50b85edd@redhat.com>
+ <20200116180606.134cb1a6@redhat.com>
+ <a0b60484-d5fb-7409-b13e-4e70d1177138@redhat.com>
+ <20200117143305.7eb9571e@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <a1a1720a-899e-8e30-662f-757ace5a0d05@redhat.com>
+Date: Fri, 17 Jan 2020 14:52:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-90-dgilbert@redhat.com>
+In-Reply-To: <20200117143305.7eb9571e@redhat.com>
 Content-Language: en-US
-X-MC-Unique: VGvPq0FSMbil6BCR-elsXQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: bPHxyyZePh-KzRRrkla6hw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -108,146 +96,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/19 5:38 PM, Dr. David Alan Gilbert (git) wrote:
-> From: Stefan Hajnoczi <stefanha@redhat.com>
+On 17/01/2020 14.33, Igor Mammedov wrote:
+> On Fri, 17 Jan 2020 12:14:11 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
 >=20
-> Introduce lo_dirp_put() so that FUSE_RELEASEDIR does not cause
-> use-after-free races with other threads that are accessing lo_dirp.
->=20
-> Also make lo_releasedir() atomic to prevent FUSE_RELEASEDIR racing with
-> itself.  This prevents double-frees.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   tools/virtiofsd/passthrough_ll.c | 41 +++++++++++++++++++++++++++-----
->   1 file changed, 35 insertions(+), 6 deletions(-)
->=20
-> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrou=
-gh_ll.c
-> index eadd568435..7663e574d8 100644
-> --- a/tools/virtiofsd/passthrough_ll.c
-> +++ b/tools/virtiofsd/passthrough_ll.c
-> @@ -1317,11 +1317,28 @@ static void lo_readlink(fuse_req_t req, fuse_ino_=
-t ino)
->   }
->  =20
->   struct lo_dirp {
-> +    gint refcount;
->       DIR *dp;
->       struct dirent *entry;
->       off_t offset;
->   };
->  =20
-> +static void lo_dirp_put(struct lo_dirp **dp)
-> +{
-> +    struct lo_dirp *d =3D *dp;
-> +
-> +    if (!d) {
-> +        return;
-> +    }
-> +    *dp =3D NULL;
-> +
-> +    if (g_atomic_int_dec_and_test(&d->refcount)) {
-> +        closedir(d->dp);
-> +        free(d);
-> +    }
-> +}
-> +
-> +/* Call lo_dirp_put() on the return value when no longer needed */
->   static struct lo_dirp *lo_dirp(fuse_req_t req, struct fuse_file_info *f=
-i)
->   {
->       struct lo_data *lo =3D lo_data(req);
-> @@ -1329,6 +1346,9 @@ static struct lo_dirp *lo_dirp(fuse_req_t req, stru=
-ct fuse_file_info *fi)
->  =20
->       pthread_mutex_lock(&lo->mutex);
->       elem =3D lo_map_get(&lo->dirp_map, fi->fh);
-> +    if (elem) {
-> +        g_atomic_int_inc(&elem->dirp->refcount);
-> +    }
->       pthread_mutex_unlock(&lo->mutex);
->       if (!elem) {
->           return NULL;
-> @@ -1364,6 +1384,7 @@ static void lo_opendir(fuse_req_t req, fuse_ino_t i=
-no,
->       d->offset =3D 0;
->       d->entry =3D NULL;
->  =20
-> +    g_atomic_int_set(&d->refcount, 1); /* paired with lo_releasedir() */
->       pthread_mutex_lock(&lo->mutex);
->       fh =3D lo_add_dirp_mapping(req, d);
->       pthread_mutex_unlock(&lo->mutex);
-> @@ -1397,7 +1418,7 @@ static void lo_do_readdir(fuse_req_t req, fuse_ino_=
-t ino, size_t size,
->                             off_t offset, struct fuse_file_info *fi, int =
-plus)
->   {
->       struct lo_data *lo =3D lo_data(req);
-> -    struct lo_dirp *d;
-> +    struct lo_dirp *d =3D NULL;
->       struct lo_inode *dinode;
->       char *buf =3D NULL;
->       char *p;
-> @@ -1487,6 +1508,8 @@ static void lo_do_readdir(fuse_req_t req, fuse_ino_=
-t ino, size_t size,
->  =20
->       err =3D 0;
->   error:
-> +    lo_dirp_put(&d);
-> +
->       /*
->        * If there's an error, we can only signal it if we haven't stored
->        * any entries yet - otherwise we'd end up with wrong lookup
-> @@ -1517,22 +1540,25 @@ static void lo_releasedir(fuse_req_t req, fuse_in=
-o_t ino,
->                             struct fuse_file_info *fi)
->   {
->       struct lo_data *lo =3D lo_data(req);
-> +    struct lo_map_elem *elem;
->       struct lo_dirp *d;
->  =20
->       (void)ino;
->  =20
-> -    d =3D lo_dirp(req, fi);
-> -    if (!d) {
-> +    pthread_mutex_lock(&lo->mutex);
-> +    elem =3D lo_map_get(&lo->dirp_map, fi->fh);
-> +    if (!elem) {
-> +        pthread_mutex_unlock(&lo->mutex);
->           fuse_reply_err(req, EBADF);
->           return;
->       }
->  =20
-> -    pthread_mutex_lock(&lo->mutex);
-> +    d =3D elem->dirp;
->       lo_map_remove(&lo->dirp_map, fi->fh);
->       pthread_mutex_unlock(&lo->mutex);
->  =20
-> -    closedir(d->dp);
-> -    free(d);
-> +    lo_dirp_put(&d); /* paired with lo_opendir() */
-> +
->       fuse_reply_err(req, 0);
->   }
->  =20
-> @@ -1743,6 +1769,9 @@ static void lo_fsyncdir(fuse_req_t req, fuse_ino_t =
-ino, int datasync,
->       } else {
->           res =3D fsync(fd);
->       }
-> +
-> +    lo_dirp_put(&d);
-> +
->       fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
->   }
->  =20
->=20
+>> On 16/01/2020 18.06, Igor Mammedov wrote:
+>>> On Thu, 16 Jan 2020 17:35:32 +0100
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>  =20
+>>>> On 15/01/2020 16.07, Igor Mammedov wrote: =20
+>>>>> Use GString to pass argument to make_cli() so that it would be easy
+>>>>> to dynamically change test case arguments from main(). The follow up
+>>>>> patch will use it to change RAM size options depending on target.
+>>>>>
+>>>>> While at it cleanup 'cli' freeing, using g_autofree annotation.   =20
+>>>>
+>>>> Hmm, I'd use g_autofree for new code or do it in a separate cleanup
+>>>> patch, but doing this here distracts quite a bit from the real changes
+>>>> that you are doing... =20
+>>> I'll split it into separate patch
+>>>  =20
+>>>> =20
+>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>>>> ---
+>>>>> PS:
+>>>>>   made as a separate patch so it won't clutter followup testcase chan=
+ges.
+>>>>>
+>>>>> CC: thuth@redhat.com
+>>>>> CC: lvivier@redhat.com
+>>>>> ---
+>>>>>  tests/qtest/numa-test.c | 38 ++++++++++++++------------------------
+>>>>>  1 file changed, 14 insertions(+), 24 deletions(-)
+>>>>>
+>>>>> diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
+>>>>> index 17dd807..a696dfd 100644
+>>>>> --- a/tests/qtest/numa-test.c
+>>>>> +++ b/tests/qtest/numa-test.c
+>>>>> @@ -14,16 +14,16 @@
+>>>>>  #include "qapi/qmp/qdict.h"
+>>>>>  #include "qapi/qmp/qlist.h"
+>>>>> =20
+>>>>> -static char *make_cli(const char *generic_cli, const char *test_cli)
+>>>>> +static char *make_cli(const GString *generic_cli, const char *test_c=
+li)
+>>>>>  {
+>>>>> -    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", =
+test_cli);
+>>>>> +    return g_strdup_printf("%s %s", generic_cli->str, test_cli);
+>>>>>  }   =20
+>>>> [...] =20
+>>>>> @@ -539,11 +529,11 @@ static void pc_hmat_erange_cfg(const void *data=
+)
+>>>>> =20
+>>>>>  int main(int argc, char **argv)
+>>>>>  {
+>>>>> -    const char *args =3D NULL;
+>>>>> +    g_autoptr(GString) args =3D g_string_new("");   =20
+>>>>
+>>>> I think g_string_new(NULL) would be better?
+>>>> =20
+>>>>>      const char *arch =3D qtest_get_arch();
+>>>>> =20
+>>>>>      if (strcmp(arch, "aarch64") =3D=3D 0) {
+>>>>> -        args =3D "-machine virt";
+>>>>> +        g_string_append(args, " -machine virt")>      }   =20
+>>>>
+>>>> Is this really required? Looking at your next patch, you could also
+>>>> simply do
+>>>>
+>>>>           args =3D " -object memory-backend-ram,id=3Dram,size=3DxxxM" =
+=20
+>>> xxx is variable so options are
+>>>  1 build this part of CLI dynamically
+>>>  2 mostly duplicate testcase function and include per target size there
+>>>  3 make up a test data structure and pass that to test cases
+>>>
+>>> Given simplicity of current testcases, I'd prefer continue with
+>>> passing CLI as testcase data (option #1). =20
+>>
+>> Sorry, I think I missed something here... currently I see in the next pa=
+tch:
+>>
+>> +    if (!strcmp(arch, "ppc64")) {
+>> +        g_string_append(args, " -object
+>> memory-backend-ram,id=3Dram,size=3D512M");
+>> +    } else {
+>> +        g_string_append(args, " -object
+>> memory-backend-ram,id=3Dram,size=3D128M");
+>> +    }
+>>
+>> ... so these are static strings which could also be handled fine without
+>> GString? Or do you plan to update this in later patches?
+> it's 1 or concatenation of 2 strings
+>   " -object memory-backend-ram,id=3Dram,size=3D128M"
+>   " -object memory-backend-ram,id=3Dram,size=3D512M"
+>   " -machine virt" + " -object memory-backend-ram,id=3Dram,size=3D128M"
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Ah, well, that's what I was missing. Since the if-arch-statements follow
+close to each other, I somehow read 'else if (!strcmp(arch, "ppc64"))'
+... sorry for that.
+Maybe it's more obvious if you'd do it the other way round, first the
+"-object" lines, then the "-machine virt" stuff?
+
+Anyway, another note: It's a little bit ugly that one if-statment uses
+strcmp() !=3D 0 while the other one uses !strcmp() ... since you're using
+GLIB code here anyway, what do you think about converting them to
+g_str_equal() instead?
+
+ Thomas
 
 
