@@ -2,79 +2,85 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE715C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3832C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:04:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 791072073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:04:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8ECC62073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 14:04:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NqzUIRAm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 791072073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M03pBmIj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ECC62073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isSEh-0001OW-Ui
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:04:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53090)
+	id 1isSF4-0001tm-3g
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 09:04:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1isSBK-0007Qv-54
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:01:04 -0500
+ (envelope-from <imammedo@redhat.com>) id 1isSDJ-0000UX-M6
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:03:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1isSBE-0005uH-QH
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:01:02 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42439)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1isSBE-0005t0-DS
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:00:56 -0500
-Received: by mail-ot1-x342.google.com with SMTP id 66so22574387otd.9
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 06:00:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ER+LkyNb1e+F6XJEMqagb4//d3ToXFWicQDU9yloNKc=;
- b=NqzUIRAmrGKHWKdtnkWYTBCbFS5MTyjnH3GLSZQAOoHDSVjpB+33FHxr034Iden8hs
- 5vTF9egfQuRwy36yWVuAncxW2TsHLTJsL0nDLS2AM9My0cvUVngyyUJzWnVE236gAa3D
- IosqoyrLmp/0h/b/EjhBC1duffmunURwPGwjEj6JMcwleK4tU0GTtcOK7q4bnuFSA8NY
- vgt/aEtz4EX/n1L/V9GVYUtOh30MstwFGP/3Mp77r3acyROZSb1g/+FmUI2zNWyddcP7
- /mrzNjPPlRicHKgR95D1rkuww2F57EH8LfG2Gd9SDwL1ISDnle+UUtut3feShIafnRxJ
- z06w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ER+LkyNb1e+F6XJEMqagb4//d3ToXFWicQDU9yloNKc=;
- b=mnU5KNmX7Ja+XRlO6r/VW8uh18unUyR4WGEwLQ+p/aOEzFUHKEtxruyBLII1GNsmXr
- XddPjbm0m/qZeOw1Igs0IKxo4vP2p4iPJQGCPyt+HKuyad9zxspCQ0rgVdpJ26tJ/aU3
- QfEBhnb4yIfUE5lYkzLROa1RxICGuSKGiSC92OZ0W/87MEkHwx2B68ncsgfuWu+bUsc2
- BnBVoENZtPWnMXNcgr4nbu6eEef2d92pnapcI3CcVLdLh9cD+YnpcniKfaOYtLC84GBA
- YwydlgIK07vOF5iP71FyMFEBRwIOH3dGPiLLlPWjEfnYtwG9vm1qyFPiylFkt3sLp5Tk
- Cj1Q==
-X-Gm-Message-State: APjAAAXSmTW9yJzM+Rk0K2u+KONxb7V6XdMoefUrSKksN1hCM2V0WJ6z
- 3C5DteSkmeLicErtj4LpdRZvSY3jLjrn/8qfx9X30A==
-X-Google-Smtp-Source: APXvYqxj1eJw3xkRrlviQ2/HsOp/FQ+/nXMPQtAsobr6DKH0eBasuPuC/SEZL4BDuA+Lb7WaYtQmckFiU5iw7E79wM0=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr5810406otq.97.1579269654059; 
- Fri, 17 Jan 2020 06:00:54 -0800 (PST)
+ (envelope-from <imammedo@redhat.com>) id 1isSDF-00070C-Ps
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:03:05 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57966
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1isSDF-0006zp-Kw
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 09:03:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579269781;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7MrWsJ9YuTOfC0mzYSEFRUA41muLtCo5bwUq9wWFAAQ=;
+ b=M03pBmIjUBtsSvoQXPiOsevLzncFLOdkz14h7qdcHRy2zT4w8s6If7hRjjQoS321JC/U3L
+ 0aXTZNb2CyseTggxaf+vW3grnL2IhO7QKk9vf1i1ctEqQfi1QZPv3UmitZgOOaR/doFxWW
+ 1xu95COOWEdfElKBNOaGyhZ6V9dIYTs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-4dI8cyueORqpmTjA0kHnTg-1; Fri, 17 Jan 2020 09:02:59 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1C6F18AAFA6
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 14:02:58 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 17CB77C012;
+ Fri, 17 Jan 2020 14:02:57 +0000 (UTC)
+Date: Fri, 17 Jan 2020 15:02:57 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v2 83/86] tests:numa-test: make top level args dynamic
+ and g_autofree(cli) cleanups
+Message-ID: <20200117150257.268ca4b2@redhat.com>
+In-Reply-To: <a1a1720a-899e-8e30-662f-757ace5a0d05@redhat.com>
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-84-git-send-email-imammedo@redhat.com>
+ <20e88588-13b4-8c7d-3f97-cb2d50b85edd@redhat.com>
+ <20200116180606.134cb1a6@redhat.com>
+ <a0b60484-d5fb-7409-b13e-4e70d1177138@redhat.com>
+ <20200117143305.7eb9571e@redhat.com>
+ <a1a1720a-899e-8e30-662f-757ace5a0d05@redhat.com>
 MIME-Version: 1.0
-References: <20191219040612.28431-1-gshan@redhat.com>
-In-Reply-To: <20191219040612.28431-1-gshan@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Jan 2020 14:00:43 +0000
-Message-ID: <CAFEAcA-aucN9anYbhqLMQZTOzhfYaBB0DLV0d16B2HkgEs=ULw@mail.gmail.com>
-Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
-To: Gavin Shan <gshan@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 4dI8cyueORqpmTjA0kHnTg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +92,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, Andrew Jones <drjones@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Dec 2019 at 04:06, Gavin Shan <gshan@redhat.com> wrote:
-> This supports NMI injection for virtual machine and currently it's only
-> supported on GICv3 controller, which is emulated by qemu or host kernel.
-> The design is highlighted as below:
->
->    * The NMI is identified by its priority (0x20). In the guest (linux)
->      kernel, the GICC_PMR is set to 0x80, to block all interrupts except
->      the NMIs when the external interrupt is disabled. It means the FIQ
->      and IRQ bit in PSTATE isn't touched when the functionality (NMI) is
->      functional.
->    * LPIs aren't considered as NMIs because of their nature. It means NMI
->      is either SPI or PPI. Besides, the NMIs are injected in round-robin
->      fashion is there are multiple NMIs existing.
->    * When the GICv3 controller is emulated by qemu, the interrupt states
->      (e.g. enabled, priority) is fetched from the corresponding data struct
->      directly. However, we have to pause all CPUs to fetch the interrupt
->      states from host in advance if the GICv3 controller is emulated by
->      host.
->
-> The testing scenario is to tweak guest (linux) kernel where the pl011 SPI
-> can be enabled as NMI by request_nmi(). Check "/proc/interrupts" after injecting
-> several NMIs, to see if the interrupt count is increased or not. The result
-> is just as expected.
+On Fri, 17 Jan 2020 14:52:35 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-So, QEMU is trying to emulate actual hardware. None of this
-looks to me like what GICv3 hardware does... If you want to
-have the virt board send an interrupt, do it the usual way
-by wiring up a qemu_irq from some device to the GIC, please.
-(More generally, there is no concept of an "NMI" in the GIC;
-there are just interrupts at varying possible guest-programmable
-priority levels.)
+> On 17/01/2020 14.33, Igor Mammedov wrote:
+> > On Fri, 17 Jan 2020 12:14:11 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> On 16/01/2020 18.06, Igor Mammedov wrote:  
+> >>> On Thu, 16 Jan 2020 17:35:32 +0100
+> >>> Thomas Huth <thuth@redhat.com> wrote:
+> >>>     
+> >>>> On 15/01/2020 16.07, Igor Mammedov wrote:    
+> >>>>> Use GString to pass argument to make_cli() so that it would be easy
+> >>>>> to dynamically change test case arguments from main(). The follow up
+> >>>>> patch will use it to change RAM size options depending on target.
+> >>>>>
+> >>>>> While at it cleanup 'cli' freeing, using g_autofree annotation.      
+> >>>>
+> >>>> Hmm, I'd use g_autofree for new code or do it in a separate cleanup
+> >>>> patch, but doing this here distracts quite a bit from the real changes
+> >>>> that you are doing...    
+> >>> I'll split it into separate patch
+> >>>     
+> >>>>    
+> >>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >>>>> ---
+> >>>>> PS:
+> >>>>>   made as a separate patch so it won't clutter followup testcase changes.
+> >>>>>
+> >>>>> CC: thuth@redhat.com
+> >>>>> CC: lvivier@redhat.com
+> >>>>> ---
+> >>>>>  tests/qtest/numa-test.c | 38 ++++++++++++++------------------------
+> >>>>>  1 file changed, 14 insertions(+), 24 deletions(-)
+> >>>>>
+> >>>>> diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
+> >>>>> index 17dd807..a696dfd 100644
+> >>>>> --- a/tests/qtest/numa-test.c
+> >>>>> +++ b/tests/qtest/numa-test.c
+> >>>>> @@ -14,16 +14,16 @@
+> >>>>>  #include "qapi/qmp/qdict.h"
+> >>>>>  #include "qapi/qmp/qlist.h"
+> >>>>>  
+> >>>>> -static char *make_cli(const char *generic_cli, const char *test_cli)
+> >>>>> +static char *make_cli(const GString *generic_cli, const char *test_cli)
+> >>>>>  {
+> >>>>> -    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test_cli);
+> >>>>> +    return g_strdup_printf("%s %s", generic_cli->str, test_cli);
+> >>>>>  }      
+> >>>> [...]    
+> >>>>> @@ -539,11 +529,11 @@ static void pc_hmat_erange_cfg(const void *data)
+> >>>>>  
+> >>>>>  int main(int argc, char **argv)
+> >>>>>  {
+> >>>>> -    const char *args = NULL;
+> >>>>> +    g_autoptr(GString) args = g_string_new("");      
+> >>>>
+> >>>> I think g_string_new(NULL) would be better?
+> >>>>    
+> >>>>>      const char *arch = qtest_get_arch();
+> >>>>>  
+> >>>>>      if (strcmp(arch, "aarch64") == 0) {
+> >>>>> -        args = "-machine virt";
+> >>>>> +        g_string_append(args, " -machine virt")>      }      
+> >>>>
+> >>>> Is this really required? Looking at your next patch, you could also
+> >>>> simply do
+> >>>>
+> >>>>           args = " -object memory-backend-ram,id=ram,size=xxxM"    
+> >>> xxx is variable so options are
+> >>>  1 build this part of CLI dynamically
+> >>>  2 mostly duplicate testcase function and include per target size there
+> >>>  3 make up a test data structure and pass that to test cases
+> >>>
+> >>> Given simplicity of current testcases, I'd prefer continue with
+> >>> passing CLI as testcase data (option #1).    
+> >>
+> >> Sorry, I think I missed something here... currently I see in the next patch:
+> >>
+> >> +    if (!strcmp(arch, "ppc64")) {
+> >> +        g_string_append(args, " -object
+> >> memory-backend-ram,id=ram,size=512M");
+> >> +    } else {
+> >> +        g_string_append(args, " -object
+> >> memory-backend-ram,id=ram,size=128M");
+> >> +    }
+> >>
+> >> ... so these are static strings which could also be handled fine without
+> >> GString? Or do you plan to update this in later patches?  
+> > it's 1 or concatenation of 2 strings
+> >   " -object memory-backend-ram,id=ram,size=128M"
+> >   " -object memory-backend-ram,id=ram,size=512M"
+> >   " -machine virt" + " -object memory-backend-ram,id=ram,size=128M"  
+> 
+> Ah, well, that's what I was missing. Since the if-arch-statements follow
+> close to each other, I somehow read 'else if (!strcmp(arch, "ppc64"))'
+> ... sorry for that.
+> Maybe it's more obvious if you'd do it the other way round, first the
+> "-object" lines, then the "-machine virt" stuff?
+> 
+> Anyway, another note: It's a little bit ugly that one if-statment uses
+> strcmp() != 0 while the other one uses !strcmp() ... since you're using
+> GLIB code here anyway, what do you think about converting them to
+> g_str_equal() instead?
 
-thanks
--- PMM
+will do that
+
+> 
+>  Thomas
+
 
