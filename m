@@ -2,69 +2,99 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9F1C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44008C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:20:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FC4C2073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:19:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC4C2073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
+	by mail.kernel.org (Postfix) with ESMTPS id 0C9CE206D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:20:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BeCKVmGQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C9CE206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isQaZ-00036C-Ns
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:18:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40417)
+	id 1isQcF-0004K5-56
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:20:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pl@kamp.de>) id 1isQZu-0002dE-3M
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:18:21 -0500
+ (envelope-from <mst@redhat.com>) id 1isQbM-0003a5-L3
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:19:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pl@kamp.de>) id 1isQZp-00059u-WD
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:18:17 -0500
-Received: from kerio.kamp.de ([195.62.97.192]:59666)
+ (envelope-from <mst@redhat.com>) id 1isQbJ-0006it-98
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:19:48 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47647
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pl@kamp.de>) id 1isQZp-000585-QE
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:18:13 -0500
-X-Footer: a2FtcC5kZQ==
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 13:18:09 +0100
-Received: (qmail 31307 invoked from network); 17 Jan 2020 12:18:10 -0000
-Received: from ac1.vpn.kamp-intra.net (HELO ?172.20.250.1?)
- (pl@kamp.de@::ffff:172.20.250.1)
- by submission.kamp.de with ESMTPS (AES128-SHA encrypted) ESMTPA;
- 17 Jan 2020 12:18:10 -0000
-Subject: Re: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior
- to previous a0000
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
- <20200108150458.GC3184@work-vm>
- <ca222a5f-1ec6-477c-ed83-6ef52ea9e97f@kamp.de>
- <20200109184440.GR6795@work-vm>
- <b89e8ba2-49e9-8c0d-1129-116afa76366a@kamp.de>
- <cd316fb8-b56b-2913-8b57-f085ca4426d7@kamp.de>
- <11bd7f7a-9022-6c35-3b92-27d6e66f3295@kamp.de>
- <20200116202605.GN3108@work-vm>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <a1bf5cc0-f32d-48eb-35e4-b895458f8ffe@kamp.de>
-Date: Fri, 17 Jan 2020 13:18:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1isQbJ-0006hy-3h
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:19:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579263584;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kmpp6IaUgIlgO3axl4Nc/Kkub+NfrL3AQNREn+Pk+XE=;
+ b=BeCKVmGQN7M0cC8u3ht7D+pR7rhg5vVwjI2PnSjmytv7Gj10ilXsl86yzv3wPZPPqOl3yg
+ h23THj+UdckBRwIBvkCtXWbfcDYQ9YBBq9o5YbkyhoOyRTFFqxLdVzQmOPVm9MF9pE12T9
+ fFMfGnYDnchdyELTwUzDGOcaj/IoTlk=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-rU-0ZEV9PVepPWsS6bI18Q-1; Fri, 17 Jan 2020 07:19:40 -0500
+Received: by mail-qt1-f200.google.com with SMTP id z11so5916277qts.1
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:19:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=pzvhp7Z+zyG59Ba3kmGkNgEyTIsCpnrdorbo2lBj3aU=;
+ b=pVe4gcGDpMSkS66fR8UOa64Ca8dV0rUBWqEABRgL1bprwu4g9txFo3xjzaja/NlxdL
+ 1HZ/q1SH+C0aEaRtvIHdk2mfoWPTD717mnTq+89RhkU9ExFPxLBCcCwFjDIEKN+XAUdR
+ VLq8CAhfk8KdiSFxh6ZVb0WTGkN4X2uH3qVGGuDDObZhqRkoJgaQIgm8jYTd7S5C/h3A
+ aMNY0FW25U0maDi15CKKNnHP2zWEDTiNdJhI1xVH6bk51O26uXaSh/X1O49RaIdINLES
+ 1bRZ8OxkNaeTm9mxp6RvYl/MW8mWyJu0K85FBEuI+Vm2lH0WJbyD98Hp/3rYA1d31wBN
+ TrdQ==
+X-Gm-Message-State: APjAAAXgSmY9TP30OWl85THxiw1kKQs7iAdZSSqasSZndrOYBcNa5bTn
+ o2961XBTSIS0orBzIWh4XrqGlaoDnwXrNotAsxbMsRkzXnmGMWJlydS70ePKDmi48W4bElrfAZF
+ ClTwXqVrsxQsIARs=
+X-Received: by 2002:ad4:4912:: with SMTP id bh18mr7562349qvb.50.1579263579522; 
+ Fri, 17 Jan 2020 04:19:39 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx3X1CEnhP7WNjUNxceqM1oHfXx1p8+EWk9AfLQpSy38XG0Znumc0s0eaGYfLewFfDI8KH+nQ==
+X-Received: by 2002:ad4:4912:: with SMTP id bh18mr7562319qvb.50.1579263579257; 
+ Fri, 17 Jan 2020 04:19:39 -0800 (PST)
+Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
+ by smtp.gmail.com with ESMTPSA id g16sm11686127qkk.61.2020.01.17.04.19.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Jan 2020 04:19:38 -0800 (PST)
+Date: Fri, 17 Jan 2020 07:19:31 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v22 9/9] MAINTAINERS: Add ACPI/HEST/GHES entries
+Message-ID: <20200117071928-mutt-send-email-mst@kernel.org>
+References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
+ <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
+ <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
+ <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
+ <CAFEAcA_QO1t10EJySQ5tbOHNuXgzQnJrN28n7fmZt_7aP=hvzA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200116202605.GN3108@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <CAFEAcA_QO1t10EJySQ5tbOHNuXgzQnJrN28n7fmZt_7aP=hvzA@mail.gmail.com>
+X-MC-Unique: rU-0ZEV9PVepPWsS6bI18Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 195.62.97.192
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,65 +106,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm-devel <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Dongjiu Geng <gengdongjiu@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
+ qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 16.01.20 um 21:26 schrieb Dr. David Alan Gilbert:
-> * Peter Lieven (pl@kamp.de) wrote:
->> Am 16.01.20 um 13:47 schrieb Peter Lieven:
->>> Am 13.01.20 um 17:25 schrieb Peter Lieven:
->>>> Am 09.01.20 um 19:44 schrieb Dr. David Alan Gilbert:
->>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>> Am 08.01.20 um 16:04 schrieb Dr. David Alan Gilbert:
->>>>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>>
->>>>>>>> I have a Qemu 4.0.1 machine with vhost-net network adapter, thats polluting the log with the above message.
->>>>>>>>
->>>>>>>> Is this something known? Googling revealed the following patch in Nemu (with seems to be a Qemu fork from Intel):
->>>>>>>>
->>>>>>>> https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619dccced114ef7f56e
->>>>>>>>
->>>>>>>>
->>>>>>>> The network stopped functioning. After a live-migration the vServer is reachable again.
->>>>>>>>
->>>>>>>>
->>>>>>>> Any ideas?
->>>>>>> What guest are you running and what does your qemu commandline look
->>>>>>> like?
->>>>>> Its running debian9. We have hundreds of other VMs with identical setup. Do not know why this one makes trouble.
->>>>> Could you extract an 'info mtree' from it - particularly the
->>>>> 'address-space: memory' near the top.
->>>>
->>>> Here we go:
->>>>
->>>>
->>>> address-space: memory
->>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): system
->>>>     0000000000000000-000000003fffffff (prio 0, i/o): alias ram-below-4g @pc.ram 0000000000000000-000000003fffffff
->>>>     0000000000000000-ffffffffffffffff (prio -1, i/o): pci
->>>>       00000000000a0000-00000000000affff (prio 2, i/o): alias vga.chain4 @vga.vram 0000000000000000-000000000000ffff
->>>>       00000000000a0000-00000000000bffff (prio 1, i/o): vga-lowmem
->>>
->>> What seems special is that the RAM area is prio2. Any idea if this makes trouble?
->>
->> Update from my side. This happens when I have Debian 10 with XFCE when the Graphical User Interface is initialized.
->>
->> I see the log message when I specify -M pc-i440fx-2.9. If I obmit the machine type the error does not appear.
-> I can't persuade this to reproduce here on the images I currently have;
-> but if you can rebuild, can you try the v3 of 'Fix hyperv synic on
-> vhost' I've just posted?  It turns off the alignment code that's
-> spitting that error in vhost-kernel cases, so should go away.
+On Fri, Jan 17, 2020 at 11:09:07AM +0000, Peter Maydell wrote:
+> On Fri, 17 Jan 2020 at 07:22, Philippe Mathieu-Daud=E9 <philmd@redhat.com=
+> wrote:
+> >
+> > Hi Peter,
+> >
+> > On 1/16/20 5:46 PM, Peter Maydell wrote:
+> > > On Wed, 8 Jan 2020 at 11:32, Dongjiu Geng <gengdongjiu@huawei.com> wr=
+ote:
+> > >>
+> > >> I and Xiang are willing to review the APEI-related patches and
+> > >> volunteer as the reviewers for the HEST/GHES part.
+> > >>
+> > >> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> > >> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> > >> ---
+> > >>   MAINTAINERS | 9 +++++++++
+> > >>   1 file changed, 9 insertions(+)
+> > >>
+> > >> diff --git a/MAINTAINERS b/MAINTAINERS
+> > >> index 387879a..5af70a5 100644
+> > >> --- a/MAINTAINERS
+> > >> +++ b/MAINTAINERS
+> > >> @@ -1423,6 +1423,15 @@ F: tests/bios-tables-test.c
+> > >>   F: tests/acpi-utils.[hc]
+> > >>   F: tests/data/acpi/
+> > >>
+> > >> +ACPI/HEST/GHES
+> > >> +R: Dongjiu Geng <gengdongjiu@huawei.com>
+> > >> +R: Xiang Zheng <zhengxiang9@huawei.com>
+> > >> +L: qemu-arm@nongnu.org
+> > >> +S: Maintained
+> > >> +F: hw/acpi/ghes.c
+> > >> +F: include/hw/acpi/ghes.h
+> > >> +F: docs/specs/acpi_hest_ghes.rst
+> > >> +
+> > >>   ppc4xx
+> > >>   M: David Gibson <david@gibson.dropbear.id.au>
+> > >>   L: qemu-ppc@nongnu.org
+> > >> --
+> > >
+> > > Michael, Igor: since this new MAINTAINERS section is
+> > > moving files out of the 'ACPI/SMBIOS' section that you're
+> > > currently responsible for, do you want to provide an
+> > > acked-by: that you think this division of files makes sense?
+> >
+> > The files are not 'moved out', Michael and Igor are still the
+> > maintainers of the supported ACPI/SMBIOS subsystem:
+>=20
+> Does get_maintainer.pl print the answers for all matching
+> sections, rather than just the most specific, then?
+>=20
+> In any case, I'd still like an acked-by from them.
+>=20
+> thanks
+> -- PMM
 
-Your patch also seems to fix also my issue. No more errors and the network keeps responding.
-
-
-Thanks
-
-Peter
-
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
 
