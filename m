@@ -2,98 +2,88 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E16C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A72EC33CB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:25:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A1E720748
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:24:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A1E720748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07D5220748
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:25:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Er0qrgXz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07D5220748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isNrN-0000M5-0D
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:24:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47999)
+	id 1isNsR-0001aE-71
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:25:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48130)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1isNqe-0007vl-B2
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:23:27 -0500
+ (envelope-from <kwolf@redhat.com>) id 1isNrk-00013L-Uh
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:24:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1isNqX-0002kc-3N
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:23:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51092
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1isNqW-0002kK-Th
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:23:17 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00H9Dbxv142448
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:23:16 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2xk0qsp4cp-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:23:16 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Fri, 17 Jan 2020 09:23:14 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 17 Jan 2020 09:23:12 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00H9NBo452887638
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 17 Jan 2020 09:23:11 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EE41552050;
- Fri, 17 Jan 2020 09:23:10 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.124.35.97])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B1F2B5204E;
- Fri, 17 Jan 2020 09:23:09 +0000 (GMT)
-Subject: Re: [PATCH v19 0/7]target-ppc/spapr: Add FWNMI support in QEMU for
- PowerKM guests
-To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
-References: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
-From: Ganesh <ganeshgr@linux.ibm.com>
-Date: Fri, 17 Jan 2020 14:53:09 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
+ (envelope-from <kwolf@redhat.com>) id 1isNrj-0003hh-2h
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:24:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42422
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1isNri-0003h5-VF
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:24:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579253070;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pp3Vs9w4uQbtdVCf5G8e7VyLd8hMd3Kw8DVMRQ9FZg4=;
+ b=Er0qrgXzVNvs6ML2gGENvvqeHh8ZJzd+HsAzTEvcHOal9zWYs2vxQ0XTsHw8+VgygqqMsy
+ 9+2OORmgEB65T2Y83aIlDeBor6GZBY9wHnih3VYvfhNRATf6tpcGIYImz7IEy5hnQvVVI4
+ ce8/lkD2t7KTiGXQxftDx+/8fVIUzUQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-mjFqLWwSNVeDVdvVFgEJkg-1; Fri, 17 Jan 2020 04:24:26 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD2BB800D48;
+ Fri, 17 Jan 2020 09:24:25 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5CE8B5DA32;
+ Fri, 17 Jan 2020 09:24:22 +0000 (UTC)
+Date: Fri, 17 Jan 2020 10:24:21 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v3 4/4] block: Mark 'block_resize' as coroutine
+Message-ID: <20200117092421.GB5646@dhcp-200-226.str.redhat.com>
+References: <20200115122326.26393-1-kwolf@redhat.com>
+ <20200115122326.26393-5-kwolf@redhat.com>
+ <87tv4vzqd7.fsf@dusky.pond.sub.org>
+ <20200116101333.GA9470@linux.fritz.box>
+ <875zhbtox2.fsf@dusky.pond.sub.org>
+ <20200116152312.GI9470@linux.fritz.box>
+ <871rryr60a.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20200116163952.11090-1-ganeshgr@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 20011709-0028-0000-0000-000003D1EDEE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011709-0029-0000-0000-0000249618B5
-Message-Id: <4db3cb25-a072-db48-be06-62056d7c7fa3@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-01-17_02:2020-01-16,
- 2020-01-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- mlxlogscore=999 impostorscore=0 spamscore=0 phishscore=0 suspectscore=0
- priorityscore=1501 clxscore=1015 adultscore=0 mlxscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001170072
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+In-Reply-To: <871rryr60a.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: mjFqLWwSNVeDVdvVFgEJkg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,105 +95,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, groug@kaod.org
+Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 17.01.2020 um 06:44 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+> > Am 16.01.2020 um 16:13 hat Markus Armbruster geschrieben:
+> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >>=20
+> >> > Am 16.01.2020 um 10:45 hat Markus Armbruster geschrieben:
+> >> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >> >> > block_resize is safe to run in a coroutine, so use it as an examp=
+le for
+> >> >> > the new 'coroutine': true annotation in the QAPI schema.
+> >> >> >
+> >> >> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> >> >> > Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >> >
+> >> >> > diff --git a/blockdev.c b/blockdev.c
+> >> >> > index 8e029e9c01..b5e5d1e072 100644
+> >> >> > --- a/blockdev.c
+> >> >> > +++ b/blockdev.c
+> >> >> > @@ -3161,9 +3161,9 @@ void hmp_drive_del(Monitor *mon, const QDic=
+t *qdict)
+> >> >> >      aio_context_release(aio_context);
+> >> >> >  }
+> >> >> > =20
+> >> >> > -void qmp_block_resize(bool has_device, const char *device,
+> >> >> > -                      bool has_node_name, const char *node_name,
+> >> >> > -                      int64_t size, Error **errp)
+> >> >> > +void coroutine_fn qmp_block_resize(bool has_device, const char *=
+device,
+> >> >> > +                                   bool has_node_name, const cha=
+r *node_name,
+> >> >> > +                                   int64_t size, Error **errp)
+> >> >> >  {
+> >> >> >      Error *local_err =3D NULL;
+> >> >> >      BlockBackend *blk =3D NULL;
+> >> >>=20
+> >> >> Pardon my ignorant question: what exactly makes a function a
+> >> >> coroutine_fn?
+> >> >
+> >> > When Stefan requested adding the coroutine_fn marker, it seemed to m=
+ake
+> >> > sense to me because the QMP dispatcher will always call it from
+> >> > coroutine context now, and being always run in coroutine context mak=
+es a
+> >> > function a coroutine_fn.
+> >> >
+> >> > However, it's also called from hmp_block_resize(), so at least for n=
+ow
+> >> > coroutine_fn is actually wrong.
+> >>=20
+> >> This answers the question when we mark a function a coroutine_fn.  I
+> >> meant to ask what conditions the function itself must satisfy to be
+> >> eligible for this mark.
+> >
+> > The requirement is actually not about the function itself, it's about
+> > the callers, as stated above.
+> >
+> > But being a coroutine_fn allows the function to call other functions
+> > that only work in coroutine context (other coroutine_fns). In the end
+> > the reason why a function only works in coroutine context is usually
+> > that it (or any other coroutine_fns called by it) could yield, which
+> > obviously doesn't work outside of coroutine contest.
+>=20
+> Thanks.
+>=20
+> I think "being always run in coroutine context makes a function a
+> coroutine_fn" is inaccurate.  It's "calling a coroutine_fn without
+> switching to coroutine context first when not already in coroutine
+> context".  The induction terminates at basic coroutine_fn like
+> qemu_coroutine_yield().
 
+I think we would tend to mark things as coroutine_fn even if they don't
+call other coroutine_fns (yet), but would be allowed to. But this is now
+really splitting hairs.
 
-On 1/16/20 10:09 PM, Ganesh Goudar wrote:
-> This patch set adds support for FWNMI in PowerKVM guests.
->
-> System errors such as SLB multihit and memory errors
-> that cannot be corrected by hardware is passed on to
-> the kernel for handling by raising machine check
-> exception (an NMI). Upon such machine check exceptions,
-> if the address in error belongs to guest then KVM
-> invokes guests' 0x200 interrupt vector if the guest
-> is not FWNMI capable. For FWNMI capable guest
-> KVM passes the control to QEMU by exiting the guest.
->
-> This patch series adds functionality to QEMU to pass
-> on such machine check exceptions to the FWNMI capable
-> guest kernel by building an error log and invoking
-> the guest registered machine check handling routine.
->
-> The KVM changes are now part of the upstream kernel
-> (commit e20bbd3d). This series contain QEMU changes.
->
-> Change Log v19:
->    - Create error object for migration blocker in machine_init().
->    - Remove the check to see fwnmi calls are already registered,
->      which is no longer needed.
->    - Register fwnmi RTAS calls in core_rtas_register_types() where
->      other RTAS calls are registered.
->    - Bail out from interlock call if the cap is not set.
->    - Reorder and add missing S-O-Bs.
->
-> Change Log v18:
->    - Dynamically create the Error object before adding it as blocker
->    - In apply hook check if the fwnmi calls are already registered and
->      if kvm supports fwnmi before registering the fwnmi calls.
->    - In rtas_ibm_nmi_register() test the feature flag before attempting
->      to get the RTAS address
->    - Introduce a bool member "fwnmi_calls_registered" to check if the
->      fwnmi calls are registered and use the same in needed hook to save
->      the state during migration.
->
-> Change Log v17:
->    - Add fwnmi cap to migration state
->    - Reprhase the commit message in patch 2/7
->
-> Change Log v16:
->    - Fixed coding style problems
->
-> Change Log v15:
->    - Removed cap_ppc_fwnmi
->    - Moved fwnmi registeration to .apply hook
->    - Assume SLOF has allocated enough room for rtas error log
->    - Using ARRAY_SIZE to end the loop
->    - Do not set FWNMI cap in post_load, now its done in .apply hook
->
-> Change Log v14:
->    - Feature activation moved to a separate patch
->    - Fixed issues with migration blocker
->
-> Change Log v13:
->    - Minor fixes (mostly nits)
->    - Moved FWNMI guest registration check from patch 4 to 3.
->
-> Change Log v12:
->    - Rebased to latest ppc-for-4.2 (SHA b1e8156743)
->
-> Change Log v11:
->    - Moved FWNMI SPAPR cap defaults to 4.2 class option
->    - Fixed issues with handling fwnmi KVM capability
->
-> ---
->
-> Aravinda Prasad (7):
->    Wrapper function to wait on condition for the main loop mutex
->    ppc: spapr: Introduce FWNMI capability
->    target/ppc: Handle NMI guest exit
->    target/ppc: Build rtas error log upon an MCE
->    ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS
->      calls
->    migration: Include migration support for machine check handling
->    ppc: spapr: Activate the FWNMI functionality
->
->   cpus.c                   |   5 +
->   hw/ppc/spapr.c           |  58 +++++++++
->   hw/ppc/spapr_caps.c      |  25 ++++
->   hw/ppc/spapr_events.c    | 269 +++++++++++++++++++++++++++++++++++++++
->   hw/ppc/spapr_rtas.c      |  89 +++++++++++++
->   include/hw/ppc/spapr.h   |  26 +++-
->   include/qemu/main-loop.h |   8 ++
->   target/ppc/kvm.c         |  24 ++++
->   target/ppc/kvm_ppc.h     |   8 ++
->   target/ppc/trace-events  |   1 +
->   10 files changed, 511 insertions(+), 2 deletions(-)
-Sorry, Have to remove some code left over from previous version, self NACK.
->
+Maybe I should just have referred to the documentation in the source:
+
+/**
+ * Mark a function that executes in coroutine context
+ *
+ * Functions that execute in coroutine context cannot be called directly fr=
+om
+ * normal functions.  In the future it would be nice to enable compiler or
+ * static checker support for catching such errors.  This annotation might =
+make
+ * it possible and in the meantime it serves as documentation.
+ *
+ * For example:
+ *
+ *   static void coroutine_fn foo(void) {
+ *       ....
+ *   }
+ */
+#define coroutine_fn
+
+Kevin
 
 
