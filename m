@@ -6,54 +6,56 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93180C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 08:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E244C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 08:21:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CD0C2072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 08:19:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CD0C2072B
+	by mail.kernel.org (Postfix) with ESMTPS id 40E7B20728
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 08:21:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40E7B20728
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isMrC-0003tr-EU
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 03:19:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39637)
+	id 1isMt1-00065u-9k
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 03:21:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1isMqW-0003TL-Og
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:19:17 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1isMsI-0005F7-RE
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:21:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1isMqS-0004hW-CC
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:19:12 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2683 helo=huawei.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1isMsE-0006Aw-Lq
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:21:02 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2740 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1isMqR-0004e4-Oo
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:19:08 -0500
+ id 1isMsE-00069M-2D
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:20:58 -0500
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 51C2A58BEB7877E15392;
- Fri, 17 Jan 2020 16:19:03 +0800 (CST)
+ by Forcepoint Email with ESMTP id DC7C7C79AE99B497CED3;
+ Fri, 17 Jan 2020 16:20:54 +0800 (CST)
 Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
  (10.3.19.211) with Microsoft SMTP Server (TLS) id 14.3.439.0; Fri, 17 Jan
- 2020 16:18:53 +0800
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Subject: [BUG Report] Got a use-after-free error while start arm64 VM with
+ 2020 16:20:47 +0800
+Subject: Re: [BUG Report] Got a use-after-free error while start arm64 VM with
  lots of pci controllers
+From: Pan Nengyuan <pannengyuan@huawei.com>
 To: Michael Tsirkin <mst@redhat.com>, <marcel.apfelbaum@gmail.com>
-Message-ID: <18ae8385-b760-4805-a2f1-9d43ac0bc95d@huawei.com>
-Date: Fri, 17 Jan 2020 16:18:49 +0800
+References: <18ae8385-b760-4805-a2f1-9d43ac0bc95d@huawei.com>
+Message-ID: <745e5691-157e-baa8-fe30-fdea27ef699d@huawei.com>
+Date: Fri, 17 Jan 2020 16:20:43 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="------------746E09B96AB7D09F93AFADCE"
+In-Reply-To: <18ae8385-b760-4805-a2f1-9d43ac0bc95d@huawei.com>
+Content-Type: multipart/mixed; boundary="------------551556107AC82D825DA68EC8"
 X-Originating-IP: [10.184.39.213]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,105 +67,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kuhn.chenqun@huawei.com, qemu-devel@nongnu.org,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: kuhn.chenqun@huawei.com, Euler Robot <euler.robot@huawei.com>,
+ qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---------------746E09B96AB7D09F93AFADCE
+--------------551556107AC82D825DA68EC8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-Hi,
+Cc: euler.robot@huawei.com
 
-We got a use-after-free report in our Euler Robot Test, it is can be reproduced quite easily,
-It can be reproduced by start VM with lots of pci controller and virtio-scsi devices.
-You can find the full qemu log from attachment.
-We have analyzed the log and got the rough process how it happened, but don't know how to fix it.
+On 1/17/2020 4:18 PM, Pan Nengyuan wrote:
+> Hi,
+> 
+> We got a use-after-free report in our Euler Robot Test, it is can be reproduced quite easily,
+> It can be reproduced by start VM with lots of pci controller and virtio-scsi devices.
+> You can find the full qemu log from attachment.
+> We have analyzed the log and got the rough process how it happened, but don't know how to fix it.
+> 
+> Could anyone help to fix it ?
+> 
+> The key message shows bellow:
+> har device redirected to /dev/pts/1 (label charserial0)
+> ==1517174==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+> =================================================================
+> ==1517174==ERROR: AddressSanitizer: heap-use-after-free on address 0xfffc31a002a0 at pc 0xaaad73e1f668 bp 0xfffc319fddb0 sp 0xfffc319fddd0
+> READ of size 8 at 0xfffc31a002a0 thread T1
+>     #0 0xaaad73e1f667 in memory_region_unref /home/qemu/memory.c:1771
+>     #1 0xaaad73e1f667 in flatview_destroy /home/qemu/memory.c:291
+>     #2 0xaaad74adc85b in call_rcu_thread util/rcu.c:283
+>     #3 0xaaad74ab31db in qemu_thread_start util/qemu-thread-posix.c:519
+>     #4 0xfffc3a1678bb  (/lib64/libpthread.so.0+0x78bb)
+>     #5 0xfffc3a0a616b  (/lib64/libc.so.6+0xd616b)
+> 
+> 0xfffc31a002a0 is located 544 bytes inside of 1440-byte region [0xfffc31a00080,0xfffc31a00620)
+> freed by thread T37 (CPU 0/KVM) here:
+>     #0 0xfffc3c102e23 in free (/lib64/libasan.so.4+0xd2e23)
+>     #1 0xfffc3bbc729f in g_free (/lib64/libglib-2.0.so.0+0x5729f)
+>     #2 0xaaad745cce03 in pci_bridge_update_mappings hw/pci/pci_bridge.c:245
+>     #3 0xaaad745ccf33 in pci_bridge_write_config hw/pci/pci_bridge.c:271
+>     #4 0xaaad745ba867 in pci_bridge_dev_write_config hw/pci-bridge/pci_bridge_dev.c:153
+>     #5 0xaaad745d6013 in pci_host_config_write_common hw/pci/pci_host.c:81
+>     #6 0xaaad73e2346f in memory_region_write_accessor /home/qemu/memory.c:483
+>     #7 0xaaad73e1d9ff in access_with_adjusted_size /home/qemu/memory.c:544
+>     #8 0xaaad73e28d1f in memory_region_dispatch_write /home/qemu/memory.c:1482
+>     #9 0xaaad73d7274f in flatview_write_continue /home/qemu/exec.c:3167
+>     #10 0xaaad73d72a53 in flatview_write /home/qemu/exec.c:3207
+>     #11 0xaaad73d7c8c3 in address_space_write /home/qemu/exec.c:3297
+>     #12 0xaaad73e5059b in kvm_cpu_exec /home/qemu/accel/kvm/kvm-all.c:2386
+>     #13 0xaaad73e07ac7 in qemu_kvm_cpu_thread_fn /home/qemu/cpus.c:1246
+>     #14 0xaaad74ab31db in qemu_thread_start util/qemu-thread-posix.c:519
+>     #15 0xfffc3a1678bb  (/lib64/libpthread.so.0+0x78bb)
+>     #16 0xfffc3a0a616b  (/lib64/libc.so.6+0xd616b)
+> 
+> previously allocated by thread T0 here:
+>     #0 0xfffc3c1031cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
+>     #1 0xfffc3bbc7163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+>     #2 0xaaad745ccb57 in pci_bridge_region_init hw/pci/pci_bridge.c:188
+>     #3 0xaaad745cd8cb in pci_bridge_initfn hw/pci/pci_bridge.c:385
+>     #4 0xaaad745baaf3 in pci_bridge_dev_realize hw/pci-bridge/pci_bridge_dev.c:64
+>     #5 0xaaad745cacd7 in pci_qdev_realize hw/pci/pci.c:2095
+>     #6 0xaaad7439d9f7 in device_set_realized hw/core/qdev.c:865
+>     #7 0xaaad7485ed23 in property_set_bool qom/object.c:2102
+>     #8 0xaaad74868f4b in object_property_set_qobject qom/qom-qobject.c:26
+>     #9 0xaaad74863a43 in object_property_set_bool qom/object.c:1360
+>     #10 0xaaad742a53b7 in qdev_device_add /home/qemu/qdev-monitor.c:675
+>     #11 0xaaad742a9c7b in device_init_func /home/qemu/vl.c:2074
+>     #12 0xaaad74ad4d33 in qemu_opts_foreach util/qemu-option.c:1170
+>     #13 0xaaad73d60c17 in main /home/qemu/vl.c:4313
+>     #14 0xfffc39ff0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+>     #15 0xaaad73d6db33  (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x98db33)
+> 
+> Thread T1 created by T0 here:
+>     #0 0xfffc3c068f6f in __interceptor_pthread_create (/lib64/libasan.so.4+0x38f6f)
+>     #1 0xaaad74ab54ab in qemu_thread_create util/qemu-thread-posix.c:556
+>     #2 0xaaad74adc6a7 in rcu_init_complete util/rcu.c:326
+>     #3 0xaaad74bab2a7 in __libc_csu_init (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x17cb2a7)
+>     #4 0xfffc39ff0b47 in __libc_start_main (/lib64/libc.so.6+0x20b47)
+>     #5 0xaaad73d6db33  (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x98db33)
+> 
+> Thread T37 (CPU 0/KVM) created by T0 here:
+>     #0 0xfffc3c068f6f in __interceptor_pthread_create (/lib64/libasan.so.4+0x38f6f)
+>     #1 0xaaad74ab54ab in qemu_thread_create util/qemu-thread-posix.c:556
+>     #2 0xaaad73e09b0f in qemu_dummy_start_vcpu /home/qemu/cpus.c:2045
+>     #3 0xaaad73e09b0f in qemu_init_vcpu /home/qemu/cpus.c:2077
+>     #4 0xaaad740d36b7 in arm_cpu_realizefn /home/qemu/target/arm/cpu.c:1712
+>     #5 0xaaad7439d9f7 in device_set_realized hw/core/qdev.c:865
+>     #6 0xaaad7485ed23 in property_set_bool qom/object.c:2102
+>     #7 0xaaad74868f4b in object_property_set_qobject qom/qom-qobject.c:26
+>     #8 0xaaad74863a43 in object_property_set_bool qom/object.c:1360
+>     #9 0xaaad73fe3e67 in machvirt_init /home/qemu/hw/arm/virt.c:1682
+>     #10 0xaaad743acfc7 in machine_run_board_init hw/core/machine.c:1077
+>     #11 0xaaad73d60b73 in main /home/qemu/vl.c:4292
+>     #12 0xfffc39ff0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+>     #13 0xaaad73d6db33  (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x98db33)
+> 
+> SUMMARY: AddressSanitizer: heap-use-after-free /home/qemu/memory.c:1771 in memory_region_unref
+> 
+> Thanks
+> 
 
-Could anyone help to fix it ?
-
-The key message shows bellow:
-har device redirected to /dev/pts/1 (label charserial0)
-==1517174==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
-=================================================================
-==1517174==ERROR: AddressSanitizer: heap-use-after-free on address 0xfffc31a002a0 at pc 0xaaad73e1f668 bp 0xfffc319fddb0 sp 0xfffc319fddd0
-READ of size 8 at 0xfffc31a002a0 thread T1
-    #0 0xaaad73e1f667 in memory_region_unref /home/qemu/memory.c:1771
-    #1 0xaaad73e1f667 in flatview_destroy /home/qemu/memory.c:291
-    #2 0xaaad74adc85b in call_rcu_thread util/rcu.c:283
-    #3 0xaaad74ab31db in qemu_thread_start util/qemu-thread-posix.c:519
-    #4 0xfffc3a1678bb  (/lib64/libpthread.so.0+0x78bb)
-    #5 0xfffc3a0a616b  (/lib64/libc.so.6+0xd616b)
-
-0xfffc31a002a0 is located 544 bytes inside of 1440-byte region [0xfffc31a00080,0xfffc31a00620)
-freed by thread T37 (CPU 0/KVM) here:
-    #0 0xfffc3c102e23 in free (/lib64/libasan.so.4+0xd2e23)
-    #1 0xfffc3bbc729f in g_free (/lib64/libglib-2.0.so.0+0x5729f)
-    #2 0xaaad745cce03 in pci_bridge_update_mappings hw/pci/pci_bridge.c:245
-    #3 0xaaad745ccf33 in pci_bridge_write_config hw/pci/pci_bridge.c:271
-    #4 0xaaad745ba867 in pci_bridge_dev_write_config hw/pci-bridge/pci_bridge_dev.c:153
-    #5 0xaaad745d6013 in pci_host_config_write_common hw/pci/pci_host.c:81
-    #6 0xaaad73e2346f in memory_region_write_accessor /home/qemu/memory.c:483
-    #7 0xaaad73e1d9ff in access_with_adjusted_size /home/qemu/memory.c:544
-    #8 0xaaad73e28d1f in memory_region_dispatch_write /home/qemu/memory.c:1482
-    #9 0xaaad73d7274f in flatview_write_continue /home/qemu/exec.c:3167
-    #10 0xaaad73d72a53 in flatview_write /home/qemu/exec.c:3207
-    #11 0xaaad73d7c8c3 in address_space_write /home/qemu/exec.c:3297
-    #12 0xaaad73e5059b in kvm_cpu_exec /home/qemu/accel/kvm/kvm-all.c:2386
-    #13 0xaaad73e07ac7 in qemu_kvm_cpu_thread_fn /home/qemu/cpus.c:1246
-    #14 0xaaad74ab31db in qemu_thread_start util/qemu-thread-posix.c:519
-    #15 0xfffc3a1678bb  (/lib64/libpthread.so.0+0x78bb)
-    #16 0xfffc3a0a616b  (/lib64/libc.so.6+0xd616b)
-
-previously allocated by thread T0 here:
-    #0 0xfffc3c1031cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
-    #1 0xfffc3bbc7163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
-    #2 0xaaad745ccb57 in pci_bridge_region_init hw/pci/pci_bridge.c:188
-    #3 0xaaad745cd8cb in pci_bridge_initfn hw/pci/pci_bridge.c:385
-    #4 0xaaad745baaf3 in pci_bridge_dev_realize hw/pci-bridge/pci_bridge_dev.c:64
-    #5 0xaaad745cacd7 in pci_qdev_realize hw/pci/pci.c:2095
-    #6 0xaaad7439d9f7 in device_set_realized hw/core/qdev.c:865
-    #7 0xaaad7485ed23 in property_set_bool qom/object.c:2102
-    #8 0xaaad74868f4b in object_property_set_qobject qom/qom-qobject.c:26
-    #9 0xaaad74863a43 in object_property_set_bool qom/object.c:1360
-    #10 0xaaad742a53b7 in qdev_device_add /home/qemu/qdev-monitor.c:675
-    #11 0xaaad742a9c7b in device_init_func /home/qemu/vl.c:2074
-    #12 0xaaad74ad4d33 in qemu_opts_foreach util/qemu-option.c:1170
-    #13 0xaaad73d60c17 in main /home/qemu/vl.c:4313
-    #14 0xfffc39ff0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
-    #15 0xaaad73d6db33  (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x98db33)
-
-Thread T1 created by T0 here:
-    #0 0xfffc3c068f6f in __interceptor_pthread_create (/lib64/libasan.so.4+0x38f6f)
-    #1 0xaaad74ab54ab in qemu_thread_create util/qemu-thread-posix.c:556
-    #2 0xaaad74adc6a7 in rcu_init_complete util/rcu.c:326
-    #3 0xaaad74bab2a7 in __libc_csu_init (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x17cb2a7)
-    #4 0xfffc39ff0b47 in __libc_start_main (/lib64/libc.so.6+0x20b47)
-    #5 0xaaad73d6db33  (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x98db33)
-
-Thread T37 (CPU 0/KVM) created by T0 here:
-    #0 0xfffc3c068f6f in __interceptor_pthread_create (/lib64/libasan.so.4+0x38f6f)
-    #1 0xaaad74ab54ab in qemu_thread_create util/qemu-thread-posix.c:556
-    #2 0xaaad73e09b0f in qemu_dummy_start_vcpu /home/qemu/cpus.c:2045
-    #3 0xaaad73e09b0f in qemu_init_vcpu /home/qemu/cpus.c:2077
-    #4 0xaaad740d36b7 in arm_cpu_realizefn /home/qemu/target/arm/cpu.c:1712
-    #5 0xaaad7439d9f7 in device_set_realized hw/core/qdev.c:865
-    #6 0xaaad7485ed23 in property_set_bool qom/object.c:2102
-    #7 0xaaad74868f4b in object_property_set_qobject qom/qom-qobject.c:26
-    #8 0xaaad74863a43 in object_property_set_bool qom/object.c:1360
-    #9 0xaaad73fe3e67 in machvirt_init /home/qemu/hw/arm/virt.c:1682
-    #10 0xaaad743acfc7 in machine_run_board_init hw/core/machine.c:1077
-    #11 0xaaad73d60b73 in main /home/qemu/vl.c:4292
-    #12 0xfffc39ff0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
-    #13 0xaaad73d6db33  (/home/qemu/aarch64-softmmu/qemu-system-aarch64+0x98db33)
-
-SUMMARY: AddressSanitizer: heap-use-after-free /home/qemu/memory.c:1771 in memory_region_unref
-
-Thanks
-
---------------746E09B96AB7D09F93AFADCE
+--------------551556107AC82D825DA68EC8
 Content-Type: text/plain; charset="UTF-8"; name="use-after-free-qemu.log"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="use-after-free-qemu.log"
@@ -601,5 +607,5 @@ YWw6ICAgICAgICAgICBmZQ0KICBMZWZ0IGFsbG9jYSByZWR6b25lOiAgICAgY2ENCiAgUmln
 aHQgYWxsb2NhIHJlZHpvbmU6ICAgIGNiDQo9PTE1MTcxNzQ9PUFCT1JUSU5HDQoyMDIwLTAx
 LTE3IDA3OjQ0OjAxLjMxOSswMDAwOiBzaHV0dGluZyBkb3duLCByZWFzb249Y3Jhc2hlZA0K
 
---------------746E09B96AB7D09F93AFADCE--
+--------------551556107AC82D825DA68EC8--
 
