@@ -2,82 +2,101 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40806C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF60C33CB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B23020728
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7331620661
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:51:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZM2DvcV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B23020728
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="DYEerzUS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7331620661
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isMM8-0007B1-Vw
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 02:47:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33499)
+	id 1isMPD-0001ov-Cp
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 02:50:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33956)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1isMKH-0005xj-JF
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:45:58 -0500
+ (envelope-from <dirty@apple.com>) id 1isMMw-0008Ab-7d
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:48:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1isMKD-0006Sl-1u
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:45:53 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44887
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1isMKC-0006SI-UV
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:45:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579247148;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MFkQI0+WRwSCWnWSROARUw5HrTsB5hfe//ZEG0pOmIA=;
- b=ZZM2DvcV+R8vhlfpS4HVqDDV2ANXgWJn5mcSWLYgjU00Ta9ELi3X0nw7U/9ucbkGdn89Y7
- bs8NpSAJ/tUw4CtNzQ2p7PU4zEY+6Gi5yxBJSCjNZWWi4rKOhL/Wmsk1xOZOUISnnZXHCd
- rUbxywlUtfzFoQ3CpZQ9EgxlkJBtKOQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-MUFko7JGPYyg2nCvWXuRyA-1; Fri, 17 Jan 2020 02:45:32 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8B4A107ACC4;
- Fri, 17 Jan 2020 07:45:31 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-106.ams2.redhat.com
- [10.36.116.106])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DC5781219;
- Fri, 17 Jan 2020 07:45:31 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id B33C497C2; Fri, 17 Jan 2020 08:45:30 +0100 (CET)
-Date: Fri, 17 Jan 2020 08:45:30 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Cameron Esfahani <dirty@apple.com>
+ (envelope-from <dirty@apple.com>) id 1isMMv-0000SB-5W
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:48:38 -0500
+Received: from nwk-aaemail-lapp02.apple.com ([17.151.62.67]:45422)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1isMMu-0000RE-O4
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:48:37 -0500
+Received: from pps.filterd (nwk-aaemail-lapp02.apple.com [127.0.0.1])
+ by nwk-aaemail-lapp02.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ 00H7l3jR028797; Thu, 16 Jan 2020 23:48:35 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : content-type
+ : mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=20180706;
+ bh=rr/TtVwYhoZ8owdNlS4bF/X43o1raE+DR93ymu9Txsg=;
+ b=DYEerzUSldyQEhBaIZ/9WdAUI8d44yyO2sEnBfcWwhGsaAxhZe2NRdFW1j7J83mYOL82
+ C86em/QgmNQktwPbLNiI+vuHFMbPYA5tuAy8gjOr2uBs1WmwQXF6QcS6QZt8//+2SRyz
+ NIQUt0+V3wSCbwadOWKwGoqb16gX8sssC4WCGpDdHckKuuBcSZJYXI7gYIH+KVqyCeXp
+ fWxhk5kRK6Ivws0vvE1Pec46M3+5ghta05Y4Zie9WLV4HZgrucO1i44VDrq94Uzvl3bQ
+ QgbB0sasgtiBsXYXwqoD3KjhRPIzYDqSdn1Bj/9oNl4BsCQsujQq+VqZrT0+i5uZjRrl yQ== 
+Received: from ma1-mtap-s03.corp.apple.com (ma1-mtap-s03.corp.apple.com
+ [17.40.76.7])
+ by nwk-aaemail-lapp02.apple.com with ESMTP id 2xfbtpmu12-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Thu, 16 Jan 2020 23:48:35 -0800
+Received: from nwk-mmpp-sz11.apple.com
+ (nwk-mmpp-sz11.apple.com [17.128.115.155]) by ma1-mtap-s03.corp.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) with ESMTPS id <0Q48008Y5R0Y8910@ma1-mtap-s03.corp.apple.com>; Thu,
+ 16 Jan 2020 23:48:34 -0800 (PST)
+Received: from process_milters-daemon.nwk-mmpp-sz11.apple.com by
+ nwk-mmpp-sz11.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) id <0Q4800100QEKHO00@nwk-mmpp-sz11.apple.com>; Thu,
+ 16 Jan 2020 23:48:34 -0800 (PST)
+X-Va-A: 
+X-Va-T-CD: e453fe7e51fd089f43dd72677d71143c
+X-Va-E-CD: 96db56e8de44b13642a708958e9da172
+X-Va-R-CD: 6d5c2ad239283543a9f2829d6df51a97
+X-Va-CD: 0
+X-Va-ID: 3847f940-b825-4c99-9b38-81323437719e
+X-V-A: 
+X-V-T-CD: e453fe7e51fd089f43dd72677d71143c
+X-V-E-CD: 96db56e8de44b13642a708958e9da172
+X-V-R-CD: 6d5c2ad239283543a9f2829d6df51a97
+X-V-CD: 0
+X-V-ID: c7d948ba-9b41-46ba-a106-1df623c62da1
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,,
+ definitions=2020-01-16_06:,, signatures=0
+Received: from [17.234.92.20] (unknown [17.234.92.20])
+ by nwk-mmpp-sz11.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) with ESMTPSA id <0Q4800MRMR0V5J80@nwk-mmpp-sz11.apple.com>; Thu,
+ 16 Jan 2020 23:48:31 -0800 (PST)
+Content-type: text/plain; charset=us-ascii
+MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
 Subject: Re: [PATCH v1] vnc: fix VNC artifacts
-Message-ID: <20200117074530.mt2upbm7y5knyj7j@sirius.home.kraxel.org>
+In-reply-to: <20200117074530.mt2upbm7y5knyj7j@sirius.home.kraxel.org>
+Date: Thu, 16 Jan 2020 23:48:30 -0800
+Cc: qemu-devel@nongnu.org
+Content-transfer-encoding: quoted-printable
+Message-id: <DD35EA77-0343-4BA1-8D37-92808BCEF2A5@apple.com>
 References: <7cb1f22ef8d575238c84f091f03dee8e7fedb78d.1579232679.git.dirty@apple.com>
-MIME-Version: 1.0
-In-Reply-To: <7cb1f22ef8d575238c84f091f03dee8e7fedb78d.1579232679.git.dirty@apple.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: MUFko7JGPYyg2nCvWXuRyA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+ <20200117074530.mt2upbm7y5knyj7j@sirius.home.kraxel.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2020-01-16_06:, , signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 17.151.62.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,32 +108,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-On Thu, Jan 16, 2020 at 07:50:58PM -0800, Cameron Esfahani wrote:
-> Remove VNC optimization to reencode framebuffer update as raw if it's
-> smaller than the default encoding.  QEMU's implementation was naive and
-> didn't account for the ZLIB z_stream mutating with each compression.  Jus=
-t
-> saving and restoring the output buffer offset wasn't sufficient to "rewin=
-d"
-> the previous encoding.  Considering that ZRLE is never larger than raw an=
-d
-> even though ZLIB can occasionally be fractionally larger than raw, the
-> overhead of implementing this optimization correctly isn't worth it.
+Yes.  Personally, I'd also take the change to vnc-enc-zrle.c: because =
+vs->zrle->zlib is reset at the top of the function, using =
+vs->zrle->zlib.offset in determining zstream->next_out and =
+zstream->avail_out is useless.
 
-So just revert de3f7de7f4e257 then ...
+Cameron Esfahani
+dirty@apple.com
 
-> In my investigation, ZRLE always compresses better than ZLIB so
-> prioritize ZRLE over ZLIB, even if the client hints that ZLIB is
-> preferred.
+"All that is necessary for the triumph of evil is that good men do =
+nothing."
 
-... and make this a separate patch?
+Edmund Burke
 
-cheers,
-  Gerd
+
+
+> On Jan 16, 2020, at 11:45 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>=20
+> On Thu, Jan 16, 2020 at 07:50:58PM -0800, Cameron Esfahani wrote:
+>> Remove VNC optimization to reencode framebuffer update as raw if it's
+>> smaller than the default encoding.  QEMU's implementation was naive =
+and
+>> didn't account for the ZLIB z_stream mutating with each compression.  =
+Just
+>> saving and restoring the output buffer offset wasn't sufficient to =
+"rewind"
+>> the previous encoding.  Considering that ZRLE is never larger than =
+raw and
+>> even though ZLIB can occasionally be fractionally larger than raw, =
+the
+>> overhead of implementing this optimization correctly isn't worth it.
+>=20
+> So just revert de3f7de7f4e257 then ...
+>=20
+>> In my investigation, ZRLE always compresses better than ZLIB so
+>> prioritize ZRLE over ZLIB, even if the client hints that ZLIB is
+>> preferred.
+>=20
+> ... and make this a separate patch?
+>=20
+> cheers,
+>  Gerd
+>=20
 
 
