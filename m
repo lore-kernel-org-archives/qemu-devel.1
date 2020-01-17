@@ -2,80 +2,88 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FORGED_YAHOO_RCVD,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FCEC33C9E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 18:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF8FC33C9E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 18:30:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1992A20728
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 18:27:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EBBC20728
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 18:30:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="MzhaU1m6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1992A20728
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXDo7jjr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EBBC20728
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isWL4-0005qp-8O
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 13:27:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33126)
+	id 1isWOA-00075j-H5
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 13:30:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liewkj@yahoo.com>) id 1isWKF-00050q-Mv
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 13:26:36 -0500
+ (envelope-from <groeck7@gmail.com>) id 1isWNO-0006Rm-8r
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 13:29:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liewkj@yahoo.com>) id 1isWKA-0007B9-M3
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 13:26:31 -0500
-Received: from sonic310-24.consmr.mail.ne1.yahoo.com ([66.163.186.205]:36213)
+ (envelope-from <groeck7@gmail.com>) id 1isWNN-0001Ik-6o
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 13:29:46 -0500
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:40151)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liewkj@yahoo.com>) id 1isWKA-0007AB-HD
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 13:26:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
- t=1579285585; bh=xm5FYwtSgINxrZCgUNPJWpqKAU6luAW6mvgPqAjV22k=;
- h=Date:From:To:Subject:References:From:Subject;
- b=MzhaU1m6gI/dHhjtWhnjKg5X/mHjQgRhnJLwmD8gIi4Rn0+BoQA6LqCxb0WG5pZLwhD78Hq1YuYHVO181XogoN7RpJ08/gHmnlkScnJHpxUxfTWGwkvpnfzMrY51gdipu/TNtpA0fox2wwRZZyWO8TmJVVvGJZmrFn17ybAq+FDK8fHC79U66PcWImOM0z0yTkCgiiyLHdlw0apQNKOXzh3LX1nzlnkNrIskbLugDlcGSrXf7FfNo4U9nZyLtesCaB/y6yPckUB8RkddxW4/HE63xhrvlJybqqAEN8PRixiMVIi5uAdUIdcI9YCGeUfbUyiFXSWz2PawjwttSSSIxw==
-X-YMail-OSG: rTY2390VM1m0dMk48sjMqHthtoijmAoB7maUfLsvlrmZNni2dxVYOa2.MXLK9Lu
- g6CLnCS_lzB4U0NKMVx2BYa2Vv8B9dJ_xcjai_LHLJNMZtXs_wG35FMA5ceTHdyGyRXKKdVAfauf
- 5Jcx6mE38kPZmHDnHC3ARX4boWVVPotUHGN9TYlIIpPTRODiAOQY764z9O89rNHAk748fBUZAJ.7
- TlZ9Zfn5Z9vDh8M5sPcBXjYnBirwYUQnljPguoXUPUbwrAyj3R6Japym6JcIGPzcVgUS8m83gVOk
- MBwEk6zaREhrv7J0mRWNnmHmztSjIjBrPjOn0OM7lnEH_FKPFKyo6F7bAaYhR0wFgX3SQXC_cPtq
- KQGVzHJitNltoZ.Dl8YwJeNKtWxFMMQdeLtRTdn_ugxwQblgBmSZ8QF44KvzNAsrO.6.7SGSnkcG
- Utc6Iy1dF88vl54951eIwmXkRFxmV3X2lR9NEk.gfCJous6F3fTzHUl0A8zrdDnnFCVHUNMRpvET
- z0OEsYXMHMQV7Kq_5AMWT9JNK9xNQc_x9JTdcvylh74jmZso_DQwD44N69G2muBtDzvc_E_aiUTV
- v.XmfJezJUXlu2ffCHyTY9FheV7KlGK_Hofoi.T.JwVR0Jw9WxnBLTorSBen6N8LPkUI.ngQVslU
- Gk4sCgnJU2.taucWzyRPM6Vty8KfBH56KHIpRNdDLKOJV9YV2Oqt32nMe7P2naYkWpMLWYPDM7nL
- fTXyT5xcwjTC4Ma6yg6Aa2r7STzcPMYtv6eIDe90vchmPehzvgTSMtyH48gPkQbQzJElEie8HL7k
- 4cIrjFKMcDfQhEsp1snXSFrMz84CJ.i9V6R7C_wujrozcZAhSI_EYH08tq9vSc7QlYfgf54cKhAH
- rxeQBu88rSNzWKL95CwN3g5QZLYHHJmo2az0wFc_nn59Sowr6TesP8wwMREdQJciL84YAcog.1Gf
- kraTcRAv9y6UbyZKBXVd.AP8OYMLZHg0sokfGRUXd.BGKuOJf.5Dbnc4PuOSy7PQPnmgtc0GwM68
- StI9242RVNoFzRO4yaqmtCBzEcyMFoRKnrFKxN_IjpO7g_L_SYieIjS2ucwVRetXFeIjeAIlwjku
- sLTJbbaOx6.rVqs9fiCtoUcyDKrKwuVMph9H0bKe6HuL7QfBQ6RHz0bBiJ56azmfx_hGYP4SP2YY
- _9SWqCN4R5rFne5h3J44NQVK9hUuIl06C6L2h52fXAI6ZjGOqRHEUIDqVu10GBnVEcDADLKcvH3p
- PXkt6ZrQ_TlqYWbel1Mnp09WFaaCPgdpF9rHvPGppOg39GOzY7g5hSyEcjlhG4A6.SUOBsKGV3yf
- 3cqFewzflpWsjcPXUlYXqB1U6mzq_NDBcWwXGOa5ykeQO8DAijnvvHLj8v7Id2z3fYWLggQ--
-Received: from sonic.gate.mail.ne1.yahoo.com by
- sonic310.consmr.mail.ne1.yahoo.com with HTTP; Fri, 17 Jan 2020 18:26:25 +0000
-Received: by smtp430.mail.ne1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA
- ID ddc13d78cfad84e37aab329e7a6a0888; 
- Fri, 17 Jan 2020 18:26:23 +0000 (UTC)
-Date: Fri, 17 Jan 2020 10:26:21 -0800
-From: KJ Liew <liewkj@yahoo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] audio/dsound: fix invalid parameters error
-Message-ID: <20200117182621.GB13724@chuwi-lt0>
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1isWNK-0001Gg-Nq; Fri, 17 Jan 2020 13:29:42 -0500
+Received: by mail-yb1-xb43.google.com with SMTP id l197so4917884ybf.7;
+ Fri, 17 Jan 2020 10:29:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=ROPyz/f5AhqyNnlV8CsC/MUsp5r48yvDR1ZrQnvMJ4A=;
+ b=BXDo7jjrlUZIFGB91S5G7FSKbyYXtU7ZlLi38FuNzLC+wxvfLu4oo6Mi9v+C5ggnlR
+ o5tjgX8QI/kA8w9C9+0ba1HL1tn8MgwT3tXFhEBBVIIEa7LQXv9QGl17w/bjrzB4MX8l
+ Tnp7kCPbtueIQcYzm3IDTqedMX1USPBaal9RmosuHidzzOcIdGNMY8Zy1rPb0KA9VQBK
+ 5/aDzir4YHiPKS//6BkMHElyY6BLMQ75gHFDmZ60gNpX1/JFopt5A4stlb7ftw6snneY
+ e7QgtW6xxCxL22SpI7+pZ/TlJMtMQAT432GQK9YsGZXhklvLqnkb/cDbPFvy3i/SW7oY
+ SOMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=ROPyz/f5AhqyNnlV8CsC/MUsp5r48yvDR1ZrQnvMJ4A=;
+ b=nVQFYwo43uEMdii0sopzTzu3YVGSJDNZlyqTDeeiNs7Cp+7CzMIJWkLXNwTENFE+zJ
+ QupHg9XEovEH5lhYjdAjTJ2dnQ6fFKVxRAucjfHOzNhZdVHwgQKZIgxTBToLchFAkNHl
+ rWTQ87q00lGtIDrIXIPl1iOQz6BnA4eBzhSgHGTVPUG37McA0NKMmYtp9iHf4n9QnTzV
+ lx276lYegIGDYviAgI/TF0e4hSFuiLR7hR0ySJi5bVgwJPCY3KF3LNa20DfktilBfMas
+ XyY5ImXGYY+AFH40i1NmtPGeEFhk3Bxyd0MoHqZ24UPZoOX27n1HYXjkHLJEY8AgJAg5
+ pSHQ==
+X-Gm-Message-State: APjAAAWvU8QIotpgyrVSkXwBcvakko0zCX37ka4NppQ57yd9xrwXAt0q
+ QOyoRknukZkHVQRyJYhmHmA=
+X-Google-Smtp-Source: APXvYqz2+3hL1okXrBnvSux7iSdsbdB/6q550VxqTxOt/jg9GONqWJ3SzMyUn8RN+Fz9CVhhGM1u1g==
+X-Received: by 2002:a25:5a06:: with SMTP id o6mr30345918ybb.384.1579285781654; 
+ Fri, 17 Jan 2020 10:29:41 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id y206sm11930688ywa.102.2020.01.17.10.29.40
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 17 Jan 2020 10:29:40 -0800 (PST)
+Date: Fri, 17 Jan 2020 10:29:39 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 6/6] hw/arm/exynos4210: Connect serial port DMA busy
+ signals with pl330
+Message-ID: <20200117182939.GC13396@roeck-us.net>
+References: <20200110203942.5745-1-linux@roeck-us.net>
+ <20200110203942.5745-7-linux@roeck-us.net>
+ <CAFEAcA_v98GcR06PWfm+=VnteQN_Q7iKK4wobAg6NrVSP1AyDg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-References: <20200117182621.GB13724.ref@chuwi-lt0>
-X-Mailer: WebService/1.1.15077 hermes Apache-HttpAsyncClient/4.1.4
- (Java/1.8.0_181)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 66.163.186.205
+In-Reply-To: <CAFEAcA_v98GcR06PWfm+=VnteQN_Q7iKK4wobAg6NrVSP1AyDg@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,103 +95,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU Windows has broken dsound backend since the rewrite of audio API in
-version 4.2.0. Both playback and capture buffers failed to lock with
-invalid parameters error.
+On Fri, Jan 17, 2020 at 01:48:06PM +0000, Peter Maydell wrote:
+> On Fri, 10 Jan 2020 at 20:39, Guenter Roeck <linux@roeck-us.net> wrote:
+> >
+> > The Exynos4210 serial driver uses an interrupt line to signal if receive
+> > data is available. Connect that interrupt with the DMA controller's
+> > 'peripheral busy' gpio pin.
+> >
+> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> > ---
+> >  hw/arm/exynos4210.c | 39 ++++++++++++++++++++++++++-------------
+> >  1 file changed, 26 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+> > index c7b5c587b1..498d79ebb2 100644
+> > --- a/hw/arm/exynos4210.c
+> > +++ b/hw/arm/exynos4210.c
+> > @@ -166,8 +166,8 @@ static uint64_t exynos4210_calc_affinity(int cpu)
+> >      return (0x9 << ARM_AFF1_SHIFT) | cpu;
+> >  }
+> >
+> > -static void pl330_create(uint32_t base, qemu_irq irq, int nreq, int nevents,
+> > -                         int width)
+> > +static DeviceState *pl330_create(uint32_t base, qemu_irq irq, int nreq,
+> > +                                 int nevents, int width)
+> >  {
+> >      SysBusDevice *busdev;
+> >      DeviceState *dev;
+> > @@ -191,6 +191,7 @@ static void pl330_create(uint32_t base, qemu_irq irq, int nreq, int nevents,
+> >      for (i = 0; i < nevents; i++) {
+> >          sysbus_connect_irq(busdev, i + 1, irq); /* event irq lines */
+> >      }
+> > +    return dev;
+> >  }
+> >
+> >  static void exynos4210_realize(DeviceState *socdev, Error **errp)
+> > @@ -199,7 +200,7 @@ static void exynos4210_realize(DeviceState *socdev, Error **errp)
+> >      MemoryRegion *system_mem = get_system_memory();
+> >      qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
+> >      SysBusDevice *busdev;
+> > -    DeviceState *dev;
+> > +    DeviceState *dev, *uart[4], *pl330[3];
+> 
+> Rather than having the uart and pl330 pointers be locals,
+> they should be fields in Exynos4210State. (Otherwise technically
+> we leak them, though this is unnoticeable in practice because there's
+> no way to destroy an Exynos4210State.)
+> 
+Out of curiosity: Is that a new leak because they are now tied together,
+or is it an existing leak ? I don't find many DeviceState entries
+in xxxState structures, so find it difficult to determine if/when/why
+there is such a leak.
 
---- ../orig/qemu-4.2.0/audio/dsoundaudio.c	2019-12-12 10:20:47.000000000 -0800
-+++ ../qemu-4.2.0/audio/dsoundaudio.c	2020-01-17 08:05:46.783966900 -0800
-@@ -53,6 +53,7 @@
- typedef struct {
-     HWVoiceOut hw;
-     LPDIRECTSOUNDBUFFER dsound_buffer;
-+    void *last_buf;
-     dsound *s;
- } DSoundVoiceOut;
- 
-@@ -414,10 +415,10 @@
-     DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
-     LPDIRECTSOUNDBUFFER dsb = ds->dsound_buffer;
-     HRESULT hr;
--    DWORD ppos, act_size;
-+    DWORD ppos, act_size, last_size;
-     size_t req_size;
-     int err;
--    void *ret;
-+    void *ret, *last_ret;
- 
-     hr = IDirectSoundBuffer_GetCurrentPosition(dsb, &ppos, NULL);
-     if (FAILED(hr)) {
-@@ -426,17 +427,24 @@
-         return NULL;
-     }
- 
-+    if (ppos == hw->pos_emul) {
-+        *size = 0;
-+        return ds->last_buf;
-+    }
-+
-     req_size = audio_ring_dist(ppos, hw->pos_emul, hw->size_emul);
-     req_size = MIN(req_size, hw->size_emul - hw->pos_emul);
- 
--    err = dsound_lock_out(dsb, &hw->info, hw->pos_emul, req_size, &ret, NULL,
--                          &act_size, NULL, false, ds->s);
-+    err = dsound_lock_out(dsb, &hw->info, hw->pos_emul, req_size, &ret, &last_ret,
-+                          &act_size, &last_size, false, ds->s);
-     if (err) {
-         dolog("Failed to lock buffer\n");
-         *size = 0;
-         return NULL;
-     }
- 
-+    ds->last_buf = g_realloc(ds->last_buf, act_size);
-+    memcpy(ds->last_buf, ret, act_size);
-     *size = act_size;
-     return ret;
- }
-@@ -445,6 +453,8 @@
- {
-     DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
-     LPDIRECTSOUNDBUFFER dsb = ds->dsound_buffer;
-+    if (len == 0)
-+        return 0;
-     int err = dsound_unlock_out(dsb, buf, NULL, len, 0);
- 
-     if (err) {
-@@ -508,10 +518,10 @@
-     DSoundVoiceIn *ds = (DSoundVoiceIn *) hw;
-     LPDIRECTSOUNDCAPTUREBUFFER dscb = ds->dsound_capture_buffer;
-     HRESULT hr;
--    DWORD cpos, act_size;
-+    DWORD cpos, act_size, last_size;
-     size_t req_size;
-     int err;
--    void *ret;
-+    void *ret, *last_ret;
- 
-     hr = IDirectSoundCaptureBuffer_GetCurrentPosition(dscb, &cpos, NULL);
-     if (FAILED(hr)) {
-@@ -520,11 +530,16 @@
-         return NULL;
-     }
- 
-+    if (cpos == hw->pos_emul) {
-+        *size = 0;
-+        return NULL;
-+    }
-+
-     req_size = audio_ring_dist(cpos, hw->pos_emul, hw->size_emul);
-     req_size = MIN(req_size, hw->size_emul - hw->pos_emul);
- 
--    err = dsound_lock_in(dscb, &hw->info, hw->pos_emul, req_size, &ret, NULL,
--                         &act_size, NULL, false, ds->s);
-+    err = dsound_lock_in(dscb, &hw->info, hw->pos_emul, req_size, &ret, &last_ret,
-+                         &act_size, &last_size, false, ds->s);
-     if (err) {
-         dolog("Failed to lock buffer\n");
-         *size = 0;
+Thanks,
+Guenter
 
