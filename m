@@ -1,79 +1,101 @@
 Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_IMAGE_ONLY_08,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5E6C33CB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5682BC33C9E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:44:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BBAB2083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 267962082F
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 21:44:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SG+HgYet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BBAB2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="U12qBxNC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267962082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isYwg-00062g-Af
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 16:14:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40661)
+	id 1isZPK-0004HV-Vq
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 16:43:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fairouz.fsegs@gmail.com>) id 1isXKz-0007to-2E
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 14:31:22 -0500
+ (envelope-from <dirty@apple.com>) id 1isZOX-0003ou-TP
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 16:43:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fairouz.fsegs@gmail.com>) id 1isXKx-0006FD-Tw
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 14:31:20 -0500
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:45841)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <fairouz.fsegs@gmail.com>)
- id 1isXKx-0006EF-PK
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 14:31:19 -0500
-Received: by mail-oi1-x231.google.com with SMTP id n16so23190311oie.12
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 11:31:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=/uBY9fCAQSyeZdYF9jAsudL5P9yVjLAeINdgiZzi03M=;
- b=SG+HgYet7p2bHkuf1HXLgo/XVFdNimzJEACaBZB1Io2cyaYYOTx1F68cwujM4T4O0c
- +TR4olqAr9fEqVctA5LUbrhMDZQRJuTDxHbRmK8KmgnVnrmYydKgOCH0g/ABV0lrgsUp
- FBlbTShs7PRlDn4RLvfZJDBEQks5SRliUNKA7TgOp7VqqmxjR11rDs5wRkmHoUkkXJED
- E/nk7TasAqdyOdF7WWfeMmTvdjudMgzmx3dZcBRvd248nKGsD1hgf9bHKLYgDM6fZNxF
- hRogGCW4qFedUPs3xMuo4e1I/BTjtnpFtZgSnZvY7fiXVq0QwKDYpT2wTERFsk/FwZpW
- aSHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=/uBY9fCAQSyeZdYF9jAsudL5P9yVjLAeINdgiZzi03M=;
- b=Ra9rwVI2AnMFtYWBrDEo1xTeDu3jxMI7GOibxNE3DuiKKCWBikxTJaBoj9gE5oMNB/
- Z51zEGr3IP0HbwnnTALhyLnMk2ZVrhAuCgVpPdUnN8gbL0M51TjA4JCh7PDoZTQ27u+m
- LkK0T1ANellfjoESF8wPDPtF6tEmYr4tT1XYg7AaKNOb8fnuVGp4jq+jc8PuVo4Nk5hJ
- 8FiLJk033ecfjPaJPTe1L4h1M3+l2oDar5jalcYN0a72a+7cHLVBbTi0lDYohMGbEbgK
- 45PFi8ZVM24UoTSHjEnIM/9GuQLsx2ruzFsKjtGDw7sYhcKVMTbC/6ni6eBtvIkPhjjA
- fk0w==
-X-Gm-Message-State: APjAAAWCJuXofkrB+WfOekVdUWk25dln9lhs0zAuyN0I6MhAk3dSJyZp
- mD8rFin01R060HuL0nAblUfNh5BnnheUpuBcs6gqeeA4
-X-Google-Smtp-Source: APXvYqxa/CM8g4H/jGC9h4pFcmdK4Fb3eMWgntAw2lc3H0kmrKNmP+M2wmKXVwR6nH1YuimlgRVI1hAl9F6/7F/4a2g=
-X-Received: by 2002:a05:6808:a83:: with SMTP id q3mr4798066oij.0.1579289478123; 
- Fri, 17 Jan 2020 11:31:18 -0800 (PST)
-MIME-Version: 1.0
-From: Fairouz Fakhfakh <fairouz.fsegs@gmail.com>
-Date: Fri, 17 Jan 2020 20:31:08 +0100
-Message-ID: <CABeOJJXwH05-fKDumR=vLV8aJvxyZhaqD7S+LMAqEz-53MOmYQ@mail.gmail.com>
-Subject: help
-To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="00000000000057533a059c5afc2a"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::231
-X-Mailman-Approved-At: Fri, 17 Jan 2020 16:13:05 -0500
+ (envelope-from <dirty@apple.com>) id 1isZOW-00025a-PO
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 16:43:09 -0500
+Received: from ma1-aaemail-dr-lapp01.apple.com ([17.171.2.60]:60810)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1isZOW-00024i-K6
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 16:43:08 -0500
+Received: from pps.filterd (ma1-aaemail-dr-lapp01.apple.com [127.0.0.1])
+ by ma1-aaemail-dr-lapp01.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ 00HLg7Ha035957; Fri, 17 Jan 2020 13:43:07 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : content-type
+ : content-transfer-encoding : from : mime-version : subject : date :
+ message-id : references : cc : in-reply-to : to; s=20180706;
+ bh=qAk5AwzlTzE+JHV25oC42OZE/RTkiA+IAVQNwblvZrg=;
+ b=U12qBxNCuQisqRw6z/2qrOw+mdlK2nlay83JnAmWTJn7Avm9ZjjT/SQkXLv5LOJuZu96
+ kvAN9fkZp+96glj1ZMz8pvEOiejz3bCgE0GfezWaicmmBd0gpN0b0p5tDAcuyGjxoW4D
+ pHS2+XHNROJVYrZcJdj+3BWUvVB+ZXjjMHJ12HOXTE5Mv3MoLPihWFzaB4pQLd8mwa3r
+ v9gWQHQ91GWBeeuF5tKSURxk9Ms2nZ3Z/iSkuf6TWFeKr0IyGfY/jTyX7VsrBb7WJ5N9
+ +Sv7SCrLNTjSTxuMyBYykXAT9eSTu+VKe9NDiltP0wlobCv3ph1sscXX3A5AiQRSWLYv /Q== 
+Received: from ma1-mtap-s03.corp.apple.com (ma1-mtap-s03.corp.apple.com
+ [17.40.76.7])
+ by ma1-aaemail-dr-lapp01.apple.com with ESMTP id 2xfdw99w9q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Fri, 17 Jan 2020 13:43:07 -0800
+Received: from nwk-mmpp-sz09.apple.com
+ (nwk-mmpp-sz09.apple.com [17.128.115.80]) by ma1-mtap-s03.corp.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) with ESMTPS id <0Q49003SLTNR8O10@ma1-mtap-s03.corp.apple.com>; Fri,
+ 17 Jan 2020 13:43:04 -0800 (PST)
+Received: from process_milters-daemon.nwk-mmpp-sz09.apple.com by
+ nwk-mmpp-sz09.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) id <0Q4900L00T53N400@nwk-mmpp-sz09.apple.com>; Fri,
+ 17 Jan 2020 13:43:03 -0800 (PST)
+X-Va-A: 
+X-Va-T-CD: e453fe7e51fd089f43dd72677d71143c
+X-Va-E-CD: 96db56e8de44b13642a708958e9da172
+X-Va-R-CD: 6d5c2ad239283543a9f2829d6df51a97
+X-Va-CD: 0
+X-Va-ID: 76e6b16b-38be-4334-b9dc-227a1655694f
+X-V-A: 
+X-V-T-CD: e453fe7e51fd089f43dd72677d71143c
+X-V-E-CD: 96db56e8de44b13642a708958e9da172
+X-V-R-CD: 6d5c2ad239283543a9f2829d6df51a97
+X-V-CD: 0
+X-V-ID: a19f1189-65f7-476f-96df-6bd1b9e5243e
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,,
+ definitions=2020-01-17_05:,, signatures=0
+Received: from [17.234.116.82] (unknown [17.234.116.82])
+ by nwk-mmpp-sz09.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) with ESMTPSA id <0Q4900CJ6TNQYD60@nwk-mmpp-sz09.apple.com>; Fri,
+ 17 Jan 2020 13:43:03 -0800 (PST)
+Content-type: text/plain; charset=utf-8
+Content-transfer-encoding: quoted-printable
+MIME-version: 1.0 (1.0)
+Subject: Re: [PATCH v1] vnc: fix VNC artifacts
+Date: Fri, 17 Jan 2020 13:43:02 -0800
+Message-id: <C23889A4-CD29-4B95-9D43-DA6FB7C179C0@apple.com>
+References: <20200117074530.mt2upbm7y5knyj7j@sirius.home.kraxel.org>
+Cc: qemu-devel@nongnu.org
+In-reply-to: <20200117074530.mt2upbm7y5knyj7j@sirius.home.kraxel.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+X-Mailer: iPhone Mail (17C54)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2020-01-17_05:, , signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 17.171.2.60
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,28 +110,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
---00000000000057533a059c5afc2a
-Content-Type: text/plain; charset="UTF-8"
+I=E2=80=99m new to this process, what are the next steps?
 
-Hello,
-I would like to use qemu to install a virtual machine (VM) in Ubuntu.
-I need a minimal VM  which contains only jdk (openjdk).
+Cameron Esfahani
+dirty@apple.com
 
-Can someone help me, please.
-Thank you in advance.
+> On Jan 16, 2020, at 11:47 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>=20
+> =EF=BB=BFOn Thu, Jan 16, 2020 at 07:50:58PM -0800, Cameron Esfahani wrote:=
 
---00000000000057533a059c5afc2a
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Hello,</div><div>I would like to use qemu to install =
-a virtual machine (VM) in Ubuntu.<br>I need a minimal VM =C2=A0which contai=
-ns only jdk (openjdk).<br><br>Can someone help me, please.<br>Thank you in =
-advance.<br></div></div><img src=3D"https://my-email-signature.link/signatu=
-re.gif?u=3D43490&amp;e=3D82146786&amp;v=3Dac8ccdef42c4fd4b7d102b7c8d6f15c85=
-0fefb5c9a5bd6adaad6257e36bcd7cd" style=3D"width:2px;max-height:0;overflow:h=
-idden">
-
---00000000000057533a059c5afc2a--
+>> Remove VNC optimization to reencode framebuffer update as raw if it's
+>> smaller than the default encoding.  QEMU's implementation was naive and
+>> didn't account for the ZLIB z_stream mutating with each compression.  Jus=
+t
+>> saving and restoring the output buffer offset wasn't sufficient to "rewin=
+d"
+>> the previous encoding.  Considering that ZRLE is never larger than raw an=
+d
+>> even though ZLIB can occasionally be fractionally larger than raw, the
+>> overhead of implementing this optimization correctly isn't worth it.
+>=20
+> So just revert de3f7de7f4e257 then ...
+>=20
+>> In my investigation, ZRLE always compresses better than ZLIB so
+>> prioritize ZRLE over ZLIB, even if the client hints that ZLIB is
+>> preferred.
+>=20
+> ... and make this a separate patch?
+>=20
+> cheers,
+>  Gerd
+>=20
+>=20
 
