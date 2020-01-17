@@ -2,76 +2,80 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7A2C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3529EC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:18:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A0B220728
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00E56206E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:18:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HpiFy5Af"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0B220728
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VszoQfjn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E56206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isRUd-00027W-R0
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:16:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46758)
+	id 1isRVt-00035r-Us
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:18:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46946)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1isRTU-0001ZI-Gz
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:15:48 -0500
+ (envelope-from <eblake@redhat.com>) id 1isRUs-0002Ub-KQ
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1isRTQ-00005A-09
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:15:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45862
+ (envelope-from <eblake@redhat.com>) id 1isRUp-0001GE-6R
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:17:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25615
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1isRTP-0008Vc-Gv
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:15:39 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1isRUp-0001Fr-2A
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:17:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579266938;
+ s=mimecast20190719; t=1579267026;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iIBOlwwddxLm/wFmbClDgfBUiXwTJeo1h7DFwBHfUWM=;
- b=HpiFy5AfbJZhdaXFSwOJsw5/AjIrHUlQIkSzcjKsR2Yp55xzGrZmUNdtkE/04Wo6Phy7ZK
- uhQabgaCqDvS2Sf8h18seGSW7VcTC0iins1Tben6Nb/ad2GyfJalm7Xf/TE8HcJb6kkErv
- o/So3OvgwnzuMDUF62sDjc2QjVvSvaE=
+ bh=vGZbk7MNFUyLpmRP6A69f7QL/mb48H/ao779vSGLJSM=;
+ b=VszoQfjnbRYWLlkxNj3wXRKrRBqo3nmhFC6OKc0xlRR+/Yzz0ybOhuGswZDLybRFaU7RvU
+ IwKF7KTK+xWzrPkFY6i6yP+08OolO0Kj4HoQ8Bv8QotVwoSBeGYKX+tyzWCcJ2QqCxBH8Q
+ f42twy8ISVoJRenmtud4uG1yazqbCWI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-ltJOukHcOdScL78F8Q298Q-1; Fri, 17 Jan 2020 08:15:37 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-362-Uv8FDETbNSa9YJrIIY77Nw-1; Fri, 17 Jan 2020 08:15:54 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B762DB60;
- Fri, 17 Jan 2020 13:15:36 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 328D180895;
- Fri, 17 Jan 2020 13:15:35 +0000 (UTC)
-Date: Fri, 17 Jan 2020 14:15:33 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger
- <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v2] s390x: adapter routes error handling
-Message-ID: <20200117141533.0e31b9f5.cohuck@redhat.com>
-In-Reply-To: <20200117111147.5006-1-cohuck@redhat.com>
-References: <20200117111147.5006-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 778FE477;
+ Fri, 17 Jan 2020 13:15:52 +0000 (UTC)
+Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A89880F40;
+ Fri, 17 Jan 2020 13:15:44 +0000 (UTC)
+Subject: Re: [PATCH v6 01/11] qapi/error: add (Error **errp) cleaning APIs
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
+ <20200110194158.14190-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <8d937add-260f-dbc5-b747-3934858c30e9@redhat.com>
+Date: Fri, 17 Jan 2020 07:15:43 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: ltJOukHcOdScL78F8Q298Q-1
+In-Reply-To: <20200110194158.14190-2-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Uv8FDETbNSa9YJrIIY77Nw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -87,36 +91,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jan 2020 12:11:47 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> If the kernel irqchip has been disabled, we don't want the
-> {add,release}_adapter_routes routines to call any kvm_irqchip_*
-> interfaces, as they may rely on an irqchip actually having been
-> created. Just take a quick exit in that case instead.
-> 
-> Also initialize routes->gsi[] with -1 in the virtio-ccw handling,
-> to make sure we don't trip over other errors, either. (Nobody
-> else uses the gsi array in that structure.)
-> 
-> Fixes: d426d9fba8ea ("s390x/virtio-ccw: wire up irq routing and irqfds")
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+On 1/10/20 1:41 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-> 
-> v1->v2:
->   - also initialize the gsi array with -1
-> 
-> ---
->  hw/intc/s390_flic_kvm.c | 8 ++++++++
->  hw/s390x/virtio-ccw.c   | 4 ++++
->  2 files changed, 12 insertions(+)
 
-Queued (with amended commit message) to s390-next.
+Sparse commit message; it might be nice (for future 'git log' 
+greppability) to at least mention the names of the functions being added.
+
+>   
+> +/*
+> + * Functions to clean Error **errp: call corresponding Error *err cleaning
+> + * function an set pointer to NULL
+
+s/ an/, then/
+
+Missing a '.' at the end of the sentence.
+
+Otherwise,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
