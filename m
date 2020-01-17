@@ -2,93 +2,76 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8249C33C9E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 17:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A229C33C9E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 17:33:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F3282073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 17:31:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15D512073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 17:33:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mqKMA30I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F3282073A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wrJtNyXZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D512073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isVT2-0000mW-0R
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 12:31:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53446)
+	id 1isVV3-0002af-Hr
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 12:33:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1isVS9-0000HX-Rg
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:30:38 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1isVSS-0000SE-Db
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1isVS8-0002CF-Rh
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:30:37 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:53451)
+ (envelope-from <peter.maydell@linaro.org>) id 1isVSR-0002RE-4j
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:30:56 -0500
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:35012)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1isVS8-0002Am-Kj
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:30:36 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id n96so3441328pjc.3
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 09:30:36 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1isVSQ-0002QZ-W5
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 12:30:55 -0500
+Received: by mail-ot1-x335.google.com with SMTP id i15so23219558oto.2
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 09:30:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=h1CzXGyPSgcp4W4X48Fvvvy6A4vmx5d0s3Q5h62TvUk=;
- b=mqKMA30IXbqp9TrRdnZbIdGW39QZISAtYSJUFKX4XMDr2ZRJ2tpy6Y7rhxSdSOVDy/
- 2bWD7JOJq2L473ZBregBu+0rU6qEKqAhDNe4DNmJyAUmloF/uQzXpxFRabWlGVrxZUQa
- 2CFV+54fnQVlJMPsfV8LyvG1ZDqDReZoIlXffa1GQJmqk+5739eQtR7DEk6G7BB6mscV
- vSoZGycNGWgj5RNaXb9+jrng372rcG2eCRxKYzyy7Kb4oaIMlLaG0D2LPgQQ9Xx+vExn
- N0wflIsdUwjR8urwUdGADDCN1US6uEQD3EYME9f2Up5wohtBzyWvn1f7uxRJWAi30d7C
- xNMw==
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=2wHVw6YI0c0F4tPkWzzLnCpXdVZBUb1tkEffK1ygTfA=;
+ b=wrJtNyXZ7ggEWeJDVW0K4Enj1UMjq70TTkP0x9+EHjjDZQ270lPz132i6oZ89cD3ZL
+ eHLZNb9b6OZqjHwdTi6PeJrDSn6RfXYLtLarKa4AeHYzragAPsHtLuG06dbz9gxwmJxf
+ Z29vMGfsTghCgv2SioFGQwO3XpEgde1/RNJEDhy1/iltZCxq1LKAAWWxvS99633kCyE+
+ 2zDccOKyiNpSY9uhxHIHBplmyit5Ml0SreijU9WOcrzLSd3Z6Uhmi2PjW+19kUatzqaL
+ 2CTaIdzswAsP5QZ1FNo2AVhdnMbN5A6tc3SP4gvyOVq7HstUyON211TBio7Jgrwtqhp2
+ NodQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=h1CzXGyPSgcp4W4X48Fvvvy6A4vmx5d0s3Q5h62TvUk=;
- b=MJ3gPy2qPqL6QYIW9Rt9Cf35MLyvq4m5Ut9N84MNHlv3lJv2Z1XYH7R0ajeAsXdv5L
- yXVdiKJweUsknqOY/uxN4MkFq3leYzpiQcZ+zF1LHZVNK+IttYN+GPL7BtqQ3WNJKVQ+
- xp8s5miAlXsb5aKyMfy0a+M1/YpUIpcVawmuLxw64u4bwOskT7uC5k5Z2Hq6xifUvA6G
- j/ecmU7NhyNB94NuM3PbQCS/72t/DKRbEbpPy9zlUqvclICDsUjpJR+oKwPAfBu5LenD
- kXr8RpCpUqjkRhMea2wC5HVwVOyWPOprdlDKXoBZOVzJrkEuX6qXQtIvEmKr1k6oZc/F
- Ea2g==
-X-Gm-Message-State: APjAAAVwhupofBpBsoeNAYzYjq9GjAz3uaO08P2ChFnG2ejXuiLdA+RU
- tjI4Mfx7/dVYCjP1gLYRerQsOQ==
-X-Google-Smtp-Source: APXvYqwrUC0ShaOCI28JI9MPNQXBMoKJabikzM/yKGZnc2Z+CpURqFYcmCUUY7GpW2S4fD2B2jxP3A==
-X-Received: by 2002:a17:902:74cb:: with SMTP id
- f11mr92638plt.139.1579282235324; 
- Fri, 17 Jan 2020 09:30:35 -0800 (PST)
-Received: from [192.168.3.43] (rrcs-66-91-136-155.west.biz.rr.com.
- [66.91.136.155])
- by smtp.gmail.com with ESMTPSA id e19sm8093191pjr.10.2020.01.17.09.30.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Jan 2020 09:30:34 -0800 (PST)
-Subject: Re: [PATCH] target/hppa: Allow, but diagnose, LDCW aligned only mod 4
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20200117015322.12953-1-richard.henderson@linaro.org>
- <7b14c840-0d3f-0c67-06be-81b058c727fb@gmx.de>
- <08c4bdcb-b07d-eb30-a38d-f27ed6400952@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <57d3bd1a-0597-8353-46bd-09dd93347f7b@linaro.org>
-Date: Fri, 17 Jan 2020 07:30:30 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=2wHVw6YI0c0F4tPkWzzLnCpXdVZBUb1tkEffK1ygTfA=;
+ b=QpCW/2Qu1Zj2/pgQp336Rkd9RuJhztsjLktR6A+x2EOKRv5wt20+f/sp1jx0Jze8B8
+ LAYj1To3u4elv6umLfP2NXMLvEXswnz/eQf4FTF5aiytN9WcgQcBEH/l0eD+6pUkBGRj
+ b9CSXT7z/GI6Co0gxJIHEuthWj4Oq8qdpOy4xxSJRz61VEvOIVWpEo1UDqbdwEigB50c
+ J5mPRd4FD/7B8CxBhBMruyNfg8jQE8q4Xtf10iQWmPjLvNFG2vRvuQ/LiPkXl+FEinMU
+ Rw8d8nEpHnwyXIPHBcSN4m/bDihSOsGqyykSZFHKwkcfp97CFP9I0yve4MunkAbOXVtE
+ hZEw==
+X-Gm-Message-State: APjAAAWTWU7ykgqlkiqvR00NydrLAkiIPRGFnyiMVVogY40B/4s/x1//
+ PgaSPkN78+oxOpY5TJhzwuSFbOR0vly4/wLd9LKyakdNpNg=
+X-Google-Smtp-Source: APXvYqyqGD8rAo6E1bmKNzOXgUWPZK3jz4naQ8in4RSwph2o+Uat57Diln6QCB3WDHZ2G2hrssxqk8aQe4p+fxlUhiU=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr6985291ota.232.1579282253879; 
+ Fri, 17 Jan 2020 09:30:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <08c4bdcb-b07d-eb30-a38d-f27ed6400952@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Jan 2020 17:30:43 +0000
+Message-ID: <CAFEAcA-_Y0Qaw-S83tMAph21opaDx-2y6aPbv5J_J0Bo4bgJuA@mail.gmail.com>
+Subject: Proposal for handling .hx files with Sphinx
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,24 +83,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dave.anglin@bell.net
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/17/20 6:13 AM, Philippe Mathieu-Daudé wrote:
->>> -    MemOp mop = MO_TEUL | MO_ALIGN_16 | a->size;
->>> +    MemOp mop = MO_TE | MO_ALIGN | a->size;
-> 
-> 
-> Hmmm you changed MO_TEUL -> MO_TE, so from MO_32 to MO_8.
-> 
-> Per your description, shouldn't this be MO_TEUL | MO_ALIGN_4?
+Currently our manual creation includes some .texi files which
+are autogenerated from .hx files by running scripts/hxtool.
+.hx files are a simple format, where where a line is either a
+directive or literal text to be output:
 
-The "UL" part is also being added by a->size.  This code was written this way
-in preparation for the 64-bit ldc, and the bug was not noticable because we
-don't have that yet.
+HXCOMM
+ -- comment lines, ignored
+STEXI/ETEXI
+ -- mark start/end of chunks of text to put into the texinfo output only
+DEFHEADING/ARCHHEADING
+ -- appear in the .h file output verbatim (they are defined as C macros);
+    for texi output they are parsed to add in header sections
 
+For Sphinx, rather than creating a file to include, the most
+natural way to handle this is to have a small custom Sphinx
+extension which will read the .hx file and process it. So
+instead of "makefile produces foo.texi from foo.hx, qemu-doc.texi
+says '@include foo.texi'", we have "qemu-doc.rst says
+'hxtool-doc:: foo.hx', the Sphinx extension for hxtool has
+code that runs to handle that Sphinx directive, it reads the .hx
+file and emits the appropriate documentation contents". (This is
+pretty much the same way the kerneldoc extension works right now.
+It also has the advantage that it should work for third-party
+services like readthedocs that expect to build the docs directly
+with sphinx rather than by invoking our makefiles.)
 
-r~
+We'll need to update what the markup is to handle having rST
+fragments in it. A very minimalist approach to this would
+simply define a new pair of SRST/ERST directives marking the
+start/end of chunks of rST text to go into the rST only.
+(We might be able to do better than that later, as there's
+some repetition currently going on. But we'll probably get
+a better idea of how easy it is to avoid the repetition if
+we start with a simple conversion.)
+
+Here's what we do with hx files at the moment. We have four:
+
+ hmp-commands.hx
+   -- defines monitor commands used by monitor.c; generates
+      qemu-monitor.texi, used by qemu-doc.texi
+ hmp-commands-info.hx
+   -- ditto, for the "info" command's subcommand;
+      generates qemu-monitor-info.texi, used by qemu-doc.texi
+
+These two use only the "put this in the texi or in the .h file"
+functionality, alternating "raw C code defining an entry for the
+monitor command array" with "lump of raw texi for the docs".
+
+ qemu-img-cmds.hx
+   -- defines options for qemu-img, used by qemu-img.texi
+
+This uses the STEXI/ETEXI directives to alternate C and texi.
+In the for-the-h-file section the only content is always a DEF()
+macro invocation defining the option; in the texi is only the
+synopsis of the command. This means there's a lot of repetition,
+as the DEF macro includes an argument giving the text of the
+option synopsis, and then the texi also has that synopsis with
+some extra markup. Finally the main qemu-img.texi repeats the
+marked-up synopsis later on when it has the actual main documentation
+of each command.
+
+ qemu-options.hx
+   -- options for qemu proper, used by qemu-doc.texi
+
+This uses only the DEF, DEFHEADING, ARCHHEADING macros
+in the for-the-h-file sections (and the DEFHEADING/ARCHHEADING
+are read also for texi generation). This also repeats the
+synopsis in the DEF macro and in the texi fragment.
+
+So I think my current view is that we should do the very
+simple "add SRST/ERST directives" to start with:
+ * scripts/hxtool needs to recognize them and just ignore
+   the text inside them
+ * write the hxtool sphinx extension (shouldn't be too hard)
+ * conversion of any particular .hx file then involves
+   replacing the STEXI ...texi stuff... ETEXI sections with
+   SRST ...rst stuff... ERST. There's no need for any
+   particular .hx file to support both texi and rst output
+   at the same time
+
+I would initially start with qemu-img-cmds.hx, since that's
+pulled in by qemu-img.texi, which we can convert in the
+same way I've been doing qemu-nbd and other standalone-ish
+manpages. The others are part of the big fat qemu-doc.texi,
+which is probably going to be the very last thing we convert...
+
+thanks
+-- PMM
 
