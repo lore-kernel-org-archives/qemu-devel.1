@@ -2,56 +2,64 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DABC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB61C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:18:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DD5024692
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:13:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DD5024692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B022A2072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:18:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B022A2072B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOdT-0001Td-Ow
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:13:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53602)
+	id 1isOho-0004Cq-RK
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:18:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1isOcv-000117-BL
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:13:18 -0500
+ (envelope-from <gengdongjiu@huawei.com>) id 1isOgl-0003aF-3s
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:17:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1isOcs-0001IG-Nh
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:13:16 -0500
-Resent-Date: Fri, 17 Jan 2020 05:13:16 -0500
-Resent-Message-Id: <E1isOcs-0001IG-Nh@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21111)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1isOcs-0001HM-Fh
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:13:14 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1579255975285943.3267080258317;
- Fri, 17 Jan 2020 02:12:55 -0800 (PST)
-In-Reply-To: <1579227117-6310-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: Re: [PATCH 0/4] linux-user: Fix some issues in termbits.h files 
-Message-ID: <157925597419.3991.2478032997321602729@197193fa8d23>
+ (envelope-from <gengdongjiu@huawei.com>) id 1isOgk-00048M-0r
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:17:15 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:49332 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
+ id 1isOgd-00040U-5o; Fri, 17 Jan 2020 05:17:07 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 0F497E896FAF0E365F54;
+ Fri, 17 Jan 2020 18:17:02 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
+ 18:16:53 +0800
+Subject: Re: [PATCH v22 9/9] MAINTAINERS: Add ACPI/HEST/GHES entries
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>
+References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
+ <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
+ <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
+ <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <d502bd34-79e4-45f8-e1b7-54265623db15@huawei.com>
+Date: Fri, 17 Jan 2020 18:16:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
+In-Reply-To: <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: aleksandar.markovic@rt-rk.com
-Date: Fri, 17 Jan 2020 02:12:55 -0800 (PST)
-X-ZohoMailClient: External
+Content-Language: en-US
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,49 +71,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, amarkovic@wavecomp.com, laurent@vivier.eu
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
+ qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc5MjI3MTE3LTYzMTAtMS1n
-aXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS8KCgoKSGksCgpUaGlz
-IHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0
-cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTU3OTIyNzExNy02
-MzEwLTEtZ2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20KVHlwZTog
-c2VyaWVzClN1YmplY3Q6IFtQQVRDSCAwLzRdIGxpbnV4LXVzZXI6IEZpeCBzb21lIGlzc3VlcyBp
-biB0ZXJtYml0cy5oIGZpbGVzIAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFn
-XSAgICAgICAgIHBhdGNoZXcvMTU3OTIyNzExNy02MzEwLTEtZ2l0LXNlbmQtZW1haWwtYWxla3Nh
-bmRhci5tYXJrb3ZpY0BydC1yay5jb20gLT4gcGF0Y2hldy8xNTc5MjI3MTE3LTYzMTAtMS1naXQt
-c2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjJhMTgzOTQgbGludXgtdXNlcjogRml4IHNvbWUgY29uc3RhbnRzIGlu
-IHJlbWFpbmluZyB0ZXJtYml0cy5oCjExYWNhZjYgbGludXgtdXNlcjogeHRlbnNhOiBGaXggc29t
-ZSBjb25zdGFudHMgaW4gdGVybWJpdHMuaAo1ZjY0MDk4IGxpbnV4LXVzZXI6IG1pcHM6IFN5bmNo
-cm9uaXplIHRlcm1iaXRzLmggd2l0aCBrZXJuZWwKMGQ1MjMxYSBsaW51eC11c2VyOiBhbHBoYTog
-U3luY2hyb25pemUgdGVybWJpdHMuaCB3aXRoIGtlcm5lbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-MS80IENoZWNraW5nIGNvbW1pdCAwZDUyMzFhNWM1OGYgKGxpbnV4LXVzZXI6IGFscGhhOiBTeW5j
-aHJvbml6ZSB0ZXJtYml0cy5oIHdpdGgga2VybmVsKQoyLzQgQ2hlY2tpbmcgY29tbWl0IDVmNjQw
-OTgwZThmMyAobGludXgtdXNlcjogbWlwczogU3luY2hyb25pemUgdGVybWJpdHMuaCB3aXRoIGtl
-cm5lbCkKRVJST1I6IGlmIHRoaXMgY29kZSBpcyByZWR1bmRhbnQgY29uc2lkZXIgcmVtb3Zpbmcg
-aXQKIzgzOiBGSUxFOiBsaW51eC11c2VyL21pcHMvdGVybWJpdHMuaDo2MDoKKyNpZiAwCgp0b3Rh
-bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzQgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMvNCBDaGVja2luZyBjb21taXQgMTFhY2FmNmIwNDYw
-IChsaW51eC11c2VyOiB4dGVuc2E6IEZpeCBzb21lIGNvbnN0YW50cyBpbiB0ZXJtYml0cy5oKQo0
-LzQgQ2hlY2tpbmcgY29tbWl0IDJhMTgzOTRiMGQzYyAobGludXgtdXNlcjogRml4IHNvbWUgY29u
-c3RhbnRzIGluIHJlbWFpbmluZyB0ZXJtYml0cy5oKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTc5MjI3MTE3LTYzMTAtMS1naXQtc2VuZC1lbWFp
-bC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9
-bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+On 2020/1/17 15:22, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Peter,
+>=20
+> On 1/16/20 5:46 PM, Peter Maydell wrote:
+>> On Wed, 8 Jan 2020 at 11:32, Dongjiu Geng <gengdongjiu@huawei.com> wro=
+te:
+>>>
+>>> I and Xiang are willing to review the APEI-related patches and
+>>> volunteer as the reviewers for the HEST/GHES part.
+>>>
+>>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>>> ---
+>>> =C2=A0 MAINTAINERS | 9 +++++++++
+>>> =C2=A0 1 file changed, 9 insertions(+)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 387879a..5af70a5 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -1423,6 +1423,15 @@ F: tests/bios-tables-test.c
+>>> =C2=A0 F: tests/acpi-utils.[hc]
+>>> =C2=A0 F: tests/data/acpi/
+>>>
+>>> +ACPI/HEST/GHES
+>>> +R: Dongjiu Geng <gengdongjiu@huawei.com>
+>>> +R: Xiang Zheng <zhengxiang9@huawei.com>
+>>> +L: qemu-arm@nongnu.org
+>>> +S: Maintained
+>>> +F: hw/acpi/ghes.c
+>>> +F: include/hw/acpi/ghes.h
+>>> +F: docs/specs/acpi_hest_ghes.rst
+>>> +
+>>> =C2=A0 ppc4xx
+>>> =C2=A0 M: David Gibson <david@gibson.dropbear.id.au>
+>>> =C2=A0 L: qemu-ppc@nongnu.org
+>>> --=20
+>>
+>> Michael, Igor: since this new MAINTAINERS section is
+>> moving files out of the 'ACPI/SMBIOS' section that you're
+>> currently responsible for, do you want to provide an
+>> acked-by: that you think this division of files makes sense?
+>=20
+> The files are not 'moved out', Michael and Igor are still the maintaine=
+rs of the supported ACPI/SMBIOS subsystem:
+>=20
+> ACPI/SMBIOS
+> M: Michael S. Tsirkin <mst@redhat.com>
+> M: Igor Mammedov <imammedo@redhat.com>
+> S: Supported
+> F: include/hw/acpi/*
+> F: hw/acpi/*
+>=20
+> Dongjiu and Xiang only add themselves as reviewers to get notified on c=
+hanges on these specific files. The more eyes the better :)
+>=20
+> The docs/specs/acpi_hest_ghes.rst document has no maintainer, as these =
+others too:
+If this file has no maintainer, may be it needs a M tag for this file, ot=
+herwise when people change this file, and use "./scripts/get_maintainer.p=
+l xxxxx" to get maintainer, it will be empty.
+
+>=20
+> - docs/specs/acpi_cpu_hotplug.txt
+> - docs/specs/acpi_hw_reduced_hotplug.rst
+> - docs/specs/acpi_mem_hotplug.txt
+> - docs/specs/acpi_nvdimm.txt
+>=20
+> The only ACPI file reported as maintained in docs/specs/ is acpi_pci_ho=
+tplug.txt, from this entry:
+>=20
+> PCI
+> M: Michael S. Tsirkin <mst@redhat.com>
+> M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> S: Supported
+> F: docs/specs/*pci*
+>=20
+> FWIW:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> .
+>=20
 
 
