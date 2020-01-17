@@ -6,91 +6,90 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DBFC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE38DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:43:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEBBC20730
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:41:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEBBC20730
+	by mail.kernel.org (Postfix) with ESMTPS id 8365920730
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 09:43:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8365920730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54519 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isO8c-00018Y-L1
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:41:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49675)
+	id 1isOA5-0003bh-77
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 04:43:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1isO6g-0007eK-Rn
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:40:02 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1isO6C-0006yn-PM
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1isO6d-0007WR-82
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15412
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1isO68-00071C-J0
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24792)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1isO6d-0007W6-3x
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:55 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1isO68-00070Q-Ap
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 04:39:24 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00H9b497122214
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:54 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xk0qvepgu-1
+ 00H9b5PT143819
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:23 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xk0qsxn8e-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:54 -0500
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 04:39:23 -0500
 Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Fri, 17 Jan 2020 09:39:52 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Fri, 17 Jan 2020 09:39:21 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 17 Jan 2020 09:39:49 -0000
+ Fri, 17 Jan 2020 09:39:17 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
  [9.149.105.62])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00H9dm9750331676
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00H9dGSD40698106
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 17 Jan 2020 09:39:48 GMT
+ Fri, 17 Jan 2020 09:39:16 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 62E7EAE055;
- Fri, 17 Jan 2020 09:39:48 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 482E4AE05D;
+ Fri, 17 Jan 2020 09:39:16 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CD8C4AE056;
- Fri, 17 Jan 2020 09:39:46 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id BAFC1AE053;
+ Fri, 17 Jan 2020 09:39:14 +0000 (GMT)
 Received: from localhost.in.ibm.com (unknown [9.124.35.97])
  by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 17 Jan 2020 09:39:46 +0000 (GMT)
+ Fri, 17 Jan 2020 09:39:14 +0000 (GMT)
 From: Ganesh Goudar <ganeshgr@linux.ibm.com>
 To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
  david@gibson.dropbear.id.au
-Subject: [PATCH v20 7/7] ppc: spapr: Activate the FWNMI functionality
-Date: Fri, 17 Jan 2020 15:08:55 +0530
+Subject: [PATCH v20 2/7] ppc: spapr: Introduce FWNMI capability
+Date: Fri, 17 Jan 2020 15:08:50 +0530
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
 References: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 20011709-0016-0000-0000-000002DE3303
+x-cbid: 20011709-0028-0000-0000-000003D1EF7A
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011709-0017-0000-0000-00003340CE37
-Message-Id: <20200117093855.19074-8-ganeshgr@linux.ibm.com>
+x-cbparentid: 20011709-0029-0000-0000-000024961A4A
+Message-Id: <20200117093855.19074-3-ganeshgr@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-01-17_02:2020-01-16,
  2020-01-17 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 bulkscore=0
- mlxscore=0 impostorscore=0 malwarescore=0 phishscore=0 adultscore=0
- mlxlogscore=781 priorityscore=1501 spamscore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 mlxscore=0 mlxlogscore=681 bulkscore=0
+ suspectscore=0 phishscore=0 spamscore=0 adultscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-2001170074
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,36 +109,153 @@ Sender: "Qemu-devel"
 
 From: Aravinda Prasad <arawinda.p@gmail.com>
 
-This patch sets the default value of SPAPR_CAP_FWNMI_MCE
-to SPAPR_CAP_ON for machine type 4.2.
+Introduce fwnmi an spapr capability and add a helper function
+which tries to enable it, which would be used by following patch
+of the series. This patch by itself does not change the existing
+behavior.
 
 Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+[eliminate cap_ppc_fwnmi, add fwnmi cap to migration state
+ and reprhase the commit message]
 Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
 ---
- hw/ppc/spapr.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c         |  2 ++
+ hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
+ include/hw/ppc/spapr.h |  5 ++++-
+ target/ppc/kvm.c       |  8 ++++++++
+ target/ppc/kvm_ppc.h   |  6 ++++++
+ 5 files changed, 38 insertions(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c8bc2fa9f3..a81c18b6b6 100644
+index 30a5fbd3be..f5c036d3d9 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -4454,7 +4454,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+@@ -1992,6 +1992,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_dtb,
+         &vmstate_spapr_cap_large_decr,
+         &vmstate_spapr_cap_ccf_assist,
++        &vmstate_spapr_cap_fwnmi,
+         NULL
+     }
+ };
+@@ -4398,6 +4399,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
--    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
-+    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_ON;
++    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
      spapr_caps_add_properties(smc, &error_abort);
      smc->irq = &spapr_irq_dual;
      smc->dr_phb_enabled = true;
-@@ -4544,6 +4544,7 @@ static void spapr_machine_4_1_class_options(MachineClass *mc)
-     smc->smp_threads_vsmt = false;
-     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 481dfd2a27..3001098601 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -496,6 +496,14 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+     }
  }
  
- DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
++static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
++                                Error **errp)
++{
++    if (!val) {
++        return; /* Disabled by default */
++    }
++}
++
+ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_HTM] = {
+         .name = "htm",
+@@ -595,6 +603,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .type = "bool",
+         .apply = cap_ccf_assist_apply,
+     },
++    [SPAPR_CAP_FWNMI_MCE] = {
++        .name = "fwnmi-mce",
++        .description = "Handle fwnmi machine check exceptions",
++        .index = SPAPR_CAP_FWNMI_MCE,
++        .get = spapr_cap_get_bool,
++        .set = spapr_cap_set_bool,
++        .type = "bool",
++        .apply = cap_fwnmi_mce_apply,
++    },
+ };
+ 
+ static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+@@ -734,6 +751,7 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
+ SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+ SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+ SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
++SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
+ 
+ void spapr_caps_init(SpaprMachineState *spapr)
+ {
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 61f005c6f6..7bc5fc3a9e 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -79,8 +79,10 @@ typedef enum {
+ #define SPAPR_CAP_LARGE_DECREMENTER     0x08
+ /* Count Cache Flush Assist HW Instruction */
+ #define SPAPR_CAP_CCF_ASSIST            0x09
++/* FWNMI machine check handling */
++#define SPAPR_CAP_FWNMI_MCE             0x0A
+ /* Num Caps */
+-#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
++#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
+ 
+ /*
+  * Capability Values
+@@ -869,6 +871,7 @@ extern const VMStateDescription vmstate_spapr_cap_hpt_maxpagesize;
+ extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
+ extern const VMStateDescription vmstate_spapr_cap_large_decr;
+ extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
++extern const VMStateDescription vmstate_spapr_cap_fwnmi;
+ 
+ static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int cap)
+ {
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index b5799e62b4..9161eea865 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2054,6 +2054,14 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
+     }
+ }
+ 
++int kvmppc_set_fwnmi(void)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
++    CPUState *cs = CPU(cpu);
++
++    return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
++}
++
+ int kvmppc_smt_threads(void)
+ {
+     return cap_ppc_smt ? cap_ppc_smt : 1;
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index b713097bfb..2c60dedd0d 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
+ void kvmppc_set_papr(PowerPCCPU *cpu);
+ int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
++int kvmppc_set_fwnmi(void);
+ int kvmppc_smt_threads(void);
+ void kvmppc_error_append_smt_possible_hint(Error *const *errp);
+ int kvmppc_set_smt_threads(int smt);
+@@ -160,6 +161,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
+ {
+ }
+ 
++static inline int kvmppc_set_fwnmi(void)
++{
++    return -1;
++}
++
+ static inline int kvmppc_smt_threads(void)
+ {
+     return 1;
 -- 
 2.17.2
 
