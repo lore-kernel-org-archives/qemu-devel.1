@@ -2,63 +2,86 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14FBDC33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49813C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:12:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFC302082F
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:05:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC302082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 144D82087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 10:12:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAxmTwI7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 144D82087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isOVm-0007KR-0k
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:05:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52838)
+	id 1isOcb-0000b5-3C
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 05:12:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1isOV2-0006kI-5x
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:05:11 -0500
+ (envelope-from <kwolf@redhat.com>) id 1isObv-0000AL-7k
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:12:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1isOUy-0003oM-Ks
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:05:08 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2741 helo=huawei.com)
+ (envelope-from <kwolf@redhat.com>) id 1isObp-0000Sy-Uo
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:12:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24983
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1isOUr-0003bn-38; Fri, 17 Jan 2020 05:04:57 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id EFDA36E91CCDC5E96B4D;
- Fri, 17 Jan 2020 18:04:49 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
- 18:04:42 +0800
-Subject: Re: [PATCH v22 8/9] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-9-git-send-email-gengdongjiu@huawei.com>
- <CAFEAcA_=PgkrWjwPxD89fCi85XPpcTHssXkSmE04Ctoj7AX0kA@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <c89db331-cb94-8e0b-edf8-25bfb64f826d@huawei.com>
-Date: Fri, 17 Jan 2020 18:04:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1isObp-0000Qs-CN
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 05:12:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579255928;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3EGu704SUO8QER/L8NKa0ZRo5VuB6sK+xxU02AlQJDE=;
+ b=OAxmTwI78AdHe1UgdounldMLtn+lb412uy80eSYMxvQXVBLLPnUaNqk8UuAyGOLZ6WgNRj
+ fQSRbhwjXgD0ez5PS/pi/ISd1XvZebSugHjAz3ypPxY+ccPp/HAaJ6DmpuKzR6oPdeQTA2
+ E57uUu1Vpjt1zwX+1UbRUKJ3IQkBs9A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-zMWRw7s5PYyVPf67aI1CoQ-1; Fri, 17 Jan 2020 05:12:04 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 898F0DB61;
+ Fri, 17 Jan 2020 10:12:03 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA1B719C4F;
+ Fri, 17 Jan 2020 10:11:59 +0000 (UTC)
+Date: Fri, 17 Jan 2020 11:11:58 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Coiby Xu <coiby.xu@gmail.com>
+Subject: Re: [PATCH v2 3/5] a standone-alone tool to directly share disk
+ image file via vhost-user protocol
+Message-ID: <20200117101158.GC7394@dhcp-200-226.str.redhat.com>
+References: <20200114140620.10385-1-coiby.xu@gmail.com>
+ <20200114140620.10385-4-coiby.xu@gmail.com>
+ <20200116140429.GJ163546@stefanha-x1.localdomain>
+ <CAJAkqrVhvi-8MZ-mPjZ67yfjOaick5Gu_g3GxYAeYvH3Cp6QVw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_=PgkrWjwPxD89fCi85XPpcTHssXkSmE04Ctoj7AX0kA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CAJAkqrVhvi-8MZ-mPjZ67yfjOaick5Gu_g3GxYAeYvH3Cp6QVw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: zMWRw7s5PYyVPf67aI1CoQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,177 +93,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, QEMU
- Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
- qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/1/17 0:28, Peter Maydell wrote:
-> On Wed, 8 Jan 2020 at 11:33, Dongjiu Geng <gengdongjiu@huawei.com> wrot=
-e:
->=20
->> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->> +{
->> +    ram_addr_t ram_addr;
->> +    hwaddr paddr;
->> +
->> +    assert(code =3D=3D BUS_MCEERR_AR || code =3D=3D BUS_MCEERR_AO);
->> +
->> +    if (acpi_enabled && addr &&
->> +            object_property_get_bool(qdev_get_machine(), "ras", NULL)=
-) {
->> +        ram_addr =3D qemu_ram_addr_from_host(addr);
->> +        if (ram_addr !=3D RAM_ADDR_INVALID &&
->> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &p=
-addr)) {
->> +            kvm_hwpoison_page_add(ram_addr);
->> +            /*
->> +             * Asynchronous signal will be masked by main thread, so
->> +             * only handle synchronous signal.
->> +             */
->=20
-> I don't understand this comment. (I think we've had discussions
-> about it before, but it's still not clear to me.)
->=20
-> This function (kvm_arch_on_sigbus_vcpu()) will be called in two context=
-s:
->=20
-> (1) in the vcpu thread:
->   * the real SIGBUS handler sigbus_handler() sets a flag and arranges
->     for an immediate vcpu exit
->   * the vcpu thread reads the flag on exit from KVM_RUN and
->     calls kvm_arch_on_sigbus_vcpu() directly
->   * the error could be MCEERR_AR or MCEERR_AOFor the vcpu thread, the e=
-rror can be MCEERR_AR or MCEERR_AO,
-but kernel/KVM usually uses MCEERR_AR(action required) instead of MCEERR_=
-AO, because it needs do action immediately. For MCEERR_AO error, the acti=
-on is optional and the error can be ignored.
-At least I do not find Linux kernel/KVM deliver MCEERR_AO in the vcpu thr=
-eads.
+Am 17.01.2020 um 09:12 hat Coiby Xu geschrieben:
+> Excellent! I will add an option (or object property) for
+> vhost-user-blk server oject which will tell the daemon process to exit
+> when the client disconnects, thus "make check-qtest" will not get held
+> by this daemon process. After that since Kevin's qemu-storage-daemon
+> support "-object" option
+> (https://patchew.org/QEMU/20191017130204.16131-1-kwolf@redhat.com/2019101=
+7130204.16131-3-kwolf@redhat.com/)
+> and vhost-user-server is a user-creatable QOM object, it will work out
+> of the box.
 
-> (2) MCE errors on other threads:
->   * here SIGBUS is blocked, so MCEERR_AR (action-required)
->     errors will cause the kernel to just kill the QEMU process
->   * MCEERR_AO errors will be handled via the iothread's use
->     of signalfd(), so kvm_on_sigbus() will get called from
->     the main thread, and it will call kvm_arch_on_sigbus_vcpu()
->   * in this case the passed in CPUState will (arbitrarily) be that
->     for the first vCPU
+Yes, I think at least for the moment it should work fine this way.
+Eventually, I'd like to integrate it with --export (and associated QMP
+commands, which are still to be created), too. Maybe at that point we
+want to make the QOM object not user creatable any more.
 
-For the MCE errors on other threads, it can only handle MCEERR_AO. If it =
-is MCEERR_AR, the QEMU will assert and exit[2].
+Would it make sense to prefix the object type name with "x-" so we can
+later retire it from the external user interface without a deprecation
+period?
 
-Case1: Other APP indeed can send MCEERR_AO to QEMU=EF=BC=8C QEMU handle i=
-t via the iothread's use of signalfd() through above path.
-Case2: But if the MCEERR_AO is delivered by kernel, I see QEMU ignore it =
-because SIGBUS is masked in main thread[3], for this case, I do not see Q=
-EMU handle it via signalfd() for MCEERR_AO errors from my test.
+As for test cases, do you think it would be hard to just modify the
+tests to send an explicit 'quit' command to the daemon?
 
-For Case1=EF=BC=8CI think we should not let guest know it, because it is =
-not triggered by guest. only other APP send SIGBUS to tell QEMU do someth=
-ings.
-For Case2=EF=BC=8Cit does not call call kvm_arch_on_sigbus_vcpu().
+> I'm curious when will be formal version of qemu-storage-daemon
+> finished so I can take advantage of it? Or should I apply the RFC
+> PATCHes to my working branch directly and submit them together with
+> the patches on vhost-user-blk server feature when posting v3?
 
+It's the next thing I'm planning to work on after completing the
+coroutine-base QMP handlers (which I hope to get finished very soon).
 
-[1]:
-/* Called synchronously (via signalfd) in main thread.  */
-int kvm_on_sigbus(int code, void *addr)
-{
-#ifdef KVM_HAVE_MCE_INJECTION
-    /* Action required MCE kills the process if SIGBUS is blocked.  Becau=
-se
-     * that's what happens in the I/O thread, where we handle MCE via sig=
-nalfd,
-     * we can only get action optional here.
-     */
-[2]: assert(code !=3D BUS_MCEERR_AR);
-    kvm_arch_on_sigbus_vcpu(first_cpu, code, addr);
-    return 0;
-#else
-    return 1;
-#endif
-}
+For the time being I would suggest that you put any patches that depend
+on qemu-storage-daemon (if you do need it) at the end of your series so
+that we could apply the first part even if the storage daemon isn't in
+yet.
 
-[3]: https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03575.html
+The latest version of my patches is at:
 
+    git://repo.or.cz/qemu/kevin.git storage-daemon
 
->=20
-> For MCEERR_AR, the code here looks correct -- we know this is
-> only going to happen for the relevant vCPU so we can go ahead
-> and do the "record it in the ACPI table and tell the guest" bit.
->=20
-> But shouldn't we be doing something with the MCEERR_AO too?
+But if you just need something for testing your code, I think it would
+even make sense if you kept your standalone tool around (even though
+we'll never merge it) and we'll deal with integration in the storage
+daemon once both parts are ready.
 
-Above all, from my test, for MCEERR_AO error which is triggered by guest,=
- it not call kvm_arch_on_sigbus_vcpu().
-so I think currently we can just report error. If afterwards  MCEERR_AO e=
-rror can call kvm_arch_on_sigbus_vcpu(), we can let the guest know about =
-it.
-
-> That of course will be trickier because we're not necessarily
-> in the vcpu thread, but it would be nice to let the guest
-> know about it.
->=20
-> One comment that would work with the current code would be:
->=20
-> /*
->  * If this is a BUS_MCEERR_AR, we know we have been called
->  * synchronously from the vCPU thread, so we can easily
->  * synchronize the state and inject an error.
->  *
->  * TODO: we currently don't tell the guest at all about BUS_MCEERR_AO.
->  * In that case we might either be being called synchronously from
->  * the vCPU thread, or a bit later from the main thread, so doing
-At least I do not find Linux kernel/KVM deliver MCEERR_AO in the vcpu thr=
-eads.
-In the main thread, signalfd() is not called when it is BUS_MCEERR_AO whi=
-ch is triggered by guest.
-
->  * the injection of the error would be more complicated.
->  */
->=20
-> but I don't know if that's what you meant to say/implement...
-we can implement MCEERR_AO logic when QEMU can receive MCEERR_AO error wh=
-ich is triggered by guest.
-
->=20
->> +            if (code =3D=3D BUS_MCEERR_AR) {
->> +                kvm_cpu_synchronize_state(c);
->> +                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, pa=
-ddr)) {
->> +                    kvm_inject_arm_sea(c);
->> +                } else {
->> +                    error_report("failed to record the error");
->> +                    abort();
->> +                }
->> +            }
->> +            return;
->> +        }
->> +        if (code =3D=3D BUS_MCEERR_AO) {
->> +            error_report("Hardware memory error at addr %p for memory=
- used by "
->> +                "QEMU itself instead of guest system!", addr);
->> +        }
->> +    }
->> +
->> +    if (code =3D=3D BUS_MCEERR_AR) {
->> +        error_report("Hardware memory error!");
->> +        exit(1);
->> +    }
->> +}
->>
->=20
-> thanks
-> -- PMM
-> .
->=20
+Kevin
 
 
