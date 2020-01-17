@@ -2,83 +2,103 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB0EC33CB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5943FC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:42:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DC1820661
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:40:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24DFA20661
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:42:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJXaRx4N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DC1820661
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HuDm9TEV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24DFA20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isRri-0002Eu-5j
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:40:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48901)
+	id 1isRtG-00041J-B2
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:42:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1isRkS-0002cC-FD
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:33:21 -0500
+ (envelope-from <philmd@redhat.com>) id 1isRrx-0002kQ-Bz
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:41:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1isRkM-00084d-Hy
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:33:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39261
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1isRrs-0004xB-R4
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:41:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32975
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1isRkM-00083c-Di
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:33:10 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1isRrs-0004wB-MO
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 08:40:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579267989;
+ s=mimecast20190719; t=1579268455;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Hnzy45dwlG0rl6JrsPjiOMNPuy28u2DoYDAroEsLWbs=;
- b=YJXaRx4ND0/wOulrUVUPGe/65kHvOT4PNfHM8eKNnjOFb+ypl7fJM7xG2WjSiIBk/+k6TO
- PGGMMqsPAwExJ3xT1jvtkuJkx2CjY3IEzLb/CmlOJkD+AnfgEU/rR+9y2LpgjpuhYz/GoY
- g31HR8KkV6yx5rFOinRpPcFRPJtHqps=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-Q2rzLsdCOsKiC3VFzkUzDQ-1; Fri, 17 Jan 2020 08:33:08 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A3B5DB62
- for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 13:33:07 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BBBD19C4F;
- Fri, 17 Jan 2020 13:33:06 +0000 (UTC)
-Date: Fri, 17 Jan 2020 14:33:05 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 83/86] tests:numa-test: make top level args dynamic
- and g_autofree(cli) cleanups
-Message-ID: <20200117143305.7eb9571e@redhat.com>
-In-Reply-To: <a0b60484-d5fb-7409-b13e-4e70d1177138@redhat.com>
-References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
- <1579100861-73692-84-git-send-email-imammedo@redhat.com>
- <20e88588-13b4-8c7d-3f97-cb2d50b85edd@redhat.com>
- <20200116180606.134cb1a6@redhat.com>
- <a0b60484-d5fb-7409-b13e-4e70d1177138@redhat.com>
+ bh=07RTHvBHE4VNC9jCjfontt3M2n7z1N4EXWkvTtXywdk=;
+ b=HuDm9TEVs8lL418p+dTFEuC7WF6MnuoHFJ9AsrTfcVPRKv5BevYbz9rYnGNg7efMa4ovvE
+ UPN+MJs4FN7RJT1X9xtYqrBlUZrlarLIEVx/HMwIKf3ewjiGgP+QmVs4t8kjhBZlnI1zYD
+ +ddlDD7K3sy2KBUqONzouF5YUvlkAqY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-__kkDFV-MRyedEsBaPCCQQ-1; Fri, 17 Jan 2020 08:40:54 -0500
+Received: by mail-wr1-f71.google.com with SMTP id t3so10470945wrm.23
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 05:40:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=07RTHvBHE4VNC9jCjfontt3M2n7z1N4EXWkvTtXywdk=;
+ b=rxwXHbi6L/ECHzjg37pxhBgbAT66AY2li+nfrnQkrI0bylfd4ZKsqdGpyvyytHcxPj
+ UMFFLSxZcDILp0QBajY756xkVkLDcbiZLXkIN8I/IcF/cPhjRQEG+HI6sqvkHFb1dsDC
+ uGrvYSVoYcVPZtEW9CdhW+NstnUt5tUfpvAvAhkWrj/nOI6rXuMUgdM3yfDjjgc8mZkR
+ MJkVr5HVaVy5FzErepZ+7SWkx9gOUSl1916R85iMFEg6Yfqk00iNX18fzCtXUHRnyh7k
+ 98t08Jsf8xxMwIKcKYARsg30K1fsI4LLeeW1tU6w4mXbDoioGGgu6o82nXPL2bt/lL57
+ TXdw==
+X-Gm-Message-State: APjAAAXLZeauwFkKM4GZFuuy7fv12RYtLrc7oOlAOhVKXhUBrmHSqyqh
+ 7WTD7LwilJWbnIQvymWsDmt/UJibN85R+jduETrkjdIN80OGgUh1/IZjrrVq2mEe3AuBZfwmv8k
+ eJ8TNrfBm93xAsgY=
+X-Received: by 2002:a05:600c:214f:: with SMTP id
+ v15mr4724155wml.110.1579268452983; 
+ Fri, 17 Jan 2020 05:40:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx493g8s/LQRyA/WdT7Yi2O3EAIjVzby+wmczFtRmbIWgj6UD3eERoQR4EVHe8CA2ha7kuhwA==
+X-Received: by 2002:a05:600c:214f:: with SMTP id
+ v15mr4724135wml.110.1579268452753; 
+ Fri, 17 Jan 2020 05:40:52 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id u8sm9749149wmm.15.2020.01.17.05.40.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 17 Jan 2020 05:40:52 -0800 (PST)
+Subject: Re: [PATCH 101/104] virtiofsd: prevent FUSE_INIT/FUSE_DESTROY races
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-102-dgilbert@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <73aa1b6c-612e-363e-dd49-04d1ba4f88f8@redhat.com>
+Date: Fri, 17 Jan 2020 14:40:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Q2rzLsdCOsKiC3VFzkUzDQ-1
+In-Reply-To: <20191212163904.159893-102-dgilbert@redhat.com>
+Content-Language: en-US
+X-MC-Unique: __kkDFV-MRyedEsBaPCCQQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,104 +110,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jan 2020 12:14:11 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+On 12/12/19 5:39 PM, Dr. David Alan Gilbert (git) wrote:
+> From: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> When running with multiple threads it can be tricky to handle
+> FUSE_INIT/FUSE_DESTROY in parallel with other request types or in
+> parallel with themselves.  Serialize FUSE_INIT and FUSE_DESTROY so that
+> malicious clients cannot trigger race conditions.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   tools/virtiofsd/fuse_i.h        |  1 +
+>   tools/virtiofsd/fuse_lowlevel.c | 18 ++++++++++++++++++
+>   2 files changed, 19 insertions(+)
+> 
+> diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+> index d0679508cd..8a4a05b319 100644
+> --- a/tools/virtiofsd/fuse_i.h
+> +++ b/tools/virtiofsd/fuse_i.h
+> @@ -61,6 +61,7 @@ struct fuse_session {
+>       struct fuse_req list;
+>       struct fuse_req interrupts;
+>       pthread_mutex_t lock;
+> +    pthread_rwlock_t init_rwlock;
+>       int got_destroy;
+>       int broken_splice_nonblock;
+>       uint64_t notify_ctr;
+> diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
+> index 10f478b00c..9f01c05e3e 100644
+> --- a/tools/virtiofsd/fuse_lowlevel.c
+> +++ b/tools/virtiofsd/fuse_lowlevel.c
+> @@ -2431,6 +2431,19 @@ void fuse_session_process_buf_int(struct fuse_session *se,
+>       req->ctx.pid = in->pid;
+>       req->ch = ch ? fuse_chan_get(ch) : NULL;
+>   
+> +    /*
+> +     * INIT and DESTROY requests are serialized, all other request types
+> +     * run in parallel.  This prevents races between FUSE_INIT and ordinary
+> +     * requests, FUSE_INIT and FUSE_INIT, FUSE_INIT and FUSE_DESTROY, and
 
-> On 16/01/2020 18.06, Igor Mammedov wrote:
-> > On Thu, 16 Jan 2020 17:35:32 +0100
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 15/01/2020 16.07, Igor Mammedov wrote:  
-> >>> Use GString to pass argument to make_cli() so that it would be easy
-> >>> to dynamically change test case arguments from main(). The follow up
-> >>> patch will use it to change RAM size options depending on target.
-> >>>
-> >>> While at it cleanup 'cli' freeing, using g_autofree annotation.    
-> >>
-> >> Hmm, I'd use g_autofree for new code or do it in a separate cleanup
-> >> patch, but doing this here distracts quite a bit from the real changes
-> >> that you are doing...  
-> > I'll split it into separate patch
-> >   
-> >>  
-> >>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> >>> ---
-> >>> PS:
-> >>>   made as a separate patch so it won't clutter followup testcase changes.
-> >>>
-> >>> CC: thuth@redhat.com
-> >>> CC: lvivier@redhat.com
-> >>> ---
-> >>>  tests/qtest/numa-test.c | 38 ++++++++++++++------------------------
-> >>>  1 file changed, 14 insertions(+), 24 deletions(-)
-> >>>
-> >>> diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
-> >>> index 17dd807..a696dfd 100644
-> >>> --- a/tests/qtest/numa-test.c
-> >>> +++ b/tests/qtest/numa-test.c
-> >>> @@ -14,16 +14,16 @@
-> >>>  #include "qapi/qmp/qdict.h"
-> >>>  #include "qapi/qmp/qlist.h"
-> >>>  
-> >>> -static char *make_cli(const char *generic_cli, const char *test_cli)
-> >>> +static char *make_cli(const GString *generic_cli, const char *test_cli)
-> >>>  {
-> >>> -    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test_cli);
-> >>> +    return g_strdup_printf("%s %s", generic_cli->str, test_cli);
-> >>>  }    
-> >> [...]  
-> >>> @@ -539,11 +529,11 @@ static void pc_hmat_erange_cfg(const void *data)
-> >>>  
-> >>>  int main(int argc, char **argv)
-> >>>  {
-> >>> -    const char *args = NULL;
-> >>> +    g_autoptr(GString) args = g_string_new("");    
-> >>
-> >> I think g_string_new(NULL) would be better?
-> >>  
-> >>>      const char *arch = qtest_get_arch();
-> >>>  
-> >>>      if (strcmp(arch, "aarch64") == 0) {
-> >>> -        args = "-machine virt";
-> >>> +        g_string_append(args, " -machine virt")>      }    
-> >>
-> >> Is this really required? Looking at your next patch, you could also
-> >> simply do
-> >>
-> >>           args = " -object memory-backend-ram,id=ram,size=xxxM"  
-> > xxx is variable so options are
-> >  1 build this part of CLI dynamically
-> >  2 mostly duplicate testcase function and include per target size there
-> >  3 make up a test data structure and pass that to test cases
-> > 
-> > Given simplicity of current testcases, I'd prefer continue with
-> > passing CLI as testcase data (option #1).  
-> 
-> Sorry, I think I missed something here... currently I see in the next patch:
-> 
-> +    if (!strcmp(arch, "ppc64")) {
-> +        g_string_append(args, " -object
-> memory-backend-ram,id=ram,size=512M");
+typo "FUSE_INIT and FUSE_INIT" -> "FUSE_INIT and CUSE_INIT"?
+
+> +     * FUSE_DESTROY and FUSE_DESTROY.
+> +     */
+> +    if (in->opcode == FUSE_INIT || in->opcode == CUSE_INIT ||
+> +        in->opcode == FUSE_DESTROY) {
+> +        pthread_rwlock_wrlock(&se->init_rwlock);
 > +    } else {
-> +        g_string_append(args, " -object
-> memory-backend-ram,id=ram,size=128M");
+> +        pthread_rwlock_rdlock(&se->init_rwlock);
 > +    }
+> +
+>       err = EIO;
+>       if (!se->got_init) {
+>           enum fuse_opcode expected;
+> @@ -2488,10 +2501,13 @@ void fuse_session_process_buf_int(struct fuse_session *se,
+>       } else {
+>           fuse_ll_ops[in->opcode].func(req, in->nodeid, &iter);
+>       }
+> +
+> +    pthread_rwlock_unlock(&se->init_rwlock);
+>       return;
+>   
+>   reply_err:
+>       fuse_reply_err(req, err);
+> +    pthread_rwlock_unlock(&se->init_rwlock);
+>   }
+>   
+>   #define LL_OPTION(n, o, v)                     \
+> @@ -2538,6 +2554,7 @@ void fuse_session_destroy(struct fuse_session *se)
+>               se->op.destroy(se->userdata);
+>           }
+>       }
+> +    pthread_rwlock_destroy(&se->init_rwlock);
+>       pthread_mutex_destroy(&se->lock);
+>       free(se->cuse_data);
+>       if (se->fd != -1) {
+> @@ -2631,6 +2648,7 @@ struct fuse_session *fuse_session_new(struct fuse_args *args,
+>       list_init_req(&se->list);
+>       list_init_req(&se->interrupts);
+>       fuse_mutex_init(&se->lock);
+> +    pthread_rwlock_init(&se->init_rwlock, NULL);
+>   
+>       memcpy(&se->op, op, op_size);
+>       se->owner = getuid();
 > 
-> ... so these are static strings which could also be handled fine without
-> GString? Or do you plan to update this in later patches?
-it's 1 or concatenation of 2 strings
-  " -object memory-backend-ram,id=ram,size=128M"
-  " -object memory-backend-ram,id=ram,size=512M"
-  " -machine virt" + " -object memory-backend-ram,id=ram,size=128M"
-
-It's possible to use static strings in expense of a bit of duplication
-and long winded "if" chain. So using dynamic string here, looks better to me.
-
->  Thomas
 
 
