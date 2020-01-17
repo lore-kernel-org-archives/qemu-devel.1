@@ -2,88 +2,101 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CE7C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB31C33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 08:07:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B3F620748
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 07:59:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67B392072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 08:07:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxbF8S+h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B3F620748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqQD5lKN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67B392072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isMXK-0002KP-4F
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 02:59:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36571)
+	id 1isMf7-0006O6-IS
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 03:07:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38179)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1isMVI-00076r-OM
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:57:17 -0500
+ (envelope-from <philmd@redhat.com>) id 1isMeS-0005x4-AS
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:06:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1isMVG-0007J6-Jl
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:57:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31813
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1isMeQ-0005Wo-Fz
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:06:43 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43882)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1isMVG-0007IS-Ca
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 02:57:14 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1isMeQ-0005WA-C6
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 03:06:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579247833;
+ s=mimecast20190719; t=1579248401;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tcSLiQw/5rSSmReM01YjfSiJ2g05EPisChg47dMtTpY=;
- b=TxbF8S+hN2uZbY3C0Z/3cUDGIzPtHfrPvooxZVeiUgr2dVBoOdYaoXzlDAe+Tr0swZpWBh
- pQWhNpi4QREkGcknUGDG2PJ6Tghu7/D7Tv6TQP4P/EQL1JF1OB7nIOL05ovqZhmQB53rl6
- 4FvWlDKldQPsTwl/hLPDdHtzf/OZX6w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-eNC_jU8sOaqBmG0JFa40nQ-1; Fri, 17 Jan 2020 02:57:10 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49559DBA3;
- Fri, 17 Jan 2020 07:57:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 86BB219C5B;
- Fri, 17 Jan 2020 07:57:06 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1A94B1138600; Fri, 17 Jan 2020 08:57:05 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v3 1/4] qapi: Add a 'coroutine' flag for commands
-References: <20200115122326.26393-1-kwolf@redhat.com>
- <20200115122326.26393-2-kwolf@redhat.com>
- <875zhc9360.fsf@dusky.pond.sub.org>
- <20200115155850.GG5505@linux.fritz.box>
- <871rrzy2sg.fsf@dusky.pond.sub.org>
- <20200116150214.GH9470@linux.fritz.box>
-Date: Fri, 17 Jan 2020 08:57:05 +0100
-In-Reply-To: <20200116150214.GH9470@linux.fritz.box> (Kevin Wolf's message of
- "Thu, 16 Jan 2020 16:02:14 +0100")
-Message-ID: <87o8v2o6r2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ bh=T4BB2IAob1UsFEdt2S0pw3B6hK2+ghCgtJwyUDYiOAU=;
+ b=dqQD5lKNH/rV8DNgc/SWxh3La1IrX8NZK7wmTIcnmsVE8cjMYmkVWvTsCa8SNzq+VBNV7F
+ 0cgaFdGISa+Vef1lad4Y/uyYmeogtUpcS9oLUGBCzk88yNd1VvXLp+FPT1AkjJiShB6dCP
+ vstNLFGTb3iDq2uZm9ysRiM9cqmF9c4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-cGjTzGChMfCnV4CsDGyS1g-1; Fri, 17 Jan 2020 03:06:40 -0500
+Received: by mail-wm1-f69.google.com with SMTP id t4so1965032wmf.2
+ for <qemu-devel@nongnu.org>; Fri, 17 Jan 2020 00:06:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=T4BB2IAob1UsFEdt2S0pw3B6hK2+ghCgtJwyUDYiOAU=;
+ b=jKSNI2XUpd3kG+2X5qPsCN2HSHrv1OmDNmReTF/oXyUNK5XAtZVPNESnq2lyy5gAkj
+ EqXO0GNw8DHCTHwaFlm9Xy+OqZZrkyYW8p6c+vXgNdW2L4f3HKq2RSoswkLsKwa85sC5
+ WUKTdzFZYeFaVD0yEcvJkL7vlCWpSQCDSr2xysb9PIDvIcCvG/R+I7iBnas0ZcidHl3c
+ q1slAY/o/y5E4uJ3sXo2wBZJsKFOvlrJovrUx7ll2ij80EiNjeb9fwZP5KiJJpoAqoNf
+ o/AIhNodxuDo7VwFNBQHgxLizlP+DlP9TItvpgTP3nui6RE+GhsODBKWqJ9E5bh6cl4p
+ m29g==
+X-Gm-Message-State: APjAAAX88m9k3EEeJTo9YXzPrqCWDfXdtiC5mMBSUL4riJt0ql8/BCye
+ jH9N18Ds5ciVggrKwY2TJYYuQ5/Szu4ojS6N/Xzkpxp9XoI179XhwWZfVFbsJb3qtDzKcsDK2Mn
+ ZroiwTpmqFhp8UzY=
+X-Received: by 2002:a7b:c93a:: with SMTP id h26mr3354354wml.83.1579248399168; 
+ Fri, 17 Jan 2020 00:06:39 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyUSpz+3v7fXhJJ7qHrxJ5MXcvR86FNHFl3oVFGwR7hXyzJgAkp9bZ0gnpKKvwAOHsgj64wBA==
+X-Received: by 2002:a7b:c93a:: with SMTP id h26mr3354336wml.83.1579248398934; 
+ Fri, 17 Jan 2020 00:06:38 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id c195sm3487708wmd.45.2020.01.17.00.06.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 17 Jan 2020 00:06:38 -0800 (PST)
+Subject: Re: [PATCH v2 85/86] numa: make exit() usage consistent
+To: Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-devel@nongnu.org
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-86-git-send-email-imammedo@redhat.com>
+ <a4feb8cd-a105-bcfd-b8c3-27ac5bb0f474@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1e76bbe6-1dda-818a-49a2-68843a08f989@redhat.com>
+Date: Fri, 17 Jan 2020 09:06:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: eNC_jU8sOaqBmG0JFa40nQ-1
+In-Reply-To: <a4feb8cd-a105-bcfd-b8c3-27ac5bb0f474@redhat.com>
+Content-Language: en-US
+X-MC-Unique: cGjTzGChMfCnV4CsDGyS1g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,123 +108,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com,
+ Riku Voipio <riku.voipio@linaro.org>, Markus Armbruster <armbru@redhat.com>,
+ David Gibson <dgibson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Hi Thomas,
 
-> Am 16.01.2020 um 14:00 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->> > I have no idea if we will eventually get a case where the command want=
-s
->> > to behave different between the two modes and actually has use for a
->> > coroutine. I hope not.
->> >
->> > But using two bools rather than a single enum keeps the code simple an=
-d
->> > leaves us all options open if it turns out that we do have a use case.
->>=20
->> I can buy the argument "the two are conceptually orthogonal, although we
->> don't haven't found a use for one of the four cases".
->>=20
->> Let's review the four combinations of the two flags once more:
->>=20
->> * allow-oob: false, coroutine: false
->>=20
->>   Handler runs in main loop, outside coroutine context.  Okay.
->>=20
->> * allow-oob: false, coroutine: true
->>=20
->>   Handler runs in main loop, in coroutine context.  Okay.
->>=20
->> * allow-oob: true, coroutine: false
->>=20
->>   Handler may run in main loop or in iothread, outside coroutine
->>   context.  Okay.
->>=20
->> * allow-oob: true, coroutine: true
->>=20
->>   Handler may run (in main loop, in coroutine context) or (in iothread,
->>   outside coroutine context).  This "in coroutine context only with
->>   execute, not with exec-oob" behavior is a bit surprising.
->>=20
->>   We could document it, noting that it may change to always run in
->>   coroutine context.  Or we simply reject this case as "not
->>   implemented".  Since we have no uses, I'm leaning towards reject.  One
->>   fewer case to test then.
->
-> What would be the right mode of rejecting it?
->
-> I assume we should catch it somewhere in the QAPI generator (where?) and
+On 1/16/20 5:43 PM, Thomas Huth wrote:
+> On 15/01/2020 16.07, Igor Mammedov wrote:
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>> CC: ehabkost@redhat.com
+>> ---
+>>   hw/core/numa.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/core/numa.c b/hw/core/numa.c
+>> index 3177066..47d5ea1 100644
+>> --- a/hw/core/numa.c
+>> +++ b/hw/core/numa.c
+>> @@ -718,7 +718,7 @@ void numa_complete_configuration(MachineState *ms)
+>>           /* Report large node IDs first, to make mistakes easier to spot */
+>>           if (!numa_info[i].present) {
+>>               error_report("numa: Node ID missing: %d", i);
+>> -            exit(1);
+>> +            exit(EXIT_FAILURE);
+>>           }
+>>       }
+>>   
+>> @@ -759,7 +759,7 @@ void numa_complete_configuration(MachineState *ms)
+>>               error_report("total memory for NUMA nodes (0x%" PRIx64 ")"
+>>                            " should equal RAM size (0x" RAM_ADDR_FMT ")",
+>>                            numa_total, ram_size);
+>> -            exit(1);
+>> +            exit(EXIT_FAILURE);
+>>           }
+>>   
+>>           if (!numa_uses_legacy_mem()) {
+> 
+> Please don't. We've had exit(1) vs. exit(EXIT_FAILURE) discussions in
+> the past already, and IIRC there was no clear conclusion which one we
+> want to use. There are examples of changes to the numeric value in our
+> git history (see d54e4d7659ebecd0e1fa7ffc3e954197e09f8a1f for example),
+> and example of the other way round (see 4d1275c24d5d64d22ec4a30ce1b6a0
+> for example).
+> 
+> Your patch series here is already big enough, so I suggest to drop this
+> patch from the series. If you want to change this, please suggest an
+> update to CODING_STYLE.rst first so that we agree upon one style for
+> exit() ... otherwise somebody else might change this back into numeric
+> values in a couple of months just because they have a different taste.
 
-check_flags() in expr.py?
+TBH I find your suggestion a bit harsh. If you noticed this, it means 
+you care about finding a consensus about which style the project should 
+use, but then you ask Igor to update to CODING_STYLE to restart the 
+discussion until we get an agreement, so he can apply his patch.
 
-> then just assert in the C code that both flags aren't set at the same
-> time?
+If this patch were single, this could be understandable. Now considering 
+the series size, as you suggested, as the patch author I'd obviously 
+drop my patch and stay away of modifying a 'exit()' line forever.
 
-I think you already do, in do_qmp_dispatch():
+Maybe it is a good opportunity to restart the discussion and settle on a 
+position, update CODING_STYLE.rst, do a global cleanup, update 
+checkpatch to keep the code clean.
+As I don't remember such discussions, they might predate my involvement 
+with the project. Do you mind starting a thread with pointers to the 
+previous discussions?
 
-    assert(!(oob && qemu_in_coroutine()));
+Thanks,
 
-Not sure that's the best spot.  Let's see when I review PATCH 3.
-
->> >> > @@ -194,8 +195,9 @@ out:
->> >> >      return ret
->> >> > =20
->> >> > =20
->> >> > -def gen_register_command(name, success_response, allow_oob, allow_=
-preconfig):
->> >> > -    options =3D []
->> >> > +def gen_register_command(name: str, success_response: bool, allow_=
-oob: bool,
->> >> > +                         allow_preconfig: bool, coroutine: bool) -=
-> str:
->> >> > +    options =3D [] # type: List[str]
->>=20
->> One more: this is a PEP 484 type hint.  With Python 3, we can use PEP
->> 526 instead:
->>=20
->>           options: List[str] =3D []
->>=20
->> I think we should.
->
-> This requires Python 3.6, unfortunately. The minimum requirement for
-> building QEMU is 3.5.
-
-*Sigh*
-
->> >> Some extra churn due to type hints here.  Distracting.  Suggest not t=
-o
->> >> mix adding type hints to existing code with feature work.
->> >
->> > If you would be open for a compromise, I could leave options
->> > unannotated, but keep the typed parameter list.
->>=20
->> Keeping just the function annotation is much less distracting.  I can't
->> reject that with a "separate patches for separate things" argument.
->>=20
->> I'd still prefer not to, because:
->>=20
->> * If we do add systematic type hints in the near future, then delaying
->>   this one until then shouldn't hurt your productivity.
->>=20
->> * If we don't, this lone one won't help your productivity much, but
->>   it'll look out of place.
->>=20
->> I really don't want us to add type hints as we go, because such
->> open-ended "while we touch it anyway" conversions take forever and a
->> day.  Maximizes the confusion integral over time.
->
-> I think it's a first time that I'm asked not to document things, but
-> I'll remove them.
-
-I'm asking you not to mix documenting existing code with adding a
-new feature to it in the same patch.
-
-Hopefully, that won't lead to the documentation getting dropped for
-good.  That would be sad.
+Phil.
 
 
