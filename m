@@ -2,71 +2,81 @@ Return-Path: <SRS0=+Hf+=3G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0D7C33CB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FCEC33CB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:00:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBF342073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 12:54:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7300420728
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jan 2020 13:00:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="omcygCyx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBF342073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRInYtXR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7300420728
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isR8x-0001U8-S0
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 07:54:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44240)
+	id 1isREV-00038c-IM
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jan 2020 08:00:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44787)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1isR7W-00005f-6W
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:53:05 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1isRDh-0002az-0R
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:59:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1isR7S-0003TI-KM
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:53:02 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:57027)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1isR7S-0003S7-89
- for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:52:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=WWAxBM0HwRtqtr8gFAXHwZg5jhKzLmk9kV/zFBlG+Xw=; b=omcygCyxUWTkBDJUS4eSlndNEa
- 9xWKLpylRlrftaaG5MbvJcO/LjL2ZmHpcXI04jYEN+gaLXm/60+LJ1IF50hTbEcvSArgRgBC2c1Lv
- e2cRs4dlJmc4sP0ECpj1OnehZjJNpT2suZdd45YOIaDxD74V+ioNYdsz315tEYALH+4DUWxpo5KbL
- ZhMP2OFp1RGLcsE3pqcpqcClFVFj9gIV3yaojGQ/ApvZaGZLTVyQUGQDJu/ZjaVwDQmLj/6O4GGGh
- 7p5okwc2hNUXC5WDhmofjiRFpex8oTFeWZngAuOiM0SMwHo1Qw159ik8f4ERpj7w9xE5/8avNlPcs
- KBDjJYjF1kRCK0AqJLk8firKKUnzrD6UBPrQ3Crp0J9v9VmP/qZBDw2VPZULwY+md+FKRI+fPKyFA
- mKOINrpNOwbMo3ued/qXbGHspJd+3HylK3vTqMvZyzVe3dceDY+je/odUuo+/IglUyqE3KGTOJdl4
- 2yjJTeE+KioWLAuA013cWbxaHHXPeY3AGZcsnb5Rrd9NXRIPNKxP8xOfYZQSZIY4zi/eEEu9vdVYh
- C2rq16BAjrB2Mz5oe9YciRh7EOuNtE6az0WnITyJ6Aib54O+lwnFmwmLJk4ihMGumaNv2zG++ECYt
- /SJYWfoxq5+chDwrG9ZuGeSCteiw/zpNgVP0Ugong=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: pannengyuan@huawei.com, mst@redhat.com, groug@kaod.org,
- Euler Robot <euler.robot@huawei.com>, zhang.zhanghailiang@huawei.com
-Subject: Re: [PATCH v2 1/2] virtio-9p-device: fix memleak in
- virtio_9p_device_unrealize
-Date: Fri, 17 Jan 2020 13:52:53 +0100
-Message-ID: <7781044.dIsAdKOGtE@silver>
-In-Reply-To: <20200117060927.51996-2-pannengyuan@huawei.com>
-References: <20200117060927.51996-1-pannengyuan@huawei.com>
- <20200117060927.51996-2-pannengyuan@huawei.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1isRDf-0000fA-Tk
+ for qemu-devel@nongnu.org; Fri, 17 Jan 2020 07:59:24 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45124)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1isRDd-0000bA-HZ; Fri, 17 Jan 2020 07:59:21 -0500
+Received: by mail-wr1-x444.google.com with SMTP id j42so22587599wrj.12;
+ Fri, 17 Jan 2020 04:59:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=bo2XaogUdfhbNeHsGKTAYLqj0dqky/6E6mwFYSkEF5A=;
+ b=CRInYtXRFD0EJXaJZ8fMoIuWx10ZYROwLB6AScxVSAgU2eYyxOHPgUsHvsg6+qv0BL
+ GvGnodNHnYvyGOIeWsLPMn82LgWHENOe94ZlpYSl6U5tTq9puELS3dVNkZymeq+TM4CO
+ DMxkthkFzDNWaPdQ+jQDbhvw+Ww/u6BYW1AEdVaD8mbx0TXU5s7KIKfHBsDSkEglD0yY
+ Fl2kx4ZRMreNDCL4krjax18zYMh3aAiX34Qz/ssUy3z0s9K2HIRKtyj+DjvZph9MXwvC
+ /vDwDdn1aC0UveE30i+fMb52UOuYUOFWUObgavc6l61NmvE3PrjBNJYgKZxltgjA4axV
+ V8vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=bo2XaogUdfhbNeHsGKTAYLqj0dqky/6E6mwFYSkEF5A=;
+ b=AMLuoImShxuoOlhDPv+bAvzoOx5vuDc+F6xEjjr8OQDzkWSFWhjGwlWVzTVRuLpEzY
+ p6xNTA7o0bDLtlkhmuMmh5x0sD8Twk3/ZIeQ7ju00xIx0jF1GWmrKXomfVT5RXcCWWHY
+ zmn9dAoHKhI4NhKJFNhZRwVbEXe8+WdT9/1jgrHaurX9xVISi/pWwLFnsPEWBrWuBPC7
+ zBHTeGE0LaQB1Gjb60tp3uniDO56GkC8udbmwRgAPEdjAyOHJbn5vx7BOm0VbB6RPRth
+ d6FzF322xog0DioE1oN0/b4D4IW1Psm6xqhU25E70nomSOnedW/GkzQvilwaQR3XAyGP
+ f2eg==
+X-Gm-Message-State: APjAAAUpzzcHdTOFoIVrhi9oVuvGv3+ivTfE19W1zsr6RuvcRQBKlDCb
+ iB9c/LrY+s58CLuzxYjdy3ynjf0oTu/gKCatTQ4=
+X-Google-Smtp-Source: APXvYqz0siPLHKaWbUgLxJ2FxSQpPe/kpKU3LUjhuDZCPO/ns2CcGGustXTXWm4qbH3kjAU2AdFDGt6WBxOm5/3VXUs=
+X-Received: by 2002:a5d:43c7:: with SMTP id v7mr2861401wrr.32.1579265959912;
+ Fri, 17 Jan 2020 04:59:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.189.157.229
+References: <20200108161012.1821385-1-stefanb@linux.ibm.com>
+ <20200108161012.1821385-3-stefanb@linux.ibm.com>
+In-Reply-To: <20200108161012.1821385-3-stefanb@linux.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 17 Jan 2020 16:59:07 +0400
+Message-ID: <CAJ+F1C+-SRBEz4JFoRg-cexa7PeN0W5dPGX07knBApyMmnwCYQ@mail.gmail.com>
+Subject: Re: [PATCH v8 2/6] spapr: Implement get_dt_compatible() callback
+To: Stefan Berger <stefanb@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,57 +88,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+ "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 17. Januar 2020 07:09:26 CET pannengyuan@huawei.com wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
-> 
-> v->vq forgot to cleanup in virtio_9p_device_unrealize, the memory leak
-> stack is as follow:
-> 
-> Direct leak of 14336 byte(s) in 2 object(s) allocated from:
->   #0 0x7f819ae43970 (/lib64/libasan.so.5+0xef970)  ??:?
->   #1 0x7f819872f49d (/lib64/libglib-2.0.so.0+0x5249d)  ??:?
->   #2 0x55a3a58da624 (./x86_64-softmmu/qemu-system-x86_64+0x2c14624) 
-> /mnt/sdb/qemu/hw/virtio/virtio.c:2327 #3 0x55a3a571bac7
-> (./x86_64-softmmu/qemu-system-x86_64+0x2a55ac7) 
-> /mnt/sdb/qemu/hw/9pfs/virtio-9p-device.c:209 #4 0x55a3a58e7bc6
-> (./x86_64-softmmu/qemu-system-x86_64+0x2c21bc6) 
-> /mnt/sdb/qemu/hw/virtio/virtio.c:3504 #5 0x55a3a5ebfb37
-> (./x86_64-softmmu/qemu-system-x86_64+0x31f9b37) 
-> /mnt/sdb/qemu/hw/core/qdev.c:876
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+On Wed, Jan 8, 2020 at 8:11 PM Stefan Berger <stefanb@linux.ibm.com> wrote:
+>
+> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>
+> For devices that cannot be statically initialized, implement a
+> get_dt_compatible() callback that allows us to ask the device for
+> the 'compatible' value.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Maybe you could add this patch to your revised PR Greg?
 
 > ---
-> Changes V2 to V1:
-> - use old function virtio_del_queue to make it easier for stable branch
-> to merge (suggested by Christian Schoenebeck)
-> ---
->  hw/9pfs/virtio-9p-device.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index b5a7c03f26..910dc5045e 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -215,6 +215,7 @@ static void virtio_9p_device_unrealize(DeviceState *dev,
-> Error **errp) V9fsVirtioState *v = VIRTIO_9P(dev);
->      V9fsState *s = &v->state;
-> 
-> +    virtio_del_queue(vdev, 0);
->      virtio_cleanup(vdev);
->      v9fs_device_unrealize_common(s, errp);
->  }
+>  hw/ppc/spapr_vio.c         | 11 +++++++++--
+>  include/hw/ppc/spapr_vio.h |  1 +
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index 554de9930d..4b24b81797 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -87,6 +87,7 @@ static int vio_make_devnode(SpaprVioDevice *dev,
+>      SpaprVioDeviceClass *pc =3D VIO_SPAPR_DEVICE_GET_CLASS(dev);
+>      int vdevice_off, node_off, ret;
+>      char *dt_name;
+> +    const char *dt_compatible;
+>
+>      vdevice_off =3D fdt_path_offset(fdt, "/vdevice");
+>      if (vdevice_off < 0) {
+> @@ -113,9 +114,15 @@ static int vio_make_devnode(SpaprVioDevice *dev,
+>          }
+>      }
+>
+> -    if (pc->dt_compatible) {
+> +    if (pc->get_dt_compatible) {
+> +        dt_compatible =3D pc->get_dt_compatible(dev);
+> +    } else {
+> +        dt_compatible =3D pc->dt_compatible;
+> +    }
+> +
+> +    if (dt_compatible) {
+>          ret =3D fdt_setprop_string(fdt, node_off, "compatible",
+> -                                 pc->dt_compatible);
+> +                                 dt_compatible);
+>          if (ret < 0) {
+>              return ret;
+>          }
+> diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+> index 72762ed16b..67f58b7f98 100644
+> --- a/include/hw/ppc/spapr_vio.h
+> +++ b/include/hw/ppc/spapr_vio.h
+> @@ -58,6 +58,7 @@ typedef struct SpaprVioDeviceClass {
+>      void (*realize)(SpaprVioDevice *dev, Error **errp);
+>      void (*reset)(SpaprVioDevice *dev);
+>      int (*devnode)(SpaprVioDevice *dev, void *fdt, int node_off);
+> +    const char *(*get_dt_compatible)(SpaprVioDevice *dev);
+>  } SpaprVioDeviceClass;
+>
+>  struct SpaprVioDevice {
+> --
+> 2.24.1
+>
+>
 
 
-
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
