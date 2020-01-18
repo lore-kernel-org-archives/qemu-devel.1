@@ -2,89 +2,88 @@ Return-Path: <SRS0=bgql=3H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A94FC32771
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C00C32771
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:21:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6C4121739
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:21:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA45321739
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:21:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QmAq0C4P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6C4121739
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nk13pImp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA45321739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1istfF-0005ex-9z
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:21:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49328)
+	id 1istfO-0005qu-Sw
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:21:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1istaA-0008RA-DA
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:32 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1istc0-0002KQ-Im
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:18:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ista7-0001Ol-TX
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:30 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51200)
+ (envelope-from <mrolnik@gmail.com>) id 1istbv-0003Jb-Sd
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:18:24 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43718)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ista7-0001NF-Jv; Sat, 18 Jan 2020 14:16:27 -0500
-Received: by mail-wm1-x342.google.com with SMTP id d73so10552527wmd.1;
- Sat, 18 Jan 2020 11:16:27 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1istbv-0003It-GV
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:18:19 -0500
+Received: by mail-wr1-x442.google.com with SMTP id d16so25734156wre.10
+ for <qemu-devel@nongnu.org>; Sat, 18 Jan 2020 11:18:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=293nwiyuaOamswqMc0EVTlOq8q0MzXCBPubm+nvXYDI=;
- b=QmAq0C4PRgdnUb7wZfnqw6Spi6JmLykluvhuT7NtN9az4KFrxCpoHwgQ40tLOEa6yx
- 7VoVE9Gq6fJ09G1fRViBEqifvV/aabz+dOWJnPzP8IHTJoa79UGSaMGvQPtLBInuNgNZ
- nLBB2YHNeT93sRMu6/ORpIevi9dsXc90e2D3S8PYT1eqm/4ZfkgCwOJZjwys5CrWDIiE
- kRawG93I0AWtYFLH3QE0TEl/Huaowv1DDvZ2WJxoRji/z9TewgPnwEy6ydRoeG5u7l/6
- WfzfDpYEq3WVoU+oTAEorG8hMb+DbclFxTwIcfNlsMZ1kcQx9e+PLF7cY+c3PX4k3rhF
- lsqQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=2PMQVyXFv2eii9jVDF9+QNazFj1KogeI6P2QrVCcPeo=;
+ b=Nk13pImp2zJ+UVyZmZkVpeWRoyImIToxECvFlCrdrvCPPh2+FTvRXxPAGErsXC1Xr9
+ brknI8Dxwg3HvalsAZdL9YcOPf5M1QstvuA6V4VVCa+W9c0nUnv81ZcQrkqhevTqjw1a
+ z2on4NRo1GdZwt2IFNL95aqSGwIihJXy6G9Ggf7Gy6u/kXFhfPv9jsO0mcFJrWSMCmci
+ m5VQCuBbqyEOBS8w8PjVITHGeb6UhkGZAaSPRGn29B5Kw3ez09DT+vz9mWJMzdgeNYAe
+ Yw8CBgURJnYHp+3ofFOZTl4c8AFCzIK6qiT+8g4pjXFxwHaWvtcBrjtUzVvgNXiooKYb
+ GV5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=293nwiyuaOamswqMc0EVTlOq8q0MzXCBPubm+nvXYDI=;
- b=enjTScK3/xbgxsUzoemhvncQyUbubWyQlAKS8+303l95saHOLRiKjxTI6xdt39W3e0
- madYnT8344Cmz+XiHq5FCteVJ+84baWz+5w75QHpgI2JrvsvqMcE9n9Z0g1rd4dEJwFo
- Lc8vY3/LGbEU6G1zNr8kR2WytRExo5fxHpFEwKcwRo3tmsIDzaRgY1CHsZI/XkghfqbY
- aaFG4jnPLln3cpuoR6I5Ar6sZ0gvEiwxSs7fWmJ8EriXB+CAPmCUp6kD4RVlefKsNrMV
- 6xShDGvNoQ/5xR2OQbl5WUsBL7eR+XMeLFOFqc1jd4Zwru4gCymsN/d/JNjcC1D2UkUn
- YCmA==
-X-Gm-Message-State: APjAAAWypa1Y2uSF8g/O4juZtitVrHZ/AGabUjiFanrO1CPyYBEMqpTv
- wcD7mlZHmn7z12xbo7Q487GEm/vZ
-X-Google-Smtp-Source: APXvYqwJW4dWmYd3pwy5SUXrSS/4WS63NkWDB63fBwf4YX+K/2QLbRtKKwft3wGdNyiKTS6zSY0MHg==
-X-Received: by 2002:a05:600c:210e:: with SMTP id
- u14mr10650326wml.28.1579374985597; 
- Sat, 18 Jan 2020 11:16:25 -0800 (PST)
-Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z11sm41339690wrt.82.2020.01.18.11.16.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Jan 2020 11:16:24 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>
-Subject: [PATCH 0/4] tests/boot_linux_console: Test booting NetBSD via U-Boot
- on OrangePi PC
-Date: Sat, 18 Jan 2020 20:16:19 +0100
-Message-Id: <20200118191623.32549-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=2PMQVyXFv2eii9jVDF9+QNazFj1KogeI6P2QrVCcPeo=;
+ b=BvewscMhSzVtaNdpqWVJmXy4swxk1l5VTzNrEfwqaBtth3gH0QDlknTmcnyR5ok+If
+ ppQx2ucFi08JrVLEyP4sOz/JnZX+UsI1sQenBLDRriltNKccCK5LFU3I734YFgMleMV0
+ 0mWpGcjE3WICm2YWOgrCoDq6q5qpzaDUNKpQF7+4N5kRohfen6MpTZ48xQyvbMllHP4q
+ U1Wj6Ps1E3KVjgAVVzoZw+iJ2cCAThwHKoXYypw7oZT5drV3xFSDz/d3ZnFoj5JZI4fT
+ PceMtHPWoiBYYbMETvrrhN1oQuDYVED00sq0MCI8KUOBgoQZOf4wwyYt+7jTkagYxR+2
+ CluQ==
+X-Gm-Message-State: APjAAAUvBvydhkedFm7KOiz38Lwm3107hox5+DLyQqkDH94gr9Uh+znQ
+ zA+Bq3MLiVQn865UkCbhl3F0GXXUunjQSCVR
+X-Google-Smtp-Source: APXvYqy61YIuFJn0KmaBNfqwJDuCd3r5nPxC88i5Y+ApUMUAY3BZEU8BSqcW9n1tpfdabTcuIYrx3A==
+X-Received: by 2002:adf:978c:: with SMTP id s12mr9677155wrb.408.1579375097545; 
+ Sat, 18 Jan 2020 11:18:17 -0800 (PST)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-109-65-108-13.red.bezeqint.net. [109.65.108.13])
+ by smtp.gmail.com with ESMTPSA id o16sm2875468wmc.18.2020.01.18.11.17.45
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Sat, 18 Jan 2020 11:18:17 -0800 (PST)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v41 01/21] target/avr: Add outward facing interfaces and core
+ CPU logic
+Date: Sat, 18 Jan 2020 21:13:56 +0200
+Message-Id: <20200118191416.19934-2-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
+In-Reply-To: <20200118191416.19934-1-mrolnik@gmail.com>
+References: <20200118191416.19934-1-mrolnik@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,280 +95,1516 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Kamil Rytarowski <kamil@netbsd.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
+ me@xcancerberox.com.ar, richard.henderson@linaro.org,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series add a test on the OrangePi PC for:
-- SD Card booting
-- U-boot & UART
-- NetBSD 9
+This includes:
+- CPU data structures
+- object model classes and functions
+- migration functions
+- GDB hooks
 
-I simply followed Niek description in docs/orangepi.rst:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg669347.html
+Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ target/avr/cpu-param.h |  37 ++
+ target/avr/cpu-qom.h   |  54 +++
+ target/avr/cpu.h       | 258 +++++++++++++
+ target/avr/cpu.c       | 826 +++++++++++++++++++++++++++++++++++++++++
+ target/avr/gdbstub.c   |  84 +++++
+ target/avr/machine.c   | 121 ++++++
+ gdb-xml/avr-cpu.xml    |  49 +++
+ 7 files changed, 1429 insertions(+)
+ create mode 100644 target/avr/cpu-param.h
+ create mode 100644 target/avr/cpu-qom.h
+ create mode 100644 target/avr/cpu.h
+ create mode 100644 target/avr/cpu.c
+ create mode 100644 target/avr/gdbstub.c
+ create mode 100644 target/avr/machine.c
+ create mode 100644 gdb-xml/avr-cpu.xml
 
-The sdcard image is big, but the test runs very quick (1min),
-even on Travis CI: https://travis-ci.org/philmd/qemu/jobs/638823612#L3778
-
-(11/48) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_uboot_netbsd9:  PASS (65.17 s)
-
-  $ TMPDIR=/tmp AVOCADO_ALLOW_LARGE_STORAGE=yes avocado --show=app,console run -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
-  JOB ID     : 4e11f0d22d121fd766ab5f0956ec464cf9fce64b
-  JOB LOG    : /home/phil/avocado/job-results/job-2020-01-18T19.14-4e11f0d/job.log
-   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_uboot_netbsd9:
-  console: U-Boot SPL 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000)
-  console: DRAM: 1024 MiB
-  console: Failed to set core voltage! Can't set CPU frequency
-  console: Trying to boot from MMC1
-  console: U-Boot 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000) Allwinner Technology
-  console: CPU:   Allwinner H3 (SUN8I 0000)
-  console: Model: Xunlong Orange Pi Plus / Plus 2
-  console: DRAM:  1 GiB
-  console: MMC:   Device 'mmc@1c11000': seq 1 is in use by 'mmc@1c10000'
-  console: mmc@1c0f000: 0, mmc@1c10000: 2, mmc@1c11000: 1
-  console: Loading Environment from FAT... Warning: HDMI PHY init timeout!
-  console: Warning: HDMI PHY init timeout!
-  console: In:    serial
-  console: Out:   serial
-  console: Err:   serial
-  console: Net:   phy interface7
-  console: Could not get PHY for ethernet@1c30000: addr 0
-  console: No ethernet found.
-  console: starting USB...
-  console: Bus usb@1c1b000: USB EHCI 1.00
-  console: Bus usb@1c1d000: USB EHCI 1.00
-  console: scanning bus usb@1c1b000 for devices... 1 USB Device(s) found
-  console: scanning bus usb@1c1d000 for devices... 1 USB Device(s) found
-  console: scanning usb for storage devices... 0 Storage Device(s) found
-  console: Hit any key to stop autoboot:  0
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: =>
-  console: => setenv bootargs root=ld0a
-  console: => setenv kernel netbsd-GENERIC.ub
-  console: => setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb
-  console: => setenv bootcmd 'fatload mmc 0:1 ${kernel_addr_r} ${kernel}; fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; fdt addr ${fdt_addr_r}; bootm ${kernel_addr_r} - ${fdt_addr_r}'
-  console: => boot
-  console: 8850008 bytes read in 2583 ms (3.3 MiB/s)
-  console: 28162 bytes read in 34 ms (808.6 KiB/s)
-  console: ## Booting kernel from Legacy Image at 42000000 ...
-  console: Image Name:   NetBSD/earmv7hf 9.0_RC1
-  console: Image Type:   ARM Linux Kernel Image (no loading done) (uncompressed)
-  console: Data Size:    8849944 Bytes = 8.4 MiB
-  console: Load Address: 00000000
-  console: Entry Point:  00000000
-  console: Verifying Checksum ... OK
-  console: ## Flattened Device Tree blob at 43000000
-  console: Booting using the fdt blob at 0x43000000
-  console: XIP Kernel Image (no loading done)
-  console: Loading Device Tree to 49ff6000, end 49fffe01 ... OK
-  console: Starting kernel ...
-  console: [   1.0000000] NetBSD/evbarm (fdt) booting ...
-  console: [   1.0000000] [ Kernel symbol table missing! ]
-  console: [   1.0000000] Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-  console: [   1.0000000]     2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017,
-  console: [   1.0000000]     2018, 2019 The NetBSD Foundation, Inc.  All rights reserved.
-  console: [   1.0000000] Copyright (c) 1982, 1986, 1989, 1991, 1993
-  console: [   1.0000000]     The Regents of the University of California.  All rights reserved.
-  console: [   1.0000000] NetBSD 9.0_RC1 (GENERIC) #0: Wed Nov 27 16:14:52 UTC 2019
-  console: [   1.0000000]         mkrepro@mkrepro.NetBSD.org:/usr/src/sys/arch/evbarm/compile/GENERIC
-  console: [   1.0000000] total memory = 1024 MB
-  console: [   1.0000000] avail memory = 1003 MB
-  console: [   1.0000000] armfdt0 (root)
-  console: [   1.0000000] simplebus0 at armfdt0: Xunlong Orange Pi PC
-  console: [   1.0000000] simplebus1 at simplebus0
-  console: [   1.0000000] simplebus2 at simplebus0
-  console: [   1.0000000] cpus0 at simplebus0
-  console: [   1.0000000] simplebus3 at simplebus0
-  console: [   1.0000000] cpu0 at cpus0: Cortex-A7 r0p5 (Cortex V7A core)
-  console: [   1.0000000] cpu0: DC enabled IC enabled WB enabled LABT branch prediction enabled
-  console: [   1.0000000] cpu0: 32KB/64B 2-way L1 VIPT Instruction cache
-  console: [   1.0000000] cpu0: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
-  console: [   1.0000000] cpu0: 2304KB/64B 16-way write-through L2 PIPT Unified cache
-  console: [   1.0000000] vfp0 at cpu0: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
-  console: [   1.0000000] cpufreqdt0 at cpu0
-  console: [   1.0000000] cpu1 at cpus0
-  console: [   1.0000000] cpufreqdt1 at cpu1
-  console: [   1.0000000] cpu2 at cpus0
-  console: [   1.0000000] cpufreqdt2 at cpu2
-  console: [   1.0000000] cpu3 at cpus0
-  console: [   1.0000000] cpufreqdt3 at cpu3
-  console: [   1.0000000] gic0 at simplebus1: GIC
-  console: [   1.0000000] armgic0 at gic0: Generic Interrupt Controller, 160 sources (160 valid)
-  console: [   1.0000000] armgic0: 256 Priorities, 128 SPIs, 16 PPIs, 16 SGIs
-  console: [   1.0000000] fclock0 at simplebus2: 24000000 Hz fixed clock (osc24M)
-  console: [   1.0000000] fclock1 at simplebus2: 32768 Hz fixed clock (ext_osc32k)
-  console: [   1.0000000] gtmr0 at simplebus0: Generic Timer
-  console: [   1.0000000] gtmr0: interrupting on GIC irq 27
-  console: [   1.0000000] armgtmr0 at gtmr0: Generic Timer (24000 kHz, virtual)
-  console: [   1.0000060] sun8ih3ccu0 at simplebus1: H3 CCU
-  console: [   1.0000060] sun8ih3rccu0 at simplebus1: H3 PRCM CCU
-  console: [   1.0000060] sunxigpio0 at simplebus1: PIO
-  console: [   1.0000060] gpio0 at sunxigpio0: 94 pins
-  console: [   1.0000060] sunxigpio0: interrupting on GIC irq 43
-  console: [   1.0000060] sunxigpio1 at simplebus1: PIO
-  console: [   1.0000060] gpio1 at sunxigpio1: 12 pins
-  console: [   1.0000060] sunxigpio1: interrupting on GIC irq 77
-  console: [   1.0000060] sunxisramc0 at simplebus1: SRAM Controller
-  console: [   1.0000060] sun6idma0 at simplebus1: DMA controller (12 channels)
-  console: [   1.0000060] sun6idma0: interrupting on GIC irq 82
-  console: [   1.0000060] connector0 at simplebus0: HDMI connector
-  console: [   1.0000060] com0 at simplebus1: ns16550a, working fifo
-  console: [   1.0000060] com0: console
-  console: [   1.0000060] com0: interrupting on GIC irq 32
-  console: [   1.0000060] fregulator0 at simplebus0: vcc3v3
-  console: [   1.0000060] fregulator1 at simplebus0: usb0-vbus
-  console: [   1.0000060] fregulator2 at simplebus0: vcc3v0
-  console: [   1.0000060] fregulator3 at simplebus0: vcc5v0
-  console: [   1.0000060] sunxiusbphy0 at simplebus1: USB PHY
-  console: [   1.0000060] /soc/clock@1000000 at simplebus1 not configured
-  console: [   1.0000060] /soc/mixer@1100000 at simplebus1 not configured
-  console: [   1.0000060] /soc/lcd-controller@1c0c000 at simplebus1 not configured
-  console: [   1.0000060] /soc/hdmi@1ee0000 at simplebus1 not configured
-  console: [   1.0000060] sunxirtc0 at simplebus1: RTC
-  console: [   1.0000060] emac0 at simplebus1: EMAC
-  console: [   1.0000060] emac0: Ethernet address 52:54:00:12:34:56
-  console: [   1.0000060] emac0: interrupting on GIC irq 114
-  console: [   1.0000060] ukphy0 at emac0 phy 1: OUI 0x0088a0, model 0x0000, rev. 0
-  console: [   1.0000060] ukphy0: 10baseT, 10baseT-FDX, 100baseTX, 100baseTX-FDX, 100baseT4, auto
-  console: [   1.0000060] h3codec0 at simplebus1: H3 Audio Codec (analog part)
-  console: [   1.0000060] /soc/hdmi-phy@1ef0000 at simplebus1 not configured
-  console: [   1.0000060] /opp_table0 at simplebus0 not configured
-  console: [   1.0000060] sunxitwi0 at simplebus1: Marvell TWSI controller
-  console: [   1.0000060] sunxitwi0: interrupting on GIC irq 76
-  console: [   1.0000060] iic0 at sunxitwi0: I2C bus
-  console: [   1.0000060] sy8106a0 at iic0 addr 0x65: Silergy SY8106A regulator
-  console: [   1.0000060] /display-engine at simplebus0 not configured
-  console: [   1.0000060] sunximmc0 at simplebus1: SD/MMC controller
-  console: [   1.0000060] sunximmc0: interrupting on GIC irq 92
-  console: [   1.0000060] motg0 at simplebus1: 'otg' mode not supported
-  console: [   1.0000060] ehci0 at simplebus1: EHCI
-  console: [   1.0000060] ehci0: interrupting on GIC irq 104
-  console: ehci0: ohci or uhci probably not configured
-  console: [   1.0000060] usb0 at ehci0: USB revision 2.0
-  console: [   1.0000060] ohci0 at simplebus1: OHCI
-  console: [   1.0000060] ohci0: interrupting on GIC irq 105
-  console: [   1.0000060] ohci0: OHCI version 1.0
-  console: [   1.0000060] usb1 at ohci0: USB revision 1.0
-  console: [   1.0000060] ehci1 at simplebus1: EHCI
-  console: [   1.0000060] ehci1: interrupting on GIC irq 106
-  console: ehci1: ohci or uhci probably not configured
-  console: [   1.0000060] usb2 at ehci1: USB revision 2.0
-  console: [   1.0000060] ohci1 at simplebus1: OHCI
-  console: [   1.0000060] ohci1: interrupting on GIC irq 107
-  console: [   1.0000060] ohci1: OHCI version 1.0
-  -console: [   1.0000060] usb3 at ohci1: USB revision 1.0
-  console: [   1.0000060] ehci2 at simplebus1: EHCI
-  console: [   1.0000060] ehci2: interrupting on GIC irq 108
-  console: ehci2: ohci or uhci probably not configured
-  console: [   1.0000060] usb4 at ehci2: USB revision 2.0
-  console: [   1.0000060] ohci2 at simplebus1: OHCI
-  console: [   1.0000060] ohci2: interrupting on GIC irq 109
-  console: [   1.0000060] ohci2: OHCI version 1.0
-  console: [   1.0000060] usb5 at ohci2: USB revision 1.0
-  console: [   1.0000060] ehci3 at simplebus1: EHCI
-  console: [   1.0000060] ehci3: interrupting on GIC irq 110
-  console: ehci3: ohci or uhci probably not configured
-  console: [   1.0000060] usb6 at ehci3: USB revision 2.0
-  console: [   1.0000060] ohci3 at simplebus1: OHCI
-  console: [   1.0000060] ohci3: interrupting on GIC irq 111
-  console: [   1.0000060] ohci3: OHCI version 1.0
-  console: [   1.0000060] usb7 at ohci3: USB revision 1.0
-  console: [   1.0000060] sunxiwdt0 at simplebus1: Watchdog
-  console: [   1.0000060] sunxiwdt0: default watchdog period is 16 seconds
-  console: [   1.0000060] sunxicodec0 at simplebus1: H3 Audio Codec
-  console: [   1.0000060] audio0 at sunxicodec0: playback, capture, full duplex, independent
-  console: [   1.0000060] audio0: slinear_le:16 2ch 48000Hz, blk 40ms for playback
-  console: [   1.0000060] audio0: slinear_le:16 2ch 48000Hz, blk 40ms for recording
-  console: [   1.0000060] spkr0 at audio0: PC Speaker (synthesized)
-  console: [   1.0000060] wsbell at spkr0 not configured
-  console: [   1.0000060] /soc/ir@1f02000 at simplebus1 not configured
-  console: [   1.0000060] /soc/gpu@1c40000 at simplebus1 not configured
-  console: [   1.0000060] psci0 at simplebus0: PSCI 0.1
-  console: [   1.0000060] gpioleds0 at simplebus0: orangepi:green:pwr orangepi:red:status
-  console: [   1.0000060] gpiokeys0 at simplebus0: sw4
-  console: [   1.0000060] sunxitimer0 at simplebus1: Timer
-  console: [   1.0000060] /soc/video-codec@1c0e000 at simplebus1 not configured
-  console: [   1.0000060] cpu3: Cortex-A7 r0p5 (Cortex V7A core)
-  console: [   1.0000060] cpu3: DC enabled IC enabled WB enabled LABT branch prediction enabled
-  console: [   1.0000060] cpu3: 32KB/64B 2-way L1 VIPT Instruction cache
-  console: [   1.0000060] cpu3: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
-  console: [   1.0160154] cpu3: 2304KB/64B 16-way write-through L2 PIPT Unified cache
-  console: [   1.0234452] vfp3 at cpu3: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
-  console: [   1.0291986] cpu1: Cortex-A7 r0p5 (Cortex V7A core)
-  console: [   1.0291986] cpu1: DC enabled IC enabled WB enabled LABT branch prediction enabled
-  console: [   1.0291986] cpu1: 32KB/64B 2-way L1 VIPT Instruction cache
-  console: [   1.0394135] cpu1: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
-  console: [   1.0394135] cpu1: 2304KB/64B 16-way write-through L2 PIPT Unified cache
-  console: [   1.0394135] vfp1 at cpu1: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
-  console: [   1.0493315] cpu2: Cortex-A7 r0p5 (Cortex V7A core)
-  console: [   1.0634020] cpu2: DC enabled IC enabled WB enabled LABT branch prediction enabled
-  console: [   1.0694913] cpu2: 32KB/64B 2-way L1 VIPT Instruction cache
-  console: [   1.0694913] cpu2: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
-  console: [   1.0806243] cpu2: 2304KB/64B 16-way write-through L2 PIPT Unified cache
-  console: [   1.0896281] vfp2 at cpu2: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
-  console: [   1.6053940] sdmmc0 at sunximmc0
-  console: [   1.9566931] uhub0 at usb0: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
-  console: [   2.0663940] uhub1 at usb2: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
-  console: [   2.1170633] uhub2 at usb1: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
-  console: [   2.2277627] uhub3 at usb4: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
-  console: [   2.2800297] uhub4 at usb3: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
-  console: [   2.3289886] uhub5 at usb6: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
-  console: [   2.4083724] uhub6 at usb7: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
-  console: [   2.4895047] uhub7 at usb5: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
-  console: [   2.8171937] sdmmc0: SD card status: 4-bit, C0
-  console: [   2.8234040] ld0 at sdmmc0: <0xaa:0x5859:QEMU!:0x01:0xdeadbeef:0x062>
-  console: [   2.8743967] ld0: 1290 MB, 655 cyl, 64 head, 63 sec, 512 bytes/sect x 2642944 sectors
-  console: [   3.1588850] ld0: 4-bit width, High-Speed/SDR25, 50.000 MHz
-  console: [   4.9942260] WARNING: 4 errors while detecting hardware; check system log.
-  console: [   5.0142912] boot device: ld0
-  console: [   5.0551260] root on ld0a dumps on ld0b
-  console: [   5.2175484] root file system type: ffs
-  console: [   5.2858559] kern.module.path=/stand/evbarm/9.0/modules
-  console: Tue Jan 18 18:15:15 UTC 2050
-  console: Starting root file system check:
-  PASS (35.96 s)
-  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
-  JOB TIME   : 36.09 s
-
-Based-on: <20200108200020.4745-1-nieklinnenbank@gmail.com>
-"Add Allwinner H3 SoC and Orange Pi PC Machine" v3
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg669328.html
-
-Philippe Mathieu-Daudé (4):
-  Acceptance tests: Extract _console_interaction()
-  Acceptance tests: Add interrupt_interactive_console_until_pattern()
-  tests/boot_linux_console: Test booting NetBSD via U-Boot on OrangePi
-    PC
-  .travis.yml: Allow untrusted code and large files
-
- .travis.yml                               |  2 +
- tests/acceptance/avocado_qemu/__init__.py | 59 ++++++++++++++++-----
- tests/acceptance/boot_linux_console.py    | 63 +++++++++++++++++++++++
- 3 files changed, 110 insertions(+), 14 deletions(-)
-
+diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
+new file mode 100644
+index 0000000000..0c29ce4223
+--- /dev/null
++++ b/target/avr/cpu-param.h
+@@ -0,0 +1,37 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#ifndef AVR_CPU_PARAM_H
++#define AVR_CPU_PARAM_H
++
++#define TARGET_LONG_BITS 32
++/*
++ * TARGET_PAGE_BITS cannot be more than 8 bits because
++ * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and they
++ *     should be implemented as a device and not memory
++ * 2.  SRAM starts at the address 0x0100
++ */
++#define TARGET_PAGE_BITS 8
++#define TARGET_PHYS_ADDR_SPACE_BITS 24
++#define TARGET_VIRT_ADDR_SPACE_BITS 24
++#define NB_MMU_MODES 2
++
++
++#endif
+diff --git a/target/avr/cpu-qom.h b/target/avr/cpu-qom.h
+new file mode 100644
+index 0000000000..e28b58c897
+--- /dev/null
++++ b/target/avr/cpu-qom.h
+@@ -0,0 +1,54 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#ifndef QEMU_AVR_QOM_H
++#define QEMU_AVR_QOM_H
++
++#include "hw/core/cpu.h"
++
++#define TYPE_AVR_CPU "avr-cpu"
++
++#define AVR_CPU_CLASS(klass) \
++    OBJECT_CLASS_CHECK(AVRCPUClass, (klass), TYPE_AVR_CPU)
++#define AVR_CPU(obj) \
++    OBJECT_CHECK(AVRCPU, (obj), TYPE_AVR_CPU)
++#define AVR_CPU_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(AVRCPUClass, (obj), TYPE_AVR_CPU)
++
++/**
++ *  AVRCPUClass:
++ *  @parent_realize: The parent class' realize handler.
++ *  @parent_reset: The parent class' reset handler.
++ *  @vr: Version Register value.
++ *
++ *  A AVR CPU model.
++ */
++typedef struct AVRCPUClass {
++    /*< private >*/
++    CPUClass parent_class;
++    /*< public >*/
++    DeviceRealize parent_realize;
++    void (*parent_reset)(CPUState *cpu);
++} AVRCPUClass;
++
++typedef struct AVRCPU AVRCPU;
++
++
++#endif /* !defined (QEMU_AVR_CPU_QOM_H) */
+diff --git a/target/avr/cpu.h b/target/avr/cpu.h
+new file mode 100644
+index 0000000000..b74bcf01ae
+--- /dev/null
++++ b/target/avr/cpu.h
+@@ -0,0 +1,258 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#ifndef QEMU_AVR_CPU_H
++#define QEMU_AVR_CPU_H
++
++#include "cpu-qom.h"
++#include "exec/cpu-defs.h"
++
++#define TCG_GUEST_DEFAULT_MO 0
++#define AVR_CPU_TYPE_SUFFIX "-" TYPE_AVR_CPU
++#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)
++#define CPU_RESOLVING_TYPE TYPE_AVR_CPU
++
++/*
++ * AVR has two memory spaces, data & code.
++ * e.g. both have 0 address
++ * ST/LD instructions access data space
++ * LPM/SPM and instruction fetching access code memory space
++ */
++#define MMU_CODE_IDX 0
++#define MMU_DATA_IDX 1
++
++#define EXCP_RESET 1
++#define EXCP_INT(n) (EXCP_RESET + (n) + 1)
++
++/* Number of CPU registers */
++#define NUMBER_OF_CPU_REGISTERS 32
++/* Number of IO registers accessible by ld/st/in/out */
++#define NUMBER_OF_IO_REGISTERS 64
++
++/*
++ * Offsets of AVR memory regions in host memory space.
++ *
++ * This is needed because the AVR has separate code and data address
++ * spaces that both have start from zero but have to go somewhere in
++ * host memory.
++ *
++ * It's also useful to know where some things are, like the IO registers.
++ */
++/* Flash program memory */
++#define OFFSET_CODE 0x00000000
++/* CPU registers, IO registers, and SRAM */
++#define OFFSET_DATA 0x00800000
++/* CPU registers specifically, these are mapped at the start of data */
++#define OFFSET_CPU_REGISTERS OFFSET_DATA
++/*
++ * IO registers, including status register, stack pointer, and memory
++ * mapped peripherals, mapped just after CPU registers
++ */
++#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)
++
++#define EF_AVR_MACH 0x7F
++
++typedef enum AVRFeature {
++    AVR_FEATURE_SRAM,
++
++    AVR_FEATURE_1_BYTE_PC,
++    AVR_FEATURE_2_BYTE_PC,
++    AVR_FEATURE_3_BYTE_PC,
++
++    AVR_FEATURE_1_BYTE_SP,
++    AVR_FEATURE_2_BYTE_SP,
++
++    AVR_FEATURE_BREAK,
++    AVR_FEATURE_DES,
++    AVR_FEATURE_RMW, /* Read Modify Write - XCH LAC LAS LAT */
++
++    AVR_FEATURE_EIJMP_EICALL,
++    AVR_FEATURE_IJMP_ICALL,
++    AVR_FEATURE_JMP_CALL,
++
++    AVR_FEATURE_ADIW_SBIW,
++
++    AVR_FEATURE_SPM,
++    AVR_FEATURE_SPMX,
++
++    AVR_FEATURE_ELPMX,
++    AVR_FEATURE_ELPM,
++    AVR_FEATURE_LPMX,
++    AVR_FEATURE_LPM,
++
++    AVR_FEATURE_MOVW,
++    AVR_FEATURE_MUL,
++    AVR_FEATURE_RAMPD,
++    AVR_FEATURE_RAMPX,
++    AVR_FEATURE_RAMPY,
++    AVR_FEATURE_RAMPZ,
++} AVRFeature;
++
++typedef struct CPUAVRState CPUAVRState;
++
++struct CPUAVRState {
++    uint32_t pc_w; /* 0x003fffff up to 22 bits */
++
++    uint32_t sregC; /* 0x00000001 1 bit */
++    uint32_t sregZ; /* 0x00000001 1 bit */
++    uint32_t sregN; /* 0x00000001 1 bit */
++    uint32_t sregV; /* 0x00000001 1 bit */
++    uint32_t sregS; /* 0x00000001 1 bit */
++    uint32_t sregH; /* 0x00000001 1 bit */
++    uint32_t sregT; /* 0x00000001 1 bit */
++    uint32_t sregI; /* 0x00000001 1 bit */
++
++    uint32_t rampD; /* 0x00ff0000 8 bits */
++    uint32_t rampX; /* 0x00ff0000 8 bits */
++    uint32_t rampY; /* 0x00ff0000 8 bits */
++    uint32_t rampZ; /* 0x00ff0000 8 bits */
++    uint32_t eind; /* 0x00ff0000 8 bits */
++
++    uint32_t r[NUMBER_OF_CPU_REGISTERS]; /* 8 bits each */
++    uint32_t sp; /* 16 bits */
++
++    uint32_t skip; /* if set skip instruction */
++
++    uint64_t intsrc; /* interrupt sources */
++    bool fullacc; /* CPU/MEM if true MEM only otherwise */
++
++    uint32_t features;
++};
++
++/**
++ *  AVRCPU:
++ *  @env: #CPUAVRState
++ *
++ *  A AVR CPU.
++ */
++typedef struct AVRCPU {
++    /*< private >*/
++    CPUState parent_obj;
++    /*< public >*/
++
++    CPUNegativeOffsetState neg;
++    CPUAVRState env;
++} AVRCPU;
++
++#ifndef CONFIG_USER_ONLY
++extern const struct VMStateDescription vms_avr_cpu;
++#endif
++
++void avr_cpu_do_interrupt(CPUState *cpu);
++bool avr_cpu_exec_interrupt(CPUState *cpu, int int_req);
++hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
++int avr_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
++int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
++
++static inline int avr_feature(CPUAVRState *env, AVRFeature feature)
++{
++    return (env->features & (1U << feature)) != 0;
++}
++
++static inline void avr_set_feature(CPUAVRState *env, int feature)
++{
++    env->features |= (1U << feature);
++}
++
++#define cpu_list avr_cpu_list
++#define cpu_signal_handler cpu_avr_signal_handler
++#define cpu_mmu_index avr_cpu_mmu_index
++
++static inline int avr_cpu_mmu_index(CPUAVRState *env, bool ifetch)
++{
++    return ifetch ? MMU_CODE_IDX : MMU_DATA_IDX;
++}
++
++void avr_cpu_tcg_init(void);
++
++void avr_cpu_list(void);
++int cpu_avr_exec(CPUState *cpu);
++int cpu_avr_signal_handler(int host_signum, void *pinfo, void *puc);
++int avr_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
++                                int rw, int mmu_idx);
++int avr_cpu_memory_rw_debug(CPUState *cs, vaddr address, uint8_t *buf,
++                                int len, bool is_write);
++
++enum {
++    TB_FLAGS_FULL_ACCESS = 1,
++    TB_FLAGS_SKIP = 2,
++};
++
++static inline void cpu_get_tb_cpu_state(CPUAVRState *env, target_ulong *pc,
++                                target_ulong *cs_base, uint32_t *pflags)
++{
++    uint32_t flags = 0;
++
++    *pc = env->pc_w * 2;
++    *cs_base = 0;
++
++    if (env->fullacc) {
++        flags |= TB_FLAGS_FULL_ACCESS;
++    }
++    if (env->skip) {
++        flags |= TB_FLAGS_SKIP;
++    }
++
++    *pflags = flags;
++}
++
++static inline int cpu_interrupts_enabled(CPUAVRState *env)
++{
++    return env->sregI != 0;
++}
++
++static inline uint8_t cpu_get_sreg(CPUAVRState *env)
++{
++    uint8_t sreg;
++    sreg = (env->sregC) << 0
++         | (env->sregZ) << 1
++         | (env->sregN) << 2
++         | (env->sregV) << 3
++         | (env->sregS) << 4
++         | (env->sregH) << 5
++         | (env->sregT) << 6
++         | (env->sregI) << 7;
++    return sreg;
++}
++
++static inline void cpu_set_sreg(CPUAVRState *env, uint8_t sreg)
++{
++    env->sregC = (sreg >> 0) & 0x01;
++    env->sregZ = (sreg >> 1) & 0x01;
++    env->sregN = (sreg >> 2) & 0x01;
++    env->sregV = (sreg >> 3) & 0x01;
++    env->sregS = (sreg >> 4) & 0x01;
++    env->sregH = (sreg >> 5) & 0x01;
++    env->sregT = (sreg >> 6) & 0x01;
++    env->sregI = (sreg >> 7) & 0x01;
++}
++
++bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr);
++
++typedef CPUAVRState CPUArchState;
++typedef AVRCPU ArchCPU;
++
++#include "exec/cpu-all.h"
++
++const char *avr_flags_to_cpu_type(uint32_t flags, const char *def_cpu_type);
++
++#endif /* !defined (QEMU_AVR_CPU_H) */
+diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+new file mode 100644
+index 0000000000..c74c5106fe
+--- /dev/null
++++ b/target/avr/cpu.c
+@@ -0,0 +1,826 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/qemu-print.h"
++#include "exec/exec-all.h"
++#include "cpu.h"
++#include "disas/dis-asm.h"
++
++static void avr_cpu_set_pc(CPUState *cs, vaddr value)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++
++    cpu->env.pc_w = value / 2; /* internally PC points to words */
++}
++
++static bool avr_cpu_has_work(CPUState *cs)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    return (cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_RESET))
++            && cpu_interrupts_enabled(env);
++}
++
++static void avr_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    env->pc_w = tb->pc / 2; /* internally PC points to words */
++}
++
++static void avr_cpu_reset(CPUState *cs)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    AVRCPUClass *mcc = AVR_CPU_GET_CLASS(cpu);
++    CPUAVRState *env = &cpu->env;
++
++    mcc->parent_reset(cs);
++
++    env->pc_w = 0;
++    env->sregI = 1;
++    env->sregC = 0;
++    env->sregZ = 0;
++    env->sregN = 0;
++    env->sregV = 0;
++    env->sregS = 0;
++    env->sregH = 0;
++    env->sregT = 0;
++
++    env->rampD = 0;
++    env->rampX = 0;
++    env->rampY = 0;
++    env->rampZ = 0;
++    env->eind = 0;
++    env->sp = 0;
++
++    env->skip = 0;
++
++    memset(env->r, 0, sizeof(env->r));
++
++    tlb_flush(cs);
++}
++
++static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
++{
++    info->mach = bfd_arch_avr;
++    info->print_insn = NULL;
++}
++
++static void avr_cpu_realizefn(DeviceState *dev, Error **errp)
++{
++    CPUState *cs = CPU(dev);
++    AVRCPUClass *mcc = AVR_CPU_GET_CLASS(dev);
++    Error *local_err = NULL;
++
++    cpu_exec_realizefn(cs, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
++        return;
++    }
++    qemu_init_vcpu(cs);
++    cpu_reset(cs);
++
++    mcc->parent_realize(dev, errp);
++}
++
++static void avr_cpu_set_int(void *opaque, int irq, int level)
++{
++    AVRCPU *cpu = opaque;
++    CPUAVRState *env = &cpu->env;
++    CPUState *cs = CPU(cpu);
++
++    uint64_t mask = (1ull << irq);
++    if (level) {
++        env->intsrc |= mask;
++        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
++    } else {
++        env->intsrc &= ~mask;
++        if (env->intsrc == 0) {
++            cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
++        }
++    }
++}
++
++static void avr_cpu_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++
++    cpu_set_cpustate_pointers(cpu);
++
++#ifndef CONFIG_USER_ONLY
++    /* Set the number of interrupts supported by the CPU. */
++    qdev_init_gpio_in(DEVICE(cpu), avr_cpu_set_int,
++            sizeof(cpu->env.intsrc) * 8);
++#endif
++}
++
++static ObjectClass *avr_cpu_class_by_name(const char *cpu_model)
++{
++    ObjectClass *oc;
++
++    oc = object_class_by_name(cpu_model);
++    if (object_class_dynamic_cast(oc, TYPE_AVR_CPU) == NULL ||
++        object_class_is_abstract(oc)) {
++        oc = NULL;
++    }
++    return oc;
++}
++
++static void avr_cpu_dump_state(CPUState *cs, FILE *f, int flags)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++    int i;
++
++    qemu_fprintf(f, "\n");
++    qemu_fprintf(f, "PC:    %06x\n", env->pc_w);
++    qemu_fprintf(f, "SP:      %04x\n", env->sp);
++    qemu_fprintf(f, "rampD:     %02x\n", env->rampD >> 16);
++    qemu_fprintf(f, "rampX:     %02x\n", env->rampX >> 16);
++    qemu_fprintf(f, "rampY:     %02x\n", env->rampY >> 16);
++    qemu_fprintf(f, "rampZ:     %02x\n", env->rampZ >> 16);
++    qemu_fprintf(f, "EIND:      %02x\n", env->eind >> 16);
++    qemu_fprintf(f, "X:       %02x%02x\n", env->r[27], env->r[26]);
++    qemu_fprintf(f, "Y:       %02x%02x\n", env->r[29], env->r[28]);
++    qemu_fprintf(f, "Z:       %02x%02x\n", env->r[31], env->r[30]);
++    qemu_fprintf(f, "SREG:    [ %c %c %c %c %c %c %c %c ]\n",
++                        env->sregI ? 'I' : '-',
++                        env->sregT ? 'T' : '-',
++                        env->sregH ? 'H' : '-',
++                        env->sregS ? 'S' : '-',
++                        env->sregV ? 'V' : '-',
++                        env->sregN ? '-' : 'N', /* Zf has negative logic */
++                        env->sregZ ? 'Z' : '-',
++                        env->sregC ? 'I' : '-');
++    qemu_fprintf(f, "SKIP:    %02x\n", env->skip);
++
++    qemu_fprintf(f, "\n");
++    for (i = 0; i < ARRAY_SIZE(env->r); i++) {
++        qemu_fprintf(f, "R[%02d]:  %02x   ", i, env->r[i]);
++
++        if ((i % 8) == 7) {
++            qemu_fprintf(f, "\n");
++        }
++    }
++    qemu_fprintf(f, "\n");
++}
++
++static void avr_cpu_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++    CPUClass *cc = CPU_CLASS(oc);
++    AVRCPUClass *mcc = AVR_CPU_CLASS(oc);
++
++    mcc->parent_realize = dc->realize;
++    dc->realize = avr_cpu_realizefn;
++
++    mcc->parent_reset = cc->reset;
++    cc->reset = avr_cpu_reset;
++
++    cc->class_by_name = avr_cpu_class_by_name;
++
++    cc->has_work = avr_cpu_has_work;
++    cc->do_interrupt = avr_cpu_do_interrupt;
++    cc->cpu_exec_interrupt = avr_cpu_exec_interrupt;
++    cc->dump_state = avr_cpu_dump_state;
++    cc->set_pc = avr_cpu_set_pc;
++#if !defined(CONFIG_USER_ONLY)
++    cc->memory_rw_debug = avr_cpu_memory_rw_debug;
++#endif
++#ifdef CONFIG_USER_ONLY
++    cc->handle_mmu_fault = avr_cpu_handle_mmu_fault;
++#else
++    cc->get_phys_page_debug = avr_cpu_get_phys_page_debug;
++    cc->vmsd = &vms_avr_cpu;
++#endif
++    cc->disas_set_info = avr_cpu_disas_set_info;
++    cc->tlb_fill = avr_cpu_tlb_fill;
++    cc->tcg_initialize = avr_cpu_tcg_init;
++    cc->synchronize_from_tb = avr_cpu_synchronize_from_tb;
++    cc->gdb_read_register = avr_cpu_gdb_read_register;
++    cc->gdb_write_register = avr_cpu_gdb_write_register;
++    cc->gdb_num_core_regs = 35;
++    cc->gdb_core_xml_file = "avr-cpu.xml";
++}
++
++/*
++ * Setting features of AVR core type avr1
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * at90s1200, attiny11, attiny12, attiny15, attiny28
++ */
++static void avr_avr1_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++}
++
++/*
++ * Setting features of AVR core type avr2
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * at90s2313, at90s2323, at90s2333, at90s2343, attiny22, attiny26, at90s4414,
++ * at90s4433, at90s4434, at90s8515, at90c8534, at90s8535
++ */
++static void avr_avr2_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++}
++
++/*
++ * Setting features of AVR core type avr25
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * ata5272, ata6616c, attiny13, attiny13a, attiny2313, attiny2313a, attiny24,
++ * attiny24a, attiny4313, attiny44, attiny44a, attiny441, attiny84, attiny84a,
++ * attiny25, attiny45, attiny85, attiny261, attiny261a, attiny461, attiny461a,
++ * attiny861, attiny861a, attiny43u, attiny87, attiny48, attiny88, attiny828,
++ * attiny841, at86rf401
++ */
++static void avr_avr25_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++}
++
++/*
++ * Setting features of AVR core type avr3
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * at43usb355, at76c711
++ */
++static void avr_avr3_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++}
++
++/*
++ * Setting features of AVR core type avr31
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atmega103, at43usb320
++ */
++static void avr_avr31_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++}
++
++/*
++ * Setting features of AVR core type avr35
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * ata5505, ata6617c, ata664251, at90usb82, at90usb162, atmega8u2, atmega16u2,
++ * atmega32u2, attiny167, attiny1634
++ */
++static void avr_avr35_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++}
++
++/*
++ * Setting features of AVR core type avr4
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * ata6285, ata6286, ata6289, ata6612c, atmega8, atmega8a, atmega48, atmega48a,
++ * atmega48p, atmega48pa, atmega48pb, atmega88, atmega88a, atmega88p,
++ * atmega88pa, atmega88pb, atmega8515, atmega8535, atmega8hva, at90pwm1,
++ * at90pwm2, at90pwm2b, at90pwm3, at90pwm3b, at90pwm81
++ */
++static void avr_avr4_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avr5
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * ata5702m322, ata5782, ata5790, ata5790n, ata5791, ata5795, ata5831, ata6613c,
++ * ata6614q, ata8210, ata8510, atmega16, atmega16a, atmega161, atmega162,
++ * atmega163, atmega164a, atmega164p, atmega164pa, atmega165, atmega165a,
++ * atmega165p, atmega165pa, atmega168, atmega168a, atmega168p, atmega168pa,
++ * atmega168pb, atmega169, atmega169a, atmega169p, atmega169pa, atmega16hvb,
++ * atmega16hvbrevb, atmega16m1, atmega16u4, atmega32a, atmega32, atmega323,
++ * atmega324a, atmega324p, atmega324pa, atmega325, atmega325a, atmega325p,
++ * atmega325pa, atmega3250, atmega3250a, atmega3250p, atmega3250pa, atmega328,
++ * atmega328p, atmega328pb, atmega329, atmega329a, atmega329p, atmega329pa,
++ * atmega3290, atmega3290a, atmega3290p, atmega3290pa, atmega32c1, atmega32m1,
++ * atmega32u4, atmega32u6, atmega406, atmega64, atmega64a, atmega640, atmega644,
++ * atmega644a, atmega644p, atmega644pa, atmega645, atmega645a, atmega645p,
++ * atmega6450, atmega6450a, atmega6450p, atmega649, atmega649a, atmega649p,
++ * atmega6490, atmega16hva, atmega16hva2, atmega32hvb, atmega6490a, atmega6490p,
++ * atmega64c1, atmega64m1, atmega64hve, atmega64hve2, atmega64rfr2,
++ * atmega644rfr2, atmega32hvbrevb, at90can32, at90can64, at90pwm161, at90pwm216,
++ * at90pwm316, at90scr100, at90usb646, at90usb647, at94k, m3000
++ */
++static void avr_avr5_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avr51
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atmega128, atmega128a, atmega1280, atmega1281, atmega1284, atmega1284p,
++ * atmega128rfa1, atmega128rfr2, atmega1284rfr2, at90can128, at90usb1286,
++ * at90usb1287
++ */
++static void avr_avr51_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avr6
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atmega2560, atmega2561, atmega256rfr2, atmega2564rfr2
++ */
++static void avr_avr6_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avrtiny
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * attiny4, attiny5, attiny9, attiny10, attiny20, attiny40
++ */
++static void avr_avrtiny_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_1_BYTE_SP);
++}
++
++/*
++ * Setting features of AVR core type xmega2
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega8e5, atxmega16a4, atxmega16d4, atxmega16e5, atxmega32a4, atxmega32c3,
++ * atxmega32d3, atxmega32d4, atxmega16a4u, atxmega16c4, atxmega32a4u,
++ * atxmega32c4, atxmega32e5
++ */
++static void avr_xmega2_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega3
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * attiny212, attiny214, attiny412, attiny414, attiny416, attiny417, attiny814,
++ * attiny816, attiny817, attiny1614, attiny1616, attiny1617, attiny3214,
++ * attiny3216, attiny3217, atmega808, atmega809, atmega1608, atmega1609,
++ * atmega3208, atmega3209, atmega4808, atmega4809
++ */
++static void avr_xmega3_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega4
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega64a3, atxmega64d3, atxmega64a3u, atxmega64a4u, atxmega64b1,
++ * atxmega64b3, atxmega64c3, atxmega64d4
++ */
++static void avr_xmega4_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega5
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega64a1, atxmega64a1u
++ */
++static void avr_xmega5_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPD);
++    avr_set_feature(env, AVR_FEATURE_RAMPX);
++    avr_set_feature(env, AVR_FEATURE_RAMPY);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega6
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega128a3, atxmega128d3, atxmega192a3, atxmega192d3, atxmega256a3,
++ * atxmega256a3b, atxmega256a3bu, atxmega256d3, atxmega128a3u, atxmega128b1,
++ * atxmega128b3, atxmega128c3, atxmega128d4, atxmega192a3u, atxmega192c3,
++ * atxmega256a3u, atxmega256c3, atxmega384c3, atxmega384d3
++ */
++static void avr_xmega6_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega7
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega128a1, atxmega128a1u, atxmega128a4u
++ */
++static void avr_xmega7_initfn(Object *obj)
++{
++    AVRCPU *cpu = AVR_CPU(obj);
++    CPUAVRState *env = &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPD);
++    avr_set_feature(env, AVR_FEATURE_RAMPX);
++    avr_set_feature(env, AVR_FEATURE_RAMPY);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++typedef struct AVRCPUInfo {
++    const char *name;
++    void (*initfn)(Object *obj);
++} AVRCPUInfo;
++
++
++static void avr_cpu_list_entry(gpointer data, gpointer user_data)
++{
++    const char *typename = object_class_get_name(OBJECT_CLASS(data));
++
++    qemu_printf("%s\n", typename);
++}
++
++void avr_cpu_list(void)
++{
++    GSList *list;
++    list = object_class_get_list_sorted(TYPE_AVR_CPU, false);
++    g_slist_foreach(list, avr_cpu_list_entry, NULL);
++    g_slist_free(list);
++}
++
++#define DEFINE_AVR_CPU_TYPE(model, initfn) \
++    { \
++        .parent = TYPE_AVR_CPU, \
++        .instance_init = initfn, \
++        .name = AVR_CPU_TYPE_NAME(model), \
++    }
++
++static const TypeInfo avr_cpu_type_info[] = {
++    {
++        .name = TYPE_AVR_CPU,
++        .parent = TYPE_CPU,
++        .instance_size = sizeof(AVRCPU),
++        .instance_init = avr_cpu_initfn,
++        .class_size = sizeof(AVRCPUClass),
++        .class_init = avr_cpu_class_init,
++        .abstract = true,
++    },
++    DEFINE_AVR_CPU_TYPE("avrtiny", avr_avrtiny_initfn),
++    DEFINE_AVR_CPU_TYPE("avr1", avr_avr1_initfn),
++    DEFINE_AVR_CPU_TYPE("avr2", avr_avr2_initfn),
++    DEFINE_AVR_CPU_TYPE("avr25", avr_avr25_initfn),
++    DEFINE_AVR_CPU_TYPE("avr3", avr_avr3_initfn),
++    DEFINE_AVR_CPU_TYPE("avr31", avr_avr31_initfn),
++    DEFINE_AVR_CPU_TYPE("avr35", avr_avr35_initfn),
++    DEFINE_AVR_CPU_TYPE("avr4", avr_avr4_initfn),
++    DEFINE_AVR_CPU_TYPE("avr5", avr_avr5_initfn),
++    DEFINE_AVR_CPU_TYPE("avr51", avr_avr51_initfn),
++    DEFINE_AVR_CPU_TYPE("avr6", avr_avr6_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega2", avr_xmega2_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega3", avr_xmega3_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega4", avr_xmega4_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega5", avr_xmega5_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega6", avr_xmega6_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega7", avr_xmega7_initfn),
++};
++
++const char *avr_flags_to_cpu_type(uint32_t flags, const char *def_cpu_type)
++{
++    switch (flags & EF_AVR_MACH) {
++    case bfd_mach_avr1:
++        return AVR_CPU_TYPE_NAME("avr1");
++    case bfd_mach_avr2:
++        return AVR_CPU_TYPE_NAME("avr2");
++    case bfd_mach_avr25:
++        return AVR_CPU_TYPE_NAME("avr25");
++    case bfd_mach_avr3:
++        return AVR_CPU_TYPE_NAME("avr3");
++    case bfd_mach_avr31:
++        return AVR_CPU_TYPE_NAME("avr31");
++    case bfd_mach_avr35:
++        return AVR_CPU_TYPE_NAME("avr35");
++    case bfd_mach_avr4:
++        return AVR_CPU_TYPE_NAME("avr4");
++    case bfd_mach_avr5:
++        return AVR_CPU_TYPE_NAME("avr5");
++    case bfd_mach_avr51:
++        return AVR_CPU_TYPE_NAME("avr51");
++    case bfd_mach_avr6:
++        return AVR_CPU_TYPE_NAME("avr6");
++    case bfd_mach_avrtiny:
++        return AVR_CPU_TYPE_NAME("avrtiny");
++    case bfd_mach_avrxmega2:
++        return AVR_CPU_TYPE_NAME("xmega2");
++    case bfd_mach_avrxmega3:
++        return AVR_CPU_TYPE_NAME("xmega3");
++    case bfd_mach_avrxmega4:
++        return AVR_CPU_TYPE_NAME("xmega4");
++    case bfd_mach_avrxmega5:
++        return AVR_CPU_TYPE_NAME("xmega5");
++    case bfd_mach_avrxmega6:
++        return AVR_CPU_TYPE_NAME("xmega6");
++    case bfd_mach_avrxmega7:
++        return AVR_CPU_TYPE_NAME("xmega7");
++    default:
++        return def_cpu_type;
++    }
++}
++
++DEFINE_TYPES(avr_cpu_type_info)
+diff --git a/target/avr/gdbstub.c b/target/avr/gdbstub.c
+new file mode 100644
+index 0000000000..733184c08f
+--- /dev/null
++++ b/target/avr/gdbstub.c
+@@ -0,0 +1,84 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "exec/gdbstub.h"
++
++int avr_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    /*  R */
++    if (n < 32) {
++        return gdb_get_reg8(mem_buf, env->r[n]);
++    }
++
++    /*  SREG */
++    if (n == 32) {
++        uint8_t sreg = cpu_get_sreg(env);
++
++        return gdb_get_reg8(mem_buf, sreg);
++    }
++
++    /*  SP */
++    if (n == 33) {
++        return gdb_get_reg16(mem_buf, env->sp & 0x0000ffff);
++    }
++
++    /*  PC */
++    if (n == 34) {
++        return gdb_get_reg32(mem_buf, env->pc_w * 2);
++    }
++
++    return 0;
++}
++
++int avr_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    /*  R */
++    if (n < 32) {
++        env->r[n] = *mem_buf;
++        return 1;
++    }
++
++    /*  SREG */
++    if (n == 32) {
++        cpu_set_sreg(env, *mem_buf);
++        return 1;
++    }
++
++    /*  SP */
++    if (n == 33) {
++        env->sp = lduw_p(mem_buf);
++        return 2;
++    }
++
++    /*  PC */
++    if (n == 34) {
++        env->pc_w = ldl_p(mem_buf) / 2;
++        return 4;
++    }
++
++    return 0;
++}
+diff --git a/target/avr/machine.c b/target/avr/machine.c
+new file mode 100644
+index 0000000000..ba44bd042b
+--- /dev/null
++++ b/target/avr/machine.c
+@@ -0,0 +1,121 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "migration/cpu.h"
++
++static int get_sreg(QEMUFile *f, void *opaque, size_t size,
++    const VMStateField *field)
++{
++    CPUAVRState *env = opaque;
++    uint8_t sreg;
++
++    sreg = qemu_get_byte(f);
++    cpu_set_sreg(env, sreg);
++    return 0;
++}
++
++static int put_sreg(
++    QEMUFile *f, void *opaque, size_t size,
++    const VMStateField *field, QJSON *vmdesc)
++{
++    CPUAVRState *env = opaque;
++    uint8_t sreg = cpu_get_sreg(env);
++
++    qemu_put_byte(f, sreg);
++    return 0;
++}
++
++static const VMStateInfo vms_sreg = {
++    .name = "sreg",
++    .get = get_sreg,
++    .put = put_sreg,
++};
++
++static int get_segment(
++    QEMUFile *f, void *opaque, size_t size, const VMStateField *field)
++{
++    uint32_t *ramp = opaque;
++    uint8_t temp;
++
++    temp = qemu_get_byte(f);
++    *ramp = ((uint32_t)temp) << 16;
++    return 0;
++}
++
++static int put_segment(
++    QEMUFile *f, void *opaque, size_t size,
++    const VMStateField *field, QJSON *vmdesc)
++{
++    uint32_t *ramp = opaque;
++    uint8_t temp = *ramp >> 16;
++
++    qemu_put_byte(f, temp);
++    return 0;
++}
++
++static const VMStateInfo vms_rampD = {
++    .name = "rampD",
++    .get = get_segment,
++    .put = put_segment,
++};
++static const VMStateInfo vms_rampX = {
++    .name = "rampX",
++    .get = get_segment,
++    .put = put_segment,
++};
++static const VMStateInfo vms_rampY = {
++    .name = "rampY",
++    .get = get_segment,
++    .put = put_segment,
++};
++static const VMStateInfo vms_rampZ = {
++    .name = "rampZ",
++    .get = get_segment,
++    .put = put_segment,
++};
++static const VMStateInfo vms_eind = {
++    .name = "eind",
++    .get = get_segment,
++    .put = put_segment,
++};
++
++const VMStateDescription vms_avr_cpu = {
++    .name = "cpu",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(env.pc_w, AVRCPU),
++        VMSTATE_UINT32(env.sp, AVRCPU),
++        VMSTATE_UINT32(env.skip, AVRCPU),
++
++        VMSTATE_UINT32_ARRAY(env.r, AVRCPU, NUMBER_OF_CPU_REGISTERS),
++
++        VMSTATE_SINGLE(env, AVRCPU, 0, vms_sreg, CPUAVRState),
++        VMSTATE_SINGLE(env.rampD, AVRCPU, 0, vms_rampD, uint32_t),
++        VMSTATE_SINGLE(env.rampX, AVRCPU, 0, vms_rampX, uint32_t),
++        VMSTATE_SINGLE(env.rampY, AVRCPU, 0, vms_rampY, uint32_t),
++        VMSTATE_SINGLE(env.rampZ, AVRCPU, 0, vms_rampZ, uint32_t),
++        VMSTATE_SINGLE(env.eind, AVRCPU, 0, vms_eind, uint32_t),
++
++        VMSTATE_END_OF_LIST()
++    }
++};
+diff --git a/gdb-xml/avr-cpu.xml b/gdb-xml/avr-cpu.xml
+new file mode 100644
+index 0000000000..c4747f5b40
+--- /dev/null
++++ b/gdb-xml/avr-cpu.xml
+@@ -0,0 +1,49 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!-- Register numbers are hard-coded in order to maintain backward
++     compatibility with older versions of tools that didn't use xml
++     register descriptions.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.riscv.cpu">
++  <reg name="r0" bitsize="8" type="int" regnum="0"/>
++  <reg name="r1" bitsize="8" type="int"/>
++  <reg name="r2" bitsize="8" type="int"/>
++  <reg name="r3" bitsize="8" type="int"/>
++  <reg name="r4" bitsize="8" type="int"/>
++  <reg name="r5" bitsize="8" type="int"/>
++  <reg name="r6" bitsize="8" type="int"/>
++  <reg name="r7" bitsize="8" type="int"/>
++  <reg name="r8" bitsize="8" type="int"/>
++  <reg name="r9" bitsize="8" type="int"/>
++  <reg name="r10" bitsize="8" type="int"/>
++  <reg name="r11" bitsize="8" type="int"/>
++  <reg name="r12" bitsize="8" type="int"/>
++  <reg name="r13" bitsize="8" type="int"/>
++  <reg name="r14" bitsize="8" type="int"/>
++  <reg name="r15" bitsize="8" type="int"/>
++  <reg name="r16" bitsize="8" type="int"/>
++  <reg name="r17" bitsize="8" type="int"/>
++  <reg name="r18" bitsize="8" type="int"/>
++  <reg name="r19" bitsize="8" type="int"/>
++  <reg name="r20" bitsize="8" type="int"/>
++  <reg name="r21" bitsize="8" type="int"/>
++  <reg name="r22" bitsize="8" type="int"/>
++  <reg name="r23" bitsize="8" type="int"/>
++  <reg name="r24" bitsize="8" type="int"/>
++  <reg name="r25" bitsize="8" type="int"/>
++  <reg name="r26" bitsize="8" type="int"/>
++  <reg name="r27" bitsize="8" type="int"/>
++  <reg name="r28" bitsize="8" type="int"/>
++  <reg name="r29" bitsize="8" type="int"/>
++  <reg name="r30" bitsize="8" type="int"/>
++  <reg name="r31" bitsize="8" type="int"/>
++  <reg name="sreg" bitsize="8" type="int"/>
++  <reg name="sp" bitsize="8" type="int"/>
++  <reg name="pc" bitsize="8" type="int"/>
++</feature>
 -- 
-2.21.1
+2.17.2 (Apple Git-113)
 
 
