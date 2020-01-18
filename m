@@ -8,82 +8,78 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D85A1C32771
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79CAAC32771
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:31:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 953C324679
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:29:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D3CD24683
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SW7N93+/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953C324679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcXcfmeY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D3CD24683
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1istmp-0008KW-Hx
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:29:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49762)
+	id 1istoW-0001SC-DA
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:31:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1istdF-0003qd-Gm
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:19:43 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1isteY-0005Lj-Qw
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:21:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1istdD-0004vY-3G
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:19:41 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40465)
+ (envelope-from <mrolnik@gmail.com>) id 1isteW-00070J-2Z
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:21:02 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41623)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1istdC-0004uB-Pr
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:19:39 -0500
-Received: by mail-wm1-x344.google.com with SMTP id t14so10782056wmi.5
- for <qemu-devel@nongnu.org>; Sat, 18 Jan 2020 11:19:38 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1isteV-0006za-PQ
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:21:00 -0500
+Received: by mail-wr1-x444.google.com with SMTP id c9so25730309wrw.8
+ for <qemu-devel@nongnu.org>; Sat, 18 Jan 2020 11:20:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=DhL1KYjNsXz5yXsdegQ7yg1vjGWtwMZnmHkf+B5dxv8=;
- b=SW7N93+/k2NriW3g1W9a1Co1oY3ZGTmsoY6/8iT9pZeEJf93j+fwjKb2nQQXEwTB6C
- Ef7JSzDH1HndncKC3ujDsk5dmKbIwGo7vlOMhO6dB1VTVMM+FVoOXPwI3h4p2elRuj4Y
- eqgXHBhoHZoRmXpbBc/XFIh5Dr0uKrShgDEzR7YuTxF5awT6mZlGWJr/rjgLRQ3Z1BMg
- Y+Pzy5JOdgf8YmVxsMbHsJu7ROyScaysNuejs5kQrXOT/TQIU9V3cb/4NeD9TDsQzR8Q
- 11/9qa1en4ncVGtC5G8DKShQFd+nBSzc0GG+U7MJHy2z9oW9S1+9FY5U+jkJ3XkkJelc
- yHtg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=BC7TK3KXLb/XVS80ZiFsTIhysVwX6Pf/+PKiMgs9VdQ=;
+ b=VcXcfmeY2U5CmIx5uXqb0+R8DsIc3Bv1/UQBuQKh3xzBieeZSWomBya0ni+tV0FCxa
+ mvch7iiX4fpOavBS6wtLRim3EKNeFBiUaRg9yYO234wEzRQQR1/XIr/SberNgrjocWfk
+ 8tOGSL8NiWakaTfx7AfzjKTkmuyF6Kwa2gb4HDDYzzuPo7wFq/DB0satTu84qecqZfmR
+ +AGFvofG/Q1d2QOygxaiKG7hTPA5WP/PEBkJoEFt0xP6rzpwd21PW9qAQdzE3vv3rlEm
+ P1K/iaqVnQniQIHb2REMpj4PTJu4jDqhN3CIfGoofJMGp03/EnkjGHdN59IAL/GVGM3j
+ HbRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=DhL1KYjNsXz5yXsdegQ7yg1vjGWtwMZnmHkf+B5dxv8=;
- b=O9+1oxA8xawYeWb0lyp3cqnwGZmfrBCxmghr1MT0Qj3ftiY/IS9rzmDFdqouD4/FQc
- n4IrGHQjo+oOhhYtuxq1NWsRW62b4UzJqjlvGbq00t73vRoidil37CBv92TVjJNiqPNy
- SgdywcEqTJY4pnfFMSEPzZYS22FWmlP+UxC//yAeLFJvUI2JjHdYzZgxhsd3p7RkbPaQ
- 10e7L0Lqc3qD1fXs/y2y9Zhy8S+x3OyZyl6ezJ5I6mdEmt8ELg0TpkPSe4LktaCk6XVC
- U5W7cpbUCmezcKguwN9XDLoidmQGnUv56K0YW0Y6BdrP9RvgbOTYS9bc7p0gr3qA4ogd
- ob5A==
-X-Gm-Message-State: APjAAAXy5DACSPrrQKFjzPNFFoSyhqkcV+herfxyWBF7Dl7i+lpQ53yf
- oCaf1AGmkHaBFhkhPwvLdDdI51eeIZrawNTR
-X-Google-Smtp-Source: APXvYqzoMpcDp23tfhXTCvXk3JG+9qN5u8o9Fa/vo/tXwcwjygmYn29CvBfVo7zxN52ELrjNfI8Ycg==
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr10737520wmk.15.1579375177167; 
- Sat, 18 Jan 2020 11:19:37 -0800 (PST)
+ :references;
+ bh=BC7TK3KXLb/XVS80ZiFsTIhysVwX6Pf/+PKiMgs9VdQ=;
+ b=NPoAuXvEv2DGl7xJWCkmFEQ7pc0fltdwtSIz3Ux2jS7xbHNxBp60G9l/tgOQ6F0hrk
+ gB2XYcMbL7XzSo7X+dhYtyPailAOHguNyxBvonmdvLz2420TvPAthvInNEAbRzjb80aS
+ 6/UEEyWGHUeI0kbe7X1e8SoeqQJ55eCzvlVmlqQjMptxzjJ8tJy83uBjJIdAakCMf0OS
+ ZDBcTtpQRBM6CMkpenhy0Bu/+IGe/+WiUdl1PAl++kHAVEAkCOFmT3kzfuZOJT5nNJ3K
+ tFiHqbsinmD9VNYF0qyQUfQQnuNSU9n0kMTL1vdwM2F31d2JVkPVn5bmQSAAW0bOuokd
+ FyhQ==
+X-Gm-Message-State: APjAAAVHy2H3KTrmk6jmM9/08yVhThA1yG7JO72mg2rJqNjPVvFXrQ8+
+ CImSS+jkImYeaJqzw2TaOraBvjP3SZIYTxH6
+X-Google-Smtp-Source: APXvYqy+iY6CjVXiB2kOToBD3Gqx4bADDzZhUuR1w3SRcjJdUOL3OocSqw3C+ziBIVJEOcnWxMkqwQ==
+X-Received: by 2002:a5d:6344:: with SMTP id b4mr9803699wrw.414.1579375258201; 
+ Sat, 18 Jan 2020 11:20:58 -0800 (PST)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-109-65-108-13.red.bezeqint.net. [109.65.108.13])
- by smtp.gmail.com with ESMTPSA id o16sm2875468wmc.18.2020.01.18.11.19.16
+ by smtp.gmail.com with ESMTPSA id o16sm2875468wmc.18.2020.01.18.11.20.45
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sat, 18 Jan 2020 11:19:36 -0800 (PST)
+ Sat, 18 Jan 2020 11:20:57 -0800 (PST)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v41 05/21] target/avr: Add instruction translation - Branch
- Instructions
-Date: Sat, 18 Jan 2020 21:14:00 +0200
-Message-Id: <20200118191416.19934-6-mrolnik@gmail.com>
+Subject: [PATCH v41 12/21] hw/avr: Add limited support for 16 bit timer
+ peripheral
+Date: Sat, 18 Jan 2020 21:14:07 +0200
+Message-Id: <20200118191416.19934-13-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20200118191416.19934-1-mrolnik@gmail.com>
 References: <20200118191416.19934-1-mrolnik@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,600 +92,755 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- me@xcancerberox.com.ar, richard.henderson@linaro.org, dovgaluk@ispras.ru,
- imammedo@redhat.com, philmd@redhat.com, aleksandar.m.mail@gmail.com
+ me@xcancerberox.com.ar, richard.henderson@linaro.org,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-    - RJMP, IJMP, EIJMP, JMP
-    - RCALL, ICALL, EICALL, CALL
-    - RET, RETI
-    - CPSE, CP, CPC, CPI
-    - SBRC, SBRS, SBIC, SBIS
-    - BRBC, BRBS
+These were designed to facilitate testing but should provide enough function to be useful in other contexts.
+Only a subset of the functions of each peripheral is implemented, mainly due to the lack of a standard way to handle electrical connections (like GPIO pins).
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 ---
- target/avr/translate.c | 533 +++++++++++++++++++++++++++++++++++++++++
- target/avr/insn.decode |  24 ++
- 2 files changed, 557 insertions(+)
+ include/hw/timer/avr_timer16.h |  94 +++++
+ hw/timer/avr_timer16.c         | 602 +++++++++++++++++++++++++++++++++
+ hw/timer/Kconfig               |   3 +
+ hw/timer/Makefile.objs         |   2 +
+ 4 files changed, 701 insertions(+)
+ create mode 100644 include/hw/timer/avr_timer16.h
+ create mode 100644 hw/timer/avr_timer16.c
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 00fb3f5350..475f502e72 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -921,3 +921,536 @@ static bool trans_DES(DisasContext *ctx, arg_DES *a)
- 
-     return true;
- }
+diff --git a/include/hw/timer/avr_timer16.h b/include/hw/timer/avr_timer16.h
+new file mode 100644
+index 0000000000..4ae0c64a34
+--- /dev/null
++++ b/include/hw/timer/avr_timer16.h
+@@ -0,0 +1,94 @@
++/*
++ * AVR 16 bit timer
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Ed Robbins
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
 +/*
-+ * Branch Instructions
++ * Driver for 16 bit timers on 8 bit AVR devices.
++ * Note:
++ * On ATmega640/V-1280/V-1281/V-2560/V-2561/V timers 1, 3, 4 and 5 are 16 bit
 + */
-+static void gen_jmp_ez(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    tcg_gen_or_tl(cpu_pc, cpu_pc, cpu_eind);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
 +
-+static void gen_jmp_z(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
++#ifndef AVR_TIMER16_H
++#define AVR_TIMER16_H
 +
-+static void gen_push_ret(DisasContext *ctx, int ret)
-+{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
++#include "hw/sysbus.h"
++#include "qemu/timer.h"
++#include "hw/hw.h"
 +
-+        TCGv t0 = tcg_const_i32((ret & 0x0000ff));
++enum NextInterrupt {
++    OVERFLOW,
++    COMPA,
++    COMPB,
++    COMPC,
++    CAPT
++};
 +
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
++#define TYPE_AVR_TIMER16 "avr-timer16"
++#define AVR_TIMER16(obj) \
++    OBJECT_CHECK(AVRTimer16State, (obj), TYPE_AVR_TIMER16)
 +
-+        tcg_temp_free_i32(t0);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
++typedef struct AVRTimer16State {
++    /* <private> */
++    SysBusDevice parent_obj;
 +
-+        TCGv t0 = tcg_const_i32((ret & 0x00ffff));
++    /* <public> */
++    MemoryRegion iomem;
++    MemoryRegion imsk_iomem;
++    MemoryRegion ifr_iomem;
++    QEMUTimer *timer;
++    qemu_irq capt_irq;
++    qemu_irq compa_irq;
++    qemu_irq compb_irq;
++    qemu_irq compc_irq;
++    qemu_irq ovf_irq;
 +
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
++    bool enabled;
 +
-+        tcg_temp_free_i32(t0);
-+
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+
-+        TCGv lo = tcg_const_i32((ret & 0x0000ff));
-+        TCGv hi = tcg_const_i32((ret & 0xffff00) >> 8);
-+
-+        tcg_gen_qemu_st_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_st_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
-+    }
-+}
-+
-+static void gen_pop_ret(DisasContext *ctx, TCGv ret)
-+{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_UB);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+        TCGv lo = tcg_temp_new_i32();
-+        TCGv hi = tcg_temp_new_i32();
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_ld_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+
-+        tcg_gen_deposit_tl(ret, lo, hi, 8, 16);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
-+    }
-+}
-+
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-+{
-+    TranslationBlock *tb = ctx->tb;
-+
-+    if (ctx->singlestep == 0) {
-+        tcg_gen_goto_tb(n);
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        tcg_gen_exit_tb(tb, n);
-+    } else {
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        gen_helper_debug(cpu_env);
-+        tcg_gen_exit_tb(NULL, 0);
-+    }
-+    ctx->bstate = DISAS_NORETURN;
-+}
-+
-+/*
-+ *  Relative jump to an address within PC - 2K +1 and PC + 2K (words). For
-+ *  AVR microcontrollers with Program memory not exceeding 4K words (8KB) this
-+ *  instruction can address the entire memory from every address location. See
-+ *  also JMP.
-+ */
-+static bool trans_RJMP(DisasContext *ctx, arg_RJMP *a)
-+{
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File. The Z-pointer Register is 16 bits wide and
-+ *  allows jump within the lowest 64K words (128KB) section of Program memory.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_IJMP(DisasContext *ctx, arg_IJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect jumps to the entire 4M (words) Program
-+ *  memory space. See also IJMP.  This instruction is not available in all
-+ *  devices. Refer to the device specific instruction set summary.
-+ */
-+static bool trans_EIJMP(DisasContext *ctx, arg_EIJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+/*
-+ *  Jump to an address within the entire 4M (words) Program memory. See also
-+ *  RJMP.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.0
-+ */
-+static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    gen_goto_tb(ctx, 0, a->imm);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Relative call to an address within PC - 2K + 1 and PC + 2K (words). The
-+ *  return address (the instruction after the RCALL) is stored onto the Stack.
-+ *  See also CALL. For AVR microcontrollers with Program memory not exceeding 4K
-+ *  words (8KB) this instruction can address the entire memory from every
-+ *  address location. The Stack Pointer uses a post-decrement scheme during
-+ *  RCALL.
-+ */
-+static bool trans_RCALL(DisasContext *ctx, arg_RCALL *a)
-+{
-+    int ret = ctx->npc;
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Calls to a subroutine within the entire 4M (words) Program memory. The
-+ *  return address (to the instruction after the CALL) will be stored onto the
-+ *  Stack. See also RCALL. The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_ICALL(DisasContext *ctx, arg_ICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect call of a subroutine pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect calls to the entire 4M (words) Program
-+ *  memory space. See also ICALL. The Stack Pointer uses a post-decrement scheme
-+ *  during EICALL.  This instruction is not available in all devices. Refer to
-+ *  the device specific instruction set summary.
-+ */
-+static bool trans_EICALL(DisasContext *ctx, arg_EICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+/*
-+ *  Calls to a subroutine within the entire Program memory. The return
-+ *  address (to the instruction after the CALL) will be stored onto the Stack.
-+ *  (See also RCALL). The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_CALL(DisasContext *ctx, arg_CALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    int Imm = a->imm;
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, Imm);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Returns from subroutine. The return address is loaded from the STACK.
-+ *  The Stack Pointer uses a preincrement scheme during RET.
-+ */
-+static bool trans_RET(DisasContext *ctx, arg_RET *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+
-+    ctx->bstate = DISAS_LOOKUP;
-+    return true;
-+}
-+
-+/*
-+ *  Returns from interrupt. The return address is loaded from the STACK and
-+ *  the Global Interrupt Flag is set.  Note that the Status Register is not
-+ *  automatically stored when entering an interrupt routine, and it is not
-+ *  restored when returning from an interrupt routine. This must be handled by
-+ *  the application program. The Stack Pointer uses a pre-increment scheme
-+ *  during RETI.
-+ */
-+static bool trans_RETI(DisasContext *ctx, arg_RETI *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+    tcg_gen_movi_tl(cpu_If, 1);
-+
-+    /* Need to return to main loop to re-evaluate interrupts.  */
-+    ctx->bstate = DISAS_EXIT;
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr, and
-+ *  skips the next instruction if Rd = Rr.
-+ */
-+static bool trans_CPSE(DisasContext *ctx, arg_CPSE *a)
-+{
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = cpu_r[a->rd];
-+    ctx->skip_var1 = cpu_r[a->rr];
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr.
-+ *  None of the registers are changed. All conditional branches can be used
-+ *  after this instruction.
-+ */
-+static bool trans_CP(DisasContext *ctx, arg_CP *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    /* update status register */
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr and
-+ *  also takes into account the previous carry. None of the registers are
-+ *  changed. All conditional branches can be used after this instruction.
-+ */
-+static bool trans_CPC(DisasContext *ctx, arg_CPC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv zero = tcg_const_i32(0);
-+
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+    /* update status register */
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
++    /* registers */
++    uint8_t cra;
++    uint8_t crb;
++    uint8_t crc;
++    uint8_t cntl;
++    uint8_t cnth;
++    uint8_t icrl;
++    uint8_t icrh;
++    uint8_t ocral;
++    uint8_t ocrah;
++    uint8_t ocrbl;
++    uint8_t ocrbh;
++    uint8_t ocrcl;
++    uint8_t ocrch;
 +    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
++     * Reads and writes to CNT and ICR utilise a bizarre temporary
++     * register, which we emulate
 +     */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, cpu_Zf, R, zero, cpu_Zf, zero);
++    uint8_t rtmp;
++    uint8_t imsk;
++    uint8_t ifr;
 +
-+    tcg_temp_free_i32(zero);
-+    tcg_temp_free_i32(R);
++    uint8_t id;
++    uint64_t cpu_freq_hz;
++    uint64_t freq_hz;
++    uint64_t period_ns;
++    uint64_t reset_time_ns;
++    enum NextInterrupt next_interrupt;
++} AVRTimer16State;
 +
-+    return true;
-+}
++#endif /* AVR_TIMER16_H */
+diff --git a/hw/timer/avr_timer16.c b/hw/timer/avr_timer16.c
+new file mode 100644
+index 0000000000..aea1bf009e
+--- /dev/null
++++ b/hw/timer/avr_timer16.c
+@@ -0,0 +1,602 @@
++/*
++ * AVR 16 bit timer
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Ed Robbins
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
 +/*
-+ *  This instruction performs a compare between register Rd and a constant.
-+ *  The register is not changed. All conditional branches can be used after this
-+ *  instruction.
++ * Driver for 16 bit timers on 8 bit AVR devices.
++ * Note:
++ * ATmega640/V-1280/V-1281/V-2560/V-2561/V timers 1, 3, 4 and 5 are 16 bit
 + */
-+static bool trans_CPI(DisasContext *ctx, arg_CPI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = a->imm;
-+    TCGv Rr = tcg_const_i32(Imm);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+    /* update status register */
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
 +
 +/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is cleared.
++ * XXX TODO: Power Reduction Register support
++ *           prescaler pause support
++ *           PWM modes, GPIO, output capture pins, input compare pin
 + */
-+static bool trans_SBRC(DisasContext *ctx, arg_SBRC *a)
++
++#include "qemu/osdep.h"
++#include "hw/timer/avr_timer16.h"
++#include "qemu/log.h"
++#include "hw/irq.h"
++#include "hw/qdev-properties.h"
++
++/* Register offsets */
++#define T16_CRA     0x0
++#define T16_CRB     0x1
++#define T16_CRC     0x2
++#define T16_CNTL    0x4
++#define T16_CNTH    0x5
++#define T16_ICRL    0x6
++#define T16_ICRH    0x7
++#define T16_OCRAL   0x8
++#define T16_OCRAH   0x9
++#define T16_OCRBL   0xa
++#define T16_OCRBH   0xb
++#define T16_OCRCL   0xc
++#define T16_OCRCH   0xd
++
++/* Field masks */
++#define T16_CRA_WGM01   0x3
++#define T16_CRA_COMC    0xc
++#define T16_CRA_COMB    0x30
++#define T16_CRA_COMA    0xc0
++#define T16_CRA_OC_CONF \
++    (T16_CRA_COMA | T16_CRA_COMB | T16_CRA_COMC)
++
++#define T16_CRB_CS      0x7
++#define T16_CRB_WGM23   0x18
++#define T16_CRB_ICES    0x40
++#define T16_CRB_ICNC    0x80
++
++#define T16_CRC_FOCC    0x20
++#define T16_CRC_FOCB    0x40
++#define T16_CRC_FOCA    0x80
++
++/* Fields masks both TIMSK and TIFR (interrupt mask/flag registers) */
++#define T16_INT_TOV    0x1 /* Timer overflow */
++#define T16_INT_OCA    0x2 /* Output compare A */
++#define T16_INT_OCB    0x4 /* Output compare B */
++#define T16_INT_OCC    0x8 /* Output compare C */
++#define T16_INT_IC     0x20 /* Input capture */
++
++/* Clock source values */
++#define T16_CLKSRC_STOPPED     0
++#define T16_CLKSRC_DIV1        1
++#define T16_CLKSRC_DIV8        2
++#define T16_CLKSRC_DIV64       3
++#define T16_CLKSRC_DIV256      4
++#define T16_CLKSRC_DIV1024     5
++#define T16_CLKSRC_EXT_FALLING 6
++#define T16_CLKSRC_EXT_RISING  7
++
++/* Timer mode values (not including PWM modes) */
++#define T16_MODE_NORMAL     0
++#define T16_MODE_CTC_OCRA   4
++#define T16_MODE_CTC_ICR    12
++
++/* Accessors */
++#define CLKSRC(t16) (t16->crb & T16_CRB_CS)
++#define MODE(t16)   (((t16->crb & T16_CRB_WGM23) >> 1) | \
++                     (t16->cra & T16_CRA_WGM01))
++#define CNT(t16)    VAL16(t16->cntl, t16->cnth)
++#define OCRA(t16)   VAL16(t16->ocral, t16->ocrah)
++#define OCRB(t16)   VAL16(t16->ocrbl, t16->ocrbh)
++#define OCRC(t16)   VAL16(t16->ocrcl, t16->ocrch)
++#define ICR(t16)    VAL16(t16->icrl, t16->icrh)
++
++/* Helper macros */
++#define VAL16(l, h) ((h << 8) | l)
++#define ERROR(fmt, args...) \
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: " fmt "\n", __func__, ## args)
++#define DB_PRINT(fmt, args...) /* Nothing */
++/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## args)*/
++
++static inline int64_t avr_timer16_ns_to_ticks(AVRTimer16State *t16, int64_t t)
 +{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
++    if (t16->period_ns == 0) {
++        return 0;
++    }
++    return t / t16->period_ns;
 +}
 +
-+/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is set.
-+ */
-+static bool trans_SBRS(DisasContext *ctx, arg_SBRS *a)
++static void avr_timer16_update_cnt(AVRTimer16State *t16)
 +{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
++    uint16_t cnt;
++    cnt = avr_timer16_ns_to_ticks(t16, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
++                                       t16->reset_time_ns);
++    t16->cntl = (uint8_t)(cnt & 0xff);
++    t16->cnth = (uint8_t)((cnt & 0xff00) >> 8);
 +}
 +
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is cleared. This instruction operates on the
-+ *  lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIC(DisasContext *ctx, arg_SBIC *a)
++static inline void avr_timer16_recalc_reset_time(AVRTimer16State *t16)
 +{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
++    t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
++                         CNT(t16) * t16->period_ns;
 +}
 +
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is set. This instruction operates on the lower
-+ *  32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIS(DisasContext *ctx, arg_SBIS *a)
++static void avr_timer16_clock_reset(AVRTimer16State *t16)
 +{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
++    t16->cntl = 0;
++    t16->cnth = 0;
++    t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
 +}
 +
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is cleared. This instruction branches relatively
-+ *  to PC in either direction (PC - 63 < = destination <= PC + 64). The
-+ *  parameter k is the offset from PC and is represented in two's complement
-+ *  form.
-+ */
-+static bool trans_BRBC(DisasContext *ctx, arg_BRBC *a)
++static void avr_timer16_clksrc_update(AVRTimer16State *t16)
 +{
-+    TCGLabel *not_taken = gen_new_label();
-+
-+    TCGv var;
-+
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
++    uint16_t divider = 0;
++    switch (CLKSRC(t16)) {
++    case T16_CLKSRC_EXT_FALLING:
++    case T16_CLKSRC_EXT_RISING:
++        ERROR("external clock source unsupported");
++        goto end;
++    case T16_CLKSRC_STOPPED:
++        goto end;
++    case T16_CLKSRC_DIV1:
++        divider = 1;
 +        break;
-+    case 0x01:
-+        var = cpu_Zf;
++    case T16_CLKSRC_DIV8:
++        divider = 8;
 +        break;
-+    case 0x02:
-+        var = cpu_Nf;
++    case T16_CLKSRC_DIV64:
++        divider = 64;
 +        break;
-+    case 0x03:
-+        var = cpu_Vf;
++    case T16_CLKSRC_DIV256:
++        divider = 256;
 +        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
++    case T16_CLKSRC_DIV1024:
++        divider = 1024;
 +        break;
 +    default:
-+        g_assert_not_reached();
++        goto end;
 +    }
-+
-+    tcg_gen_brcondi_i32(TCG_COND_NE, var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
-+
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
++    t16->freq_hz = t16->cpu_freq_hz / divider;
++    t16->period_ns = NANOSECONDS_PER_SECOND / t16->freq_hz;
++    DB_PRINT("Timer frequency %" PRIu64 " hz, period %" PRIu64 " ns (%f s)",
++             t16->freq_hz, t16->period_ns, 1 / (double)t16->freq_hz);
++end:
++    return;
 +}
 +
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is set. This instruction branches relatively to
-+ *  PC in either direction (PC - 63 < = destination <= PC + 64). The parameter k
-+ *  is the offset from PC and is represented in two's complement form.
-+ */
-+static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
++static void avr_timer16_set_alarm(AVRTimer16State *t16)
 +{
-+    TCGLabel *not_taken = gen_new_label();
++    if (CLKSRC(t16) == T16_CLKSRC_EXT_FALLING ||
++        CLKSRC(t16) == T16_CLKSRC_EXT_RISING ||
++        CLKSRC(t16) == T16_CLKSRC_STOPPED) {
++        /* Timer is disabled or set to external clock source (unsupported) */
++        goto end;
++    }
 +
-+    TCGv var;
++    uint64_t alarm_offset = 0xffff;
++    enum NextInterrupt next_interrupt = OVERFLOW;
 +
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
++    switch (MODE(t16)) {
++    case T16_MODE_NORMAL:
++        /* Normal mode */
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
++            (t16->imsk & T16_INT_OCA)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
 +        break;
-+    case 0x01:
-+        var = cpu_Zf;
-+        break;
-+    case 0x02:
-+        var = cpu_Nf;
-+        break;
-+    case 0x03:
-+        var = cpu_Vf;
-+        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
++    case T16_MODE_CTC_OCRA:
++        /* CTC mode, top = ocra */
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
++       break;
++    case T16_MODE_CTC_ICR:
++        /* CTC mode, top = icr */
++        if (ICR(t16) < alarm_offset && ICR(t16) > CNT(t16)) {
++            alarm_offset = ICR(t16);
++            next_interrupt = CAPT;
++        }
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
++            (t16->imsk & T16_INT_OCA)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
 +        break;
 +    default:
-+        g_assert_not_reached();
++        ERROR("pwm modes are unsupported");
++        goto end;
 +    }
++    if (OCRB(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
++        (t16->imsk & T16_INT_OCB)) {
++        alarm_offset = OCRB(t16);
++        next_interrupt = COMPB;
++    }
++    if (OCRC(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
++        (t16->imsk & T16_INT_OCC)) {
++        alarm_offset = OCRB(t16);
++        next_interrupt = COMPC;
++    }
++    alarm_offset -= CNT(t16);
 +
-+    tcg_gen_brcondi_i32(TCG_COND_EQ, var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
++    t16->next_interrupt = next_interrupt;
++    uint64_t alarm_ns =
++        t16->reset_time_ns + ((CNT(t16) + alarm_offset) * t16->period_ns);
++    timer_mod(t16->timer, alarm_ns);
 +
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
++    DB_PRINT("next alarm %" PRIu64 " ns from now",
++        alarm_offset * t16->period_ns);
++
++end:
++    return;
 +}
 +
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode
-index 9c71ed6b2f..32034c10d2 100644
---- a/target/avr/insn.decode
-+++ b/target/avr/insn.decode
-@@ -91,3 +91,27 @@ FMUL            0000 0011 0 ... 1 ...       @fmul
- FMULS           0000 0011 1 ... 0 ...       @fmul
- FMULSU          0000 0011 1 ... 1 ...       @fmul
- DES             1001 0100 imm:4 1011
++static void avr_timer16_interrupt(void *opaque)
++{
++    AVRTimer16State *t16 = opaque;
++    uint8_t mode = MODE(t16);
 +
-+#
-+# Branch Instructions
-+#
-+RJMP            1100 imm:s12
-+IJMP            1001 0100 0000 1001
-+EIJMP           1001 0100 0001 1001
-+JMP             1001 010 ..... 110 .        imm=%imm_call
-+RCALL           1101 imm:s12
-+ICALL           1001 0101 0000 1001
-+EICALL          1001 0101 0001 1001
-+CALL            1001 010 ..... 111 .        imm=%imm_call
-+RET             1001 0101 0000 1000
-+RETI            1001 0101 0001 1000
-+CPSE            0001 00 . ..... ....        @op_rd_rr
-+CP              0001 01 . ..... ....        @op_rd_rr
-+CPC             0000 01 . ..... ....        @op_rd_rr
-+CPI             0011 .... .... ....         @op_rd_imm8
-+SBRC            1111 110 rr:5 0 bit:3
-+SBRS            1111 111 rr:5 0 bit:3
-+SBIC            1001 1001 reg:5 bit:3
-+SBIS            1001 1011 reg:5 bit:3
-+BRBS            1111 00 ....... ...         @op_bit_imm
-+BRBC            1111 01 ....... ...         @op_bit_imm
++    avr_timer16_update_cnt(t16);
++
++    if (CLKSRC(t16) == T16_CLKSRC_EXT_FALLING ||
++        CLKSRC(t16) == T16_CLKSRC_EXT_RISING ||
++        CLKSRC(t16) == T16_CLKSRC_STOPPED) {
++        /* Timer is disabled or set to external clock source (unsupported) */
++        return;
++    }
++
++    DB_PRINT("interrupt, cnt = %d", CNT(t16));
++
++    /* Counter overflow */
++    if (t16->next_interrupt == OVERFLOW) {
++        DB_PRINT("0xffff overflow");
++        avr_timer16_clock_reset(t16);
++        if (t16->imsk & T16_INT_TOV) {
++            t16->ifr |= T16_INT_TOV;
++            qemu_set_irq(t16->ovf_irq, 1);
++        }
++    }
++    /* Check for ocra overflow in CTC mode */
++    if (mode == T16_MODE_CTC_OCRA && t16->next_interrupt == COMPA) {
++        DB_PRINT("CTC OCRA overflow");
++        avr_timer16_clock_reset(t16);
++    }
++    /* Check for icr overflow in CTC mode */
++    if (mode == T16_MODE_CTC_ICR && t16->next_interrupt == CAPT) {
++        DB_PRINT("CTC ICR overflow");
++        avr_timer16_clock_reset(t16);
++        if (t16->imsk & T16_INT_IC) {
++            t16->ifr |= T16_INT_IC;
++            qemu_set_irq(t16->capt_irq, 1);
++        }
++    }
++    /* Check for output compare interrupts */
++    if (t16->imsk & T16_INT_OCA && t16->next_interrupt == COMPA) {
++        t16->ifr |= T16_INT_OCA;
++        qemu_set_irq(t16->compa_irq, 1);
++    }
++    if (t16->imsk & T16_INT_OCB && t16->next_interrupt == COMPB) {
++        t16->ifr |= T16_INT_OCB;
++        qemu_set_irq(t16->compb_irq, 1);
++    }
++    if (t16->imsk & T16_INT_OCC && t16->next_interrupt == COMPC) {
++        t16->ifr |= T16_INT_OCC;
++        qemu_set_irq(t16->compc_irq, 1);
++    }
++    avr_timer16_set_alarm(t16);
++}
++
++static void avr_timer16_reset(DeviceState *dev)
++{
++    AVRTimer16State *t16 = AVR_TIMER16(dev);
++
++    avr_timer16_clock_reset(t16);
++    avr_timer16_clksrc_update(t16);
++    avr_timer16_set_alarm(t16);
++
++    qemu_set_irq(t16->capt_irq, 0);
++    qemu_set_irq(t16->compa_irq, 0);
++    qemu_set_irq(t16->compb_irq, 0);
++    qemu_set_irq(t16->compc_irq, 0);
++    qemu_set_irq(t16->ovf_irq, 0);
++}
++
++static uint64_t avr_timer16_read(void *opaque, hwaddr offset, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    uint8_t retval = 0;
++
++    switch (offset) {
++    case T16_CRA:
++        retval = t16->cra;
++        break;
++    case T16_CRB:
++        retval = t16->crb;
++        break;
++    case T16_CRC:
++        retval = t16->crc;
++        break;
++    case T16_CNTL:
++        avr_timer16_update_cnt(t16);
++        t16->rtmp = t16->cnth;
++        retval = t16->cntl;
++        break;
++    case T16_CNTH:
++        retval = t16->rtmp;
++        break;
++    case T16_ICRL:
++        /*
++         * The timer copies cnt to icr when the input capture pin changes
++         * state or when the analog comparator has a match. We don't
++         * emulate this behaviour. We do support it's use for defining a
++         * TOP value in T16_MODE_CTC_ICR
++         */
++        t16->rtmp = t16->icrh;
++        retval = t16->icrl;
++        break;
++    case T16_ICRH:
++        retval = t16->rtmp;
++        break;
++    case T16_OCRAL:
++        retval = t16->ocral;
++        break;
++    case T16_OCRAH:
++        retval = t16->ocrah;
++        break;
++    case T16_OCRBL:
++        retval = t16->ocrbl;
++        break;
++    case T16_OCRBH:
++        retval = t16->ocrbh;
++        break;
++    case T16_OCRCL:
++        retval = t16->ocrcl;
++        break;
++    case T16_OCRCH:
++        retval = t16->ocrch;
++        break;
++    default:
++        break;
++    }
++    return (uint64_t)retval;
++}
++
++static void avr_timer16_write(void *opaque, hwaddr offset,
++                              uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    uint8_t val8 = (uint8_t)val64;
++    uint8_t prev_clk_src = CLKSRC(t16);
++
++    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
++
++    switch (offset) {
++    case T16_CRA:
++        t16->cra = val8;
++        if (t16->cra & T16_CRA_OC_CONF) {
++            ERROR("output compare pins unsupported");
++        }
++        break;
++    case T16_CRB:
++        t16->crb = val8;
++        if (t16->crb & T16_CRB_ICNC) {
++            ERROR("input capture noise canceller unsupported");
++        }
++        if (t16->crb & T16_CRB_ICES) {
++            ERROR("input capture unsupported");
++        }
++        if (CLKSRC(t16) != prev_clk_src) {
++            avr_timer16_clksrc_update(t16);
++            if (prev_clk_src == T16_CLKSRC_STOPPED) {
++                t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++            }
++        }
++        break;
++    case T16_CRC:
++        t16->crc = val8;
++        ERROR("output compare pins unsupported");
++        break;
++    case T16_CNTL:
++        /*
++         * CNT is the 16-bit counter value, it must be read/written via
++         * a temporary register (rtmp) to make the read/write atomic.
++         */
++        /* ICR also has this behaviour, and shares rtmp */
++        /*
++         * Writing CNT blocks compare matches for one clock cycle.
++         * Writing CNT to TOP or to an OCR value (if in use) will
++         * skip the relevant interrupt
++         */
++        t16->cntl = val8;
++        t16->cnth = t16->rtmp;
++        avr_timer16_recalc_reset_time(t16);
++        break;
++    case T16_CNTH:
++        t16->rtmp = val8;
++        break;
++    case T16_ICRL:
++        /* ICR can only be written in mode T16_MODE_CTC_ICR */
++        if (MODE(t16) == T16_MODE_CTC_ICR) {
++            t16->icrl = val8;
++            t16->icrh = t16->rtmp;
++        }
++        break;
++    case T16_ICRH:
++        if (MODE(t16) == T16_MODE_CTC_ICR) {
++            t16->rtmp = val8;
++        }
++        break;
++    case T16_OCRAL:
++        /*
++         * OCRn cause the relevant output compare flag to be raised, and
++         * trigger an interrupt, when CNT is equal to the value here
++         */
++        t16->ocral = val8;
++        break;
++    case T16_OCRAH:
++        t16->ocrah = val8;
++        break;
++    case T16_OCRBL:
++        t16->ocrbl = val8;
++        break;
++    case T16_OCRBH:
++        t16->ocrbh = val8;
++        break;
++    case T16_OCRCL:
++        t16->ocrcl = val8;
++        break;
++    case T16_OCRCH:
++        t16->ocrch = val8;
++        break;
++    default:
++        break;
++    }
++    avr_timer16_set_alarm(t16);
++}
++
++static uint64_t avr_timer16_imsk_read(void *opaque,
++                                      hwaddr offset,
++                                      unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return 0;
++    }
++    return t16->imsk;
++}
++
++static void avr_timer16_imsk_write(void *opaque, hwaddr offset,
++                                   uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return;
++    }
++    t16->imsk = (uint8_t)val64;
++}
++
++static uint64_t avr_timer16_ifr_read(void *opaque,
++                                     hwaddr offset,
++                                     unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return 0;
++    }
++    return t16->ifr;
++}
++
++static void avr_timer16_ifr_write(void *opaque, hwaddr offset,
++                                  uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return;
++    }
++    t16->ifr = (uint8_t)val64;
++}
++
++static const MemoryRegionOps avr_timer16_ops = {
++    .read = avr_timer16_read,
++    .write = avr_timer16_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static const MemoryRegionOps avr_timer16_imsk_ops = {
++    .read = avr_timer16_imsk_read,
++    .write = avr_timer16_imsk_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static const MemoryRegionOps avr_timer16_ifr_ops = {
++    .read = avr_timer16_ifr_read,
++    .write = avr_timer16_ifr_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static Property avr_timer16_properties[] = {
++    DEFINE_PROP_UINT8("id", struct AVRTimer16State, id, 0),
++    DEFINE_PROP_UINT64("cpu-frequency-hz", struct AVRTimer16State,
++                       cpu_freq_hz, 20000000),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void avr_timer16_pr(void *opaque, int irq, int level)
++{
++    AVRTimer16State *s = AVR_TIMER16(opaque);
++
++    s->enabled = !level;
++
++    if (!s->enabled) {
++        avr_timer16_reset(DEVICE(s));
++    }
++}
++
++static void avr_timer16_init(Object *obj)
++{
++    AVRTimer16State *s = AVR_TIMER16(obj);
++
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->capt_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compa_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compb_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compc_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->ovf_irq);
++
++    memory_region_init_io(&s->iomem, obj, &avr_timer16_ops,
++                          s, TYPE_AVR_TIMER16, 0xe);
++    memory_region_init_io(&s->imsk_iomem, obj, &avr_timer16_imsk_ops,
++                          s, TYPE_AVR_TIMER16, 0x1);
++    memory_region_init_io(&s->ifr_iomem, obj, &avr_timer16_ifr_ops,
++                          s, TYPE_AVR_TIMER16, 0x1);
++
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->imsk_iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->ifr_iomem);
++    qdev_init_gpio_in(DEVICE(s), avr_timer16_pr, 1);
++
++    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, avr_timer16_interrupt, s);
++    s->enabled = true;
++}
++
++static void avr_timer16_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_timer16_reset;
++    dc->props = avr_timer16_properties;
++}
++
++static const TypeInfo avr_timer16_info = {
++    .name          = TYPE_AVR_TIMER16,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRTimer16State),
++    .instance_init = avr_timer16_init,
++    .class_init    = avr_timer16_class_init,
++};
++
++static void avr_timer16_register_types(void)
++{
++    type_register_static(&avr_timer16_info);
++}
++
++type_init(avr_timer16_register_types)
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index 59b3f44d69..2521056dc8 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -35,3 +35,6 @@ config CMSDK_APB_TIMER
+ config CMSDK_APB_DUALTIMER
+     bool
+     select PTIMER
++
++config AVR_TIMER16
++    bool
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index dece235fd7..af0913ca3b 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -35,3 +35,5 @@ common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+ common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) += cmsdk-apb-dualtimer.o
+ common-obj-$(CONFIG_MSF2) += mss-timer.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_systmr.o
++
++obj-$(CONFIG_AVR_TIMER16) += avr_timer16.o
 -- 
 2.17.2 (Apple Git-113)
 
