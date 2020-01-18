@@ -7,60 +7,86 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE30C32771
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C18C32771
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:18:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B92C2468B
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:13:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46C152468B
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:18:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="pgoRITyV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B92C2468B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fan+f77n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46C152468B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1istXZ-00069o-HR
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:13:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48549)
+	id 1istc6-0001id-V5
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:18:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49317)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1istTt-0001UJ-8w
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:10:02 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ista9-0008R9-LW
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1istTs-0004PG-4k
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:10:01 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:48327)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ista8-0001PO-EF
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:29 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33167)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1istTr-0004N5-Nt; Sat, 18 Jan 2020 14:10:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=tU0tqKTyF6mG4OdZGy/YoITFRev2rTHsJBdgq0mqCIQ=; 
- b=pgoRITyVH0dH6Xi56ZsgyXrA/+ibRZcHdokopw/ATnTXtPrD0rwkg70u49oQnw+fSStZnrCXVjiVkLE217W6v494CmW9mvgwsBzdLiH95jYLZexG+kDRBfmjzVw1vZ+9KlmcmjSb3vlXZV7DtrduyUolK0zaupQIak05g3kq3aCJcsmQ4c9KZyUJHMzSo30/m1ULP0VBdfrPQpV03ARSVVs/ik2uRfuh320ESBEpv3aO+AxtNcTE5vY7Uq9y9K2pJybSAfqytzw0rAdRUNkuqQz9ExZS5fvbm56ghTahAstvMjNoJzTZaG5ffS0aavllxJl/ucmK462J/6H89JNPOg==;
-Received: from [80.30.177.7] (helo=perseus.local)
- by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1istTn-000659-9d; Sat, 18 Jan 2020 20:09:55 +0100
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1istTW-0002JV-Ob; Sat, 18 Jan 2020 20:09:38 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/5] qcow2: Don't round the L1 table allocation up to the
- sector size
-Date: Sat, 18 Jan 2020 20:09:26 +0100
-Message-Id: <b2e27214ec7b03a585931bcf383ee1ac3a641a10.1579374329.git.berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1579374329.git.berto@igalia.com>
-References: <cover.1579374329.git.berto@igalia.com>
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ista8-0001OT-8c; Sat, 18 Jan 2020 14:16:28 -0500
+Received: by mail-wm1-x341.google.com with SMTP id d139so11824595wmd.0;
+ Sat, 18 Jan 2020 11:16:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=K+cZ6I/QpgXaxA05OKDA44Z96Grs/O31aTUTE91bprM=;
+ b=Fan+f77nzTO2u4vl+CbNzzt6b8TfqkQkLOn49CElsLYfX3g0Q1D3GL4hkCgBsKJCz+
+ dKRXP570N+OmEUOlOoSitVlsdwPBk2HYxUrFa+KoNk8nA3SOTeSPmW7osXYopPja2fXr
+ pM48WxWwKWrSL+1juokIsR5GZNkzfRdcrpb84mGE1sC3U5GA0fJOCd2iai6/g0d9LhKS
+ skbX9QCHPcJ9bkuO4EdC+lCZS2M/2+mRQQn+vtBkOf87AOSo7Y1Gza4VNnyCvFJR7qss
+ hFlc44tlIND9u7J4xBqL5ZJRbI1pFxzWnyDrQA9MaISV3vLMI+fmDXFBzWQ/3pUUuhXX
+ k+dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=K+cZ6I/QpgXaxA05OKDA44Z96Grs/O31aTUTE91bprM=;
+ b=r08w7Iam2wnTyt8gbMNfWNy0TteQg/WJDihq60Ilz0gEDQC7bvRYNIcpHn8FWuinh0
+ LxPTV7Z+TM1AW/JWYjrQNpi8fbA2A6FT9xgTKD91j7x4Fpd8wpq76M7CzBfXfN91q7Es
+ K5gna/qbRtL8xB+b2U1JCH3rMxQcOcQC+OJFOpU+gffczNNPLIyAGhpt9umo/Bh+RtxH
+ cnI8mMopQhxqUmO33/1ewes/jifYuPESdS40xlOUKVtInDqvdKLjb56Q+8+2ocSsWGxZ
+ hcHz+1Wg+RXZHzlYFCnLFiqfHkLUoG923YMaAL7gf8y8PTUnR7rcM1Qja/iROYoe2coC
+ rI2w==
+X-Gm-Message-State: APjAAAVLAF4FZGRZy6Wwg3ggt7nC8CydkT2St2NcwLE3G85uE7qbqZaL
+ S53haNMWCm6zB3QKrPqk91YC09di
+X-Google-Smtp-Source: APXvYqyoSRprmjZR7Gibuqtr+8P7ZS5CeGu8n/nSb06P6XoKX20MrnbivQMxnNp5PJMm4dhIkEK2HQ==
+X-Received: by 2002:a05:600c:2959:: with SMTP id
+ n25mr7665791wmd.185.1579374987022; 
+ Sat, 18 Jan 2020 11:16:27 -0800 (PST)
+Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id z11sm41339690wrt.82.2020.01.18.11.16.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 18 Jan 2020 11:16:26 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>
+Subject: [PATCH 1/4] Acceptance tests: Extract _console_interaction()
+Date: Sat, 18 Jan 2020 20:16:20 +0100
+Message-Id: <20200118191623.32549-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200118191623.32549-1-f4bug@amsat.org>
+References: <20200118191623.32549-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,86 +98,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The L1 table is read from disk using the byte-based bdrv_pread() and
-is never accessed beyond its last element, so there's no need to
-allocate more memory than that.
+Since we are going to re-use the code shared between
+wait_for_console_pattern() and exec_command_and_wait_for_pattern(),
+extract the common part into a local function.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- block/qcow2-cluster.c  | 5 ++---
- block/qcow2-refcount.c | 2 +-
- block/qcow2-snapshot.c | 3 +--
- block/qcow2.c          | 2 +-
- 4 files changed, 5 insertions(+), 7 deletions(-)
+ tests/acceptance/avocado_qemu/__init__.py | 31 +++++++++++++----------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 8982b7b762..932fc48919 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -124,12 +124,11 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
- #endif
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+index 6618ea67c1..0a50fcf2be 100644
+--- a/tests/acceptance/avocado_qemu/__init__.py
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -55,19 +55,14 @@ def pick_default_qemu_bin(arch=None):
+         return qemu_bin_from_src_dir_path
  
-     new_l1_size2 = sizeof(uint64_t) * new_l1_size;
--    new_l1_table = qemu_try_blockalign(bs->file->bs,
--                                       ROUND_UP(new_l1_size2, 512));
-+    new_l1_table = qemu_try_blockalign(bs->file->bs, new_l1_size2);
-     if (new_l1_table == NULL) {
-         return -ENOMEM;
-     }
--    memset(new_l1_table, 0, ROUND_UP(new_l1_size2, 512));
-+    memset(new_l1_table, 0, new_l1_size2);
  
-     if (s->l1_size) {
-         memcpy(new_l1_table, s->l1_table, s->l1_size * sizeof(uint64_t));
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index f67ac6b2d8..c963bc8de1 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1262,7 +1262,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-      * l1_table_offset when it is the current s->l1_table_offset! Be careful
-      * when changing this! */
-     if (l1_table_offset != s->l1_table_offset) {
--        l1_table = g_try_malloc0(ROUND_UP(l1_size2, 512));
-+        l1_table = g_try_malloc0(l1_size2);
-         if (l1_size2 && l1_table == NULL) {
-             ret = -ENOMEM;
-             goto fail;
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 5ab64da1ec..82c32d4c9b 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -1024,8 +1024,7 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
-         return ret;
-     }
-     new_l1_bytes = sn->l1_size * sizeof(uint64_t);
--    new_l1_table = qemu_try_blockalign(bs->file->bs,
--                                       ROUND_UP(new_l1_bytes, 512));
-+    new_l1_table = qemu_try_blockalign(bs->file->bs, new_l1_bytes);
-     if (new_l1_table == NULL) {
-         return -ENOMEM;
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index cef9d72b3a..ba71a815b6 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1492,7 +1492,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+-def wait_for_console_pattern(test, success_message, failure_message=None):
+-    """
+-    Waits for messages to appear on the console, while logging the content
+-
+-    :param test: an Avocado test containing a VM that will have its console
+-                 read and probed for a success or failure message
+-    :type test: :class:`avocado_qemu.Test`
+-    :param success_message: if this message appears, test succeeds
+-    :param failure_message: if this message appears, test fails
+-    """
++def _console_interaction(test, success_message, failure_message,
++                         send_string):
+     console = test.vm.console_socket.makefile()
+     console_logger = logging.getLogger('console')
+     while True:
++        if send_string:
++            test.vm.console_socket.sendall(send_string.encode())
++            send_string = None # send only once
+         msg = console.readline().strip()
+         if not msg:
+             continue
+@@ -79,6 +74,17 @@ def wait_for_console_pattern(test, success_message, failure_message=None):
+             fail = 'Failure message found in console: %s' % failure_message
+             test.fail(fail)
  
-     if (s->l1_size > 0) {
-         s->l1_table = qemu_try_blockalign(bs->file->bs,
--            ROUND_UP(s->l1_size * sizeof(uint64_t), 512));
-+                                          s->l1_size * sizeof(uint64_t));
-         if (s->l1_table == NULL) {
-             error_setg(errp, "Could not allocate L1 table");
-             ret = -ENOMEM;
++def wait_for_console_pattern(test, success_message, failure_message=None):
++    """
++    Waits for messages to appear on the console, while logging the content
++
++    :param test: an Avocado test containing a VM that will have its console
++                 read and probed for a success or failure message
++    :type test: :class:`avocado_qemu.Test`
++    :param success_message: if this message appears, test succeeds
++    :param failure_message: if this message appears, test fails
++    """
++    _console_interaction(test, success_message, failure_message, None)
+ 
+ def exec_command_and_wait_for_pattern(test, command,
+                                       success_message, failure_message=None):
+@@ -94,10 +100,7 @@ def exec_command_and_wait_for_pattern(test, command,
+     :param success_message: if this message appears, test succeeds
+     :param failure_message: if this message appears, test fails
+     """
+-    command += '\r'
+-    test.vm.console_socket.sendall(command.encode())
+-    wait_for_console_pattern(test, success_message, failure_message)
+-
++    _console_interaction(test, success_message, failure_message, command + '\r')
+ 
+ class Test(avocado.Test):
+     def _get_unique_tag_val(self, tag_name):
 -- 
-2.20.1
+2.21.1
 
 
