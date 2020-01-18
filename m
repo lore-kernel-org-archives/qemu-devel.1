@@ -2,82 +2,83 @@ Return-Path: <SRS0=bgql=3H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCDDBC32771
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 22:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB0FC32771
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 22:29:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85782246A5
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 22:18:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3C3E2468D
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 22:29:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZvFFaOp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85782246A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DO8pQ0L4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C3E2468D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iswQG-0003Nr-OA
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 17:18:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36345)
+	id 1iswao-0006kZ-Sf
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 17:29:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37195)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iswPV-0002ov-KA
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 17:17:43 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iswa9-0006K6-QG
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 17:28:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iswPU-0005KS-7H
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 17:17:41 -0500
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:40580)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iswa7-0004jq-UF
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 17:28:41 -0500
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:45816)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1iswPT-0005Jx-Ed; Sat, 18 Jan 2020 17:17:39 -0500
-Received: by mail-il1-x144.google.com with SMTP id c4so24329658ilo.7;
- Sat, 18 Jan 2020 14:17:39 -0800 (PST)
+ id 1iswa7-0004jY-Ng; Sat, 18 Jan 2020 17:28:39 -0500
+Received: by mail-io1-xd42.google.com with SMTP id i11so29768521ioi.12;
+ Sat, 18 Jan 2020 14:28:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LwHgfidZ+zRbXHrlEI9nla79xjadEOrUICmgJs99C2w=;
- b=FZvFFaOp7g9FLDsUzuMB/KuUMh7WqymayODsGjNPnoNu8jde+o/sF+I7FwOeHAlkFm
- 0+afptGK8UFxaaGfPDBboEYqqkikU2qU9jhbywuPgVAtr+Q9EHHUeaXLcpKSe1/WMWwR
- WW8L8z3z3fNbE2KNeHGpibiy3Utsn2wRNGRYODU9TFaYKLpM5Y0FQNsInM1vLFN3ZBZq
- FvHufnAaFDbTgGkJ9787r+DYV5zsi4gvKZgSEFnp/02nK0DSr0Af3RjJ0oCNntK8aKRd
- 2CwmiZ+vT6C01g0AlG09m6XOWph1bbEGLghmPh8iPhtcA9mwi/x3VwWVmB6wm+oEYfUT
- frJg==
+ :cc; bh=walFZZcTozveskYiOXwPzNEmRLzkjzl/4sHRkc1mPeg=;
+ b=DO8pQ0L41BJDxjeIzzLEec8abCk2v3AIZ97+eFAVH6MXoRpvxTpy43PAFFSHJUNTFP
+ dGQd3O5djvSXVQLuOjGsirXhepGQH8NQP7OrU2HyZflJY3sG2KR1tPwDfsWIaWPG0rDE
+ SFly7RMmL29V+CypzrmxtG0PPjCKol/da/YFWvJN1NJRPmuZjKvynmS/04XDS4nuqJXL
+ zI3tfCSLcWlYzXEzKFmCugh1YaRmKBIf97IhYr36Qse/r2grC1gLF5VFQAtoQ8TuX1ud
+ mo25bcob9VWzuNOROYcUQL8NnNfeHIwQ7VZPhav6B6yDSNV/3eb/eVf5P8PZIDgOZlSa
+ EQ4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=LwHgfidZ+zRbXHrlEI9nla79xjadEOrUICmgJs99C2w=;
- b=Fv+N2H+VhnKQpiNPP5PjWrnAgZ38UPpvgXHOtuduArGugIRMfpvC8Zfwr+0bEjNyS8
- n+XLnhJpYFJ5Wb/4nRBxuVWo5gjGFHqHyoAc00T3IPfDy8gXYaVxRU1Dno02eTExG6gV
- mkJrPJ05U4PveWINCWbKoP3h+P1BNfj6ytE2wqVnoUSnXc9Zz4dUXpDIQlS6/ErpnTvc
- sbueSqjPa84UVm57Wn+GHLQorllVfM3W77c/1cWNKeJxxCgDxGn8uzk+nhFCbOl5eACF
- 0SIA55To5J3CaiKoUrHsElyYTAXLKzgGrTTNcuEjNOYuO0vY8qi3wvN11VylXzxZWADT
- v2pg==
-X-Gm-Message-State: APjAAAXPJG2Ip6o4DRtYD3gLfo1lv7cd7Z0JmM1Gspi4WSpADsE3B06x
- ztyc2Ri7zNfeOfwJEKH14Wg9UAwTpjUWwwERIgM=
-X-Google-Smtp-Source: APXvYqyte3YeHI7pTl/+Ggc5Hy55/Ep8zhk7cyw7lZnkKzhZTN9vzkEkOfjv/dBfIWrKad/nj7cc2IUb5TTQcoTWquU=
-X-Received: by 2002:a92:a103:: with SMTP id v3mr4657039ili.265.1579385858514; 
- Sat, 18 Jan 2020 14:17:38 -0800 (PST)
+ bh=walFZZcTozveskYiOXwPzNEmRLzkjzl/4sHRkc1mPeg=;
+ b=uR9AZv9FeMC0qqkGOnVgJ0oYIlLMgf3CGzSrWNCotuGBO3obgBB7kIXVIvDCxFnyoG
+ Zy2TKCWrJys+oyhx0/s68mtqUDPjGlwl5mCJcmkTckdabciRqTaa2rEicu4t7Z/60VKy
+ VrD84dOa0aLOcZ/g5BOjO34XNjHjfonqtAzTTfxIfxc5sfAq59Mzvhz3Qg7Eb9ix21kd
+ RCLUpbmHFyIXnTJ30aZWmtW72pedHX4zJP7FcQ2RcjKKeBX6EoyzOuQ6RZbFFIhjAT0r
+ Gsry3Z750VyvEmVDi7s2fzGMVZ1lqW2igZDdudwZEF5ugT8tbGR+KcJJJ/mTHJz29D9y
+ DKVQ==
+X-Gm-Message-State: APjAAAVk7UScrHB0iSSJ8L9nOi8Aq6fb7dTwLksKYqLKF+IitypXexgt
+ ZS+tdC/KlqosHtW+DLgeIBONHTlnLSZZ+tKQY44=
+X-Google-Smtp-Source: APXvYqyKvpeP+CXwTj6S1ykg2HTeM+G+C2hHtEIUhAAXOZ8PKuUCDf73tjvWQPaSZdJDBp5I0UWIwvbYC5qlAqxBp9o=
+X-Received: by 2002:a02:bb02:: with SMTP id y2mr37488577jan.99.1579386518755; 
+ Sat, 18 Jan 2020 14:28:38 -0800 (PST)
 MIME-Version: 1.0
 References: <20200108200020.4745-1-nieklinnenbank@gmail.com>
- <20200108200020.4745-7-nieklinnenbank@gmail.com>
- <8bbf88b2-867a-c95d-a3ae-e819f7dd08ac@redhat.com>
- <CAPan3Wo3Li4XZJqHhhk5fnY_PnzGZ8YwUwCud8Ge4Z_+BOwW1w@mail.gmail.com>
- <5760dae5-f7cc-5736-7275-e6461f985dbd@redhat.com>
-In-Reply-To: <5760dae5-f7cc-5736-7275-e6461f985dbd@redhat.com>
+ <20200108200020.4745-11-nieklinnenbank@gmail.com>
+ <9c878f16-b18c-cc1a-9e82-40dbdd31b823@redhat.com>
+ <CAPan3WpNxGRfixQp5CwCwTU_boCq4h-BdJgD=KJEhRrGt7S7wg@mail.gmail.com>
+ <316c94b7-fea2-f44e-6d31-10fb41b09be3@redhat.com>
+In-Reply-To: <316c94b7-fea2-f44e-6d31-10fb41b09be3@redhat.com>
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Sat, 18 Jan 2020 23:17:27 +0100
-Message-ID: <CAPan3WpLzg0yzkgj29t3QdFczNsFwqubMUa1_xnqrO2RJMgxaA@mail.gmail.com>
-Subject: Re: [PATCH v3 06/17] hw/arm/allwinner: add CPU Configuration module
+Date: Sat, 18 Jan 2020 23:28:27 +0100
+Message-ID: <CAPan3WpwidKz+SEN6B=soCERFjzwJTZxQTz2soHdikda6zzNAQ@mail.gmail.com>
+Subject: Re: [PATCH v3 10/17] hw/arm/allwinner-h3: add Boot ROM support
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000000f646a059c716d30"
+Content-Type: multipart/alternative; boundary="00000000000069def1059c7194a3"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::144
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,184 +96,305 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000f646a059c716d30
+--00000000000069def1059c7194a3
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 18, 2020 at 10:06 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+On Sat, Jan 18, 2020 at 10:09 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
 .com>
 wrote:
 
-> On 1/15/20 12:04 AM, Niek Linnenbank wrote:
-> > On Tue, Jan 14, 2020 at 12:14 AM Philippe Mathieu-Daud=C3=A9
+> On 1/15/20 12:10 AM, Niek Linnenbank wrote:
+> > On Tue, Jan 14, 2020 at 12:28 AM Philippe Mathieu-Daud=C3=A9
 > > <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
 > >
 > >     On 1/8/20 9:00 PM, Niek Linnenbank wrote:
-> >      > Various Allwinner System on Chip designs contain multiple
-> processors
-> >      > that can be configured and reset using the generic CPU
-> Configuration
-> >      > module interface. This commit adds support for the Allwinner CPU
-> >      > configuration interface which emulates the following features:
+> >      > A real Allwinner H3 SoC contains a Boot ROM which is the
+> >      > first code that runs right after the SoC is powered on.
+> >      > The Boot ROM is responsible for loading user code (e.g. a
+> bootloader)
+> >      > from any of the supported external devices and writing the
+> downloaded
+> >      > code to internal SRAM. After loading the SoC begins executing th=
+e
+> >     code
+> >      > written to SRAM. This commits adds emulation of the Boot ROM
+> firmware
+> >      > setup functionality by loading user code from SD card.
 > >      >
-> >      >   * CPU reset
-> >      >   * CPU status
-> >      >   * Shared 64-bit timer
+> >      > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com
+> >     <mailto:nieklinnenbank@gmail.com>>
+> >      > ---
+> >      >   include/hw/arm/allwinner-h3.h | 23 +++++++++++++++++++++++
+> >      >   hw/arm/allwinner-h3.c         | 28 +++++++++++++++++++++++++++=
++
+> >      >   hw/arm/orangepi.c             |  3 +++
+> >      >   3 files changed, 54 insertions(+)
 > >      >
-> [...]
-> >      > +    case REG_CPU0_CTRL:         /* CPU#0 Control */
-> >      > +    case REG_CPU1_CTRL:         /* CPU#1 Control */
-> >      > +    case REG_CPU2_CTRL:         /* CPU#2 Control */
-> >      > +    case REG_CPU3_CTRL:         /* CPU#3 Control */
-> >      > +    case REG_CPU0_STATUS:       /* CPU#0 Status */
-> >      > +    case REG_CPU1_STATUS:       /* CPU#1 Status */
-> >      > +    case REG_CPU2_STATUS:       /* CPU#2 Status */
-> >      > +    case REG_CPU3_STATUS:       /* CPU#3 Status */
-> >      > +    case REG_CLK_GATING:        /* CPU Clock Gating */
-> >      > +    case REG_GEN_CTRL:          /* General Control */
-> >      > +        s->gen_ctrl =3D val;
-> >      > +        break;
-> >      > +    case REG_SUPER_STANDBY:     /* Super Standby Flag */
-> >      > +        s->super_standby =3D val;
-> >      > +        break;
-> >      > +    case REG_ENTRY_ADDR:        /* Reset Entry Address */
-> >      > +        s->entry_addr =3D val;
-> >      > +        break;
-> >      > +    case REG_DBG_EXTERN:        /* Debug External */
-> >      > +        break;
-> >      > +    case REG_CNT64_CTRL:        /* 64-bit Counter Control */
-> >      > +        s->counter_ctrl =3D val;
-> >      > +        break;
-> >      > +    case REG_CNT64_LOW:         /* 64-bit Counter Low */
-> >      > +    case REG_CNT64_HIGH:        /* 64-bit Counter High */
+> >      > diff --git a/include/hw/arm/allwinner-h3.h
+> >     b/include/hw/arm/allwinner-h3.h
+> >      > index 5d74cca28e..4b66227ac4 100644
+> >      > --- a/include/hw/arm/allwinner-h3.h
+> >      > +++ b/include/hw/arm/allwinner-h3.h
+> >      > @@ -50,6 +50,7 @@
+> >      >   #include "hw/sd/allwinner-sdhost.h"
+> >      >   #include "hw/net/allwinner-sun8i-emac.h"
+> >      >   #include "target/arm/cpu.h"
+> >      > +#include "sysemu/block-backend.h"
+> >      >
+> >      >   /**
+> >      >    * Allwinner H3 device list
+> >      > @@ -130,4 +131,26 @@ typedef struct AwH3State {
+> >      >       MemoryRegion sram_c;
+> >      >   } AwH3State;
+> >      >
+> >      > +/**
+> >      > + * Emulate Boot ROM firmware setup functionality.
+> >      > + *
+> >      > + * A real Allwinner H3 SoC contains a Boot ROM
+> >      > + * which is the first code that runs right after
+> >      > + * the SoC is powered on. The Boot ROM is responsible
+> >      > + * for loading user code (e.g. a bootloader) from any
+> >      > + * of the supported external devices and writing the
+> >      > + * downloaded code to internal SRAM. After loading the SoC
+> >      > + * begins executing the code written to SRAM.
+> >      > + *
+> >      > + * This function emulates the Boot ROM by copying 32 KiB
+> >      > + * of data from the given block device and writes it to
+> >      > + * the start of the first internal SRAM memory.
+> >      > + *
+> >      > + * @s: Allwinner H3 state object pointer
+> >      > + * @blk: Block backend device object pointer
+> >      > + * @errp: Error object pointer for raising errors
+> >      > + */
+> >      > +void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk=
+,
+> >      > +                                Error **errp);
+> >      > +
+> >      >   #endif /* HW_ARM_ALLWINNER_H3_H */
+> >      > diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
+> >      > index e692432b4e..e7b768ad5b 100644
+> >      > --- a/hw/arm/allwinner-h3.c
+> >      > +++ b/hw/arm/allwinner-h3.c
+> >      > @@ -27,6 +27,7 @@
+> >      >   #include "hw/char/serial.h"
+> >      >   #include "hw/misc/unimp.h"
+> >      >   #include "hw/usb/hcd-ehci.h"
+> >      > +#include "hw/loader.h"
+> >      >   #include "sysemu/sysemu.h"
+> >      >   #include "hw/arm/allwinner-h3.h"
+> >      >
+> >      > @@ -168,6 +169,33 @@ enum {
+> >      >       AW_H3_GIC_NUM_SPI       =3D 128
+> >      >   };
+> >      >
+> >      > +void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk=
+,
+> >     Error **errp)
+> >      > +{
+> >      > +    uint8_t *buffer;
+> >      > +    int64_t rom_size =3D 32 * KiB;
 > >
-> >     You forgot to set these. Maybe you can add a int64_t cnt64_diff, se=
-t
-> it
-> >     here to the difference with qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> and
-> >     in the read() function return cnt64_diff +
-> >     qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL).
+> >     Why restrict to 32K? The A1 SRAM is 64K.
 > >
-> > OK I'll need to look into that. Currently this timer is not used by
-> > Linux, NetBSD or U-Boot as far
-> > as I know. But since it is there, it should be correct indeed.
+> >
+> > The reason is that the actual Boot ROM on the H3 also uses 32K:
+> > https://linux-sunxi.org/BROM
+> >
+> > See the 'U-Boot SPL Limitations' table at the end of the page.
+> >
+> > You can see the comment in the table there regarding the 32 KiB:
+> >    "Sizes larger than 32 KiB are rejected by the BROM. Exactly 32 KiB i=
+s
+> > fine, as verified by writing a special pattern at the end of the SPL an=
+d
+> > checking it in the SRAM."
+> > Probably it would not harm to increase it to the full size of the SRAM,
+> > but I tried to model
+> > the behavior as close to the real hardware as possible.
 >
-> You might reduce this patch by simply using LOG_UNIMP for these
-> registers. Than add the patch when you find some use.
+> OK, then please document this difference in the commit description -
+> such "While the A1 SRAM is 64K, we limit to 32K because ..." - and add a
+> reference to https://linux-sunxi.org/BROM#U-Boot_SPL_limitations
 >
-> We are more confident when reviewing code when we have a way to test it :=
-)
->
->
-True indeed. I'll just remove the 64-bit counter from this patch. Thanks!
-
-Regards,
-Niek
-
+> Agreed, I'll add this to the commit message.
 
 --=20
 Niek Linnenbank
 
---0000000000000f646a059c716d30
+--00000000000069def1059c7194a3
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Sat, Jan 18, 2020 at 10:06 AM Phil=
+<div dir=3D"ltr" class=3D"gmail_attr">On Sat, Jan 18, 2020 at 10:09 AM Phil=
 ippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@red=
 hat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
 margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
-t:1ex">On 1/15/20 12:04 AM, Niek Linnenbank wrote:<br>
-&gt; On Tue, Jan 14, 2020 at 12:14 AM Philippe Mathieu-Daud=C3=A9 <br>
+t:1ex">On 1/15/20 12:10 AM, Niek Linnenbank wrote:<br>
+&gt; On Tue, Jan 14, 2020 at 12:28 AM Philippe Mathieu-Daud=C3=A9 <br>
 &gt; &lt;<a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redh=
 at.com</a> &lt;mailto:<a href=3D"mailto:philmd@redhat.com" target=3D"_blank=
 ">philmd@redhat.com</a>&gt;&gt; wrote:<br>
 &gt; <br>
 &gt;=C2=A0 =C2=A0 =C2=A0On 1/8/20 9:00 PM, Niek Linnenbank wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; Various Allwinner System on Chip designs cont=
-ain multiple processors<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; that can be configured and reset using the ge=
-neric CPU Configuration<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; module interface. This commit adds support fo=
-r the Allwinner CPU<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; configuration interface which emulates the fo=
-llowing features:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; A real Allwinner H3 SoC contains a Boot ROM w=
+hich is the<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; first code that runs right after the SoC is p=
+owered on.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; The Boot ROM is responsible for loading user =
+code (e.g. a bootloader)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; from any of the supported external devices an=
+d writing the downloaded<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; code to internal SRAM. After loading the SoC =
+begins executing the<br>
+&gt;=C2=A0 =C2=A0 =C2=A0code<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; written to SRAM. This commits adds emulation =
+of the Boot ROM firmware<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; setup functionality by loading user code from=
+ SD card.<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0* CPU reset<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0* CPU status<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0* Shared 64-bit timer<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D=
+"mailto:nieklinnenbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.co=
+m</a><br>
+&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:nieklinnenbank@gmail.c=
+om" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; ---<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0include/hw/arm/allwinner-h3.h | 2=
+3 +++++++++++++++++++++++<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0| 28 ++++++++++++++++++++++++++++<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0hw/arm/orangepi.c=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 3 +++<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A03 files changed, 54 insertions(+)=
+<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 &gt;<br>
-[...]<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU0_CTRL:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#0 Control */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU1_CTRL:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#1 Control */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU2_CTRL:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#2 Control */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU3_CTRL:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#3 Control */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU0_STATUS:=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0/* CPU#0 Status */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU1_STATUS:=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0/* CPU#1 Status */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU2_STATUS:=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0/* CPU#2 Status */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CPU3_STATUS:=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0/* CPU#3 Status */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CLK_GATING:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 /* CPU Clock Gating */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_GEN_CTRL:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 /* General Control */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;gen_ctrl =
-=3D val;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_SUPER_STANDBY:=C2=A0 =
-=C2=A0 =C2=A0/* Super Standby Flag */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;super_stan=
-dby =3D val;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_ENTRY_ADDR:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 /* Reset Entry Address */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;entry_addr=
- =3D val;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_DBG_EXTERN:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 /* Debug External */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CNT64_CTRL:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 /* 64-bit Counter Control */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;counter_ct=
-rl =3D val;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CNT64_LOW:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* 64-bit Counter Low */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 case REG_CNT64_HIGH:=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 /* 64-bit Counter High */<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0You forgot to set these. Maybe you can add a int64_=
-t cnt64_diff, set it<br>
-&gt;=C2=A0 =C2=A0 =C2=A0here to the difference with qemu_clock_get_ns(QEMU_=
-CLOCK_VIRTUAL), and<br>
-&gt;=C2=A0 =C2=A0 =C2=A0in the read() function return cnt64_diff +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL).<br>
-&gt; <br>
-&gt; OK I&#39;ll need to look into that. Currently this timer is not used b=
-y <br>
-&gt; Linux, NetBSD or U-Boot as far<br>
-&gt; as I know. But since it is there, it should be correct indeed.<br>
-<br>
-You might reduce this patch by simply using LOG_UNIMP for these <br>
-registers. Than add the patch when you find some use.<br>
-<br>
-We are more confident when reviewing code when we have a way to test it :)<=
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; diff --git a/include/hw/arm/allwinner-h3.h<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0b/include/hw/arm/allwinner-h3.h<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; index 5d74cca28e..4b66227ac4 100644<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; --- a/include/hw/arm/allwinner-h3.h<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +++ b/include/hw/arm/allwinner-h3.h<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; @@ -50,6 +50,7 @@<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;hw/sd/allwinner-sd=
+host.h&quot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;hw/net/allwinner-s=
+un8i-emac.h&quot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;target/arm/cpu.h&q=
+uot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +#include &quot;sysemu/block-backend.h&quot;<=
 br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0/**<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0 * Allwinner H3 device list<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; @@ -130,4 +131,26 @@ typedef struct AwH3State=
+ {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0MemoryRegion sram_c=
+;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0} AwH3State;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +/**<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * Emulate Boot ROM firmware setup functiona=
+lity.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + *<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * A real Allwinner H3 SoC contains a Boot R=
+OM<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * which is the first code that runs right a=
+fter<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * the SoC is powered on. The Boot ROM is re=
+sponsible<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * for loading user code (e.g. a bootloader)=
+ from any<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * of the supported external devices and wri=
+ting the<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * downloaded code to internal SRAM. After l=
+oading the SoC<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * begins executing the code written to SRAM=
+.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + *<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * This function emulates the Boot ROM by co=
+pying 32 KiB<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * of data from the given block device and w=
+rites it to<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * the start of the first internal SRAM memo=
+ry.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + *<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * @s: Allwinner H3 state object pointer<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * @blk: Block backend device object pointer=
 <br>
-</blockquote></div><div><br></div><div>True indeed. I&#39;ll just remove th=
-e 64-bit counter from this patch. Thanks!</div><div><br></div><div>Regards,=
-</div><div>Niek<br></div><div><br></div><br>-- <br><div dir=3D"ltr" class=
-=3D"gmail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></d=
-iv></div></div>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + * @errp: Error object pointer for raising e=
+rrors<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; + */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +void allwinner_h3_bootrom_setup(AwH3State *s=
+, BlockBackend *blk,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Error=
+ **errp);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#endif /* HW_ARM_ALLWINNER_H3_H *=
+/<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; diff --git a/hw/arm/allwinner-h3.c b/hw/arm/a=
+llwinner-h3.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; index e692432b4e..e7b768ad5b 100644<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; --- a/hw/arm/allwinner-h3.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +++ b/hw/arm/allwinner-h3.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; @@ -27,6 +27,7 @@<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;hw/char/serial.h&q=
+uot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;hw/misc/unimp.h&qu=
+ot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;hw/usb/hcd-ehci.h&=
+quot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +#include &quot;hw/loader.h&quot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;sysemu/sysemu.h&qu=
+ot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0#include &quot;hw/arm/allwinner-h=
+3.h&quot;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; @@ -168,6 +169,33 @@ enum {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_GIC_NUM_SPI=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 128<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;=C2=A0 =C2=A0};<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +void allwinner_h3_bootrom_setup(AwH3State *s=
+, BlockBackend *blk,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Error **errp)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +{<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 uint8_t *buffer;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 int64_t rom_size =3D 32 * KiB;=
+<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0Why restrict to 32K? The A1 SRAM is 64K.<br>
+&gt; <br>
+&gt; <br>
+&gt; The reason is that the actual Boot ROM on the H3 also uses 32K:<br>
+&gt; <a href=3D"https://linux-sunxi.org/BROM" rel=3D"noreferrer" target=3D"=
+_blank">https://linux-sunxi.org/BROM</a><br>
+&gt; <br>
+&gt; See the &#39;U-Boot SPL Limitations&#39; table at the end of the page.=
+<br>
+&gt; <br>
+&gt; You can see the comment in the table there regarding the 32 KiB:<br>
+&gt;=C2=A0 =C2=A0 &quot;Sizes larger than 32 KiB are rejected by the BROM. =
+Exactly 32 KiB is <br>
+&gt; fine, as verified by writing a special pattern at the end of the SPL a=
+nd <br>
+&gt; checking it in the SRAM.&quot;<br>
+&gt; Probably it would not harm to increase it to the full size of the SRAM=
+, <br>
+&gt; but I tried to model<br>
+&gt; the behavior as close to the real hardware as possible.<br>
+<br>
+OK, then please document this difference in the commit description - <br>
+such &quot;While the A1 SRAM is 64K, we limit to 32K because ...&quot; - an=
+d add a <br>
+reference to <a href=3D"https://linux-sunxi.org/BROM#U-Boot_SPL_limitations=
+" rel=3D"noreferrer" target=3D"_blank">https://linux-sunxi.org/BROM#U-Boot_=
+SPL_limitations</a><br>
+<br>
+</blockquote></div>Agreed, I&#39;ll add this to the commit message.<br clea=
+r=3D"all"><div><br>-- <br><div dir=3D"ltr" class=3D"gmail_signature"><div d=
+ir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></div></div></div>
 
---0000000000000f646a059c716d30--
+--00000000000069def1059c7194a3--
 
