@@ -8,82 +8,78 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89946C32771
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 540F6C32771
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:34:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5644824683
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20DCA24683
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:34:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E2iqmkpI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5644824683
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QO5GzDsl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20DCA24683
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1istqM-0003e8-9U
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:33:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49856)
+	id 1istrI-0004VF-RE
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:34:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1istdd-0004Ak-F5
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:20:10 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1isteb-0005QW-V6
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:21:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1istdb-00067O-MM
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:20:05 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40156)
+ (envelope-from <mrolnik@gmail.com>) id 1istea-000749-7c
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:21:05 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38968)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1istdb-00066V-Fz
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:20:03 -0500
-Received: by mail-wr1-x443.google.com with SMTP id c14so25717617wrn.7
- for <qemu-devel@nongnu.org>; Sat, 18 Jan 2020 11:20:03 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1istea-00073R-0p
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:21:04 -0500
+Received: by mail-wm1-x344.google.com with SMTP id 20so10815088wmj.4
+ for <qemu-devel@nongnu.org>; Sat, 18 Jan 2020 11:21:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=462i1Ag4o0cfxhQVfRSys4sY7nSXMyI7nbnWCXem7s4=;
- b=E2iqmkpIyyacXS8n9yD4JtEGIbA+m+6IvS7I9NB0DEDZDPoSkpG/0Kcm8MXhpTxKWL
- 96pDaDHoSTLGOmOlasuIZGmRsynJENiQcWFWNMw6z2r/4Ct8x+ToZqSb9vDtEhKa6Bci
- RPu0dPigQqEEnr0lhGYJcEeQunJSF5IoFdE/3APM3WIYT0SagCmc7E00VRAt/ZUjX4Gl
- gz+LRpx5GHOmnaS1YBAnJdWj2E1wAmQ6HXtoo5VGEFGkIuW5jRFYXpCoobYq24KabaSS
- 2clXThVXCBmnPjO8249jIu2yTyL1wDm6ukkDsfhSDZu5b9gCSVlONN1Fgs1GVntI+jj1
- MJ3Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=f0Dp6GGDhBgnTynbqKq3B4A9OGC9gPqHD+W52wlMqDQ=;
+ b=QO5GzDsloym+/hNaz1n2WF3h2aqL3vhWs/9aSMmD7YyOa9fO9FmgSCLLZCeTveMyAU
+ JJ6rDK21hEipE8xau2ifxBg0vZaws2mJeXkNZwpeWMsPd0yjU3AtxwG//ZhcMVQvi+Yl
+ 9Tk4XvwQ39XHLpJqjvj6SjYanKQDcgZA8Mdj8GR861+ZRIUNDbCBwE7nrmD1Cldvhj5C
+ inDEMORecCPQKXDzbiscogVDB1D2uB7AwxbV0/PgC+PZay8f7cZ4og2t2mOoNjbKN+FH
+ 9Ieqj1UZNu8i1jv49fuKbedq1tmjzkD1N7WxoBIfmhQ6+vFnl3zXjz7DZOC4qmsp3ZEy
+ Ikfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=462i1Ag4o0cfxhQVfRSys4sY7nSXMyI7nbnWCXem7s4=;
- b=Zpx903+TIEwy/btJXw6Qs3VMnfs2ukwdt6UM37P/fhhVYCzKkNHOW/Aiwz8b0AKGut
- y6gKbZbE7b/AwgzvlWqZSTyS0RJFlL9Py1kB3V8o1X5bRUiPSEkWVa4D5AnxxVHlK3ft
- 9fsPoDwdNAjFlPtBBdZOKUZsZtWVu1TbakxRD/g3iIwuDd5l9kueryiqtzqGJUzZHPHf
- v4Sv/vOadSSQjAjgxRMEZ7ndgrKlwcDat5dgsxrOyFU/rCyLiXJmP7aLKLSjdls2U4NY
- nXSJIF0X69qTScnP193PPRYVKmQjTom/JFzfRRqrp1kt8E/ywGveF8QYL43fgvxejPLA
- XePA==
-X-Gm-Message-State: APjAAAVbpNEAIrClqWLwilqoKBgSX8wN2BTME2lXneIlORIaa27NrCd4
- W+XGE5CpCS41kCClA1ObQf7Z1+wowY7nrnTZ
-X-Google-Smtp-Source: APXvYqwtJyBcK3D3EdMyBqxO6msb8+sGhERMzcO94IOOkkNIZ0Ajv464IKm97hPiYKKYYPrN4/DrsQ==
-X-Received: by 2002:a5d:6692:: with SMTP id l18mr9476704wru.382.1579375202191; 
- Sat, 18 Jan 2020 11:20:02 -0800 (PST)
+ :references;
+ bh=f0Dp6GGDhBgnTynbqKq3B4A9OGC9gPqHD+W52wlMqDQ=;
+ b=HdcTKyIV6QgWFdC2wE2vUoW/kZJmTLzYZ6hFvAhJTY4t/F36NR4zBJphra469o5LHk
+ KGdgqz1ZGPqsiL4UJuBR+07JzaKeoOSXqmEtljSEIEik9I+b2xdU0TWw277ki/dhrV6s
+ dzwH78eSlz+rjMkEb4msx5+9a3MRRHbgnsdhU3bDVEdjiLNR7zqSo0O/HmmgxYxtTLYO
+ LIUINcFK/iRKXjDMB87kRfY+CACWSE0A3JNZC2Ph2YBbs/Ld2ybglFWk0UlCBeiQIwnp
+ awMJitQmd7heuDXJIBELmzfwuxR5CJRk4mip+ZcRxxrPXlkdq12CoVP1FX+/+K34+kxt
+ wq2w==
+X-Gm-Message-State: APjAAAWDl30v33T1KQJjiDwiylX96UTbMqOcAot2bZovVfy+87nonPo6
+ e5izm/+Ta/5H6PW7xO+kDIje6TP/ZEpmQT1E
+X-Google-Smtp-Source: APXvYqzTo81wqKMf2MxAtr5D6NpLwKaXLU+/ITZTQnZncsPDRYhbM1Ki13ncn6lkruuEjgC03czTTg==
+X-Received: by 2002:a05:600c:2551:: with SMTP id
+ e17mr10754711wma.26.1579375262827; 
+ Sat, 18 Jan 2020 11:21:02 -0800 (PST)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-109-65-108-13.red.bezeqint.net. [109.65.108.13])
- by smtp.gmail.com with ESMTPSA id o16sm2875468wmc.18.2020.01.18.11.19.55
+ by smtp.gmail.com with ESMTPSA id o16sm2875468wmc.18.2020.01.18.11.20.59
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sat, 18 Jan 2020 11:20:01 -0800 (PST)
+ Sat, 18 Jan 2020 11:21:02 -0800 (PST)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v41 07/21] target/avr: Add instruction translation - Bit and
- Bit-test Instructions
-Date: Sat, 18 Jan 2020 21:14:02 +0200
-Message-Id: <20200118191416.19934-8-mrolnik@gmail.com>
+Subject: [PATCH v41 13/21] hw/avr: Add dummy mask device
+Date: Sat, 18 Jan 2020 21:14:08 +0200
+Message-Id: <20200118191416.19934-14-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20200118191416.19934-1-mrolnik@gmail.com>
 References: <20200118191416.19934-1-mrolnik@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,292 +98,213 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-    - LSR, ROR
-    - ASR
-    - SWAP
-    - SBI, CBI
-    - BST, BLD
-    - BSET, BCLR
+This is a simple device of just one register, whenver this register is
+written it calls qemu_set_irq function for each of 8 bits/IRQs..
+It is used to implement AVR Power Reduction
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/avr/translate.c | 241 +++++++++++++++++++++++++++++++++++++++++
- target/avr/insn.decode |  14 +++
- 2 files changed, 255 insertions(+)
+ include/hw/misc/avr_mask.h |  47 ++++++++++++++++
+ hw/misc/avr_mask.c         | 112 +++++++++++++++++++++++++++++++++++++
+ hw/misc/Kconfig            |   3 +
+ hw/misc/Makefile.objs      |   2 +
+ 4 files changed, 164 insertions(+)
+ create mode 100644 include/hw/misc/avr_mask.h
+ create mode 100644 hw/misc/avr_mask.c
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 4a62d9312a..58775af17c 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -2440,3 +2440,244 @@ static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
+diff --git a/include/hw/misc/avr_mask.h b/include/hw/misc/avr_mask.h
+new file mode 100644
+index 0000000000..d3e21972d8
+--- /dev/null
++++ b/include/hw/misc/avr_mask.h
+@@ -0,0 +1,47 @@
++/*
++ * AVR Power Reduction
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_avr_mask_H
++#define HW_avr_mask_H
++
++#include "hw/sysbus.h"
++#include "chardev/char-fe.h"
++#include "hw/hw.h"
++
++
++#define TYPE_AVR_MASK "avr-mask"
++#define AVR_MASK(obj) OBJECT_CHECK(AVRMaskState, (obj), TYPE_AVR_MASK)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion iomem;
++
++    uint8_t val;
++    qemu_irq irq[8];
++} AVRMaskState;
++
++#endif /* HW_avr_mask_H */
+diff --git a/hw/misc/avr_mask.c b/hw/misc/avr_mask.c
+new file mode 100644
+index 0000000000..3af82ed9c1
+--- /dev/null
++++ b/hw/misc/avr_mask.c
+@@ -0,0 +1,112 @@
++/*
++ * AVR Power Reduction
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/misc/avr_mask.h"
++#include "qemu/log.h"
++#include "hw/qdev-properties.h"
++#include "hw/irq.h"
++
++#define DB_PRINT(fmt, args...) /* Nothing */
++/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## args)*/
++
++static void avr_mask_reset(DeviceState *dev)
++{
++    AVRMaskState *s = AVR_MASK(dev);
++
++    s->val = 0x00;
++
++    for (int i = 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], 0);
++    }
++}
++
++static uint64_t avr_mask_read(void *opaque, hwaddr offset, unsigned size)
++{
++    assert(size == 1);
++    assert(offset == 0);
++    AVRMaskState *s = opaque;
++
++    return (uint64_t)s->val;
++}
++
++static void avr_mask_write(void *opaque, hwaddr offset,
++                              uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    assert(offset == 0);
++    AVRMaskState *s = opaque;
++    uint8_t val8 = val64;
++
++    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
++
++    s->val = val8;
++    for (int i = 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], (val8 & (1 << i)) != 0);
++    }
++}
++
++static const MemoryRegionOps avr_mask_ops = {
++    .read = avr_mask_read,
++    .write = avr_mask_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static void avr_mask_init(Object *dev)
++{
++    AVRMaskState *s = AVR_MASK(dev);
++    SysBusDevice *busdev = SYS_BUS_DEVICE(dev);
++
++    memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_MASK,
++            0x01);
++    sysbus_init_mmio(busdev, &s->iomem);
++
++    for (int i = 0; i < 8; i++) {
++        sysbus_init_irq(busdev, &s->irq[i]);
++    }
++    s->val = 0x00;
++}
++
++static void avr_mask_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_mask_reset;
++}
++
++static const TypeInfo avr_mask_info = {
++    .name          = TYPE_AVR_MASK,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRMaskState),
++    .class_init    = avr_mask_class_init,
++    .instance_init = avr_mask_init,
++};
++
++static void avr_mask_register_types(void)
++{
++    type_register_static(&avr_mask_info);
++}
++
++type_init(avr_mask_register_types)
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index bdd77d8020..74a1e9a241 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -131,4 +131,7 @@ config MAC_VIA
+     select MOS6522
+     select ADB
  
-     return true;
- }
++config AVR_MASK
++    bool
 +
-+/*
-+ * Bit and Bit-test Instructions
-+ */
-+static void gen_rshift_ZNVSf(TCGv R)
-+{
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+}
+ source macio/Kconfig
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index da993f45b7..bbf17f651b 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -85,3 +85,5 @@ common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+ obj-$(CONFIG_MAC_VIA) += mac_via.o
+ 
+ common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
 +
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
-+ *  loaded into the C Flag of the SREG. This operation effectively divides an
-+ *  unsigned value by two. The C Flag can be used to round the result.
-+ */
-+static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    /* update status register */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
-+    tcg_gen_movi_tl(cpu_Nf, 0);
-+    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
-+    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. The C Flag is shifted into
-+ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, combined
-+ *  with ASR, effectively divides multi-byte signed values by two. Combined with
-+ *  LSR it effectively divides multi-byte unsigned values by two. The Carry Flag
-+ *  can be used to round the result.
-+ */
-+static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_shli_tl(t0, cpu_Cf, 7);
-+    /* update status register */
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    /* update output register */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+    /* update status register */
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant. Bit 0
-+ *  is loaded into the C Flag of the SREG. This operation effectively divides a
-+ *  signed value by two without changing its sign. The Carry Flag can be used to
-+ *  round the result.
-+ */
-+static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    /* update status register */
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
-+    /* update output register */
-+    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+    /* update status register */
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Swaps high and low nibbles in a register.
-+ */
-+static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(t0, Rd, 0x0f);
-+    tcg_gen_shli_tl(t0, t0, 4);
-+    tcg_gen_andi_tl(t1, Rd, 0xf0);
-+    tcg_gen_shri_tl(t1, t1, 4);
-+    tcg_gen_or_tl(Rd, t0, t1);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Sets a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_ori_tl(data, data, 1 << a->bit);
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(port);
-+    tcg_temp_free_i32(data);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(data);
-+    tcg_temp_free_i32(port);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
-+ */
-+static bool trans_BST(DisasContext *ctx, arg_BST *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
-+    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Copies the T Flag in the SREG (Status Register) to bit b in register Rd.
-+ */
-+static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
-+    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
-+    tcg_gen_or_tl(Rd, Rd, t1);
-+
-+    tcg_temp_free_i32(t1);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Sets a single Flag or bit in SREG.
-+ */
-+static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x01);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x01);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x01);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x01);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x01);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x01);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x01);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x01);
-+        break;
-+    }
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears a single Flag in SREG.
-+ */
-+static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x00);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x00);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x00);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x00);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x00);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x00);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x00);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x00);
-+        break;
-+    }
-+
-+    return true;
-+}
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode
-index 3f9304f8b0..4ee55862b2 100644
---- a/target/avr/insn.decode
-+++ b/target/avr/insn.decode
-@@ -158,3 +158,17 @@ XCH             1001 001 rd:5 0100
- LAC             1001 001 rd:5 0110
- LAS             1001 001 rd:5 0101
- LAT             1001 001 rd:5 0111
-+
-+#
-+# Bit and Bit-test Instructions
-+#
-+LSR             1001 010 rd:5 0110
-+ROR             1001 010 rd:5 0111
-+ASR             1001 010 rd:5 0101
-+SWAP            1001 010 rd:5 0010
-+SBI             1001 1010 reg:5 bit:3
-+CBI             1001 1000 reg:5 bit:3
-+BST             1111 101 rd:5 0 bit:3
-+BLD             1111 100 rd:5 0 bit:3
-+BSET            1001 0100 0 bit:3 1000
-+BCLR            1001 0100 1 bit:3 1000
++obj-$(CONFIG_AVR_MASK) += avr_mask.o
 -- 
 2.17.2 (Apple Git-113)
 
