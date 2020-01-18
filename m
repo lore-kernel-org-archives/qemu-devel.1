@@ -2,91 +2,89 @@ Return-Path: <SRS0=bgql=3H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1DB1C32771
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A94FC32771
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:21:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B70C24695
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6C4121739
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jan 2020 19:21:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rE90ZYe5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B70C24695
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QmAq0C4P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6C4121739
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1istcp-0002nV-Sm
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:19:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49377)
+	id 1istfF-0005ex-9z
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 14:21:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1istaD-0008Su-Sc
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:35 -0500
+ id 1istaA-0008RA-DA
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1istaC-0001T7-5K
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:33 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33641)
+ id 1ista7-0001Ol-TX
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 14:16:30 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51200)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1istaB-0001SH-Ul; Sat, 18 Jan 2020 14:16:32 -0500
-Received: by mail-wr1-x442.google.com with SMTP id b6so25761292wrq.0;
- Sat, 18 Jan 2020 11:16:31 -0800 (PST)
+ id 1ista7-0001NF-Jv; Sat, 18 Jan 2020 14:16:27 -0500
+Received: by mail-wm1-x342.google.com with SMTP id d73so10552527wmd.1;
+ Sat, 18 Jan 2020 11:16:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=AyAU2X5VPRy6Esk965p6WIgVLdsOCthkRQaP1bet484=;
- b=rE90ZYe5/lvnrQLlXlIFQtlNE/pW5XTVVGaw0F6JBW7w8xoLoubgB9NAcpc/3qBe9p
- A68wQXeE2UqgCjVKPA2+6JobLrOBc338Ibt/utLK5374zz/bUJJCEn70lx7ryIJW/Fpi
- Bnfj+i+MDNlZHO+97qD39xqAeUbX6KzYcXydOqEaf92+CSlAQXJ2OBAjmrUyTtqhQ8ty
- p42wU4fkPbEO2d+c19QtMntwrYHsqOpJ/9gTdLn3ff723gpvVcOq4roCmYJzKvoKBrkz
- ALDhxA1WAV3iseYwKfUHchieCm7Gki5TQt9bkN1lxpGRzYt7FNYPOxcgWpxNI94rcfis
- KFsA==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=293nwiyuaOamswqMc0EVTlOq8q0MzXCBPubm+nvXYDI=;
+ b=QmAq0C4PRgdnUb7wZfnqw6Spi6JmLykluvhuT7NtN9az4KFrxCpoHwgQ40tLOEa6yx
+ 7VoVE9Gq6fJ09G1fRViBEqifvV/aabz+dOWJnPzP8IHTJoa79UGSaMGvQPtLBInuNgNZ
+ nLBB2YHNeT93sRMu6/ORpIevi9dsXc90e2D3S8PYT1eqm/4ZfkgCwOJZjwys5CrWDIiE
+ kRawG93I0AWtYFLH3QE0TEl/Huaowv1DDvZ2WJxoRji/z9TewgPnwEy6ydRoeG5u7l/6
+ WfzfDpYEq3WVoU+oTAEorG8hMb+DbclFxTwIcfNlsMZ1kcQx9e+PLF7cY+c3PX4k3rhF
+ lsqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=AyAU2X5VPRy6Esk965p6WIgVLdsOCthkRQaP1bet484=;
- b=FIhotyWNq0POqwMiR1IbISi26udp78/XZrsSDrZiOR9Hs/tUHJBNnthpVwZXmkYRDU
- 2ThEMmsEH5KagUZrjnGsAc9lDkIV32qfILtL6rr9bhhqKGefj6UdSyHAUmANG2Gp6yY4
- an9mV59r3a/bKNVzRgIHz2ExhPfiLIAkAKDKGbjoKe7LAtHeqJ90qj6MaqkVd9EXa7tQ
- cgVBNx4mWGA/mTy/VDyg9qRptK2+DoctdSRzrZepj0C0wPa7OzndPlQ2vv7GSnc57l/U
- Py4DQrn9oLLyBH+fFcUnFXQoUHvGtGxe2kgv5hr+swra6VKhmtfXTG8njcKptpn1ZqDf
- MeLQ==
-X-Gm-Message-State: APjAAAWj3PIcWJMKhVTHHOo7zgLYDyOONOmPkgSONCEvsqXOvawFKUhY
- B7fFJAEAM7DRVEHIJyOpO6KFm4RT
-X-Google-Smtp-Source: APXvYqzD1TRrQOMRA6fYv3Rp3grcWVFf0emNEJzPH1iq6lpzMIs14DUqcof3C1kDqcM7p23ic6rzYw==
-X-Received: by 2002:adf:e6c5:: with SMTP id y5mr10255012wrm.210.1579374990506; 
- Sat, 18 Jan 2020 11:16:30 -0800 (PST)
+ :mime-version:content-transfer-encoding;
+ bh=293nwiyuaOamswqMc0EVTlOq8q0MzXCBPubm+nvXYDI=;
+ b=enjTScK3/xbgxsUzoemhvncQyUbubWyQlAKS8+303l95saHOLRiKjxTI6xdt39W3e0
+ madYnT8344Cmz+XiHq5FCteVJ+84baWz+5w75QHpgI2JrvsvqMcE9n9Z0g1rd4dEJwFo
+ Lc8vY3/LGbEU6G1zNr8kR2WytRExo5fxHpFEwKcwRo3tmsIDzaRgY1CHsZI/XkghfqbY
+ aaFG4jnPLln3cpuoR6I5Ar6sZ0gvEiwxSs7fWmJ8EriXB+CAPmCUp6kD4RVlefKsNrMV
+ 6xShDGvNoQ/5xR2OQbl5WUsBL7eR+XMeLFOFqc1jd4Zwru4gCymsN/d/JNjcC1D2UkUn
+ YCmA==
+X-Gm-Message-State: APjAAAWypa1Y2uSF8g/O4juZtitVrHZ/AGabUjiFanrO1CPyYBEMqpTv
+ wcD7mlZHmn7z12xbo7Q487GEm/vZ
+X-Google-Smtp-Source: APXvYqwJW4dWmYd3pwy5SUXrSS/4WS63NkWDB63fBwf4YX+K/2QLbRtKKwft3wGdNyiKTS6zSY0MHg==
+X-Received: by 2002:a05:600c:210e:: with SMTP id
+ u14mr10650326wml.28.1579374985597; 
+ Sat, 18 Jan 2020 11:16:25 -0800 (PST)
 Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z11sm41339690wrt.82.2020.01.18.11.16.28
+ by smtp.gmail.com with ESMTPSA id z11sm41339690wrt.82.2020.01.18.11.16.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Jan 2020 11:16:29 -0800 (PST)
+ Sat, 18 Jan 2020 11:16:24 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
  Niek Linnenbank <nieklinnenbank@gmail.com>
-Subject: [PATCH 3/4] tests/boot_linux_console: Test booting NetBSD via U-Boot
+Subject: [PATCH 0/4] tests/boot_linux_console: Test booting NetBSD via U-Boot
  on OrangePi PC
-Date: Sat, 18 Jan 2020 20:16:22 +0100
-Message-Id: <20200118191623.32549-4-f4bug@amsat.org>
+Date: Sat, 18 Jan 2020 20:16:19 +0100
+Message-Id: <20200118191623.32549-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200118191623.32549-1-f4bug@amsat.org>
-References: <20200118191623.32549-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,48 +105,239 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test boots U-Boot then NetBSD (stored on a SD card) on
-a OrangePi PC board.
+This series add a test on the OrangePi PC for:
+- SD Card booting
+- U-boot & UART
+- NetBSD 9
 
-As it requires ~1.3GB of storage, it is disabled by default.
+I simply followed Niek description in docs/orangepi.rst:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg669347.html
 
-U-Boot is built by the Debian project [1], and the SD card image
-is provided by the NetBSD organization [2].
+The sdcard image is big, but the test runs very quick (1min),
+even on Travis CI: https://travis-ci.org/philmd/qemu/jobs/638823612#L3778
 
-Once the compressed SD card image is downloaded (304MB) and
-extracted, this test is fast:
+(11/48) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_uboot_netbsd9:  PASS (65.17 s)
 
-  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
-    avocado --show=app,console run -t machine:orangepi-pc \
-      tests/acceptance/boot_linux_console.py
+  $ TMPDIR=/tmp AVOCADO_ALLOW_LARGE_STORAGE=yes avocado --show=app,console run -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
+  JOB ID     : 4e11f0d22d121fd766ab5f0956ec464cf9fce64b
+  JOB LOG    : /home/phil/avocado/job-results/job-2020-01-18T19.14-4e11f0d/job.log
+   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_uboot_netbsd9:
   console: U-Boot SPL 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000)
   console: DRAM: 1024 MiB
+  console: Failed to set core voltage! Can't set CPU frequency
+  console: Trying to boot from MMC1
   console: U-Boot 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000) Allwinner Technology
   console: CPU:   Allwinner H3 (SUN8I 0000)
+  console: Model: Xunlong Orange Pi Plus / Plus 2
+  console: DRAM:  1 GiB
+  console: MMC:   Device 'mmc@1c11000': seq 1 is in use by 'mmc@1c10000'
+  console: mmc@1c0f000: 0, mmc@1c10000: 2, mmc@1c11000: 1
+  console: Loading Environment from FAT... Warning: HDMI PHY init timeout!
+  console: Warning: HDMI PHY init timeout!
+  console: In:    serial
+  console: Out:   serial
+  console: Err:   serial
+  console: Net:   phy interface7
+  console: Could not get PHY for ethernet@1c30000: addr 0
+  console: No ethernet found.
+  console: starting USB...
+  console: Bus usb@1c1b000: USB EHCI 1.00
+  console: Bus usb@1c1d000: USB EHCI 1.00
   console: scanning bus usb@1c1b000 for devices... 1 USB Device(s) found
   console: scanning bus usb@1c1d000 for devices... 1 USB Device(s) found
   console: scanning usb for storage devices... 0 Storage Device(s) found
   console: Hit any key to stop autoboot:  0
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
+  console: =>
   console: => setenv bootargs root=ld0a
   console: => setenv kernel netbsd-GENERIC.ub
   console: => setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb
+  console: => setenv bootcmd 'fatload mmc 0:1 ${kernel_addr_r} ${kernel}; fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; fdt addr ${fdt_addr_r}; bootm ${kernel_addr_r} - ${fdt_addr_r}'
   console: => boot
+  console: 8850008 bytes read in 2583 ms (3.3 MiB/s)
+  console: 28162 bytes read in 34 ms (808.6 KiB/s)
   console: ## Booting kernel from Legacy Image at 42000000 ...
   console: Image Name:   NetBSD/earmv7hf 9.0_RC1
   console: Image Type:   ARM Linux Kernel Image (no loading done) (uncompressed)
+  console: Data Size:    8849944 Bytes = 8.4 MiB
+  console: Load Address: 00000000
+  console: Entry Point:  00000000
+  console: Verifying Checksum ... OK
+  console: ## Flattened Device Tree blob at 43000000
+  console: Booting using the fdt blob at 0x43000000
   console: XIP Kernel Image (no loading done)
   console: Loading Device Tree to 49ff6000, end 49fffe01 ... OK
   console: Starting kernel ...
   console: [   1.0000000] NetBSD/evbarm (fdt) booting ...
+  console: [   1.0000000] [ Kernel symbol table missing! ]
+  console: [   1.0000000] Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+  console: [   1.0000000]     2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017,
+  console: [   1.0000000]     2018, 2019 The NetBSD Foundation, Inc.  All rights reserved.
+  console: [   1.0000000] Copyright (c) 1982, 1986, 1989, 1991, 1993
+  console: [   1.0000000]     The Regents of the University of California.  All rights reserved.
   console: [   1.0000000] NetBSD 9.0_RC1 (GENERIC) #0: Wed Nov 27 16:14:52 UTC 2019
+  console: [   1.0000000]         mkrepro@mkrepro.NetBSD.org:/usr/src/sys/arch/evbarm/compile/GENERIC
+  console: [   1.0000000] total memory = 1024 MB
+  console: [   1.0000000] avail memory = 1003 MB
+  console: [   1.0000000] armfdt0 (root)
   console: [   1.0000000] simplebus0 at armfdt0: Xunlong Orange Pi PC
+  console: [   1.0000000] simplebus1 at simplebus0
+  console: [   1.0000000] simplebus2 at simplebus0
+  console: [   1.0000000] cpus0 at simplebus0
+  console: [   1.0000000] simplebus3 at simplebus0
   console: [   1.0000000] cpu0 at cpus0: Cortex-A7 r0p5 (Cortex V7A core)
   console: [   1.0000000] cpu0: DC enabled IC enabled WB enabled LABT branch prediction enabled
   console: [   1.0000000] cpu0: 32KB/64B 2-way L1 VIPT Instruction cache
   console: [   1.0000000] cpu0: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
   console: [   1.0000000] cpu0: 2304KB/64B 16-way write-through L2 PIPT Unified cache
   console: [   1.0000000] vfp0 at cpu0: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
-  ...
+  console: [   1.0000000] cpufreqdt0 at cpu0
+  console: [   1.0000000] cpu1 at cpus0
+  console: [   1.0000000] cpufreqdt1 at cpu1
+  console: [   1.0000000] cpu2 at cpus0
+  console: [   1.0000000] cpufreqdt2 at cpu2
+  console: [   1.0000000] cpu3 at cpus0
+  console: [   1.0000000] cpufreqdt3 at cpu3
+  console: [   1.0000000] gic0 at simplebus1: GIC
+  console: [   1.0000000] armgic0 at gic0: Generic Interrupt Controller, 160 sources (160 valid)
+  console: [   1.0000000] armgic0: 256 Priorities, 128 SPIs, 16 PPIs, 16 SGIs
+  console: [   1.0000000] fclock0 at simplebus2: 24000000 Hz fixed clock (osc24M)
+  console: [   1.0000000] fclock1 at simplebus2: 32768 Hz fixed clock (ext_osc32k)
+  console: [   1.0000000] gtmr0 at simplebus0: Generic Timer
+  console: [   1.0000000] gtmr0: interrupting on GIC irq 27
+  console: [   1.0000000] armgtmr0 at gtmr0: Generic Timer (24000 kHz, virtual)
+  console: [   1.0000060] sun8ih3ccu0 at simplebus1: H3 CCU
+  console: [   1.0000060] sun8ih3rccu0 at simplebus1: H3 PRCM CCU
+  console: [   1.0000060] sunxigpio0 at simplebus1: PIO
+  console: [   1.0000060] gpio0 at sunxigpio0: 94 pins
+  console: [   1.0000060] sunxigpio0: interrupting on GIC irq 43
+  console: [   1.0000060] sunxigpio1 at simplebus1: PIO
+  console: [   1.0000060] gpio1 at sunxigpio1: 12 pins
+  console: [   1.0000060] sunxigpio1: interrupting on GIC irq 77
+  console: [   1.0000060] sunxisramc0 at simplebus1: SRAM Controller
+  console: [   1.0000060] sun6idma0 at simplebus1: DMA controller (12 channels)
+  console: [   1.0000060] sun6idma0: interrupting on GIC irq 82
+  console: [   1.0000060] connector0 at simplebus0: HDMI connector
+  console: [   1.0000060] com0 at simplebus1: ns16550a, working fifo
+  console: [   1.0000060] com0: console
+  console: [   1.0000060] com0: interrupting on GIC irq 32
+  console: [   1.0000060] fregulator0 at simplebus0: vcc3v3
+  console: [   1.0000060] fregulator1 at simplebus0: usb0-vbus
+  console: [   1.0000060] fregulator2 at simplebus0: vcc3v0
+  console: [   1.0000060] fregulator3 at simplebus0: vcc5v0
+  console: [   1.0000060] sunxiusbphy0 at simplebus1: USB PHY
+  console: [   1.0000060] /soc/clock@1000000 at simplebus1 not configured
+  console: [   1.0000060] /soc/mixer@1100000 at simplebus1 not configured
+  console: [   1.0000060] /soc/lcd-controller@1c0c000 at simplebus1 not configured
+  console: [   1.0000060] /soc/hdmi@1ee0000 at simplebus1 not configured
+  console: [   1.0000060] sunxirtc0 at simplebus1: RTC
+  console: [   1.0000060] emac0 at simplebus1: EMAC
+  console: [   1.0000060] emac0: Ethernet address 52:54:00:12:34:56
+  console: [   1.0000060] emac0: interrupting on GIC irq 114
+  console: [   1.0000060] ukphy0 at emac0 phy 1: OUI 0x0088a0, model 0x0000, rev. 0
+  console: [   1.0000060] ukphy0: 10baseT, 10baseT-FDX, 100baseTX, 100baseTX-FDX, 100baseT4, auto
+  console: [   1.0000060] h3codec0 at simplebus1: H3 Audio Codec (analog part)
+  console: [   1.0000060] /soc/hdmi-phy@1ef0000 at simplebus1 not configured
+  console: [   1.0000060] /opp_table0 at simplebus0 not configured
+  console: [   1.0000060] sunxitwi0 at simplebus1: Marvell TWSI controller
+  console: [   1.0000060] sunxitwi0: interrupting on GIC irq 76
+  console: [   1.0000060] iic0 at sunxitwi0: I2C bus
+  console: [   1.0000060] sy8106a0 at iic0 addr 0x65: Silergy SY8106A regulator
+  console: [   1.0000060] /display-engine at simplebus0 not configured
+  console: [   1.0000060] sunximmc0 at simplebus1: SD/MMC controller
+  console: [   1.0000060] sunximmc0: interrupting on GIC irq 92
+  console: [   1.0000060] motg0 at simplebus1: 'otg' mode not supported
+  console: [   1.0000060] ehci0 at simplebus1: EHCI
+  console: [   1.0000060] ehci0: interrupting on GIC irq 104
+  console: ehci0: ohci or uhci probably not configured
+  console: [   1.0000060] usb0 at ehci0: USB revision 2.0
+  console: [   1.0000060] ohci0 at simplebus1: OHCI
+  console: [   1.0000060] ohci0: interrupting on GIC irq 105
+  console: [   1.0000060] ohci0: OHCI version 1.0
+  console: [   1.0000060] usb1 at ohci0: USB revision 1.0
+  console: [   1.0000060] ehci1 at simplebus1: EHCI
+  console: [   1.0000060] ehci1: interrupting on GIC irq 106
+  console: ehci1: ohci or uhci probably not configured
+  console: [   1.0000060] usb2 at ehci1: USB revision 2.0
+  console: [   1.0000060] ohci1 at simplebus1: OHCI
+  console: [   1.0000060] ohci1: interrupting on GIC irq 107
+  console: [   1.0000060] ohci1: OHCI version 1.0
+  -console: [   1.0000060] usb3 at ohci1: USB revision 1.0
+  console: [   1.0000060] ehci2 at simplebus1: EHCI
+  console: [   1.0000060] ehci2: interrupting on GIC irq 108
+  console: ehci2: ohci or uhci probably not configured
+  console: [   1.0000060] usb4 at ehci2: USB revision 2.0
+  console: [   1.0000060] ohci2 at simplebus1: OHCI
+  console: [   1.0000060] ohci2: interrupting on GIC irq 109
+  console: [   1.0000060] ohci2: OHCI version 1.0
+  console: [   1.0000060] usb5 at ohci2: USB revision 1.0
+  console: [   1.0000060] ehci3 at simplebus1: EHCI
+  console: [   1.0000060] ehci3: interrupting on GIC irq 110
+  console: ehci3: ohci or uhci probably not configured
+  console: [   1.0000060] usb6 at ehci3: USB revision 2.0
+  console: [   1.0000060] ohci3 at simplebus1: OHCI
+  console: [   1.0000060] ohci3: interrupting on GIC irq 111
+  console: [   1.0000060] ohci3: OHCI version 1.0
+  console: [   1.0000060] usb7 at ohci3: USB revision 1.0
+  console: [   1.0000060] sunxiwdt0 at simplebus1: Watchdog
+  console: [   1.0000060] sunxiwdt0: default watchdog period is 16 seconds
+  console: [   1.0000060] sunxicodec0 at simplebus1: H3 Audio Codec
+  console: [   1.0000060] audio0 at sunxicodec0: playback, capture, full duplex, independent
+  console: [   1.0000060] audio0: slinear_le:16 2ch 48000Hz, blk 40ms for playback
+  console: [   1.0000060] audio0: slinear_le:16 2ch 48000Hz, blk 40ms for recording
+  console: [   1.0000060] spkr0 at audio0: PC Speaker (synthesized)
+  console: [   1.0000060] wsbell at spkr0 not configured
+  console: [   1.0000060] /soc/ir@1f02000 at simplebus1 not configured
+  console: [   1.0000060] /soc/gpu@1c40000 at simplebus1 not configured
+  console: [   1.0000060] psci0 at simplebus0: PSCI 0.1
+  console: [   1.0000060] gpioleds0 at simplebus0: orangepi:green:pwr orangepi:red:status
+  console: [   1.0000060] gpiokeys0 at simplebus0: sw4
+  console: [   1.0000060] sunxitimer0 at simplebus1: Timer
+  console: [   1.0000060] /soc/video-codec@1c0e000 at simplebus1 not configured
+  console: [   1.0000060] cpu3: Cortex-A7 r0p5 (Cortex V7A core)
+  console: [   1.0000060] cpu3: DC enabled IC enabled WB enabled LABT branch prediction enabled
+  console: [   1.0000060] cpu3: 32KB/64B 2-way L1 VIPT Instruction cache
+  console: [   1.0000060] cpu3: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
+  console: [   1.0160154] cpu3: 2304KB/64B 16-way write-through L2 PIPT Unified cache
+  console: [   1.0234452] vfp3 at cpu3: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
+  console: [   1.0291986] cpu1: Cortex-A7 r0p5 (Cortex V7A core)
+  console: [   1.0291986] cpu1: DC enabled IC enabled WB enabled LABT branch prediction enabled
+  console: [   1.0291986] cpu1: 32KB/64B 2-way L1 VIPT Instruction cache
+  console: [   1.0394135] cpu1: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
+  console: [   1.0394135] cpu1: 2304KB/64B 16-way write-through L2 PIPT Unified cache
+  console: [   1.0394135] vfp1 at cpu1: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
+  console: [   1.0493315] cpu2: Cortex-A7 r0p5 (Cortex V7A core)
+  console: [   1.0634020] cpu2: DC enabled IC enabled WB enabled LABT branch prediction enabled
+  console: [   1.0694913] cpu2: 32KB/64B 2-way L1 VIPT Instruction cache
+  console: [   1.0694913] cpu2: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
+  console: [   1.0806243] cpu2: 2304KB/64B 16-way write-through L2 PIPT Unified cache
+  console: [   1.0896281] vfp2 at cpu2: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
+  console: [   1.6053940] sdmmc0 at sunximmc0
+  console: [   1.9566931] uhub0 at usb0: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
+  console: [   2.0663940] uhub1 at usb2: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
+  console: [   2.1170633] uhub2 at usb1: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
+  console: [   2.2277627] uhub3 at usb4: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
+  console: [   2.2800297] uhub4 at usb3: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
+  console: [   2.3289886] uhub5 at usb6: NetBSD (0000) EHCI root hub (0000), class 9/0, rev 2.00/1.00, addr 1
+  console: [   2.4083724] uhub6 at usb7: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
+  console: [   2.4895047] uhub7 at usb5: NetBSD (0000) OHCI root hub (0000), class 9/0, rev 1.00/1.00, addr 1
   console: [   2.8171937] sdmmc0: SD card status: 4-bit, C0
   console: [   2.8234040] ld0 at sdmmc0: <0xaa:0x5859:QEMU!:0x01:0xdeadbeef:0x062>
   console: [   2.8743967] ld0: 1290 MB, 655 cyl, 64 head, 63 sec, 512 bytes/sect x 2642944 sectors
@@ -164,101 +353,22 @@ extracted, this test is fast:
   RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
   JOB TIME   : 36.09 s
 
-Note, this test only took ~65 seconds to run on Travis-CI, see: [3].
+Based-on: <20200108200020.4745-1-nieklinnenbank@gmail.com>
+"Add Allwinner H3 SoC and Orange Pi PC Machine" v3
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg669328.html
 
-This test is based on a description from Niek Linnenbank from [4].
+Philippe Mathieu-Daudé (4):
+  Acceptance tests: Extract _console_interaction()
+  Acceptance tests: Add interrupt_interactive_console_until_pattern()
+  tests/boot_linux_console: Test booting NetBSD via U-Boot on OrangePi
+    PC
+  .travis.yml: Allow untrusted code and large files
 
-[1] https://wiki.debian.org/InstallingDebianOn/Allwinner#Creating_a_bootable_SD_Card_with_u-boot
-[2] https://wiki.netbsd.org/ports/evbarm/allwinner/
-[3] https://travis-ci.org/philmd/qemu/jobs/638823612#L3778
-[4] https://www.mail-archive.com/qemu-devel@nongnu.org/msg669347.html
+ .travis.yml                               |  2 +
+ tests/acceptance/avocado_qemu/__init__.py | 59 ++++++++++++++++-----
+ tests/acceptance/boot_linux_console.py    | 63 +++++++++++++++++++++++
+ 3 files changed, 110 insertions(+), 14 deletions(-)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/acceptance/boot_linux_console.py | 63 ++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
-
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 55d0b8b036..56d3d6e9eb 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -16,6 +16,7 @@ import shutil
- from avocado import skipUnless
- from avocado_qemu import Test
- from avocado_qemu import exec_command_and_wait_for_pattern
-+from avocado_qemu import interrupt_interactive_console_until_pattern
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-@@ -551,6 +552,68 @@ class BootLinuxConsole(Test):
-                                       'to <orangepipc>')
-         self.wait_for_console_pattern('Starting Load Kernel Modules...')
- 
-+    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
-+    def test_arm_orangepi_uboot_netbsd9(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:orangepi-pc
-+        """
-+        # This test download a 304MB compressed image and expand it to 1.3GB...
-+        deb_url = ('http://snapshot.debian.org/archive/debian/'
-+                   '20200108T145233Z/pool/main/u/u-boot/'
-+                   'u-boot-sunxi_2020.01%2Bdfsg-1_armhf.deb')
-+        deb_hash = 'f67f404a80753ca3d1258f13e38f2b060e13db99'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        # We use the common OrangePi PC 'plus' build of U-Boot for our secondary
-+        # program loader (SPL). We will then set the path to the more specific
-+        # OrangePi "PC" device tree blob with 'setenv fdtfile' in U-Boot prompt,
-+        # before to boot NetBSD.
-+        uboot_path = '/usr/lib/u-boot/orangepi_plus/u-boot-sunxi-with-spl.bin'
-+        uboot_path = self.extract_from_deb(deb_path, uboot_path)
-+        image_url = ('https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0_RC1/'
-+                     'evbarm-earmv7hf/binary/gzimg/armv7.img.gz')
-+        image_hash = '7f58d5c36600430a8bcebe7e999a8945a2be4d1f'
-+        image_path_gz = self.fetch_asset(image_url, asset_hash=image_hash)
-+        image_path = os.path.join(self.workdir, 'armv7.img')
-+        image_drive_args = 'if=sd,format=raw,snapshot=on,file=' + image_path
-+        archive.gzip_uncompress(image_path_gz, image_path)
-+
-+        # dd if=u-boot-sunxi-with-spl.bin of=armv7.img bs=1K seek=8 conv=notrunc
-+        with open(uboot_path, 'rb') as f_in:
-+            with open(image_path, 'r+b') as f_out:
-+                f_out.seek(8 * 1024)
-+                shutil.copyfileobj(f_in, f_out)
-+
-+        self.vm.set_console()
-+        self.vm.add_args('-nic', 'user',
-+                         '-drive', image_drive_args,
-+                         '-no-reboot')
-+        self.vm.launch()
-+        wait_for_console_pattern(self, 'U-Boot 2020.01+dfsg-1')
-+        interrupt_interactive_console_until_pattern(self,
-+                                       'Hit any key to stop autoboot:',
-+                                       'switch to partitions #0, OK')
-+
-+        exec_command_and_wait_for_pattern(self, '', '=>')
-+        cmd = 'setenv bootargs root=ld0a'
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+        cmd = 'setenv kernel netbsd-GENERIC.ub'
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+        cmd = 'setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb'
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+        cmd = ("setenv bootcmd 'fatload mmc 0:1 ${kernel_addr_r} ${kernel}; "
-+               "fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; "
-+               "fdt addr ${fdt_addr_r}; "
-+               "bootm ${kernel_addr_r} - ${fdt_addr_r}'")
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+
-+        exec_command_and_wait_for_pattern(self, 'boot',
-+                                          'Booting kernel from Legacy Image')
-+        wait_for_console_pattern(self, 'Starting kernel ...')
-+        wait_for_console_pattern(self, 'NetBSD 9.0_RC1 (GENERIC)')
-+        # Wait for user-space
-+        wait_for_console_pattern(self, 'Starting root file system check')
-+
-     def test_s390x_s390_ccw_virtio(self):
-         """
-         :avocado: tags=arch:s390x
 -- 
 2.21.1
 
