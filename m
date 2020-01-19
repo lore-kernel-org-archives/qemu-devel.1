@@ -2,125 +2,79 @@ Return-Path: <SRS0=UCRd=3I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C663EC33CB1
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C81DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 898FB2064C
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:37:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49EB8206B7
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:52:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSjvtdnA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898FB2064C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGRj2AxA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49EB8206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1it8t4-0004Yb-PD
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 06:37:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54388)
+	id 1it97h-00084i-Fz
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 06:52:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1it8sT-00048n-3I
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:36:26 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1it96w-0007WW-En
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:51:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1it8sR-0002PP-TR
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:36:24 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34641)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1it96t-0002lH-L7
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:51:22 -0500
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:44473)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1it8sR-0002Oo-LS
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:36:23 -0500
-Received: by mail-wm1-x342.google.com with SMTP id w5so12705913wmi.1
- for <qemu-devel@nongnu.org>; Sun, 19 Jan 2020 03:36:23 -0800 (PST)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1it96t-0002l4-Bk; Sun, 19 Jan 2020 06:51:19 -0500
+Received: by mail-il1-x144.google.com with SMTP id z12so25007007iln.11;
+ Sun, 19 Jan 2020 03:51:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pVMLjmysx/GAxoOSlchhJrjzKdlg8+FB1XEtBsIhF8M=;
- b=DSjvtdnAJj922tNKjBC8k2VI8k6IkGC2ZlMBIw6mftskn7iODTVXbc30FOWg+Art1m
- tBpIwixo8T55awqmJSrZBctFW3HadT1xxpMvCSG532WjXYRM0KO0y/O7YcAaCUVmv4Dz
- mTA6Z2IJEw07PUBtwhhDLnEs/LR6dRdQ1NVxamqdk9CMJ5W3t8A6q7X9V1jegDWwavsJ
- 50xGOE/xoA6sSP+uw+Tq3g/E7UGOQkth3oJ5OW+/IHr76zbCl3voc+rpJ59zY24xlv/p
- BzQM7vM6gWqnxE8azEbBRl3Wz7QlAVuCVmhm1j5vue6sQKy2dcHzUyIpR3bp3SNFyBTu
- QPOg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/Z5hCkiejUKYZe5HGAm2SNriVtp+XM17RnOZJbpinqM=;
+ b=WGRj2AxA8R+a2ZE0Eg2r810hTKmodkDBwMhHcjH0mNw/5VQt2O2AU214E1yx3UVV9r
+ KvBYCew1mdwbiMnRxlutVMMkiQ/lllgL+Tyw3hqGQWTvIlfWuUtf+3jjIQ6r67qySkfk
+ Dpbq4FNUI4KU7fzOWXD6bzeNPdkPX2xgeSRxEU8XH9+cRMCh16II/sgwYhHQBersuhay
+ kNegvU0tVID9g/zAKbnznEfP3dUatwe2XOTkHgzsj85UCZG7pLtyTKVhqpUzAQZYiytF
+ /qIFZYJTPXmFJwnYrv5sC4wL+ESLOWLytdpeD+8k0OkdD4yGgh+TIzlVS1JFF8D33Rz9
+ G0Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=pVMLjmysx/GAxoOSlchhJrjzKdlg8+FB1XEtBsIhF8M=;
- b=HIzLwbpvmt8AZc5LtuvYSA/fH224qOnNS9GIGPQdBg9yam6ZthKwPAwtbX+CRNot4a
- EQLEgWpInZhmWPCrFMbIT/BVry94Q611lShWY9v68+gRth662PL2uo0HXoDp5bD1OsBX
- n2wxQb8pfZcwyyeBQjNn7hqRRyqpwXRA38EkGSJaYuFPA2eVT9CsLJzNgDycqE7iI6zo
- YISpPK45G8xNSzn9YDK7ABAu6+A1Bqoo0A6K+yHXb25zYNCYUES5mPmrNWAHqqOS+Rsx
- zEhQ/P0yR04ucGpgag6RdusHazgsOLsNB50iVSVLgz5UFdKumHsbUxDsVWCY2vS6PR7k
- 9lnQ==
-X-Gm-Message-State: APjAAAXr1Z0oDCn33iaNrcFFrzn/TqbczBN96M1G53nQB6OloLvnPp/0
- tHMzD8xfl/hzd1fpFyxbj0I=
-X-Google-Smtp-Source: APXvYqwc98X776mZ7k9NpFB6Z5/tUNJntzntVheNgoz3ACePgi9lBMH9/FuRuLRWGRwSKLaiYMrDcQ==
-X-Received: by 2002:a7b:cb97:: with SMTP id m23mr13549930wmi.37.1579433782577; 
- Sun, 19 Jan 2020 03:36:22 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id y22sm17523924wma.35.2020.01.19.03.36.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 19 Jan 2020 03:36:21 -0800 (PST)
-Subject: Re: [Qemu-devel] What should a virtual board emulate?
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>,
- Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
-References: <20190319144013.26584-1-pbonzini@redhat.com>
- <alpine.BSF.2.21.9999.1903192350550.11467@zero.eik.bme.hu>
- <87imwe847x.fsf_-_@dusky.pond.sub.org>
- <CAAdtpL5Z1OXqZ_zzA0RLq9soydNtTFt2oCOEfui1rq19bLKUgA@mail.gmail.com>
- <d9d5ac96-c0f5-dd83-d305-10e20c745dd1@redhat.com>
- <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
- <6b5459b5-deb2-e70c-deab-fa7246b43e38@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <36d5b922-b134-a5f4-8d9e-1ea3d87daedc@amsat.org>
-Date: Sun, 19 Jan 2020 12:36:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/Z5hCkiejUKYZe5HGAm2SNriVtp+XM17RnOZJbpinqM=;
+ b=murRaD5kmoJvEYVTE6s7a12xbP/y58OWVjtiKIUH5fs+JUomX1pa39IpHb6jX36wbH
+ 35wX9aVE6xGLLcF8vK2gy5Kuzk6/r+VhB6ABw+d/LOQy/qypJriornk6JSIFU8VzKNk4
+ U6gUnrlsqoZ9CcWjVOBOPEdMbknd6oVRrd8HBhFN7EPffFBYcIK9Oi9wkRDgZd2Ws8Iz
+ C/7Tzw051X9uyRbrQezBdaLvK+7k/7ape0VUkF2eQKCKpGPPH4z9MQsRcocDmKmQ4WMq
+ s23WX8a8Wmqx2tzS2FhKDD2sN3/GNKsgNzSXIhS3Lou/+Qlm6R7fihxbgMoAHFdoNY7P
+ pB2A==
+X-Gm-Message-State: APjAAAUSC+qygAKW6Jrd7zHTOLVIgK81ko8HUwI/+X6T4IomBdG3axru
+ z6NjDWuJUXF/CKx9RYhJCmyZkiSq9brELgeXms+bdaq3
+X-Google-Smtp-Source: APXvYqyMeuQuhrOoNnINKQ2+hbcVpAeLdGx2MjXSmzpmDKX10Pnmc7dCUV+M8CA2a/cYd4oyqGyjJSWi/mErzAOCaLk=
+X-Received: by 2002:a92:d5cf:: with SMTP id d15mr6338646ilq.306.1579434678460; 
+ Sun, 19 Jan 2020 03:51:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <6b5459b5-deb2-e70c-deab-fa7246b43e38@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
+In-Reply-To: <20200119005102.3847-1-nieklinnenbank@gmail.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Sun, 19 Jan 2020 12:51:06 +0100
+Message-ID: <CAPan3Wo-DcUnf2Ct=H_-_DSD_RSYBM+dpAD4z0U=nqTYnDDOzw@mail.gmail.com>
+Subject: Re: [PATCH v4 00/20] Add Allwinner H3 SoC and Orange Pi PC Machine
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="000000000000f4a6d6059c7cca16"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,106 +86,498 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Cleber Rosa <crosa@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, John Snow <jsnow@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, alex.bennee@linaro.org,
+ jasowang@redhat.com, b.galvani@gmail.com, qemu-arm <qemu-arm@nongnu.org>,
+ imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/18/20 9:46 PM, Paolo Bonzini wrote:
-> On 04/01/20 22:16, Philippe Mathieu-Daudé wrote:
->> 1/ the Radeon chip is soldered on the motherboard,
->>
->> 2/ the default BIOS expects the Radeon chip to be
->>    unconditionally present,
->>
->> I insist this patch is incorrect for the particular case of the
->> Fuloong2e board. I plan to revert it when I post the test.
->>
->> BTW I'm not using --nodefault, I'm running default ./configure:
->>
->> qemu-system-mips64el -M fulong2e -bios pmon_2e.bin \
->> -display none -vga none -serial stdio
-> 
-> But if you're not specifying -nodefaults, why are you specifying a
-> configuration that your BIOS does not support?  You should just remove
-> -vga none and leave in -display none.
+--000000000000f4a6d6059c7cca16
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-OK, with this information I searched what enforcing -vga none, with:
+On Sun, Jan 19, 2020, 01:51 Niek Linnenbank <nieklinnenbank@gmail.com>
+wrote:
 
-$ git grep -- -vga.*none python/
-python/qemu/machine.py:232:        args = ['-display', 'none', '-vga',
-'none']
+> Dear QEMU developers,
+>
+> Hereby I would like to contribute the following set of patches to QEMU
+> which add support for the Allwinner H3 System on Chip and the
+> Orange Pi PC machine. The following features and devices are supported:
+>
+>  * SMP (Quad Core Cortex A7)
+>  * Generic Interrupt Controller configuration
+>  * SRAM mappings
+>  * SDRAM controller
+>  * Real Time Clock
+>  * Timer device (re-used from Allwinner A10)
+>  * UART
+>  * SD/MMC storage controller
+>  * EMAC ethernet connectivity
+>  * USB 2.0 interfaces
+>  * Clock Control Unit
+>  * System Control module
+>  * Security Identifier device
+>
+> Functionality related to graphical output such as HDMI, GPU,
+> Display Engine and audio are not included. Recently released
+> mainline Linux kernels (4.19 up to latest master), mainline U-Boot
+> and NetBSD 9.0-RC1 are known to work.
+>
+> For full details on how to use the Orange Pi PC machine, see the file
+> docs/orangepi.rst which is included as a patch in this series.
+>
+> The contents of this patch series is available on Github at:
+>
+>   https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v3
 
-Context:
 
- 61 class QEMUMachine(object):
-...
-230
-231     def _base_args(self):
-232         args = ['-display', 'none', '-vga', 'none']
-...
-290     def launch(self):
-301         try:
-302             self._launch()
-...
-314     def _launch(self):
-315         """
-316         Launch the VM and establish a QMP connection
-317         """
-318         devnull = open(os.path.devnull, 'rb')
-319         self._pre_launch()
-320         self._qemu_full_args = (self._wrapper + [self._binary] +
-321                                 self._base_args() + self._args)
+I forgot to update this link in the cover letter to v4. The correct link is=
+:
 
-Except the refactors moving this code, the original commit is:
+https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v4
 
-$ git show 0fd05e8dd1e
-commit 0fd05e8dd1ee7ae143fba3d6bcc6abe3fbeaeb34
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed Jun 6 16:23:27 2012 +0200
 
-    qemu-iotests: start vms in qtest mode
+>
+> The followings are currently known issues in this series:
+>
+>   - NetBSD 9.0-RC1 reads out year 2050 from RTC, while Linux works fine
+>      -> This is due to difference in base year defined by the
+> corresponding drivers
+>   - RTC date & time is not persistent
+>   - boot0 custom Allwinner bootloader not yet working
+>   - Watchdog not yet implemented, affects U-Boot 'reset' and
+> shutdown/reboot
+>      -> This is part of the existing A10 timer that needs to be
+> generalized first
+>
+> Looking forward to your review comments. I will do my best
+> to update the patches where needed.
+>
+> =3D=3D=3D=3D=3D CHANGELOG =3D=3D=3D=3D=3D
+> v4:
+>  * docs/orangepi.rst: correct SDRAM size in board description: 512MB ->
+> 1GiB
+>  * hw/arm/orangepi.c: correct SDRAM size in commit message: 512MB -> 1GiB
+>  * hw/arm/orangepi.c: set .nb_cpus in the orangepi_binfo struct static
+> initialisation
+>  * hw/arm/orangepi.c: remove .board_id from orangepi_binfo struct
+>  * hw/arm/orangepi.c: move BIOS check to top of orangepi_init()
+>  * hw/arm/orangepi.c: change clk1-freq argument 24000000 to 24 * 1000 *
+> 1000 for readability
+>  * hw/arm/orangepi.c: rephrase 1GiB check error message
+>  * include/hw/arm/allwinner-h3.h: improved comments
+>  * hw/arm/allwinner-h3.c: remove duplicate initialization and declaration
+> of i variable
+>  * hw/arm/allwinner-h3.c: use DEVICE(&s->cpus[i]) instead of qemu_get_cpu=
+()
+>  * hw/arm/allwinner-h3.c: use qdev API instead of object API in CPU
+> initialization part
+>  * hw/arm/allwinner-h3.c: add note that UARTs are connected to APB2_CLK,
+> for future clocktree API
+>  * hw/arm/allwinner-h3.c: extend commit message for Boot ROM with
+> description for the 32KiB size
+>  * hw/rtc/allwinner-rtc.c: correct usage of AwRtcClass->regmap_size for
+> checking r/w offset
+>  * hw/misc/allwinner-cpucfg.c: remove 64-bit counter, as it is unused by
+> Linux/U-Boot/NetBSD
+>  * hw/misc/allwinner-cpucfg.c: add CPU_EXCEPTION_LEVEL_ON_RESET constant
+>  * hw/misc/allwinner-cpucfg.c: break instead of return after logging gues=
+t
+> error, for tracing
+>  * hw/misc/allwinner-cpucfg.c: reduce duplication in switch/case for
+> REG_CPUX_RST_CTRL in write function
+>  * include/hw/rtc/allwinner-rtc.h: increase AW_RTC_REGS_MAXADDR to 0x200
+>  * include/hw/rtc/allwinner-rtc.h: change type of AwRtcClass->year_offset
+> to int, to match struct tm
+>  * tests/acceptance/boot_linux_console.py: remove calls to vm.set_machine=
+()
+>  * tests/acceptance/boot_linux_console.py: added NetBSD test by Philippe
+>  * docs/orangepi.rst: removed some unneeded words/typos
+>  * docs/orangepi.rst: remove usage of -j5 for calling make (not all users
+> have >=3D 4 SMP cores)
+>  * include/hw/*/allwinner*.h: moved #include "qemu/osdep.h" and unneeded
+> #includes to .c file
+>
+> v3: https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg01534.html
+>     https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v3
+>
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03265.html
+>     https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v2
+>
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg00320.html
+>     https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v1
+>
+> With kind regards,
+>
+> Niek Linnenbank
+>
+> Niek Linnenbank (13):
+>   hw/arm: add Allwinner H3 System-on-Chip
+>   hw/arm: add Xunlong Orange Pi PC machine
+>   hw/arm/allwinner-h3: add Clock Control Unit
+>   hw/arm/allwinner-h3: add USB host controller
+>   hw/arm/allwinner-h3: add System Control module
+>   hw/arm/allwinner: add CPU Configuration module
+>   hw/arm/allwinner: add Security Identifier device
+>   hw/arm/allwinner: add SD/MMC host controller
+>   hw/arm/allwinner-h3: add EMAC ethernet device
+>   hw/arm/allwinner-h3: add Boot ROM support
+>   hw/arm/allwinner-h3: add SDRAM controller device
+>   hw/arm/allwinner: add RTC device support
+>   docs: add Orange Pi PC document
+>
+> Philippe Mathieu-Daud=C3=A9 (7):
+>   tests/boot_linux_console: Add a quick test for the OrangePi PC board
+>   tests/boot_linux_console: Add initrd test for the Orange Pi PC board
+>   tests/boot_linux_console: Add a SD card test for the OrangePi PC board
+>   tests/boot_linux_console: Add a SLOW test booting Ubuntu on OrangePi
+>     PC
+>   Acceptance tests: Extract _console_interaction()
+>   Acceptance tests: Add interrupt_interactive_console_until_pattern()
+>   tests/boot_linux_console: Test booting NetBSD via U-Boot on OrangePi
+>     PC
+>
+>  docs/orangepi.rst                         | 199 +++++
+>  default-configs/arm-softmmu.mak           |   1 +
+>  hw/usb/hcd-ehci.h                         |   1 +
+>  include/hw/arm/allwinner-a10.h            |   4 +
+>  include/hw/arm/allwinner-h3.h             | 163 ++++
+>  include/hw/misc/allwinner-cpucfg.h        |  52 ++
+>  include/hw/misc/allwinner-h3-ccu.h        |  66 ++
+>  include/hw/misc/allwinner-h3-dramc.h      | 106 +++
+>  include/hw/misc/allwinner-h3-sysctrl.h    |  67 ++
+>  include/hw/misc/allwinner-sid.h           |  60 ++
+>  include/hw/net/allwinner-sun8i-emac.h     |  99 +++
+>  include/hw/rtc/allwinner-rtc.h            | 128 ++++
+>  include/hw/sd/allwinner-sdhost.h          | 135 ++++
+>  hw/arm/allwinner-a10.c                    |  19 +
+>  hw/arm/allwinner-h3.c                     | 476 ++++++++++++
+>  hw/arm/cubieboard.c                       |  15 +
+>  hw/arm/orangepi.c                         | 127 ++++
+>  hw/misc/allwinner-cpucfg.c                | 269 +++++++
+>  hw/misc/allwinner-h3-ccu.c                | 243 ++++++
+>  hw/misc/allwinner-h3-dramc.c              | 358 +++++++++
+>  hw/misc/allwinner-h3-sysctrl.c            | 140 ++++
+>  hw/misc/allwinner-sid.c                   | 170 +++++
+>  hw/net/allwinner-sun8i-emac.c             | 871 ++++++++++++++++++++++
+>  hw/rtc/allwinner-rtc.c                    | 386 ++++++++++
+>  hw/sd/allwinner-sdhost.c                  | 848 +++++++++++++++++++++
+>  hw/usb/hcd-ehci-sysbus.c                  |  17 +
+>  MAINTAINERS                               |   9 +
+>  hw/arm/Kconfig                            |   9 +
+>  hw/arm/Makefile.objs                      |   1 +
+>  hw/misc/Makefile.objs                     |   5 +
+>  hw/misc/trace-events                      |  19 +
+>  hw/net/Kconfig                            |   3 +
+>  hw/net/Makefile.objs                      |   1 +
+>  hw/net/trace-events                       |  10 +
+>  hw/rtc/Makefile.objs                      |   1 +
+>  hw/rtc/trace-events                       |   4 +
+>  hw/sd/Makefile.objs                       |   1 +
+>  hw/sd/trace-events                        |   7 +
+>  tests/acceptance/avocado_qemu/__init__.py |  59 +-
+>  tests/acceptance/boot_linux_console.py    | 210 ++++++
+>  40 files changed, 5345 insertions(+), 14 deletions(-)
+>  create mode 100644 docs/orangepi.rst
+>  create mode 100644 include/hw/arm/allwinner-h3.h
+>  create mode 100644 include/hw/misc/allwinner-cpucfg.h
+>  create mode 100644 include/hw/misc/allwinner-h3-ccu.h
+>  create mode 100644 include/hw/misc/allwinner-h3-dramc.h
+>  create mode 100644 include/hw/misc/allwinner-h3-sysctrl.h
+>  create mode 100644 include/hw/misc/allwinner-sid.h
+>  create mode 100644 include/hw/net/allwinner-sun8i-emac.h
+>  create mode 100644 include/hw/rtc/allwinner-rtc.h
+>  create mode 100644 include/hw/sd/allwinner-sdhost.h
+>  create mode 100644 hw/arm/allwinner-h3.c
+>  create mode 100644 hw/arm/orangepi.c
+>  create mode 100644 hw/misc/allwinner-cpucfg.c
+>  create mode 100644 hw/misc/allwinner-h3-ccu.c
+>  create mode 100644 hw/misc/allwinner-h3-dramc.c
+>  create mode 100644 hw/misc/allwinner-h3-sysctrl.c
+>  create mode 100644 hw/misc/allwinner-sid.c
+>  create mode 100644 hw/net/allwinner-sun8i-emac.c
+>  create mode 100644 hw/rtc/allwinner-rtc.c
+>  create mode 100644 hw/sd/allwinner-sdhost.c
+>
+> --
+> 2.17.1
+>
 
-    This way, they will not execute any VM code at all.  However, right now
-    the cancellation test is "relying" on being slowed down by TCG executing
-    BIOS code.  So, change the timeouts.
+--000000000000f4a6d6059c7cca16
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-    Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">On Sun, Jan 19, 2020, 01:51 Niek Linnenbank &lt;<a hre=
+f=3D"mailto:nieklinnenbank@gmail.com">nieklinnenbank@gmail.com</a>&gt; wrot=
+e:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
+rder-left:1px #ccc solid;padding-left:1ex">Dear QEMU developers,<br>
+<br>
+Hereby I would like to contribute the following set of patches to QEMU<br>
+which add support for the Allwinner H3 System on Chip and the<br>
+Orange Pi PC machine. The following features and devices are supported:<br>
+<br>
+=C2=A0* SMP (Quad Core Cortex A7)<br>
+=C2=A0* Generic Interrupt Controller configuration<br>
+=C2=A0* SRAM mappings<br>
+=C2=A0* SDRAM controller<br>
+=C2=A0* Real Time Clock<br>
+=C2=A0* Timer device (re-used from Allwinner A10)<br>
+=C2=A0* UART<br>
+=C2=A0* SD/MMC storage controller<br>
+=C2=A0* EMAC ethernet connectivity<br>
+=C2=A0* USB 2.0 interfaces<br>
+=C2=A0* Clock Control Unit<br>
+=C2=A0* System Control module<br>
+=C2=A0* Security Identifier device<br>
+<br>
+Functionality related to graphical output such as HDMI, GPU,<br>
+Display Engine and audio are not included. Recently released<br>
+mainline Linux kernels (4.19 up to latest master), mainline U-Boot<br>
+and NetBSD 9.0-RC1 are known to work.<br>
+<br>
+For full details on how to use the Orange Pi PC machine, see the file<br>
+docs/orangepi.rst which is included as a patch in this series.<br>
+<br>
+The contents of this patch series is available on Github at:<br>
+<br>
+=C2=A0 <a href=3D"https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-=
+v3" rel=3D"noreferrer noreferrer" target=3D"_blank">https://github.com/niek=
+linnenbank/qemu/tree/allwinner-h3-v3</a></blockquote></div></div><div dir=
+=3D"auto"><br></div><div dir=3D"auto">I forgot to update this link in the c=
+over letter to v4. The correct link is:</div><div dir=3D"auto"><br></div><d=
+iv dir=3D"auto"><a href=3D"https://github.com/nieklinnenbank/qemu/tree/allw=
+inner-h3-v4">https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v4</a=
+><br></div><div dir=3D"auto"><br></div><div dir=3D"auto"><div class=3D"gmai=
+l_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;borde=
+r-left:1px #ccc solid;padding-left:1ex"><br>
+<br>
+The followings are currently known issues in this series:<br>
+<br>
+=C2=A0 - NetBSD 9.0-RC1 reads out year 2050 from RTC, while Linux works fin=
+e<br>
+=C2=A0 =C2=A0 =C2=A0-&gt; This is due to difference in base year defined by=
+ the corresponding drivers<br>
+=C2=A0 - RTC date &amp; time is not persistent<br>
+=C2=A0 - boot0 custom Allwinner bootloader not yet working<br>
+=C2=A0 - Watchdog not yet implemented, affects U-Boot &#39;reset&#39; and s=
+hutdown/reboot<br>
+=C2=A0 =C2=A0 =C2=A0-&gt; This is part of the existing A10 timer that needs=
+ to be generalized first<br>
+<br>
+Looking forward to your review comments. I will do my best<br>
+to update the patches where needed.<br>
+<br>
+=3D=3D=3D=3D=3D CHANGELOG =3D=3D=3D=3D=3D<br>
+v4:<br>
+=C2=A0* docs/orangepi.rst: correct SDRAM size in board description: 512MB -=
+&gt; 1GiB<br>
+=C2=A0* hw/arm/orangepi.c: correct SDRAM size in commit message: 512MB -&gt=
+; 1GiB<br>
+=C2=A0* hw/arm/orangepi.c: set .nb_cpus in the orangepi_binfo struct static=
+ initialisation<br>
+=C2=A0* hw/arm/orangepi.c: remove .board_id from orangepi_binfo struct<br>
+=C2=A0* hw/arm/orangepi.c: move BIOS check to top of orangepi_init()<br>
+=C2=A0* hw/arm/orangepi.c: change clk1-freq argument 24000000 to 24 * 1000 =
+* 1000 for readability<br>
+=C2=A0* hw/arm/orangepi.c: rephrase 1GiB check error message<br>
+=C2=A0* include/hw/arm/allwinner-h3.h: improved comments<br>
+=C2=A0* hw/arm/allwinner-h3.c: remove duplicate initialization and declarat=
+ion of i variable<br>
+=C2=A0* hw/arm/allwinner-h3.c: use DEVICE(&amp;s-&gt;cpus[i]) instead of qe=
+mu_get_cpu()<br>
+=C2=A0* hw/arm/allwinner-h3.c: use qdev API instead of object API in CPU in=
+itialization part<br>
+=C2=A0* hw/arm/allwinner-h3.c: add note that UARTs are connected to APB2_CL=
+K, for future clocktree API<br>
+=C2=A0* hw/arm/allwinner-h3.c: extend commit message for Boot ROM with desc=
+ription for the 32KiB size<br>
+=C2=A0* hw/rtc/allwinner-rtc.c: correct usage of AwRtcClass-&gt;regmap_size=
+ for checking r/w offset<br>
+=C2=A0* hw/misc/allwinner-cpucfg.c: remove 64-bit counter, as it is unused =
+by Linux/U-Boot/NetBSD<br>
+=C2=A0* hw/misc/allwinner-cpucfg.c: add CPU_EXCEPTION_LEVEL_ON_RESET consta=
+nt<br>
+=C2=A0* hw/misc/allwinner-cpucfg.c: break instead of return after logging g=
+uest error, for tracing<br>
+=C2=A0* hw/misc/allwinner-cpucfg.c: reduce duplication in switch/case for R=
+EG_CPUX_RST_CTRL in write function<br>
+=C2=A0* include/hw/rtc/allwinner-rtc.h: increase AW_RTC_REGS_MAXADDR to 0x2=
+00<br>
+=C2=A0* include/hw/rtc/allwinner-rtc.h: change type of AwRtcClass-&gt;year_=
+offset to int, to match struct tm<br>
+=C2=A0* tests/acceptance/boot_linux_console.py: remove calls to vm.set_mach=
+ine()<br>
+=C2=A0* tests/acceptance/boot_linux_console.py: added NetBSD test by Philip=
+pe<br>
+=C2=A0* docs/orangepi.rst: removed some unneeded words/typos<br>
+=C2=A0* docs/orangepi.rst: remove usage of -j5 for calling make (not all us=
+ers have &gt;=3D 4 SMP cores)<br>
+=C2=A0* include/hw/*/allwinner*.h: moved #include &quot;qemu/osdep.h&quot; =
+and unneeded #includes to .c file<br>
+<br>
+v3: <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg015=
+34.html" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.=
+org/archive/html/qemu-devel/2020-01/msg01534.html</a><br>
+=C2=A0 =C2=A0 <a href=3D"https://github.com/nieklinnenbank/qemu/tree/allwin=
+ner-h3-v3" rel=3D"noreferrer noreferrer" target=3D"_blank">https://github.c=
+om/nieklinnenbank/qemu/tree/allwinner-h3-v3</a><br>
+<br>
+v2: <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg032=
+65.html" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.=
+org/archive/html/qemu-devel/2019-12/msg03265.html</a><br>
+=C2=A0 =C2=A0 <a href=3D"https://github.com/nieklinnenbank/qemu/tree/allwin=
+ner-h3-v2" rel=3D"noreferrer noreferrer" target=3D"_blank">https://github.c=
+om/nieklinnenbank/qemu/tree/allwinner-h3-v2</a><br>
+<br>
+v1: <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg003=
+20.html" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.=
+org/archive/html/qemu-devel/2019-12/msg00320.html</a><br>
+=C2=A0 =C2=A0 <a href=3D"https://github.com/nieklinnenbank/qemu/tree/allwin=
+ner-h3-v1" rel=3D"noreferrer noreferrer" target=3D"_blank">https://github.c=
+om/nieklinnenbank/qemu/tree/allwinner-h3-v1</a><br>
+<br>
+With kind regards,<br>
+<br>
+Niek Linnenbank<br>
+<br>
+Niek Linnenbank (13):<br>
+=C2=A0 hw/arm: add Allwinner H3 System-on-Chip<br>
+=C2=A0 hw/arm: add Xunlong Orange Pi PC machine<br>
+=C2=A0 hw/arm/allwinner-h3: add Clock Control Unit<br>
+=C2=A0 hw/arm/allwinner-h3: add USB host controller<br>
+=C2=A0 hw/arm/allwinner-h3: add System Control module<br>
+=C2=A0 hw/arm/allwinner: add CPU Configuration module<br>
+=C2=A0 hw/arm/allwinner: add Security Identifier device<br>
+=C2=A0 hw/arm/allwinner: add SD/MMC host controller<br>
+=C2=A0 hw/arm/allwinner-h3: add EMAC ethernet device<br>
+=C2=A0 hw/arm/allwinner-h3: add Boot ROM support<br>
+=C2=A0 hw/arm/allwinner-h3: add SDRAM controller device<br>
+=C2=A0 hw/arm/allwinner: add RTC device support<br>
+=C2=A0 docs: add Orange Pi PC document<br>
+<br>
+Philippe Mathieu-Daud=C3=A9 (7):<br>
+=C2=A0 tests/boot_linux_console: Add a quick test for the OrangePi PC board=
+<br>
+=C2=A0 tests/boot_linux_console: Add initrd test for the Orange Pi PC board=
+<br>
+=C2=A0 tests/boot_linux_console: Add a SD card test for the OrangePi PC boa=
+rd<br>
+=C2=A0 tests/boot_linux_console: Add a SLOW test booting Ubuntu on OrangePi=
+<br>
+=C2=A0 =C2=A0 PC<br>
+=C2=A0 Acceptance tests: Extract _console_interaction()<br>
+=C2=A0 Acceptance tests: Add interrupt_interactive_console_until_pattern()<=
+br>
+=C2=A0 tests/boot_linux_console: Test booting NetBSD via U-Boot on OrangePi=
+<br>
+=C2=A0 =C2=A0 PC<br>
+<br>
+=C2=A0docs/orangepi.rst=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 199 +++++<br>
+=C2=A0default-configs/arm-softmmu.mak=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0|=C2=A0 =C2=A01 +<br>
+=C2=A0hw/usb/hcd-ehci.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
+=C2=A0include/hw/arm/allwinner-a10.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 =C2=A04 +<br>
+=C2=A0include/hw/arm/allwinner-h3.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0| 163 ++++<br>
+=C2=A0include/hw/misc/allwinner-cpucfg.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0=
+ 52 ++<br>
+=C2=A0include/hw/misc/allwinner-h3-ccu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0=
+ 66 ++<br>
+=C2=A0include/hw/misc/allwinner-h3-dramc.h=C2=A0 =C2=A0 =C2=A0 | 106 +++<br=
+>
+=C2=A0include/hw/misc/allwinner-h3-sysctrl.h=C2=A0 =C2=A0 |=C2=A0 67 ++<br>
+=C2=A0include/hw/misc/allwinner-sid.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0|=C2=A0 60 ++<br>
+=C2=A0include/hw/net/allwinner-sun8i-emac.h=C2=A0 =C2=A0 =C2=A0|=C2=A0 99 +=
+++<br>
+=C2=A0include/hw/rtc/allwinner-rtc.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 | 128 ++++<br>
+=C2=A0include/hw/sd/allwinner-sdhost.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =
+135 ++++<br>
+=C2=A0hw/arm/allwinner-a10.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 19 +<br>
+=C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0| 476 ++++++++++++<br>
+=C2=A0hw/arm/cubieboard.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 15 +<br>
+=C2=A0hw/arm/orangepi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 127 ++++<br>
+=C2=A0hw/misc/allwinner-cpucfg.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 | 269 +++++++<br>
+=C2=A0hw/misc/allwinner-h3-ccu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 | 243 ++++++<br>
+=C2=A0hw/misc/allwinner-h3-dramc.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 | 358 +++++++++<br>
+=C2=A0hw/misc/allwinner-h3-sysctrl.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 | 140 ++++<br>
+=C2=A0hw/misc/allwinner-sid.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0| 170 +++++<br>
+=C2=A0hw/net/allwinner-sun8i-emac.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0| 871 ++++++++++++++++++++++<br>
+=C2=A0hw/rtc/allwinner-rtc.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 | 386 ++++++++++<br>
+=C2=A0hw/sd/allwinner-sdhost.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 | 848 +++++++++++++++++++++<br>
+=C2=A0hw/usb/hcd-ehci-sysbus.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 |=C2=A0 17 +<br>
+=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A09 +<br=
+>
+=C2=A0hw/arm/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A09 +<br>
+=C2=A0hw/arm/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
+=C2=A0hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A05 +<br>
+=C2=A0hw/misc/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 19 +<br>
+=C2=A0hw/net/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A03 +<br>
+=C2=A0hw/net/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
+=C2=A0hw/net/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 10 +<br>
+=C2=A0hw/rtc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
+=C2=A0hw/rtc/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A04 +<br>
+=C2=A0hw/sd/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
+=C2=A0hw/sd/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A07 +<br>
+=C2=A0tests/acceptance/avocado_qemu/__init__.py |=C2=A0 59 +-<br>
+=C2=A0tests/acceptance/boot_linux_console.py=C2=A0 =C2=A0 | 210 ++++++<br>
+=C2=A040 files changed, 5345 insertions(+), 14 deletions(-)<br>
+=C2=A0create mode 100644 docs/orangepi.rst<br>
+=C2=A0create mode 100644 include/hw/arm/allwinner-h3.h<br>
+=C2=A0create mode 100644 include/hw/misc/allwinner-cpucfg.h<br>
+=C2=A0create mode 100644 include/hw/misc/allwinner-h3-ccu.h<br>
+=C2=A0create mode 100644 include/hw/misc/allwinner-h3-dramc.h<br>
+=C2=A0create mode 100644 include/hw/misc/allwinner-h3-sysctrl.h<br>
+=C2=A0create mode 100644 include/hw/misc/allwinner-sid.h<br>
+=C2=A0create mode 100644 include/hw/net/allwinner-sun8i-emac.h<br>
+=C2=A0create mode 100644 include/hw/rtc/allwinner-rtc.h<br>
+=C2=A0create mode 100644 include/hw/sd/allwinner-sdhost.h<br>
+=C2=A0create mode 100644 hw/arm/allwinner-h3.c<br>
+=C2=A0create mode 100644 hw/arm/orangepi.c<br>
+=C2=A0create mode 100644 hw/misc/allwinner-cpucfg.c<br>
+=C2=A0create mode 100644 hw/misc/allwinner-h3-ccu.c<br>
+=C2=A0create mode 100644 hw/misc/allwinner-h3-dramc.c<br>
+=C2=A0create mode 100644 hw/misc/allwinner-h3-sysctrl.c<br>
+=C2=A0create mode 100644 hw/misc/allwinner-sid.c<br>
+=C2=A0create mode 100644 hw/net/allwinner-sun8i-emac.c<br>
+=C2=A0create mode 100644 hw/rtc/allwinner-rtc.c<br>
+=C2=A0create mode 100644 hw/sd/allwinner-sdhost.c<br>
+<br>
+-- <br>
+2.17.1<br>
+</blockquote></div></div></div>
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index e27b40e289..e05b1d640b 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -54,7 +54,9 @@ class VM(object):
-         self._qemu_log_path = os.path.join(test_dir, 'qemu-log.%d' %
-os.getpid())
-         self._args = qemu_args + ['-chardev',
-                      'socket,id=mon,path=' + self._monitor_path,
--                     '-mon', 'chardev=mon,mode=control', '-nographic']
-+                     '-mon', 'chardev=mon,mode=control',
-+                     '-qtest', 'stdio', '-machine', 'accel=qtest',
-+                     '-display', 'none', '-vga', 'none']
-         self._num_drives = 0
-
-     def add_drive(self, path, opts=''):
-
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 4ab7d62961..cc671dd7aa 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -147,7 +147,7 @@ class TestStreamStop(ImageStreamingTestCase):
-         result = self.vm.qmp('block-stream', device='drive0')
-         self.assert_qmp(result, 'return', {})
-
--        time.sleep(1)
-+        time.sleep(0.1)
-         events = self.vm.get_qmp_events(wait=False)
-         self.assertEqual(events, [], 'unexpected QMP event: %s' % events)
-
-So IIUC we need to rework a bit the defaults of QEMUMachine::base_args.
+--000000000000f4a6d6059c7cca16--
 
