@@ -2,67 +2,64 @@ Return-Path: <SRS0=UCRd=3I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E961C33CB1
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 08:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1626C33CB1
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 08:14:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C0EE20684
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 08:09:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C0EE20684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cn.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8CCC120684
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 08:14:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CCC120684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1it5dt-0002mF-CJ
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 03:09:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42468)
+	id 1it5ix-0005J7-Ow
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 03:14:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yangx.jy@cn.fujitsu.com>) id 1it5dD-0002M0-90
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:08:28 -0500
+ (envelope-from <eguan@linux.alibaba.com>) id 1it5iH-0004YJ-7D
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:13:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yangx.jy@cn.fujitsu.com>) id 1it5dB-0005Kd-UI
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:08:27 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:45409
- helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <yangx.jy@cn.fujitsu.com>) id 1it5dB-0005Ie-JE
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:08:25 -0500
-X-IronPort-AV: E=Sophos;i="5.70,337,1574092800"; d="scan'208";a="82259448"
-Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
- by heian.cn.fujitsu.com with ESMTP; 19 Jan 2020 16:08:15 +0800
-Received: from G08CNEXMBPEKD06.g08.fujitsu.local (unknown [10.167.33.206])
- by cn.fujitsu.com (Postfix) with ESMTP id 1F2ED5010EAF;
- Sun, 19 Jan 2020 15:59:02 +0800 (CST)
-Received: from [10.167.220.69] (10.167.220.69) by
- G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206) with Microsoft SMTP Server
- (TLS) id 15.0.1395.4; Sun, 19 Jan 2020 16:08:10 +0800
-Message-ID: <5E240E69.2030803@cn.fujitsu.com>
-Date: Sun, 19 Jan 2020 16:08:09 +0800
-From: Xiao Yang <yangx.jy@cn.fujitsu.com>
-User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.2; zh-CN;
- rv:1.9.2.18) Gecko/20110616 Thunderbird/3.1.11
+ (envelope-from <eguan@linux.alibaba.com>) id 1it5i9-0007it-PM
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:13:35 -0500
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:15519)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eguan@linux.alibaba.com>)
+ id 1it5i9-0007hL-AK
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:13:33 -0500
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R341e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04426; MF=eguan@linux.alibaba.com;
+ NM=1; PH=DS; RN=5; SR=0; TI=SMTPD_---0To4bcBS_1579421589; 
+Received: from localhost(mailfrom:eguan@linux.alibaba.com
+ fp:SMTPD_---0To4bcBS_1579421589) by smtp.aliyun-inc.com(127.0.0.1);
+ Sun, 19 Jan 2020 16:13:09 +0800
+Date: Sun, 19 Jan 2020 16:13:09 +0800
+From: Eryu Guan <eguan@linux.alibaba.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [BUG qemu 4.0] segfault when unplugging virtio-blk-pci device
+Message-ID: <20200119081309.GB47669@e18g06458.et15sqa>
+References: <20191231103434.GA41863@e18g06458.et15sqa>
+ <20191231115136.7b967604@Igors-MacBook-Pro>
+ <20200102020850.GB41863@e18g06458.et15sqa>
+ <20200107130649.GH41863@e18g06458.et15sqa>
+ <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
+ <20200109045806.GB79586@e18g06458.et15sqa>
+ <20200113163855.GC103384@stefanha-x1.localdomain>
+ <20200114025058.GA47669@e18g06458.et15sqa>
+ <20200114161624.GC132666@stefanha-x1.localdomain>
 MIME-Version: 1.0
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 040/104] virtiofsd: Pass write iov's all the way through
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-41-dgilbert@redhat.com>
-In-Reply-To: <20191212163904.159893-41-dgilbert@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.167.220.69]
-X-ClientProxiedBy: G08CNEXCHPEKD04.g08.fujitsu.local (10.167.33.200) To
- G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206)
-X-yoursite-MailScanner-ID: 1F2ED5010EAF.AB276
-X-yoursite-MailScanner: Found to be clean
-X-yoursite-MailScanner-From: yangx.jy@cn.fujitsu.com
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 183.91.158.132
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200114161624.GC132666@stefanha-x1.localdomain>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 47.88.44.36
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,138 +71,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019/12/13 0:38, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert"<dgilbert@redhat.com>
->
-> Pass the write iov pointing to guest RAM all the way through rather
-> than copying the data.
->
-> Signed-off-by: Dr. David Alan Gilbert<dgilbert@redhat.com>
-> ---
->   tools/virtiofsd/fuse_virtio.c | 79 ++++++++++++++++++++++++++++++++---
->   1 file changed, 73 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-> index 99c877ea2e..3c778b6296 100644
-> --- a/tools/virtiofsd/fuse_virtio.c
-> +++ b/tools/virtiofsd/fuse_virtio.c
-> @@ -452,6 +452,10 @@ static void *fv_queue_thread(void *opaque)
->                    __func__, qi->qidx, (size_t)evalue, in_bytes, out_bytes);
->
->           while (1) {
-> +            bool allocated_bufv = false;
-> +            struct fuse_bufvec bufv;
-> +            struct fuse_bufvec *pbufv;
-> +
->               /*
->                * An element contains one request and the space to send our
->                * response They're spread over multiple descriptors in a
-> @@ -493,14 +497,76 @@ static void *fv_queue_thread(void *opaque)
->                            __func__, elem->index);
->                   assert(0); /* TODO */
->               }
-> -            copy_from_iov(&fbuf, out_num, out_sg);
-> -            fbuf.size = out_len;
-> +            /* Copy just the first element and look at it */
-> +            copy_from_iov(&fbuf, 1, out_sg);
-> +
-> +            if (out_num>  2&&
-> +                out_sg[0].iov_len == sizeof(struct fuse_in_header)&&
-> +                ((struct fuse_in_header *)fbuf.mem)->opcode == FUSE_WRITE&&
-> +                out_sg[1].iov_len == sizeof(struct fuse_write_in)) {
-> +                /*
-> +                 * For a write we don't actually need to copy the
-> +                 * data, we can just do it straight out of guest memory
-> +                 * but we must still copy the headers in case the guest
-> +                 * was nasty and changed them while we were using them.
-> +                 */
-> +                fuse_log(FUSE_LOG_DEBUG, "%s: Write special case\n", __func__);
-> +
-> +                /* copy the fuse_write_in header after the fuse_in_header */
-> +                fbuf.mem += out_sg->iov_len;
-> +                copy_from_iov(&fbuf, 1, out_sg + 1);
-> +                fbuf.mem -= out_sg->iov_len;
-> +                fbuf.size = out_sg[0].iov_len + out_sg[1].iov_len;
-> +
-> +                /* Allocate the bufv, with space for the rest of the iov */
-> +                allocated_bufv = true;
-> +                pbufv = malloc(sizeof(struct fuse_bufvec) +
-> +                               sizeof(struct fuse_buf) * (out_num - 2));
-> +                if (!pbufv) {
-> +                    vu_queue_unpop(dev, q, elem, 0);
-> +                    free(elem);
-> +                    fuse_log(FUSE_LOG_ERR, "%s: pbufv malloc failed\n",
-> +                             __func__);
-> +                    goto out;
-> +                }
-> +
-> +                pbufv->count = 1;
-> +                pbufv->buf[0] = fbuf;
-> +
-> +                size_t iovindex, pbufvindex;
-> +                iovindex = 2; /* 2 headers, separate iovs */
-> +                pbufvindex = 1; /* 2 headers, 1 fusebuf */
-> +
-> +                for (; iovindex<  out_num; iovindex++, pbufvindex++) {
-> +                    pbufv->count++;
-> +                    pbufv->buf[pbufvindex].pos = ~0; /* Dummy */
-> +                    pbufv->buf[pbufvindex].flags = 0;
-> +                    pbufv->buf[pbufvindex].mem = out_sg[iovindex].iov_base;
-> +                    pbufv->buf[pbufvindex].size = out_sg[iovindex].iov_len;
-> +                }
-> +            } else {
-> +                /* Normal (non fast write) path */
-> +
-> +                /* Copy the rest of the buffer */
-> +                fbuf.mem += out_sg->iov_len;
-> +                copy_from_iov(&fbuf, out_num - 1, out_sg + 1);
-> +                fbuf.mem -= out_sg->iov_len;
-> +                fbuf.size = out_len;
->
-> -            /* TODO! Endianness of header */
-> +                /* TODO! Endianness of header */
->
-> -            /* TODO: Add checks for fuse_session_exited */
-> -            struct fuse_bufvec bufv = { .buf[0] = fbuf, .count = 1 };
-> -            fuse_session_process_buf_int(se,&bufv,&ch);
-> +                /* TODO: Add checks for fuse_session_exited */
-> +                bufv.buf[0] = fbuf;
-> +                bufv.count = 1;
-> +                pbufv =&bufv;
-> +            }
-> +            pbufv->idx = 0;
-> +            pbufv->off = 0;
-> +            fuse_session_process_buf_int(se, pbufv,&ch);
-> +
-> +            if (allocated_bufv) {
-> +                free(pbufv);
-> +            }
->
->               if (!qi->reply_sent) {
->                   fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
-> @@ -514,6 +580,7 @@ static void *fv_queue_thread(void *opaque)
->               elem = NULL;
->           }
->       }
-> +out:
->       pthread_mutex_destroy(&ch.lock);
->       free(fbuf.mem);
->
-Hi,
+On Tue, Jan 14, 2020 at 04:16:24PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Jan 14, 2020 at 10:50:58AM +0800, Eryu Guan wrote:
+> > On Mon, Jan 13, 2020 at 04:38:55PM +0000, Stefan Hajnoczi wrote:
+> > > On Thu, Jan 09, 2020 at 12:58:06PM +0800, Eryu Guan wrote:
+> > > > On Tue, Jan 07, 2020 at 03:01:01PM +0100, Julia Suvorova wrote:
+> > > > > On Tue, Jan 7, 2020 at 2:06 PM Eryu Guan <eguan@linux.alibaba.com> wrote:
+> > > > > >
+> > > > > > On Thu, Jan 02, 2020 at 10:08:50AM +0800, Eryu Guan wrote:
+> > > > > > > On Tue, Dec 31, 2019 at 11:51:35AM +0100, Igor Mammedov wrote:
+> > > > > > > > On Tue, 31 Dec 2019 18:34:34 +0800
+> > > > > > > > Eryu Guan <eguan@linux.alibaba.com> wrote:
+> > > > > > > >
+> > > > > > > > > Hi,
+> > > > > > > > >
+> > > > > > > > > I'm using qemu 4.0 and hit segfault when tearing down kata sandbox, I
+> > > > > > > > > think it's because io completion hits use-after-free when device is
+> > > > > > > > > already gone. Is this a known bug that has been fixed? (I went through
+> > > > > > > > > the git log but didn't find anything obvious).
+> > > > > > > > >
+> > > > > > > > > gdb backtrace is:
+> > > > > > > > >
+> > > > > > > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-5b8df8c6c6901c3c0a9b02879be10fe8d69d6'.
+> > > > > > > > > Program terminated with signal 11, Segmentation fault.
+> > > > > > > > > #0 object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
+> > > > > > > > > 903        return obj->class;
+> > > > > > > > > (gdb) bt
+> > > > > > > > > #0  object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
+> > > > > > > > > #1  0x0000558a2c009e9b in virtio_notify_vector (vdev=0x558a2e7751d0,
+> > > > > > > > >     vector=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio.c:1118
+> > > > > > > > > #2  0x0000558a2bfdcb1e in virtio_blk_discard_write_zeroes_complete (
+> > > > > > > > >     opaque=0x558a2f2fd420, ret=0)
+> > > > > > > > >     at /usr/src/debug/qemu-4.0/hw/block/virtio-blk.c:186
+> > > > > > > > > #3  0x0000558a2c261c7e in blk_aio_complete (acb=0x558a2eed7420)
+> > > > > > > > >     at /usr/src/debug/qemu-4.0/block/block-backend.c:1305
+> > > > > > > > > #4  0x0000558a2c3031db in coroutine_trampoline (i0=<optimized out>,
+> > > > > > > > >     i1=<optimized out>) at /usr/src/debug/qemu-4.0/util/coroutine-ucontext.c:116
+> > > > > > > > > #5  0x00007f45b2f8b080 in ?? () from /lib64/libc.so.6
+> > > > > > > > > #6  0x00007fff9ed75780 in ?? ()
+> > > > > > > > > #7  0x0000000000000000 in ?? ()
+> > > > > > > > >
+> > > > > > > > > It seems like qemu was completing a discard/write_zero request, but
+> > > > > > > > > parent BusState was already freed & set to NULL.
+> > > > > > > > >
+> > > > > > > > > Do we need to drain all pending request before unrealizing virtio-blk
+> > > > > > > > > device? Like the following patch proposed?
+> > > > > > > > >
+> > > > > > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02945.html
+> > > > > > > > >
+> > > > > > > > > If more info is needed, please let me know.
+> > > > > > > >
+> > > > > > > > may be this will help: https://patchwork.kernel.org/patch/11213047/
+> > > > > > >
+> > > > > > > Yeah, this looks promising! I'll try it out (though it's a one-time
+> > > > > > > crash for me). Thanks!
+> > > > > >
+> > > > > > After applying this patch, I don't see the original segfaut and
+> > > > > > backtrace, but I see this crash
+> > > > > >
+> > > > > > [Thread debugging using libthread_db enabled]
+> > > > > > Using host libthread_db library "/lib64/libthread_db.so.1".
+> > > > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-a2f34a11a7e1449496503bbc4050ae040c0d3'.
+> > > > > > Program terminated with signal 11, Segmentation fault.
+> > > > > > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
+> > > > > > 1324        VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
+> > > > > > Missing separate debuginfos, use: debuginfo-install glib2-2.42.2-5.1.alios7.x86_64 glibc-2.17-260.alios7.x86_64 libgcc-4.8.5-28.alios7.1.x86_64 libseccomp-2.3.1-3.alios7.x86_64 libstdc++-4.8.5-28.alios7.1.x86_64 numactl-libs-2.0.9-5.1.alios7.x86_64 pixman-0.32.6-3.1.alios7.x86_64 zlib-1.2.7-16.2.alios7.x86_64
+> > > > > > (gdb) bt
+> > > > > > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
+> > > > > > #1  0x0000561216835b22 in memory_region_write_accessor (mr=<optimized out>, addr=<optimized out>, value=<optimized out>, size=<optimized out>, shift=<optimized out>, mask=<optimized out>, attrs=...) at /usr/src/debug/qemu-4.0/memory.c:502
+> > > > > > #2  0x0000561216833c5d in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7fcdeab1b8a8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x561216835ac0 <memory_region_write_accessor>, mr=0x56121846d340, attrs=...)
+> > > > > >     at /usr/src/debug/qemu-4.0/memory.c:568
+> > > > > > #3  0x0000561216837c66 in memory_region_dispatch_write (mr=mr@entry=0x56121846d340, addr=0, data=<optimized out>, size=2, attrs=attrs@entry=...) at /usr/src/debug/qemu-4.0/memory.c:1503
+> > > > > > #4  0x00005612167e036f in flatview_write_continue (fv=fv@entry=0x56121852edd0, addr=addr@entry=841813602304, attrs=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=len@entry=2, addr1=<optimized out>, l=<optimized out>, mr=0x56121846d340)
+> > > > > >     at /usr/src/debug/qemu-4.0/exec.c:3279
+> > > > > > #5  0x00005612167e0506 in flatview_write (fv=0x56121852edd0, addr=841813602304, attrs=..., buf=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=2) at /usr/src/debug/qemu-4.0/exec.c:3318
+> > > > > > #6  0x00005612167e4a1b in address_space_write (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3408
+> > > > > > #7  0x00005612167e4aa5 in address_space_rw (as=<optimized out>, addr=<optimized out>, attrs=..., attrs@entry=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=<optimized out>, is_write=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3419
+> > > > > > #8  0x0000561216849da1 in kvm_cpu_exec (cpu=cpu@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/accel/kvm/kvm-all.c:2034
+> > > > > > #9  0x000056121682255e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/cpus.c:1281
+> > > > > > #10 0x0000561216b794d6 in qemu_thread_start (args=<optimized out>) at /usr/src/debug/qemu-4.0/util/qemu-thread-posix.c:502
+> > > > > > #11 0x00007fce7bef6e25 in start_thread () from /lib64/libpthread.so.0
+> > > > > > #12 0x00007fce7bc1ef1d in clone () from /lib64/libc.so.6
+> > > > > >
+> > > > > > And I searched and found
+> > > > > > https://bugzilla.redhat.com/show_bug.cgi?id=1706759 , which has the same
+> > > > > > backtrace as above, and it seems commit 7bfde688fb1b ("virtio-blk: Add
+> > > > > > blk_drain() to virtio_blk_device_unrealize()") is to fix this particular
+> > > > > > bug.
+> > > > > >
+> > > > > > But I can still hit the bug even after applying the commit. Do I miss
+> > > > > > anything?
+> > > > > 
+> > > > > Hi Eryu,
+> > > > > This backtrace seems to be caused by this bug (there were two bugs in
+> > > > > 1706759): https://bugzilla.redhat.com/show_bug.cgi?id=1708480
+> > > > > Although the solution hasn't been tested on virtio-blk yet, you may
+> > > > > want to apply this patch:
+> > > > >     https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg05197.html
+> > > > > Let me know if this works.
+> > > > 
+> > > > Unfortunately, I still see the same segfault & backtrace after applying
+> > > > commit 421afd2fe8dd ("virtio: reset region cache when on queue
+> > > > deletion")
+> > > > 
+> > > > Anything I can help to debug?
+> > > 
+> > > Please post the QEMU command-line and the QMP commands use to remove the
+> > > device.
+> > 
+> > It's a normal kata instance using virtio-fs as rootfs.
+> > 
+> > /usr/local/libexec/qemu-kvm -name sandbox-a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d \
+> >  -uuid e03f6b6b-b80b-40c0-8d5b-0cbfed1305d2 -machine q35,accel=kvm,kernel_irqchip,nvdimm,nosmm,nosmbus,nosata,nopit \
+> >  -cpu host -qmp unix:/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/qmp.sock,server,nowait \
+> >  -qmp unix:/run/vc/vm/debug-a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/qmp.sock,server,nowait \
+> >  -m 2048M,slots=10,maxmem=773893M -device pci-bridge,bus=pcie.0,id=pci-bridge-0,chassis_nr=1,shpc=on,addr=2,romfile= \
+> >  -device virtio-serial-pci,disable-modern=false,id=serial0,romfile= -device virtconsole,chardev=charconsole0,id=console0 \
+> >  -chardev socket,id=charconsole0,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/console.sock,server,nowait \
+> >  -device virtserialport,chardev=metricagent,id=channel10,name=metric.agent.channel.10 \
+> >  -chardev socket,id=metricagent,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/metric.agent.channel.sock,server,nowait \
+> >  -device nvdimm,id=nv0,memdev=mem0 -object memory-backend-file,id=mem0,mem-path=/usr/local/share/containers-image-1.9.0.img,size=268435456 \
+> >  -object rng-random,id=rng0,filename=/dev/urandom -device virtio-rng,rng=rng0,romfile= \
+> >  -device virtserialport,chardev=charch0,id=channel0,name=agent.channel.0 \
+> >  -chardev socket,id=charch0,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/kata.sock,server,nowait \
+> >  -chardev socket,id=char-6fca044b801a78a1,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/vhost-fs.sock \
+> >  -device vhost-user-fs-pci,chardev=char-6fca044b801a78a1,tag=kataShared,cache-size=8192M -netdev tap,id=network-0,vhost=on,vhostfds=3,fds=4 \
+> >  -device driver=virtio-net-pci,netdev=network-0,mac=76:57:f1:ab:51:5c,disable-modern=false,mq=on,vectors=4,romfile= \
+> >  -global kvm-pit.lost_tick_policy=discard -vga none -no-user-config -nodefaults -nographic -daemonize \
+> >  -object memory-backend-file,id=dimm1,size=2048M,mem-path=/dev/shm,share=on -numa node,memdev=dimm1 -kernel /usr/local/share/kernel \
+> >  -append tsc=reliable no_timer_check rcupdate.rcu_expedited=1 i8042.direct=1 i8042.dumbkbd=1 i8042.nopnp=1 i8042.noaux=1 noreplace-smp reboot=k console=hvc0 console=hvc1 iommu=off cryptomgr.notests net.ifnames=0 pci=lastbus=0 root=/dev/pmem0p1 rootflags=dax,data=ordered,errors=remount-ro ro rootfstype=ext4 quiet systemd.show_status=false panic=1 nr_cpus=96 agent.use_vsock=false init=/usr/lib/systemd/systemd systemd.unit=kata-containers.target systemd.mask=systemd-networkd.service systemd.mask=systemd-networkd.socket \
+> >  -pidfile /run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/pid \
+> >  -smp 1,cores=1,threads=1,sockets=96,maxcpus=96
+> > 
+> > QMP command to delete device (the device id is just an example, not the
+> > one caused the crash):
+> > 
+> > "{\"arguments\":{\"id\":\"virtio-drive-5967abfb917c8da6\"},\"execute\":\"device_del\"}"
+> > 
+> > which has been hot plugged by:
+> > "{\"arguments\":{\"cache\":{\"direct\":true,\"no-flush\":false},\"driver\":\"raw\",\"file\":{\"driver\":\"file\",\"filename\":\"/dev/dm-18\"},\"node-name\":\"drive-5967abfb917c8da6\"},\"execute\":\"blockdev-add\"}"
+> > "{\"return\": {}}"
+> > "{\"arguments\":{\"addr\":\"01\",\"bus\":\"pci-bridge-0\",\"drive\":\"drive-5967abfb917c8da6\",\"driver\":\"virtio-blk-pci\",\"id\":\"virtio-drive-5967abfb917c8da6\",\"romfile\":\"\",\"share-rw\":\"on\"},\"execute\":\"device_add\"}"
+> > "{\"return\": {}}"
+> 
+> Thanks.  I wasn't able to reproduce this crash with qemu.git/master.
+> 
+> One thing that is strange about the latest backtrace you posted: QEMU is
+> dispatching the memory access instead of using the ioeventfd code that
+> that virtio-blk-pci normally takes when a virtqueue is notified.  I
+> guess this means ioeventfd has already been disabled due to the hot
+> unplug.
+> 
+> Could you try with machine type "i440fx" instead of "q35"?  I wonder if
+> pci-bridge/shpc is part of the problem.
 
-Tested the patch and got the correct data written by guest, so it looks 
-fine to me.
-Reviewed-by: Xiao Yang <yangx.jy@cn.fujitsu.com>
+Sure, will try it. But it may take some time, as the test bed is busy
+with other testing tasks. I'll report back once I got the results.
 
-Best Regards,
-Xiao Yang
-
-
-
-
+Thanks,
+Eryu
 
