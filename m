@@ -8,76 +8,80 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6466EC32771
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 01:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E83C32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 01:05:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FCCF2467C
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 01:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C2B22051A
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 01:05:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwjplsLK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FCCF2467C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gdGaMyKc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C2B22051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46445 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isz1r-0000Dx-AQ
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 20:05:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47027)
+	id 1isz2D-0000rw-78
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 20:05:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1isyoL-000767-Gq
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:32 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1isyoK-00075C-Tu
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1isyoI-0008Of-7X
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:29 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:46534)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1isyoF-0008Mf-AV
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:28 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38206)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1isyoH-0008O2-U8; Sat, 18 Jan 2020 19:51:26 -0500
-Received: by mail-wr1-x434.google.com with SMTP id z7so26027617wrl.13;
- Sat, 18 Jan 2020 16:51:25 -0800 (PST)
+ id 1isyoE-0008Lp-Tl; Sat, 18 Jan 2020 19:51:23 -0500
+Received: by mail-wr1-x433.google.com with SMTP id y17so26094997wrh.5;
+ Sat, 18 Jan 2020 16:51:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=8NZnaFL5HDNWg/DSDJ4H2shR8llyXCALhvmMpOOztZ0=;
- b=cwjplsLKlh5txGx2/wFgLzcLapj0dLleDv9IB+CS2Hghq1FQD337qKIIvET+lb3ESl
- Hwc70xPdhobVjvHCmO/lWy5LY4qUubukSrds9eu2a3flIFY/fkx/+9qJMB64+Njgk2/C
- utcUW8qh975ZovP1oqFJ9XPWIGy3zVraXbPW+G+WVrjWYbS+EmkRqDHroSrSTwkJutkQ
- XymJtnsPuLQwGrA1xL9HP6m/xZtrMWTNkpv88iWFgWBMEKRW4S1HzBLPtsl4BF2zHjow
- 0/lQQSodd80w/nIdZmIMRk4WO9Oevbwbga6O6TfQBcgWx734Xww7CBk9aCK5ayU4Hl3Q
- Hkaw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=IHy5e91OKJAyQ3k36PwLVZ8yCvVKOKzzBxBFkuR11HQ=;
+ b=gdGaMyKcB9CoEHDbHuWVpBNwZ6/1SGMb+J5dfFAX7RU5fzJQvfAOt5WTa1DNMmW9HT
+ EtfkDz81GpeTit7M8kczODIN3MewLojYSUaRTos1T/x49bDGfnKXGYLUGd+C+yGHpz5w
+ +6mC8Kz/jwfzWRsaAKjPWiRo0LyfJorpxwIDjNqctPYNsoG9q/pdpJuLUjdEqLhgPzU9
+ ZFSlQd90wDggT9TBPduzaJtoPhUEnsrFOkCdoMnRX4GExv4bprLCop3n3/dNAQAbJQkr
+ Kd/IF2kbgsy/IgSuZ1SCCSMoVXWPrDROL2ppN7L/seH7nTxqq9BUNPcUJM7anMhgjPzA
+ swsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=8NZnaFL5HDNWg/DSDJ4H2shR8llyXCALhvmMpOOztZ0=;
- b=SC+A/ZrOvA44GQOXH5SmBv47e+3Rfh0az7DI0F62MAlBIp6oIrpGrlXVd6wMMP2m6T
- rt3wy4Yx81YjPM1mzGfXGyxD46cuogbjhXF8TiMjwAuJwqgWg364+3F5MiVrTmNhE5xm
- RGiKbsWuMcFt3DtMVpy0OxURCPClFPK+IN+DzzdncfEjPXns+h9+E4poV6qS5nrUweeQ
- EjnfaEEg4+wdBzYhdcc38xGntQfuOM1GK9FNOMGz56/Jstu0DFuDUuRkPAeuPy5IUIT8
- dByYoKW1Zg3zJmxbDBWM8aRZsa/y3eVpr84ybwzSkzmDk4CkU4xlVr3TC/AsLn0kLOUU
- Ubbg==
-X-Gm-Message-State: APjAAAVrLVj4C1FbR/XcPZ42V6F45573lH8EtRm+xwtq2eBMyK3+8YjH
- HBtLaRwYi/CGXVTqj/N2Id7BK7HkqVI=
-X-Google-Smtp-Source: APXvYqwMMDnTABV/pf4yNeYcEGULU0daOU0aJP3fgz/+eiyesNoOtWEmJSN/S/HmvReZqHmtFcDeng==
-X-Received: by 2002:a5d:42c5:: with SMTP id t5mr11212821wrr.73.1579395084470; 
- Sat, 18 Jan 2020 16:51:24 -0800 (PST)
+ :references:mime-version:content-transfer-encoding;
+ bh=IHy5e91OKJAyQ3k36PwLVZ8yCvVKOKzzBxBFkuR11HQ=;
+ b=m102UfXNHOmX0Ljj/ZebFCRjm/uEUlYIEfY69ZxVyLl3gwM5dwzdcXbQEMJM4LcV1A
+ Ui9e+kErwemu0enNNvvIuzz9kyHvpr3aiEKapX8hT9i9CIcbM1RbkCwK+zwt2FUliSS8
+ 343DN2jb4ImPozI0ROPubROhKjYRpXmuEyGFEcs73+6LcGIhYIU3GwLESh3ntsoOkqlF
+ Z/T0pnF1z/9SUE+IkH0CQerR+gzW1QsFXnLyBmkov/2AJcmOo1Z80AU7ifLoNiMYUolT
+ tepaUjnoAAYwezIDHq9YgCFITFBp6j00gvEVPXwfeUmxFVWWK8jxCQVDqr1EVEJ6kF5r
+ iu3Q==
+X-Gm-Message-State: APjAAAXx7vsYNxmlVx1fk3wPsTl1TlKEbewgEWR+kTi2YFH9j8vUbywH
+ yG/vuQfukYl7R65U4duljJ70koJNhHg=
+X-Google-Smtp-Source: APXvYqz+PYtErVqosu8KnrDoZXv2scwnTFVjC/Hn8GtVFPwi7ewQaEcRjdfQRXUkNrpnvuMxlAchlQ==
+X-Received: by 2002:adf:fbc9:: with SMTP id d9mr10704146wrs.20.1579395081039; 
+ Sat, 18 Jan 2020 16:51:21 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id h2sm41763568wrv.66.2020.01.18.16.51.23
+ by smtp.gmail.com with ESMTPSA id h2sm41763568wrv.66.2020.01.18.16.51.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Jan 2020 16:51:23 -0800 (PST)
+ Sat, 18 Jan 2020 16:51:20 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 12/20] hw/arm/allwinner: add RTC device support
-Date: Sun, 19 Jan 2020 01:50:54 +0100
-Message-Id: <20200119005102.3847-13-nieklinnenbank@gmail.com>
+Subject: [PATCH v4 08/20] hw/arm/allwinner: add SD/MMC host controller
+Date: Sun, 19 Jan 2020 01:50:50 +0100
+Message-Id: <20200119005102.3847-9-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200119005102.3847-1-nieklinnenbank@gmail.com>
 References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,91 +100,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allwinner System-on-Chips usually contain a Real Time Clock (RTC)
-for non-volatile system date and time keeping. This commit adds a generic
-Allwinner RTC device that supports the RTC devices found in Allwinner SoC
-family sun4i (A10), sun7i (A20) and sun6i and newer (A31, H2+, H3, etc).
-The following RTC functionality and features are implemented:
+The Allwinner System on Chip families sun4i and above contain
+an integrated storage controller for Secure Digital (SD) and
+Multi Media Card (MMC) interfaces. This commit adds support
+for the Allwinner SD/MMC storage controller with the following
+emulated features:
 
- * Year-Month-Day read/write
- * Hour-Minute-Second read/write
- * General Purpose storage
+ * DMA transfers
+ * Direct FIFO I/O
+ * Short/Long format command responses
+ * Auto-Stop command (CMD12)
+ * Insert & remove card detection
 
-The following boards are extended with the RTC device:
+The following boards are extended with the SD host controller:
 
  * Cubieboard (hw/arm/cubieboard.c)
  * Orange Pi PC (hw/arm/orangepi.c)
 
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/arm/allwinner-a10.h |   2 +
- include/hw/arm/allwinner-h3.h  |   3 +
- include/hw/rtc/allwinner-rtc.h | 128 +++++++++++
- hw/arm/allwinner-a10.c         |   8 +
- hw/arm/allwinner-h3.c          |   9 +-
- hw/rtc/allwinner-rtc.c         | 386 +++++++++++++++++++++++++++++++++
- hw/rtc/Makefile.objs           |   1 +
- hw/rtc/trace-events            |   4 +
- 8 files changed, 540 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/rtc/allwinner-rtc.h
- create mode 100644 hw/rtc/allwinner-rtc.c
+ include/hw/arm/allwinner-a10.h   |   2 +
+ include/hw/arm/allwinner-h3.h    |   3 +
+ include/hw/sd/allwinner-sdhost.h | 135 +++++
+ hw/arm/allwinner-a10.c           |  11 +
+ hw/arm/allwinner-h3.c            |  15 +-
+ hw/arm/cubieboard.c              |  15 +
+ hw/arm/orangepi.c                |  16 +
+ hw/sd/allwinner-sdhost.c         | 848 +++++++++++++++++++++++++++++++
+ hw/sd/Makefile.objs              |   1 +
+ hw/sd/trace-events               |   7 +
+ 10 files changed, 1052 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/sd/allwinner-sdhost.h
+ create mode 100644 hw/sd/allwinner-sdhost.c
 
 diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a10.h
-index d009616eef..fc979985e6 100644
+index 40d0b1d9c0..d009616eef 100644
 --- a/include/hw/arm/allwinner-a10.h
 +++ b/include/hw/arm/allwinner-a10.h
-@@ -9,6 +9,7 @@
+@@ -7,6 +7,7 @@
+ #include "hw/timer/allwinner-a10-pit.h"
+ #include "hw/intc/allwinner-a10-pic.h"
  #include "hw/net/allwinner_emac.h"
- #include "hw/sd/allwinner-sdhost.h"
++#include "hw/sd/allwinner-sdhost.h"
  #include "hw/ide/ahci.h"
-+#include "hw/rtc/allwinner-rtc.h"
  
  #include "target/arm/cpu.h"
- 
-@@ -29,6 +30,7 @@ typedef struct AwA10State {
+@@ -27,6 +28,7 @@ typedef struct AwA10State {
+     AwA10PICState intc;
      AwEmacState emac;
      AllwinnerAHCIState sata;
-     AwSdHostState mmc0;
-+    AwRtcState rtc;
++    AwSdHostState mmc0;
      MemoryRegion sram_a;
  } AwA10State;
  
 diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index 8bcfc4a164..fd6077c23b 100644
+index 85416d9d64..d71a4917ab 100644
 --- a/include/hw/arm/allwinner-h3.h
 +++ b/include/hw/arm/allwinner-h3.h
-@@ -46,6 +46,7 @@
+@@ -43,6 +43,7 @@
+ #include "hw/misc/allwinner-cpucfg.h"
+ #include "hw/misc/allwinner-h3-sysctrl.h"
  #include "hw/misc/allwinner-sid.h"
- #include "hw/sd/allwinner-sdhost.h"
- #include "hw/net/allwinner-sun8i-emac.h"
-+#include "hw/rtc/allwinner-rtc.h"
++#include "hw/sd/allwinner-sdhost.h"
  #include "target/arm/cpu.h"
- #include "sysemu/block-backend.h"
  
-@@ -88,6 +89,7 @@ enum {
-     AW_H3_GIC_CPU,
-     AW_H3_GIC_HYP,
-     AW_H3_GIC_VCPU,
-+    AW_H3_RTC,
-     AW_H3_CPUCFG,
-     AW_H3_SDRAM
- };
-@@ -129,6 +131,7 @@ typedef struct AwH3State {
+ /**
+@@ -60,6 +61,7 @@ enum {
+     AW_H3_SRAM_A2,
+     AW_H3_SRAM_C,
+     AW_H3_SYSCTRL,
++    AW_H3_MMC0,
+     AW_H3_SID,
+     AW_H3_EHCI0,
+     AW_H3_OHCI0,
+@@ -117,6 +119,7 @@ typedef struct AwH3State {
+     AwCpuCfgState cpucfg;
+     AwH3SysCtrlState sysctrl;
      AwSidState sid;
-     AwSdHostState mmc0;
-     AwSun8iEmacState emac;
-+    AwRtcState rtc;
++    AwSdHostState mmc0;
      GICState gic;
      MemoryRegion sram_a1;
      MemoryRegion sram_a2;
-diff --git a/include/hw/rtc/allwinner-rtc.h b/include/hw/rtc/allwinner-rtc.h
+diff --git a/include/hw/sd/allwinner-sdhost.h b/include/hw/sd/allwinner-sdhost.h
 new file mode 100644
-index 0000000000..ce5f883396
+index 0000000000..d94606a853
 --- /dev/null
-+++ b/include/hw/rtc/allwinner-rtc.h
-@@ -0,0 +1,128 @@
++++ b/include/hw/sd/allwinner-sdhost.h
+@@ -0,0 +1,135 @@
 +/*
-+ * Allwinner Real Time Clock emulation
++ * Allwinner (sun4i and above) SD Host Controller emulation
 + *
 + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 + *
@@ -198,41 +207,26 @@ index 0000000000..ce5f883396
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_MISC_ALLWINNER_RTC_H
-+#define HW_MISC_ALLWINNER_RTC_H
++#ifndef HW_SD_ALLWINNER_SDHOST_H
++#define HW_SD_ALLWINNER_SDHOST_H
 +
 +#include "qom/object.h"
 +#include "hw/sysbus.h"
-+
-+/**
-+ * Constants
-+ * @{
-+ */
-+
-+/** Highest register address used by RTC device */
-+#define AW_RTC_REGS_MAXADDR     (0x200)
-+
-+/** Total number of known registers */
-+#define AW_RTC_REGS_NUM         (AW_RTC_REGS_MAXADDR / sizeof(uint32_t))
-+
-+/** @} */
++#include "hw/sd/sd.h"
 +
 +/**
 + * Object model types
 + * @{
 + */
 +
-+/** Generic Allwinner RTC device (abstract) */
-+#define TYPE_AW_RTC          "allwinner-rtc"
++/** Generic Allwinner SD Host Controller (abstract) */
++#define TYPE_AW_SDHOST "allwinner-sdhost"
 +
-+/** Allwinner RTC sun4i family (A10, A12) */
-+#define TYPE_AW_RTC_SUN4I    TYPE_AW_RTC "-sun4i"
++/** Allwinner sun4i family (A10, A12) */
++#define TYPE_AW_SDHOST_SUN4I TYPE_AW_SDHOST "-sun4i"
 +
-+/** Allwinner RTC sun6i family and newer (A31, H2+, H3, etc) */
-+#define TYPE_AW_RTC_SUN6I    TYPE_AW_RTC "-sun6i"
-+
-+/** Allwinner RTC sun7i family (A20) */
-+#define TYPE_AW_RTC_SUN7I    TYPE_AW_RTC "-sun7i"
++/** Allwinner sun5i family and newer (A13, H2+, H3, etc) */
++#define TYPE_AW_SDHOST_SUN5I TYPE_AW_SDHOST "-sun5i"
 +
 +/** @} */
 +
@@ -241,154 +235,273 @@ index 0000000000..ce5f883396
 + * @{
 + */
 +
-+#define AW_RTC(obj) \
-+    OBJECT_CHECK(AwRtcState, (obj), TYPE_AW_RTC)
-+#define AW_RTC_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AwRtcClass, (klass), TYPE_AW_RTC)
-+#define AW_RTC_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AwRtcClass, (obj), TYPE_AW_RTC)
++#define AW_SDHOST(obj) \
++    OBJECT_CHECK(AwSdHostState, (obj), TYPE_AW_SDHOST)
++#define AW_SDHOST_CLASS(klass) \
++     OBJECT_CLASS_CHECK(AwSdHostClass, (klass), TYPE_AW_SDHOST)
++#define AW_SDHOST_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(AwSdHostClass, (obj), TYPE_AW_SDHOST)
 +
 +/** @} */
 +
 +/**
-+ * Allwinner RTC per-object instance state.
++ * Allwinner SD Host Controller object instance state.
 + */
-+typedef struct AwRtcState {
++typedef struct AwSdHostState {
 +    /*< private >*/
-+    SysBusDevice parent_obj;
++    SysBusDevice busdev;
 +    /*< public >*/
++
++    /** Secure Digital (SD) bus, which connects to SD card (if present) */
++    SDBus sdbus;
 +
 +    /** Maps I/O registers in physical memory */
 +    MemoryRegion iomem;
 +
-+    /** Array of hardware registers */
-+    uint32_t regs[AW_RTC_REGS_NUM];
++    /** Interrupt output signal to notify CPU */
++    qemu_irq irq;
 +
-+} AwRtcState;
++    /** Number of bytes left in current DMA transfer */
++    uint32_t transfer_cnt;
++
++    /**
++     * @name Hardware Registers
++     * @{
++     */
++
++    uint32_t global_ctl;        /**< Global Control */
++    uint32_t clock_ctl;         /**< Clock Control */
++    uint32_t timeout;           /**< Timeout */
++    uint32_t bus_width;         /**< Bus Width */
++    uint32_t block_size;        /**< Block Size */
++    uint32_t byte_count;        /**< Byte Count */
++
++    uint32_t command;           /**< Command */
++    uint32_t command_arg;       /**< Command Argument */
++    uint32_t response[4];       /**< Command Response */
++
++    uint32_t irq_mask;          /**< Interrupt Mask */
++    uint32_t irq_status;        /**< Raw Interrupt Status */
++    uint32_t status;            /**< Status */
++
++    uint32_t fifo_wlevel;       /**< FIFO Water Level */
++    uint32_t fifo_func_sel;     /**< FIFO Function Select */
++    uint32_t debug_enable;      /**< Debug Enable */
++    uint32_t auto12_arg;        /**< Auto Command 12 Argument */
++    uint32_t newtiming_set;     /**< SD New Timing Set */
++    uint32_t newtiming_debug;   /**< SD New Timing Debug */
++    uint32_t hardware_rst;      /**< Hardware Reset */
++    uint32_t dmac;              /**< Internal DMA Controller Control */
++    uint32_t desc_base;         /**< Descriptor List Base Address */
++    uint32_t dmac_status;       /**< Internal DMA Controller Status */
++    uint32_t dmac_irq;          /**< Internal DMA Controller IRQ Enable */
++    uint32_t card_threshold;    /**< Card Threshold Control */
++    uint32_t startbit_detect;   /**< eMMC DDR Start Bit Detection Control */
++    uint32_t response_crc;      /**< Response CRC */
++    uint32_t data_crc[8];       /**< Data CRC */
++    uint32_t status_crc;        /**< Status CRC */
++
++    /** @} */
++
++} AwSdHostState;
 +
 +/**
-+ * Allwinner RTC class-level struct.
++ * Allwinner SD Host Controller class-level struct.
 + *
 + * This struct is filled by each sunxi device specific code
 + * such that the generic code can use this struct to support
 + * all devices.
 + */
-+typedef struct AwRtcClass {
++typedef struct AwSdHostClass {
 +    /*< private >*/
 +    SysBusDeviceClass parent_class;
 +    /*< public >*/
 +
-+    /** Defines device specific register map */
-+    const uint8_t *regmap;
++    /** Maximum buffer size in bytes per DMA descriptor */
++    size_t max_desc_size;
 +
-+    /** Size of the regmap in bytes */
-+    size_t regmap_size;
++} AwSdHostClass;
 +
-+    /** Device offset in years to 1900, for struct tm.tm_year */
-+    int year_offset;
-+
-+    /**
-+     * Read device specific register
-+     *
-+     * @offset: register offset to read
-+     * @return true if register read successful, false otherwise
-+     */
-+    bool (*read)(AwRtcState *s, uint32_t offset);
-+
-+    /**
-+     * Write device specific register
-+     *
-+     * @offset: register offset to write
-+     * @data: value to set in register
-+     * @return true if register write successful, false otherwise
-+     */
-+    bool (*write)(AwRtcState *s, uint32_t offset, uint32_t data);
-+
-+} AwRtcClass;
-+
-+#endif /* HW_MISC_ALLWINNER_RTC_H */
++#endif /* HW_SD_ALLWINNER_SDHOST_H */
 diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index a80319bcbc..db8dc2dfc2 100644
+index 1cde165611..a80319bcbc 100644
 --- a/hw/arm/allwinner-a10.c
 +++ b/hw/arm/allwinner-a10.c
-@@ -31,6 +31,7 @@
+@@ -25,6 +25,7 @@
+ #include "hw/misc/unimp.h"
+ #include "sysemu/sysemu.h"
+ 
++#define AW_A10_MMC0_BASE        0x01c0f000
+ #define AW_A10_PIC_REG_BASE     0x01c20400
+ #define AW_A10_PIT_REG_BASE     0x01c20c00
  #define AW_A10_UART0_REG_BASE   0x01c28000
- #define AW_A10_EMAC_BASE        0x01c0b000
- #define AW_A10_SATA_BASE        0x01c18000
-+#define AW_A10_RTC_BASE         0x01c20d00
+@@ -49,6 +50,9 @@ static void aw_a10_init(Object *obj)
  
- static void aw_a10_init(Object *obj)
- {
-@@ -53,6 +54,9 @@ static void aw_a10_init(Object *obj)
- 
-     sysbus_init_child_obj(obj, "mmc0", &s->mmc0, sizeof(s->mmc0),
-                           TYPE_AW_SDHOST_SUN4I);
+     sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
+                           TYPE_ALLWINNER_AHCI);
 +
-+    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-+                          TYPE_AW_RTC_SUN4I);
++    sysbus_init_child_obj(obj, "mmc0", &s->mmc0, sizeof(s->mmc0),
++                          TYPE_AW_SDHOST_SUN4I);
  }
  
  static void aw_a10_realize(DeviceState *dev, Error **errp)
-@@ -132,6 +136,10 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->mmc0), 0, qdev_get_gpio_in(dev, 32));
-     object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->mmc0),
-                               "sd-bus", &error_abort);
+@@ -121,6 +125,13 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+     serial_mm_init(get_system_memory(), AW_A10_UART0_REG_BASE, 2,
+                    qdev_get_gpio_in(dev, 1),
+                    115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
 +
-+    /* RTC */
-+    qdev_init_nofail(DEVICE(&s->rtc));
-+    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->rtc), 0, AW_A10_RTC_BASE, 10);
++    /* SD/MMC */
++    qdev_init_nofail(DEVICE(&s->mmc0));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->mmc0), 0, AW_A10_MMC0_BASE);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->mmc0), 0, qdev_get_gpio_in(dev, 32));
++    object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->mmc0),
++                              "sd-bus", &error_abort);
  }
  
  static void aw_a10_class_init(ObjectClass *oc, void *data)
 diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index cf3a60bfd1..2b966b63f0 100644
+index 919fba6cf6..a53404c0fb 100644
 --- a/hw/arm/allwinner-h3.c
 +++ b/hw/arm/allwinner-h3.c
-@@ -63,6 +63,7 @@ const hwaddr allwinner_h3_memmap[] = {
-     [AW_H3_GIC_CPU]    = 0x01c82000,
-     [AW_H3_GIC_HYP]    = 0x01c84000,
-     [AW_H3_GIC_VCPU]   = 0x01c86000,
-+    [AW_H3_RTC]        = 0x01f00000,
-     [AW_H3_CPUCFG]     = 0x01f01c00,
-     [AW_H3_SDRAM]      = 0x40000000
- };
-@@ -118,7 +119,6 @@ struct AwH3Unimplemented {
-     { "csi",       0x01cb0000, 320 * KiB },
-     { "tve",       0x01e00000, 64 * KiB },
-     { "hdmi",      0x01ee0000, 128 * KiB },
--    { "rtc",       0x01f00000, 1 * KiB },
-     { "r_timer",   0x01f00800, 1 * KiB },
-     { "r_intc",    0x01f00c00, 1 * KiB },
-     { "r_wdog",    0x01f01000, 1 * KiB },
-@@ -246,6 +246,9 @@ static void allwinner_h3_init(Object *obj)
-                              "ram-addr", &error_abort);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->dramc),
-                               "ram-size", &error_abort);
+@@ -38,6 +38,7 @@ const hwaddr allwinner_h3_memmap[] = {
+     [AW_H3_SRAM_A2]    = 0x00044000,
+     [AW_H3_SRAM_C]     = 0x00010000,
+     [AW_H3_SYSCTRL]    = 0x01c00000,
++    [AW_H3_MMC0]       = 0x01c0f000,
+     [AW_H3_SID]        = 0x01c14000,
+     [AW_H3_EHCI0]      = 0x01c1a000,
+     [AW_H3_OHCI0]      = 0x01c1a400,
+@@ -76,7 +77,6 @@ struct AwH3Unimplemented {
+     { "lcd0",      0x01c0c000, 4 * KiB },
+     { "lcd1",      0x01c0d000, 4 * KiB },
+     { "ve",        0x01c0e000, 4 * KiB },
+-    { "mmc0",      0x01c0f000, 4 * KiB },
+     { "mmc1",      0x01c10000, 4 * KiB },
+     { "mmc2",      0x01c11000, 4 * KiB },
+     { "crypto",    0x01c15000, 4 * KiB },
+@@ -153,6 +153,7 @@ enum {
+     AW_H3_GIC_SPI_UART3     =  3,
+     AW_H3_GIC_SPI_TIMER0    = 18,
+     AW_H3_GIC_SPI_TIMER1    = 19,
++    AW_H3_GIC_SPI_MMC0      = 60,
+     AW_H3_GIC_SPI_EHCI0     = 72,
+     AW_H3_GIC_SPI_OHCI0     = 73,
+     AW_H3_GIC_SPI_EHCI1     = 74,
+@@ -203,6 +204,9 @@ static void allwinner_h3_init(Object *obj)
+                           TYPE_AW_SID);
+     object_property_add_alias(obj, "identifier", OBJECT(&s->sid),
+                               "identifier", &error_abort);
 +
-+    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-+                          TYPE_AW_RTC_SUN6I);
++    sysbus_init_child_obj(obj, "mmc0", &s->mmc0, sizeof(s->mmc0),
++                          TYPE_AW_SDHOST_SUN5I);
  }
  
  static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-@@ -436,6 +439,10 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 1, s->memmap[AW_H3_DRAMCTL]);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 2, s->memmap[AW_H3_DRAMPHY]);
+@@ -324,6 +328,15 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+     qdev_init_nofail(DEVICE(&s->sid));
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sid), 0, s->memmap[AW_H3_SID]);
  
-+    /* RTC */
-+    qdev_init_nofail(DEVICE(&s->rtc));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, s->memmap[AW_H3_RTC]);
++    /* SD/MMC */
++    qdev_init_nofail(DEVICE(&s->mmc0));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->mmc0), 0, s->memmap[AW_H3_MMC0]);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->mmc0), 0,
++                       qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_MMC0));
 +
-     /* Unimplemented devices */
-     for (i = 0; i < ARRAY_SIZE(unimplemented); i++) {
-         create_unimplemented_device(unimplemented[i].device_name,
-diff --git a/hw/rtc/allwinner-rtc.c b/hw/rtc/allwinner-rtc.c
++    object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->mmc0),
++                              "sd-bus", &error_abort);
++
+     /* Universal Serial Bus */
+     sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
+                          qdev_get_gpio_in(DEVICE(&s->gic),
+diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
+index 6dc2f1d6b6..2286bd7ef7 100644
+--- a/hw/arm/cubieboard.c
++++ b/hw/arm/cubieboard.c
+@@ -21,6 +21,7 @@
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+ #include "hw/boards.h"
++#include "hw/qdev-properties.h"
+ #include "hw/arm/allwinner-a10.h"
+ 
+ static struct arm_boot_info cubieboard_binfo = {
+@@ -37,6 +38,10 @@ static void cubieboard_init(MachineState *machine)
+ {
+     CubieBoardState *s = g_new(CubieBoardState, 1);
+     Error *err = NULL;
++    DriveInfo *di;
++    BlockBackend *blk;
++    BusState *bus;
++    DeviceState *carddev;
+ 
+     s->a10 = AW_A10(object_new(TYPE_AW_A10));
+ 
+@@ -65,6 +70,16 @@ static void cubieboard_init(MachineState *machine)
+         exit(1);
+     }
+ 
++    /* Retrieve SD bus */
++    di = drive_get_next(IF_SD);
++    blk = di ? blk_by_legacy_dinfo(di) : NULL;
++    bus = qdev_get_child_bus(DEVICE(s->a10), "sd-bus");
++
++    /* Plug in SD card */
++    carddev = qdev_create(bus, TYPE_SD_CARD);
++    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
++    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
++
+     memory_region_allocate_system_memory(&s->sdram, NULL, "cubieboard.ram",
+                                          machine->ram_size);
+     memory_region_add_subregion(get_system_memory(), AW_A10_SDRAM_BASE,
+diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+index 5b60f35a80..83385ff1c7 100644
+--- a/hw/arm/orangepi.c
++++ b/hw/arm/orangepi.c
+@@ -40,6 +40,10 @@ typedef struct OrangePiState {
+ static void orangepi_init(MachineState *machine)
+ {
+     OrangePiState *s = g_new(OrangePiState, 1);
++    DriveInfo *di;
++    BlockBackend *blk;
++    BusState *bus;
++    DeviceState *carddev;
+ 
+     /* BIOS is not supported by this board */
+     if (bios_name) {
+@@ -68,6 +72,16 @@ static void orangepi_init(MachineState *machine)
+     /* Mark H3 object realized */
+     object_property_set_bool(OBJECT(s->h3), true, "realized", &error_abort);
+ 
++    /* Retrieve SD bus */
++    di = drive_get_next(IF_SD);
++    blk = di ? blk_by_legacy_dinfo(di) : NULL;
++    bus = qdev_get_child_bus(DEVICE(s->h3), "sd-bus");
++
++    /* Plug in SD card */
++    carddev = qdev_create(bus, TYPE_SD_CARD);
++    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
++    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
++
+     /* SDRAM */
+     if (machine->ram_size != 1 * GiB) {
+         error_report("This machine can only be used with 1GiB of RAM");
+@@ -87,6 +101,8 @@ static void orangepi_machine_init(MachineClass *mc)
+ {
+     mc->desc = "Orange Pi PC";
+     mc->init = orangepi_init;
++    mc->block_default_type = IF_SD;
++    mc->units_per_default_bus = 1;
+     mc->min_cpus = AW_H3_NUM_CPUS;
+     mc->max_cpus = AW_H3_NUM_CPUS;
+     mc->default_cpus = AW_H3_NUM_CPUS;
+diff --git a/hw/sd/allwinner-sdhost.c b/hw/sd/allwinner-sdhost.c
 new file mode 100644
-index 0000000000..284f4589a7
+index 0000000000..65222180a9
 --- /dev/null
-+++ b/hw/rtc/allwinner-rtc.c
-@@ -0,0 +1,386 @@
++++ b/hw/sd/allwinner-sdhost.c
+@@ -0,0 +1,848 @@
 +/*
-+ * Allwinner Real Time Clock emulation
++ * Allwinner (sun4i and above) SD Host Controller emulation
 + *
 + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 + *
@@ -407,246 +520,665 @@ index 0000000000..284f4589a7
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "migration/vmstate.h"
 +#include "qemu/log.h"
 +#include "qemu/module.h"
-+#include "qemu-common.h"
-+#include "hw/rtc/allwinner-rtc.h"
++#include "qemu/units.h"
++#include "sysemu/blockdev.h"
++#include "hw/irq.h"
++#include "hw/sd/allwinner-sdhost.h"
++#include "migration/vmstate.h"
 +#include "trace.h"
 +
-+/* RTC registers */
++#define TYPE_AW_SDHOST_BUS "allwinner-sdhost-bus"
++#define AW_SDHOST_BUS(obj) \
++    OBJECT_CHECK(SDBus, (obj), TYPE_AW_SDHOST_BUS)
++
++/* SD Host register offsets */
 +enum {
-+    REG_LOSC = 1,        /* Low Oscillator Control */
-+    REG_YYMMDD,          /* RTC Year-Month-Day */
-+    REG_HHMMSS,          /* RTC Hour-Minute-Second */
-+    REG_ALARM1_WKHHMMSS, /* Alarm1 Week Hour-Minute-Second */
-+    REG_ALARM1_EN,       /* Alarm1 Enable */
-+    REG_ALARM1_IRQ_EN,   /* Alarm1 IRQ Enable */
-+    REG_ALARM1_IRQ_STA,  /* Alarm1 IRQ Status */
-+    REG_GP0,             /* General Purpose Register 0 */
-+    REG_GP1,             /* General Purpose Register 1 */
-+    REG_GP2,             /* General Purpose Register 2 */
-+    REG_GP3,             /* General Purpose Register 3 */
-+
-+    /* sun4i registers */
-+    REG_ALARM1_DDHHMMSS, /* Alarm1 Day Hour-Minute-Second */
-+    REG_CPUCFG,          /* CPU Configuration Register */
-+
-+    /* sun6i registers */
-+    REG_LOSC_AUTOSTA,    /* LOSC Auto Switch Status */
-+    REG_INT_OSC_PRE,     /* Internal OSC Clock Prescaler */
-+    REG_ALARM0_COUNTER,  /* Alarm0 Counter */
-+    REG_ALARM0_CUR_VLU,  /* Alarm0 Counter Current Value */
-+    REG_ALARM0_ENABLE,   /* Alarm0 Enable */
-+    REG_ALARM0_IRQ_EN,   /* Alarm0 IRQ Enable */
-+    REG_ALARM0_IRQ_STA,  /* Alarm0 IRQ Status */
-+    REG_ALARM_CONFIG,    /* Alarm Config */
-+    REG_LOSC_OUT_GATING, /* LOSC Output Gating Register */
-+    REG_GP4,             /* General Purpose Register 4 */
-+    REG_GP5,             /* General Purpose Register 5 */
-+    REG_GP6,             /* General Purpose Register 6 */
-+    REG_GP7,             /* General Purpose Register 7 */
-+    REG_RTC_DBG,         /* RTC Debug Register */
-+    REG_GPL_HOLD_OUT,    /* GPL Hold Output Register */
-+    REG_VDD_RTC,         /* VDD RTC Regulate Register */
-+    REG_IC_CHARA,        /* IC Characteristics Register */
++    REG_SD_GCTL       = 0x00,  /* Global Control */
++    REG_SD_CKCR       = 0x04,  /* Clock Control */
++    REG_SD_TMOR       = 0x08,  /* Timeout */
++    REG_SD_BWDR       = 0x0C,  /* Bus Width */
++    REG_SD_BKSR       = 0x10,  /* Block Size */
++    REG_SD_BYCR       = 0x14,  /* Byte Count */
++    REG_SD_CMDR       = 0x18,  /* Command */
++    REG_SD_CAGR       = 0x1C,  /* Command Argument */
++    REG_SD_RESP0      = 0x20,  /* Response Zero */
++    REG_SD_RESP1      = 0x24,  /* Response One */
++    REG_SD_RESP2      = 0x28,  /* Response Two */
++    REG_SD_RESP3      = 0x2C,  /* Response Three */
++    REG_SD_IMKR       = 0x30,  /* Interrupt Mask */
++    REG_SD_MISR       = 0x34,  /* Masked Interrupt Status */
++    REG_SD_RISR       = 0x38,  /* Raw Interrupt Status */
++    REG_SD_STAR       = 0x3C,  /* Status */
++    REG_SD_FWLR       = 0x40,  /* FIFO Water Level */
++    REG_SD_FUNS       = 0x44,  /* FIFO Function Select */
++    REG_SD_DBGC       = 0x50,  /* Debug Enable */
++    REG_SD_A12A       = 0x58,  /* Auto command 12 argument */
++    REG_SD_NTSR       = 0x5C,  /* SD NewTiming Set */
++    REG_SD_SDBG       = 0x60,  /* SD newTiming Set Debug */
++    REG_SD_HWRST      = 0x78,  /* Hardware Reset Register */
++    REG_SD_DMAC       = 0x80,  /* Internal DMA Controller Control */
++    REG_SD_DLBA       = 0x84,  /* Descriptor List Base Address */
++    REG_SD_IDST       = 0x88,  /* Internal DMA Controller Status */
++    REG_SD_IDIE       = 0x8C,  /* Internal DMA Controller IRQ Enable */
++    REG_SD_THLDC      = 0x100, /* Card Threshold Control */
++    REG_SD_DSBD       = 0x10C, /* eMMC DDR Start Bit Detection Control */
++    REG_SD_RES_CRC    = 0x110, /* Response CRC from card/eMMC */
++    REG_SD_DATA7_CRC  = 0x114, /* CRC Data 7 from card/eMMC */
++    REG_SD_DATA6_CRC  = 0x118, /* CRC Data 6 from card/eMMC */
++    REG_SD_DATA5_CRC  = 0x11C, /* CRC Data 5 from card/eMMC */
++    REG_SD_DATA4_CRC  = 0x120, /* CRC Data 4 from card/eMMC */
++    REG_SD_DATA3_CRC  = 0x124, /* CRC Data 3 from card/eMMC */
++    REG_SD_DATA2_CRC  = 0x128, /* CRC Data 2 from card/eMMC */
++    REG_SD_DATA1_CRC  = 0x12C, /* CRC Data 1 from card/eMMC */
++    REG_SD_DATA0_CRC  = 0x130, /* CRC Data 0 from card/eMMC */
++    REG_SD_CRC_STA    = 0x134, /* CRC status from card/eMMC during write */
++    REG_SD_FIFO       = 0x200, /* Read/Write FIFO */
 +};
 +
-+/* RTC register flags */
++/* SD Host register flags */
 +enum {
-+    REG_LOSC_YMD   = (1 << 7),
-+    REG_LOSC_HMS   = (1 << 8),
++    SD_GCTL_FIFO_AC_MOD     = (1 << 31),
++    SD_GCTL_DDR_MOD_SEL     = (1 << 10),
++    SD_GCTL_CD_DBC_ENB      = (1 << 8),
++    SD_GCTL_DMA_ENB         = (1 << 5),
++    SD_GCTL_INT_ENB         = (1 << 4),
++    SD_GCTL_DMA_RST         = (1 << 2),
++    SD_GCTL_FIFO_RST        = (1 << 1),
++    SD_GCTL_SOFT_RST        = (1 << 0),
 +};
 +
-+/* RTC sun4i register map (offset to name) */
-+const uint8_t allwinner_rtc_sun4i_regmap[] = {
-+    [0x0000] = REG_LOSC,
-+    [0x0004] = REG_YYMMDD,
-+    [0x0008] = REG_HHMMSS,
-+    [0x000C] = REG_ALARM1_DDHHMMSS,
-+    [0x0010] = REG_ALARM1_WKHHMMSS,
-+    [0x0014] = REG_ALARM1_EN,
-+    [0x0018] = REG_ALARM1_IRQ_EN,
-+    [0x001C] = REG_ALARM1_IRQ_STA,
-+    [0x0020] = REG_GP0,
-+    [0x0024] = REG_GP1,
-+    [0x0028] = REG_GP2,
-+    [0x002C] = REG_GP3,
-+    [0x003C] = REG_CPUCFG,
++enum {
++    SD_CMDR_LOAD            = (1 << 31),
++    SD_CMDR_CLKCHANGE       = (1 << 21),
++    SD_CMDR_WRITE           = (1 << 10),
++    SD_CMDR_AUTOSTOP        = (1 << 12),
++    SD_CMDR_DATA            = (1 << 9),
++    SD_CMDR_RESPONSE_LONG   = (1 << 7),
++    SD_CMDR_RESPONSE        = (1 << 6),
++    SD_CMDR_CMDID_MASK      = (0x3f),
 +};
 +
-+/* RTC sun6i register map (offset to name) */
-+const uint8_t allwinner_rtc_sun6i_regmap[] = {
-+    [0x0000] = REG_LOSC,
-+    [0x0004] = REG_LOSC_AUTOSTA,
-+    [0x0008] = REG_INT_OSC_PRE,
-+    [0x0010] = REG_YYMMDD,
-+    [0x0014] = REG_HHMMSS,
-+    [0x0020] = REG_ALARM0_COUNTER,
-+    [0x0024] = REG_ALARM0_CUR_VLU,
-+    [0x0028] = REG_ALARM0_ENABLE,
-+    [0x002C] = REG_ALARM0_IRQ_EN,
-+    [0x0030] = REG_ALARM0_IRQ_STA,
-+    [0x0040] = REG_ALARM1_WKHHMMSS,
-+    [0x0044] = REG_ALARM1_EN,
-+    [0x0048] = REG_ALARM1_IRQ_EN,
-+    [0x004C] = REG_ALARM1_IRQ_STA,
-+    [0x0050] = REG_ALARM_CONFIG,
-+    [0x0060] = REG_LOSC_OUT_GATING,
-+    [0x0100] = REG_GP0,
-+    [0x0104] = REG_GP1,
-+    [0x0108] = REG_GP2,
-+    [0x010C] = REG_GP3,
-+    [0x0110] = REG_GP4,
-+    [0x0114] = REG_GP5,
-+    [0x0118] = REG_GP6,
-+    [0x011C] = REG_GP7,
-+    [0x0170] = REG_RTC_DBG,
-+    [0x0180] = REG_GPL_HOLD_OUT,
-+    [0x0190] = REG_VDD_RTC,
-+    [0x01F0] = REG_IC_CHARA,
++enum {
++    SD_RISR_CARD_REMOVE     = (1 << 31),
++    SD_RISR_CARD_INSERT     = (1 << 30),
++    SD_RISR_AUTOCMD_DONE    = (1 << 14),
++    SD_RISR_DATA_COMPLETE   = (1 << 3),
++    SD_RISR_CMD_COMPLETE    = (1 << 2),
++    SD_RISR_NO_RESPONSE     = (1 << 1),
 +};
 +
-+static bool allwinner_rtc_sun4i_read(AwRtcState *s, uint32_t offset)
++enum {
++    SD_STAR_CARD_PRESENT    = (1 << 8),
++};
++
++enum {
++    SD_IDST_SUM_RECEIVE_IRQ = (1 << 8),
++    SD_IDST_RECEIVE_IRQ     = (1 << 1),
++    SD_IDST_TRANSMIT_IRQ    = (1 << 0),
++    SD_IDST_IRQ_MASK        = (1 << 1) | (1 << 0) | (1 << 8),
++    SD_IDST_WR_MASK         = (0x3ff),
++};
++
++/* SD Host register reset values */
++enum {
++    REG_SD_GCTL_RST         = 0x00000300,
++    REG_SD_CKCR_RST         = 0x0,
++    REG_SD_TMOR_RST         = 0xFFFFFF40,
++    REG_SD_BWDR_RST         = 0x0,
++    REG_SD_BKSR_RST         = 0x00000200,
++    REG_SD_BYCR_RST         = 0x00000200,
++    REG_SD_CMDR_RST         = 0x0,
++    REG_SD_CAGR_RST         = 0x0,
++    REG_SD_RESP_RST         = 0x0,
++    REG_SD_IMKR_RST         = 0x0,
++    REG_SD_MISR_RST         = 0x0,
++    REG_SD_RISR_RST         = 0x0,
++    REG_SD_STAR_RST         = 0x00000100,
++    REG_SD_FWLR_RST         = 0x000F0000,
++    REG_SD_FUNS_RST         = 0x0,
++    REG_SD_DBGC_RST         = 0x0,
++    REG_SD_A12A_RST         = 0x0000FFFF,
++    REG_SD_NTSR_RST         = 0x00000001,
++    REG_SD_SDBG_RST         = 0x0,
++    REG_SD_HWRST_RST        = 0x00000001,
++    REG_SD_DMAC_RST         = 0x0,
++    REG_SD_DLBA_RST         = 0x0,
++    REG_SD_IDST_RST         = 0x0,
++    REG_SD_IDIE_RST         = 0x0,
++    REG_SD_THLDC_RST        = 0x0,
++    REG_SD_DSBD_RST         = 0x0,
++    REG_SD_RES_CRC_RST      = 0x0,
++    REG_SD_DATA_CRC_RST     = 0x0,
++    REG_SD_CRC_STA_RST      = 0x0,
++    REG_SD_FIFO_RST         = 0x0,
++};
++
++/* Data transfer descriptor for DMA */
++typedef struct TransferDescriptor {
++    uint32_t status; /* Status flags */
++    uint32_t size;   /* Data buffer size */
++    uint32_t addr;   /* Data buffer address */
++    uint32_t next;   /* Physical address of next descriptor */
++} TransferDescriptor;
++
++/* Data transfer descriptor flags */
++enum {
++    DESC_STATUS_HOLD   = (1 << 31), /* Set when descriptor is in use by DMA */
++    DESC_STATUS_ERROR  = (1 << 30), /* Set when DMA transfer error occurred */
++    DESC_STATUS_CHAIN  = (1 << 4),  /* Indicates chained descriptor. */
++    DESC_STATUS_FIRST  = (1 << 3),  /* Set on the first descriptor */
++    DESC_STATUS_LAST   = (1 << 2),  /* Set on the last descriptor */
++    DESC_STATUS_NOIRQ  = (1 << 1),  /* Skip raising interrupt after transfer */
++    DESC_SIZE_MASK     = (0xfffffffc)
++};
++
++static void allwinner_sdhost_update_irq(AwSdHostState *s)
 +{
-+    /* no sun4i specific registers currently implemented */
-+    return false;
++    uint32_t irq;
++
++    if (s->global_ctl & SD_GCTL_INT_ENB) {
++        irq = s->irq_status & s->irq_mask;
++    } else {
++        irq = 0;
++    }
++
++    trace_allwinner_sdhost_update_irq(irq);
++    qemu_set_irq(s->irq, irq);
 +}
 +
-+static bool allwinner_rtc_sun4i_write(AwRtcState *s, uint32_t offset,
-+                                      uint32_t data)
++static void allwinner_sdhost_update_transfer_cnt(AwSdHostState *s,
++                                                 uint32_t bytes)
 +{
-+    /* no sun4i specific registers currently implemented */
-+    return false;
++    if (s->transfer_cnt > bytes) {
++        s->transfer_cnt -= bytes;
++    } else {
++        s->transfer_cnt = 0;
++    }
++
++    if (!s->transfer_cnt) {
++        s->irq_status |= SD_RISR_DATA_COMPLETE | SD_RISR_AUTOCMD_DONE;
++    }
 +}
 +
-+static bool allwinner_rtc_sun6i_read(AwRtcState *s, uint32_t offset)
++static void allwinner_sdhost_set_inserted(DeviceState *dev, bool inserted)
 +{
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
++    AwSdHostState *s = AW_SDHOST(dev);
 +
-+    switch (c->regmap[offset]) {
-+    case REG_GP4:             /* General Purpose Register 4 */
-+    case REG_GP5:             /* General Purpose Register 5 */
-+    case REG_GP6:             /* General Purpose Register 6 */
-+    case REG_GP7:             /* General Purpose Register 7 */
-+        return true;
-+    default:
-+        break;
++    trace_allwinner_sdhost_set_inserted(inserted);
++
++    if (inserted) {
++        s->irq_status |= SD_RISR_CARD_INSERT;
++        s->irq_status &= ~SD_RISR_CARD_REMOVE;
++        s->status |= SD_STAR_CARD_PRESENT;
++    } else {
++        s->irq_status &= ~SD_RISR_CARD_INSERT;
++        s->irq_status |= SD_RISR_CARD_REMOVE;
++        s->status &= ~SD_STAR_CARD_PRESENT;
 +    }
-+    return false;
++
++    allwinner_sdhost_update_irq(s);
 +}
 +
-+static bool allwinner_rtc_sun6i_write(AwRtcState *s, uint32_t offset,
-+                                      uint32_t data)
++static void allwinner_sdhost_send_command(AwSdHostState *s)
 +{
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
++    SDRequest request;
++    uint8_t resp[16];
++    int rlen;
 +
-+    switch (c->regmap[offset]) {
-+    case REG_GP4:             /* General Purpose Register 4 */
-+    case REG_GP5:             /* General Purpose Register 5 */
-+    case REG_GP6:             /* General Purpose Register 6 */
-+    case REG_GP7:             /* General Purpose Register 7 */
-+        return true;
-+    default:
-+        break;
-+    }
-+    return false;
-+}
++    /* Auto clear load flag */
++    s->command &= ~SD_CMDR_LOAD;
 +
-+static uint64_t allwinner_rtc_read(void *opaque, hwaddr offset,
-+                                   unsigned size)
-+{
-+    AwRtcState *s = AW_RTC(opaque);
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
-+    uint64_t val = 0;
++    /* Clock change does not actually interact with the SD bus */
++    if (!(s->command & SD_CMDR_CLKCHANGE)) {
 +
-+    if (offset >= c->regmap_size) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
-+    }
++        /* Prepare request */
++        request.cmd = s->command & SD_CMDR_CMDID_MASK;
++        request.arg = s->command_arg;
 +
-+    if (!c->regmap[offset]) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
-+        return 0;
-+    }
-+
-+    switch (c->regmap[offset]) {
-+    case REG_LOSC:       /* Low Oscillator Control */
-+        val = s->regs[REG_LOSC];
-+        s->regs[REG_LOSC] &= ~(REG_LOSC_YMD | REG_LOSC_HMS);
-+        break;
-+    case REG_YYMMDD:     /* RTC Year-Month-Day */
-+    case REG_HHMMSS:     /* RTC Hour-Minute-Second */
-+    case REG_GP0:        /* General Purpose Register 0 */
-+    case REG_GP1:        /* General Purpose Register 1 */
-+    case REG_GP2:        /* General Purpose Register 2 */
-+    case REG_GP3:        /* General Purpose Register 3 */
-+        val = s->regs[c->regmap[offset]];
-+        break;
-+    default:
-+        if (!c->read(s, offset)) {
-+            qemu_log_mask(LOG_UNIMP, "%s: unimplemented register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
++        /* Send request to SD bus */
++        rlen = sdbus_do_command(&s->sdbus, &request, resp);
++        if (rlen < 0) {
++            goto error;
 +        }
-+        val = s->regs[c->regmap[offset]];
-+        break;
++
++        /* If the command has a response, store it in the response registers */
++        if ((s->command & SD_CMDR_RESPONSE)) {
++            if (rlen == 4 && !(s->command & SD_CMDR_RESPONSE_LONG)) {
++                s->response[0] = ldl_be_p(&resp[0]);
++                s->response[1] = s->response[2] = s->response[3] = 0;
++
++            } else if (rlen == 16 && (s->command & SD_CMDR_RESPONSE_LONG)) {
++                s->response[0] = ldl_be_p(&resp[12]);
++                s->response[1] = ldl_be_p(&resp[8]);
++                s->response[2] = ldl_be_p(&resp[4]);
++                s->response[3] = ldl_be_p(&resp[0]);
++            } else {
++                goto error;
++            }
++        }
 +    }
 +
-+    trace_allwinner_rtc_read(offset, val);
-+    return val;
++    /* Set interrupt status bits */
++    s->irq_status |= SD_RISR_CMD_COMPLETE;
++    return;
++
++error:
++    s->irq_status |= SD_RISR_NO_RESPONSE;
 +}
 +
-+static void allwinner_rtc_write(void *opaque, hwaddr offset,
-+                                uint64_t val, unsigned size)
++static void allwinner_sdhost_auto_stop(AwSdHostState *s)
 +{
-+    AwRtcState *s = AW_RTC(opaque);
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
++    /*
++     * The stop command (CMD12) ensures the SD bus
++     * returns to the transfer state.
++     */
++    if ((s->command & SD_CMDR_AUTOSTOP) && (s->transfer_cnt == 0)) {
++        /* First save current command registers */
++        uint32_t saved_cmd = s->command;
++        uint32_t saved_arg = s->command_arg;
 +
-+    if (offset >= c->regmap_size) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
++        /* Prepare stop command (CMD12) */
++        s->command &= ~SD_CMDR_CMDID_MASK;
++        s->command |= 12; /* CMD12 */
++        s->command_arg = 0;
++
++        /* Put the command on SD bus */
++        allwinner_sdhost_send_command(s);
++
++        /* Restore command values */
++        s->command = saved_cmd;
++        s->command_arg = saved_arg;
++    }
++}
++
++static uint32_t allwinner_sdhost_process_desc(AwSdHostState *s,
++                                              hwaddr desc_addr,
++                                              TransferDescriptor *desc,
++                                              bool is_write, uint32_t max_bytes)
++{
++    AwSdHostClass *klass = AW_SDHOST_GET_CLASS(s);
++    uint32_t num_done = 0;
++    uint32_t num_bytes = max_bytes;
++    uint8_t buf[1024];
++
++    /* Read descriptor */
++    cpu_physical_memory_read(desc_addr, desc, sizeof(*desc));
++    if (desc->size == 0) {
++        desc->size = klass->max_desc_size;
++    } else if (desc->size > klass->max_desc_size) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: DMA descriptor buffer size "
++                      " is out-of-bounds: %" PRIu32 " > %zu",
++                      __func__, desc->size, klass->max_desc_size);
++        desc->size = klass->max_desc_size;
++    }
++    if (desc->size < num_bytes) {
++        num_bytes = desc->size;
++    }
++
++    trace_allwinner_sdhost_process_desc(desc_addr, desc->size,
++                                        is_write, max_bytes);
++
++    while (num_done < num_bytes) {
++        /* Try to completely fill the local buffer */
++        uint32_t buf_bytes = num_bytes - num_done;
++        if (buf_bytes > sizeof(buf)) {
++            buf_bytes = sizeof(buf);
++        }
++
++        /* Write to SD bus */
++        if (is_write) {
++            cpu_physical_memory_read((desc->addr & DESC_SIZE_MASK) + num_done,
++                                      buf, buf_bytes);
++
++            for (uint32_t i = 0; i < buf_bytes; i++) {
++                sdbus_write_data(&s->sdbus, buf[i]);
++            }
++
++        /* Read from SD bus */
++        } else {
++            for (uint32_t i = 0; i < buf_bytes; i++) {
++                buf[i] = sdbus_read_data(&s->sdbus);
++            }
++            cpu_physical_memory_write((desc->addr & DESC_SIZE_MASK) + num_done,
++                                       buf, buf_bytes);
++        }
++        num_done += buf_bytes;
++    }
++
++    /* Clear hold flag and flush descriptor */
++    desc->status &= ~DESC_STATUS_HOLD;
++    cpu_physical_memory_write(desc_addr, desc, sizeof(*desc));
++
++    return num_done;
++}
++
++static void allwinner_sdhost_dma(AwSdHostState *s)
++{
++    TransferDescriptor desc;
++    hwaddr desc_addr = s->desc_base;
++    bool is_write = (s->command & SD_CMDR_WRITE);
++    uint32_t bytes_done = 0;
++
++    /* Check if DMA can be performed */
++    if (s->byte_count == 0 || s->block_size == 0 ||
++      !(s->global_ctl & SD_GCTL_DMA_ENB)) {
 +        return;
 +    }
 +
-+    if (!c->regmap[offset]) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
++    /*
++     * For read operations, data must be available on the SD bus
++     * If not, it is an error and we should not act at all
++     */
++    if (!is_write && !sdbus_data_ready(&s->sdbus)) {
 +        return;
 +    }
 +
-+    trace_allwinner_rtc_write(offset, val);
++    /* Process the DMA descriptors until all data is copied */
++    while (s->byte_count > 0) {
++        bytes_done = allwinner_sdhost_process_desc(s, desc_addr, &desc,
++                                                   is_write, s->byte_count);
++        allwinner_sdhost_update_transfer_cnt(s, bytes_done);
 +
-+    switch (c->regmap[offset]) {
-+    case REG_YYMMDD:     /* RTC Year-Month-Day */
-+        s->regs[REG_YYMMDD] = val;
-+        s->regs[REG_LOSC]  |= REG_LOSC_YMD;
++        if (bytes_done <= s->byte_count) {
++            s->byte_count -= bytes_done;
++        } else {
++            s->byte_count = 0;
++        }
++
++        if (desc.status & DESC_STATUS_LAST) {
++            break;
++        } else {
++            desc_addr = desc.next;
++        }
++    }
++
++    /* Raise IRQ to signal DMA is completed */
++    s->irq_status |= SD_RISR_DATA_COMPLETE | SD_RISR_AUTOCMD_DONE;
++
++    /* Update DMAC bits */
++    if (is_write) {
++        s->dmac_status |= SD_IDST_TRANSMIT_IRQ;
++    } else {
++        s->dmac_status |= (SD_IDST_SUM_RECEIVE_IRQ | SD_IDST_RECEIVE_IRQ);
++    }
++}
++
++static uint64_t allwinner_sdhost_read(void *opaque, hwaddr offset,
++                                      unsigned size)
++{
++    AwSdHostState *s = AW_SDHOST(opaque);
++    uint32_t res = 0;
++
++    switch (offset) {
++    case REG_SD_GCTL:      /* Global Control */
++        res = s->global_ctl;
 +        break;
-+    case REG_HHMMSS:     /* RTC Hour-Minute-Second */
-+        s->regs[REG_HHMMSS] = val;
-+        s->regs[REG_LOSC]  |= REG_LOSC_HMS;
++    case REG_SD_CKCR:      /* Clock Control */
++        res = s->clock_ctl;
 +        break;
-+    case REG_GP0:        /* General Purpose Register 0 */
-+    case REG_GP1:        /* General Purpose Register 1 */
-+    case REG_GP2:        /* General Purpose Register 2 */
-+    case REG_GP3:        /* General Purpose Register 3 */
-+        s->regs[c->regmap[offset]] = val;
++    case REG_SD_TMOR:      /* Timeout */
++        res = s->timeout;
++        break;
++    case REG_SD_BWDR:      /* Bus Width */
++        res = s->bus_width;
++        break;
++    case REG_SD_BKSR:      /* Block Size */
++        res = s->block_size;
++        break;
++    case REG_SD_BYCR:      /* Byte Count */
++        res = s->byte_count;
++        break;
++    case REG_SD_CMDR:      /* Command */
++        res = s->command;
++        break;
++    case REG_SD_CAGR:      /* Command Argument */
++        res = s->command_arg;
++        break;
++    case REG_SD_RESP0:     /* Response Zero */
++        res = s->response[0];
++        break;
++    case REG_SD_RESP1:     /* Response One */
++        res = s->response[1];
++        break;
++    case REG_SD_RESP2:     /* Response Two */
++        res = s->response[2];
++        break;
++    case REG_SD_RESP3:     /* Response Three */
++        res = s->response[3];
++        break;
++    case REG_SD_IMKR:      /* Interrupt Mask */
++        res = s->irq_mask;
++        break;
++    case REG_SD_MISR:      /* Masked Interrupt Status */
++        res = s->irq_status & s->irq_mask;
++        break;
++    case REG_SD_RISR:      /* Raw Interrupt Status */
++        res = s->irq_status;
++        break;
++    case REG_SD_STAR:      /* Status */
++        res = s->status;
++        break;
++    case REG_SD_FWLR:      /* FIFO Water Level */
++        res = s->fifo_wlevel;
++        break;
++    case REG_SD_FUNS:      /* FIFO Function Select */
++        res = s->fifo_func_sel;
++        break;
++    case REG_SD_DBGC:      /* Debug Enable */
++        res = s->debug_enable;
++        break;
++    case REG_SD_A12A:      /* Auto command 12 argument */
++        res = s->auto12_arg;
++        break;
++    case REG_SD_NTSR:      /* SD NewTiming Set */
++        res = s->newtiming_set;
++        break;
++    case REG_SD_SDBG:      /* SD newTiming Set Debug */
++        res = s->newtiming_debug;
++        break;
++    case REG_SD_HWRST:     /* Hardware Reset Register */
++        res = s->hardware_rst;
++        break;
++    case REG_SD_DMAC:      /* Internal DMA Controller Control */
++        res = s->dmac;
++        break;
++    case REG_SD_DLBA:      /* Descriptor List Base Address */
++        res = s->desc_base;
++        break;
++    case REG_SD_IDST:      /* Internal DMA Controller Status */
++        res = s->dmac_status;
++        break;
++    case REG_SD_IDIE:      /* Internal DMA Controller Interrupt Enable */
++        res = s->dmac_irq;
++        break;
++    case REG_SD_THLDC:     /* Card Threshold Control */
++        res = s->card_threshold;
++        break;
++    case REG_SD_DSBD:      /* eMMC DDR Start Bit Detection Control */
++        res = s->startbit_detect;
++        break;
++    case REG_SD_RES_CRC:   /* Response CRC from card/eMMC */
++        res = s->response_crc;
++        break;
++    case REG_SD_DATA7_CRC: /* CRC Data 7 from card/eMMC */
++    case REG_SD_DATA6_CRC: /* CRC Data 6 from card/eMMC */
++    case REG_SD_DATA5_CRC: /* CRC Data 5 from card/eMMC */
++    case REG_SD_DATA4_CRC: /* CRC Data 4 from card/eMMC */
++    case REG_SD_DATA3_CRC: /* CRC Data 3 from card/eMMC */
++    case REG_SD_DATA2_CRC: /* CRC Data 2 from card/eMMC */
++    case REG_SD_DATA1_CRC: /* CRC Data 1 from card/eMMC */
++    case REG_SD_DATA0_CRC: /* CRC Data 0 from card/eMMC */
++        res = s->data_crc[((offset - REG_SD_DATA7_CRC) / sizeof(uint32_t))];
++        break;
++    case REG_SD_CRC_STA:   /* CRC status from card/eMMC in write operation */
++        res = s->status_crc;
++        break;
++    case REG_SD_FIFO:      /* Read/Write FIFO */
++        if (sdbus_data_ready(&s->sdbus)) {
++            res = sdbus_read_data(&s->sdbus);
++            res |= sdbus_read_data(&s->sdbus) << 8;
++            res |= sdbus_read_data(&s->sdbus) << 16;
++            res |= sdbus_read_data(&s->sdbus) << 24;
++            allwinner_sdhost_update_transfer_cnt(s, sizeof(uint32_t));
++            allwinner_sdhost_auto_stop(s);
++            allwinner_sdhost_update_irq(s);
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: no data ready on SD bus\n",
++                          __func__);
++        }
 +        break;
 +    default:
-+        if (!c->write(s, offset, val)) {
-+            qemu_log_mask(LOG_UNIMP, "%s: unimplemented register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset %"
++                      HWADDR_PRIx"\n", __func__, offset);
++        res = 0;
++        break;
++    }
++
++    trace_allwinner_sdhost_read(offset, res, size);
++    return res;
++}
++
++static void allwinner_sdhost_write(void *opaque, hwaddr offset,
++                                   uint64_t value, unsigned size)
++{
++    AwSdHostState *s = AW_SDHOST(opaque);
++
++    trace_allwinner_sdhost_write(offset, value, size);
++
++    switch (offset) {
++    case REG_SD_GCTL:      /* Global Control */
++        s->global_ctl = value;
++        s->global_ctl &= ~(SD_GCTL_DMA_RST | SD_GCTL_FIFO_RST |
++                           SD_GCTL_SOFT_RST);
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_CKCR:      /* Clock Control */
++        s->clock_ctl = value;
++        break;
++    case REG_SD_TMOR:      /* Timeout */
++        s->timeout = value;
++        break;
++    case REG_SD_BWDR:      /* Bus Width */
++        s->bus_width = value;
++        break;
++    case REG_SD_BKSR:      /* Block Size */
++        s->block_size = value;
++        break;
++    case REG_SD_BYCR:      /* Byte Count */
++        s->byte_count = value;
++        s->transfer_cnt = value;
++        break;
++    case REG_SD_CMDR:      /* Command */
++        s->command = value;
++        if (value & SD_CMDR_LOAD) {
++            allwinner_sdhost_send_command(s);
++            allwinner_sdhost_dma(s);
++            allwinner_sdhost_auto_stop(s);
 +        }
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_CAGR:      /* Command Argument */
++        s->command_arg = value;
++        break;
++    case REG_SD_RESP0:     /* Response Zero */
++        s->response[0] = value;
++        break;
++    case REG_SD_RESP1:     /* Response One */
++        s->response[1] = value;
++        break;
++    case REG_SD_RESP2:     /* Response Two */
++        s->response[2] = value;
++        break;
++    case REG_SD_RESP3:     /* Response Three */
++        s->response[3] = value;
++        break;
++    case REG_SD_IMKR:      /* Interrupt Mask */
++        s->irq_mask = value;
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_MISR:      /* Masked Interrupt Status */
++    case REG_SD_RISR:      /* Raw Interrupt Status */
++        s->irq_status &= ~value;
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_STAR:      /* Status */
++        s->status &= ~value;
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_FWLR:      /* FIFO Water Level */
++        s->fifo_wlevel = value;
++        break;
++    case REG_SD_FUNS:      /* FIFO Function Select */
++        s->fifo_func_sel = value;
++        break;
++    case REG_SD_DBGC:      /* Debug Enable */
++        s->debug_enable = value;
++        break;
++    case REG_SD_A12A:      /* Auto command 12 argument */
++        s->auto12_arg = value;
++        break;
++    case REG_SD_NTSR:      /* SD NewTiming Set */
++        s->newtiming_set = value;
++        break;
++    case REG_SD_SDBG:      /* SD newTiming Set Debug */
++        s->newtiming_debug = value;
++        break;
++    case REG_SD_HWRST:     /* Hardware Reset Register */
++        s->hardware_rst = value;
++        break;
++    case REG_SD_DMAC:      /* Internal DMA Controller Control */
++        s->dmac = value;
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_DLBA:      /* Descriptor List Base Address */
++        s->desc_base = value;
++        break;
++    case REG_SD_IDST:      /* Internal DMA Controller Status */
++        s->dmac_status &= (~SD_IDST_WR_MASK) | (~value & SD_IDST_WR_MASK);
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_IDIE:      /* Internal DMA Controller Interrupt Enable */
++        s->dmac_irq = value;
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_THLDC:     /* Card Threshold Control */
++        s->card_threshold = value;
++        break;
++    case REG_SD_DSBD:      /* eMMC DDR Start Bit Detection Control */
++        s->startbit_detect = value;
++        break;
++    case REG_SD_FIFO:      /* Read/Write FIFO */
++        sdbus_write_data(&s->sdbus, value & 0xff);
++        sdbus_write_data(&s->sdbus, (value >> 8) & 0xff);
++        sdbus_write_data(&s->sdbus, (value >> 16) & 0xff);
++        sdbus_write_data(&s->sdbus, (value >> 24) & 0xff);
++        allwinner_sdhost_update_transfer_cnt(s, sizeof(uint32_t));
++        allwinner_sdhost_auto_stop(s);
++        allwinner_sdhost_update_irq(s);
++        break;
++    case REG_SD_RES_CRC:   /* Response CRC from card/eMMC */
++    case REG_SD_DATA7_CRC: /* CRC Data 7 from card/eMMC */
++    case REG_SD_DATA6_CRC: /* CRC Data 6 from card/eMMC */
++    case REG_SD_DATA5_CRC: /* CRC Data 5 from card/eMMC */
++    case REG_SD_DATA4_CRC: /* CRC Data 4 from card/eMMC */
++    case REG_SD_DATA3_CRC: /* CRC Data 3 from card/eMMC */
++    case REG_SD_DATA2_CRC: /* CRC Data 2 from card/eMMC */
++    case REG_SD_DATA1_CRC: /* CRC Data 1 from card/eMMC */
++    case REG_SD_DATA0_CRC: /* CRC Data 0 from card/eMMC */
++    case REG_SD_CRC_STA:   /* CRC status from card/eMMC in write operation */
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset %"
++                      HWADDR_PRIx"\n", __func__, offset);
 +        break;
 +    }
 +}
 +
-+static const MemoryRegionOps allwinner_rtc_ops = {
-+    .read = allwinner_rtc_read,
-+    .write = allwinner_rtc_write,
++static const MemoryRegionOps allwinner_sdhost_ops = {
++    .read = allwinner_sdhost_read,
++    .write = allwinner_sdhost_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .valid = {
 +        .min_access_size = 4,
@@ -655,147 +1187,196 @@ index 0000000000..284f4589a7
 +    .impl.min_access_size = 4,
 +};
 +
-+static void allwinner_rtc_reset(DeviceState *dev)
-+{
-+    AwRtcState *s = AW_RTC(dev);
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(dev);
-+    struct tm now;
-+
-+    /* Clear registers */
-+    memset(s->regs, 0, sizeof(s->regs));
-+
-+    /* Get current datetime */
-+    qemu_get_timedate(&now, 0);
-+
-+    /* Set RTC with current datetime */
-+    s->regs[REG_YYMMDD] =  ((now.tm_year - c->year_offset) << 16) |
-+                           ((now.tm_mon + 1) << 8) |
-+                             now.tm_mday;
-+    s->regs[REG_HHMMSS] = (((now.tm_wday + 6) % 7) << 29) |
-+                              (now.tm_hour << 16) |
-+                              (now.tm_min << 8) |
-+                               now.tm_sec;
-+}
-+
-+static void allwinner_rtc_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AwRtcState *s = AW_RTC(obj);
-+
-+    /* Memory mapping */
-+    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_rtc_ops, s,
-+                          TYPE_AW_RTC, 1 * KiB);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static const VMStateDescription allwinner_rtc_vmstate = {
-+    .name = "allwinner-rtc",
++static const VMStateDescription vmstate_allwinner_sdhost = {
++    .name = "allwinner-sdhost",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, AwRtcState, AW_RTC_REGS_NUM),
++        VMSTATE_UINT32(global_ctl, AwSdHostState),
++        VMSTATE_UINT32(clock_ctl, AwSdHostState),
++        VMSTATE_UINT32(timeout, AwSdHostState),
++        VMSTATE_UINT32(bus_width, AwSdHostState),
++        VMSTATE_UINT32(block_size, AwSdHostState),
++        VMSTATE_UINT32(byte_count, AwSdHostState),
++        VMSTATE_UINT32(transfer_cnt, AwSdHostState),
++        VMSTATE_UINT32(command, AwSdHostState),
++        VMSTATE_UINT32(command_arg, AwSdHostState),
++        VMSTATE_UINT32_ARRAY(response, AwSdHostState, 4),
++        VMSTATE_UINT32(irq_mask, AwSdHostState),
++        VMSTATE_UINT32(irq_status, AwSdHostState),
++        VMSTATE_UINT32(status, AwSdHostState),
++        VMSTATE_UINT32(fifo_wlevel, AwSdHostState),
++        VMSTATE_UINT32(fifo_func_sel, AwSdHostState),
++        VMSTATE_UINT32(debug_enable, AwSdHostState),
++        VMSTATE_UINT32(auto12_arg, AwSdHostState),
++        VMSTATE_UINT32(newtiming_set, AwSdHostState),
++        VMSTATE_UINT32(newtiming_debug, AwSdHostState),
++        VMSTATE_UINT32(hardware_rst, AwSdHostState),
++        VMSTATE_UINT32(dmac, AwSdHostState),
++        VMSTATE_UINT32(desc_base, AwSdHostState),
++        VMSTATE_UINT32(dmac_status, AwSdHostState),
++        VMSTATE_UINT32(dmac_irq, AwSdHostState),
++        VMSTATE_UINT32(card_threshold, AwSdHostState),
++        VMSTATE_UINT32(startbit_detect, AwSdHostState),
++        VMSTATE_UINT32(response_crc, AwSdHostState),
++        VMSTATE_UINT32_ARRAY(data_crc, AwSdHostState, 8),
++        VMSTATE_UINT32(status_crc, AwSdHostState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static void allwinner_rtc_class_init(ObjectClass *klass, void *data)
++static void allwinner_sdhost_init(Object *obj)
++{
++    AwSdHostState *s = AW_SDHOST(obj);
++
++    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
++                         TYPE_AW_SDHOST_BUS, DEVICE(s), "sd-bus");
++
++    memory_region_init_io(&s->iomem, obj, &allwinner_sdhost_ops, s,
++                           TYPE_AW_SDHOST, 4 * KiB);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++    sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
++}
++
++static void allwinner_sdhost_reset(DeviceState *dev)
++{
++    AwSdHostState *s = AW_SDHOST(dev);
++
++    s->global_ctl = REG_SD_GCTL_RST;
++    s->clock_ctl = REG_SD_CKCR_RST;
++    s->timeout = REG_SD_TMOR_RST;
++    s->bus_width = REG_SD_BWDR_RST;
++    s->block_size = REG_SD_BKSR_RST;
++    s->byte_count = REG_SD_BYCR_RST;
++    s->transfer_cnt = 0;
++
++    s->command = REG_SD_CMDR_RST;
++    s->command_arg = REG_SD_CAGR_RST;
++
++    for (int i = 0; i < ARRAY_SIZE(s->response); i++) {
++        s->response[i] = REG_SD_RESP_RST;
++    }
++
++    s->irq_mask = REG_SD_IMKR_RST;
++    s->irq_status = REG_SD_RISR_RST;
++    s->status = REG_SD_STAR_RST;
++
++    s->fifo_wlevel = REG_SD_FWLR_RST;
++    s->fifo_func_sel = REG_SD_FUNS_RST;
++    s->debug_enable = REG_SD_DBGC_RST;
++    s->auto12_arg = REG_SD_A12A_RST;
++    s->newtiming_set = REG_SD_NTSR_RST;
++    s->newtiming_debug = REG_SD_SDBG_RST;
++    s->hardware_rst = REG_SD_HWRST_RST;
++    s->dmac = REG_SD_DMAC_RST;
++    s->desc_base = REG_SD_DLBA_RST;
++    s->dmac_status = REG_SD_IDST_RST;
++    s->dmac_irq = REG_SD_IDIE_RST;
++    s->card_threshold = REG_SD_THLDC_RST;
++    s->startbit_detect = REG_SD_DSBD_RST;
++    s->response_crc = REG_SD_RES_CRC_RST;
++
++    for (int i = 0; i < ARRAY_SIZE(s->data_crc); i++) {
++        s->data_crc[i] = REG_SD_DATA_CRC_RST;
++    }
++
++    s->status_crc = REG_SD_CRC_STA_RST;
++}
++
++static void allwinner_sdhost_bus_class_init(ObjectClass *klass, void *data)
++{
++    SDBusClass *sbc = SD_BUS_CLASS(klass);
++
++    sbc->set_inserted = allwinner_sdhost_set_inserted;
++}
++
++static void allwinner_sdhost_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = allwinner_rtc_reset;
-+    dc->vmsd = &allwinner_rtc_vmstate;
++    dc->reset = allwinner_sdhost_reset;
++    dc->vmsd = &vmstate_allwinner_sdhost;
 +}
 +
-+static void allwinner_rtc_sun4i_class_init(ObjectClass *klass, void *data)
++static void allwinner_sdhost_sun4i_class_init(ObjectClass *klass, void *data)
 +{
-+    AwRtcClass *arc = AW_RTC_CLASS(klass);
-+
-+    arc->regmap = allwinner_rtc_sun4i_regmap;
-+    arc->regmap_size = sizeof(allwinner_rtc_sun4i_regmap);
-+    arc->year_offset = 110;
-+    arc->read = allwinner_rtc_sun4i_read;
-+    arc->write = allwinner_rtc_sun4i_write;
++    AwSdHostClass *sc = AW_SDHOST_CLASS(klass);
++    sc->max_desc_size = 8 * KiB;
 +}
 +
-+static void allwinner_rtc_sun6i_class_init(ObjectClass *klass, void *data)
++static void allwinner_sdhost_sun5i_class_init(ObjectClass *klass, void *data)
 +{
-+    AwRtcClass *arc = AW_RTC_CLASS(klass);
-+
-+    arc->regmap = allwinner_rtc_sun6i_regmap;
-+    arc->regmap_size = sizeof(allwinner_rtc_sun6i_regmap);
-+    arc->year_offset = 70;
-+    arc->read = allwinner_rtc_sun6i_read;
-+    arc->write = allwinner_rtc_sun6i_write;
++    AwSdHostClass *sc = AW_SDHOST_CLASS(klass);
++    sc->max_desc_size = 64 * KiB;
 +}
 +
-+static void allwinner_rtc_sun7i_class_init(ObjectClass *klass, void *data)
-+{
-+    AwRtcClass *arc = AW_RTC_CLASS(klass);
-+
-+    allwinner_rtc_sun4i_class_init(klass, arc);
-+    arc->year_offset = 70;
-+}
-+
-+static const TypeInfo allwinner_rtc_info = {
-+    .name          = TYPE_AW_RTC,
++static TypeInfo allwinner_sdhost_info = {
++    .name          = TYPE_AW_SDHOST,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_init = allwinner_rtc_init,
-+    .instance_size = sizeof(AwRtcState),
-+    .class_init    = allwinner_rtc_class_init,
-+    .class_size    = sizeof(AwRtcClass),
++    .instance_init = allwinner_sdhost_init,
++    .instance_size = sizeof(AwSdHostState),
++    .class_init    = allwinner_sdhost_class_init,
++    .class_size    = sizeof(AwSdHostClass),
 +    .abstract      = true,
 +};
 +
-+static const TypeInfo allwinner_rtc_sun4i_info = {
-+    .name          = TYPE_AW_RTC_SUN4I,
-+    .parent        = TYPE_AW_RTC,
-+    .class_init    = allwinner_rtc_sun4i_class_init,
++static const TypeInfo allwinner_sdhost_sun4i_info = {
++    .name          = TYPE_AW_SDHOST_SUN4I,
++    .parent        = TYPE_AW_SDHOST,
++    .class_init    = allwinner_sdhost_sun4i_class_init,
 +};
 +
-+static const TypeInfo allwinner_rtc_sun6i_info = {
-+    .name          = TYPE_AW_RTC_SUN6I,
-+    .parent        = TYPE_AW_RTC,
-+    .class_init    = allwinner_rtc_sun6i_class_init,
++static const TypeInfo allwinner_sdhost_sun5i_info = {
++    .name          = TYPE_AW_SDHOST_SUN5I,
++    .parent        = TYPE_AW_SDHOST,
++    .class_init    = allwinner_sdhost_sun5i_class_init,
 +};
 +
-+static const TypeInfo allwinner_rtc_sun7i_info = {
-+    .name          = TYPE_AW_RTC_SUN7I,
-+    .parent        = TYPE_AW_RTC,
-+    .class_init    = allwinner_rtc_sun7i_class_init,
++static const TypeInfo allwinner_sdhost_bus_info = {
++    .name = TYPE_AW_SDHOST_BUS,
++    .parent = TYPE_SD_BUS,
++    .instance_size = sizeof(SDBus),
++    .class_init = allwinner_sdhost_bus_class_init,
 +};
 +
-+static void allwinner_rtc_register(void)
++static void allwinner_sdhost_register_types(void)
 +{
-+    type_register_static(&allwinner_rtc_info);
-+    type_register_static(&allwinner_rtc_sun4i_info);
-+    type_register_static(&allwinner_rtc_sun6i_info);
-+    type_register_static(&allwinner_rtc_sun7i_info);
++    type_register_static(&allwinner_sdhost_info);
++    type_register_static(&allwinner_sdhost_sun4i_info);
++    type_register_static(&allwinner_sdhost_sun5i_info);
++    type_register_static(&allwinner_sdhost_bus_info);
 +}
 +
-+type_init(allwinner_rtc_register)
-diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-index 8dc9fcd3a9..12d92feebf 100644
---- a/hw/rtc/Makefile.objs
-+++ b/hw/rtc/Makefile.objs
-@@ -11,3 +11,4 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
- obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
- common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
- common-obj-$(CONFIG_ASPEED_SOC) += aspeed_rtc.o
-+common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-rtc.o
-diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
-index d6749f4616..eb57de3bd6 100644
---- a/hw/rtc/trace-events
-+++ b/hw/rtc/trace-events
-@@ -1,5 +1,9 @@
++type_init(allwinner_sdhost_register_types)
+diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
+index a884c238df..429c327de8 100644
+--- a/hw/sd/Makefile.objs
++++ b/hw/sd/Makefile.objs
+@@ -4,6 +4,7 @@ common-obj-$(CONFIG_SD) += sd.o core.o sdmmc-internal.o
+ common-obj-$(CONFIG_SDHCI) += sdhci.o
+ common-obj-$(CONFIG_SDHCI_PCI) += sdhci-pci.o
+ 
++obj-$(CONFIG_ALLWINNER_H3) += allwinner-sdhost.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
+ obj-$(CONFIG_OMAP) += omap_mmc.o
+ obj-$(CONFIG_PXA2XX) += pxa2xx_mmci.o
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index efcff666a2..5f09d32eb2 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -1,5 +1,12 @@
  # See docs/devel/tracing.txt for syntax documentation.
  
-+# allwinner-rtc.c
-+allwinner_rtc_read(uint64_t addr, uint64_t value) "addr 0x%" PRIx64 " value 0x%" PRIx64
-+allwinner_rtc_write(uint64_t addr, uint64_t value) "addr 0x%" PRIx64 " value 0x%" PRIx64
++# allwinner-sdhost.c
++allwinner_sdhost_set_inserted(bool inserted) "inserted %u"
++allwinner_sdhost_process_desc(uint64_t desc_addr, uint32_t desc_size, bool is_write, uint32_t max_bytes) "desc_addr 0x%" PRIx64 " desc_size %" PRIu32 " is_write %u max_bytes %" PRIu32
++allwinner_sdhost_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++allwinner_sdhost_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++allwinner_sdhost_update_irq(uint32_t irq) "IRQ bits 0x%" PRIx32
 +
- # sun4v-rtc.c
- sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " value 0x%" PRIx64
- sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 " value 0x%" PRIx64
+ # bcm2835_sdhost.c
+ bcm2835_sdhost_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ bcm2835_sdhost_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
 -- 
 2.17.1
 
