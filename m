@@ -6,46 +6,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9FA5C33CAF
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D8DC33CAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:15:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83CB2206B7
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:13:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83CB2206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 8B0AC206B7
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:15:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B0AC206B7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itJlW-00049B-8b
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 18:13:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55968)
+	id 1itJmg-0006MC-Dq
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 18:15:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1itJfj-0004AH-Hr
+ (envelope-from <fthain@telegraphics.com.au>) id 1itJfj-0004AF-Gk
  for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:08:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1itJfh-0003mI-DD
+ (envelope-from <fthain@telegraphics.com.au>) id 1itJfh-0003m1-AN
  for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:07:59 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:54662)
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:54738)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1itJfh-0003k7-6q; Sun, 19 Jan 2020 18:07:57 -0500
+ id 1itJfh-0003lW-3q; Sun, 19 Jan 2020 18:07:57 -0500
 Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
- id 18EF02991F; Sun, 19 Jan 2020 18:07:55 -0500 (EST)
+ id 5F5F029633; Sun, 19 Jan 2020 18:07:55 -0500 (EST)
 To: Jason Wang <jasowang@redhat.com>,
     qemu-devel@nongnu.org
-Message-Id: <a582b4412af479e0830d1ef0005a91a98bfc56cc.1579474761.git.fthain@telegraphics.com.au>
+Message-Id: <49ee52289db03344afc627dd49706ae81eb7d165.1579474761.git.fthain@telegraphics.com.au>
 In-Reply-To: <cover.1579474761.git.fthain@telegraphics.com.au>
 References: <cover.1579474761.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v3 04/14] dp8393x: Have dp8393x_receive() return the packet
- size
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v3 10/14] dp8393x: Pad frames to word or long word boundary
 Date: Mon, 20 Jan 2020 09:59:21 +1100
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
@@ -66,59 +62,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function re-uses its 'size' argument as a scratch variable.
-Instead, declare a local 'size' variable for that purpose so that the
-function result doesn't get messed up.
+The existing code has a bug where the Remaining Buffer Word Count (RBWC)
+is calculated with a truncating division, which gives the wrong result
+for odd-sized packets.
+
+Section 1.4.1 of the datasheet says,
+
+    Once the end of the packet has been reached, the serializer will
+    fill out the last word (16-bit mode) or long word (32-bit mode)
+    if the last byte did not end on a word or long word boundary
+    respectively. The fill byte will be 0FFh.
+
+Implement buffer padding so that buffer limits are correctly enforced.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/net/dp8393x.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ hw/net/dp8393x.c | 39 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 2d2ace2549..ece72cbf42 100644
+index b052e2c854..13513986f0 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -757,20 +757,21 @@ static int dp8393x_receive_filter(dp8393xState *s, =
-const uint8_t * buf,
- }
-=20
- static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
--                               size_t size)
-+                               size_t pkt_size)
- {
-     dp8393xState *s =3D qemu_get_nic_opaque(nc);
+@@ -766,16 +766,23 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     dp8393xState *s = qemu_get_nic_opaque(nc);
      int packet_type;
      uint32_t available, address;
--    int width, rx_len =3D size;
-+    int width, rx_len =3D pkt_size;
+-    int width, rx_len = pkt_size;
++    int width, rx_len, padded_len;
      uint32_t checksum;
-+    int size;
-=20
-     width =3D (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
-=20
-     s->regs[SONIC_RCR] &=3D ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_=
-FAER |
+     int size;
+ 
+-    width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
+-
+     s->regs[SONIC_RCR] &= ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_FAER |
          SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC);
-=20
--    packet_type =3D dp8393x_receive_filter(s, buf, size);
-+    packet_type =3D dp8393x_receive_filter(s, buf, pkt_size);
-     if (packet_type < 0) {
-         DPRINTF("packet not for netcard\n");
-         return -1;
-@@ -864,7 +865,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
-nst uint8_t * buf,
-     /* Done */
-     dp8393x_update_irq(s);
-=20
--    return size;
-+    return pkt_size;
- }
-=20
- static void dp8393x_reset(DeviceState *dev)
---=20
+ 
+-    if (pkt_size + 4 > dp8393x_rbwc(s) * 2) {
++    rx_len = pkt_size + sizeof(checksum);
++    if (s->regs[SONIC_DCR] & SONIC_DCR_DW) {
++        width = 2;
++        padded_len = ((rx_len - 1) | 3) + 1;
++    } else {
++        width = 1;
++        padded_len = ((rx_len - 1) | 1) + 1;
++    }
++
++    if (padded_len > dp8393x_rbwc(s) * 2) {
+         DPRINTF("oversize packet, pkt_size is %d\n", pkt_size);
+         s->regs[SONIC_ISR] |= SONIC_ISR_RBAE;
+         dp8393x_update_irq(s);
+@@ -810,22 +817,32 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     s->regs[SONIC_TRBA0] = s->regs[SONIC_CRBA0];
+ 
+     /* Calculate the ethernet checksum */
+-    checksum = cpu_to_le32(crc32(0, buf, rx_len));
++    checksum = cpu_to_le32(crc32(0, buf, pkt_size));
+ 
+     /* Put packet into RBA */
+     DPRINTF("Receive packet at %08x\n", dp8393x_crba(s));
+     address = dp8393x_crba(s);
+     address_space_rw(&s->as, address,
+-        MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, rx_len, 1);
+-    address += rx_len;
++        MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, pkt_size, 1);
++    address += pkt_size;
++
++    /* Put frame checksum into RBA */
+     address_space_rw(&s->as, address,
+-        MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, 4, 1);
+-    address += 4;
+-    rx_len += 4;
++        MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, sizeof(checksum), 1);
++    address += sizeof(checksum);
++
++    /* Pad short packets to keep pointers aligned */
++    if (rx_len < padded_len) {
++        size = padded_len - rx_len;
++        address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
++            (uint8_t *)"\xFF\xFF\xFF", size, 1);
++        address += size;
++    }
++
+     s->regs[SONIC_CRBA1] = address >> 16;
+     s->regs[SONIC_CRBA0] = address & 0xffff;
+     available = dp8393x_rbwc(s);
+-    available -= rx_len / 2;
++    available -= padded_len >> 1;
+     s->regs[SONIC_RBWC1] = available >> 16;
+     s->regs[SONIC_RBWC0] = available & 0xffff;
+ 
+-- 
 2.24.1
 
 
