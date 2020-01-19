@@ -2,66 +2,72 @@ Return-Path: <SRS0=UCRd=3I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF2DC33CB1
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 13:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F21ECC33CB1
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 17:25:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73A2E206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 13:55:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73A2E206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ict.ac.cn
+	by mail.kernel.org (Postfix) with ESMTPS id B728120684
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 17:25:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="kSMacf/t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B728120684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itB3A-0000ca-Kl
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 08:55:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51948)
+	id 1itEKX-0008Fx-JS
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 12:25:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiangzhiying@ict.ac.cn>) id 1it8CQ-0002Cs-Vq
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 05:52:59 -0500
+ (envelope-from <svens@stackframe.org>) id 1itEHK-0007ki-Io
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 12:22:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiangzhiying@ict.ac.cn>) id 1it8CP-0006fu-Lw
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 05:52:58 -0500
-Received: from smtp21.cstnet.cn ([159.226.251.21]:36882 helo=cstnet.cn)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <jiangzhiying@ict.ac.cn>) id 1it8CP-0006bT-3K
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 05:52:57 -0500
-Received: from localhost.localdomain (unknown [111.196.189.80])
- by APP-01 (Coremail) with SMTP id qwCowADn7Zn+NCRe_nvKFw--.318S2;
- Sun, 19 Jan 2020 18:52:46 +0800 (CST)
-From: jiangzhiying@ict.ac.cn
-To: qemu-devel@nongnu.org
-Subject: [PATCH] riscv: Fix defination of csr operations
-Date: Sun, 19 Jan 2020 18:52:45 +0800
-Message-Id: <20200119105245.5860-1-jiangzhiying@ict.ac.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: qwCowADn7Zn+NCRe_nvKFw--.318S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gw4rAFyUJFW3ZrWkZFy5Jwb_yoWfJFb_Wr
- 4vgF9Y9ry7Wa9Fvayku348tr1xZr1vgay2ga1xKr45G345WrZxGw1kXrn3XrWYvr4xG34f
- Ca4Iqa9xKay2yjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
- 9fnUUIcSsGvfJTRUUUb7AYjsxI4VW3JwAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I
- 6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
- 8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0
- cI8IcVCY1x0267AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4
- A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
- w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4UMc
- vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwAKzVCY07xG64k0F24l42xK82IY
- c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
- 026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF
- 0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0x
- vE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
- jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8XyCJUUUUU==
-X-Originating-IP: [111.196.189.80]
-X-CM-SenderInfo: xmld0w52kl5x1qj6xunwoduhdfq/
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 159.226.251.21
-X-Mailman-Approved-At: Sun, 19 Jan 2020 08:54:49 -0500
+ (envelope-from <svens@stackframe.org>) id 1itEHI-0005TZ-4s
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 12:22:26 -0500
+Received: from propper.duncanthrax.net ([91.207.61.48]:55204
+ helo=smtp.duncanthrax.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <svens@stackframe.org>)
+ id 1itEHH-0005Rq-HS
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 12:22:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=duncanthrax.net; s=dkim; h=In-Reply-To:Content-Transfer-Encoding:
+ Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+ Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=IaPB6sEvBXtD9yZAJOTgkcbRrghXoh4lmTZRESqr1JE=; b=kSMacf/tO49RXylgim/8B2h5Nk
+ kjjlPKcf1MzWvBqF/nVCCRrWyuoFMz8Ju7FUHUJv3OALPTxeSWwx3eJa/+KLGrxEAbzINti4I8xsd
+ H83whtyQXu48v/SDXFjLkc2zIEpGUUIs3XEQqk30Vw6ZKS9jemfX2exPvBUKTb0eFr+E=;
+Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
+ ([46.5.233.221] helo=t470p.stackframe.org)
+ by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
+ (envelope-from <svens@stackframe.org>)
+ id 1itEH6-0007jL-H3; Sun, 19 Jan 2020 18:22:12 +0100
+Date: Sun, 19 Jan 2020 18:22:04 +0100
+From: Sven Schnelle <svens@stackframe.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v5 4/6] hppa: add emulation of LASI PS2 controllers
+Message-ID: <20200119172204.GA4835@t470p.stackframe.org>
+References: <20191220211512.3289-1-svens@stackframe.org>
+ <20191220211512.3289-5-svens@stackframe.org>
+ <8eff8c1b-1d56-19a1-a8dd-743517716007@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8eff8c1b-1d56-19a1-a8dd-743517716007@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.207.61.48
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,37 +79,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair.Francis@wdc.com, palmer@dabbelt.com,
- Ian Jiang <ianjiang.ict@gmail.com>, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de
+Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Ian Jiang <ianjiang.ict@gmail.com>
+On Fri, Jan 03, 2020 at 07:15:49AM +0100, Philippe Mathieu-Daudé wrote:
+> On 12/20/19 10:15 PM, Sven Schnelle wrote:
+> > Signed-off-by: Sven Schnelle <svens@stackframe.org>
+> > ---
+> >   hw/hppa/Kconfig            |   1 +
+> >   hw/hppa/lasi.c             |  10 +-
+> >   hw/input/Kconfig           |   3 +
+> >   hw/input/Makefile.objs     |   1 +
+> >   hw/input/lasips2.c         | 289 +++++++++++++++++++++++++++++++++++++
+> >   hw/input/ps2.c             |   5 +
+> >   hw/input/trace-events      |   5 +
+> >   include/hw/input/lasips2.h |  16 ++
+> >   include/hw/input/ps2.h     |   1 +
+> >   9 files changed, 330 insertions(+), 1 deletion(-)
+> >   create mode 100644 hw/input/lasips2.c
+> >   create mode 100644 include/hw/input/lasips2.h
+> > 
+> > diff --git a/hw/hppa/Kconfig b/hw/hppa/Kconfig
+> > index 2a7b38d6d6..7f9be7f25c 100644
+> > --- a/hw/hppa/Kconfig
+> > +++ b/hw/hppa/Kconfig
+> > @@ -11,3 +11,4 @@ config DINO
+> >       select MC146818RTC
+> >       select LSI_SCSI_PCI
+> >       select LASI_82596
+> > +    select LASIPS2
+> 
+> If these components are part of the LASI chipset, you don't need an specific
+> Kconfig entry for each, you can simply use the LASI one.
+> 
+> Add a LASI entry in hw/hppa/Kconfig such:
+> 
+> config LASI
+>     bool
+>     select I82596_COMMON
+>     select PS2
+> 
 
-There is a mistake in defining CSR operations for pmpcfg registers.
-This patch fixes the bug.
+I'll send a patch as soon as this series is merged - that's easier than
+resending the whole series.
 
-Signed-off-by: Ian Jiang <ianjiang.ict@gmail.com>
----
- target/riscv/csr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index da02f9f0b1..e07b5267be 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -948,7 +948,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     [CSR_SATP] =                { smode, read_satp,        write_satp        },
- 
-     /* Physical Memory Protection */
--    [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
-+    [CSR_PMPCFG0  ... CSR_PMPCFG3] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
-     [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
- 
-     /* Performance Counters */
--- 
-2.17.1
-
+Regards
+Sven
 
