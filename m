@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E75C32771
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FD6C32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:56:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C48F2467C
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:55:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1CC22467C
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:56:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nenbwYMb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C48F2467C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ele+nnXq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1CC22467C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isysa-0004cD-Nf
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 19:55:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46873)
+	id 1isyst-00056U-Ou
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 19:56:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1isyoE-0006vK-TA
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:25 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1isyoR-0007Gc-Jl
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1isyoC-0008Ke-EN
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:22 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46007)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1isyoP-0008TY-5h
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:51:35 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50413)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1isyoC-0008K9-6c; Sat, 18 Jan 2020 19:51:20 -0500
-Received: by mail-wr1-x444.google.com with SMTP id j42so26030738wrj.12;
- Sat, 18 Jan 2020 16:51:20 -0800 (PST)
+ id 1isyoO-0008T1-V6; Sat, 18 Jan 2020 19:51:33 -0500
+Received: by mail-wm1-x341.google.com with SMTP id a5so10946836wmb.0;
+ Sat, 18 Jan 2020 16:51:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=AqdZexMIwvu0FsbhvsNVqy+3fktZu0wPf8IHRtxz0pI=;
- b=nenbwYMbjeCuHwmkaBaMLhYCgjHrq88k68FV7+l835+iz0yIVoJD/16GQ9c3WUTXXO
- BmelCvq3KlDQK9a+oOT/pTMDazlLv8h6KbCrccXTlP2Rn6FYgQEweKEOjKs27ilNaCPs
- C1j/ZdXO0ATxOXAaSK1qAjugjQvU4fiH7blMOkHDVFqj/Hsauq6I0NCGElaEQOAd15eQ
- eyX/kaO25sjN5sDJO2kbWH3SaROL5XF7bJ3z3fuO8+4rjdz6njHw+JtMlQOtHlhOsPzc
- 6lyiMX67dkM4h7m7sZV6fasjrF0Nq2CwS5prro3RBHXfkpBS2/ZhIyBu1dpKFCfhH93G
- P9ow==
+ bh=pdl/uNvO7egscf35xl4ajBsKhu2xXqtaLGKPbzOUV5s=;
+ b=ele+nnXqaJxFJrrSkR935m3AiSU46CSK59cWO8V9qHmSJpWkw5V/xz798SDEQkpfnj
+ 7xg5b2ceBUQ7flMvrsmwB+9Tgv2qA+0tzDJ5pRRr4pkiyipASPaZEIdCjah1I6dFuYMd
+ jpq8YAnFjGYPe9ex1ENI9m1gvZNGyCjYUnqbhI8jJdwhLlfXrk6kaMZuEKdSisTlENMb
+ T5Ig0WmW7wiKDTp8AWX1lRzewMGa7+6SUbM/hvogrKMhGOktaJ/wMzpBz9FfWTRcwfE1
+ UH5juPvrzlflUxFL7NSlmH2FQXLnz9/bhsDhKyzx71JoeF4Dw6fSVWrJ/4qeaWpWOa1N
+ k7bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=AqdZexMIwvu0FsbhvsNVqy+3fktZu0wPf8IHRtxz0pI=;
- b=BZQKCBTgc7DPVyQBVf/tNwJW9Adc+dOxuQt81Kpkvg3EcYF47x8rtemUtlORxznwpk
- 9Y6RlDN1325TmTk2rcwv0dR2UjyxLvnOsGRbg9P0V2yJcQ228/AYTZ0teyzg6PS+GMxj
- V8O/Gc2CZCINSoKq75vljRYSHMB9vy/E1dIyhIJAg54SXxZWrmgiGyUQFI/GrLbEIAJt
- I/lEj82KZiWDGlhKk2WOPQWR7qxLhEMd61kt1CS2cEgHP+kHoIiTgiZ399DFpHLlNRPC
- ZMHWPezKjBrrENWOu39vmnRrr973PBrYcrc1RUZ+ZHfwVSOHoLVEXZGvs43CAFvnLnxu
- w/Tw==
-X-Gm-Message-State: APjAAAVfewT1Uj3vh0a+uxf5iJe1wG5XWawpbrf5OjwayDiscE7XQOPE
- S4tzfdcz8EwY+u9wrzJPtYbclJGc1c8=
-X-Google-Smtp-Source: APXvYqyT2OYnNOqr/Val8/DIBz1RtUUfVbVCjhiKikFukunxuuzlsUsfqbrh3uoR7v96wwuNSX5xfA==
-X-Received: by 2002:adf:f850:: with SMTP id d16mr10582998wrq.161.1579395078881; 
- Sat, 18 Jan 2020 16:51:18 -0800 (PST)
+ bh=pdl/uNvO7egscf35xl4ajBsKhu2xXqtaLGKPbzOUV5s=;
+ b=H2x4t4dx+HsLZIHZQGO/w1MmEUaV6+KJ0uZLPLNTYh0B7kwUqo013VBqazsiVV4xit
+ Tnm0i7hP21wFZX+2imW2jvWmHi3dgy9M4XIgTYdaNQn5SbNQpBc0RBRGXqthGWNtAKNk
+ FZnkh2wolClbxKPIE24oNGKRbOh0jce1ZdRUkoqPqPPJxws/c+jcDd/ZiVlig12mDCZy
+ ztdsDnkWNJwN+dVDZKHYACv6NlXh/CbBva90kiJW1kRzj5z/pJVOzZXlPsaf0Zj/Z7GC
+ vbKY+n0Jp3+MwqeZdUlpp7DRsIWRYMn9NMQt9ORLWLLUCGVUajIsKyy7Fu1sfw5PmXiy
+ 94eQ==
+X-Gm-Message-State: APjAAAVBfcxlBW2MIdRwdI0gxn1AzCqPbIaNxDjBXzXlYSr2HCal1iZn
+ kEy/XxMsaQEO69o81m9QSKcnsPZf8a0=
+X-Google-Smtp-Source: APXvYqwcBpMHesEn4WkoTkDJ3x68ULqghU6FE2DW6AQndWj5JJqFISrx25N7hr6KBNYTEvT7Td+XgA==
+X-Received: by 2002:a7b:c392:: with SMTP id s18mr11810942wmj.169.1579395091715; 
+ Sat, 18 Jan 2020 16:51:31 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id h2sm41763568wrv.66.2020.01.18.16.51.18
+ by smtp.gmail.com with ESMTPSA id h2sm41763568wrv.66.2020.01.18.16.51.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Jan 2020 16:51:18 -0800 (PST)
+ Sat, 18 Jan 2020 16:51:31 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 06/20] hw/arm/allwinner: add CPU Configuration module
-Date: Sun, 19 Jan 2020 01:50:48 +0100
-Message-Id: <20200119005102.3847-7-nieklinnenbank@gmail.com>
+Subject: [PATCH v4 20/20] docs: add Orange Pi PC document
+Date: Sun, 19 Jan 2020 01:51:02 +0100
+Message-Id: <20200119005102.3847-21-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200119005102.3847-1-nieklinnenbank@gmail.com>
 References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,455 +96,237 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Various Allwinner System on Chip designs contain multiple processors
-that can be configured and reset using the generic CPU Configuration
-module interface. This commit adds support for the Allwinner CPU
-configuration interface which emulates the following features:
+The Xunlong Orange Pi PC machine is a functional ARM machine
+based on the Allwinner H3 System-on-Chip. It supports mainline
+Linux, U-Boot, NetBSD and is covered by acceptance tests.
 
- * CPU reset
- * CPU status
+This commit adds a documentation text file with a description
+of the machine and instructions for the user.
 
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- include/hw/arm/allwinner-h3.h      |   3 +
- include/hw/misc/allwinner-cpucfg.h |  52 ++++++
- hw/arm/allwinner-h3.c              |   9 +-
- hw/misc/allwinner-cpucfg.c         | 269 +++++++++++++++++++++++++++++
- hw/misc/Makefile.objs              |   1 +
- hw/misc/trace-events               |   5 +
- 6 files changed, 338 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/misc/allwinner-cpucfg.h
- create mode 100644 hw/misc/allwinner-cpucfg.c
+ docs/orangepi.rst | 199 ++++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS       |   1 +
+ 2 files changed, 200 insertions(+)
+ create mode 100644 docs/orangepi.rst
 
-diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index 43500c4262..dc729176ab 100644
---- a/include/hw/arm/allwinner-h3.h
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -40,6 +40,7 @@
- #include "hw/timer/allwinner-a10-pit.h"
- #include "hw/intc/arm_gic.h"
- #include "hw/misc/allwinner-h3-ccu.h"
-+#include "hw/misc/allwinner-cpucfg.h"
- #include "hw/misc/allwinner-h3-sysctrl.h"
- #include "target/arm/cpu.h"
- 
-@@ -76,6 +77,7 @@ enum {
-     AW_H3_GIC_CPU,
-     AW_H3_GIC_HYP,
-     AW_H3_GIC_VCPU,
-+    AW_H3_CPUCFG,
-     AW_H3_SDRAM
- };
- 
-@@ -110,6 +112,7 @@ typedef struct AwH3State {
-     const hwaddr *memmap;
-     AwA10PITState timer;
-     AwH3ClockCtlState ccu;
-+    AwCpuCfgState cpucfg;
-     AwH3SysCtrlState sysctrl;
-     GICState gic;
-     MemoryRegion sram_a1;
-diff --git a/include/hw/misc/allwinner-cpucfg.h b/include/hw/misc/allwinner-cpucfg.h
+diff --git a/docs/orangepi.rst b/docs/orangepi.rst
 new file mode 100644
-index 0000000000..2c3693a8be
+index 0000000000..dbca9abe80
 --- /dev/null
-+++ b/include/hw/misc/allwinner-cpucfg.h
-@@ -0,0 +1,52 @@
-+/*
-+ * Allwinner CPU Configuration Module emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++++ b/docs/orangepi.rst
+@@ -0,0 +1,199 @@
++=========================
++Orange Pi PC Machine Type
++=========================
 +
-+#ifndef HW_MISC_ALLWINNER_CPUCFG_H
-+#define HW_MISC_ALLWINNER_CPUCFG_H
++The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
++based embedded computer with mainline support in both U-Boot
++and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,
++1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and
++various other I/O.
 +
-+#include "qom/object.h"
-+#include "hw/sysbus.h"
++Supported devices
++-----------------
 +
-+/**
-+ * Object model
-+ * @{
-+ */
++The Orange Pi PC machine supports the following devices:
 +
-+#define TYPE_AW_CPUCFG   "allwinner-cpucfg"
-+#define AW_CPUCFG(obj) \
-+    OBJECT_CHECK(AwCpuCfgState, (obj), TYPE_AW_CPUCFG)
++ * SMP (Quad Core Cortex A7)
++ * Generic Interrupt Controller configuration
++ * SRAM mappings
++ * SDRAM controller
++ * Real Time Clock
++ * Timer device (re-used from Allwinner A10)
++ * UART
++ * SD/MMC storage controller
++ * EMAC ethernet
++ * USB 2.0 interfaces
++ * Clock Control Unit
++ * System Control module
++ * Security Identifier device
 +
-+/** @} */
++Limitations
++-----------
 +
-+/**
-+ * Allwinner CPU Configuration Module instance state
-+ */
-+typedef struct AwCpuCfgState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
++Currently, Orange Pi PC does *not* support the following features:
 +
-+    MemoryRegion iomem;
-+    uint32_t gen_ctrl;
-+    uint32_t super_standby;
-+    uint32_t entry_addr;
++- Graphical output via HDMI, GPU and/or the Display Engine
++- Audio output
++- Hardware Watchdog
 +
-+} AwCpuCfgState;
++Also see the 'unimplemented' array in the Allwinner H3 SoC module
++for a complete list of unimplemented I/O devices:
++  ./hw/arm/allwinner-h3.c
 +
-+#endif /* HW_MISC_ALLWINNER_CPUCFG_H */
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index 600cfa2c11..daa2d3c819 100644
---- a/hw/arm/allwinner-h3.c
-+++ b/hw/arm/allwinner-h3.c
-@@ -56,6 +56,7 @@ const hwaddr allwinner_h3_memmap[] = {
-     [AW_H3_GIC_CPU]    = 0x01c82000,
-     [AW_H3_GIC_HYP]    = 0x01c84000,
-     [AW_H3_GIC_VCPU]   = 0x01c86000,
-+    [AW_H3_CPUCFG]     = 0x01f01c00,
-     [AW_H3_SDRAM]      = 0x40000000
- };
++Using the Orange Pi PC machine type
++-----------------------------------
++
++Boot options
++~~~~~~~~~~~~
++
++The Orange Pi PC machine can start using the standard -kernel functionality
++for loading a Linux kernel or ELF executable. Additionally, the Orange Pi PC
++machine can also emulate the BootROM which is present on an actual Allwinner H3
++based SoC, which loads the bootloader from a SD card, specified via the -sd argument
++to qemu-system-arm.
++
++Running mainline Linux
++~~~~~~~~~~~~~~~~~~~~~~
++
++Mainline Linux kernels from 4.19 up to latest master are known to work.
++To build a Linux mainline kernel that can be booted by the Orange Pi PC machine,
++simply configure the kernel using the sunxi_defconfig configuration:
++
++  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make mrproper
++  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make sunxi_defconfig
++
++To be able to use USB storage, you need to manually enable the corresponding
++configuration item. Start the kconfig configuration tool:
++
++  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make menuconfig
++
++Navigate to the following item, enable it and save your configuration:
++
++  Device Drivers > USB support > USB Mass Storage support
++
++Build the Linux kernel with:
++
++  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make
++
++To boot the newly build linux kernel in QEMU with the Orange Pi PC machine, use:
++
++  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
++      -kernel /path/to/linux/arch/arm/boot/zImage \
++      -append 'console=ttyS0,115200' \
++      -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb
++
++Orange Pi PC images
++~~~~~~~~~~~~~~~~~~~
++
++Note that the mainline kernel does not have a root filesystem. You may provide it
++with an official Orange Pi PC image from the official website:
++
++  http://www.orangepi.org/downloadresources/
++
++Another possibility is to run an Armbian image for Orange Pi PC which
++can be downloaded from:
++
++   https://www.armbian.com/orange-pi-pc/
++
++Alternatively, you can also choose to build you own image with buildroot
++using the orangepi_pc_defconfig. Also see https://buildroot.org for more information.
++
++You can choose to attach the selected image either as an SD card or as USB mass storage.
++For example, to boot using the Orange Pi PC Debian image on SD card, simply add the -sd
++argument and provide the proper root= kernel parameter:
++
++  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
++      -kernel /path/to/linux/arch/arm/boot/zImage \
++      -append 'console=ttyS0,115200 root=/dev/mmcblk0p2' \
++      -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb \
++      -sd OrangePi_pc_debian_stretch_server_linux5.3.5_v1.0.img
++
++To attach the image as an USB mass storage device to the machine,
++simply append to the command:
++
++  -drive if=none,id=stick,file=myimage.img \
++  -device usb-storage,bus=usb-bus.0,drive=stick
++
++Instead of providing a custom Linux kernel via the -kernel command you may also
++choose to let the Orange Pi PC machine load the bootloader from SD card, just like
++a real board would do using the BootROM. Simply pass the selected image via the -sd
++argument and remove the -kernel, -append, -dbt and -initrd arguments:
++
++  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
++       -sd Armbian_19.11.3_Orangepipc_buster_current_5.3.9.img
++
++Note that both the official Orange Pi PC images and Armbian images start
++a lot of userland programs via systemd. Depending on the host hardware and OS,
++they may be slow to emulate, especially due to emulating the 4 cores.
++To help reduce the performance slow down due to emulating the 4 cores, you can
++give the following kernel parameters (or via -append):
++
++  => setenv extraargs 'systemd.default_timeout_start_sec=9000 loglevel=7 nosmp console=ttyS0,115200'
++
++Running U-Boot
++~~~~~~~~~~~~~~
++
++U-Boot mainline can be build and configured using the orangepi_pc_defconfig
++using similar commands as describe above for Linux. Note that it is recommended
++for development/testing to select the following configuration setting in U-Boot:
++
++  Device Tree Control > Provider for DTB for DT Control > Embedded DTB
++
++To start U-Boot using the Orange Pi PC machine, provide the
++u-boot binary to the -kernel argument:
++
++  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
++      -kernel /path/to/uboot/u-boot -sd disk.img
++
++Use the following U-boot commands to load and boot a Linux kernel from SD card:
++
++  -> setenv bootargs console=ttyS0,115200
++  -> ext2load mmc 0 0x42000000 zImage
++  -> ext2load mmc 0 0x43000000 sun8i-h3-orangepi-pc.dtb
++  -> bootz 0x42000000 - 0x43000000
++
++Running NetBSD
++~~~~~~~~~~~~~~
++
++The NetBSD operating system also includes support for Allwinner H3 based boards,
++including the Orange Pi PC. NetBSD 9.0 is known to work best for the Orange Pi PC
++board and provides a fully working system with serial console, networking and storage.
++
++Currently NetBSD 9.0 is in testing, but release candidate 1 can be started
++successfully on the Orange Pi PC machine. Get the 'evbarm-earmv7hf' based image from:
++
++  https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0_RC1/evbarm-earmv7hf/binary/gzimg/armv7.img.gz
++
++The image requires manually installing U-Boot in the image. Build U-Boot with
++the orangepi_pc_defconfig configuration as described in the previous section.
++Next, unzip the NetBSD image and write the U-Boot binary including SPL using:
++
++  $ gunzip armv7.img.gz
++  $ dd if=/path/to/u-boot-sunxi-with-spl.bin of=armv7.img bs=1024 seek=8 conv=notrunc
++
++Start the machine using the following command:
++
++  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
++        -sd armv7.img
++
++At the U-Boot stage, interrupt the automatic boot process by pressing a key
++and set the following environment variables before booting:
++
++  => setenv bootargs root=ld0a
++  => setenv kernel netbsd-GENERIC.ub
++  => setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb
++  => setenv bootcmd 'fatload mmc 0:1 ${kernel_addr_r} ${kernel}; fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; fdt addr ${fdt_addr_r}; bootm ${kernel_addr_r} - ${fdt_addr_r}'
++
++Optionally you may save the environment variables to SD card with 'saveenv'.
++To continue booting simply give the 'boot' command and NetBSD boots.
++
++Orange Pi PC acceptance tests
++-----------------------------
++
++The Orange Pi PC machine has several acceptance tests included.
++To run the whole set of tests, build QEMU from source and simply
++provide the following command:
++
++  $ AVOCADO_ALLOW_LARGE_STORAGE=yes avocado --show=app,console run \
++     -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
++
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e99797eec9..8b7096070c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -488,6 +488,7 @@ S: Maintained
+ F: hw/*/allwinner-h3*
+ F: include/hw/*/allwinner-h3*
+ F: hw/arm/orangepi.c
++F: docs/orangepi.rst
  
-@@ -122,7 +123,6 @@ struct AwH3Unimplemented {
-     { "r_wdog",    0x01f01000, 1 * KiB },
-     { "r_prcm",    0x01f01400, 1 * KiB },
-     { "r_twd",     0x01f01800, 1 * KiB },
--    { "r_cpucfg",  0x01f01c00, 1 * KiB },
-     { "r_cir-rx",  0x01f02000, 1 * KiB },
-     { "r_twi",     0x01f02400, 1 * KiB },
-     { "r_uart",    0x01f02800, 1 * KiB },
-@@ -195,6 +195,9 @@ static void allwinner_h3_init(Object *obj)
- 
-     sysbus_init_child_obj(obj, "sysctrl", &s->sysctrl, sizeof(s->sysctrl),
-                           TYPE_AW_H3_SYSCTRL);
-+
-+    sysbus_init_child_obj(obj, "cpucfg", &s->cpucfg, sizeof(s->cpucfg),
-+                          TYPE_AW_CPUCFG);
- }
- 
- static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-@@ -308,6 +311,10 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-     qdev_init_nofail(DEVICE(&s->sysctrl));
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctrl), 0, s->memmap[AW_H3_SYSCTRL]);
- 
-+    /* CPU Configuration */
-+    qdev_init_nofail(DEVICE(&s->cpucfg));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->cpucfg), 0, s->memmap[AW_H3_CPUCFG]);
-+
-     /* Universal Serial Bus */
-     sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
-                          qdev_get_gpio_in(DEVICE(&s->gic),
-diff --git a/hw/misc/allwinner-cpucfg.c b/hw/misc/allwinner-cpucfg.c
-new file mode 100644
-index 0000000000..47254bfafd
---- /dev/null
-+++ b/hw/misc/allwinner-cpucfg.c
-@@ -0,0 +1,269 @@
-+/*
-+ * Allwinner CPU Configuration Module emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "migration/vmstate.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "qemu/error-report.h"
-+#include "qemu/timer.h"
-+#include "hw/core/cpu.h"
-+#include "arm-powerctl.h"
-+#include "hw/misc/allwinner-cpucfg.h"
-+#include "trace.h"
-+
-+/* CPUCFG register offsets */
-+enum {
-+    REG_CPUS_RST_CTRL       = 0x0000, /* CPUs Reset Control */
-+    REG_CPU0_RST_CTRL       = 0x0040, /* CPU#0 Reset Control */
-+    REG_CPU0_CTRL           = 0x0044, /* CPU#0 Control */
-+    REG_CPU0_STATUS         = 0x0048, /* CPU#0 Status */
-+    REG_CPU1_RST_CTRL       = 0x0080, /* CPU#1 Reset Control */
-+    REG_CPU1_CTRL           = 0x0084, /* CPU#1 Control */
-+    REG_CPU1_STATUS         = 0x0088, /* CPU#1 Status */
-+    REG_CPU2_RST_CTRL       = 0x00C0, /* CPU#2 Reset Control */
-+    REG_CPU2_CTRL           = 0x00C4, /* CPU#2 Control */
-+    REG_CPU2_STATUS         = 0x00C8, /* CPU#2 Status */
-+    REG_CPU3_RST_CTRL       = 0x0100, /* CPU#3 Reset Control */
-+    REG_CPU3_CTRL           = 0x0104, /* CPU#3 Control */
-+    REG_CPU3_STATUS         = 0x0108, /* CPU#3 Status */
-+    REG_CPU_SYS_RST         = 0x0140, /* CPU System Reset */
-+    REG_CLK_GATING          = 0x0144, /* CPU Clock Gating */
-+    REG_GEN_CTRL            = 0x0184, /* General Control */
-+    REG_SUPER_STANDBY       = 0x01A0, /* Super Standby Flag */
-+    REG_ENTRY_ADDR          = 0x01A4, /* Reset Entry Address */
-+    REG_DBG_EXTERN          = 0x01E4, /* Debug External */
-+    REG_CNT64_CTRL          = 0x0280, /* 64-bit Counter Control */
-+    REG_CNT64_LOW           = 0x0284, /* 64-bit Counter Low */
-+    REG_CNT64_HIGH          = 0x0288, /* 64-bit Counter High */
-+};
-+
-+/* CPUCFG register flags */
-+enum {
-+    CPUX_RESET_RELEASED     = ((1 << 1) | (1 << 0)),
-+    CPUX_STATUS_SMP         = (1 << 0),
-+    CPU_SYS_RESET_RELEASED  = (1 << 0),
-+    CLK_GATING_ENABLE       = ((1 << 8) | 0xF),
-+};
-+
-+/* CPUCFG register reset values */
-+enum {
-+    REG_CLK_GATING_RST      = 0x0000010F,
-+    REG_GEN_CTRL_RST        = 0x00000020,
-+    REG_SUPER_STANDBY_RST   = 0x0,
-+    REG_CNT64_CTRL_RST      = 0x0,
-+};
-+
-+/* CPUCFG constants */
-+enum {
-+    CPU_EXCEPTION_LEVEL_ON_RESET = 3, /* EL3 */
-+};
-+
-+static void allwinner_cpucfg_cpu_reset(AwCpuCfgState *s, uint8_t cpu_id)
-+{
-+    int ret;
-+
-+    trace_allwinner_cpucfg_cpu_reset(cpu_id, s->entry_addr);
-+
-+    ret = arm_set_cpu_on(cpu_id, s->entry_addr, 0,
-+                         CPU_EXCEPTION_LEVEL_ON_RESET, false);
-+    if (ret != QEMU_ARM_POWERCTL_RET_SUCCESS) {
-+        error_report("%s: failed to bring up CPU %d: err %d",
-+                     __func__, cpu_id, ret);
-+        return;
-+    }
-+}
-+
-+static uint64_t allwinner_cpucfg_read(void *opaque, hwaddr offset,
-+                                      unsigned size)
-+{
-+    const AwCpuCfgState *s = AW_CPUCFG(opaque);
-+    uint64_t val = 0;
-+
-+    switch (offset) {
-+    case REG_CPUS_RST_CTRL:     /* CPUs Reset Control */
-+    case REG_CPU_SYS_RST:       /* CPU System Reset */
-+        val = CPU_SYS_RESET_RELEASED;
-+        break;
-+    case REG_CPU0_RST_CTRL:     /* CPU#0 Reset Control */
-+    case REG_CPU1_RST_CTRL:     /* CPU#1 Reset Control */
-+    case REG_CPU2_RST_CTRL:     /* CPU#2 Reset Control */
-+    case REG_CPU3_RST_CTRL:     /* CPU#3 Reset Control */
-+        val = CPUX_RESET_RELEASED;
-+        break;
-+    case REG_CPU0_CTRL:         /* CPU#0 Control */
-+    case REG_CPU1_CTRL:         /* CPU#1 Control */
-+    case REG_CPU2_CTRL:         /* CPU#2 Control */
-+    case REG_CPU3_CTRL:         /* CPU#3 Control */
-+        val = 0;
-+        break;
-+    case REG_CPU0_STATUS:       /* CPU#0 Status */
-+    case REG_CPU1_STATUS:       /* CPU#1 Status */
-+    case REG_CPU2_STATUS:       /* CPU#2 Status */
-+    case REG_CPU3_STATUS:       /* CPU#3 Status */
-+        val = CPUX_STATUS_SMP;
-+        break;
-+    case REG_CLK_GATING:        /* CPU Clock Gating */
-+        val = CLK_GATING_ENABLE;
-+        break;
-+    case REG_GEN_CTRL:          /* General Control */
-+        val = s->gen_ctrl;
-+        break;
-+    case REG_SUPER_STANDBY:     /* Super Standby Flag */
-+        val = s->super_standby;
-+        break;
-+    case REG_ENTRY_ADDR:        /* Reset Entry Address */
-+        val = s->entry_addr;
-+        break;
-+    case REG_DBG_EXTERN:        /* Debug External */
-+    case REG_CNT64_CTRL:        /* 64-bit Counter Control */
-+    case REG_CNT64_LOW:         /* 64-bit Counter Low */
-+    case REG_CNT64_HIGH:        /* 64-bit Counter High */
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register at 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        break;
-+    }
-+
-+    trace_allwinner_cpucfg_read(offset, val, size);
-+
-+    return val;
-+}
-+
-+static void allwinner_cpucfg_write(void *opaque, hwaddr offset,
-+                                   uint64_t val, unsigned size)
-+{
-+    AwCpuCfgState *s = AW_CPUCFG(opaque);
-+
-+    trace_allwinner_cpucfg_write(offset, val, size);
-+
-+    switch (offset) {
-+    case REG_CPUS_RST_CTRL:     /* CPUs Reset Control */
-+    case REG_CPU_SYS_RST:       /* CPU System Reset */
-+        break;
-+    case REG_CPU0_RST_CTRL:     /* CPU#0 Reset Control */
-+    case REG_CPU1_RST_CTRL:     /* CPU#1 Reset Control */
-+    case REG_CPU2_RST_CTRL:     /* CPU#2 Reset Control */
-+    case REG_CPU3_RST_CTRL:     /* CPU#3 Reset Control */
-+        if (val) {
-+            allwinner_cpucfg_cpu_reset(s, (offset - REG_CPU0_RST_CTRL) >> 6);
-+        }
-+        break;
-+    case REG_CPU0_CTRL:         /* CPU#0 Control */
-+    case REG_CPU1_CTRL:         /* CPU#1 Control */
-+    case REG_CPU2_CTRL:         /* CPU#2 Control */
-+    case REG_CPU3_CTRL:         /* CPU#3 Control */
-+    case REG_CPU0_STATUS:       /* CPU#0 Status */
-+    case REG_CPU1_STATUS:       /* CPU#1 Status */
-+    case REG_CPU2_STATUS:       /* CPU#2 Status */
-+    case REG_CPU3_STATUS:       /* CPU#3 Status */
-+    case REG_CLK_GATING:        /* CPU Clock Gating */
-+    case REG_GEN_CTRL:          /* General Control */
-+        s->gen_ctrl = val;
-+        break;
-+    case REG_SUPER_STANDBY:     /* Super Standby Flag */
-+        s->super_standby = val;
-+        break;
-+    case REG_ENTRY_ADDR:        /* Reset Entry Address */
-+        s->entry_addr = val;
-+        break;
-+    case REG_DBG_EXTERN:        /* Debug External */
-+    case REG_CNT64_CTRL:        /* 64-bit Counter Control */
-+    case REG_CNT64_LOW:         /* 64-bit Counter Low */
-+    case REG_CNT64_HIGH:        /* 64-bit Counter High */
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register at 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps allwinner_cpucfg_ops = {
-+    .read = allwinner_cpucfg_read,
-+    .write = allwinner_cpucfg_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
-+
-+static void allwinner_cpucfg_reset(DeviceState *dev)
-+{
-+    AwCpuCfgState *s = AW_CPUCFG(dev);
-+
-+    /* Set default values for registers */
-+    s->gen_ctrl = REG_GEN_CTRL_RST;
-+    s->super_standby = REG_SUPER_STANDBY_RST;
-+    s->entry_addr = 0;
-+}
-+
-+static void allwinner_cpucfg_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AwCpuCfgState *s = AW_CPUCFG(obj);
-+
-+    /* Memory mapping */
-+    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_cpucfg_ops, s,
-+                          TYPE_AW_CPUCFG, 1 * KiB);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static const VMStateDescription allwinner_cpucfg_vmstate = {
-+    .name = "allwinner-cpucfg",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(gen_ctrl, AwCpuCfgState),
-+        VMSTATE_UINT32(super_standby, AwCpuCfgState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void allwinner_cpucfg_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = allwinner_cpucfg_reset;
-+    dc->vmsd = &allwinner_cpucfg_vmstate;
-+}
-+
-+static const TypeInfo allwinner_cpucfg_info = {
-+    .name          = TYPE_AW_CPUCFG,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_init = allwinner_cpucfg_init,
-+    .instance_size = sizeof(AwCpuCfgState),
-+    .class_init    = allwinner_cpucfg_class_init,
-+};
-+
-+static void allwinner_cpucfg_register(void)
-+{
-+    type_register_static(&allwinner_cpucfg_info);
-+}
-+
-+type_init(allwinner_cpucfg_register)
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 63b2e528f9..f3788a5903 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -29,6 +29,7 @@ common-obj-$(CONFIG_MACIO) += macio/
- common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
- 
- common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
-+obj-$(CONFIG_ALLWINNER_H3) += allwinner-cpucfg.o
- common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-sysctrl.o
- common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- common-obj-$(CONFIG_NSERIES) += cbus.o
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 7f0f5dff3a..ede1650672 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -1,5 +1,10 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# allwinner-cpucfg.c
-+allwinner_cpucfg_cpu_reset(uint8_t cpu_id, uint32_t reset_addr) "id %u, reset_addr 0x%" PRIu32
-+allwinner_cpucfg_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-+allwinner_cpucfg_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-+
- # eccmemctl.c
- ecc_mem_writel_mer(uint32_t val) "Write memory enable 0x%08x"
- ecc_mem_writel_mdr(uint32_t val) "Write memory delay 0x%08x"
+ ARM PrimeCell and CMSDK devices
+ M: Peter Maydell <peter.maydell@linaro.org>
 -- 
 2.17.1
 
