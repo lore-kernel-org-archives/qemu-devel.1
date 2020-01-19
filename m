@@ -7,79 +7,84 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F96CC33CB1
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C663EC33CB1
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54F20205F4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 898FB2064C
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 11:37:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6bWuHy/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F20205F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSjvtdnA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898FB2064C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1it8gd-0001Sb-I4
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 06:24:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53652)
+	id 1it8t4-0004Yb-PD
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 06:37:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1it8g2-00012Y-Ph
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:23:36 -0500
+ id 1it8sT-00048n-3I
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:36:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1it8g1-0005kx-Ke
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:23:34 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51069)
+ id 1it8sR-0002PP-TR
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:36:24 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34641)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1it8g1-0005kb-Cd
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:23:33 -0500
-Received: by mail-wm1-x341.google.com with SMTP id a5so11595248wmb.0
- for <qemu-devel@nongnu.org>; Sun, 19 Jan 2020 03:23:33 -0800 (PST)
+ id 1it8sR-0002Oo-LS
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 06:36:23 -0500
+Received: by mail-wm1-x342.google.com with SMTP id w5so12705913wmi.1
+ for <qemu-devel@nongnu.org>; Sun, 19 Jan 2020 03:36:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ucUIpubvjkOCnZu7ztZU2jv49LKqB4JfC0G5Va7uEUo=;
- b=O6bWuHy/lf0ltGx2TNvidR7UV7KXTXrUfC30skcgCMXoF5Fv5JLlHZ4Z54lSbxSxJW
- BoSLEwolkCQFPnIJzxu+jHS/jmSUM4ou0+BMk4Xdhs6pThn9/mS/r2xWUGO0OR/6AeJJ
- AarhYDSgegu8LBV1zy6hfO2B+9M9y9qWnQvOuF11X1hQhViT9W9RB7AJkaWjDcXq5rP9
- h1SIQdONQ40Hj5TALbGm8xzw52mJz3Ji/gVB5u5LNIkSapEsOtPCGI7fMy2LvXOMFhUY
- fIoQ/cff/2IVsreb0Q6BoHWRooEpINoYYji4Z8197DI7+sxw2nzSzbhN/1iadRXDUrGz
- rQcA==
+ bh=pVMLjmysx/GAxoOSlchhJrjzKdlg8+FB1XEtBsIhF8M=;
+ b=DSjvtdnAJj922tNKjBC8k2VI8k6IkGC2ZlMBIw6mftskn7iODTVXbc30FOWg+Art1m
+ tBpIwixo8T55awqmJSrZBctFW3HadT1xxpMvCSG532WjXYRM0KO0y/O7YcAaCUVmv4Dz
+ mTA6Z2IJEw07PUBtwhhDLnEs/LR6dRdQ1NVxamqdk9CMJ5W3t8A6q7X9V1jegDWwavsJ
+ 50xGOE/xoA6sSP+uw+Tq3g/E7UGOQkth3oJ5OW+/IHr76zbCl3voc+rpJ59zY24xlv/p
+ BzQM7vM6gWqnxE8azEbBRl3Wz7QlAVuCVmhm1j5vue6sQKy2dcHzUyIpR3bp3SNFyBTu
+ QPOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=ucUIpubvjkOCnZu7ztZU2jv49LKqB4JfC0G5Va7uEUo=;
- b=Qjbqjk4eTPl5ORhM42CTJtEUucnfU0404AstcruppxVF5b42lgpeqkCidL2mZSLFZ9
- KkMrDWmECU4quuqdvgQ608K79bXQJJ4zTxxxb94GqSodxL8+aziW9BLiG6SxRrmwjrd9
- oyNVgQTWJL8RbnyhSnZteFHj2X4n3LtvUSlPfSj8ltX+93eT8XSAud5CcyM2aG9JYom6
- z59R87tp30ManUREWbFBZzreEVGhAoqygU4JaE9p+tSIU6+UmioJ3VuIjslsjm1CwSMZ
- KsqRE7R7eXalmpe4qz4jvkhOKPneyyeKM+DgY+Qj14lfrJybrdly/kYKub3RpimfRj86
- ajUQ==
-X-Gm-Message-State: APjAAAUklFlHS1n1CBy+7qUSlVnWZMMnBQgkJ1lD329khAH1qStNT8h+
- 5JAmys7ZcFWI0sRfOhRSCJ8=
-X-Google-Smtp-Source: APXvYqycwF6FxPLQ8Axbf5KPOZkG/+Y7CxO4jJZfrrAJZNeiRK01zhwW4o8fNj8iq8jUTmw5WuWybQ==
-X-Received: by 2002:a7b:cf2d:: with SMTP id m13mr14566492wmg.163.1579433011962; 
- Sun, 19 Jan 2020 03:23:31 -0800 (PST)
+ bh=pVMLjmysx/GAxoOSlchhJrjzKdlg8+FB1XEtBsIhF8M=;
+ b=HIzLwbpvmt8AZc5LtuvYSA/fH224qOnNS9GIGPQdBg9yam6ZthKwPAwtbX+CRNot4a
+ EQLEgWpInZhmWPCrFMbIT/BVry94Q611lShWY9v68+gRth662PL2uo0HXoDp5bD1OsBX
+ n2wxQb8pfZcwyyeBQjNn7hqRRyqpwXRA38EkGSJaYuFPA2eVT9CsLJzNgDycqE7iI6zo
+ YISpPK45G8xNSzn9YDK7ABAu6+A1Bqoo0A6K+yHXb25zYNCYUES5mPmrNWAHqqOS+Rsx
+ zEhQ/P0yR04ucGpgag6RdusHazgsOLsNB50iVSVLgz5UFdKumHsbUxDsVWCY2vS6PR7k
+ 9lnQ==
+X-Gm-Message-State: APjAAAXr1Z0oDCn33iaNrcFFrzn/TqbczBN96M1G53nQB6OloLvnPp/0
+ tHMzD8xfl/hzd1fpFyxbj0I=
+X-Google-Smtp-Source: APXvYqwc98X776mZ7k9NpFB6Z5/tUNJntzntVheNgoz3ACePgi9lBMH9/FuRuLRWGRwSKLaiYMrDcQ==
+X-Received: by 2002:a7b:cb97:: with SMTP id m23mr13549930wmi.37.1579433782577; 
+ Sun, 19 Jan 2020 03:36:22 -0800 (PST)
 Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id h2sm43657422wrv.66.2020.01.19.03.23.30
+ by smtp.gmail.com with ESMTPSA id y22sm17523924wma.35.2020.01.19.03.36.20
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 19 Jan 2020 03:23:31 -0800 (PST)
-Subject: Re: [PATCH] qapi: Fix code generation with Python 3.5
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
-References: <20200116202558.31473-1-armbru@redhat.com>
- <163735a5-b8d0-e657-86b2-a3921d754381@redhat.com>
- <87tv4ul5nd.fsf@dusky.pond.sub.org>
- <b8976470-1fe3-f380-8bde-af2d7c29c9ab@redhat.com>
+ Sun, 19 Jan 2020 03:36:21 -0800 (PST)
+Subject: Re: [Qemu-devel] What should a virtual board emulate?
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>,
+ Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+References: <20190319144013.26584-1-pbonzini@redhat.com>
+ <alpine.BSF.2.21.9999.1903192350550.11467@zero.eik.bme.hu>
+ <87imwe847x.fsf_-_@dusky.pond.sub.org>
+ <CAAdtpL5Z1OXqZ_zzA0RLq9soydNtTFt2oCOEfui1rq19bLKUgA@mail.gmail.com>
+ <d9d5ac96-c0f5-dd83-d305-10e20c745dd1@redhat.com>
+ <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
+ <6b5459b5-deb2-e70c-deab-fa7246b43e38@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Autocrypt: addr=f4bug@amsat.org; keydata=
  mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
@@ -104,18 +109,18 @@ Autocrypt: addr=f4bug@amsat.org; keydata=
  K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
  n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
  CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <4179b4ec-00cd-6e09-7a98-fab422075d72@amsat.org>
-Date: Sun, 19 Jan 2020 12:23:30 +0100
+Message-ID: <36d5b922-b134-a5f4-8d9e-1ea3d87daedc@amsat.org>
+Date: Sun, 19 Jan 2020 12:36:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <b8976470-1fe3-f380-8bde-af2d7c29c9ab@redhat.com>
+In-Reply-To: <6b5459b5-deb2-e70c-deab-fa7246b43e38@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,79 +132,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, John Snow <jsnow@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/18/20 9:33 AM, Philippe Mathieu-Daudé wrote:
-> On 1/17/20 11:49 AM, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
+On 1/18/20 9:46 PM, Paolo Bonzini wrote:
+> On 04/01/20 22:16, Philippe Mathieu-Daudé wrote:
+>> 1/ the Radeon chip is soldered on the motherboard,
 >>
->>> On 16/01/2020 21.25, Markus Armbruster wrote:
->>>> Recent commit 3e7fb5811b "qapi: Fix code generation for empty modules"
->>>> modules" switched QAPISchema.visit() from
->>>>
->>>>      for entity in self._entity_list:
->>>>
->>>> effectively to
->>>>
->>>>      for mod in self._module_dict.values():
->>>>          for entity in mod._entity_list:
->>>>
->>>> Visits in the same order as long as .values() is in insertion order.
->>>> That's the case only for Python 3.6 and later.  Before, it's in some
->>>> arbitrary order, which results in broken generated code.
->>>>
->>>> Fix by making self._module_dict an OrderedDict rather than a dict.
->>>>
->>>> Fixes: 3e7fb5811baab213dcc7149c3aa69442d683c26c
->>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>>> ---
->>>>   scripts/qapi/schema.py | 2 +-
->>>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
->>>> index 0bfc5256fb..5100110fa2 100644
->>>> --- a/scripts/qapi/schema.py
->>>> +++ b/scripts/qapi/schema.py
->>>> @@ -795,7 +795,7 @@ class QAPISchema(object):
->>>>           self.docs = parser.docs
->>>>           self._entity_list = []
->>>>           self._entity_dict = {}
->>>> -        self._module_dict = {}
->>>> +        self._module_dict = OrderedDict()
->>>>           self._schema_dir = os.path.dirname(fname)
->>>>           self._make_module(None) # built-ins
->>>>           self._make_module(fname)
->>>>
->>>
->>> Thanks, this fixes the problems on Travis for me!
->>>
->>> Tested-by: Thomas Huth <thuth@redhat.com>
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-And per https://www.mail-archive.com/qemu-devel@nongnu.org/msg671745.html:
-
-Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
-
->>> Peter, could you maybe apply this directly to the master branch as a
->>> build fix?
+>> 2/ the default BIOS expects the Radeon chip to be
+>>    unconditionally present,
 >>
->> The commit message isn't quite right: s/Visits in the same order/Visits
->> modules in the same order/.  Peter, want me to respin for that?
+>> I insist this patch is incorrect for the particular case of the
+>> Fuloong2e board. I plan to revert it when I post the test.
+>>
+>> BTW I'm not using --nodefault, I'm running default ./configure:
+>>
+>> qemu-system-mips64el -M fulong2e -bios pmon_2e.bin \
+>> -display none -vga none -serial stdio
 > 
-> Since it is a single patch, it shouldn't be too much work to respin :)
-> 
-> I agree this patch is candidate for direct fix on /master.
-> 
-> Thanks,
-> 
-> Phil.
-> 
-> 
+> But if you're not specifying -nodefaults, why are you specifying a
+> configuration that your BIOS does not support?  You should just remove
+> -vga none and leave in -display none.
+
+OK, with this information I searched what enforcing -vga none, with:
+
+$ git grep -- -vga.*none python/
+python/qemu/machine.py:232:        args = ['-display', 'none', '-vga',
+'none']
+
+Context:
+
+ 61 class QEMUMachine(object):
+...
+230
+231     def _base_args(self):
+232         args = ['-display', 'none', '-vga', 'none']
+...
+290     def launch(self):
+301         try:
+302             self._launch()
+...
+314     def _launch(self):
+315         """
+316         Launch the VM and establish a QMP connection
+317         """
+318         devnull = open(os.path.devnull, 'rb')
+319         self._pre_launch()
+320         self._qemu_full_args = (self._wrapper + [self._binary] +
+321                                 self._base_args() + self._args)
+
+Except the refactors moving this code, the original commit is:
+
+$ git show 0fd05e8dd1e
+commit 0fd05e8dd1ee7ae143fba3d6bcc6abe3fbeaeb34
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed Jun 6 16:23:27 2012 +0200
+
+    qemu-iotests: start vms in qtest mode
+
+    This way, they will not execute any VM code at all.  However, right now
+    the cancellation test is "relying" on being slowed down by TCG executing
+    BIOS code.  So, change the timeouts.
+
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index e27b40e289..e05b1d640b 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -54,7 +54,9 @@ class VM(object):
+         self._qemu_log_path = os.path.join(test_dir, 'qemu-log.%d' %
+os.getpid())
+         self._args = qemu_args + ['-chardev',
+                      'socket,id=mon,path=' + self._monitor_path,
+-                     '-mon', 'chardev=mon,mode=control', '-nographic']
++                     '-mon', 'chardev=mon,mode=control',
++                     '-qtest', 'stdio', '-machine', 'accel=qtest',
++                     '-display', 'none', '-vga', 'none']
+         self._num_drives = 0
+
+     def add_drive(self, path, opts=''):
+
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 4ab7d62961..cc671dd7aa 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -147,7 +147,7 @@ class TestStreamStop(ImageStreamingTestCase):
+         result = self.vm.qmp('block-stream', device='drive0')
+         self.assert_qmp(result, 'return', {})
+
+-        time.sleep(1)
++        time.sleep(0.1)
+         events = self.vm.get_qmp_events(wait=False)
+         self.assertEqual(events, [], 'unexpected QMP event: %s' % events)
+
+So IIUC we need to rework a bit the defaults of QEMUMachine::base_args.
 
