@@ -2,61 +2,67 @@ Return-Path: <SRS0=UCRd=3I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B06C33CB1
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 06:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E961C33CB1
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 08:09:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8030E20714
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 06:42:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CqGMg5A4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8030E20714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 3C0EE20684
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 08:09:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C0EE20684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cn.fujitsu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1it4Hg-0005rS-LA
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 01:42:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38536)
+	id 1it5dt-0002mF-CJ
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 03:09:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1it4H0-0005Jy-6q
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 01:41:29 -0500
+ (envelope-from <yangx.jy@cn.fujitsu.com>) id 1it5dD-0002M0-90
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:08:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1it4Gu-0003ea-Kb
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 01:41:24 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:56503)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1it4Gt-0003Ws-Cx; Sun, 19 Jan 2020 01:41:20 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 480lYz0MYWz9sRW; Sun, 19 Jan 2020 17:41:10 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1579416071;
- bh=ALVjebjQXzfumNzirXTkFkXPcOMV793VkV1OL7Scgow=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=CqGMg5A4oCvb2vmQbBbPnTj+oLkK1Lv68YNNNCUbbOEWGh3Epq5+x1plYgpdcld9e
- wkbB0dtGAownDDvR5/8s3rYmj6bfBm8wtwTvkgrMMXNgDBk1vAxiWozIsjPJcVI9ws
- lJENUSqt8UW6ralKk0VqE3SMUWGKnTFkY0kIRwPg=
-Date: Sun, 19 Jan 2020 15:27:39 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v3] spapr: Fail CAS if option vector table cannot be parsed
-Message-ID: <20200119052739.GC54439@umbus>
-References: <157925255250.397143.10855183619366882459.stgit@bahia.lan>
+ (envelope-from <yangx.jy@cn.fujitsu.com>) id 1it5dB-0005Kd-UI
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:08:27 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:45409
+ helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <yangx.jy@cn.fujitsu.com>) id 1it5dB-0005Ie-JE
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 03:08:25 -0500
+X-IronPort-AV: E=Sophos;i="5.70,337,1574092800"; d="scan'208";a="82259448"
+Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
+ by heian.cn.fujitsu.com with ESMTP; 19 Jan 2020 16:08:15 +0800
+Received: from G08CNEXMBPEKD06.g08.fujitsu.local (unknown [10.167.33.206])
+ by cn.fujitsu.com (Postfix) with ESMTP id 1F2ED5010EAF;
+ Sun, 19 Jan 2020 15:59:02 +0800 (CST)
+Received: from [10.167.220.69] (10.167.220.69) by
+ G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206) with Microsoft SMTP Server
+ (TLS) id 15.0.1395.4; Sun, 19 Jan 2020 16:08:10 +0800
+Message-ID: <5E240E69.2030803@cn.fujitsu.com>
+Date: Sun, 19 Jan 2020 16:08:09 +0800
+From: Xiao Yang <yangx.jy@cn.fujitsu.com>
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.2; zh-CN;
+ rv:1.9.2.18) Gecko/20110616 Thunderbird/3.1.11
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="+RqgOR8y65RRYhVY"
-Content-Disposition: inline
-In-Reply-To: <157925255250.397143.10855183619366882459.stgit@bahia.lan>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 040/104] virtiofsd: Pass write iov's all the way through
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-41-dgilbert@redhat.com>
+In-Reply-To: <20191212163904.159893-41-dgilbert@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.167.220.69]
+X-ClientProxiedBy: G08CNEXCHPEKD04.g08.fujitsu.local (10.167.33.200) To
+ G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206)
+X-yoursite-MailScanner-ID: 1F2ED5010EAF.AB276
+X-yoursite-MailScanner: Found to be clean
+X-yoursite-MailScanner-From: yangx.jy@cn.fujitsu.com
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 183.91.158.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,86 +74,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---+RqgOR8y65RRYhVY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jan 17, 2020 at 10:15:52AM +0100, Greg Kurz wrote:
-> Most of the option vector helpers have assertions to check their
-> arguments aren't null. The guest can provide an arbitrary address
-> for the CAS structure that would result in such null arguments.
-> Fail CAS with H_PARAMETER and print a warning instead of aborting
-> QEMU.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-Applied to ppc-for-5.0, thanks.
-
+On 2019/12/13 0:38, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert"<dgilbert@redhat.com>
+>
+> Pass the write iov pointing to guest RAM all the way through rather
+> than copying the data.
+>
+> Signed-off-by: Dr. David Alan Gilbert<dgilbert@redhat.com>
 > ---
-> v3: - drop ov_table check
-> v2: - print warnings
-> ---
->  hw/ppc/spapr_hcall.c |    8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index f1799b1b707d..ffb14641f9d3 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1703,7 +1703,15 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
->      ov_table =3D addr;
-> =20
->      ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
-> +    if (!ov1_guest) {
-> +        warn_report("guest didn't provide option vector 1");
-> +        return H_PARAMETER;
-> +    }
->      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
-> +    if (!ov5_guest) {
-> +        warn_report("guest didn't provide option vector 5");
-> +        return H_PARAMETER;
-> +    }
->      if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
->          error_report("guest requested hash and radix MMU, which is inval=
-id.");
->          exit(EXIT_FAILURE);
->=20
+>   tools/virtiofsd/fuse_virtio.c | 79 ++++++++++++++++++++++++++++++++---
+>   1 file changed, 73 insertions(+), 6 deletions(-)
+>
+> diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+> index 99c877ea2e..3c778b6296 100644
+> --- a/tools/virtiofsd/fuse_virtio.c
+> +++ b/tools/virtiofsd/fuse_virtio.c
+> @@ -452,6 +452,10 @@ static void *fv_queue_thread(void *opaque)
+>                    __func__, qi->qidx, (size_t)evalue, in_bytes, out_bytes);
+>
+>           while (1) {
+> +            bool allocated_bufv = false;
+> +            struct fuse_bufvec bufv;
+> +            struct fuse_bufvec *pbufv;
+> +
+>               /*
+>                * An element contains one request and the space to send our
+>                * response They're spread over multiple descriptors in a
+> @@ -493,14 +497,76 @@ static void *fv_queue_thread(void *opaque)
+>                            __func__, elem->index);
+>                   assert(0); /* TODO */
+>               }
+> -            copy_from_iov(&fbuf, out_num, out_sg);
+> -            fbuf.size = out_len;
+> +            /* Copy just the first element and look at it */
+> +            copy_from_iov(&fbuf, 1, out_sg);
+> +
+> +            if (out_num>  2&&
+> +                out_sg[0].iov_len == sizeof(struct fuse_in_header)&&
+> +                ((struct fuse_in_header *)fbuf.mem)->opcode == FUSE_WRITE&&
+> +                out_sg[1].iov_len == sizeof(struct fuse_write_in)) {
+> +                /*
+> +                 * For a write we don't actually need to copy the
+> +                 * data, we can just do it straight out of guest memory
+> +                 * but we must still copy the headers in case the guest
+> +                 * was nasty and changed them while we were using them.
+> +                 */
+> +                fuse_log(FUSE_LOG_DEBUG, "%s: Write special case\n", __func__);
+> +
+> +                /* copy the fuse_write_in header after the fuse_in_header */
+> +                fbuf.mem += out_sg->iov_len;
+> +                copy_from_iov(&fbuf, 1, out_sg + 1);
+> +                fbuf.mem -= out_sg->iov_len;
+> +                fbuf.size = out_sg[0].iov_len + out_sg[1].iov_len;
+> +
+> +                /* Allocate the bufv, with space for the rest of the iov */
+> +                allocated_bufv = true;
+> +                pbufv = malloc(sizeof(struct fuse_bufvec) +
+> +                               sizeof(struct fuse_buf) * (out_num - 2));
+> +                if (!pbufv) {
+> +                    vu_queue_unpop(dev, q, elem, 0);
+> +                    free(elem);
+> +                    fuse_log(FUSE_LOG_ERR, "%s: pbufv malloc failed\n",
+> +                             __func__);
+> +                    goto out;
+> +                }
+> +
+> +                pbufv->count = 1;
+> +                pbufv->buf[0] = fbuf;
+> +
+> +                size_t iovindex, pbufvindex;
+> +                iovindex = 2; /* 2 headers, separate iovs */
+> +                pbufvindex = 1; /* 2 headers, 1 fusebuf */
+> +
+> +                for (; iovindex<  out_num; iovindex++, pbufvindex++) {
+> +                    pbufv->count++;
+> +                    pbufv->buf[pbufvindex].pos = ~0; /* Dummy */
+> +                    pbufv->buf[pbufvindex].flags = 0;
+> +                    pbufv->buf[pbufvindex].mem = out_sg[iovindex].iov_base;
+> +                    pbufv->buf[pbufvindex].size = out_sg[iovindex].iov_len;
+> +                }
+> +            } else {
+> +                /* Normal (non fast write) path */
+> +
+> +                /* Copy the rest of the buffer */
+> +                fbuf.mem += out_sg->iov_len;
+> +                copy_from_iov(&fbuf, out_num - 1, out_sg + 1);
+> +                fbuf.mem -= out_sg->iov_len;
+> +                fbuf.size = out_len;
+>
+> -            /* TODO! Endianness of header */
+> +                /* TODO! Endianness of header */
+>
+> -            /* TODO: Add checks for fuse_session_exited */
+> -            struct fuse_bufvec bufv = { .buf[0] = fbuf, .count = 1 };
+> -            fuse_session_process_buf_int(se,&bufv,&ch);
+> +                /* TODO: Add checks for fuse_session_exited */
+> +                bufv.buf[0] = fbuf;
+> +                bufv.count = 1;
+> +                pbufv =&bufv;
+> +            }
+> +            pbufv->idx = 0;
+> +            pbufv->off = 0;
+> +            fuse_session_process_buf_int(se, pbufv,&ch);
+> +
+> +            if (allocated_bufv) {
+> +                free(pbufv);
+> +            }
+>
+>               if (!qi->reply_sent) {
+>                   fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
+> @@ -514,6 +580,7 @@ static void *fv_queue_thread(void *opaque)
+>               elem = NULL;
+>           }
+>       }
+> +out:
+>       pthread_mutex_destroy(&ch.lock);
+>       free(fbuf.mem);
+>
+Hi,
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Tested the patch and got the correct data written by guest, so it looks 
+fine to me.
+Reviewed-by: Xiao Yang <yangx.jy@cn.fujitsu.com>
 
---+RqgOR8y65RRYhVY
-Content-Type: application/pgp-signature; name="signature.asc"
+Best Regards,
+Xiao Yang
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4j6MgACgkQbDjKyiDZ
-s5LQvw/8CGCZlpBJpu/0kkzsR+7jnR7ObnHmr/9UWfDMd+77D2PGIvONSvtwA0kF
-l8ajG92AAOxZTcrN6Qvkmc47EDkNP7eRt4fZ+R+BE0jDmUtqrAwTz+K3kKZmgZvE
-SLuLmJB22PdQaJG8A14PZY4kjQz/1hTr90wiQ8junnAjSSkw/RDYEvv1db70jrII
-ESKVCu1rFGBIPpuFqXcByvA0nojoWXMIqGfHY5twa12GoSWgX+hq6Tft/zVajxno
-Yi6g3jtFZI2oIP2l0Rfec+BoFHN3Sq4FJ0sAk5GPSaauvKsR5i5lbAIfhwKn1DVm
-dnerkLEqxBfLY90Fw0lWrIK/ZdlANhMo4hfDriVkSU+9Y0xxNvBjKenLvb3F/+4k
-VqtcXzq7pqrR/OwZtzzEWlxoM5Ti9pu3cSRXtm1DksRDSKHbcv9KaG9tMLuPXwqO
-66ZcRUptaBsPJB9G5AxN1ZLb0HffoM6bAUjOU0uo0cDR64ETUzf4PscIzSqvkEHU
-/4WwKJmLRLi/PTMt6ZNo3vfqhU6PhpLQXe6A/xQ/IB2hj5e7mKz7LA3lyWTnZ187
-x6UJRhFxdbbHabq5C7+cW4X9r/uVZ3pamswxcK8uRT+M7NaD5JnnZMZnSC9GWXjH
-PHFxrEvPLiHBlrFVGGvlFe9wUc3HmIoCdMxUqFKpnwlsbgujGmk=
-=lqNl
------END PGP SIGNATURE-----
 
---+RqgOR8y65RRYhVY--
+
 
