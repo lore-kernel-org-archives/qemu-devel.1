@@ -6,45 +6,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42669C33CB7
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD0CC33CAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:17:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B9D0206B7
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:15:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B9D0206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 50EAA206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:17:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50EAA206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itJmg-0006M8-RE
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 18:15:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55906)
+	id 1itJp4-0000NW-6r
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 18:17:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1itJfi-00049i-Le
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:07:59 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1itJfj-0004AU-KB
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:08:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1itJfh-0003ls-7f
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:07:58 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:54736)
+ (envelope-from <fthain@telegraphics.com.au>) id 1itJfh-0003mX-E0
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:07:59 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:54652)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1itJfh-0003lU-3K; Sun, 19 Jan 2020 18:07:57 -0500
+ id 1itJfh-0003k6-7O; Sun, 19 Jan 2020 18:07:57 -0500
 Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
- id 507472997B; Sun, 19 Jan 2020 18:07:55 -0500 (EST)
+ id 0A10B2991B; Sun, 19 Jan 2020 18:07:55 -0500 (EST)
 To: Jason Wang <jasowang@redhat.com>,
     qemu-devel@nongnu.org
-Message-Id: <e4fd3638021d2b469f4e786ea82d5b9284e8627b.1579474761.git.fthain@telegraphics.com.au>
+Message-Id: <9c3243048ebb89a2af674847c0570d0c84cc3e79.1579474761.git.fthain@telegraphics.com.au>
 In-Reply-To: <cover.1579474761.git.fthain@telegraphics.com.au>
 References: <cover.1579474761.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v3 08/14] dp8393x: Don't clobber packet checksum
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v3 03/14] dp8393x: Clean up endianness hacks
 Date: Mon, 20 Jan 2020 09:59:21 +1100
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
@@ -65,33 +62,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A received packet consumes pkt_size bytes in the buffer and the frame
-checksum that's appended to it consumes another 4 bytes. The Receive
-Buffer Address register takes the former quantity into account but
-not the latter. So the next packet written to the buffer overwrites
-the frame checksum. Fix this.
+According to the datasheet, section 3.4.4, "in 32-bit mode ... the SONIC
+always writes long words".
+
+Therefore, use the same technique for the 'in_use' field that is used
+everywhere else, and write the full long word.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/net/dp8393x.c | 1 +
- 1 file changed, 1 insertion(+)
+Changed since v1:
+ - Use existing 'address' variable rather than declare a new one.
+
+Laurent tells me that a similar clean-up has been tried before.
+He referred me to commit c744cf7879 ("dp8393x: fix dp8393x_receive()")
+and commit 409b52bfe1 ("net/dp8393x: correctly reset in_use field").
+I believe the underlying issue has been fixed by the preceding patch,
+as this no longer breaks NetBSD 5.1.
+---
+ hw/net/dp8393x.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 0309365fda..947ceef37c 100644
+index b2fd44bc2f..2d2ace2549 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -816,6 +816,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
-nst uint8_t * buf,
-     address +=3D rx_len;
-     address_space_rw(&s->as, address,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, 4, 1);
-+    address +=3D 4;
-     rx_len +=3D 4;
-     s->regs[SONIC_CRBA1] =3D address >> 16;
-     s->regs[SONIC_CRBA0] =3D address & 0xffff;
---=20
+@@ -776,8 +776,6 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+         return -1;
+     }
+ 
+-    /* XXX: Check byte ordering */
+-
+     /* Check for EOL */
+     if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
+         /* Are we still in resource exhaustion? */
+@@ -847,15 +845,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+         /* EOL detected */
+         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
+     } else {
+-        /* Clear in_use, but it is always 16bit wide */
+-        int offset = dp8393x_crda(s) + sizeof(uint16_t) * 6 * width;
+-        if (s->big_endian && width == 2) {
+-            /* we need to adjust the offset of the 16bit field */
+-            offset += sizeof(uint16_t);
+-        }
+-        s->data[0] = 0;
+-        address_space_rw(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
+-                         (uint8_t *)s->data, sizeof(uint16_t), 1);
++        /* Clear in_use */
++        size = sizeof(uint16_t) * width;
++        address = dp8393x_crda(s) + sizeof(uint16_t) * 6 * width;
++        dp8393x_put(s, width, 0, 0);
++        address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
++                         (uint8_t *)s->data, size, 1);
+         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
+         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
+         s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
+-- 
 2.24.1
 
 
