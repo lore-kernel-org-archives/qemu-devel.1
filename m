@@ -8,74 +8,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D01C32771
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07861C32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:28:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1386E246A5
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C71AE246A5
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 00:28:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="djnIq15a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1386E246A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OKNdJKCf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C71AE246A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1isyQk-0008G3-55
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 19:27:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45734)
+	id 1isyRj-0001FQ-0i
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jan 2020 19:28:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1isyPx-0007NM-0Z
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:26:18 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1isyQm-00005f-Ek
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:27:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1isyPv-0006aP-9K
- for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:26:16 -0500
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39097)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1isyQk-0006vU-WC
+ for qemu-devel@nongnu.org; Sat, 18 Jan 2020 19:27:08 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:37457)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1isyPu-0006a3-Vl; Sat, 18 Jan 2020 19:26:15 -0500
-Received: by mail-il1-x143.google.com with SMTP id x5so24429133ila.6;
- Sat, 18 Jan 2020 16:26:14 -0800 (PST)
+ id 1isyQk-0006v9-8L; Sat, 18 Jan 2020 19:27:06 -0500
+Received: by mail-io1-xd41.google.com with SMTP id k24so29943583ioc.4;
+ Sat, 18 Jan 2020 16:27:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qDV4Wi5Ca+D+V+mozqNEyUEFxt41+syqpRtjs+GEEMk=;
- b=djnIq15ayRaYwu66sOh4tk7Ozlnulmbd+Ih4e9Hy4oAhzEUQyiO+rcszBUt+oEVL9Q
- IV0tgkLG8+N7LlGUAD7xKY4OaYTa7kd9wyoXME4iEN3A0J5LCFNh6ylI8NxBncwUK9/X
- 3NdPgUUHaRFsg6y0xf/aJcmxdwt6YVXJdxBia5Ifp3Msa5Qa2/qpeVFRnoJCQBcSpem6
- ukCdnX6WBH6SmHaWKMjwGlzM/p5PVN1wY6ZWH1ZNCS7kGPVG2EOtGrFN/Iw+l6GlO426
- IplMq9R6edxrwDeFxmpZLPx7ibaYgNzc7mFSqbn9vDKWo1gzf4V7RKZr7O2jgT/bZr/3
- TfqA==
+ :cc; bh=qaDTQE9Xs/M5JD5bz7OeKEUK7FrITUNeOBAznWlPD0s=;
+ b=OKNdJKCfM6s/XO8q5AucRvbJfGh+/GfWv+DJowTMUxq9L8Jxc4MUGCctmdlBKacr+6
+ xzubt/7pcuj53HaslAkm5KBnO7tx99OndLQGJKCrD14VJbJyKLTHjbpUdxtmZV2TOvB2
+ 9DGEXR9EKmz/kAczlVnf71OFeC9RuK2H0XfCOPfcnwSpjh4VBMycXzsXlo9ZLihf4AEi
+ zsS6HZCVphkBcz3e6CA/U5B4CwLdPSS4T9bUZoXZgarB9uAnvAp4Qkhx2E43j0YOUWsj
+ dP7wEwfoY+bOhDhpEDaFVU+AL4/m/JgE+KCISNpLDGAIrl6mAj7Tn1L7BheM35L9nTCY
+ WZ1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=qDV4Wi5Ca+D+V+mozqNEyUEFxt41+syqpRtjs+GEEMk=;
- b=FTKcH+6V1eoR8F/kwdltyS58NBvrQiHc2ynuJa9tI8l1yvOynx8BRIQsKTzh0Xhj2t
- BpFG187NVf0hSp4H6nRs4SqJ7XTmogeLEj9MRawZE/RQ4IlfJg+GIxV7I3ZviC8h+qOi
- niTcdZWaDDUdJ8dXBjkR25xaeKLYw29iJzbCbDnNpivU6RirYrwpyu2vmI/VxLQZBLuQ
- mkXE9XZ0jXqOSMHwFYZWolOiqz6xygXQQmbK7fuqamgv/1SDgyL61DqUvJoBxzUvdEh+
- YLJ3Nv7a4uclTbGAHEbyziyj3J/2AkjFINUhYaNFWfEDXFXqLQ7zJS9r3IUsdqtP0Lof
- AVrg==
-X-Gm-Message-State: APjAAAU117Hgc4uJHy7Z5Ftfl0/uVA/9dxAAEpeYI4/TR3cBdGOn7HpF
- 8RQo9iW6GPIQw+FnBP6UlZJ5KFw3PcYb4RzxvDE=
-X-Google-Smtp-Source: APXvYqy13B4OouWIplBMz7f9mS70IKUoQB82jqsyzIwtieFZX8RxqHdg+C7+4axfT1Me0K6HybR+enXWLn3gyST6gjo=
-X-Received: by 2002:a92:af08:: with SMTP id n8mr4713173ili.217.1579393574185; 
- Sat, 18 Jan 2020 16:26:14 -0800 (PST)
+ bh=qaDTQE9Xs/M5JD5bz7OeKEUK7FrITUNeOBAznWlPD0s=;
+ b=kwrojpoe5njlj7UuTxAiKxdCbW+T8aHbg7B/Te3Z9HLOWRPgECUxsK0vd3oc1xM2rQ
+ fJW5K2mXX4YxrBFn1WUaGWBbwpJ9Qjgx4jN/ytD1DkiFNGnbgQ0VHvsqqbdV9IWBWxW6
+ eVkiOfIHlqDPnJ72sQDV0JO+8vjbrk2L34y/0bf9VF030RNqUF/3kHRmlyv/855xmpqD
+ khrlWlqgpHg06qpJpGLVoCKQIMVsxK7O76Hf/bMVsHwYoqQh+ESuKVGWdPS4Codybfo0
+ 3786zADff4Q6tjlXsEQ8O0n88C95/tGzctdBEEePdi4gz/OAM/Hp5oFKRV8ZbTpAgjvl
+ TCxQ==
+X-Gm-Message-State: APjAAAWiaivr4xj+AyBGGMI1PS7UqhYUR611fKAG+KuYqbHrtASzAXL6
+ +36TNjg9iUnxBxXewOCGYexJrT0vxRVKYweOy7GFCJUC
+X-Google-Smtp-Source: APXvYqwrjQ1Skzf7Yi8ID6NpJkv/K3tHsMWNd2V/dbHHtuLBpaj7i+pWnbplKmDRT7nvU1m5I1AaQXruf5LsBC4cfU8=
+X-Received: by 2002:a02:856a:: with SMTP id g97mr6430035jai.97.1579393625624; 
+ Sat, 18 Jan 2020 16:27:05 -0800 (PST)
 MIME-Version: 1.0
 References: <20200118191623.32549-1-f4bug@amsat.org>
- <20200118191623.32549-2-f4bug@amsat.org>
-In-Reply-To: <20200118191623.32549-2-f4bug@amsat.org>
+ <20200118191623.32549-3-f4bug@amsat.org>
+In-Reply-To: <20200118191623.32549-3-f4bug@amsat.org>
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Sun, 19 Jan 2020 01:26:02 +0100
-Message-ID: <CAPan3WqEd10j4SJ_HE3zN+STGVHnM7j8MWh72G7vL8E99FJCLg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Acceptance tests: Extract _console_interaction()
+Date: Sun, 19 Jan 2020 01:26:54 +0100
+Message-ID: <CAPan3WpecxTceifvgfpyrO=BHufU1v=2UrCXbfBGXAJx+Dm0pw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] Acceptance tests: Add
+ interrupt_interactive_console_until_pattern()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="000000000000f43205059c733837"
+Content-Type: multipart/alternative; boundary="000000000000041689059c733c3c"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::143
+X-Received-From: 2607:f8b0:4864:20::d41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,7 +97,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f43205059c733837
+--000000000000041689059c733c3c
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -104,62 +105,64 @@ On Sat, Jan 18, 2020 at 8:16 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g>
 wrote:
 
-> Since we are going to re-use the code shared between
-> wait_for_console_pattern() and exec_command_and_wait_for_pattern(),
-> extract the common part into a local function.
+> We need a function to interrupt interactive consoles.
+>
+> Example: Interrupt U-Boot to set different environment values.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 >
 Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 
 > ---
->  tests/acceptance/avocado_qemu/__init__.py | 31 +++++++++++++----------
->  1 file changed, 17 insertions(+), 14 deletions(-)
+>  tests/acceptance/avocado_qemu/__init__.py | 32 +++++++++++++++++++++--
+>  1 file changed, 30 insertions(+), 2 deletions(-)
 >
 > diff --git a/tests/acceptance/avocado_qemu/__init__.py
 > b/tests/acceptance/avocado_qemu/__init__.py
-> index 6618ea67c1..0a50fcf2be 100644
+> index 0a50fcf2be..d4358eb431 100644
 > --- a/tests/acceptance/avocado_qemu/__init__.py
 > +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -55,19 +55,14 @@ def pick_default_qemu_bin(arch=3DNone):
->          return qemu_bin_from_src_dir_path
+> @@ -56,13 +56,15 @@ def pick_default_qemu_bin(arch=3DNone):
 >
 >
-> -def wait_for_console_pattern(test, success_message, failure_message=3DNo=
-ne):
-> -    """
-> -    Waits for messages to appear on the console, while logging the conte=
-nt
-> -
-> -    :param test: an Avocado test containing a VM that will have its
-> console
-> -                 read and probed for a success or failure message
-> -    :type test: :class:`avocado_qemu.Test`
-> -    :param success_message: if this message appears, test succeeds
-> -    :param failure_message: if this message appears, test fails
-> -    """
-> +def _console_interaction(test, success_message, failure_message,
-> +                         send_string):
+>  def _console_interaction(test, success_message, failure_message,
+> -                         send_string):
+> +                         send_string, keep_sending=3DFalse):
+> +    assert not keep_sending or send_string
 >      console =3D test.vm.console_socket.makefile()
 >      console_logger =3D logging.getLogger('console')
 >      while True:
-> +        if send_string:
-> +            test.vm.console_socket.sendall(send_string.encode())
-> +            send_string =3D None # send only once
+>          if send_string:
+>              test.vm.console_socket.sendall(send_string.encode())
+> -            send_string =3D None # send only once
+> +            if not keep_sending:
+> +                send_string =3D None # send only once
 >          msg =3D console.readline().strip()
 >          if not msg:
 >              continue
-> @@ -79,6 +74,17 @@ def wait_for_console_pattern(test, success_message,
-> failure_message=3DNone):
+> @@ -74,6 +76,32 @@ def _console_interaction(test, success_message,
+> failure_message,
 >              fail =3D 'Failure message found in console: %s' %
 > failure_message
 >              test.fail(fail)
 >
-> +def wait_for_console_pattern(test, success_message, failure_message=3DNo=
-ne):
+> +def interrupt_interactive_console_until_pattern(test, success_message,
+> +                                                failure_message=3DNone,
+> +                                                interrupt_string=3D'\r')=
+:
 > +    """
-> +    Waits for messages to appear on the console, while logging the conte=
-nt
+> +    Keep sending a string to interrupt a console prompt, while logging t=
+he
+> +    console output. Typical use case is to break a boot loader prompt,
+> such:
+> +
+> +        Press a key within 5 seconds to interrupt boot process.
+> +        5
+> +        4
+> +        3
+> +        2
+> +        1
+> +        Booting default image...
 > +
 > +    :param test: an Avocado test containing a VM that will have its
 > console
@@ -167,25 +170,18 @@ nt
 > +    :type test: :class:`avocado_qemu.Test`
 > +    :param success_message: if this message appears, test succeeds
 > +    :param failure_message: if this message appears, test fails
+> +    :param interrupt_string: a string to send to the console before tryi=
+ng
+> +                             to read a new line
 > +    """
-> +    _console_interaction(test, success_message, failure_message, None)
->
->  def exec_command_and_wait_for_pattern(test, command,
->                                        success_message,
-> failure_message=3DNone):
-> @@ -94,10 +100,7 @@ def exec_command_and_wait_for_pattern(test, command,
->      :param success_message: if this message appears, test succeeds
->      :param failure_message: if this message appears, test fails
+> +    _console_interaction(test, success_message, failure_message,
+> +                         interrupt_string, True)
+> +
+>  def wait_for_console_pattern(test, success_message, failure_message=3DNo=
+ne):
 >      """
-> -    command +=3D '\r'
-> -    test.vm.console_socket.sendall(command.encode())
-> -    wait_for_console_pattern(test, success_message, failure_message)
-> -
-> +    _console_interaction(test, success_message, failure_message, command
-> + '\r')
->
->  class Test(avocado.Test):
->      def _get_unique_tag_val(self, tag_name):
+>      Waits for messages to appear on the console, while logging the conte=
+nt
 > --
 > 2.21.1
 >
@@ -194,7 +190,7 @@ nt
 --=20
 Niek Linnenbank
 
---000000000000f43205059c733837
+--000000000000041689059c733c3c
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -203,9 +199,9 @@ Content-Transfer-Encoding: quoted-printable
 ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.o=
 rg</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
 n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-">Since we are going to re-use the code shared between<br>
-wait_for_console_pattern() and exec_command_and_wait_for_pattern(),<br>
-extract the common part into a local function.<br>
+">We need a function to interrupt interactive consoles.<br>
+<br>
+Example: Interrupt U-Boot to set different environment values.<br>
 <br>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
 t.org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br></blockquote><div>Teste=
@@ -214,61 +210,66 @@ innenbank@gmail.com</a>&gt; <br></div><blockquote class=3D"gmail_quote" sty=
 le=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddi=
 ng-left:1ex">
 ---<br>
-=C2=A0tests/acceptance/avocado_qemu/__init__.py | 31 +++++++++++++---------=
+=C2=A0tests/acceptance/avocado_qemu/__init__.py | 32 +++++++++++++++++++++-=
 -<br>
-=C2=A01 file changed, 17 insertions(+), 14 deletions(-)<br>
+=C2=A01 file changed, 30 insertions(+), 2 deletions(-)<br>
 <br>
 diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/a=
 vocado_qemu/__init__.py<br>
-index 6618ea67c1..0a50fcf2be 100644<br>
+index 0a50fcf2be..d4358eb431 100644<br>
 --- a/tests/acceptance/avocado_qemu/__init__.py<br>
 +++ b/tests/acceptance/avocado_qemu/__init__.py<br>
-@@ -55,19 +55,14 @@ def pick_default_qemu_bin(arch=3DNone):<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return qemu_bin_from_src_dir_path<br>
+@@ -56,13 +56,15 @@ def pick_default_qemu_bin(arch=3DNone):<br>
 <br>
 <br>
--def wait_for_console_pattern(test, success_message, failure_message=3DNone=
-):<br>
--=C2=A0 =C2=A0 &quot;&quot;&quot;<br>
--=C2=A0 =C2=A0 Waits for messages to appear on the console, while logging t=
-he content<br>
--<br>
--=C2=A0 =C2=A0 :param test: an Avocado test containing a VM that will have =
-its console<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0read and pro=
-bed for a success or failure message<br>
--=C2=A0 =C2=A0 :type test: :class:`avocado_qemu.Test`<br>
--=C2=A0 =C2=A0 :param success_message: if this message appears, test succee=
-ds<br>
--=C2=A0 =C2=A0 :param failure_message: if this message appears, test fails<=
-br>
--=C2=A0 =C2=A0 &quot;&quot;&quot;<br>
-+def _console_interaction(test, success_message, failure_message,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=C2=A0def _console_interaction(test, success_message, failure_message,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
 =A0 =C2=A0 =C2=A0send_string):<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0send_string, keep_sending=3DFalse):<br>
++=C2=A0 =C2=A0 assert not keep_sending or send_string<br>
 =C2=A0 =C2=A0 =C2=A0console =3D test.vm.console_socket.makefile()<br>
 =C2=A0 =C2=A0 =C2=A0console_logger =3D logging.getLogger(&#39;console&#39;)=
 <br>
 =C2=A0 =C2=A0 =C2=A0while True:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if send_string:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 test.vm.console_socket.sendall(s=
-end_string.encode())<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 send_string =3D None # send only=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if send_string:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0test.vm.console_socket.send=
+all(send_string.encode())<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 send_string =3D None # send only=
  once<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if not keep_sending:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 send_string =3D No=
+ne # send only once<br>
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0msg =3D console.readline().strip()<br>
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if not msg:<br>
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0continue<br>
-@@ -79,6 +74,17 @@ def wait_for_console_pattern(test, success_message, fail=
-ure_message=3DNone):<br>
+@@ -74,6 +76,32 @@ def _console_interaction(test, success_message, failure_=
+message,<br>
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0fail =3D &#39;Failure messa=
 ge found in console: %s&#39; % failure_message<br>
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0test.fail(fail)<br>
 <br>
-+def wait_for_console_pattern(test, success_message, failure_message=3DNone=
-):<br>
++def interrupt_interactive_console_until_pattern(test, success_message,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 failure_message=3DNone,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 interrupt_string=3D&#39;\r&#39;):<br>
 +=C2=A0 =C2=A0 &quot;&quot;&quot;<br>
-+=C2=A0 =C2=A0 Waits for messages to appear on the console, while logging t=
-he content<br>
++=C2=A0 =C2=A0 Keep sending a string to interrupt a console prompt, while l=
+ogging the<br>
++=C2=A0 =C2=A0 console output. Typical use case is to break a boot loader p=
+rompt, such:<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 Press a key within 5 seconds to interrupt boot=
+ process.<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 5<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 4<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 3<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 2<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 1<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 Booting default image...<br>
 +<br>
 +=C2=A0 =C2=A0 :param test: an Avocado test containing a VM that will have =
 its console<br>
@@ -279,31 +280,21 @@ bed for a success or failure message<br>
 ds<br>
 +=C2=A0 =C2=A0 :param failure_message: if this message appears, test fails<=
 br>
++=C2=A0 =C2=A0 :param interrupt_string: a string to send to the console bef=
+ore trying<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0to read a new line<br>
 +=C2=A0 =C2=A0 &quot;&quot;&quot;<br>
 +=C2=A0 =C2=A0 _console_interaction(test, success_message, failure_message,=
- None)<br>
 <br>
-=C2=A0def exec_command_and_wait_for_pattern(test, command,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0success_m=
-essage, failure_message=3DNone):<br>
-@@ -94,10 +100,7 @@ def exec_command_and_wait_for_pattern(test, command,<br=
->
-=C2=A0 =C2=A0 =C2=A0:param success_message: if this message appears, test s=
-ucceeds<br>
-=C2=A0 =C2=A0 =C2=A0:param failure_message: if this message appears, test f=
-ails<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0interrupt_string, True)<br>
++<br>
+=C2=A0def wait_for_console_pattern(test, success_message, failure_message=
+=3DNone):<br>
 =C2=A0 =C2=A0 =C2=A0&quot;&quot;&quot;<br>
--=C2=A0 =C2=A0 command +=3D &#39;\r&#39;<br>
--=C2=A0 =C2=A0 test.vm.console_socket.sendall(command.encode())<br>
--=C2=A0 =C2=A0 wait_for_console_pattern(test, success_message, failure_mess=
-age)<br>
--<br>
-+=C2=A0 =C2=A0 _console_interaction(test, success_message, failure_message,=
- command + &#39;\r&#39;)<br>
-<br>
-=C2=A0class Test(avocado.Test):<br>
-=C2=A0 =C2=A0 =C2=A0def _get_unique_tag_val(self, tag_name):<br>
+=C2=A0 =C2=A0 =C2=A0Waits for messages to appear on the console, while logg=
+ing the content<br>
 -- <br>
 2.21.1<br>
 <br>
@@ -311,5 +302,5 @@ age)<br>
 mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
 div></div>
 
---000000000000f43205059c733837--
+--000000000000041689059c733c3c--
 
