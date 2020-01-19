@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0116CC33CAF
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA98C33CAF
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4880206B7
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:21:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4880206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 537372051A
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jan 2020 23:22:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 537372051A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itJsf-0004na-Kl
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 18:21:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56283)
+	id 1itJte-0006BE-E7
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 18:22:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56325)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1itJg2-0004ez-Ar
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:08:19 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1itJg4-0004jE-Mg
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:08:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1itJg1-00041G-CH
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:08:18 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:54740)
+ (envelope-from <fthain@telegraphics.com.au>) id 1itJg2-00041r-Er
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 18:08:20 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:54742)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1itJg1-0003lk-8R; Sun, 19 Jan 2020 18:08:17 -0500
+ id 1itJg2-0003lo-8l; Sun, 19 Jan 2020 18:08:18 -0500
 Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
- id 747F32997F; Sun, 19 Jan 2020 18:07:55 -0500 (EST)
+ id 8AD4A29983; Sun, 19 Jan 2020 18:07:55 -0500 (EST)
 To: Jason Wang <jasowang@redhat.com>,
     qemu-devel@nongnu.org
-Message-Id: <a226aca301bf9ef0ee6d64569dc4eb9623089fc2.1579474761.git.fthain@telegraphics.com.au>
+Message-Id: <e45b5be179d84ee6f7b8c666fa64548e8a74fdd1.1579474761.git.fthain@telegraphics.com.au>
 In-Reply-To: <cover.1579474761.git.fthain@telegraphics.com.au>
 References: <cover.1579474761.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v3 12/14] dp8393x: Always update RRA pointers and sequence
- numbers
+Subject: [PATCH v3 14/14] dp8393x: Don't stop reception upon RBE interrupt
+ assertion
 Date: Mon, 20 Jan 2020 09:59:21 +1100
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 98.124.60.144
@@ -63,42 +63,131 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These operations have to take place regardless of whether or not rx
-descriptors have been used up (that is, EOL flag was observed).
+Section 3.4.7 of the datasheet explains that,
 
-The algorithm is the now the same for a packet that was withheld as
-for a packet that was not.
+    The RBE bit in the Interrupt Status register is set when the
+    SONIC finishes using the second to last receive buffer and reads
+    the last RRA descriptor. Actually, the SONIC is not truly out of
+    resources, but gives the system an early warning of an impending
+    out of resources condition.
+
+RBE does not mean actual receive buffer exhaustion, and reception should
+not be stopped. This is important because Linux will not check and clear
+the RBE interrupt until it receives another packet. But that won't
+happen if can_receive returns false. This bug causes the SONIC to become
+deaf (until reset).
+
+Fix this with a new flag to indicate actual receive buffer exhaustion.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/net/dp8393x.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Changed since v2:
+ - Don't use can_receive to suspend packet reception.
+ - Don't misuse the RBE interrupt flag as a proxy for RRP == RWP.
+---
+ hw/net/dp8393x.c | 35 ++++++++++++++++++++++-------------
+ 1 file changed, 22 insertions(+), 13 deletions(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 99c5dad7c4..1b73a8703b 100644
+index 71af0fad51..1ccee0c189 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -897,12 +897,14 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         /* Move to next descriptor */
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
--        s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
-+    }
- 
--        if (s->regs[SONIC_RCR] & SONIC_RCR_LPKT) {
--            /* Read next RRA */
--            dp8393x_do_read_rra(s);
--        }
-+    s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) |
-+                         ((s->regs[SONIC_RSC] + 1) & 0x00ff);
-+
-+    if (s->regs[SONIC_RCR] & SONIC_RCR_LPKT) {
-+        /* Read next RRA */
-+        dp8393x_do_read_rra(s);
+@@ -158,6 +158,7 @@ typedef struct dp8393xState {
+     /* Hardware */
+     uint8_t it_shift;
+     bool big_endian;
++    bool last_rba_is_full;
+     qemu_irq irq;
+ #ifdef DEBUG_SONIC
+     int irq_level;
+@@ -347,12 +348,15 @@ static void dp8393x_do_read_rra(dp8393xState *s)
+         s->regs[SONIC_RRP] = s->regs[SONIC_RSA];
      }
  
-     /* Done */
+-    /* Check resource exhaustion */
++    /* Warn the host if CRBA now has the last available resource */
+     if (s->regs[SONIC_RRP] == s->regs[SONIC_RWP])
+     {
+         s->regs[SONIC_ISR] |= SONIC_ISR_RBE;
+         dp8393x_update_irq(s);
+     }
++
++    /* Allow packet reception */
++    s->last_rba_is_full = false;
+ }
+ 
+ static void dp8393x_do_software_reset(dp8393xState *s)
+@@ -663,9 +667,6 @@ static void dp8393x_write(void *opaque, hwaddr addr, uint64_t data,
+                 dp8393x_do_read_rra(s);
+             }
+             dp8393x_update_irq(s);
+-            if (dp8393x_can_receive(s->nic->ncs)) {
+-                qemu_flush_queued_packets(qemu_get_queue(s->nic));
+-            }
+             break;
+         /* The guest is required to store aligned pointers here */
+         case SONIC_RSA:
+@@ -725,8 +726,6 @@ static int dp8393x_can_receive(NetClientState *nc)
+ 
+     if (!(s->regs[SONIC_CR] & SONIC_CR_RXEN))
+         return 0;
+-    if (s->regs[SONIC_ISR] & SONIC_ISR_RBE)
+-        return 0;
+     return 1;
+ }
+ 
+@@ -777,6 +776,10 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     s->regs[SONIC_RCR] &= ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_FAER |
+         SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC);
+ 
++    if (s->last_rba_is_full) {
++        return pkt_size;
++    }
++
+     rx_len = pkt_size + sizeof(checksum);
+     if (s->regs[SONIC_DCR] & SONIC_DCR_DW) {
+         width = 2;
+@@ -790,8 +793,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+         DPRINTF("oversize packet, pkt_size is %d\n", pkt_size);
+         s->regs[SONIC_ISR] |= SONIC_ISR_RBAE;
+         dp8393x_update_irq(s);
+-        dp8393x_do_read_rra(s);
+-        return pkt_size;
++        s->regs[SONIC_RCR] |= SONIC_RCR_LPKT;
++        goto done;
+     }
+ 
+     packet_type = dp8393x_receive_filter(s, buf, pkt_size);
+@@ -903,17 +906,23 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
+     }
+ 
++    dp8393x_update_irq(s);
++
+     s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) |
+                          ((s->regs[SONIC_RSC] + 1) & 0x00ff);
+ 
++done:
++
+     if (s->regs[SONIC_RCR] & SONIC_RCR_LPKT) {
+-        /* Read next RRA */
+-        dp8393x_do_read_rra(s);
++        if (s->regs[SONIC_RRP] == s->regs[SONIC_RWP]) {
++            /* Stop packet reception */
++            s->last_rba_is_full = true;
++        } else {
++            /* Read next resource */
++            dp8393x_do_read_rra(s);
++        }
+     }
+ 
+-    /* Done */
+-    dp8393x_update_irq(s);
+-
+     return pkt_size;
+ }
+ 
 -- 
 2.24.1
 
