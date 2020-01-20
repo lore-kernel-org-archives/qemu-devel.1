@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0706C33CAA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:24:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE4EC33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8037F20678
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:24:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DC2A20678
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:26:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UkFFm8I0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8037F20678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SL0NeIdX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DC2A20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itXyD-0003Zr-8f
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:24:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39994)
+	id 1itY0e-0007IN-8Z
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:26:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1itXut-0007e2-7u
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:39 -0500
+ (envelope-from <stefanha@redhat.com>) id 1itXuW-00072j-Qj
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1itXup-0006Uc-96
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:35 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52917
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1itXuV-0006Ek-HG
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53202
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1itXup-0006Tu-4K
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:31 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1itXuV-0006EF-Cv
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579530030;
+ s=mimecast20190719; t=1579530011;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EdhpjWEWIjVtO+UGn2spiFs+BkXRjtSL4P/3dtsliQs=;
- b=UkFFm8I0m83B4ahBQhPH2e5o9YOFdD8h4xjmX5RxX+4aJNJCasdmumsfJt3SExWgJ94bAS
- HxfrGIJ4lWBpCGr69A2R7TmlCLxFn+vqfCHiWxyncMWKV1A3n9xzT82Y5k28q4TqWyCgoe
- HQVIDZHuyPFnS1acTxVCziTwu5QjqZI=
+ bh=a3+DyTGEcN2TwzdQ2sDklxF9uNtETYiLnrP9Dbk3Nys=;
+ b=SL0NeIdXK3lAx6RCBcyQ6W+/gTIOpTHBoUDpEx2WbqxJUyz6NMaopcqnfPc1aZVXQDdYTg
+ wwYm7qoE3UUcW86f40mS4ZQQVr3yjDub5o8pt61G60gNrXreZwkqeq9eY1vr+OqQUVxlOB
+ Et6JLbUZiGy0L37x4LMWxcOSXMVV1Kg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-Svc4qIacPT6X2RnRnPIe9g-1; Mon, 20 Jan 2020 09:20:29 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-227-dqcgNdZ5P86udMcPunw9mg-1; Mon, 20 Jan 2020 09:20:09 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47FC4107ACC5;
- Mon, 20 Jan 2020 14:20:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66910DB62;
+ Mon, 20 Jan 2020 14:20:08 +0000 (UTC)
 Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A39357C3D9;
- Mon, 20 Jan 2020 14:20:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 318315C1BB;
+ Mon, 20 Jan 2020 14:20:00 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 09/15] block: add trace events for io_uring
-Date: Mon, 20 Jan 2020 14:18:52 +0000
-Message-Id: <20200120141858.587874-10-stefanha@redhat.com>
+Subject: [PATCH v5 06/15] util/async: add aio interfaces for io_uring
+Date: Mon, 20 Jan 2020 14:18:49 +0000
+Message-Id: <20200120141858.587874-7-stefanha@redhat.com>
 In-Reply-To: <20200120141858.587874-1-stefanha@redhat.com>
 References: <20200120141858.587874-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Svc4qIacPT6X2RnRnPIe9g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: dqcgNdZ5P86udMcPunw9mg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,159 +101,70 @@ Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/io_uring.c   | 23 ++++++++++++++++++++---
- block/trace-events | 12 ++++++++++++
- 2 files changed, 32 insertions(+), 3 deletions(-)
+ util/async.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/block/io_uring.c b/block/io_uring.c
-index bb433a685b..a5c0d16220 100644
---- a/block/io_uring.c
-+++ b/block/io_uring.c
-@@ -17,6 +17,7 @@
- #include "block/raw-aio.h"
- #include "qemu/coroutine.h"
- #include "qapi/error.h"
-+#include "trace.h"
-=20
- /* io_uring ring size */
- #define MAX_ENTRIES 128
-@@ -85,6 +86,8 @@ static void luring_resubmit_short_read(LuringState *s, Lu=
-ringAIOCB *luringcb,
-     QEMUIOVector *resubmit_qiov;
-     size_t remaining;
-=20
-+    trace_luring_resubmit_short_read(s, luringcb, nread);
-+
-     /* Update read position */
-     luringcb->total_read =3D nread;
-     remaining =3D luringcb->qiov->size - luringcb->total_read;
-@@ -156,6 +159,7 @@ static void luring_process_completions(LuringState *s)
-=20
-         /* Change counters one-by-one because we can be nested. */
-         s->io_q.in_flight--;
-+        trace_luring_process_completion(s, luringcb, ret);
-=20
-         /* total_read is non-zero only for resubmitted read requests */
-         total_bytes =3D ret + luringcb->total_read;
-@@ -224,6 +228,7 @@ static int ioq_submit(LuringState *s)
-             QSIMPLEQ_REMOVE_HEAD(&s->io_q.submit_queue, next);
-         }
-         ret =3D io_uring_submit(&s->ring);
-+        trace_luring_io_uring_submit(s, ret);
-         /* Prevent infinite loop if submission is refused */
-         if (ret <=3D 0) {
-             if (ret =3D=3D -EAGAIN) {
-@@ -280,12 +285,15 @@ static void ioq_init(LuringQueue *io_q)
-=20
- void luring_io_plug(BlockDriverState *bs, LuringState *s)
- {
-+    trace_luring_io_plug(s);
-     s->io_q.plugged++;
- }
-=20
- void luring_io_unplug(BlockDriverState *bs, LuringState *s)
- {
-     assert(s->io_q.plugged);
-+    trace_luring_io_unplug(s, s->io_q.blocked, s->io_q.plugged,
-+                           s->io_q.in_queue, s->io_q.in_flight);
-     if (--s->io_q.plugged =3D=3D 0 &&
-         !s->io_q.blocked && s->io_q.in_queue > 0) {
-         ioq_submit(s);
-@@ -306,6 +314,7 @@ void luring_io_unplug(BlockDriverState *bs, LuringState=
- *s)
- static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
-                             uint64_t offset, int type)
- {
-+    int ret;
-     struct io_uring_sqe *sqes =3D &luringcb->sqeq;
-=20
-     switch (type) {
-@@ -329,11 +338,14 @@ static int luring_do_submit(int fd, LuringAIOCB *luri=
-ngcb, LuringState *s,
-=20
-     QSIMPLEQ_INSERT_TAIL(&s->io_q.submit_queue, luringcb, next);
-     s->io_q.in_queue++;
--
-+    trace_luring_do_submit(s, s->io_q.blocked, s->io_q.plugged,
-+                           s->io_q.in_queue, s->io_q.in_flight);
-     if (!s->io_q.blocked &&
-         (!s->io_q.plugged ||
-          s->io_q.in_flight + s->io_q.in_queue >=3D MAX_ENTRIES)) {
--        return ioq_submit(s);
-+        ret =3D ioq_submit(s);
-+        trace_luring_do_submit_done(s, ret);
-+        return ret;
+diff --git a/util/async.c b/util/async.c
+index b1fa5319e5..c192a24a61 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -276,6 +276,14 @@ aio_ctx_finalize(GSource     *source)
      }
-     return 0;
- }
-@@ -348,8 +360,10 @@ int coroutine_fn luring_co_submit(BlockDriverState *bs=
-, LuringState *s, int fd,
-         .qiov       =3D qiov,
-         .is_read    =3D (type =3D=3D QEMU_AIO_READ),
-     };
--
-+    trace_luring_co_submit(bs, s, &luringcb, fd, offset, qiov ? qiov->size=
- : 0,
-+                           type);
-     ret =3D luring_do_submit(fd, &luringcb, s, offset, type);
-+
-     if (ret < 0) {
-         return ret;
-     }
-@@ -382,6 +396,8 @@ LuringState *luring_init(Error **errp)
-     LuringState *s =3D g_new0(LuringState, 1);
-     struct io_uring *ring =3D &s->ring;
+ #endif
 =20
-+    trace_luring_init_state(s, sizeof(*s));
++#ifdef CONFIG_LINUX_IO_URING
++    if (ctx->linux_io_uring) {
++        luring_detach_aio_context(ctx->linux_io_uring, ctx);
++        luring_cleanup(ctx->linux_io_uring);
++        ctx->linux_io_uring =3D NULL;
++    }
++#endif
 +
-     rc =3D io_uring_queue_init(MAX_ENTRIES, ring, 0);
-     if (rc < 0) {
-         error_setg_errno(errp, errno, "failed to init linux io_uring ring"=
-);
-@@ -398,4 +414,5 @@ void luring_cleanup(LuringState *s)
+     assert(QSLIST_EMPTY(&ctx->scheduled_coroutines));
+     qemu_bh_delete(ctx->co_schedule_bh);
+=20
+@@ -340,6 +348,29 @@ LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+ }
+ #endif
+=20
++#ifdef CONFIG_LINUX_IO_URING
++LuringState *aio_setup_linux_io_uring(AioContext *ctx, Error **errp)
++{
++    if (ctx->linux_io_uring) {
++        return ctx->linux_io_uring;
++    }
++
++    ctx->linux_io_uring =3D luring_init(errp);
++    if (!ctx->linux_io_uring) {
++        return NULL;
++    }
++
++    luring_attach_aio_context(ctx->linux_io_uring, ctx);
++    return ctx->linux_io_uring;
++}
++
++LuringState *aio_get_linux_io_uring(AioContext *ctx)
++{
++    assert(ctx->linux_io_uring);
++    return ctx->linux_io_uring;
++}
++#endif
++
+ void aio_notify(AioContext *ctx)
  {
-     io_uring_queue_exit(&s->ring);
-     g_free(s);
-+    trace_luring_cleanup_state(s);
- }
-diff --git a/block/trace-events b/block/trace-events
-index 6ba86decca..1a7329b736 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -63,6 +63,18 @@ qmp_block_stream(void *bs) "bs %p"
- file_paio_submit(void *acb, void *opaque, int64_t offset, int count, int t=
-ype) "acb %p opaque %p offset %"PRId64" count %d type %d"
- file_copy_file_range(void *bs, int src, int64_t src_off, int dst, int64_t =
-dst_off, int64_t bytes, int flags, int64_t ret) "bs %p src_fd %d offset %"P=
-RIu64" dst_fd %d offset %"PRIu64" bytes %"PRIu64" flags %d ret %"PRId64
-=20
-+#io_uring.c
-+luring_init_state(void *s, size_t size) "s %p size %zu"
-+luring_cleanup_state(void *s) "%p freed"
-+luring_io_plug(void *s) "LuringState %p plug"
-+luring_io_unplug(void *s, int blocked, int plugged, int queued, int inflig=
-ht) "LuringState %p blocked %d plugged %d queued %d inflight %d"
-+luring_do_submit(void *s, int blocked, int plugged, int queued, int inflig=
-ht) "LuringState %p blocked %d plugged %d queued %d inflight %d"
-+luring_do_submit_done(void *s, int ret) "LuringState %p submitted to kerne=
-l %d"
-+luring_co_submit(void *bs, void *s, void *luringcb, int fd, uint64_t offse=
-t, size_t nbytes, int type) "bs %p s %p luringcb %p fd %d offset %" PRId64 =
-" nbytes %zd type %d"
-+luring_process_completion(void *s, void *aiocb, int ret) "LuringState %p l=
-uringcb %p ret %d"
-+luring_io_uring_submit(void *s, int ret) "LuringState %p ret %d"
-+luring_resubmit_short_read(void *s, void *luringcb, int nread) "LuringStat=
-e %p luringcb %p nread %d"
+     /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
+@@ -434,6 +465,11 @@ AioContext *aio_context_new(Error **errp)
+ #ifdef CONFIG_LINUX_AIO
+     ctx->linux_aio =3D NULL;
+ #endif
 +
- # qcow2.c
- qcow2_add_task(void *co, void *bs, void *pool, const char *action, int clu=
-ster_type, uint64_t file_cluster_offset, uint64_t offset, uint64_t bytes, v=
-oid *qiov, size_t qiov_offset) "co %p bs %p pool %p: %s: cluster_type %d fi=
-le_cluster_offset %" PRIu64 " offset %" PRIu64 " bytes %" PRIu64 " qiov %p =
-qiov_offset %zu"
- qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset =
-0x%" PRIx64 " bytes %d"
++#ifdef CONFIG_LINUX_IO_URING
++    ctx->linux_io_uring =3D NULL;
++#endif
++
+     ctx->thread_pool =3D NULL;
+     qemu_rec_mutex_init(&ctx->lock);
+     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
 --=20
 2.24.1
 
