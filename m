@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE4CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E20EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:02:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 255B0217F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:59:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD39321D7E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:02:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ciYy3VL5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 255B0217F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uBUcvIbB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD39321D7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itXaf-0002is-BO
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:59:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37169)
+	id 1itXcu-0004fa-Nn
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:02:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1itXZy-00027B-Dp
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:58:59 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1itXat-00034q-7Y
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1itXZw-0006Yu-V8
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:58:58 -0500
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:44882)
+ (envelope-from <peter.maydell@linaro.org>) id 1itXar-00077D-3g
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:59:55 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41799)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1itXZw-0006YH-OR
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:58:56 -0500
-Received: by mail-ot1-x333.google.com with SMTP id h9so28665528otj.11
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:58:56 -0800 (PST)
+ id 1itXaq-00076h-Vk
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:59:53 -0500
+Received: by mail-oi1-x242.google.com with SMTP id i1so28537483oie.8
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:59:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jEgzaPkCNNQ5N+IGF5UyFuBEb2jf5dAPic+nQbNMIH0=;
- b=ciYy3VL5ceqeOlIoSShkReD3+Jh2ynD2ReZnUPMlt3diTBhNZ0dSTyJUS0IX3/XCHV
- MhWieUh3fc8NDneywqwPs5RCvUsp+8N+xrmhSX/twn2I/EifQazdbMsNxXt7N3/yjYy7
- 3PyQ09O1DpJycmnw1Re4Wfsy/gBZDdUphm4gEEN/8rJQl8e3e4y6xx34d+JXTpLRVAKg
- QsuAyuE1+eEOKfGCCJw8IXJYt9UscsXgpu7avtpS5+Ax07cUsFgs1NtgUL6li/ySZQ4R
- v9+nD7UwHJeEvqmaGbxRH8TMydnK0EEkE9NMP77Tj018BDMg3j01sBDJEFzHlM+xY6EE
- RoaQ==
+ :cc; bh=9C4cxku4EuN276kH2zSsBROBZcYr/SLI9wjT+E0UXR8=;
+ b=uBUcvIbBcJnPn9jXudVl9NQEZMpDDdH8JEkC3blzx7aCUgc+GKS0sWopY2F7b8SqOa
+ JZV9r1Ua+3Q+Yi8cFkK7aqFT1B8iHGPuA5j36DEGTHF1vSx/yJXwpzoZd386SsQWjXf3
+ 7eiZKhRVv4yOS+R/7Pg2diTMe5Wy6H5T3CmOBudAJREx8xtOjcqmclgRVjXZpU5UvDEb
+ u+ipOMWsZiAJ3pP5aoC5gsm09WvdIzTiTeMcZNCkg7BcN6FMM3UzMtlgMn0NCk0qBIYs
+ aH6G+Vudd0wSxGg4ZaraKBmsUCZygFCg8c+Max4rANLk8DemGI4T7yIy5reTB8pO3dpe
+ eAAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=jEgzaPkCNNQ5N+IGF5UyFuBEb2jf5dAPic+nQbNMIH0=;
- b=FKPpnaqrLrUJgcKoWb6Q20F2QaxcdxfQuylycGsBCF/HFS5/p4axM2Ip1nGK6E6N0Y
- A3qximJvvnP7i/jVGYIHGjpEXn6uTonXpH06dCLrtt/XLn4oRZVeC6JavlruqtdUHZPd
- 3KZSiUEyjLi+XBNBeXbVXTXDlkTgil0GEBHRDqdpK1lR95v2J4aNQRrAnMSuIJtQDGm+
- EGRGAzLS7VlFobajJqO9hNXOsRXV/4L1wMPKlb3hJ4xwbVfYNFzunCgYlNh/Ijjnn2vZ
- 1IyooAZwVpBd/gnj3e1lYZjGj8EMI8x9vxETDOcMqV/YMwst7+eJxzEYxNDOoVx2+tho
- q5Cg==
-X-Gm-Message-State: APjAAAVekvVCXhYk3a6vf+JS20z0QNvKk62MlGirZJ51ZJAbBE+U21F0
- b3xzRt496aWP+2OJwKcJIHf90NNwIJZhTq4iqao9tw==
-X-Google-Smtp-Source: APXvYqwBO7dl3SCY244C0CHElDp2xq4TL/FVP/xg1Z77rEzLH+pOSk+81nr1W02K3bdMOgx356lDU+aBCmX+5HnynoY=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr16017040otd.91.1579528735484; 
- Mon, 20 Jan 2020 05:58:55 -0800 (PST)
+ bh=9C4cxku4EuN276kH2zSsBROBZcYr/SLI9wjT+E0UXR8=;
+ b=VLOdah3O+75Ln7pIJkT4Fw+49Rsq6APxmkzWhMnqHb5vxqCoF/d3AGi/3JqWxuLlsP
+ B6CtUr7EnfqpQl6Vqeler+mSkblrYqOA9c2x/EanA/HyfhMC6WBkd/xq1NxbZJstasI8
+ awoZzfvDQaPq1wocvPhVXkw8V7W1Znq+iKdhL7vX7d21s/fsSEN82VAzhYSi2F45zMjA
+ GUJdvaC0sPo/m8eR7wIZcS007ynHTRiqBGX22Cy/oLAGdpLY7j5HAXsmTdfqLJjrQqgG
+ gFfsTccjX7n06hLDqmveYEF5cx0KWks3PIFMZaWGn5FU4AsJHce2LrGV82k+tnWJQU5+
+ Mv9w==
+X-Gm-Message-State: APjAAAUMosExnsR1o3LrE7cFllUnZsziAow6gVToEU22WTPV5uFnMkEn
+ RYSzd2PIqwz0Gkq3Qrt2a0KEfBZlvDvH0T78Gfd6wA==
+X-Google-Smtp-Source: APXvYqytss0xtfkovsQAsO4NycOWghmc36RWoC2Wceg0UTgg3zxvUtRKCyuai746sufNAeSdcKgAWJEW5fNiUfYebO0=
+X-Received: by 2002:aca:d78b:: with SMTP id
+ o133mr13086702oig.163.1579528792161; 
+ Mon, 20 Jan 2020 05:59:52 -0800 (PST)
 MIME-Version: 1.0
 References: <20200118164229.22539-1-linux@roeck-us.net>
- <20200118164229.22539-6-linux@roeck-us.net>
-In-Reply-To: <20200118164229.22539-6-linux@roeck-us.net>
+ <20200118164229.22539-8-linux@roeck-us.net>
+In-Reply-To: <20200118164229.22539-8-linux@roeck-us.net>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Jan 2020 13:58:44 +0000
-Message-ID: <CAFEAcA9kK7mK=FQRKc0sDL8rZzibYov9Xm__+-MA06ERCotZ1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 5/7] hw/char/exynos4210_uart: Implement Rx FIFO level
- triggers and timeouts
+Date: Mon, 20 Jan 2020 13:59:41 +0000
+Message-ID: <CAFEAcA9ADoUh+eKXKMTv2x=ubqTiyENNdKxuwVHfP3t6=dZXUg@mail.gmail.com>
+Subject: Re: [PATCH v2 7/7] hw/arm/exynos4210: Connect serial port DMA busy
+ signals with pl330
 To: Guenter Roeck <linux@roeck-us.net>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::333
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,69 +96,29 @@ Sender: "Qemu-devel"
 
 On Sat, 18 Jan 2020 at 16:42, Guenter Roeck <linux@roeck-us.net> wrote:
 >
-> The driver already implements a receive FIFO, but it does not
-> handle receive FIFO trigger levels and timeout. Implement the
-> missing functionality.
+> The Exynos4210 serial driver uses an interrupt line to signal if receive
+> data is available. Connect that interrupt with the DMA controller's
+> 'peripheral busy' gpio pin to stop the DMA if there is no more receive
+> data available. Without this patch, receive DMA runs wild and fills the
+> entire receive DMA buffer with invalid data.
 >
 > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 > ---
-> v2: Call exynos4210_uart_rx_timeout_set() from new post_load function
->     to set the receive timeout timer.
->     Add timer to vmstate_exynos4210_uart.
+> v2: Context changes; improved description
+>     This patch has an outstanding review comment, suggesting that
+>     uart and pl330 device states should be kept in Exynos4210State.
+>     I did not address this comment for a number of reasons.
+>     It looks like the problem is hypothetical, the problem may
+>     apply to all devices created in exynos4210_realize(), and I am
+>     not sure I understand what would need to be done to fix
+>     the problem for good (ie for all devices created in the same
+>     function which have the same problem). Overall, I think that
+>     handling this situation would be better left for a separate patch.
 >
->  hw/char/exynos4210_uart.c | 122 ++++++++++++++++++++++++++++++--------
->  hw/char/trace-events      |   3 +-
->  2 files changed, 99 insertions(+), 26 deletions(-)
+>  hw/arm/exynos4210.c | 42 +++++++++++++++++++++++++++++-------------
+>  1 file changed, 29 insertions(+), 13 deletions(-)
 
-Since the timeout value depends on s->wordtime, and
-exynos4210_uart_update_parameters() can change s->wordtime,
-do you need to recalculate the timeout at that point?
-This would correspond to if the guest wrote to the
-UBRDIV/UFRACVAL/ULCON registers, I think. Maybe this comes
-under the heading of "undefined behaviour if the guest does
-this odd thing" ? (The exact behaviour of the h/w is probably
-undocumented and mildly painful to emulate exactly, so it's
-hard to see why QEMU should care about getting it exactly right.)
-
-I did also wonder whether writing the same value to the UCON
-timeout-interval field repeatedly really does restart the timer
-counting down from 8*(N+1) frames again, but again maybe that's
-just weird for a guest to do.
-
-> @@ -553,6 +620,7 @@ static const VMStateDescription vmstate_exynos4210_uart = {
->                         vmstate_exynos4210_uart_fifo, Exynos4210UartFIFO),
->          VMSTATE_UINT32_ARRAY(reg, Exynos4210UartState,
->                               EXYNOS4210_UART_REGS_MEM_SIZE / sizeof(uint32_t)),
-> +        VMSTATE_TIMER_PTR(fifo_timeout_timer, Exynos4210UartState),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-
-Unfortunately you can't simply add entries to a VMStateDescription:
-it breaks migration compatibility.
-
-The choices here are:
- * the nicest approach if it works is that in the post_load
-function you just recalculate the timer timeout. Then there's
-no need to migrate the current state of the timer. (In fact
-it looks like your code does do this in post_load.)
- * if something really does need adding to the migration state,
-then the version_id and minimum_version_id need to be bumped
-(so migration fails cleanly rather than confusingly).
- * if you want migration to continue to work across versions
-(which we don't care about for the exynos boards but does
-apply for boards like 'virt'), this can be done by adding
-a 'subsection' to the vmstate.
-
-I think the answer in this case is just "you don't need to
-add this line to the vmstate at all". (This does mean that
-a vmsave/vmload will slightly extend the rx-timeout and
-delay the interrupt because we re-calculate the timer,
-but I guess that's OK. If you don't like that and would
-prefer the timer to retain the exact timeout value across
-migration, then keep the new vmstate array entry, bump the
-version fields, and don't call exynos4210_uart_rx_timeout_set()
-in post-load.)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
