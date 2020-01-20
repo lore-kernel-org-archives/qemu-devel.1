@@ -2,119 +2,87 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0FEC33CA1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84067C33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:12:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C953E20684
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:12:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D98A20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:12:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="gyMw6fh6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C953E20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="6FiTQPDU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D98A20684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itT6V-0003L6-0b
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:12:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54111)
+	id 1itT6p-000322-49
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:12:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itT5W-0002ct-VG
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:11:19 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1itT3N-0000Lu-Ik
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itT5S-0002i5-Jv
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:11:14 -0500
-Received: from mail-eopbgr150137.outbound.protection.outlook.com
- ([40.107.15.137]:13664 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1itT5J-0002fW-JM; Mon, 20 Jan 2020 04:11:02 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LI4AppTeJVV8kVhIPIPAmPu2cXx0+cn47om5Eg6iH2kt8p1D+BLRfO3Xqqant3mIBRxDWmv53PN6o2EtdCS01A9VR0GercKoLyH+2dxZhbTCptfznLb/Q4mEIq0FrOieF/iCyGDIwYvvUdOepRWVH6GafodMpayY+NUH5oDaKvNhgTooEzqnuQXdkLZsUDma6r9dGj141AURu789yscS+Ww617d7Q7EEPsgJoP64UlIy/61N4aalAYg77I2QyY757RTeqM5j+S7NkFfpisQF3gBmoW19/YAG1Px2+gttH1/6VbkyHlX/lpEpk66W7YDi9WIPDBNNYSGCw2yeaS6p6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Dh/Yp2B0YMcAcEoWoExO5neper65RzO017nQGwb5qlk=;
- b=K/3MrtinMXvFZCVvvMh7C5gK7zmQRGWDyJUyMJ6MS9ile2NB+P2MzCX4Y5Mgs0k28AZpANmABkA1s544e64TgIxuIb+L1ZDyjHPkYnsmHCBD1NJ6mOpM81cpazOq0fZKxgm8aImvIJ9AROknZS9Ug0Dwk/mtnBuc+4lV9jXIjRe2GV4L72ECJwHtMgQJCK0ChpHXFcNIYutoeBsAuDQChTquodMhXNgAYiVTHVhRdTNh2nqxe+5S661Es8brtrs5y2mbF1Ldc+rF2lVTnUyT5KUiRGiOVfe70Vgh4vsmFmyHf/bHzgLbvHeQUGJILDklgvsmmW1NB1fx3IbCBZmO8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Dh/Yp2B0YMcAcEoWoExO5neper65RzO017nQGwb5qlk=;
- b=gyMw6fh6cKLUTSgrHvDcKQCnvMVgr2kfO7Qwv5SE0ltjLKRnwpYCi4P3vPjdG6Hf2EqtJDT2t6WRiWeMXTSkKRpZX9tcXqZeQpY+Ty+N4q93CFUvh9RM+c99LnPb/iWnrxfXTjP/ZDbjphFEW/SUf6Cgf/wJ4k9NR2LdhDWMOzI=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3527.eurprd08.prod.outlook.com (20.177.112.86) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.25; Mon, 20 Jan 2020 09:11:00 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.026; Mon, 20 Jan 2020
- 09:11:00 +0000
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR07CA0010.eurprd07.prod.outlook.com (2603:10a6:7:67::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.12 via Frontend Transport; Mon, 20 Jan 2020 09:10:59 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: ping Re: [PATCH for-5.0 v2 0/3] benchmark util
-Thread-Topic: ping Re: [PATCH for-5.0 v2 0/3] benchmark util
-Thread-Index: AQHVpHEG5YfDz7UI8UOBrTTRR2csGafzmiqA
-Date: Mon, 20 Jan 2020 09:10:59 +0000
-Message-ID: <e1efd3d2-b623-292b-67a9-e3cdd479f104@virtuozzo.com>
-References: <20191126154848.193407-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20191126154848.193407-1-vsementsov@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR07CA0010.eurprd07.prod.outlook.com
- (2603:10a6:7:67::20) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20200120121057670
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 07432fc7-2980-4725-1f28-08d79d88aa8b
-x-ms-traffictypediagnostic: AM6PR08MB3527:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB35271707C93DBFEDC633F5B9C1320@AM6PR08MB3527.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-forefront-prvs: 0288CD37D9
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(136003)(366004)(346002)(376002)(396003)(199004)(189003)(66446008)(66556008)(66476007)(64756008)(956004)(66946007)(2906002)(54906003)(6486002)(186003)(71200400001)(16526019)(26005)(86362001)(31696002)(52116002)(2616005)(8936002)(478600001)(8676002)(81156014)(81166006)(4326008)(31686004)(5660300002)(16576012)(36756003)(110136005)(316002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3527;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ofVihttcc54kEJ/RMZwFU5xn61rikoNrFqbeBvzDYpd/HU1uBJ8V+UymS8IyhLPDd3yJfoCc4oVQSLqaYt7eQYu3K16TY4qogvYoEHgOqbw0KqbsOliLHrxTjPEadfBuz6ndgn9BUdLqv9GdJ7wDIBx8seiu+z4REJ1PH/sWNCoRUG5H2EfhiIzqOKmc+BJ85oyLUtlfwVtisSQ9mEQG5RJ3ENSyDP0XFG1dWymI6afXFHbL7cO5O87u9JK5s2VgkYUeEjKmt+axm6kRc6N5gVnj6po4XC5+t2ijndt9WXJMhaB10LuZpbVPUeVEvFy3pURxB0pkAs0co0ZUTwcntVPKbAH54YEbDrUmcbOgJf1MbnwCxSJP8GJpJkh4kuvCPJPtglBh8xxAYmHoCoRiAGMnFDKdpy7HZ9xq2z+lvYAHxNAbvuEJyYF0wYQ/AvKf
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CCFCD1BECA3D7647B2566952B6704A62@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <damien.hedde@greensocs.com>) id 1itT3J-0001xi-2m
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:09:01 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:34502)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1itT3I-0001wZ-G9; Mon, 20 Jan 2020 04:08:57 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 035B096EF0;
+ Mon, 20 Jan 2020 09:08:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1579511334;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=i8/LnW0bwcpK++QSmBYAdkhPwZFClrcBc3HzopR/Zbg=;
+ b=6FiTQPDU7uS6rjJCQovnKCgg6ZcfTcG96wIaoZIaZxQWPrKhA1xiekFr4EhMnUhX87nmYP
+ 5jl68JCcumyqBaYDfcCvL5ZGbSWUKFps0aMv3vhT4Gq4sEdCKen3dMw1RMJ4P9c1vE0S9g
+ uSn7IAxQPP68DM4qNJw8lsTZF365G5I=
+Subject: Re: [PATCH v7 03/11] hw/core: create Resettable QOM interface
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200115123620.250132-1-damien.hedde@greensocs.com>
+ <20200115123620.250132-4-damien.hedde@greensocs.com>
+ <b527f52b-a632-2044-4813-c06751b663ce@redhat.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <19a6a511-a259-8d25-cba6-7059fbe4fe6f@greensocs.com>
+Date: Mon, 20 Jan 2020 10:08:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07432fc7-2980-4725-1f28-08d79d88aa8b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 09:11:00.0050 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v3Z4eKli0loEj03/jPRjxhudsWa+bcnfpEPYWVM8h9XRoOiI/RCR+/aEyV0+8LCBVxz7zVl/46HYNyGof3ME1aoYwwu5+/1z701R32ovDAU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3527
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.137
+In-Reply-To: <b527f52b-a632-2044-4813-c06751b663ce@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1579511334;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=i8/LnW0bwcpK++QSmBYAdkhPwZFClrcBc3HzopR/Zbg=;
+ b=0FPAGVbyYVHn+L9zOmbWQriRxki49n2Fx2g/F1XOpVfkeFq0PXquBlNHQBjWceZ8/R3c7m
+ FGU4XpWR5A/4glUea9zwQWnChe5adbQHEmoXVnqmOUntVeOhkU1sDrPbkIVXaEkSM4b3jf
+ ifWxOwZCjCdlAzDweDuJLND9d3QwTz0=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579511334; a=rsa-sha256; cv=none;
+ b=2Hufd2y1MawrpmWxuBpOs5xvvWKBC/WUZYo11e6bo+ECzv9CMEtQWUQWbxfBIZO8k8xyCH
+ OUmThrmfXSWUeFWmDFwBCpGr9HmdFHHqHiEbVtDRnxnZhUhphD68KySeFxoAR56Ht45Q0J
+ 1sKICZimXUCtRWcae364HbP0s/uT0f0=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,37 +94,287 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "stefanha@gmail.com" <stefanha@gmail.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
+ mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
+ pbonzini@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cGluZw0KDQoyNi4xMS4yMDE5IDE4OjQ4LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBIaSBhbGwhDQo+IA0KPiBIZXJlIGlzIHNpbXBsZSBiZW5jaG1hcmtpbmcgdXRpbGl0
-eSwgdG8gZ2VuZXJhdGUgcGVyZm9ybWFuY2UNCj4gY29tcGFyaXNvbiB0YWJsZXMsIGxpa2UgdGhl
-IGZvbGxvd2luZzoNCj4gDQo+IC0tLS0tLS0tLS0gIC0tLS0tLS0tLS0tLS0gIC0tLS0tLS0tLS0t
-LS0gIC0tLS0tLS0tLS0tLS0NCj4gICAgICAgICAgICAgIGJhY2t1cC0xICAgICAgIGJhY2t1cC0y
-ICAgICAgIG1pcnJvcg0KPiBzc2QgLT4gc3NkICAwLjQzICstIDAuMDAgICA0LjQ4ICstIDAuMDYg
-ICA0LjM4ICstIDAuMDINCj4gc3NkIC0+IGhkZCAgMTAuNjAgKy0gMC4wOCAgMTAuNjkgKy0gMC4x
-OCAgMTAuNTcgKy0gMC4wNQ0KPiBzc2QgLT4gbmJkICAzMy44MSArLSAwLjM3ICAxMC42NyArLSAw
-LjE3ICAxMC4wNyArLSAwLjA3DQo+IC0tLS0tLS0tLS0gIC0tLS0tLS0tLS0tLS0gIC0tLS0tLS0t
-LS0tLS0gIC0tLS0tLS0tLS0tLS0NCj4gDQo+IFRoaXMgaXMgYSB2MiwgYXMgdjEgd2FzIGluc2lk
-ZQ0KPiAgICJbUkZDIDAwLzI0XSBiYWNrdXAgcGVyZm9ybWFuY2U6IGJsb2NrX3N0YXR1cyArIGFz
-eW5jIg0KPiANCj4gSSdsbCB1c2UgdGhpcyBiZW5jaG1hcmsgaW4gb3RoZXIgc2VyaWVzLCBob3Bl
-IHNvbWVvbmUNCj4gd2lsbCBsaWtlIGl0Lg0KPiANCj4gVmxhZGltaXIgU2VtZW50c292LU9naWV2
-c2tpeSAoMyk6DQo+ICAgIHB5dGhvbjogYWRkIHNpbXBsZWJlbmNoLnB5DQo+ICAgIHB5dGhvbjog
-YWRkIHFlbXUvYmVuY2hfYmxvY2tfam9iLnB5DQo+ICAgIHB5dGhvbjogYWRkIGV4YW1wbGUgdXNh
-Z2Ugb2Ygc2ltcGxlYmVuY2gNCj4gDQo+ICAgcHl0aG9uL2JlbmNoLWV4YW1wbGUucHkgICAgICAg
-IHwgIDgwICsrKysrKysrKysrKysrKysrKysrKw0KPiAgIHB5dGhvbi9xZW11L2JlbmNoX2Jsb2Nr
-X2pvYi5weSB8IDExNSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAgIHB5dGhvbi9z
-aW1wbGViZW5jaC5weSAgICAgICAgICB8IDEyOCArKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysNCj4gICAzIGZpbGVzIGNoYW5nZWQsIDMyMyBpbnNlcnRpb25zKCspDQo+ICAgY3JlYXRl
-IG1vZGUgMTAwNjQ0IHB5dGhvbi9iZW5jaC1leGFtcGxlLnB5DQo+ICAgY3JlYXRlIG1vZGUgMTAw
-NzU1IHB5dGhvbi9xZW11L2JlbmNoX2Jsb2NrX2pvYi5weQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0
-NCBweXRob24vc2ltcGxlYmVuY2gucHkNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
-aW1pcg0K
+
+
+On 1/18/20 7:42 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/15/20 1:36 PM, Damien Hedde wrote:
+>> This commit defines an interface allowing multi-phase reset. This aims
+>> to solve a problem of the actual single-phase reset (built in
+>> DeviceClass and BusClass): reset behavior is dependent on the order
+>> in which reset handlers are called. In particular doing external
+>> side-effect (like setting an qemu_irq) is problematic because receivin=
+g
+>> object may not be reset yet.
+>>
+>> The Resettable interface divides the reset in 3 well defined phases.
+>> To reset an object tree, all 1st phases are executed then all 2nd then
+>> all 3rd. See the comments in include/hw/resettable.h for a more comple=
+te
+>> description. The interface defines 3 phases to let the future
+>> possibility of holding an object into reset for some time.
+>>
+>> The qdev/qbus reset in DeviceClass and BusClass will be modified in
+>> following commits to use this interface. A mechanism is provided
+>> to allow executing a transitional reset handler in place of the 2nd
+>> phase which is executed in children-then-parent order inside a tree.
+>> This will allow to transition devices and buses smoothly while
+>> keeping the exact current qdev/qbus reset behavior for now.
+>>
+>> Documentation will be added in a following commit.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>
+>> v7 update: un-nest struct ResettablePhases
+>> ---
+>> =C2=A0 Makefile.objs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |=C2=A0=C2=A0 1 +
+>> =C2=A0 include/hw/resettable.h | 211 +++++++++++++++++++++++++++++++++=
+++
+>> =C2=A0 hw/core/resettable.c=C2=A0=C2=A0=C2=A0 | 238 ++++++++++++++++++=
+++++++++++++++++++++++
+>> =C2=A0 hw/core/Makefile.objs=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
+>> =C2=A0 hw/core/trace-events=C2=A0=C2=A0=C2=A0 |=C2=A0 17 +++
+>> =C2=A0 5 files changed, 468 insertions(+)
+>> =C2=A0 create mode 100644 include/hw/resettable.h
+>> =C2=A0 create mode 100644 hw/core/resettable.c
+>>
+>> diff --git a/Makefile.objs b/Makefile.objs
+>> index 7c1e50f9d6..9752d549b4 100644
+>> --- a/Makefile.objs
+>> +++ b/Makefile.objs
+>> @@ -191,6 +191,7 @@ trace-events-subdirs +=3D migration
+>> =C2=A0 trace-events-subdirs +=3D net
+>> =C2=A0 trace-events-subdirs +=3D ui
+>> =C2=A0 endif
+>> +trace-events-subdirs +=3D hw/core
+>> =C2=A0 trace-events-subdirs +=3D hw/display
+>> =C2=A0 trace-events-subdirs +=3D qapi
+>> =C2=A0 trace-events-subdirs +=3D qom
+>> diff --git a/include/hw/resettable.h b/include/hw/resettable.h
+>> new file mode 100644
+>> index 0000000000..58b3df4c22
+>> --- /dev/null
+>> +++ b/include/hw/resettable.h
+>> @@ -0,0 +1,211 @@
+>> +/*
+>> + * Resettable interface header.
+>> + *
+>> + * Copyright (c) 2019 GreenSocs SAS
+>> + *
+>> + * Authors:
+>> + *=C2=A0=C2=A0 Damien Hedde
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or
+>> later.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#ifndef HW_RESETTABLE_H
+>> +#define HW_RESETTABLE_H
+>> +
+>> +#include "qom/object.h"
+>> +
+>> +#define TYPE_RESETTABLE_INTERFACE "resettable"
+>> +
+>> +#define RESETTABLE_CLASS(class) \
+>> +=C2=A0=C2=A0=C2=A0 OBJECT_CLASS_CHECK(ResettableClass, (class),
+>> TYPE_RESETTABLE_INTERFACE)
+>> +
+>> +#define RESETTABLE_GET_CLASS(obj) \
+>> +=C2=A0=C2=A0=C2=A0 OBJECT_GET_CLASS(ResettableClass, (obj), TYPE_RESE=
+TTABLE_INTERFACE)
+>> +
+>> +typedef struct ResettableState ResettableState;
+>> +
+>> +/**
+>> + * ResetType:
+>> + * Types of reset.
+>> + *
+>> + * + Cold: reset resulting from a power cycle of the object.
+>> + *
+>> + * TODO: Support has to be added to handle more types. In particular,
+>> + * ResettableState structure needs to be expanded.
+>> + */
+>> +typedef enum ResetType {
+>> +=C2=A0=C2=A0=C2=A0 RESET_TYPE_COLD,
+>> +} ResetType;
+>> +
+>> +/*
+>> + * ResettableClass:
+>> + * Interface for resettable objects.
+>> + *
+>> + * See docs/devel/reset.rst for more detailed information about how
+>> QEMU models
+>> + * reset. This whole API must only be used when holding the iothread
+>> mutex.
+>> + *
+>> + * All objects which can be reset must implement this interface;
+>> + * it is usually provided by a base class such as DeviceClass or
+>> BusClass.
+>> + * Every Resettable object must maintain some state tracking the
+>> + * progress of a reset operation by providing a ResettableState
+>> structure.
+>> + * The functions defined in this module take care of updating the
+>> + * state of the reset.
+>> + * The base class implementation of the interface provides this
+>> + * state and implements the associated method: get_state.
+>> + *
+>> + * Concrete object implementations (typically specific devices
+>> + * such as a UART model) should provide the functions
+>> + * for the phases.enter, phases.hold and phases.exit methods, which
+>> + * they can set in their class init function, either directly or
+>> + * by calling resettable_class_set_parent_phases().
+>> + * The phase methods are guaranteed to only only ever be called once
+>> + * for any reset event, in the order 'enter', 'hold', 'exit'.
+>> + * An object will always move quickly from 'enter' to 'hold'
+>> + * but might remain in 'hold' for an arbitrary period of time
+>> + * before eventually reset is deasserted and the 'exit' phase is call=
+ed.
+>> + * Object implementations should be prepared for functions handling
+>> + * inbound connections from other devices (such as qemu_irq handler
+>> + * functions) to be called at any point during reset after their
+>> + * 'enter' method has been called.
+>> + *
+>> + * Users of a resettable object should not call these methods
+>> + * directly, but instead use the function resettable_reset().
+>> + *
+>> + * @phases.enter: This phase is called when the object enters reset. =
+It
+>> + * should reset local state of the object, but it must not do
+>> anything that
+>> + * has a side-effect on other objects, such as raising or lowering a
+>> qemu_irq
+>> + * line or reading or writing guest memory. It takes the reset's type=
+ as
+>> + * argument.
+>> + *
+>> + * @phases.hold: This phase is called for entry into reset, once
+>> every object
+>> + * in the system which is being reset has had its @phases.enter
+>> method called.
+>> + * At this point devices can do actions that affect other objects.
+>> + *
+>> + * @phases.exit: This phase is called when the object leaves the
+>> reset state.
+>> + * Actions affecting other objects are permitted.
+>> + *
+>> + * @get_state: Mandatory method which must return a pointer to a
+>> + * ResettableState.
+>> + *
+>> + * @get_transitional_function: transitional method to handle
+>> Resettable objects
+>> + * not yet fully moved to this interface. It will be removed as soon
+>> as it is
+>> + * not needed anymore. This method is optional and may return a
+>> pointer to a
+>> + * function to be used instead of the phases. If the method exists
+>> and returns
+>> + * a non-NULL function pointer then that function is executed as a
+>> replacement
+>> + * of the 'hold' phase method taking the object as argument. The two
+>> other phase
+>> + * methods are not executed.
+>> + *
+>> + * @child_foreach: Executes a given callback on every Resettable
+>> child. Child
+>> + * in this context means a child in the qbus tree, so the children of
+>> a qbus
+>> + * are the devices on it, and the children of a device are all the
+>> buses it
+>> + * owns. This is not the same as the QOM object hierarchy. The
+>> function takes
+>> + * additional opaque and ResetType arguments which must be passed
+>> unmodified to
+>> + * the callback.
+>> + */
+>> +typedef void (*ResettableEnterPhase)(Object *obj, ResetType type);
+>> +typedef void (*ResettableHoldPhase)(Object *obj);
+>> +typedef void (*ResettableExitPhase)(Object *obj);
+>> +typedef ResettableState * (*ResettableGetState)(Object *obj);
+>> +typedef void (*ResettableTrFunction)(Object *obj);
+>> +typedef ResettableTrFunction (*ResettableGetTrFunction)(Object *obj);
+>> +typedef void (*ResettableChildCallback)(Object *, void *opaque,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 ResetType type);
+>> +typedef void (*ResettableChildForeach)(Object *obj,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 ResettableChildCallback cb,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 void *opaque, ResetType type);
+>> +typedef struct ResettablePhases {
+>> +=C2=A0=C2=A0=C2=A0 ResettableEnterPhase enter;
+>> +=C2=A0=C2=A0=C2=A0 ResettableHoldPhase hold;
+>> +=C2=A0=C2=A0=C2=A0 ResettableExitPhase exit;
+>> +} ResettablePhases;
+>> +typedef struct ResettableClass {
+>> +=C2=A0=C2=A0=C2=A0 InterfaceClass parent_class;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* Phase methods */
+>> +=C2=A0=C2=A0=C2=A0 ResettablePhases phases;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* State access method */
+>> +=C2=A0=C2=A0=C2=A0 ResettableGetState get_state;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* Transitional method for legacy reset compatibil=
+ity */
+>> +=C2=A0=C2=A0=C2=A0 ResettableGetTrFunction get_transitional_function;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* Hierarchy handling method */
+>> +=C2=A0=C2=A0=C2=A0 ResettableChildForeach child_foreach;
+>> +} ResettableClass;
+>> +
+>> +/**
+>> + * ResettableState:
+>> + * Structure holding reset related state. The fields should not be
+>> accessed
+>> + * directly; the definition is here to allow further inclusion into
+>> other
+>> + * objects.
+>> + *
+>> + * @count: Number of reset level the object is into. It is
+>> incremented when
+>> + * the reset operation starts and decremented when it finishes.
+>=20
+> Maybe you can add this comment and the variable in patch 5/11, that
+> would make patch 5 easier to review.
+
+The variable is used in this patch so I cannot do that.
+
+>=20
+>> + * @hold_phase_pending: flag which indicates that we need to invoke
+>> the 'hold'
+>> + * phase handler for this object.
+>> + * @exit_phase_in_progress: true if we are currently in the exit phas=
+e
+>> + */
+>> +struct ResettableState {
+>> +=C2=A0=C2=A0=C2=A0 uint32_t count;
+>=20
+> Maybe simply 'unsigned'?
+>=20
+
+Ok.
+
+--
+Damien
+
+
+
+
 
