@@ -2,80 +2,89 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6356AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA2FAC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:18:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ADF420684
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:16:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 851232073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ii+1CAk9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ADF420684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPU9z5i4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 851232073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itU6e-0004FU-Pg
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:16:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34073)
+	id 1itU8C-0005hY-AD
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:18:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1itU19-0005eE-Ps
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:53 -0500
+ (envelope-from <stefanha@gmail.com>) id 1itU6Y-0004PE-Ot
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1itU16-000396-G1
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:47 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36264
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1itU16-00038h-CI
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579515043;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FIuyqTwYjniU8Rv/Up3Ucm43QkJkGzsnOMywuHYKg/I=;
- b=Ii+1CAk9Q5DqTCIdWbRdTPMmvuKdLa++GXUo0CFtR1dhC/kNB71H9n3X9RTNCr7sCxY98q
- Q7VAto0Q7Q7VyNiT9NTZ2x8DvGpEo/12kVayJWMbv1gDvcWpQIJoA6PnpuATdaJE8Wjpa/
- QSqJ1kOhi6qgGF/aScX7lfs49UB4QFk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-NO4lindWOHGhJyon4cnzXA-1; Mon, 20 Jan 2020 05:10:40 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5275E107ACC4;
- Mon, 20 Jan 2020 10:10:39 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 86F8248;
- Mon, 20 Jan 2020 10:10:37 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Subject: [RFC PATCH v3 6/6] target/arm/cpu: Add the kvm-no-adjvtime CPU
- property
-Date: Mon, 20 Jan 2020 11:10:23 +0100
-Message-Id: <20200120101023.16030-7-drjones@redhat.com>
-In-Reply-To: <20200120101023.16030-1-drjones@redhat.com>
-References: <20200120101023.16030-1-drjones@redhat.com>
+ (envelope-from <stefanha@gmail.com>) id 1itU6X-0005Si-4r
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:16:22 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45854)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1itU6W-0005Qx-Tx
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:16:21 -0500
+Received: by mail-wr1-x441.google.com with SMTP id j42so28842017wrj.12
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 02:16:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=0dDo7KjfEl7MVx6H05pJJDvNiqm4o+InpLbev2A/hAc=;
+ b=VPU9z5i40/NOR7ea5siEMlbzeADp6X8a9V/rwvDpgNbey7DPoTmAU/LNsP1ZG2cZmC
+ ym1SrKPIFbIiE2E8zLkzdopW9JWBwhNEm8wy5zXPe99gD70LiNm67826onQqP5MApXY1
+ xxwYOIwbQGvZWLYjGQ3L5/PeUf079SbfwdidDwx5Ur4wfyByUiUZC/LFlKzxLU8kBF+g
+ xdVMo1pZSHiorAX+aZq+HMT5itft96IAVb9aiUN6G8TjASE7+3kLetWQFWcWX5FSEuXB
+ UvtL/WGzsVanTOH8xY4xnnWnetr2+NsFGTGAWSh7gXbvrguGX+T52lftx+fpQRLn/hsw
+ BZlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=0dDo7KjfEl7MVx6H05pJJDvNiqm4o+InpLbev2A/hAc=;
+ b=Asf+NJcaiKqnthqhNUt4rYdTpqJ5PahIZG9l4rfEu2QvvK5oHEhBvGcOSXSj840uXF
+ SnB5erQVfagydA5MJFIyinDM2P/nXuG2bBp1XHzKSQfk0YhbCSv4OQT9zwy3f1NCFfR4
+ zZdcoz3a/VBd72k5iqT31bdejqNzRdH7CVyxNekFnfscQROY3T05HWuIqc+s1URfB9dS
+ 0MCfbMZAGtdtPjLYTsmpcBFsujPZyAaQgvjeKq8hosbCy/QjPcI2aR7CQsEb1q44iGIO
+ NXockjc5f866vo8YpKnIKRM58TO5oJTHm1KLHopQJ0P3jOI4aMubd946xjWAYunx+Z0y
+ jufw==
+X-Gm-Message-State: APjAAAXKdUvTkHcFLywiEWWFAfxexJMscnIqing57C8WZhT1sVsYHmnM
+ 1ojkvKafhyOM29aGDehGFms=
+X-Google-Smtp-Source: APXvYqxfpfVOer4sb3bwHSj4OxFmenhzNVRTz9+BWwKCXyN3Vor1PA5GoZihW5A4GmHDaVaPBRvDSg==
+X-Received: by 2002:adf:e70d:: with SMTP id c13mr17257861wrm.248.1579515379282; 
+ Mon, 20 Jan 2020 02:16:19 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id u8sm22362540wmm.15.2020.01.20.02.16.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jan 2020 02:16:18 -0800 (PST)
+Date: Mon, 20 Jan 2020 10:16:17 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [qemu-web PATCH] documentation: update links to readthedocs
+Message-ID: <20200120101617.GC345995@stefanha-x1.localdomain>
+References: <20200113103550.1133-1-alex.bennee@linaro.org>
+ <2331e0b7-cad9-7b53-3d30-7fb88d692c8a@redhat.com>
+ <20200115111042.GA163546@stefanha-x1.localdomain>
+ <87zhepkk6j.fsf@linaro.org> <20200115120134.GH93923@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: NO4lindWOHGhJyon4cnzXA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="OBd5C1Lgu00Gd/Tn"
+Content-Disposition: inline
+In-Reply-To: <20200115120134.GH93923@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,277 +96,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, bijan.mottahedeh@oracle.com, maz@kernel.org,
- richard.henderson@linaro.org, guoheyi@huawei.com, msys.mizuma@gmail.com
+Cc: pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-kvm-no-adjvtime is a KVM specific CPU property and a first of its
-kind. To accommodate it we also add kvm_arm_add_vcpu_properties()
-and a KVM specific CPU properties description to the CPU features
-document.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- docs/arm-cpu-features.rst      | 37 +++++++++++++++++++++++++++++++++-
- hw/arm/virt.c                  |  8 ++++++++
- include/hw/arm/virt.h          |  1 +
- target/arm/cpu.c               |  2 ++
- target/arm/cpu64.c             |  1 +
- target/arm/kvm.c               | 28 +++++++++++++++++++++++++
- target/arm/kvm_arm.h           | 11 ++++++++++
- target/arm/monitor.c           |  1 +
- tests/qtest/arm-cpu-features.c |  4 ++++
- 9 files changed, 92 insertions(+), 1 deletion(-)
+--OBd5C1Lgu00Gd/Tn
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
-index 9b537a75e695..dbf3b7cf42c0 100644
---- a/docs/arm-cpu-features.rst
-+++ b/docs/arm-cpu-features.rst
-@@ -31,7 +31,9 @@ supporting the feature or only supporting the feature und=
-er certain
- configurations.  For example, the `aarch64` CPU feature, which, when
- disabled, enables the optional AArch32 CPU feature, is only supported
- when using the KVM accelerator and when running on a host CPU type that
--supports the feature.
-+supports the feature.  While `aarch64` currently only works with KVM,
-+it could work with TCG.  CPU features that are specific to KVM are
-+prefixed with "kvm-" and are described in "KVM VCPU Features".
-=20
- CPU Feature Probing
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-@@ -171,6 +173,39 @@ disabling many SVE vector lengths would be quite verbo=
-se, the `sve<N>` CPU
- properties have special semantics (see "SVE CPU Property Parsing
- Semantics").
-=20
-+KVM VCPU Features
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+KVM VCPU features are CPU features that are specific to KVM, such as
-+paravirt features or features that enable CPU virtualization extensions.
-+The features' CPU properties are only available when KVM is enabled and
-+are named with the prefix "kvm-".  KVM VCPU features may be probed,
-+enabled, and disabled in the same way as other CPU features.  Below is
-+the list of KVM VCPU features and their descriptions.
-+
-+  kvm-no-adjvtime          By default kvm-no-adjvtime is disabled.  This
-+                           means that by default the virtual time
-+                           adjustment is enabled (vtime is *not not*
-+                           adjusted).
-+
-+                           When virtual time adjustment is enabled each
-+                           time the VM transitions back to running state
-+                           the VCPU's virtual counter is updated to ensure
-+                           stopped time is not counted.  This avoids time
-+                           jumps surprising guest OSes and applications,
-+                           as long as they use the virtual counter for
-+                           timekeeping.  However it has the side effect of
-+                           the virtual and physical counters diverging.
-+                           All timekeeping based on the virtual counter
-+                           will appear to lag behind any timekeeping that
-+                           does not subtract VM stopped time.  The guest
-+                           may resynchronize its virtual counter with
-+                           other time sources as needed.
-+
-+                           Enable kvm-no-adjvtime to disable virtual time
-+                           adjustment, also restoring the legacy (pre-5.0)
-+                           behavior.
-+
- SVE CPU Properties
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=20
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 27ca26b05e27..08b3c34c345c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1663,6 +1663,11 @@ static void machvirt_init(MachineState *machine)
-             }
-         }
-=20
-+        if (vmc->kvm_no_adjvtime &&
-+            object_property_find(cpuobj, "kvm-no-adjvtime", NULL)) {
-+            object_property_set_bool(cpuobj, true, "kvm-no-adjvtime", NULL=
-);
-+        }
-+
-         if (vmc->no_pmu && object_property_find(cpuobj, "pmu", NULL)) {
-             object_property_set_bool(cpuobj, false, "pmu", NULL);
-         }
-@@ -2153,8 +2158,11 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 0)
-=20
- static void virt_machine_4_2_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc =3D VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_5_0_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
-+    vmc->kvm_no_adjvtime =3D true;
- }
- DEFINE_VIRT_MACHINE(4, 2)
-=20
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 38f0c33c77c4..71508bf40c34 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -109,6 +109,7 @@ typedef struct {
-     bool smbios_old_sys_ver;
-     bool no_highmem_ecam;
-     bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
-+    bool kvm_no_adjvtime;
- } VirtMachineClass;
-=20
- typedef struct {
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index d62fd5fdc644..c2347f1cd335 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2562,6 +2562,7 @@ static void arm_max_initfn(Object *obj)
-=20
-     if (kvm_enabled()) {
-         kvm_arm_set_cpu_features_from_host(cpu);
-+        kvm_arm_add_vcpu_properties(obj);
-     } else {
-         cortex_a15_initfn(obj);
-=20
-@@ -2755,6 +2756,7 @@ static void arm_host_initfn(Object *obj)
-     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-         aarch64_add_sve_properties(obj);
-     }
-+    kvm_arm_add_vcpu_properties(obj);
-     arm_cpu_post_init(obj);
- }
-=20
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 61fd0ade29a8..2d97bf45e1ec 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -605,6 +605,7 @@ static void aarch64_max_initfn(Object *obj)
-=20
-     if (kvm_enabled()) {
-         kvm_arm_set_cpu_features_from_host(cpu);
-+        kvm_arm_add_vcpu_properties(obj);
-     } else {
-         uint64_t t;
-         uint32_t u;
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 91e38def6b29..418bcedc3e6e 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -17,6 +17,8 @@
- #include "qemu/timer.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
-+#include "qom/object.h"
-+#include "qapi/error.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "sysemu/kvm_int.h"
-@@ -179,6 +181,32 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-     env->features =3D arm_host_cpu_features.features;
- }
-=20
-+static bool kvm_no_adjvtime_get(Object *obj, Error **errp)
-+{
-+    return !ARM_CPU(obj)->kvm_adjvtime;
-+}
-+
-+static void kvm_no_adjvtime_set(Object *obj, bool value, Error **errp)
-+{
-+    ARM_CPU(obj)->kvm_adjvtime =3D !value;
-+}
-+
-+/* KVM VCPU properties should be prefixed with "kvm-". */
-+void kvm_arm_add_vcpu_properties(Object *obj)
-+{
-+    if (!kvm_enabled()) {
-+        return;
-+    }
-+
-+    ARM_CPU(obj)->kvm_adjvtime =3D true;
-+    object_property_add_bool(obj, "kvm-no-adjvtime", kvm_no_adjvtime_get,
-+                             kvm_no_adjvtime_set, &error_abort);
-+    object_property_set_description(obj, "kvm-no-adjvtime",
-+                                    "Set on to disable the adjustment of "
-+                                    "the virtual counter. VM stopped time =
-"
-+                                    "will be counted.", &error_abort);
-+}
-+
- bool kvm_arm_pmu_supported(CPUState *cpu)
- {
-     KVMState *s =3D KVM_STATE(current_machine->accelerator);
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 01a9a1827851..ae9e075d7545 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -255,6 +255,15 @@ void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *=
-map);
-  */
- void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
-=20
-+/**
-+ * kvm_arm_add_vcpu_properties:
-+ * @obj: The CPU object to add the properties to
-+ *
-+ * Add all KVM specific CPU properties to the CPU object. These
-+ * are the CPU properties with "kvm-" prefixed names.
-+ */
-+void kvm_arm_add_vcpu_properties(Object *obj);
-+
- /**
-  * kvm_arm_aarch32_supported:
-  * @cs: CPUState
-@@ -345,6 +354,8 @@ static inline void kvm_arm_set_cpu_features_from_host(A=
-RMCPU *cpu)
-     cpu->host_cpu_probe_failed =3D true;
- }
-=20
-+static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
-+
- static inline bool kvm_arm_aarch32_supported(CPUState *cs)
- {
-     return false;
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index fa054f8a369c..9725dfff16d4 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -103,6 +103,7 @@ static const char *cpu_model_advertised_features[] =3D =
-{
-     "sve128", "sve256", "sve384", "sve512",
-     "sve640", "sve768", "sve896", "sve1024", "sve1152", "sve1280",
-     "sve1408", "sve1536", "sve1664", "sve1792", "sve1920", "sve2048",
-+    "kvm-no-adjvtime",
-     NULL
- };
-=20
-diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.=
-c
-index a039e3c8d724..469217367661 100644
---- a/tests/qtest/arm-cpu-features.c
-+++ b/tests/qtest/arm-cpu-features.c
-@@ -428,6 +428,8 @@ static void test_query_cpu_model_expansion(const void *=
-data)
-     assert_has_feature_enabled(qts, "cortex-a15", "pmu");
-     assert_has_not_feature(qts, "cortex-a15", "aarch64");
-=20
-+    assert_has_not_feature(qts, "max", "kvm-no-adjvtime");
-+
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         assert_has_feature_enabled(qts, "max", "aarch64");
-         assert_has_feature_enabled(qts, "max", "sve");
-@@ -462,6 +464,8 @@ static void test_query_cpu_model_expansion_kvm(const vo=
-id *data)
-         return;
-     }
-=20
-+    assert_has_feature_disabled(qts, "host", "kvm-no-adjvtime");
-+
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         bool kvm_supports_sve;
-         char max_name[8], name[8];
---=20
-2.21.1
+On Wed, Jan 15, 2020 at 12:01:34PM +0000, Daniel P. Berrang=E9 wrote:
+> On Wed, Jan 15, 2020 at 11:56:04AM +0000, Alex Benn=E9e wrote:
+> >=20
+> > Stefan Hajnoczi <stefanha@redhat.com> writes:
+> >=20
+> > > On Tue, Jan 14, 2020 at 12:11:34PM +0100, Thomas Huth wrote:
+> > >> On 13/01/2020 11.35, Alex Benn=E9e wrote:
+> > >> > ..and extemporise a little about their state.
+> > >> >=20
+> > >> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> > >> > ---
+> > >> >  documentation.md | 9 ++++++---
+> > >> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> > >> >=20
+> > >> > diff --git a/documentation.md b/documentation.md
+> > >> > index f4ef9f4..55d5db6 100644
+> > >> > --- a/documentation.md
+> > >> > +++ b/documentation.md
+> > >> > @@ -3,9 +3,12 @@ title: QEMU documentation
+> > >> >  permalink: /documentation/
+> > >> >  ---
+> > >> > =20
+> > >> > -The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) ca=
+n be read online, courtesy of Stefan Weil.
+> > >> > -More documentation is found in the <a href=3D"https://git.qemu.or=
+g/?p=3Dqemu.git;a=3Dtree;f=3Ddocs;hb=3Dmaster">`docs`</a>
+> > >> > -directory of the QEMU git tree.
+> > >> > +The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) ca=
+n be
+> > >> > +read online, courtesy of Stefan Weil. There is a partial set of
+> > >> > +[developer documentation](https://qemu.readthedocs.io/en/latest/)
+> > >> > +which is generated from the QEMU git tree. The process of convert=
+ing
+> > >> > +the rest of the [`docs`](https://git.qemu.org/?p=3Dqemu.git;a=3Dt=
+ree;f=3Ddocs;hb=3Dmaster)
+> > >> > +directory is ongoing.
+> > >>=20
+> > >> This has a conflict with Stefan's patch to point to our documentatio=
+n on
+> > >> www.qemu.org now instead:
+> > >>=20
+> > >>  https://patchwork.kernel.org/patch/11234545/
+> > >>=20
+> > >> ... Stefan, looks like the index.html page is still not there yet,
+> > >> although your other patch that includes index.html.in in the sources=
+ is
+> > >> in the repository now? What's the status here?
+> > >
+> > > The qemu.git/master docs are built nightly here (index.html is now
+> > > visible!):
+> > > https://www.qemu.org/docs/master/
+> > >
+> > > qemu.org's docs are more useful at the moment since they include the
+> > > user documentation in addition to the developer documentation.
+> >=20
+> > And I think we want to continue hosting them on qemu.org. Is it possible
+> > to theme them under the website branding? Stefan's version includes a
+> > banner and background icon so it would be nice to at least fit in with
+> > the reset of the site.
+>=20
+> I did a demo of this a while back:
+>=20
+>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg578110.html
+>=20
+> Essentially you just need to strip the HTML header down to the
+> <body> content. Then add the jekyll header and run its site
+> generator which will add the new HTML header with theme.
+>=20
+> In my patches above I committed the ref docs .html files to qemu-web.git
+> but this is not required. They just need to be placed in any directory
+> on the server where jekyll build process runs, so that we can access
+> them when building the static site content.
 
+I won't have time to play with this until after FOSDEM.
+
+If anyone wants to send patches, please go ahead!
+
+Stefan
+
+--OBd5C1Lgu00Gd/Tn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4lffEACgkQnKSrs4Gr
+c8jxbwf/WXXe4gsBUxjRM4+XNarQELw42A4qu3kayiEgUiEBMwxiT48+X7+JR81A
+i3wMPEAdQGrmfUpYNgjUB9ahbLhex2W8RF2hLIroRoXfhvVZEg0gJePVgO0Z2d3u
+6EsFB+Xefk0TxhCtF1DwDIuOOi+9hjQjv4/CsBDo4qb65KVVqbJWtnY7ySzP8cME
+9UFghiUSgQdnjXhPGWvK7bvhj706ls8OjOguI5e/iOW49rkPft3f3KqUChCSGEzV
+2OletNvXaSkrXP8a30wta35m0/svq8kZDLScI82PqfIvvEwVayVPun1V4Ez/0gw7
+yS674wnphIdAg733sGelu37Hbc/Rjw==
+=KKXB
+-----END PGP SIGNATURE-----
+
+--OBd5C1Lgu00Gd/Tn--
 
