@@ -2,80 +2,124 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C73A8C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:17:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1914C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:29:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9278C207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:17:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB8EB21835
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:29:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lyDOqw4m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9278C207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="iDA7SBkY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB8EB21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itVzt-0002qg-M1
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 07:17:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52009)
+	id 1itWBF-0006Ol-Ne
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 07:29:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1itVyX-0001sV-72
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:16:14 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itWAS-0005wn-PZ
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:28:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1itVyW-00054j-10
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:16:13 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:36856)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1itVyV-00052H-Rc
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:16:11 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id m2so23643342otq.3
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 04:16:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xFQuNcLCkoeU3tI/OX3S7iOhI7u734JiwHNW4LQc9iQ=;
- b=lyDOqw4mHni2KtUZ/USVPqacvTPLxhAcIb+Jlcy1aXGi8lVZGcfPRqJX/NcK1lS6cP
- O0Z4GbE2IiGVN6OoBrg+/6iVX8EO0k1n8quAGcPyKdpj4FqADe1lzTzlq2MxTREned93
- cs2QONjyaqeYuqlmaBUxslC2rVKKMUFetMUNyWzoWRvtGA/0244VsO+RLX1Ib/6qz9KW
- xOF02UOxfmkBZ3W/BQnth6Zu5PJY2v8F2t/O4MawKX8XHRXxQ0ox25EtzA5U0Mv+EuTE
- 2qjjJAWF/dP6R21Fyvrr08Zd8sx+V6aN8/9HhwWyPGQkGlBhSc+K1MTnxUW5iOZlAs1S
- VvUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xFQuNcLCkoeU3tI/OX3S7iOhI7u734JiwHNW4LQc9iQ=;
- b=oS9omgZNZHXUGvcOB3vUPWQKl7KeQkkIMiURsVvPIraejHay/67YDe5Ywj1nIpKLXX
- gETPYZ4wMikmyToOkqO8dgCK+YtEU+bSb7q4G/aYrWiy1o9Uq0OB4E/32No2WUTdqyrB
- CJ7R/au7hdnDSxAwL9F8tITwLHEVI2z/csf3HDXPujeSzdAKjYkUxZusSzm5SlON9dpE
- li/1ledlBHiRVhKbn+QrM3udeQLMSBkKdVk5e8VrnLDeFCtDZpqoIjV1ajEYxs4GVhTe
- IGtoSMUp0rKeUyDxAc0h/Xige4j6297eAzFHBYWRLKebESr/pgrRtdCHYwZ/N4bCApLR
- lKmg==
-X-Gm-Message-State: APjAAAUi//4tL/ThyX+vOrB71l4QJq38GSH410xbJHO0rcYRf1HhAcUb
- qSx1toXUOujX7XGZ8xIhxQF15R4QS6OSr8g8pyycaw==
-X-Google-Smtp-Source: APXvYqzPDYDa5NlW2Y71xCHinmaUVozzPD/HHh4z0/dOuxCpTMkKxFPWkc4S1lBNVsUch1YrCxO30zgmTtewIg1WLBU=
-X-Received: by 2002:a05:6830:184:: with SMTP id
- q4mr16008856ota.232.1579522571014; 
- Mon, 20 Jan 2020 04:16:11 -0800 (PST)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itWAO-000612-W7
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:28:32 -0500
+Received: from mail-am6eur05on2108.outbound.protection.outlook.com
+ ([40.107.22.108]:46575 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1itWAO-0005zy-EP; Mon, 20 Jan 2020 07:28:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PF0Ku6g0RHCyKWGs4s9gJczZATxVh8QwY749hcSy1tqt7FO7aU82zEtOtIaxOsOgOd7lxm34WWMqMUUHQKAMtMIMW0J1hxLLdhgbU9tOFU4wnIb6CXoQiJvr5S0YWNBmmi8D4L1TTiUIzRNykLanaWDk5VqKkNWsFQFQg27EOJzP4nc4cgwWuaw6K07CqjDFk4uRnQ8WJVt/Es6MiydgI/SERoBpj9MWz+hipYLJpzfWt4KFmpCaFUspHKLZi+0afvUdPdjJhRbu8i+3e0/zdQbvJ6YRiAP++4pa9BFglbdOHJGx9zDSdFRks3mgOQTEaBTClMOnqQ6UeO7GFZBTkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=alD9leOborb0utfTjhlQzljke6EpgozQt8LQ8NYhfsQ=;
+ b=RFRuPVLl+GjdeXzleuJpAO2DsAcsqBRwWjQacUgNZ/LHLtuDMgZCaw6gMB4yuNqi92D0jW36Zj0kW93K1Ugf7MMwl/qJX4WIOQQBn5KouGc5Qo8SPKRe0a3loD7/VHD/FexBe1qmz+vu4cj6jt3saFcXqVSADcUN5KUb4lRyYO5VTRH2Vw/aqevR0MEjzPRKnKf4P1b6wAi31zrV62KQ+3e7NUx/Kp2l5zokZrKLxaoaIp8TO/7zDJMW5J3vY2pBfHmMmOP1AN125BF8nQsw6icZ4TwoHjML7qF46XDcKsVbDQkvj8QBU2NzWglO5NJ+Ro4n53vNrpcygNDbB7G1xQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=alD9leOborb0utfTjhlQzljke6EpgozQt8LQ8NYhfsQ=;
+ b=iDA7SBkYHLWom0Tdeiw/ONxlZWFnRgi7wmjXR1RwDTyOtUj1DFwB4GlOqyJe89iuas9ELposLhvBsgU9KQMCHSbDzib7gOLMzukfRhQexbZitUvbwFtU3lgLCTJgeVFmvi1hOK3PsOHqoOeQlCjJlM9KDHyqk3uQnv/EnUHDiho=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4101.eurprd08.prod.outlook.com (20.179.0.24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.22; Mon, 20 Jan 2020 12:28:26 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.026; Mon, 20 Jan 2020
+ 12:28:26 +0000
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0502CA0005.eurprd05.prod.outlook.com (2603:10a6:3:e3::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.18 via Frontend Transport; Mon, 20 Jan 2020 12:28:25 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v3 05/10] block/dirty-bitmap: switch _next_dirty_area and
+ _next_zero to int64_t
+Thread-Topic: [PATCH v3 05/10] block/dirty-bitmap: switch _next_dirty_area and
+ _next_zero to int64_t
+Thread-Index: AQHVtlOgUpFQPqMlfES7+kiweMLEXqfzpZGAgAAH/oA=
+Date: Mon, 20 Jan 2020 12:28:25 +0000
+Message-ID: <c2f78255-c001-01a3-487a-f7cf224f86f8@virtuozzo.com>
+References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
+ <20191219100348.24827-6-vsementsov@virtuozzo.com>
+ <ee73d55c-7f4f-fda1-b651-ced940027b62@redhat.com>
+In-Reply-To: <ee73d55c-7f4f-fda1-b651-ced940027b62@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0502CA0005.eurprd05.prod.outlook.com
+ (2603:10a6:3:e3::15) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20200120152823413
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6effb02d-6f17-425b-aaa1-08d79da43f27
+x-ms-traffictypediagnostic: AM6PR08MB4101:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB41014D1207662E730A848F1EC1320@AM6PR08MB4101.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0288CD37D9
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(376002)(346002)(136003)(366004)(39840400004)(189003)(199004)(956004)(66556008)(66476007)(4326008)(66946007)(316002)(478600001)(66446008)(64756008)(2906002)(16576012)(2616005)(36756003)(31686004)(5660300002)(110136005)(53546011)(107886003)(71200400001)(54906003)(26005)(8676002)(6486002)(81166006)(31696002)(8936002)(86362001)(186003)(52116002)(16526019)(81156014)(14143004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4101;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UcP9vmtJFkF0j9685qJdNGQB9MaRHtLH+UX43jyXC2MHUaEVG5CI2xDuSTmTH+GffzqzLVDLwbYaAhvuEQVZjr4851/KcoCgG3sCkT/ffMmJt0Ryf6j+oNCT0H2SLw4VtkZOpgp8WRYqN0mx1XbKCqo17bsjrViSm8QKtkHyKWWW6QtoOoHvTYEoOUa1bXKqCup/yZUdVc352mhJk6yGW7eG4Y8pXC4pvs5iyKP6Ct6n8bv/nPkBf05CgR/KQpbl0BrELzD4jYVlZr0dhVh2BvXVkSTpw/sGaYO70B3LaqfLiH3WaZtVce8RMBB/CRPkvDi9pi9GOCkv8ZyCwOZNPz60Xlv6wIpzr2IXt5o2FL3Bc13AC1beE6pKPFubz76E2Em5OMZSMDDsjtgkzNPRgN1/b2egSYMleSQ3XTTWxa47R8OWPr9d+mog6kpOC1fCSMSeSzWXL3jnEg+qHSYAOC//Om1xo3xruh5KmqUl1C8=
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <F7E057CFD475094A9E45CF4E837208F0@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20200120103340.25118-1-quintela@redhat.com>
-In-Reply-To: <20200120103340.25118-1-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Jan 2020 12:16:00 +0000
-Message-ID: <CAFEAcA8RimrjEc3duMC4-vZLk0eXVGuZfsf8jaJKBLJtG7C9mg@mail.gmail.com>
-Subject: Re: [PULL 00/29] Migration pull patches
-To: Juan Quintela <quintela@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6effb02d-6f17-425b-aaa1-08d79da43f27
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 12:28:25.9773 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: spKzD3fONRm4DO93fnezoZMUU1+5ucr8cjDpWOxFbpLbV7W+GjlZMqvHq0XzU+Z2a83ryIt8g05NHa+cBqJzOFMDPQN96BrZSrdw1jOJzcU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4101
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.22.108
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,60 +131,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 20 Jan 2020 at 10:33, Juan Quintela <quintela@redhat.com> wrote:
->
-> The following changes since commit 7fb38daf256bd1bcbcb5ea556422283d0d55a1b1:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200117-1' into staging (2020-01-17 17:27:20 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/juanquintela/qemu.git tags/migration-pull-pull-request
->
-> for you to fetch changes up to ddac5cb2d95774cd019bfaf93c54ffd921095fea:
->
->   multifd: Be consistent about using uint64_t (2020-01-20 09:17:07 +0100)
->
-> ----------------------------------------------------------------
-> Migration pull request (take 5)
->
-> Making history short:
->
-> * having your machine named x32 to really be a 32bit guest helps for
->   testing 32bits
-> * disabling CONFIG_XEN on i686 makes rdma_addr_t be a 32bit value
->
-> After this, and patch sent on Friday, I got this pull request to:
-> * compile on x86_64
-> * pass tests on x86_64
-> * compile on i686
-> * pass tests on i686 (with rdma_dma_t 32 bits)
-> * cross-compile for windows 32bits
-> * cross-compile for windows 64bits
->
-> Please apply, Juan.
->
+20.01.2020 14:59, Max Reitz wrote:
+> On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
+>> We are going to introduce bdrv_dirty_bitmap_next_dirty so that same
+>> variable may be used to store its return value and to be its parameter,
+>> so it would int64_t.
+>>
+>> Similarly, we are going to refactor hbitmap_next_dirty_area to use
+>> hbitmap_next_dirty together with hbitmap_next_zero, therefore we want
+>> hbitmap_next_zero parameter type to be int64_t too.
+>>
+>> So, for convenience update all parameters of *_next_zero and
+>> *_next_dirty_area to be int64_t.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/dirty-bitmap.h |  6 +++---
+>>   include/qemu/hbitmap.h       |  7 +++----
+>>   block/dirty-bitmap.c         |  6 +++---
+>>   nbd/server.c                 |  2 +-
+>>   tests/test-hbitmap.c         | 32 ++++++++++++++++----------------
+>>   util/hbitmap.c               | 13 ++++++++-----
+>>   6 files changed, 34 insertions(+), 32 deletions(-)
+>=20
+> [...]
+>=20
+>> diff --git a/util/hbitmap.c b/util/hbitmap.c
+>> index b6d4b99a06..df22f06be6 100644
+>> --- a/util/hbitmap.c
+>> +++ b/util/hbitmap.c
+>> @@ -193,7 +193,7 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitm=
+ap *hb, uint64_t first)
+>>       }
+>>   }
+>>  =20
+>> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t c=
+ount)
+>> +int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t cou=
+nt)
+>>   {
+>>       size_t pos =3D (start >> hb->granularity) >> BITS_PER_LEVEL;
+>>       unsigned long *last_lev =3D hb->levels[HBITMAP_LEVELS - 1];
+>> @@ -202,6 +202,8 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_=
+t start, uint64_t count)
+>>       uint64_t end_bit, sz;
+>>       int64_t res;
+>>  =20
+>> +    assert(start >=3D 0 && count >=3D 0);
+>> +
+>>       if (start >=3D hb->orig_size || count =3D=3D 0) {
+>>           return -1;
+>>       }
+> As far as I can see, NBD just passes NBDRequest.from (which is a
+> uint64_t) to this function (on NBD_CMD_BLOCK_STATUS).  Would this allow
+> a malicious client to send a value > INT64_MAX, thus provoking an
+> overflow and killing the server with this new assertion?
 
 
-Applied, thanks.
+in nbd_co_receive_request() we have
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
 
--- PMM
+     if (request->from > client->exp->size ||
+         request->len > client->exp->size - request->from) {
+
+
+So, we check that from is <=3D exp->size. and exp->size cant be greater tha=
+n INT64_MAX,
+as it derived from bdrv_getlength, which returns int64_t.
+
+
+
+Interesting, should we be more strict in server:?
+
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -2178,7 +2178,7 @@ static int nbd_co_receive_request(NBDRequestData *req=
+, NBDRequest *request,
+          error_setg(errp, "Export is read-only");
+          return -EROFS;
+      }
+-    if (request->from > client->exp->size ||
++    if (request->from >=3D client->exp->size ||
+          request->len > client->exp->size - request->from) {
+          error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" =
+PRIu32
+                     ", Size: %" PRIu64, request->from, request->len,
+
+Or is it intentional? Looking through NBD spec I found only
+
+    client MUST NOT use a length ... or which, when added to offset, would =
+exceed the export size.
+
+So, formally pair offset=3D<export size>, len=3D0 is valid...
+
+>=20
+> On second thought, we have this problem already everywhere in
+> nbd_handle_request().  I don=92t see it or its caller ever checking
+> whether the received values are in bounds, it just passes them to all
+> kind of block layer functions that sometimes even just accept plain
+> ints.  Well, I suppose all other functions just error out, so it
+> probably isn=92t an actual problem in practice so far...
+>=20
+> Max
+>=20
+
+
+--=20
+Best regards,
+Vladimir
 
