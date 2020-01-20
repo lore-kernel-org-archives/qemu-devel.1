@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2830CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:37:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D606EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E738A2087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:37:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A441922314
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:40:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vIc5fBei"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E738A2087E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EYS2zL+X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A441922314
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itXF6-0003JA-4E
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:37:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34461)
+	id 1itXIS-0006HB-Fo
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:40:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1itXEG-0002Xg-55
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:36:33 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1itXHQ-0005L6-N2
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1itXEF-00062a-1j
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:36:32 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36935)
+ (envelope-from <alex.bennee@linaro.org>) id 1itXHM-0000Oz-Qi
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:39:48 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37515)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1itXEE-00061u-Qw
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:36:31 -0500
-Received: by mail-wr1-x443.google.com with SMTP id w15so29655469wru.4
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:36:30 -0800 (PST)
+ id 1itXHM-0000Mu-Ji
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:39:44 -0500
+Received: by mail-wm1-x342.google.com with SMTP id f129so14759934wmf.2
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:39:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
  bh=vRN84Jl9tbGUzXGqo6qoYhjzT52eSeIsYUJQ8egx89M=;
- b=vIc5fBeigYnSQXMaM62U86xD6mCdIXo2omJKvUCv6W6JnC17/HREKPyyT+EF8K1xBh
- arKEk8BqPCQ768iBf+zqJsGv0zaG3kUob1mFeTRD8+bRLoPs2Et0DWLC7cRWGg4khiIp
- tSAHaQi8hcCMUkwbRZduyE81TacL8gQ5jiuorkD92zPjzSE7cHRzSzzzh9YiGcPStOTG
- zEbXxRfF/v5ULFcAz3sjBlDLI8iXGC1o3wtL61eoBsVdQEsyGgjBc8hEf/cv0+C0hUWv
- w6V5MDnueN814qvPuiXVdKbHrGxR33agrhlIIUUwzFbDObWw92/lccmd5rrRmAPJXGrF
- PlRg==
+ b=EYS2zL+X7dURqo5cUdZfzL5gj34h4fX8YvV0jfzp5B1aa8KySRr3KO9oLh1tSzKF1T
+ bxBymi3wsG10RMkfRhc52mZxxCoKckbYwVLcJT8mPFksSP+ARl8htQuJGsqpe+BROUzr
+ CG5hP2jYNnDFw8+W1aeEZWsmYAMIT7JwyOYce763jsc51o9zIT7I7qY42WA+HdhImh5n
+ vNGErdrwa8vuls2B12IYnkHCkEoSIDY3U8doAhW7hMCW9aYKiinweNXIQfx9oH45SVre
+ tbmz2+/0TmOdclVHWjEQ8BxXf2lJD1awxyDehznMIwy/3YVV11a30KqwjzhDf/BIRIob
+ 2P7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
  bh=vRN84Jl9tbGUzXGqo6qoYhjzT52eSeIsYUJQ8egx89M=;
- b=kkyDYniEdh/1PAJWqhbdm1TxR3G6QClcpA3qDKQ/TOjWZz9hxc09yXviyh/XtFhXyH
- SRq+7SvsDM+XKUdUx3zDsqWJWRoahEZ/C6e8Qea147UyMhWXkFH6T8sEndQVs53vFY7A
- boOBPDIm7v+Sdcg4gOdPNH9t5cnpaPXSgQ8CQJtN1J3SU7rYFflEaczAAZb8rkWo+rir
- NHUWVOTBxMAgl+1hdDGch/GzXmcPMDCkswisuwHYLjSm3SnsGMEKmDTVOC19Lk38cF1+
- FVjpkSvDcUKxpPldkQ+G+3ZE9MbYAe7HCriZJNjrXtD8SkpyzWaYmCatAwsDnyhGIY5u
- ikXQ==
-X-Gm-Message-State: APjAAAWkcG5zFjG5F2+vTjsY+ZfRpS8aHKI8oHQwmwCAC8X35ETryBka
- 6OtLulDU8mHYPffUaJW9f5CmqYm+LLM=
-X-Google-Smtp-Source: APXvYqyxRIlVnlGDICNVWpS6LjrUxmIYhUAvWICQEaA709w/d0YHe7GDgiegQh6UJi39LYeEZ+4dkw==
-X-Received: by 2002:adf:e58b:: with SMTP id l11mr18183636wrm.402.1579527389602; 
- Mon, 20 Jan 2020 05:36:29 -0800 (PST)
+ b=GfP6yRRHhDGZ1VkNfREFNtPee5kuUsQ3L5g1X3xVS8JjZJToHh/UaWEEFnx+gbJGOu
+ /zt/530rTLyC0r7BGfsPaT1lL9atTnxw6rh2F2JJ9pX2Xr4u8SK03VLJ3ruiB9Noi3U3
+ VzMtoRcmzUfDFfCFU4ZwrdOcoY/IoDUgheix2UswsuB9D+6N32gtgQ6JG27bUjzCuba4
+ fX2E+m6bpz0j5A8LvDV3eC29RGizGWLSbrTrVB3MtQ15nDHU3nBmitYbQ9oyPL78TNh0
+ lVrUxySomfkP5ogpFfdYVGHAcobSjfkpmo3To2GhiSTjn6rUJF0QG0gd7wW2lmDbwKmq
+ hs0A==
+X-Gm-Message-State: APjAAAXTxodKC8uYVM9qW1mlHqB2qwRMJG19osQK0GsrIr3xXaaPJkcY
+ c+W0+I/ZabXDt8JJ7PJmjxdc+A==
+X-Google-Smtp-Source: APXvYqwEiWOGq+txOhEgvNAYS4eFQd7YV01TGX+YYZV1N7KFmADZsTTaITGOQGqUtOS7wI8k0mZmTw==
+X-Received: by 2002:a1c:2504:: with SMTP id l4mr18718971wml.134.1579527582665; 
+ Mon, 20 Jan 2020 05:39:42 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v14sm47272269wrm.28.2020.01.20.05.36.28
+ by smtp.gmail.com with ESMTPSA id e8sm47670186wrt.7.2020.01.20.05.39.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 05:36:28 -0800 (PST)
+ Mon, 20 Jan 2020 05:39:40 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 850711FF87;
- Mon, 20 Jan 2020 13:36:27 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 2055A1FF87;
+ Mon, 20 Jan 2020 13:39:40 +0000 (GMT)
 References: <20200109024907.2730-1-richard.henderson@linaro.org>
  <20200109024907.2730-4-richard.henderson@linaro.org>
 User-agent: mu4e 1.3.6; emacs 28.0.50
@@ -79,14 +79,14 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Subject: Re: [PATCH 3/9] cputlb: Pass CPUTLBDescFast to tlb_n_entries and
  sizeof_tlb
 In-reply-to: <20200109024907.2730-4-richard.henderson@linaro.org>
-Date: Mon, 20 Jan 2020 13:36:27 +0000
-Message-ID: <87k15m2qsk.fsf@linaro.org>
+Date: Mon, 20 Jan 2020 13:39:40 +0000
+Message-ID: <87h80q2qn7.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
