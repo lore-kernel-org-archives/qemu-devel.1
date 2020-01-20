@@ -2,67 +2,68 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A142FC33CB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED851C33CB7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:35:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A3F02073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:33:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A3F02073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
+	by mail.kernel.org (Postfix) with ESMTPS id C630A2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:35:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C630A2073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itTRS-0005Ih-8p
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:33:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57135)
+	id 1itTSp-00070C-VB
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:35:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pl@kamp.de>) id 1itTQk-0004rh-0q
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:33:13 -0500
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1itTRi-0005zM-0W
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:34:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pl@kamp.de>) id 1itTQg-000445-2j
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:33:09 -0500
-Received: from kerio.kamp.de ([195.62.97.192]:40192)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pl@kamp.de>) id 1itTQf-00042H-Ph
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:33:06 -0500
-X-Footer: a2FtcC5kZQ==
-Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
- by kerio.kamp.de with ESMTPSA
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
- Mon, 20 Jan 2020 10:32:55 +0100
-Subject: Re: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior
- to previous a0000
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
- <20200108150458.GC3184@work-vm>
- <ca222a5f-1ec6-477c-ed83-6ef52ea9e97f@kamp.de>
- <20200109184440.GR6795@work-vm>
- <b89e8ba2-49e9-8c0d-1129-116afa76366a@kamp.de>
- <cd316fb8-b56b-2913-8b57-f085ca4426d7@kamp.de>
- <11bd7f7a-9022-6c35-3b92-27d6e66f3295@kamp.de>
- <20200116202605.GN3108@work-vm>
- <a1bf5cc0-f32d-48eb-35e4-b895458f8ffe@kamp.de>
- <20200117155909.GM3209@work-vm>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <70f7fc38-61f8-e018-5730-d4d0cb3db639@kamp.de>
-Date: Mon, 20 Jan 2020 10:32:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1itTRe-0004N6-A6
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:34:09 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:42331)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1itTRe-0004Md-5s
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:34:06 -0500
+Received: by mail-oi1-f194.google.com with SMTP id 18so27969278oin.9
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 01:34:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4UGZULGX+YbThMmtUsP+6rz+ppDz5uP2ldQfl/P5Icg=;
+ b=Q2YCy9oGlEIzyhYbgoI6KlBMwvQI3Hso1V9hWMueWpDncDosKbI7enBTZH9k7jR0p+
+ oQ+L5k+U+ZjywTWeal7t6UAVq2GrGYM+0/RzWeOjYkh3DXDr9Y1lrXSRsxPIbp5EZx0u
+ P0Qkfcd5QYIn8SdfDF33G1U+ElU/YuqIpWdN1/AMKVm8V6aMxdgxdAQhieikc1XpwQwr
+ Gv7+e8DUID7X8O+j9lTn/GhPeXkKEhdehJTT5myEaE8CpmfB1E5kzbOXxhL6L4K/1oY+
+ t47jKUGs8o9uDeKjGEtTM5RBp9jSLAjwe2LudgTSGGD5CFktuC3ndZYqooy574fy3Cwa
+ xEmg==
+X-Gm-Message-State: APjAAAWW6d6mG242dFbL8H2Zb0jmW1hWnySJkLYHaLciqNfNZllkNZDx
+ KZ87FHREReS3hbEsB2uqFCR/h7i42B3WdJWXaFI=
+X-Google-Smtp-Source: APXvYqzKSRFvw6ji0gpORenZnjRNgTgsQRPZg2pYUM0CIPBoLJXTQJmTGSvG1PbarmgxudUhQ+JfoPFk+YrYJBaAPTE=
+X-Received: by 2002:aca:1a06:: with SMTP id a6mr11682717oia.148.1579512844618; 
+ Mon, 20 Jan 2020 01:34:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200117155909.GM3209@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20200118014632.GA14644@lxhi-065.adit-jv.com>
+In-Reply-To: <20200118014632.GA14644@lxhi-065.adit-jv.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 20 Jan 2020 10:33:53 +0100
+Message-ID: <CAMuHMdUUc17n0TxOrtQNby+ZiHDpz-aEh-ncnkz50vcwQe6z6w@mail.gmail.com>
+Subject: Re: [PATCH v3 0/7] gpio: Add GPIO Aggregator/Repeater
+To: Eugeniu Rosca <erosca@de.adit-jv.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 195.62.97.192
+X-Received-From: 209.85.167.194
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,75 +75,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Eugeniu Rosca <roscaeugeniu@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Phil Reid <preid@electromag.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 17.01.20 um 16:59 schrieb Dr. David Alan Gilbert:
-> * Peter Lieven (pl@kamp.de) wrote:
->> Am 16.01.20 um 21:26 schrieb Dr. David Alan Gilbert:
->>> * Peter Lieven (pl@kamp.de) wrote:
->>>> Am 16.01.20 um 13:47 schrieb Peter Lieven:
->>>>> Am 13.01.20 um 17:25 schrieb Peter Lieven:
->>>>>> Am 09.01.20 um 19:44 schrieb Dr. David Alan Gilbert:
->>>>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>>>> Am 08.01.20 um 16:04 schrieb Dr. David Alan Gilbert:
->>>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>>>>>> Hi,
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> I have a Qemu 4.0.1 machine with vhost-net network adapter, thats polluting the log with the above message.
->>>>>>>>>>
->>>>>>>>>> Is this something known? Googling revealed the following patch in Nemu (with seems to be a Qemu fork from Intel):
->>>>>>>>>>
->>>>>>>>>> https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619dccced114ef7f56e
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> The network stopped functioning. After a live-migration the vServer is reachable again.
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> Any ideas?
->>>>>>>>> What guest are you running and what does your qemu commandline look
->>>>>>>>> like?
->>>>>>>> Its running debian9. We have hundreds of other VMs with identical setup. Do not know why this one makes trouble.
->>>>>>> Could you extract an 'info mtree' from it - particularly the
->>>>>>> 'address-space: memory' near the top.
->>>>>> Here we go:
->>>>>>
->>>>>>
->>>>>> address-space: memory
->>>>>>    0000000000000000-ffffffffffffffff (prio 0, i/o): system
->>>>>>      0000000000000000-000000003fffffff (prio 0, i/o): alias ram-below-4g @pc.ram 0000000000000000-000000003fffffff
->>>>>>      0000000000000000-ffffffffffffffff (prio -1, i/o): pci
->>>>>>        00000000000a0000-00000000000affff (prio 2, i/o): alias vga.chain4 @vga.vram 0000000000000000-000000000000ffff
->>>>>>        00000000000a0000-00000000000bffff (prio 1, i/o): vga-lowmem
->>>>> What seems special is that the RAM area is prio2. Any idea if this makes trouble?
->>>> Update from my side. This happens when I have Debian 10 with XFCE when the Graphical User Interface is initialized.
->>>>
->>>> I see the log message when I specify -M pc-i440fx-2.9. If I obmit the machine type the error does not appear.
->>> I can't persuade this to reproduce here on the images I currently have;
->>> but if you can rebuild, can you try the v3 of 'Fix hyperv synic on
->>> vhost' I've just posted?  It turns off the alignment code that's
->>> spitting that error in vhost-kernel cases, so should go away.
->> Your patch also seems to fix also my issue. No more errors and the network keeps responding.
-> Great, can you reply to that post with a Tested-by ?
+Hi Eugeniu,
 
+On Sat, Jan 18, 2020 at 2:46 AM Eugeniu Rosca <erosca@de.adit-jv.com> wrote:
+> On Wed, Nov 27, 2019 at 09:42:46AM +0100, Geert Uytterhoeven wrote:
+> >   - Create aggregators:
+> >
+> >     $ echo e6052000.gpio 19,20 \
+> >         > /sys/bus/platform/drivers/gpio-aggregator/new_device
 
-I was not sure if I should reply since the patch is for a total different issue.
+> The only unexpected thing is seeing below messages (where gpiochip99 and
+> gpiochip22 are inexisting gpiochip names, mistakenly provided on command
+> line prior to passing the correct name):
+>
+> root@rcar-gen3:~# echo gpiochip6 12-13 > /sys/bus/platform/drivers/gpio-aggregator/new_device
+> [  915.572905] gpio-aggregator gpio-aggregator.0: cannot find GPIO chip gpiochip99, deferring
+> [  915.584224] gpio-aggregator gpio-aggregator.2: cannot find GPIO chip gpiochip99, deferring
+> [  915.865281] gpio-aggregator gpio-aggregator.29: cannot find GPIO chip gpiochip22, deferring
+>
+> Obviously, in the above case, due to a typo in the names, the gpio
+> chips will never be found, no matter how long gpio-aggregator defers
 
-Anyway, please feel free to add a
+Indeed, that is expected behavior: you have created platform devices
+referring to resources that are not available.
 
+> their probing. Unfortunately, the driver will continuously emit those
+> messages, upon each successfully created/aggregated gpiochip. I built
 
-Tested-by: Peter Lieven <pl@kamp.de>
+That is expected behavior, too: every time the driver core manages to
+bind a device to a driver, it will retry all previously deferred probes,
+in the hope they can be satisfied by the just bound device.
 
+Note that you can destroy these bogus devices, using e.g.
 
-I am currently not subscribed to qemu-devel so I can't reply directly.
+    # echo gpio-aggregator.0 > \
+    /sys/bus/platform/drivers/gpio-aggregator/delete_device
 
+> gpio-aggregator as a loadable module, if that's relevant.
 
-Best,
+Modular or non-modular shouldn't matter w.r.t. this behavior.
+Although unloading the module should get rid of the cruft.
 
-Peter
+> Another comment is that, while the series _does_ allow specifying
+> gpio lines in the DTS (this would require a common compatible string
+> in gpio_aggregator_dt_ids[] and in the DTS node) and while those lines
+> are indeed exposed to userspace, based on my testing, these same gpio
+> lines are marked as "used/reserved" by the kernel. This means that
+> operating on those gpio pins from userspace will not be possible.
+> For instance, gpioget/gpioset return "Device or resource busy":
+>
+> gpioget: error reading GPIO values: Device or resource busy
+> gpioset: error setting the GPIO line values: Device or resource busy
+>
+> I guess Harish will be unhappy about that, as his expectation was that
+> upon merging gpio-aggregator with gpio-inverter, he will be able to
+> describe GPIO polarity and names in DTS without "hogging" the pins.
+> Perhaps this can be supplemented via an add-on patch later on?
 
+When aggregating GPIO lines, the original GPIO lines are indeed marked
+used/reserved, so you cannot use them from userspace.
+However, you are expected to use them through the newly created virtual
+gpiochip representing the aggregated GPIO lines.
 
+You can try this using the "door" example in
+Documentation/admin-guide/gpio/gpio-aggregator.rst, after replacing
+gpio2 {19,20} by gpio6 {12,13} to suit your H3ULCB.
+
+> For the whole series (leaving the above findings to your discretion):
+>
+> Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+> Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
