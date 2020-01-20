@@ -2,94 +2,57 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CF6C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 18:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15FF2C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 18:41:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F0F322525
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 18:27:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K4KaXaDM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F0F322525
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2C9522314
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 18:41:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2C9522314
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itbmA-0005Cl-N9
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 13:27:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57447)
+	id 1itbzk-0003Wi-3A
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 13:41:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59046)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <casantos@redhat.com>) id 1itblY-0004mQ-Qm
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 13:27:13 -0500
+ (envelope-from <no-reply@patchew.org>) id 1itbz2-00036Q-IF
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 13:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <casantos@redhat.com>) id 1itblW-0002FC-IW
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 13:27:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58365
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <casantos@redhat.com>) id 1itblW-0002Ea-F5
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 13:27:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579544829;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uFDWd1hMM7dq/m9RKyvQmhqfGJFBaWSC3T5JliV1Bo4=;
- b=K4KaXaDMTUsU0aWnf2MHUQP09Zj8m/SqZGA5G9GAUjv4YXP2RHVxMv/xNoq8rah+6b1ZA1
- wSTc4pKQGgJFgedIQT0qZck0c439yOBd+lNdcMyQove53t3MZSlxmRu8S6NBK8BL2Im/Cu
- FlB55Q/Dn8zrYbJUymxqZJfy5kj3VFE=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-_Gyptq5rPWiBPZutPwX9Kg-1; Mon, 20 Jan 2020 13:27:05 -0500
-Received: by mail-il1-f200.google.com with SMTP id h87so311539ild.11
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 10:27:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=fI4OzxrzT/3iyJf6v/VMJP4PCHF4RPi/iEC58/3GhIU=;
- b=rh/J/pS/fx3XA0pRjWu0q0QBO6U8zOeDC6v26ydNiSnfO5XAdweEOCCoakOtelUGcm
- kCv1MOTplIMs73athISobnwRW11rW3UQ3wvJrR8v96gDvSlRKMZeP4wEbvMl19ar0xpa
- nWX3nzQY+Z+BlCHpAUnRLZ2yCEt+lrlcTPzjCdqZb7FtJ1csJ7FQ2g8haL5vQPaK6cSC
- zo6051l+OvP5cYlCvsfJTDSQWaoHVxyW5OfjMC9AYFjYJXVbVk4OZx5Hywd2GLUElnRq
- 7EX0aWD3KFgtclalWrQLz2S+mrklDyEbBTfJRvd8D+XmoQqRWde0TwNIeLHHwbHZ5dYG
- vqTQ==
-X-Gm-Message-State: APjAAAW8MzndmjqHkPdQxKwfjdGrNwR4DiDSfLgHngrJSNkBUToLIsC3
- OpKfDhqwLAMPHZPY0yS+hlNsKvX9l4pppeB0WswcgaziHzs+jMdI74JeL5LbM+RPsMISohZKIua
- q4lCwOa0rzxX3cawLoA43lVBFL4Fnb00=
-X-Received: by 2002:a02:c646:: with SMTP id k6mr299630jan.34.1579544825219;
- Mon, 20 Jan 2020 10:27:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxha+n6sUxcsPcuhSgrnoHVmo7N2BsWwJUVfMs15Bw18DtsPz5fKf/LrTppTclrTRdC0MUoMiV1XeWnaNK5PpA=
-X-Received: by 2002:a02:c646:: with SMTP id k6mr299619jan.34.1579544824961;
- Mon, 20 Jan 2020 10:27:04 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1itbyy-0002av-HJ
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 13:41:08 -0500
+Resent-Date: Mon, 20 Jan 2020 13:41:08 -0500
+Resent-Message-Id: <E1itbyy-0002av-HJ@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21164)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1itbyy-0002ab-9v
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 13:41:04 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579545650210341.65792329254384;
+ Mon, 20 Jan 2020 10:40:50 -0800 (PST)
+In-Reply-To: <1579544504-3616-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [PATCH 0/3] target/i386: early MSR initialization + pass down
+ host microcode revision for "-cpu host"
+Message-ID: <157954564910.492.5136672157542857962@f6d1ed32ca6b>
 MIME-Version: 1.0
-References: <20191017123713.30192-1-casantos@redhat.com>
- <CAFEAcA9dMRBtDs6QSXGVv_bNhtu5wnGKLvMxr2YuoWM=yomGDg@mail.gmail.com>
- <CAC1VKkNr8jN_0qVLtX5-YVH1dgN0fGAvnVZJXUpa+UfG_34ooQ@mail.gmail.com>
- <CAC1VKkPfacdLkXfHVNm-josjtds3Xsj=9NhRfNaQTyRv4XxEfQ@mail.gmail.com>
- <48f341e2-5844-2929-1c38-4ecd26ed8546@linaro.org>
-In-Reply-To: <48f341e2-5844-2929-1c38-4ecd26ed8546@linaro.org>
-From: Carlos Santos <casantos@redhat.com>
-Date: Mon, 20 Jan 2020 15:26:54 -0300
-Message-ID: <CAC1VKkMVTWq+xsKRXmsA-U7Uwwq_6iXrFuDP9zdJEoFthg374A@mail.gmail.com>
-Subject: Re: [PATCH] util/cacheinfo: fix crash when compiling with uClibc
-To: Richard Henderson <richard.henderson@linaro.org>
-X-MC-Unique: _Gyptq5rPWiBPZutPwX9Kg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pbonzini@redhat.com
+Date: Mon, 20 Jan 2020 10:40:50 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,98 +64,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: vkuznets@redhat.com, liran.alon@oracle.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 16, 2020 at 9:04 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 12/16/19 1:18 AM, Carlos Santos wrote:
-> > On Thu, Oct 17, 2019 at 8:06 PM Carlos Santos <casantos@redhat.com> wro=
-te:
-> >>
-> >> On Thu, Oct 17, 2019 at 9:47 AM Peter Maydell <peter.maydell@linaro.or=
-g> wrote:
-> >>>
-> >>> On Thu, 17 Oct 2019 at 13:39, <casantos@redhat.com> wrote:
-> >>>>
-> >>>> From: Carlos Santos <casantos@redhat.com>
-> >>>>
-> >>>> uClibc defines _SC_LEVEL1_ICACHE_LINESIZE and _SC_LEVEL1_DCACHE_LINE=
-SIZE
-> >>>> but the corresponding sysconf calls returns -1, which is a valid res=
-ult,
-> >>>> meaning that the limit is indeterminate.
-> >>>>
-> >>>> Handle this situation using the fallback values instead of crashing =
-due
-> >>>> to an assertion failure.
-> >>>>
-> >>>> Signed-off-by: Carlos Santos <casantos@redhat.com>
-> >>>> ---
-> >>>>  util/cacheinfo.c | 10 ++++++++--
-> >>>>  1 file changed, 8 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
-> >>>> index ea6f3e99bf..d94dc6adc8 100644
-> >>>> --- a/util/cacheinfo.c
-> >>>> +++ b/util/cacheinfo.c
-> >>>> @@ -93,10 +93,16 @@ static void sys_cache_info(int *isize, int *dsiz=
-e)
-> >>>>  static void sys_cache_info(int *isize, int *dsize)
-> >>>>  {
-> >>>>  # ifdef _SC_LEVEL1_ICACHE_LINESIZE
-> >>>> -    *isize =3D sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
-> >>>> +    int tmp_isize =3D (int) sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
-> >>>
-> >>> Do we need the cast here ?
-> >>
-> >> It's there to remind the reader that a type coercion may occur, since
-> >> sysconf() returns a long and isize is an int.
-> >>
-> >>>> +    if (tmp_isize > 0) {
-> >>>> +        *isize =3D tmp_isize;
-> >>>> +    }
-> >>>>  # endif
-> >>>>  # ifdef _SC_LEVEL1_DCACHE_LINESIZE
-> >>>> -    *dsize =3D sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-> >>>> +    int tmp_dsize =3D (int) sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-> >>>> +    if (tmp_dsize > 0) {
-> >>>> +        *dsize =3D tmp_dsize;
-> >>>> +    }
-> >>>>  # endif
-> >>>>  }
-> >>>>  #endif /* sys_cache_info */
-> >>>> --
-> >>>
-> >>> thanks
-> >>> -- PMM
-> >>
-> >> --
-> >> Carlos Santos
-> >> Senior Software Maintenance Engineer
-> >> Red Hat
-> >> casantos@redhat.com    T: +55-11-3534-6186
-> >
-> > Hi,
-> >
-> > Any chance to have this merged for Christmas? :-)
->
-> No, but it's queued now.  ;-)
->
->
-> r~
->
-
-Ah, Easter, perhaps. :-)
-
---=20
-Carlos Santos
-Senior Software Maintenance Engineer
-Red Hat
-casantos@redhat.com    T: +55-11-3534-6186
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc5NTQ0NTA0LTM2MTYtMS1n
+aXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
+ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
+Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU3OTU0NDUw
+NC0zNjE2LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFU
+Q0ggMC8zXSB0YXJnZXQvaTM4NjogZWFybHkgTVNSIGluaXRpYWxpemF0aW9uICsgcGFzcyBkb3du
+IGhvc3QgbWljcm9jb2RlIHJldmlzaW9uIGZvciAiLWNwdSBob3N0IgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwg
+ZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
+bSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjlh
+Yzk0YiB0YXJnZXQvaTM4Njoga3ZtOiBpbml0aWFsaXplIG1pY3JvY29kZSByZXZpc2lvbiBmcm9t
+IEtWTQo1NDUwMmIzIHRhcmdldC9pMzg2OiBhZGQgYSB1Y29kZS1yZXYgcHJvcGVydHkKN2Q2NmEw
+YSB0YXJnZXQvaTM4Njoga3ZtOiBpbml0aWFsaXplIGZlYXR1cmUgTVNScyB2ZXJ5IGVhcmx5Cgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IDdkNjZhMGFkNDRlMCAodGFy
+Z2V0L2kzODY6IGt2bTogaW5pdGlhbGl6ZSBmZWF0dXJlIE1TUnMgdmVyeSBlYXJseSkKMi8zIENo
+ZWNraW5nIGNvbW1pdCA1NDUwMmIzNDQ5MWQgKHRhcmdldC9pMzg2OiBhZGQgYSB1Y29kZS1yZXYg
+cHJvcGVydHkpCjMvMyBDaGVja2luZyBjb21taXQgMjlhYzk0YmVjMTUxICh0YXJnZXQvaTM4Njog
+a3ZtOiBpbml0aWFsaXplIG1pY3JvY29kZSByZXZpc2lvbiBmcm9tIEtWTSkKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIzOiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzo2NDIxOgor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIE1TUl9JQTMyX1VDT0RFX1JFVik7CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMzNzogRklMRTogdGFyZ2V0L2kzODYva3ZtLmM6MjcwMDoKK15JXkleSV5J
+XkkgICBNU1JfSUEzMl9VQ09ERV9SRVYpKSB7JAoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdz
+LCAyMSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1Nzk1
+NDQ1MDQtMzYxNi0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5jb20vdGVzdGluZy5j
+aGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
