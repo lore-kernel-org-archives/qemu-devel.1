@@ -2,67 +2,74 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC021C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63FAEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:36:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E17D21D7E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:34:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E17D21D7E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 387A221D7E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:36:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 387A221D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itZ4n-0007x6-G8
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 10:34:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50641)
+	id 1itZ6G-0000yA-FE
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 10:36:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50950)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1itZ40-00077g-2Q
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:34:08 -0500
+ (envelope-from <bounces@canonical.com>) id 1itZ5X-0000Eh-Iy
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:35:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1itZ3v-0000b1-IH
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:34:03 -0500
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:41390)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1itZ3v-0000aE-BL
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:33:59 -0500
-Received: from player699.ha.ovh.net (unknown [10.109.143.3])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id CD9FF1BEF27
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 16:33:56 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player699.ha.ovh.net (Postfix) with ESMTPSA id 467F2E6636D9;
- Mon, 20 Jan 2020 15:33:50 +0000 (UTC)
-Subject: Re: [PATCH v3 07/84] hw/arm/aspeed: actually check RAM size
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <83481ccb-38e4-d0a2-18b5-66fcd7248521@kaod.org>
- <1579530112-80542-1-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e124b5be-42ec-03c2-10ee-874b966a3e67@kaod.org>
-Date: Mon, 20 Jan 2020 16:33:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <bounces@canonical.com>) id 1itZ5T-0001KT-R4
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:35:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46226)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1itZ5T-0001Jo-L3
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:35:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1itZ5R-00077e-SX
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 15:35:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D55B02E80CD
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 15:35:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1579530112-80542-1-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 14439666306392361904
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeigddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Jan 2020 15:26:28 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm gcc9.2 segfault
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fgodeh pmaydell
+X-Launchpad-Bug-Reporter: Fabian Godehardt (fgodeh)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <157666594314.15384.3778802807711797985.malonedeb@wampee.canonical.com>
+Message-Id: <157953398861.24612.16671820632562065829.malone@chaenomeles.canonical.com>
+Subject: [Bug 1856837] Re: qemu 4.2.0 arm  segmentation fault with gcc 9.2
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1783b07db55f9fcb9987db49b9190eb4124d351f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.53.149
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,340 +78,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: andrew@aj.id.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- joel@jms.id.au
+Reply-To: Bug 1856837 <1856837@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/20/20 3:21 PM, Igor Mammedov wrote:
-> It's supposed that SOC will check if "-m" provided
-> RAM size is valid by setting "ram-size" property and
-> then board would read back valid (possibly corrected
-> value) to map RAM MemoryReging with valid size.
-> It isn't doing so, since check is called only
-> indirectly from
->   aspeed_sdmc_reset()->asc->compute_conf()
-> or much later when guest writes to configuration
-> register.
->=20
-> So depending on "-m" value QEMU end-ups with a warning
-> and an invalid MemoryRegion size allocated and mapped.
-> (examples:
->  -M ast2500-evb -m 1M
->     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-contain=
-er
->       0000000080000000-00000000800fffff (prio 0, ram): ram
->       0000000080100000-00000000bfffffff (prio 0, i/o): max_ram
->  -M ast2500-evb -m 3G
->     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-contain=
-er
->       0000000080000000-000000013fffffff (prio 0, ram): ram
->       [DETECTED OVERFLOW!] 0000000140000000-00000000bfffffff (prio 0, i=
-/o): max_ram
-> )
-> On top of that sdmc falls back and reports to guest
-> "default" size, it thinks machine should have.
->=20
-> This patch makes ram-size check actually work and
-> changes behavior from a warning later on during
-> machine reset to error_fatal at the moment SOC.ram-size
-> is set so user will have to fix RAM size on CLI
-> to start machine.
->=20
-> It also gets out of the way mutable ram-size logic,
-> so we could consolidate RAM allocation logic around
-> pre-allocated hostmem backend (supplied by user or
-> auto created by generic machine code depending on
-> supplied -m/mem-path/mem-prealloc options.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+At the point of the segfault, QEMU is correctly delivering a segfault to
+the guest because it has attempted to dereference a NULL pointer. You
+can see this if you run QEMU with the '-g 1234' option and connect an
+arm-aware gdb to it:
 
-LGTM, some comments below.
+(gdb) disas $pc-32,$pc+32
+Dump of assembler code from 0x2bf24c to 0x2bf28c:
+   0x002bf24c:  ldr     r4, [r0, #296]  ; 0x128
+   0x002bf250:  mov     r6, r1
+   0x002bf254:  add     r8, r0, #40     ; 0x28
+   0x002bf258:  mov     r5, #0
+   0x002bf25c:  b       0x2bf268
+   0x002bf260:  cmp     r5, r6
+   0x002bf264:  bge     0x2bf2d4
+   0x002bf268:  mov     r12, r4
+=3D> 0x002bf26c:  ldr     r4, [r4]
+   0x002bf270:  ldr     r3, [r12, #12]
+   0x002bf274:  tst     r3, #512        ; 0x200
+   0x002bf278:  bne     0x2bf2c0
+   0x002bf27c:  tst     r3, #1024       ; 0x400
+   0x002bf280:  ubfx    r1, r3, #11, #1
+   0x002bf284:  bne     0x2bf2c0
+   0x002bf288:  tst     r3, #2048       ; 0x800
+End of assembler dump.
+(gdb) print /x $r4
+$3 =3D 0x0
 
-> ---
-> v3:
->   * replace
->      [PATCH v2 07/86] arm:aspeed: convert valid RAM sizes to data
->      [PATCH v2 08/86] arm:aspeed: actually check RAM size
->     with a simplified variant that adds ram_size check to sdmc.ram-size
->     property
->=20
-> CC: clg@kaod.org
-> CC: peter.maydell@linaro.org
-> CC: andrew@aj.id.au
-> CC: joel@jms.id.au
-> CC: qemu-arm@nongnu.org
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/hw/misc/aspeed_sdmc.h |  1 +
->  hw/arm/aspeed.c               | 13 +++-----
->  hw/misc/aspeed_sdmc.c         | 77 +++++++++++++++++++++++++++++++++++=
---------
->  3 files changed, 70 insertions(+), 21 deletions(-)
->=20
-> diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdm=
-c.h
-> index 5dbde59..cea1e67 100644
-> --- a/include/hw/misc/aspeed_sdmc.h
-> +++ b/include/hw/misc/aspeed_sdmc.h
-> @@ -40,6 +40,7 @@ typedef struct AspeedSDMCClass {
->      SysBusDeviceClass parent_class;
-> =20
->      uint64_t max_ram_size;
-> +    const uint64_t *valid_ram_sizes;
->      uint32_t (*compute_conf)(AspeedSDMCState *s, uint32_t data);
->      void (*write)(AspeedSDMCState *s, uint32_t reg, uint32_t data);
->  } AspeedSDMCClass;
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index cc06af4..c8573e5 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -191,8 +191,12 @@ static void aspeed_machine_init(MachineState *mach=
-ine)
-> =20
->      sc =3D ASPEED_SOC_GET_CLASS(&bmc->soc);
-> =20
-> +    /*
-> +     * This will error out if isize is not supported by memory control=
-ler.
-> +     */
->      object_property_set_uint(OBJECT(&bmc->soc), ram_size, "ram-size",
-> -                             &error_abort);
-> +                             &error_fatal);
-> +
->      object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap1, "hw-str=
-ap1",
->                              &error_abort);
->      object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap2, "hw-str=
-ap2",
-> @@ -215,13 +219,6 @@ static void aspeed_machine_init(MachineState *mach=
-ine)
->      object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
->                               &error_abort);
-> =20
-> -    /*
-> -     * Allocate RAM after the memory controller has checked the size
-> -     * was valid. If not, a default value is used.
-> -     */
-> -    ram_size =3D object_property_get_uint(OBJECT(&bmc->soc), "ram-size=
-",
-> -                                        &error_abort);
-> -
->      memory_region_allocate_system_memory(&bmc->ram, NULL, "ram", ram_s=
-ize);
->      memory_region_add_subregion(&bmc->ram_container, 0, &bmc->ram);
->      memory_region_add_subregion(get_system_memory(),
-> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-> index 2df3244..b36b362 100644
-> --- a/hw/misc/aspeed_sdmc.c
-> +++ b/hw/misc/aspeed_sdmc.c
-> @@ -17,6 +17,9 @@
->  #include "migration/vmstate.h"
->  #include "qapi/error.h"
->  #include "trace.h"
-> +#include "qemu/units.h"
-> +#include "qemu/cutils.h"
-> +#include "qapi/visitor.h"
-> =20
->  /* Protection Key Register */
->  #define R_PROT            (0x00 / 4)
-> @@ -163,10 +166,7 @@ static int ast2400_rambits(AspeedSDMCState *s)
->          break;
->      }
+It looks like this is in the middle of somebody's garbage collector (the
+elf symbol is _ZN2v88internal10PagedSpace14AdvanceSweeperEi).
 
-Now that the ramsizes are being checked, I think we can add in the defaul=
-t
-statement :
+The next step would be to find out what was going on in the run-up to
+that that resulted in the NULL pointer. That's a bit of guest-level
+debugging work that would be much easier with the source code. If you
+can debug where something unexpected happens to the guest that would
+probably help -- this is likely to be a much longer piece of debugging
+than I'm afraid I have time to do.
 
-	g_assert_not_reached();
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856837
 
-> =20
-> -    /* use a common default */
-> -    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 256M",
-> -                s->ram_size);
-> -    s->ram_size =3D 256 << 20;
-> +    assert(0);
->      return ASPEED_SDMC_DRAM_256MB;
+Title:
+  qemu 4.2.0 arm  segmentation fault with gcc 9.2
 
+Status in QEMU:
+  New
 
-and skip the default return value.
+Bug description:
+  As discussed with f4bug yesterday on IRC here comes the bug
+  description.
 
-A part from that,
+  I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
+  6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
+  linux-user" and debug enabled. I use the arm-linux-user variant,
+  "qemu-arm".
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+  Then i'm trying to cross-compile (arm gcc) an old version of googles
+  v8 (as i need this version of the lib for binary compatibility) which
+  uses qemu during build.
 
-Thanks,
+  It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
+  7.4.0 and 8.3.0 but those are also causing the same segmentation
+  fault.
 
-C.
+  The executed command wich breaks qemu is:
 
->  }
-> =20
-> @@ -185,10 +185,7 @@ static int ast2500_rambits(AspeedSDMCState *s)
->          break;
->      }
-> =20
-> -    /* use a common default */
-> -    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 512M",
-> -                s->ram_size);
-> -    s->ram_size =3D 512 << 20;
-> +    assert(0);
->      return ASPEED_SDMC_AST2500_512MB;
->  }
-> =20
-> @@ -207,10 +204,7 @@ static int ast2600_rambits(AspeedSDMCState *s)
->          break;
->      }
-> =20
-> -    /* use a common default */
-> -    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 1024M",
-> -                s->ram_size);
-> -    s->ram_size =3D 1024 << 20;
-> +    assert(0);
->      return ASPEED_SDMC_AST2600_1024MB;
->  }
-> =20
-> @@ -225,6 +219,51 @@ static void aspeed_sdmc_reset(DeviceState *dev)
->      s->regs[R_CONF] =3D asc->compute_conf(s, 0);
->  }
-> =20
-> +static void aspeed_sdmc_get_ram_size(Object *obj, Visitor *v, const ch=
-ar *name,
-> +                                     void *opaque, Error **errp)
-> +{
-> +    AspeedSDMCState *s =3D ASPEED_SDMC(obj);
-> +    int64_t value =3D s->ram_size;
-> +
-> +    visit_type_int(v, name, &value, errp);
-> +}
-> +
-> +static void aspeed_sdmc_set_ram_size(Object *obj, Visitor *v, const ch=
-ar *name,
-> +                                     void *opaque, Error **errp)
-> +{
-> +    int i;
-> +    char *sz;
-> +    int64_t value;
-> +    Error *local_err =3D NULL;
-> +    AspeedSDMCState *s =3D ASPEED_SDMC(obj);
-> +    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
-> +
-> +    visit_type_int(v, name, &value, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    for (i =3D 0; asc->valid_ram_sizes[i]; i++) {
-> +        if (value =3D=3D asc->valid_ram_sizes[i]) {
-> +            s->ram_size =3D value;
-> +            return;
-> +        }
-> +    }
-> +
-> +    sz =3D size_to_str(value);
-> +    error_setg(&local_err, "Invalid RAM size %s", sz);
-> +    g_free(sz);
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void aspeed_sdmc_initfn(Object *obj)
-> +{
-> +    object_property_add(obj, "ram-size", "int",
-> +                        aspeed_sdmc_get_ram_size, aspeed_sdmc_set_ram_=
-size,
-> +                        NULL, NULL, NULL);
-> +}
-> +
->  static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
->  {
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> @@ -249,7 +288,6 @@ static const VMStateDescription vmstate_aspeed_sdmc=
- =3D {
->  };
-> =20
->  static Property aspeed_sdmc_properties[] =3D {
-> -    DEFINE_PROP_UINT64("ram-size", AspeedSDMCState, ram_size, 0),
->      DEFINE_PROP_UINT64("max-ram-size", AspeedSDMCState, max_ram_size, =
-0),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> @@ -268,6 +306,7 @@ static const TypeInfo aspeed_sdmc_info =3D {
->      .name =3D TYPE_ASPEED_SDMC,
->      .parent =3D TYPE_SYS_BUS_DEVICE,
->      .instance_size =3D sizeof(AspeedSDMCState),
-> +    .instance_init =3D aspeed_sdmc_initfn,
->      .class_init =3D aspeed_sdmc_class_init,
->      .class_size =3D sizeof(AspeedSDMCClass),
->      .abstract   =3D true,
-> @@ -298,6 +337,9 @@ static void aspeed_2400_sdmc_write(AspeedSDMCState =
-*s, uint32_t reg,
->      s->regs[reg] =3D data;
->  }
-> =20
-> +static const uint64_t
-> +aspeed_2400_ram_sizes[] =3D { 64 * MiB, 128 * MiB, 256 * MiB, 512 * Mi=
-B, 0};
-> +
->  static void aspeed_2400_sdmc_class_init(ObjectClass *klass, void *data=
-)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -307,6 +349,7 @@ static void aspeed_2400_sdmc_class_init(ObjectClass=
- *klass, void *data)
->      asc->max_ram_size =3D 512 << 20;
->      asc->compute_conf =3D aspeed_2400_sdmc_compute_conf;
->      asc->write =3D aspeed_2400_sdmc_write;
-> +    asc->valid_ram_sizes =3D aspeed_2400_ram_sizes;
->  }
-> =20
->  static const TypeInfo aspeed_2400_sdmc_info =3D {
-> @@ -351,6 +394,9 @@ static void aspeed_2500_sdmc_write(AspeedSDMCState =
-*s, uint32_t reg,
->      s->regs[reg] =3D data;
->  }
-> =20
-> +static const uint64_t
-> +aspeed_2500_ram_sizes[] =3D { 128 * MiB, 256 * MiB, 512 * MiB, 1024 * =
-MiB, 0};
-> +
->  static void aspeed_2500_sdmc_class_init(ObjectClass *klass, void *data=
-)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -360,6 +406,7 @@ static void aspeed_2500_sdmc_class_init(ObjectClass=
- *klass, void *data)
->      asc->max_ram_size =3D 1024 << 20;
->      asc->compute_conf =3D aspeed_2500_sdmc_compute_conf;
->      asc->write =3D aspeed_2500_sdmc_write;
-> +    asc->valid_ram_sizes =3D aspeed_2500_ram_sizes;
->  }
-> =20
->  static const TypeInfo aspeed_2500_sdmc_info =3D {
-> @@ -404,6 +451,9 @@ static void aspeed_2600_sdmc_write(AspeedSDMCState =
-*s, uint32_t reg,
->      s->regs[reg] =3D data;
->  }
-> =20
-> +static const uint64_t
-> +aspeed_2600_ram_sizes[] =3D { 256 * MiB, 512 * MiB, 1024 * MiB, 2048 *=
- MiB, 0};
-> +
->  static void aspeed_2600_sdmc_class_init(ObjectClass *klass, void *data=
-)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -413,6 +463,7 @@ static void aspeed_2600_sdmc_class_init(ObjectClass=
- *klass, void *data)
->      asc->max_ram_size =3D 2048 << 20;
->      asc->compute_conf =3D aspeed_2600_sdmc_compute_conf;
->      asc->write =3D aspeed_2600_sdmc_write;
-> +    asc->valid_ram_sizes =3D aspeed_2600_ram_sizes;
->  }
-> =20
->  static const TypeInfo aspeed_2600_sdmc_info =3D {
->=20
+   qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
+  positions --logfile
+  /tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
+  --random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
 
+  The printed error message is:
+
+  ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=
+=3D1 MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  Calling qemu with gdb gives the following information:
+
+   Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
+   0x0000555555d63d11 in static_code_gen_buffer ()
+
+  and
+
+   (gdb) bt
+   #0  0x0000555555d63d11 in static_code_gen_buffer ()
+   #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55=
+5557c33930) at =
+
+   /tmp/build/qemu/accel/tcg/cpu-exec.c:172
+   #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<syntheti=
+c pointer>, tb=3D<optimized out>, =
+
+   cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
+   #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel=
+/tcg/cpu-exec.c:731
+   #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/=
+qemu/linux-user/arm/cpu_loop.c:219
+  #5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
+
+  Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the
+  log in the attached file.
+
+  Thanks for any hints!
+  Fabian
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856837/+subscriptions
 
