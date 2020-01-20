@@ -2,58 +2,109 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C66C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1747C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:01:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0689208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:59:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0689208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 662D2208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:01:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DjuTdJhE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 662D2208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itVi2-00034l-4v
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:59:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49942)
+	id 1itVk5-0004Dj-GC
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 07:01:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50110)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1itVhM-0002dB-2o
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:58:29 -0500
+ (envelope-from <mreitz@redhat.com>) id 1itViu-0003aq-5c
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:00:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1itVhK-0000kW-CZ
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:58:27 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:33844)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1itVhK-0000hu-0w
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:58:26 -0500
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 990B3725C1;
- Mon, 20 Jan 2020 14:58:21 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
- <87o8v3lkq8.fsf@linaro.org> <000f01d5cc5f$cccb90b0$6662b210$@ru>
- <871rrykmmh.fsf@linaro.org>
-In-Reply-To: <871rrykmmh.fsf@linaro.org>
-Subject: RE: [for-5.0 PATCH 00/11] Support for reverse debugging with GDB
-Date: Mon, 20 Jan 2020 14:58:21 +0300
-Message-ID: <002f01d5cf88$eaabfee0$c003fca0$@ru>
+ (envelope-from <mreitz@redhat.com>) id 1itViq-0001aX-7f
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:00:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46951
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1itViq-0001a0-3J
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:00:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579521599;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=wmuPfVtIy4EaXy11c3TQdws0BYdgh1SzcGXR+OuHDeE=;
+ b=DjuTdJhEL0O50XfVLmZDD+R33nn+Ika1Il4tDQCFk455U3/i9vAUIaMx39fqQ+JMdCQ/ag
+ 2vEQKLy4UD/cwofREpC13bjw54QreCUymJFqanL/gzKCeBnAR+L0uHlXa7NEYpHO8HAZ4r
+ jHe3LLyRUvir+Lka5kG/SAR9hyxt11M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-266-xIzMGBGGNC6SvMmmbVnC8w-1; Mon, 20 Jan 2020 06:59:55 -0500
+X-MC-Unique: xIzMGBGGNC6SvMmmbVnC8w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B11A7107ACCD;
+ Mon, 20 Jan 2020 11:59:54 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-225.ams2.redhat.com
+ [10.36.117.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B435E10013A7;
+ Mon, 20 Jan 2020 11:59:49 +0000 (UTC)
+Subject: Re: [PATCH v3 05/10] block/dirty-bitmap: switch _next_dirty_area and
+ _next_zero to int64_t
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
+ <20191219100348.24827-6-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ee73d55c-7f4f-fda1-b651-ced940027b62@redhat.com>
+Date: Mon, 20 Jan 2020 12:59:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Office Outlook 12.0
-thread-index: AdXNXSokBMQOaR6eS1q6nT2VhQMT/QCKxx1A
-Content-Language: ru
+In-Reply-To: <20191219100348.24827-6-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="EcHiIStijgkUS9omHCVHKU9XM63BfMMQi"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 83.149.199.45
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,151 +116,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EcHiIStijgkUS9omHCVHKU9XM63BfMMQi
+Content-Type: multipart/mixed; boundary="OTMIcfc3IkyvxMb9v9Fwz1i96CzcTY9VO"
+
+--OTMIcfc3IkyvxMb9v9Fwz1i96CzcTY9VO
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
+> We are going to introduce bdrv_dirty_bitmap_next_dirty so that same
+> variable may be used to store its return value and to be its parameter,
+> so it would int64_t.
 >=20
-> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> Pavel Dovgalyuk <pavel.dovgaluk@gmail.com> writes:
-> >>
-> >> > GDB remote protocol supports reverse debugging of the targets.
-> >> > It includes 'reverse step' and 'reverse continue' operations.
-> >> > The first one finds the previous step of the execution,
-> >> > and the second one is intended to stop at the last breakpoint =
-that
-> >> > would happen when the program is executed normally.
-> >> >
-> >> > Reverse debugging is possible in the replay mode, when at least
-> >> > one snapshot was created at the record or replay phase.
-> >> > QEMU can use these snapshots for travelling back in time with =
-GDB.
-> >> >
-> >> > Running the execution in replay mode allows using GDB reverse =
-debugging
-> >> > commands:
-> >> >  - reverse-stepi (or rsi): Steps one instruction to the past.
-> >> >    QEMU loads on of the prior snapshots and proceeds to the =
-desired
-> >> >    instruction forward. When that step is reaches, execution =
-stops.
-> >> >  - reverse-continue (or rc): Runs execution "backwards".
-> >> >    QEMU tries to find breakpoint or watchpoint by loaded prior =
-snapshot
-> >> >    and replaying the execution. Then QEMU loads snapshots again =
-and
-> >> >    replays to the latest breakpoint. When there are no =
-breakpoints in
-> >> >    the examined section of the execution, QEMU finds one more =
-snapshot
-> >> >    and tries again. After the first snapshot is processed, =
-execution
-> >> >    stops at this snapshot.
-> >> >
-> >> > The set of patches include the following modifications:
-> >> >  - gdbstub update for reverse debugging support
-> >> >  - functions that automatically perform reverse step and reverse
-> >> >    continue operations
-> >> >  - hmp/qmp commands for manipulating the replay process
-> >> >  - improvement of the snapshotting for saving the execution step
-> >> >    in the snapshot parameters
-> >> >
-> >> > The patches are available in the repository:
-> >> > https://github.com/ispras/qemu/tree/rr-191223
-> >>
-> >> So I tried with your additional patch. Launching QEMU as:
-> >>
-> >>   ./aarch64-softmmu//qemu-system-aarch64 -monitor none \
-> >>      -display none -M virt -cpu max -display none \
-> >>      -semihosting-config enable=3Don \
-> >>      -kernel ./tests/tcg/aarch64-softmmu/memory \
-> >>      -icount shift=3D5,rr=3Dreplay,rrfile=3Drecord.bin \
-> >>      -s -S -d trace:gdbstub\*
-> >>
-> >> And gdb:
-> >>
-> >>   gdb tests/tcg/aarch64-softmmu/memory \
-> >>     -ex "target remote localhost:1234"
-> >>
-> >> I get the following log:
-> >>
-> >>   (gdb) x/3i $pc
-> >>   =3D> 0x400037b0 <__start>:        adr     x0, 0x40003000 =
-<vector_table>
-> >>      0x400037b4 <__start+4>:      msr     vbar_el1, x0
-> >>      0x400037b8 <__start+8>:      adrp    x0, 0x40200000
-> >>   (gdb) p/x $x0
-> >>   $1 =3D 0x0
-> >>   (gdb) si
-> >>   92              msr     vbar_el1, x0
-> >>   (gdb) p/x $x0
-> >>   $2 =3D 0x40003000
-> >>   (gdb) rsi
-> >>   warning: Remote failure reply: E14
-> >>
-> >>   Program stopped.
-> >>   __start () at =
-/home/alex.bennee/lsrc/qemu.git/tests/tcg/aarch64/system/boot.S:92
-> >>   92              msr     vbar_el1, x0
-> >>   (gdb) p/x $x0
-> >>   $3 =3D 0x40003000
-> >>
-> >> So it doesn't seem to be working.
-> >
-> > That's ok, you'll need at least one VM snapshot available to recover =
-the initial VM state.
-> > Try changing the command lines in the following way:
-> >
-> > First, create empty.qcow2 which will be used for saving the =
-snapshots.
-> > Then record with initial snapshot and attached empty.qcow2:
-> >
-> >    ./aarch64-softmmu//qemu-system-aarch64 -monitor none \
-> >       -display none -M virt -cpu max \
-> >       -kernel ./tests/tcg/aarch64-softmmu/memory \
-> >       -icount =
-shift=3D5,rr=3Drecord,rrfile=3Drecord.bin,rrsnapshot=3Dinit \
-> >       -drive file=3Dempty.qcow2
+> Similarly, we are going to refactor hbitmap_next_dirty_area to use
+> hbitmap_next_dirty together with hbitmap_next_zero, therefore we want
+> hbitmap_next_zero parameter type to be int64_t too.
 >=20
-> ./aarch64-softmmu//qemu-system-aarch64 -monitor none -display none -M =
-virt -cpu max -display
-> none -semihosting-config enable=3Don -kernel =
-./tests/tcg/aarch64-softmmu/memory -icount
-> shift=3D5,rr=3Drecord,rrfile=3Drecord.bin,rrsnapshot=3Dinit -drive =
-file=3Dempty.qcow2
+> So, for convenience update all parameters of *_next_zero and
+> *_next_dirty_area to be int64_t.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/dirty-bitmap.h |  6 +++---
+>  include/qemu/hbitmap.h       |  7 +++----
+>  block/dirty-bitmap.c         |  6 +++---
+>  nbd/server.c                 |  2 +-
+>  tests/test-hbitmap.c         | 32 ++++++++++++++++----------------
+>  util/hbitmap.c               | 13 ++++++++-----
+>  6 files changed, 34 insertions(+), 32 deletions(-)
+
+[...]
+
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index b6d4b99a06..df22f06be6 100644
+> --- a/util/hbitmap.c
+> +++ b/util/hbitmap.c
+> @@ -193,7 +193,7 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitma=
+p *hb, uint64_t first)
+>      }
+>  }
+> =20
+> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t co=
+unt)
+> +int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t coun=
+t)
+>  {
+>      size_t pos =3D (start >> hb->granularity) >> BITS_PER_LEVEL;
+>      unsigned long *last_lev =3D hb->levels[HBITMAP_LEVELS - 1];
+> @@ -202,6 +202,8 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t=
+ start, uint64_t count)
+>      uint64_t end_bit, sz;
+>      int64_t res;
+> =20
+> +    assert(start >=3D 0 && count >=3D 0);
+> +
+>      if (start >=3D hb->orig_size || count =3D=3D 0) {
+>          return -1;
+>      }
+As far as I can see, NBD just passes NBDRequest.from (which is a
+uint64_t) to this function (on NBD_CMD_BLOCK_STATUS).  Would this allow
+a malicious client to send a value > INT64_MAX, thus provoking an
+overflow and killing the server with this new assertion?
+
+On second thought, we have this problem already everywhere in
+nbd_handle_request().  I don=92t see it or its caller ever checking
+whether the received values are in bounds, it just passes them to all
+kind of block layer functions that sometimes even just accept plain
+ints.  Well, I suppose all other functions just error out, so it
+probably isn=92t an actual problem in practice so far...
+
+Max
 
 
-> qemu-system-aarch64: invalid accelerator kvm
-> qemu-system-aarch64: falling back to tcg
-> qemu-system-aarch64: The qcow format used by node '#block163' does not =
-support live migration
-> qemu-system-aarch64: Could not create snapshot for icount record
+--OTMIcfc3IkyvxMb9v9Fwz1i96CzcTY9VO--
 
-It seems that you have some problems with your disk image. Is it qcow2 =
-or just qcow?
+--EcHiIStijgkUS9omHCVHKU9XM63BfMMQi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> For this testcase semihosting in just a convenient output device (in
-> lieu of a serial device).=20
+-----BEGIN PGP SIGNATURE-----
 
-I tried this test kernel with your options and everything was ok.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4lljMACgkQ9AfbAGHV
+z0CPrgf/UVubr505h70KTUvMr84HddLJN8C+rn8eb+rpKxYjGXfU79GDXiQMOxdm
+6uG2Gko5xvLJq2pki1TVNFU1oIFCaOEHRWuRDOAqhROGnGyKlejVVQqSZsuqsU69
+yNSyt+DN1i2/CGjMGHOouDLdeXp7uqEfWRqBK1weCqUb28IGeGsSi4hcFNdIOICm
+cYZriJ0XZbDGAo7WN1U77HMF7xONGlE9CsUrX9vh4daDp1Wc1grWmbY+2BDnXOHn
+/J1B7SCoXV0SJHsgpzMP1EA8Wa78/zqhv28dvFySlpHMYdYcZGyNcOpP5u8v+z+L
+BQpL15az+NTJ+uwKfMB97iq3QSrdKg==
+=7A4P
+-----END PGP SIGNATURE-----
 
-> We probably need to come up with a strategy on
-> how we handle all these devices otherwise we will end up with a random
-> selection of hardware combinations which work.
-
-All correctly implemented virtual hardware should support record/replay.
-But real semihosting (like file IO) should not, because it provides
-untracked virtual machine inputs.
-
-Pavel Dovgalyuk
+--EcHiIStijgkUS9omHCVHKU9XM63BfMMQi--
 
 
