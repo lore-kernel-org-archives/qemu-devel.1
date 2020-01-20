@@ -2,101 +2,109 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4D1C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C598CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC52F21835
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90A3020678
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:20:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bxMjco2Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC52F21835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLS3tT9y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90A3020678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itXnH-0002Zi-TO
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:12:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38575)
+	id 1itXuL-0006AD-4t
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:20:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1itXmE-0001kd-Ko
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:11:42 -0500
+ (envelope-from <mreitz@redhat.com>) id 1itXt5-0005Gy-4n
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:18:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1itXmA-0006KQ-U0
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:11:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38558
+ (envelope-from <mreitz@redhat.com>) id 1itXt3-0005QO-O7
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:18:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48382
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1itXmA-0006K9-RB
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:11:34 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1itXt3-0005Pz-K1
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:18:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579529494;
+ s=mimecast20190719; t=1579529921;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CDGAV3QhU/eE1Y7cuVyRbz2nXej2CCA9CZvlP9eg7jc=;
- b=bxMjco2QnNt1qk8vbInmpE+XoAEMEYTRx3M8iHta0b6o0D7ni1Tx7qlt52LMLB6oBacnNi
- Oc9zV8ez2rNo6rfkI8i1GXRW7zVj9xjDZ22TXec+ZUhhNBoJ7dHyvWH9FwquzrWC02hfR7
- hB0MG+2mUCxhejjSR3IizI1188kWzTI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-YQxESkmmPdSsFzRPtMSojA-1; Mon, 20 Jan 2020 09:11:32 -0500
-Received: by mail-wr1-f69.google.com with SMTP id u12so14176116wrt.15
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 06:11:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SxnHpeVt7Kxi5Mq7w5H+O8eTfhJBUNne0/A1tG5HIpU=;
- b=K6JKNnf02lYR0KaulVcwK1mqbRr7QygugpbTr44BL/Wm+GZr/OElQzxuDCVqHPh+u7
- UazNoAnqpSwBQksmhdtsIyI6PpFm60iaSvcj2D+tIYmKBCmw83pxnZ6FmFgo2B+1OYV2
- 8DfJxI8AUtXOwV6RvYzGNh7uqvRdCse5Gn2GkUPYpZbT61sxRtjXDewklzNTm2hotHxu
- ZASpeRNqU8fKIRfYvgYqOP2ukeC+u7OjNCcw8Iprro7xunlEVi5OaKHgh+lwGz/gEA3d
- aCuWJPnZo5Dqg7nGA4bOPFPNUh9bjG4elSUY6oSYP7MKFGjggordvgwjn06Th7/Cgzk0
- BtJg==
-X-Gm-Message-State: APjAAAVnABy/cdBzo0WZTnJawBELO1q5LcYXBkjF5MkLFtISy66VlLH2
- BoPxnR/AjnMpmX4lOyrpRVepWHp4TiRqTbinwxVHBPqAhGVk6H08g0AimwHaXeI33XIomCSJnut
- FgeBDh2dhDQCJ2gg=
-X-Received: by 2002:a5d:46d0:: with SMTP id g16mr17916650wrs.287.1579529489355; 
- Mon, 20 Jan 2020 06:11:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxulsO8hg0ySyTHIMouXGb9C/7GgV29Qac301GeahUAPeO+fB4twHd1YL+25sPLnhjnAXgK/w==
-X-Received: by 2002:a5d:46d0:: with SMTP id g16mr17916620wrs.287.1579529488979; 
- Mon, 20 Jan 2020 06:11:28 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id n10sm46877943wrt.14.2020.01.20.06.11.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Jan 2020 06:11:28 -0800 (PST)
-Subject: Re: [PATCH v2 2/2] MAINTAINERS: Move the OMAP section inside the ARM
- Machines one
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200118085509.30182-1-philmd@redhat.com>
- <20200118085509.30182-3-philmd@redhat.com>
- <CAFEAcA92AOY1m9yUew4WtwKfJ63kSF-xwnaYNjmxY33rJEhzJg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1c978771-a622-f0ca-3fa4-d3e27c416391@redhat.com>
-Date: Mon, 20 Jan 2020 15:11:27 +0100
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=s9WKvoWPX+XJN54oi12/XNJKljgq83NwW0TVoSXxdho=;
+ b=WLS3tT9yFub2neQrRMrJbtCeCtxT8pZFwr67p/CRHBdSFttXHv1egIG6mnXAEzqcyiTsTw
+ kyJ17ZsvnIhc510N82lFobr5wVwN6fp+XnD1Ez1Gd4LMyEXrDX46Oi2xZUHgk8sFobz6eg
+ YfguCqY8qx2J0WytMhjaE5axrEqoq2Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-xv40hnrmN0iLQSIUuxgdzQ-1; Mon, 20 Jan 2020 09:18:37 -0500
+X-MC-Unique: xv40hnrmN0iLQSIUuxgdzQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89F891854336;
+ Mon, 20 Jan 2020 14:18:36 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-225.ams2.redhat.com
+ [10.36.117.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ABD6D10842A9;
+ Mon, 20 Jan 2020 14:18:29 +0000 (UTC)
+Subject: Re: [PATCH v3 10/10] block/qcow2-bitmap: use
+ bdrv_dirty_bitmap_next_dirty
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
+ <20191219100348.24827-11-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fcdd14da-b273-a71c-c6f8-f7c8ac3e2bd5@redhat.com>
+Date: Mon, 20 Jan 2020 15:18:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA92AOY1m9yUew4WtwKfJ63kSF-xwnaYNjmxY33rJEhzJg@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: YQxESkmmPdSsFzRPtMSojA-1
+In-Reply-To: <20191219100348.24827-11-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="WPgl9D0z0Ka3HZ56YbaBXWhdHyFrb7Cj1"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,29 +116,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/20/20 2:24 PM, Peter Maydell wrote:
-> On Sat, 18 Jan 2020 at 08:55, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->>
->> Add the Siemens SX1 (OMAP310) machines with the other ARM machines.
->=20
->> +OMAP
->> +M: Peter Maydell <peter.maydell@linaro.org>
->> +L: qemu-arm@nongnu.org
->> +S: Maintained
->> +F: hw/*/omap*
->> +F: include/hw/arm/omap.h
->=20
-> This is the block that covers the various devices
-> and SoC objects for all the OMAP boards. I'm not clear
-> why the commit message calls out the SX1 in particular ?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WPgl9D0z0Ka3HZ56YbaBXWhdHyFrb7Cj1
+Content-Type: multipart/mixed; boundary="u95PWm5xTXDkJrb9gaJXh8Zzv5MZocd5W"
 
-I missed that indeed, thanks.
+--u95PWm5xTXDkJrb9gaJXh8Zzv5MZocd5W
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
+> store_bitmap_data() loop does bdrv_set_dirty_iter() on each iteration,
+> which means that we actually don't need iterator itself and we can use
+> simpler bitmap API.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index c6c8ebbe89..015f5d18d2 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+
+[...]
+
+> @@ -1360,19 +1361,17 @@ static uint64_t *store_bitmap_data(BlockDriverSta=
+te *bs,
+
+(One line more context:)
+
+>          if (end >=3D bm_size)=20
+>              break;
+>          }
+
+Can we drop this now?
+
+If so, and with that done:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> =20
+> -        bdrv_set_dirty_iter(dbi, end);
+> +        offset =3D end;
+>      }
+
+
+--u95PWm5xTXDkJrb9gaJXh8Zzv5MZocd5W--
+
+--WPgl9D0z0Ka3HZ56YbaBXWhdHyFrb7Cj1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4ltrQACgkQ9AfbAGHV
+z0CnNAf+N4OAZxX1gJXOj1kMAKwuYgp6zXNj2trPSD9yhVHKa8zRgC2/dGid8VQ4
+2H/d9DOXy4Ec2STgX3V6zIdJKaXo23HvqU5L/hgbtW+nPSWGmQKX8FGjLl/kY3fb
+sdYOyH0ykgas5eip5W4iNBrhLmW6yOPBHr7UvJZ2nCC0petgXk+S9Xw7vUbDGEOT
+qOI0ktRatECrhSHtGHaMGwfGId1nxAiIj8EzrH31VJX42FyO8/W4KQdEomp8cf/G
+JddpVk8CJV8iMu0NwAob5R+bTkVDevVZi2Ifng3cJOm02jK2LcaUG+uzmNKJIT2w
+/+1XKAOB6WX0wQtq2nzOJOU5p1Hsng==
+=HouG
+-----END PGP SIGNATURE-----
+
+--WPgl9D0z0Ka3HZ56YbaBXWhdHyFrb7Cj1--
 
 
