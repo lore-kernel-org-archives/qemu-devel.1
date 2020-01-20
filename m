@@ -2,68 +2,86 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED851C33CB7
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B29C33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:41:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C630A2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:35:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C630A2073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8EC9E207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:41:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hb/GR34R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC9E207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itTSp-00070C-VB
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:35:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57269)
+	id 1itTYo-0000p5-QW
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:41:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1itTRi-0005zM-0W
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:34:13 -0500
+ (envelope-from <drjones@redhat.com>) id 1itTXt-0000Gz-1p
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1itTRe-0004N6-A6
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:34:09 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:42331)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1itTRe-0004Md-5s
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:34:06 -0500
-Received: by mail-oi1-f194.google.com with SMTP id 18so27969278oin.9
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 01:34:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4UGZULGX+YbThMmtUsP+6rz+ppDz5uP2ldQfl/P5Icg=;
- b=Q2YCy9oGlEIzyhYbgoI6KlBMwvQI3Hso1V9hWMueWpDncDosKbI7enBTZH9k7jR0p+
- oQ+L5k+U+ZjywTWeal7t6UAVq2GrGYM+0/RzWeOjYkh3DXDr9Y1lrXSRsxPIbp5EZx0u
- P0Qkfcd5QYIn8SdfDF33G1U+ElU/YuqIpWdN1/AMKVm8V6aMxdgxdAQhieikc1XpwQwr
- Gv7+e8DUID7X8O+j9lTn/GhPeXkKEhdehJTT5myEaE8CpmfB1E5kzbOXxhL6L4K/1oY+
- t47jKUGs8o9uDeKjGEtTM5RBp9jSLAjwe2LudgTSGGD5CFktuC3ndZYqooy574fy3Cwa
- xEmg==
-X-Gm-Message-State: APjAAAWW6d6mG242dFbL8H2Zb0jmW1hWnySJkLYHaLciqNfNZllkNZDx
- KZ87FHREReS3hbEsB2uqFCR/h7i42B3WdJWXaFI=
-X-Google-Smtp-Source: APXvYqzKSRFvw6ji0gpORenZnjRNgTgsQRPZg2pYUM0CIPBoLJXTQJmTGSvG1PbarmgxudUhQ+JfoPFk+YrYJBaAPTE=
-X-Received: by 2002:aca:1a06:: with SMTP id a6mr11682717oia.148.1579512844618; 
- Mon, 20 Jan 2020 01:34:04 -0800 (PST)
+ (envelope-from <drjones@redhat.com>) id 1itTXn-0007Dt-N9
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:40:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57154
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1itTXn-0007CJ-Fx
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:40:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579513224;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RpnQ6glcOAHFYOHgm0OzjRxP2VYfw7bPy9yfW4KiEOs=;
+ b=hb/GR34RdBiWgTfvcSwhoTq4w8PRAktpxzl03H6SzUMlKpMxyTc/UdJPdgM9pOzFRl0BvF
+ 3AwqNJGrPU9kVN22/ve0A99pH17pVM1nZnRbVjj+L0ZWmyK1QaqSOMEttJpeKPncj7MjgD
+ LvPcJdWTLEdTKSMcoJq5v07T8VsAxBA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-S82e4SpNN0SdX3f_0WM3iQ-1; Mon, 20 Jan 2020 04:40:20 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD8CBDBB2;
+ Mon, 20 Jan 2020 09:40:18 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E2CEA60C18;
+ Mon, 20 Jan 2020 09:40:16 +0000 (UTC)
+Date: Mon, 20 Jan 2020 10:40:14 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH v2 3/5] target/arm/kvm: Implement virtual time
+ adjustment
+Message-ID: <20200120094014.yvqucqj6q2weh2pc@kamzik.brq.redhat.com>
+References: <20191212173320.11610-1-drjones@redhat.com>
+ <20191212173320.11610-4-drjones@redhat.com>
+ <CAFEAcA_u94O8WYLgB8DF=pu-3V7LrNWpiQFV5mDYeeqLj1Ee2Q@mail.gmail.com>
+ <CAFEAcA9ZoOZt6Jh42hi6q91=kRM9T9z436J99NF+Ns5KVKUYow@mail.gmail.com>
+ <20191216164355.i5rpfuqlfqv2z7m7@kamzik.brq.redhat.com>
+ <CAFEAcA8NzQ8QYE2NMnviPPnmBn1Dwm4W_KvhMbwCNwFzkurK-Q@mail.gmail.com>
+ <20191219143005.gw43k2hug2n5nvto@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-References: <20191127084253.16356-1-geert+renesas@glider.be>
- <20200118014632.GA14644@lxhi-065.adit-jv.com>
-In-Reply-To: <20200118014632.GA14644@lxhi-065.adit-jv.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 20 Jan 2020 10:33:53 +0100
-Message-ID: <CAMuHMdUUc17n0TxOrtQNby+ZiHDpz-aEh-ncnkz50vcwQe6z6w@mail.gmail.com>
-Subject: Re: [PATCH v3 0/7] gpio: Add GPIO Aggregator/Repeater
-To: Eugeniu Rosca <erosca@de.adit-jv.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191219143005.gw43k2hug2n5nvto@kamzik.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: S82e4SpNN0SdX3f_0WM3iQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.167.194
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,108 +93,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Eugeniu Rosca <roscaeugeniu@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
- Phil Reid <preid@electromag.com.au>
+Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eugeniu,
+On Thu, Dec 19, 2019 at 03:30:12PM +0100, Andrew Jones wrote:
+> On Mon, Dec 16, 2019 at 06:06:30PM +0000, Peter Maydell wrote:
+> > Your approach in this patchset reads and writes on vm-paused,
+> > so it won't have the pre-2015 problems.
+> >=20
+> > It still feels odd that we're storing this bit of guest state
+> > in two places now though -- in kvm_vtime, and also in its usual
+> > place in the cpreg_array data structures (we write back the
+> > value from kvm_vtime when the VM starts running, and we write
+> > back the value from the cpreg_array for a PUT_FULL_STATE, which
+> > the comments claim is only on startup or when we just loaded
+> > migration state (and also undocumentedly but reasonably on
+> > cpu-hotplug, which arm doesn't have yet).
 
-On Sat, Jan 18, 2020 at 2:46 AM Eugeniu Rosca <erosca@de.adit-jv.com> wrote:
-> On Wed, Nov 27, 2019 at 09:42:46AM +0100, Geert Uytterhoeven wrote:
-> >   - Create aggregators:
-> >
-> >     $ echo e6052000.gpio 19,20 \
-> >         > /sys/bus/platform/drivers/gpio-aggregator/new_device
+I tried to get rid of the extra state location (kvm_vtime), but we still
+need it because kvm_arch_get_registers() doesn't take 'level', like
+kvm_arch_put_registers() does. Maybe it should? Without being able to
+filter out TIMER_CNT at get time too, then if we migrate a paused guest
+we'll resume with vtime including the ticks between the pause and the
+start of the migration. Adding the additional state (kvm_vtime) and a
+cpu_pre_save() hook to fixup the cpreg value is a possible way to resolve
+that. That's what I've done for v3, which I'll post shortly.
 
-> The only unexpected thing is seeing below messages (where gpiochip99 and
-> gpiochip22 are inexisting gpiochip names, mistakenly provided on command
-> line prior to passing the correct name):
->
-> root@rcar-gen3:~# echo gpiochip6 12-13 > /sys/bus/platform/drivers/gpio-aggregator/new_device
-> [  915.572905] gpio-aggregator gpio-aggregator.0: cannot find GPIO chip gpiochip99, deferring
-> [  915.584224] gpio-aggregator gpio-aggregator.2: cannot find GPIO chip gpiochip99, deferring
-> [  915.865281] gpio-aggregator gpio-aggregator.29: cannot find GPIO chip gpiochip22, deferring
->
-> Obviously, in the above case, due to a typo in the names, the gpio
-> chips will never be found, no matter how long gpio-aggregator defers
+> >=20
+> > I've just spent a little while digging through code, and
+> > haven't been able to satisfy myself on the ordering of which
+> > writeback wins: for a loadvm I think we first do a
+> > cpu_synchronize_all_post_init() (writing back the counter
+> > value from the migration data) and then after than we will
+> > unpause the VM -- why doesn't this overwrite the correct
+> > value with the wrong value from kvm_vtime ?
 
-Indeed, that is expected behavior: you have created platform devices
-referring to resources that are not available.
+It wasn't overwriting because we weren't detecting a runstate
+transition from paused to running. However, for v3, I've dropped
+the explicit running/pause transition checking and now ensured
+we get the right value with a cpu_post_load() hook.
 
-> their probing. Unfortunately, the driver will continuously emit those
-> messages, upon each successfully created/aggregated gpiochip. I built
+>=20
+> > I just noticed also that the logic used in this patch
+> > doesn't match what other architectures do in their vm_state_change
+> > function -- eg cpu_ppc_clock_vm_state_change() has an
+> > "if (running) { load } else { save }", and kvmclock_vm_state_change()
+> > for i386 also has "if (running) { ... } else { ... }", though
+> > it has an extra wrinkle where it captures "are we PAUSED?"
+> > to use in the pre_save function; the comment above
+> > kvmclock_pre_save() suggests maybe that would be useful for other
+> > than x86, too. kvm_s390_tod_vm_state_change() has
+> > logic that's a slightly more complicated variation on just
+> > testing the 'running' flag, but it doesn't look at the
+> > specific new state.
 
-That is expected behavior, too: every time the driver core manages to
-bind a device to a driver, it will retry all previously deferred probes,
-in the hope they can be satisfied by the just bound device.
+I think I've mimicked this logic now for arm in v3.
 
-Note that you can destroy these bogus devices, using e.g.
+Thanks,
+drew
 
-    # echo gpio-aggregator.0 > \
-    /sys/bus/platform/drivers/gpio-aggregator/delete_device
-
-> gpio-aggregator as a loadable module, if that's relevant.
-
-Modular or non-modular shouldn't matter w.r.t. this behavior.
-Although unloading the module should get rid of the cruft.
-
-> Another comment is that, while the series _does_ allow specifying
-> gpio lines in the DTS (this would require a common compatible string
-> in gpio_aggregator_dt_ids[] and in the DTS node) and while those lines
-> are indeed exposed to userspace, based on my testing, these same gpio
-> lines are marked as "used/reserved" by the kernel. This means that
-> operating on those gpio pins from userspace will not be possible.
-> For instance, gpioget/gpioset return "Device or resource busy":
->
-> gpioget: error reading GPIO values: Device or resource busy
-> gpioset: error setting the GPIO line values: Device or resource busy
->
-> I guess Harish will be unhappy about that, as his expectation was that
-> upon merging gpio-aggregator with gpio-inverter, he will be able to
-> describe GPIO polarity and names in DTS without "hogging" the pins.
-> Perhaps this can be supplemented via an add-on patch later on?
-
-When aggregating GPIO lines, the original GPIO lines are indeed marked
-used/reserved, so you cannot use them from userspace.
-However, you are expected to use them through the newly created virtual
-gpiochip representing the aggregated GPIO lines.
-
-You can try this using the "door" example in
-Documentation/admin-guide/gpio/gpio-aggregator.rst, after replacing
-gpio2 {19,20} by gpio6 {12,13} to suit your H3ULCB.
-
-> For the whole series (leaving the above findings to your discretion):
->
-> Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
-> Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
-
-Thanks!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
