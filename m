@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B381BC33CAA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D328EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:53:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73B6A2087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:52:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C0DA20674
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:53:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tncd2rkB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73B6A2087E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0phoWhX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C0DA20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itUfN-0002KF-5b
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:52:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37484)
+	id 1itUgA-0003e9-DV
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:53:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1itUOv-00054U-W2
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:35:23 -0500
+ (envelope-from <quintela@redhat.com>) id 1itUQ8-0006fI-0K
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:36:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1itUOu-0002Bb-Po
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:35:21 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58083
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1itUQ4-0002ob-CH
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:36:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43358
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1itUOu-0002BC-Kd
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:35:20 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1itUQ4-0002oG-82
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:36:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579516520;
+ s=mimecast20190719; t=1579516591;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/YoKMG17GrqYtkuc78YXbVehm34fwjEw8DbFqXGYYW0=;
- b=Tncd2rkBxBm1yruTSqkoxp2SpdLPMTGLWmtoIFD6oFcbkDjL8sx3UjslbJToFVXptNcKpj
- 5OQlF/3Sm5rSDVzwFm35SqxTZUUvOncbfmApRa8leTp6q7r+JSVXKRKauCEN1wsQWelUlA
- wur3Mp0sKQA7+HEBbKbmIlwAFsGnZio=
+ bh=3VZqz3zUF2Y1jQsm5V0KLQ63Ic05gunHzewXnrdXRG4=;
+ b=a0phoWhX/SASbLIFcZhvCNXMHa8I0DuDeuTkfdnvi19yTILdvNliQ2Q1sX6kkZIhIqNu1j
+ EyHV/howFmmeGEWAZ+OpNtywXJLVgrhshbiOrbq3PXcn3hGM6t67RZx0TUYwpRIiUkgiqu
+ B9llYVogv1pS07kZ1MWQ9rF5+7UfDas=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-MQFIOKZrMcehRLWu7otHJA-1; Mon, 20 Jan 2020 05:35:18 -0500
+ us-mta-182-YlMkEsz4NCy5R13Itm7gDw-1; Mon, 20 Jan 2020 05:36:28 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18C43800D4E;
- Mon, 20 Jan 2020 10:35:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A215107BAAD;
+ Mon, 20 Jan 2020 10:36:26 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 340F0860ED;
- Mon, 20 Jan 2020 10:35:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4811F1BC6D;
+ Mon, 20 Jan 2020 10:36:17 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/29] misc: use QEMU_IS_ALIGNED
-Date: Mon, 20 Jan 2020 11:33:21 +0100
-Message-Id: <20200120103340.25118-11-quintela@redhat.com>
+Subject: [PULL 17/29] migration/postcopy: set all_zero to true on the first
+ target page
+Date: Mon, 20 Jan 2020 11:33:28 +0100
+Message-Id: <20200120103340.25118-18-quintela@redhat.com>
 In-Reply-To: <20200120103340.25118-1-quintela@redhat.com>
 References: <20200120103340.25118-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: MQFIOKZrMcehRLWu7otHJA-1
+X-MC-Unique: YlMkEsz4NCy5R13Itm7gDw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,52 +93,43 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
  Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
  Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+ qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
  Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+For the first target page, all_zero is set to true for this round check.
+
+After target_pages introduced, we could leverage this variable instead
+of checking the address offset.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- exec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ migration/ram.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/exec.c b/exec.c
-index 0f6b087f57..67e520d18e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3895,7 +3895,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t st=
-art, size_t length)
-=20
-     uint8_t *host_startaddr =3D rb->host + start;
-=20
--    if ((uintptr_t)host_startaddr & (rb->page_size - 1)) {
-+    if (!QEMU_PTR_IS_ALIGNED(host_startaddr, rb->page_size)) {
-         error_report("ram_block_discard_range: Unaligned start address: %p=
-",
-                      host_startaddr);
-         goto err;
-@@ -3903,7 +3903,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t st=
-art, size_t length)
-=20
-     if ((start + length) <=3D rb->used_length) {
-         bool need_madvise, need_fallocate;
--        if (length & (rb->page_size - 1)) {
-+        if (!QEMU_IS_ALIGNED(length, rb->page_size)) {
-             error_report("ram_block_discard_range: Unaligned length: %zx",
-                          length);
-             goto err;
+diff --git a/migration/ram.c b/migration/ram.c
+index 8ebaea255e..460abfa2c3 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -4102,7 +4102,7 @@ static int ram_load_postcopy(QEMUFile *f)
+             page_buffer =3D postcopy_host_page +
+                           ((uintptr_t)host & (block->page_size - 1));
+             /* If all TP are zero then we can optimise the place */
+-            if (!((uintptr_t)host & (block->page_size - 1))) {
++            if (target_pages =3D=3D 1) {
+                 all_zero =3D true;
+             } else {
+                 /* not the 1st TP within the HP */
 --=20
 2.24.1
 
