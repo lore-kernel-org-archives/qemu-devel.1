@@ -2,60 +2,55 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96192C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5959C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:17:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B5342087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B5342087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8AA442087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:17:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AA442087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itV2s-000326-4C
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:16:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40182)
+	id 1itV3U-0003vs-4a
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:17:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1itUdG-0008GO-PL
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:50:18 -0500
+ (envelope-from <no-reply@patchew.org>) id 1itUwx-0003Rz-38
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:10:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1itUdC-0000p8-RG
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:50:10 -0500
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:41631)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1itUd8-0000lL-Ig
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:50:06 -0500
-Received: from player718.ha.ovh.net (unknown [10.108.42.5])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 3ED561C02CA
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 11:49:48 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player718.ha.ovh.net (Postfix) with ESMTPSA id 77743E50624A;
- Mon, 20 Jan 2020 10:49:36 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v2 0/2] ppc: add support for Directed Privileged Doorbell
- (non-hypervisor)
-Date: Mon, 20 Jan 2020 11:49:33 +0100
-Message-Id: <20200120104935.24449-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <no-reply@patchew.org>) id 1itUwt-0006ey-1y
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:10:30 -0500
+Resent-Date: Mon, 20 Jan 2020 06:10:30 -0500
+Resent-Message-Id: <E1itUwt-0006ey-1y@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21123)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1itUws-0006de-QS; Mon, 20 Jan 2020 06:10:27 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579518596305202.62166712169596;
+ Mon, 20 Jan 2020 03:09:56 -0800 (PST)
+In-Reply-To: <20200120101832.18781-1-drjones@redhat.com>
+Subject: Re: [PATCH REPOST v3] target/arm/arch_dump: Add SVE notes
+Message-ID: <157951859491.20990.6046185151636456198@197193fa8d23>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 9640236481169427430
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudehgddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: drjones@redhat.com
+Date: Mon, 20 Jan 2020 03:09:56 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.52.147
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,57 +62,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, eric.auger@redhat.com, qemu-arm@nongnu.org,
+ alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
-
-The Processor Control facility for POWER8 processors and later
-provides a mechanism for the hypervisor to send messages to other
-threads in the system (msgsnd instruction) and cause hypervisor-level
-exceptions.
-
-Privileged non-hypervisor programs can also send messages (msgsndp
-instruction) but are restricted to the threads of the same
-subprocessor and cause privileged-level exceptions. The Directed
-Privileged Doorbell Exception State (DPDES) register reflects the
-state of pending privileged-level doorbell exceptions for all threads
-and can be used to modify that state.
-
-If the MSGP facility is not in the HFSCR, a hypervisor facility
-unavailable exception is generated when these instructions are used or
-when the DPDES register is accessed by the supervisor.
-
-Based on previous work from Suraj Jitindar Singh.=20
-
-Thanks,
-
-C.
-
-Changes since v1:
-
- - removed DBELL_TIRTAG_MASK and simplified helpers as QEMU TCG
-   doesn't support more than on thread per core  =20
- - simplified book3s_dbell2irq() and renamed it to dbell_type_server()=20
- - replaced mask LOG_GUEST_ERROR by CPU_LOG_INT to track HV Facility
-   errors
-=20
-C=C3=A9dric Le Goater (2):
-  target/ppc: Add privileged message send facilities
-  target/ppc: add support for Hypervisor Facility Unavailable Exception
-
- target/ppc/cpu.h                |  6 +++
- target/ppc/helper.h             |  4 ++
- target/ppc/excp_helper.c        | 79 ++++++++++++++++++++++++++-------
- target/ppc/misc_helper.c        | 63 ++++++++++++++++++++++++++
- target/ppc/translate.c          | 26 +++++++++++
- target/ppc/translate_init.inc.c | 20 +++++++--
- 6 files changed, 178 insertions(+), 20 deletions(-)
-
---=20
-2.21.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyMDEwMTgzMi4xODc4
+MS0xLWRyam9uZXNAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDAxMjAxMDE4MzIuMTg3ODEtMS1kcmpvbmVzQHJl
+ZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtQQVRDSCBSRVBPU1QgdjNdIHRhcmdldC9h
+cm0vYXJjaF9kdW1wOiBBZGQgU1ZFIG5vdGVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICog
+W25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDEyMDEwMTgzMi4xODc4MS0xLWRyam9uZXNA
+cmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwMTIwMTAxODMyLjE4NzgxLTEtZHJqb25lc0ByZWRo
+YXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKM2RmMTU0ZiB0YXJnZXQvYXJt
+L2FyY2hfZHVtcDogQWRkIFNWRSBub3RlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjI6IEZJTEU6IGluY2x1ZGUvZWxmLmg6
+MTY1MzoKKyNkZWZpbmUgTlRfQVJNX1NWRV5JMHg0MDVeSV5JLyogQVJNIFNjYWxhYmxlIFZlY3Rv
+ciBFeHRlbnNpb24kCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9u
+IGEgc2VwYXJhdGUgbGluZQojMjI6IEZJTEU6IGluY2x1ZGUvZWxmLmg6MTY1MzoKKyNkZWZpbmUg
+TlRfQVJNX1NWRSAgICAgMHg0MDUgICAgICAgICAgIC8qIEFSTSBTY2FsYWJsZSBWZWN0b3IgRXh0
+ZW5zaW9uCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMzogRklM
+RTogaW5jbHVkZS9lbGYuaDoxNjU0OgorXkleSV5JXkleSSAgIHJlZ2lzdGVycyAqLyQKCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSAqIG9uIHN1YnNlcXVlbnQgbGluZXMKIzIzOiBGSUxFOiBp
+bmNsdWRlL2VsZi5oOjE2NTQ6CisjZGVmaW5lIE5UX0FSTV9TVkUgICAgIDB4NDA1ICAgICAgICAg
+ICAvKiBBUk0gU2NhbGFibGUgVmVjdG9yIEV4dGVuc2lvbgorICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgcmVnaXN0ZXJzICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
+cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzIzOiBGSUxFOiBpbmNsdWRl
+L2VsZi5oOjE2NTQ6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBy
+ZWdpc3RlcnMgKi8KCnRvdGFsOiAyIGVycm9ycywgMyB3YXJuaW5ncywgMjMzIGxpbmVzIGNoZWNr
+ZWQKCkNvbW1pdCAzZGYxNTRmZDExOWIgKHRhcmdldC9hcm0vYXJjaF9kdW1wOiBBZGQgU1ZFIG5v
+dGVzKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
+Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
+dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDEyMDEwMTgzMi4xODc4MS0xLWRyam9uZXNA
+cmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
