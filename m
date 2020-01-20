@@ -2,82 +2,81 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED4EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12247C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:11:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2886120678
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF14B22314
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:11:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bX4XaQYD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2886120678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FvTyS2cF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF14B22314
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itWge-00043p-9F
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:01:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57201)
+	id 1itWpk-0007GW-1e
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:11:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1itWfk-0003Uh-MD
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:00:53 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1itWp0-0006RZ-Bk
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:10:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1itWfj-0003js-HA
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:00:52 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41015)
+ (envelope-from <peter.maydell@linaro.org>) id 1itWoz-0002BA-8S
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:10:26 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42292)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1itWfh-0003hV-VD
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:00:50 -0500
-Received: by mail-ot1-x342.google.com with SMTP id r27so28554216otc.8
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:00:48 -0800 (PST)
+ id 1itWoz-0002AS-2M
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:10:25 -0500
+Received: by mail-oi1-x243.google.com with SMTP id 18so28437384oin.9
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:10:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=enEzIYGOJ3Z9BcpMWQn0M59KHHmkVRX4jfdLkG5CuCk=;
- b=bX4XaQYDs43MyIIESYHeI8kkQ/pwbnQSNPMjHiF4P5Za1GD8YduN/DSGcEL0Hvge6Y
- 8LRks6GSVgt4jnH9Jk6XfTZUmxKMbtRpDcmx2797dyffQ3lyUqijBsGYoswec3N1vAGP
- cta9GInwB8/jAyRdXCkddjf65qN0Rao9VrvIzF3z3P2ieA5yer6O4xG/So1Nz2eX6UnP
- 5+x0GOGxCLwMWdOzpbrCIHTEGDYuiUfCr21KqVSESPxRMzHakzuAIXEbdLM5EP7DtfZG
- 8kg5BACFwa5U/q1S+5RDuE1uv2G/foA/5D8mFA8aRfaxj8r5Ui1qOprvHQ5cNmAGJUQ7
- TW/w==
+ :cc; bh=8z0f483G/o+tJzzynyt5Nymb9+diyELwl+bePXpneG0=;
+ b=FvTyS2cFxSkhJl7UivJvyVGn/38I8h+Bln+2V5SSEFc9Kt8/lfLtpGoDedKfr9RWAa
+ IoaFDalc88TA9PqLjptYw+0H0mnk/0eC6hXmtfhAV9tybO/A4hIfyPuWe+gVBUyraYnG
+ MOo3Fmoj2zjVC6BXMij01Yi24saxvmb/HLL0flqmh3x5JlKzqajYLgB2KP1uzZxzj30O
+ 4NPsh03klwTVuPgvVfCodwYePQPg3BrVxs59ICmOLC0rRLLbfr2oGyQO+dFpSHaMnJym
+ sElDvZPm/G6Qp2HUIr5ZFhfysUAWGQK3aTF/Uag4zVhy1F1aehm1jfkkokx0rrd8GjLK
+ ZJAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=enEzIYGOJ3Z9BcpMWQn0M59KHHmkVRX4jfdLkG5CuCk=;
- b=Q2JYaqVucXnEqyNIk21BDYEB9sUL+WPcFqivv+uFecyc1Jlxx+XMKUY70K4ZP+vwtp
- Mi0bBc4oWAOi5lhg8cr6Ky5CsukJOT66xQ0WzSq8SBtriwZlxQqjNzNYnjXmKqq+Z1nJ
- 7GmHsv8n7Kc3GRqy5MaGveHRMduTBptkm1rMaxORfpoDu6lOBPdnE4w5c88mQf+t3roK
- Jjl8EWzox6DySO2P5fWAFBaUsDqUjBx2dw5rmjmpuEETqIgBjZVbai6clOQodSkixisn
- q+3vIWfD4r99voDk4341ZMk/PB/U65xEj/yTv47kdJwpm5SLNooCndrHRhU2UcLMt/ei
- ebvA==
-X-Gm-Message-State: APjAAAU/OXUK6xxK2zIJTqt4Jjqj61Utt1/u97E9GY/HVYR5Du1SI6iu
- X+zbM/QLlI1KNPpZvb/Y4NIhT7Y5hohW+7vDWD0GVQ==
-X-Google-Smtp-Source: APXvYqxYrXh+bs0hosTD/hzmdQkN1G90/b647zIel/Jl7hKZbVY6pkzUQgTI+fIWHmnErEf5W84Du3nysbF+feMrkrE=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr14993763otq.97.1579525248039; 
- Mon, 20 Jan 2020 05:00:48 -0800 (PST)
+ :message-id:subject:to:cc;
+ bh=8z0f483G/o+tJzzynyt5Nymb9+diyELwl+bePXpneG0=;
+ b=NhpkYZBU29SkBydxz0ysn79x8cAfAt/FJn5MUwynQGXhgc5cM7ppkLsvW0eI29u1al
+ W+WNroCW2e/6U75vjs/E0TinDqbXldq0DQoaR/lYEo8gDkP2PDGU+7bvoG0wPYONxAM0
+ gd3BNwRwBpCnKZNbwqqDbgzfutT5yLhHhmJebgqGgOUCjz+rwUrF1Df2sfgy8WijsskI
+ 1yIPElBub7MK4EkaKnAev8VJsiEAFvgBlIPwca6ZRwl9MjY5DVlGk9GSiK13iFP3nNE8
+ oMwSgU4GUS3ThIWA4FLIwX7cntiXkAEj4AOHNjkNBiqNyQstG1v5FB6ZV1VvL2sM5M1B
+ MFoA==
+X-Gm-Message-State: APjAAAVTmmafMpJ4JSXGfr4xrucqPW/299mXNm3YWFJcsX7JMtIDm0/e
+ 5FRnlZbIhFoohDYgf2Zmakjo+g202MSFIeliT4hURg==
+X-Google-Smtp-Source: APXvYqwJsfQ2mw2AtxsEVNo6BOHBFFICSwMNHTAtNOSQ2DnCkDB/AYhgXrmpMcG/Lh9AUlAXf/m8gm9JmSn5HnFMPnc=
+X-Received: by 2002:aca:d78b:: with SMTP id
+ o133mr12950584oig.163.1579525824021; 
+ Mon, 20 Jan 2020 05:10:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20200114105918.2366370-1-clement.deschamps@greensocs.com>
- <03110090-dd50-b124-e60a-9cf136e8f7fd@redhat.com>
-In-Reply-To: <03110090-dd50-b124-e60a-9cf136e8f7fd@redhat.com>
+References: <20200116230809.19078-1-richard.henderson@linaro.org>
+ <20200116230809.19078-3-richard.henderson@linaro.org>
+In-Reply-To: <20200116230809.19078-3-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Jan 2020 13:00:37 +0000
-Message-ID: <CAFEAcA92pO3j+d8wS2PHhUKTjViLS3GbrmT4ocaDUYKFZLWgAg@mail.gmail.com>
-Subject: Re: [PATCH] target/arm: add PMU feature to cortex-r5 and cortex-r5f
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Mon, 20 Jan 2020 13:10:13 +0000
+Message-ID: <CAFEAcA_PMJTDkn5C1Ym46yXsunhddHPAbMyQ=EMpAu8i7wNQhQ@mail.gmail.com>
+Subject: Re: [PATCH 2/4] tests/tcg/aarch64: Fix compilation parameters for
+ pauth-%
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,31 +88,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Clement Deschamps <clement.deschamps@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: vincent.dehors@smile.fr,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, adrien.grassein@smile.fr
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jan 2020 at 12:44, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+On Thu, 16 Jan 2020 at 23:08, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> On 1/14/20 11:59 AM, Clement Deschamps wrote:
->
-> Maybe describe here:
->
-> The PMU is not optional on cortex-r5 and cortex-r5f (see
-> the "Features" chapter of the Technical Reference Manual).
->
-> > Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Hiding the required architecture within asm() is not correct.
+> Add it to the cflags of the (cross-) compiler.
+
+This commit message implies that we're just moving the architecture
+specification from the asm statements to the cflags, but the
+patch also changes the requested value from v8.4-a to v8.3-a.
+
+I plan to tweak the commit message to be a bit clearer:
+
+We were incorrectly requiring ARMv8.4 support for the pauth
+tests, but Pointer Authentication is an ARMv8.3 extension.
+Further, hiding the required architecture within asm() is
+not correct.
+
+Correct the architecture version requested, and specify it
+in the cflags of the (cross-) compiler rather than in the asm.
 
 
-
-Applied to target-arm.next, thanks (with the suggested
-improvement to the commit message).
-
+thanks
 -- PMM
 
