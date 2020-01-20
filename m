@@ -2,67 +2,100 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D94FAC33CA1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78AC6C33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:23:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA9122073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:06:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA9122073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3BDB22073D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:23:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZV1VEGaI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BDB22073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itS4O-00035U-OQ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 03:06:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46814)
+	id 1itSL3-0007gr-Cz
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 03:23:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48534)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1itS3W-0002Tm-44
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:05:09 -0500
+ (envelope-from <philmd@redhat.com>) id 1itSKB-00079K-3g
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:22:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1itS3S-0003VC-3z
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:05:05 -0500
-Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:46506)
+ (envelope-from <philmd@redhat.com>) id 1itSK5-00043z-KK
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:22:17 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35352
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1itS3R-0003PU-T9
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:05:02 -0500
-Received: from player688.ha.ovh.net (unknown [10.108.16.55])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 757701A9049
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 09:04:52 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id BC088E4E495F;
- Mon, 20 Jan 2020 08:04:39 +0000 (UTC)
-Date: Mon, 20 Jan 2020 09:04:38 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
-Message-ID: <20200120090438.75ff9e65@bahia.lan>
-In-Reply-To: <20200117164427.2c238412@bahia.lan>
-References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
- <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
- <20200116094848.555c170d@bahia.lan>
- <2dda458a-dfa1-ab23-4a97-d27d9266226b@redhat.com>
- <20200116131435.3985e86e@bahia.lan>
- <20200116192902.63674769@bahia.lan> <20200117091608.GV54439@umbus>
- <20200117164427.2c238412@bahia.lan>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1itSK5-00043H-Dn
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:22:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579508532;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TQzF28PH1WRMqdTrdg37DO0bT3HsuUHP0mh+IQbQcpM=;
+ b=ZV1VEGaIVd2vTc9NAXVoIR1sLQiLGRb6Rj8ThhYDWSaJ+Xijk/hEBpoERYxR225nz6gr+S
+ JYhRQHvlUyFOoFaJ7jg1NCPS47gxJRe33MoKvBcl2mLSATsd88deiz9jabw93T5bA5kfa5
+ XRGWjJl2XEHwAy12LcU3mMku2yXUfQw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-uzLDQpi7NU-itfyL7qjJQQ-1; Mon, 20 Jan 2020 03:22:11 -0500
+Received: by mail-wr1-f71.google.com with SMTP id u18so13756914wrn.11
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 00:22:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MBlKV7a1E6OPePgNnFfOOX2L6Nm9mTCYTzlUDjDk7uE=;
+ b=bbkfbuvM+K8lv6Ybcqvn2EBZeauhsUlsfP5Yo4j5SVndEA6bRRIZB6gLxOhUPO3I/S
+ umlLsYfbw2cKvRpZPMzF0fQZ27xne0gKOw4qfFZipt/YphNSPWGo+9GSKzuy7CZ67BJJ
+ jUnaQUyyvy1eBRcfQVjTXa1hU2EzcVzCg68WjYHGvBXv5lMM3TOq5scMLkwH5zmIurut
+ nlUdj+ufX+e+2B0zg6moMgNxJ+nc/hciNzAP4GXB2lqizuvCVkeJtaKurtk5pAC6wS5A
+ Ibwvmt40fc/zIIUXodhYxPkXIk9ldWIeK3w3MS6AUHp6Y2v3OXrUVN0TBW/pbQh8CXWM
+ gNkQ==
+X-Gm-Message-State: APjAAAXz4f9g31VcnV+6vK28DgvtDC1Tk5kMKLIt5RaH4kh+uZg3APfE
+ 19zrDgaI5XUsbb0ByfY10WV9bZXzx1hghMou/JMimq7OZ3Jv1uIr2sPdfewOPy6WZKNg3ZFSKVn
+ iPDt4GOX58ndwVbA=
+X-Received: by 2002:a5d:6a10:: with SMTP id m16mr16714988wru.411.1579508529835; 
+ Mon, 20 Jan 2020 00:22:09 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxyACaUpyAR9FiJj5Rhg6euXbtMktitQ2XdaGDrDNLim8snnYmj9BIluQAE7MjiL6ape9H3sw==
+X-Received: by 2002:a5d:6a10:: with SMTP id m16mr16714964wru.411.1579508529519; 
+ Mon, 20 Jan 2020 00:22:09 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id n187sm22534405wme.28.2020.01.20.00.22.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 20 Jan 2020 00:22:09 -0800 (PST)
+Subject: Re: [PATCH] python: Treat None-return of greeting cmd
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200120071202.30646-1-ldoktor@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <664ea3a9-6053-4df8-5a3b-75c11aabc736@redhat.com>
+Date: Mon, 20 Jan 2020 09:22:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/b82WDh=9nYwK+d3J2eRYp3N";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 6855604533199739366
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeggdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtsehgtderreertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+In-Reply-To: <20200120071202.30646-1-ldoktor@redhat.com>
+Content-Language: en-US
+X-MC-Unique: uzLDQpi7NU-itfyL7qjJQQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.38.232
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,209 +107,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/b82WDh=9nYwK+d3J2eRYp3N
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, 17 Jan 2020 16:44:27 +0100
-Greg Kurz <groug@kaod.org> wrote:
 
-> On Fri, 17 Jan 2020 19:16:08 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On 1/20/20 8:12 AM, Luk=C3=A1=C5=A1 Doktor wrote:
+> In case qemu process dies the "monitor.cmd" returns None which gets
+> passed to the "__negotiate_capabilities" and leads to unhandled
+> exception. Let's only check the resp in case it has a value.
 >=20
-> > On Thu, Jan 16, 2020 at 07:29:02PM +0100, Greg Kurz wrote:
-> > > On Thu, 16 Jan 2020 13:14:35 +0100
-> > > Greg Kurz <groug@kaod.org> wrote:
-> > >=20
-> > > > On Thu, 16 Jan 2020 11:37:24 +0100
-> > > > Laurent Vivier <lvivier@redhat.com> wrote:
-> > > >=20
-> > > > > On 16/01/2020 09:48, Greg Kurz wrote:
-> > > > > > On Wed, 15 Jan 2020 19:10:37 +0100
-> > > > > > Laurent Vivier <lvivier@redhat.com> wrote:
-> > > > > >=20
-> > > > > >> Hi,
-> > > > > >>
-> > > > > >> On 15/01/2020 18:48, Greg Kurz wrote:
-> > > > > >>> Migration can potentially race with CAS reboot. If the migrat=
-ion thread
-> > > > > >>> completes migration after CAS has set spapr->cas_reboot but b=
-efore the
-> > > > > >>> mainloop could pick up the reset request and reset the machin=
-e, the
-> > > > > >>> guest is migrated unrebooted and the destination doesn't rebo=
-ot it
-> > > > > >>> either because it isn't aware a CAS reboot was needed (eg, be=
-cause a
-> > > > > >>> device was added before CAS). This likely result in a broken =
-or hung
-> > > > > >>> guest.
-> > > > > >>>
-> > > > > >>> Even if it is small, the window between CAS and CAS reboot is=
- enough to
-> > > > > >>> re-qualify spapr->cas_reboot as state that we should migrate.=
- Add a new
-> > > > > >>> subsection for that and always send it when a CAS reboot is p=
-ending.
-> > > > > >>> This may cause migration to older QEMUs to fail but it is sti=
-ll better
-> > > > > >>> than end up with a broken guest.
-> > > > > >>>
-> > > > > >>> The destination cannot honour the CAS reboot request from a p=
-ost load
-> > > > > >>> handler because this must be done after the guest is fully re=
-stored.
-> > > > > >>> It is thus done from a VM change state handler.
-> > > > > >>>
-> > > > > >>> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> > > > > >>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > > >>> ---
-> > > > > >>>
-> > > > > >>
-> > > > > >> I'm wondering if the problem can be related with the fact that
-> > > > > >> main_loop_should_exit() could release qemu_global_mutex in
-> > > > > >> pause_all_vcpus() in the reset case?
-> > > > > >>
-> > > > > >> 1602 static bool main_loop_should_exit(void)
-> > > > > >> 1603 {
-> > > > > >> ...
-> > > > > >> 1633     request =3D qemu_reset_requested();
-> > > > > >> 1634     if (request) {
-> > > > > >> 1635         pause_all_vcpus();
-> > > > > >> 1636         qemu_system_reset(request);
-> > > > > >> 1637         resume_all_vcpus();
-> > > > > >> 1638         if (!runstate_check(RUN_STATE_RUNNING) &&
-> > > > > >> 1639                 !runstate_check(RUN_STATE_INMIGRATE)) {
-> > > > > >> 1640             runstate_set(RUN_STATE_PRELAUNCH);
-> > > > > >> 1641         }
-> > > > > >> 1642     }
-> > > > > >> ...
-> > > > > >>
-> > > > > >> I already sent a patch for this kind of problem (in current Ju=
-an pull
-> > > > > >> request):
-> > > > > >>
-> > > > > >> "runstate: ignore finishmigrate -> prelaunch transition"
-> > > > > >>
-> > > > > >=20
-> > > > > > IIUC your patch avoids an invalid 'prelaunch' -> 'postmigrate' =
-runstate
-> > > > > > transition that can happen if the migration thread sets the run=
-state to
-> > > > > > 'finishmigrate' when pause_all_vcpus() releases the main loop m=
-utex.
-> > > > > >=20
-> > > > > > ie. symptom of the problem is QEMU aborting, correct ? The issu=
-e I'm
-> > > > > > trying to fix is a guest breakage caused by a discrepancy betwe=
-en
-> > > > > > QEMU and the guest after migration has succeeded.
-> > > > > >=20
-> > > > > >> but I don't know if it could fix this one.
-> > > > > >>
-> > > > > >=20
-> > > > > > I don't think so and your patch kinda illustrates it. If the ru=
-nstate
-> > > > > > is 'finishmigrate' when returning from pause_all_vcpus(), this =
-means
-> > > > > > that state was sent to the destination before we could actually=
- reset
-> > > > > > the machine.
-> > > > >=20
-> > > > > Yes, you're right.
-> > > > >=20
-> > > > > But the question behind my comment was: is it expected to have a =
-pending
-> > > > > reset while we are migrating?
-> > > > >=20
-> > > >=20
-> > > > Nothing prevents qemu_system_reset_request() to be called when migr=
-ation
-> > > > is active.=20
-> > > >=20
-> > > > > Perhaps H_CAS can return H_BUSY and wait the end of the migration=
- and
-> > > > > then be fully executed on destination?
-> > > > >=20
-> > > >=20
-> > > > And so we would need to teach SLOF to try H_CAS again until it stops
-> > > > returning H_BUSY ? It seems safer to migrate the CAS reboot flag IM=
-HO.
-> > > >=20
-> > >=20
-> > > Ok I've tried that with a patched SLOF that sleeps 500ms and tries CAS
-> > > again if H_BUSY was returned. It fixes the issue but it looks a bit
-> > > ugly because of the polling with an arbitrary timeout in SLOF... I'm
-> > > not very comfortable either with calling migration_is_active() from
-> > > the CAS code in QEMU.
-> > >=20
-> > > David,
-> > >=20
-> > > Any suggestion ?
-> >=20
-> > Yeah, I think looping in SLOF is a worse idea than migrating the
-> > cas_reboot flag.
-> >=20
-> > But.. a better solution still might be to just remove the remaining
-> > causes for CAS reboot entirely.  CAS reboots pretty much suck when
-> > they happen, anyway.
-> >=20
+> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> ---
+>   python/qemu/qmp.py | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> I Agree.
+> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+> index 5c8cf6a056..a3e5de718a 100644
+> --- a/python/qemu/qmp.py
+> +++ b/python/qemu/qmp.py
+> @@ -73,7 +73,7 @@ class QEMUMonitorProtocol(object):
+>               raise QMPConnectError
+>           # Greeting seems ok, negotiate capabilities
+>           resp =3D self.cmd('qmp_capabilities')
+> -        if "return" in resp:
+> +        if resp and "return" in resp:
+>               return greeting
+>           raise QMPCapabilitiesError
+>  =20
 >=20
-> > With the irq changeover condition removed, I think the remaining
-> > causes are more theoretical than practical situations at this point.
-> >=20
->=20
-> FWIW, hotpluggging a PCI device before CAS result in a hung guest (not yet
-> investigated the details).
 
-commit 10f12e6450407b18b4d5a6b50d3852dcfd7fff75
-Author: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date:   Wed Aug 30 15:21:41 2017 -0300
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-    hw/ppc: CAS reset on early device hotplug
-
-I'll have a look to see what can be done here.
-
-But I agree the other check is more theoretical:
-
-    /* capabilities that have been added since CAS-generated guest reset.
-     * if capabilities have since been removed, generate another reset
-     */
-    spapr->cas_reboot =3D !spapr_ovec_subset(ov5_cas_old, spapr->ov5_cas);
-
-Unless changing kernels or tempering with the kernel command line, I don't
-see how some capabilities could change between the two CAS in practice.
-
---Sig_/b82WDh=9nYwK+d3J2eRYp3N
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl4lXxYACgkQcdTV5YIv
-c9b7RxAAuYqb3V62eFLhNGeshqdK3XDoayzcTZZYmCslY5qW2I2pTa8cmVDAbqqZ
-wjTNzlbZ2eOJdavV2qLesZntINGT+R+1SRi22IIrgdqT3f3h5Lv2VoxRzr3PBFen
-G1GqE4fAHgjSnIqcmmOeRlmM14hIgM4GVX/XX1EK50CM0kDxv9tEu6/6Lx6O3IVL
-91aGHH8cPxa02ZSz3b1bAjyXC7mTcCWaVjpmdSB1ssLE68SVxGHJd/IBF6Osn6Br
-+Z7RX22dz+UdOdg5qss/fuFyPpxAGlW6mnb/vEZRHNMSfoj7IPniFP4+QmtaiRSd
-67kuF2KnSZzQ0R2ipldCMPIeTLnGRrA3yy7HiHviBZXdD7kS+8vx+qNas+Zdrs8w
-trhZl5aHZOOz3Zt23mz2FljfSEzxcnnKXIAhFpmguSnDe98PbfkqrbOvy4cGV/dP
-G6nJnHCaScxbyfBi8RtRJ73gb0tpXfo+zuWgSK0TtJM9i2ncnZK81FCIj8JMIS9T
-FRnnSXYpDon5iiciRKCK33/PBNIgaSLe6VsicFRb15cZPfU8Iqc++qURTXetNnpq
-CdL1jbCvtPfSpd2AaJynglfVkFsK+199F6xpzOFic1q/VyfGzU3bIWVW9KOASbqp
-cAeID2AYDzIN2Eyx16GXJPUv63gdjXpY1eMqlcPycuD1cu0aziU=
-=mC4I
------END PGP SIGNATURE-----
-
---Sig_/b82WDh=9nYwK+d3J2eRYp3N--
 
