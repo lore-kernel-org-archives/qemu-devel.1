@@ -2,91 +2,65 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986ACC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1E4C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:30:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61C3E21835
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:29:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="viKVwkdO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61C3E21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0FAA921835
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:30:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FAA921835
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=de.adit-jv.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itX7G-0003TH-9K
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:29:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33138)
+	id 1itX81-0004h0-1s
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:30:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1itX5D-00026D-6B
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:27:12 -0500
+ (envelope-from <erosca@de.adit-jv.com>) id 1itX4N-0000YH-HK
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1itX5C-0008Ty-0e
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:27:11 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36637)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1itX5B-0008TJ-PT
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:27:09 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p17so14733403wma.1
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:27:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=0ZjGdMWOXKWSNvxjzI89CvJnoPIJwoJ9oFTthJFliaA=;
- b=viKVwkdOQ9Bfjl2ejw8w1fhpB+0d0owK7OGy1m77Ab3o0QCl/WDxde3CqyqXoF0MjS
- gUYU+MMvu3E4VHJCN4XU/aKKhX68tHWBHvKXWXWJoEAMMcW8zRlGbvWPua2s+wv4e1dU
- TwFUi4y6ayaGPVq+8BFfP5QQPaXBtt5ASv6crlz5K580lRne5lQ2HOiQ5GC/jxIrYw6a
- r2asrnb78X+q9CDbz724Um1BwdwIkKE2C3CY3IQFtsw6KnFT5aL9N/HjmutIq8HBDTn/
- om/kM5O77C+Sdlf0wi/S+I8R2RnDJV4z3+qwE31zBzVVCj4TepLQDTEQDHvv7/fMPr/U
- uVKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=0ZjGdMWOXKWSNvxjzI89CvJnoPIJwoJ9oFTthJFliaA=;
- b=QjhbIi46CfjRG2rjqL63JtZT1KTvXdSEdDRye618zQIwbLdST+Y4qHZm85NXv1FNFy
- 18N300spmUeo6IHwhhNGxiy+028tSfRDsbY/cu7iR8JXm5bp9TQEusy1xxjCU5+A1jjI
- aLUOOjyeV34rGZCAh/TkE9MlzCajr01LqpJ24kAkcj49O4w+gUGuGRYx0K/ZRSyFLqPl
- fp//8JY0AIy1fP4XtoLKu6EmvUvefFI+74Xm0j1DuTf3B8v3XVWrRKjvQT4y+alsQJg3
- fD41b1JR0sxffz+Q6wdwCNwVi622bZc0DzIIZ+6D0EJBFNc/BFgHHmEZEow9MR8LkK/5
- 6+pw==
-X-Gm-Message-State: APjAAAXn4q03AKs7dMOsvVlmgQasWuL5kaGjzX2kD5giGtmKeOVfbrUJ
- CVxYV1OPib+E0PRiohyNj5J4Qw==
-X-Google-Smtp-Source: APXvYqyAFdT7ohtsYOlc/D4XKx8XCwluYoH0Le/ktVtoTcRV0BGdXZ/wK9aJQPD4rRs1ri9dR5r+2Q==
-X-Received: by 2002:a1c:f001:: with SMTP id a1mr18218424wmb.76.1579526828180; 
- Mon, 20 Jan 2020 05:27:08 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z187sm1608104wme.16.2020.01.20.05.27.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 05:27:06 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3E39C1FF87;
- Mon, 20 Jan 2020 13:27:06 +0000 (GMT)
-References: <20200116194341.402-1-richard.henderson@linaro.org>
- <20200116194341.402-6-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 5/5] linux-user: Flush out implementation of
- gettimeofday
-In-reply-to: <20200116194341.402-6-richard.henderson@linaro.org>
-Date: Mon, 20 Jan 2020 13:27:06 +0000
-Message-ID: <87sgka2r85.fsf@linaro.org>
+ (envelope-from <erosca@de.adit-jv.com>) id 1itX4J-00081x-Hd
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:26:19 -0500
+Received: from smtp1.de.adit-jv.com ([93.241.18.167]:37892)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <erosca@de.adit-jv.com>)
+ id 1itX4J-00080n-BD
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:26:15 -0500
+Received: from localhost (smtp1.de.adit-jv.com [127.0.0.1])
+ by smtp1.de.adit-jv.com (Postfix) with ESMTP id 805063C04C1;
+ Mon, 20 Jan 2020 14:26:12 +0100 (CET)
+Received: from smtp1.de.adit-jv.com ([127.0.0.1])
+ by localhost (smtp1.de.adit-jv.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0WEtl-NDxPMY; Mon, 20 Jan 2020 14:26:07 +0100 (CET)
+Received: from HI2EXCH01.adit-jv.com (hi2exch01.adit-jv.com [10.72.92.24])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by smtp1.de.adit-jv.com (Postfix) with ESMTPS id 5FC4E3C00C5;
+ Mon, 20 Jan 2020 14:26:07 +0100 (CET)
+Received: from lxhi-065.adit-jv.com (10.72.93.66) by HI2EXCH01.adit-jv.com
+ (10.72.92.24) with Microsoft SMTP Server (TLS) id 14.3.468.0; Mon, 20 Jan
+ 2020 14:26:07 +0100
+Date: Mon, 20 Jan 2020 14:26:07 +0100
+From: Eugeniu Rosca <erosca@de.adit-jv.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: Re: [PATCH v4 0/5] gpio: Add GPIO Aggregator
+Message-ID: <20200120132607.GB24951@lxhi-065.adit-jv.com>
+References: <20200115181523.23556-1-geert+renesas@glider.be>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200115181523.23556-1-geert+renesas@glider.be>
+X-Originating-IP: [10.72.93.66]
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 93.241.18.167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,78 +72,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Phil Reid <preid@electromag.com.au>, Eugeniu Rosca <roscaeugeniu@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>,
+ Linus Walleij <linus.walleij@linaro.org>, linux-doc@vger.kernel.org,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Rob Herring <robh+dt@kernel.org>, Harish Jenny K N <harish_kandiga@mentor.com>,
+ linux-gpio@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexander Graf <graf@amazon.com>, Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Geert,
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+On Wed, Jan 15, 2020 at 07:15:18PM +0100, Geert Uytterhoeven wrote:
+> 	Hi all,
+> 
+> GPIO controllers are exported to userspace using /dev/gpiochip*
+> character devices.  Access control to these devices is provided by
+> standard UNIX file system permissions, on an all-or-nothing basis:
+> either a GPIO controller is accessible for a user, or it is not.
+> Currently no mechanism exists to control access to individual GPIOs.
+> 
+> Hence this adds a GPIO driver to aggregate existing GPIOs, and expose
+> them as a new gpiochip.  This is useful for implementing access control,
+> and assigning a set of GPIOs to a specific user.  Furthermore, this
+> simplifies and hardens exporting GPIOs to a virtual machine, as the VM
+> can just grab the full GPIO controller, and no longer needs to care
+> about which GPIOs to grab and which not, reducing the attack surface.
+> 
+> Recently, other use cases have been discovered[1]:
+>   - Describing simple GPIO-operated devices in DT, and using the GPIO
+>     Aggregator as a generic GPIO driver for userspace, which is useful
+>     for industrial control.
 
-> The first argument, timeval, is allowed to be NULL.
->
-> The second argument, timezone, was missing.  While its use is
-> deprecated, it is still present in the syscall.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+As per comments and test results in [*] (accidentally attached to v3):
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
 
-> ---
->  linux-user/syscall.c | 27 +++++++++++++++++++++++++--
->  1 file changed, 25 insertions(+), 2 deletions(-)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index eb867a5296..628b4de9a1 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -1219,6 +1219,23 @@ static inline abi_long host_to_target_timespec64(a=
-bi_ulong target_addr,
->      return 0;
->  }
->=20=20
-> +static inline abi_long copy_to_user_timezone(abi_ulong target_tz_addr,
-> +                                             struct timezone *tz)
-> +{
-> +    struct target_timezone *target_tz;
-> +
-> +    if (!lock_user_struct(VERIFY_WRITE, target_tz, target_tz_addr, 1)) {
-> +        return -TARGET_EFAULT;
-> +    }
-> +
-> +    __put_user(tz->tz_minuteswest, &target_tz->tz_minuteswest);
-> +    __put_user(tz->tz_dsttime, &target_tz->tz_dsttime);
-> +
-> +    unlock_user_struct(target_tz, target_tz_addr, 1);
-> +
-> +    return 0;
-> +}
-> +
->  static inline abi_long copy_from_user_timezone(struct timezone *tz,
->                                                 abi_ulong target_tz_addr)
->  {
-> @@ -8567,10 +8584,16 @@ static abi_long do_syscall1(void *cpu_env, int nu=
-m, abi_long arg1,
->      case TARGET_NR_gettimeofday:
->          {
->              struct timeval tv;
-> -            ret =3D get_errno(gettimeofday(&tv, NULL));
-> +            struct timezone tz;
-> +
-> +            ret =3D get_errno(gettimeofday(&tv, &tz));
->              if (!is_error(ret)) {
-> -                if (copy_to_user_timeval(arg1, &tv))
-> +                if (arg1 && copy_to_user_timeval(arg1, &tv)) {
->                      return -TARGET_EFAULT;
-> +                }
-> +                if (arg2 && copy_to_user_timezone(arg2, &tz)) {
-> +                    return -TARGET_EFAULT;
-> +                }
->              }
->          }
->          return ret;
+[*] https://lore.kernel.org/linux-renesas-soc/20200120121439.GA24951@lxhi-065.adit-jv.com/
+    ("Re: [PATCH v3 0/7] gpio: Add GPIO Aggregator/Repeater")
 
-
---=20
-Alex Benn=C3=A9e
+-- 
+Best Regards,
+Eugeniu Rosca
 
