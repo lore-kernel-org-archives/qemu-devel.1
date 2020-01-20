@@ -2,75 +2,81 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A403AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A523C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:21:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D36E2070C
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:20:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D36E2070C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
+	by mail.kernel.org (Postfix) with ESMTPS id E9B542070C
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:21:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jd+6Fdxi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B542070C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itYqn-0000sQ-5e
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 10:20:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48180)
+	id 1itYrZ-0001hE-4L
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 10:21:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48811)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1itYmX-0005an-Gk
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:16:03 -0500
+ (envelope-from <imammedo@redhat.com>) id 1itYpw-0000YJ-Cp
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:19:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1itYmS-0001PZ-5T
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:16:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43306)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1itYmR-0001OQ-HF
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:15:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1itYmM-0004wH-OK
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 15:15:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 226F82E80D6
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 15:15:50 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jan 2020 15:02:36 -0000
-From: Samuel thibault <samuel.thibault@ens-lyon.org>
+ (envelope-from <imammedo@redhat.com>) id 1itYpt-0002dw-SI
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:19:32 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42346
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1itYpt-0002dp-Oj
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:19:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579533569;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aqtedyLBefzKHaFVNFS+YqIyxoMfosQAGZwopz8z0EU=;
+ b=Jd+6Fdxi/jd7Nv07rqMPFey+fqp60yGCY6w2LYINMpHCBWl+jFwdf3hGtni469OyDx4yIG
+ Ljn0SVVJ8qhCgtc7sTWMyVPTHvNdT0WCCSn+bumt+RTRzjYZP3C+9R/aPh9kjFxwcLcsFz
+ ihfLMy63xGbNAvEGre9bayu/cEopUso=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-PPzyLN8-O7mjhtSB_LBKUA-1; Mon, 20 Jan 2020 10:19:26 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBA9C14E5;
+ Mon, 20 Jan 2020 15:19:24 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A6CF2860DA;
+ Mon, 20 Jan 2020 15:19:23 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: asiagaming samuel-thibault
-X-Launchpad-Bug-Reporter: jusunLee (asiagaming)
-X-Launchpad-Bug-Modifier: Samuel thibault (samuel-thibault)
-References: <154785010249.1233.12902128942224805447.malonedeb@gac.canonical.com>
-Message-Id: <157953255816.4478.11753035949965603376.malone@soybean.canonical.com>
-Subject: [Bug 1812451] Re: In windows host,
- tftp arbitrary file read vulnerability
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 16a9badfeedc9f86114a17df197870c87804753a
+Subject: [PATCH v3 65/84] ppc/{ppc440_bamboo, sam460ex}: use memdev for RAM
+Date: Mon, 20 Jan 2020 16:17:04 +0100
+Message-Id: <1579533424-177690-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <alpine.BSF.2.21.99999.352.2001152233540.24151@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.99999.352.2001152233540.24151@zero.eik.bme.hu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: PPzyLN8-O7mjhtSB_LBKUA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,46 +85,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1812451 <1812451@bugs.launchpad.net>
+Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is fixed upstream by
-https://gitlab.freedesktop.org/slirp/libslirp/commit/14ec36e107a8c9af7d0a80=
-c3571fe39b291ff1d4
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
--- =
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v3:
+  * drop ram_size from comment above ppc4xx_sdram_banks
+     (BALATON Zoltan <balaton@eik.bme.hu>)
+  * move memory alias initialization into the same loop
+    where RAM is split on banks.
+     (BALATON Zoltan <balaton@eik.bme.hu>)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1812451
+CC: balaton@eik.bme.hu
+CC: david@gibson.dropbear.id.au
+CC: qemu-ppc@nongnu.org
+---
+ include/hw/ppc/ppc4xx.h |  2 +-
+ hw/ppc/ppc440_bamboo.c  |  3 ++-
+ hw/ppc/ppc4xx_devs.c    | 26 ++++++++++----------------
+ hw/ppc/sam460ex.c       |  3 ++-
+ 4 files changed, 15 insertions(+), 19 deletions(-)
 
-Title:
-  In windows host, tftp arbitrary file read vulnerability
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index b8c8f32..cc19c8d 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -42,7 +42,7 @@ enum {
+ qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
+                        uint32_t dcr_base, int has_ssr, int has_vr);
+=20
+-void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
++void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_banks,
+                         MemoryRegion ram_memories[],
+                         hwaddr ram_bases[], hwaddr ram_sizes[],
+                         const ram_addr_t sdram_bank_sizes[]);
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 577f7c2..1d4a11d 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -202,7 +202,7 @@ static void bamboo_init(MachineState *machine)
+     /* SDRAM controller */
+     memset(ram_bases, 0, sizeof(ram_bases));
+     memset(ram_sizes, 0, sizeof(ram_sizes));
+-    ppc4xx_sdram_banks(ram_size, PPC440EP_SDRAM_NR_BANKS, ram_memories,
++    ppc4xx_sdram_banks(machine->ram, PPC440EP_SDRAM_NR_BANKS, ram_memories=
+,
+                        ram_bases, ram_sizes, ppc440ep_sdram_bank_sizes);
+     /* XXX 440EP's ECC interrupts are on UIC1, but we've only created UIC0=
+. */
+     ppc4xx_sdram_init(env, pic[14], PPC440EP_SDRAM_NR_BANKS, ram_memories,
+@@ -289,6 +289,7 @@ static void bamboo_machine_init(MachineClass *mc)
+     mc->desc =3D "bamboo";
+     mc->init =3D bamboo_init;
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("440epb");
++    mc->default_ram_id =3D "ppc4xx.sdram";
+ }
+=20
+ DEFINE_MACHINE("bamboo", bamboo_machine_init)
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index de2c87b..c0ddaa2 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -666,23 +666,21 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq ir=
+q, int nbanks,
+         sdram_map_bcr(sdram);
+ }
+=20
+-/* Fill in consecutive SDRAM banks with 'ram_size' bytes of memory.
++/* Split RAM between SDRAM banks.
+  *
+  * sdram_bank_sizes[] must be 0-terminated.
+  *
+  * The 4xx SDRAM controller supports a small number of banks, and each ban=
+k
+  * must be one of a small set of sizes. The number of banks and the suppor=
+ted
+  * sizes varies by SoC. */
+-void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
++void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_banks,
+                         MemoryRegion ram_memories[],
+                         hwaddr ram_bases[], hwaddr ram_sizes[],
+                         const ram_addr_t sdram_bank_sizes[])
+ {
+-    MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
+-    ram_addr_t size_left =3D ram_size;
++    ram_addr_t size_left =3D memory_region_size(ram);
+     ram_addr_t base =3D 0;
+     ram_addr_t bank_size;
+-    int last_bank =3D 0;
+     int i;
+     int j;
+=20
+@@ -690,11 +688,16 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_b=
+anks,
+         for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
+             bank_size =3D sdram_bank_sizes[j];
+             if (bank_size <=3D size_left) {
++                char name[32];
++
+                 ram_bases[i] =3D base;
+                 ram_sizes[i] =3D bank_size;
+                 base +=3D bank_size;
+                 size_left -=3D bank_size;
+-                last_bank =3D i;
++
++                snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
++                memory_region_init_alias(&ram_memories[i], NULL, name, ram=
+,
++                                         ram_bases[i], ram_sizes[i]);
+             }
+         }
+         if (!size_left) {
+@@ -704,7 +707,7 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_ban=
+ks,
+     }
+=20
+     if (size_left) {
+-        ram_addr_t used_size =3D ram_size - size_left;
++        ram_addr_t used_size =3D memory_region_size(ram) - size_left;
+         GString *s =3D g_string_new(NULL);
+=20
+         for (i =3D 0; sdram_bank_sizes[i]; i++) {
+@@ -720,15 +723,6 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_ba=
+nks,
+         g_string_free(s, true);
+         exit(EXIT_FAILURE);
+     }
+-
+-    memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_si=
+ze);
+-
+-    for (i =3D 0; i <=3D last_bank; i++) {
+-        char name[32];
+-        snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
+-        memory_region_init_alias(&ram_memories[i], NULL, name, ram,
+-                                 ram_bases[i], ram_sizes[i]);
+-    }
+ }
+=20
+ /*************************************************************************=
+****/
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 949acba..b48aea5 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -324,7 +324,7 @@ static void sam460ex_init(MachineState *machine)
+     /* SDRAM controller */
+     /* put all RAM on first bank because board has one slot
+      * and firmware only checks that */
+-    ppc4xx_sdram_banks(machine->ram_size, 1, ram_memories, ram_bases, ram_=
+sizes,
++    ppc4xx_sdram_banks(machine->ram, 1, ram_memories, ram_bases, ram_sizes=
+,
+                        ppc460ex_sdram_bank_sizes);
+=20
+     /* FIXME: does 460EX have ECC interrupts? */
+@@ -483,6 +483,7 @@ static void sam460ex_machine_init(MachineClass *mc)
+     mc->init =3D sam460ex_init;
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("460exb");
+     mc->default_ram_size =3D 512 * MiB;
++    mc->default_ram_id =3D "ppc4xx.sdram";
+ }
+=20
+ DEFINE_MACHINE("sam460ex", sam460ex_machine_init)
+--=20
+2.7.4
 
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  https://github.com/qemu/qemu/blob/master/slirp/tftp.c#L343
-
-  =C2=A0=C2=A0if (!strncmp(req_fname, "../", 3) ||
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0req_fname[strlen(req_fname) - 1] =3D=
-=3D '/' ||
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strstr(req_fname, "/../")) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tftp_send_error(spt, 2, "Access viola=
-tion", tp);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-  =C2=A0=C2=A0}
-
-  There is file path check for not allowing escape tftp directory.
-  But, in windows, file path is separated by "\" backslash.
-  So, guest can read arbitrary file in Windows host.
-
-  This bug is variant of CVE-2019-2553 - Directory traversal
-  vulnerability.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1812451/+subscriptions
 
