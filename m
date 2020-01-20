@@ -2,108 +2,86 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D9DC33CAA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88124C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:04:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35BCF207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:04:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52E21207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:04:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvbLOX+b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35BCF207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gcwGFZV9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E21207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itUrK-0002YM-Fx
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:04:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40423)
+	id 1itUrQ-0002bA-TV
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:04:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1itUfG-0002hF-CZ
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:52:17 -0500
+ (envelope-from <stefanha@gmail.com>) id 1itUUX-0005Dc-5x
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:41:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1itUfC-0001w1-1s
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:52:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49711
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1itUfB-0001vf-TZ
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:52:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579517529;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JyF6NyBMeXCwvV04ThbgkqthwYacCvtWAhGuCK6zjLM=;
- b=VvbLOX+bQddCFc50RyRf729kDcywbW2INoHhTLGVesjMR2rFwf4g/BQLrMMAD7AUveWTbJ
- Ehtj9iPFHxfTJXl2Tge1f8MOXyzEABgF1I4xFT3MnGfm/P4tkHKxe5OJZWpOFkDKah7Xye
- LdnCKx6eINbGi+74AmpgDt2jQChje3s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77-ikyCpEcmMI-I5pvhnPKtbQ-1; Mon, 20 Jan 2020 05:52:06 -0500
-X-MC-Unique: ikyCpEcmMI-I5pvhnPKtbQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB4D7800D48;
- Mon, 20 Jan 2020 10:52:04 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-225.ams2.redhat.com
- [10.36.117.225])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 29573272B4;
- Mon, 20 Jan 2020 10:51:59 +0000 (UTC)
-Subject: Re: [PATCH v3 01/10] hbitmap: assert that we don't create bitmap
- larger than INT64_MAX
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
- <20191219100348.24827-2-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <862e3780-4ca7-ed39-6858-4bb54760c75c@redhat.com>
-Date: Mon, 20 Jan 2020 11:51:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <stefanha@gmail.com>) id 1itUUW-0005Ux-0P
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:41:09 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:39121)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1itUUV-0005U6-M6
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:41:07 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id y11so28975415wrt.6
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 02:41:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=wHSf4hpjOYkPo29+7kwbZybvl7dOvlQu+eUAlnPqBco=;
+ b=gcwGFZV9TpV7keq6wIEJQz2Dw/t0kJTOEOXghGtznM3ekIQJEVxeDvzqyhwfXVtoUT
+ xmGDXjhFa1hlafg6r8O32vBhUF99inL/MZeH0GljEYU3kV31dWXHW9vZ1w2QzRmz5SP4
+ +Fu0pBcFiKMuzqQ30tuBxF4F7kIvDyHzLDKgsIl12vs85GwM+rQO+RT4Iyp7Kup3r+kw
+ kxM8xOGyyTrm26qCW4louxVJlDJHzkdxOsbxA/U/uhq6n9Oi6cQiFwDCuCNJO2wCbERD
+ RSNSvvsKHGyYkQD/7bDS77xpN3p5b0TryEbqW/o9gZ5FM5uaxJob2DloRVTBKGku0RdQ
+ uTZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wHSf4hpjOYkPo29+7kwbZybvl7dOvlQu+eUAlnPqBco=;
+ b=Eu4M33BFpLc4gXh8wUP71Upelcze1NGDr10CPI5MYNCfubtUqAaRTdTNqB8wwOVkJe
+ BXUtUjl9g8vRfNjZVoewCKIdtyulj/XxhNJQj8EhL0TN6g5gQ7UJ4mNgth2u3hmNCd11
+ s7HUFiw12+FuEAi1SoztJ0nPt3nOdWVFUYYjLn8yvSeU01nAjHMB6ssWj+n54xZT6+kM
+ BgeBADm/VYQMRWtNe0AzpHhgZIYlOkPvIpHTOP2BpgprY2/6PCyXMpCyMamrG3awAP1+
+ ThGGV4MFOI7z1E6Y031ZmVPiC4aVTPzxPZe6pkjwYNprXFs3j22cblQJjkQ2imjAu0Ru
+ aFNQ==
+X-Gm-Message-State: APjAAAWZiiz9c2mna+1bJln+xfnEjYsfbePCMXBwxWjN06w1Y1tOKsCq
+ HuC8Q4mQMkhrotBjzna9GL4=
+X-Google-Smtp-Source: APXvYqzhVdjrCtqgnQCIqheQnHy1B/xdBetWSZHL0Nk8G9eD7o7aAOhJvhDXJbOptWF108oi1HJB6Q==
+X-Received: by 2002:a5d:5267:: with SMTP id l7mr17181966wrc.84.1579516865219; 
+ Mon, 20 Jan 2020 02:41:05 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id z3sm46945298wrs.94.2020.01.20.02.41.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jan 2020 02:41:04 -0800 (PST)
+Date: Mon, 20 Jan 2020 10:41:03 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Felipe Franciosi <felipe@nutanix.com>
+Subject: Re: Feedback on multi-process QEMU muser prototype
+Message-ID: <20200120104103.GE345995@stefanha-x1.localdomain>
+References: <CAJSP0QWUfHyAk-xLFA1-sWSU7CvB4yKu0=Okoc7wcv7TinmXWg@mail.gmail.com>
+ <75F8F7A2-0925-4010-97EA-F135C873087F@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <20191219100348.24827-2-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="l6jfeanhLwXT5dyum2EPKhZnc2AzBL8Ou"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ protocol="application/pgp-signature"; boundary="cPi+lWm09sJ+d57q"
+Content-Disposition: inline
+In-Reply-To: <75F8F7A2-0925-4010-97EA-F135C873087F@nutanix.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,56 +93,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, den@openvz.org
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ John G Johnson <john.g.johnson@oracle.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Jag Raman <jag.raman@oracle.com>,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---l6jfeanhLwXT5dyum2EPKhZnc2AzBL8Ou
-Content-Type: multipart/mixed; boundary="2p9VNO2kONpwWU1cJ5CFpDr3oBecmjRGp"
 
---2p9VNO2kONpwWU1cJ5CFpDr3oBecmjRGp
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+--cPi+lWm09sJ+d57q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
-> We have APIs which returns signed int64_t, to be able to return error.
-> Therefore we can't handle bitmaps with absolute size larger than
-> (INT64_MAX+1). Still, keep maximum to be INT64_MAX which is a bit
-> safer.
+On Wed, Jan 15, 2020 at 10:58:38AM +0000, Felipe Franciosi wrote:
+> > On Jan 14, 2020, at 3:22 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> >=20
+> > I haven't seen the link to the muser prototype shared on the list yet,
+> > so I'm taking the liberty of posting it for discussion:
+> > https://github.com/oracle/qemu/tree/multi-process-qemu-v0.4.1-muser
+> >=20
+> > Great that a lot of the multi-process patch series is no longer
+> > necessary.  The muser approach requires less code in QEMU.
+> >=20
+> > The following points came to mind:
+> >=20
+> > 1. Configure PCI configuration space, BARs, and MSI/IRQs based on the P=
+CIDevice
+> >   instead of hard-coding the LSI SCSI controller's specifics.  That way=
+ any
+> >   PCIDevice can run as an muser device.
+> >=20
+> > 2. Integrate with QEMU's event loop instead of spawning threads and cal=
+ling
+> >   lm_ctx_run().  The event loop should monitor the muser fd for activit=
+y using
+> >   aio_set_fd_handler() and then call into libmuser to handle the event.=
+  This
+> >   will avoid thread model problems in the future and also allow true
+> >   multi-threading (IOThreads).
 >=20
-> Note, that bitmaps are used to represent disk images, which can't
-> exceed INT64_MAX anyway.
+> Allowing muser to be used like that is in our to-do list.
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  util/hbitmap.c | 2 ++
->  1 file changed, 2 insertions(+)
+> (+ Thanos / Swapnil).
+>=20
+> We have to extend muser.ko to allow the device file descriptor to be
+> "pollable".  Let me know how soon you want to see that so we can
+> prioritise accordingly or assist someone in doing the work.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Last I talked with the multi-process QEMU team the discussion was about
+moving forward with the existing QEMU patches and then moving to
+VFIO-over-socket.  libmuser makes a nice library API for device emulator
+programs and I think it will be revisited when VFIO-over-socket
+integration begins.
 
+This makes the pollable fd less of a priority for QEMU at the moment.
 
---2p9VNO2kONpwWU1cJ5CFpDr3oBecmjRGp--
+Stefan
 
---l6jfeanhLwXT5dyum2EPKhZnc2AzBL8Ou
+--cPi+lWm09sJ+d57q
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4lhk4ACgkQ9AfbAGHV
-z0AJtgf+PAwDqzlh1v5uquzv8iXmKu/diJODIT38nRcEEKgPb5AWs/n3YybhJgF9
-ngRB/fsQyJnSg00a01HsRXeRVDFFlPTT3AhB7opxfsY+fq9h0KGjU3N0AcsNpbgX
-GoKCKa2IDjwJYkX7pQCc4WTe2JoPKuK5pbZmXS+vWyQ6SFruhVEUYom66LDlmr7S
-+pK0upx70yFqxsix19IZW2gHuIUed8ivbIk+bMHEUJ63dnmX0RRVXXbDFSZ5nIS+
-YxxpbcVl7OlasEDqKQ8HNq2rCzMQTO/4wysgThbrIv8IbOpMlvM4RLTBInn1d5Wd
-IV03lCFy8CZCBPKw88liHDlr5CUhGA==
-=MtnL
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4lg78ACgkQnKSrs4Gr
+c8j8Qgf+JpWTg/ko60R2vvJWD9yrG++9hreQ46P/8a9mYoeXxzyrEwgihBem2u8b
+oAKvXW9UY32uwtzsrVCly9sxoD8eYymKvOVXQvxTkCbjj+W7bE6R/ZfMIpG5BW+5
+SUIDzBDJ0NiVsFLNBZ2/uN/rAXb5+DojW7XLOqRaYmY62esMY/1VXUQETgZTwTLA
+YwEzGhZAaa3jTrBTsS7+6kvz5raZO5aFSiwcrPdqfse1N5IxvyuYFUawpbt1cOcr
+VM70+P7FKDnS46925ht5YBhQz9SBqCAt+wldbcdewOf1tky1bMYBkRH5bVDE2B2P
+BlC9sQKnInbWq2iTU7R+n0CyOOpZ1g==
+=UHI8
 -----END PGP SIGNATURE-----
 
---l6jfeanhLwXT5dyum2EPKhZnc2AzBL8Ou--
-
+--cPi+lWm09sJ+d57q--
 
