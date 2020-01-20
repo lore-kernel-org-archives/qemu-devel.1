@@ -2,85 +2,119 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F550C33CA1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 015B9C33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:07:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4952A20684
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:07:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C03E720684
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:07:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJ4zhkE6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4952A20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="K2igUef7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C03E720684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itT1e-0006Ah-5C
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:07:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53223)
+	id 1itT1s-0006Wr-Je
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:07:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53116)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itSzw-0004HZ-Ay
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:05:32 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itSzO-0003di-NI
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:04:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itSzs-0000bZ-Fa
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:05:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32752
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itSzs-0000bB-8x
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:05:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579511123;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UjgLIQLZnEWnfHxE8zkHcHRPypW+wAkf9hxN1SAf6oA=;
- b=BJ4zhkE6/mMB2h5HipmqPvxyyE7aRe+PthRhVKvBKy2/+86S7E6oREtjrnIy6uO9cwwQ1a
- SpeN4tOx7TRdWfpCVNmqGIMoMyaVYE+3d10cFPIWTHHVDvyjpko9WXrinVR7wfULCM4eSi
- hgzGPR8AKhWaIZwDKsPF5T0vIR4Gqxw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-SLjUsWGTOpWOYrfMdEq-XA-1; Mon, 20 Jan 2020 04:05:22 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB3A218AAFA1;
- Mon, 20 Jan 2020 09:05:20 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 99A3A89E95;
- Mon, 20 Jan 2020 09:05:18 +0000 (UTC)
-Date: Mon, 20 Jan 2020 09:05:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: fengzhimin <fengzhimin1@huawei.com>
-Subject: Re: [PATCH RFC 12/12] migration/rdma: only register the virt-ram
- block for MultiRDMA
-Message-ID: <20200120090515.GA2827@work-vm>
-References: <20200109045922.904-1-fengzhimin1@huawei.com>
- <20200109045922.904-13-fengzhimin1@huawei.com>
- <20200117185227.GS3209@work-vm>
- <03C2A65461456D4EBE9E6D4D0D96C583FC1465@DGGEMI529-MBX.china.huawei.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itSzN-0000MS-8K
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:04:54 -0500
+Received: from mail-ve1eur01on072a.outbound.protection.outlook.com
+ ([2a01:111:f400:fe1f::72a]:22785
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1itSzM-0000Lk-If; Mon, 20 Jan 2020 04:04:53 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PvW7uu2eDQ2dGgYsaJ8JOL/IRW9OEYBNLVG0xt8o3WH5ggNkYOalCnQGDIm8d9xbf3/RxNAV4TvNUE4kS6MVFbNOLYWUYNwA2Q1NqqDcybay51NZUOksTxQ4FuKnGCkd8OefG3DAJhDtzD80dzmYdfKDNyHjUZzwGQbV9tDwTrBf5kle0QOmZhTHyetTBjx9BHf567OZtgzbTNNgxsTVEm0dDN+3HNx9yA1ZK+d3jzLQZDuNBFqx8bPRYPuxPCfZIDHBI9x5rqmJO9jNJuh8ffRxuDzA2oko6KgtLqb0O/KID2nvC+n3O2W9YDcBxkCW/Qe3GUeiw5nHctRcYO3X4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+f0B4UYTCG98PD9zgwfTUOLeMVQH7wvx0hgViWgQwaQ=;
+ b=NuX6ZnTDPJiLQoN/otIr4D/Kne0ABpGR5lfwxFkZXoQz8gGrf7JYdlji4WCsxPlW7I+ceSkHyvggFFZEDCN7+HiNjQ0TQ4RnhSK0mFLft7YySbXlWs2Sx85cd9L2CT2OXySKnkQqYQY2WrrtQs2hw6nKGw6LOWbKFaPfRX9GgEIjleROhSWpKkIX6LneljBrqGk6uKMr0PKN2qi58PVhIFgtChz7eAhSlD0tLo+4ltHlva8fq/UB+CwRHg7kFJdtbThNj0FoD1aJzEWYH7I9cnLJ42F83gyO1pcfJzitUFKBqDuE/lbtnEPqmqmiIeEsdnDym6zb6lBhvvapN8B0Aw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+f0B4UYTCG98PD9zgwfTUOLeMVQH7wvx0hgViWgQwaQ=;
+ b=K2igUef7q36qeRSUTHMHjWEJ+mVWgLkf2jBQKkNI+tugMTOV17tNLHr/JjIiXklQR7dFuUE9HQtyRbH09XmaEvn6hXoI5iQVpBo02XmCFy0aFtIWcfdXsNZQueovLMft7bdKTdNU/8a0rlhy5r7HbbahqcciQFhi7BIRLn4Qigw=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB5016.eurprd08.prod.outlook.com (10.255.122.20) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.19; Mon, 20 Jan 2020 09:04:49 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.026; Mon, 20 Jan 2020
+ 09:04:49 +0000
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0202CA0013.eurprd02.prod.outlook.com (2603:10a6:3:8c::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.18 via Frontend Transport; Mon, 20 Jan 2020 09:04:48 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v2 0/5] fix migration with bitmaps and mirror
+Thread-Topic: [PATCH v2 0/5] fix migration with bitmaps and mirror
+Thread-Index: AQHVtkmClxBjAFsANkahPv5xTkXxQqfzdL8A
+Date: Mon, 20 Jan 2020 09:04:49 +0000
+Message-ID: <531a9a94-2d43-1de9-327a-5af723d72268@virtuozzo.com>
+References: <20191219085106.22309-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20191219085106.22309-1-vsementsov@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0202CA0013.eurprd02.prod.outlook.com
+ (2603:10a6:3:8c::23) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20200120120446811
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 26a0a1e9-98fc-4c7c-5b73-08d79d87cda8
+x-ms-traffictypediagnostic: AM6PR08MB5016:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB5016B3219477F0A60CA4DE16C1320@AM6PR08MB5016.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:131;
+x-forefront-prvs: 0288CD37D9
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(39840400004)(396003)(136003)(346002)(376002)(199004)(189003)(8676002)(66946007)(6916009)(71200400001)(316002)(66446008)(81156014)(186003)(66556008)(16576012)(66476007)(64756008)(7416002)(36756003)(5660300002)(6486002)(26005)(966005)(8936002)(31696002)(31686004)(52116002)(4326008)(956004)(478600001)(2616005)(16526019)(54906003)(2906002)(86362001)(81166006);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5016;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: S+ewfAmGYuTw6JvumqiOI9QGz1EXtuUJUqZ24yqhClK/b+4hM9msQyzDa/lF4SYZ+nVFO4KMQwlI5qVAetsa8eZYHfdBH87h1HtGIFhYqbMxWZnrMYAu0scCN6KqiBVkbEP1hIkYxyfgHz1PqYWOKI+b49YsnaSJIxKQmHhjqcpKiG0qoXzV99iXQGj+/Cl9S5O2LJOg9S8bfwe0yllpiLSuEw4OyvJJOZOvQdCouF0j/u836NhfTycMPMcOkN2oTCTmo2PM249tkyInTjhK+sn7jciTX4IrW9Wme7P6d6u3im50ptwuurr9te2L/vAOYxgWR2favBYnEKYuoiF2E+gg4MZL6wfF+A5AUsrELkLcQ+IclDf1FVD9nU1BnmIic5lI8NB71SM4k/kOpsYezbqlf+PqRxwlmLj765hZ4hw52FGbIB2XtXZCSgKPZToZDJ8ULn5fZJ/GfVrHAjmbyBDh+gLfvO0yziQvThd4+o4w5g8y1XrSJevUrOKRMWF+zf1vnzDnMxi+IZ/hB1lxzA==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E37D3E8467309242836424AE2DF9AE11@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <03C2A65461456D4EBE9E6D4D0D96C583FC1465@DGGEMI529-MBX.china.huawei.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: SLjUsWGTOpWOYrfMdEq-XA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26a0a1e9-98fc-4c7c-5b73-08d79d87cda8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 09:04:49.6520 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uMs8FcvCt4FSCWwt0tUDd+LheqiwnDnSZS94k2y82xilRdDDNa/sTv2Vu6WAsednWkqozZ0ob43OjPCfqLSZOsFA0gJQi4hvDqGJo5beGiM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5016
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe1f::72a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,395 +126,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "quintela@redhat.com" <quintela@redhat.com>,
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>, "quintela@redhat.com" <quintela@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "jemmy858585@gmail.com" <jemmy858585@gmail.com>
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* fengzhimin (fengzhimin1@huawei.com) wrote:
-> OK, I will modify it.
->=20
-> Due to the mach-virt.ram is sent by the multiRDMA channels instead of the=
- main channel, it don't to register on the main channel.
-
-You might be OK if instead  of using the name, you use a size threshold;
-e.g. you use the multirdma threads for any RAM block larger than say
-128MB.
-
-> It takes a long time to register the mach-virt.ram for VM with large capa=
-city memory, so we shall try our best not to register it.
-
-I'm curious why, I know it's expensive to register RAM blocks with rdma
-code; but I thought that would just be the first time; it surprises me
-that registering it with a 2nd RDMA channel is as expensive.
-
-But then that makes me ask a 2nd question; is your performance increase
-due to multiple threads or is it due to the multiple RDMA channels?
-COuld you have multiple threads but still a single RDMA channel
-(and with sufficient locking) still get the performance?
-
-Dave
-
-> Thanks for your review.
->=20
-> Zhimin Feng
->=20
-> -----Original Message-----
-> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]=20
-> Sent: Saturday, January 18, 2020 2:52 AM
-> To: fengzhimin <fengzhimin1@huawei.com>
-> Cc: quintela@redhat.com; armbru@redhat.com; eblake@redhat.com; qemu-devel=
-@nongnu.org; Zhanghailiang <zhang.zhanghailiang@huawei.com>; jemmy858585@gm=
-ail.com
-> Subject: Re: [PATCH RFC 12/12] migration/rdma: only register the virt-ram=
- block for MultiRDMA
->=20
-> * Zhimin Feng (fengzhimin1@huawei.com) wrote:
-> > From: fengzhimin <fengzhimin1@huawei.com>
-> >=20
-> > The virt-ram block is sent by MultiRDMA, so we only register it for=20
-> > MultiRDMA channels and main channel don't register the virt-ram block.
-> >=20
-> > Signed-off-by: fengzhimin <fengzhimin1@huawei.com>
->=20
-> You can't specialise on the name of the RAMBlock like that.
-> 'mach-virt.ram' is the name specific to just the main ram on just aarch's=
- machine type;  for example the name on x86 is completely different and if =
-you use NUMA or hotplug etc it would also be different on aarch.
->=20
-> Is there a downside to also registering the mach-virt.ram on the main cha=
-nnel?
->=20
-> Dave
->=20
-> > ---
-> >  migration/rdma.c | 140=20
-> > +++++++++++++++++++++++++++++++++++++----------
-> >  1 file changed, 112 insertions(+), 28 deletions(-)
-> >=20
-> > diff --git a/migration/rdma.c b/migration/rdma.c index=20
-> > 0a150099e2..1477fd509b 100644
-> > --- a/migration/rdma.c
-> > +++ b/migration/rdma.c
-> > @@ -618,7 +618,9 @@ const char *print_wrid(int wrid);  static int=20
-> > qemu_rdma_exchange_send(RDMAContext *rdma, RDMAControlHeader *head,
-> >                                     uint8_t *data, RDMAControlHeader *r=
-esp,
-> >                                     int *resp_idx,
-> > -                                   int (*callback)(RDMAContext *rdma))=
-;
-> > +                                   int (*callback)(RDMAContext *rdma,
-> > +                                   uint8_t id),
-> > +                                   uint8_t id);
-> > =20
-> >  static inline uint64_t ram_chunk_index(const uint8_t *start,
-> >                                         const uint8_t *host) @@=20
-> > -1198,24 +1200,81 @@ static int qemu_rdma_alloc_qp(RDMAContext *rdma)
-> >      return 0;
-> >  }
-> > =20
-> > -static int qemu_rdma_reg_whole_ram_blocks(RDMAContext *rdma)
-> > +/*
-> > + * Parameters:
-> > + *    @id =3D=3D UNUSED_ID :
-> > + *    This means that we register memory for the main RDMA channel,
-> > + *    the main RDMA channel don't register the mach-virt.ram block
-> > + *    when we use multiRDMA method to migrate.
-> > + *
-> > + *    @id =3D=3D 0 or id =3D=3D 1 or ... :
-> > + *    This means that we register memory for the multiRDMA channels,
-> > + *    the multiRDMA channels only register memory for the mach-virt.ra=
-m
-> > + *    block when we use multiRDAM method to migrate.
-> > + */
-> > +static int qemu_rdma_reg_whole_ram_blocks(RDMAContext *rdma, uint8_t=
-=20
-> > +id)
-> >  {
-> >      int i;
-> >      RDMALocalBlocks *local =3D &rdma->local_ram_blocks;
-> > =20
-> > -    for (i =3D 0; i < local->nb_blocks; i++) {
-> > -        local->block[i].mr =3D
-> > -            ibv_reg_mr(rdma->pd,
-> > -                    local->block[i].local_host_addr,
-> > -                    local->block[i].length,
-> > -                    IBV_ACCESS_LOCAL_WRITE |
-> > -                    IBV_ACCESS_REMOTE_WRITE
-> > -                    );
-> > -        if (!local->block[i].mr) {
-> > -            perror("Failed to register local dest ram block!\n");
-> > -            break;
-> > +    if (migrate_use_multiRDMA()) {
-> > +        if (id =3D=3D UNUSED_ID) {
-> > +            for (i =3D 0; i < local->nb_blocks; i++) {
-> > +                /* main RDMA channel don't register the mach-virt.ram =
-block */
-> > +                if (strcmp(local->block[i].block_name, "mach-virt.ram"=
-) =3D=3D 0) {
-> > +                    continue;
-> > +                }
-> > +
-> > +                local->block[i].mr =3D
-> > +                    ibv_reg_mr(rdma->pd,
-> > +                            local->block[i].local_host_addr,
-> > +                            local->block[i].length,
-> > +                            IBV_ACCESS_LOCAL_WRITE |
-> > +                            IBV_ACCESS_REMOTE_WRITE
-> > +                            );
-> > +                if (!local->block[i].mr) {
-> > +                    perror("Failed to register local dest ram block!\n=
-");
-> > +                    break;
-> > +                }
-> > +                rdma->total_registrations++;
-> > +            }
-> > +        } else {
-> > +            for (i =3D 0; i < local->nb_blocks; i++) {
-> > +                /*
-> > +                 * The multiRDAM channels only register
-> > +                 * the mach-virt.ram block
-> > +                 */
-> > +                if (strcmp(local->block[i].block_name, "mach-virt.ram"=
-) =3D=3D 0) {
-> > +                    local->block[i].mr =3D
-> > +                        ibv_reg_mr(rdma->pd,
-> > +                                local->block[i].local_host_addr,
-> > +                                local->block[i].length,
-> > +                                IBV_ACCESS_LOCAL_WRITE |
-> > +                                IBV_ACCESS_REMOTE_WRITE
-> > +                                );
-> > +                    if (!local->block[i].mr) {
-> > +                        perror("Failed to register local dest ram bloc=
-k!\n");
-> > +                        break;
-> > +                    }
-> > +                    rdma->total_registrations++;
-> > +                }
-> > +            }
-> > +        }
-> > +    } else {
-> > +        for (i =3D 0; i < local->nb_blocks; i++) {
-> > +            local->block[i].mr =3D
-> > +                ibv_reg_mr(rdma->pd,
-> > +                        local->block[i].local_host_addr,
-> > +                        local->block[i].length,
-> > +                        IBV_ACCESS_LOCAL_WRITE |
-> > +                        IBV_ACCESS_REMOTE_WRITE
-> > +                        );
-> > +            if (!local->block[i].mr) {
-> > +                perror("Failed to register local dest ram block!\n");
-> > +                break;
-> > +            }
-> > +            rdma->total_registrations++;
-> >          }
-> > -        rdma->total_registrations++;
-> >      }
-> > =20
-> >      if (i >=3D local->nb_blocks) {
-> > @@ -1223,8 +1282,10 @@ static int qemu_rdma_reg_whole_ram_blocks(RDMACo=
-ntext *rdma)
-> >      }
-> > =20
-> >      for (i--; i >=3D 0; i--) {
-> > -        ibv_dereg_mr(local->block[i].mr);
-> > -        rdma->total_registrations--;
-> > +        if (local->block[i].mr) {
-> > +            ibv_dereg_mr(local->block[i].mr);
-> > +            rdma->total_registrations--;
-> > +        }
-> >      }
-> > =20
-> >      return -1;
-> > @@ -1446,7 +1507,7 @@ static int qemu_rdma_unregister_waiting(RDMAConte=
-xt *rdma)
-> >          reg.key.chunk =3D chunk;
-> >          register_to_network(rdma, &reg);
-> >          ret =3D qemu_rdma_exchange_send(rdma, &head, (uint8_t *) &reg,
-> > -                                &resp, NULL, NULL);
-> > +                                      &resp, NULL, NULL, UNUSED_ID);
-> >          if (ret < 0) {
-> >              return ret;
-> >          }
-> > @@ -1915,11 +1976,17 @@ static void qemu_rdma_move_header(RDMAContext *=
-rdma, int idx,
-> >   * The extra (optional) response is used during registration to us fro=
-m having
-> >   * to perform an *additional* exchange of message just to provide a re=
-sponse by
-> >   * instead piggy-backing on the acknowledgement.
-> > + *
-> > + * Parameters:
-> > + *    @id : callback function need two parameters, id is the second pa=
-rameter.
-> > + *
-> >   */
-> >  static int qemu_rdma_exchange_send(RDMAContext *rdma, RDMAControlHeade=
-r *head,
-> >                                     uint8_t *data, RDMAControlHeader *r=
-esp,
-> >                                     int *resp_idx,
-> > -                                   int (*callback)(RDMAContext *rdma))
-> > +                                   int (*callback)(RDMAContext *rdma,
-> > +                                   uint8_t id),
-> > +                                   uint8_t id)
-> >  {
-> >      int ret =3D 0;
-> > =20
-> > @@ -1973,7 +2040,7 @@ static int qemu_rdma_exchange_send(RDMAContext *r=
-dma, RDMAControlHeader *head,
-> >      if (resp) {
-> >          if (callback) {
-> >              trace_qemu_rdma_exchange_send_issue_callback();
-> > -            ret =3D callback(rdma);
-> > +            ret =3D callback(rdma, id);
-> >              if (ret < 0) {
-> >                  return ret;
-> >              }
-> > @@ -2168,7 +2235,7 @@ retry:
-> > =20
-> >                  compress_to_network(rdma, &comp);
-> >                  ret =3D qemu_rdma_exchange_send(rdma, &head,
-> > -                                (uint8_t *) &comp, NULL, NULL, NULL);
-> > +                                (uint8_t *) &comp, NULL, NULL, NULL,=
-=20
-> > + UNUSED_ID);
-> > =20
-> >                  if (ret < 0) {
-> >                      return -EIO;
-> > @@ -2195,7 +2262,7 @@ retry:
-> > =20
-> >              register_to_network(rdma, &reg);
-> >              ret =3D qemu_rdma_exchange_send(rdma, &head, (uint8_t *) &=
-reg,
-> > -                                    &resp, &reg_result_idx, NULL);
-> > +                                    &resp, &reg_result_idx, NULL,=20
-> > + UNUSED_ID);
-> >              if (ret < 0) {
-> >                  return ret;
-> >              }
-> > @@ -2828,7 +2895,8 @@ static ssize_t qio_channel_rdma_writev(QIOChannel=
- *ioc,
-> >              head.len =3D len;
-> >              head.type =3D RDMA_CONTROL_QEMU_FILE;
-> > =20
-> > -            ret =3D qemu_rdma_exchange_send(rdma, &head, data, NULL, N=
-ULL, NULL);
-> > +            ret =3D qemu_rdma_exchange_send(rdma, &head, data, NULL,
-> > +                                          NULL, NULL, UNUSED_ID);
-> > =20
-> >              if (ret < 0) {
-> >                  rdma->error_state =3D ret; @@ -3660,7 +3728,7 @@ stati=
-c=20
-> > int qemu_rdma_registration_handle(QEMUFile *f, void *opaque)
-> >              }
-> > =20
-> >              if (rdma->pin_all) {
-> > -                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma);
-> > +                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma,=20
-> > + UNUSED_ID);
-> >                  if (ret) {
-> >                      error_report("rdma migration: error dest "
-> >                                      "registering ram blocks"); @@=20
-> > -3675,6 +3743,15 @@ static int qemu_rdma_registration_handle(QEMUFile *=
-f, void *opaque)
-> >               * their "local" descriptions with what was sent.
-> >               */
-> >              for (i =3D 0; i < local->nb_blocks; i++) {
-> > +                /*
-> > +                 * use the main RDMA channel to deliver the block of d=
-evice
-> > +                 * use the multiRDMA channels to deliver the RAMBlock
-> > +                 */
-> > +                if (migrate_use_multiRDMA() &&
-> > +                    strcmp(local->block[i].block_name, "mach-virt.ram"=
-) =3D=3D 0) {
-> > +                        continue;
-> > +                }
-> > +
-> >                  rdma->dest_blocks[i].remote_host_addr =3D
-> >                      (uintptr_t)(local->block[i].local_host_addr);
-> > =20
-> > @@ -3992,7 +4069,7 @@ static int qemu_rdma_registration_stop(QEMUFile *=
-f, void *opaque,
-> >           */
-> >          ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, &resp,
-> >                      &reg_result_idx, rdma->pin_all ?
-> > -                    qemu_rdma_reg_whole_ram_blocks : NULL);
-> > +                    qemu_rdma_reg_whole_ram_blocks : NULL,=20
-> > + UNUSED_ID);
-> >          if (ret < 0) {
-> >              ERROR(errp, "receiving remote info!");
-> >              return ret;
-> > @@ -4025,6 +4102,11 @@ static int qemu_rdma_registration_stop(QEMUFile =
-*f, void *opaque,
-> >          memcpy(rdma->dest_blocks,
-> >              rdma->wr_data[reg_result_idx].control_curr, resp.len);
-> >          for (i =3D 0; i < nb_dest_blocks; i++) {
-> > +            if (migrate_use_multiRDMA() &&
-> > +                strcmp(local->block[i].block_name, "mach-virt.ram") =
-=3D=3D 0) {
-> > +                continue;
-> > +            }
-> > +
-> >              network_to_dest_block(&rdma->dest_blocks[i]);
-> > =20
-> >              /* We require that the blocks are in the same order */ @@=
-=20
-> > -4050,7 +4132,8 @@ static int qemu_rdma_registration_stop(QEMUFile *f, =
-void *opaque,
-> >      trace_qemu_rdma_registration_stop(flags);
-> > =20
-> >      head.type =3D RDMA_CONTROL_REGISTER_FINISHED;
-> > -    ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL, NULL, NUL=
-L);
-> > +    ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL,
-> > +                                  NULL, NULL, UNUSED_ID);
-> > =20
-> >      if (migrate_use_multiRDMA()) {
-> >          /*
-> > @@ -4298,7 +4381,7 @@ static int qemu_multiRDMA_registration_handle(voi=
-d *opaque)
-> >                    sizeof(RDMALocalBlock), dest_ram_sort_func);
-> > =20
-> >              if (rdma->pin_all) {
-> > -                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma);
-> > +                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma, p->id);
-> >                  if (ret) {
-> >                      error_report("rdma migration: error dest "
-> >                                   "registering ram blocks"); @@=20
-> > -4680,7 +4763,7 @@ static void *multiRDMA_send_thread(void *opaque)
-> > =20
-> >      ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, &resp,
-> >              &reg_result_idx, rdma->pin_all ?
-> > -            qemu_rdma_reg_whole_ram_blocks : NULL);
-> > +            qemu_rdma_reg_whole_ram_blocks : NULL, p->id);
-> >      if (ret < 0) {
-> >          return NULL;
-> >      }
-> > @@ -4749,7 +4832,8 @@ static void *multiRDMA_send_thread(void *opaque)
-> > =20
-> >          /* Send FINISHED to the destination */
-> >          head.type =3D RDMA_CONTROL_REGISTER_FINISHED;
-> > -        ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL, NULL,=
- NULL);
-> > +        ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL,
-> > +                                      NULL, NULL, p->id);
-> >          if (ret < 0) {
-> >              return NULL;
-> >          }
-> > --
-> > 2.19.1
-> >=20
-> >=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Sm9obiwgSSBkb24ndCBxdWl0ZSBmb2xsb3cgZGlzY3Vzc2lvbiBpbiBidWd6aWxsYS4gRG8gd2Ug
+bmVlZCB0aGVzZSBzZXJpZXMNCmFzIGF0IGxlYXN0IHRlbXBvcmFyeSB3b3JrYXJvdW5kLCBvciBu
+b3Q/IFNob3VsZCBJIHJlc2VuZD8NCg0KDQoxOS4xMi4yMDE5IDExOjUxLCBWbGFkaW1pciBTZW1l
+bnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiBIaSBhbGwhDQo+IA0KPiBJdCdzIGEgY29udGludWF0
+aW9uIGZvcg0KPiAiYml0bWFwIG1pZ3JhdGlvbiBidWcgd2l0aCAtZHJpdmUgd2hpbGUgYmxvY2sg
+bWlycm9yIHJ1bnMiDQo+IDwzMTVjZmY3OC1kY2RiLWEzY2UtMjc0Mi1kYTNjYzlmMGNhOTdAcmVk
+aGF0LmNvbT4NCj4gaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVs
+LzIwMTktMDkvbXNnMDcyNDEuaHRtbA0KPiANCj4gVGhlIHByb2JsZW0gaXMgdGhhdCBiaXRtYXBz
+IG1pZ3JhdGVkIHRvIG5vZGUgd2l0aCBzYW1lIG5vZGUtbmFtZSBvcg0KPiBibGstcGFyZW50IG5h
+bWUuIEFuZCBjdXJyZW50bHkgb25seSB0aGUgbGF0dGVyIGFjdHVhbGx5IHdvcmsgaW4gbGlidmly
+dC4NCj4gQW5kIHdpdGggbWlycm9yLXRvcCBmaWx0ZXIgaXQgZG9lc24ndCB3b3JrLCBiZWNhdXNl
+DQo+IGJkcnZfZ2V0X2RldmljZV9vcl9ub2RlX25hbWUgZG9uJ3QgZ28gdGhyb3VnaCBmaWx0ZXJz
+Lg0KPiANCj4gRml4IHRoaXMgYnkgaGFuZGxpbmcgZmlsdGVyZWQgY2hpbGRyZW4gb2YgYmxvY2sg
+YmFja2VuZHMgaW4gc2VwYXJhdGUuDQo+IA0KPiB2MjogcmViYXNlIG9uIGN1cnJlbnQgbWFzdGVy
+DQo+IA0KPiBNYXggUmVpdHogKDEpOg0KPiAgICBibG9jazogTWFyayBjb21taXQgYW5kIG1pcnJv
+ciBhcyBmaWx0ZXIgZHJpdmVycw0KPiANCj4gVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSAo
+NCk6DQo+ICAgIG1pZ3JldGlvbi9ibG9jay1kaXJ0eS1iaXRtYXA6IHJlZmFjdG9yIGluaXRfZGly
+dHlfYml0bWFwX21pZ3JhdGlvbg0KPiAgICBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBiZHJ2X2hh
+c19uYW1lZF9iaXRtYXBzIGhlbHBlcg0KPiAgICBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFw
+OiBmaXggYml0bWFwcyBtaWdyYXRpb24gZHVyaW5nIG1pcnJvciBqb2INCj4gICAgaW90ZXN0czog
+MTk0OiB0ZXN0IGFsc28gbWlncmF0aW9uIG9mIGRpcnR5IGJpdG1hcA0KPiANCj4gICBpbmNsdWRl
+L2Jsb2NrL2Jsb2NrX2ludC5oICAgICAgfCAgIDggKystDQo+ICAgaW5jbHVkZS9ibG9jay9kaXJ0
+eS1iaXRtYXAuaCAgIHwgICAxICsNCj4gICBibG9jay9jb21taXQuYyAgICAgICAgICAgICAgICAg
+fCAgIDIgKw0KPiAgIGJsb2NrL2RpcnR5LWJpdG1hcC5jICAgICAgICAgICB8ICAxMyArKysrDQo+
+ICAgYmxvY2svbWlycm9yLmMgICAgICAgICAgICAgICAgIHwgICAyICsNCj4gICBtaWdyYXRpb24v
+YmxvY2stZGlydHktYml0bWFwLmMgfCAxMTQgKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0t
+LS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzE5NCAgICAgICAgIHwgIDE0ICsrLS0NCj4gICB0
+ZXN0cy9xZW11LWlvdGVzdHMvMTk0Lm91dCAgICAgfCAgIDYgKysNCj4gICA4IGZpbGVzIGNoYW5n
+ZWQsIDExOSBpbnNlcnRpb25zKCspLCA0MSBkZWxldGlvbnMoLSkNCj4gDQoNCg0KLS0gDQpCZXN0
+IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
