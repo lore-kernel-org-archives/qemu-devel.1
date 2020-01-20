@@ -2,80 +2,67 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 793BBC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82BEBC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:15:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48342207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:06:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbvlmP9x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48342207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 550DF20882
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:15:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 550DF20882
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=de.adit-jv.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itVpF-0006gL-Fk
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 07:06:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50909)
+	id 1itVxz-00019l-9J
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 07:15:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1itVoQ-0005o6-Vi
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:05:48 -0500
+ (envelope-from <erosca@de.adit-jv.com>) id 1itVxI-0000f0-8b
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:14:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1itVoP-000595-N1
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:05:46 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:42932)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1itVoP-00058Y-Fe
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:05:45 -0500
-Received: by mail-lj1-x242.google.com with SMTP id y4so33564639ljj.9
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 04:05:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hdAp30xrsSt2od2S8ebUYdHVYwa2PaAeyPBmHJMBeH4=;
- b=HbvlmP9xWIenwVkpBAmnZhrGpucKnoa3sr1CdWNuSYMpl9LHHYszzQKVEYKN1mYRgj
- hDoBRicAMJF/s+S/4eMwZEIrzs1UnIUtwHkOv3z2YEKjt+kxklCQ3+TyzdT49OijMHrj
- B9n26Q/Blm9yYQkCe9GwH6MQYAau744Nxsgur8EeygPe5LGr1YUUiAsnOp92FslRd3S0
- 0kESpL9KCMzFxe0tNE+KaVIhTaTJs9smepJSrZqVE9RGUEoU+HMuqzQ19LOZxj1dzOFN
- 8TatOB3xDsfodnUz2B6IU0rY8lVdsfpbtyEpoSJwrmnGxqB/BpATocNtNh3K5SYaeXFO
- N4vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hdAp30xrsSt2od2S8ebUYdHVYwa2PaAeyPBmHJMBeH4=;
- b=tYbJSNK4abfz8tvh+gZKRn2ytF4fqzpdXHjYD707+P8P62851AgqFuqiYhGAbsgozX
- Ot9xVKd+VXYDU462z1oVpEMZc9BYk+EDAoNW1DVq03GAA6sBEOE9RWHySlx9QJEbvGyo
- wJbbkmcL6rPtrhXhhoDIKE/WiHqbcNHPmD5exDrTE/6tw2977SncMpMko2a8VQjEws4D
- EdN2UlDnHrIvaOfpl7H15HKGxhD+pwjJxJtYozlfvj67u5VFoG72IZrGzgm2YokZ5CFF
- e4lcp+kCPvwtfctKnmfqKv52KxaSOxMt/Iy8ah9ugqKBYrtxBGWSSlArz4Z8WbV63xYf
- OsAQ==
-X-Gm-Message-State: APjAAAV9gAR5eLAdUOdpTDJcRcB5e2SVmEdgAkwn4sCbp6YB2HZFI8+E
- wwwWvDDDWB95TtgWZTKw7T8q4mNlt+CJRMQcFaU=
-X-Google-Smtp-Source: APXvYqxv94DPGhCjdTuyG8jmDEOM4aYuleAZAL3l5UoKo4f2MhhA2bA0PB64cv0fPVFkAL67HoSJXH4orDsU2wV7+Js=
-X-Received: by 2002:a2e:8946:: with SMTP id b6mr13205075ljk.1.1579521943812;
- Mon, 20 Jan 2020 04:05:43 -0800 (PST)
+ (envelope-from <erosca@de.adit-jv.com>) id 1itVxG-00021j-NG
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:14:56 -0500
+Received: from smtp1.de.adit-jv.com ([93.241.18.167]:37203)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <erosca@de.adit-jv.com>)
+ id 1itVxG-0001xb-D8
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:14:54 -0500
+Received: from localhost (smtp1.de.adit-jv.com [127.0.0.1])
+ by smtp1.de.adit-jv.com (Postfix) with ESMTP id C7E013C00C5;
+ Mon, 20 Jan 2020 13:14:50 +0100 (CET)
+Received: from smtp1.de.adit-jv.com ([127.0.0.1])
+ by localhost (smtp1.de.adit-jv.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Bta2hz3l_WGv; Mon, 20 Jan 2020 13:14:42 +0100 (CET)
+Received: from HI2EXCH01.adit-jv.com (hi2exch01.adit-jv.com [10.72.92.24])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by smtp1.de.adit-jv.com (Postfix) with ESMTPS id AC1BB3C04C1;
+ Mon, 20 Jan 2020 13:14:42 +0100 (CET)
+Received: from lxhi-065.adit-jv.com (10.72.93.66) by HI2EXCH01.adit-jv.com
+ (10.72.92.24) with Microsoft SMTP Server (TLS) id 14.3.468.0; Mon, 20 Jan
+ 2020 13:14:42 +0100
+Date: Mon, 20 Jan 2020 13:14:39 +0100
+From: Eugeniu Rosca <erosca@de.adit-jv.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH v3 0/7] gpio: Add GPIO Aggregator/Repeater
+Message-ID: <20200120121439.GA24951@lxhi-065.adit-jv.com>
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20200118014632.GA14644@lxhi-065.adit-jv.com>
+ <CAMuHMdUUc17n0TxOrtQNby+ZiHDpz-aEh-ncnkz50vcwQe6z6w@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200109024907.2730-1-richard.henderson@linaro.org>
- <20200109024907.2730-5-richard.henderson@linaro.org>
-In-Reply-To: <20200109024907.2730-5-richard.henderson@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 20 Jan 2020 22:05:14 +1000
-Message-ID: <CAKmqyKO+TA2QG0zLPyUAz5a58sA8FPbtJdFA9CRWOTnz0hDVkA@mail.gmail.com>
-Subject: Re: [PATCH 4/9] cputlb: Hoist tlb portions in tlb_mmu_resize_locked
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdUUc17n0TxOrtQNby+ZiHDpz-aEh-ncnkz50vcwQe6z6w@mail.gmail.com>
+X-Originating-IP: [10.72.93.66]
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 93.241.18.167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,112 +74,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Eugeniu Rosca <roscaeugeniu@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE
+ TREE BINDINGS" <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Harish Jenny K N <harish_kandiga@mentor.com>, "open
+ list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 9, 2020 at 12:52 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> No functional change, but the smaller expressions make
-> the code easier to read.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Hi Geert,
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+On Mon, Jan 20, 2020 at 10:33:53AM +0100, Geert Uytterhoeven wrote:
+> On Sat, Jan 18, 2020 at 2:46 AM Eugeniu Rosca <erosca@de.adit-jv.com> wrote:
+> > The only unexpected thing is seeing below messages (where gpiochip99 and
+> > gpiochip22 are inexisting gpiochip names, mistakenly provided on command
+> > line prior to passing the correct name):
+> >
+> > root@rcar-gen3:~# echo gpiochip6 12-13 > /sys/bus/platform/drivers/gpio-aggregator/new_device
+> > [  915.572905] gpio-aggregator gpio-aggregator.0: cannot find GPIO chip gpiochip99, deferring
+> > [  915.584224] gpio-aggregator gpio-aggregator.2: cannot find GPIO chip gpiochip99, deferring
+> > [  915.865281] gpio-aggregator gpio-aggregator.29: cannot find GPIO chip gpiochip22, deferring
+> >
+> > Obviously, in the above case, due to a typo in the names, the gpio
+> > chips will never be found, no matter how long gpio-aggregator defers
+> 
+> Indeed, that is expected behavior: you have created platform devices
+> referring to resources that are not available.
 
-Alistair
+Got it. Sounds reasonable to me.
 
-> ---
->  accel/tcg/cputlb.c | 35 +++++++++++++++++------------------
->  1 file changed, 17 insertions(+), 18 deletions(-)
->
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index 49c605b6d8..c7dc1dc85a 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -115,8 +115,8 @@ static void tlb_dyn_init(CPUArchState *env)
->
->  /**
->   * tlb_mmu_resize_locked() - perform TLB resize bookkeeping; resize if necessary
-> - * @env: CPU that owns the TLB
-> - * @mmu_idx: MMU index of the TLB
-> + * @desc: The CPUTLBDesc portion of the TLB
-> + * @fast: The CPUTLBDescFast portion of the same TLB
->   *
->   * Called with tlb_lock_held.
->   *
-> @@ -153,10 +153,9 @@ static void tlb_dyn_init(CPUArchState *env)
->   * high), since otherwise we are likely to have a significant amount of
->   * conflict misses.
->   */
-> -static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
-> +static void tlb_mmu_resize_locked(CPUTLBDesc *desc, CPUTLBDescFast *fast)
->  {
-> -    CPUTLBDesc *desc = &env_tlb(env)->d[mmu_idx];
-> -    size_t old_size = tlb_n_entries(&env_tlb(env)->f[mmu_idx]);
-> +    size_t old_size = tlb_n_entries(fast);
->      size_t rate;
->      size_t new_size = old_size;
->      int64_t now = get_clock_realtime();
-> @@ -198,14 +197,15 @@ static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
->          return;
->      }
->
-> -    g_free(env_tlb(env)->f[mmu_idx].table);
-> -    g_free(env_tlb(env)->d[mmu_idx].iotlb);
-> +    g_free(fast->table);
-> +    g_free(desc->iotlb);
->
->      tlb_window_reset(desc, now, 0);
->      /* desc->n_used_entries is cleared by the caller */
-> -    env_tlb(env)->f[mmu_idx].mask = (new_size - 1) << CPU_TLB_ENTRY_BITS;
-> -    env_tlb(env)->f[mmu_idx].table = g_try_new(CPUTLBEntry, new_size);
-> -    env_tlb(env)->d[mmu_idx].iotlb = g_try_new(CPUIOTLBEntry, new_size);
-> +    fast->mask = (new_size - 1) << CPU_TLB_ENTRY_BITS;
-> +    fast->table = g_try_new(CPUTLBEntry, new_size);
-> +    desc->iotlb = g_try_new(CPUIOTLBEntry, new_size);
-> +
->      /*
->       * If the allocations fail, try smaller sizes. We just freed some
->       * memory, so going back to half of new_size has a good chance of working.
-> @@ -213,25 +213,24 @@ static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
->       * allocations to fail though, so we progressively reduce the allocation
->       * size, aborting if we cannot even allocate the smallest TLB we support.
->       */
-> -    while (env_tlb(env)->f[mmu_idx].table == NULL ||
-> -           env_tlb(env)->d[mmu_idx].iotlb == NULL) {
-> +    while (fast->table == NULL || desc->iotlb == NULL) {
->          if (new_size == (1 << CPU_TLB_DYN_MIN_BITS)) {
->              error_report("%s: %s", __func__, strerror(errno));
->              abort();
->          }
->          new_size = MAX(new_size >> 1, 1 << CPU_TLB_DYN_MIN_BITS);
-> -        env_tlb(env)->f[mmu_idx].mask = (new_size - 1) << CPU_TLB_ENTRY_BITS;
-> +        fast->mask = (new_size - 1) << CPU_TLB_ENTRY_BITS;
->
-> -        g_free(env_tlb(env)->f[mmu_idx].table);
-> -        g_free(env_tlb(env)->d[mmu_idx].iotlb);
-> -        env_tlb(env)->f[mmu_idx].table = g_try_new(CPUTLBEntry, new_size);
-> -        env_tlb(env)->d[mmu_idx].iotlb = g_try_new(CPUIOTLBEntry, new_size);
-> +        g_free(fast->table);
-> +        g_free(desc->iotlb);
-> +        fast->table = g_try_new(CPUTLBEntry, new_size);
-> +        desc->iotlb = g_try_new(CPUIOTLBEntry, new_size);
->      }
->  }
->
->  static void tlb_flush_one_mmuidx_locked(CPUArchState *env, int mmu_idx)
->  {
-> -    tlb_mmu_resize_locked(env, mmu_idx);
-> +    tlb_mmu_resize_locked(&env_tlb(env)->d[mmu_idx], &env_tlb(env)->f[mmu_idx]);
->      env_tlb(env)->d[mmu_idx].n_used_entries = 0;
->      env_tlb(env)->d[mmu_idx].large_page_addr = -1;
->      env_tlb(env)->d[mmu_idx].large_page_mask = -1;
-> --
-> 2.20.1
->
->
+> 
+> > their probing. Unfortunately, the driver will continuously emit those
+> > messages, upon each successfully created/aggregated gpiochip. I built
+> 
+> That is expected behavior, too: every time the driver core manages to
+> bind a device to a driver, it will retry all previously deferred probes,
+> in the hope they can be satisfied by the just bound device.
+> 
+> Note that you can destroy these bogus devices, using e.g.
+> 
+>     # echo gpio-aggregator.0 > \
+>     /sys/bus/platform/drivers/gpio-aggregator/delete_device
+
+Yep, I can get rid of the bogus devices this way. Thanks!
+
+> 
+> > gpio-aggregator as a loadable module, if that's relevant.
+> 
+> Modular or non-modular shouldn't matter w.r.t. this behavior.
+> Although unloading the module should get rid of the cruft.
+
+Yes, indeed!
+
+> 
+> > Another comment is that, while the series _does_ allow specifying
+> > gpio lines in the DTS (this would require a common compatible string
+> > in gpio_aggregator_dt_ids[] and in the DTS node) and while those lines
+> > are indeed exposed to userspace, based on my testing, these same gpio
+> > lines are marked as "used/reserved" by the kernel. This means that
+> > operating on those gpio pins from userspace will not be possible.
+> > For instance, gpioget/gpioset return "Device or resource busy":
+> >
+> > gpioget: error reading GPIO values: Device or resource busy
+> > gpioset: error setting the GPIO line values: Device or resource busy
+> >
+> > I guess Harish will be unhappy about that, as his expectation was that
+> > upon merging gpio-aggregator with gpio-inverter, he will be able to
+> > describe GPIO polarity and names in DTS without "hogging" the pins.
+> > Perhaps this can be supplemented via an add-on patch later on?
+> 
+> When aggregating GPIO lines, the original GPIO lines are indeed marked
+> used/reserved, so you cannot use them from userspace.
+> However, you are expected to use them through the newly created virtual
+> gpiochip representing the aggregated GPIO lines.
+> 
+> You can try this using the "door" example in
+> Documentation/admin-guide/gpio/gpio-aggregator.rst, after replacing
+> gpio2 {19,20} by gpio6 {12,13} to suit your H3ULCB.
+
+Confirmed. The example works like a charm. One difference between
+the runtime-created and DTS-created gpiochips is the name:
+ - gpio-aggregator.<number>, for the ones created via sysfs
+ - <name-of-DTS-node>, for the ones created via DTS
+
+Seeing this behavior on my target, I believe the expectations of
+Harish should be met w/o any major limitations.
+
+> 
+> > For the whole series (leaving the above findings to your discretion):
+> >
+> > Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+> > Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+
+The recent [v3] discussion actually applies to [v4], for which I did
+review and testing. Will relay the signatures to the latest version.
+
+Thank you very much.
+
+-- 
+Best Regards,
+Eugeniu
 
