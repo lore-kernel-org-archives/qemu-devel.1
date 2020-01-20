@@ -2,74 +2,86 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63FAEC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C10CCC33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:52:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 387A221D7E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:36:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 387A221D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FD892070C
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 15:52:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UeSDbpC3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD892070C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itZ6G-0000yA-FE
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 10:36:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50950)
+	id 1itZLw-0008Ir-Nx
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 10:52:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53037)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1itZ5X-0000Eh-Iy
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:35:43 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itZKR-0007ER-D6
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1itZ5T-0001KT-R4
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:35:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46226)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1itZ5T-0001Jo-L3
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:35:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1itZ5R-00077e-SX
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 15:35:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D55B02E80CD
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 15:35:33 +0000 (UTC)
+ (envelope-from <dgilbert@redhat.com>) id 1itZKL-0002xI-Iv
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:51:02 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46191
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itZKL-0002xE-Eh
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 10:50:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579535457;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ejPQtz/UW624Tv+8quf3JJdZo9SF044qhzOWJzL2E7Y=;
+ b=UeSDbpC3LmqKrSSzAux/Jc1DnhAq7GiaX1/5ORoOcrVTgvK9G4BHcPZt37p1CxRgrwKIbV
+ FgPyhKmM6B6fBosqufZB8cdvuIAmeWDjvTEDzgVKgLECmGam/ukYWR2pAok0BYkscMUNGq
+ HlP5EBZSm7SyhVxn7Sj8qYr1Xz78A/Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-vNWcxG_aNXGFugAdwlvLNg-1; Mon, 20 Jan 2020 10:50:48 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE91A10054E3;
+ Mon, 20 Jan 2020 15:50:47 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 48E4A8BE11;
+ Mon, 20 Jan 2020 15:50:44 +0000 (UTC)
+Date: Mon, 20 Jan 2020 15:50:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH 091/104] libvhost-user: Fix some memtable remap cases
+Message-ID: <20200120155041.GO2827@work-vm>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-92-dgilbert@redhat.com>
+ <CAJ+F1CKRGS_bzm=HXQrswE2nVvP-Nfur80YZK790nO-xkCNxcg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAJ+F1CKRGS_bzm=HXQrswE2nVvP-Nfur80YZK790nO-xkCNxcg@mail.gmail.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: vNWcxG_aNXGFugAdwlvLNg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jan 2020 15:26:28 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm gcc9.2 segfault
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fgodeh pmaydell
-X-Launchpad-Bug-Reporter: Fabian Godehardt (fgodeh)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <157666594314.15384.3778802807711797985.malonedeb@wampee.canonical.com>
-Message-Id: <157953398861.24612.16671820632562065829.malone@chaenomeles.canonical.com>
-Subject: [Bug 1856837] Re: qemu 4.2.0 arm  segmentation fault with gcc 9.2
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="f1052173880d8dae43faa7c2fc45da1b42227143";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1783b07db55f9fcb9987db49b9190eb4124d351f
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,120 +90,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856837 <1856837@bugs.launchpad.net>
+Cc: QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At the point of the segfault, QEMU is correctly delivering a segfault to
-the guest because it has attempted to dereference a NULL pointer. You
-can see this if you run QEMU with the '-g 1234' option and connect an
-arm-aware gdb to it:
+* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> Hi
+>=20
+> On Thu, Dec 12, 2019 at 10:05 PM Dr. David Alan Gilbert (git)
+> <dgilbert@redhat.com> wrote:
+> >
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > If a new setmemtable command comes in once the vhost threads are
+> > running, it will remap the guests address space and the threads
+> > will now be looking in the wrong place.
+> >
+> > Fortunately we're running this command under lock, so we can
+> > update the queue mappings so that threads will look in the new-right
+> > place.
+> >
+> > Note: This doesn't fix things that the threads might be doing
+> > without a lock (e.g. a readv/writev!)  That's for another time.
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  contrib/libvhost-user/libvhost-user.c | 33 ++++++++++++++++++++-------
+> >  contrib/libvhost-user/libvhost-user.h |  3 +++
+> >  2 files changed, 28 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-u=
+ser/libvhost-user.c
+> > index 63e41062a4..b89bf18501 100644
+> > --- a/contrib/libvhost-user/libvhost-user.c
+> > +++ b/contrib/libvhost-user/libvhost-user.c
+> > @@ -564,6 +564,21 @@ vu_reset_device_exec(VuDev *dev, VhostUserMsg *vms=
+g)
+> >      return false;
+> >  }
+> >
+> > +static bool
+> > +map_ring(VuDev *dev, VuVirtq *vq)
+> > +{
+> > +    vq->vring.desc =3D qva_to_va(dev, vq->vra.desc_user_addr);
+> > +    vq->vring.used =3D qva_to_va(dev, vq->vra.used_user_addr);
+> > +    vq->vring.avail =3D qva_to_va(dev, vq->vra.avail_user_addr);
+> > +
+> > +    DPRINT("Setting virtq addresses:\n");
+> > +    DPRINT("    vring_desc  at %p\n", vq->vring.desc);
+> > +    DPRINT("    vring_used  at %p\n", vq->vring.used);
+> > +    DPRINT("    vring_avail at %p\n", vq->vring.avail);
+> > +
+> > +    return !(vq->vring.desc && vq->vring.used && vq->vring.avail);
+> > +}
+> > +
+> >  static bool
+> >  vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+> >  {
+> > @@ -767,6 +782,14 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vm=
+sg)
+> >          close(vmsg->fds[i]);
+> >      }
+> >
+> > +    for (i =3D 0; i < dev->max_queues; i++) {
+> > +        if (dev->vq[i].vring.desc) {
+>=20
+> The code usually checks for all (vq->vring.desc && vq->vring.used &&
+> vq->vring.avail).
+>=20
+> Perhaps we should introduce a VQ_RING_IS_SET() macro?
 
-(gdb) disas $pc-32,$pc+32
-Dump of assembler code from 0x2bf24c to 0x2bf28c:
-   0x002bf24c:  ldr     r4, [r0, #296]  ; 0x128
-   0x002bf250:  mov     r6, r1
-   0x002bf254:  add     r8, r0, #40     ; 0x28
-   0x002bf258:  mov     r5, #0
-   0x002bf25c:  b       0x2bf268
-   0x002bf260:  cmp     r5, r6
-   0x002bf264:  bge     0x2bf2d4
-   0x002bf268:  mov     r12, r4
-=3D> 0x002bf26c:  ldr     r4, [r4]
-   0x002bf270:  ldr     r3, [r12, #12]
-   0x002bf274:  tst     r3, #512        ; 0x200
-   0x002bf278:  bne     0x2bf2c0
-   0x002bf27c:  tst     r3, #1024       ; 0x400
-   0x002bf280:  ubfx    r1, r3, #11, #1
-   0x002bf284:  bne     0x2bf2c0
-   0x002bf288:  tst     r3, #2048       ; 0x800
-End of assembler dump.
-(gdb) print /x $r4
-$3 =3D 0x0
+I'd like to understand why? and what to do in the case only one was set?
+In this case I'm intending to make sure that there's no old mapping left
+in any of the 3.
 
-It looks like this is in the middle of somebody's garbage collector (the
-elf symbol is _ZN2v88internal10PagedSpace14AdvanceSweeperEi).
+> > +            if (map_ring(dev, &dev->vq[i])) {
+> > +                vu_panic(dev, "remaping queue %d during setmemtable", =
+i);
+> > +            }
+> > +        }
+> > +    }
+> > +
+> >      return false;
+> >  }
+> >
+> > @@ -853,18 +876,12 @@ vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *=
+vmsg)
+> >      DPRINT("    avail_user_addr:  0x%016" PRIx64 "\n", vra->avail_user=
+_addr);
+> >      DPRINT("    log_guest_addr:   0x%016" PRIx64 "\n", vra->log_guest_=
+addr);
+> >
+> > +    vq->vra =3D *vra;
+> >      vq->vring.flags =3D vra->flags;
+> > -    vq->vring.desc =3D qva_to_va(dev, vra->desc_user_addr);
+> > -    vq->vring.used =3D qva_to_va(dev, vra->used_user_addr);
+> > -    vq->vring.avail =3D qva_to_va(dev, vra->avail_user_addr);
+> >      vq->vring.log_guest_addr =3D vra->log_guest_addr;
+> >
+> > -    DPRINT("Setting virtq addresses:\n");
+> > -    DPRINT("    vring_desc  at %p\n", vq->vring.desc);
+> > -    DPRINT("    vring_used  at %p\n", vq->vring.used);
+> > -    DPRINT("    vring_avail at %p\n", vq->vring.avail);
+> >
+> > -    if (!(vq->vring.desc && vq->vring.used && vq->vring.avail)) {
+> > +    if (map_ring(dev, vq)) {
+> >          vu_panic(dev, "Invalid vring_addr message");
+> >          return false;
+> >      }
+> > diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-u=
+ser/libvhost-user.h
+> > index 1844b6f8d4..5cb7708559 100644
+> > --- a/contrib/libvhost-user/libvhost-user.h
+> > +++ b/contrib/libvhost-user/libvhost-user.h
+> > @@ -327,6 +327,9 @@ typedef struct VuVirtq {
+> >      int err_fd;
+> >      unsigned int enable;
+> >      bool started;
+> > +
+> > +    /* Guest addresses of our ring */
+> > +    struct vhost_vring_addr vra;
+> >  } VuVirtq;
+> >
+> >  enum VuWatchCondtion {
+> > --
+> > 2.23.0
+> >
+> >
+>=20
+> Looks reasonable otherwise (assuming all running threads were flushed
+> somehow by other means)
 
-The next step would be to find out what was going on in the run-up to
-that that resulted in the NULL pointer. That's a bit of guest-level
-debugging work that would be much easier with the source code. If you
-can debug where something unexpected happens to the guest that would
-probably help -- this is likely to be a much longer piece of debugging
-than I'm afraid I have time to do.
+Yeh, well, that's a separate question - which I think there's room for
+more caution over; but that is why there's a 'some' in the subject line.
 
--- =
+Dave
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856837
+> --=20
+> Marc-Andr=E9 Lureau
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Title:
-  qemu 4.2.0 arm  segmentation fault with gcc 9.2
-
-Status in QEMU:
-  New
-
-Bug description:
-  As discussed with f4bug yesterday on IRC here comes the bug
-  description.
-
-  I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
-  6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
-  linux-user" and debug enabled. I use the arm-linux-user variant,
-  "qemu-arm".
-
-  Then i'm trying to cross-compile (arm gcc) an old version of googles
-  v8 (as i need this version of the lib for binary compatibility) which
-  uses qemu during build.
-
-  It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
-  7.4.0 and 8.3.0 but those are also causing the same segmentation
-  fault.
-
-  The executed command wich breaks qemu is:
-
-   qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
-  positions --logfile
-  /tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
-  --random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
-
-  The printed error message is:
-
-  ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=
-=3D1 MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  Calling qemu with gdb gives the following information:
-
-   Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
-   0x0000555555d63d11 in static_code_gen_buffer ()
-
-  and
-
-   (gdb) bt
-   #0  0x0000555555d63d11 in static_code_gen_buffer ()
-   #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55=
-5557c33930) at =
-
-   /tmp/build/qemu/accel/tcg/cpu-exec.c:172
-   #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<syntheti=
-c pointer>, tb=3D<optimized out>, =
-
-   cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
-   #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel=
-/tcg/cpu-exec.c:731
-   #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/=
-qemu/linux-user/arm/cpu_loop.c:219
-  #5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
-
-  Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the
-  log in the attached file.
-
-  Thanks for any hints!
-  Fabian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856837/+subscriptions
 
