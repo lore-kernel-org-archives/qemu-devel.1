@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE22FC32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 06:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61891C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 06:04:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92A2A2073D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 06:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AAF52073D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 06:04:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="LUS1vhgX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92A2A2073D
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="J3IaHCAE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AAF52073D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itQAM-0008Bb-00
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 01:04:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35178)
+	id 1itQB5-0000It-4S
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 01:04:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1itQ1P-0006ow-Ar
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 00:54:48 -0500
+ (envelope-from <alxndr@bu.edu>) id 1itQ1j-0007Kv-BV
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 00:55:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alxndr@bu.edu>) id 1itQ1N-0006Fx-6b
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 00:54:47 -0500
-Received: from mail-bn7nam10on2115.outbound.protection.outlook.com
- ([40.107.92.115]:59757 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ (envelope-from <alxndr@bu.edu>) id 1itQ1g-0006Tf-01
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 00:55:07 -0500
+Received: from mail-bn7nam10on2111.outbound.protection.outlook.com
+ ([40.107.92.111]:18623 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1itQ1N-0006Fc-2K
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 00:54:45 -0500
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1itQ1f-0006TL-QT
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 00:55:03 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gNBpxbS7ZrctVDxE81gTX2gMOkZWLn9SSaOSZzA9FRVbT+JytFlTccsBT0ThianycX4LYevoGPi2nnwle2PXiHOT1f3cjiVjePb/qvpGf2OIEpnEICKP3AyEcd34w+kr8F0JyBy8LP3wiWmEgzPeMeIa4FHrtdRAGdUGGdDvXD429Q3SFFHzPsqMxsJUnumyIl4SqMRwXYMjejgUqOJvuz75dynvLSCjfwr31H7dWXOvvTOmnngqKMncM1/BUGOg2kGTf6PZacAr1R6OGs5rnyBowEH+CKwnEtEvOaOSy56b5OCJwM3uSk2/6Z53FLLrigyQCMWMeawsZgLkRklCwQ==
+ b=GQFiWZmVVxzkY2oALYFK6NE35iqduQU6wTJoacKXw0K2SUunz3LQdPN3/bMoWY+4sAhCYyvslFO265AEzFPmWPND9Wx+f9BnscDw9/x3d06z37jYO8ahxP29jU2K0tj+zzB7d6uxe5eDD2AE0hH7RWx/SGnzJKjs+qpji+Oen+/bh8PGSvUBtBndZhD/jJ+4+kIQCPCguGT6QBRnqpx+S65wFvCjzeqTkZXwQ4A1eklnVUx47YZLskNoQ3IDq5NpVHZ+x25/oL2oEb8O/zlZCGNcZkQ9mfmLiOmpbN77qBD5mg/G+XCtkbQ5bzrtg+fIZVY6RFUT3BThi0TcnziGww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sDcyKBGnhfVKL9MV14vCpp1u3vtovcs2UihQKuSPZwg=;
- b=dBhOgNrjaCELR+YFroUY7uV+T7e0CwqLP4fmTZlKgUCqQFljEv7oMxi8Ke+wS2CyTLwHY7pRDxCtbYeGNLtjBNG8PDDuVg6S2FAYiX4gb7rCbn7LMR0rMfVTFYjdJdkip6Qscc1kezNN/ewaClAIxJaWgt54p1P8OSf8y4+rGfkatDXkbtaPvnoL0ids0iiSdWePgGQh4hSbm8DCbmubPMnstssmec0rqbw74yc1fdw1MWiyk6Wd734cCaT6OMV0ng3hYEe6E47VRmeKvqK1J81fmGjw2qRBLr0LItfq5qillTZNO36K7cEZKum839vgRkWAbxx/1lYSSQBCFW0e0A==
+ bh=FfY1+16kphmDJ7KfW3C1Len7PaAQLoDr0wlMmfRhp+w=;
+ b=G59Fnu5/L7+aMQ+qKEeNJVh7tlIW0RvdHWGmQfPmwqkgKZpC6EpvE450kAlh6l7Ed6WX7XgD55BK4ONTvh0K/L895ZWCiKCxSwAh7HDgMXQSOHRylrdnrGgmeVglzH+5u8Cp9YX8b71h7Z6a0B6/go6ol3IAV59MTWZbjlfRrWyUwnYWZCoPG9LwgtBM6z1NUba3BXMTHmoY/0n45YMWWqmA3lAIMvTmlyxP53h+YuJyr/jQBRwknRIxom0CYVlaadEN8xxiMndBDFPpkMn3OYKe848AL6mdjmjzadtEnXwlrCQPrzh6RMz6zeN5hoRnsK2p40q0iH30LOuPyYIWjw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sDcyKBGnhfVKL9MV14vCpp1u3vtovcs2UihQKuSPZwg=;
- b=LUS1vhgXF4ztdBXucAcpDvzDaygEaM9pa1ENtRdWSLN4VCPKTdR0KU/pBQbWOSn2eqhgJG8t11dHnjeqXFVfXX/mlYXcn9H2rGGchalP5oeBMuXfhc4+OsADC7jepLjCP+G8lcHdcvgT6oPUfYhoYKItLwA2+pShIkq4KwkoRTA=
+ bh=FfY1+16kphmDJ7KfW3C1Len7PaAQLoDr0wlMmfRhp+w=;
+ b=J3IaHCAE2gIW49KoTbtsSMPiaVdTwJKP0Zk2vXAoYbyRcreubE+ZYM73ncqH21FkbgO7cTwy3Ak04vr5HQEP306N+B9NY++DXhl4VE5WY11FDF1NfLnxpwqS5NEcj83Xxtvg626n2eg98qqAGwiq7q7nLKMeguzBYPhCkJy1oSs=
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (52.135.102.32) by
  SN6PR03MB4399.namprd03.prod.outlook.com (20.178.6.20) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.23; Mon, 20 Jan 2020 05:54:44 +0000
+ 15.20.2644.23; Mon, 20 Jan 2020 05:55:03 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::9c11:10cd:6e97:bbe8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::9c11:10cd:6e97:bbe8%7]) with mapi id 15.20.2644.024; Mon, 20 Jan 2020
- 05:54:44 +0000
+ 05:55:03 +0000
 Received: from mozz.bu.edu (128.197.127.33) by
  MN2PR20CA0032.namprd20.prod.outlook.com (2603:10b6:208:e8::45) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20 via Frontend Transport; Mon, 20 Jan 2020 05:54:43 +0000
+ 15.20.2644.20 via Frontend Transport; Mon, 20 Jan 2020 05:55:01 +0000
 From: "Bulekov, Alexander" <alxndr@bu.edu>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: [PATCH v7 03/20] fuzz: add FUZZ_TARGET module type
-Thread-Topic: [PATCH v7 03/20] fuzz: add FUZZ_TARGET module type
-Thread-Index: AQHVz1YcpvhXbPp/Y0+K3YHEi9Rxiw==
-Date: Mon, 20 Jan 2020 05:54:43 +0000
-Message-ID: <20200120055410.22322-5-alxndr@bu.edu>
+Subject: [PATCH v7 15/20] fuzz: add target/fuzz makefile rules
+Thread-Topic: [PATCH v7 15/20] fuzz: add target/fuzz makefile rules
+Thread-Index: AQHVz1YozqjYdhj3yUy1KAakuF80Pw==
+Date: Mon, 20 Jan 2020 05:55:02 +0000
+Message-ID: <20200120055410.22322-21-alxndr@bu.edu>
 References: <20200120055410.22322-1-alxndr@bu.edu>
 In-Reply-To: <20200120055410.22322-1-alxndr@bu.edu>
 Accept-Language: en-US
@@ -84,14 +84,14 @@ x-clientproxiedby: MN2PR20CA0032.namprd20.prod.outlook.com
 authentication-results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
 x-ms-exchange-messagesentrepresentingtype: 1
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 57aad507-e68a-4680-632b-08d79d6d3f55
+x-ms-office365-filtering-correlation-id: 100b29b4-6c82-4aa4-033a-08d79d6d4a84
 x-ms-traffictypediagnostic: SN6PR03MB4399:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR03MB4399E3C1251EEE4DF02EEFE6BA320@SN6PR03MB4399.namprd03.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:229;
+x-microsoft-antispam-prvs: <SN6PR03MB4399BA9139DF9D5BF711B606BA320@SN6PR03MB4399.namprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:478;
 x-forefront-prvs: 0288CD37D9
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(136003)(366004)(39860400002)(346002)(376002)(396003)(189003)(199004)(5660300002)(956004)(2616005)(8936002)(86362001)(6916009)(6486002)(7696005)(4744005)(1076003)(52116002)(316002)(71200400001)(16526019)(186003)(786003)(478600001)(2906002)(26005)(81166006)(66946007)(66476007)(64756008)(36756003)(8676002)(75432002)(81156014)(66446008)(4326008)(66556008)(54906003);
+ SFS:(10019020)(4636009)(136003)(366004)(39860400002)(346002)(376002)(396003)(189003)(199004)(5660300002)(956004)(2616005)(8936002)(86362001)(6916009)(6486002)(7696005)(1076003)(52116002)(316002)(71200400001)(16526019)(186003)(786003)(478600001)(2906002)(26005)(81166006)(66946007)(66476007)(64756008)(36756003)(8676002)(75432002)(81156014)(66446008)(4326008)(66556008)(54906003);
  DIR:OUT; SFP:1102; SCL:1; SRVR:SN6PR03MB4399;
  H:SN6PR03MB3871.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; MX:1; A:1; 
@@ -99,20 +99,20 @@ received-spf: None (protection.outlook.com: bu.edu does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ErgJBw/XTsOxJbI7hTMnC3LcatxN2AW98ot1xohKEa6eYf0s0VjdmsfGg1Arta4GLj3cMQY8iJsC7FKR9aRhOaaWmoWFs2paPe/XuOyuP+Zng4cdi2meoHUu2UAzS5t8XPhzY3+0nT35AoGzASnyd99zRYzJbj+AFG/by49sOsjsezKRLHCKZlsdKHJR1klN+B3PIMUWQvoIjR2DaNN7DrAlT+iwQHMVZixADbnTBimN4MkVmruy7fxfsCoF6kkoG/s//GK5D/WycjEHHfAJE5e3/7hz2bkjEO0Hm5NpqX9IVuxwheDypPZdd33ZY3Eqjinr3Z6tNMy1GAupJApnVQPx1h3Gn/WMHYSnU3Nglp2j63L/u9NTSkquQSPgBg41E9SbRFlbg/bik0evfmVbvGZ5mS/H1DOqqR3mYW9PRAUhu09mRyjpEWiAKdDt7Iyj
+x-microsoft-antispam-message-info: 1Tus7UVIvX3P08BshOIS4GYbkT+CetiMeLONwOE3Nx29pLG81eT8EUwVsgxOPEUjSVBkv9sC7As+06s/BKk4xxaazieAbj5SCR0S0y41NApWJTD1qI8xRhefKvFOQbXQPlTH/otZ7W4QGlZKRtd6xyX9MedN0rueaDFEn8dzsAQ2ZHiLsb8CQBvZcASAKY4+zWvnxL1B295LppgAokO9eiVbp6sMVsUNcS81FbFE600Q9jEWGWLU3Qus95f6DQcoq6v/uZRv7BYdQJEFLh8IG6hnpZPLHA71HiEorUMcA0c4lrnHNcjUxFMJYmo/OU5zJsrzusTKj8Trn922lNKrhFuZhDE+cqbtD+DsMiIZ8QOGLprCl7WsokU4Md53G+2y3ZANKXDB5aDCtDCr5LM8wVUjMyOLDs2pC6k7/kWjrzujFexSC8ihJ8E4Oaydl/S/
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57aad507-e68a-4680-632b-08d79d6d3f55
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 05:54:43.9029 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 100b29b4-6c82-4aa4-033a-08d79d6d4a84
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 05:55:02.5584 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3s60BPWYf/bcWq2pMfsSJE1I9gfrpPM56tBSr3ZzWGaTMzOHUC/uzR3QwsIFTRJp
+X-MS-Exchange-CrossTenant-userprincipalname: SFLvqxpReEiMIDB2vaJRWraOH8xN0Zb32DqUwd9pQT6jVekTdm4aXw7/v8DQwCNG
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB4399
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.92.115
+X-Received-From: 40.107.92.111
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,40 +125,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
- "Bulekov, Alexander" <alxndr@bu.edu>
+ "bsd@redhat.com" <bsd@redhat.com>, Darren Kenny <darren.kenny@oracle.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>, "Bulekov, 
+ Alexander" <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/qemu/module.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ Makefile        | 15 ++++++++++++++-
+ Makefile.objs   |  2 +-
+ Makefile.target | 16 ++++++++++++++++
+ 3 files changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 65ba596e46..684753d808 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -46,6 +46,7 @@ typedef enum {
-     MODULE_INIT_TRACE,
-     MODULE_INIT_XEN_BACKEND,
-     MODULE_INIT_LIBQOS,
-+    MODULE_INIT_FUZZ_TARGET,
-     MODULE_INIT_MAX
- } module_init_type;
+diff --git a/Makefile b/Makefile
+index e6de7a47bb..dab291455f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -464,7 +464,7 @@ config-host.h-timestamp: config-host.mak
+ qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@=
+")
 =20
-@@ -56,7 +57,8 @@ typedef enum {
- #define xen_backend_init(function) module_init(function, \
-                                                MODULE_INIT_XEN_BACKEND)
- #define libqos_init(function) module_init(function, MODULE_INIT_LIBQOS)
+-TARGET_DIRS_RULES :=3D $(foreach t, all clean install, $(addsuffix /$(t), =
+$(TARGET_DIRS)))
++TARGET_DIRS_RULES :=3D $(foreach t, all fuzz clean install, $(addsuffix /$=
+(t), $(TARGET_DIRS)))
+=20
+ SOFTMMU_ALL_RULES=3D$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
+ $(SOFTMMU_ALL_RULES): $(authz-obj-y)
+@@ -478,6 +478,15 @@ ifdef DECOMPRESS_EDK2_BLOBS
+ $(SOFTMMU_ALL_RULES): $(edk2-decompressed)
+ endif
+=20
++SOFTMMU_FUZZ_RULES=3D$(filter %-softmmu/fuzz, $(TARGET_DIRS_RULES))
++$(SOFTMMU_FUZZ_RULES): $(authz-obj-y)
++$(SOFTMMU_FUZZ_RULES): $(block-obj-y)
++$(SOFTMMU_FUZZ_RULES): $(chardev-obj-y)
++$(SOFTMMU_FUZZ_RULES): $(crypto-obj-y)
++$(SOFTMMU_FUZZ_RULES): $(io-obj-y)
++$(SOFTMMU_FUZZ_RULES): config-all-devices.mak
++$(SOFTMMU_FUZZ_RULES): $(edk2-decompressed)
++
+ .PHONY: $(TARGET_DIRS_RULES)
+ # The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
+ # $(dir $@) yields the sub-directory, and $(notdir $@) yields the sub-goal
+@@ -528,6 +537,9 @@ subdir-slirp: slirp/all
+ $(filter %/all, $(TARGET_DIRS_RULES)): libqemuutil.a $(common-obj-y) \
+ 	$(qom-obj-y)
+=20
++$(filter %/fuzz, $(TARGET_DIRS_RULES)): libqemuutil.a $(common-obj-y) \
++	$(qom-obj-y) $(crypto-user-obj-$(CONFIG_USER_ONLY))
++
+ ROM_DIRS =3D $(addprefix pc-bios/, $(ROMS))
+ ROM_DIRS_RULES=3D$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
+ # Only keep -O and -g cflags
+@@ -537,6 +549,7 @@ $(ROM_DIRS_RULES):
+=20
+ .PHONY: recurse-all recurse-clean recurse-install
+ recurse-all: $(addsuffix /all, $(TARGET_DIRS) $(ROM_DIRS))
++recurse-fuzz: $(addsuffix /fuzz, $(TARGET_DIRS) $(ROM_DIRS))
+ recurse-clean: $(addsuffix /clean, $(TARGET_DIRS) $(ROM_DIRS))
+ recurse-install: $(addsuffix /install, $(TARGET_DIRS))
+ $(addsuffix /install, $(TARGET_DIRS)): all
+diff --git a/Makefile.objs b/Makefile.objs
+index 5ab166fed5..9d87a1009e 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -84,8 +84,8 @@ common-obj-$(CONFIG_FDT) +=3D device_tree.o
+ # qapi
+=20
+ common-obj-y +=3D qapi/
 -
-+#define fuzz_target_init(function) module_init(function, \
-+                                               MODULE_INIT_FUZZ_TARGET)
- #define block_module_load_one(lib) module_load_one("block-", lib)
- #define ui_module_load_one(lib) module_load_one("ui-", lib)
- #define audio_module_load_one(lib) module_load_one("audio-", lib)
+ softmmu-obj-y =3D main.o
++
+ endif
+=20
+ #######################################################################
+diff --git a/Makefile.target b/Makefile.target
+index 8dcf3dddd8..fd6fe79495 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -227,6 +227,22 @@ ifdef CONFIG_TRACE_SYSTEMTAP
+ 	rm -f *.stp
+ endif
+=20
++ifdef CONFIG_FUZZ
++include $(SRC_PATH)/tests/qtest/fuzz/Makefile.include
++include $(SRC_PATH)/tests/qtest/Makefile.include
++
++fuzz: fuzz-vars
++fuzz-vars: QEMU_CFLAGS :=3D $(FUZZ_CFLAGS) $(QEMU_CFLAGS)
++fuzz-vars: QEMU_LDFLAGS :=3D $(FUZZ_LDFLAGS) $(QEMU_LDFLAGS)
++fuzz-vars: $(QEMU_PROG_FUZZ)
++dummy :=3D $(call unnest-vars,, fuzz-obj-y)
++
++
++$(QEMU_PROG_FUZZ): config-devices.mak $(all-obj-y) $(COMMON_LDADDS) $(fuzz=
+-obj-y)
++	$(call LINK, $(filter-out %.mak, $^))
++
++endif
++
+ install: all
+ ifneq ($(PROGS),)
+ 	$(call install-prog,$(PROGS),$(DESTDIR)$(bindir))
 --=20
 2.23.0
 
