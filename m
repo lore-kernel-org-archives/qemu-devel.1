@@ -2,100 +2,78 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE1EEC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E131C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77D63217F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B828217F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:39:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLv1VY+3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77D63217F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L9wrYPqB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B828217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itYDQ-000609-G0
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:39:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41909)
+	id 1itYDX-00066B-5A
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:39:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1itY6z-0007CK-OU
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:33:09 -0500
+ (envelope-from <imammedo@redhat.com>) id 1itXya-0004t4-Bc
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:24:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1itY6w-0005Sh-7N
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:33:05 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23858
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1itXyW-00009B-Sx
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:24:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53242
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1itY6w-0005SO-3Y
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:33:02 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1itXyW-00008q-Pb
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:24:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579530781;
+ s=mimecast20190719; t=1579530260;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wiuR/TBKSn7iq3zXfA4rwRILcghA5F0tmB02QQDWD0U=;
- b=MLv1VY+3ffsuS44g7LNafM/PEHT82zTH9ff3hFLDyM7LyhZoOwmRYqetyK0m7xHh/oa1T+
- YrXAL6l3SYlPLctrzzskcuPsGi6uNxNCfBmxAW0QdEGid3mO8FX6eIGupCgjuIy7TuMEHw
- J9KmMVaTH/svTM0BgpRDK83P98RP/4Y=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-Cspg97ZSP06ikO_BwX7xVA-1; Mon, 20 Jan 2020 09:33:00 -0500
-Received: by mail-wm1-f72.google.com with SMTP id f25so3767335wmb.1
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 06:33:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=uCsbDigzTt6RW4fnGOjgxkWaT/i208m4Os41PawKEKY=;
- b=qLNfOipVMo9JRPf0M1cxGsXhv+hZRKKCIqR9lI/+3IjDH6g/pXKpc9cOsaRnIiOwc7
- 393b7e7YZ9NiIE5kB3+vYHX0IEoIW8pNdGrFr5tTU8Mlom3RTmlMKWxtR6DcS3BXp4Xr
- R/1495lJd9PAVmW7vKD4nNp831p4LiJtLnco3Mj7YZUn6PCcx8qUop3tRWT0dFbYex9K
- r3dX1Tpq57RmTeFhgRtKamKEUmMMe/+GU2ZiWTMXijUEUGQJVFQrCsuENbTuKl+bzCpw
- 8WfXtxPI/uVch/g6ZOr7EIPC+Cf6sjfm/EwJDlhTMP+jXFdkbpBokjwolfFRIfSrcnRR
- X0/g==
-X-Gm-Message-State: APjAAAU28//rcNVyUHHHzTd2ocoZ1Dt/VSw4mvTl2NAMVwos+lraEFv5
- LiF/a0261WUwyNJylfbjw8B15db1eTkSq6ILJSzNctCAQlzc3ohlf1C/5RnFMSi7/PYjvRh7+oA
- mzSW3x05UC5aCNK0=
-X-Received: by 2002:a7b:c151:: with SMTP id z17mr19595454wmi.137.1579530778741; 
- Mon, 20 Jan 2020 06:32:58 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx/jWOkwEundbpdIRMcJVDS0I1yPkDwpYNZpAZmMSX6hU6Npd9PWqn4Jr4FBxtRhtQONi6Usw==
-X-Received: by 2002:a7b:c151:: with SMTP id z17mr19595434wmi.137.1579530778450; 
- Mon, 20 Jan 2020 06:32:58 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z124sm25648866wmc.20.2020.01.20.06.32.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Jan 2020 06:32:57 -0800 (PST)
-Subject: Re: [PATCH] hw/core/or-irq: Fix incorrect assert forbidding num-lines
- == MAX_OR_LINES
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200120142235.10432-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b6db7d21-684d-5ccc-8df0-ce83d00c98bd@redhat.com>
-Date: Mon, 20 Jan 2020 15:32:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <20200120142235.10432-1-peter.maydell@linaro.org>
-Content-Language: en-US
-X-MC-Unique: Cspg97ZSP06ikO_BwX7xVA-1
+ bh=gQQrypcH82vvxguj9m1CeBZ/Pu2S/bf4/KIB8a4Hv5s=;
+ b=L9wrYPqBxDaO/mJqQHZAL3BYu3RoKtfzeR36njNHvoA85uAZmgPqZ95JIWNhT51rV2liZM
+ 1zmbahBD0TRNStioIUi7A0t2A5EwguLtS3dzqBkXOUaLb2A8GMwFZak8OXpeOtW0uNO8Z6
+ He5EnD7CCH29RPLUO0IyXL/G5oLDdYs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-emjuMxipPBauaJvGJ_kkWQ-1; Mon, 20 Jan 2020 09:24:16 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49137DB61;
+ Mon, 20 Jan 2020 14:24:15 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB8A560C81;
+ Mon, 20 Jan 2020 14:24:13 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 07/84] hw/arm/aspeed: actually check RAM size
+Date: Mon, 20 Jan 2020 15:21:52 +0100
+Message-Id: <1579530112-80542-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <83481ccb-38e4-d0a2-18b5-66fcd7248521@kaod.org>
+References: <83481ccb-38e4-d0a2-18b5-66fcd7248521@kaod.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: emjuMxipPBauaJvGJ_kkWQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,45 +85,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: andrew@aj.id.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ clg@kaod.org, joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/20/20 3:22 PM, Peter Maydell wrote:
-> The num-lines property of the TYPE_OR_GATE device sets the number
-> of input lines it has. An assert() in or_irq_realize() restricts
-> this to the maximum supported by the implementation. However we
-> got the condition in the assert wrong: it should be using <=3D,
-> because num-lines =3D=3D MAX_OR_LINES is permitted, and means that
-> all entries from 0 to MAX_OR_LINES-1 in the s->levels[] array
-> are used.
->=20
-> We didn't notice this previously because no user has so far
-> needed that many input lines.
->=20
-> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   hw/core/or-irq.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
-> index 18d63831cd3..2be18333811 100644
-> --- a/hw/core/or-irq.c
-> +++ b/hw/core/or-irq.c
-> @@ -58,7 +58,7 @@ static void or_irq_realize(DeviceState *dev, Error **er=
-rp)
->   {
->       qemu_or_irq *s =3D OR_IRQ(dev);
->  =20
-> -    assert(s->num_lines < MAX_OR_LINES);
-> +    assert(s->num_lines <=3D MAX_OR_LINES);
->  =20
->       qdev_init_gpio_in(dev, or_irq_handler, s->num_lines);
->   }
->=20
+It's supposed that SOC will check if "-m" provided
+RAM size is valid by setting "ram-size" property and
+then board would read back valid (possibly corrected
+value) to map RAM MemoryReging with valid size.
+It isn't doing so, since check is called only
+indirectly from
+  aspeed_sdmc_reset()->asc->compute_conf()
+or much later when guest writes to configuration
+register.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+So depending on "-m" value QEMU end-ups with a warning
+and an invalid MemoryRegion size allocated and mapped.
+(examples:
+ -M ast2500-evb -m 1M
+    0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
+      0000000080000000-00000000800fffff (prio 0, ram): ram
+      0000000080100000-00000000bfffffff (prio 0, i/o): max_ram
+ -M ast2500-evb -m 3G
+    0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
+      0000000080000000-000000013fffffff (prio 0, ram): ram
+      [DETECTED OVERFLOW!] 0000000140000000-00000000bfffffff (prio 0, i/o):=
+ max_ram
+)
+On top of that sdmc falls back and reports to guest
+"default" size, it thinks machine should have.
+
+This patch makes ram-size check actually work and
+changes behavior from a warning later on during
+machine reset to error_fatal at the moment SOC.ram-size
+is set so user will have to fix RAM size on CLI
+to start machine.
+
+It also gets out of the way mutable ram-size logic,
+so we could consolidate RAM allocation logic around
+pre-allocated hostmem backend (supplied by user or
+auto created by generic machine code depending on
+supplied -m/mem-path/mem-prealloc options.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v3:
+  * replace
+     [PATCH v2 07/86] arm:aspeed: convert valid RAM sizes to data
+     [PATCH v2 08/86] arm:aspeed: actually check RAM size
+    with a simplified variant that adds ram_size check to sdmc.ram-size
+    property
+
+CC: clg@kaod.org
+CC: peter.maydell@linaro.org
+CC: andrew@aj.id.au
+CC: joel@jms.id.au
+CC: qemu-arm@nongnu.org
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ include/hw/misc/aspeed_sdmc.h |  1 +
+ hw/arm/aspeed.c               | 13 +++-----
+ hw/misc/aspeed_sdmc.c         | 77 +++++++++++++++++++++++++++++++++++----=
+----
+ 3 files changed, 70 insertions(+), 21 deletions(-)
+
+diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
+index 5dbde59..cea1e67 100644
+--- a/include/hw/misc/aspeed_sdmc.h
++++ b/include/hw/misc/aspeed_sdmc.h
+@@ -40,6 +40,7 @@ typedef struct AspeedSDMCClass {
+     SysBusDeviceClass parent_class;
+=20
+     uint64_t max_ram_size;
++    const uint64_t *valid_ram_sizes;
+     uint32_t (*compute_conf)(AspeedSDMCState *s, uint32_t data);
+     void (*write)(AspeedSDMCState *s, uint32_t reg, uint32_t data);
+ } AspeedSDMCClass;
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index cc06af4..c8573e5 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -191,8 +191,12 @@ static void aspeed_machine_init(MachineState *machine)
+=20
+     sc =3D ASPEED_SOC_GET_CLASS(&bmc->soc);
+=20
++    /*
++     * This will error out if isize is not supported by memory controller.
++     */
+     object_property_set_uint(OBJECT(&bmc->soc), ram_size, "ram-size",
+-                             &error_abort);
++                             &error_fatal);
++
+     object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap1, "hw-strap1"=
+,
+                             &error_abort);
+     object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap2, "hw-strap2"=
+,
+@@ -215,13 +219,6 @@ static void aspeed_machine_init(MachineState *machine)
+     object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
+                              &error_abort);
+=20
+-    /*
+-     * Allocate RAM after the memory controller has checked the size
+-     * was valid. If not, a default value is used.
+-     */
+-    ram_size =3D object_property_get_uint(OBJECT(&bmc->soc), "ram-size",
+-                                        &error_abort);
+-
+     memory_region_allocate_system_memory(&bmc->ram, NULL, "ram", ram_size)=
+;
+     memory_region_add_subregion(&bmc->ram_container, 0, &bmc->ram);
+     memory_region_add_subregion(get_system_memory(),
+diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+index 2df3244..b36b362 100644
+--- a/hw/misc/aspeed_sdmc.c
++++ b/hw/misc/aspeed_sdmc.c
+@@ -17,6 +17,9 @@
+ #include "migration/vmstate.h"
+ #include "qapi/error.h"
+ #include "trace.h"
++#include "qemu/units.h"
++#include "qemu/cutils.h"
++#include "qapi/visitor.h"
+=20
+ /* Protection Key Register */
+ #define R_PROT            (0x00 / 4)
+@@ -163,10 +166,7 @@ static int ast2400_rambits(AspeedSDMCState *s)
+         break;
+     }
+=20
+-    /* use a common default */
+-    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 256M",
+-                s->ram_size);
+-    s->ram_size =3D 256 << 20;
++    assert(0);
+     return ASPEED_SDMC_DRAM_256MB;
+ }
+=20
+@@ -185,10 +185,7 @@ static int ast2500_rambits(AspeedSDMCState *s)
+         break;
+     }
+=20
+-    /* use a common default */
+-    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 512M",
+-                s->ram_size);
+-    s->ram_size =3D 512 << 20;
++    assert(0);
+     return ASPEED_SDMC_AST2500_512MB;
+ }
+=20
+@@ -207,10 +204,7 @@ static int ast2600_rambits(AspeedSDMCState *s)
+         break;
+     }
+=20
+-    /* use a common default */
+-    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 1024M",
+-                s->ram_size);
+-    s->ram_size =3D 1024 << 20;
++    assert(0);
+     return ASPEED_SDMC_AST2600_1024MB;
+ }
+=20
+@@ -225,6 +219,51 @@ static void aspeed_sdmc_reset(DeviceState *dev)
+     s->regs[R_CONF] =3D asc->compute_conf(s, 0);
+ }
+=20
++static void aspeed_sdmc_get_ram_size(Object *obj, Visitor *v, const char *=
+name,
++                                     void *opaque, Error **errp)
++{
++    AspeedSDMCState *s =3D ASPEED_SDMC(obj);
++    int64_t value =3D s->ram_size;
++
++    visit_type_int(v, name, &value, errp);
++}
++
++static void aspeed_sdmc_set_ram_size(Object *obj, Visitor *v, const char *=
+name,
++                                     void *opaque, Error **errp)
++{
++    int i;
++    char *sz;
++    int64_t value;
++    Error *local_err =3D NULL;
++    AspeedSDMCState *s =3D ASPEED_SDMC(obj);
++    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
++
++    visit_type_int(v, name, &value, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    for (i =3D 0; asc->valid_ram_sizes[i]; i++) {
++        if (value =3D=3D asc->valid_ram_sizes[i]) {
++            s->ram_size =3D value;
++            return;
++        }
++    }
++
++    sz =3D size_to_str(value);
++    error_setg(&local_err, "Invalid RAM size %s", sz);
++    g_free(sz);
++    error_propagate(errp, local_err);
++}
++
++static void aspeed_sdmc_initfn(Object *obj)
++{
++    object_property_add(obj, "ram-size", "int",
++                        aspeed_sdmc_get_ram_size, aspeed_sdmc_set_ram_size=
+,
++                        NULL, NULL, NULL);
++}
++
+ static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
+ {
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+@@ -249,7 +288,6 @@ static const VMStateDescription vmstate_aspeed_sdmc =3D=
+ {
+ };
+=20
+ static Property aspeed_sdmc_properties[] =3D {
+-    DEFINE_PROP_UINT64("ram-size", AspeedSDMCState, ram_size, 0),
+     DEFINE_PROP_UINT64("max-ram-size", AspeedSDMCState, max_ram_size, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -268,6 +306,7 @@ static const TypeInfo aspeed_sdmc_info =3D {
+     .name =3D TYPE_ASPEED_SDMC,
+     .parent =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(AspeedSDMCState),
++    .instance_init =3D aspeed_sdmc_initfn,
+     .class_init =3D aspeed_sdmc_class_init,
+     .class_size =3D sizeof(AspeedSDMCClass),
+     .abstract   =3D true,
+@@ -298,6 +337,9 @@ static void aspeed_2400_sdmc_write(AspeedSDMCState *s, =
+uint32_t reg,
+     s->regs[reg] =3D data;
+ }
+=20
++static const uint64_t
++aspeed_2400_ram_sizes[] =3D { 64 * MiB, 128 * MiB, 256 * MiB, 512 * MiB, 0=
+};
++
+ static void aspeed_2400_sdmc_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -307,6 +349,7 @@ static void aspeed_2400_sdmc_class_init(ObjectClass *kl=
+ass, void *data)
+     asc->max_ram_size =3D 512 << 20;
+     asc->compute_conf =3D aspeed_2400_sdmc_compute_conf;
+     asc->write =3D aspeed_2400_sdmc_write;
++    asc->valid_ram_sizes =3D aspeed_2400_ram_sizes;
+ }
+=20
+ static const TypeInfo aspeed_2400_sdmc_info =3D {
+@@ -351,6 +394,9 @@ static void aspeed_2500_sdmc_write(AspeedSDMCState *s, =
+uint32_t reg,
+     s->regs[reg] =3D data;
+ }
+=20
++static const uint64_t
++aspeed_2500_ram_sizes[] =3D { 128 * MiB, 256 * MiB, 512 * MiB, 1024 * MiB,=
+ 0};
++
+ static void aspeed_2500_sdmc_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -360,6 +406,7 @@ static void aspeed_2500_sdmc_class_init(ObjectClass *kl=
+ass, void *data)
+     asc->max_ram_size =3D 1024 << 20;
+     asc->compute_conf =3D aspeed_2500_sdmc_compute_conf;
+     asc->write =3D aspeed_2500_sdmc_write;
++    asc->valid_ram_sizes =3D aspeed_2500_ram_sizes;
+ }
+=20
+ static const TypeInfo aspeed_2500_sdmc_info =3D {
+@@ -404,6 +451,9 @@ static void aspeed_2600_sdmc_write(AspeedSDMCState *s, =
+uint32_t reg,
+     s->regs[reg] =3D data;
+ }
+=20
++static const uint64_t
++aspeed_2600_ram_sizes[] =3D { 256 * MiB, 512 * MiB, 1024 * MiB, 2048 * MiB=
+, 0};
++
+ static void aspeed_2600_sdmc_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -413,6 +463,7 @@ static void aspeed_2600_sdmc_class_init(ObjectClass *kl=
+ass, void *data)
+     asc->max_ram_size =3D 2048 << 20;
+     asc->compute_conf =3D aspeed_2600_sdmc_compute_conf;
+     asc->write =3D aspeed_2600_sdmc_write;
++    asc->valid_ram_sizes =3D aspeed_2600_ram_sizes;
+ }
+=20
+ static const TypeInfo aspeed_2600_sdmc_info =3D {
+--=20
+2.7.4
 
 
