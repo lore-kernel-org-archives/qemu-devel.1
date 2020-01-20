@@ -2,76 +2,100 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C9CC33CA1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC76C33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:59:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A8C32077C
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:56:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F16032077C
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 08:59:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0Z9YM8+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A8C32077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fppwtP5D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16032077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itSrG-0003tQ-8z
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 03:56:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51499)
+	id 1itStz-00068M-4W
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 03:59:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1itSlw-0000Ol-NL
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:51:06 -0500
+ (envelope-from <philmd@redhat.com>) id 1itSsy-00058h-TE
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:58:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1itSlq-0001yC-Ja
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:50:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51478
+ (envelope-from <philmd@redhat.com>) id 1itSsv-0005cG-0q
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:58:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59191
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1itSlq-0001xg-7q
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:50:54 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1itSsu-0005c3-Tz
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:58:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579510253;
+ s=mimecast20190719; t=1579510692;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=hM/Zi1dbJNKYx0P8grt5QihhSHIvqzqjEsDj4SB6TIs=;
- b=M0Z9YM8+FJfc9mIejOqKky1XN2x72F4ZstNanYoiiQUzMb3x80WqerN4PMtPxuobTxl5LT
- uM9Fvl6jHS/vJRdsusdf2LA9Y6pdDwNmu82T9XIkAVtfeCJ9lwMnCbE0tscziAyorKXb9w
- C6PWNiiHg6K+DjOVfLaMQNbsgHWcXtU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-wAQHhwjdNN2l-BlzLYGz1A-1; Mon, 20 Jan 2020 03:50:52 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65137477;
- Mon, 20 Jan 2020 08:50:51 +0000 (UTC)
-Received: from angien.redhat.com (unknown [10.43.2.48])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A78B60BF7;
- Mon, 20 Jan 2020 08:50:50 +0000 (UTC)
-From: Peter Krempa <pkrempa@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] qapi: Allow getting flat output from
- 'query-named-block-nodes'
-Date: Mon, 20 Jan 2020 09:50:49 +0100
-Message-Id: <4470f8c779abc404dcf65e375db195cd91a80651.1579509782.git.pkrempa@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HTBNwqXOU0vSA3Kcc81vyC/bSzmFgyb/XcHNCP0W9BY=;
+ b=fppwtP5Dzl+2XCWnl+HK3jASBlLoquPzoyf8VKdABKR9eIdfxWgxdwfOAw4Gj8YEUFGStY
+ vZnrP62s6Ykd651ykgoQJ6xrDJPM2o5RxYBKXAn1hoPQlarLZD4Umd16oEHSJKw/KFW74i
+ u4SOmcJi2LP2sgZCDu0TChVNwDjR7HE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-xgY1s08MMzyxBMNa4qPsJg-1; Mon, 20 Jan 2020 03:58:11 -0500
+Received: by mail-wr1-f71.google.com with SMTP id i9so13863251wru.1
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 00:58:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+sycqzM8BYcJkLA7rdtQW2P6p2rJIeWpN83xYyQsz3w=;
+ b=TiLU9Vy5RHgfQ24ffK7IeCFvxk8pL+aaRN153Mw+RCitUuTIAEeBu2CZimWiiuIiY1
+ kzEcc3Av2p8zZzdgBRvOa2zH28UeJrH5Xq6SQicVqoDU4+A2Ro29DWBZ/FPbBrFbAZHU
+ d0J7GOfZFnxFhbp9EPSG9b786hVDAN+UptC6ivQay3ktL//QxRCXecUCeDG1zr8PUm95
+ Xr5s0oymqTLpIgj+/IRYq/GLhRGwCjUZqtU/gArR/QOZfrXozI7DUVs7URKV2IE2kNDY
+ 5vBEJ7Gku+rWsRaKzLE0JR18TfgLEDddzs3+lE7w/+I6K2Rgffw8LRrVqunTlJ5E3Nci
+ GMDQ==
+X-Gm-Message-State: APjAAAWN6OKBpkNXIMjYFBD8qDc4LJCrp09pHC9yv1qGkiKztqiGe5Ui
+ mpB5EzGNzLhM6GbmjU4FH1u+BtFdvj9ETxPDnyZQsUTVhsA9DEYA18Zueh4Je1hlBCGFHuOOt6X
+ yCBNHRTzI5HtoDA8=
+X-Received: by 2002:adf:ea4e:: with SMTP id j14mr17261084wrn.101.1579510689761; 
+ Mon, 20 Jan 2020 00:58:09 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwOSKenFPUIXfPECVAYHSM1xOMVM9jQ9BXbopyljexMtpxBcYjT0JJgh0Ok2fgoXaXY3dlBUg==
+X-Received: by 2002:adf:ea4e:: with SMTP id j14mr17261054wrn.101.1579510689352; 
+ Mon, 20 Jan 2020 00:58:09 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id k8sm46373104wrl.3.2020.01.20.00.58.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 20 Jan 2020 00:58:08 -0800 (PST)
+Subject: Re: [PATCH 4/9] cputlb: Hoist tlb portions in tlb_mmu_resize_locked
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200109024907.2730-1-richard.henderson@linaro.org>
+ <20200109024907.2730-5-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3ca547aa-a710-84f2-262b-db29f4998d46@redhat.com>
+Date: Mon, 20 Jan 2020 09:58:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: wAQHhwjdNN2l-BlzLYGz1A-1
+In-Reply-To: <20200109024907.2730-5-richard.henderson@linaro.org>
+Content-Language: en-US
+X-MC-Unique: xgY1s08MMzyxBMNa4qPsJg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,199 +107,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When a management application manages node names there's no reason to
-recurse into backing images in the output of query-named-block-nodes.
+On 1/9/20 3:49 AM, Richard Henderson wrote:
+> No functional change, but the smaller expressions make
+> the code easier to read.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Add a parameter to the command which will return just the top level
-structs.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Peter Krempa <pkrempa@redhat.com>
----
-
-Diff to v1:
- - rewrote setting of 'return_flat' in qmp_query_named_block_nodes
- - tried to clarify the QMP schema docs for the new field
-
-This patch does not aim to fix the rather suboptimal original
-documentation of the command as that is going to end up in a bunch of
-bikeshedding.
-
-While I know that there are plans for a new command that should fix
-this, the plans were already there for quite some time without much
-happening. This is a quick fix to a real problem, because if you have
-(maybe unpractically) deep backing chains, the returned JSON is getting
-huge. (140 nesting levels exceeds 10MiB of JSON)
-
- block.c               |  5 +++--
- block/qapi.c          | 10 ++++++++--
- blockdev.c            |  8 ++++++--
- include/block/block.h |  2 +-
- include/block/qapi.h  |  4 +++-
- monitor/hmp-cmds.c    |  2 +-
- qapi/block-core.json  |  7 ++++++-
- 7 files changed, 28 insertions(+), 10 deletions(-)
-
-diff --git a/block.c b/block.c
-index ecd09dbbfd..73d70aec11 100644
---- a/block.c
-+++ b/block.c
-@@ -4784,14 +4784,15 @@ BlockDriverState *bdrv_find_node(const char *node_n=
-ame)
- }
-
- /* Put this QMP function here so it can access the static graph_bdrv_state=
-s. */
--BlockDeviceInfoList *bdrv_named_nodes_list(Error **errp)
-+BlockDeviceInfoList *bdrv_named_nodes_list(bool flat,
-+                                           Error **errp)
- {
-     BlockDeviceInfoList *list, *entry;
-     BlockDriverState *bs;
-
-     list =3D NULL;
-     QTAILQ_FOREACH(bs, &graph_bdrv_states, node_list) {
--        BlockDeviceInfo *info =3D bdrv_block_device_info(NULL, bs, errp);
-+        BlockDeviceInfo *info =3D bdrv_block_device_info(NULL, bs, flat, e=
-rrp);
-         if (!info) {
-             qapi_free_BlockDeviceInfoList(list);
-             return NULL;
-diff --git a/block/qapi.c b/block/qapi.c
-index 9a5d0c9b27..84048e1a57 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -42,7 +42,9 @@
- #include "qemu/cutils.h"
-
- BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
--                                        BlockDriverState *bs, Error **errp=
+> ---
+>   accel/tcg/cputlb.c | 35 +++++++++++++++++------------------
+>   1 file changed, 17 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 49c605b6d8..c7dc1dc85a 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -115,8 +115,8 @@ static void tlb_dyn_init(CPUArchState *env)
+>  =20
+>   /**
+>    * tlb_mmu_resize_locked() - perform TLB resize bookkeeping; resize if =
+necessary
+> - * @env: CPU that owns the TLB
+> - * @mmu_idx: MMU index of the TLB
+> + * @desc: The CPUTLBDesc portion of the TLB
+> + * @fast: The CPUTLBDescFast portion of the same TLB
+>    *
+>    * Called with tlb_lock_held.
+>    *
+> @@ -153,10 +153,9 @@ static void tlb_dyn_init(CPUArchState *env)
+>    * high), since otherwise we are likely to have a significant amount of
+>    * conflict misses.
+>    */
+> -static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
+> +static void tlb_mmu_resize_locked(CPUTLBDesc *desc, CPUTLBDescFast *fast=
 )
-+                                        BlockDriverState *bs,
-+                                        bool flat,
-+                                        Error **errp)
- {
-     ImageInfo **p_image_info;
-     BlockDriverState *bs0;
-@@ -156,6 +158,10 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *=
-blk,
-             return NULL;
-         }
-
-+        /* stop gathering data for flat output */
-+        if (flat)
-+            break;
-+
-         if (bs0->drv && bs0->backing) {
-             info->backing_file_depth++;
-             bs0 =3D bs0->backing->bs;
-@@ -389,7 +395,7 @@ static void bdrv_query_info(BlockBackend *blk, BlockInf=
-o **p_info,
-
-     if (bs && bs->drv) {
-         info->has_inserted =3D true;
--        info->inserted =3D bdrv_block_device_info(blk, bs, errp);
-+        info->inserted =3D bdrv_block_device_info(blk, bs, false, errp);
-         if (info->inserted =3D=3D NULL) {
-             goto err;
-         }
-diff --git a/blockdev.c b/blockdev.c
-index 8e029e9c01..cba2f567aa 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3707,9 +3707,13 @@ void qmp_drive_backup(DriveBackup *arg, Error **errp=
-)
-     }
- }
-
--BlockDeviceInfoList *qmp_query_named_block_nodes(Error **errp)
-+BlockDeviceInfoList *qmp_query_named_block_nodes(bool has_flat,
-+                                                 bool flat,
-+                                                 Error **errp)
- {
--    return bdrv_named_nodes_list(errp);
-+    bool return_flat =3D has_flat && flat;
-+
-+    return bdrv_named_nodes_list(return_flat, errp);
- }
-
- XDbgBlockGraph *qmp_x_debug_query_block_graph(Error **errp)
-diff --git a/include/block/block.h b/include/block/block.h
-index e9dcfef7fa..afced5249c 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -469,7 +469,7 @@ void bdrv_lock_medium(BlockDriverState *bs, bool locked=
+>   {
+> -    CPUTLBDesc *desc =3D &env_tlb(env)->d[mmu_idx];
+> -    size_t old_size =3D tlb_n_entries(&env_tlb(env)->f[mmu_idx]);
+> +    size_t old_size =3D tlb_n_entries(fast);
+>       size_t rate;
+>       size_t new_size =3D old_size;
+>       int64_t now =3D get_clock_realtime();
+> @@ -198,14 +197,15 @@ static void tlb_mmu_resize_locked(CPUArchState *env=
+, int mmu_idx)
+>           return;
+>       }
+>  =20
+> -    g_free(env_tlb(env)->f[mmu_idx].table);
+> -    g_free(env_tlb(env)->d[mmu_idx].iotlb);
+> +    g_free(fast->table);
+> +    g_free(desc->iotlb);
+>  =20
+>       tlb_window_reset(desc, now, 0);
+>       /* desc->n_used_entries is cleared by the caller */
+> -    env_tlb(env)->f[mmu_idx].mask =3D (new_size - 1) << CPU_TLB_ENTRY_BI=
+TS;
+> -    env_tlb(env)->f[mmu_idx].table =3D g_try_new(CPUTLBEntry, new_size);
+> -    env_tlb(env)->d[mmu_idx].iotlb =3D g_try_new(CPUIOTLBEntry, new_size=
 );
- void bdrv_eject(BlockDriverState *bs, bool eject_flag);
- const char *bdrv_get_format_name(BlockDriverState *bs);
- BlockDriverState *bdrv_find_node(const char *node_name);
--BlockDeviceInfoList *bdrv_named_nodes_list(Error **errp);
-+BlockDeviceInfoList *bdrv_named_nodes_list(bool flat, Error **errp);
- XDbgBlockGraph *bdrv_get_xdbg_block_graph(Error **errp);
- BlockDriverState *bdrv_lookup_bs(const char *device,
-                                  const char *node_name,
-diff --git a/include/block/qapi.h b/include/block/qapi.h
-index cd9410dee3..22c7807c89 100644
---- a/include/block/qapi.h
-+++ b/include/block/qapi.h
-@@ -29,7 +29,9 @@
- #include "block/snapshot.h"
-
- BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
--                                        BlockDriverState *bs, Error **errp=
-);
-+                                        BlockDriverState *bs,
-+                                        bool flat,
-+                                        Error **errp);
- int bdrv_query_snapshot_info_list(BlockDriverState *bs,
-                                   SnapshotInfoList **p_list,
-                                   Error **errp);
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index d0e0af893a..bece8447a5 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -619,7 +619,7 @@ void hmp_info_block(Monitor *mon, const QDict *qdict)
-     }
-
-     /* Print node information */
--    blockdev_list =3D qmp_query_named_block_nodes(NULL);
-+    blockdev_list =3D qmp_query_named_block_nodes(false, false, NULL);
-     for (blockdev =3D blockdev_list; blockdev; blockdev =3D blockdev->next=
-) {
-         assert(blockdev->value->has_node_name);
-         if (device && strcmp(device, blockdev->value->node_name)) {
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7ff5e5edaf..56561ff703 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1752,6 +1752,9 @@
- #
- # Get the named block driver list
- #
-+# @flat: Omit the nested data about backing image ("backing-image" key) if=
- true.
-+#        Default is false (Since 5.0)
-+#
- # Returns: the list of BlockDeviceInfo
- #
- # Since: 2.0
-@@ -1805,7 +1808,9 @@
- #                    } } ] }
- #
- ##
--{ 'command': 'query-named-block-nodes', 'returns': [ 'BlockDeviceInfo' ] }
-+{ 'command': 'query-named-block-nodes',
-+  'returns': [ 'BlockDeviceInfo' ],
-+  'data': { '*flat': 'bool' } }
-
- ##
- # @XDbgBlockGraphNodeType:
---=20
-2.24.1
+> +    fast->mask =3D (new_size - 1) << CPU_TLB_ENTRY_BITS;
+> +    fast->table =3D g_try_new(CPUTLBEntry, new_size);
+> +    desc->iotlb =3D g_try_new(CPUIOTLBEntry, new_size);
+> +
+>       /*
+>        * If the allocations fail, try smaller sizes. We just freed some
+>        * memory, so going back to half of new_size has a good chance of w=
+orking.
+> @@ -213,25 +213,24 @@ static void tlb_mmu_resize_locked(CPUArchState *env=
+, int mmu_idx)
+>        * allocations to fail though, so we progressively reduce the alloc=
+ation
+>        * size, aborting if we cannot even allocate the smallest TLB we su=
+pport.
+>        */
+> -    while (env_tlb(env)->f[mmu_idx].table =3D=3D NULL ||
+> -           env_tlb(env)->d[mmu_idx].iotlb =3D=3D NULL) {
+> +    while (fast->table =3D=3D NULL || desc->iotlb =3D=3D NULL) {
+>           if (new_size =3D=3D (1 << CPU_TLB_DYN_MIN_BITS)) {
+>               error_report("%s: %s", __func__, strerror(errno));
+>               abort();
+>           }
+>           new_size =3D MAX(new_size >> 1, 1 << CPU_TLB_DYN_MIN_BITS);
+> -        env_tlb(env)->f[mmu_idx].mask =3D (new_size - 1) << CPU_TLB_ENTR=
+Y_BITS;
+> +        fast->mask =3D (new_size - 1) << CPU_TLB_ENTRY_BITS;
+>  =20
+> -        g_free(env_tlb(env)->f[mmu_idx].table);
+> -        g_free(env_tlb(env)->d[mmu_idx].iotlb);
+> -        env_tlb(env)->f[mmu_idx].table =3D g_try_new(CPUTLBEntry, new_si=
+ze);
+> -        env_tlb(env)->d[mmu_idx].iotlb =3D g_try_new(CPUIOTLBEntry, new_=
+size);
+> +        g_free(fast->table);
+> +        g_free(desc->iotlb);
+> +        fast->table =3D g_try_new(CPUTLBEntry, new_size);
+> +        desc->iotlb =3D g_try_new(CPUIOTLBEntry, new_size);
+>       }
+>   }
+>  =20
+>   static void tlb_flush_one_mmuidx_locked(CPUArchState *env, int mmu_idx)
+>   {
+> -    tlb_mmu_resize_locked(env, mmu_idx);
+> +    tlb_mmu_resize_locked(&env_tlb(env)->d[mmu_idx], &env_tlb(env)->f[mm=
+u_idx]);
+>       env_tlb(env)->d[mmu_idx].n_used_entries =3D 0;
+>       env_tlb(env)->d[mmu_idx].large_page_addr =3D -1;
+>       env_tlb(env)->d[mmu_idx].large_page_mask =3D -1;
+>=20
 
 
