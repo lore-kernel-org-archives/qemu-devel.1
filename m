@@ -2,81 +2,63 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4EFC33CAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 00:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7164AC33CAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 00:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58CF4206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 00:39:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 356E3206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 00:51:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iU4ZrmuS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58CF4206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mvrC7Ylt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 356E3206B7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itL63-0004cb-IK
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 19:39:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36467)
+	id 1itLHP-0001PH-Cf
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 19:50:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37355)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1itL5F-00047f-Si
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 19:38:26 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1itLFW-0007wk-8T
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 19:49:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1itL5E-0004GO-Ni
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 19:38:25 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:32881)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1itL5E-0004Fm-Gq
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 19:38:24 -0500
-Received: by mail-lj1-x244.google.com with SMTP id y6so32065597lji.0
- for <qemu-devel@nongnu.org>; Sun, 19 Jan 2020 16:38:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6kkSBjU9KcJIECujhqZi2tBv398h8qXlG2nD+oX3Rp0=;
- b=iU4ZrmuSgDhAffxRdohbzT9UyCkidf+IeTR+yZZgnaI+cYJh3Nl8omkbMJB/towVtS
- WOrn/2Z3SDH+tshCit7OU0cJv4+fkzTUyAyMKSpzKf7hLqB7+qcK6Mz++i2VZWH/UcXf
- 64JrVwKoLuGsF3MSGJ/zMUn383wDJePB1FXTeSivQRgYc1LSXN1q5ouOJQhk+d2lnDUS
- Ce6eZuICC9msJIHqKrE7YfqBqk7eSF5ZxA+mHhre4kZNes/0FPFZBQ2ya48+NiBSaiWn
- 1JHb2m89wAnpbMPUTO7zp9RljfbWIyYTym1pRaum6QsyhSCQ0Bh/75hsgsL1hnW67mNU
- g+Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6kkSBjU9KcJIECujhqZi2tBv398h8qXlG2nD+oX3Rp0=;
- b=rLpLBZKfUhwoaLjNQq8+GhkVa7nIVrwcQMLi2SmonRHAqhKOCSW2GOyjE1lIH3SZ5k
- 4OMka6gGh5o4LT8Ej+mEOSO9QE+JMuUt7ACtjInZ9Kq5a0yQn2EpTQBePYXejp9GJYK3
- QD+SpxsLNCh4pRq0jLVxqBs3ti5rw3n3JGhRqmutc0KigL3DLyX5IAOEP7s2eSXHy2uz
- CBTVZYQKyaXq8+0RadvXeSrBYJTnUEJ/yB4sK+c7lULZ/ataHpDYYgovTgk6Ftwu4Qav
- rNBBVjCERY6/SAiccIACppWg8B4nEvPc/fdDEG5KNr9iyzGQSi5zMKYqTekK6dKEXvCV
- ZPFg==
-X-Gm-Message-State: APjAAAXxQA5Yysa0mDHm3+DwhsnUFm2XKmEo4arvd3P5XjWGtTGbMAo5
- g8X2CGDejjQE9Xc/UQaZEuPFctVaswCPMRai+/s=
-X-Google-Smtp-Source: APXvYqwkzhidKukUfrZ4pbUAL8Ks7hLpqyRV6Vo8loS5pLkQoQfOlgAs/982pkdWcRjLMTV0OqHLlhUvg+nB/a/Ro3E=
-X-Received: by 2002:a2e:8946:: with SMTP id b6mr11820789ljk.1.1579480703100;
- Sun, 19 Jan 2020 16:38:23 -0800 (PST)
+ (envelope-from <dgibson@ozlabs.org>) id 1itLFU-00036P-9R
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 19:49:01 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35799 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1itLFT-00031N-BH; Sun, 19 Jan 2020 19:49:00 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 481Cj24yB3z9sR0; Mon, 20 Jan 2020 11:48:54 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1579481334;
+ bh=o5TlmzqCQFMH3RE24u5TFllgtiwUrQEPEAK2vrQevuw=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=mvrC7YltZat0pzU/QgEfbrXVhxbjqBUdDVbfXmmE+b/OX/ShlYHAcmwdUy1Cy5VtQ
+ u+jaxHfyv1uvfjqrTs3ID2buyuTJ22C3WgsNe7Jxinxa5VwRxit7WSI0DvNHTrP7CS
+ J9wHml2Rvz5cAX7rpkxy1Vjheo4yVOvgyWVXycaE=
+Date: Mon, 20 Jan 2020 11:48:42 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Ganesh Goudar <ganeshgr@linux.ibm.com>
+Subject: Re: [PATCH v20 6/7] migration: Include migration support for machine
+ check handling
+Message-ID: <20200120004842.GJ54439@umbus>
+References: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
+ <20200117093855.19074-7-ganeshgr@linux.ibm.com>
 MIME-Version: 1.0
-References: <20200109024907.2730-1-richard.henderson@linaro.org>
- <20200109024907.2730-4-richard.henderson@linaro.org>
-In-Reply-To: <20200109024907.2730-4-richard.henderson@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 20 Jan 2020 10:37:56 +1000
-Message-ID: <CAKmqyKM1_R9VRF2nC+cC3G8QYQ8X9wbh8vD_MrmdM5QJgV5jTg@mail.gmail.com>
-Subject: Re: [PATCH 3/9] cputlb: Pass CPUTLBDescFast to tlb_n_entries and
- sizeof_tlb
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="7UxcOAJ07vnNm5/N"
+Content-Disposition: inline
+In-Reply-To: <20200117093855.19074-7-ganeshgr@linux.ibm.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,80 +70,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
+ qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 9, 2020 at 12:49 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> We do not need the entire CPUArchState to compute these values.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+--7UxcOAJ07vnNm5/N
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Alistair
-
+On Fri, Jan 17, 2020 at 03:08:54PM +0530, Ganesh Goudar wrote:
+> From: Aravinda Prasad <arawinda.p@gmail.com>
+>=20
+> This patch includes migration support for machine check
+> handling. Especially this patch blocks VM migration
+> requests until the machine check error handling is
+> complete as these errors are specific to the source
+> hardware and is irrelevant on the target hardware.
+>=20
+> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+> [Do not set FWNMI cap in post_load, now its done in .apply hook]
+> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
 > ---
->  accel/tcg/cputlb.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index e4a8ed9534..49c605b6d8 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -80,14 +80,14 @@ QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
->  QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
->  #define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
->
-> -static inline size_t tlb_n_entries(CPUArchState *env, uintptr_t mmu_idx)
-> +static inline size_t tlb_n_entries(CPUTLBDescFast *fast)
->  {
-> -    return (env_tlb(env)->f[mmu_idx].mask >> CPU_TLB_ENTRY_BITS) + 1;
-> +    return (fast->mask >> CPU_TLB_ENTRY_BITS) + 1;
+>  hw/ppc/spapr.c         | 47 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_events.c  | 16 +++++++++++++-
+>  hw/ppc/spapr_rtas.c    |  2 ++
+>  include/hw/ppc/spapr.h |  2 ++
+>  4 files changed, 66 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 46bac1a83c..c8bc2fa9f3 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -46,6 +46,7 @@
+>  #include "migration/qemu-file-types.h"
+>  #include "migration/global_state.h"
+>  #include "migration/register.h"
+> +#include "migration/blocker.h"
+>  #include "mmu-hash64.h"
+>  #include "mmu-book3s-v3.h"
+>  #include "cpu-models.h"
+> @@ -1683,6 +1684,8 @@ static void spapr_machine_reset(MachineState *machi=
+ne)
+> =20
+>      /* Signal all vCPUs waiting on this condition */
+>      qemu_cond_broadcast(&spapr->mc_delivery_cond);
+> +
+> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
+
+Thinking on our discussions about this earlier, there are
+circumstances where we could add the blocker message multiple times.
+IIUC, this will just remove one of them, but at reset, we need to
+remove all of them.
+
 >  }
->
-> -static inline size_t sizeof_tlb(CPUArchState *env, uintptr_t mmu_idx)
-> +static inline size_t sizeof_tlb(CPUTLBDescFast *fast)
+> =20
+>  static void spapr_create_nvram(SpaprMachineState *spapr)
+> @@ -1965,6 +1968,42 @@ static const VMStateDescription vmstate_spapr_dtb =
+=3D {
+>      },
+>  };
+> =20
+> +static bool spapr_fwnmi_needed(void *opaque)
+> +{
+> +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
+> +
+> +    return spapr->guest_machine_check_addr !=3D -1;
+> +}
+> +
+> +static int spapr_fwnmi_pre_save(void *opaque)
+> +{
+> +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
+> +
+> +    /*
+> +     * Check if machine check handling is in progress and print a
+> +     * warning message.
+> +     */
+> +    if (spapr->mc_status !=3D -1) {
+> +        warn_report("A machine check is being handled during migration. =
+The"
+> +                "handler may run and log hardware error on the destinati=
+on");
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_machine_check =3D {
+> +    .name =3D "spapr_machine_check",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_fwnmi_needed,
+> +    .pre_save =3D spapr_fwnmi_pre_save,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr =3D {
+>      .name =3D "spapr",
+>      .version_id =3D 3,
+> @@ -1999,6 +2038,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>          &vmstate_spapr_cap_large_decr,
+>          &vmstate_spapr_cap_ccf_assist,
+>          &vmstate_spapr_cap_fwnmi,
+> +        &vmstate_spapr_machine_check,
+>          NULL
+>      }
+>  };
+> @@ -2814,6 +2854,13 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+>          spapr_create_lmb_dr_connectors(spapr);
+>      }
+> =20
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) =3D=3D SPAPR_CAP_ON) {
+> +        /* Create the error string for live migration blocker */
+> +        error_setg(&spapr->fwnmi_migration_blocker,
+> +            "A machine check is being handled during migration. The hand=
+ler"
+> +            "may run and log hardware error on the destination");
+> +    }
+> +
+>      /* Set up RTAS event infrastructure */
+>      spapr_events_init(spapr);
+> =20
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 54eaf28a9e..884e455f02 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -43,6 +43,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include <libfdt.h>
+> +#include "migration/blocker.h"
+> =20
+>  #define RTAS_LOG_VERSION_MASK                   0xff000000
+>  #define   RTAS_LOG_VERSION_6                    0x06000000
+> @@ -843,6 +844,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recove=
+red)
 >  {
-> -    return env_tlb(env)->f[mmu_idx].mask + (1 << CPU_TLB_ENTRY_BITS);
-> +    return fast->mask + (1 << CPU_TLB_ENTRY_BITS);
+>      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      CPUState *cs =3D CPU(cpu);
+> +    int ret;
+> +    Error *local_err =3D NULL;
+> =20
+>      if (spapr->guest_machine_check_addr =3D=3D -1) {
+>          /*
+> @@ -872,8 +875,19 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recov=
+ered)
+>              return;
+>          }
+>      }
+> -    spapr->mc_status =3D cpu->vcpu_id;
+> =20
+> +    ret =3D migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_e=
+rr);
+> +    if (ret =3D=3D -EBUSY) {
+> +        /*
+> +         * We don't want to abort so we let the migration to continue.
+> +         * In a rare case, the machine check handler will run on the tar=
+get.
+> +         * Though this is not preferable, it is better than aborting
+> +         * the migration or killing the VM.
+> +         */
+> +        warn_report("Received a fwnmi while migration was in progress");
+> +    }
+> +
+> +    spapr->mc_status =3D cpu->vcpu_id;
+>      spapr_mce_dispatch_elog(cpu, recovered);
 >  }
->
->  static void tlb_window_reset(CPUTLBDesc *desc, int64_t ns,
-> @@ -156,7 +156,7 @@ static void tlb_dyn_init(CPUArchState *env)
->  static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
->  {
->      CPUTLBDesc *desc = &env_tlb(env)->d[mmu_idx];
-> -    size_t old_size = tlb_n_entries(env, mmu_idx);
-> +    size_t old_size = tlb_n_entries(&env_tlb(env)->f[mmu_idx]);
->      size_t rate;
->      size_t new_size = old_size;
->      int64_t now = get_clock_realtime();
-> @@ -236,7 +236,8 @@ static void tlb_flush_one_mmuidx_locked(CPUArchState *env, int mmu_idx)
->      env_tlb(env)->d[mmu_idx].large_page_addr = -1;
->      env_tlb(env)->d[mmu_idx].large_page_mask = -1;
->      env_tlb(env)->d[mmu_idx].vindex = 0;
-> -    memset(env_tlb(env)->f[mmu_idx].table, -1, sizeof_tlb(env, mmu_idx));
-> +    memset(env_tlb(env)->f[mmu_idx].table, -1,
-> +           sizeof_tlb(&env_tlb(env)->f[mmu_idx]));
->      memset(env_tlb(env)->d[mmu_idx].vtable, -1,
->             sizeof(env_tlb(env)->d[0].vtable));
+> =20
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 3f162d82f5..4ce8e48d2a 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -50,6 +50,7 @@
+>  #include "hw/ppc/fdt.h"
+>  #include "target/ppc/mmu-hash64.h"
+>  #include "target/ppc/mmu-book3s-v3.h"
+> +#include "migration/blocker.h"
+> =20
+>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *s=
+papr,
+>                                     uint32_t token, uint32_t nargs,
+> @@ -453,6 +454,7 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>      spapr->mc_status =3D -1;
+>      qemu_cond_signal(&spapr->mc_delivery_cond);
+>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
 >  }
-> @@ -622,7 +623,7 @@ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
->      qemu_spin_lock(&env_tlb(env)->c.lock);
->      for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
->          unsigned int i;
-> -        unsigned int n = tlb_n_entries(env, mmu_idx);
-> +        unsigned int n = tlb_n_entries(&env_tlb(env)->f[mmu_idx]);
->
->          for (i = 0; i < n; i++) {
->              tlb_reset_dirty_range_locked(&env_tlb(env)->f[mmu_idx].table[i],
-> --
-> 2.20.1
->
->
+> =20
+>  static struct rtas_call {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index f6f82d88aa..a1fba95c82 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -218,6 +218,8 @@ struct SpaprMachineState {
+> =20
+>      unsigned gpu_numa_id;
+>      SpaprTpmProxy *tpm_proxy;
+> +
+> +    Error *fwnmi_migration_blocker;
+>  };
+> =20
+>  #define H_SUCCESS         0
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--7UxcOAJ07vnNm5/N
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4k+OoACgkQbDjKyiDZ
+s5LwzQ//VPS3DM60AsTuNCqFsVmNJ8FaMWHU0pgH2672kG2CUMGEowGyE5eQnzx4
+yrvzurl17GHMSVJgtGyOw2hHrAnki4FvfBI1BBhAPpcf3SH5WuuscKiLFCKrUcjA
+0TeP1h1JGyqneoHxGKvtcvFQeCQzBWqizVCj0ZTwlxC/IvKc4Q3Bj6BT6C2k+tXr
+lD/FWtDtuksAtgRLjgXEM1qe1d/q3zh0Ak8cHeLTueSsbUinIe5vVuz8Waim/YPN
+9ZL1/UtEjOj9kDoj7rAj+jhmA1SDKUOP+LJWiAlFbhst+ZofB8WL1TPJ2cRzdTf/
+ACWCEPC1+kbYFzJkV3MsNEUtYr7yRYltpAi8FAfp8CwwApQGdMMe9bxvkoaffa3E
+hDmI+pOipjFyM2Pby+YoeEg5M7K56ovfHV/uVU9+0oM/jGC8l0u2mCCO1dpWTsYv
+ib6da2cpshim2hrwvJvzpkesqDZzdzWlcgtezsRmL005Y7jhDhZx341Nx65YMOmx
+1aAHIfzx+HifeXBfzAca7Z4561bYC25/qER1z0ICrUtt+XpbBF27Xca72ZAYgcMC
+6nMbtEmoQ+0Ak3IeOQQ+uBaRaStGb0jBT4FO22byB/1Qzzb8Hc6GsGcvp6xWPMP4
+OZ7waW3E5aDYYQWnzbuMDZIwSt0dPwrXS2n6mcQ+f4itGtOL+jg=
+=pryl
+-----END PGP SIGNATURE-----
+
+--7UxcOAJ07vnNm5/N--
 
