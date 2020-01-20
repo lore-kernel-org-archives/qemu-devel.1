@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7CCC32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 23:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D8EC32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 23:58:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D063206A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 23:58:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D17C206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 23:58:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mlUzk62W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D063206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n77fPCT7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D17C206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itgwK-00015j-IL
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 18:58:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35804)
+	id 1itgwW-0001Uh-3F
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 18:58:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itgq4-0000tX-Js
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 18:52:13 -0500
+ id 1itgq7-0000yC-3a
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 18:52:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itgq3-0007Yt-8J
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 18:52:12 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52653)
+ id 1itgq5-0007a2-QX
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 18:52:14 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42847)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itgq3-0007YW-2G; Mon, 20 Jan 2020 18:52:11 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p9so1122398wmc.2;
- Mon, 20 Jan 2020 15:52:11 -0800 (PST)
+ id 1itgq5-0007Zl-Kc; Mon, 20 Jan 2020 18:52:13 -0500
+Received: by mail-wr1-x444.google.com with SMTP id q6so1277424wro.9;
+ Mon, 20 Jan 2020 15:52:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HmU95xX8aiHgv582n9n1gFgP0RnyUSIOGgAammjQwq4=;
- b=mlUzk62WQoMQEbBYRE/ABkDc5CQXIEkYrOaWG4g8743z0u/9C6YQGlQEcHBvIBLvGa
- ctWfebxGlSn2s1qs+SQrzxhyLWMP/yyGUc3nxO28IWc1TQCU/ypHEs6WZlZ91Q/SVIIk
- BLmOsCOuF5HuIg+YiB9PH3JtILgKNabEltxaYKJZfF9DB3TMImb0dQ6HJwtKh0EnKQu2
- 9hHK3J86JMPenrtJ2269jwERK28sE3ay7UB35Kvtp0sJ5spQM66A1ITuCV8KQ/CJOc0y
- cdv/qeyfrxO4VG+bIc5WbVRNfCNrPm01+MK2+kBP1/ujyUswgJ7wClfATCvjb3Flw22w
- K0SA==
+ bh=5pr6W5RFhMmV9VGbpJaWwEgOlR2uCM7o5V9+FQdTDQg=;
+ b=n77fPCT76au2bt4wgItA9oPwh8goAaRwjz/XWNjzSHPgFgiqeCUbZs/Gwk75ICiiWU
+ CkB1YJc3piup8Lo5nMa4JSqP4drqOhyH4aVmpncPwOdZhyBko2myFSYQSzAfomWbNr0M
+ GY9zwk1oww8+1qQxsZD3kr8rkDIKKlun3D4rwT5TAvTxQFHiJO73+KvSeYbakPdRetuC
+ BViRVTA3I6Dj3A/3M/UAKFKJ6GnuryuFmmX0vC+E5C1nWNf6skl7S8ieTYwy/IUHFsig
+ LiwVQBuZdFDzQy11W3OsZfmKpV5wlVGTDYI5Aq3J2oeOsC+ZOeOS8LdaLng20u29rJFw
+ wiRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=HmU95xX8aiHgv582n9n1gFgP0RnyUSIOGgAammjQwq4=;
- b=Z6ej/JuB6KjlnlGC/valabA1HgGz732pkWnZozwF49kroAZ9WfnUibxsSi8TaRg6hH
- YSeTS6DyzN6+3gS0O+WkrrIpnEse6eaijWBSW3ozkjvo88cwEI8tT4yB7FxkNaagXSLk
- Eoj11VJ4hbuKeDgZ79RdqttoICK3cDmfzGWVlW6rf2CP7ecEvoz4gSJXTBmTWuk/L+B3
- dJ3nLkFRBPZbXycFaooQw5NLEilTnETtYN7dIOq/XoXOwx/wzN2767cWsOhr1zkVAuOQ
- ESXcd6Zb681SEYKxnU6AoJjazD2qksOyHxeliLsraYz11Xvg1NK/nweF/Qmw+GIgM0Sg
- Ts/w==
-X-Gm-Message-State: APjAAAX7Ieh912coLqYmArVKBZQrsUwQHv1UKnx3i3mfNVifr+skvYBx
- dNLhdUgRbcDVFOU7BmlF+vhpsKV+
-X-Google-Smtp-Source: APXvYqwnFzclMaLm13lPJ3Aaimid5Vi0wZtLRoWaO9ia65KfWufKz6fm7/JH+4tbW23v1tK9pO3Vfg==
-X-Received: by 2002:a7b:c74c:: with SMTP id w12mr1155175wmk.1.1579564329908;
- Mon, 20 Jan 2020 15:52:09 -0800 (PST)
+ bh=5pr6W5RFhMmV9VGbpJaWwEgOlR2uCM7o5V9+FQdTDQg=;
+ b=tFkiadY+oTUDRmGxJ8lqdkIOz7gSUY5HvEAJXV+MyxUUcxZaH6kyqwJf/ZVpAE1Ifu
+ +BhR2JBla7ZaVXmixu1sSkHYpoZhwc7ef5ELwwp/AiX9mYLlvbLBPJH3zpq6KkRUnwsa
+ R5LSnoCAKcSYtlrAAZWwCbtP/FvfJw/t6kPIbu/p0iSPFBqLoxBNjTWvTe9O547OCZYv
+ /9bjci90kiUo8tGwzlz9MKtfSxkOol2ApIEzEeKglasbuKJ6OClBiBmQ+I737HoWBvi/
+ jpzAL54+d4eukSNNpaTMaUAFI18/7sEHq/OsVT8S1dwVNXnrJy3/6q+qvALssYzHrSna
+ aV6Q==
+X-Gm-Message-State: APjAAAXU2/CrU9r4W3SQWO01OaJAqWuEQbUTyRzL3GOwcZjwmDMDl1nU
+ qVwWWjFtKbMRsSeb2mlDzwpQr1cY
+X-Google-Smtp-Source: APXvYqzRCs2EPTAbghMVhHr+LbAI2QMePPm+oDeRbPaYPGkBzeEuaEa1KgBWPMmLy6tTnoDCRasX3A==
+X-Received: by 2002:a5d:4651:: with SMTP id j17mr1848778wrs.237.1579564332549; 
+ Mon, 20 Jan 2020 15:52:12 -0800 (PST)
 Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id d8sm48655269wrx.71.2020.01.20.15.52.08
+ by smtp.gmail.com with ESMTPSA id d8sm48655269wrx.71.2020.01.20.15.52.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 15:52:09 -0800 (PST)
+ Mon, 20 Jan 2020 15:52:12 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 5/7] tests/boot_linux_console: Test booting U-Boot on the
- Raspberry Pi 2
-Date: Tue, 21 Jan 2020 00:51:57 +0100
-Message-Id: <20200120235159.18510-6-f4bug@amsat.org>
+Subject: [PATCH v4 7/7] tests/boot_linux_console: Tag Emcraft Smartfusion2 as
+ running 'u-boot'
+Date: Tue, 21 Jan 2020 00:51:59 +0100
+Message-Id: <20200120235159.18510-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200120235159.18510-1-f4bug@amsat.org>
 References: <20200120235159.18510-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,98 +109,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test runs U-Boot on the Raspberry Pi 2.
-It is very simple and fast:
+Avocado tags are handy to automatically select tests matching
+the tags. Since this test also runs U-Boot, tag it.
 
-  $ avocado --show=app,console run -t raspi2 -t u-boot tests/acceptance/
-  JOB LOG    : avocado/job-results/job-2020-01-20T23.40-2424777/job.log
-   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_raspi2_uboot:
-  console: MMC:   sdhci@7e300000: 0
-  console: Loading Environment from FAT... Card did not respond to voltage select!
-  console: In:    serial
-  console: Out:   vidconsole
-  console: Err:   vidconsole
-  console: Net:   No ethernet found.
-  console: starting USB...
-  console: USB0:   Port not available.
-  console: Hit any key to stop autoboot:  0
-  console: U-Boot>
-  console: U-Boot> bdinfo
-  console: arch_number = 0x00000000
-  console: boot_params = 0x00000100
-  console: DRAM bank   = 0x00000000
-  console: -> start    = 0x00000000
-  console: -> size     = 0x3c000000
-  console: baudrate    = 115200 bps
-  console: TLB addr    = 0x3bff0000
-  console: relocaddr   = 0x3bf64000
-  console: reloc off   = 0x3bf5c000
-  console: irq_sp      = 0x3bb5fec0
-  console: sp start    = 0x3bb5feb0
-  console: Early malloc usage: 2a4 / 400
-  console: fdt_blob    = 0x3bfbdfb0
-  console: U-Boot> version
-  console: U-Boot 2019.01+dfsg-7 (May 14 2019 - 02:07:44 +0000)
-  console: gcc (Debian 8.3.0-7) 8.3.0
-  console: GNU ld (GNU Binutils for Debian) 2.31.1
-  console: U-Boot> reset
-  console: resetting ...
-  PASS (0.46 s)
+We can run all the tests using U-Boot as once with:
 
-U-Boot is built by the Debian project, see:
-https://wiki.debian.org/InstallingDebianOn/Allwinner#Creating_a_bootable_SD_Card_with_u-boot
+  $ avocado --show=app run -t u-boot tests/acceptance/
+  JOB LOG    : avocado/job-results/job-2020-01-21T00.16-ee9344e/job.log
+   (1/3) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_emcraft_sf2: PASS (16.59 s)
+   (2/3) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_raspi2_uboot: PASS (0.47 s)
+   (3/3) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aarch64_raspi3_uboot: PASS (2.43 s)
+  RESULTS    : PASS 3 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+  JOB TIME   : 19.78 s
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/acceptance/boot_linux_console.py | 28 ++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ tests/acceptance/boot_linux_console.py | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index e40b84651b..682b801b4f 100644
+index 22b360118d..4a4cf9d0ea 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -16,6 +16,7 @@ import shutil
- from avocado import skipUnless
- from avocado_qemu import Test
- from avocado_qemu import exec_command_and_wait_for_pattern
-+from avocado_qemu import interrupt_interactive_console_until_pattern
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-@@ -485,6 +486,33 @@ class BootLinuxConsole(Test):
-         exec_command_and_wait_for_pattern(self, 'reboot',
-                                                 'reboot: Restarting system')
- 
-+    def test_arm_raspi2_uboot(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:raspi2
+@@ -305,6 +305,7 @@ class BootLinuxConsole(Test):
+         :avocado: tags=arch:arm
+         :avocado: tags=machine:emcraft-sf2
+         :avocado: tags=endian:little
 +        :avocado: tags=u-boot
-+        """
-+        deb_url = ('https://snapshot.debian.org/archive/debian/'
-+                   '20190514T084354Z/pool/main/u/u-boot/'
-+                   'u-boot-rpi_2019.01%2Bdfsg-7_armhf.deb')
-+        deb_hash = 'ad858cf3afe623b6c3fa2e20dcdd1768fcb9ae83'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        uboot_path = '/usr/lib/u-boot/rpi_2/uboot.elf'
-+        uboot_path = self.extract_from_deb(deb_path, uboot_path)
-+
-+        self.vm.set_console()
-+        self.vm.add_args('-kernel', uboot_path,
-+                         # VideoCore starts CPU with only 1 core enabled
-+                         '-global', 'bcm2836.enabled-cpus=1',
-+                         '-no-reboot')
-+        self.vm.launch()
-+        interrupt_interactive_console_until_pattern(self,
-+                                       'Hit any key to stop autoboot:',
-+                                       'Config file not found')
-+        exec_command_and_wait_for_pattern(self, 'bdinfo', 'U-Boot')
-+        exec_command_and_wait_for_pattern(self, 'version', 'U-Boot')
-+        exec_command_and_wait_for_pattern(self, 'reset', 'resetting ...')
-+
-     def test_s390x_s390_ccw_virtio(self):
          """
-         :avocado: tags=arch:s390x
+         uboot_url = ('https://raw.githubusercontent.com/'
+                      'Subbaraya-Sundeep/qemu-test-binaries/'
 -- 
 2.21.1
 
