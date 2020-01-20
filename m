@@ -2,66 +2,90 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AA9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DFDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:42:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 600A222314
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:41:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 600A222314
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5329E2087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 13:42:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zOEv8U33"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5329E2087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itXIv-0006pC-86
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:41:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50130)
+	id 1itXJb-0007nF-Ck
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 08:42:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35017)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiangyifei@huawei.com>) id 1itSWT-0003Ij-9b
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:35:04 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1itXIK-0006OZ-H2
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:40:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiangyifei@huawei.com>) id 1itSWP-0002uC-GY
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 03:35:00 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2430 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiangyifei@huawei.com>)
- id 1itSWO-0002rT-VE; Mon, 20 Jan 2020 03:34:57 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.54])
- by Forcepoint Email with ESMTP id 791759FEB4CE1A869816;
- Mon, 20 Jan 2020 16:34:49 +0800 (CST)
-Received: from DGGEMM525-MBS.china.huawei.com ([169.254.5.80]) by
- DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id 14.03.0439.000;
- Mon, 20 Jan 2020 16:34:39 +0800
-From: Jiangyifei <jiangyifei@huawei.com>
-To: Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Subject: RE: [PATCH v1 23/36] target/riscv: Add hypvervisor trap support
-Thread-Topic: [PATCH v1 23/36] target/riscv: Add hypvervisor trap support
-Thread-Index: AQHVrr/CZI5tv9SLhESxVfT7OMDMLafzeTfA
-Date: Mon, 20 Jan 2020 08:34:39 +0000
-Message-ID: <3915816D913D8241BB43E932213F57D4ADBFCED8@dggemm525-mbs.china.huawei.com>
-References: <cover.1575914822.git.alistair.francis@wdc.com>
- <f3bdee4a9bee10980939c37968aa45b406824e48.1575914822.git.alistair.francis@wdc.com>
-In-Reply-To: <f3bdee4a9bee10980939c37968aa45b406824e48.1575914822.git.alistair.francis@wdc.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.201.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <alex.bennee@linaro.org>) id 1itXIJ-0001AH-8D
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:40:44 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33786)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1itXII-00018x-1B
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 08:40:43 -0500
+Received: by mail-wr1-x441.google.com with SMTP id b6so29654131wrq.0
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 05:40:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=fHrde87/BSdZVamOcVW6+hVOVFmE6NoQDdhJSFP7HSY=;
+ b=zOEv8U330vxN+B38HjDfhP1E9R6KfRsiKmJCYfqtQsInmBpEiKAlsbY7jd5dqwhYmP
+ A8Nbf0f2+ji+oAbkMzGy0BKoJ6XieVODB0cWnMN7mZVJJa0BdV3FUeyLa9RtNzVO0CC5
+ QdvZ4Zb7pKhJTuvuc+e4kTzhDyF1q7ueUy+kP74LeCMGN8mGhXP0pVjTq/JGO40AfD1e
+ C/pv71jyMwqtkw8FGl/uw5XPadzR3hZ8eiytdD2t5ToBPTvXWEC1S6eI1aW+Lgc8c0Pc
+ BheQi2W0taiXdMeKDhxFOEPwvUsP5oKb+QcS89FRaHe4JUeWdxXj8FTAnZbBZwILX//N
+ rYIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=fHrde87/BSdZVamOcVW6+hVOVFmE6NoQDdhJSFP7HSY=;
+ b=l1wSWJXILZfrcOQc93PWNkdgFuwDis5YvlJWfHiP8Y2c2/GZI7tRtxGQl9SxYMei76
+ GFlqxkH8bg3pAa1tVGWrhyz0BlvJHDJE1qTuJS9jDV1U2Ix6bZAoLE8oJnhI/BOhU7pJ
+ 3JySEv6BSzgfRTwjwtmFhOWl/rtugR8xE4qTRb/BLFkvVJjQvm5h2ol1HDn47bqaz4El
+ 0itH71LH6dA8KMaNe9ebt9w9kyVnxe2u9rpcQwY8Ma9ptS39sp0AjxIVLoav+O/tzVfP
+ VwuDh1FRryo1RnmI+y0MECZVaZYDr4B+NTaa4L2Jj8GBsFCj92b6y9K0MXHCg9D9gywh
+ 7UwQ==
+X-Gm-Message-State: APjAAAVbNzLlJZZouQto9j2BivPXsLu+BM+OMeZf4sqeIsEXBj3CiTtB
+ FIZWyYBZT50HXA0/3EMplxd1Qw==
+X-Google-Smtp-Source: APXvYqy8KX/QGo9kflrhuV5H53S+O/oVnttmaI+UpgIavXxsYCkL/R9euW0je4rbEQ9mIZx7cEK6nA==
+X-Received: by 2002:a5d:42c5:: with SMTP id t5mr19053508wrr.73.1579527640701; 
+ Mon, 20 Jan 2020 05:40:40 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i5sm23291128wml.31.2020.01.20.05.40.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jan 2020 05:40:39 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F37E21FF87;
+ Mon, 20 Jan 2020 13:40:38 +0000 (GMT)
+References: <20200109024907.2730-1-richard.henderson@linaro.org>
+ <20200109024907.2730-5-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 4/9] cputlb: Hoist tlb portions in tlb_mmu_resize_locked
+In-reply-to: <20200109024907.2730-5-richard.henderson@linaro.org>
+Date: Mon, 20 Jan 2020 13:40:38 +0000
+Message-ID: <87eevu2qll.fsf@linaro.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.187
-X-Mailman-Approved-At: Mon, 20 Jan 2020 08:40:08 -0500
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,214 +97,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>,
- "zhaosiqi \(A\)" <zhaosiqi3@huawei.com>,
- "palmer@dabbelt.com" <palmer@dabbelt.com>,
- "limingwang \(A\)" <limingwang@huawei.com>,
- "dengkai \(A\)" <dengkai1@huawei.com>
+Cc: alistair.francis@wdc.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,=20
 
-When I boot a riscv OS (the host) on the QEMU emulator and then boot a
-guest riscv OS in the host. The guest riscv OS fails to boot.=20
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-The riscv OS is a linux kernel in the riscv_kvm_v10 branch, the qemu emulat=
-or
-is the riscv-hyp-ext-v0.5.next branch.
+> No functional change, but the smaller expressions make
+> the code easier to read.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-The QEMU command line:
-    ./qemu-system-riscv64 -M virt -m 4096M -cpu rv64,x-h=3Dtrue -nographic =
-\
-        -smp 8 \
-        -name guest=3Driscv-test,debug-threads=3Don \
-        -kernel ./fw_jump.elf \
-        -device loader,file=3D./Image,addr=3D0x80200000 \
-        -drive file=3D./hyp.img,format=3Draw,id=3Dhd0 \
-        -device virtio-blk-device,drive=3Dhd0 \
-        -append "root=3D/dev/vda rw console=3DttyS0 earlycon=3Dsbi"
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-The kvmtool command line:
-    ./lkvm-static run -m 2048 -c2 --console serial -p "console=3DttyS0 \
-        earlycon=3Duart8250,mmio,0x3f8" -k ./Image -d guest.img
-
-The error message is:
-    [   46.136740] kvm [128]: VCPU exit error -14
-    [   46.137967] kvm [128]: SEPC=3D0x3febbf234e SSTATUS=3D0x4020 HSTATUS=
-=3D0x380
-    [   46.140075] kvm [128]: SCAUSE=3D0x8 STVAL=3D0x0
-    KVM_RUN failed: Bad address
-
-According to the error message printed by kvm, the exception of Environment
-call from VU-mode should to be delivered to VS-mode, instead of delivered
-to kvm in HS-mode.
-
-The problem is that the FORCE_HS_EXCEP flag is set when there is a pending
-irq that should trap to V=3D=3D0, but this bit is not cleared in  riscv_cpu=
-_do_interrupt
-when trapping to M-mode. So clearing FORCE_HS_EXCEP flag when trap to
-M-mode. The patch is as follows:
-
-Signed-off-by: Jiang Yifei <jiangyifei@huawei.com>
----
-target/riscv/cpu_helper.c | 1 +
-1 file changed, 1 insertion(+)
-
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 7166e61..cb6a1d6 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -954,6 +954,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-
-            /* Trapping to M mode, virt is disabled */
-            riscv_cpu_set_virt_enabled(env, 0);
-+            riscv_cpu_set_force_hs_excep(env, 0);
-        }
-
-        s =3D *env->mstatus;
---
-
-Regards,
-Yifei
-
-> -----Original Message-----
-> From: Qemu-riscv [mailto:qemu-riscv-
-> bounces+jiangyifei=3Dhuawei.com@nongnu.org] On Behalf Of Alistair Francis
-> Sent: Tuesday, December 10, 2019 2:12 AM
-> To: qemu-devel@nongnu.org; qemu-riscv@nongnu.org
-> Cc: alistair.francis@wdc.com; palmer@dabbelt.com; alistair23@gmail.com
-> Subject: [PATCH v1 23/36] target/riscv: Add hypvervisor trap support
->=20
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 > ---
->  target/riscv/cpu_helper.c | 65 +++++++++++++++++++++++++++++++++---
-> ---
->  1 file changed, 55 insertions(+), 10 deletions(-)
->=20
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c index
-> 1b747abf93..2c6d2bc3a3 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -641,6 +641,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->=20
->      RISCVCPU *cpu =3D RISCV_CPU(cs);
->      CPURISCVState *env =3D &cpu->env;
-> +    target_ulong s;
->=20
->      /* cs->exception is 32-bits wide unlike mcause which is XLEN-bits wi=
-de
->       * so we mask off the MSB and separate into trap type and cause.
-> @@ -650,13 +651,6 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->      target_ulong deleg =3D async ? env->mideleg : env->medeleg;
->      target_ulong tval =3D 0;
->=20
-> -    static const int ecall_cause_map[] =3D {
-> -        [PRV_U] =3D RISCV_EXCP_U_ECALL,
-> -        [PRV_S] =3D RISCV_EXCP_S_ECALL,
-> -        [PRV_H] =3D RISCV_EXCP_VS_ECALL,
-> -        [PRV_M] =3D RISCV_EXCP_M_ECALL
-> -    };
-> -
->      if (!async) {
->          /* set tval to badaddr for traps with address information */
->          switch (cause) {
-> @@ -680,7 +674,16 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->          /* ecall is dispatched as one cause so translate based on mode *=
-/
->          if (cause =3D=3D RISCV_EXCP_U_ECALL) {
->              assert(env->priv <=3D 3);
-> -            cause =3D ecall_cause_map[env->priv];
-> +
-> +            if (env->priv =3D=3D PRV_M) {
-> +                cause =3D RISCV_EXCP_M_ECALL;
-> +            } else if (env->priv =3D=3D PRV_S && riscv_cpu_virt_enabled(=
-env)) {
-> +                cause =3D RISCV_EXCP_VS_ECALL;
-> +            } else if (env->priv =3D=3D PRV_S && !riscv_cpu_virt_enabled=
-(env)) {
-> +                cause =3D RISCV_EXCP_S_ECALL;
-> +            } else if (env->priv =3D=3D PRV_U) {
-> +                cause =3D RISCV_EXCP_U_ECALL;
-> +            }
->          }
+>  accel/tcg/cputlb.c | 35 +++++++++++++++++------------------
+>  1 file changed, 17 insertions(+), 18 deletions(-)
+>
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 49c605b6d8..c7dc1dc85a 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -115,8 +115,8 @@ static void tlb_dyn_init(CPUArchState *env)
+>=20=20
+>  /**
+>   * tlb_mmu_resize_locked() - perform TLB resize bookkeeping; resize if n=
+ecessary
+> - * @env: CPU that owns the TLB
+> - * @mmu_idx: MMU index of the TLB
+> + * @desc: The CPUTLBDesc portion of the TLB
+> + * @fast: The CPUTLBDescFast portion of the same TLB
+>   *
+>   * Called with tlb_lock_held.
+>   *
+> @@ -153,10 +153,9 @@ static void tlb_dyn_init(CPUArchState *env)
+>   * high), since otherwise we are likely to have a significant amount of
+>   * conflict misses.
+>   */
+> -static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
+> +static void tlb_mmu_resize_locked(CPUTLBDesc *desc, CPUTLBDescFast *fast)
+>  {
+> -    CPUTLBDesc *desc =3D &env_tlb(env)->d[mmu_idx];
+> -    size_t old_size =3D tlb_n_entries(&env_tlb(env)->f[mmu_idx]);
+> +    size_t old_size =3D tlb_n_entries(fast);
+>      size_t rate;
+>      size_t new_size =3D old_size;
+>      int64_t now =3D get_clock_realtime();
+> @@ -198,14 +197,15 @@ static void tlb_mmu_resize_locked(CPUArchState *env=
+, int mmu_idx)
+>          return;
 >      }
->=20
-> @@ -690,7 +693,36 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->      if (env->priv <=3D PRV_S &&
->              cause < TARGET_LONG_BITS && ((deleg >> cause) & 1)) {
->          /* handle the trap in S-mode */
-> -        target_ulong s =3D *env->mstatus;
-> +        if (riscv_has_ext(env, RVH)) {
-> +            target_ulong hdeleg =3D async ? env->hideleg : env->hedeleg;
+>=20=20
+> -    g_free(env_tlb(env)->f[mmu_idx].table);
+> -    g_free(env_tlb(env)->d[mmu_idx].iotlb);
+> +    g_free(fast->table);
+> +    g_free(desc->iotlb);
+>=20=20
+>      tlb_window_reset(desc, now, 0);
+>      /* desc->n_used_entries is cleared by the caller */
+> -    env_tlb(env)->f[mmu_idx].mask =3D (new_size - 1) << CPU_TLB_ENTRY_BI=
+TS;
+> -    env_tlb(env)->f[mmu_idx].table =3D g_try_new(CPUTLBEntry, new_size);
+> -    env_tlb(env)->d[mmu_idx].iotlb =3D g_try_new(CPUIOTLBEntry, new_size=
+);
+> +    fast->mask =3D (new_size - 1) << CPU_TLB_ENTRY_BITS;
+> +    fast->table =3D g_try_new(CPUTLBEntry, new_size);
+> +    desc->iotlb =3D g_try_new(CPUIOTLBEntry, new_size);
 > +
-> +            if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &=
-&
-> +                !riscv_cpu_force_hs_excep_enabled(env)) {
-> +                /* Trap to VS mode */
-> +            } else if (riscv_cpu_virt_enabled(env)) {
-> +                /* Trap into HS mode, from virt */
-> +                riscv_cpu_swap_hypervisor_regs(env);
-> +                env->hstatus =3D set_field(env->hstatus, HSTATUS_SP2V,
-> +                                         get_field(env->hstatus, HSTATUS=
-_SPV));
-> +                env->hstatus =3D set_field(env->hstatus, HSTATUS_SP2P,
-> +                                         get_field(*env->mstatus, SSTATU=
-S_SPP));
-> +                env->hstatus =3D set_field(env->hstatus, HSTATUS_SPV,
-> +                                         riscv_cpu_virt_enabled(env));
-> +
-> +                riscv_cpu_set_virt_enabled(env, 0);
-> +                riscv_cpu_set_force_hs_excep(env, 0);
-> +            } else {
-> +                /* Trap into HS mode */
-> +                env->hstatus =3D set_field(env->hstatus, HSTATUS_SP2V,
-> +                                         get_field(env->hstatus, HSTATUS=
-_SPV));
-> +                env->hstatus =3D set_field(env->hstatus, HSTATUS_SP2P,
-> +                                         get_field(*env->mstatus, SSTATU=
-S_SPP));
-> +                env->hstatus =3D set_field(env->hstatus, HSTATUS_SPV,
-> +                                         riscv_cpu_virt_enabled(env));
-> +            }
-> +        }
-> +
-> +        s =3D *env->mstatus;
->          s =3D set_field(s, MSTATUS_SPIE, env->priv_ver >=3D
-> PRIV_VERSION_1_10_0 ?
->              get_field(s, MSTATUS_SIE) : get_field(s, MSTATUS_UIE << env-=
->priv));
->          s =3D set_field(s, MSTATUS_SPP, env->priv); @@ -704,7 +736,20 @@=
- void
-> riscv_cpu_do_interrupt(CPUState *cs)
->          riscv_cpu_set_mode(env, PRV_S);
->      } else {
->          /* handle the trap in M-mode */
-> -        target_ulong s =3D *env->mstatus;
-> +        if (riscv_has_ext(env, RVH)) {
-> +            if (riscv_cpu_virt_enabled(env)) {
-> +                riscv_cpu_swap_hypervisor_regs(env);
-> +            }
-> +            *env->mstatus =3D set_field(*env->mstatus, MSTATUS_MPV,
-> +                                      riscv_cpu_virt_enabled(env));
-> +            *env->mstatus =3D set_field(*env->mstatus, MSTATUS_MTL,
-> +
-> + riscv_cpu_force_hs_excep_enabled(env));
-> +
-> +            /* Trapping to M mode, virt is disabled */
-> +            riscv_cpu_set_virt_enabled(env, 0);
-> +        }
-> +
-> +        s =3D *env->mstatus;
->          s =3D set_field(s, MSTATUS_MPIE, env->priv_ver >=3D
-> PRIV_VERSION_1_10_0 ?
->              get_field(s, MSTATUS_MIE) : get_field(s, MSTATUS_UIE << env-
-> >priv));
->          s =3D set_field(s, MSTATUS_MPP, env->priv);
-> --
-> 2.24.0
->=20
+>      /*
+>       * If the allocations fail, try smaller sizes. We just freed some
+>       * memory, so going back to half of new_size has a good chance of wo=
+rking.
+> @@ -213,25 +213,24 @@ static void tlb_mmu_resize_locked(CPUArchState *env=
+, int mmu_idx)
+>       * allocations to fail though, so we progressively reduce the alloca=
+tion
+>       * size, aborting if we cannot even allocate the smallest TLB we sup=
+port.
+>       */
+> -    while (env_tlb(env)->f[mmu_idx].table =3D=3D NULL ||
+> -           env_tlb(env)->d[mmu_idx].iotlb =3D=3D NULL) {
+> +    while (fast->table =3D=3D NULL || desc->iotlb =3D=3D NULL) {
+>          if (new_size =3D=3D (1 << CPU_TLB_DYN_MIN_BITS)) {
+>              error_report("%s: %s", __func__, strerror(errno));
+>              abort();
+>          }
+>          new_size =3D MAX(new_size >> 1, 1 << CPU_TLB_DYN_MIN_BITS);
+> -        env_tlb(env)->f[mmu_idx].mask =3D (new_size - 1) << CPU_TLB_ENTR=
+Y_BITS;
+> +        fast->mask =3D (new_size - 1) << CPU_TLB_ENTRY_BITS;
+>=20=20
+> -        g_free(env_tlb(env)->f[mmu_idx].table);
+> -        g_free(env_tlb(env)->d[mmu_idx].iotlb);
+> -        env_tlb(env)->f[mmu_idx].table =3D g_try_new(CPUTLBEntry, new_si=
+ze);
+> -        env_tlb(env)->d[mmu_idx].iotlb =3D g_try_new(CPUIOTLBEntry, new_=
+size);
+> +        g_free(fast->table);
+> +        g_free(desc->iotlb);
+> +        fast->table =3D g_try_new(CPUTLBEntry, new_size);
+> +        desc->iotlb =3D g_try_new(CPUIOTLBEntry, new_size);
+>      }
+>  }
+>=20=20
+>  static void tlb_flush_one_mmuidx_locked(CPUArchState *env, int mmu_idx)
+>  {
+> -    tlb_mmu_resize_locked(env, mmu_idx);
+> +    tlb_mmu_resize_locked(&env_tlb(env)->d[mmu_idx], &env_tlb(env)->f[mm=
+u_idx]);
+>      env_tlb(env)->d[mmu_idx].n_used_entries =3D 0;
+>      env_tlb(env)->d[mmu_idx].large_page_addr =3D -1;
+>      env_tlb(env)->d[mmu_idx].large_page_mask =3D -1;
 
+
+--=20
+Alex Benn=C3=A9e
 
