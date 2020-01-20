@@ -2,73 +2,69 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D30C33CA1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF611C33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:14:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0000B20684
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:13:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F20720684
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:14:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T63F3fOg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0000B20684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOorKeb8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F20720684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itU3N-0008F0-SB
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:13:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33962)
+	id 1itU4a-0001jp-G2
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:14:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1itU10-0005PJ-N0
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:42 -0500
+ (envelope-from <drjones@redhat.com>) id 1itU0y-0005My-5E
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1itU0w-0002zi-4U
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49990
+ (envelope-from <drjones@redhat.com>) id 1itU0u-0002yd-3I
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42383
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1itU0w-0002zQ-0O
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:34 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1itU0t-0002yL-VE
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:10:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579515033;
+ s=mimecast20190719; t=1579515031;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5JK0SPejtfnhDv2PZmh14HOx+dBSg1c8oIKDy0lXZ34=;
- b=T63F3fOggoWKldbIOZ0fWrE7T+L2AxzMrusD/DDv0P4hd+NMDeWODWzqaYofh+uWxst30e
- baL6yHov9Kdoe5aysTYQ0ZOskyJXITyxG9ZczjNOvyNFmcDn2qKAjiPvDIwiWtR4fgm/kd
- JPiDl9q+N3BHesuZZpv4u1kUpMa2mwc=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=gpiTY7C+FUDsh6siZn/Ci7Goc6W669jxLLLakhq1bzo=;
+ b=hOorKeb8wMKpChLjnFcQ5PBwMMjDL81F1xV8Go8/m51VBv6xTpffaN0gdiP5P2JyYp8MoJ
+ QEm1/2HH7iGPPQNdRvhA3uJHovWZEjZhOvcuZnv9KQuglzi9CwyuojeCGP7VcRide/Et5d
+ 5rqgSHjBY2Msc4itxnn+nCcX9d3exgQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-2FuIHtcgPqWv671Nk2Qayg-1; Mon, 20 Jan 2020 05:10:30 -0500
+ us-mta-206-AZmSxa_qPwaqrX_99jvASw-1; Mon, 20 Jan 2020 05:10:28 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E25E9800D48;
- Mon, 20 Jan 2020 10:10:28 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 24C3C48;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D31BC107ACC9;
  Mon, 20 Jan 2020 10:10:26 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D418F87EDF;
+ Mon, 20 Jan 2020 10:10:24 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Subject: [RFC PATCH v3 1/6] target/arm/kvm: trivial: Clean up header
- documentation
-Date: Mon, 20 Jan 2020 11:10:18 +0100
-Message-Id: <20200120101023.16030-2-drjones@redhat.com>
-In-Reply-To: <20200120101023.16030-1-drjones@redhat.com>
-References: <20200120101023.16030-1-drjones@redhat.com>
+Subject: [RFC PATCH v3 0/6] target/arm/kvm: Adjust virtual time
+Date: Mon, 20 Jan 2020 11:10:17 +0100
+Message-Id: <20200120101023.16030-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 2FuIHtcgPqWv671Nk2Qayg-1
+X-MC-Unique: AZmSxa_qPwaqrX_99jvASw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -93,174 +89,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- target/arm/kvm_arm.h | 46 ++++++++++++++++++++++++++------------------
- 1 file changed, 27 insertions(+), 19 deletions(-)
+v3:
+ - Added a target/arm/kvm_arm.h comment cleanup patch (1/6)
+ - Minor refactoring of assert_has_feature_enabled/disabled in 4/6,
+   kept Richard's r-b.
+ - Rewrote kvm-no-adjvtime documentation in 6/6.
+ - Reworked approach in 5/6 to properly deal with migration and to
+   track running vs. !running, rather than running vs. paused states.
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 8e14d400e8ab..b48a9c95573b 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -28,9 +28,9 @@
- int kvm_arm_vcpu_init(CPUState *cs);
+v2:
+ - Reworked it enough that I brought back the RFC tag and retitled the
+   series. Also had to drop r-b's from a couple of patches, and even
+   drop patches.
+ - Changed approach from writing the QEMU virtual time to the guest
+   vtime counter to saving and restoring the guest vtime counter.
+ - Changed the kvm-adjvtime property, which was off by default, to a
+   kvm-no-adjvtime property, which is also off by default, meaning the
+   effective "adjust vtime" property is now on by default (but only
+   for 5.0 virt machine types and later)
+
+v1:
+ - move from RFC status to v1
+ - put kvm_arm_vm_state_change() in kvm.c to share among kvm32.c and kvm64.=
+c
+ - add r-b's from Richard
+
+
+This series is inspired by a series[1] posted by Bijan Mottahedeh over
+a year ago and by the patch[2] posted by Heyi Guo almost a year ago.
+The problem described in the cover letter of [1] is easily reproducible
+and some users would like to have the option to avoid it. However the
+solution, which is to adjust the virtual counter each time the VM
+transitions to the running state, introduces a different problem, which
+is that the virtual and physical counters diverge. As described in the
+cover letter of [1] this divergence is easily observed when comparing
+the output of `date` and `hwclock` after suspending the guest, waiting
+a while, and then resuming it. Because this different problem may actually
+be worse for some users, unlike [1], the series posted here makes the
+virtual counter adjustment optional. Besides the adjustment being
+optional, this series approaches the needed changes differently to apply
+them in more appropriate locations.
+
+Additional notes
+----------------
+
+Note 1
+------
+
+As described above, when running a guest with kvm-no-adjtime disabled
+it will be less likely the guest OS and guest applications get surprise
+time jumps when they use the virtual counter.  However the counter will
+no longer reflect real time.  It will lag behind.  If this is a problem
+then the guest can resynchronize its time from an external source or
+even from its physical counter.  If the suspend/resume is done with
+libvirt's virsh, and the guest is running the guest agent, then it's
+also possible to use a sequence like this
+
+ $ virsh suspend $GUEST
+ $ virsh resume $GUEST
+ $ virsh domtime --sync $GUEST
+
+in order to resynchronize a guest right after the resume.  Of course
+there will still be time when the clock is not right, possibly creating
+confusing timestamps in logs, for example, and the guest must still be
+tolerant to the time synchronizations.
+
+Note 2
+------
+
+Userspace that wants to set KVM_REG_ARM_TIMER_CNT should beware that
+the KVM register ID is not correct.  This cannot be fixed because it's
+UAPI and if the UAPI headers are used then it can't be a problem.
+However, if a userspace attempts to create the ID themselves from the
+register's specification, then they will get KVM_REG_ARM_TIMER_CVAL
+instead, as the _CNT and _CVAL definitions have their register
+parameters swapped.
+
+Note 3
+------
+
+I didn't test this with a 32-bit KVM host, but the changes to kvm32.c
+are the same as kvm64.c. So what could go wrong? Test results would be
+appreciated.
 =20
- /**
-- * kvm_arm_vcpu_finalize
-+ * kvm_arm_vcpu_finalize:
-  * @cs: CPUState
-- * @feature: int
-+ * @feature: feature to finalize
-  *
-  * Finalizes the configuration of the specified VCPU feature by
-  * invoking the KVM_ARM_VCPU_FINALIZE ioctl. Features requiring
-@@ -75,8 +75,8 @@ void kvm_arm_register_device(MemoryRegion *mr, uint64_t d=
-evid, uint64_t group,
- int kvm_arm_init_cpreg_list(ARMCPU *cpu);
-=20
- /**
-- * kvm_arm_reg_syncs_via_cpreg_list
-- * regidx: KVM register index
-+ * kvm_arm_reg_syncs_via_cpreg_list:
-+ * @regidx: KVM register index
-  *
-  * Return true if this KVM register should be synchronized via the
-  * cpreg list of arbitrary system registers, false if it is synchronized
-@@ -85,8 +85,8 @@ int kvm_arm_init_cpreg_list(ARMCPU *cpu);
- bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx);
-=20
- /**
-- * kvm_arm_cpreg_level
-- * regidx: KVM register index
-+ * kvm_arm_cpreg_level:
-+ * @regidx: KVM register index
-  *
-  * Return the level of this coprocessor/system register.  Return value is
-  * either KVM_PUT_RUNTIME_STATE, KVM_PUT_RESET_STATE, or KVM_PUT_FULL_STAT=
-E.
-@@ -148,6 +148,8 @@ void kvm_arm_init_serror_injection(CPUState *cs);
-  * @cpu: ARMCPU
-  *
-  * Get VCPU related state from kvm.
-+ *
-+ * Returns: 0 if success else < 0 error code
-  */
- int kvm_get_vcpu_events(ARMCPU *cpu);
-=20
-@@ -156,6 +158,8 @@ int kvm_get_vcpu_events(ARMCPU *cpu);
-  * @cpu: ARMCPU
-  *
-  * Put VCPU related state to kvm.
-+ *
-+ * Returns: 0 if success else < 0 error code
-  */
- int kvm_put_vcpu_events(ARMCPU *cpu);
-=20
-@@ -205,10 +209,12 @@ typedef struct ARMHostCPUFeatures {
-=20
- /**
-  * kvm_arm_get_host_cpu_features:
-- * @ahcc: ARMHostCPUClass to fill in
-+ * @ahcf: ARMHostCPUClass to fill in
-  *
-  * Probe the capabilities of the host kernel's preferred CPU and fill
-  * in the ARMHostCPUClass struct accordingly.
-+ *
-+ * Returns true on success and false otherwise.
-  */
- bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
-=20
-@@ -242,7 +248,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
- bool kvm_arm_aarch32_supported(CPUState *cs);
-=20
- /**
-- * bool kvm_arm_pmu_supported:
-+ * kvm_arm_pmu_supported:
-  * @cs: CPUState
-  *
-  * Returns: true if the KVM VCPU can enable its PMU
-@@ -251,7 +257,7 @@ bool kvm_arm_aarch32_supported(CPUState *cs);
- bool kvm_arm_pmu_supported(CPUState *cs);
-=20
- /**
-- * bool kvm_arm_sve_supported:
-+ * kvm_arm_sve_supported:
-  * @cs: CPUState
-  *
-  * Returns true if the KVM VCPU can enable SVE and false otherwise.
-@@ -259,26 +265,30 @@ bool kvm_arm_pmu_supported(CPUState *cs);
- bool kvm_arm_sve_supported(CPUState *cs);
-=20
- /**
-- * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
-- * IPA address space supported by KVM
-- *
-+ * kvm_arm_get_max_vm_ipa_size:
-  * @ms: Machine state handle
-+ *
-+ * Returns the number of bits in the IPA address space supported by KVM
-  */
- int kvm_arm_get_max_vm_ipa_size(MachineState *ms);
-=20
- /**
-- * kvm_arm_sync_mpstate_to_kvm
-+ * kvm_arm_sync_mpstate_to_kvm:
-  * @cpu: ARMCPU
-  *
-  * If supported set the KVM MP_STATE based on QEMU's model.
-+ *
-+ * Returns 0 on success and -1 on failure.
-  */
- int kvm_arm_sync_mpstate_to_kvm(ARMCPU *cpu);
-=20
- /**
-- * kvm_arm_sync_mpstate_to_qemu
-+ * kvm_arm_sync_mpstate_to_qemu:
-  * @cpu: ARMCPU
-  *
-  * If supported get the MP_STATE from KVM and store in QEMU's model.
-+ *
-+ * Returns 0 on success and aborts on failure.
-  */
- int kvm_arm_sync_mpstate_to_qemu(ARMCPU *cpu);
-=20
-@@ -292,7 +302,8 @@ int kvm_arm_set_irq(int cpu, int irqtype, int irq, int =
-level);
-=20
- static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
- {
--    /* This should never actually be called in the "not KVM" case,
-+    /*
-+     * This should never actually be called in the "not KVM" case,
-      * but set up the fields to indicate an error anyway.
-      */
-     cpu->kvm_target =3D QEMU_KVM_ARM_TARGET_NONE;
-@@ -377,23 +388,20 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_de=
-bug_exit_arch *debug_exit);
-  *
-  * Return: TRUE if any hardware breakpoints in use.
-  */
--
- bool kvm_arm_hw_debug_active(CPUState *cs);
-=20
- /**
-  * kvm_arm_copy_hw_debug_data:
-- *
-  * @ptr: kvm_guest_debug_arch structure
-  *
-  * Copy the architecture specific debug registers into the
-  * kvm_guest_debug ioctl structure.
-  */
- struct kvm_guest_debug_arch;
--
- void kvm_arm_copy_hw_debug_data(struct kvm_guest_debug_arch *ptr);
-=20
- /**
-- * its_class_name
-+ * its_class_name:
-  *
-  * Return the ITS class name to use depending on whether KVM acceleration
-  * and KVM CAP_SIGNAL_MSI are supported
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05713.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg03695.html
+
+Thanks,
+drew
+
+
+Andrew Jones (6):
+  target/arm/kvm: trivial: Clean up header documentation
+  hw/arm/virt: Add missing 5.0 options call to 4.2 options
+  target/arm/kvm64: kvm64 cpus have timer registers
+  tests/arm-cpu-features: Check feature default values
+  target/arm/kvm: Implement virtual time adjustment
+  target/arm/cpu: Add the kvm-no-adjvtime CPU property
+
+ docs/arm-cpu-features.rst      |  37 +++++++++-
+ hw/arm/virt.c                  |   9 +++
+ include/hw/arm/virt.h          |   1 +
+ target/arm/cpu.c               |   2 +
+ target/arm/cpu.h               |   7 ++
+ target/arm/cpu64.c             |   1 +
+ target/arm/kvm.c               | 120 +++++++++++++++++++++++++++++++++
+ target/arm/kvm32.c             |   3 +
+ target/arm/kvm64.c             |   4 ++
+ target/arm/kvm_arm.h           |  95 ++++++++++++++++++++------
+ target/arm/machine.c           |   7 ++
+ target/arm/monitor.c           |   1 +
+ tests/qtest/arm-cpu-features.c |  41 ++++++++---
+ 13 files changed, 299 insertions(+), 29 deletions(-)
+
 --=20
 2.21.1
 
