@@ -2,124 +2,83 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1914C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:29:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DE1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:33:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB8EB21835
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:29:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91B8021D7E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 12:33:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="iDA7SBkY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB8EB21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPKvAlii"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91B8021D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itWBF-0006Ol-Ne
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 07:29:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53331)
+	id 1itWEt-0008P3-Nk
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 07:33:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itWAS-0005wn-PZ
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:28:36 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itWE6-0007qA-Lr
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:32:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itWAO-000612-W7
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:28:32 -0500
-Received: from mail-am6eur05on2108.outbound.protection.outlook.com
- ([40.107.22.108]:46575 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1itWAO-0005zy-EP; Mon, 20 Jan 2020 07:28:28 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PF0Ku6g0RHCyKWGs4s9gJczZATxVh8QwY749hcSy1tqt7FO7aU82zEtOtIaxOsOgOd7lxm34WWMqMUUHQKAMtMIMW0J1hxLLdhgbU9tOFU4wnIb6CXoQiJvr5S0YWNBmmi8D4L1TTiUIzRNykLanaWDk5VqKkNWsFQFQg27EOJzP4nc4cgwWuaw6K07CqjDFk4uRnQ8WJVt/Es6MiydgI/SERoBpj9MWz+hipYLJpzfWt4KFmpCaFUspHKLZi+0afvUdPdjJhRbu8i+3e0/zdQbvJ6YRiAP++4pa9BFglbdOHJGx9zDSdFRks3mgOQTEaBTClMOnqQ6UeO7GFZBTkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=alD9leOborb0utfTjhlQzljke6EpgozQt8LQ8NYhfsQ=;
- b=RFRuPVLl+GjdeXzleuJpAO2DsAcsqBRwWjQacUgNZ/LHLtuDMgZCaw6gMB4yuNqi92D0jW36Zj0kW93K1Ugf7MMwl/qJX4WIOQQBn5KouGc5Qo8SPKRe0a3loD7/VHD/FexBe1qmz+vu4cj6jt3saFcXqVSADcUN5KUb4lRyYO5VTRH2Vw/aqevR0MEjzPRKnKf4P1b6wAi31zrV62KQ+3e7NUx/Kp2l5zokZrKLxaoaIp8TO/7zDJMW5J3vY2pBfHmMmOP1AN125BF8nQsw6icZ4TwoHjML7qF46XDcKsVbDQkvj8QBU2NzWglO5NJ+Ro4n53vNrpcygNDbB7G1xQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=alD9leOborb0utfTjhlQzljke6EpgozQt8LQ8NYhfsQ=;
- b=iDA7SBkYHLWom0Tdeiw/ONxlZWFnRgi7wmjXR1RwDTyOtUj1DFwB4GlOqyJe89iuas9ELposLhvBsgU9KQMCHSbDzib7gOLMzukfRhQexbZitUvbwFtU3lgLCTJgeVFmvi1hOK3PsOHqoOeQlCjJlM9KDHyqk3uQnv/EnUHDiho=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4101.eurprd08.prod.outlook.com (20.179.0.24) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.22; Mon, 20 Jan 2020 12:28:26 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.026; Mon, 20 Jan 2020
- 12:28:26 +0000
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0502CA0005.eurprd05.prod.outlook.com (2603:10a6:3:e3::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.18 via Frontend Transport; Mon, 20 Jan 2020 12:28:25 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v3 05/10] block/dirty-bitmap: switch _next_dirty_area and
- _next_zero to int64_t
-Thread-Topic: [PATCH v3 05/10] block/dirty-bitmap: switch _next_dirty_area and
- _next_zero to int64_t
-Thread-Index: AQHVtlOgUpFQPqMlfES7+kiweMLEXqfzpZGAgAAH/oA=
-Date: Mon, 20 Jan 2020 12:28:25 +0000
-Message-ID: <c2f78255-c001-01a3-487a-f7cf224f86f8@virtuozzo.com>
-References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
- <20191219100348.24827-6-vsementsov@virtuozzo.com>
- <ee73d55c-7f4f-fda1-b651-ced940027b62@redhat.com>
-In-Reply-To: <ee73d55c-7f4f-fda1-b651-ced940027b62@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0502CA0005.eurprd05.prod.outlook.com
- (2603:10a6:3:e3::15) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20200120152823413
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6effb02d-6f17-425b-aaa1-08d79da43f27
-x-ms-traffictypediagnostic: AM6PR08MB4101:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB41014D1207662E730A848F1EC1320@AM6PR08MB4101.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-forefront-prvs: 0288CD37D9
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(376002)(346002)(136003)(366004)(39840400004)(189003)(199004)(956004)(66556008)(66476007)(4326008)(66946007)(316002)(478600001)(66446008)(64756008)(2906002)(16576012)(2616005)(36756003)(31686004)(5660300002)(110136005)(53546011)(107886003)(71200400001)(54906003)(26005)(8676002)(6486002)(81166006)(31696002)(8936002)(86362001)(186003)(52116002)(16526019)(81156014)(14143004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4101;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UcP9vmtJFkF0j9685qJdNGQB9MaRHtLH+UX43jyXC2MHUaEVG5CI2xDuSTmTH+GffzqzLVDLwbYaAhvuEQVZjr4851/KcoCgG3sCkT/ffMmJt0Ryf6j+oNCT0H2SLw4VtkZOpgp8WRYqN0mx1XbKCqo17bsjrViSm8QKtkHyKWWW6QtoOoHvTYEoOUa1bXKqCup/yZUdVc352mhJk6yGW7eG4Y8pXC4pvs5iyKP6Ct6n8bv/nPkBf05CgR/KQpbl0BrELzD4jYVlZr0dhVh2BvXVkSTpw/sGaYO70B3LaqfLiH3WaZtVce8RMBB/CRPkvDi9pi9GOCkv8ZyCwOZNPz60Xlv6wIpzr2IXt5o2FL3Bc13AC1beE6pKPFubz76E2Em5OMZSMDDsjtgkzNPRgN1/b2egSYMleSQ3XTTWxa47R8OWPr9d+mog6kpOC1fCSMSeSzWXL3jnEg+qHSYAOC//Om1xo3xruh5KmqUl1C8=
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <F7E057CFD475094A9E45CF4E837208F0@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <dgilbert@redhat.com>) id 1itWE1-0008QY-MW
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:32:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32762
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itWE1-0008Pw-Eh
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 07:32:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579523532;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AFOl4H63bGrDSw2PUNUObgyLW1MD1+AiFA9k7Z2JXhs=;
+ b=VPKvAliiCiYg812ib5BoQXFI2uYEGrGU5iaP2i/ybYZ/vwDOrZhVBPNlvk2ffcvZdTCHHN
+ +UJADVPxvAnWbqJh9+JVLp7H+9W3fBcX43f8B5K7G3F3k8u0P3tbWHjAxwGCQtA+M23hrt
+ tO43gW7RLQ7eGCHRdU7lTVL1PLuTF0E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-qpDGUCWnOpuiH5QIn3OIpg-1; Mon, 20 Jan 2020 07:32:11 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B035800D48;
+ Mon, 20 Jan 2020 12:32:10 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A9DDE858BE;
+ Mon, 20 Jan 2020 12:32:06 +0000 (UTC)
+Date: Mon, 20 Jan 2020 12:32:04 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Masayoshi Mizuma <msys.mizuma@gmail.com>
+Subject: Re: [PATCH 026/104] virtiofsd: Fast path for virtio read
+Message-ID: <20200120123204.GL2827@work-vm>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-27-dgilbert@redhat.com>
+ <20200117185412.5hmvojeqzg7vgpko@gabell>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6effb02d-6f17-425b-aaa1-08d79da43f27
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 12:28:25.9773 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: spKzD3fONRm4DO93fnezoZMUU1+5ucr8cjDpWOxFbpLbV7W+GjlZMqvHq0XzU+Z2a83ryIt8g05NHa+cBqJzOFMDPQN96BrZSrdw1jOJzcU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4101
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.22.108
+In-Reply-To: <20200117185412.5hmvojeqzg7vgpko@gabell>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: qpDGUCWnOpuiH5QIn3OIpg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,120 +90,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.01.2020 14:59, Max Reitz wrote:
-> On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
->> We are going to introduce bdrv_dirty_bitmap_next_dirty so that same
->> variable may be used to store its return value and to be its parameter,
->> so it would int64_t.
->>
->> Similarly, we are going to refactor hbitmap_next_dirty_area to use
->> hbitmap_next_dirty together with hbitmap_next_zero, therefore we want
->> hbitmap_next_zero parameter type to be int64_t too.
->>
->> So, for convenience update all parameters of *_next_zero and
->> *_next_dirty_area to be int64_t.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/dirty-bitmap.h |  6 +++---
->>   include/qemu/hbitmap.h       |  7 +++----
->>   block/dirty-bitmap.c         |  6 +++---
->>   nbd/server.c                 |  2 +-
->>   tests/test-hbitmap.c         | 32 ++++++++++++++++----------------
->>   util/hbitmap.c               | 13 ++++++++-----
->>   6 files changed, 34 insertions(+), 32 deletions(-)
+* Masayoshi Mizuma (msys.mizuma@gmail.com) wrote:
+> On Thu, Dec 12, 2019 at 04:37:46PM +0000, Dr. David Alan Gilbert (git) wr=
+ote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >=20
+> > Readv the data straight into the guests buffer.
+> >=20
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > With fix by:
+> > Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
+> > ---
+> >  tools/virtiofsd/fuse_lowlevel.c |   5 +
+> >  tools/virtiofsd/fuse_virtio.c   | 159 ++++++++++++++++++++++++++++++++
+> >  tools/virtiofsd/fuse_virtio.h   |   4 +
+> >  3 files changed, 168 insertions(+)
+> >=20
+> > diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_low=
+level.c
+> > index c2b114cf5b..5f80625652 100644
+> > --- a/tools/virtiofsd/fuse_lowlevel.c
+> > +++ b/tools/virtiofsd/fuse_lowlevel.c
+> > @@ -475,6 +475,11 @@ static int fuse_send_data_iov_fallback(struct fuse=
+_session *se,
+> >          return fuse_send_msg(se, ch, iov, iov_count);
+> >      }
+> > =20
+> > +    if (fuse_lowlevel_is_virtio(se) && buf->count =3D=3D 1 &&
+> > +        buf->buf[0].flags =3D=3D (FUSE_BUF_IS_FD | FUSE_BUF_FD_SEEK)) =
+{
+> > +        return virtio_send_data_iov(se, ch, iov, iov_count, buf, len);
+> > +    }
+> > +
+> >      abort(); /* Will have taken vhost path */
+> >      return 0;
+> >  }
+> > diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virti=
+o.c
+> > index c33e0f7e8c..146cd3f702 100644
+> > --- a/tools/virtiofsd/fuse_virtio.c
+> > +++ b/tools/virtiofsd/fuse_virtio.c
+> > @@ -230,6 +230,165 @@ err:
+> >      return ret;
+> >  }
+> > =20
+> > +/*
+> > + * Callback from fuse_send_data_iov_* when it's virtio and the buffer
+> > + * is a single FD with FUSE_BUF_IS_FD | FUSE_BUF_FD_SEEK
+> > + * We need send the iov and then the buffer.
+> > + * Return 0 on success
+> > + */
+> > +int virtio_send_data_iov(struct fuse_session *se, struct fuse_chan *ch=
+,
+> > +                         struct iovec *iov, int count, struct fuse_buf=
+vec *buf,
+> > +                         size_t len)
+> > +{
+> > +    int ret =3D 0;
+> > +    VuVirtqElement *elem;
+> > +    VuVirtq *q;
+> > +
+> > +    assert(count >=3D 1);
+> > +    assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
+> > +
+> > +    struct fuse_out_header *out =3D iov[0].iov_base;
+> > +    /* TODO: Endianness! */
+> > +
+> > +    size_t iov_len =3D iov_size(iov, count);
+> > +    size_t tosend_len =3D iov_len + len;
+> > +
+> > +    out->len =3D tosend_len;
+> > +
+> > +    fuse_log(FUSE_LOG_DEBUG, "%s: count=3D%d len=3D%zd iov_len=3D%zd\n=
+", __func__,
+> > +             count, len, iov_len);
+> > +
+> > +    /* unique =3D=3D 0 is notification which we don't support */
+> > +    assert(out->unique);
+> > +
+> > +    /* For virtio we always have ch */
+> > +    assert(ch);
+> > +    assert(!ch->qi->reply_sent);
+> > +    elem =3D ch->qi->qe;
+> > +    q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
+> > +
+> > +    /* The 'in' part of the elem is to qemu */
+> > +    unsigned int in_num =3D elem->in_num;
+> > +    struct iovec *in_sg =3D elem->in_sg;
+> > +    size_t in_len =3D iov_size(in_sg, in_num);
+> > +    fuse_log(FUSE_LOG_DEBUG, "%s: elem %d: with %d in desc of length %=
+zd\n",
+> > +             __func__, elem->index, in_num, in_len);
+> > +
+> > +    /*
+> > +     * The elem should have room for a 'fuse_out_header' (out from fus=
+e)
+> > +     * plus the data based on the len in the header.
+> > +     */
+> > +    if (in_len < sizeof(struct fuse_out_header)) {
+> > +        fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n=
+",
+> > +                 __func__, elem->index);
 >=20
-> [...]
+> > +        ret =3D -E2BIG;
 >=20
->> diff --git a/util/hbitmap.c b/util/hbitmap.c
->> index b6d4b99a06..df22f06be6 100644
->> --- a/util/hbitmap.c
->> +++ b/util/hbitmap.c
->> @@ -193,7 +193,7 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitm=
-ap *hb, uint64_t first)
->>       }
->>   }
->>  =20
->> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t c=
-ount)
->> +int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t cou=
-nt)
->>   {
->>       size_t pos =3D (start >> hb->granularity) >> BITS_PER_LEVEL;
->>       unsigned long *last_lev =3D hb->levels[HBITMAP_LEVELS - 1];
->> @@ -202,6 +202,8 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_=
-t start, uint64_t count)
->>       uint64_t end_bit, sz;
->>       int64_t res;
->>  =20
->> +    assert(start >=3D 0 && count >=3D 0);
->> +
->>       if (start >=3D hb->orig_size || count =3D=3D 0) {
->>           return -1;
->>       }
-> As far as I can see, NBD just passes NBDRequest.from (which is a
-> uint64_t) to this function (on NBD_CMD_BLOCK_STATUS).  Would this allow
-> a malicious client to send a value > INT64_MAX, thus provoking an
-> overflow and killing the server with this new assertion?
+> The ret should be positive value, right?
+>=20
+>            ret =3D E2BIG;
 
+Yes, I think so.
 
-in nbd_co_receive_request() we have
+> > +        goto err;
+> > +    }
+> > +    if (in_len < tosend_len) {
+> > +        fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd=
+\n",
+> > +                 __func__, elem->index, tosend_len);
+>=20
+> > +        ret =3D -E2BIG;
+>=20
+>            ret =3D E2BIG;
+>=20
+> > +        goto err;
+> > +    }
+> > +
+> > +    /* TODO: Limit to 'len' */
+> > +
+> > +    /* First copy the header data from iov->in_sg */
+> > +    copy_iov(iov, count, in_sg, in_num, iov_len);
+> > +
+> > +    /*
+> > +     * Build a copy of the the in_sg iov so we can skip bits in it,
+> > +     * including changing the offsets
+> > +     */
+>=20
+> > +    struct iovec *in_sg_cpy =3D calloc(sizeof(struct iovec), in_num);
+>=20
+>        assert(in_sg_cpy) should be here? in case calloc() fails...
 
+Thanks, added.
 
-     if (request->from > client->exp->size ||
-         request->len > client->exp->size - request->from) {
+> > +    memcpy(in_sg_cpy, in_sg, sizeof(struct iovec) * in_num);
+> > +    /* These get updated as we skip */
+> > +    struct iovec *in_sg_ptr =3D in_sg_cpy;
+> > +    int in_sg_cpy_count =3D in_num;
+> > +
+> > +    /* skip over parts of in_sg that contained the header iov */
+> > +    size_t skip_size =3D iov_len;
+> > +
+> > +    size_t in_sg_left =3D 0;
+> > +    do {
+> > +        while (skip_size !=3D 0 && in_sg_cpy_count) {
+> > +            if (skip_size >=3D in_sg_ptr[0].iov_len) {
+> > +                skip_size -=3D in_sg_ptr[0].iov_len;
+> > +                in_sg_ptr++;
+> > +                in_sg_cpy_count--;
+> > +            } else {
+> > +                in_sg_ptr[0].iov_len -=3D skip_size;
+> > +                in_sg_ptr[0].iov_base +=3D skip_size;
+> > +                break;
+> > +            }
+> > +        }
+> > +
+> > +        int i;
+> > +        for (i =3D 0, in_sg_left =3D 0; i < in_sg_cpy_count; i++) {
+> > +            in_sg_left +=3D in_sg_ptr[i].iov_len;
+> > +        }
+> > +        fuse_log(FUSE_LOG_DEBUG,
+> > +                 "%s: after skip skip_size=3D%zd in_sg_cpy_count=3D%d =
+"
+> > +                 "in_sg_left=3D%zd\n",
+> > +                 __func__, skip_size, in_sg_cpy_count, in_sg_left);
+> > +        ret =3D preadv(buf->buf[0].fd, in_sg_ptr, in_sg_cpy_count,
+> > +                     buf->buf[0].pos);
+> > +
+>=20
+> > +        fuse_log(FUSE_LOG_DEBUG, "%s: preadv_res=3D%d(%m) len=3D%zd\n"=
+,
+> > +                 __func__, ret, len);
+>=20
+> "%m" should be removed? because it may show the previous errno even if pr=
+eadv()
+> is succsess. Like as:
+>=20
+> [ID: 00000079] virtio_send_data_iov: after skip skip_size=3D0 in_sg_cpy_c=
+ount=3D1 in_sg_left=3D65536
+> [ID: 00000079] virtio_send_data_iov: preadv_res=3D16000(No such file or d=
+irectory) len=3D65536
 
+I think there's another problem; that fuse_log might corrupt errno, so
+we return a bad errno below it.
+So I'll split it into two separate fuse_log's - one inside the (ret =3D=3D
+-1_ block with the %m and one after without it.
 
-So, we check that from is <=3D exp->size. and exp->size cant be greater tha=
-n INT64_MAX,
-as it derived from bdrv_getlength, which returns int64_t.
+> Otherwise, looks good to me:
+>=20
+> Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 
-
-
-Interesting, should we be more strict in server:?
-
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2178,7 +2178,7 @@ static int nbd_co_receive_request(NBDRequestData *req=
-, NBDRequest *request,
-          error_setg(errp, "Export is read-only");
-          return -EROFS;
-      }
--    if (request->from > client->exp->size ||
-+    if (request->from >=3D client->exp->size ||
-          request->len > client->exp->size - request->from) {
-          error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" =
-PRIu32
-                     ", Size: %" PRIu64, request->from, request->len,
-
-Or is it intentional? Looking through NBD spec I found only
-
-    client MUST NOT use a length ... or which, when added to offset, would =
-exceed the export size.
-
-So, formally pair offset=3D<export size>, len=3D0 is valid...
+Thanks
 
 >=20
-> On second thought, we have this problem already everywhere in
-> nbd_handle_request().  I don=92t see it or its caller ever checking
-> whether the received values are in bounds, it just passes them to all
-> kind of block layer functions that sometimes even just accept plain
-> ints.  Well, I suppose all other functions just error out, so it
-> probably isn=92t an actual problem in practice so far...
+> Thanks,
+> Masa
 >=20
-> Max
+> > +        if (ret =3D=3D -1) {
+> > +            ret =3D errno;
+> > +            free(in_sg_cpy);
+> > +            goto err;
+> > +        }
+> > +        if (ret < len && ret) {
+> > +            fuse_log(FUSE_LOG_DEBUG, "%s: ret < len\n", __func__);
+> > +            /* Skip over this much next time around */
+> > +            skip_size =3D ret;
+> > +            buf->buf[0].pos +=3D ret;
+> > +            len -=3D ret;
+> > +
+> > +            /* Lets do another read */
+> > +            continue;
+> > +        }
+> > +        if (!ret) {
+> > +            /* EOF case? */
+> > +            fuse_log(FUSE_LOG_DEBUG, "%s: !ret in_sg_left=3D%zd\n", __=
+func__,
+> > +                     in_sg_left);
+> > +            break;
+> > +        }
+> > +        if (ret !=3D len) {
+> > +            fuse_log(FUSE_LOG_DEBUG, "%s: ret!=3Dlen\n", __func__);
+> > +            ret =3D EIO;
+> > +            free(in_sg_cpy);
+> > +            goto err;
+> > +        }
+> > +        in_sg_left -=3D ret;
+> > +        len -=3D ret;
+> > +    } while (in_sg_left);
+> > +    free(in_sg_cpy);
+> > +
+> > +    /* Need to fix out->len on EOF */
+> > +    if (len) {
+> > +        struct fuse_out_header *out_sg =3D in_sg[0].iov_base;
+> > +
+> > +        tosend_len -=3D len;
+> > +        out_sg->len =3D tosend_len;
+> > +    }
+> > +
+> > +    ret =3D 0;
+> > +
+> > +    vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
+> > +    vu_queue_notify(&se->virtio_dev->dev, q);
+> > +
+> > +err:
+> > +    if (ret =3D=3D 0) {
+> > +        ch->qi->reply_sent =3D true;
+> > +    }
+> > +
+> > +    return ret;
+> > +}
+> > +
+> >  /* Thread function for individual queues, created when a queue is 'sta=
+rted' */
+> >  static void *fv_queue_thread(void *opaque)
+> >  {
+> > diff --git a/tools/virtiofsd/fuse_virtio.h b/tools/virtiofsd/fuse_virti=
+o.h
+> > index 135a14875a..cc676b9193 100644
+> > --- a/tools/virtiofsd/fuse_virtio.h
+> > +++ b/tools/virtiofsd/fuse_virtio.h
+> > @@ -26,4 +26,8 @@ int virtio_loop(struct fuse_session *se);
+> >  int virtio_send_msg(struct fuse_session *se, struct fuse_chan *ch,
+> >                      struct iovec *iov, int count);
+> > =20
+> > +int virtio_send_data_iov(struct fuse_session *se, struct fuse_chan *ch=
+,
+> > +                         struct iovec *iov, int count,
+> > +                         struct fuse_bufvec *buf, size_t len);
+> > +
+> >  #endif
+> > --=20
+> > 2.23.0
+> >=20
+> >=20
 >=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-
---=20
-Best regards,
-Vladimir
 
