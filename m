@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F0B0C32771
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820DCC3F68F
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 22:03:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 291CA22525
+	by mail.kernel.org (Postfix) with ESMTPS id 4FBDF22527
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 22:03:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFK9VGsr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 291CA22525
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XjM/qX/u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FBDF22527
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itf93-0003Sv-El
+	id 1itf93-0003SF-9V
 	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 17:03:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50961)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50936)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itf6h-0001Vr-NF
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:16 -0500
+ id 1itf6f-0001Vk-QQ
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itf6f-0005m6-Tp
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:15 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35663)
+ id 1itf6e-0005je-Bg
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:13 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38094)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itf6f-0005ji-NT
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:13 -0500
-Received: by mail-wr1-x444.google.com with SMTP id g17so1132047wro.2
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 14:01:12 -0800 (PST)
+ id 1itf6e-0005id-3b
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:12 -0500
+Received: by mail-wm1-x341.google.com with SMTP id u2so926737wmc.3
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 14:01:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/1VSe/7St+k6/MQRetjcnD35mCiVVbYYdodJto6H7yU=;
- b=PFK9VGsrdI27BvomgI27b7fqRGifADuRdpF67qcU07bomcuWDsOLRrBoIQHPSgnCxZ
- NqZCcPnTbFTFD8x84k3rR2d1feCthc0O65J8wil0C4cO0MqWwf7WgxihwZg38mRO8K4X
- 6t2BZqvmSN4a3OumZ10521OW5Iwcs867RPtvKty44ndJxmYFO4Dr4Gtg1bzQyhrq7392
- xEMIVNAolpT9+iTRMEUuHbYEOsoY84vSQEHbIfhI7QFJYuP+CL5QC5B0rjG5craxvUXp
- 7jKmSdFU98t4Zy/srOvqSIi0162ma0CkR4Vxg7Q7R8L2jlje0ZJs4MVQsU62L/22K3cY
- h0Cg==
+ bh=IMzDWPOAlokC12hxHZKbBpZqQqABH6KMX9scWYox2oU=;
+ b=XjM/qX/uwLzdgSiPulSdmfQT0f2AG9WLZp1DXSQHy0p5hDhwcYRi3TLxGTMfm80zJE
+ 2zT3MW9HSoQaTH9x2wh9SfaswV1JzsjeWEsJflASASfCdCaEG6EZJHvQq2jM6KDjG7w1
+ 2Oc1Gn7TMcG5Oiky78961vCSu5gkaHArdAn67ApqUvKnOpAujuVC2eQOxwkiD6vGBW9V
+ 6Tby6a5umh30puYrUVs+vMDocEZQy5xcPhDa9/uOoxHz91ZTQo5cA7x/36fS+OEsLULl
+ 8WQffE0bJKcX9BK3zz98vcfbjgwEcD96xnCuV/gbMRYZCkn0YDjyNT7pIFo090zp0OV8
+ lIbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=/1VSe/7St+k6/MQRetjcnD35mCiVVbYYdodJto6H7yU=;
- b=eb8spv2upe7106WNCk24gXgNaWQEyOvpIKJ6krTHRkFzsQ/HpwM5qTxJBnsPGYCugB
- rw00G97q5Ss4qY3NmYBPKuHx/9iTRr4OuWITnPOXsgPqR++PL8O/SEWwXSs/O5/vJpo0
- 2ulN7vupjiZ1ARevdPam8vHWAUaAJV3ujLDDUIBcHf18wu4y/H/RWNIxn5IuErdBFgu2
- t1CfdNZQVgRdDxwCtEUU6Jg66ObO5m8NpMFWcH/3ZuFtukwxRTmOsF5PlpFyOFhQC1zv
- tq1a2bb7n0ZAhdYOUs7dYljfqLXRie3TNKWgyz3fhe2EdPeXzPwFW7PGBlbZSfrN5ygM
- kuZA==
-X-Gm-Message-State: APjAAAW5uTacMN8OPBw4yVUaeePNQ4rPLAunh9rGGNleAxjvfngmQlZQ
- RAgaX0xA+4TSs9ScRQk9xG1TvRCP
-X-Google-Smtp-Source: APXvYqzAZO9Yyo2A4fnf315HSdCx+8IbysAoJa1DEg9hfxoj5Xf4dS4Wjwnr4aOoE6hkbypfcHs/RQ==
-X-Received: by 2002:a5d:43c7:: with SMTP id v7mr1493442wrr.32.1579557671802;
- Mon, 20 Jan 2020 14:01:11 -0800 (PST)
+ bh=IMzDWPOAlokC12hxHZKbBpZqQqABH6KMX9scWYox2oU=;
+ b=Jdn6G8S8kwDqf+3TDV5kFeGLhBbR7yVBPRgOFXq0ZCeOaZGsgUMCK5vhsABg6iJTMh
+ i7gtk8thhRV+QoQnOYsLbJgBVa/fig3mBfKWcOGFuwqtJXbR71WpH3qJQrou2oJemaL6
+ dNmG90Xn7Aak1zIU0ce04/fRJh4qIsbvL/KAGfBibgLT7WAMFwkf5NyAGZl54d0Qh+0i
+ nIqjjKA0zdIakME/Js6fzjyR2UWrQYkwbzp2Mr/Plk41g2GPgQWglx+vW8kSTlFRSz6Z
+ F8Fl3SRK7R3X52oRLFYis4p8yL5+Sxw5Bxcv46MUPs5ITHAe07u2RjjHd4PQ8UPc8cDG
+ eTkw==
+X-Gm-Message-State: APjAAAWCgYH3k+thvd5mFEF67T/n551Ur0W4gOPLKvdj3vhHlTY8wjX5
+ 1DjxzaZOszgB83sLuPa/BX4vHrsR
+X-Google-Smtp-Source: APXvYqwyvVzMT5biFjw3cX9fB41a9AuXKX4Mv+BFjq6i+z4axl1htAgUX6LnLRADGUtbvxdWWD15TA==
+X-Received: by 2002:a7b:c407:: with SMTP id k7mr888264wmi.46.1579557670640;
+ Mon, 20 Jan 2020 14:01:10 -0800 (PST)
 Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id f1sm904341wmc.45.2020.01.20.14.01.10
+ by smtp.gmail.com with ESMTPSA id f1sm904341wmc.45.2020.01.20.14.01.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 14:01:11 -0800 (PST)
+ Mon, 20 Jan 2020 14:01:10 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 02/18] MAINTAINERS: Move the AVR machines in new section
- (not within ARM)
-Date: Mon, 20 Jan 2020 23:00:51 +0100
-Message-Id: <20200120220107.17825-3-f4bug@amsat.org>
+Subject: [PATCH v4 01/18] MAINTAINERS: Move machine test to the machine
+ section (not ARCH one)
+Date: Mon, 20 Jan 2020 23:00:50 +0100
+Message-Id: <20200120220107.17825-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200120220107.17825-1-f4bug@amsat.org>
 References: <20200120220107.17825-1-f4bug@amsat.org>
@@ -86,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,56 +110,29 @@ Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
 !squash
 ---
- MAINTAINERS | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 3fbac64b31..4998fee99a 100644
+index c70d77b1ae..3fbac64b31 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -489,19 +489,6 @@ F: hw/*/allwinner*
- F: include/hw/*/allwinner*
- F: hw/arm/cubieboard.c
- 
--AVR Machines
--M: Michael Rolnik <mrolnik@gmail.com>
--R: Sarah Harris <S.E.Harris@kent.ac.uk>
--S: Maintained
--F: hw/avr/
--F: hw/char/avr_usart.c
--F: include/hw/char/avr_usart.h
--F: hw/timer/avr_timer16.c
--F: include/hw/timer/avr_timer16.h
--F: hw/misc/avr_mask.c
--F: include/hw/misc/avr_mask.h
+@@ -168,7 +168,6 @@ M: Michael Rolnik <mrolnik@gmail.com>
+ R: Sarah Harris <S.E.Harris@kent.ac.uk>
+ S: Maintained
+ F: target/avr/
 -F: tests/acceptance/machine_avr6.py
--
+ F: default-configs/avr-softmmu.mak
+ F: gdb-xml/avr-cpu.xml
+ 
+@@ -501,6 +500,7 @@ F: hw/timer/avr_timer16.c
+ F: include/hw/timer/avr_timer16.h
+ F: hw/misc/avr_mask.c
+ F: include/hw/misc/avr_mask.h
++F: tests/acceptance/machine_avr6.py
+ 
  ARM PrimeCell and CMSDK devices
  M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -901,6 +888,22 @@ F: include/hw/*/nrf51*.h
- F: include/hw/*/microbit*.h
- F: tests/qtest/microbit-test.c
- 
-+AVR Machines
-+-------------
-+
-+Atmel MCU
-+M: Michael Rolnik <mrolnik@gmail.com>
-+R: Sarah Harris <S.E.Harris@kent.ac.uk>
-+S: Maintained
-+F: hw/avr/
-+F: hw/char/avr_usart.c
-+F: include/hw/char/avr_usart.h
-+F: hw/timer/avr_timer16.c
-+F: include/hw/timer/avr_timer16.h
-+F: hw/misc/avr_mask.c
-+F: include/hw/misc/avr_mask.h
-+F: tests/acceptance/machine_avr6.py
-+
- CRIS Machines
- -------------
- Axis Dev88
 -- 
 2.21.1
 
