@@ -2,80 +2,80 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 943D2C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 22:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5B0C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 22:15:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CBC3217F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 22:13:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EF41217F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 22:15:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JElk8Zfx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CBC3217F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PtnKeuTO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EF41217F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itfId-000085-Uu
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 17:13:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51154)
+	id 1itfKW-0002tY-Li
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 17:15:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itf70-0001oQ-Nn
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:35 -0500
+ id 1itf73-0001rh-Dq
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itf6z-0005yb-Dy
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:34 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:44845)
+ id 1itf70-0005zR-Vc
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:37 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39425)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1itf6z-0005yH-71
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:33 -0500
-Received: by mail-wr1-x429.google.com with SMTP id q10so1063904wrm.11
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 14:01:33 -0800 (PST)
+ id 1itf70-0005z7-O5
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 17:01:34 -0500
+Received: by mail-wr1-x444.google.com with SMTP id y11so1100709wrt.6
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 14:01:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PKTXExoANFsgS8Ee5P5ychq32drqafI8xSRUijLe4QA=;
- b=JElk8ZfxaW0vbZWvuPu1QPzma+S3K3fJVaonIU/j1yuhmR5IW39bJDdwe3iLp8oE5w
- HHw8dEY91yJ817/BTm271Idh5KPIP05Bgnce/DIQ7a365CmYoKNm7Buqwob9rDf423fp
- N4yGaS+KdCYCO/j16NdXFWodkiebJuKGupd8GQPKEWrdxE5CH231YiUnAxetCS1B5R2G
- TGvETPjtg0DeLF48CR/QZTfCQ+SneeJMu7lZRrhjAfpDirrsSxSSvlNVsqKKCqRL6td1
- 4lVTyNcGUnmkKp9N+BUvqlYLuT9jhAYCvbBZ/9up8JoAw6hets6MFfRLRdSBISe+hAMg
- mlqg==
+ bh=qKKy1SZvFws5yZqExt6szwtl12gCjt5k/DbYWN76mWU=;
+ b=PtnKeuTOxPwMd39FdxMQIRhI8nr6+JLKY+OPJQuEemZ/o/pKSTioqBH8V4D2dkho9F
+ QYB7dcaPAbYbNFRHNjmQTO3uoMbzhDsX33sgmcsxZ4l/ymEgyTVWzfdLwvkrdsx3MLj8
+ 76sSLE8FjCc2ABGaIbZv+aJaxYrx5L4JWvWhmeR30qnpGTQOxKH9e95WmZV7WNZfP0sy
+ K30Qu/l5A60n01jbwx5niNRv6v7wk7LtselbhpydoeitHAznF9zE0m/otHCtAkPq0HaD
+ h87XPii86tVHG6inHgFusXJoL94JRzfTIAfIln1qilBbU1YLZArspkzxvkMYfAqoQHYA
+ L/7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=PKTXExoANFsgS8Ee5P5ychq32drqafI8xSRUijLe4QA=;
- b=BhLxez0F/BDJQ+F2LRHymz/y9sAiSRin0squMD9E2rl5ksJu9TGIfhArgtMdS0CsKd
- LmteGEJS+BO9f894aMHmZELiZ7QUd3wd5njOw1htIj5HZG/MY73NeO8VhBTke8j3Ipcr
- 1eLdu8p0rPRiXKfWppj8dlEv/xuS0h0QNmCWSe10vZL/BaMG3NI3gYiy4RZToYu8Obcj
- J0y5HX8x4NfwSVaAywr5b7Up7/z58a/B0MJaYP/DOsF8uFD9GI9VESUCQLhazLaxo3NT
- M+QWHzFKJlcBOQzT30KMenWT9HpErlo4DadETKDZYW0UwtoRC389ceRvCdnB5/I5j2Mf
- Hbqg==
-X-Gm-Message-State: APjAAAX7sVLJ7Nrj1wqzfG8e2PHO96S0C0KrQhELVj4cqgs3J4zkX6de
- ZecGK6Kd9ZqRrelFf2cAl6uNaFtW
-X-Google-Smtp-Source: APXvYqx3GuIZj6HIVqFPnrFmVWGegg8mBIv+f9vG+uHM5EQJfVmG/N6htfb2dQYSmGYn16mvbZY0vg==
-X-Received: by 2002:a5d:6346:: with SMTP id b6mr1499549wrw.354.1579557692019; 
- Mon, 20 Jan 2020 14:01:32 -0800 (PST)
+ bh=qKKy1SZvFws5yZqExt6szwtl12gCjt5k/DbYWN76mWU=;
+ b=LayALOD0Ne8NDitQ2UWgbaqvLFmCD6RjRh5GuCIk20Ds7wGy/1tZLwI1y/2Baak/0e
+ fJ50d3fL76wofzhG8/fVZ+GnCbkGrvaeMemshSgbFCy/MayKaaracBG7kT69gzoW4Kpj
+ 4NQSqdQDN26LBg8QIVXQSDryXYzMms/RmS821mZrNVornLhJ9yB/fhfGz+jHSWltIRXT
+ MzJsdfyKY/G3cKBHFISCi6Isy14QPdyoUX1cpwEw5JPg9cJ9c2TT5Y6fHcD5elu9Vp4N
+ Vbyt7zJ/kyo/3t65e4VzwEWE6XNUunwJHu4brldAlRQdatFSdUWY4PMKK7o5KbFnHzJY
+ 4V7g==
+X-Gm-Message-State: APjAAAWBTZ641wq9DV/N6ohzPcmdv96UoJBsRmmOTIS/dOqus5V9oQeq
+ fS/HtO0Pmm9GCYbneFUQjKAEbAjD
+X-Google-Smtp-Source: APXvYqyXXA0ukjhkslPtNu5GRUd/wSQ/+KNp5Tg2WNUEfIfLoOwgYxxDP1F/PxCHizti/QxEkud/tg==
+X-Received: by 2002:adf:ec4c:: with SMTP id w12mr1600134wrn.124.1579557693429; 
+ Mon, 20 Jan 2020 14:01:33 -0800 (PST)
 Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id f1sm904341wmc.45.2020.01.20.14.01.30
+ by smtp.gmail.com with ESMTPSA id f1sm904341wmc.45.2020.01.20.14.01.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 14:01:31 -0800 (PST)
+ Mon, 20 Jan 2020 14:01:32 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 16/18] tests/acceptance: Test the Arduino MEGA2560 board
-Date: Mon, 20 Jan 2020 23:01:05 +0100
-Message-Id: <20200120220107.17825-17-f4bug@amsat.org>
+Subject: [PATCH v4 17/18] hw/avr: Remove the unrealistic AVR 'sample' board
+Date: Mon, 20 Jan 2020 23:01:06 +0100
+Message-Id: <20200120220107.17825-18-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200120220107.17825-1-f4bug@amsat.org>
 References: <20200120220107.17825-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,41 +97,373 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Michael Rolnik <mrolnik@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As the path name demonstrates, the FreeRTOS tests target a
-board based on a ATMega2560 MCU. We have one, the Arduino
-MEGA2560.
-
-Complementary documentation:
-
-https://feilipu.me/2012/01/15/ethermega-arduino-mega-2560-and-freertos/
-https://feilipu.me/2015/11/24/arduino_freertos/ (see 'Compatibility')
+The 'arduino-mega-2560-v3' board fully replace the 'sample'
+board.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/acceptance/machine_avr6.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+!squash?
+---
+ default-configs/avr-softmmu.mak |   1 -
+ hw/avr/sample.c                 | 295 --------------------------------
+ tests/qtest/boot-serial-test.c  |   1 -
+ hw/avr/Kconfig                  |   4 -
+ hw/avr/Makefile.objs            |   1 -
+ 5 files changed, 302 deletions(-)
+ delete mode 100644 hw/avr/sample.c
 
-diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
-index 611f6a62a4..b644d2a81c 100644
---- a/tests/acceptance/machine_avr6.py
-+++ b/tests/acceptance/machine_avr6.py
-@@ -27,7 +27,7 @@ class AVR6Machine(Test):
-     def test_freertos(self):
-         """
-         :avocado: tags=arch:avr
--        :avocado: tags=machine:sample
-+        :avocado: tags=machine:arduino-mega-2560-v3
-         """
-         """
-         https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
+diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
+index d8d1d8e6fe..80218add98 100644
+--- a/default-configs/avr-softmmu.mak
++++ b/default-configs/avr-softmmu.mak
+@@ -3,4 +3,3 @@
+ # Boards:
+ #
+ CONFIG_ARDUINO=y
+-CONFIG_AVR_SAMPLE=y
+diff --git a/hw/avr/sample.c b/hw/avr/sample.c
+deleted file mode 100644
+index 19b8c067e5..0000000000
+--- a/hw/avr/sample.c
++++ /dev/null
+@@ -1,295 +0,0 @@
+-/*
+- * QEMU AVR CPU
+- *
+- * Copyright (c) 2019 Michael Rolnik
+- *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2.1 of the License, or (at your option) any later version.
+- *
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see
+- * <http://www.gnu.org/licenses/lgpl-2.1.html>
+- */
+-
+-/*
+- *  NOTE:
+- *      This is not a real AVR board, this is an example!
+- *      The CPU is an approximation of an ATmega2560, but is missing various
+- *      built-in peripherals.
+- *
+- *      This example board loads provided binary file into flash memory and
+- *      executes it from 0x00000000 address in the code memory space.
+- *
+- *      Currently used for AVR CPU validation
+- *
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qapi/error.h"
+-#include "qemu-common.h"
+-#include "cpu.h"
+-#include "hw/hw.h"
+-#include "sysemu/sysemu.h"
+-#include "sysemu/qtest.h"
+-#include "ui/console.h"
+-#include "hw/boards.h"
+-#include "hw/loader.h"
+-#include "qemu/error-report.h"
+-#include "exec/address-spaces.h"
+-#include "include/hw/sysbus.h"
+-#include "include/hw/char/atmel_usart.h"
+-#include "include/hw/timer/atmel_timer16.h"
+-#include "include/hw/misc/atmel_power.h"
+-#include "elf.h"
+-#include "hw/misc/unimp.h"
+-
+-#define SIZE_FLASH 0x00040000
+-#define SIZE_SRAM 0x00002000
+-/*
+- * Size of additional "external" memory, as if the AVR were configured to use
+- * an external RAM chip.
+- * Note that the configuration registers that normally enable this feature are
+- * unimplemented.
+- */
+-#define SIZE_EXMEM 0x00000000
+-
+-/* Offsets of peripherals in emulated memory space (i.e. not host addresses)  */
+-#define PRR0_BASE 0x64
+-#define PRR1_BASE 0x65
+-#define USART_BASE 0xc0
+-#define TIMER1_BASE 0x80
+-#define TIMER1_IMSK_BASE 0x6f
+-#define TIMER1_IFR_BASE 0x36
+-
+-/* Interrupt numbers used by peripherals */
+-#define USART_RXC_IRQ 24
+-#define USART_DRE_IRQ 25
+-#define USART_TXC_IRQ 26
+-
+-#define TIMER1_CAPT_IRQ 15
+-#define TIMER1_COMPA_IRQ 16
+-#define TIMER1_COMPB_IRQ 17
+-#define TIMER1_COMPC_IRQ 18
+-#define TIMER1_OVF_IRQ 19
+-
+-/*  Power reduction     */
+-#define PRR1_BIT_PRTIM5     0x05    /*  Timer/Counter5  */
+-#define PRR1_BIT_PRTIM4     0x04    /*  Timer/Counter4  */
+-#define PRR1_BIT_PRTIM3     0x03    /*  Timer/Counter3  */
+-#define PRR1_BIT_PRUSART3   0x02    /*  USART3  */
+-#define PRR1_BIT_PRUSART2   0x01    /*  USART2  */
+-#define PRR1_BIT_PRUSART1   0x00    /*  USART1  */
+-
+-#define PRR0_BIT_PRTWI      0x06    /*  TWI */
+-#define PRR0_BIT_PRTIM2     0x05    /*  Timer/Counter2  */
+-#define PRR0_BIT_PRTIM0     0x04    /*  Timer/Counter0  */
+-#define PRR0_BIT_PRTIM1     0x03    /*  Timer/Counter1  */
+-#define PRR0_BIT_PRSPI      0x02    /*  Serial Peripheral Interface */
+-#define PRR0_BIT_PRUSART0   0x01    /*  USART0  */
+-#define PRR0_BIT_PRADC      0x00    /*  ADC */
+-
+-#define configCPU_CLOCK_HZ ((unsigned long)16000000)
+-
+-typedef struct {
+-    MachineClass parent;
+-} SampleMachineClass;
+-
+-typedef struct {
+-    MachineState parent;
+-    MemoryRegion *ram;
+-    MemoryRegion *flash;
+-    AVRUsartState *usart0;
+-    AVRTimer16State *timer1;
+-    AVRMaskState *prr[2];
+-} SampleMachineState;
+-
+-#define TYPE_SAMPLE_MACHINE MACHINE_TYPE_NAME("sample")
+-
+-#define SAMPLE_MACHINE(obj) \
+-    OBJECT_CHECK(SampleMachineState, obj, TYPE_SAMPLE_MACHINE)
+-#define SAMPLE_MACHINE_GET_CLASS(obj) \
+-    OBJECT_GET_CLASS(SampleMachineClass, obj, TYPE_SAMPLE_MACHINE)
+-#define SAMPLE_MACHINE_CLASS(klass) \
+-    OBJECT_CLASS_CHECK(SampleMachineClass, klass, TYPE_SAMPLE_MACHINE)
+-
+-static void sample_init(MachineState *machine)
+-{
+-    SampleMachineState *sms = SAMPLE_MACHINE(machine);
+-    MemoryRegion *system_memory = get_system_memory();
+-    AVRCPU *cpu;
+-    const char *firmware = NULL;
+-    const char *filename = NULL;
+-    const char *cpu_type = NULL;
+-    uint32_t e_flags;
+-    int bytes_loaded;
+-    SysBusDevice *busdev;
+-    DeviceState *cpudev;
+-
+-    system_memory = get_system_memory();
+-    sms->ram = g_new(MemoryRegion, 1);
+-    sms->flash = g_new(MemoryRegion, 1);
+-
+-    /* if ELF file is provided, determine CPU type reading ELF e_flags */
+-    cpu_type = machine->cpu_type;
+-    firmware = machine->firmware;
+-    if (firmware != NULL) {
+-        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
+-        if (filename == NULL) {
+-            error_report("Unable to find %s", firmware);
+-            exit(1);
+-        }
+-
+-        bytes_loaded = load_elf_ram_sym(filename, NULL, NULL, NULL, NULL, NULL,
+-                NULL, &e_flags, 0, EM_AVR, 0, 0, NULL, 0, 0);
+-        if (bytes_loaded > 0) {
+-            cpu_type = avr_flags_to_cpu_type(e_flags, cpu_type);
+-        }
+-    }
+-
+-    cpu = AVR_CPU(cpu_create(cpu_type));
+-    cpudev = DEVICE(cpu);
+-
+-    memory_region_init_rom(sms->flash, NULL, "avr.flash", SIZE_FLASH,
+-            &error_fatal);
+-    memory_region_add_subregion(system_memory, OFFSET_CODE, sms->flash);
+-
+-    /* following are atmel2560 device */
+-    create_unimplemented_device("usart 3", OFFSET_DATA + 0x0130, 0x0007);
+-    create_unimplemented_device("timer-counter-16bit 5",
+-            OFFSET_DATA + 0x0120, 0x000e);
+-    create_unimplemented_device("gpio L", OFFSET_DATA + 0x0109, 0x0003);
+-    create_unimplemented_device("gpio K", OFFSET_DATA + 0x0106, 0x0003);
+-    create_unimplemented_device("gpio J", OFFSET_DATA + 0x0103, 0x0003);
+-    create_unimplemented_device("gpio H", OFFSET_DATA + 0x0100, 0x0003);
+-    create_unimplemented_device("usart 2", OFFSET_DATA + 0x00d0, 0x0007);
+-    create_unimplemented_device("usart 1", OFFSET_DATA + 0x00c8, 0x0007);
+-    create_unimplemented_device("twi", OFFSET_DATA + 0x00b8, 0x0006);
+-    create_unimplemented_device("timer-counter-async-8bit 2",
+-            OFFSET_DATA + 0x00b0, 0x0007);
+-    create_unimplemented_device("timer-counter-16bit 4",
+-            OFFSET_DATA + 0x00a0, 0x000e);
+-    create_unimplemented_device("timer-counter-16bit 3",
+-            OFFSET_DATA + 0x0090, 0x000e);
+-    create_unimplemented_device("ac / adc",
+-            OFFSET_DATA + 0x0078, 0x0008);
+-    create_unimplemented_device("ext-mem-iface",
+-            OFFSET_DATA + 0x0074, 0x0002);
+-    create_unimplemented_device("int-controller",
+-            OFFSET_DATA + 0x0068, 0x0006);
+-    create_unimplemented_device("sys",
+-            OFFSET_DATA + 0x0060, 0x0007);
+-    create_unimplemented_device("spi",
+-            OFFSET_DATA + 0x004c, 0x0003);
+-    create_unimplemented_device("ext-mem-iface",
+-            OFFSET_DATA + 0x004a, 0x0002);
+-    create_unimplemented_device("timer-counter-pwm-8bit 0",
+-            OFFSET_DATA + 0x0044, 0x0005);
+-    create_unimplemented_device("ext-mem-iface",
+-            OFFSET_DATA + 0x003e, 0x0005);
+-    create_unimplemented_device("int-controller",
+-            OFFSET_DATA + 0x0035, 0x0009);
+-    create_unimplemented_device("gpio G", OFFSET_DATA + 0x0032, 0x0003);
+-    create_unimplemented_device("gpio F", OFFSET_DATA + 0x002f, 0x0003);
+-    create_unimplemented_device("gpio E", OFFSET_DATA + 0x002c, 0x0003);
+-    create_unimplemented_device("gpio D", OFFSET_DATA + 0x0029, 0x0003);
+-    create_unimplemented_device("gpio C", OFFSET_DATA + 0x0026, 0x0003);
+-    create_unimplemented_device("gpio B", OFFSET_DATA + 0x0023, 0x0003);
+-    create_unimplemented_device("gpio A", OFFSET_DATA + 0x0020, 0x0003);
+-
+-    memory_region_allocate_system_memory(
+-        sms->ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
+-    memory_region_add_subregion(system_memory, OFFSET_DATA + 0x200, sms->ram);
+-
+-    /* Power Reduction built-in peripheral */
+-    sms->prr[0] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
+-                    OFFSET_DATA + PRR0_BASE, NULL));
+-    sms->prr[1] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
+-                    OFFSET_DATA + PRR1_BASE, NULL));
+-
+-    /* USART 0 built-in peripheral */
+-    sms->usart0 = AVR_USART(object_new(TYPE_AVR_USART));
+-    busdev = SYS_BUS_DEVICE(sms->usart0);
+-    qdev_prop_set_chr(DEVICE(sms->usart0), "chardev", serial_hd(0));
+-    object_property_set_bool(OBJECT(sms->usart0), true, "realized",
+-            &error_fatal);
+-    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
+-    /*
+-     * These IRQ numbers don't match the datasheet because we're counting from
+-     * zero and not including reset.
+-     */
+-    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, USART_RXC_IRQ));
+-    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, USART_DRE_IRQ));
+-    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, USART_TXC_IRQ));
+-    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[1]), PRR1_BIT_PRUSART1,
+-            qdev_get_gpio_in(DEVICE(sms->usart0), 0));
+-
+-    /* Timer 1 built-in periphal */
+-    sms->timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
+-    object_property_set_uint(OBJECT(sms->timer1), 1, "id", &error_abort);
+-    object_property_set_uint(OBJECT(sms->timer1), configCPU_CLOCK_HZ,
+-                                 "cpu-frequency-hz", &error_abort);
+-    object_property_set_bool(OBJECT(sms->timer1), true, "realized",
+-            &error_fatal);
+-    busdev = SYS_BUS_DEVICE(sms->timer1);
+-    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
+-    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
+-    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
+-    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, TIMER1_CAPT_IRQ));
+-    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, TIMER1_COMPA_IRQ));
+-    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, TIMER1_COMPB_IRQ));
+-    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(cpudev, TIMER1_COMPC_IRQ));
+-    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(cpudev, TIMER1_OVF_IRQ));
+-    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[0]), PRR0_BIT_PRTIM1,
+-            qdev_get_gpio_in(DEVICE(sms->timer1), 0));
+-
+-    /* Load firmware (contents of flash) trying to auto-detect format */
+-    if (filename != NULL) {
+-        bytes_loaded = load_elf(
+-            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0, 0);
+-        if (bytes_loaded < 0) {
+-            bytes_loaded = load_image_targphys(
+-                filename, OFFSET_CODE, SIZE_FLASH);
+-        }
+-        if (bytes_loaded < 0) {
+-            error_report(
+-                "Unable to load firmware image %s as ELF or raw binary",
+-                firmware);
+-            exit(1);
+-        }
+-    }
+-}
+-
+-static void sample_class_init(ObjectClass *oc, void *data)
+-{
+-    MachineClass *mc = MACHINE_CLASS(oc);
+-
+-    mc->desc = "AVR sample/example board (ATmega2560)";
+-    mc->init = sample_init;
+-    mc->default_cpus = 1;
+-    mc->min_cpus = mc->default_cpus;
+-    mc->max_cpus = mc->default_cpus;
+-    mc->default_cpu_type = AVR_CPU_TYPE_NAME("avr5");
+-    mc->is_default = 1;
+-}
+-
+-static const TypeInfo sample_info = {
+-    .name = TYPE_SAMPLE_MACHINE,
+-    .parent = TYPE_MACHINE,
+-    .instance_size = sizeof(SampleMachineState),
+-    .class_size = sizeof(SampleMachineClass),
+-    .class_init = sample_class_init,
+-};
+-
+-static void sample_machine_init(void)
+-{
+-    type_register_static(&sample_info);
+-}
+-
+-type_init(sample_machine_init);
+diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-test.c
+index 582a497963..07067b76a2 100644
+--- a/tests/qtest/boot-serial-test.c
++++ b/tests/qtest/boot-serial-test.c
+@@ -112,7 +112,6 @@ typedef struct testdef {
+ 
+ static testdef_t tests[] = {
+     { "alpha", "clipper", "", "PCI:" },
+-    { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
+     { "avr", "arduino-duemilanove", "", "T", sizeof(bios_avr), NULL, bios_avr },
+     { "avr", "arduino-mega-2560-v3", "", "T", sizeof(bios_avr), NULL, bios_avr},
+     { "ppc", "ppce500", "", "U-Boot" },
+diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+index 7907584ac7..59d9649d27 100644
+--- a/hw/avr/Kconfig
++++ b/hw/avr/Kconfig
+@@ -7,7 +7,3 @@ config ATMEL_ATMEGA_MCU
+ config ARDUINO
+     select ATMEL_ATMEGA_MCU
+     select UNIMP
+-
+-config AVR_SAMPLE
+-    select ATMEL_ATMEGA_MCU
+-    select UNIMP
+diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+index b36ca77cf0..f6aab1438d 100644
+--- a/hw/avr/Makefile.objs
++++ b/hw/avr/Makefile.objs
+@@ -1,3 +1,2 @@
+ obj-$(CONFIG_ATMEL_ATMEGA_MCU) += atmel_atmega.o
+ obj-$(CONFIG_ARDUINO) += arduino.o
+-obj-$(CONFIG_AVR_SAMPLE) += sample.o
 -- 
 2.21.1
 
