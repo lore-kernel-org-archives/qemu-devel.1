@@ -2,80 +2,86 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FORGED_YAHOO_RCVD,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F99C33CAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 02:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2013C33CAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 02:57:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A25420678
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 02:45:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B10F20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 02:57:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="JOI4ElgT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A25420678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GAWeo529"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B10F20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itN4B-0006xq-JT
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 21:45:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48100)
+	id 1itNG2-00015r-P0
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jan 2020 21:57:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liewkj@yahoo.com>) id 1itN3P-0006Rw-Ac
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 21:44:40 -0500
+ (envelope-from <jasowang@redhat.com>) id 1itNFN-0000et-OJ
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 21:57:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liewkj@yahoo.com>) id 1itN3N-00071I-V4
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 21:44:38 -0500
-Received: from sonic316-21.consmr.mail.ne1.yahoo.com ([66.163.187.147]:44213)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liewkj@yahoo.com>) id 1itN3N-00070T-A3
- for qemu-devel@nongnu.org; Sun, 19 Jan 2020 21:44:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
- t=1579488274; bh=88xQHsac10/B/z0HyzIFe8G5lh269QiGzPihCI2hXFo=;
- h=Date:From:To:Subject:References:From:Subject;
- b=JOI4ElgTdeVBDHUffj1Y49F9Ta2yeepjbXRn0IhEZ6H4v1w40vIxEqF2jS2KiAciBO72/Gtp6FdORoIY+YID5EL5+78ddC1yCmcdLhwAqOIApNhO8jBDZBzVaP4v7WuwBlH3At6LhWcYH5y8TLIu3+RJptn7RqkFzBNkFSSHOGg6y54XvBB50OjZJA2KsyyvxAlIV4H2NPDIc0WBUHnpgnk1tIMM8gbqxUmLi1LW0gBuzdIJi+U57BOvYdrTSBBkZatbMGJP1WZFvSE0qcAsuLySEginajt1ESzAaS+OqRYVz5VLQQvpDDug+gQilI9E3v5QYeq9gcfpB1XvpCRjMw==
-X-YMail-OSG: 7ZPN9x0VM1n7F7vm6S9yG1q6HogReXM7AlRZ2shxirMINCFFImn3Rq.IIpxPfr1
- koOlssc0P21bPFA2A3feU8JkwmYo6hPm7snXC_Cc9C4ZeKYbI7OdjrXGJJBzFEPJwG36aO3tLxWC
- DZQVeiRQStRvZh2y01sD0c5Gxnk5C6Jeg00tyxMKjrJna2l1vtEnBP9rd9wIyTqfAUsPPNVVHmyN
- ZWfsyjLZCcdtgY2ssUz40fweIVLrWaZV1NHkzI0PpAuuG1SKBfs8KSVuwurmdQLG3LbyEzzHpJpc
- TXd0brLgVZOyS9JG2j..v13KWwNgO8NJ0hKpuQx9BK37P6m70DMAlg0e3uyY7II1uxyZgcW9c51g
- jdAy9LX_r0VUPTRZUZzDiKYLE.NYNTeAFb76Z2E3_NJtYT92WpHyUuXncXy6D0_NKgd.di3o7e4c
- p0SgYTwugC2fXiGYrDwUQJlZkI903pWxnhkA3oT1P5vjGyjqVrfspvyD0ipo7pOBkWB791.9PXvS
- Ww.6Xv6VWlhXGM5ulsi0lxFtHrgnvajk6H0HzHiFNKEPFGc4ZbF4CJPBNl.piNABcD4RlPkSC_Ob
- G6bve1Z46UkwJotNt5TRWc9d_UvUOvl0f7_LIUv6B6VUDoCzWKDgBqJ060nCmBf46na6XliFSkht
- eZCvm972IfhORx.vYFSPhzy0FyTawO0wr58NEsFGNlJnb_WucPIYTbQBlkrtqgNtczyYWuO_pVkv
- 464iOQYH0E6DhHvs.okah2p1DDx.cTkfjVJBcPv9IovtG9RGSiEjfSV1nyv731HLhWcInvS7C0MF
- OR7eKCt3r.zxQ9btV1xBYR93R9KwWmnIe9LLR7.0uhJoKDNQgUZzyh7MuEpei9fMAmUV8xhuRML6
- IGOospj3_hMifRkTyhtEDUc8n4GLfc0X7dL5uHKFYKPhCyMS4bsu4pSYMF93ZruGvySViojLtVBE
- Xxczmxklvp6t3Ox6BLHElkDkBSWPZ74OqBxHMY3rtrAn9LrAujlIRk6.CTIPEB9UzGSuyOwHJAER
- e0h0ecMAU_EtkT.SP67XVbEMZqp.1enkUCvIO4Pi.IOtkq4QINQNpxg1Zq2Abnzof3dhcTzajm18
- OZlu8j2P_4oylXbR9SKZogN4eAGreFTsPEBfR7uToK1wJFso8N1Zf1n9tV5dmIlNSSXlZkxd74Qd
- sntPOXgXrIx8g7edVlNSmBQigtgEez.X02eAHU2UAXbkYxPShT14VZJ2zB32v.0QA_rtv91jSqQh
- z_07cZoGcaqRvdpxPgZKncmdALF_HRu1KYll31ECL1_u1pkFPOrksA6Icqg2SwXuz1j4NB20qtoW
- tgTRzsfgErdA8Zp_gfEcbvSpV2gPxexSje67KxopH.tEO1SRO3KKsHgzqreV1cA--
-Received: from sonic.gate.mail.ne1.yahoo.com by
- sonic316.consmr.mail.ne1.yahoo.com with HTTP; Mon, 20 Jan 2020 02:44:34 +0000
-Received: by smtp424.mail.bf1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA
- ID 47cdfa335a329bccde23c92ed7b56e4b; 
- Mon, 20 Jan 2020 02:44:33 +0000 (UTC)
-Date: Sun, 19 Jan 2020 18:44:22 -0800
-From: KJ Liew <liewkj@yahoo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] audio/sdl2: fix unrecognized audio format
-Message-ID: <20200120024422.GA686@PC-SEANJYE>
+ (envelope-from <jasowang@redhat.com>) id 1itNFK-0003de-RG
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 21:56:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56295
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1itNFK-0003d8-Bd
+ for qemu-devel@nongnu.org; Sun, 19 Jan 2020 21:56:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579489017;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5Z8ttRBa7SE+nrGNIAI87DI7UM74q+4YzubCDpvt6X4=;
+ b=GAWeo529ag4g2JejXPdF4qpGmgUjH6TSA2JH3i7q0j/BDY1xMSPsB/lTlwd322gXtRz/E+
+ 9ezHvUZ1Y1rLAhefIaVtxB7yk2BxhbCB09RRr+23EuunOzcVfWkSeS+cN49s4Wo3Pcsi2h
+ kRrOKx/x33ucOahnroeJeMFTLdIJJJE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-07aA_yyBODyUJOMIFN1S6g-1; Sun, 19 Jan 2020 21:56:53 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0FC98017CC;
+ Mon, 20 Jan 2020 02:56:52 +0000 (UTC)
+Received: from [10.72.12.173] (ovpn-12-173.pek2.redhat.com [10.72.12.173])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3765519C7F;
+ Mon, 20 Jan 2020 02:56:47 +0000 (UTC)
+Subject: Re: [PATCH V4 0/5] Introduce Advanced Watch Dog module
+To: "Zhang, Chen" <chen.zhang@intel.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
+References: <20191217124554.30818-1-chen.zhang@intel.com>
+ <fa1ed6cb-63d7-ee83-a5a0-b099b662fef2@intel.com>
+ <0502a0db0a17484c9220b3a63c40b397@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <08a1a225-52c1-4e6c-85f7-fcf6612b5383@redhat.com>
+Date: Mon, 20 Jan 2020 10:56:46 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-References: <20200120024422.GA686.ref@PC-SEANJYE>
-X-Mailer: WebService/1.1.15077 hermes Apache-HttpAsyncClient/4.1.4
- (Java/1.8.0_181)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 66.163.187.147
+In-Reply-To: <0502a0db0a17484c9220b3a63c40b397@intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 07aA_yyBODyUJOMIFN1S6g-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,34 +93,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Windows/SDL2, SDL_OpenAudio() may obtain audio format different from
-requested format.
 
-QEMU trace:
-sdl: sdl_open: req.fmt = 0x8010 obt.fmt = 0x8120
-sdl: Unrecognized SDL audio format 33056
-sdl: SDL_OpenAudio failed
+On 2020/1/19 =E4=B8=8B=E5=8D=885:10, Zhang, Chen wrote:
+> Hi~
+>
+> Anyone have comments about this module?
 
-The easiest fix is to force audio format conversion internal to SDL2.
 
-diff -ru ../orig/qemu-4.2.0/audio/sdlaudio.c ../qemu-4.2.0/audio/sdlaudio.c
---- ../orig/qemu-4.2.0/audio/sdlaudio.c	2019-12-12 10:20:47.000000000 -0800
-+++ ../qemu-4.2.0/audio/sdlaudio.c	2020-01-15 15:56:25.059841600 -0800
-@@ -147,10 +147,11 @@
-     }
- #endif
- 
--    status = SDL_OpenAudio (req, obt);
-+    status = SDL_OpenAudio (req, NULL);
-     if (status) {
-         sdl_logerr ("SDL_OpenAudio failed\n");
-     }
-+    memcpy(obt, req, sizeof(SDL_AudioSpec));
- 
- #ifndef _WIN32
-     err = pthread_sigmask (SIG_SETMASK, &old, NULL);
+Hi Chen:
+
+I will take a look at this series.
+
+Two general questions:
+
+- if it can detect more than network stall, it should not belong to /net
+- need to convince libvirt guys for this proposal, since usually it's=20
+the duty of upper layer instead of qemu itself
+
+Thanks
+
+
+> We have some clients already try to use this module with COLO. Please rev=
+iew this part.
+> If no one want to maintain this module, I can maintain this module myself=
+.
+>
+> Thanks
+> Zhang Chen
+>
+>> -----Original Message-----
+>> From: Qemu-devel <qemu-devel-
+>> bounces+chen.zhang=3Dintel.com@nongnu.org> On Behalf Of Zhang, Chen
+>> Sent: Tuesday, January 7, 2020 12:33 PM
+>> To: Jason Wang <jasowang@redhat.com>; Paolo Bonzini
+>> <pbonzini@redhat.com>; Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>;
+>> qemu-dev <qemu-devel@nongnu.org>
+>> Cc: Zhang Chen <zhangckid@gmail.com>
+>> Subject: Re: [PATCH V4 0/5] Introduce Advanced Watch Dog module
+>>
+>> Hi All,
+>>
+>> No news for a while about this series.
+>>
+>> This version already add new docs to address Paolo's comments.
+>>
+>> Please give me more comments.
+>>
+>>
+>> Thanks
+>>
+>> Zhang Chen
+>>
+>>
+>> On 12/17/2019 8:45 PM, Zhang, Chen wrote:
+>>> From: Zhang Chen <chen.zhang@intel.com>
+>>>
+>>> Advanced Watch Dog is an universal monitoring module on VMM side, it
+>>> can be used to detect network down(VMM to guest, VMM to VMM, VMM
+>> to
+>>> another remote server) and do previously set operation. Current AWD
+>>> patch just accept any input as the signal to refresh the watchdog
+>>> timer, and we can also make a certain interactive protocol here. For
+>>> the outputs, user can pre-write some command or some messages in the
+>>> AWD opt-script. We noticed that there is no way for VMM communicate
+>>> directly, maybe some people think we don't need such things(up layer
+>>> software like openstack can handle it). so we engaged with real
+>>> customer found that they need a lightweight and efficient mechanism to
+>>> solve some practical problems,
+>>>
+>>> For example Edge Computing cases(they think high level software is too
+>>> heavy to use in Edge or it is hard to manage and combine with VM instan=
+ce).
+>>> It make user have basic VM/Host network monitoring tools and basic
+>>> false tolerance and recovery solution..
+>>>
+>>> Please see the detail documentation in the last patch.
+>>>
+>>> V4:
+>>>    - Add more introduction in qemu-options.hx
+>>>    - Addressed Paolo's comments add docs/awd.txt for the AWD module
+>> detail.
+>>> V3:
+>>>    - Rebased on Qemu 4.2.0-rc1 code.
+>>>    - Fix commit message issue.
+>>>
+>>> V2:
+>>>    - Addressed Philippe comments add configure selector for AWD.
+>>>
+>>> Initial:
+>>>    - Initial version.
+>>>
+>>>
+>>> Zhang Chen (5):
+>>>     net/awd.c: Introduce Advanced Watch Dog module framework
+>>>     net/awd.c: Initailize input/output chardev
+>>>     net/awd.c: Load advanced watch dog worker thread job
+>>>     vl.c: Make Advanced Watch Dog delayed initialization
+>>>     docs/awd.txt: Add doc to introduce Advanced WatchDog(AWD) module
+>>>
+>>>    configure         |   9 +
+>>>    docs/awd.txt      |  88 +++++++++
+>>>    net/Makefile.objs |   1 +
+>>>    net/awd.c         | 491
+>> ++++++++++++++++++++++++++++++++++++++++++++++
+>>>    qemu-options.hx   |  20 ++
+>>>    vl.c              |   7 +
+>>>    6 files changed, 616 insertions(+)
+>>>    create mode 100644 docs/awd.txt
+>>>    create mode 100644 net/awd.c
+>>>
+
 
