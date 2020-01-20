@@ -2,78 +2,78 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URG_BIZ autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C47EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2622C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:41:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 085372073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:41:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EBE52073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eGgKfLtw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085372073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QNO0ltRR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EBE52073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itUVH-0005LP-IE
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:41:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37167)
+	id 1itUVJ-0005O4-2x
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:41:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1itUO4-0004En-Ng
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:34:35 -0500
+ (envelope-from <quintela@redhat.com>) id 1itUOR-0004ft-76
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1itUO3-0001ar-I9
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:34:28 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25686
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1itUON-0001q1-GQ
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:34:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22360
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1itUO3-0001Zm-DK
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:34:27 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1itUON-0001pS-BK
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:34:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579516466;
+ s=mimecast20190719; t=1579516486;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oqibwUkJd0cALDqIK5Izjq+NpqGT38BSd3XKGz8Uz8I=;
- b=eGgKfLtweBnM3VIHBP+wRUUp/l/lLGdpyKEASpjmDmAzBvw+n84cXs+QQoFUryyo8kl4+F
- TB/5FIBhZByTgt1SXjAfc4uTHqPM0FFtC8Z5vVwmJ48jfu5CH5DznuiSrGKPM0lpnVsQDb
- 9d8rmdECD5YUbUJYR2oJo+/KE0NHQRw=
+ bh=LsOB1plsrf+L0MjZkIhW9gkC1Fbo6Je4OwCPKg11rHk=;
+ b=QNO0ltRRY1hBOfIl7UovRaKrUcpTHBCBolT6EjGL3S1+07V0sWvw0Jyo+ZzgPYMo0wgzul
+ 4qSTRbYaGvuvUXntDdkj8WJR2oBiSyvMuKYTTxemp8R9lF1/ZnuKDctR78v0HhPpEk08bl
+ 4/VMmRZaiYLO2mYAadcNKiC4c5EQ7zk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-a2HWLB_BMhehLAmgZ5HXUw-1; Mon, 20 Jan 2020 05:34:25 -0500
+ us-mta-343-vQdp4kTTOMuH1AyrvBmTjQ-1; Mon, 20 Jan 2020 05:34:45 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7180718A8C81;
- Mon, 20 Jan 2020 10:34:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33A8B18A8C80;
+ Mon, 20 Jan 2020 10:34:43 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE2EB860E5;
- Mon, 20 Jan 2020 10:34:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83FCD860E5;
+ Mon, 20 Jan 2020 10:34:33 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/29] runstate: ignore finishmigrate -> prelaunch transition
-Date: Mon, 20 Jan 2020 11:33:16 +0100
-Message-Id: <20200120103340.25118-6-quintela@redhat.com>
+Subject: [PULL 07/29] migration: Rate limit inside host pages
+Date: Mon, 20 Jan 2020 11:33:18 +0100
+Message-Id: <20200120103340.25118-8-quintela@redhat.com>
 In-Reply-To: <20200120103340.25118-1-quintela@redhat.com>
 References: <20200120103340.25118-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: a2HWLB_BMhehLAmgZ5HXUw-1
+X-MC-Unique: vQdp4kTTOMuH1AyrvBmTjQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,78 +85,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
- Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
+ Richard Henderson <rth@twiddle.net>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-arm@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc@nongnu.org, Lin Ma <LMa@suse.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Commit 1bd71dce4bf2 tries to prevent a finishmigrate -> prelaunch
-transition by exiting at the beginning of the main_loop_should_exit()
-function if the state is already finishmigrate.
+When using hugepages, rate limiting is necessary within each huge
+page, since a 1G huge page can take a significant time to send, so
+you end up with bursty behaviour.
 
-As the finishmigrate state is set in the migration thread it can
-happen concurrently to the function. The migration thread and the
-function are normally protected by the iothread mutex and thus the
-state should no evolve between the start of the function and its end.
-
-Unfortunately during the function life the lock is released by
-pause_all_vcpus() just before the point we need to be sure we are
-not in finishmigrate state and if the migration thread is waiting
-for the lock it will take the opportunity to change the state
-to finishmigrate.
-
-The only way to be sure we are not in the finishmigrate state when
-we need is to check the state after the pause_all_vcpus() function.
-
-Fixes: 1bd71dce4bf2 ("runstate: ignore exit request in finish migrate state=
-")
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Fixes: 4c011c37ecb3 ("postcopy: Send whole huge pages")
+Reported-by: Lin Ma <LMa@suse.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- vl.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ migration/migration.c  | 57 ++++++++++++++++++++++++------------------
+ migration/migration.h  |  1 +
+ migration/ram.c        |  2 ++
+ migration/trace-events |  4 +--
+ 4 files changed, 37 insertions(+), 27 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 751401214c..71d3e7eefb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1604,9 +1604,6 @@ static bool main_loop_should_exit(void)
-     RunState r;
-     ShutdownCause request;
+diff --git a/migration/migration.c b/migration/migration.c
+index 354ad072fa..27500d09a9 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -3224,6 +3224,37 @@ void migration_consume_urgent_request(void)
+     qemu_sem_wait(&migrate_get_current()->rate_limit_sem);
+ }
 =20
--    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
--        return false;
--    }
-     if (preconfig_exit_requested) {
-         if (runstate_check(RUN_STATE_PRECONFIG)) {
-             runstate_set(RUN_STATE_PRELAUNCH);
-@@ -1635,8 +1632,13 @@ static bool main_loop_should_exit(void)
-         pause_all_vcpus();
-         qemu_system_reset(request);
-         resume_all_vcpus();
++/* Returns true if the rate limiting was broken by an urgent request */
++bool migration_rate_limit(void)
++{
++    int64_t now =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    MigrationState *s =3D migrate_get_current();
++
++    bool urgent =3D false;
++    migration_update_counters(s, now);
++    if (qemu_file_rate_limit(s->to_dst_file)) {
 +        /*
-+         * runstate can change in pause_all_vcpus()
-+         * as iothread mutex is unlocked
++         * Wait for a delay to do rate limiting OR
++         * something urgent to post the semaphore.
 +         */
-         if (!runstate_check(RUN_STATE_RUNNING) &&
--                !runstate_check(RUN_STATE_INMIGRATE)) {
-+                !runstate_check(RUN_STATE_INMIGRATE) &&
-+                !runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-             runstate_set(RUN_STATE_PRELAUNCH);
++        int ms =3D s->iteration_start_time + BUFFER_DELAY - now;
++        trace_migration_rate_limit_pre(ms);
++        if (qemu_sem_timedwait(&s->rate_limit_sem, ms) =3D=3D 0) {
++            /*
++             * We were woken by one or more urgent things but
++             * the timedwait will have consumed one of them.
++             * The service routine for the urgent wake will dec
++             * the semaphore itself for each item it consumes,
++             * so add this one we just eat back.
++             */
++            qemu_sem_post(&s->rate_limit_sem);
++            urgent =3D true;
++        }
++        trace_migration_rate_limit_post(urgent);
++    }
++    return urgent;
++}
++
+ /*
+  * Master migration thread on the source VM.
+  * It drives the migration and pumps the data down the outgoing channel.
+@@ -3290,8 +3321,6 @@ static void *migration_thread(void *opaque)
+     trace_migration_thread_setup_complete();
+=20
+     while (migration_is_active(s)) {
+-        int64_t current_time;
+-
+         if (urgent || !qemu_file_rate_limit(s->to_dst_file)) {
+             MigIterateState iter_state =3D migration_iteration_run(s);
+             if (iter_state =3D=3D MIG_ITERATE_SKIP) {
+@@ -3318,29 +3347,7 @@ static void *migration_thread(void *opaque)
+             update_iteration_initial_status(s);
          }
+=20
+-        current_time =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+-
+-        migration_update_counters(s, current_time);
+-
+-        urgent =3D false;
+-        if (qemu_file_rate_limit(s->to_dst_file)) {
+-            /* Wait for a delay to do rate limiting OR
+-             * something urgent to post the semaphore.
+-             */
+-            int ms =3D s->iteration_start_time + BUFFER_DELAY - current_ti=
+me;
+-            trace_migration_thread_ratelimit_pre(ms);
+-            if (qemu_sem_timedwait(&s->rate_limit_sem, ms) =3D=3D 0) {
+-                /* We were worken by one or more urgent things but
+-                 * the timedwait will have consumed one of them.
+-                 * The service routine for the urgent wake will dec
+-                 * the semaphore itself for each item it consumes,
+-                 * so add this one we just eat back.
+-                 */
+-                qemu_sem_post(&s->rate_limit_sem);
+-                urgent =3D true;
+-            }
+-            trace_migration_thread_ratelimit_post(urgent);
+-        }
++        urgent =3D migration_rate_limit();
      }
+=20
+     trace_migration_thread_after_loop();
+diff --git a/migration/migration.h b/migration/migration.h
+index 79b3dda146..aa9ff6f27b 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -341,5 +341,6 @@ int foreach_not_ignored_block(RAMBlockIterFunc func, vo=
+id *opaque);
+=20
+ void migration_make_urgent_request(void);
+ void migration_consume_urgent_request(void);
++bool migration_rate_limit(void);
+=20
+ #endif
+diff --git a/migration/ram.c b/migration/ram.c
+index 17cd8d524b..1ec5c10561 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2639,6 +2639,8 @@ static int ram_save_host_page(RAMState *rs, PageSearc=
+hStatus *pss,
+=20
+         pages +=3D tmppages;
+         pss->page++;
++        /* Allow rate limiting to happen in the middle of huge pages */
++        migration_rate_limit();
+     } while ((pss->page & (pagesize_bits - 1)) &&
+              offset_in_ramblock(pss->block, pss->page << TARGET_PAGE_BITS)=
+);
+=20
+diff --git a/migration/trace-events b/migration/trace-events
+index 6dee7b5389..2f9129e213 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -138,12 +138,12 @@ migrate_send_rp_recv_bitmap(char *name, int64_t size)=
+ "block '%s' size 0x%"PRIi6
+ migration_completion_file_err(void) ""
+ migration_completion_postcopy_end(void) ""
+ migration_completion_postcopy_end_after_complete(void) ""
++migration_rate_limit_pre(int ms) "%d ms"
++migration_rate_limit_post(int urgent) "urgent: %d"
+ migration_return_path_end_before(void) ""
+ migration_return_path_end_after(int rp_error) "%d"
+ migration_thread_after_loop(void) ""
+ migration_thread_file_err(void) ""
+-migration_thread_ratelimit_pre(int ms) "%d ms"
+-migration_thread_ratelimit_post(int urgent) "urgent: %d"
+ migration_thread_setup_complete(void) ""
+ open_return_path_on_source(void) ""
+ open_return_path_on_source_continue(void) ""
 --=20
 2.24.1
 
