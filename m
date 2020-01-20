@@ -2,76 +2,82 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2E5C33CA1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F550C33CA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:07:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72F922073D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:05:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4952A20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 09:07:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+VKUG7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72F922073D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJ4zhkE6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4952A20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itT06-0003x8-5L
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:05:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52989)
+	id 1itT1e-0006Ah-5C
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 04:07:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1itSyL-0002cZ-Lr
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:03:55 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itSzw-0004HZ-Ay
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:05:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1itSyH-0008LQ-OC
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:03:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27641
+ (envelope-from <dgilbert@redhat.com>) id 1itSzs-0000bZ-Fa
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:05:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32752
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1itSyH-0008Kp-IP
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:03:45 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itSzs-0000bB-8x
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 04:05:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579511023;
+ s=mimecast20190719; t=1579511123;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uciPn72MwEgI063A+6nCPRNHimc0XTqn7Hjp9zwUVk4=;
- b=Y+VKUG7N6cGxxyjwIe7sfBDLktf/PRzvx4wkj5Kc3hQZNx6VuiMO+yBpCcsQ9HkyusqtAm
- N05v6HIyTOp5+iljdTKbf0cSAwCnCPNTR1GFw4/vSWUw9EDhIPJ2334RpmFFgIMlNI1z8W
- ypP9LCBHmWU5t+tMRf7tPg79EU5UvkQ=
+ bh=UjgLIQLZnEWnfHxE8zkHcHRPypW+wAkf9hxN1SAf6oA=;
+ b=BJ4zhkE6/mMB2h5HipmqPvxyyE7aRe+PthRhVKvBKy2/+86S7E6oREtjrnIy6uO9cwwQ1a
+ SpeN4tOx7TRdWfpCVNmqGIMoMyaVYE+3d10cFPIWTHHVDvyjpko9WXrinVR7wfULCM4eSi
+ hgzGPR8AKhWaIZwDKsPF5T0vIR4Gqxw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152--f8uHZlXPUqk1mSwa2o0bw-1; Mon, 20 Jan 2020 04:03:42 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-48-SLjUsWGTOpWOYrfMdEq-XA-1; Mon, 20 Jan 2020 04:05:22 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FDF0800EBF;
- Mon, 20 Jan 2020 09:03:41 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA7095C21A;
- Mon, 20 Jan 2020 09:03:36 +0000 (UTC)
-Date: Mon, 20 Jan 2020 10:03:35 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Subject: Re: [PATCH v3 4/8] hw/avr: Add some Arduino boards
-Message-ID: <20200120100335.58f1b7d2@redhat.com>
-In-Reply-To: <20191229224505.24466-5-f4bug@amsat.org>
-References: <20191229224505.24466-1-f4bug@amsat.org>
- <20191229224505.24466-5-f4bug@amsat.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB3A218AAFA1;
+ Mon, 20 Jan 2020 09:05:20 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 99A3A89E95;
+ Mon, 20 Jan 2020 09:05:18 +0000 (UTC)
+Date: Mon, 20 Jan 2020 09:05:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: fengzhimin <fengzhimin1@huawei.com>
+Subject: Re: [PATCH RFC 12/12] migration/rdma: only register the virt-ram
+ block for MultiRDMA
+Message-ID: <20200120090515.GA2827@work-vm>
+References: <20200109045922.904-1-fengzhimin1@huawei.com>
+ <20200109045922.904-13-fengzhimin1@huawei.com>
+ <20200117185227.GS3209@work-vm>
+ <03C2A65461456D4EBE9E6D4D0D96C583FC1465@DGGEMI529-MBX.china.huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: -f8uHZlXPUqk1mSwa2o0bw-1
+In-Reply-To: <03C2A65461456D4EBE9E6D4D0D96C583FC1465@DGGEMI529-MBX.china.huawei.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: SLjUsWGTOpWOYrfMdEq-XA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -86,236 +92,395 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, qemu-devel@nongnu.org,
- Michael Rolnik <mrolnik@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Phillip Stevens <phillip.stevens@gmail.com>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "jemmy858585@gmail.com" <jemmy858585@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 29 Dec 2019 23:45:01 +0100
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+* fengzhimin (fengzhimin1@huawei.com) wrote:
+> OK, I will modify it.
+>=20
+> Due to the mach-virt.ram is sent by the multiRDMA channels instead of the=
+ main channel, it don't to register on the main channel.
 
-> Arduino boards are build with AVR chipsets.
-> Add some of the popular boards:
->=20
-> - Arduino Duemilanove
-> - Arduino Uno
-> - Arduino Mega
->=20
-> For more information:
->   https://www.arduino.cc/en/Main/Products
->   https://store.arduino.cc/arduino-genuino/most-popular
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v2:
-> - Reword description adding more information (Aleksandar)
-> - Use DEFINE_TYPES (Igor)
->=20
-> Cc: Phillip Stevens <phillip.stevens@gmail.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> ---
->  hw/avr/arduino.c     | 177 +++++++++++++++++++++++++++++++++++++++++++
->  hw/avr/Makefile.objs |   1 +
->  2 files changed, 178 insertions(+)
->  create mode 100644 hw/avr/arduino.c
->=20
-> diff --git a/hw/avr/arduino.c b/hw/avr/arduino.c
-> new file mode 100644
-> index 0000000000..ecaaa295d8
-> --- /dev/null
-> +++ b/hw/avr/arduino.c
-> @@ -0,0 +1,177 @@
-> +/*
-> + * QEMU Arduino boards
-> + *
-> + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
-> + *
-> + * This work is licensed under the terms of the GNU GPLv2 or later.
-> + * See the COPYING file in the top-level directory.
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +/* TODO: Implement the use of EXTRAM */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qapi/error.h"
-> +#include "hw/boards.h"
-> +#include "hw/loader.h"
-> +#include "elf.h"
-> +#include "atmega.h"
-> +
-> +typedef struct ArduinoMachineState {
-[...]
-> +    MemoryRegion extram;
-> +} ArduinoMachineState;
-> +
-> +typedef struct ArduinoMachineClass {
-[...]
-> +    size_t extram_size;
+You might be OK if instead  of using the name, you use a size threshold;
+e.g. you use the multirdma threads for any RAM block larger than say
+128MB.
 
-extfoo doesn't seem to be used in this patch
+> It takes a long time to register the mach-virt.ram for VM with large capa=
+city memory, so we shall try our best not to register it.
 
-> +} ArduinoMachineClass;
-> +
-> +#define TYPE_ARDUINO_MACHINE \
-> +        MACHINE_TYPE_NAME("arduino")
-> +#define ARDUINO_MACHINE(obj) \
-> +        OBJECT_CHECK(ArduinoMachineState, (obj), TYPE_ARDUINO_MACHINE)
-> +#define ARDUINO_MACHINE_CLASS(klass) \
-> +        OBJECT_CLASS_CHECK(ArduinoMachineClass, (klass), TYPE_ARDUINO_MA=
-CHINE)
-> +#define ARDUINO_MACHINE_GET_CLASS(obj) \
-> +        OBJECT_GET_CLASS(ArduinoMachineClass, (obj), TYPE_ARDUINO_MACHIN=
-E)
-> +
-> +static void load_firmware(const char *firmware, uint64_t flash_size)
-> +{
-> +    const char *filename;
-> +    int bytes_loaded;
-> +
-> +    /* Load firmware (contents of flash) trying to auto-detect format */
-> +    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-> +    if (filename =3D=3D NULL) {
-> +        error_report("Unable to find %s", firmware);
-> +        exit(1);
-> +    }
-> +
-> +    bytes_loaded =3D load_elf(filename, NULL, NULL, NULL, NULL, NULL, NU=
-LL,
-> +                            0, EM_NONE, 0, 0);
-> +    if (bytes_loaded < 0) {
-> +        bytes_loaded =3D load_image_targphys(filename, OFFSET_CODE, flas=
-h_size);
-> +    }
-> +    if (bytes_loaded < 0) {
-> +        error_report("Unable to load firmware image %s as ELF or raw bin=
-ary",
-> +                     firmware);
-> +        exit(1);
-> +    }
-> +}
-> +
-> +static void arduino_machine_init(MachineState *machine)
-> +{
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_GET_CLASS(machine);
-> +    ArduinoMachineState *ams =3D ARDUINO_MACHINE(machine);
-> +
-> +    sysbus_init_child_obj(OBJECT(machine), "mcu", &ams->mcu, sizeof(ams-=
->mcu),
-> +                          amc->mcu_type);
-> +    object_property_set_uint(OBJECT(&ams->mcu), amc->xtal_hz,
-> +                             "xtal-frequency-hz", &error_abort);
-> +    object_property_set_bool(OBJECT(&ams->mcu), true, "realized",
-> +                             &error_abort);
-> +
-> +    if (machine->firmware) {
-> +        load_firmware(machine->firmware, memory_region_size(&ams->mcu.fl=
-ash));
-> +    }
-> +}
-> +
-> +static void arduino_machine_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +
-> +    mc->init =3D arduino_machine_init;
-> +    mc->default_cpus =3D 1;
-> +    mc->min_cpus =3D mc->default_cpus;
-> +    mc->max_cpus =3D mc->default_cpus;
-> +    mc->no_floppy =3D 1;
-> +    mc->no_cdrom =3D 1;
-> +    mc->no_parallel =3D 1;
-> +}
-> +
-> +static void arduino_duemilanove_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://www.arduino.cc/en/Main/ArduinoBoardDuemilanove */
-> +    mc->desc        =3D "Arduino Duemilanove (ATmega168)",
-> +    mc->alias       =3D "2009";
-> +    amc->mcu_type   =3D TYPE_ATMEGA168_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
-> +};
-> +
-> +static void arduino_uno_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://store.arduino.cc/arduino-uno-rev3 */
-> +    mc->desc        =3D "Arduino UNO (ATmega328P)";
-> +    mc->alias       =3D "uno";
-> +    amc->mcu_type   =3D TYPE_ATMEGA328_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
-> +};
-> +
-> +static void arduino_mega_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://www.arduino.cc/en/Main/ArduinoBoardMega */
-> +    mc->desc        =3D "Arduino Mega (ATmega1280)";
-> +    mc->alias       =3D "mega";
-> +    amc->mcu_type   =3D TYPE_ATMEGA1280_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
-> +};
-> +
-> +static void arduino_mega2560_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://store.arduino.cc/arduino-mega-2560-rev3 */
-> +    mc->desc        =3D "Arduino Mega 2560 (ATmega2560)";
-> +    mc->alias       =3D "mega2560";
-> +    mc->is_default  =3D true;
-> +    amc->mcu_type   =3D TYPE_ATMEGA2560_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000; /* CSTCE16M0V53-R0 */
-> +};
-> +
-> +static const TypeInfo arduino_machine_types[] =3D {
-> +    {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-duemilanove"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_duemilanove_class_init,
-> +    }, {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-uno"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_uno_class_init,
-> +    }, {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-mega"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_mega_class_init,
-> +    }, {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-mega-2560-v3"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_mega2560_class_init,
-> +    }, {
-> +        .name           =3D TYPE_ARDUINO_MACHINE,
-> +        .parent         =3D TYPE_MACHINE,
-> +        .instance_size  =3D sizeof(ArduinoMachineState),
-> +        .class_size     =3D sizeof(ArduinoMachineClass),
-> +        .class_init     =3D arduino_machine_class_init,
-> +        .abstract       =3D true,
-> +    }
-> +};
-> +
-> +DEFINE_TYPES(arduino_machine_types)
-> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
-> index 4b6b911820..39ee3c32b2 100644
-> --- a/hw/avr/Makefile.objs
-> +++ b/hw/avr/Makefile.objs
-> @@ -1,2 +1,3 @@
->  obj-y +=3D sample.o
->  obj-y +=3D atmega.o
-> +obj-y +=3D arduino.o
+I'm curious why, I know it's expensive to register RAM blocks with rdma
+code; but I thought that would just be the first time; it surprises me
+that registering it with a 2nd RDMA channel is as expensive.
+
+But then that makes me ask a 2nd question; is your performance increase
+due to multiple threads or is it due to the multiple RDMA channels?
+COuld you have multiple threads but still a single RDMA channel
+(and with sufficient locking) still get the performance?
+
+Dave
+
+> Thanks for your review.
+>=20
+> Zhimin Feng
+>=20
+> -----Original Message-----
+> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]=20
+> Sent: Saturday, January 18, 2020 2:52 AM
+> To: fengzhimin <fengzhimin1@huawei.com>
+> Cc: quintela@redhat.com; armbru@redhat.com; eblake@redhat.com; qemu-devel=
+@nongnu.org; Zhanghailiang <zhang.zhanghailiang@huawei.com>; jemmy858585@gm=
+ail.com
+> Subject: Re: [PATCH RFC 12/12] migration/rdma: only register the virt-ram=
+ block for MultiRDMA
+>=20
+> * Zhimin Feng (fengzhimin1@huawei.com) wrote:
+> > From: fengzhimin <fengzhimin1@huawei.com>
+> >=20
+> > The virt-ram block is sent by MultiRDMA, so we only register it for=20
+> > MultiRDMA channels and main channel don't register the virt-ram block.
+> >=20
+> > Signed-off-by: fengzhimin <fengzhimin1@huawei.com>
+>=20
+> You can't specialise on the name of the RAMBlock like that.
+> 'mach-virt.ram' is the name specific to just the main ram on just aarch's=
+ machine type;  for example the name on x86 is completely different and if =
+you use NUMA or hotplug etc it would also be different on aarch.
+>=20
+> Is there a downside to also registering the mach-virt.ram on the main cha=
+nnel?
+>=20
+> Dave
+>=20
+> > ---
+> >  migration/rdma.c | 140=20
+> > +++++++++++++++++++++++++++++++++++++----------
+> >  1 file changed, 112 insertions(+), 28 deletions(-)
+> >=20
+> > diff --git a/migration/rdma.c b/migration/rdma.c index=20
+> > 0a150099e2..1477fd509b 100644
+> > --- a/migration/rdma.c
+> > +++ b/migration/rdma.c
+> > @@ -618,7 +618,9 @@ const char *print_wrid(int wrid);  static int=20
+> > qemu_rdma_exchange_send(RDMAContext *rdma, RDMAControlHeader *head,
+> >                                     uint8_t *data, RDMAControlHeader *r=
+esp,
+> >                                     int *resp_idx,
+> > -                                   int (*callback)(RDMAContext *rdma))=
+;
+> > +                                   int (*callback)(RDMAContext *rdma,
+> > +                                   uint8_t id),
+> > +                                   uint8_t id);
+> > =20
+> >  static inline uint64_t ram_chunk_index(const uint8_t *start,
+> >                                         const uint8_t *host) @@=20
+> > -1198,24 +1200,81 @@ static int qemu_rdma_alloc_qp(RDMAContext *rdma)
+> >      return 0;
+> >  }
+> > =20
+> > -static int qemu_rdma_reg_whole_ram_blocks(RDMAContext *rdma)
+> > +/*
+> > + * Parameters:
+> > + *    @id =3D=3D UNUSED_ID :
+> > + *    This means that we register memory for the main RDMA channel,
+> > + *    the main RDMA channel don't register the mach-virt.ram block
+> > + *    when we use multiRDMA method to migrate.
+> > + *
+> > + *    @id =3D=3D 0 or id =3D=3D 1 or ... :
+> > + *    This means that we register memory for the multiRDMA channels,
+> > + *    the multiRDMA channels only register memory for the mach-virt.ra=
+m
+> > + *    block when we use multiRDAM method to migrate.
+> > + */
+> > +static int qemu_rdma_reg_whole_ram_blocks(RDMAContext *rdma, uint8_t=
+=20
+> > +id)
+> >  {
+> >      int i;
+> >      RDMALocalBlocks *local =3D &rdma->local_ram_blocks;
+> > =20
+> > -    for (i =3D 0; i < local->nb_blocks; i++) {
+> > -        local->block[i].mr =3D
+> > -            ibv_reg_mr(rdma->pd,
+> > -                    local->block[i].local_host_addr,
+> > -                    local->block[i].length,
+> > -                    IBV_ACCESS_LOCAL_WRITE |
+> > -                    IBV_ACCESS_REMOTE_WRITE
+> > -                    );
+> > -        if (!local->block[i].mr) {
+> > -            perror("Failed to register local dest ram block!\n");
+> > -            break;
+> > +    if (migrate_use_multiRDMA()) {
+> > +        if (id =3D=3D UNUSED_ID) {
+> > +            for (i =3D 0; i < local->nb_blocks; i++) {
+> > +                /* main RDMA channel don't register the mach-virt.ram =
+block */
+> > +                if (strcmp(local->block[i].block_name, "mach-virt.ram"=
+) =3D=3D 0) {
+> > +                    continue;
+> > +                }
+> > +
+> > +                local->block[i].mr =3D
+> > +                    ibv_reg_mr(rdma->pd,
+> > +                            local->block[i].local_host_addr,
+> > +                            local->block[i].length,
+> > +                            IBV_ACCESS_LOCAL_WRITE |
+> > +                            IBV_ACCESS_REMOTE_WRITE
+> > +                            );
+> > +                if (!local->block[i].mr) {
+> > +                    perror("Failed to register local dest ram block!\n=
+");
+> > +                    break;
+> > +                }
+> > +                rdma->total_registrations++;
+> > +            }
+> > +        } else {
+> > +            for (i =3D 0; i < local->nb_blocks; i++) {
+> > +                /*
+> > +                 * The multiRDAM channels only register
+> > +                 * the mach-virt.ram block
+> > +                 */
+> > +                if (strcmp(local->block[i].block_name, "mach-virt.ram"=
+) =3D=3D 0) {
+> > +                    local->block[i].mr =3D
+> > +                        ibv_reg_mr(rdma->pd,
+> > +                                local->block[i].local_host_addr,
+> > +                                local->block[i].length,
+> > +                                IBV_ACCESS_LOCAL_WRITE |
+> > +                                IBV_ACCESS_REMOTE_WRITE
+> > +                                );
+> > +                    if (!local->block[i].mr) {
+> > +                        perror("Failed to register local dest ram bloc=
+k!\n");
+> > +                        break;
+> > +                    }
+> > +                    rdma->total_registrations++;
+> > +                }
+> > +            }
+> > +        }
+> > +    } else {
+> > +        for (i =3D 0; i < local->nb_blocks; i++) {
+> > +            local->block[i].mr =3D
+> > +                ibv_reg_mr(rdma->pd,
+> > +                        local->block[i].local_host_addr,
+> > +                        local->block[i].length,
+> > +                        IBV_ACCESS_LOCAL_WRITE |
+> > +                        IBV_ACCESS_REMOTE_WRITE
+> > +                        );
+> > +            if (!local->block[i].mr) {
+> > +                perror("Failed to register local dest ram block!\n");
+> > +                break;
+> > +            }
+> > +            rdma->total_registrations++;
+> >          }
+> > -        rdma->total_registrations++;
+> >      }
+> > =20
+> >      if (i >=3D local->nb_blocks) {
+> > @@ -1223,8 +1282,10 @@ static int qemu_rdma_reg_whole_ram_blocks(RDMACo=
+ntext *rdma)
+> >      }
+> > =20
+> >      for (i--; i >=3D 0; i--) {
+> > -        ibv_dereg_mr(local->block[i].mr);
+> > -        rdma->total_registrations--;
+> > +        if (local->block[i].mr) {
+> > +            ibv_dereg_mr(local->block[i].mr);
+> > +            rdma->total_registrations--;
+> > +        }
+> >      }
+> > =20
+> >      return -1;
+> > @@ -1446,7 +1507,7 @@ static int qemu_rdma_unregister_waiting(RDMAConte=
+xt *rdma)
+> >          reg.key.chunk =3D chunk;
+> >          register_to_network(rdma, &reg);
+> >          ret =3D qemu_rdma_exchange_send(rdma, &head, (uint8_t *) &reg,
+> > -                                &resp, NULL, NULL);
+> > +                                      &resp, NULL, NULL, UNUSED_ID);
+> >          if (ret < 0) {
+> >              return ret;
+> >          }
+> > @@ -1915,11 +1976,17 @@ static void qemu_rdma_move_header(RDMAContext *=
+rdma, int idx,
+> >   * The extra (optional) response is used during registration to us fro=
+m having
+> >   * to perform an *additional* exchange of message just to provide a re=
+sponse by
+> >   * instead piggy-backing on the acknowledgement.
+> > + *
+> > + * Parameters:
+> > + *    @id : callback function need two parameters, id is the second pa=
+rameter.
+> > + *
+> >   */
+> >  static int qemu_rdma_exchange_send(RDMAContext *rdma, RDMAControlHeade=
+r *head,
+> >                                     uint8_t *data, RDMAControlHeader *r=
+esp,
+> >                                     int *resp_idx,
+> > -                                   int (*callback)(RDMAContext *rdma))
+> > +                                   int (*callback)(RDMAContext *rdma,
+> > +                                   uint8_t id),
+> > +                                   uint8_t id)
+> >  {
+> >      int ret =3D 0;
+> > =20
+> > @@ -1973,7 +2040,7 @@ static int qemu_rdma_exchange_send(RDMAContext *r=
+dma, RDMAControlHeader *head,
+> >      if (resp) {
+> >          if (callback) {
+> >              trace_qemu_rdma_exchange_send_issue_callback();
+> > -            ret =3D callback(rdma);
+> > +            ret =3D callback(rdma, id);
+> >              if (ret < 0) {
+> >                  return ret;
+> >              }
+> > @@ -2168,7 +2235,7 @@ retry:
+> > =20
+> >                  compress_to_network(rdma, &comp);
+> >                  ret =3D qemu_rdma_exchange_send(rdma, &head,
+> > -                                (uint8_t *) &comp, NULL, NULL, NULL);
+> > +                                (uint8_t *) &comp, NULL, NULL, NULL,=
+=20
+> > + UNUSED_ID);
+> > =20
+> >                  if (ret < 0) {
+> >                      return -EIO;
+> > @@ -2195,7 +2262,7 @@ retry:
+> > =20
+> >              register_to_network(rdma, &reg);
+> >              ret =3D qemu_rdma_exchange_send(rdma, &head, (uint8_t *) &=
+reg,
+> > -                                    &resp, &reg_result_idx, NULL);
+> > +                                    &resp, &reg_result_idx, NULL,=20
+> > + UNUSED_ID);
+> >              if (ret < 0) {
+> >                  return ret;
+> >              }
+> > @@ -2828,7 +2895,8 @@ static ssize_t qio_channel_rdma_writev(QIOChannel=
+ *ioc,
+> >              head.len =3D len;
+> >              head.type =3D RDMA_CONTROL_QEMU_FILE;
+> > =20
+> > -            ret =3D qemu_rdma_exchange_send(rdma, &head, data, NULL, N=
+ULL, NULL);
+> > +            ret =3D qemu_rdma_exchange_send(rdma, &head, data, NULL,
+> > +                                          NULL, NULL, UNUSED_ID);
+> > =20
+> >              if (ret < 0) {
+> >                  rdma->error_state =3D ret; @@ -3660,7 +3728,7 @@ stati=
+c=20
+> > int qemu_rdma_registration_handle(QEMUFile *f, void *opaque)
+> >              }
+> > =20
+> >              if (rdma->pin_all) {
+> > -                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma);
+> > +                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma,=20
+> > + UNUSED_ID);
+> >                  if (ret) {
+> >                      error_report("rdma migration: error dest "
+> >                                      "registering ram blocks"); @@=20
+> > -3675,6 +3743,15 @@ static int qemu_rdma_registration_handle(QEMUFile *=
+f, void *opaque)
+> >               * their "local" descriptions with what was sent.
+> >               */
+> >              for (i =3D 0; i < local->nb_blocks; i++) {
+> > +                /*
+> > +                 * use the main RDMA channel to deliver the block of d=
+evice
+> > +                 * use the multiRDMA channels to deliver the RAMBlock
+> > +                 */
+> > +                if (migrate_use_multiRDMA() &&
+> > +                    strcmp(local->block[i].block_name, "mach-virt.ram"=
+) =3D=3D 0) {
+> > +                        continue;
+> > +                }
+> > +
+> >                  rdma->dest_blocks[i].remote_host_addr =3D
+> >                      (uintptr_t)(local->block[i].local_host_addr);
+> > =20
+> > @@ -3992,7 +4069,7 @@ static int qemu_rdma_registration_stop(QEMUFile *=
+f, void *opaque,
+> >           */
+> >          ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, &resp,
+> >                      &reg_result_idx, rdma->pin_all ?
+> > -                    qemu_rdma_reg_whole_ram_blocks : NULL);
+> > +                    qemu_rdma_reg_whole_ram_blocks : NULL,=20
+> > + UNUSED_ID);
+> >          if (ret < 0) {
+> >              ERROR(errp, "receiving remote info!");
+> >              return ret;
+> > @@ -4025,6 +4102,11 @@ static int qemu_rdma_registration_stop(QEMUFile =
+*f, void *opaque,
+> >          memcpy(rdma->dest_blocks,
+> >              rdma->wr_data[reg_result_idx].control_curr, resp.len);
+> >          for (i =3D 0; i < nb_dest_blocks; i++) {
+> > +            if (migrate_use_multiRDMA() &&
+> > +                strcmp(local->block[i].block_name, "mach-virt.ram") =
+=3D=3D 0) {
+> > +                continue;
+> > +            }
+> > +
+> >              network_to_dest_block(&rdma->dest_blocks[i]);
+> > =20
+> >              /* We require that the blocks are in the same order */ @@=
+=20
+> > -4050,7 +4132,8 @@ static int qemu_rdma_registration_stop(QEMUFile *f, =
+void *opaque,
+> >      trace_qemu_rdma_registration_stop(flags);
+> > =20
+> >      head.type =3D RDMA_CONTROL_REGISTER_FINISHED;
+> > -    ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL, NULL, NUL=
+L);
+> > +    ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL,
+> > +                                  NULL, NULL, UNUSED_ID);
+> > =20
+> >      if (migrate_use_multiRDMA()) {
+> >          /*
+> > @@ -4298,7 +4381,7 @@ static int qemu_multiRDMA_registration_handle(voi=
+d *opaque)
+> >                    sizeof(RDMALocalBlock), dest_ram_sort_func);
+> > =20
+> >              if (rdma->pin_all) {
+> > -                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma);
+> > +                ret =3D qemu_rdma_reg_whole_ram_blocks(rdma, p->id);
+> >                  if (ret) {
+> >                      error_report("rdma migration: error dest "
+> >                                   "registering ram blocks"); @@=20
+> > -4680,7 +4763,7 @@ static void *multiRDMA_send_thread(void *opaque)
+> > =20
+> >      ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, &resp,
+> >              &reg_result_idx, rdma->pin_all ?
+> > -            qemu_rdma_reg_whole_ram_blocks : NULL);
+> > +            qemu_rdma_reg_whole_ram_blocks : NULL, p->id);
+> >      if (ret < 0) {
+> >          return NULL;
+> >      }
+> > @@ -4749,7 +4832,8 @@ static void *multiRDMA_send_thread(void *opaque)
+> > =20
+> >          /* Send FINISHED to the destination */
+> >          head.type =3D RDMA_CONTROL_REGISTER_FINISHED;
+> > -        ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL, NULL,=
+ NULL);
+> > +        ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL,
+> > +                                      NULL, NULL, p->id);
+> >          if (ret < 0) {
+> >              return NULL;
+> >          }
+> > --
+> > 2.19.1
+> >=20
+> >=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
