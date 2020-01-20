@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D83C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22404C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:30:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 511A720678
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E685B20678
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:29:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="glhLW8Dz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 511A720678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i7azWVgX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E685B20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itY3u-0003Ko-Ra
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:29:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39875)
+	id 1itY3y-0003Sf-G2
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:29:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1itXuY-00075q-Fq
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:15 -0500
+ (envelope-from <stefanha@redhat.com>) id 1itXv3-0007mI-06
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1itXuX-0006GZ-6P
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:14 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55426
+ (envelope-from <stefanha@redhat.com>) id 1itXuz-0006eS-3E
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:44 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33373
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1itXuX-0006GG-2a
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:13 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1itXuy-0006dU-70
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579530012;
+ s=mimecast20190719; t=1579530039;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=T4C7H8US9C+0o3jOaH4jJKW81pnBF5wlB3cYpsUWEzs=;
- b=glhLW8Dzzlz/HVsMMvJxy7ySEcMFM/Etmpz8nQ+6ymrSVnuXmDzzYu/tMuCNxKXgQXSmzS
- sPui61cJHdullQ7zNC97Ee+dsrExzlaNA+j045kwG2Te7aTmvhNmVQssHnS8ak9M9GXDmz
- 0DjEN6WhC1vsJmKoYBw23WENQDihmWY=
+ bh=o8BVFrFEfvciksl8D9jN4lPgkp/gkSTZlJEjXrcQiRE=;
+ b=i7azWVgXjplOrPxGwA84Hiv2nJgX+MmhHlh27sVy7luf6IJwYhdmSJ9eKxjx0m5Gpzvxh+
+ tgcr56OBxrolqlPyPPyVe2pOSBE4P73f1yVfEXuVewRyzm9UbOuYrRFOES85YsQo5JeApf
+ VrNdwdOpFaYDEG0ko/6kcci2YMA1EX4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-C7TU0K1MMQSDEDBx6UegJQ-1; Mon, 20 Jan 2020 09:20:11 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-251-XBgoGrL3PhmUy1H5WZYtkg-1; Mon, 20 Jan 2020 09:20:38 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FA2BDB60;
- Mon, 20 Jan 2020 14:20:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45CBFDB61;
+ Mon, 20 Jan 2020 14:20:37 +0000 (UTC)
 Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C719F5C1BB;
- Mon, 20 Jan 2020 14:20:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B83C7DB5D;
+ Mon, 20 Jan 2020 14:20:29 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 07/15] blockdev: adds bdrv_parse_aio to use io_uring
-Date: Mon, 20 Jan 2020 14:18:50 +0000
-Message-Id: <20200120141858.587874-8-stefanha@redhat.com>
+Subject: [PATCH v5 10/15] block/io_uring: adds userspace completion polling
+Date: Mon, 20 Jan 2020 14:18:53 +0000
+Message-Id: <20200120141858.587874-11-stefanha@redhat.com>
 In-Reply-To: <20200120141858.587874-1-stefanha@redhat.com>
 References: <20200120141858.587874-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: C7TU0K1MMQSDEDBx6UegJQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: XBgoGrL3PhmUy1H5WZYtkg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -101,91 +101,47 @@ Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block.c               | 22 ++++++++++++++++++++++
- blockdev.c            | 12 ++++--------
- include/block/block.h |  1 +
- 3 files changed, 27 insertions(+), 8 deletions(-)
+ block/io_uring.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index ecd09dbbfd..6c2b2bd2e2 100644
---- a/block.c
-+++ b/block.c
-@@ -845,6 +845,28 @@ static BlockdevDetectZeroesOptions bdrv_parse_detect_z=
-eroes(QemuOpts *opts,
-     return detect_zeroes;
+diff --git a/block/io_uring.c b/block/io_uring.c
+index a5c0d16220..56892fd1ab 100644
+--- a/block/io_uring.c
++++ b/block/io_uring.c
+@@ -274,6 +274,21 @@ static void qemu_luring_completion_cb(void *opaque)
+     luring_process_completions_and_submit(s);
  }
 =20
-+/**
-+ * Set open flags for aio engine
-+ *
-+ * Return 0 on success, -1 if the engine specified is invalid
-+ */
-+int bdrv_parse_aio(const char *mode, int *flags)
++static bool qemu_luring_poll_cb(void *opaque)
 +{
-+    if (!strcmp(mode, "threads")) {
-+        /* do nothing, default */
-+    } else if (!strcmp(mode, "native")) {
-+        *flags |=3D BDRV_O_NATIVE_AIO;
-+#ifdef CONFIG_LINUX_IO_URING
-+    } else if (!strcmp(mode, "io_uring")) {
-+        *flags |=3D BDRV_O_IO_URING;
-+#endif
-+    } else {
-+        return -1;
++    LuringState *s =3D opaque;
++    struct io_uring_cqe *cqes;
++
++    if (io_uring_peek_cqe(&s->ring, &cqes) =3D=3D 0) {
++        if (cqes) {
++            luring_process_completions_and_submit(s);
++            return true;
++        }
 +    }
 +
-+    return 0;
++    return false;
 +}
 +
- /**
-  * Set open flags for a given discard mode
-  *
-diff --git a/blockdev.c b/blockdev.c
-index 8e029e9c01..6523f9551d 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -385,13 +385,9 @@ static void extract_common_blockdev_options(QemuOpts *=
-opts, int *bdrv_flags,
-         }
+ static void ioq_init(LuringQueue *io_q)
+ {
+     QSIMPLEQ_INIT(&io_q->submit_queue);
+@@ -387,7 +402,7 @@ void luring_attach_aio_context(LuringState *s, AioConte=
+xt *new_context)
+     s->aio_context =3D new_context;
+     s->completion_bh =3D aio_bh_new(new_context, qemu_luring_completion_bh=
+, s);
+     aio_set_fd_handler(s->aio_context, s->ring.ring_fd, false,
+-                       qemu_luring_completion_cb, NULL, NULL, s);
++                       qemu_luring_completion_cb, NULL, qemu_luring_poll_c=
+b, s);
+ }
 =20
-         if ((aio =3D qemu_opt_get(opts, "aio")) !=3D NULL) {
--            if (!strcmp(aio, "native")) {
--                *bdrv_flags |=3D BDRV_O_NATIVE_AIO;
--            } else if (!strcmp(aio, "threads")) {
--                /* this is the default */
--            } else {
--               error_setg(errp, "invalid aio option");
--               return;
-+            if (bdrv_parse_aio(aio, bdrv_flags) < 0) {
-+                error_setg(errp, "invalid aio option");
-+                return;
-             }
-         }
-     }
-@@ -4641,7 +4637,7 @@ QemuOptsList qemu_common_drive_opts =3D {
-         },{
-             .name =3D "aio",
-             .type =3D QEMU_OPT_STRING,
--            .help =3D "host AIO implementation (threads, native)",
-+            .help =3D "host AIO implementation (threads, native, io_uring)=
-",
-         },{
-             .name =3D BDRV_OPT_CACHE_WB,
-             .type =3D QEMU_OPT_BOOL,
-diff --git a/include/block/block.h b/include/block/block.h
-index ea155da45a..2eba61e750 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -301,6 +301,7 @@ void bdrv_append(BlockDriverState *bs_new, BlockDriverS=
-tate *bs_top,
- void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
-                        Error **errp);
-=20
-+int bdrv_parse_aio(const char *mode, int *flags);
- int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough=
-);
- int bdrv_parse_discard_flags(const char *mode, int *flags);
- BdrvChild *bdrv_open_child(const char *filename,
+ LuringState *luring_init(Error **errp)
 --=20
 2.24.1
 
