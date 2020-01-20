@@ -2,62 +2,90 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A2F3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 651AFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:08:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D08BF2073D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:08:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D08BF2073D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 312112073D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:08:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mzoFEAue"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 312112073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itUuZ-0007dC-AK
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:08:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40250)
+	id 1itUuq-0007zd-6V
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:08:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1itUdg-0000Ra-2T
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:50:40 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1itUft-0003ks-9v
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:52:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1itUdb-00013l-DV
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:50:35 -0500
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:56882)
- by eggs.gnu.org with esmtp (Exim 4.71) (envelope-from <clg@kaod.org>)
- id 1itUdb-00013O-2f
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:50:31 -0500
-Received: from player718.ha.ovh.net (unknown [10.108.16.135])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 9CDD411F2D4
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 11:50:27 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player718.ha.ovh.net (Postfix) with ESMTPSA id 922BDE506393;
- Mon, 20 Jan 2020 10:49:54 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v2 2/2] target/ppc: add support for Hypervisor Facility
- Unavailable Exception
-Date: Mon, 20 Jan 2020 11:49:35 +0100
-Message-Id: <20200120104935.24449-3-clg@kaod.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200120104935.24449-1-clg@kaod.org>
-References: <20200120104935.24449-1-clg@kaod.org>
+ (envelope-from <alex.bennee@linaro.org>) id 1itUfo-0002EI-UT
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:52:53 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52530)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1itUfo-0002DX-MI
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:52:48 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p9so14005645wmc.2
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 02:52:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ro0KJeMJ1nY64zYwW38tAClp2psQe9pWZzMJrN43a7E=;
+ b=mzoFEAuepaQj8tm5KEbuGihlBXEaynCpVncdwcuHCoAl+hMlg25+gla/bQdQbnmHM+
+ XezuhzLSWDSQ86hxxLueoT1mjjZl5Dlq1a7AuQKUtqsme+lXKRqR+FDXHG3vB1a2iIHU
+ meYpwaIM2+35sTEuE9YT7cPQrsjAxLdyKouBI+uAJtLOR8wHh4ORqTRC7gVnYXBdwAxS
+ nJAotavaOyYPzKlYanKWfC2h814kokaTUXIpsaw7BkvmejgsavwhkmWmnJbC5h78vr/O
+ 03JmW2ElRNqIsD7ydfetjUwo8Tw/jb7+OFGaMNUFKEyew4/k/euoZ0pYLyNVv+qffy+D
+ 4o3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ro0KJeMJ1nY64zYwW38tAClp2psQe9pWZzMJrN43a7E=;
+ b=aCDzBo3x1ZmMmJM3HhWArB6+mRX3wG4kp1U96xzCpIlpwTZ+h89Nn8ZS0AlR0jpMka
+ PYCiSxAmOdNBj1igsSL9BowTnU4VIY79QbAhnZRZwb3MnKcdowgKBwagso6u1zCqEuV8
+ wrrXFgI7GXIrBWGIjQ3IJ+b4yeOn9RUJ1IgYkZTlDfX9Tlq4vgOO6sI0JOfKn3I7m8RA
+ TuYNII4mXB6pJkhjlJLGbUnIz2vaywmHejpKh51z6Xdh9wUxY/bNpjhQocUCfpLf0AUV
+ nT3q1mtvNvP5YdWO35aygGtVM4Ca5dS8U8BtM8pXC8h/GP/Jb797oE11zQEqHaye8x1g
+ irng==
+X-Gm-Message-State: APjAAAUZk4OQv9dH2SC1j1qca/k+Y85qEBf4y2BnDLyw91aKlOe5FxtG
+ NDCXhm5AJ5vK48eC9+7R7wJzfA==
+X-Google-Smtp-Source: APXvYqxfUE3gWjKVEBEZ7+zKMVX+rmS/11epGdIgj7msF8LjGZg34NIu1u9xPKvjak2Sl+NIDLYmiQ==
+X-Received: by 2002:a1c:960c:: with SMTP id y12mr18323247wmd.9.1579517567100; 
+ Mon, 20 Jan 2020 02:52:47 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a16sm47907776wrt.37.2020.01.20.02.52.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jan 2020 02:52:46 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3E14A1FF87;
+ Mon, 20 Jan 2020 10:52:45 +0000 (GMT)
+References: <20200116202558.31473-1-armbru@redhat.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>
+Subject: Re: [PATCH] qapi: Fix code generation with Python 3.5
+In-reply-to: <20200116202558.31473-1-armbru@redhat.com>
+Date: Mon, 20 Jan 2020 10:52:44 +0000
+Message-ID: <87lfq24cxv.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 9644740080235088870
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudehgddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.37.72
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,168 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
- qemu-devel@nongnu.org
+Cc: thuth@redhat.com, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The privileged message send and clear instructions (msgsndp & msgclrp)
-are privileged, but will generate a hypervisor facility unavailable
-exception if not enabled in the HFSCR and executed in privileged
-non-hypervisor state.
 
-Add checks when accessing the DPDES register and when using the
-msgsndp and msgclrp isntructions.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- target/ppc/cpu.h         |  6 ++++++
- target/ppc/excp_helper.c | 13 +++++++++++++
- target/ppc/misc_helper.c | 27 +++++++++++++++++++++++++++
- 3 files changed, 46 insertions(+)
+> Recent commit 3e7fb5811b "qapi: Fix code generation for empty modules"
+> modules" switched QAPISchema.visit() from
+>
+>     for entity in self._entity_list:
+>
+> effectively to
+>
+>     for mod in self._module_dict.values():
+>         for entity in mod._entity_list:
+>
+> Visits in the same order as long as .values() is in insertion order.
+> That's the case only for Python 3.6 and later.  Before, it's in some
+> arbitrary order, which results in broken generated code.
+>
+> Fix by making self._module_dict an OrderedDict rather than a dict.
+>
+> Fixes: 3e7fb5811baab213dcc7149c3aa69442d683c26c
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 8ebeaba649d0..96aeea1934d8 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -397,6 +397,10 @@ typedef struct ppc_v3_pate_t {
- #define PSSCR_ESL         PPC_BIT(42) /* Enable State Loss */
- #define PSSCR_EC          PPC_BIT(43) /* Exit Criterion */
-=20
-+/* HFSCR bits */
-+#define HFSCR_MSGP     PPC_BIT(53) /* Privileged Message Send Facilities=
- */
-+#define HFSCR_IC_MSGP  0xA
-+
- #define msr_sf   ((env->msr >> MSR_SF)   & 1)
- #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
- #define msr_shv  ((env->msr >> MSR_SHV)  & 1)
-@@ -1329,6 +1333,8 @@ void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHy=
-pervisor *vhyp);
- #endif
-=20
- void store_fpscr(CPUPPCState *env, uint64_t arg, uint32_t mask);
-+void helper_hfscr_facility_check(CPUPPCState *env, uint32_t bit,
-+                                 const char *caller, uint32_t cause);
-=20
- static inline uint64_t ppc_dump_gpr(CPUPPCState *env, int gprn)
- {
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 1b07c3ed561e..027f54c0ed5f 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -471,6 +471,15 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
-     case POWERPC_EXCP_FU:         /* Facility unavailable exception     =
-     */
- #ifdef TARGET_PPC64
-         env->spr[SPR_FSCR] |=3D ((target_ulong)env->error_code << 56);
-+#endif
-+        break;
-+    case POWERPC_EXCP_HV_FU:     /* Hypervisor Facility Unavailable Exce=
-ption */
-+#ifdef TARGET_PPC64
-+        env->spr[SPR_HFSCR] |=3D ((target_ulong)env->error_code << FSCR_=
-IC_POS);
-+        srr0 =3D SPR_HSRR0;
-+        srr1 =3D SPR_HSRR1;
-+        new_msr |=3D (target_ulong)MSR_HVB;
-+        new_msr |=3D env->msr & ((target_ulong)1 << MSR_RI);
- #endif
-         break;
-     case POWERPC_EXCP_PIT:       /* Programmable interval timer interrup=
-t    */
-@@ -1277,6 +1286,8 @@ void helper_book3s_msgsnd(target_ulong rb)
- #if defined(TARGET_PPC64)
- void helper_book3s_msgclrp(CPUPPCState *env, target_ulong rb)
- {
-+    helper_hfscr_facility_check(env, HFSCR_MSGP, "msgclrp", HFSCR_IC_MSG=
-P);
-+
-     if (!dbell_type_server(rb)) {
-         return;
-     }
-@@ -1292,6 +1303,8 @@ void helper_book3s_msgsndp(CPUPPCState *env, target=
-_ulong rb)
- {
-     int pir =3D env->spr_cb[SPR_PIR].default_value;
-=20
-+    helper_hfscr_facility_check(env, HFSCR_MSGP, "msgsndp", HFSCR_IC_MSG=
-P);
-+
-     if (!dbell_type_server(rb)) {
-         return;
-     }
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index 0c5919ff08b0..55b68d1246e4 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -41,6 +41,18 @@ void helper_store_dump_spr(CPUPPCState *env, uint32_t =
-sprn)
- }
-=20
- #ifdef TARGET_PPC64
-+static void raise_hv_fu_exception(CPUPPCState *env, uint32_t bit,
-+                                  const char *caller, uint32_t cause,
-+                                  uintptr_t raddr)
-+{
-+    qemu_log_mask(CPU_LOG_INT, "HV Facility %d is unavailable (%s)\n",
-+                  bit, caller);
-+
-+    env->spr[SPR_HFSCR] &=3D ~((target_ulong)FSCR_IC_MASK << FSCR_IC_POS=
-);
-+
-+    raise_exception_err_ra(env, POWERPC_EXCP_HV_FU, cause, raddr);
-+}
-+
- static void raise_fu_exception(CPUPPCState *env, uint32_t bit,
-                                uint32_t sprn, uint32_t cause,
-                                uintptr_t raddr)
-@@ -55,6 +67,17 @@ static void raise_fu_exception(CPUPPCState *env, uint3=
-2_t bit,
- }
- #endif
-=20
-+void helper_hfscr_facility_check(CPUPPCState *env, uint32_t bit,
-+                                 const char *caller, uint32_t cause)
-+{
-+#ifdef TARGET_PPC64
-+    if ((env->msr_mask & MSR_HVB) && !msr_hv &&
-+                                     !(env->spr[SPR_HFSCR] & (1UL << bit=
-))) {
-+        raise_hv_fu_exception(env, bit, caller, cause, GETPC());
-+    }
-+#endif
-+}
-+
- void helper_fscr_facility_check(CPUPPCState *env, uint32_t bit,
-                                 uint32_t sprn, uint32_t cause)
- {
-@@ -114,6 +137,8 @@ target_ulong helper_load_dpdes(CPUPPCState *env)
- {
-     target_ulong dpdes =3D 0;
-=20
-+    helper_hfscr_facility_check(env, HFSCR_MSGP, "load DPDES", HFSCR_IC_=
-MSGP);
-+
-     /* TODO: TCG supports only one thread */
-     if (env->pending_interrupts & (1 << PPC_INTERRUPT_DOORBELL)) {
-         dpdes =3D 1;
-@@ -127,6 +152,8 @@ void helper_store_dpdes(CPUPPCState *env, target_ulon=
-g val)
-     PowerPCCPU *cpu =3D env_archcpu(env);
-     CPUState *cs =3D CPU(cpu);
-=20
-+    helper_hfscr_facility_check(env, HFSCR_MSGP, "store DPDES", HFSCR_IC=
-_MSGP);
-+
-     /* TODO: TCG supports only one thread */
-     if (val & ~0x1) {
-         qemu_log_mask(LOG_GUEST_ERROR, "Invalid DPDES register value "
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+Well that certainly clears up a bunch of red. Can we apply it directly
+as a build fix?
+
+> ---
+>  scripts/qapi/schema.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+> index 0bfc5256fb..5100110fa2 100644
+> --- a/scripts/qapi/schema.py
+> +++ b/scripts/qapi/schema.py
+> @@ -795,7 +795,7 @@ class QAPISchema(object):
+>          self.docs =3D parser.docs
+>          self._entity_list =3D []
+>          self._entity_dict =3D {}
+> -        self._module_dict =3D {}
+> +        self._module_dict =3D OrderedDict()
+>          self._schema_dir =3D os.path.dirname(fname)
+>          self._make_module(None) # built-ins
+>          self._make_module(fname)
+
+
 --=20
-2.21.1
-
+Alex Benn=C3=A9e
 
