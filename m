@@ -2,81 +2,80 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F22A9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA90BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:32:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B86FC2073D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3C0A2073D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 10:32:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SF8wokuB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B86FC2073D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWOk85aP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3C0A2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itUJ2-0007qD-SS
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:29:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36132)
+	id 1itUM0-0001T5-39
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 05:32:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1itUI5-0006u8-Ea
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:28:18 -0500
+ (envelope-from <cohuck@redhat.com>) id 1itUKj-0000Yh-G5
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:31:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1itUI1-0006R5-3l
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:28:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36431
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1itUKi-00087J-1D
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:31:01 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38864
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1itUI0-0006Qm-Vc
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:28:13 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1itUKh-00086K-Tf
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 05:30:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579516092;
+ s=mimecast20190719; t=1579516258;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uCY1Ukrbv/Ec7W1QzeMSc2kBob//COVMLsRObrANmIs=;
- b=SF8wokuBOTf8NaqyHaYKXBrv8lHugRbkLj9IYJu8Wqg1wcU3jFbDp1T6XRusrGJOzyL1On
- anjykckyffY1ublncsfDlF4F4qCaVpFLdtW1B8TnYwF7tj6Zx2ea5zd0ZJBy8XM7wuUReT
- 2fmyTJX7pK0mZKVgtajFhqWOgdBbPeU=
+ bh=m6N0ShmSlnD5tAHaBlzCb6wLvRQ0yAmGd4ejIOdMpzY=;
+ b=WWOk85aPsNWWl/6WI+zRWug2jrkxZv+p/+S1amK9TYiqJocf+7bmh2qeCyr4IzBDQg1QqD
+ N8vZch1VlHxYL7SOD8OqnudC3w+DhcLNEoxyt6mSDq9KPJQYir3v7K8y64snAdPsAkjGp3
+ xy0r76CGFgCPlfxayrJgcC0qodYBVwU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-D0BV_xxlMSelFuXEC8uvkg-1; Mon, 20 Jan 2020 05:28:08 -0500
-X-MC-Unique: D0BV_xxlMSelFuXEC8uvkg-1
+ us-mta-133-DKjNUYwiMuGt5v11XiwMqw-1; Mon, 20 Jan 2020 05:30:55 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E607DB60
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 10:28:07 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F14B060BF7;
- Mon, 20 Jan 2020 10:28:02 +0000 (UTC)
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-94-dgilbert@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.3
-From: Sergio Lopez <slp@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 093/104] virtiofsd: introduce inode refcount to prevent
- use-after-free
-In-reply-to: <20191212163904.159893-94-dgilbert@redhat.com>
-Date: Mon, 20 Jan 2020 11:28:00 +0100
-Message-ID: <8736ca8lsf.fsf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 562338017CC;
+ Mon, 20 Jan 2020 10:30:54 +0000 (UTC)
+Received: from gondolin (ovpn-205-161.brq.redhat.com [10.40.205.161])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CB58D60BF7;
+ Mon, 20 Jan 2020 10:30:49 +0000 (UTC)
+Date: Mon, 20 Jan 2020 11:30:46 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v2] target/s390x/kvm: Enable adapter interruption
+ suppression again
+Message-ID: <20200120113046.05d37145.cohuck@redhat.com>
+In-Reply-To: <20200120094901.6432-1-thuth@redhat.com>
+References: <20200120094901.6432-1-thuth@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: DKjNUYwiMuGt5v11XiwMqw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,61 +87,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com,
- vgoyal@redhat.com
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
+On Mon, 20 Jan 2020 10:49:01 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-
-Dr. David Alan Gilbert (git) <dgilbert@redhat.com> writes:
-
-> From: Stefan Hajnoczi <stefanha@redhat.com>
->
-> If thread A is using an inode it must not be deleted by thread B when
-> processing a FUSE_FORGET request.
->
-> The FUSE protocol itself already has a counter called nlookup that is
-> used in FUSE_FORGET messages.  We cannot trust this counter since the
-> untrusted client can manipulate it via FUSE_FORGET messages.
->
-> Introduce a new refcount to keep inodes alive for the required lifespan.
-> lo_inode_put() must be called to release a reference.  FUSE's nlookup
-> counter holds exactly one reference so that the inode stays alive as
-> long as the client still wants to remember it.
->
-> Note that the lo_inode->is_symlink field is moved to avoid creating a
-> hole in the struct due to struct field alignment.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> The AIS feature has been disabled late in the v2.10 development cycle since
+> there were some issues with migration (see commit 3f2d07b3b01ea61126b -
+> "s390x/ais: for 2.10 stable: disable ais facility"). We originally wanted
+> to enable it again for newer machine types, but apparently we forgot to do
+> this so far. Let's do it for the new s390-ccw-virtio-5.0 machine now.
+> 
+> While at it, also add a more verbose comment why we need the *_allowed()
+> wrappers in s390-virtio-ccw.c.
+> 
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tools/virtiofsd/passthrough_ll.c | 168 ++++++++++++++++++++++++++-----
->  1 file changed, 145 insertions(+), 23 deletions(-)
+>  Matthew, could you please give this another try on your system? Thanks!
+> 
+>  hw/s390x/s390-virtio-ccw.c         | 20 +++++++++++++++++---
+>  include/hw/s390x/s390-virtio-ccw.h |  3 +++
+>  target/s390x/kvm.c                 |  9 ++++++---
+>  3 files changed, 26 insertions(+), 6 deletions(-)
+> 
 
-Reviewed-by: Sergio Lopez <slp@redhat.com>
+> @@ -658,6 +669,9 @@ static void ccw_machine_4_2_instance_options(MachineState *machine)
+>  
+>  static void ccw_machine_4_2_class_options(MachineClass *mc)
+>  {
+> +    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+> +
+> +    s390mc->kvm_ais_allowed = false;
+>      ccw_machine_5_0_class_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+One thing I've noticed: You set the _allowed value to false, and
+afterwards apply the options from any 'later' class; this is the same
+order as for the other _allowed values. There's also
+css_migration_enabled, which is set to false _after_ the class options
+from 'later' classes have been applied.
 
------BEGIN PGP SIGNATURE-----
+Both variants end up the same, as we only ever set the value to true in
+the base class and to false just in a single class option callback; but
+I wonder whether it would be cleaner to set it to false after the other
+options have been applied. Or am I thinking backwards here?
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl4lgLAACgkQ9GknjS8M
-AjWSfw//f51RWDVlvQ/cu9wmsi07+fRee8h4BJ2tWxGJ8YE+MES16Ho8CiBT1K9g
-LtIsMpA4OeJlhM9IHYbROeUmMKJ4a6p9GOkxP+Rlm59Z/i5h/qgvmWRnbU/gat+b
-0DBJnxweS4F/WbvO0SC7ESIlXtLBJGG4GYac/vpgc6PALrZna3FkTRJdDWRSYjCs
-WOD9XDuY0kbrXKZ9kH3y478LoHIvnFqqE1rHS1J1uCk0fV74rSlCIakzPN8pEx80
-i34ZyCSS0Ociig4dS5uKVZOD1MsdtizoupQLS+l3wNHY/XmklXMEdWIzy1kBkMKT
-lArer6nJpesBeXKlvafzJJ1A+h/2VgbuDMHM1FS4UfSDR5ctX2MYNoFwktB0VTgf
-WKwri0jrIxsa6XotxwKJSo1e09fn7IC2lygtdBQOSj1mwyaz78Irn3sXSjIYYo5J
-80fsEFWrbcBCjas7iq0p2GOPyjWSItIZ4PhAkgvlQ+JF9taRKBacAHxS8u8hGvX2
-N5s6UHimq+QVE/hjPeDoXy/dA9lw2qROD9rgAPBF7s9T+5wKS2cAVCWXRYmfA18o
-3E+nC/RrHyNJL9oHs3grf/THSmbixAANyxi5uvT1rAMz3IibMr9sullXIHDex7wM
-TyxwYBdpcTDZCKvE4b97mElkELLJ/1iNytCjUKe9DTJnrIpkjGQ=
-=PJYF
------END PGP SIGNATURE-----
---=-=-=--
+>  }
 
 
