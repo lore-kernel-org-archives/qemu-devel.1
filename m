@@ -2,82 +2,108 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AEFAC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3331C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:50:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55E0A217F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F53B217F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:50:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rfXPmkAs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55E0A217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KzBJcEPy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F53B217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itYLE-0008JK-Bx
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:47:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43662)
+	id 1itYN5-0001X6-5Q
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:49:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1itYJx-0007Pv-PC
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:46:31 -0500
+ (envelope-from <mreitz@redhat.com>) id 1itYLV-0000Kc-Vl
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:48:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1itYJw-0004r5-I4
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:46:29 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44384)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1itYJw-0004qi-Ce
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:46:28 -0500
-Received: by mail-ot1-x344.google.com with SMTP id h9so28808343otj.11
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 06:46:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qOK8VN1mzP/WyTATLIzeey0kgoT/JaPleiDvZFbnNDQ=;
- b=rfXPmkAsvFAoKRd7hT6Rx6u4FyP/fGq/0VjsY6mDK01YjllLh9YT+B379As1nIpUDw
- rj71JAlak8jkYwMoKcKw9fxriX1VhWnZZ0bZaBZ5B/85rX7knp9kFhwMDsa1mYGgUmw5
- Sylpti/R5wf3CJEO24B/+jt/0/s66/hxKtBGWblSbFsWyZbdjE/Xwb1GOYa2CrlGC8A5
- la/WWx02EyobqJIpzjOlyjG/TG3guI1BiQWEpuzWeEk50v3cxwetPyiyMpqMZC+FEPbB
- ajUUXe242aisSzKj4eTE+I5WF+GnwIv6c6x3h4SkfcqWsdJYH6WWvlwIGo2QP+5yHVM4
- 8D/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qOK8VN1mzP/WyTATLIzeey0kgoT/JaPleiDvZFbnNDQ=;
- b=hQVTRyogtHk3pFbnoGfLqehlvmuuhEU0+hpkq7x1nyeUhqm2ZdAvSX0L4WLf+w4j0d
- rQ1uXSZEEGcrmW+qOYlHsns8VrU9qLLY6uFdORuxvy/MXwE6zyK+D6y7PqU54QGei1s+
- JwISNhJ4TmI8tRV1OE5Mcy5PPFZIx83G7bnaXElhxfMdiblHJtAkZphCzo6sJ3RpRkK6
- LGEwf8YvGR1VNH7ziH31wwVlpKuTXUZHUy+7Qju85f2SL47vLEHKvUxbErOMa8I+qyH3
- WBG1C6A7FHLtyYjoPuwAVYM/pee81LKNcSFNZ1XT3jfNDHZKesyRQ3Qe31ImROQ5Ar0c
- W6uA==
-X-Gm-Message-State: APjAAAVZQfox+JYc9uIch3w4KWLG36Nf8C6t09LPJNma68vMlj2QtO5t
- elNndBmVEVpG3A2u+qyYzjv8lMFhXvbPP5QOVN+7kw==
-X-Google-Smtp-Source: APXvYqwF11rGLtJhyZioOKVqH+4t2EebAl2PezJvS2G9f3BuMAqp+EYUBm+Wx/5vYylUm8MOYXxNnQDiEKrQYVhNpIM=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr15344821otq.97.1579531587455; 
- Mon, 20 Jan 2020 06:46:27 -0800 (PST)
+ (envelope-from <mreitz@redhat.com>) id 1itYLT-0005aX-Dr
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:48:04 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60567
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1itYLT-0005a8-8g
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:48:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579531682;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ijGmDE7e68QRclcJJTRByyiYe4ZHQ+af+/xROXv7ZcQ=;
+ b=KzBJcEPyn3H8VFCxHzfpIt1oa6uq0uMM+uDECtL7i8NGf5R4ZssBtIdaAfsIWfUk2qmM42
+ +xPMRSX5VWCc1cbxoLyDh2oGfE+ECMooPsXDXIHs4aNOJiBBwXnwZZR7ELAfdRJzGCNczT
+ EROm3d4nWTMhCIuZeWOGeANf5Aa8bG0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-jH_cQYWDOv2iEH2SIyu3_g-1; Mon, 20 Jan 2020 09:48:00 -0500
+X-MC-Unique: jH_cQYWDOv2iEH2SIyu3_g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B03698017CC;
+ Mon, 20 Jan 2020 14:47:59 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-225.ams2.redhat.com
+ [10.36.117.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 119427DB5D;
+ Mon, 20 Jan 2020 14:47:55 +0000 (UTC)
+Subject: Re: [PATCH v4 4/6] iotests: Check for the availability of the
+ required devices in 267 and 127
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
+References: <20191202101039.8981-1-thuth@redhat.com>
+ <20191202101039.8981-5-thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fca7c2d0-c4d9-e607-4b20-93cf10b1ea38@redhat.com>
+Date: Mon, 20 Jan 2020 15:47:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-References: <20200118164229.22539-1-linux@roeck-us.net>
- <20200118164229.22539-3-linux@roeck-us.net>
- <CAFEAcA8yH8deTL6PrX42Lh_TbR=gx4QbukuKUOo1XgLod=2ZXg@mail.gmail.com>
- <526c74cf-bbaf-2c79-08ec-9472288aaa59@roeck-us.net>
-In-Reply-To: <526c74cf-bbaf-2c79-08ec-9472288aaa59@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Jan 2020 14:46:16 +0000
-Message-ID: <CAFEAcA8j=RnrBcoJzpYJZcLUgyq4N-o7TVKhutoDR27idUu-1g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] hw/arm/exynos4210: Fix DMA initialization
-To: Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <20191202101039.8981-5-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="lHM1WiP4YoKqCNeJRTc7Pm7PnHGlTgGO9"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,34 +115,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 20 Jan 2020 at 14:30, Guenter Roeck <linux@roeck-us.net> wrote:
->
-> On 1/20/20 5:35 AM, Peter Maydell wrote:
-> > As the comment in or-irq.h notes, we can safely simply bump the
-> > #define value without breaking anything if you need more input
-> > OR lines than 32.
-> >
->
-> Yes, I noticed the comment, and I did that initially, but then
-> I noticed the complexity of actually doing it in the code
-> increasing it from 16 to 32, and decided I better leave it alone.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lHM1WiP4YoKqCNeJRTc7Pm7PnHGlTgGO9
+Content-Type: multipart/mixed; boundary="6FBnnrE0Hu4xGptD6RcMZIkQCLcRXQLhx"
 
-Yeah, the conversion from 16 to 32 was hairy because our
-initial implementation made the migration-compatibility
-awkward. When I wrote that conversion I was careful to
-avoid creating a similar problem for my future self if
-I needed to bump the value again :-)
+--6FBnnrE0Hu4xGptD6RcMZIkQCLcRXQLhx
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> I'll add another patch fixing the check and use 32.
+On 02.12.19 11:10, Thomas Huth wrote:
+> We are going to enable 127 in the "auto" group, but it only works if
+> virtio-scsi and scsi-hd are available - which is not the case with
+> QEMU binaries like qemu-system-tricore for example, so we need a
+> proper check for the availability of these devices here.
+>=20
+> A very similar problem exists in iotest 267 - it has been added to
+> the "auto" group already, but requires virtio-blk and thus currently
+> fails with qemu-system-tricore for example. Let's also add aproper
+> check there.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/qemu-iotests/127       |  2 ++
+>  tests/qemu-iotests/267       |  2 ++
+>  tests/qemu-iotests/common.rc | 14 ++++++++++++++
+>  3 files changed, 18 insertions(+)
 
-I just sent a patch that fixes the check.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-thanks
--- PMM
+
+--6FBnnrE0Hu4xGptD6RcMZIkQCLcRXQLhx--
+
+--lHM1WiP4YoKqCNeJRTc7Pm7PnHGlTgGO9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4lvZoACgkQ9AfbAGHV
+z0BodggAnfa8jcPtkSmSWF91Op0/UEZZsolsILjnoSzdDlHl1etlFh5ZwaK3rOnP
+GTl0d1ttqJ44C3BddbhXO3nJUXFTyUXweCz3Dm6Pvuw93lrCLdCF3D7EhnZcLd57
+vXxrLcFG+2bwnO8CZlqxJAwdluE3xBPe/Uf1q7uzWnKRP34Qt1/s7awrAgSDcGp9
+4IPuxglMhfwKK1P+AfAA2I7wjC8d3McuaZp1aKDrOL3012WEWscoJndjrh5Y8aJ5
+gD7a/MRSlxwPih5GtcilInOTmq4n7NU1FLXCGeUOgGx6fmUIqZlQsAlbE3gBJSGq
+RQYg2LdyUez5FNzmOXuaJZVXIN1WuQ==
+=9O2i
+-----END PGP SIGNATURE-----
+
+--lHM1WiP4YoKqCNeJRTc7Pm7PnHGlTgGO9--
+
 
