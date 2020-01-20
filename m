@@ -2,124 +2,101 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F2CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 17:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99991C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 17:33:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49EC221835
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 17:30:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="D/AgoYGW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49EC221835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6B0B421835
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 17:33:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0B421835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itasV-00067L-L0
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 12:30:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39603)
+	id 1itavb-0008TH-JX
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 12:33:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itaqq-00058c-UM
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 12:28:38 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1itats-0007BA-Og
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 12:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itaqp-00049L-GJ
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 12:28:36 -0500
-Received: from mail-vi1eur04on0714.outbound.protection.outlook.com
- ([2a01:111:f400:fe0e::714]:58754
- helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1itato-0006Kf-Va
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 12:31:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36846)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1itaqp-00048Y-8W; Mon, 20 Jan 2020 12:28:35 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZwVOiwlg8RV4mEEUekFaBJUeOsRgk4zQEikNtGXWwbvvkN0AQR2J1KWNoI/ZTL67FKjEJRztFXDUYVa4sDBdGqoehTJg1hf5uQ/jeDuILrXuPRiOCKjuKbMS1ll6+wg/XrNUGWILDLG9Qrq7FhRbODu0vNc2TTTdula1ERgG1wobYOxDBJEt4lGsf7r7QTDC6J5xcL70fbbl6U5Wr8t32Qw2guDnT4EzK0oz3dwZekfEEqK4gHUXvOSWS9PIfspSChX0PDGQO5iZ2Z+71Th9UUy7pVVB5WqokmePo2nYWC00eG5kNNC8DkpgJj6uwjK/yMh9KUWr4GaNEYFJ03x2Hg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OiX/A4Yjl7XbfMHEOwAhuZpxtU+3HMdy09U/X6tWZ5E=;
- b=kkGayAESJ3Y2UGPhY93v/GCtAud0MRUDfELkZLyAL3fpVNsTykTIVKVhzf0FlCSKz66BEFYmvPFyF2RPy1asefIbCLO1T1XVvQzX9HknkotlLzPFsEx5e4LUMDEcq6XmfH8m5Ql3iCxgXHJY1nbh4cSnVSJtxnBENbopHQojfjKTT6u5shargzqtbL1pfGTkcuAlcCac6ZJy+SWz4+HpY+LQw+89p98hWWyXpJcCHlljzK0F8Ch9i0FRjWxXvrb2TulA98IN7dOwjYntdvF7cMn+7yFc0Vp2ODxnuWIN/pz2ih5SQ9J84FPGg5Xa/Owrfq1DZPfac2Y8f9WexHyylw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OiX/A4Yjl7XbfMHEOwAhuZpxtU+3HMdy09U/X6tWZ5E=;
- b=D/AgoYGWy4KOlOyBOlrZFr27rY24kvSMPn36qK+WUlXn2Cm3BtcRtSHfogic2GzvozBNHx9mHC00pnblXOmtcqoiBiudM8AcJdV/F1BprJdQWYGcZi/m3vjTAmRpm5bhh0+NC/TDEHuvt6lo7+RG202QFHgiMJvueCOdHw/eL3w=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3191.eurprd08.prod.outlook.com (52.135.161.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.19; Mon, 20 Jan 2020 17:28:32 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.026; Mon, 20 Jan 2020
- 17:28:32 +0000
-Received: from [172.16.24.200] (185.231.240.5) by
- FR2P281CA0012.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.19 via Frontend Transport; Mon, 20 Jan 2020 17:28:32 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v3 04/10] hbitmap: drop meta bitmaps as they are unused
-Thread-Topic: [PATCH v3 04/10] hbitmap: drop meta bitmaps as they are unused
-Thread-Index: AQHVtlOfjJFz1HLGS0Gzm2LfZzDgPKfzmLyAgACH1YD//9p+AIAABloA
-Date: Mon, 20 Jan 2020 17:28:32 +0000
-Message-ID: <3b4f3ef4-adc7-1fda-44cc-b16b497cb110@virtuozzo.com>
-References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
- <20191219100348.24827-5-vsementsov@virtuozzo.com>
- <a42037d5-0d62-d916-a814-ba755b6ad9a4@redhat.com>
- <e6d654fb-7c04-c709-6b2a-3801ae1008d6@virtuozzo.com>
- <0cf94b1f-e7cb-081a-34ab-63a7d9ba80ce@redhat.com>
-In-Reply-To: <0cf94b1f-e7cb-081a-34ab-63a7d9ba80ce@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: FR2P281CA0012.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::22) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20200120202830896
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0a4a471d-98b9-4f21-7985-08d79dce2c36
-x-ms-traffictypediagnostic: AM6PR08MB3191:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB3191A3AB2572E7AAAA8C2EF4C1320@AM6PR08MB3191.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2803;
-x-forefront-prvs: 0288CD37D9
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(376002)(39840400004)(136003)(366004)(396003)(199004)(189003)(66446008)(64756008)(66556008)(66476007)(6486002)(66946007)(5660300002)(110136005)(54906003)(16576012)(53546011)(31686004)(478600001)(86362001)(16526019)(52116002)(186003)(26005)(107886003)(31696002)(71200400001)(4326008)(316002)(956004)(2616005)(36756003)(81156014)(2906002)(8936002)(8676002)(81166006);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3191;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 84uN7yclM3zMeN+dbZ4YKXnAnTcf3i8lJ3NRf1MWW9B+819bPPd5ZEAjoDpGQXnjuL5I1q4+mmLeUe4o7ZePlkdPy3bNzysK1UOTyQZXnD1LjPyRnHmHoAxZOSNzpNFjDyYFKghAcx70igNf0Uz7ummKfdq95iHUaS7y32AKLG4JCrD5Kol5mvbgg6UUVTJa24VsmKyvrKmPwQTO7k+XW7qJjAfmVHwQnnYwv+X2y79TeIC9pdpwSCtqdVd9AZBoeokOfswVr2TMZIq9Wm95GslaHZkc6YPYpvTuQR65emWFyZ00PtueJUzUTlZ5FxGpuJVY3JE3T4i0EPjEv0arAF8m2+1SnaXJl42EewH2EqROpngX2vl/27Eh6Tm8W5egPyfQqAQVreqyzyWtlQ8E7ChyQHxEdKJWSoBwGI7sS8kAYftAA3VNJub/vJCaGyHi
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <CF0C020ABA0EE745B0000BC148342148@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
+ id 1itato-0006Jw-Le
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 12:31:40 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00KHRQGm077000
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 12:31:39 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xmgdk6w68-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 12:31:39 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
+ Mon, 20 Jan 2020 17:31:36 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 20 Jan 2020 17:31:34 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00KHVXRB45744382
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 20 Jan 2020 17:31:33 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8B004A4066;
+ Mon, 20 Jan 2020 17:31:33 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2F478A405B;
+ Mon, 20 Jan 2020 17:31:31 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.199.51.38])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 20 Jan 2020 17:31:30 +0000 (GMT)
+Subject: Re: [PATCH v20 6/7] migration: Include migration support for machine
+ check handling
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
+ <20200117093855.19074-7-ganeshgr@linux.ibm.com>
+ <20200120004842.GJ54439@umbus>
+From: Ganesh <ganeshgr@linux.ibm.com>
+Date: Mon, 20 Jan 2020 23:01:30 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a4a471d-98b9-4f21-7985-08d79dce2c36
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 17:28:32.7855 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PykxfV0na/VnuQ3LaO1Hf6ukvsDfgNtM4j2ZPyo7CgLxpazOkaHhGeIt1Is/dTCaLRh6jqqBcf0APYXxlTAZHx3pMuQqVsldqGE6Rh1m8dk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3191
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0e::714
+In-Reply-To: <20200120004842.GJ54439@umbus>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 20012017-0016-0000-0000-000002DF23E0
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012017-0017-0000-0000-00003341C8B4
+Message-Id: <217864bc-30f5-88ba-7677-dad963095e80@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-20_07:2020-01-20,
+ 2020-01-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 clxscore=1015
+ bulkscore=0 suspectscore=0 mlxlogscore=999 lowpriorityscore=0 spamscore=0
+ adultscore=0 malwarescore=0 impostorscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001200147
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,69 +108,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
+ qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.01.2020 20:05, Max Reitz wrote:
-> On 20.01.20 17:20, Vladimir Sementsov-Ogievskiy wrote:
->> 20.01.2020 14:13, Max Reitz wrote:
->>> On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>    include/qemu/hbitmap.h |  21 --------
->>>>    tests/test-hbitmap.c   | 115 --------------------------------------=
----
->>>>    util/hbitmap.c         |  16 ------
->>>>    3 files changed, 152 deletions(-)
->>>
->>> Er, hrm, well.
->>>
->>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>>
->>> git log me the only commits that touched anything to the regard of
->>> '*create_meta*' were the ones that introduced it and your commit that
->>> dropped it.
->>>
->>> Soo, er, well, okay.  Why did we introduce these again?  (I suppose I
->>> should know since they have my S-o-b on them.  But I actually don=92t.)
->>>
->>> Max
->>>
+
+
+On 1/20/20 6:18 AM, David Gibson wrote:
+> On Fri, Jan 17, 2020 at 03:08:54PM +0530, Ganesh Goudar wrote:
+>> From: Aravinda Prasad <arawinda.p@gmail.com>
 >>
->> I'm a bit not follow what you mean. I can just note, that dirty-bitmap.c
->> part of meta bitmaps was recently removed, and hbitmap.c part I forgot t=
-o
->> remove...
->=20
-> Yes, but who used that dirty-bitmap.c interface?  As far as I can tell,
-> nobody.
+>> This patch includes migration support for machine check
+>> handling. Especially this patch blocks VM migration
+>> requests until the machine check error handling is
+>> complete as these errors are specific to the source
+>> hardware and is irrelevant on the target hardware.
+>>
+>> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+>> [Do not set FWNMI cap in post_load, now its done in .apply hook]
+>> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
+>> ---
+>>   hw/ppc/spapr.c         | 47 ++++++++++++++++++++++++++++++++++++++++++
+>>   hw/ppc/spapr_events.c  | 16 +++++++++++++-
+>>   hw/ppc/spapr_rtas.c    |  2 ++
+>>   include/hw/ppc/spapr.h |  2 ++
+>>   4 files changed, 66 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 46bac1a83c..c8bc2fa9f3 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -46,6 +46,7 @@
+>>   #include "migration/qemu-file-types.h"
+>>   #include "migration/global_state.h"
+>>   #include "migration/register.h"
+>> +#include "migration/blocker.h"
+>>   #include "mmu-hash64.h"
+>>   #include "mmu-book3s-v3.h"
+>>   #include "cpu-models.h"
+>> @@ -1683,6 +1684,8 @@ static void spapr_machine_reset(MachineState *machine)
+>>   
+>>       /* Signal all vCPUs waiting on this condition */
+>>       qemu_cond_broadcast(&spapr->mc_delivery_cond);
+>> +
+>> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
+> Thinking on our discussions about this earlier, there are
+> circumstances where we could add the blocker message multiple times.
+> IIUC, this will just remove one of them, but at reset, we need to
+> remove all of them.
+Sorry I did not mention it in our previous conversation, here machine 
+check events
+are serialized, Aravinda has explained it clear in commit message of 
+patch 5/7, So
+there will be a single entry in the list.
+>
+>>   }
+>>   
+>>   static void spapr_create_nvram(SpaprMachineState *spapr)
+>> @@ -1965,6 +1968,42 @@ static const VMStateDescription vmstate_spapr_dtb = {
+>>       },
+>>   };
+>>   
+>> +static bool spapr_fwnmi_needed(void *opaque)
+>> +{
+>> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+>> +
+>> +    return spapr->guest_machine_check_addr != -1;
+>> +}
+>> +
+>> +static int spapr_fwnmi_pre_save(void *opaque)
+>> +{
+>> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+>> +
+>> +    /*
+>> +     * Check if machine check handling is in progress and print a
+>> +     * warning message.
+>> +     */
+>> +    if (spapr->mc_status != -1) {
+>> +        warn_report("A machine check is being handled during migration. The"
+>> +                "handler may run and log hardware error on the destination");
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_spapr_machine_check = {
+>> +    .name = "spapr_machine_check",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .needed = spapr_fwnmi_needed,
+>> +    .pre_save = spapr_fwnmi_pre_save,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+>> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>>   static const VMStateDescription vmstate_spapr = {
+>>       .name = "spapr",
+>>       .version_id = 3,
+>> @@ -1999,6 +2038,7 @@ static const VMStateDescription vmstate_spapr = {
+>>           &vmstate_spapr_cap_large_decr,
+>>           &vmstate_spapr_cap_ccf_assist,
+>>           &vmstate_spapr_cap_fwnmi,
+>> +        &vmstate_spapr_machine_check,
+>>           NULL
+>>       }
+>>   };
+>> @@ -2814,6 +2854,13 @@ static void spapr_machine_init(MachineState *machine)
+>>           spapr_create_lmb_dr_connectors(spapr);
+>>       }
+>>   
+>> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_ON) {
+>> +        /* Create the error string for live migration blocker */
+>> +        error_setg(&spapr->fwnmi_migration_blocker,
+>> +            "A machine check is being handled during migration. The handler"
+>> +            "may run and log hardware error on the destination");
+>> +    }
+>> +
+>>       /* Set up RTAS event infrastructure */
+>>       spapr_events_init(spapr);
+>>   
+>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>> index 54eaf28a9e..884e455f02 100644
+>> --- a/hw/ppc/spapr_events.c
+>> +++ b/hw/ppc/spapr_events.c
+>> @@ -43,6 +43,7 @@
+>>   #include "qemu/main-loop.h"
+>>   #include "hw/ppc/spapr_ovec.h"
+>>   #include <libfdt.h>
+>> +#include "migration/blocker.h"
+>>   
+>>   #define RTAS_LOG_VERSION_MASK                   0xff000000
+>>   #define   RTAS_LOG_VERSION_6                    0x06000000
+>> @@ -843,6 +844,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>   {
+>>       SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>       CPUState *cs = CPU(cpu);
+>> +    int ret;
+>> +    Error *local_err = NULL;
+>>   
+>>       if (spapr->guest_machine_check_addr == -1) {
+>>           /*
+>> @@ -872,8 +875,19 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>               return;
+>>           }
+>>       }
+>> -    spapr->mc_status = cpu->vcpu_id;
+>>   
+>> +    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
+>> +    if (ret == -EBUSY) {
+>> +        /*
+>> +         * We don't want to abort so we let the migration to continue.
+>> +         * In a rare case, the machine check handler will run on the target.
+>> +         * Though this is not preferable, it is better than aborting
+>> +         * the migration or killing the VM.
+>> +         */
+>> +        warn_report("Received a fwnmi while migration was in progress");
+>> +    }
+>> +
+>> +    spapr->mc_status = cpu->vcpu_id;
+>>       spapr_mce_dispatch_elog(cpu, recovered);
+>>   }
+>>   
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index 3f162d82f5..4ce8e48d2a 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -50,6 +50,7 @@
+>>   #include "hw/ppc/fdt.h"
+>>   #include "target/ppc/mmu-hash64.h"
+>>   #include "target/ppc/mmu-book3s-v3.h"
+>> +#include "migration/blocker.h"
+>>   
+>>   static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>                                      uint32_t token, uint32_t nargs,
+>> @@ -453,6 +454,7 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>>       spapr->mc_status = -1;
+>>       qemu_cond_signal(&spapr->mc_delivery_cond);
+>>       rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
+>>   }
+>>   
+>>   static struct rtas_call {
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index f6f82d88aa..a1fba95c82 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -218,6 +218,8 @@ struct SpaprMachineState {
+>>   
+>>       unsigned gpu_numa_id;
+>>       SpaprTpmProxy *tpm_proxy;
+>> +
+>> +    Error *fwnmi_migration_blocker;
+>>   };
+>>   
+>>   #define H_SUCCESS         0
 
-Yes, as far as I know, nobody and never.
-
->=20
->> Meta bitmaps were intended to control live migration of bitmaps and to
->> implement something like partial sync of bitmaps (write to qcow2 only
->> changed part of bitmap), but migration implemented in other way
->> (postcopy) and the second thing was not implemented.
->=20
-> OK.  I was wondering why they were implemented without ever having been
-> used (as far as I can tell).
->=20
-
-It was too optimistic preparatory series.
-
-(I can never finally understand, series - who a they or what is it?
-  Plural or singular? They were too optimistic series? Sounds weird..
-  And if one series is series, than what about several serieses?
-  OK, let's say, it was too optimistic preparatory patch set :)
-
-
---=20
-Best regards,
-Vladimir
 
