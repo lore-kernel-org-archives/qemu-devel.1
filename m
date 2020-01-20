@@ -2,109 +2,124 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CA7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 16:04:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E96D5C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 16:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21C0A22314
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 16:04:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4727217F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 16:07:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5+BO04H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C0A22314
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="TlEjVI1t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4727217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itZXm-0007QQ-BI
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 11:04:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55224)
+	id 1itZZv-0000u8-Am
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 11:07:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1itZWc-0006GY-1s
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 11:03:41 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itZYD-0007yR-Gl
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 11:05:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1itZWY-0001MF-E6
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 11:03:37 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22717
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1itZWY-0001M4-AL
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 11:03:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579536213;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Z6eNFUDmrtsy0UHSaNM6j7zOzvNAI7eMxWcpuByNLIQ=;
- b=G5+BO04Hz5AWI2TT8AHOQiENc+NZ7FwBJEJKrspfhnvq5nroJXz3PcYcYw8ySCLdCvuXM7
- qa9cZktcKIMYAtZ21JGnikirIeB1gsA7oSswKUsZzRQCueGCo7AXXK0QU6wO8GkRX8Je8t
- XC2gQZolVhInTUmA1Y4WtpTJlPP6tuE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-jzvy9kVuMuKDyy_VnTt9vw-1; Mon, 20 Jan 2020 11:03:30 -0500
-X-MC-Unique: jzvy9kVuMuKDyy_VnTt9vw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18AC5800D48;
- Mon, 20 Jan 2020 16:03:29 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-225.ams2.redhat.com
- [10.36.117.225])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E0E484DBC;
- Mon, 20 Jan 2020 16:03:26 +0000 (UTC)
-Subject: Re: [PATCH v9 1/2] docs: improve qcow2 spec about extending image
- header
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20191216121733.63562-1-vsementsov@virtuozzo.com>
- <20191216121733.63562-2-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5ec4a89e-ea37-d46c-f006-2f47d6f9b736@redhat.com>
-Date: Mon, 20 Jan 2020 17:03:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itZY9-00029Q-6c
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 11:05:16 -0500
+Received: from mail-eopbgr80101.outbound.protection.outlook.com
+ ([40.107.8.101]:22595 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1itZY8-00028E-Dx; Mon, 20 Jan 2020 11:05:13 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U1vUTVM5oJ0ryKSn7hVXK3yvYAvONiI6/rwkzJaCIjrbNRwN8/YQfGRnnm0pUe7ISeSCHai26pxAWd7NcMvsPBzS2r+QzJNbOV7IWW5X9MyBX15j12PoXS9PAgbjpiQYKON1vBzsifStgjPsBZfhkPJF+S4oVw0bJRANP6mnGoydPTmQVZr/xeyJteph+uyGaAtsQ53BA2ESvWN8e8veNfr6CG2r0fVMeoWatQuXdOLy8bWbbg0SWqd0vu6jKdpoHMrfkvrEjPPZrLpztVReJOMCnp4F4W+2rByfgYqWVc1Od6+V9sa03STBuuQxsNyZ/Hby7nAtHO8YniMhUKMmsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FZQAKmwg6fgKYwxteGEvfj8Dyi4kooul4BXhT8fPjVU=;
+ b=LF56ppLo+80kzTGV5hgLKBkmWQRZ0w5orXTjLRABaISb6k3XIU4viz/XCVumogPm9tQTLT86/jy8X8J2IXh/5ScEbGwCDmkK9HFjPlXTS0S+RqvvlKVz5uF3i08b5gipXOuMeh98IbNGJLWTHmdef3kkIHWSJlShWF0FSTmcZOxmcB4DtofL/NrK5wNdsnF9AZFcSYYamsKsIZUvFI50n1fmvtiDdBYW7ThK0UhXOBe8gpLqdAJnkv4p5xedd/HinjAjhiRAhik+DUrh0PHGZhRixCwo57dO2m8Fkbg9IvrS+t0em2nBe/BmlNuDP0mq9p5jCpT6s010hTMBINEhtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FZQAKmwg6fgKYwxteGEvfj8Dyi4kooul4BXhT8fPjVU=;
+ b=TlEjVI1t41JAo7MVt/klYDmT54JGh99zNRvmA4ZOglRnbF7hmGoDJr6yzsew3CH3AA/disRvr/xCNjDcBJOvZw4g+sZzQeFfWQVPOIZCeCErYbfpQOw2H7F+EoxqaIUvL2TqILYyBjmbPgFqep2G3ep5eJNH/wjhR700W7z7Ubk=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4088.eurprd08.prod.outlook.com (20.179.2.10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.20; Mon, 20 Jan 2020 16:05:10 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.026; Mon, 20 Jan 2020
+ 16:05:10 +0000
+Received: from [172.16.24.200] (185.231.240.5) by
+ AM3PR04CA0132.eurprd04.prod.outlook.com (2603:10a6:207::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.19 via Frontend Transport; Mon, 20 Jan 2020 16:05:09 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v3 10/10] block/qcow2-bitmap: use
+ bdrv_dirty_bitmap_next_dirty
+Thread-Topic: [PATCH v3 10/10] block/qcow2-bitmap: use
+ bdrv_dirty_bitmap_next_dirty
+Thread-Index: AQHVtlOhvcaeV5Say0ur9RDAvfGtBafzzE+AgAAdzwA=
+Date: Mon, 20 Jan 2020 16:05:09 +0000
+Message-ID: <9c4c4489-ead1-3587-7f71-ad1d2aa2b9e6@virtuozzo.com>
+References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
+ <20191219100348.24827-11-vsementsov@virtuozzo.com>
+ <fcdd14da-b273-a71c-c6f8-f7c8ac3e2bd5@redhat.com>
+In-Reply-To: <fcdd14da-b273-a71c-c6f8-f7c8ac3e2bd5@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: AM3PR04CA0132.eurprd04.prod.outlook.com (2603:10a6:207::16)
+ To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20200120190508027
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 149a543a-496e-4aa6-e445-08d79dc28620
+x-ms-traffictypediagnostic: AM6PR08MB4088:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB4088AF8F86BF4777470636FFC1320@AM6PR08MB4088.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:143;
+x-forefront-prvs: 0288CD37D9
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(136003)(396003)(39840400004)(366004)(346002)(189003)(199004)(36756003)(81156014)(81166006)(64756008)(66446008)(4326008)(316002)(16576012)(16526019)(54906003)(110136005)(186003)(66556008)(53546011)(66946007)(66476007)(26005)(8936002)(478600001)(2906002)(6486002)(31696002)(5660300002)(31686004)(71200400001)(4744005)(8676002)(52116002)(107886003)(956004)(86362001)(2616005)(14143004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4088;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: kRg9gLr+lqSZfLs8AcW4R8IbRaf56UVcZKzrZ6VmWcwhy0JW4p97Q25e6+G2RpSUItp7AM2GR4I73i6rcrsnYFqfbjD8XyXVx0x3ALBUFovMYM5IlIKdLXoUnlZy/BMj8gqcF9URqyyMLJyPgiPFrRd6NaBIOUAANKb/yIH6VGqwjjbT8ed7bkvVCRNUqp8LNNK/hKtbVvzQziWlTMU/wKWdScFWjPSaajj/ib5rjzyxCkAiKuCt5PsyTSlahVtFSZtuy9jn/xa+wlx0PhdmC6cM8Z8hGTJQKFUvISvrOJQgPNP7aQOshoV5pIDyLmCD0NZJcvSfD3SSfGJ9G7noOxgDR8F9sBBNvFJ0Hkm7kP11BiZmHtooa/5XxrE1zEjZOML0z+MNjX/6xYXh110gq1lzw4S/lndqjuJbC2JZAzchBHqjMprNiWgC1gHcXJcQodLtNSD/QQHstt2pbruM9sQvWMlkT/uhQLIXxFwL/C/Pk/Bz1nS5c2E27OyUL68p
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <E1816918FFF2B742B257A64BF0B47FB5@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20191216121733.63562-2-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="jbah3ijyEU0rOhGTw44xIsG4MPkPvrIx6"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 149a543a-496e-4aa6-e445-08d79dc28620
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 16:05:09.8931 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 49XvFWvPJf6RAE5xJoauU7R2UNpzfPiVmqgTrza23EqOj7fS82EmwYjqYg39tOoSzHTLX1TPEm/MjVipehkuhtfj7rmb9gOYMiaRl6/qTCA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4088
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.101
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,193 +131,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- dplotnikov@virtuozzo.com, den@openvz.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jbah3ijyEU0rOhGTw44xIsG4MPkPvrIx6
-Content-Type: multipart/mixed; boundary="wSLA8SKpzGHOFK4bFFfRsWr6ngXqOUW31"
-
---wSLA8SKpzGHOFK4bFFfRsWr6ngXqOUW31
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 16.12.19 13:17, Vladimir Sementsov-Ogievskiy wrote:
-> Make it more obvious how to add new fields to the version 3 header and
-> how to interpret them.
+20.01.2020 17:18, Max Reitz wrote:
+> On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
+>> store_bitmap_data() loop does bdrv_set_dirty_iter() on each iteration,
+>> which means that we actually don't need iterator itself and we can use
+>> simpler bitmap API.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/qcow2-bitmap.c | 11 +++++------
+>>   1 file changed, 5 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>> index c6c8ebbe89..015f5d18d2 100644
+>> --- a/block/qcow2-bitmap.c
+>> +++ b/block/qcow2-bitmap.c
 >=20
-> The specification is adjusted so for new defined optional fields:
+> [...]
 >=20
-> 1. Software may support some of these optional fields and ignore the
->    others, which means that features may be backported to downstream
->    Qemu independently.
-> 2. If we want to add incompatible field (or a field, for which some its
->    values would be incompatible), it must be accompanied by
->    incompatible feature bit.
+>> @@ -1360,19 +1361,17 @@ static uint64_t *store_bitmap_data(BlockDriverSt=
+ate *bs,
 >=20
-> Also the concept of "default is zero" is clarified, as it's strange to
-> say that the value of the field is assumed to be zero for the software
-> version which don't know about the field at all and don't know how to
-> treat it be it zero or not.
+> (One line more context:)
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  docs/interop/qcow2.txt | 39 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 36 insertions(+), 3 deletions(-)
+>>           if (end >=3D bm_size)
+>>               break;
+>>           }
+>=20
+> Can we drop this now?
 
-I put review of this off for so long because I always waited for Eric to
-give his R-b, but maybe not.
+Yes, we can, as hbitmap_next_dirty returns -1 in this case.
 
-I generally think that he=92s stricter on what to write in documentation,
-and accordingly I only have nit picks on spelling and structure:
-
-> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-> index af5711e533..d92c827763 100644
-> --- a/docs/interop/qcow2.txt
-> +++ b/docs/interop/qcow2.txt
-> @@ -79,9 +79,9 @@ The first cluster of a qcow2 image contains the file he=
-ader:
->                      Offset into the image file at which the snapshot tab=
-le
->                      starts. Must be aligned to a cluster boundary.
-> =20
-> -If the version is 3 or higher, the header has the following additional f=
-ields.
-> -For version 2, the values are assumed to be zero, unless specified other=
-wise
-> -in the description of a field.
-> +For version 2, the header is exactly 72 bytes in length, and finishes he=
-re.
-> +For version 3 or higher, the header length is at least 104 bytes, includ=
-ing
-> +the next fields through header_length.
-> =20
->           72 -  79:  incompatible_features
->                      Bitmask of incompatible features. An implementation =
-must
-> @@ -164,6 +164,39 @@ in the description of a field.
->          100 - 103:  header_length
->                      Length of the header structure in bytes. For version=
- 2
->                      images, the length is always assumed to be 72 bytes.
-> +                    For version 3 it's at least 104 bytes and must be a =
-multiply
-
-s/multiply/multiple/
-
-> +                    of 8.
-> +
-> +Additional fields (version 3 and higher)
-
-If this is supposed to be a heading, maybe it should enclosed by =93=3D=3D=
-=3D=94
-on both sides.
-
-> +
-> +In general, these fields are optional and may be safely ignored by the s=
-oftware,
-> +as well as filled by zeros (which is equal to field absence), if softwar=
-e needs
-> +to set field B, but don't want to care about field A, which precedes B. =
-More
-
-s/don't/does not/ (or maybe s/don't want/does not/)
-
-> +formally, additional fields have the following compatibility rules:
-> +
-> +1. If the value of the additional field must not be ignored for correct
-> +handling of the file, it will be accompanied by a corresponding incompat=
-ible
-> +feature bit.
-> +
-> +2. If there are no unrecognized incompatible feature bits set, an unknow=
-n
-> +additional field may be safely ignored other than preserving its value w=
-hen
-> +rewriting the image header.
-> +
-> +3. An explicit value of 0 will have the same behavior as when the field =
-is not
-> +present*, if not altered by specific incompatible bit.
-
-s/by specific/by a specific/
-
-> +
-> +*. Field is not present when header_length is less or equal to field's o=
-ffset.
-
-s/Field/A field/, s/field's/the field's/
-
-(maybe also +considered, as in "A field is considered not present...")
-
-> +Also, all additional fields are not present for version 2.
-> +
-> +        < ... No additional fields in the header currently ... >
-
-This looks a bit weird to me, but the next patch will remove it again,
-so who cares.
-
-> +Header padding
-
-Same heading note here (I=92d make this =93=3D=3D=3D Header padding =3D=3D=
-=3D=94).
-
-> +
-> +@header_length must be a multiply of 8, which means that if last additio=
-nal field
-
-s/multiply/multiple/
-
-> +end is not aligned, some padding is needed. This padding must be zeroed,=
- so that,
-
-I think s/last additional field end/the last additional field=92s end/, or
-maybe s/last additional field end/the end of the last additional field/.
-
-> +if some existing (or future) additional field will fall into the padding=
-, it
-> +will be interpreted accordingly to point [3.] of the previous paragraph,=
- i.e.
-> +in same manner as when this field is not present.
-
-s/in same/in the same/
-
-> =20
-
-I think there should be a new heading here
-(=93=3D=3D=3D Header extensions =3D=3D=3D=94).
-
-Max
-
->  Directly after the image header, optional sections called header extensi=
-ons can
->  be stored. Each extension has a structure like the following:
+>=20
+> If so, and with that done:
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+>>  =20
+>> -        bdrv_set_dirty_iter(dbi, end);
+>> +        offset =3D end;
+>>       }
 >=20
 
 
---wSLA8SKpzGHOFK4bFFfRsWr6ngXqOUW31--
-
---jbah3ijyEU0rOhGTw44xIsG4MPkPvrIx6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4lz0wACgkQ9AfbAGHV
-z0CZhggAnzvY6luTZO/SaLiyJ/2M5HnSnj2p04mrgaHciNXiVzFzEEuBXVlYhtWk
-4jwR8GXQhCeyMqChEoboiM9L25yoe5OiPnqU3BDYS9F3QZfjxoboU37BMzPP6jt9
-cuC7YRTReitERBf8y5gYS9ZsTsdi9X0ZaiVFdrssL32s1liVydylo2/6xVW+OWzt
-O7eMucKxVnJFbHmKD+Rwp/mYfRprJKnawUIs06hfn0FjT8R1EU6Rs/nonO9Sbt0i
-ysyLzC242IVl0NXE9/UcbjIapzmtZahI1VjZW53ZNR8H0kfemgfsI4uk36y7ynP9
-Y7Ucf9+42OUc1d4FyVdAVF2TeqibIA==
-=m1dh
------END PGP SIGNATURE-----
-
---jbah3ijyEU0rOhGTw44xIsG4MPkPvrIx6--
-
+--=20
+Best regards,
+Vladimir
 
