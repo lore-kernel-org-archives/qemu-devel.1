@@ -2,84 +2,79 @@ Return-Path: <SRS0=XqMt=3J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D72CC33CAA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DE9C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:29:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9E1020678
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:28:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EF3120678
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 14:29:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vyahkz/P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E1020678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bhfiskvq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF3120678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itY29-0000pz-Bc
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:28:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40429)
+	id 1itY3X-0002lV-Hg
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 09:29:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1itXww-00029H-CU
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:22:43 -0500
+ (envelope-from <stefanha@redhat.com>) id 1itXvK-00088h-Ar
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:21:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1itXwv-0007nV-0C
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:22:41 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36250)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1itXwu-0007mY-Ob
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:22:40 -0500
-Received: by mail-wm1-x343.google.com with SMTP id p17so14927797wma.1
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 06:22:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=b7fnyn7VZswX8TxYX4J1qJUh5P887/OHSr88SWkveho=;
- b=Vyahkz/P+3DzNLR+9XZIz/K7GjySh5cxlt3SxqUgX63Esnkysg5HXM1R4vJjtl3X1P
- dEz0e4jLjZPBohr5lkCA+l+kT1cNc/BO5Rn6d3sgpls0tDydbNUS9lKDvP/SKHE6jmXV
- Flv2cZCFbWZVJKzPEAXzy+Ui03uzqbIjLXVRm3tQbVL0HAkPW62HnnWxvP8rFU6utsw2
- RpkmVGLHIattBthjB5JK/0RJ0irU9MfKQuiPjz2m80f3tApK+duRo+oxnFMtSWXfVxW7
- dOVQaGVWTz8o/O/70uwrOfEW2z8MlgPalwOX58mYJNR2ZpasRpQrSsNuikJTS3MSQE85
- Y6gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=b7fnyn7VZswX8TxYX4J1qJUh5P887/OHSr88SWkveho=;
- b=sD21jdIcPGxF+5SQuqI+7KnVg+VDPH7MUwYBtusx1wEXUYvUxYzANZHHGpJa1osPQU
- w1Z0f9BX2CGDXnNc/6E49r66kFCDrNehKwAYWc9TNMyqpOJkwf/bgSUZ+OizN9C8yzYP
- HzfVbWCnKixhNfj3o2ZefJ3y8PxfbYxTRgIrCqZKVZFDdoTcW2wVyEby2KcKBLKpLK8g
- a+NScwr7vZ2gcWGTgElybsL1JRzb8WLowyu+ZQXV4bnxcik0X7j7bN6FECl/mWXKqx9P
- MOVNQx70NnlGMOywKmYx1PrlHvzynnUx8FlxKKRuG53CM0KSFLntLCAy52E3isiAqmti
- a9kA==
-X-Gm-Message-State: APjAAAVySg7anTfahmDKumjOribdkMIhq9G01A0w0oiiFOOCbp8hIMj4
- O3L9An8pP3gFZDubPgvKSohEjkQevQkmng==
-X-Google-Smtp-Source: APXvYqyZHPTmn3IAiL1n2h8pE13XoEqUHTNZ9VmuS4wRCjVJHcYO2QHbsMwV5Oa8BP8yOERlnpK78w==
-X-Received: by 2002:a1c:3c8b:: with SMTP id j133mr19435952wma.66.1579530158689; 
- Mon, 20 Jan 2020 06:22:38 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id l18sm22873016wme.30.2020.01.20.06.22.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 06:22:37 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (envelope-from <stefanha@redhat.com>) id 1itXvG-0006pK-DO
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:21:02 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55682
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1itXvG-0006os-8e
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 09:20:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579530057;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QcF76SiLWpgtvCUROTLlRH+nHSE6t2UFIHOWl610TG4=;
+ b=bhfiskvqx/VsXo1ZKASpkGQLiKF0O5OjiPgAHBdBfICh1v6uz9AZskJEKjiioFNs2i0KM/
+ 7QUN03CxVOGpfEAC9Y4b2sA9EJSBsv9dYqViEEnvJFk8am52qIf9FRqNlIT+B8VkZ7g6hh
+ JdE/gOMUXfhilduOKNijn+ng/eL6k54=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-OkrgZsUfODqz5pRlcgfxAg-1; Mon, 20 Jan 2020 09:20:56 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 193B41005510;
+ Mon, 20 Jan 2020 14:20:55 +0000 (UTC)
+Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4740860CD0;
+ Mon, 20 Jan 2020 14:20:47 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/core/or-irq: Fix incorrect assert forbidding num-lines ==
- MAX_OR_LINES
-Date: Mon, 20 Jan 2020 14:22:35 +0000
-Message-Id: <20200120142235.10432-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+Subject: [PATCH v5 12/15] qemu-img: adds option to use aio engine for
+ benchmarking
+Date: Mon, 20 Jan 2020 14:18:55 +0000
+Message-Id: <20200120141858.587874-13-stefanha@redhat.com>
+In-Reply-To: <20200120141858.587874-1-stefanha@redhat.com>
+References: <20200120141858.587874-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: OkrgZsUfODqz5pRlcgfxAg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,42 +86,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: oleksandr@redhat.com, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The num-lines property of the TYPE_OR_GATE device sets the number
-of input lines it has. An assert() in or_irq_realize() restricts
-this to the maximum supported by the implementation. However we
-got the condition in the assert wrong: it should be using <=,
-because num-lines == MAX_OR_LINES is permitted, and means that
-all entries from 0 to MAX_OR_LINES-1 in the s->levels[] array
-are used.
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
-We didn't notice this previously because no user has so far
-needed that many input lines.
-
-Reported-by: Guenter Roeck <linux@roeck-us.net>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/core/or-irq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v10:
+ * Add missing space to qemu-img command-line documentation
+---
+ qemu-img-cmds.hx |  4 ++--
+ qemu-img.c       | 11 ++++++++++-
+ qemu-img.texi    |  5 ++++-
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
-index 18d63831cd3..2be18333811 100644
---- a/hw/core/or-irq.c
-+++ b/hw/core/or-irq.c
-@@ -58,7 +58,7 @@ static void or_irq_realize(DeviceState *dev, Error **errp)
- {
-     qemu_or_irq *s = OR_IRQ(dev);
- 
--    assert(s->num_lines < MAX_OR_LINES);
-+    assert(s->num_lines <= MAX_OR_LINES);
- 
-     qdev_init_gpio_in(dev, or_irq_handler, s->num_lines);
- }
--- 
-2.20.1
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 1c93e6d185..77b5a8dda8 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -20,9 +20,9 @@ STEXI
+ ETEXI
+=20
+ DEF("bench", img_bench,
+-    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_interv=
+al] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buffer_siz=
+e] [-S step_size] [-t cache] [-w] [-U] filename")
++    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_interv=
+al] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buffer_siz=
+e] [-S step_size] [-t cache] [-i aio] [-w] [-U] filename")
+ STEXI
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=
+=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var=
+{cache}] [-w] [-U] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=
+=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var=
+{cache}] [-i @var{aio}] [-w] [-U] @var{filename}
+ ETEXI
+=20
+ DEF("check", img_check,
+diff --git a/qemu-img.c b/qemu-img.c
+index 6233b8ca56..2b4562b9d9 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4187,7 +4187,8 @@ static int img_bench(int argc, char **argv)
+             {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c =3D getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:wU", long_options=
+, NULL);
++        c =3D getopt_long(argc, argv, ":hc:d:f:ni:o:qs:S:t:wU", long_optio=
+ns,
++                        NULL);
+         if (c =3D=3D -1) {
+             break;
+         }
+@@ -4230,6 +4231,14 @@ static int img_bench(int argc, char **argv)
+         case 'n':
+             flags |=3D BDRV_O_NATIVE_AIO;
+             break;
++        case 'i':
++            ret =3D bdrv_parse_aio(optarg, &flags);
++            if (ret < 0) {
++                error_report("Invalid aio option: %s", optarg);
++                ret =3D -1;
++                goto out;
++            }
++            break;
+         case 'o':
+         {
+             offset =3D cvtnum(optarg);
+diff --git a/qemu-img.texi b/qemu-img.texi
+index b5156d6316..20136fcb94 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -206,7 +206,7 @@ Command description:
+ Amends the image format specific @var{options} for the image file
+ @var{filename}. Not all file formats support this operation.
+=20
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=
+=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var=
+{cache}] [-w] [-U] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-inte=
+rval=3D@var{flush_interval}] [-n] [-i @var{aio}] [--no-drain] [-o @var{offs=
+et}] [--pattern=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_=
+size}] [-t @var{cache}] [-w] [-U] @var{filename}
+=20
+ Run a simple sequential I/O benchmark on the specified image. If @code{-w}=
+ is
+ specified, a write test is performed, otherwise a read test is performed.
+@@ -227,6 +227,9 @@ If @code{-n} is specified, the native AIO backend is us=
+ed if possible. On
+ Linux, this option only works if @code{-t none} or @code{-t directsync} is
+ specified as well.
+=20
++If @code{-i} is specified, aio option can be used to specify different AIO
++backends: @var{threads}, @var{native} or @var{io_uring}.
++
+ For write tests, by default a buffer filled with zeros is written. This ca=
+n be
+ overridden with a pattern byte specified by @var{pattern}.
+=20
+--=20
+2.24.1
 
 
