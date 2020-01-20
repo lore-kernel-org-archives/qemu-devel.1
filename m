@@ -6,86 +6,85 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E5F1C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFD4C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AEC820882
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:23:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87261207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jan 2020 11:24:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g8VhosLE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AEC820882
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yic4ajdK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87261207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itV9T-0003k5-5z
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:23:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42257)
+	id 1itVAU-0004dH-N9
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 06:24:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42894)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1itUpt-0001BJ-40
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:03:14 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1itUu1-0007Fj-AU
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1itUpo-00009g-1g
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:03:12 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50330)
+ (envelope-from <alex.bennee@linaro.org>) id 1itUu0-0004h8-7A
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:07:29 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33848)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1itUpn-00009I-R8
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:03:07 -0500
-Received: by mail-wm1-x341.google.com with SMTP id a5so14033705wmb.0
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 03:03:07 -0800 (PST)
+ id 1itUtz-0004gh-VX
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 06:07:28 -0500
+Received: by mail-wm1-x343.google.com with SMTP id w5so14473542wmi.1
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 03:07:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=if2jQzJ0JN3HZjix+IX3YLcUvsCrd0RAqio9jShR0AA=;
- b=g8VhosLE0F8HS/NKbQTORq4dHI3UW8NWcDNMbTG7SA9dOpkTKXrk44cW9KFfPyxWBw
- rJS2Op47BXNuzNnyTPYUnfLE5llHwYpfgYylLym94rv6wEK/8q60d7S+iGyuNXYGOcUG
- KFxIoItsVlnxWFKJFyz1wu/TjpkjEMae2PdCcyzmaem1m98UIQPBizCUEAL3dnNBB9iG
- y1DjjBh2ec/V6yYwuhNMmfWSvPT1tJXO4eOW3+AkMBHBbdxh0c0/699V5FfDJWGAoQu4
- pCr+1HaIfkrnNTJTqBffDwOFHTHzLz0IPAlv8LaWf6nxjhrsv7rJ2b1b1EXKB12/a6IX
- /IUA==
+ bh=6aAQgYqsH+S1uG/+DB1Ku3IfLwrK6c2Lmk2fj97fPgM=;
+ b=yic4ajdKomiVW+QsR9mHeTS0yuYerI4RfuP/QvromypNlcBcwwJI4LZo/tVfPamZF+
+ 6Jp5v/zgo8JHsRXObEYRKCA4xBhiUKdBLUhI1ClnHMXTczmeiPts5xQcoB8ehoXB3PdB
+ rY7CVVHZXNmU2+r9hZ1fGc9vjGVCqBWUS3s4dvofOLs0WxV832umfo5Em8NXLiPKXa7G
+ YULjyddgPFqfzXuZy/GHzo6GQOp6FajZ95P9+BlDPLeojjuBcnFRjvqQtuT+QJcemSS/
+ MJx4Jxr9e2NTwwUWpw9cboj9BCMsh352JmGrcCCvw0VzmesnuU5HpFVJrccYX2aDq6Mc
+ 4Pdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=if2jQzJ0JN3HZjix+IX3YLcUvsCrd0RAqio9jShR0AA=;
- b=GxZL0onDvGMPO2Fx+WSvsA07kDIeXCOKCZxRn+sV62deq1NLMw05MVbOkZOqhzrpKP
- N/aTd4rcRsMwnGES6ga+nm7Ps/oksdBmkgN8nbDWobJYPaYsJVO94InZirkpykJ5gB3W
- oQo9Co4w+w8UPy9E8EQp7XhymgYfuwXxaf9AJwILHApEDwTl018+peiMoVhuj0fKKRtK
- xZEDkNvDlGdK3Nsd6p6ouhYenQ4fUzOShmuMWBvG/sEz8dxRPXBcODq89iNjBf+JVdX2
- PYIOivgLiWoc87DVspMVyu0BSf5yaEymQD3bUlT9jXAH+jrqsa1mTwcrnF2j5rcIbHd4
- rENQ==
-X-Gm-Message-State: APjAAAU4irhyh9DtWffp8fpCaKmNofY5FUzWIQo6X4Tv8pC/1kMjVSin
- YJCcqQA4Xe2u0ljpU2KxU2Qq/A==
-X-Google-Smtp-Source: APXvYqycrhqE6XnOh3VhhVbcYhzusw0AqJuy7VzyKqtcXTCoXN1IMUG3OABazBWEww8Ch9hZVaNydA==
-X-Received: by 2002:a1c:7f4f:: with SMTP id a76mr18827993wmd.77.1579518186591; 
- Mon, 20 Jan 2020 03:03:06 -0800 (PST)
+ bh=6aAQgYqsH+S1uG/+DB1Ku3IfLwrK6c2Lmk2fj97fPgM=;
+ b=WGEsGEn3hZmAYG38y3LkiT1j0wZ8HnPPgfuKboPS7bBAqel8/EnwIKwxMNExVyHhsb
+ e6LG4nCfptDnBVWb8agGJO7q/J6H6zGpZQMK0iszGueNlbR6YkoMlXcmAo4Q+O9eLVFh
+ h8ot9hc0uGBxH0U5Qy8lK/CE+PTma5iolstQwnbXJGXGDYAN4XDzUunqXAtROn4ZpXvQ
+ WEJNDCj166QQzYd0hiaWG6rVHAjaestb/8QOYDiAIoCaLx5h2aMD6LYXhmDy3VPH6rj2
+ IGpYf5HrtgR8dXdlCFABcDjic9gueDQZjgI6s2fv09McxY6V4aW5habuVbJeMjeIoZjW
+ DVQg==
+X-Gm-Message-State: APjAAAWoA3Bsg6+fRzKS75DNvo7Flqnnp+EfAi8O2z/Bdk3Y3mFDyCDA
+ 5W8McfxZVgcVEdoudQTDf9GSUg==
+X-Google-Smtp-Source: APXvYqwwBZ3qht93UIhmi/D7ZFWhF7OymciD13XDYX2Q/UHucF8YJv/WZl6eAsiWYcy9HT25XHLKyA==
+X-Received: by 2002:a7b:c3d7:: with SMTP id t23mr18640864wmj.33.1579518446875; 
+ Mon, 20 Jan 2020 03:07:26 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 2sm46359372wrq.31.2020.01.20.03.03.05
+ by smtp.gmail.com with ESMTPSA id s15sm44186198wrp.4.2020.01.20.03.07.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 03:03:05 -0800 (PST)
+ Mon, 20 Jan 2020 03:07:25 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A0E681FF87;
- Mon, 20 Jan 2020 11:03:04 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id CD0381FF87;
+ Mon, 20 Jan 2020 11:07:24 +0000 (GMT)
 References: <20200118140619.26333-1-philmd@redhat.com>
- <20200118140619.26333-3-philmd@redhat.com>
+ <20200118140619.26333-6-philmd@redhat.com>
 User-agent: mu4e 1.3.6; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 2/6] Makefile: Clarify all the codebase requires qom/
- objects
-In-reply-to: <20200118140619.26333-3-philmd@redhat.com>
-Date: Mon, 20 Jan 2020 11:03:04 +0000
-Message-ID: <87ftga4cgn.fsf@linaro.org>
+Subject: Re: [PATCH v2 5/6] hw/core: Restrict reset handlers API to system-mode
+In-reply-to: <20200118140619.26333-6-philmd@redhat.com>
+Date: Mon, 20 Jan 2020 11:07:24 +0000
+Message-ID: <877e1m4c9f.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,43 +107,36 @@ Sender: "Qemu-devel"
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> QEMU user-mode also requires the qom/ objects, it is not only
-> used by "system emulation and qemu-img". As we will use a big
-> if() block, move it upper in the "Common libraries for tools
-> and emulators" section.
+> The user-mode code does not use this API, restrict it
+> to the system-mode.
 >
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/core/Makefile.objs | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index 0edd9e635d..2fea68ccf7 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  # core qdev-related obj files, also used by *-user:
+>  common-obj-y +=3D qdev.o qdev-properties.o
+> -common-obj-y +=3D bus.o reset.o
+> +common-obj-y +=3D bus.o
+> +common-obj-$(CONFIG_SOFTMMU) +=3D reset.o
+
+This seems a very minor tweaks as far as it goes. I though the only
+thing needed in hw was hw/core/cpu and everything else was system
+emulation?
+
+However it at least moves the needle in the right direction:
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> ---
->  Makefile.objs | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 7c1e50f9d6..5aae561984 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -2,6 +2,7 @@
->  # Common libraries for tools and emulators
->  stub-obj-y =3D stubs/
->  util-obj-y =3D crypto/ util/ qobject/ qapi/
-> +qom-obj-y =3D qom/
->=20=20
->  chardev-obj-y =3D chardev/
->=20=20
-> @@ -26,11 +27,6 @@ block-obj-m =3D block/
->=20=20
->  crypto-obj-y =3D crypto/
->=20=20
-> -#######################################################################
-> -# qom-obj-y is code used by both qemu system emulation and qemu-img
-> -
-> -qom-obj-y =3D qom/
-> -
->  #######################################################################
->  # io-obj-y is code used by both qemu system emulation and qemu-img
+>  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-fw.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
+>  # irq.o needed for qdev GPIO handling:
 
 
 --=20
