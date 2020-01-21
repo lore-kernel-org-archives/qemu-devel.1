@@ -2,67 +2,141 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E93C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB6FC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:02:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9E0420882
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:01:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9E0420882
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cn.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 04EDA20882
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:02:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04EDA20882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itqM0-000233-RP
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 05:01:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33154)
+	id 1itqMy-00032v-5I
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 05:02:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yangx.jy@cn.fujitsu.com>) id 1itqJM-000825-FN
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:59:05 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1itqIR-0006rP-HJ
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yangx.jy@cn.fujitsu.com>) id 1itqJI-0000Yd-Nt
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:59:04 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:33578
- helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <yangx.jy@cn.fujitsu.com>) id 1itqJI-0000VV-CI
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:59:00 -0500
-X-IronPort-AV: E=Sophos;i="5.70,345,1574092800"; d="scan'208";a="82341048"
-Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
- by heian.cn.fujitsu.com with ESMTP; 21 Jan 2020 17:58:52 +0800
-Received: from G08CNEXMBPEKD06.g08.fujitsu.local (unknown [10.167.33.206])
- by cn.fujitsu.com (Postfix) with ESMTP id DE5B95010EB0;
- Tue, 21 Jan 2020 17:49:39 +0800 (CST)
-Received: from [10.167.220.69] (10.167.220.69) by
- G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206) with Microsoft SMTP Server
- (TLS) id 15.0.1395.4; Tue, 21 Jan 2020 17:58:49 +0800
-Message-ID: <5E26CB57.7060804@cn.fujitsu.com>
-Date: Tue, 21 Jan 2020 17:58:47 +0800
-From: Xiao Yang <yangx.jy@cn.fujitsu.com>
-User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.2; zh-CN;
- rv:1.9.2.18) Gecko/20110616 Thunderbird/3.1.11
+ (envelope-from <borntraeger@de.ibm.com>) id 1itqIN-00007V-S1
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:58:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41734)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1itqIN-00006i-K4
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:58:03 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00L9qX18104453
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 04:58:01 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xmgcp9bkd-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 04:58:01 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 21 Jan 2020 09:57:59 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 21 Jan 2020 09:57:57 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00L9vuFA52559986
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 21 Jan 2020 09:57:56 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3BA6C4C04E;
+ Tue, 21 Jan 2020 09:57:56 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 09C394C050;
+ Tue, 21 Jan 2020 09:57:56 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.183])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 21 Jan 2020 09:57:55 +0000 (GMT)
+Subject: Re: [PATCH] s390x/event-facility: fix error propagation
+To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org
+References: <20200121095506.8537-1-cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Tue, 21 Jan 2020 10:57:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 006/104] virtiofsd: Trim down imported files
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-7-dgilbert@redhat.com>
-In-Reply-To: <20191212163904.159893-7-dgilbert@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+In-Reply-To: <20200121095506.8537-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.167.220.69]
-X-ClientProxiedBy: G08CNEXCHPEKD04.g08.fujitsu.local (10.167.33.200) To
- G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206)
-X-yoursite-MailScanner-ID: DE5B95010EB0.AB64A
-X-yoursite-MailScanner: Found to be clean
-X-yoursite-MailScanner-From: yangx.jy@cn.fujitsu.com
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 183.91.158.132
+X-TM-AS-GCONF: 00
+x-cbid: 20012109-0016-0000-0000-000002DF50CB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012109-0017-0000-0000-00003341F7B9
+Message-Id: <fab43638-e3c1-e63b-1eab-f00ec4cc4f92@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-21_02:2020-01-21,
+ 2020-01-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999 mlxscore=0
+ phishscore=0 impostorscore=0 priorityscore=1501 bulkscore=0 adultscore=0
+ spamscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-2001210084
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,124 +148,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019/12/13 0:37, Dr. David Alan Gilbert (git) wrote:
-> -	res = fuse_buf_copy(&pipe_buf, buf,
-> -			    FUSE_BUF_FORCE_SPLICE | FUSE_BUF_SPLICE_NONBLOCK);
-> -	if (res<  0) {
-> -		if (res == -EAGAIN || res == -EINVAL) {
-> -			/*
-> -			 * Should only get EAGAIN on kernels with
-> -			 * broken SPLICE_F_NONBLOCK support (<=
-> -			 * 2.6.35) where this error or a short read is
-> -			 * returned even if the pipe itself is not
-> -			 * full
-> -			 *
-> -			 * EINVAL might mean that splice can't handle
-> -			 * this combination of input and output.
-> -			 */
-> -			if (res == -EAGAIN)
-> -				se->broken_splice_nonblock = 1;
-> -
-> -			pthread_setspecific(se->pipe_key, NULL);
-> -			fuse_ll_pipe_free(llp);
-> -			goto fallback;
-> -		}
-> -		res = -res;
-> -		goto clear_pipe;
-> -	}
-> -
-> -	if (res != 0&&  res<  len) {
-> -		struct fuse_bufvec mem_buf = FUSE_BUFVEC_INIT(len);
-> -		void *mbuf;
-> -		size_t now_len = res;
-> -		/*
-> -		 * For regular files a short count is either
-> -		 *  1) due to EOF, or
-> -		 *  2) because of broken SPLICE_F_NONBLOCK (see above)
-> -		 *
-> -		 * For other inputs it's possible that we overflowed
-> -		 * the pipe because of small buffer fragments.
-> -		 */
-> -
-> -		res = posix_memalign(&mbuf, pagesize, len);
-> -		if (res != 0)
-> -			goto clear_pipe;
-> -
-> -		mem_buf.buf[0].mem = mbuf;
-> -		mem_buf.off = now_len;
-> -		res = fuse_buf_copy(&mem_buf, buf, 0);
-> -		if (res>  0) {
-> -			char *tmpbuf;
-> -			size_t extra_len = res;
-> -			/*
-> -			 * Trickiest case: got more data.  Need to get
-> -			 * back the data from the pipe and then fall
-> -			 * back to regular write.
-> -			 */
-> -			tmpbuf = malloc(headerlen);
-> -			if (tmpbuf == NULL) {
-> -				free(mbuf);
-> -				res = ENOMEM;
-> -				goto clear_pipe;
-> -			}
-> -			res = read_back(llp->pipe[0], tmpbuf, headerlen);
-> -			free(tmpbuf);
-> -			if (res != 0) {
-> -				free(mbuf);
-> -				goto clear_pipe;
-> -			}
-> -			res = read_back(llp->pipe[0], mbuf, now_len);
-> -			if (res != 0) {
-> -				free(mbuf);
-> -				goto clear_pipe;
-> -			}
-> -			len = now_len + extra_len;
-> -			iov[iov_count].iov_base = mbuf;
-> -			iov[iov_count].iov_len = len;
-> -			iov_count++;
-> -			res = fuse_send_msg(se, ch, iov, iov_count);
-> -			free(mbuf);
-> -			return res;
-> -		}
-> -		free(mbuf);
-> -		res = now_len;
-> -	}
-> -	len = res;
-> -	out->len = headerlen + len;
-> -
-> -	if (se->debug) {
-> -		fuse_log(FUSE_LOG_DEBUG,
-> -			"   unique: %llu, success, outsize: %i (splice)\n",
-> -			(unsigned long long) out->unique, out->len);
-> -	}
-> -
-> -	splice_flags = 0;
-> -	if ((flags&  FUSE_BUF_SPLICE_MOVE)&&
-> -	    (se->conn.want&  FUSE_CAP_SPLICE_MOVE))
-> -		splice_flags |= SPLICE_F_MOVE;
-> -
-> -	res = splice(llp->pipe[0], NULL, ch ? ch->fd : se->fd,
-> -		     NULL, out->len, splice_flags);
-Hi,
 
-1) In buffer.c, fuse_buf_splice() uses splice(2) to copy/move data in 
-some cases if the syscall is supported.
-2) One pipe needs to be passed to splice(2) so splice(2) without one 
-pipe fails and then go back to use other ways(e.g. use fuse_buf_fd_to_fd()).
-3) fuse_buf_copy() calls fuse_buf_splice() indirectly and this patch has 
-removed all pipes used by fuse_buf_copy().
 
-Is it necessary to leave the code related to splice(2)?  Is it going to 
-be used in future?
-We have to use splice(2) by the correct CONFIG_SPLICE macro If necessary.
+On 21.01.20 10:55, Cornelia Huck wrote:
+> We currently check (by error) if the passed-in Error pointer errp
+> is non-null and return after realizing the first child of the
+> event facility in that case. Symptom is that 'virsh shutdown'
+> does not work, as the sclpquiesce device is not realized.
+> 
+> Fix this by (correctly) checking the local Error err.
+> 
+> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Fixes: 3d508334dd2c ("s390x/event-facility: Fix realize() error API violations")
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-Best Regards,
-Xiao Yang
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
+> ---
+>  hw/s390x/event-facility.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 8a93b8a1da97..9d6972afa8b3 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -338,7 +338,7 @@ static void sclp_events_bus_realize(BusState *bus, Error **errp)
+>          DeviceState *dev = kid->child;
+>  
+>          object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> -        if (errp) {
+> +        if (err) {
+>              error_propagate(errp, err);
+>              return;
+>          }
+> 
 
 
