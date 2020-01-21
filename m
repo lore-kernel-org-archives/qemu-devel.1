@@ -2,62 +2,65 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE61CC33CAA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C82D3C33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 04:05:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2C8122314
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:49:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2C8122314
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9451822522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 04:05:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EGHRL+T+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9451822522
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itkXr-0007or-Sy
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 22:49:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55948)
+	id 1itkmn-000247-Mb
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 23:05:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1itkX5-00078D-35
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:48:52 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1itklT-0001D1-9e
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 23:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1itkX3-0000o5-Tm
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:48:51 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38382 helo=huawei.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1itklS-0000Rb-4g
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 23:03:43 -0500
+Received: from ozlabs.org ([203.11.71.1]:48593)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1itkX1-0000gv-1A; Mon, 20 Jan 2020 22:48:47 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 4110858C8C31749A7AB5;
- Tue, 21 Jan 2020 11:48:39 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Tue, 21 Jan 2020
- 11:48:29 +0800
-Subject: Re: [PATCH 1/2] arm/virt/acpi: remove meaningless sub device "PR0"
- from PCI0
-To: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>
-References: <20191219064759.35053-1-guoheyi@huawei.com>
- <20191219064759.35053-2-guoheyi@huawei.com>
- <20200113133702.1dea867b@redhat.com>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <613eaf96-c49d-11ac-1204-8c762a8295cc@huawei.com>
-Date: Tue, 21 Jan 2020 11:48:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1itklR-0000Pl-1F; Mon, 20 Jan 2020 23:03:42 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 481vzC6XQCz9sNx; Tue, 21 Jan 2020 15:03:35 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1579579415;
+ bh=21vHYx1m/HdKjVRYxSR1WkV0mkn6qnZQS6xNRKkBQRM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=EGHRL+T+3Ypnta290HRopgah5XH1NWzzx8rb3xqqz268yVKbdo1WhgauYL2zPfXIv
+ /cnlojeRfMRQwF9SmeMq6f6wUTk7SnI6fGVp9z3OamqNTrEq7z/mToraLSmYyVudmn
+ /IeRLgiH6Tb5eX/naOmdb6MdxHGToFME7aZjTb24=
+Date: Tue, 21 Jan 2020 15:02:13 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH v8 4/6] tpm_spapr: Support suspend and resume
+Message-ID: <20200121040213.GD265522@umbus.fritz.box>
+References: <20200108161012.1821385-1-stefanb@linux.ibm.com>
+ <20200108161012.1821385-5-stefanb@linux.ibm.com>
+ <CAJ+F1CJLKnhWW5kz=C5f9EJd=h-_b46ST_qOpwe1zDBjNU76mw@mail.gmail.com>
+ <9307b42f-3149-2cea-fbc9-28110ebc481b@linux.ibm.com>
+ <CAJ+F1CKbiNZvzdexR6+=0bNTLT4bO0xEsvotRJYoDJ4h+rUYQA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200113133702.1dea867b@redhat.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="gE7i1rD7pdK0Ng3j"
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKbiNZvzdexR6+=0bNTLT4bO0xEsvotRJYoDJ4h+rUYQA@mail.gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,103 +72,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon
- Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- wanghaibin.wang@huawei.com
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Julia,
 
-Could you provide some comments or advice?
+--gE7i1rD7pdK0Ng3j
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Fri, Jan 17, 2020 at 05:46:21PM +0400, Marc-Andr=E9 Lureau wrote:
+> On Fri, Jan 17, 2020 at 5:41 PM Stefan Berger <stefanb@linux.ibm.com> wro=
+te:
+> >
+> > On 1/17/20 8:31 AM, Marc-Andr=E9 Lureau wrote:
+> > > Hi
+> > >
+> > > On Wed, Jan 8, 2020 at 8:14 PM Stefan Berger <stefanb@linux.ibm.com> =
+wrote:
+> > >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> > >>
+> > >> Extend the tpm_spapr frontend with VM suspend and resume support.
+> > >>
+> > >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> > >> ---
+> > >>   hw/tpm/tpm_spapr.c  | 67 +++++++++++++++++++++++++++++++++++++++++=
++++-
+> > >>   hw/tpm/trace-events |  2 ++
+> > >>   2 files changed, 68 insertions(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+> > >> index ab184fbb82..cf5c7851e7 100644
+> > >> --- a/hw/tpm/tpm_spapr.c
+> > >> +++ b/hw/tpm/tpm_spapr.c
+> > >> @@ -76,6 +76,9 @@ typedef struct {
+> > >>
+> > >>       unsigned char buffer[TPM_SPAPR_BUFFER_MAX];
+> > >>
+> > >> +    uint32_t numbytes; /* number of bytes in suspend_buffer */
+> > >> +    unsigned char *suspend_buffer;
+> > > Why do you need a copy suspend_buffer? Why not use and save buffer[] =
+directly?
+> >
+> >
+> > This addresses David's comment:
+> >
+> > "Transferring the whole 4kiB buffer unconditionally when it mostly
+> > won't have anything useful in it doesn't seem like a great idea."
+> >
+> > https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg02601.html
+>=20
+> Oh ok.. (well really I don't think 4k (usually compressed) will really
+> matter much in multi-gigabytes streams ;)
 
-Heyi
+Probably not - though it is in the downtime portion of the stream.
 
-=D4=DA 2020/1/13 20:37, Igor Mammedov =D0=B4=B5=C0:
-> On Thu, 19 Dec 2019 14:47:58 +0800
-> Heyi Guo <guoheyi@huawei.com> wrote:
->
->> The sub device "PR0" under PCI0 in ACPI/DSDT does not make any sense,
->> so simply remote it.
-> Could you make commit message more concrete so it would say
-> why it doesn't make any sense.
->
-> It seems to be there to describe root port,
-> I'd rather have PCI folk ack if it's ok to remove it.
->
->> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->>
->> ---
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
->> Cc: qemu-arm@nongnu.org
->> Cc: qemu-devel@nongnu.org
->> ---
->>   hw/arm/virt-acpi-build.c          |   4 ----
->>   tests/data/acpi/virt/DSDT         | Bin 18462 -> 18449 bytes
->>   tests/data/acpi/virt/DSDT.memhp   | Bin 19799 -> 19786 bytes
->>   tests/data/acpi/virt/DSDT.numamem | Bin 18462 -> 18449 bytes
->>   4 files changed, 4 deletions(-)
->>
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index bd5f771e9b..9f4c7d1889 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -317,10 +317,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const M=
-emMapEntry *memmap,
->>       aml_append(method, aml_return(buf));
->>       aml_append(dev, method);
->>  =20
->> -    Aml *dev_rp0 =3D aml_device("%s", "RP0");
->> -    aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
->> -    aml_append(dev, dev_rp0);
->> -
->>       Aml *dev_res0 =3D aml_device("%s", "RES0");
->>       aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")=
-));
->>       crs =3D aml_resource_template();
->> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
->> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3=
-d32ec856feb388be4c 100644
->> GIT binary patch
->> delta 39
->> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
->>
->> delta 50
->> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
->> G{V4!>hYx%J
->>
->> diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DS=
-DT.memhp
->> index 41ccc6431b917252bcbaac86c33b340c796be5ce..69ad844f65d047973a3e55=
-198beecd45a35b8fce 100644
->> GIT binary patch
->> delta 40
->> wcmcaUi}BPfMlP3Nmk=3D*s1_q}3iCof5t(P{ccXBfI+}XT|v(|RAjk`1(02g)*ivR!s
->>
->> delta 51
->> zcmX>#i}Cs_MlP3NmymE@1_mbiiCof5O_w*ScXBdy-rc;3v(}c2J1D>)o+IATC1|sb
->> HyBr$;t7;Fc
->>
->> diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/=
-DSDT.numamem
->> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3=
-d32ec856feb388be4c 100644
->> GIT binary patch
->> delta 39
->> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
->>
->> delta 50
->> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
->> G{V4!>hYx%J
->>
->
-> .
+But more to the point you can still make the size / whether you send
+conditional on numbytes without having a whole separate buffer for it.
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--gE7i1rD7pdK0Ng3j
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4md8UACgkQbDjKyiDZ
+s5KLJA//bJmLj0J8EyBFnds0fnk4KO4C1VDRZxkRPf7kCrRriz1NYZoETuhd+ZM2
+WODtIyuOTSslris91doi8kWlRosiZO9uCmzB33ji64zvNKHYiiA6rTIHkAK7O3We
+B8HOnVYAubp3zebGheW7SDvPWL/g/N6AOG/utMAOoXhLKOjJAoYVs8XrN2Gjd1uM
+a45iAL8UStBRt4SCQfRtvsLeYtAZQkk8CeqoHlMKXLh7B4XexPKDG21yhHo+9yvx
+JnpctdhQOZOY029zVmOShEZBAgr3QeaF0WFvFyyh5keYs2+H26HXNSuXtBCuBPXB
+HcPPq0TfiY66Ba1T5vy7Qvp9Lczh9Oaxw/E1Q01i3FohwTyoFsl79Ov4e83cXU2Z
+0p2LPGEqlsyjWFndOy/G3fawDgu9sUDA7jvI3/WjQy0kw2K2WVfKr6EXKHcqehR+
+3aXvwS53wgvrGh/JPMf7NXwAKSmtzYbje9rgex6BO/YOCN8zHwHsiMYdfgf/Oz6u
+fRzr9uqAUOelp+Jezr9zXci2P/fxBavMz3lq0NPJup9UFQrDE7Mm527prAvZ/xW7
++lJ5xxaIfBSBdGu6yC1/JgIogesEEiGkh4TCKMRY1uhJb8sI0SXMWU1qlsggzpnd
+3gMVOQrOZzTVYCUpD/v84fC845XHAUzC0mWW+StAe/KF5YhZHMY=
+=ajAu
+-----END PGP SIGNATURE-----
+
+--gE7i1rD7pdK0Ng3j--
 
