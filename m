@@ -2,103 +2,96 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 246C0C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CC2C33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:31:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7E4E217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:26:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avQ3ZB2w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7E4E217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 716B720882
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:31:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 716B720882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itvPn-0006VY-Ul
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 10:26:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54509)
+	id 1itvVG-0001Ab-08
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 10:31:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55048)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1itvOR-00057l-DB
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:24:40 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1itvTO-0007mp-CM
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:29:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1itvOQ-0001Iu-9n
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:24:39 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27643
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1itvOQ-0001IH-6H
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:24:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579620277;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3ypQmoBs1risnQU7ThFjmYkafd8YaWdj31PnJDVkltg=;
- b=avQ3ZB2wkPNXdYFF3HbCvftWHzO9lTIBFetDczaDwCim7SnjcloMmchQbUa21+lLH3VvM5
- CRbfiWiEbWX7WX/4kV2C7yy7ztM4v8fmQmZpyhr2B0TtFwAAH043GDVeQCM3RgOAUd5UB/
- dcmVZG5ElszD8ojjyC1aJou3DIcX924=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-YWlAD2vHMG2t-TlF8UNRBQ-1; Tue, 21 Jan 2020 10:24:35 -0500
-Received: by mail-wm1-f71.google.com with SMTP id g26so481600wmk.6
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 07:24:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZJlu4yA7MTXN+/hAQn2JyOXLvWp6zfX4ftczNVReyGI=;
- b=lqNFvX6uNSnI9dOuByKV/3R833mZoUl4r/Quae3e89SdTuml63tdQU36/digvwEHqr
- D7wJsPKwayvfmeCjluPkS2PnYKVJD1cZCw5g/riJ68SxP8BiPbCkDCPknzL+nT5qNxWg
- ihH/pVKsrKm5PGHTtgY7PEGBchB4JqmvceYiRRsw3y3uw7cJIsehvl95HnXIRhE5FyPu
- yCrI9exc4idztW22kzB7rkWUnlW6O3whT4oKzIToC6vMTMPkI8WO0n10Lei2MLImhUGc
- wJ/B1rX3roKnuwW2cAT9clSBGjuk/kiRrysMH0xq8cs26guE0R2+FEEHkpgznOMIC2dT
- TTXw==
-X-Gm-Message-State: APjAAAXM/R5MU//pWoZhHMO2nL0kXNuKlkKLMpcExtjeZORBewbvIl+Y
- zkoPW7b/3AJA0hHYQP8iRCRftaNBauI8Iryyw778/CVtHeX7lEW86NYBBq72HMJ/TWoFFyFG6uk
- JCB/1OKOCb5I+Hic=
-X-Received: by 2002:adf:ce87:: with SMTP id r7mr5757551wrn.245.1579620274320; 
- Tue, 21 Jan 2020 07:24:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw7QquMdPL5BJPAOoEDtGEY1iJ/lJROubhff8wt8OOyj2AzKbzAqkFC9a+9OkcIfRj6+qT1Rg==
-X-Received: by 2002:adf:ce87:: with SMTP id r7mr5757538wrn.245.1579620273986; 
- Tue, 21 Jan 2020 07:24:33 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id t25sm4340929wmj.19.2020.01.21.07.24.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jan 2020 07:24:33 -0800 (PST)
-Subject: Re: [PATCH v2 011/109] virtiofsd: Fix common header and define for
- QEMU builds
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
- berrange@redhat.com, slp@redhat.com
-References: <20200121122433.50803-1-dgilbert@redhat.com>
- <20200121122433.50803-12-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8bf51480-fdef-14b5-2d4f-0068fa94e808@redhat.com>
-Date: Tue, 21 Jan 2020 16:24:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <stefanb@linux.ibm.com>) id 1itvTM-0003sS-Kt
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:29:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16894
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+ id 1itvTM-0003rA-GK; Tue, 21 Jan 2020 10:29:44 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00LFCOHC164332; Tue, 21 Jan 2020 10:29:39 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2xp1v5dcwv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jan 2020 10:29:39 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00LFCSTn164761;
+ Tue, 21 Jan 2020 10:29:39 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2xp1v5dcwa-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jan 2020 10:29:39 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00LFRZG7007529;
+ Tue, 21 Jan 2020 15:29:38 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
+ [9.57.198.27]) by ppma02dal.us.ibm.com with ESMTP id 2xksn6uujf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jan 2020 15:29:38 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00LFTbRg53215720
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 21 Jan 2020 15:29:37 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 82D4D28059;
+ Tue, 21 Jan 2020 15:29:37 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 74E6428060;
+ Tue, 21 Jan 2020 15:29:37 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 21 Jan 2020 15:29:37 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: qemu-ppc@nongnu.org
+Subject: [PATCH v9 4/6] tpm_spapr: Support suspend and resume
+Date: Tue, 21 Jan 2020 10:29:33 -0500
+Message-Id: <20200121152935.649898-5-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200121152935.649898-1-stefanb@linux.ibm.com>
+References: <20200121152935.649898-1-stefanb@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200121122433.50803-12-dgilbert@redhat.com>
-Content-Language: en-US
-X-MC-Unique: YWlAD2vHMG2t-TlF8UNRBQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-21_04:2020-01-21,
+ 2020-01-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 bulkscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 suspectscore=1 spamscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001210123
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,124 +103,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
+Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/21/20 1:22 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> All of the fuse files include config.h and define GNU_SOURCE
-> where we don't have either under our build - remove them.
-> Fixup path to the kernel's fuse.h in the QEMUs world.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->   tools/virtiofsd/buffer.c         | 3 ---
->   tools/virtiofsd/fuse_i.h         | 3 +++
->   tools/virtiofsd/fuse_lowlevel.c  | 5 +----
->   tools/virtiofsd/fuse_opt.c       | 1 -
->   tools/virtiofsd/fuse_signals.c   | 1 -
->   tools/virtiofsd/passthrough_ll.c | 7 +------
->   6 files changed, 5 insertions(+), 15 deletions(-)
->=20
-> diff --git a/tools/virtiofsd/buffer.c b/tools/virtiofsd/buffer.c
-> index 5df946c82c..db1885ab19 100644
-> --- a/tools/virtiofsd/buffer.c
-> +++ b/tools/virtiofsd/buffer.c
-> @@ -9,9 +9,6 @@
->    * See the file COPYING.LIB
->    */
->  =20
-> -#define _GNU_SOURCE
-> -
-> -#include "config.h"
->   #include "fuse_i.h"
->   #include "fuse_lowlevel.h"
->   #include <assert.h>
-> diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-> index e63cb58388..bae06992e0 100644
-> --- a/tools/virtiofsd/fuse_i.h
-> +++ b/tools/virtiofsd/fuse_i.h
-> @@ -6,6 +6,9 @@
->    * See the file COPYING.LIB
->    */
->  =20
-> +#define FUSE_USE_VERSION 31
-> +
-> +
->   #include "fuse.h"
->   #include "fuse_lowlevel.h"
->  =20
-> diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowle=
-vel.c
-> index b3d26cab66..f76f3d3fdc 100644
-> --- a/tools/virtiofsd/fuse_lowlevel.c
-> +++ b/tools/virtiofsd/fuse_lowlevel.c
-> @@ -9,11 +9,8 @@
->    * See the file COPYING.LIB
->    */
->  =20
-> -#define _GNU_SOURCE
-> -
-> -#include "config.h"
->   #include "fuse_i.h"
-> -#include "fuse_kernel.h"
-> +#include "standard-headers/linux/fuse.h"
->   #include "fuse_misc.h"
->   #include "fuse_opt.h"
->  =20
-> diff --git a/tools/virtiofsd/fuse_opt.c b/tools/virtiofsd/fuse_opt.c
-> index edd36f4a3b..1fee55e266 100644
-> --- a/tools/virtiofsd/fuse_opt.c
-> +++ b/tools/virtiofsd/fuse_opt.c
-> @@ -10,7 +10,6 @@
->    */
->  =20
->   #include "fuse_opt.h"
-> -#include "config.h"
->   #include "fuse_i.h"
->   #include "fuse_misc.h"
->  =20
-> diff --git a/tools/virtiofsd/fuse_signals.c b/tools/virtiofsd/fuse_signal=
-s.c
-> index 19d6791cb9..10a6f88088 100644
-> --- a/tools/virtiofsd/fuse_signals.c
-> +++ b/tools/virtiofsd/fuse_signals.c
-> @@ -8,7 +8,6 @@
->    * See the file COPYING.LIB
->    */
->  =20
-> -#include "config.h"
->   #include "fuse_i.h"
->   #include "fuse_lowlevel.h"
->  =20
-> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrou=
-gh_ll.c
-> index 9377718d9d..e702f7dec6 100644
-> --- a/tools/virtiofsd/passthrough_ll.c
-> +++ b/tools/virtiofsd/passthrough_ll.c
-> @@ -35,15 +35,10 @@
->    * \include passthrough_ll.c
->    */
->  =20
-> -#define _GNU_SOURCE
-> -#define FUSE_USE_VERSION 31
-> -
-> -#include "config.h"
-> -
-> +#include "fuse_lowlevel.h"
->   #include <assert.h>
->   #include <dirent.h>
->   #include <errno.h>
-> -#include <fuse_lowlevel.h>
->   #include <inttypes.h>
->   #include <limits.h>
->   #include <pthread.h>
->=20
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Extend the tpm_spapr frontend with VM suspend and resume support.
+
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_spapr.c  | 52 ++++++++++++++++++++++++++++++++++++++++++++-
+ hw/tpm/trace-events |  2 ++
+ 2 files changed, 53 insertions(+), 1 deletion(-)
+
+diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+index 1db9696ae0..8ba561f41c 100644
+--- a/hw/tpm/tpm_spapr.c
++++ b/hw/tpm/tpm_spapr.c
+@@ -76,6 +76,8 @@ typedef struct {
+ 
+     unsigned char *buffer;
+ 
++    uint32_t numbytes; /* number of bytes to deliver on resume */
++
+     TPMBackendCmd cmd;
+ 
+     TPMBackend *be_driver;
+@@ -240,6 +242,14 @@ static void tpm_spapr_request_completed(TPMIf *ti, int ret)
+ 
+     /* a max. of be_buffer_size bytes can be transported */
+     len = MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size);
++
++    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
++        trace_tpm_spapr_caught_response(len);
++        /* defer delivery of response until .post_load */
++        s->numbytes = len;
++        return;
++    }
++
+     rc = spapr_vio_dma_write(&s->vdev, be32_to_cpu(crq->data),
+                              s->buffer, len);
+ 
+@@ -288,6 +298,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
+     SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
+ 
+     s->state = SPAPR_VTPM_STATE_NONE;
++    s->numbytes = 0;
+ 
+     s->be_tpm_version = tpm_backend_get_tpm_version(s->be_driver);
+ 
+@@ -309,9 +320,48 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
+     return tpm_backend_get_tpm_version(s->be_driver);
+ }
+ 
++/* persistent state handling */
++
++static int tpm_spapr_pre_save(void *opaque)
++{
++    SpaprTpmState *s = opaque;
++
++    tpm_backend_finish_sync(s->be_driver);
++    /*
++     * we cannot deliver the results to the VM since DMA would touch VM memory
++     */
++
++    return 0;
++}
++
++static int tpm_spapr_post_load(void *opaque, int version_id)
++{
++    SpaprTpmState *s = opaque;
++
++    if (s->numbytes) {
++        trace_tpm_spapr_post_load();
++        /* deliver the results to the VM via DMA */
++        tpm_spapr_request_completed(TPM_IF(s), 0);
++        s->numbytes = 0;
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_spapr_vtpm = {
+     .name = "tpm-spapr",
+-    .unmigratable = 1,
++    .pre_save = tpm_spapr_pre_save,
++    .post_load = tpm_spapr_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_SPAPR_VIO(vdev, SpaprTpmState),
++
++        VMSTATE_UINT8(state, SpaprTpmState),
++        VMSTATE_UINT32(numbytes, SpaprTpmState),
++        VMSTATE_VBUFFER_UINT32(buffer, SpaprTpmState, 0, NULL, numbytes),
++        /* remember DMA address */
++        VMSTATE_UINT32(crq.data, SpaprTpmState),
++        VMSTATE_END_OF_LIST(),
++    }
+ };
+ 
+ static Property tpm_spapr_properties[] = {
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index 9143a8eaa3..439e514787 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -67,3 +67,5 @@ tpm_spapr_do_crq_get_version(uint32_t version) "response: version %u"
+ tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspend"
+ tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x%02x"
+ tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x%02x 0x%02x ..."
++tpm_spapr_post_load(void) "Delivering TPM response after resume"
++tpm_spapr_caught_response(uint32_t v) "Caught response to deliver after resume: %u bytes"
+-- 
+2.24.1
 
 
