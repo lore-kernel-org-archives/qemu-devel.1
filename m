@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3F1C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 18:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3259C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 18:14:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC61222522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 18:14:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6005D22522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 18:14:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XApqRCYQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC61222522
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1IbK6KK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6005D22522
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ity2W-0001Og-1h
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 13:14:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52668)
+	id 1ity2c-0001Yz-D2
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 13:14:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ity0A-0006ns-7d
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 13:11:50 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ity0F-0006oC-1f
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 13:11:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ity06-0008Om-35
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 13:11:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28740
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1ity0A-0008R4-Bo
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 13:11:50 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37606
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ity05-0008OT-RD
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 13:11:41 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ity0A-0008Qa-6t
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 13:11:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579630301;
+ s=mimecast20190719; t=1579630305;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YI3NFDmtTeYy5gM+AfaVNkFvNNIAJkKFQUZy2S1doYY=;
- b=XApqRCYQ1wFaiNka4SfdH5IAocfNteKrUYfcXf3OVdTsQcB5O6MW/6CCagoYSnaHPxbqX6
- tlx77qw5199BZNprwFCwsXuEZVO4Q+U3i191m08jDx+bs56gltdlTdLfR2zYZuEoI+mmes
- WUC143J5SVj6R602RiBMQ4lsIqovVes=
+ bh=IUntV6YZ1Zux0ESK5KWd4L3a5cZ0vjNPGazEozWE27c=;
+ b=D1IbK6KKtQZEbdIBHZNangF2YlQ+bD9bCQEYPRSfiR/m/ukQeZyZobK0Y+g+JJW3s2dd0w
+ VY/cc/dbTRGr6FiPBOrRUlFcl5XzBduOaL3+ZdVIxgq71Tva42yUqdQfO1OryUTMzY5m3k
+ pJ5FvpODZCqULQ/tUFPPIzvjJWCfvbA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-SxpOBa5MME2Lgs56eNgdIg-1; Tue, 21 Jan 2020 13:11:39 -0500
+ us-mta-99-rbLNMz5xNB-I6uNQKX1HAA-1; Tue, 21 Jan 2020 13:11:42 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25597100550E;
- Tue, 21 Jan 2020 18:11:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6E9A1882CD8;
+ Tue, 21 Jan 2020 18:11:41 +0000 (UTC)
 Received: from linux.fritz.box.com (unknown [10.36.118.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 789FC60E1C;
- Tue, 21 Jan 2020 18:11:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3336460FC1;
+ Tue, 21 Jan 2020 18:11:40 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/4] qapi: Add a 'coroutine' flag for commands
-Date: Tue, 21 Jan 2020 19:11:19 +0100
-Message-Id: <20200121181122.15941-2-kwolf@redhat.com>
+Subject: [PATCH v4 3/4] qmp: Move dispatcher to a coroutine
+Date: Tue, 21 Jan 2020 19:11:21 +0100
+Message-Id: <20200121181122.15941-4-kwolf@redhat.com>
 In-Reply-To: <20200121181122.15941-1-kwolf@redhat.com>
 References: <20200121181122.15941-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: SxpOBa5MME2Lgs56eNgdIg-1
+X-MC-Unique: rbLNMz5xNB-I6uNQKX1HAA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,345 +91,409 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a new 'coroutine' flag to QMP command definitions that
-tells the QMP dispatcher that the command handler is safe to be run in a
-coroutine.
+This moves the QMP dispatcher to a coroutine and runs all QMP command
+handlers that declare 'coroutine': true in coroutine context so they
+can avoid blocking the main loop while doing I/O or waiting for other
+events.
 
-The documentation of the new flag pretends that this flag is already
-used as intended, which it isn't yet after this patch. We'll implement
-this in another patch in this series.
+For commands that are not declared safe to run in a coroutine, the
+dispatcher drops out of coroutine context by calling the QMP command
+handler from a bottom half.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt            | 10 ++++++++++
- include/qapi/qmp/dispatch.h             |  1 +
- tests/test-qmp-cmds.c                   |  4 ++++
- scripts/qapi/commands.py                | 10 +++++++---
- scripts/qapi/doc.py                     |  2 +-
- scripts/qapi/expr.py                    |  7 +++++--
- scripts/qapi/introspect.py              |  2 +-
- scripts/qapi/schema.py                  |  9 ++++++---
- tests/qapi-schema/test-qapi.py          |  7 ++++---
- tests/Makefile.include                  |  1 +
- tests/qapi-schema/oob-coroutine.err     |  2 ++
- tests/qapi-schema/oob-coroutine.json    |  2 ++
- tests/qapi-schema/oob-coroutine.out     |  0
- tests/qapi-schema/qapi-schema-test.json |  1 +
- tests/qapi-schema/qapi-schema-test.out  |  2 ++
- 15 files changed, 47 insertions(+), 13 deletions(-)
- create mode 100644 tests/qapi-schema/oob-coroutine.err
- create mode 100644 tests/qapi-schema/oob-coroutine.json
- create mode 100644 tests/qapi-schema/oob-coroutine.out
+ include/qapi/qmp/dispatch.h |   1 +
+ monitor/monitor-internal.h  |   6 +-
+ monitor/monitor.c           |  33 ++++++++---
+ monitor/qmp.c               | 110 ++++++++++++++++++++++++++----------
+ qapi/qmp-dispatch.c         |  44 ++++++++++++++-
+ qapi/qmp-registry.c         |   3 +
+ util/aio-posix.c            |   7 ++-
+ 7 files changed, 162 insertions(+), 42 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 59d6973e1e..9b65cd3ab3 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -457,6 +457,7 @@ Syntax:
-                 '*gen': false,
-                 '*allow-oob': true,
-                 '*allow-preconfig': true,
-+                '*coroutine': true,
-                 '*if': COND,
-                 '*features': FEATURES }
-=20
-@@ -581,6 +582,15 @@ before the machine is built.  It defaults to false.  F=
-or example:
- QMP is available before the machine is built only when QEMU was
- started with --preconfig.
-=20
-+Member 'coroutine' tells the QMP dispatcher whether the command handler
-+is safe to be run in a coroutine.  It defaults to false.  If it is true,
-+the command handler is called from coroutine context and may yield while
-+waiting for an external event (such as I/O completion) in order to avoid
-+blocking the guest and other background operations.
-+
-+It is an error to specify both 'coroutine': true and 'allow-oob': true
-+for a command.
-+
- The optional 'if' member specifies a conditional.  See "Configuring
- the schema" below for more on this.
-=20
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 9aa426a398..d6ce9efc8e 100644
+index d6ce9efc8e..6812e49b5f 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -24,6 +24,7 @@ typedef enum QmpCommandOptions
-     QCO_NO_SUCCESS_RESP       =3D  (1U << 0),
-     QCO_ALLOW_OOB             =3D  (1U << 1),
-     QCO_ALLOW_PRECONFIG       =3D  (1U << 2),
-+    QCO_COROUTINE             =3D  (1U << 3),
- } QmpCommandOptions;
-=20
+@@ -30,6 +30,7 @@ typedef enum QmpCommandOptions
  typedef struct QmpCommand
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 79507d9e54..6359cc28c7 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -35,6 +35,10 @@ void qmp_cmd_success_response(Error **errp)
  {
+     const char *name;
++    /* Runs in coroutine context if QCO_COROUTINE is set */
+     QmpCommandFunc *fn;
+     QmpCommandOptions options;
+     QTAILQ_ENTRY(QmpCommand) node;
+diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+index d78f5ca190..f180d03368 100644
+--- a/monitor/monitor-internal.h
++++ b/monitor/monitor-internal.h
+@@ -154,7 +154,9 @@ static inline bool monitor_is_qmp(const Monitor *mon)
+=20
+ typedef QTAILQ_HEAD(MonitorList, Monitor) MonitorList;
+ extern IOThread *mon_iothread;
+-extern QEMUBH *qmp_dispatcher_bh;
++extern Coroutine *qmp_dispatcher_co;
++extern bool qmp_dispatcher_co_shutdown;
++extern bool qmp_dispatcher_co_busy;
+ extern QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
+ extern QemuMutex monitor_lock;
+ extern MonitorList mon_list;
+@@ -172,7 +174,7 @@ void monitor_fdsets_cleanup(void);
+=20
+ void qmp_send_response(MonitorQMP *mon, const QDict *rsp);
+ void monitor_data_destroy_qmp(MonitorQMP *mon);
+-void monitor_qmp_bh_dispatcher(void *data);
++void coroutine_fn monitor_qmp_dispatcher_co(void *data);
+=20
+ int get_monitor_def(int64_t *pval, const char *name);
+ void help_cmd(Monitor *mon, const char *name);
+diff --git a/monitor/monitor.c b/monitor/monitor.c
+index 12898b6448..e753fa435d 100644
+--- a/monitor/monitor.c
++++ b/monitor/monitor.c
+@@ -53,8 +53,18 @@ typedef struct {
+ /* Shared monitor I/O thread */
+ IOThread *mon_iothread;
+=20
+-/* Bottom half to dispatch the requests received from I/O thread */
+-QEMUBH *qmp_dispatcher_bh;
++/* Coroutine to dispatch the requests received from I/O thread */
++Coroutine *qmp_dispatcher_co;
++
++/* Set to true when the dispatcher coroutine should terminate */
++bool qmp_dispatcher_co_shutdown;
++
++/*
++ * true if the coroutine is active and processing requests. The coroutine =
+may
++ * only be woken up externally (e.g. from the monitor thread) after changi=
+ng
++ * qmp_dispatcher_co_busy from false to true (e.g. using atomic_xchg).
++ */
++bool qmp_dispatcher_co_busy;
+=20
+ /* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
+ QemuMutex monitor_lock;
+@@ -579,9 +589,16 @@ void monitor_cleanup(void)
+     }
+     qemu_mutex_unlock(&monitor_lock);
+=20
+-    /* QEMUBHs needs to be deleted before destroying the I/O thread */
+-    qemu_bh_delete(qmp_dispatcher_bh);
+-    qmp_dispatcher_bh =3D NULL;
++    /* The dispatcher needs to stop before destroying the I/O thread */
++    qmp_dispatcher_co_shutdown =3D true;
++    if (!atomic_xchg(&qmp_dispatcher_co_busy, true)) {
++        aio_co_wake(qmp_dispatcher_co);
++    }
++
++    AIO_WAIT_WHILE(qemu_get_aio_context(),
++                   (aio_poll(iohandler_get_aio_context(), false),
++                    atomic_mb_read(&qmp_dispatcher_co_busy)));
++
+     if (mon_iothread) {
+         iothread_destroy(mon_iothread);
+         mon_iothread =3D NULL;
+@@ -604,9 +621,9 @@ void monitor_init_globals_core(void)
+      * have commands assuming that context.  It would be nice to get
+      * rid of those assumptions.
+      */
+-    qmp_dispatcher_bh =3D aio_bh_new(iohandler_get_aio_context(),
+-                                   monitor_qmp_bh_dispatcher,
+-                                   NULL);
++    qmp_dispatcher_co =3D qemu_coroutine_create(monitor_qmp_dispatcher_co,=
+ NULL);
++    atomic_mb_set(&qmp_dispatcher_co_busy, true);
++    aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
  }
 =20
-+void qmp_coroutine_cmd(Error **errp)
+ QemuOptsList qemu_mon_opts =3D {
+diff --git a/monitor/qmp.c b/monitor/qmp.c
+index 54c06ba824..9444de9fcf 100644
+--- a/monitor/qmp.c
++++ b/monitor/qmp.c
+@@ -133,6 +133,10 @@ static void monitor_qmp_respond(MonitorQMP *mon, QDict=
+ *rsp)
+     }
+ }
+=20
++/*
++ * Runs outside of coroutine context for OOB commands, but in coroutine co=
+ntext
++ * for everything else.
++ */
+ static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
+ {
+     Monitor *old_mon;
+@@ -211,43 +215,87 @@ static QMPRequest *monitor_qmp_requests_pop_any_with_=
+lock(void)
+     return req_obj;
+ }
+=20
+-void monitor_qmp_bh_dispatcher(void *data)
++void coroutine_fn monitor_qmp_dispatcher_co(void *data)
+ {
+-    QMPRequest *req_obj =3D monitor_qmp_requests_pop_any_with_lock();
++    QMPRequest *req_obj =3D NULL;
+     QDict *rsp;
+     bool need_resume;
+     MonitorQMP *mon;
+=20
+-    if (!req_obj) {
+-        return;
+-    }
++    while (true) {
++        assert(atomic_mb_read(&qmp_dispatcher_co_busy) =3D=3D true);
++
++        /* Mark the dispatcher as not busy already here so that we don't m=
+iss
++         * any new requests coming in the middle of our processing. */
++        atomic_mb_set(&qmp_dispatcher_co_busy, false);
++
++        while (!(req_obj =3D monitor_qmp_requests_pop_any_with_lock())) {
++            /* Wait to be reentered from handle_qmp_command, or terminate =
+if
++             * qmp_dispatcher_co_shutdown is true*/
++            if (!qmp_dispatcher_co_shutdown) {
++                qemu_coroutine_yield();
++
++                /* busy must be set to true again by whoever rescheduled u=
+s to
++                 * avoid double scheduling */
++                assert(atomic_xchg(&qmp_dispatcher_co_busy, false) =3D=3D =
+true);
++            }
++
++            /* qmp_dispatcher_co_shutdown may have changed if we yielded a=
+nd
++             * were reentered from monitor_cleanup() */
++            if (qmp_dispatcher_co_shutdown) {
++                return;
++            }
++        }
+=20
+-    mon =3D req_obj->mon;
+-    /*  qmp_oob_enabled() might change after "qmp_capabilities" */
+-    need_resume =3D !qmp_oob_enabled(mon) ||
+-        mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
+-    qemu_mutex_unlock(&mon->qmp_queue_lock);
+-    if (req_obj->req) {
+-        QDict *qdict =3D qobject_to(QDict, req_obj->req);
+-        QObject *id =3D qdict ? qdict_get(qdict, "id") : NULL;
+-        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: "");
+-        monitor_qmp_dispatch(mon, req_obj->req);
+-    } else {
+-        assert(req_obj->err);
+-        rsp =3D qmp_error_response(req_obj->err);
+-        req_obj->err =3D NULL;
+-        monitor_qmp_respond(mon, rsp);
+-        qobject_unref(rsp);
+-    }
++        if (atomic_xchg(&qmp_dispatcher_co_busy, true) =3D=3D true) {
++            /* Someone rescheduled us (probably because a new requests cam=
+e
++             * in), but we didn't actually yield. Do that now, only to be
++             * immediately reentered and removed from the list of schedule=
+d
++             * coroutines. */
++            qemu_coroutine_yield();
++        }
+=20
+-    if (need_resume) {
+-        /* Pairs with the monitor_suspend() in handle_qmp_command() */
+-        monitor_resume(&mon->common);
+-    }
+-    qmp_request_free(req_obj);
++        /*
++         * Move the coroutine from iohandler_ctx to qemu_aio_context for
++         * executing the command handler so that it can make progress if i=
+t
++         * involves an AIO_WAIT_WHILE().
++         */
++        aio_co_schedule(qemu_get_aio_context(), qmp_dispatcher_co);
++        qemu_coroutine_yield();
++
++        mon =3D req_obj->mon;
++        /*  qmp_oob_enabled() might change after "qmp_capabilities" */
++        need_resume =3D !qmp_oob_enabled(mon) ||
++            mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
++        qemu_mutex_unlock(&mon->qmp_queue_lock);
++        if (req_obj->req) {
++            QDict *qdict =3D qobject_to(QDict, req_obj->req);
++            QObject *id =3D qdict ? qdict_get(qdict, "id") : NULL;
++            trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: "");
++            monitor_qmp_dispatch(mon, req_obj->req);
++        } else {
++            assert(req_obj->err);
++            rsp =3D qmp_error_response(req_obj->err);
++            req_obj->err =3D NULL;
++            monitor_qmp_respond(mon, rsp);
++            qobject_unref(rsp);
++        }
++
++        if (need_resume) {
++            /* Pairs with the monitor_suspend() in handle_qmp_command() */
++            monitor_resume(&mon->common);
++        }
++        qmp_request_free(req_obj);
+=20
+-    /* Reschedule instead of looping so the main loop stays responsive */
+-    qemu_bh_schedule(qmp_dispatcher_bh);
++        /*
++         * Yield and reschedule so the main loop stays responsive.
++         *
++         * Move back to iohandler_ctx so that nested event loops for
++         * qemu_aio_context don't start new monitor commands.
++         */
++        aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
++        qemu_coroutine_yield();
++    }
+ }
+=20
+ static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+@@ -308,7 +356,9 @@ static void handle_qmp_command(void *opaque, QObject *r=
+eq, Error *err)
+     qemu_mutex_unlock(&mon->qmp_queue_lock);
+=20
+     /* Kick the dispatcher routine */
+-    qemu_bh_schedule(qmp_dispatcher_bh);
++    if (!atomic_xchg(&qmp_dispatcher_co_busy, true)) {
++        aio_co_wake(qmp_dispatcher_co);
++    }
+ }
+=20
+ static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index bc264b3c9b..eef09d15bc 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -12,12 +12,16 @@
+  */
+=20
+ #include "qemu/osdep.h"
++
++#include "block/aio.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/dispatch.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
+ #include "sysemu/runstate.h"
+ #include "qapi/qmp/qbool.h"
++#include "qemu/coroutine.h"
++#include "qemu/main-loop.h"
+=20
+ static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oo=
+b,
+                                      Error **errp)
+@@ -75,6 +79,25 @@ static QDict *qmp_dispatch_check_obj(const QObject *requ=
+est, bool allow_oob,
+     return dict;
+ }
+=20
++typedef struct QmpDispatchBH {
++    QmpCommand *cmd;
++    QDict *args;
++    QObject **ret;
++    Error **errp;
++    Coroutine *co;
++} QmpDispatchBH;
++
++static void do_qmp_dispatch_bh(void *opaque)
 +{
++    QmpDispatchBH *data =3D opaque;
++    data->cmd->fn(data->args, data->ret, data->errp);
++    aio_co_wake(data->co);
 +}
 +
- Empty2 *qmp_user_def_cmd0(Error **errp)
++/*
++ * Runs outside of coroutine context for OOB commands, but in coroutine co=
+ntext
++ * for everything else.
++ */
+ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+                                 bool allow_oob, Error **errp)
  {
-     return g_new0(Empty2, 1);
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index afa55b055c..f2f2f8948d 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -194,7 +194,8 @@ out:
-     return ret
+@@ -129,7 +152,22 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, =
+QObject *request,
+         qobject_ref(args);
+     }
 =20
-=20
--def gen_register_command(name, success_response, allow_oob, allow_preconfi=
-g):
-+def gen_register_command(name, success_response, allow_oob, allow_preconfi=
-g,
-+                         coroutine):
-     options =3D []
-=20
-     if not success_response:
-@@ -203,6 +204,8 @@ def gen_register_command(name, success_response, allow_=
-oob, allow_preconfig):
-         options +=3D ['QCO_ALLOW_OOB']
-     if allow_preconfig:
-         options +=3D ['QCO_ALLOW_PRECONFIG']
-+    if coroutine:
-+        options +=3D ['QCO_COROUTINE']
-=20
-     if not options:
-         options =3D ['QCO_NO_OPTIONS']
-@@ -285,7 +288,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)=
-;
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfig,
--                      features):
-+                      coroutine, features):
-         if not gen:
-             return
-         # FIXME: If T is a user-defined type, the user is responsible
-@@ -303,7 +306,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)=
-;
-             self._genh.add(gen_marshal_decl(name))
-             self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
-             self._regy.add(gen_register_command(name, success_response,
--                                                allow_oob, allow_preconfig=
-))
-+                                                allow_oob, allow_preconfig=
+-    cmd->fn(args, &ret, &local_err);
++    assert(!(oob && qemu_in_coroutine()));
++    if ((cmd->options & QCO_COROUTINE) || !qemu_in_coroutine()) {
++        cmd->fn(args, &ret, &local_err);
++    } else {
++        /* Must drop out of coroutine context for this one */
++        QmpDispatchBH data =3D {
++            .cmd    =3D cmd,
++            .args   =3D args,
++            .ret    =3D &ret,
++            .errp   =3D &local_err,
++            .co     =3D qemu_coroutine_self(),
++        };
++        aio_bh_schedule_oneshot(qemu_get_aio_context(), do_qmp_dispatch_bh=
 ,
-+                                                coroutine))
-=20
-=20
- def gen_commands(schema, output_dir, prefix):
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 6f1c17f71f..8b6978c81e 100644
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -265,7 +265,7 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfig,
--                      features):
-+                      coroutine, features):
-         doc =3D self.cur_doc
-         self._gen.add(texi_msg('Command', doc, ifcond,
-                                texi_arguments(doc,
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index d7a289eded..769c54ebfe 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -89,10 +89,13 @@ def check_flags(expr, info):
-         if key in expr and expr[key] is not False:
-             raise QAPISemError(
-                 info, "flag '%s' may only use false value" % key)
--    for key in ['boxed', 'allow-oob', 'allow-preconfig']:
-+    for key in ['boxed', 'allow-oob', 'allow-preconfig', 'coroutine']:
-         if key in expr and expr[key] is not True:
-             raise QAPISemError(
-                 info, "flag '%s' may only use true value" % key)
-+    if 'allow-oob' in expr and 'coroutine' in expr:
-+        raise QAPISemError(info, "flags 'allow-oob' and 'coroutine' "
-+                                 "are incompatible")
-=20
-=20
- def check_if(expr, info, source):
-@@ -344,7 +347,7 @@ def check_exprs(exprs):
-                        ['command'],
-                        ['data', 'returns', 'boxed', 'if', 'features',
-                         'gen', 'success-response', 'allow-oob',
--                        'allow-preconfig'])
-+                        'allow-preconfig', 'coroutine'])
-             normalize_members(expr.get('data'))
-             check_command(expr, info)
-         elif meta =3D=3D 'event':
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index b3a463dd8b..8a296a69d6 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -212,7 +212,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfig,
--                      features):
-+                      coroutine, features):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         ret_type =3D ret_type or self._schema.the_empty_object_type
-         obj =3D {'arg-type': self._use_type(arg_type),
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 0bfc5256fb..87d76b59d3 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -128,7 +128,7 @@ class QAPISchemaVisitor(object):
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfig,
--                      features):
-+                      coroutine, features):
-         pass
-=20
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-@@ -690,7 +690,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-=20
-     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
-                  gen, success_response, boxed, allow_oob, allow_preconfig,
--                 features):
-+                 coroutine, features):
-         QAPISchemaEntity.__init__(self, name, info, doc, ifcond, features)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-@@ -703,6 +703,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.boxed =3D boxed
-         self.allow_oob =3D allow_oob
-         self.allow_preconfig =3D allow_preconfig
-+        self.coroutine =3D coroutine
-=20
-     def check(self, schema):
-         QAPISchemaEntity.check(self, schema)
-@@ -745,7 +746,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-                               self.arg_type, self.ret_type,
-                               self.gen, self.success_response,
-                               self.boxed, self.allow_oob,
--                              self.allow_preconfig,
-+                              self.allow_preconfig, self.coroutine,
-                               self.features)
-=20
-=20
-@@ -1043,6 +1044,7 @@ class QAPISchema(object):
-         boxed =3D expr.get('boxed', False)
-         allow_oob =3D expr.get('allow-oob', False)
-         allow_preconfig =3D expr.get('allow-preconfig', False)
-+        coroutine =3D expr.get('coroutine', False)
-         ifcond =3D expr.get('if')
-         features =3D expr.get('features', [])
-         if isinstance(data, OrderedDict):
-@@ -1054,6 +1056,7 @@ class QAPISchema(object):
-         self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, data, =
-rets,
-                                            gen, success_response,
-                                            boxed, allow_oob, allow_preconf=
-ig,
-+                                           coroutine,
-                                            self._make_features(features, i=
-nfo)))
-=20
-     def _def_event(self, expr, info, doc):
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.p=
-y
-index bad14edb47..7a8e65188d 100755
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -70,12 +70,13 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfig,
--                      features):
-+                      coroutine, features):
-         print('command %s %s -> %s'
-               % (name, arg_type and arg_type.name,
-                  ret_type and ret_type.name))
--        print('    gen=3D%s success_response=3D%s boxed=3D%s oob=3D%s prec=
-onfig=3D%s'
--              % (gen, success_response, boxed, allow_oob, allow_preconfig)=
-)
-+        print('    gen=3D%s success_response=3D%s boxed=3D%s oob=3D%s prec=
-onfig=3D%s%s'
-+              % (gen, success_response, boxed, allow_oob, allow_preconfig,
-+                 " coroutine=3DTrue" if coroutine else ""))
-         self._print_if(ifcond)
-         self._print_features(features)
-=20
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c6827ce8c2..d111389c03 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -286,6 +286,7 @@ qapi-schema +=3D missing-type.json
- qapi-schema +=3D nested-struct-data.json
- qapi-schema +=3D nested-struct-data-invalid-dict.json
- qapi-schema +=3D non-objects.json
-+qapi-schema +=3D oob-coroutine.json
- qapi-schema +=3D oob-test.json
- qapi-schema +=3D allow-preconfig-test.json
- qapi-schema +=3D pragma-doc-required-crap.json
-diff --git a/tests/qapi-schema/oob-coroutine.err b/tests/qapi-schema/oob-co=
-routine.err
-new file mode 100644
-index 0000000000..c01a4992bd
---- /dev/null
-+++ b/tests/qapi-schema/oob-coroutine.err
-@@ -0,0 +1,2 @@
-+oob-coroutine.json: In command 'oob-command-1':
-+oob-coroutine.json:2: flags 'allow-oob' and 'coroutine' are incompatible
-diff --git a/tests/qapi-schema/oob-coroutine.json b/tests/qapi-schema/oob-c=
-oroutine.json
-new file mode 100644
-index 0000000000..0f67663bcd
---- /dev/null
-+++ b/tests/qapi-schema/oob-coroutine.json
-@@ -0,0 +1,2 @@
-+# Check that incompatible flags allow-oob and coroutine are rejected
-+{ 'command': 'oob-command-1', 'allow-oob': true, 'coroutine': true }
-diff --git a/tests/qapi-schema/oob-coroutine.out b/tests/qapi-schema/oob-co=
-routine.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qa=
-pi-schema-test.json
-index 9abf175fe0..1a850fe171 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -147,6 +147,7 @@
-   'returns': 'UserDefTwo' }
-=20
- { 'command': 'cmd-success-response', 'data': {}, 'success-response': false=
++                                &data);
++        qemu_coroutine_yield();
++    }
+     if (local_err) {
+         error_propagate(errp, local_err);
+     } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
+@@ -164,6 +202,10 @@ bool qmp_is_oob(const QDict *dict)
+         && !qdict_haskey(dict, "execute");
  }
-+{ 'command': 'coroutine-cmd', 'data': {}, 'coroutine': true }
 =20
- # Returning a non-dictionary requires a name from the whitelist
- { 'command': 'guest-get-time', 'data': {'a': 'int', '*b': 'int' },
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qap=
-i-schema-test.out
-index 9bd3c4a490..fdc349991a 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -203,6 +203,8 @@ command user_def_cmd2 q_obj_user_def_cmd2-arg -> UserDe=
-fTwo
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
- command cmd-success-response None -> None
-     gen=3DTrue success_response=3DFalse boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-+command coroutine-cmd None -> None
-+    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse coroutine=3DTrue
- object q_obj_guest-get-time-arg
-     member a: int optional=3DFalse
-     member b: int optional=3DTrue
++/*
++ * Runs outside of coroutine context for OOB commands, but in coroutine co=
+ntext
++ * for everything else.
++ */
+ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+                     bool allow_oob)
+ {
+diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+index ca00f74795..3d896aedd8 100644
+--- a/qapi/qmp-registry.c
++++ b/qapi/qmp-registry.c
+@@ -20,6 +20,9 @@ void qmp_register_command(QmpCommandList *cmds, const cha=
+r *name,
+ {
+     QmpCommand *cmd =3D g_malloc0(sizeof(*cmd));
+=20
++    /* QCO_COROUTINE and QCO_ALLOW_OOB are incompatible */
++    assert(!((options & QCO_COROUTINE) && (options & QCO_ALLOW_OOB)));
++
+     cmd->name =3D name;
+     cmd->fn =3D fn;
+     cmd->enabled =3D true;
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index a4977f538e..223de08b91 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -15,6 +15,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "block/block.h"
++#include "qemu/main-loop.h"
+ #include "qemu/rcu_queue.h"
+ #include "qemu/sockets.h"
+ #include "qemu/cutils.h"
+@@ -616,7 +617,11 @@ bool aio_poll(AioContext *ctx, bool blocking)
+     int64_t timeout;
+     int64_t start =3D 0;
+=20
+-    assert(in_aio_context_home_thread(ctx));
++    /* aio_poll() may only be called in the AioContext's thread. iohandler=
+_ctx
++     * is special in that it runs in the main thread, but that thread's co=
+ntext
++     * is qemu_aio_context. */
++    assert(in_aio_context_home_thread(ctx =3D=3D iohandler_get_aio_context=
+() ?
++                                      qemu_get_aio_context() : ctx));
+=20
+     /* aio_notify can avoid the expensive event_notifier_set if
+      * everything (file descriptors, bottom halves, timers) will
 --=20
 2.20.1
 
