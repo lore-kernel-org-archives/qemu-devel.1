@@ -2,78 +2,67 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA58AC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B62C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:29:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 752FE2253D
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:26:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D302424653
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:29:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="jyPZ8kvP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 752FE2253D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HF2l5647"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D302424653
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituUQ-0007Oi-Cl
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:26:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35897)
+	id 1ituWd-0001wD-Oe
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:29:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itttp-0005mi-53
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:48:58 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ittwH-00006S-Jc
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itttn-0006mm-Hr
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:48:57 -0500
-Received: from mail-db8eur05on2130.outbound.protection.outlook.com
- ([40.107.20.130]:59424 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ittti-0006dt-C5; Tue, 21 Jan 2020 08:48:51 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZXHT3LV/zZBvN2jrMAWipZMHLlBCWlAzFPhiQK+2AN7kpIh2Z8pis7kIutA98bZzPfnsePRlJv6k82deWqUWs/zQ2tX+54jGvZXdaxIJkppsLEfduFXIX3mctWsgySp5HlWZvUD4rC8Op5ixxkjDU+8DnI3Qi73VDiHpRbpEyTpkgFSP6WsKcoGDhQXu2hU1OchMYgpCV5DAfdg+Ix05YFDaR0afdnxpy9TYr+/47k8M43/CRZrNRzp6e7gIjBZL4zFitVNBYfZXA7n27Q8khKW6p5zEHHthFBhkP6PRUOJ3b+M9///9Ty++QodRkX66armfWEZrlLK/qvbkMJW5bA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aANhmxXbs6Vc9K0DQZBtmMIyl210M0fcUFcIOBviw6o=;
- b=dO90p62koaP36EUbNyqu1f+tdeOs76Vkfsq1D94t7HQKCxwAuOSc6k+YkhlCwj4YocsKzUIDfr98RkTqGOaVarGnWZVsdrydoHP6WeCeuaeaGkr3i0InLumdW97HZ7mr9aS9W3ASc8q62Hh/EHddsGPTF17MyYOVKSIKuFoUGBMqySU4YnyruBHk3oEvE6k9vGHsRKRlv0EwMSZ6uvR6AiGOY082G6mWj2T7s90DArzSJKaLqkZDoW8PHyl1Ae5eJeZJwoYPSpI4hf4BMJ7zaH/mD9oIE+ONbAc+KEFD5qxHdSvu5lKVzhYkF/HhwSmZYQ2gAqFlSA9q+7W0kiP4Dw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aANhmxXbs6Vc9K0DQZBtmMIyl210M0fcUFcIOBviw6o=;
- b=jyPZ8kvPvnvFnNRzX5/6xegYbTsMMiOjYGqlq5NkopGo7QGTiL6u0P13sA6BsRDpj3cZ4Z//5loc2e0Va9REePpLUodeD0sd348I6KaZf4tqd6TaqBtyu/y+8qXTxu5ovd8pdvPw1SJT+ByvOnpatp5rzNLeepJ5WCxbEq+v+1E=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3093.eurprd08.prod.outlook.com (52.135.161.143) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.19; Tue, 21 Jan 2020 13:48:48 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.027; Tue, 21 Jan 2020
- 13:48:48 +0000
-Received: from [172.16.24.200] (185.231.240.5) by
- AM0PR05CA0088.eurprd05.prod.outlook.com (2603:10a6:208:136::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.20 via Frontend
- Transport; Tue, 21 Jan 2020 13:48:48 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
+ (envelope-from <mreitz@redhat.com>) id 1ittwD-0000WB-38
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:51:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30791
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ittwC-0000Vk-TW
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:51:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579614684;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=dIeexc3Ll1RtE14QBGDRC/W+OPSUXGgCBhAz9qQyROs=;
+ b=HF2l5647LDd81z0sRPWESEV380dBGcO/H2AST4kxPvokzdhvnQpUb6RuOqRxxZpw96VGZl
+ sf2ixPXov7QFiEzYTIM063Z1++FgkEtQnNboSsV+hl8wV7z3axXA7zQrsoFEKfv4fdSTk3
+ Mx28GaRwnYtJBTInCkU+bf+ZYG0Rf+s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-60HbP8q0NMeyMxzefIwBCQ-1; Tue, 21 Jan 2020 08:51:20 -0500
+X-MC-Unique: 60HbP8q0NMeyMxzefIwBCQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E4B9800D48;
+ Tue, 21 Jan 2020 13:51:19 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-116.ams2.redhat.com
+ [10.36.117.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D56E1001DE1;
+ Tue, 21 Jan 2020 13:51:18 +0000 (UTC)
 Subject: Re: [PATCH 2/2] iotests: add test for backup-top failure on
  permission activation
-Thread-Topic: [PATCH 2/2] iotests: add test for backup-top failure on
- permission activation
-Thread-Index: AQHVzIVUyOIzH3fEwkGWDPORhit+OafzzmgAgAAESICAAQrFgIAANI8A///S/oCAABBigIAAIRyAgAATd4A=
-Date: Tue, 21 Jan 2020 13:48:48 +0000
-Message-ID: <6e0c4e88-6745-a668-6946-237032fdbedd@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20200116155452.30972-1-vsementsov@virtuozzo.com>
  <20200116155452.30972-3-vsementsov@virtuozzo.com>
  <eedd42b6-bf4e-f6de-13a4-412d389fdb09@redhat.com>
@@ -83,50 +72,47 @@ References: <20200116155452.30972-1-vsementsov@virtuozzo.com>
  <1313e55e-0eb1-890a-4e8e-2517f1e80d38@redhat.com>
  <04a32d71-31da-a3e3-5c5f-cc6465fc9402@virtuozzo.com>
  <6923bc19-d203-63af-b206-8fe18e4a01c6@redhat.com>
-In-Reply-To: <6923bc19-d203-63af-b206-8fe18e4a01c6@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: AM0PR05CA0088.eurprd05.prod.outlook.com
- (2603:10a6:208:136::28) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20200121164847157
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 82321ba3-788e-42d8-0923-08d79e78a428
-x-ms-traffictypediagnostic: AM6PR08MB3093:
-x-microsoft-antispam-prvs: <AM6PR08MB3093559DAAA4D391A428AD53C10D0@AM6PR08MB3093.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0289B6431E
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(39850400004)(366004)(346002)(396003)(376002)(189003)(199004)(31696002)(86362001)(26005)(8676002)(52116002)(81156014)(53546011)(8936002)(6486002)(64756008)(66946007)(4326008)(31686004)(81166006)(66476007)(66446008)(66556008)(186003)(2616005)(110136005)(508600001)(16576012)(36756003)(5660300002)(2906002)(316002)(16526019)(54906003)(956004)(71200400001)(2004002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3093;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QGJQDRSHfud/gQ2sHB+4kMw+mYhr7yEadz1f/iOx7Hggy5ebMY9ii13H62sxhYkz1i+ab5rJGFcwCKU92IjEY7cWfyq8+/r/tG+NNIj6NWZzNvpNq4nrPraS216e9DM15PLg4W97z6VcSWzaotJJy/ilL7c+vRq1NPVyO/wCoyigiJiVVySyxU+vOB8ESUjk0ozk4tYiOnWFkMs5SNe7eIGx1tz38aEXDmfBKk290sV75RRaW101JlM/g/CqXibQXJOHOjczD2LdpYkpFbqrkYbkPVkvjA9PD9N5VIk5ZMAPoLdACX63uL3jyox5FAW5Cpfa+5E6U5L2V8wcXr4sAZ1RAO7Rc3FtHRP+/60jGJ6V1TBLXbG+zqsgnPcRf8OzY6Bo5X4D1bc8DB3QwREESMhUUr1MhW6XhYP5GPqym+H25lhkexIzHiRlQ4hNVgL/7iuUIec9UNWIvV24XDOGOZU2fAh5Qb8HsRzaZo4uf4CLT5yt46MCkZm39iYA7H6TTqwfDdtu45xz+cEA8NJpEPLqcVpc+X1CdbMkPa0UFfeHr5uXNQ54MoZ0R6AIk5Gs
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B4AFD027450B924E9A80197FDB912D77@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <6e0c4e88-6745-a668-6946-237032fdbedd@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <29434a72-d2cc-5976-cbd7-ceac714d4d65@redhat.com>
+Date: Tue, 21 Jan 2020 14:51:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82321ba3-788e-42d8-0923-08d79e78a428
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 13:48:48.4505 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XD8zolNp4/r9VZdkZ6NHlRAnuOgDooBZ4MEX6/Wu6WD6Rc4PrJlVXrHjyPGJkhzMUJdDfIc5JaG0ghnA+CrurHCGWtM3hL7pwYXl14NLo8Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3093
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.20.130
+In-Reply-To: <6e0c4e88-6745-a668-6946-237032fdbedd@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,104 +131,190 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjEuMDEuMjAyMCAxNTozOSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyMS4wMS4yMCAxMTo0MCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIxLjAxLjIwMjAgMTI6NDEs
-IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAyMS4wMS4yMCAxMDoyMywgVmxhZGltaXIgU2VtZW50
-c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gMjEuMDEuMjAyMCAxMjoxNCwgTWF4IFJlaXR6IHdy
-b3RlOg0KPj4+Pj4gT24gMjAuMDEuMjAgMTg6MjAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgd3JvdGU6DQo+Pj4+Pj4gMjAuMDEuMjAyMCAyMDowNCwgTWF4IFJlaXR6IHdyb3RlOg0KPj4+
-Pj4+PiBPbiAxNi4wMS4yMCAxNjo1NCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90
-ZToNCj4+Pj4+Pj4+IFRoaXMgdGVzdCBjaGVja3MgdGhhdCBidWcgaXMgcmVhbGx5IGZpeGVkIGJ5
-IHByZXZpb3VzIGNvbW1pdC4NCj4+Pj4+Pj4+DQo+Pj4+Pj4+PiBDYzogcWVtdS1zdGFibGVAbm9u
-Z251Lm9yZyAjIHY0LjIuMA0KPj4+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50
-c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+Pj4+Pj4gLS0tDQo+
-Pj4+Pj4+PiAgICAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yODMgICAgIHwgNzUgKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+Pj4+Pj4+ICAgICAgdGVzdHMvcWVtdS1pb3Rl
-c3RzLzI4My5vdXQgfCAgOCArKysrDQo+Pj4+Pj4+PiAgICAgIHRlc3RzL3FlbXUtaW90ZXN0cy9n
-cm91cCAgIHwgIDEgKw0KPj4+Pj4+Pj4gICAgICAzIGZpbGVzIGNoYW5nZWQsIDg0IGluc2VydGlv
-bnMoKykNCj4+Pj4+Pj4+ICAgICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90ZXN0
-cy8yODMNCj4+Pj4+Pj4+ICAgICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90ZXN0
-cy8yODMub3V0DQo+Pj4+Pj4+DQo+Pj4+Pj4+IFRoZSB0ZXN0IGxvb2tzIGdvb2QgdG8gbWUsIEkg
-anVzdCBoYXZlIGEgY29tbWVudCBuaXQgYW5kIGEgbm90ZSBvbiB0aGUNCj4+Pj4+Pj4gZmFjdCB0
-aGF0IHRoaXMgc2hvdWxkIHByb2JhYmx5IGJlIHF1ZXVlZCBvbmx5IGFmdGVyIFRob21hc+KAmXMg
-4oCcRW5hYmxlDQo+Pj4+Pj4+IG1vcmUgaW90ZXN0cyBkdXJpbmcgIm1ha2UgY2hlY2stYmxvY2si
-4oCdIHNlcmllcy4NCj4+Pj4+Pj4NCj4+Pj4+Pj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlv
-dGVzdHMvMjgzIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI4Mw0KPj4+Pj4+Pj4gbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQNCj4+Pj4+Pj4+IGluZGV4IDAwMDAwMDAwMDAuLmYwZjIxNmQxMDkNCj4+Pj4+Pj4+
-IC0tLSAvZGV2L251bGwNCj4+Pj4+Pj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yODMNCj4+
-Pj4+Pj4+IEBAIC0wLDAgKzEsNzUgQEANCj4+Pj4+Pj4+ICsjIS91c3IvYmluL2VudiBweXRob24N
-Cj4+Pj4+Pj4+ICsjDQo+Pj4+Pj4+PiArIyBUZXN0IGZvciBiYWNrdXAtdG9wIGZpbHRlciBwZXJt
-aXNzaW9uIGFjdGl2YXRpb24gZmFpbHVyZQ0KPj4+Pj4+Pj4gKyMNCj4+Pj4+Pj4+ICsjIENvcHly
-aWdodCAoYykgMjAxOSBWaXJ0dW96em8gSW50ZXJuYXRpb25hbCBHbWJILg0KPj4+Pj4+Pj4gKyMN
-Cj4+Pj4+Pj4+ICsjIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlz
-dHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5DQo+Pj4+Pj4+PiArIyBpdCB1bmRlciB0aGUgdGVybXMg
-b2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBieQ0KPj4+Pj4+
-Pj4gKyMgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbjsgZWl0aGVyIHZlcnNpb24gMiBvZiB0
-aGUgTGljZW5zZSwgb3INCj4+Pj4+Pj4+ICsjIChhdCB5b3VyIG9wdGlvbikgYW55IGxhdGVyIHZl
-cnNpb24uDQo+Pj4+Pj4+PiArIw0KPj4+Pj4+Pj4gKyMgVGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1
-dGVkIGluIHRoZSBob3BlIHRoYXQgaXQgd2lsbCBiZSB1c2VmdWwsDQo+Pj4+Pj4+PiArIyBidXQg
-V0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBv
-Zg0KPj4+Pj4+Pj4gKyMgTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxB
-UiBQVVJQT1NFLiAgU2VlIHRoZQ0KPj4+Pj4+Pj4gKyMgR05VIEdlbmVyYWwgUHVibGljIExpY2Vu
-c2UgZm9yIG1vcmUgZGV0YWlscy4NCj4+Pj4+Pj4+ICsjDQo+Pj4+Pj4+PiArIyBZb3Ugc2hvdWxk
-IGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQ0K
-Pj4+Pj4+Pj4gKyMgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW0uICBJZiBub3QsIHNlZSA8aHR0cDov
-L3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uDQo+Pj4+Pj4+PiArIw0KPj4+Pj4+Pj4gKw0KPj4+Pj4+
-Pj4gK2ltcG9ydCBpb3Rlc3RzDQo+Pj4+Pj4+PiArDQo+Pj4+Pj4+PiArIyBUaGUgdGVzdCBpcyB1
-bnJlbGF0ZWQgdG8gZm9ybWF0cywgcmVzdHJpY3QgaXQgdG8gcWNvdzIgdG8gYXZvaWQgZXh0cmEg
-cnVucw0KPj4+Pj4+Pj4gK2lvdGVzdHMudmVyaWZ5X2ltYWdlX2Zvcm1hdChzdXBwb3J0ZWRfZm10
-cz1bJ3Fjb3cyJ10pDQo+Pj4+Pj4+PiArDQo+Pj4+Pj4+PiArc2l6ZSA9IDEwMjQgKiAxMDI0DQo+
-Pj4+Pj4+PiArDQo+Pj4+Pj4+PiArIiIiDQo+Pj4+Pj4+PiArT24gYWN0aXZhdGlvbiwgYmFja3Vw
-LXRvcCBpcyBnb2luZyB0byB1bnNoYXJlIHdyaXRlIHBlcm1pc3Npb24gb24gaXRzDQo+Pj4+Pj4+
-PiArc291cmNlIGNoaWxkLiBJdCB3aWxsIGJlIGltcG9zc2libGUgZm9yIHRoZSBmb2xsb3dpbmcg
-Y29uZmlndXJhdGlvbjoNCj4+Pj4+Pj4NCj4+Pj4+Pj4g4oCcVGhlIGZvbGxvd2luZyBjb25maWd1
-cmF0aW9uIHdpbGwgYmVjb21lIGltcG9zc2libGXigJ0/DQo+Pj4+Pj4NCj4+Pj4+PiBIbW0sIG5v
-LCB0aGUgY29uZmlndXJhdGlvbiBpcyBwb3NzaWJsZS4gQnV0ICJpdCIsIGkuZS4gInVuc2hhcmUg
-d3JpdGUgcGVybWlzc2lvbiIsDQo+Pj4+Pj4gaXMgaW1wb3NzaWJsZSB3aXRoIHN1Y2ggY29uZmln
-dXJhdGlvbi4uDQo+Pj4+Pg0KPj4+Pj4gQnV0IGJhY2t1cF90b3AgYWx3YXlzIHVuc2hhcmVzIHRo
-ZSB3cml0ZSBwZXJtaXNzaW9uIG9uIHRoZSBzb3VyY2UuDQo+Pj4+DQo+Pj4+IFllcywgYW5kIEkg
-anVzdCB0cnkgdG8gc2F5LCB0aGF0IHRoaXMgYWN0aW9uIHdpbGwgZmFpbC4gQW5kIHRoZSB0ZXN0
-IGNoZWNrcyB0aGF0IGl0DQo+Pj4+IGZhaWxzIChhbmQgaXQgY3Jhc2hlcyB3aXRoIGN1cnJlbnQg
-bWFzdGVyIGluc3RlYWQgb2YgZmFpbCkuDQo+Pj4NCj4+PiBPSy4gIFNvIHdoYXQgSSB3YXMgdHJ5
-aW5nIHRvIHNheSBpcyB0aGF0IHRoZSBjb21tZW50IGN1cnJlbnRseSBvbmx5DQo+Pj4gc3RhdGVz
-IHRoYXQgdGhpcyB3aWxsIGZhaWwuICBJ4oCZZCBwcmVmZXIgaXQgdG8gYWxzbyByZWFzc3VyZSBt
-ZSB0aGF0IGl04oCZcw0KPj4+IGNvcnJlY3QgdGhhdCB0aGlzIGZhaWxzIChiZWNhdXNlIGFsbCB3
-cml0ZXMgb24gdGhlIGJhY2t1cCBzb3VyY2UgbXVzdCBnbw0KPj4+IHRocm91Z2ggYmFja3VwX3Rv
-cCksIGFuZCB0aGF0IHRoaXMgaXMgZXhhY3RseSB3aGF0IHdlIHdhbnQgdG8gdGVzdCBoZXJlLg0K
-Pj4+DQo+Pj4gT24gZmlyc3QgcmVhZGluZywgSSB3YXMgd29uZGVyaW5nIHdoeSBleGFjdGx5IHRo
-aXMgY29tbWVudCB3b3VsZCB0ZWxsIG1lDQo+Pj4gYWxsIHRoZXNlIHRoaW5ncywgYmVjYXVzZSBJ
-IGRpZG7igJl0IGtub3cgd2hhdCB0aGUgdGVzdCB3YW50cyB0byB0ZXN0IGluDQo+Pj4gdGhlIGZp
-cnN0IHBsYWNlLg0KPj4+DQo+Pj4gTWF4DQo+Pg0KPj4gSG1tLCBzb21ldGhpbmcgbGlrZToNCj4+
-DQo+PiBCYWNrdXAgd2FudHMgdG8gY29weSBhIHBvaW50LWluLXRpbWUgc3RhdGUgb2YgdGhlIHNv
-dXJjZSBub2RlLiBTbywgaXQgY2F0Y2hlcyBhbGwgd3JpdGVzDQo+PiB0byB0aGUgc291cmNlIG5v
-ZGUgYnkgYXBwZW5kaW5nIGJhY2t1cC10b3AgZmlsdGVyIGFib3ZlIGl0LiBTbyB3ZSBoYW5kbGUg
-YWxsIGNoYW5nZXMgd2hpY2gNCj4+IGNvbWVzIGZyb20gc291cmNlIG5vZGUgcGFyZW50cy4gVG8g
-cHJldmVudCBhcHBlYXJpbmcgb2YgbmV3IHdyaXRpbmcgcGFyZW50cyBkdXJpbmcgdGhlDQo+PiBw
-cm9ncmVzcywgYmFja3VwLXRvcCB1bnNoYXJlcyB3cml0ZSBwZXJtaXNzaW9uIG9uIGl0cyBzb3Vy
-Y2UgY2hpbGQuIFRoaXMgaGFzIGFkZGl0aW9uYWwNCj4+IGltcGxpY2F0aW9uOiBhcyB0aGlzICJ1
-bnNoYXJpbmciIGlzIHByb3BhZ2F0ZWQgYnkgZGVmYXVsdCBieSBiYWNraW5nL2ZpbGUgY2hpbGRy
-ZW4sDQo+PiBiYWNrdXAtdG9wIGNvbmZsaWN0cyB3aXRoIGFueSBzaWRlIHBhcmVudHMgb2Ygc291
-cmNlIHN1Yi10cmVlIHdpdGggd3JpdGUgcGVybWlzc2lvbi4NCj4+IEFuZCB0aGlzIGlzIGluIGdv
-b2QgcmVsYXRpb24gd2l0aCB0aGUgZ2VuZXJhbCBpZGVhOiB3aXRoIHN1Y2ggcGFyZW50cyB3ZSBj
-YW4ndCBndWFyYW50ZWUNCj4+IHBvaW50LWluLXRpbWUgYmFja3VwLg0KPiANCj4gV29ya3MgZm9y
-IG1lICh0aGFua3MgOi0pKSwgYnV0IGEgc2hvcnRlciDigJxXaGVuIHBlcmZvcm1pbmcgYSBiYWNr
-dXAsIGFsbA0KPiB3cml0ZXMgb24gdGhlIHNvdXJjZSBzdWJ0cmVlIG11c3QgZ28gdGhyb3VnaCB0
-aGUgYmFja3VwLXRvcCBmaWx0ZXIgc28gaXQNCj4gY2FuIGNvcHkgYWxsIGRhdGEgdG8gdGhlIHRh
-cmdldCBiZWZvcmUgaXQgaXMgY2hhbmdlZC4gIFRoZXJlZm9yZSwNCj4gYmFja3VwLXRvcCBjYW5u
-b3QgYWxsb3cgb3RoZXIgbm9kZXMgdG8gY2hhbmdlIGRhdGEgb24gaXRzIHNvdXJjZSBjaGlsZC7i
-gJ0NCj4gd291bGQgd29yayBmb3IgbWUganVzdCBhcyB3ZWxsLg0KPiANCj4+IFNvLCB0cnlpbmcg
-dG8gYmFja3VwIHRoZSBjb25maWd1cmF0aW9uIHdpdGggd3JpdGluZyBzaWRlIHBhcmVudHMgb2YN
-Cj4+IHNvdXJjZSBzdWItdHJlZSBub2RlcyBzaG91bGQgZmFpbC4gTGV0J3MgdGVzdCBpdC4NCg0K
-QnV0IHRoYW4sIHdlIG5lZWQgc29tZWhvdyBsaW5rIHBhcnQgYWJvdXQgYXBwZW5kaW5nIGJhY2t1
-cC10b3AgYW5kIHNvLW9uLi4uDQoNCldoZW4gcGVyZm9ybWluZyBhIGJhY2t1cCwgYWxsIHdyaXRl
-cyBvbiB0aGUgc291cmNlIHN1YnRyZWUgbXVzdCBnbyB0aHJvdWdoIHRoZSBiYWNrdXAtdG9wIGZp
-bHRlciBzbyBpdCBjYW4gY29weSBhbGwgZGF0YSB0byB0aGUgdGFyZ2V0IGJlZm9yZSBpdCBpcyBj
-aGFuZ2VkLg0KYmFja3VwLXRvcCBmaWx0ZXIgaXMgYXBwZW5kZWQgYWJvdmUgc291cmNlIG5vZGUs
-IHRvIGFjaGlldmUgdGhpcyB0aGluZywgc28gYWxsIHBhcmVudHMgb2Ygc291cmNlIG5vZGUgYXJl
-IGhhbmRsZWQuDQpBIGNvbmZpZ3VyYXRpb24gd2l0aCBzaWRlIHBhcmVudHMgb2Ygc291cmNlIHN1
-Yi10cmVlIHdpdGggd3JpdGUgcGVybWlzc2lvbiBpcyB1bnN1cHBvcnRlZCAod2UnZCBoYXZlIGFw
-cGVuZCBzZXZlcmFsIGJhY2t1cC10b3AgZmlsdGVyIGxpa2Ugbm9kZXMgdG8gaGFuZGxlIHN1Y2gg
-cGFyZW50cykuDQpUaGUgdGVzdCBjcmVhdGUgYW4gZXhhbXBsZSBvZiBzdWNoIGNvbmZpZ3VyYXRp
-b24gYW5kIGNoZWNrcyB0aGF0IGJhY2t1cCBmYWlscy4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB
+Content-Type: multipart/mixed; boundary="MOxbylmV4dcuCgHwAoK6NprGhlsfNkEcf"
+
+--MOxbylmV4dcuCgHwAoK6NprGhlsfNkEcf
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 21.01.20 14:48, Vladimir Sementsov-Ogievskiy wrote:
+> 21.01.2020 15:39, Max Reitz wrote:
+>> On 21.01.20 11:40, Vladimir Sementsov-Ogievskiy wrote:
+>>> 21.01.2020 12:41, Max Reitz wrote:
+>>>> On 21.01.20 10:23, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 21.01.2020 12:14, Max Reitz wrote:
+>>>>>> On 20.01.20 18:20, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>> 20.01.2020 20:04, Max Reitz wrote:
+>>>>>>>> On 16.01.20 16:54, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>>> This test checks that bug is really fixed by previous commit.
+>>>>>>>>>
+>>>>>>>>> Cc: qemu-stable@nongnu.org # v4.2.0
+>>>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo=
+.com>
+>>>>>>>>> ---
+>>>>>>>>>      tests/qemu-iotests/283     | 75 ++++++++++++++++++++++++++++=
+++++++++++
+>>>>>>>>>      tests/qemu-iotests/283.out |  8 ++++
+>>>>>>>>>      tests/qemu-iotests/group   |  1 +
+>>>>>>>>>      3 files changed, 84 insertions(+)
+>>>>>>>>>      create mode 100644 tests/qemu-iotests/283
+>>>>>>>>>      create mode 100644 tests/qemu-iotests/283.out
+>>>>>>>>
+>>>>>>>> The test looks good to me, I just have a comment nit and a note on=
+ the
+>>>>>>>> fact that this should probably be queued only after Thomas=E2=80=
+=99s =E2=80=9CEnable
+>>>>>>>> more iotests during "make check-block"=E2=80=9D series.
+>>>>>>>>
+>>>>>>>>> diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
+>>>>>>>>> new file mode 100644
+>>>>>>>>> index 0000000000..f0f216d109
+>>>>>>>>> --- /dev/null
+>>>>>>>>> +++ b/tests/qemu-iotests/283
+>>>>>>>>> @@ -0,0 +1,75 @@
+>>>>>>>>> +#!/usr/bin/env python
+>>>>>>>>> +#
+>>>>>>>>> +# Test for backup-top filter permission activation failure
+>>>>>>>>> +#
+>>>>>>>>> +# Copyright (c) 2019 Virtuozzo International GmbH.
+>>>>>>>>> +#
+>>>>>>>>> +# This program is free software; you can redistribute it and/or =
+modify
+>>>>>>>>> +# it under the terms of the GNU General Public License as publis=
+hed by
+>>>>>>>>> +# the Free Software Foundation; either version 2 of the License,=
+ or
+>>>>>>>>> +# (at your option) any later version.
+>>>>>>>>> +#
+>>>>>>>>> +# This program is distributed in the hope that it will be useful=
+,
+>>>>>>>>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>>>>>>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>>>>>>>> +# GNU General Public License for more details.
+>>>>>>>>> +#
+>>>>>>>>> +# You should have received a copy of the GNU General Public Lice=
+nse
+>>>>>>>>> +# along with this program.  If not, see <http://www.gnu.org/lice=
+nses/>.
+>>>>>>>>> +#
+>>>>>>>>> +
+>>>>>>>>> +import iotests
+>>>>>>>>> +
+>>>>>>>>> +# The test is unrelated to formats, restrict it to qcow2 to avoi=
+d extra runs
+>>>>>>>>> +iotests.verify_image_format(supported_fmts=3D['qcow2'])
+>>>>>>>>> +
+>>>>>>>>> +size =3D 1024 * 1024
+>>>>>>>>> +
+>>>>>>>>> +"""
+>>>>>>>>> +On activation, backup-top is going to unshare write permission o=
+n its
+>>>>>>>>> +source child. It will be impossible for the following configurat=
+ion:
+>>>>>>>>
+>>>>>>>> =E2=80=9CThe following configuration will become impossible=E2=80=
+=9D?
+>>>>>>>
+>>>>>>> Hmm, no, the configuration is possible. But "it", i.e. "unshare wri=
+te permission",
+>>>>>>> is impossible with such configuration..
+>>>>>>
+>>>>>> But backup_top always unshares the write permission on the source.
+>>>>>
+>>>>> Yes, and I just try to say, that this action will fail. And the test =
+checks that it
+>>>>> fails (and it crashes with current master instead of fail).
+>>>>
+>>>> OK.  So what I was trying to say is that the comment currently only
+>>>> states that this will fail.  I=E2=80=99d prefer it to also reassure me=
+ that it=E2=80=99s
+>>>> correct that this fails (because all writes on the backup source must =
+go
+>>>> through backup_top), and that this is exactly what we want to test her=
+e.
+>>>>
+>>>> On first reading, I was wondering why exactly this comment would tell =
+me
+>>>> all these things, because I didn=E2=80=99t know what the test wants to=
+ test in
+>>>> the first place.
+>>>>
+>>>> Max
+>>>
+>>> Hmm, something like:
+>>>
+>>> Backup wants to copy a point-in-time state of the source node. So, it c=
+atches all writes
+>>> to the source node by appending backup-top filter above it. So we handl=
+e all changes which
+>>> comes from source node parents. To prevent appearing of new writing par=
+ents during the
+>>> progress, backup-top unshares write permission on its source child. Thi=
+s has additional
+>>> implication: as this "unsharing" is propagated by default by backing/fi=
+le children,
+>>> backup-top conflicts with any side parents of source sub-tree with writ=
+e permission.
+>>> And this is in good relation with the general idea: with such parents w=
+e can't guarantee
+>>> point-in-time backup.
+>>
+>> Works for me (thanks :-)), but a shorter =E2=80=9CWhen performing a back=
+up, all
+>> writes on the source subtree must go through the backup-top filter so it
+>> can copy all data to the target before it is changed.  Therefore,
+>> backup-top cannot allow other nodes to change data on its source child.=
+=E2=80=9D
+>> would work for me just as well.
+>>
+>>> So, trying to backup the configuration with writing side parents of
+>>> source sub-tree nodes should fail. Let's test it.
+>=20
+> But than, we need somehow link part about appending backup-top and so-on.=
+..
+>=20
+> When performing a backup, all writes on the source subtree must go throug=
+h the backup-top filter so it can copy all data to the target before it is =
+changed.
+> backup-top filter is appended above source node, to achieve this thing, s=
+o all parents of source node are handled.
+> A configuration with side parents of source sub-tree with write permissio=
+n is unsupported (we'd have append several backup-top filter like nodes to =
+handle such parents).
+> The test create an example of such configuration and checks that backup f=
+ails.
+
+Sounds good!
+
+(Except maybe s/that backup fails/that a backup is then not allowed/?
+=E2=80=9Cbackup fails=E2=80=9D might also mean that the job just produces g=
+arbage.)
+
+Max
+
+
+--MOxbylmV4dcuCgHwAoK6NprGhlsfNkEcf--
+
+--8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4nAdQACgkQ9AfbAGHV
+z0CIewf/TxgDyjDNTKjcR4jyOncw85uAy1BWw7DDG+233s4Qdm4DRROf75gx+mSs
+08S+/b1YaaPHJPRanOvezkIj7ibyt+pL1Ek/j3AK/0qFd5jMSJCtV5tY30oBIgQh
+oKEGjwWdZ36bYynymimCpMCGxhSBxN71IM2woqLsDSIvwgtTCq1XqCkJRjrdUSDj
+FaZF0YskY8tDUPOLP6L6sZrW77pL+KFbHkTHw+Ndt9Czqd4TFGFjlSsKmiZu4ZFx
+qb14GhFcDLgH2Gbw9Zl8VNd9nmkTMS7YRlaqiCIU2Aza+W7r2lckiq5J74KwELCJ
+qulpmVq8Zz3fZTSEjx1oKs/L32okUw==
+=VExs
+-----END PGP SIGNATURE-----
+
+--8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB--
+
 
