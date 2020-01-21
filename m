@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E732FC33CB6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD729C33CAA
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 07:24:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC3C122522
+	by mail.kernel.org (Postfix) with ESMTPS id B18FD21734
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 07:24:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC3C122522
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B18FD21734
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itntu-0002F5-E0
+	id 1itntu-0002FH-ES
 	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 02:24:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46969)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1itnsm-0000qn-77
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:23:31 -0500
+ (envelope-from <clg@kaod.org>) id 1itnsl-0000qm-9j
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:23:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1itnsi-0000Wo-O2
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:23:28 -0500
-Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:40461)
+ (envelope-from <clg@kaod.org>) id 1itnsh-0000W2-Mj
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:23:27 -0500
+Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:44909)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1itnsi-0000Vq-I3
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:23:24 -0500
-Received: from player687.ha.ovh.net (unknown [10.109.143.175])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 0AA068D3EC
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 08:23:23 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1itnsh-0000Ug-H4
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:23:23 -0500
+Received: from player746.ha.ovh.net (unknown [10.109.146.53])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 06E3823BE7D
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 08:23:20 +0100 (CET)
 Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
  (Authenticated sender: clg@kaod.org)
- by player687.ha.ovh.net (Postfix) with ESMTPSA id 57004E651A03;
- Tue, 21 Jan 2020 07:23:16 +0000 (UTC)
-Subject: Re: [PATCH 2/2] aspeed/scu: Implement chip ID register
+ by player746.ha.ovh.net (Postfix) with ESMTPSA id AC47BE84629E;
+ Tue, 21 Jan 2020 07:23:15 +0000 (UTC)
+Subject: Re: [PATCH 1/2] aspeed/scu: Create separate write callbacks
 To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
 References: <20200121013302.43839-1-joel@jms.id.au>
- <20200121013302.43839-3-joel@jms.id.au>
+ <20200121013302.43839-2-joel@jms.id.au>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <44b83ff5-7552-fda2-cee5-b9a7a8f0ded6@kaod.org>
-Date: Tue, 21 Jan 2020 08:23:15 +0100
+Message-ID: <c432eaaf-7b7d-90e6-1c3a-1bfdf764f7bf@kaod.org>
+Date: Tue, 21 Jan 2020 08:23:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200121013302.43839-3-joel@jms.id.au>
+In-Reply-To: <20200121013302.43839-2-joel@jms.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Ovh-Tracer-Id: 12027425757774318400
+X-Ovh-Tracer-Id: 12026862808659233600
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudejgddutdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedvnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudejgddutdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejgeeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.51.53
+X-Received-From: 46.105.44.175
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,82 +78,150 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 1/21/20 2:33 AM, Joel Stanley wrote:
-> This returns a fixed but non-zero value for the chip id.
+> This splits the common write callback into separate ast2400 and ast2500
+> implementations. This makes it clearer when implementing differing
+> behaviour.
 >=20
 > Signed-off-by: Joel Stanley <joel@jms.id.au>
 
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
 > ---
->  hw/misc/aspeed_scu.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  hw/misc/aspeed_scu.c | 80 +++++++++++++++++++++++++++++++-------------
+>  1 file changed, 57 insertions(+), 23 deletions(-)
 >=20
 > diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-> index 7108cad8c6a7..19d1780a40da 100644
+> index f62fa25e3474..7108cad8c6a7 100644
 > --- a/hw/misc/aspeed_scu.c
 > +++ b/hw/misc/aspeed_scu.c
-> @@ -77,6 +77,8 @@
->  #define CPU2_BASE_SEG4       TO_REG(0x110)
->  #define CPU2_BASE_SEG5       TO_REG(0x114)
->  #define CPU2_CACHE_CTRL      TO_REG(0x118)
-> +#define CHIP_ID0             TO_REG(0x150)
-> +#define CHIP_ID1             TO_REG(0x154)
->  #define UART_HPLL_CLK        TO_REG(0x160)
->  #define PCIE_CTRL            TO_REG(0x180)
->  #define BMC_MMIO_CTRL        TO_REG(0x184)
-> @@ -115,6 +117,8 @@
->  #define AST2600_HW_STRAP2_PROT    TO_REG(0x518)
->  #define AST2600_RNG_CTRL          TO_REG(0x524)
->  #define AST2600_RNG_DATA          TO_REG(0x540)
-> +#define AST2600_CHIP_ID0          TO_REG(0x5B0)
-> +#define AST2600_CHIP_ID1          TO_REG(0x5B4)
+> @@ -232,8 +232,47 @@ static uint64_t aspeed_scu_read(void *opaque, hwad=
+dr offset, unsigned size)
+>      return s->regs[reg];
+>  }
 > =20
->  #define AST2600_CLK TO_REG(0x40)
-> =20
-> @@ -182,6 +186,8 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU_=
-NR_REGS] =3D {
->       [CPU2_BASE_SEG1]  =3D 0x80000000U,
->       [CPU2_BASE_SEG4]  =3D 0x1E600000U,
->       [CPU2_BASE_SEG5]  =3D 0xC0000000U,
-> +     [CHIP_ID0]        =3D 0x1234ABCDU,
-> +     [CHIP_ID1]        =3D 0x88884444U,
->       [UART_HPLL_CLK]   =3D 0x00001903U,
->       [PCIE_CTRL]       =3D 0x0000007BU,
->       [BMC_DEV_ID]      =3D 0x00002402U
-> @@ -307,6 +313,8 @@ static void aspeed_ast2500_scu_write(void *opaque, =
-hwaddr offset,
->      case RNG_DATA:
->      case FREE_CNTR4:
->      case FREE_CNTR4_EXT:
-> +    case CHIP_ID0:
-> +    case CHIP_ID1:
->          qemu_log_mask(LOG_GUEST_ERROR,
->                        "%s: Write to read-only offset 0x%" HWADDR_PRIx =
-"\n",
->                        __func__, offset);
-> @@ -620,6 +628,8 @@ static void aspeed_ast2600_scu_write(void *opaque, =
-hwaddr offset,
->      case AST2600_RNG_DATA:
->      case AST2600_SILICON_REV:
->      case AST2600_SILICON_REV2:
-> +    case AST2600_CHIP_ID0:
-> +    case AST2600_CHIP_ID1:
->          /* Add read only registers here */
->          qemu_log_mask(LOG_GUEST_ERROR,
->                        "%s: Write to read-only offset 0x%" HWADDR_PRIx =
-"\n",
-> @@ -648,6 +658,9 @@ static const uint32_t ast2600_a0_resets[ASPEED_AST2=
-600_SCU_NR_REGS] =3D {
->      [AST2600_CLK_STOP_CTRL2]    =3D 0xFFF0FFF0,
->      [AST2600_SDRAM_HANDSHAKE]   =3D 0x00000040,  /* SoC completed DRAM=
- init */
->      [AST2600_HPLL_PARAM]        =3D 0x1000405F,
-> +    [AST2600_CHIP_ID0]          =3D 0x1234ABCD,
-> +    [AST2600_CHIP_ID1]          =3D 0x88884444,
+> -static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t dat=
+a,
+> -                             unsigned size)
+> +static void aspeed_ast2400_scu_write(void *opaque, hwaddr offset,
+> +                                     uint64_t data, unsigned size)
+> +{
+> +    AspeedSCUState *s =3D ASPEED_SCU(opaque);
+> +    int reg =3D TO_REG(offset);
 > +
->  };
+> +    if (reg >=3D ASPEED_SCU_NR_REGS) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: Out-of-bounds write at offset 0x%" HWADDR_P=
+RIx "\n",
+> +                      __func__, offset);
+> +        return;
+> +    }
+> +
+> +    if (reg > PROT_KEY && reg < CPU2_BASE_SEG1 &&
+> +            !s->regs[PROT_KEY]) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: SCU is locked!\n", __func_=
+_);
+> +    }
+> +
+> +    trace_aspeed_scu_write(offset, size, data);
+> +
+> +    switch (reg) {
+> +    case PROT_KEY:
+> +        s->regs[reg] =3D (data =3D=3D ASPEED_SCU_PROT_KEY) ? 1 : 0;
+> +        return;
+> +    case SILICON_REV:
+> +    case FREQ_CNTR_EVAL:
+> +    case VGA_SCRATCH1 ... VGA_SCRATCH8:
+> +    case RNG_DATA:
+> +    case FREE_CNTR4:
+> +    case FREE_CNTR4_EXT:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: Write to read-only offset 0x%" HWADDR_PRIx =
+"\n",
+> +                      __func__, offset);
+> +        return;
+> +    }
+> +
+> +    s->regs[reg] =3D data;
+> +}
+> +
+> +static void aspeed_ast2500_scu_write(void *opaque, hwaddr offset,
+> +                                     uint64_t data, unsigned size)
+>  {
+>      AspeedSCUState *s =3D ASPEED_SCU(opaque);
+>      int reg =3D TO_REG(offset);
+> @@ -257,25 +296,11 @@ static void aspeed_scu_write(void *opaque, hwaddr=
+ offset, uint64_t data,
+>      case PROT_KEY:
+>          s->regs[reg] =3D (data =3D=3D ASPEED_SCU_PROT_KEY) ? 1 : 0;
+>          return;
+> -    case CLK_SEL:
+> -        s->regs[reg] =3D data;
+> -        break;
+>      case HW_STRAP1:
+> -        if (ASPEED_IS_AST2500(s->regs[SILICON_REV])) {
+> -            s->regs[HW_STRAP1] |=3D data;
+> -            return;
+> -        }
+> -        /* Jump to assignment below */
+> -        break;
+> +        s->regs[HW_STRAP1] |=3D data;
+> +        return;
+>      case SILICON_REV:
+> -        if (ASPEED_IS_AST2500(s->regs[SILICON_REV])) {
+> -            s->regs[HW_STRAP1] &=3D ~data;
+> -        } else {
+> -            qemu_log_mask(LOG_GUEST_ERROR,
+> -                          "%s: Write to read-only offset 0x%" HWADDR_P=
+RIx "\n",
+> -                          __func__, offset);
+> -        }
+> -        /* Avoid assignment below, we've handled everything */
+> +        s->regs[HW_STRAP1] &=3D ~data;
+>          return;
+>      case FREQ_CNTR_EVAL:
+>      case VGA_SCRATCH1 ... VGA_SCRATCH8:
+> @@ -291,9 +316,18 @@ static void aspeed_scu_write(void *opaque, hwaddr =
+offset, uint64_t data,
+>      s->regs[reg] =3D data;
+>  }
 > =20
->  static void aspeed_ast2600_scu_reset(DeviceState *dev)
+> -static const MemoryRegionOps aspeed_scu_ops =3D {
+> +static const MemoryRegionOps aspeed_ast2400_scu_ops =3D {
+> +    .read =3D aspeed_scu_read,
+> +    .write =3D aspeed_ast2400_scu_write,
+> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
+> +    .valid.min_access_size =3D 4,
+> +    .valid.max_access_size =3D 4,
+> +    .valid.unaligned =3D false,
+> +};
+> +
+> +static const MemoryRegionOps aspeed_ast2500_scu_ops =3D {
+>      .read =3D aspeed_scu_read,
+> -    .write =3D aspeed_scu_write,
+> +    .write =3D aspeed_ast2500_scu_write,
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>      .valid.min_access_size =3D 4,
+>      .valid.max_access_size =3D 4,
+> @@ -469,7 +503,7 @@ static void aspeed_2400_scu_class_init(ObjectClass =
+*klass, void *data)
+>      asc->calc_hpll =3D aspeed_2400_scu_calc_hpll;
+>      asc->apb_divider =3D 2;
+>      asc->nr_regs =3D ASPEED_SCU_NR_REGS;
+> -    asc->ops =3D &aspeed_scu_ops;
+> +    asc->ops =3D &aspeed_ast2400_scu_ops;
+>  }
+> =20
+>  static const TypeInfo aspeed_2400_scu_info =3D {
+> @@ -489,7 +523,7 @@ static void aspeed_2500_scu_class_init(ObjectClass =
+*klass, void *data)
+>      asc->calc_hpll =3D aspeed_2500_scu_calc_hpll;
+>      asc->apb_divider =3D 4;
+>      asc->nr_regs =3D ASPEED_SCU_NR_REGS;
+> -    asc->ops =3D &aspeed_scu_ops;
+> +    asc->ops =3D &aspeed_ast2500_scu_ops;
+>  }
+> =20
+>  static const TypeInfo aspeed_2500_scu_info =3D {
 >=20
 
 
