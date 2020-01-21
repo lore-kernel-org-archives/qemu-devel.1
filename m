@@ -2,124 +2,112 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_RHS_DOB,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5BFC33CAA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42B2C33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C61122522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8183524679
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:43:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HX4dp919"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C61122522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGYO+AED"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8183524679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itpx4-0002db-An
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:36:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59038)
+	id 1itq3n-0004rp-JA
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:42:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itpwN-00024N-CH
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:35:20 -0500
+ (envelope-from <mreitz@redhat.com>) id 1itq33-0004CR-Di
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:42:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1itpwK-0004eP-Pd
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:35:19 -0500
-Received: from mail-eopbgr70129.outbound.protection.outlook.com
- ([40.107.7.129]:12036 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1itpwJ-0004dU-V6; Tue, 21 Jan 2020 04:35:16 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BnMpCCpPkP2Dw/AnnC2K8ORPiXaWnjDmK8udC+12/zsk9Cx1Cp/jcdE+rc3/N6aZSzar//ef9Bjk6rbC/qSR6qymKfnzC8aLtAPcPMXOHszaUldInbAh135bEowhk7mDHeMDjhao5ztMAyymyWvGc63pjJ/ghgLyEYIezQEX6NHQTXiNFM+UJtJfYvprKqqDNy1Xz6B8qSO9BcsnT5IpvCnV1en8Xg+oPd9RaUuiA/vzyMBBrhZztj6hMAEkDgtxVYDSYiwo3EKVEggJP1w+P8fpc6CY7RpYeu+btlolgdS3jcYYDAo6ZF6C3XbMmDYhwY45H0nqMjfauuOnI/7X2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yBkVxs+6TEtUZpDASWt3plV6vFIoVv/kC7hqQOTaXxA=;
- b=GtXHNI4caxGSz24WS+cKOxNGNqsxDcQS8ucDu+P7hDLnGUsLMZXv62CTtx05B+W1ZvWJx6tjrNk+vssBu6sEhs9P1diYtSZmlWJ71RotNNlUInq4dlJ13HxtAP70nnVGbGMVt59A4o0DaN1glVZcICLm8Nw0vBSuiejKmzt8H5J9pLNCrtnZe2M1a9vOzwldOl3O4/8Tfq4gvI1CVep3dvPvDeR6QX3eh0g1ff5NPci7AdANWjp2UDsH80VyPPMt14B5IVGwDV+DnYVh2wiihBP/6Hi/B/j9/boNgJUFYBanZan/nKzW9KPbFs3yjmr/EP0lpSQBI9HidmjtL/ebDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yBkVxs+6TEtUZpDASWt3plV6vFIoVv/kC7hqQOTaXxA=;
- b=HX4dp919tFEMllJFDGsR00t2IM3o+oxUy3ra/K5lX1sBQIagJ8rQT5Sjzx8UJCgp33/WBfbhWPGV8IltaqcI8c9xyDkRFYGKPCbZjSWDyeu6xMykRqVDyLqeDyf+vsIu3JwWZ/BEHilOFJW25BYAryIFd6KiiQXtjFWET14ndIs=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4835.eurprd08.prod.outlook.com (10.255.96.144) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.18; Tue, 21 Jan 2020 09:35:12 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.027; Tue, 21 Jan 2020
- 09:35:12 +0000
-Received: from [172.16.24.200] (185.231.240.5) by
- AM0PR01CA0018.eurprd01.prod.exchangelabs.com (2603:10a6:208:69::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.19 via Frontend
- Transport; Tue, 21 Jan 2020 09:35:12 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v3 06/10] block/dirty-bitmap: add _next_dirty API
-Thread-Topic: [PATCH v3 06/10] block/dirty-bitmap: add _next_dirty API
-Thread-Index: AQHVtlOgdeEZtpGHH0igSKd2umc3c6fzul2AgABpNwCAAOvqAA==
-Date: Tue, 21 Jan 2020 09:35:12 +0000
-Message-ID: <17e0811e-8f4d-20e9-75a3-0c11702900bb@virtuozzo.com>
-References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
- <20191219100348.24827-7-vsementsov@virtuozzo.com>
- <0350481a-12ad-1608-79f1-b9f433963565@redhat.com>
- <2641fe67-1035-e00b-131d-513aec6752a8@virtuozzo.com>
-In-Reply-To: <2641fe67-1035-e00b-131d-513aec6752a8@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: AM0PR01CA0018.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:69::31) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20200121123510216
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2210e5ad-ef39-44f0-100c-08d79e5536c6
-x-ms-traffictypediagnostic: AM6PR08MB4835:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB48354D55E701BBCD4C388562C10D0@AM6PR08MB4835.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1122;
-x-forefront-prvs: 0289B6431E
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39850400004)(376002)(136003)(396003)(346002)(366004)(199004)(189003)(31686004)(54906003)(4326008)(2616005)(110136005)(16576012)(186003)(71200400001)(5660300002)(956004)(2906002)(316002)(6486002)(107886003)(8676002)(81166006)(81156014)(8936002)(52116002)(66556008)(64756008)(86362001)(26005)(16526019)(66446008)(31696002)(66946007)(66476007)(36756003)(508600001)(53546011)(14143004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4835;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3NANguwDG+1RqfWAm3e+VxIhBhzWqtJoT8A6JbIz5avVeH/qvj7fEfJ2u38onHa3ZK84Ynr47vFw/1kOh1YZLh5ZZPig6KxW1VkEe0x7VOflTa7ur+MAqAiLedTaeMYXY0EI6u6Nzw1wi9O0MeASdGosICWQk02Kjbk1UrIBfF0eKiI1smHboH14McDr84MPJZBlTGdp8k6/Fx1UM8Gye8mn98Q1EW33e/CJ34CM0WZ8kD3bBL4cTVviKLDrKpHernh96JlgKwenjbw+Z9DkEjoHbRkRYZiLm4c6LO9QRfNQPGxg1NLSsk6LRr9ANMJuMuvo69B30wCdpk4C9yPTl+VzLURblKkmDcZVxkaHabpUXdxhYP/iXpfLkT/Z69GfAPYnSabeLW7WSSTNOV42o6Xt9QYpL9HoTwhWTKix4Ir4znGEvZvqsirDLK5n2kEXW9wV4RhOcJlrI3+d6fVpMPLKJTDVeojEkRXkkRi3QNo=
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <4180810DAE5EE54DB8EC136367464BEA@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <mreitz@redhat.com>) id 1itq2z-0007z5-Nt
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:42:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46026
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1itq2z-0007ya-KL
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:42:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579599729;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=jgk4io4PkW8I3lfAed/5lWEHZ4SCcIy/FcY323HyQH8=;
+ b=OGYO+AED3UODe4A9ynGegeIayo2KDf5iEe+M4wJvTvkapIRIVUvg4AuKnL2g7d2K9d3sSx
+ jIng0A2Ev04lAaWVA1ocFPx9wCeN6M8yyu/Go3j4f1WIqNbdWgJ10BpgjpKDd8IU8Ecdyo
+ NPq1z+WcMNq1fpZvQiNInVQQo8Lvr0c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-Etc1YKjiNPGzrqcwwe8w2g-1; Tue, 21 Jan 2020 04:42:04 -0500
+X-MC-Unique: Etc1YKjiNPGzrqcwwe8w2g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68CF518C43FD;
+ Tue, 21 Jan 2020 09:42:03 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AB03C860FE;
+ Tue, 21 Jan 2020 09:42:01 +0000 (UTC)
+Subject: Re: [PATCH 2/2] iotests: add test for backup-top failure on
+ permission activation
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20200116155452.30972-1-vsementsov@virtuozzo.com>
+ <20200116155452.30972-3-vsementsov@virtuozzo.com>
+ <eedd42b6-bf4e-f6de-13a4-412d389fdb09@redhat.com>
+ <ea9219cd-8cc1-8cc0-d568-a51013ba74a4@virtuozzo.com>
+ <f52b6ff5-e993-d567-cbbe-1d6d158908da@redhat.com>
+ <0e865df2-7d21-b18f-b73c-2948577b9dcb@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <1313e55e-0eb1-890a-4e8e-2517f1e80d38@redhat.com>
+Date: Tue, 21 Jan 2020 10:41:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2210e5ad-ef39-44f0-100c-08d79e5536c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 09:35:12.5622 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dZjper1EB80mGgTHmjGoXq/ShS3kcPE+7eFrC6eiX7DQ0+A+Dqx8tKoPme3Y8PHiS/qQvkiboFa6LGXt7LaedweTY+qxZmyM5UonfNnVhf4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4835
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.129
+In-Reply-To: <0e865df2-7d21-b18f-b73c-2948577b9dcb@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="PtDoMgSrLQJMwbDDSjkO8lBaupxbFY6XP"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,143 +120,251 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.01.2020 19:30, Vladimir Sementsov-Ogievskiy wrote:
-> 20.01.2020 16:14, Max Reitz wrote:
->> On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
->>> We have bdrv_dirty_bitmap_next_zero, let's add corresponding
->>> bdrv_dirty_bitmap_next_dirty, which is more comfortable to use than
->>> bitmap iterators in some cases.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PtDoMgSrLQJMwbDDSjkO8lBaupxbFY6XP
+Content-Type: multipart/mixed; boundary="kxHMJBwdgrsl6kLNfn5b1Q0j5epMRXA7C"
+
+--kxHMJBwdgrsl6kLNfn5b1Q0j5epMRXA7C
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 21.01.20 10:23, Vladimir Sementsov-Ogievskiy wrote:
+> 21.01.2020 12:14, Max Reitz wrote:
+>> On 20.01.20 18:20, Vladimir Sementsov-Ogievskiy wrote:
+>>> 20.01.2020 20:04, Max Reitz wrote:
+>>>> On 16.01.20 16:54, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> This test checks that bug is really fixed by previous commit.
+>>>>>
+>>>>> Cc: qemu-stable@nongnu.org # v4.2.0
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>>>> ---
+>>>>>    tests/qemu-iotests/283     | 75 ++++++++++++++++++++++++++++++++++=
+++++
+>>>>>    tests/qemu-iotests/283.out |  8 ++++
+>>>>>    tests/qemu-iotests/group   |  1 +
+>>>>>    3 files changed, 84 insertions(+)
+>>>>>    create mode 100644 tests/qemu-iotests/283
+>>>>>    create mode 100644 tests/qemu-iotests/283.out
+>>>>
+>>>> The test looks good to me, I just have a comment nit and a note on the
+>>>> fact that this should probably be queued only after Thomas=E2=80=99s =
+=E2=80=9CEnable
+>>>> more iotests during "make check-block"=E2=80=9D series.
+>>>>
+>>>>> diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
+>>>>> new file mode 100644
+>>>>> index 0000000000..f0f216d109
+>>>>> --- /dev/null
+>>>>> +++ b/tests/qemu-iotests/283
+>>>>> @@ -0,0 +1,75 @@
+>>>>> +#!/usr/bin/env python
+>>>>> +#
+>>>>> +# Test for backup-top filter permission activation failure
+>>>>> +#
+>>>>> +# Copyright (c) 2019 Virtuozzo International GmbH.
+>>>>> +#
+>>>>> +# This program is free software; you can redistribute it and/or modi=
+fy
+>>>>> +# it under the terms of the GNU General Public License as published =
+by
+>>>>> +# the Free Software Foundation; either version 2 of the License, or
+>>>>> +# (at your option) any later version.
+>>>>> +#
+>>>>> +# This program is distributed in the hope that it will be useful,
+>>>>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>>>> +# GNU General Public License for more details.
+>>>>> +#
+>>>>> +# You should have received a copy of the GNU General Public License
+>>>>> +# along with this program.  If not, see <http://www.gnu.org/licenses=
+/>.
+>>>>> +#
+>>>>> +
+>>>>> +import iotests
+>>>>> +
+>>>>> +# The test is unrelated to formats, restrict it to qcow2 to avoid ex=
+tra runs
+>>>>> +iotests.verify_image_format(supported_fmts=3D['qcow2'])
+>>>>> +
+>>>>> +size =3D 1024 * 1024
+>>>>> +
+>>>>> +"""
+>>>>> +On activation, backup-top is going to unshare write permission on it=
+s
+>>>>> +source child. It will be impossible for the following configuration:
+>>>>
+>>>> =E2=80=9CThe following configuration will become impossible=E2=80=9D?
 >>>
->>> For test modify test_hbitmap_next_zero_check_range to check both
->>> next_zero and next_dirty and add some new checks.
+>>> Hmm, no, the configuration is possible. But "it", i.e. "unshare write p=
+ermission",
+>>> is impossible with such configuration..
+>>
+>> But backup_top always unshares the write permission on the source.
+>=20
+> Yes, and I just try to say, that this action will fail. And the test chec=
+ks that it
+> fails (and it crashes with current master instead of fail).
+
+OK.  So what I was trying to say is that the comment currently only
+states that this will fail.  I=E2=80=99d prefer it to also reassure me that=
+ it=E2=80=99s
+correct that this fails (because all writes on the backup source must go
+through backup_top), and that this is exactly what we want to test here.
+
+On first reading, I was wondering why exactly this comment would tell me
+all these things, because I didn=E2=80=99t know what the test wants to test=
+ in
+the first place.
+
+Max
+
+>>>> I think there should be some note that this is exactly what we want to
+>>>> test, i.e. what happens when this impossible configuration is attempte=
+d
+>>>> by starting a backup.  (And maybe why this isn=E2=80=99t allowed; name=
+ly because
+>>>> we couldn=E2=80=99t do CBW for such write accesses.)
+>>>>
+>>>>> +
+>>>>> +    =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=90  target  =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=90
+>>>>> +    =E2=94=82 target =E2=94=82 =E2=97=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80 =E2=94=82 backup_top  =E2=94=82
+>>>>> +    =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=98          =E2=94=94=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=98
+>>>>> +                            =E2=94=82
+>>>>> +                            =E2=94=82 backing
+>>>>> +                            =E2=96=BC
+>>>>> +                        =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=90
+>>>>> +                        =E2=94=82   source    =E2=94=82
+>>>>> +                        =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=98
+>>>>> +                            =E2=94=82
+>>>>> +                            =E2=94=82 file
+>>>>> +                            =E2=96=BC
+>>>>> +                        =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=90  write perm   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90
+>>>>> +                        =E2=94=82    base     =E2=94=82 =E2=97=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80 =E2=94=82 other =E2=94=82
+>>>>> +                        =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=98               =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
+>>>>
+>>>> Cool Unicode art. :-)
 >>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>> =A0 include/block/dirty-bitmap.h |=A0=A0 2 +
->>> =A0 include/qemu/hbitmap.h=A0=A0=A0=A0=A0=A0 |=A0 13 ++++
->>> =A0 block/dirty-bitmap.c=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 6 ++
->>> =A0 tests/test-hbitmap.c=A0=A0=A0=A0=A0=A0=A0=A0 | 130 ++++++++++++++++=
-++++---------------
->>> =A0 util/hbitmap.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 60 ++=
-++++++--------
->>> =A0 5 files changed, 126 insertions(+), 85 deletions(-)
+>>> I found the great tool: https://dot-to-ascii.ggerganov.com/
 >>
->> [...]
+>> Thanks!
 >>
->>> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
->>> index b6e85f3d5d..a4b032b270 100644
->>> --- a/include/qemu/hbitmap.h
->>> +++ b/include/qemu/hbitmap.h
->>> @@ -297,6 +297,19 @@ void hbitmap_free(HBitmap *hb);
->>> =A0=A0 */
->>> =A0 void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_=
-t first);
->>> +/*
->>> + * hbitmap_next_dirty:
->>> + *
->>> + * Find next dirty bit within selected range. If not found, return -1.
->>> + *
->>> + * @hb: The HBitmap to operate on
->>> + * @start: The bit to start from.
->>> + * @count: Number of bits to proceed. If @start+@count > bitmap size, =
-the whole
->>> + * bitmap is looked through. You can use UINT64_MAX as @count to searc=
-h up to
+>> Max
 >>
->> I would=92ve said s/looked through/scanned/, but it matches
->> hbitmap_next_zero()=92s documentation, so it=92s fine.
+>>>>> +
+>>>>> +Write unsharing will be propagated to the "source->base"link and wil=
+l
+>>>>> +conflict with other node write permission.
+>>>>> +
+>>>>> +(Note, that we can't just consider source to be direct child of othe=
+r,
+>>>>> +as in this case this link will be broken, when backup_top is appende=
+d)
+>>>>> +"""
+>>>>> +
+>>>>> +vm =3D iotests.VM()
+>>>>> +vm.launch()
+>>>>> +
+>>>>> +vm.qmp_log('blockdev-add', **{'node-name': 'target', 'driver': 'null=
+-co'})
+>>>>> +
+>>>>> +vm.qmp_log('blockdev-add', **{
+>>>>> +    'node-name': 'source',
+>>>>> +    'driver': 'blkdebug',
+>>>>> +    'image': {'node-name': 'base', 'driver': 'null-co', 'size': size=
+}
+>>>>> +})
+>>>>> +
+>>>>> +vm.qmp_log('blockdev-add', **{
+>>>>> +    'node-name': 'other',
+>>>>> +    'driver': 'blkdebug',
+>>>>> +    'image': 'base',
+>>>>> +    'take-child-perms': ['write']
+>>>>> +})
+>>>>> +
+>>>>> +vm.qmp_log('blockdev-backup', sync=3D'full', device=3D'source', targ=
+et=3D'target')
+>>>>> +
+>>>>> +vm.shutdown()
+>>>>
+>>>> [...]
+>>>>
+>>>>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+>>>>> index cb2b789e44..d827e8c821 100644
+>>>>> --- a/tests/qemu-iotests/group
+>>>>> +++ b/tests/qemu-iotests/group
+>>>>> @@ -288,3 +288,4 @@
+>>>>>    277 rw quick
+>>>>>    279 rw backing quick
+>>>>>    280 rw migration quick
+>>>>> +283 auto quick
+>>>>
+>>>> Hm.  This would be the first Python test in auto.
+>>>
+>>> Missed that. It's OK to define it just "quick" and update later.
+>>>
+>>>>   Thomas=E2=80=99s series has
+>>>> at least one patch that seems useful to come before we do this, namely
+>>>> =E2=80=9CSkip Python-based tests if QEMU does not support virtio-blk=
+=E2=80=9D.  So I
+>>>> suppose his series should come before this, then.
+>>>>
+>>>> Max
+>>>>
+>>>
+>>>
 >>
->> But definitely s/UINT64_MAX/INT64_MAX/.
->>
->>> + * the bitmap end.
->>> + */
->>> +int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t c=
-ount);
->>> +
->>> =A0 /* hbitmap_next_zero:
->>> =A0=A0 *
->>> =A0=A0 * Find next not dirty bit within selected range. If not found, r=
-eturn -1.
->>
->> [...]
->>
->>> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
->>> index 0e1e5c64dd..e3f1b3f361 100644
->>> --- a/tests/test-hbitmap.c
->>> +++ b/tests/test-hbitmap.c
->>> @@ -816,92 +816,108 @@ static void test_hbitmap_iter_and_reset(TestHBit=
-mapData *data,
->>> =A0=A0=A0=A0=A0 hbitmap_iter_next(&hbi);
->>> =A0 }
->>> -static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint6=
-4_t start,
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint6=
-4_t count)
->>> +static void test_hbitmap_next_x_check_range(TestHBitmapData *data,
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64_t start=
-,
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64_t count=
-)
->>
->> Why not change the parameters to be signed while we=92re already here?
-
-Now I think that better to do it in previous patch.
-
->>
->> [...]
->>
->>> diff --git a/util/hbitmap.c b/util/hbitmap.c
->>> index df22f06be6..d23f4b9678 100644
->>> --- a/util/hbitmap.c
->>> +++ b/util/hbitmap.c
->>> @@ -193,6 +193,30 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBi=
-tmap *hb, uint64_t first)
->>> =A0=A0=A0=A0=A0 }
->>> =A0 }
->>> +int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t c=
-ount)
->>> +{
->>> +=A0=A0=A0 HBitmapIter hbi;
->>> +=A0=A0=A0 int64_t firt_dirty_off;
->>
->> Pre-existing, but isn=92t this just a typo that you could fix here?=A0 (=
-i.e.
->> s/firt/first/)
->>
->> Apart from this minor things:
->=20
-> Agree with them.
->=20
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>
->>> +=A0=A0=A0 uint64_t end;
->>> +
->>> +=A0=A0=A0 assert(start >=3D 0 && count >=3D 0);
->>> +
->>> +=A0=A0=A0 if (start >=3D hb->orig_size || count =3D=3D 0) {
->>> +=A0=A0=A0=A0=A0=A0=A0 return -1;
->>> +=A0=A0=A0 }
->>> +
->>> +=A0=A0=A0 end =3D count > hb->orig_size - start ?
 >>
 >=20
 >=20
 
 
---=20
-Best regards,
-Vladimir
+
+--kxHMJBwdgrsl6kLNfn5b1Q0j5epMRXA7C--
+
+--PtDoMgSrLQJMwbDDSjkO8lBaupxbFY6XP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4mx2cACgkQ9AfbAGHV
+z0Cqvwf/Vv4nnO/5e4/jABuSnXBuoIrGPxSMKBCHvqm5F6yE+v9ziUAXgnF00IJs
+tHq3RPRc8fRn2pmyWJSvlxX5EzSIDsWG3DlCxrg5ijSGsHxyahmlQ5ZO9+qRxnVG
+AmlSf6y0H2vwcnwlCAc1OSrGNmmkFcS3MNyCHynowVsFI5NaB4Vnr8zScNojxJl7
+t5YwVMj42eHj2+xubWhSc3w7HVmBZUjsmZH6/q8MXUltoDUaTMrtLknk3PjUbMXE
+UjO6eL4i7tY03JVmHTajO4stVTsEyVSbptZOc2xx1LkmciCc1NwCRCK7YjMz6C9U
+ejPFIKDCkmpSWKnG1TxzThG2kRwZyg==
+=5Hti
+-----END PGP SIGNATURE-----
+
+--PtDoMgSrLQJMwbDDSjkO8lBaupxbFY6XP--
+
 
