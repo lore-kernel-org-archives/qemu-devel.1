@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3D0C3F68F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88285C2D0CE
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E29B21734
+	by mail.kernel.org (Postfix) with ESMTPS id 2EFB620882
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:26:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HwG1QOXf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E29B21734
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YmWDSgmZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EFB620882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itscS-0006eE-5g
+	id 1itscR-0006g0-V2
 	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 07:26:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50925)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsad-0004e4-HM
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:25:07 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsae-0004fH-CW
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:25:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsaZ-0001cR-Qq
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:25:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57818
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itsaa-0001cp-KU
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:25:04 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39385)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsaZ-0001c9-L3
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:24:59 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsaa-0001ca-Er
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:25:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609499;
+ s=mimecast20190719; t=1579609500;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hmtgHDM72DpusqIfgSnPf4PI+AdTefyjrVxqJCBETz8=;
- b=HwG1QOXfP4vre9s/Edl9JDBxo6gjjkNCIURbbFqdDxxOppFVnoa+bSAcLp77BVCpATo1ih
- txDNjPJXJlIeZMFvucF4T74ZDXifdDflRmbWQ9uMFYiyys1/vtMCwN+l4fRmBwLQEdur44
- 54ZLOTUF8TDk/bFXR7ipHeyPTFWvniI=
+ bh=C4huMjwh4blrLPFPJBbTF24ciCHXe5aOzmyXsW6UjD0=;
+ b=YmWDSgmZtazt7V0LomOyLl60RiSrpOyFOme4bAaC3Tolm+D65eYgYmomiUsU3YmfkOV+Ps
+ AjCntefW5GXkOm9hjdo6atCnhkz4rwwOJEoQQ6U1o41Yo/hAJW4Eznf2Q6fNXGDcBOqV4w
+ V/ZeG27yTQr7Jr1REMv17FvnZ01NTWQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-Wxu0NxDzOfaAQTMvqB0tbA-1; Tue, 21 Jan 2020 07:24:55 -0500
+ us-mta-19-ngA4KcriMqC0Nyzsg_KBbA-1; Tue, 21 Jan 2020 07:24:57 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71D1C800D4C;
- Tue, 21 Jan 2020 12:24:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B78B1005510;
+ Tue, 21 Jan 2020 12:24:56 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BCC4E60BE0;
- Tue, 21 Jan 2020 12:24:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BF97960FC4;
+ Tue, 21 Jan 2020 12:24:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 002/109] virtiofsd: Pull in kernel's fuse.h
-Date: Tue, 21 Jan 2020 12:22:46 +0000
-Message-Id: <20200121122433.50803-3-dgilbert@redhat.com>
+Subject: [PATCH v2 003/109] virtiofsd: Add auxiliary .c's
+Date: Tue, 21 Jan 2020 12:22:47 +0000
+Message-Id: <20200121122433.50803-4-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Wxu0NxDzOfaAQTMvqB0tbA-1
+X-MC-Unique: ngA4KcriMqC0Nyzsg_KBbA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,944 +93,1385 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Update scripts/update-linux-headers.sh to add fuse.h and
-use it to pull in fuse.h from the kernel; from v5.5-rc1
+Add most of the non-main .c files we need from upstream fuse-3.8.0
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- include/standard-headers/linux/fuse.h | 891 ++++++++++++++++++++++++++
- scripts/update-linux-headers.sh       |   1 +
- 2 files changed, 892 insertions(+)
- create mode 100644 include/standard-headers/linux/fuse.h
+ tools/virtiofsd/buffer.c       | 321 ++++++++++++++++++++++++
+ tools/virtiofsd/fuse_log.c     |  40 +++
+ tools/virtiofsd/fuse_opt.c     | 423 +++++++++++++++++++++++++++++++
+ tools/virtiofsd/fuse_signals.c |  91 +++++++
+ tools/virtiofsd/helper.c       | 440 +++++++++++++++++++++++++++++++++
+ 5 files changed, 1315 insertions(+)
+ create mode 100644 tools/virtiofsd/buffer.c
+ create mode 100644 tools/virtiofsd/fuse_log.c
+ create mode 100644 tools/virtiofsd/fuse_opt.c
+ create mode 100644 tools/virtiofsd/fuse_signals.c
+ create mode 100644 tools/virtiofsd/helper.c
 
-diff --git a/include/standard-headers/linux/fuse.h b/include/standard-heade=
-rs/linux/fuse.h
+diff --git a/tools/virtiofsd/buffer.c b/tools/virtiofsd/buffer.c
 new file mode 100644
-index 0000000000..f4df0a40f6
+index 0000000000..5ab9b87455
 --- /dev/null
-+++ b/include/standard-headers/linux/fuse.h
-@@ -0,0 +1,891 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-2-Cl=
-ause) */
++++ b/tools/virtiofsd/buffer.c
+@@ -0,0 +1,321 @@
 +/*
-+    This file defines the kernel interface of FUSE
-+    Copyright (C) 2001-2008  Miklos Szeredi <miklos@szeredi.hu>
++  FUSE: Filesystem in Userspace
++  Copyright (C) 2010  Miklos Szeredi <miklos@szeredi.hu>
 +
-+    This program can be distributed under the terms of the GNU GPL.
-+    See the file COPYING.
++  Functions for dealing with `struct fuse_buf` and `struct
++  fuse_bufvec`.
 +
-+    This -- and only this -- header file may also be distributed under
-+    the terms of the BSD Licence as follows:
-+
-+    Copyright (C) 2001-2007 Miklos Szeredi. All rights reserved.
-+
-+    Redistribution and use in source and binary forms, with or without
-+    modification, are permitted provided that the following conditions
-+    are met:
-+    1. Redistributions of source code must retain the above copyright
-+       notice, this list of conditions and the following disclaimer.
-+    2. Redistributions in binary form must reproduce the above copyright
-+       notice, this list of conditions and the following disclaimer in the
-+       documentation and/or other materials provided with the distribution=
-.
-+
-+    THIS SOFTWARE IS PROVIDED BY AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PUR=
-POSE
-+    ARE DISCLAIMED.  IN NO EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE
-+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUEN=
-TIAL
-+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOOD=
-S
-+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, ST=
-RICT
-+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY =
-WAY
-+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+    SUCH DAMAGE.
++  This program can be distributed under the terms of the GNU LGPLv2.
++  See the file COPYING.LIB
 +*/
 +
++#define _GNU_SOURCE
++
++#include "config.h"
++#include "fuse_i.h"
++#include "fuse_lowlevel.h"
++#include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <assert.h>
++
++size_t fuse_buf_size(const struct fuse_bufvec *bufv)
++{
++=09size_t i;
++=09size_t size =3D 0;
++
++=09for (i =3D 0; i < bufv->count; i++) {
++=09=09if (bufv->buf[i].size =3D=3D SIZE_MAX)
++=09=09=09size =3D SIZE_MAX;
++=09=09else
++=09=09=09size +=3D bufv->buf[i].size;
++=09}
++
++=09return size;
++}
++
++static size_t min_size(size_t s1, size_t s2)
++{
++=09return s1 < s2 ? s1 : s2;
++}
++
++static ssize_t fuse_buf_write(const struct fuse_buf *dst, size_t dst_off,
++=09=09=09      const struct fuse_buf *src, size_t src_off,
++=09=09=09      size_t len)
++{
++=09ssize_t res =3D 0;
++=09size_t copied =3D 0;
++
++=09while (len) {
++=09=09if (dst->flags & FUSE_BUF_FD_SEEK) {
++=09=09=09res =3D pwrite(dst->fd, (char *)src->mem + src_off, len,
++=09=09=09=09     dst->pos + dst_off);
++=09=09} else {
++=09=09=09res =3D write(dst->fd, (char *)src->mem + src_off, len);
++=09=09}
++=09=09if (res =3D=3D -1) {
++=09=09=09if (!copied)
++=09=09=09=09return -errno;
++=09=09=09break;
++=09=09}
++=09=09if (res =3D=3D 0)
++=09=09=09break;
++
++=09=09copied +=3D res;
++=09=09if (!(dst->flags & FUSE_BUF_FD_RETRY))
++=09=09=09break;
++
++=09=09src_off +=3D res;
++=09=09dst_off +=3D res;
++=09=09len -=3D res;
++=09}
++
++=09return copied;
++}
++
++static ssize_t fuse_buf_read(const struct fuse_buf *dst, size_t dst_off,
++=09=09=09     const struct fuse_buf *src, size_t src_off,
++=09=09=09     size_t len)
++{
++=09ssize_t res =3D 0;
++=09size_t copied =3D 0;
++
++=09while (len) {
++=09=09if (src->flags & FUSE_BUF_FD_SEEK) {
++=09=09=09res =3D pread(src->fd, (char *)dst->mem + dst_off, len,
++=09=09=09=09     src->pos + src_off);
++=09=09} else {
++=09=09=09res =3D read(src->fd, (char *)dst->mem + dst_off, len);
++=09=09}
++=09=09if (res =3D=3D -1) {
++=09=09=09if (!copied)
++=09=09=09=09return -errno;
++=09=09=09break;
++=09=09}
++=09=09if (res =3D=3D 0)
++=09=09=09break;
++
++=09=09copied +=3D res;
++=09=09if (!(src->flags & FUSE_BUF_FD_RETRY))
++=09=09=09break;
++
++=09=09dst_off +=3D res;
++=09=09src_off +=3D res;
++=09=09len -=3D res;
++=09}
++
++=09return copied;
++}
++
++static ssize_t fuse_buf_fd_to_fd(const struct fuse_buf *dst, size_t dst_of=
+f,
++=09=09=09=09 const struct fuse_buf *src, size_t src_off,
++=09=09=09=09 size_t len)
++{
++=09char buf[4096];
++=09struct fuse_buf tmp =3D {
++=09=09.size =3D sizeof(buf),
++=09=09.flags =3D 0,
++=09};
++=09ssize_t res;
++=09size_t copied =3D 0;
++
++=09tmp.mem =3D buf;
++
++=09while (len) {
++=09=09size_t this_len =3D min_size(tmp.size, len);
++=09=09size_t read_len;
++
++=09=09res =3D fuse_buf_read(&tmp, 0, src, src_off, this_len);
++=09=09if (res < 0) {
++=09=09=09if (!copied)
++=09=09=09=09return res;
++=09=09=09break;
++=09=09}
++=09=09if (res =3D=3D 0)
++=09=09=09break;
++
++=09=09read_len =3D res;
++=09=09res =3D fuse_buf_write(dst, dst_off, &tmp, 0, read_len);
++=09=09if (res < 0) {
++=09=09=09if (!copied)
++=09=09=09=09return res;
++=09=09=09break;
++=09=09}
++=09=09if (res =3D=3D 0)
++=09=09=09break;
++
++=09=09copied +=3D res;
++
++=09=09if (res < this_len)
++=09=09=09break;
++
++=09=09dst_off +=3D res;
++=09=09src_off +=3D res;
++=09=09len -=3D res;
++=09}
++
++=09return copied;
++}
++
++#ifdef HAVE_SPLICE
++static ssize_t fuse_buf_splice(const struct fuse_buf *dst, size_t dst_off,
++=09=09=09       const struct fuse_buf *src, size_t src_off,
++=09=09=09       size_t len, enum fuse_buf_copy_flags flags)
++{
++=09int splice_flags =3D 0;
++=09off_t *srcpos =3D NULL;
++=09off_t *dstpos =3D NULL;
++=09off_t srcpos_val;
++=09off_t dstpos_val;
++=09ssize_t res;
++=09size_t copied =3D 0;
++
++=09if (flags & FUSE_BUF_SPLICE_MOVE)
++=09=09splice_flags |=3D SPLICE_F_MOVE;
++=09if (flags & FUSE_BUF_SPLICE_NONBLOCK)
++=09=09splice_flags |=3D SPLICE_F_NONBLOCK;
++
++=09if (src->flags & FUSE_BUF_FD_SEEK) {
++=09=09srcpos_val =3D src->pos + src_off;
++=09=09srcpos =3D &srcpos_val;
++=09}
++=09if (dst->flags & FUSE_BUF_FD_SEEK) {
++=09=09dstpos_val =3D dst->pos + dst_off;
++=09=09dstpos =3D &dstpos_val;
++=09}
++
++=09while (len) {
++=09=09res =3D splice(src->fd, srcpos, dst->fd, dstpos, len,
++=09=09=09     splice_flags);
++=09=09if (res =3D=3D -1) {
++=09=09=09if (copied)
++=09=09=09=09break;
++
++=09=09=09if (errno !=3D EINVAL || (flags & FUSE_BUF_FORCE_SPLICE))
++=09=09=09=09return -errno;
++
++=09=09=09/* Maybe splice is not supported for this combination */
++=09=09=09return fuse_buf_fd_to_fd(dst, dst_off, src, src_off,
++=09=09=09=09=09=09 len);
++=09=09}
++=09=09if (res =3D=3D 0)
++=09=09=09break;
++
++=09=09copied +=3D res;
++=09=09if (!(src->flags & FUSE_BUF_FD_RETRY) &&
++=09=09    !(dst->flags & FUSE_BUF_FD_RETRY)) {
++=09=09=09break;
++=09=09}
++
++=09=09len -=3D res;
++=09}
++
++=09return copied;
++}
++#else
++static ssize_t fuse_buf_splice(const struct fuse_buf *dst, size_t dst_off,
++=09=09=09       const struct fuse_buf *src, size_t src_off,
++=09=09=09       size_t len, enum fuse_buf_copy_flags flags)
++{
++=09(void) flags;
++
++=09return fuse_buf_fd_to_fd(dst, dst_off, src, src_off, len);
++}
++#endif
++
++
++static ssize_t fuse_buf_copy_one(const struct fuse_buf *dst, size_t dst_of=
+f,
++=09=09=09=09 const struct fuse_buf *src, size_t src_off,
++=09=09=09=09 size_t len, enum fuse_buf_copy_flags flags)
++{
++=09int src_is_fd =3D src->flags & FUSE_BUF_IS_FD;
++=09int dst_is_fd =3D dst->flags & FUSE_BUF_IS_FD;
++
++=09if (!src_is_fd && !dst_is_fd) {
++=09=09char *dstmem =3D (char *)dst->mem + dst_off;
++=09=09char *srcmem =3D (char *)src->mem + src_off;
++
++=09=09if (dstmem !=3D srcmem) {
++=09=09=09if (dstmem + len <=3D srcmem || srcmem + len <=3D dstmem)
++=09=09=09=09memcpy(dstmem, srcmem, len);
++=09=09=09else
++=09=09=09=09memmove(dstmem, srcmem, len);
++=09=09}
++
++=09=09return len;
++=09} else if (!src_is_fd) {
++=09=09return fuse_buf_write(dst, dst_off, src, src_off, len);
++=09} else if (!dst_is_fd) {
++=09=09return fuse_buf_read(dst, dst_off, src, src_off, len);
++=09} else if (flags & FUSE_BUF_NO_SPLICE) {
++=09=09return fuse_buf_fd_to_fd(dst, dst_off, src, src_off, len);
++=09} else {
++=09=09return fuse_buf_splice(dst, dst_off, src, src_off, len, flags);
++=09}
++}
++
++static const struct fuse_buf *fuse_bufvec_current(struct fuse_bufvec *bufv=
+)
++{
++=09if (bufv->idx < bufv->count)
++=09=09return &bufv->buf[bufv->idx];
++=09else
++=09=09return NULL;
++}
++
++static int fuse_bufvec_advance(struct fuse_bufvec *bufv, size_t len)
++{
++=09const struct fuse_buf *buf =3D fuse_bufvec_current(bufv);
++
++=09bufv->off +=3D len;
++=09assert(bufv->off <=3D buf->size);
++=09if (bufv->off =3D=3D buf->size) {
++=09=09assert(bufv->idx < bufv->count);
++=09=09bufv->idx++;
++=09=09if (bufv->idx =3D=3D bufv->count)
++=09=09=09return 0;
++=09=09bufv->off =3D 0;
++=09}
++=09return 1;
++}
++
++ssize_t fuse_buf_copy(struct fuse_bufvec *dstv, struct fuse_bufvec *srcv,
++=09=09      enum fuse_buf_copy_flags flags)
++{
++=09size_t copied =3D 0;
++
++=09if (dstv =3D=3D srcv)
++=09=09return fuse_buf_size(dstv);
++
++=09for (;;) {
++=09=09const struct fuse_buf *src =3D fuse_bufvec_current(srcv);
++=09=09const struct fuse_buf *dst =3D fuse_bufvec_current(dstv);
++=09=09size_t src_len;
++=09=09size_t dst_len;
++=09=09size_t len;
++=09=09ssize_t res;
++
++=09=09if (src =3D=3D NULL || dst =3D=3D NULL)
++=09=09=09break;
++
++=09=09src_len =3D src->size - srcv->off;
++=09=09dst_len =3D dst->size - dstv->off;
++=09=09len =3D min_size(src_len, dst_len);
++
++=09=09res =3D fuse_buf_copy_one(dst, dstv->off, src, srcv->off, len, flags=
+);
++=09=09if (res < 0) {
++=09=09=09if (!copied)
++=09=09=09=09return res;
++=09=09=09break;
++=09=09}
++=09=09copied +=3D res;
++
++=09=09if (!fuse_bufvec_advance(srcv, res) ||
++=09=09    !fuse_bufvec_advance(dstv, res))
++=09=09=09break;
++
++=09=09if (res < len)
++=09=09=09break;
++=09}
++
++=09return copied;
++}
+diff --git a/tools/virtiofsd/fuse_log.c b/tools/virtiofsd/fuse_log.c
+new file mode 100644
+index 0000000000..0d268ab014
+--- /dev/null
++++ b/tools/virtiofsd/fuse_log.c
+@@ -0,0 +1,40 @@
 +/*
-+ * This file defines the kernel interface of FUSE
-+ *
-+ * Protocol changelog:
-+ *
-+ * 7.1:
-+ *  - add the following messages:
-+ *      FUSE_SETATTR, FUSE_SYMLINK, FUSE_MKNOD, FUSE_MKDIR, FUSE_UNLINK,
-+ *      FUSE_RMDIR, FUSE_RENAME, FUSE_LINK, FUSE_OPEN, FUSE_READ, FUSE_WRI=
-TE,
-+ *      FUSE_RELEASE, FUSE_FSYNC, FUSE_FLUSH, FUSE_SETXATTR, FUSE_GETXATTR=
-,
-+ *      FUSE_LISTXATTR, FUSE_REMOVEXATTR, FUSE_OPENDIR, FUSE_READDIR,
-+ *      FUSE_RELEASEDIR
-+ *  - add padding to messages to accommodate 32-bit servers on 64-bit kern=
-els
-+ *
-+ * 7.2:
-+ *  - add FOPEN_DIRECT_IO and FOPEN_KEEP_CACHE flags
-+ *  - add FUSE_FSYNCDIR message
-+ *
-+ * 7.3:
-+ *  - add FUSE_ACCESS message
-+ *  - add FUSE_CREATE message
-+ *  - add filehandle to fuse_setattr_in
-+ *
-+ * 7.4:
-+ *  - add frsize to fuse_kstatfs
-+ *  - clean up request size limit checking
-+ *
-+ * 7.5:
-+ *  - add flags and max_write to fuse_init_out
-+ *
-+ * 7.6:
-+ *  - add max_readahead to fuse_init_in and fuse_init_out
-+ *
-+ * 7.7:
-+ *  - add FUSE_INTERRUPT message
-+ *  - add POSIX file lock support
-+ *
-+ * 7.8:
-+ *  - add lock_owner and flags fields to fuse_release_in
-+ *  - add FUSE_BMAP message
-+ *  - add FUSE_DESTROY message
-+ *
-+ * 7.9:
-+ *  - new fuse_getattr_in input argument of GETATTR
-+ *  - add lk_flags in fuse_lk_in
-+ *  - add lock_owner field to fuse_setattr_in, fuse_read_in and fuse_write=
-_in
-+ *  - add blksize field to fuse_attr
-+ *  - add file flags field to fuse_read_in and fuse_write_in
-+ *  - Add ATIME_NOW and MTIME_NOW flags to fuse_setattr_in
-+ *
-+ * 7.10
-+ *  - add nonseekable open flag
-+ *
-+ * 7.11
-+ *  - add IOCTL message
-+ *  - add unsolicited notification support
-+ *  - add POLL message and NOTIFY_POLL notification
-+ *
-+ * 7.12
-+ *  - add umask flag to input argument of create, mknod and mkdir
-+ *  - add notification messages for invalidation of inodes and
-+ *    directory entries
-+ *
-+ * 7.13
-+ *  - make max number of background requests and congestion threshold
-+ *    tunables
-+ *
-+ * 7.14
-+ *  - add splice support to fuse device
-+ *
-+ * 7.15
-+ *  - add store notify
-+ *  - add retrieve notify
-+ *
-+ * 7.16
-+ *  - add BATCH_FORGET request
-+ *  - FUSE_IOCTL_UNRESTRICTED shall now return with array of 'struct
-+ *    fuse_ioctl_iovec' instead of ambiguous 'struct iovec'
-+ *  - add FUSE_IOCTL_32BIT flag
-+ *
-+ * 7.17
-+ *  - add FUSE_FLOCK_LOCKS and FUSE_RELEASE_FLOCK_UNLOCK
-+ *
-+ * 7.18
-+ *  - add FUSE_IOCTL_DIR flag
-+ *  - add FUSE_NOTIFY_DELETE
-+ *
-+ * 7.19
-+ *  - add FUSE_FALLOCATE
-+ *
-+ * 7.20
-+ *  - add FUSE_AUTO_INVAL_DATA
-+ *
-+ * 7.21
-+ *  - add FUSE_READDIRPLUS
-+ *  - send the requested events in POLL request
-+ *
-+ * 7.22
-+ *  - add FUSE_ASYNC_DIO
-+ *
-+ * 7.23
-+ *  - add FUSE_WRITEBACK_CACHE
-+ *  - add time_gran to fuse_init_out
-+ *  - add reserved space to fuse_init_out
-+ *  - add FATTR_CTIME
-+ *  - add ctime and ctimensec to fuse_setattr_in
-+ *  - add FUSE_RENAME2 request
-+ *  - add FUSE_NO_OPEN_SUPPORT flag
-+ *
-+ *  7.24
-+ *  - add FUSE_LSEEK for SEEK_HOLE and SEEK_DATA support
-+ *
-+ *  7.25
-+ *  - add FUSE_PARALLEL_DIROPS
-+ *
-+ *  7.26
-+ *  - add FUSE_HANDLE_KILLPRIV
-+ *  - add FUSE_POSIX_ACL
-+ *
-+ *  7.27
-+ *  - add FUSE_ABORT_ERROR
-+ *
-+ *  7.28
-+ *  - add FUSE_COPY_FILE_RANGE
-+ *  - add FOPEN_CACHE_DIR
-+ *  - add FUSE_MAX_PAGES, add max_pages to init_out
-+ *  - add FUSE_CACHE_SYMLINKS
-+ *
-+ *  7.29
-+ *  - add FUSE_NO_OPENDIR_SUPPORT flag
-+ *
-+ *  7.30
-+ *  - add FUSE_EXPLICIT_INVAL_DATA
-+ *  - add FUSE_IOCTL_COMPAT_X32
-+ *
-+ *  7.31
-+ *  - add FUSE_WRITE_KILL_PRIV flag
-+ *  - add FUSE_SETUPMAPPING and FUSE_REMOVEMAPPING
-+ *  - add map_alignment to fuse_init_out, add FUSE_MAP_ALIGNMENT flag
-+ */
++  FUSE: Filesystem in Userspace
++  Copyright (C) 2019  Red Hat, Inc.
 +
-+#ifndef _LINUX_FUSE_H
-+#define _LINUX_FUSE_H
++  Logging API.
 +
-+#include <stdint.h>
++  This program can be distributed under the terms of the GNU LGPLv2.
++  See the file COPYING.LIB
++*/
 +
++#include "fuse_log.h"
++
++#include <stdarg.h>
++#include <stdio.h>
++
++static void default_log_func(
++=09=09__attribute__(( unused )) enum fuse_log_level level,
++=09=09const char *fmt, va_list ap)
++{
++=09vfprintf(stderr, fmt, ap);
++}
++
++static fuse_log_func_t log_func =3D default_log_func;
++
++void fuse_set_log_func(fuse_log_func_t func)
++{
++=09if (!func)
++=09=09func =3D default_log_func;
++
++=09log_func =3D func;
++}
++
++void fuse_log(enum fuse_log_level level, const char *fmt, ...)
++{
++=09va_list ap;
++
++=09va_start(ap, fmt);
++=09log_func(level, fmt, ap);
++=09va_end(ap);
++}
+diff --git a/tools/virtiofsd/fuse_opt.c b/tools/virtiofsd/fuse_opt.c
+new file mode 100644
+index 0000000000..93066b926e
+--- /dev/null
++++ b/tools/virtiofsd/fuse_opt.c
+@@ -0,0 +1,423 @@
 +/*
-+ * Version negotiation:
-+ *
-+ * Both the kernel and userspace send the version they support in the
-+ * INIT request and reply respectively.
-+ *
-+ * If the major versions match then both shall use the smallest
-+ * of the two minor versions for communication.
-+ *
-+ * If the kernel supports a larger major version, then userspace shall
-+ * reply with the major version it supports, ignore the rest of the
-+ * INIT message and expect a new INIT message from the kernel with a
-+ * matching major version.
-+ *
-+ * If the library supports a larger major version, then it shall fall
-+ * back to the major protocol version sent by the kernel for
-+ * communication and reply with that major version (and an arbitrary
-+ * supported minor version).
-+ */
++  FUSE: Filesystem in Userspace
++  Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
 +
-+/** Version number of this interface */
-+#define FUSE_KERNEL_VERSION 7
++  Implementation of option parsing routines (dealing with `struct
++  fuse_args`).
 +
-+/** Minor version number of this interface */
-+#define FUSE_KERNEL_MINOR_VERSION 31
++  This program can be distributed under the terms of the GNU LGPLv2.
++  See the file COPYING.LIB
++*/
 +
-+/** The node ID of the root inode */
-+#define FUSE_ROOT_ID 1
++#include "config.h"
++#include "fuse_i.h"
++#include "fuse_opt.h"
++#include "fuse_misc.h"
 +
-+/* Make sure all structures are padded to 64bit boundary, so 32bit
-+   userspace works under 64bit kernels */
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <assert.h>
 +
-+struct fuse_attr {
-+=09uint64_t=09ino;
-+=09uint64_t=09size;
-+=09uint64_t=09blocks;
-+=09uint64_t=09atime;
-+=09uint64_t=09mtime;
-+=09uint64_t=09ctime;
-+=09uint32_t=09atimensec;
-+=09uint32_t=09mtimensec;
-+=09uint32_t=09ctimensec;
-+=09uint32_t=09mode;
-+=09uint32_t=09nlink;
-+=09uint32_t=09uid;
-+=09uint32_t=09gid;
-+=09uint32_t=09rdev;
-+=09uint32_t=09blksize;
-+=09uint32_t=09padding;
++struct fuse_opt_context {
++=09void *data;
++=09const struct fuse_opt *opt;
++=09fuse_opt_proc_t proc;
++=09int argctr;
++=09int argc;
++=09char **argv;
++=09struct fuse_args outargs;
++=09char *opts;
++=09int nonopt;
 +};
 +
-+struct fuse_kstatfs {
-+=09uint64_t=09blocks;
-+=09uint64_t=09bfree;
-+=09uint64_t=09bavail;
-+=09uint64_t=09files;
-+=09uint64_t=09ffree;
-+=09uint32_t=09bsize;
-+=09uint32_t=09namelen;
-+=09uint32_t=09frsize;
-+=09uint32_t=09padding;
-+=09uint32_t=09spare[6];
++void fuse_opt_free_args(struct fuse_args *args)
++{
++=09if (args) {
++=09=09if (args->argv && args->allocated) {
++=09=09=09int i;
++=09=09=09for (i =3D 0; i < args->argc; i++)
++=09=09=09=09free(args->argv[i]);
++=09=09=09free(args->argv);
++=09=09}
++=09=09args->argc =3D 0;
++=09=09args->argv =3D NULL;
++=09=09args->allocated =3D 0;
++=09}
++}
++
++static int alloc_failed(void)
++{
++=09fuse_log(FUSE_LOG_ERR, "fuse: memory allocation failed\n");
++=09return -1;
++}
++
++int fuse_opt_add_arg(struct fuse_args *args, const char *arg)
++{
++=09char **newargv;
++=09char *newarg;
++
++=09assert(!args->argv || args->allocated);
++
++=09newarg =3D strdup(arg);
++=09if (!newarg)
++=09=09return alloc_failed();
++
++=09newargv =3D realloc(args->argv, (args->argc + 2) * sizeof(char *));
++=09if (!newargv) {
++=09=09free(newarg);
++=09=09return alloc_failed();
++=09}
++
++=09args->argv =3D newargv;
++=09args->allocated =3D 1;
++=09args->argv[args->argc++] =3D newarg;
++=09args->argv[args->argc] =3D NULL;
++=09return 0;
++}
++
++static int fuse_opt_insert_arg_common(struct fuse_args *args, int pos,
++=09=09=09=09      const char *arg)
++{
++=09assert(pos <=3D args->argc);
++=09if (fuse_opt_add_arg(args, arg) =3D=3D -1)
++=09=09return -1;
++
++=09if (pos !=3D args->argc - 1) {
++=09=09char *newarg =3D args->argv[args->argc - 1];
++=09=09memmove(&args->argv[pos + 1], &args->argv[pos],
++=09=09=09sizeof(char *) * (args->argc - pos - 1));
++=09=09args->argv[pos] =3D newarg;
++=09}
++=09return 0;
++}
++
++int fuse_opt_insert_arg(struct fuse_args *args, int pos, const char *arg)
++{
++=09return fuse_opt_insert_arg_common(args, pos, arg);
++}
++
++static int next_arg(struct fuse_opt_context *ctx, const char *opt)
++{
++=09if (ctx->argctr + 1 >=3D ctx->argc) {
++=09=09fuse_log(FUSE_LOG_ERR, "fuse: missing argument after `%s'\n", opt);
++=09=09return -1;
++=09}
++=09ctx->argctr++;
++=09return 0;
++}
++
++static int add_arg(struct fuse_opt_context *ctx, const char *arg)
++{
++=09return fuse_opt_add_arg(&ctx->outargs, arg);
++}
++
++static int add_opt_common(char **opts, const char *opt, int esc)
++{
++=09unsigned oldlen =3D *opts ? strlen(*opts) : 0;
++=09char *d =3D realloc(*opts, oldlen + 1 + strlen(opt) * 2 + 1);
++
++=09if (!d)
++=09=09return alloc_failed();
++
++=09*opts =3D d;
++=09if (oldlen) {
++=09=09d +=3D oldlen;
++=09=09*d++ =3D ',';
++=09}
++
++=09for (; *opt; opt++) {
++=09=09if (esc && (*opt =3D=3D ',' || *opt =3D=3D '\\'))
++=09=09=09*d++ =3D '\\';
++=09=09*d++ =3D *opt;
++=09}
++=09*d =3D '\0';
++
++=09return 0;
++}
++
++int fuse_opt_add_opt(char **opts, const char *opt)
++{
++=09return add_opt_common(opts, opt, 0);
++}
++
++int fuse_opt_add_opt_escaped(char **opts, const char *opt)
++{
++=09return add_opt_common(opts, opt, 1);
++}
++
++static int add_opt(struct fuse_opt_context *ctx, const char *opt)
++{
++=09return add_opt_common(&ctx->opts, opt, 1);
++}
++
++static int call_proc(struct fuse_opt_context *ctx, const char *arg, int ke=
+y,
++=09=09     int iso)
++{
++=09if (key =3D=3D FUSE_OPT_KEY_DISCARD)
++=09=09return 0;
++
++=09if (key !=3D FUSE_OPT_KEY_KEEP && ctx->proc) {
++=09=09int res =3D ctx->proc(ctx->data, arg, key, &ctx->outargs);
++=09=09if (res =3D=3D -1 || !res)
++=09=09=09return res;
++=09}
++=09if (iso)
++=09=09return add_opt(ctx, arg);
++=09else
++=09=09return add_arg(ctx, arg);
++}
++
++static int match_template(const char *t, const char *arg, unsigned *sepp)
++{
++=09int arglen =3D strlen(arg);
++=09const char *sep =3D strchr(t, '=3D');
++=09sep =3D sep ? sep : strchr(t, ' ');
++=09if (sep && (!sep[1] || sep[1] =3D=3D '%')) {
++=09=09int tlen =3D sep - t;
++=09=09if (sep[0] =3D=3D '=3D')
++=09=09=09tlen ++;
++=09=09if (arglen >=3D tlen && strncmp(arg, t, tlen) =3D=3D 0) {
++=09=09=09*sepp =3D sep - t;
++=09=09=09return 1;
++=09=09}
++=09}
++=09if (strcmp(t, arg) =3D=3D 0) {
++=09=09*sepp =3D 0;
++=09=09return 1;
++=09}
++=09return 0;
++}
++
++static const struct fuse_opt *find_opt(const struct fuse_opt *opt,
++=09=09=09=09       const char *arg, unsigned *sepp)
++{
++=09for (; opt && opt->templ; opt++)
++=09=09if (match_template(opt->templ, arg, sepp))
++=09=09=09return opt;
++=09return NULL;
++}
++
++int fuse_opt_match(const struct fuse_opt *opts, const char *opt)
++{
++=09unsigned dummy;
++=09return find_opt(opts, opt, &dummy) ? 1 : 0;
++}
++
++static int process_opt_param(void *var, const char *format, const char *pa=
+ram,
++=09=09=09     const char *arg)
++{
++=09assert(format[0] =3D=3D '%');
++=09if (format[1] =3D=3D 's') {
++=09=09char **s =3D var;
++=09=09char *copy =3D strdup(param);
++=09=09if (!copy)
++=09=09=09return alloc_failed();
++
++=09=09free(*s);
++=09=09*s =3D copy;
++=09} else {
++=09=09if (sscanf(param, format, var) !=3D 1) {
++=09=09=09fuse_log(FUSE_LOG_ERR, "fuse: invalid parameter in option `%s'\n"=
+, arg);
++=09=09=09return -1;
++=09=09}
++=09}
++=09return 0;
++}
++
++static int process_opt(struct fuse_opt_context *ctx,
++=09=09       const struct fuse_opt *opt, unsigned sep,
++=09=09       const char *arg, int iso)
++{
++=09if (opt->offset =3D=3D -1U) {
++=09=09if (call_proc(ctx, arg, opt->value, iso) =3D=3D -1)
++=09=09=09return -1;
++=09} else {
++=09=09void *var =3D (char *)ctx->data + opt->offset;
++=09=09if (sep && opt->templ[sep + 1]) {
++=09=09=09const char *param =3D arg + sep;
++=09=09=09if (opt->templ[sep] =3D=3D '=3D')
++=09=09=09=09param ++;
++=09=09=09if (process_opt_param(var, opt->templ + sep + 1,
++=09=09=09=09=09      param, arg) =3D=3D -1)
++=09=09=09=09return -1;
++=09=09} else
++=09=09=09*(int *)var =3D opt->value;
++=09}
++=09return 0;
++}
++
++static int process_opt_sep_arg(struct fuse_opt_context *ctx,
++=09=09=09       const struct fuse_opt *opt, unsigned sep,
++=09=09=09       const char *arg, int iso)
++{
++=09int res;
++=09char *newarg;
++=09char *param;
++
++=09if (next_arg(ctx, arg) =3D=3D -1)
++=09=09return -1;
++
++=09param =3D ctx->argv[ctx->argctr];
++=09newarg =3D malloc(sep + strlen(param) + 1);
++=09if (!newarg)
++=09=09return alloc_failed();
++
++=09memcpy(newarg, arg, sep);
++=09strcpy(newarg + sep, param);
++=09res =3D process_opt(ctx, opt, sep, newarg, iso);
++=09free(newarg);
++
++=09return res;
++}
++
++static int process_gopt(struct fuse_opt_context *ctx, const char *arg, int=
+ iso)
++{
++=09unsigned sep;
++=09const struct fuse_opt *opt =3D find_opt(ctx->opt, arg, &sep);
++=09if (opt) {
++=09=09for (; opt; opt =3D find_opt(opt + 1, arg, &sep)) {
++=09=09=09int res;
++=09=09=09if (sep && opt->templ[sep] =3D=3D ' ' && !arg[sep])
++=09=09=09=09res =3D process_opt_sep_arg(ctx, opt, sep, arg,
++=09=09=09=09=09=09=09  iso);
++=09=09=09else
++=09=09=09=09res =3D process_opt(ctx, opt, sep, arg, iso);
++=09=09=09if (res =3D=3D -1)
++=09=09=09=09return -1;
++=09=09}
++=09=09return 0;
++=09} else
++=09=09return call_proc(ctx, arg, FUSE_OPT_KEY_OPT, iso);
++}
++
++static int process_real_option_group(struct fuse_opt_context *ctx, char *o=
+pts)
++{
++=09char *s =3D opts;
++=09char *d =3D s;
++=09int end =3D 0;
++
++=09while (!end) {
++=09=09if (*s =3D=3D '\0')
++=09=09=09end =3D 1;
++=09=09if (*s =3D=3D ',' || end) {
++=09=09=09int res;
++
++=09=09=09*d =3D '\0';
++=09=09=09res =3D process_gopt(ctx, opts, 1);
++=09=09=09if (res =3D=3D -1)
++=09=09=09=09return -1;
++=09=09=09d =3D opts;
++=09=09} else {
++=09=09=09if (s[0] =3D=3D '\\' && s[1] !=3D '\0') {
++=09=09=09=09s++;
++=09=09=09=09if (s[0] >=3D '0' && s[0] <=3D '3' &&
++=09=09=09=09    s[1] >=3D '0' && s[1] <=3D '7' &&
++=09=09=09=09    s[2] >=3D '0' && s[2] <=3D '7') {
++=09=09=09=09=09*d++ =3D (s[0] - '0') * 0100 +
++=09=09=09=09=09=09(s[1] - '0') * 0010 +
++=09=09=09=09=09=09(s[2] - '0');
++=09=09=09=09=09s +=3D 2;
++=09=09=09=09} else {
++=09=09=09=09=09*d++ =3D *s;
++=09=09=09=09}
++=09=09=09} else {
++=09=09=09=09*d++ =3D *s;
++=09=09=09}
++=09=09}
++=09=09s++;
++=09}
++
++=09return 0;
++}
++
++static int process_option_group(struct fuse_opt_context *ctx, const char *=
+opts)
++{
++=09int res;
++=09char *copy =3D strdup(opts);
++
++=09if (!copy) {
++=09=09fuse_log(FUSE_LOG_ERR, "fuse: memory allocation failed\n");
++=09=09return -1;
++=09}
++=09res =3D process_real_option_group(ctx, copy);
++=09free(copy);
++=09return res;
++}
++
++static int process_one(struct fuse_opt_context *ctx, const char *arg)
++{
++=09if (ctx->nonopt || arg[0] !=3D '-')
++=09=09return call_proc(ctx, arg, FUSE_OPT_KEY_NONOPT, 0);
++=09else if (arg[1] =3D=3D 'o') {
++=09=09if (arg[2])
++=09=09=09return process_option_group(ctx, arg + 2);
++=09=09else {
++=09=09=09if (next_arg(ctx, arg) =3D=3D -1)
++=09=09=09=09return -1;
++
++=09=09=09return process_option_group(ctx,
++=09=09=09=09=09=09    ctx->argv[ctx->argctr]);
++=09=09}
++=09} else if (arg[1] =3D=3D '-' && !arg[2]) {
++=09=09if (add_arg(ctx, arg) =3D=3D -1)
++=09=09=09return -1;
++=09=09ctx->nonopt =3D ctx->outargs.argc;
++=09=09return 0;
++=09} else
++=09=09return process_gopt(ctx, arg, 0);
++}
++
++static int opt_parse(struct fuse_opt_context *ctx)
++{
++=09if (ctx->argc) {
++=09=09if (add_arg(ctx, ctx->argv[0]) =3D=3D -1)
++=09=09=09return -1;
++=09}
++
++=09for (ctx->argctr =3D 1; ctx->argctr < ctx->argc; ctx->argctr++)
++=09=09if (process_one(ctx, ctx->argv[ctx->argctr]) =3D=3D -1)
++=09=09=09return -1;
++
++=09if (ctx->opts) {
++=09=09if (fuse_opt_insert_arg(&ctx->outargs, 1, "-o") =3D=3D -1 ||
++=09=09    fuse_opt_insert_arg(&ctx->outargs, 2, ctx->opts) =3D=3D -1)
++=09=09=09return -1;
++=09}
++
++=09/* If option separator ("--") is the last argument, remove it */
++=09if (ctx->nonopt && ctx->nonopt =3D=3D ctx->outargs.argc &&
++=09    strcmp(ctx->outargs.argv[ctx->outargs.argc - 1], "--") =3D=3D 0) {
++=09=09free(ctx->outargs.argv[ctx->outargs.argc - 1]);
++=09=09ctx->outargs.argv[--ctx->outargs.argc] =3D NULL;
++=09}
++
++=09return 0;
++}
++
++int fuse_opt_parse(struct fuse_args *args, void *data,
++=09=09   const struct fuse_opt opts[], fuse_opt_proc_t proc)
++{
++=09int res;
++=09struct fuse_opt_context ctx =3D {
++=09=09.data =3D data,
++=09=09.opt =3D opts,
++=09=09.proc =3D proc,
++=09};
++
++=09if (!args || !args->argv || !args->argc)
++=09=09return 0;
++
++=09ctx.argc =3D args->argc;
++=09ctx.argv =3D args->argv;
++
++=09res =3D opt_parse(&ctx);
++=09if (res !=3D -1) {
++=09=09struct fuse_args tmp =3D *args;
++=09=09*args =3D ctx.outargs;
++=09=09ctx.outargs =3D tmp;
++=09}
++=09free(ctx.opts);
++=09fuse_opt_free_args(&ctx.outargs);
++=09return res;
++}
+diff --git a/tools/virtiofsd/fuse_signals.c b/tools/virtiofsd/fuse_signals.=
+c
+new file mode 100644
+index 0000000000..4271947bd4
+--- /dev/null
++++ b/tools/virtiofsd/fuse_signals.c
+@@ -0,0 +1,91 @@
++/*
++  FUSE: Filesystem in Userspace
++  Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
++
++  Utility functions for setting signal handlers.
++
++  This program can be distributed under the terms of the GNU LGPLv2.
++  See the file COPYING.LIB
++*/
++
++#include "config.h"
++#include "fuse_lowlevel.h"
++#include "fuse_i.h"
++
++#include <stdio.h>
++#include <string.h>
++#include <signal.h>
++#include <stdlib.h>
++
++static struct fuse_session *fuse_instance;
++
++static void exit_handler(int sig)
++{
++=09if (fuse_instance) {
++=09=09fuse_session_exit(fuse_instance);
++=09=09if(sig <=3D 0) {
++=09=09=09fuse_log(FUSE_LOG_ERR, "assertion error: signal value <=3D 0\n");
++=09=09=09abort();
++=09=09}
++=09=09fuse_instance->error =3D sig;
++=09}
++}
++
++static void do_nothing(int sig)
++{
++=09(void) sig;
++}
++
++static int set_one_signal_handler(int sig, void (*handler)(int), int remov=
+e)
++{
++=09struct sigaction sa;
++=09struct sigaction old_sa;
++
++=09memset(&sa, 0, sizeof(struct sigaction));
++=09sa.sa_handler =3D remove ? SIG_DFL : handler;
++=09sigemptyset(&(sa.sa_mask));
++=09sa.sa_flags =3D 0;
++
++=09if (sigaction(sig, NULL, &old_sa) =3D=3D -1) {
++=09=09perror("fuse: cannot get old signal handler");
++=09=09return -1;
++=09}
++
++=09if (old_sa.sa_handler =3D=3D (remove ? handler : SIG_DFL) &&
++=09    sigaction(sig, &sa, NULL) =3D=3D -1) {
++=09=09perror("fuse: cannot set signal handler");
++=09=09return -1;
++=09}
++=09return 0;
++}
++
++int fuse_set_signal_handlers(struct fuse_session *se)
++{
++=09/* If we used SIG_IGN instead of the do_nothing function,
++=09   then we would be unable to tell if we set SIG_IGN (and
++=09   thus should reset to SIG_DFL in fuse_remove_signal_handlers)
++=09   or if it was already set to SIG_IGN (and should be left
++=09   untouched. */
++=09if (set_one_signal_handler(SIGHUP, exit_handler, 0) =3D=3D -1 ||
++=09    set_one_signal_handler(SIGINT, exit_handler, 0) =3D=3D -1 ||
++=09    set_one_signal_handler(SIGTERM, exit_handler, 0) =3D=3D -1 ||
++=09    set_one_signal_handler(SIGPIPE, do_nothing, 0) =3D=3D -1)
++=09=09return -1;
++
++=09fuse_instance =3D se;
++=09return 0;
++}
++
++void fuse_remove_signal_handlers(struct fuse_session *se)
++{
++=09if (fuse_instance !=3D se)
++=09=09fuse_log(FUSE_LOG_ERR,
++=09=09=09"fuse: fuse_remove_signal_handlers: unknown session\n");
++=09else
++=09=09fuse_instance =3D NULL;
++
++=09set_one_signal_handler(SIGHUP, exit_handler, 1);
++=09set_one_signal_handler(SIGINT, exit_handler, 1);
++=09set_one_signal_handler(SIGTERM, exit_handler, 1);
++=09set_one_signal_handler(SIGPIPE, do_nothing, 1);
++}
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+new file mode 100644
+index 0000000000..64ff7ad6d5
+--- /dev/null
++++ b/tools/virtiofsd/helper.c
+@@ -0,0 +1,440 @@
++/*
++  FUSE: Filesystem in Userspace
++  Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
++
++  Helper functions to create (simple) standalone programs. With the
++  aid of these functions it should be possible to create full FUSE
++  file system by implementing nothing but the request handlers.
++
++  This program can be distributed under the terms of the GNU LGPLv2.
++  See the file COPYING.LIB.
++*/
++
++#include "config.h"
++#include "fuse_i.h"
++#include "fuse_misc.h"
++#include "fuse_opt.h"
++#include "fuse_lowlevel.h"
++#include "mount_util.h"
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <stddef.h>
++#include <unistd.h>
++#include <string.h>
++#include <limits.h>
++#include <errno.h>
++#include <sys/param.h>
++
++#define FUSE_HELPER_OPT(t, p) \
++=09{ t, offsetof(struct fuse_cmdline_opts, p), 1 }
++
++static const struct fuse_opt fuse_helper_opts[] =3D {
++=09FUSE_HELPER_OPT("-h",=09=09show_help),
++=09FUSE_HELPER_OPT("--help",=09show_help),
++=09FUSE_HELPER_OPT("-V",=09=09show_version),
++=09FUSE_HELPER_OPT("--version",=09show_version),
++=09FUSE_HELPER_OPT("-d",=09=09debug),
++=09FUSE_HELPER_OPT("debug",=09debug),
++=09FUSE_HELPER_OPT("-d",=09=09foreground),
++=09FUSE_HELPER_OPT("debug",=09foreground),
++=09FUSE_OPT_KEY("-d",=09=09FUSE_OPT_KEY_KEEP),
++=09FUSE_OPT_KEY("debug",=09=09FUSE_OPT_KEY_KEEP),
++=09FUSE_HELPER_OPT("-f",=09=09foreground),
++=09FUSE_HELPER_OPT("-s",=09=09singlethread),
++=09FUSE_HELPER_OPT("fsname=3D",=09nodefault_subtype),
++=09FUSE_OPT_KEY("fsname=3D",=09=09FUSE_OPT_KEY_KEEP),
++#ifndef __FreeBSD__
++=09FUSE_HELPER_OPT("subtype=3D",=09nodefault_subtype),
++=09FUSE_OPT_KEY("subtype=3D",=09FUSE_OPT_KEY_KEEP),
++#endif
++=09FUSE_HELPER_OPT("clone_fd",=09clone_fd),
++=09FUSE_HELPER_OPT("max_idle_threads=3D%u", max_idle_threads),
++=09FUSE_OPT_END
 +};
 +
-+struct fuse_file_lock {
-+=09uint64_t=09start;
-+=09uint64_t=09end;
-+=09uint32_t=09type;
-+=09uint32_t=09pid; /* tgid */
++struct fuse_conn_info_opts {
++=09int atomic_o_trunc;
++=09int no_remote_posix_lock;
++=09int no_remote_flock;
++=09int splice_write;
++=09int splice_move;
++=09int splice_read;
++=09int no_splice_write;
++=09int no_splice_move;
++=09int no_splice_read;
++=09int auto_inval_data;
++=09int no_auto_inval_data;
++=09int no_readdirplus;
++=09int no_readdirplus_auto;
++=09int async_dio;
++=09int no_async_dio;
++=09int writeback_cache;
++=09int no_writeback_cache;
++=09int async_read;
++=09int sync_read;
++=09unsigned max_write;
++=09unsigned max_readahead;
++=09unsigned max_background;
++=09unsigned congestion_threshold;
++=09unsigned time_gran;
++=09int set_max_write;
++=09int set_max_readahead;
++=09int set_max_background;
++=09int set_congestion_threshold;
++=09int set_time_gran;
 +};
 +
-+/**
-+ * Bitmasks for fuse_setattr_in.valid
-+ */
-+#define FATTR_MODE=09(1 << 0)
-+#define FATTR_UID=09(1 << 1)
-+#define FATTR_GID=09(1 << 2)
-+#define FATTR_SIZE=09(1 << 3)
-+#define FATTR_ATIME=09(1 << 4)
-+#define FATTR_MTIME=09(1 << 5)
-+#define FATTR_FH=09(1 << 6)
-+#define FATTR_ATIME_NOW=09(1 << 7)
-+#define FATTR_MTIME_NOW=09(1 << 8)
-+#define FATTR_LOCKOWNER=09(1 << 9)
-+#define FATTR_CTIME=09(1 << 10)
-+
-+/**
-+ * Flags returned by the OPEN request
-+ *
-+ * FOPEN_DIRECT_IO: bypass page cache for this open file
-+ * FOPEN_KEEP_CACHE: don't invalidate the data cache on open
-+ * FOPEN_NONSEEKABLE: the file is not seekable
-+ * FOPEN_CACHE_DIR: allow caching this directory
-+ * FOPEN_STREAM: the file is stream-like (no file position at all)
-+ */
-+#define FOPEN_DIRECT_IO=09=09(1 << 0)
-+#define FOPEN_KEEP_CACHE=09(1 << 1)
-+#define FOPEN_NONSEEKABLE=09(1 << 2)
-+#define FOPEN_CACHE_DIR=09=09(1 << 3)
-+#define FOPEN_STREAM=09=09(1 << 4)
-+
-+/**
-+ * INIT request/reply flags
-+ *
-+ * FUSE_ASYNC_READ: asynchronous read requests
-+ * FUSE_POSIX_LOCKS: remote locking for POSIX file locks
-+ * FUSE_FILE_OPS: kernel sends file handle for fstat, etc... (not yet supp=
-orted)
-+ * FUSE_ATOMIC_O_TRUNC: handles the O_TRUNC open flag in the filesystem
-+ * FUSE_EXPORT_SUPPORT: filesystem handles lookups of "." and ".."
-+ * FUSE_BIG_WRITES: filesystem can handle write size larger than 4kB
-+ * FUSE_DONT_MASK: don't apply umask to file mode on create operations
-+ * FUSE_SPLICE_WRITE: kernel supports splice write on the device
-+ * FUSE_SPLICE_MOVE: kernel supports splice move on the device
-+ * FUSE_SPLICE_READ: kernel supports splice read on the device
-+ * FUSE_FLOCK_LOCKS: remote locking for BSD style file locks
-+ * FUSE_HAS_IOCTL_DIR: kernel supports ioctl on directories
-+ * FUSE_AUTO_INVAL_DATA: automatically invalidate cached pages
-+ * FUSE_DO_READDIRPLUS: do READDIRPLUS (READDIR+LOOKUP in one)
-+ * FUSE_READDIRPLUS_AUTO: adaptive readdirplus
-+ * FUSE_ASYNC_DIO: asynchronous direct I/O submission
-+ * FUSE_WRITEBACK_CACHE: use writeback cache for buffered writes
-+ * FUSE_NO_OPEN_SUPPORT: kernel supports zero-message opens
-+ * FUSE_PARALLEL_DIROPS: allow parallel lookups and readdir
-+ * FUSE_HANDLE_KILLPRIV: fs handles killing suid/sgid/cap on write/chown/t=
-runc
-+ * FUSE_POSIX_ACL: filesystem supports posix acls
-+ * FUSE_ABORT_ERROR: reading the device after abort returns ECONNABORTED
-+ * FUSE_MAX_PAGES: init_out.max_pages contains the max number of req pages
-+ * FUSE_CACHE_SYMLINKS: cache READLINK responses
-+ * FUSE_NO_OPENDIR_SUPPORT: kernel supports zero-message opendir
-+ * FUSE_EXPLICIT_INVAL_DATA: only invalidate cached pages on explicit requ=
-est
-+ * FUSE_MAP_ALIGNMENT: map_alignment field is valid
-+ */
-+#define FUSE_ASYNC_READ=09=09(1 << 0)
-+#define FUSE_POSIX_LOCKS=09(1 << 1)
-+#define FUSE_FILE_OPS=09=09(1 << 2)
-+#define FUSE_ATOMIC_O_TRUNC=09(1 << 3)
-+#define FUSE_EXPORT_SUPPORT=09(1 << 4)
-+#define FUSE_BIG_WRITES=09=09(1 << 5)
-+#define FUSE_DONT_MASK=09=09(1 << 6)
-+#define FUSE_SPLICE_WRITE=09(1 << 7)
-+#define FUSE_SPLICE_MOVE=09(1 << 8)
-+#define FUSE_SPLICE_READ=09(1 << 9)
-+#define FUSE_FLOCK_LOCKS=09(1 << 10)
-+#define FUSE_HAS_IOCTL_DIR=09(1 << 11)
-+#define FUSE_AUTO_INVAL_DATA=09(1 << 12)
-+#define FUSE_DO_READDIRPLUS=09(1 << 13)
-+#define FUSE_READDIRPLUS_AUTO=09(1 << 14)
-+#define FUSE_ASYNC_DIO=09=09(1 << 15)
-+#define FUSE_WRITEBACK_CACHE=09(1 << 16)
-+#define FUSE_NO_OPEN_SUPPORT=09(1 << 17)
-+#define FUSE_PARALLEL_DIROPS    (1 << 18)
-+#define FUSE_HANDLE_KILLPRIV=09(1 << 19)
-+#define FUSE_POSIX_ACL=09=09(1 << 20)
-+#define FUSE_ABORT_ERROR=09(1 << 21)
-+#define FUSE_MAX_PAGES=09=09(1 << 22)
-+#define FUSE_CACHE_SYMLINKS=09(1 << 23)
-+#define FUSE_NO_OPENDIR_SUPPORT (1 << 24)
-+#define FUSE_EXPLICIT_INVAL_DATA (1 << 25)
-+#define FUSE_MAP_ALIGNMENT=09(1 << 26)
-+
-+/**
-+ * CUSE INIT request/reply flags
-+ *
-+ * CUSE_UNRESTRICTED_IOCTL:  use unrestricted ioctl
-+ */
-+#define CUSE_UNRESTRICTED_IOCTL=09(1 << 0)
-+
-+/**
-+ * Release flags
-+ */
-+#define FUSE_RELEASE_FLUSH=09(1 << 0)
-+#define FUSE_RELEASE_FLOCK_UNLOCK=09(1 << 1)
-+
-+/**
-+ * Getattr flags
-+ */
-+#define FUSE_GETATTR_FH=09=09(1 << 0)
-+
-+/**
-+ * Lock flags
-+ */
-+#define FUSE_LK_FLOCK=09=09(1 << 0)
-+
-+/**
-+ * WRITE flags
-+ *
-+ * FUSE_WRITE_CACHE: delayed write from page cache, file handle is guessed
-+ * FUSE_WRITE_LOCKOWNER: lock_owner field is valid
-+ * FUSE_WRITE_KILL_PRIV: kill suid and sgid bits
-+ */
-+#define FUSE_WRITE_CACHE=09(1 << 0)
-+#define FUSE_WRITE_LOCKOWNER=09(1 << 1)
-+#define FUSE_WRITE_KILL_PRIV=09(1 << 2)
-+
-+/**
-+ * Read flags
-+ */
-+#define FUSE_READ_LOCKOWNER=09(1 << 1)
-+
-+/**
-+ * Ioctl flags
-+ *
-+ * FUSE_IOCTL_COMPAT: 32bit compat ioctl on 64bit machine
-+ * FUSE_IOCTL_UNRESTRICTED: not restricted to well-formed ioctls, retry al=
-lowed
-+ * FUSE_IOCTL_RETRY: retry with new iovecs
-+ * FUSE_IOCTL_32BIT: 32bit ioctl
-+ * FUSE_IOCTL_DIR: is a directory
-+ * FUSE_IOCTL_COMPAT_X32: x32 compat ioctl on 64bit machine (64bit time_t)
-+ *
-+ * FUSE_IOCTL_MAX_IOV: maximum of in_iovecs + out_iovecs
-+ */
-+#define FUSE_IOCTL_COMPAT=09(1 << 0)
-+#define FUSE_IOCTL_UNRESTRICTED=09(1 << 1)
-+#define FUSE_IOCTL_RETRY=09(1 << 2)
-+#define FUSE_IOCTL_32BIT=09(1 << 3)
-+#define FUSE_IOCTL_DIR=09=09(1 << 4)
-+#define FUSE_IOCTL_COMPAT_X32=09(1 << 5)
-+
-+#define FUSE_IOCTL_MAX_IOV=09256
-+
-+/**
-+ * Poll flags
-+ *
-+ * FUSE_POLL_SCHEDULE_NOTIFY: request poll notify
-+ */
-+#define FUSE_POLL_SCHEDULE_NOTIFY (1 << 0)
-+
-+/**
-+ * Fsync flags
-+ *
-+ * FUSE_FSYNC_FDATASYNC: Sync data only, not metadata
-+ */
-+#define FUSE_FSYNC_FDATASYNC=09(1 << 0)
-+
-+enum fuse_opcode {
-+=09FUSE_LOOKUP=09=09=3D 1,
-+=09FUSE_FORGET=09=09=3D 2,  /* no reply */
-+=09FUSE_GETATTR=09=09=3D 3,
-+=09FUSE_SETATTR=09=09=3D 4,
-+=09FUSE_READLINK=09=09=3D 5,
-+=09FUSE_SYMLINK=09=09=3D 6,
-+=09FUSE_MKNOD=09=09=3D 8,
-+=09FUSE_MKDIR=09=09=3D 9,
-+=09FUSE_UNLINK=09=09=3D 10,
-+=09FUSE_RMDIR=09=09=3D 11,
-+=09FUSE_RENAME=09=09=3D 12,
-+=09FUSE_LINK=09=09=3D 13,
-+=09FUSE_OPEN=09=09=3D 14,
-+=09FUSE_READ=09=09=3D 15,
-+=09FUSE_WRITE=09=09=3D 16,
-+=09FUSE_STATFS=09=09=3D 17,
-+=09FUSE_RELEASE=09=09=3D 18,
-+=09FUSE_FSYNC=09=09=3D 20,
-+=09FUSE_SETXATTR=09=09=3D 21,
-+=09FUSE_GETXATTR=09=09=3D 22,
-+=09FUSE_LISTXATTR=09=09=3D 23,
-+=09FUSE_REMOVEXATTR=09=3D 24,
-+=09FUSE_FLUSH=09=09=3D 25,
-+=09FUSE_INIT=09=09=3D 26,
-+=09FUSE_OPENDIR=09=09=3D 27,
-+=09FUSE_READDIR=09=09=3D 28,
-+=09FUSE_RELEASEDIR=09=09=3D 29,
-+=09FUSE_FSYNCDIR=09=09=3D 30,
-+=09FUSE_GETLK=09=09=3D 31,
-+=09FUSE_SETLK=09=09=3D 32,
-+=09FUSE_SETLKW=09=09=3D 33,
-+=09FUSE_ACCESS=09=09=3D 34,
-+=09FUSE_CREATE=09=09=3D 35,
-+=09FUSE_INTERRUPT=09=09=3D 36,
-+=09FUSE_BMAP=09=09=3D 37,
-+=09FUSE_DESTROY=09=09=3D 38,
-+=09FUSE_IOCTL=09=09=3D 39,
-+=09FUSE_POLL=09=09=3D 40,
-+=09FUSE_NOTIFY_REPLY=09=3D 41,
-+=09FUSE_BATCH_FORGET=09=3D 42,
-+=09FUSE_FALLOCATE=09=09=3D 43,
-+=09FUSE_READDIRPLUS=09=3D 44,
-+=09FUSE_RENAME2=09=09=3D 45,
-+=09FUSE_LSEEK=09=09=3D 46,
-+=09FUSE_COPY_FILE_RANGE=09=3D 47,
-+=09FUSE_SETUPMAPPING=09=3D 48,
-+=09FUSE_REMOVEMAPPING=09=3D 49,
-+
-+=09/* CUSE specific operations */
-+=09CUSE_INIT=09=09=3D 4096,
-+
-+=09/* Reserved opcodes: helpful to detect structure endian-ness */
-+=09CUSE_INIT_BSWAP_RESERVED=09=3D 1048576,=09/* CUSE_INIT << 8 */
-+=09FUSE_INIT_BSWAP_RESERVED=09=3D 436207616,=09/* FUSE_INIT << 24 */
++#define CONN_OPTION(t, p, v)=09=09=09=09=09\
++=09{ t, offsetof(struct fuse_conn_info_opts, p), v }
++static const struct fuse_opt conn_info_opt_spec[] =3D {
++=09CONN_OPTION("max_write=3D%u", max_write, 0),
++=09CONN_OPTION("max_write=3D", set_max_write, 1),
++=09CONN_OPTION("max_readahead=3D%u", max_readahead, 0),
++=09CONN_OPTION("max_readahead=3D", set_max_readahead, 1),
++=09CONN_OPTION("max_background=3D%u", max_background, 0),
++=09CONN_OPTION("max_background=3D", set_max_background, 1),
++=09CONN_OPTION("congestion_threshold=3D%u", congestion_threshold, 0),
++=09CONN_OPTION("congestion_threshold=3D", set_congestion_threshold, 1),
++=09CONN_OPTION("sync_read", sync_read, 1),
++=09CONN_OPTION("async_read", async_read, 1),
++=09CONN_OPTION("atomic_o_trunc", atomic_o_trunc, 1),
++=09CONN_OPTION("no_remote_lock", no_remote_posix_lock, 1),
++=09CONN_OPTION("no_remote_lock", no_remote_flock, 1),
++=09CONN_OPTION("no_remote_flock", no_remote_flock, 1),
++=09CONN_OPTION("no_remote_posix_lock", no_remote_posix_lock, 1),
++=09CONN_OPTION("splice_write", splice_write, 1),
++=09CONN_OPTION("no_splice_write", no_splice_write, 1),
++=09CONN_OPTION("splice_move", splice_move, 1),
++=09CONN_OPTION("no_splice_move", no_splice_move, 1),
++=09CONN_OPTION("splice_read", splice_read, 1),
++=09CONN_OPTION("no_splice_read", no_splice_read, 1),
++=09CONN_OPTION("auto_inval_data", auto_inval_data, 1),
++=09CONN_OPTION("no_auto_inval_data", no_auto_inval_data, 1),
++=09CONN_OPTION("readdirplus=3Dno", no_readdirplus, 1),
++=09CONN_OPTION("readdirplus=3Dyes", no_readdirplus, 0),
++=09CONN_OPTION("readdirplus=3Dyes", no_readdirplus_auto, 1),
++=09CONN_OPTION("readdirplus=3Dauto", no_readdirplus, 0),
++=09CONN_OPTION("readdirplus=3Dauto", no_readdirplus_auto, 0),
++=09CONN_OPTION("async_dio", async_dio, 1),
++=09CONN_OPTION("no_async_dio", no_async_dio, 1),
++=09CONN_OPTION("writeback_cache", writeback_cache, 1),
++=09CONN_OPTION("no_writeback_cache", no_writeback_cache, 1),
++=09CONN_OPTION("time_gran=3D%u", time_gran, 0),
++=09CONN_OPTION("time_gran=3D", set_time_gran, 1),
++=09FUSE_OPT_END
 +};
 +
-+enum fuse_notify_code {
-+=09FUSE_NOTIFY_POLL   =3D 1,
-+=09FUSE_NOTIFY_INVAL_INODE =3D 2,
-+=09FUSE_NOTIFY_INVAL_ENTRY =3D 3,
-+=09FUSE_NOTIFY_STORE =3D 4,
-+=09FUSE_NOTIFY_RETRIEVE =3D 5,
-+=09FUSE_NOTIFY_DELETE =3D 6,
-+=09FUSE_NOTIFY_CODE_MAX,
-+};
-+
-+/* The read buffer is required to be at least 8k, but may be much larger *=
-/
-+#define FUSE_MIN_READ_BUFFER 8192
-+
-+#define FUSE_COMPAT_ENTRY_OUT_SIZE 120
-+
-+struct fuse_entry_out {
-+=09uint64_t=09nodeid;=09=09/* Inode ID */
-+=09uint64_t=09generation;=09/* Inode generation: nodeid:gen must
-+=09=09=09=09=09   be unique for the fs's lifetime */
-+=09uint64_t=09entry_valid;=09/* Cache timeout for the name */
-+=09uint64_t=09attr_valid;=09/* Cache timeout for the attributes */
-+=09uint32_t=09entry_valid_nsec;
-+=09uint32_t=09attr_valid_nsec;
-+=09struct fuse_attr attr;
-+};
-+
-+struct fuse_forget_in {
-+=09uint64_t=09nlookup;
-+};
-+
-+struct fuse_forget_one {
-+=09uint64_t=09nodeid;
-+=09uint64_t=09nlookup;
-+};
-+
-+struct fuse_batch_forget_in {
-+=09uint32_t=09count;
-+=09uint32_t=09dummy;
-+};
-+
-+struct fuse_getattr_in {
-+=09uint32_t=09getattr_flags;
-+=09uint32_t=09dummy;
-+=09uint64_t=09fh;
-+};
-+
-+#define FUSE_COMPAT_ATTR_OUT_SIZE 96
-+
-+struct fuse_attr_out {
-+=09uint64_t=09attr_valid;=09/* Cache timeout for the attributes */
-+=09uint32_t=09attr_valid_nsec;
-+=09uint32_t=09dummy;
-+=09struct fuse_attr attr;
-+};
-+
-+#define FUSE_COMPAT_MKNOD_IN_SIZE 8
-+
-+struct fuse_mknod_in {
-+=09uint32_t=09mode;
-+=09uint32_t=09rdev;
-+=09uint32_t=09umask;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_mkdir_in {
-+=09uint32_t=09mode;
-+=09uint32_t=09umask;
-+};
-+
-+struct fuse_rename_in {
-+=09uint64_t=09newdir;
-+};
-+
-+struct fuse_rename2_in {
-+=09uint64_t=09newdir;
-+=09uint32_t=09flags;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_link_in {
-+=09uint64_t=09oldnodeid;
-+};
-+
-+struct fuse_setattr_in {
-+=09uint32_t=09valid;
-+=09uint32_t=09padding;
-+=09uint64_t=09fh;
-+=09uint64_t=09size;
-+=09uint64_t=09lock_owner;
-+=09uint64_t=09atime;
-+=09uint64_t=09mtime;
-+=09uint64_t=09ctime;
-+=09uint32_t=09atimensec;
-+=09uint32_t=09mtimensec;
-+=09uint32_t=09ctimensec;
-+=09uint32_t=09mode;
-+=09uint32_t=09unused4;
-+=09uint32_t=09uid;
-+=09uint32_t=09gid;
-+=09uint32_t=09unused5;
-+};
-+
-+struct fuse_open_in {
-+=09uint32_t=09flags;
-+=09uint32_t=09unused;
-+};
-+
-+struct fuse_create_in {
-+=09uint32_t=09flags;
-+=09uint32_t=09mode;
-+=09uint32_t=09umask;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_open_out {
-+=09uint64_t=09fh;
-+=09uint32_t=09open_flags;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_release_in {
-+=09uint64_t=09fh;
-+=09uint32_t=09flags;
-+=09uint32_t=09release_flags;
-+=09uint64_t=09lock_owner;
-+};
-+
-+struct fuse_flush_in {
-+=09uint64_t=09fh;
-+=09uint32_t=09unused;
-+=09uint32_t=09padding;
-+=09uint64_t=09lock_owner;
-+};
-+
-+struct fuse_read_in {
-+=09uint64_t=09fh;
-+=09uint64_t=09offset;
-+=09uint32_t=09size;
-+=09uint32_t=09read_flags;
-+=09uint64_t=09lock_owner;
-+=09uint32_t=09flags;
-+=09uint32_t=09padding;
-+};
-+
-+#define FUSE_COMPAT_WRITE_IN_SIZE 24
-+
-+struct fuse_write_in {
-+=09uint64_t=09fh;
-+=09uint64_t=09offset;
-+=09uint32_t=09size;
-+=09uint32_t=09write_flags;
-+=09uint64_t=09lock_owner;
-+=09uint32_t=09flags;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_write_out {
-+=09uint32_t=09size;
-+=09uint32_t=09padding;
-+};
-+
-+#define FUSE_COMPAT_STATFS_SIZE 48
-+
-+struct fuse_statfs_out {
-+=09struct fuse_kstatfs st;
-+};
-+
-+struct fuse_fsync_in {
-+=09uint64_t=09fh;
-+=09uint32_t=09fsync_flags;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_setxattr_in {
-+=09uint32_t=09size;
-+=09uint32_t=09flags;
-+};
-+
-+struct fuse_getxattr_in {
-+=09uint32_t=09size;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_getxattr_out {
-+=09uint32_t=09size;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_lk_in {
-+=09uint64_t=09fh;
-+=09uint64_t=09owner;
-+=09struct fuse_file_lock lk;
-+=09uint32_t=09lk_flags;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_lk_out {
-+=09struct fuse_file_lock lk;
-+};
-+
-+struct fuse_access_in {
-+=09uint32_t=09mask;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_init_in {
-+=09uint32_t=09major;
-+=09uint32_t=09minor;
-+=09uint32_t=09max_readahead;
-+=09uint32_t=09flags;
-+};
-+
-+#define FUSE_COMPAT_INIT_OUT_SIZE 8
-+#define FUSE_COMPAT_22_INIT_OUT_SIZE 24
-+
-+struct fuse_init_out {
-+=09uint32_t=09major;
-+=09uint32_t=09minor;
-+=09uint32_t=09max_readahead;
-+=09uint32_t=09flags;
-+=09uint16_t=09max_background;
-+=09uint16_t=09congestion_threshold;
-+=09uint32_t=09max_write;
-+=09uint32_t=09time_gran;
-+=09uint16_t=09max_pages;
-+=09uint16_t=09map_alignment;
-+=09uint32_t=09unused[8];
-+};
-+
-+#define CUSE_INIT_INFO_MAX 4096
-+
-+struct cuse_init_in {
-+=09uint32_t=09major;
-+=09uint32_t=09minor;
-+=09uint32_t=09unused;
-+=09uint32_t=09flags;
-+};
-+
-+struct cuse_init_out {
-+=09uint32_t=09major;
-+=09uint32_t=09minor;
-+=09uint32_t=09unused;
-+=09uint32_t=09flags;
-+=09uint32_t=09max_read;
-+=09uint32_t=09max_write;
-+=09uint32_t=09dev_major;=09=09/* chardev major */
-+=09uint32_t=09dev_minor;=09=09/* chardev minor */
-+=09uint32_t=09spare[10];
-+};
-+
-+struct fuse_interrupt_in {
-+=09uint64_t=09unique;
-+};
-+
-+struct fuse_bmap_in {
-+=09uint64_t=09block;
-+=09uint32_t=09blocksize;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_bmap_out {
-+=09uint64_t=09block;
-+};
-+
-+struct fuse_ioctl_in {
-+=09uint64_t=09fh;
-+=09uint32_t=09flags;
-+=09uint32_t=09cmd;
-+=09uint64_t=09arg;
-+=09uint32_t=09in_size;
-+=09uint32_t=09out_size;
-+};
-+
-+struct fuse_ioctl_iovec {
-+=09uint64_t=09base;
-+=09uint64_t=09len;
-+};
-+
-+struct fuse_ioctl_out {
-+=09int32_t=09=09result;
-+=09uint32_t=09flags;
-+=09uint32_t=09in_iovs;
-+=09uint32_t=09out_iovs;
-+};
-+
-+struct fuse_poll_in {
-+=09uint64_t=09fh;
-+=09uint64_t=09kh;
-+=09uint32_t=09flags;
-+=09uint32_t=09events;
-+};
-+
-+struct fuse_poll_out {
-+=09uint32_t=09revents;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_notify_poll_wakeup_out {
-+=09uint64_t=09kh;
-+};
-+
-+struct fuse_fallocate_in {
-+=09uint64_t=09fh;
-+=09uint64_t=09offset;
-+=09uint64_t=09length;
-+=09uint32_t=09mode;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_in_header {
-+=09uint32_t=09len;
-+=09uint32_t=09opcode;
-+=09uint64_t=09unique;
-+=09uint64_t=09nodeid;
-+=09uint32_t=09uid;
-+=09uint32_t=09gid;
-+=09uint32_t=09pid;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_out_header {
-+=09uint32_t=09len;
-+=09int32_t=09=09error;
-+=09uint64_t=09unique;
-+};
-+
-+struct fuse_dirent {
-+=09uint64_t=09ino;
-+=09uint64_t=09off;
-+=09uint32_t=09namelen;
-+=09uint32_t=09type;
-+=09char name[];
-+};
-+
-+#define FUSE_NAME_OFFSET offsetof(struct fuse_dirent, name)
-+#define FUSE_DIRENT_ALIGN(x) \
-+=09(((x) + sizeof(uint64_t) - 1) & ~(sizeof(uint64_t) - 1))
-+#define FUSE_DIRENT_SIZE(d) \
-+=09FUSE_DIRENT_ALIGN(FUSE_NAME_OFFSET + (d)->namelen)
-+
-+struct fuse_direntplus {
-+=09struct fuse_entry_out entry_out;
-+=09struct fuse_dirent dirent;
-+};
-+
-+#define FUSE_NAME_OFFSET_DIRENTPLUS \
-+=09offsetof(struct fuse_direntplus, dirent.name)
-+#define FUSE_DIRENTPLUS_SIZE(d) \
-+=09FUSE_DIRENT_ALIGN(FUSE_NAME_OFFSET_DIRENTPLUS + (d)->dirent.namelen)
-+
-+struct fuse_notify_inval_inode_out {
-+=09uint64_t=09ino;
-+=09int64_t=09=09off;
-+=09int64_t=09=09len;
-+};
-+
-+struct fuse_notify_inval_entry_out {
-+=09uint64_t=09parent;
-+=09uint32_t=09namelen;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_notify_delete_out {
-+=09uint64_t=09parent;
-+=09uint64_t=09child;
-+=09uint32_t=09namelen;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_notify_store_out {
-+=09uint64_t=09nodeid;
-+=09uint64_t=09offset;
-+=09uint32_t=09size;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_notify_retrieve_out {
-+=09uint64_t=09notify_unique;
-+=09uint64_t=09nodeid;
-+=09uint64_t=09offset;
-+=09uint32_t=09size;
-+=09uint32_t=09padding;
-+};
-+
-+/* Matches the size of fuse_write_in */
-+struct fuse_notify_retrieve_in {
-+=09uint64_t=09dummy1;
-+=09uint64_t=09offset;
-+=09uint32_t=09size;
-+=09uint32_t=09dummy2;
-+=09uint64_t=09dummy3;
-+=09uint64_t=09dummy4;
-+};
-+
-+/* Device ioctls: */
-+#define FUSE_DEV_IOC_CLONE=09_IOR(229, 0, uint32_t)
-+
-+struct fuse_lseek_in {
-+=09uint64_t=09fh;
-+=09uint64_t=09offset;
-+=09uint32_t=09whence;
-+=09uint32_t=09padding;
-+};
-+
-+struct fuse_lseek_out {
-+=09uint64_t=09offset;
-+};
-+
-+struct fuse_copy_file_range_in {
-+=09uint64_t=09fh_in;
-+=09uint64_t=09off_in;
-+=09uint64_t=09nodeid_out;
-+=09uint64_t=09fh_out;
-+=09uint64_t=09off_out;
-+=09uint64_t=09len;
-+=09uint64_t=09flags;
-+};
-+
-+#endif /* _LINUX_FUSE_H */
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers=
-.sh
-index f76d77363b..29c27f4681 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -186,6 +186,7 @@ rm -rf "$output/include/standard-headers/linux"
- mkdir -p "$output/include/standard-headers/linux"
- for i in "$tmpdir"/include/linux/*virtio*.h \
-          "$tmpdir/include/linux/qemu_fw_cfg.h" \
-+         "$tmpdir/include/linux/fuse.h" \
-          "$tmpdir/include/linux/input.h" \
-          "$tmpdir/include/linux/input-event-codes.h" \
-          "$tmpdir/include/linux/pci_regs.h" \
++
++void fuse_cmdline_help(void)
++{
++=09printf("    -h   --help            print help\n"
++=09       "    -V   --version         print version\n"
++=09       "    -d   -o debug          enable debug output (implies -f)\n"
++=09       "    -f                     foreground operation\n"
++=09       "    -s                     disable multi-threaded operation\n"
++=09       "    -o clone_fd            use separate fuse device fd for each=
+ thread\n"
++=09       "                           (may improve performance)\n"
++=09       "    -o max_idle_threads    the maximum number of idle worker th=
+reads\n"
++=09       "                           allowed (default: 10)\n");
++}
++
++static int fuse_helper_opt_proc(void *data, const char *arg, int key,
++=09=09=09=09struct fuse_args *outargs)
++{
++=09(void) outargs;
++=09struct fuse_cmdline_opts *opts =3D data;
++
++=09switch (key) {
++=09case FUSE_OPT_KEY_NONOPT:
++=09=09if (!opts->mountpoint) {
++=09=09=09if (fuse_mnt_parse_fuse_fd(arg) !=3D -1) {
++=09=09=09=09return fuse_opt_add_opt(&opts->mountpoint, arg);
++=09=09=09}
++
++=09=09=09char mountpoint[PATH_MAX] =3D "";
++=09=09=09if (realpath(arg, mountpoint) =3D=3D NULL) {
++=09=09=09=09fuse_log(FUSE_LOG_ERR,
++=09=09=09=09=09"fuse: bad mount point `%s': %s\n",
++=09=09=09=09=09arg, strerror(errno));
++=09=09=09=09return -1;
++=09=09=09}
++=09=09=09return fuse_opt_add_opt(&opts->mountpoint, mountpoint);
++=09=09} else {
++=09=09=09fuse_log(FUSE_LOG_ERR, "fuse: invalid argument `%s'\n", arg);
++=09=09=09return -1;
++=09=09}
++
++=09default:
++=09=09/* Pass through unknown options */
++=09=09return 1;
++=09}
++}
++
++/* Under FreeBSD, there is no subtype option so this
++   function actually sets the fsname */
++static int add_default_subtype(const char *progname, struct fuse_args *arg=
+s)
++{
++=09int res;
++=09char *subtype_opt;
++
++=09const char *basename =3D strrchr(progname, '/');
++=09if (basename =3D=3D NULL)
++=09=09basename =3D progname;
++=09else if (basename[1] !=3D '\0')
++=09=09basename++;
++
++=09subtype_opt =3D (char *) malloc(strlen(basename) + 64);
++=09if (subtype_opt =3D=3D NULL) {
++=09=09fuse_log(FUSE_LOG_ERR, "fuse: memory allocation failed\n");
++=09=09return -1;
++=09}
++#ifdef __FreeBSD__
++=09sprintf(subtype_opt, "-ofsname=3D%s", basename);
++#else
++=09sprintf(subtype_opt, "-osubtype=3D%s", basename);
++#endif
++=09res =3D fuse_opt_add_arg(args, subtype_opt);
++=09free(subtype_opt);
++=09return res;
++}
++
++int fuse_parse_cmdline(struct fuse_args *args,
++=09=09       struct fuse_cmdline_opts *opts)
++{
++=09memset(opts, 0, sizeof(struct fuse_cmdline_opts));
++
++=09opts->max_idle_threads =3D 10;
++
++=09if (fuse_opt_parse(args, opts, fuse_helper_opts,
++=09=09=09   fuse_helper_opt_proc) =3D=3D -1)
++=09=09return -1;
++
++=09/* *Linux*: if neither -o subtype nor -o fsname are specified,
++=09   set subtype to program's basename.
++=09   *FreeBSD*: if fsname is not specified, set to program's
++=09   basename. */
++=09if (!opts->nodefault_subtype)
++=09=09if (add_default_subtype(args->argv[0], args) =3D=3D -1)
++=09=09=09return -1;
++
++=09return 0;
++}
++
++
++int fuse_daemonize(int foreground)
++{
++=09if (!foreground) {
++=09=09int nullfd;
++=09=09int waiter[2];
++=09=09char completed;
++
++=09=09if (pipe(waiter)) {
++=09=09=09perror("fuse_daemonize: pipe");
++=09=09=09return -1;
++=09=09}
++
++=09=09/*
++=09=09 * demonize current process by forking it and killing the
++=09=09 * parent.  This makes current process as a child of 'init'.
++=09=09 */
++=09=09switch(fork()) {
++=09=09case -1:
++=09=09=09perror("fuse_daemonize: fork");
++=09=09=09return -1;
++=09=09case 0:
++=09=09=09break;
++=09=09default:
++=09=09=09(void) read(waiter[0], &completed, sizeof(completed));
++=09=09=09_exit(0);
++=09=09}
++
++=09=09if (setsid() =3D=3D -1) {
++=09=09=09perror("fuse_daemonize: setsid");
++=09=09=09return -1;
++=09=09}
++
++=09=09(void) chdir("/");
++
++=09=09nullfd =3D open("/dev/null", O_RDWR, 0);
++=09=09if (nullfd !=3D -1) {
++=09=09=09(void) dup2(nullfd, 0);
++=09=09=09(void) dup2(nullfd, 1);
++=09=09=09(void) dup2(nullfd, 2);
++=09=09=09if (nullfd > 2)
++=09=09=09=09close(nullfd);
++=09=09}
++
++=09=09/* Propagate completion of daemon initialization */
++=09=09completed =3D 1;
++=09=09(void) write(waiter[1], &completed, sizeof(completed));
++=09=09close(waiter[0]);
++=09=09close(waiter[1]);
++=09} else {
++=09=09(void) chdir("/");
++=09}
++=09return 0;
++}
++
++int fuse_main_real(int argc, char *argv[], const struct fuse_operations *o=
+p,
++=09=09   size_t op_size, void *user_data)
++{
++=09struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
++=09struct fuse *fuse;
++=09struct fuse_cmdline_opts opts;
++=09int res;
++
++=09if (fuse_parse_cmdline(&args, &opts) !=3D 0)
++=09=09return 1;
++
++=09if (opts.show_version) {
++=09=09printf("FUSE library version %s\n", PACKAGE_VERSION);
++=09=09fuse_lowlevel_version();
++=09=09res =3D 0;
++=09=09goto out1;
++=09}
++
++=09if (opts.show_help) {
++=09=09if(args.argv[0][0] !=3D '\0')
++=09=09=09printf("usage: %s [options] <mountpoint>\n\n",
++=09=09=09       args.argv[0]);
++=09=09printf("FUSE options:\n");
++=09=09fuse_cmdline_help();
++=09=09fuse_lib_help(&args);
++=09=09res =3D 0;
++=09=09goto out1;
++=09}
++
++=09if (!opts.show_help &&
++=09    !opts.mountpoint) {
++=09=09fuse_log(FUSE_LOG_ERR, "error: no mountpoint specified\n");
++=09=09res =3D 2;
++=09=09goto out1;
++=09}
++
++
++=09fuse =3D fuse_new_31(&args, op, op_size, user_data);
++=09if (fuse =3D=3D NULL) {
++=09=09res =3D 3;
++=09=09goto out1;
++=09}
++
++=09if (fuse_mount(fuse,opts.mountpoint) !=3D 0) {
++=09=09res =3D 4;
++=09=09goto out2;
++=09}
++
++=09if (fuse_daemonize(opts.foreground) !=3D 0) {
++=09=09res =3D 5;
++=09=09goto out3;
++=09}
++
++=09struct fuse_session *se =3D fuse_get_session(fuse);
++=09if (fuse_set_signal_handlers(se) !=3D 0) {
++=09=09res =3D 6;
++=09=09goto out3;
++=09}
++
++=09if (opts.singlethread)
++=09=09res =3D fuse_loop(fuse);
++=09else {
++=09=09struct fuse_loop_config loop_config;
++=09=09loop_config.clone_fd =3D opts.clone_fd;
++=09=09loop_config.max_idle_threads =3D opts.max_idle_threads;
++=09=09res =3D fuse_loop_mt_32(fuse, &loop_config);
++=09}
++=09if (res)
++=09=09res =3D 7;
++
++=09fuse_remove_signal_handlers(se);
++out3:
++=09fuse_unmount(fuse);
++out2:
++=09fuse_destroy(fuse);
++out1:
++=09free(opts.mountpoint);
++=09fuse_opt_free_args(&args);
++=09return res;
++}
++
++
++void fuse_apply_conn_info_opts(struct fuse_conn_info_opts *opts,
++=09=09=09       struct fuse_conn_info *conn)
++{
++=09if(opts->set_max_write)
++=09=09conn->max_write =3D opts->max_write;
++=09if(opts->set_max_background)
++=09=09conn->max_background =3D opts->max_background;
++=09if(opts->set_congestion_threshold)
++=09=09conn->congestion_threshold =3D opts->congestion_threshold;
++=09if(opts->set_time_gran)
++=09=09conn->time_gran =3D opts->time_gran;
++=09if(opts->set_max_readahead)
++=09=09conn->max_readahead =3D opts->max_readahead;
++
++#define LL_ENABLE(cond,cap) \
++=09if (cond) conn->want |=3D (cap)
++#define LL_DISABLE(cond,cap) \
++=09if (cond) conn->want &=3D ~(cap)
++
++=09LL_ENABLE(opts->splice_read, FUSE_CAP_SPLICE_READ);
++=09LL_DISABLE(opts->no_splice_read, FUSE_CAP_SPLICE_READ);
++
++=09LL_ENABLE(opts->splice_write, FUSE_CAP_SPLICE_WRITE);
++=09LL_DISABLE(opts->no_splice_write, FUSE_CAP_SPLICE_WRITE);
++
++=09LL_ENABLE(opts->splice_move, FUSE_CAP_SPLICE_MOVE);
++=09LL_DISABLE(opts->no_splice_move, FUSE_CAP_SPLICE_MOVE);
++
++=09LL_ENABLE(opts->auto_inval_data, FUSE_CAP_AUTO_INVAL_DATA);
++=09LL_DISABLE(opts->no_auto_inval_data, FUSE_CAP_AUTO_INVAL_DATA);
++
++=09LL_DISABLE(opts->no_readdirplus, FUSE_CAP_READDIRPLUS);
++=09LL_DISABLE(opts->no_readdirplus_auto, FUSE_CAP_READDIRPLUS_AUTO);
++
++=09LL_ENABLE(opts->async_dio, FUSE_CAP_ASYNC_DIO);
++=09LL_DISABLE(opts->no_async_dio, FUSE_CAP_ASYNC_DIO);
++
++=09LL_ENABLE(opts->writeback_cache, FUSE_CAP_WRITEBACK_CACHE);
++=09LL_DISABLE(opts->no_writeback_cache, FUSE_CAP_WRITEBACK_CACHE);
++
++=09LL_ENABLE(opts->async_read, FUSE_CAP_ASYNC_READ);
++=09LL_DISABLE(opts->sync_read, FUSE_CAP_ASYNC_READ);
++
++=09LL_DISABLE(opts->no_remote_posix_lock, FUSE_CAP_POSIX_LOCKS);
++=09LL_DISABLE(opts->no_remote_flock, FUSE_CAP_FLOCK_LOCKS);
++}
++
++struct fuse_conn_info_opts* fuse_parse_conn_info_opts(struct fuse_args *ar=
+gs)
++{
++=09struct fuse_conn_info_opts *opts;
++
++=09opts =3D calloc(1, sizeof(struct fuse_conn_info_opts));
++=09if(opts =3D=3D NULL) {
++=09=09fuse_log(FUSE_LOG_ERR, "calloc failed\n");
++=09=09return NULL;
++=09}
++=09if(fuse_opt_parse(args, opts, conn_info_opt_spec, NULL) =3D=3D -1) {
++=09=09free(opts);
++=09=09return NULL;
++=09}
++=09return opts;
++}
++
++int fuse_open_channel(const char *mountpoint, const char* options)
++{
++=09struct mount_opts *opts =3D NULL;
++=09int fd =3D -1;
++=09const char *argv[] =3D { "", "-o", options };
++=09int argc =3D sizeof(argv) / sizeof(argv[0]);
++=09struct fuse_args args =3D FUSE_ARGS_INIT(argc, (char**) argv);
++
++=09opts =3D parse_mount_opts(&args);
++=09if (opts =3D=3D NULL)
++=09=09return -1;
++
++=09fd =3D fuse_kern_mount(mountpoint, opts);
++=09destroy_mount_opts(opts);
++
++=09return fd;
++}
 --=20
 2.24.1
 
