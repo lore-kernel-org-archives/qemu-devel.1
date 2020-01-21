@@ -2,97 +2,99 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F343DC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5AFC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:38:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B80B9207E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:36:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80B9207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 13502207E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 15:38:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13502207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itvaI-0007Kt-UI
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 10:36:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55074)
+	id 1itvbd-0000VP-4i
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 10:38:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1itvTP-0007n8-US
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:29:50 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1itvTc-00086h-RV
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:30:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1itvTM-0003s4-Ev
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:29:47 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48652
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <stefanb@linux.ibm.com>) id 1itvTX-0003yi-Vn
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 10:30:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7414)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1itvTM-0003rB-9G; Tue, 21 Jan 2020 10:29:44 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00LFDZci183114; Tue, 21 Jan 2020 10:29:39 -0500
+ id 1itvTX-0003yM-JI; Tue, 21 Jan 2020 10:29:55 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00LFCHBC039607; Tue, 21 Jan 2020 10:29:52 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2xmg3b537s-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xkxhy7cg3-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jan 2020 10:29:39 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00LFEve1193466;
- Tue, 21 Jan 2020 10:29:38 -0500
+ Tue, 21 Jan 2020 10:29:49 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00LFD6uA043988;
+ Tue, 21 Jan 2020 10:29:46 -0500
 Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
  [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2xmg3b537c-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xkxhy7cbj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jan 2020 10:29:38 -0500
+ Tue, 21 Jan 2020 10:29:46 -0500
 Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00LFSCnK014879;
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00LFStDi015710;
  Tue, 21 Jan 2020 15:29:38 GMT
 Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma03wdc.us.ibm.com with ESMTP id 2xksn64nx3-1
+ [9.57.198.27]) by ppma03wdc.us.ibm.com with ESMTP id 2xksn64nx4-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Tue, 21 Jan 2020 15:29:38 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
  by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00LFTb1D37618110
+ 00LFTb2o52953560
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 21 Jan 2020 15:29:37 GMT
+ Tue, 21 Jan 2020 15:29:38 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 745FE2805E;
+ by IMSVA (Postfix) with ESMTP id D7AA228064;
  Tue, 21 Jan 2020 15:29:37 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 51BDE2805A;
+ by IMSVA (Postfix) with ESMTP id B57E22805E;
  Tue, 21 Jan 2020 15:29:37 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
  Tue, 21 Jan 2020 15:29:37 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v9 3/6] tpm_spapr: Support TPM for ppc64 using CRQ based
- interface
-Date: Tue, 21 Jan 2020 10:29:32 -0500
-Message-Id: <20200121152935.649898-4-stefanb@linux.ibm.com>
+Subject: [PATCH v9 6/6] docs/specs/tpm: reST-ify TPM documentation
+Date: Tue, 21 Jan 2020 10:29:35 -0500
+Message-Id: <20200121152935.649898-7-stefanb@linux.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200121152935.649898-1-stefanb@linux.ibm.com>
 References: <20200121152935.649898-1-stefanb@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-01-21_04:2020-01-21,
  2020-01-21 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0
- impostorscore=0 phishscore=0 malwarescore=0 suspectscore=1
- lowpriorityscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-2001210123
+ spamscore=0 clxscore=1015
+ phishscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 adultscore=0 mlxscore=0 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001210123
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id 00LFCHBC039607
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,555 +106,1183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>,
+Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.ibm.com>,
  qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Implement support for TPM on ppc64 by implementing the vTPM CRQ interface
-as a frontend. It can use the tpm_emulator driver backend with the external
-swtpm.
-
-The Linux vTPM driver for ppc64 works with this emulation.
-
-This TPM emulator also handles the TPM 2 case.
-
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- docs/specs/tpm.txt   |  20 ++-
- hw/tpm/Kconfig       |   6 +
- hw/tpm/Makefile.objs |   1 +
- hw/tpm/tpm_spapr.c   | 379 +++++++++++++++++++++++++++++++++++++++++++
- hw/tpm/trace-events  |  12 ++
- include/sysemu/tpm.h |   3 +
- qapi/tpm.json        |   6 +-
- 7 files changed, 423 insertions(+), 4 deletions(-)
- create mode 100644 hw/tpm/tpm_spapr.c
+ docs/specs/index.rst |   1 +
+ docs/specs/tpm.rst   | 503 +++++++++++++++++++++++++++++++++++++++++++
+ docs/specs/tpm.txt   | 445 --------------------------------------
+ 3 files changed, 504 insertions(+), 445 deletions(-)
+ create mode 100644 docs/specs/tpm.rst
+ delete mode 100644 docs/specs/tpm.txt
 
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 9c8cca042d..9c3e67d8a7 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -34,6 +34,12 @@ The CRB interface makes a memory mapped IO region in the area 0xfed40000 -
- QEMU files related to TPM CRB interface:
-  - hw/tpm/tpm_crb.c
- 
+diff --git a/docs/specs/index.rst b/docs/specs/index.rst
+index 984ba44029..de46a8b5e7 100644
+--- a/docs/specs/index.rst
++++ b/docs/specs/index.rst
+@@ -13,3 +13,4 @@ Contents:
+    ppc-xive
+    ppc-spapr-xive
+    acpi_hw_reduced_hotplug
++   tpm
+diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
+new file mode 100644
+index 0000000000..2bdf637f55
+--- /dev/null
++++ b/docs/specs/tpm.rst
+@@ -0,0 +1,503 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++QEMU TPM Device
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Guest-side hardware interface
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++
++TIS interface
++-------------
++
++The QEMU TPM emulation implements a TPM TIS hardware interface
++following the Trusted Computing Group's specification "TCG PC Client
++Specific TPM Interface Specification (TIS)", Specification Version
++1.3, 21 March 2013. (see the `TIS specification`_, or a later version
++of it).
++
++The TIS interface makes a memory mapped IO region in the area
++0xfed40000-0xfed44fff available to the guest operating system.
++
++QEMU files related to TPM TIS interface:
++ - ``hw/tpm/tpm_tis.c``
++ - ``hw/tpm/tpm_tis.h``
++
++CRB interface
++-------------
++
++QEMU also implements a TPM CRB interface following the Trusted
++Computing Group's specification "TCG PC Client Platform TPM Profile
++(PTP) Specification", Family "2.0", Level 00 Revision 01.03 v22, May
++22, 2017. (see the `CRB specification`_, or a later version of it)
++
++The CRB interface makes a memory mapped IO region in the area
++0xfed40000-0xfed40fff (1 locality) available to the guest
++operating system.
++
++QEMU files related to TPM CRB interface:
++ - ``hw/tpm/tpm_crb.c``
++
++SPAPR interface
++---------------
 +
 +pSeries (ppc64) machines offer a tpm-spapr device model.
 +
 +QEMU files related to the SPAPR interface:
-+ - hw/tpm/tpm_spapr.c
++ - ``hw/tpm/tpm_spapr.c``
 +
- = fw_cfg interface =
- 
- The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
-@@ -281,7 +287,7 @@ swtpm socket --tpmstate dir=/tmp/mytpm1 \
-   --log level=20
- 
- Command line to start QEMU with the TPM emulator device communicating with
--the swtpm:
-+the swtpm (x86):
- 
- qemu-system-x86_64 -display sdl -accel kvm \
-   -m 1024 -boot d -bios bios-256k.bin -boot menu=on \
-@@ -289,6 +295,18 @@ qemu-system-x86_64 -display sdl -accel kvm \
-   -tpmdev emulator,id=tpm0,chardev=chrtpm \
-   -device tpm-tis,tpmdev=tpm0 test.img
- 
++fw_cfg interface
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The bios/firmware may read the ``"etc/tpm/config"`` fw_cfg entry for
++configuring the guest appropriately.
++
++The entry of 6 bytes has the following content, in little-endian:
++
++.. code-block:: c
++
++    #define TPM_VERSION_UNSPEC          0
++    #define TPM_VERSION_1_2             1
++    #define TPM_VERSION_2_0             2
++
++    #define TPM_PPI_VERSION_NONE        0
++    #define TPM_PPI_VERSION_1_30        1
++
++    struct FwCfgTPMConfig {
++        uint32_t tpmppi_address;         /* PPI memory location */
++        uint8_t tpm_version;             /* TPM version */
++        uint8_t tpmppi_version;          /* PPI version */
++    };
++
++ACPI interface
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT
++and passes it into the guest through the fw_cfg device. The device
++description contains the base address of the TIS interface 0xfed40000
++and the size of the MMIO area (0x5000). In case a TPM2 is used by
++QEMU, a TPM2 ACPI table is also provided.  The device is described to
++be used in polling mode rather than interrupt mode primarily because
++no unused IRQ could be found.
++
++To support measurement logs to be written by the firmware,
++e.g. SeaBIOS, a TCPA table is implemented. This table provides a 64kb
++buffer where the firmware can write its log into. For TPM 2 only a
++more recent version of the TPM2 table provides support for
++measurements logs and a TCPA table does not need to be created.
++
++The TCPA and TPM2 ACPI tables follow the Trusted Computing Group
++specification "TCG ACPI Specification" Family "1.2" and "2.0", Level
++00 Revision 00.37. (see the `ACPI specification`_, or a later version
++of it)
++
++ACPI PPI Interface
++------------------
++
++QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and
++TPM 2. This interface requires ACPI and firmware support. (see the
++`PPI specification`_)
++
++PPI enables a system administrator (root) to request a modification to
++the TPM upon reboot. The PPI specification defines the operation
++requests and the actions the firmware has to take. The system
++administrator passes the operation request number to the firmware
++through an ACPI interface which writes this number to a memory
++location that the firmware knows. Upon reboot, the firmware finds the
++number and sends commands to the TPM. The firmware writes the TPM
++result code and the operation request number to a memory location that
++ACPI can read from and pass the result on to the administrator.
++
++The PPI specification defines a set of mandatory and optional
++operations for the firmware to implement. The ACPI interface also
++allows an administrator to list the supported operations. In QEMU the
++ACPI code is generated by QEMU, yet the firmware needs to implement
++support on a per-operations basis, and different firmwares may support
++a different subset. Therefore, QEMU introduces the virtual memory
++device for PPI where the firmware can indicate which operations it
++supports and ACPI can enable the ones that are supported and disable
++all others. This interface lies in main memory and has the following
++layout:
++
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ |  Field      | Length | Offset | Description                          =
+     |
++ +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=
+=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
++
++ | ``func``    |  0x100 |  0x000 | Firmware sets values for each support=
+ed   |
++ |             |        |        | operation. See defined values below. =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``ppin``    |   0x1  |  0x100 | SMI interrupt to use. Set by firmware=
+.    |
++ |             |        |        | Not supported.                       =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``ppip``    |   0x4  |  0x101 | ACPI function index to pass to SMM co=
+de.  |
++ |             |        |        | Set by ACPI. Not supported.          =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``pprp``    |   0x4  |  0x105 | Result of last executed operation. Se=
+t by |
++ |             |        |        | firmware. See function index 5 for va=
+lues.|
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``pprq``    |   0x4  |  0x109 | Operation request number to execute. =
+See  |
++ |             |        |        | 'Physical Presence Interface Operatio=
+n    |
++ |             |        |        | Summary' tables in specs. Set by ACPI=
+.    |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``pprm``    |   0x4  |  0x10d | Operation request optional parameter.=
+     |
++ |             |        |        | Values depend on operation. Set by AC=
+PI.  |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``lppr``    |   0x4  |  0x111 | Last executed operation request numbe=
+r.   |
++ |             |        |        | Copied from pprq field by firmware.  =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``fret``    |   0x4  |  0x115 | Result code from SMM function.       =
+     |
++ |             |        |        | Not supported.                       =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``res1``    |  0x40  |  0x119 | Reserved for future use              =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ |``next_step``|   0x1  |  0x159 | Operation to execute after reboot by =
+     |
++ |             |        |        | firmware. Used by firmware.          =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++ | ``movv``    |   0x1  |  0x15a | Memory overwrite variable            =
+     |
++ +-------------+--------+--------+--------------------------------------=
+-----+
++
++The following values are supported for the ``func`` field. They
++correspond to the values used by ACPI function index 8.
++
++ +----------+-----------------------------------------------------------=
+--+
++ | Value    | Description                                               =
+  |
++ +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
++ | 0        | Operation is not implemented.                             =
+  |
++ +----------+-----------------------------------------------------------=
+--+
++ | 1        | Operation is only accessible through firmware.            =
+  |
++ +----------+-----------------------------------------------------------=
+--+
++ | 2        | Operation is blocked for OS by firmware configuration.    =
+  |
++ +----------+-----------------------------------------------------------=
+--+
++ | 3        | Operation is allowed and physically present user required.=
+  |
++ +----------+-----------------------------------------------------------=
+--+
++ | 4        | Operation is allowed and physically present user is not   =
+  |
++ |          | required.                                                 =
+  |
++ +----------+-----------------------------------------------------------=
+--+
++
++The location of the table is given by the fw_cfg ``tpmppi_address``
++field.  The PPI memory region size is 0x400 (``TPM_PPI_ADDR_SIZE``) to
++leave enough room for future updates.
++
++QEMU files related to TPM ACPI tables:
++ - ``hw/i386/acpi-build.c``
++ - ``include/hw/acpi/tpm.h``
++
++TPM backend devices
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The TPM implementation is split into two parts, frontend and
++backend. The frontend part is the hardware interface, such as the TPM
++TIS interface described earlier, and the other part is the TPM backend
++interface. The backend interfaces implement the interaction with a TPM
++device, which may be a physical or an emulated device. The split
++between the front- and backend devices allows a frontend to be
++connected with any available backend. This enables the TIS interface
++to be used with the passthrough backend or the swtpm backend.
++
++QEMU files related to TPM backends:
++ - ``backends/tpm.c``
++ - ``include/sysemu/tpm_backend.h``
++ - ``include/sysemu/tpm_backend_int.h``
++
++The QEMU TPM passthrough device
++-------------------------------
++
++In case QEMU is run on Linux as the host operating system it is
++possible to make the hardware TPM device available to a single QEMU
++guest. In this case the user must make sure that no other program is
++using the device, e.g., /dev/tpm0, before trying to start QEMU with
++it.
++
++The passthrough driver uses the host's TPM device for sending TPM
++commands and receiving responses from. Besides that it accesses the
++TPM device's sysfs entry for support of command cancellation. Since
++none of the state of a hardware TPM can be migrated between hosts,
++virtual machine migration is disabled when the TPM passthrough driver
++is used.
++
++Since the host's TPM device will already be initialized by the host's
++firmware, certain commands, e.g. ``TPM_Startup()``, sent by the
++virtual firmware for device initialization, will fail. In this case
++the firmware should not use the TPM.
++
++Sharing the device with the host is generally not a recommended usage
++scenario for a TPM device. The primary reason for this is that two
++operating systems can then access the device's single set of
++resources, such as platform configuration registers
++(PCRs). Applications or kernel security subsystems, such as the Linux
++Integrity Measurement Architecture (IMA), are not expecting to share
++PCRs.
++
++QEMU files related to the TPM passthrough device:
++ - ``hw/tpm/tpm_passthrough.c``
++ - ``hw/tpm/tpm_util.c``
++ - ``hw/tpm/tpm_util.h``
++
++
++Command line to start QEMU with the TPM passthrough device using the hos=
+t's
++hardware TPM ``/dev/tpm0``:
++
++.. code-block:: console
++
++  qemu-system-x86_64 -display sdl -accel kvm \
++  -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
++  -tpmdev passthrough,id=3Dtpm0,path=3D/dev/tpm0 \
++  -device tpm-tis,tpmdev=3Dtpm0 test.img
++
++
++The following commands should result in similar output inside the VM
++with a Linux kernel that either has the TPM TIS driver built-in or
++available as a module:
++
++.. code-block:: console
++
++  # dmesg | grep -i tpm
++  [    0.711310] tpm_tis 00:06: 1.2 TPM (device=3Did 0x1, rev-id 1)
++
++  # dmesg | grep TCPA
++  [    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
++      BXPCTCPA 0000001 BXPC 00000001)
++
++  # ls -l /dev/tpm*
++  crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
++
++  # find /sys/devices/ | grep pcrs$ | xargs cat
++  PCR-00: 35 4E 3B CE 23 9F 38 59 ...
++  ...
++  PCR-23: 00 00 00 00 00 00 00 00 ...
++
++The QEMU TPM emulator device
++----------------------------
++
++The TPM emulator device uses an external TPM emulator called 'swtpm'
++for sending TPM commands to and receiving responses from. The swtpm
++program must have been started before trying to access it through the
++TPM emulator with QEMU.
++
++The TPM emulator implements a command channel for transferring TPM
++commands and responses as well as a control channel over which control
++commands can be sent. (see the `SWTPM protocol`_ specification)
++
++The control channel serves the purpose of resetting, initializing, and
++migrating the TPM state, among other things.
++
++The swtpm program behaves like a hardware TPM and therefore needs to
++be initialized by the firmware running inside the QEMU virtual
++machine.  One necessary step for initializing the device is to send
++the TPM_Startup command to it. SeaBIOS, for example, has been
++instrumented to initialize a TPM 1.2 or TPM 2 device using this
++command.
++
++QEMU files related to the TPM emulator device:
++ - ``hw/tpm/tpm_emulator.c``
++ - ``hw/tpm/tpm_util.c``
++ - ``hw/tpm/tpm_util.h``
++
++The following commands start the swtpm with a UnixIO control channel ove=
+r
++a socket interface. They do not need to be run as root.
++
++.. code-block:: console
++
++  mkdir /tmp/mytpm1
++  swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
++    --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
++    --log level=3D20
++
++Command line to start QEMU with the TPM emulator device communicating
++with the swtpm (x86):
++
++.. code-block:: console
++
++  qemu-system-x86_64 -display sdl -accel kvm \
++    -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
++    -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
++    -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
++    -device tpm-tis,tpmdev=3Dtpm0 test.img
++
 +In case a pSeries machine is emulated, use the following command line:
 +
-+qemu-system-ppc64 -display sdl -machine pseries,accel=kvm \
-+  -m 1024 -bios slof.bin -boot menu=on \
-+  -nodefaults -device VGA -device pci-ohci -device usb-kbd \
-+  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \
-+  -tpmdev emulator,id=tpm0,chardev=chrtpm \
-+  -device tpm-spapr,tpmdev=tpm0 \
-+  -device spapr-vscsi,id=scsi0,reg=0x00002000 \
-+  -device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x3,drive=drive-virtio-disk0,id=virtio-disk0 \
-+  -drive file=test.img,format=raw,if=none,id=drive-virtio-disk0
-+
- 
- In case SeaBIOS is used as firmware, it should show the TPM menu item
- after entering the menu with 'ESC'.
-diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
-index 4c8ee87d67..66a570aac1 100644
---- a/hw/tpm/Kconfig
-+++ b/hw/tpm/Kconfig
-@@ -22,3 +22,9 @@ config TPM_EMULATOR
-     bool
-     default y
-     depends on TPMDEV
-+
-+config TPM_SPAPR
-+    bool
-+    default n
-+    select TPMDEV
-+    depends on PSERIES
-diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-index de0b85d02a..85eb99ae05 100644
---- a/hw/tpm/Makefile.objs
-+++ b/hw/tpm/Makefile.objs
-@@ -4,3 +4,4 @@ common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
- common-obj-$(CONFIG_TPM_CRB) += tpm_crb.o
- common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o
- common-obj-$(CONFIG_TPM_EMULATOR) += tpm_emulator.o
-+obj-$(CONFIG_TPM_SPAPR) += tpm_spapr.o
-diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-new file mode 100644
-index 0000000000..1db9696ae0
---- /dev/null
-+++ b/hw/tpm/tpm_spapr.c
-@@ -0,0 +1,379 @@
-+/*
-+ * QEMU PowerPC pSeries Logical Partition (aka sPAPR) hardware System Emulator
-+ *
-+ * PAPR Virtual TPM
-+ *
-+ * Copyright (c) 2015, 2017, 2019 IBM Corporation.
-+ *
-+ * Authors:
-+ *    Stefan Berger <stefanb@linux.vnet.ibm.com>
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
-+#include "migration/vmstate.h"
-+
-+#include "sysemu/tpm_backend.h"
-+#include "tpm_int.h"
-+#include "tpm_util.h"
-+
-+#include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_vio.h"
-+#include "trace.h"
-+
-+#define DEBUG_SPAPR 0
-+
-+#define VIO_SPAPR_VTPM(obj) \
-+     OBJECT_CHECK(SpaprTpmState, (obj), TYPE_TPM_SPAPR)
-+
-+typedef struct TpmCrq {
-+    uint8_t valid;  /* 0x80: cmd; 0xc0: init crq */
-+                    /* 0x81-0x83: CRQ message response */
-+    uint8_t msg;    /* see below */
-+    uint16_t len;   /* len of TPM request; len of TPM response */
-+    uint32_t data;  /* rtce_dma_handle when sending TPM request */
-+    uint64_t reserved;
-+} TpmCrq;
-+
-+#define SPAPR_VTPM_VALID_INIT_CRQ_COMMAND  0xC0
-+#define SPAPR_VTPM_VALID_COMMAND           0x80
-+#define SPAPR_VTPM_MSG_RESULT              0x80
-+
-+/* msg types for valid = SPAPR_VTPM_VALID_INIT_CRQ */
-+#define SPAPR_VTPM_INIT_CRQ_RESULT           0x1
-+#define SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT  0x2
-+
-+/* msg types for valid = SPAPR_VTPM_VALID_CMD */
-+#define SPAPR_VTPM_GET_VERSION               0x1
-+#define SPAPR_VTPM_TPM_COMMAND               0x2
-+#define SPAPR_VTPM_GET_RTCE_BUFFER_SIZE      0x3
-+#define SPAPR_VTPM_PREPARE_TO_SUSPEND        0x4
-+
-+/* response error messages */
-+#define SPAPR_VTPM_VTPM_ERROR                0xff
-+
-+/* error codes */
-+#define SPAPR_VTPM_ERR_COPY_IN_FAILED        0x3
-+#define SPAPR_VTPM_ERR_COPY_OUT_FAILED       0x4
-+
-+#define TPM_SPAPR_BUFFER_MAX                 4096
-+
-+typedef struct {
-+    SpaprVioDevice vdev;
-+
-+    TpmCrq crq; /* track single TPM command */
-+
-+    uint8_t state;
-+#define SPAPR_VTPM_STATE_NONE         0
-+#define SPAPR_VTPM_STATE_EXECUTION    1
-+#define SPAPR_VTPM_STATE_COMPLETION   2
-+
-+    unsigned char *buffer;
-+
-+    TPMBackendCmd cmd;
-+
-+    TPMBackend *be_driver;
-+    TPMVersion be_tpm_version;
-+
-+    size_t be_buffer_size;
-+} SpaprTpmState;
-+
-+/*
-+ * Send a request to the TPM.
-+ */
-+static void tpm_spapr_tpm_send(SpaprTpmState *s)
-+{
-+    if (trace_event_get_state_backends(TRACE_TPM_SPAPR_SHOW_BUFFER)) {
-+        tpm_util_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
-+    }
-+
-+    s->state = SPAPR_VTPM_STATE_EXECUTION;
-+    s->cmd = (TPMBackendCmd) {
-+        .locty = 0,
-+        .in = s->buffer,
-+        .in_len = MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size),
-+        .out = s->buffer,
-+        .out_len = s->be_buffer_size,
-+    };
-+
-+    tpm_backend_deliver_request(s->be_driver, &s->cmd);
-+}
-+
-+static int tpm_spapr_process_cmd(SpaprTpmState *s, uint64_t dataptr)
-+{
-+    long rc;
-+
-+    /* a max. of be_buffer_size bytes can be transported */
-+    rc = spapr_vio_dma_read(&s->vdev, dataptr,
-+                            s->buffer, s->be_buffer_size);
-+    if (rc) {
-+        error_report("tpm_spapr_got_payload: DMA read failure");
-+    }
-+    /* let vTPM handle any malformed request */
-+    tpm_spapr_tpm_send(s);
-+
-+    return rc;
-+}
-+
-+static inline int spapr_tpm_send_crq(struct SpaprVioDevice *dev, TpmCrq *crq)
-+{
-+    return spapr_vio_send_crq(dev, (uint8_t *)crq);
-+}
-+
-+static int tpm_spapr_do_crq(struct SpaprVioDevice *dev, uint8_t *crq_data)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+    TpmCrq local_crq;
-+    TpmCrq *crq = &s->crq; /* requests only */
-+    int rc;
-+    uint8_t valid = crq_data[0];
-+    uint8_t msg = crq_data[1];
-+
-+    trace_tpm_spapr_do_crq(valid, msg);
-+
-+    switch (valid) {
-+    case SPAPR_VTPM_VALID_INIT_CRQ_COMMAND: /* Init command/response */
-+
-+        /* Respond to initialization request */
-+        switch (msg) {
-+        case SPAPR_VTPM_INIT_CRQ_RESULT:
-+            trace_tpm_spapr_do_crq_crq_result();
-+            memset(&local_crq, 0, sizeof(local_crq));
-+            local_crq.valid = SPAPR_VTPM_VALID_INIT_CRQ_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_INIT_CRQ_RESULT;
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        case SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT:
-+            trace_tpm_spapr_do_crq_crq_complete_result();
-+            memset(&local_crq, 0, sizeof(local_crq));
-+            local_crq.valid = SPAPR_VTPM_VALID_INIT_CRQ_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT;
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+        }
-+
-+        break;
-+    case SPAPR_VTPM_VALID_COMMAND: /* Payloads */
-+        switch (msg) {
-+        case SPAPR_VTPM_TPM_COMMAND:
-+            trace_tpm_spapr_do_crq_tpm_command();
-+            if (s->state == SPAPR_VTPM_STATE_EXECUTION) {
-+                return H_BUSY;
-+            }
-+            memcpy(crq, crq_data, sizeof(*crq));
-+
-+            rc = tpm_spapr_process_cmd(s, be32_to_cpu(crq->data));
-+
-+            if (rc == H_SUCCESS) {
-+                crq->valid = be16_to_cpu(0);
-+            } else {
-+                local_crq.valid = SPAPR_VTPM_MSG_RESULT;
-+                local_crq.msg = SPAPR_VTPM_VTPM_ERROR;
-+                local_crq.len = cpu_to_be16(0);
-+                local_crq.data = cpu_to_be32(SPAPR_VTPM_ERR_COPY_IN_FAILED);
-+                spapr_tpm_send_crq(dev, &local_crq);
-+            }
-+            break;
-+
-+        case SPAPR_VTPM_GET_RTCE_BUFFER_SIZE:
-+            trace_tpm_spapr_do_crq_tpm_get_rtce_buffer_size(s->be_buffer_size);
-+            local_crq.valid = SPAPR_VTPM_VALID_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_GET_RTCE_BUFFER_SIZE |
-+                            SPAPR_VTPM_MSG_RESULT;
-+            local_crq.len = cpu_to_be16(s->be_buffer_size);
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        case SPAPR_VTPM_GET_VERSION:
-+            local_crq.valid = SPAPR_VTPM_VALID_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_GET_VERSION | SPAPR_VTPM_MSG_RESULT;
-+            local_crq.len = cpu_to_be16(0);
-+            switch (s->be_tpm_version) {
-+            case TPM_VERSION_1_2:
-+                local_crq.data = cpu_to_be32(1);
-+                break;
-+            case TPM_VERSION_2_0:
-+                local_crq.data = cpu_to_be32(2);
-+                break;
-+            default:
-+                g_assert_not_reached();
-+                break;
-+            }
-+            trace_tpm_spapr_do_crq_get_version(be32_to_cpu(local_crq.data));
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        case SPAPR_VTPM_PREPARE_TO_SUSPEND:
-+            trace_tpm_spapr_do_crq_prepare_to_suspend();
-+            local_crq.valid = SPAPR_VTPM_VALID_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_PREPARE_TO_SUSPEND |
-+                            SPAPR_VTPM_MSG_RESULT;
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        default:
-+            trace_tpm_spapr_do_crq_unknown_msg_type(crq->msg);
-+        }
-+        break;
-+    default:
-+        trace_tpm_spapr_do_crq_unknown_crq(valid, msg);
-+    };
-+
-+    return H_SUCCESS;
-+}
-+
-+static void tpm_spapr_request_completed(TPMIf *ti, int ret)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
-+    TpmCrq *crq = &s->crq;
-+    uint32_t len;
-+    int rc;
-+
-+    s->state = SPAPR_VTPM_STATE_COMPLETION;
-+
-+    /* a max. of be_buffer_size bytes can be transported */
-+    len = MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size);
-+    rc = spapr_vio_dma_write(&s->vdev, be32_to_cpu(crq->data),
-+                             s->buffer, len);
-+
-+    if (trace_event_get_state_backends(TRACE_TPM_SPAPR_SHOW_BUFFER)) {
-+        tpm_util_show_buffer(s->buffer, len, "From TPM");
-+    }
-+
-+    crq->valid = SPAPR_VTPM_MSG_RESULT;
-+    if (rc == H_SUCCESS) {
-+        crq->msg = SPAPR_VTPM_TPM_COMMAND | SPAPR_VTPM_MSG_RESULT;
-+        crq->len = cpu_to_be16(len);
-+    } else {
-+        error_report("%s: DMA write failure", __func__);
-+        crq->msg = SPAPR_VTPM_VTPM_ERROR;
-+        crq->len = cpu_to_be16(0);
-+        crq->data = cpu_to_be32(SPAPR_VTPM_ERR_COPY_OUT_FAILED);
-+    }
-+
-+    rc = spapr_tpm_send_crq(&s->vdev, crq);
-+    if (rc) {
-+        error_report("%s: Error sending response", __func__);
-+    }
-+}
-+
-+static int tpm_spapr_do_startup_tpm(SpaprTpmState *s, size_t buffersize)
-+{
-+    return tpm_backend_startup_tpm(s->be_driver, buffersize);
-+}
-+
-+static const char *tpm_spapr_get_dt_compatible(SpaprVioDevice *dev)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+
-+    switch (s->be_tpm_version) {
-+    case TPM_VERSION_1_2:
-+        return "IBM,vtpm";
-+    case TPM_VERSION_2_0:
-+        return "IBM,vtpm20";
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static void tpm_spapr_reset(SpaprVioDevice *dev)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+
-+    s->state = SPAPR_VTPM_STATE_NONE;
-+
-+    s->be_tpm_version = tpm_backend_get_tpm_version(s->be_driver);
-+
-+    s->be_buffer_size = MIN(tpm_backend_get_buffer_size(s->be_driver),
-+                            TPM_SPAPR_BUFFER_MAX);
-+
-+    tpm_backend_reset(s->be_driver);
-+    tpm_spapr_do_startup_tpm(s, s->be_buffer_size);
-+}
-+
-+static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
-+
-+    if (tpm_backend_had_startup_error(s->be_driver)) {
-+        return TPM_VERSION_UNSPEC;
-+    }
-+
-+    return tpm_backend_get_tpm_version(s->be_driver);
-+}
-+
-+static const VMStateDescription vmstate_spapr_vtpm = {
-+    .name = "tpm-spapr",
-+    .unmigratable = 1,
-+};
-+
-+static Property tpm_spapr_properties[] = {
-+    DEFINE_SPAPR_PROPERTIES(SpaprTpmState, vdev),
-+    DEFINE_PROP_TPMBE("tpmdev", SpaprTpmState, be_driver),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void tpm_spapr_realizefn(SpaprVioDevice *dev, Error **errp)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+
-+    if (!tpm_find()) {
-+        error_setg(errp, "at most one TPM device is permitted");
-+        return;
-+    }
-+
-+    dev->crq.SendFunc = tpm_spapr_do_crq;
-+
-+    if (!s->be_driver) {
-+        error_setg(errp, "'tpmdev' property is required");
-+        return;
-+    }
-+    s->buffer = g_malloc(TPM_SPAPR_BUFFER_MAX);
-+}
-+
-+static void tpm_spapr_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    SpaprVioDeviceClass *k = VIO_SPAPR_DEVICE_CLASS(klass);
-+    TPMIfClass *tc = TPM_IF_CLASS(klass);
-+
-+    k->realize = tpm_spapr_realizefn;
-+    k->reset = tpm_spapr_reset;
-+    k->dt_name = "vtpm";
-+    k->dt_type = "IBM,vtpm";
-+    k->get_dt_compatible = tpm_spapr_get_dt_compatible;
-+    k->signal_mask = 0x00000001;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->props = tpm_spapr_properties;
-+    k->rtce_window_size = 0x10000000;
-+    dc->vmsd = &vmstate_spapr_vtpm;
-+
-+    tc->model = TPM_MODEL_TPM_SPAPR;
-+    tc->get_version = tpm_spapr_get_version;
-+    tc->request_completed = tpm_spapr_request_completed;
-+}
-+
-+static const TypeInfo tpm_spapr_info = {
-+    .name          = TYPE_TPM_SPAPR,
-+    .parent        = TYPE_VIO_SPAPR_DEVICE,
-+    .instance_size = sizeof(SpaprTpmState),
-+    .class_init    = tpm_spapr_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_TPM_IF },
-+        { }
-+    }
-+};
-+
-+static void tpm_spapr_register_types(void)
-+{
-+    type_register_static(&tpm_spapr_info);
-+}
-+
-+type_init(tpm_spapr_register_types)
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 357c9e9a84..9143a8eaa3 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -55,3 +55,15 @@ tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offset = %u"
- 
- # tpm_ppi.c
- tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
-+
-+# hw/tpm/tpm_spapr.c
-+tpm_spapr_show_buffer(const char *direction, size_t len, const char *buf) "direction: %s len: %zu\n%s"
-+tpm_spapr_do_crq(uint8_t raw1, uint8_t raw2) "1st 2 bytes in CRQ: 0x%02x 0x%02x"
-+tpm_spapr_do_crq_crq_result(void) "SPAPR_VTPM_INIT_CRQ_RESULT"
-+tpm_spapr_do_crq_crq_complete_result(void) "SPAPR_VTPM_INIT_CRQ_COMP_RESULT"
-+tpm_spapr_do_crq_tpm_command(void) "got TPM command payload"
-+tpm_spapr_do_crq_tpm_get_rtce_buffer_size(size_t buffersize) "response: buffer size is %zu"
-+tpm_spapr_do_crq_get_version(uint32_t version) "response: version %u"
-+tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspend"
-+tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x%02x"
-+tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x%02x 0x%02x ..."
-diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-index 5b541a71c8..15979a3647 100644
---- a/include/sysemu/tpm.h
-+++ b/include/sysemu/tpm.h
-@@ -45,11 +45,14 @@ typedef struct TPMIfClass {
- 
- #define TYPE_TPM_TIS                "tpm-tis"
- #define TYPE_TPM_CRB                "tpm-crb"
-+#define TYPE_TPM_SPAPR              "tpm-spapr"
- 
- #define TPM_IS_TIS(chr)                             \
-     object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
- #define TPM_IS_CRB(chr)                             \
-     object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
-+#define TPM_IS_SPAPR(chr)                           \
-+    object_dynamic_cast(OBJECT(chr), TYPE_TPM_SPAPR)
- 
- /* returns NULL unless there is exactly one TPM device */
- static inline TPMIf *tpm_find(void)
-diff --git a/qapi/tpm.json b/qapi/tpm.json
-index b30323bb6b..63878aa0f4 100644
---- a/qapi/tpm.json
-+++ b/qapi/tpm.json
-@@ -12,11 +12,11 @@
- #
- # @tpm-tis: TPM TIS model
- # @tpm-crb: TPM CRB model (since 2.12)
-+# @tpm-spapr: TPM SPAPR model (since 5.0)
- #
- # Since: 1.5
- ##
--{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
++.. code-block:: console
++
++  qemu-system-ppc64 -display sdl -machine pseries,accel=3Dkvm \
++    -m 1024 -bios slof.bin -boot menu=3Don \
++    -nodefaults -device VGA -device pci-ohci -device usb-kbd \
++    -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
++    -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
++    -device tpm-spapr,tpmdev=3Dtpm0 \
++    -device spapr-vscsi,id=3Dscsi0,reg=3D0x00002000 \
++    -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x3,drive=3Ddri=
+ve-virtio-disk0,id=3Dvirtio-disk0 \
++    -drive file=3Dtest.img,format=3Draw,if=3Dnone,id=3Ddrive-virtio-disk=
+0
++
++In case SeaBIOS is used as firmware, it should show the TPM menu item
++after entering the menu with 'ESC'.
++
++.. code-block:: console
++
++  Select boot device:
++  1. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]
++  [...]
++  5. Legacy option rom
++
++  t. TPM Configuration
++
++The following commands should result in similar output inside the VM
++with a Linux kernel that either has the TPM TIS driver built-in or
++available as a module:
++
++.. code-block:: console
++
++  # dmesg | grep -i tpm
++  [    0.711310] tpm_tis 00:06: 1.2 TPM (device=3Did 0x1, rev-id 1)
++
++  # dmesg | grep TCPA
++  [    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
++      BXPCTCPA 0000001 BXPC 00000001)
++
++  # ls -l /dev/tpm*
++  crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
++
++  # find /sys/devices/ | grep pcrs$ | xargs cat
++  PCR-00: 35 4E 3B CE 23 9F 38 59 ...
++  ...
++  PCR-23: 00 00 00 00 00 00 00 00 ...
++
++Migration with the TPM emulator
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
++
++The TPM emulator supports the following types of virtual machine
++migration:
++
++- VM save / restore (migration into a file)
++- Network migration
++- Snapshotting (migration into storage like QoW2 or QED)
++
++The following command sequences can be used to test VM save / restore.
++
++In a 1st terminal start an instance of a swtpm using the following comma=
+nd:
++
++.. code-block:: console
++
++  mkdir /tmp/mytpm1
++  swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
++    --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
++    --log level=3D20 --tpm2
++
++In a 2nd terminal start the VM:
++
++.. code-block:: console
++
++  qemu-system-x86_64 -display sdl -accel kvm \
++    -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
++    -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
++    -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
++    -device tpm-tis,tpmdev=3Dtpm0 \
++    -monitor stdio \
++    test.img
++
++Verify that the attached TPM is working as expected using applications
++inside the VM.
++
++To store the state of the VM use the following command in the QEMU
++monitor in the 2nd terminal:
++
++.. code-block:: console
++
++  (qemu) migrate "exec:cat > testvm.bin"
++  (qemu) quit
++
++At this point a file called ``testvm.bin`` should exists and the swtpm
++and QEMU processes should have ended.
++
++To test 'VM restore' you have to start the swtpm with the same
++parameters as before. If previously a TPM 2 [--tpm2] was saved, --tpm2
++must now be passed again on the command line.
++
++In the 1st terminal restart the swtpm with the same command line as
++before:
++
++.. code-block:: console
++
++  swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
++    --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
++    --log level=3D20 --tpm2
++
++In the 2nd terminal restore the state of the VM using the additional
++'-incoming' option.
++
++.. code-block:: console
++
++  qemu-system-x86_64 -display sdl -accel kvm \
++    -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
++    -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
++    -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
++    -device tpm-tis,tpmdev=3Dtpm0 \
++    -incoming "exec:cat < testvm.bin" \
++    test.img
++
++Troubleshooting migration
++-------------------------
++
++There are several reasons why migration may fail. In case of problems,
++please ensure that the command lines adhere to the following rules
++and, if possible, that identical versions of QEMU and swtpm are used
++at all times.
++
++VM save and restore:
++
++ - QEMU command line parameters should be identical apart from the
++   '-incoming' option on VM restore
++
++ - swtpm command line parameters should be identical
++
++VM migration to 'localhost':
++
++ - QEMU command line parameters should be identical apart from the
++   '-incoming' option on the destination side
++
++ - swtpm command line parameters should point to two different
++   directories on the source and destination swtpm (--tpmstate dir=3D...=
+)
++   (especially if different versions of libtpms were to be used on the
++   same machine).
++
++VM migration across the network:
++
++ - QEMU command line parameters should be identical apart from the
++   '-incoming' option on the destination side
++
++ - swtpm command line parameters should be identical
++
++VM Snapshotting:
++ - QEMU command line parameters should be identical
++
++ - swtpm command line parameters should be identical
++
++
++Besides that, migration failure reasons on the swtpm level may include
++the following:
++
++ - the versions of the swtpm on the source and destination sides are
++   incompatible
++
++   - downgrading of TPM state may not be supported
++
++   - the source and destination libtpms were compiled with different
++     compile-time options and the destination side refuses to accept the
++     state
++
++ - different migration keys are used on the source and destination side
++   and the destination side cannot decrypt the migrated state
++   (swtpm ... --migration-key ... )
++
++
++.. _TIS specification:
++   https://trustedcomputinggroup.org/pc-client-work-group-pc-client-spec=
+ific-tpm-interface-specification-tis/
++
++.. _CRB specification:
++   https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-pro=
+file-ptp-specification/
++
++
++.. _ACPI specification:
++   https://trustedcomputinggroup.org/tcg-acpi-specification/
++
++.. _PPI specification:
++   https://trustedcomputinggroup.org/resource/tcg-physical-presence-inte=
+rface-specification/
++
++.. _SWTPM protocol:
++   https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioct=
+ls.pod
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+deleted file mode 100644
+index 9c3e67d8a7..0000000000
+--- a/docs/specs/tpm.txt
++++ /dev/null
+@@ -1,445 +0,0 @@
+-QEMU TPM Device
+-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 -
-+{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb', 'tpm-spapr' ] }
- ##
- # @query-tpm-models:
- #
-@@ -29,7 +29,7 @@
- # Example:
- #
- # -> { "execute": "query-tpm-models" }
--# <- { "return": [ "tpm-tis", "tpm-crb" ] }
-+# <- { "return": [ "tpm-tis", "tpm-crb", "tpm-spapr" ] }
- #
- ##
- { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
--- 
+-=3D Guest-side Hardware Interface =3D
+-
+-The QEMU TPM emulation implements a TPM TIS hardware interface following=
+ the
+-Trusted Computing Group's specification "TCG PC Client Specific TPM Inte=
+rface
+-Specification (TIS)", Specification Version 1.3, 21 March 2013. This
+-specification, or a later version of it, can be accessed from the follow=
+ing
+-URL:
+-
+-https://trustedcomputinggroup.org/pc-client-work-group-pc-client-specifi=
+c-tpm-interface-specification-tis/
+-
+-The TIS interface makes a memory mapped IO region in the area 0xfed40000=
+ -
+-0xfed44fff available to the guest operating system.
+-
+-
+-QEMU files related to TPM TIS interface:
+- - hw/tpm/tpm_tis.c
+- - hw/tpm/tpm_tis.h
+-
+-
+-QEMU also implements a TPM CRB interface following the Trusted Computing
+-Group's specification "TCG PC Client Platform TPM Profile (PTP)
+-Specification", Family "2.0", Level 00 Revision 01.03 v22, May 22, 2017.
+-This specification, or a later version of it, can be accessed from the
+-following URL:
+-
+-https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profil=
+e-ptp-specification/
+-
+-The CRB interface makes a memory mapped IO region in the area 0xfed40000=
+ -
+-0xfed40fff (1 locality) available to the guest operating system.
+-
+-QEMU files related to TPM CRB interface:
+- - hw/tpm/tpm_crb.c
+-
+-
+-pSeries (ppc64) machines offer a tpm-spapr device model.
+-
+-QEMU files related to the SPAPR interface:
+- - hw/tpm/tpm_spapr.c
+-
+-=3D fw_cfg interface =3D
+-
+-The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
+-configuring the guest appropriately.
+-
+-The entry of 6 bytes has the following content, in little-endian:
+-
+-    #define TPM_VERSION_UNSPEC          0
+-    #define TPM_VERSION_1_2             1
+-    #define TPM_VERSION_2_0             2
+-
+-    #define TPM_PPI_VERSION_NONE        0
+-    #define TPM_PPI_VERSION_1_30        1
+-
+-    struct FwCfgTPMConfig {
+-        uint32_t tpmppi_address;         /* PPI memory location */
+-        uint8_t tpm_version;             /* TPM version */
+-        uint8_t tpmppi_version;          /* PPI version */
+-    };
+-
+-=3D ACPI Interface =3D
+-
+-The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and=
+ passes
+-it into the guest through the fw_cfg device. The device description cont=
+ains
+-the base address of the TIS interface 0xfed40000 and the size of the MMI=
+O area
+-(0x5000). In case a TPM2 is used by QEMU, a TPM2 ACPI table is also prov=
+ided.
+-The device is described to be used in polling mode rather than interrupt=
+ mode
+-primarily because no unused IRQ could be found.
+-
+-To support measurement logs to be written by the firmware, e.g. SeaBIOS,=
+ a TCPA
+-table is implemented. This table provides a 64kb buffer where the firmwa=
+re can
+-write its log into. For TPM 2 only a more recent version of the TPM2 tab=
+le
+-provides support for measurements logs and a TCPA table does not need to=
+ be
+-created.
+-
+-The TCPA and TPM2 ACPI tables follow the Trusted Computing Group specifi=
+cation
+-"TCG ACPI Specification" Family "1.2" and "2.0", Level 00 Revision 00.37=
+. This
+-specification, or a later version of it, can be accessed from the follow=
+ing
+-URL:
+-
+-https://trustedcomputinggroup.org/tcg-acpi-specification/
+-
+-=3D=3D ACPI PPI Interface =3D=3D
+-
+-QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and TPM =
+2. This
+-interface requires ACPI and firmware support. The specification can be f=
+ound at
+-the following URL:
+-
+-https://trustedcomputinggroup.org/resource/tcg-physical-presence-interfa=
+ce-specification/
+-
+-PPI enables a system administrator (root) to request a modification to t=
+he
+-TPM upon reboot. The PPI specification defines the operation requests an=
+d the
+-actions the firmware has to take. The system administrator passes the op=
+eration
+-request number to the firmware through an ACPI interface which writes th=
+is
+-number to a memory location that the firmware knows. Upon reboot, the fi=
+rmware
+-finds the number and sends commands to the TPM. The firmware writes the =
+TPM
+-result code and the operation request number to a memory location that A=
+CPI can
+-read from and pass the result on to the administrator.
+-
+-The PPI specification defines a set of mandatory and optional operations=
+ for
+-the firmware to implement. The ACPI interface also allows an administrat=
+or to
+-list the supported operations. In QEMU the ACPI code is generated by QEM=
+U, yet
+-the firmware needs to implement support on a per-operations basis, and
+-different firmwares may support a different subset. Therefore, QEMU intr=
+oduces
+-the virtual memory device for PPI where the firmware can indicate which
+-operations it supports and ACPI can enable the ones that are supported a=
+nd
+-disable all others. This interface lies in main memory and has the follo=
+wing
+-layout:
+-
+- +----------+--------+--------+-----------------------------------------=
+--+
+- |  Field   | Length | Offset | Description                             =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | func     |  0x100 |  0x000 | Firmware sets values for each supported =
+  |
+- |          |        |        | operation. See defined values below.    =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | ppin     |   0x1  |  0x100 | SMI interrupt to use. Set by firmware.  =
+  |
+- |          |        |        | Not supported.                          =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | ppip     |   0x4  |  0x101 | ACPI function index to pass to SMM code.=
+  |
+- |          |        |        | Set by ACPI. Not supported.             =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | pprp     |   0x4  |  0x105 | Result of last executed operation. Set b=
+y |
+- |          |        |        | firmware. See function index 5 for value=
+s.|
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | pprq     |   0x4  |  0x109 | Operation request number to execute. See=
+  |
+- |          |        |        | 'Physical Presence Interface Operation  =
+  |
+- |          |        |        | Summary' tables in specs. Set by ACPI.  =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | pprm     |   0x4  |  0x10d | Operation request optional parameter.   =
+  |
+- |          |        |        | Values depend on operation. Set by ACPI.=
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | lppr     |   0x4  |  0x111 | Last executed operation request number. =
+  |
+- |          |        |        | Copied from pprq field by firmware.     =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | fret     |   0x4  |  0x115 | Result code from SMM function.          =
+  |
+- |          |        |        | Not supported.                          =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | res1     |  0x40  |  0x119 | Reserved for future use                 =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
+  |
+- |          |        |        | firmware. Used by firmware.             =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+- | movv     |   0x1  |  0x15a | Memory overwrite variable               =
+  |
+- +----------+--------+--------+-----------------------------------------=
+--+
+-
+-   The following values are supported for the 'func' field. They corresp=
+ond
+-   to the values used by ACPI function index 8.
+-
+- +----------+-----------------------------------------------------------=
+--+
+- | value    | Description                                               =
+  |
+- +----------+-----------------------------------------------------------=
+--+
+- | 0        | Operation is not implemented.                             =
+  |
+- +----------+-----------------------------------------------------------=
+--+
+- | 1        | Operation is only accessible through firmware.            =
+  |
+- +----------+-----------------------------------------------------------=
+--+
+- | 2        | Operation is blocked for OS by firmware configuration.    =
+  |
+- +----------+-----------------------------------------------------------=
+--+
+- | 3        | Operation is allowed and physically present user required.=
+  |
+- +----------+-----------------------------------------------------------=
+--+
+- | 4        | Operation is allowed and physically present user is not   =
+  |
+- |          | required.                                                 =
+  |
+- +----------+-----------------------------------------------------------=
+--+
+-
+-The location of the table is given by the fw_cfg tpmppi_address field.
+-The PPI memory region size is 0x400 (TPM_PPI_ADDR_SIZE) to leave
+-enough room for future updates.
+-
+-
+-QEMU files related to TPM ACPI tables:
+- - hw/i386/acpi-build.c
+- - include/hw/acpi/tpm.h
+-
+-
+-=3D TPM backend devices =3D
+-
+-The TPM implementation is split into two parts, frontend and backend. Th=
+e
+-frontend part is the hardware interface, such as the TPM TIS interface
+-described earlier, and the other part is the TPM backend interface. The =
+backend
+-interfaces implement the interaction with a TPM device, which may be a p=
+hysical
+-or an emulated device. The split between the front- and backend devices =
+allows
+-a frontend to be connected with any available backend. This enables the =
+TIS
+-interface to be used with the passthrough backend or the (future) swtpm =
+backend.
+-
+-
+-QEMU files related to TPM backends:
+- - backends/tpm.c
+- - include/sysemu/tpm_backend.h
+- - include/sysemu/tpm_backend_int.h
+-
+-
+-=3D=3D The QEMU TPM passthrough device =3D=3D
+-
+-In case QEMU is run on Linux as the host operating system it is possible=
+ to
+-make the hardware TPM device available to a single QEMU guest. In this c=
+ase the
+-user must make sure that no other program is using the device, e.g., /de=
+v/tpm0,
+-before trying to start QEMU with it.
+-
+-The passthrough driver uses the host's TPM device for sending TPM comman=
+ds
+-and receiving responses from. Besides that it accesses the TPM device's =
+sysfs
+-entry for support of command cancellation. Since none of the state of a
+-hardware TPM can be migrated between hosts, virtual machine migration is
+-disabled when the TPM passthrough driver is used.
+-
+-Since the host's TPM device will already be initialized by the host's fi=
+rmware,
+-certain commands, e.g. TPM_Startup(), sent by the virtual firmware for d=
+evice
+-initialization, will fail. In this case the firmware should not use the =
+TPM.
+-
+-Sharing the device with the host is generally not a recommended usage sc=
+enario
+-for a TPM device. The primary reason for this is that two operating syst=
+ems can
+-then access the device's single set of resources, such as platform confi=
+guration
+-registers (PCRs). Applications or kernel security subsystems, such as th=
+e
+-Linux Integrity Measurement Architecture (IMA), are not expecting to sha=
+re PCRs.
+-
+-
+-QEMU files related to the TPM passthrough device:
+- - hw/tpm/tpm_passthrough.c
+- - hw/tpm/tpm_util.c
+- - hw/tpm/tpm_util.h
+-
+-
+-Command line to start QEMU with the TPM passthrough device using the hos=
+t's
+-hardware TPM /dev/tpm0:
+-
+-qemu-system-x86_64 -display sdl -accel kvm \
+-  -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
+-  -tpmdev passthrough,id=3Dtpm0,path=3D/dev/tpm0 \
+-  -device tpm-tis,tpmdev=3Dtpm0 test.img
+-
+-The following commands should result in similar output inside the VM wit=
+h a
+-Linux kernel that either has the TPM TIS driver built-in or available as=
+ a
+-module:
+-
+-#> dmesg | grep -i tpm
+-[    0.711310] tpm_tis 00:06: 1.2 TPM (device=3Did 0x1, rev-id 1)
+-
+-#> dmesg | grep TCPA
+-[    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
+-    BXPCTCPA 0000001 BXPC 00000001)
+-
+-#> ls -l /dev/tpm*
+-crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
+-
+-#> find /sys/devices/ | grep pcrs$ | xargs cat
+-PCR-00: 35 4E 3B CE 23 9F 38 59 ...
+-...
+-PCR-23: 00 00 00 00 00 00 00 00 ...
+-
+-
+-=3D=3D The QEMU TPM emulator device =3D=3D
+-
+-The TPM emulator device uses an external TPM emulator called 'swtpm' for
+-sending TPM commands to and receiving responses from. The swtpm program
+-must have been started before trying to access it through the TPM emulat=
+or
+-with QEMU.
+-
+-The TPM emulator implements a command channel for transferring TPM comma=
+nds
+-and responses as well as a control channel over which control commands c=
+an
+-be sent. The specification for the control channel can be found here:
+-
+-https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioctls.=
+pod
+-
+-
+-The control channel serves the purpose of resetting, initializing, and
+-migrating the TPM state, among other things.
+-
+-The swtpm program behaves like a hardware TPM and therefore needs to be
+-initialized by the firmware running inside the QEMU virtual machine.
+-One necessary step for initializing the device is to send the TPM_Startu=
+p
+-command to it. SeaBIOS, for example, has been instrumented to initialize
+-a TPM 1.2 or TPM 2 device using this command.
+-
+-
+-QEMU files related to the TPM emulator device:
+- - hw/tpm/tpm_emulator.c
+- - hw/tpm/tpm_util.c
+- - hw/tpm/tpm_util.h
+-
+-
+-The following commands start the swtpm with a UnixIO control channel ove=
+r
+-a socket interface. They do not need to be run as root.
+-
+-mkdir /tmp/mytpm1
+-swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
+-  --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
+-  --log level=3D20
+-
+-Command line to start QEMU with the TPM emulator device communicating wi=
+th
+-the swtpm (x86):
+-
+-qemu-system-x86_64 -display sdl -accel kvm \
+-  -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
+-  -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
+-  -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
+-  -device tpm-tis,tpmdev=3Dtpm0 test.img
+-
+-In case a pSeries machine is emulated, use the following command line:
+-
+-qemu-system-ppc64 -display sdl -machine pseries,accel=3Dkvm \
+-  -m 1024 -bios slof.bin -boot menu=3Don \
+-  -nodefaults -device VGA -device pci-ohci -device usb-kbd \
+-  -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
+-  -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
+-  -device tpm-spapr,tpmdev=3Dtpm0 \
+-  -device spapr-vscsi,id=3Dscsi0,reg=3D0x00002000 \
+-  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x3,drive=3Ddrive=
+-virtio-disk0,id=3Dvirtio-disk0 \
+-  -drive file=3Dtest.img,format=3Draw,if=3Dnone,id=3Ddrive-virtio-disk0
+-
+-
+-In case SeaBIOS is used as firmware, it should show the TPM menu item
+-after entering the menu with 'ESC'.
+-
+-Select boot device:
+-1. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]
+-[...]
+-5. Legacy option rom
+-
+-t. TPM Configuration
+-
+-
+-The following commands should result in similar output inside the VM wit=
+h a
+-Linux kernel that either has the TPM TIS driver built-in or available as=
+ a
+-module:
+-
+-#> dmesg | grep -i tpm
+-[    0.711310] tpm_tis 00:06: 1.2 TPM (device=3Did 0x1, rev-id 1)
+-
+-#> dmesg | grep TCPA
+-[    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
+-    BXPCTCPA 0000001 BXPC 00000001)
+-
+-#> ls -l /dev/tpm*
+-crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
+-
+-#> find /sys/devices/ | grep pcrs$ | xargs cat
+-PCR-00: 35 4E 3B CE 23 9F 38 59 ...
+-...
+-PCR-23: 00 00 00 00 00 00 00 00 ...
+-
+-
+-=3D=3D=3D Migration with the TPM emulator =3D=3D=3D
+-
+-The TPM emulator supports the following types of virtual machine migrati=
+on:
+-
+-- VM save / restore (migration into a file)
+-- Network migration
+-- Snapshotting (migration into storage like QoW2 or QED)
+-
+-The following command sequences can be used to test VM save / restore.
+-
+-
+-In a 1st terminal start an instance of a swtpm using the following comma=
+nd:
+-
+-mkdir /tmp/mytpm1
+-swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
+-  --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
+-  --log level=3D20 --tpm2
+-
+-In a 2nd terminal start the VM:
+-
+-qemu-system-x86_64 -display sdl -accel kvm \
+-  -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
+-  -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
+-  -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
+-  -device tpm-tis,tpmdev=3Dtpm0 \
+-  -monitor stdio \
+-  test.img
+-
+-Verify that the attached TPM is working as expected using applications i=
+nside
+-the VM.
+-
+-To store the state of the VM use the following command in the QEMU monit=
+or in
+-the 2nd terminal:
+-
+-(qemu) migrate "exec:cat > testvm.bin"
+-(qemu) quit
+-
+-At this point a file called 'testvm.bin' should exists and the swtpm and=
+ QEMU
+-processes should have ended.
+-
+-To test 'VM restore' you have to start the swtpm with the same parameter=
+s
+-as before. If previously a TPM 2 [--tpm2] was saved, --tpm2 must now be
+-passed again on the command line.
+-
+-In the 1st terminal restart the swtpm with the same command line as befo=
+re:
+-
+-swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
+-  --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
+-  --log level=3D20 --tpm2
+-
+-In the 2nd terminal restore the state of the VM using the additional
+-'-incoming' option.
+-
+-qemu-system-x86_64 -display sdl -accel kvm \
+-  -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
+-  -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
+-  -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
+-  -device tpm-tis,tpmdev=3Dtpm0 \
+-  -incoming "exec:cat < testvm.bin" \
+-  test.img
+-
+-
+-Troubleshooting migration:
+-
+-There are several reasons why migration may fail. In case of problems,
+-please ensure that the command lines adhere to the following rules and,
+-if possible, that identical versions of QEMU and swtpm are used at all
+-times.
+-
+-VM save and restore:
+- - QEMU command line parameters should be identical apart from the
+-   '-incoming' option on VM restore
+- - swtpm command line parameters should be identical
+-
+-VM migration to 'localhost':
+- - QEMU command line parameters should be identical apart from the
+-   '-incoming' option on the destination side
+- - swtpm command line parameters should point to two different
+-   directories on the source and destination swtpm (--tpmstate dir=3D...=
+)
+-   (especially if different versions of libtpms were to be used on the
+-   same machine).
+-
+-VM migration across the network:
+- - QEMU command line parameters should be identical apart from the
+-   '-incoming' option on the destination side
+- - swtpm command line parameters should be identical
+-
+-VM Snapshotting:
+- - QEMU command line parameters should be identical
+- - swtpm command line parameters should be identical
+-
+-
+-Besides that, migration failure reasons on the swtpm level may include
+-the following:
+-
+- - the versions of the swtpm on the source and destination sides are
+-   incompatible
+-   - downgrading of TPM state may not be supported
+-   - the source and destination libtpms were compiled with different
+-     compile-time options and the destination side refuses to accept the
+-     state
+- - different migration keys are used on the source and destination side
+-   and the destination side cannot decrypt the migrated state
+-   (swtpm ... --migration-key ... )
+--=20
 2.24.1
 
 
