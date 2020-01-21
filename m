@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D701C33CB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD884C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69F0724673
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C37F24673
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:43:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQ65xVJz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F0724673
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dNypco1A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C37F24673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itssH-0006PA-2O
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 07:43:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51256)
+	id 1itssa-0006ng-A9
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 07:43:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsbq-0006UF-Lr
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:19 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsbZ-00064P-Qv
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsbp-00025w-D9
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45691
+ (envelope-from <dgilbert@redhat.com>) id 1itsbY-00021l-8L
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26452
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsbp-00025j-8p
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:17 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsbY-00021V-4c
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609576;
+ s=mimecast20190719; t=1579609559;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=R4wB/TUr2SmdZJ+PPoU2IvIVgstwKAtZw/jvk+zHuYk=;
- b=LQ65xVJzcv3+I/g7Has/X3s5FGNzhHf+llMtRtyY0Z6dtp20g3YAV1vqTTuYWVFHr7KiKp
- sQ/zKcC2eVHbc6D7FlvbA6jAASIOilhVqAH8Mgv1aVunPWK7HqXzRQ8BgwfHtUvtmG4C0z
- 7YHdEVfw8Va5j7j/xKntRSnuxXQrwvs=
+ bh=r2AI4tFoCcIcq3g/wcu8aQtWWfhJt5yQ3uZ4AhtIsnQ=;
+ b=dNypco1AzBmSfWcboHj+3xykWdfLdtCEPPeYUtC5saKO0LPjqLj543wrRJehMqpiPPA9E8
+ IQsvyajqMinc2iQ2O4zC/126xnTxznV3FtfcXX5+DBNIqX13dxCYckkLx+RtlMFXa0ebor
+ 5WBqz3yVI0CUz6nvhRvjAm8X4st/Ul8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-AUAD1VQJN46e7P-OoPeAMQ-1; Tue, 21 Jan 2020 07:26:15 -0500
+ us-mta-273-W98y1Sq2MoumM9U0P0EGCQ-1; Tue, 21 Jan 2020 07:25:57 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87662A0CBF;
- Tue, 21 Jan 2020 12:26:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B160800D55;
+ Tue, 21 Jan 2020 12:25:56 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D275860BE0;
- Tue, 21 Jan 2020 12:26:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9079C60BE0;
+ Tue, 21 Jan 2020 12:25:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 022/109] virtiofsd: Poll kick_fd for queue
-Date: Tue, 21 Jan 2020 12:23:06 +0000
-Message-Id: <20200121122433.50803-23-dgilbert@redhat.com>
+Subject: [PATCH v2 017/109] virtiofsd: Open vhost connection instead of
+ mounting
+Date: Tue, 21 Jan 2020 12:23:01 +0000
+Message-Id: <20200121122433.50803-18-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: AUAD1VQJN46e7P-OoPeAMQ-1
+X-MC-Unique: W98y1Sq2MoumM9U0P0EGCQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,84 +95,245 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-In the queue thread poll the kick_fd we're passed.
+When run with vhost-user options we conect to the QEMU instead
+via a socket.  Start this off by creating the socket.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 ---
- tools/virtiofsd/fuse_virtio.c | 40 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+ tools/virtiofsd/fuse_i.h        |  7 ++-
+ tools/virtiofsd/fuse_lowlevel.c | 55 +++--------------------
+ tools/virtiofsd/fuse_virtio.c   | 79 +++++++++++++++++++++++++++++++++
+ tools/virtiofsd/fuse_virtio.h   | 23 ++++++++++
+ 4 files changed, 114 insertions(+), 50 deletions(-)
+ create mode 100644 tools/virtiofsd/fuse_virtio.c
+ create mode 100644 tools/virtiofsd/fuse_virtio.h
 
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 2a94bb3cca..05e7258712 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -24,6 +24,7 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/eventfd.h>
- #include <sys/socket.h>
- #include <sys/types.h>
- #include <sys/un.h>
-@@ -100,13 +101,50 @@ static void fv_panic(VuDev *dev, const char *err)
-     exit(EXIT_FAILURE);
- }
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index 26b1a7da88..82d6ac7115 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -6,9 +6,10 @@
+  * See the file COPYING.LIB
+  */
 =20
-+/* Thread function for individual queues, created when a queue is 'started=
-' */
- static void *fv_queue_thread(void *opaque)
- {
-     struct fv_QueueInfo *qi =3D opaque;
-     fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __func_=
-_,
-              qi->qidx, qi->kick_fd);
-     while (1) {
--        /* TODO */
-+        struct pollfd pf[1];
-+        pf[0].fd =3D qi->kick_fd;
-+        pf[0].events =3D POLLIN;
-+        pf[0].revents =3D 0;
+-#define FUSE_USE_VERSION 31
+-
++#ifndef FUSE_I_H
++#define FUSE_I_H
+=20
++#define FUSE_USE_VERSION 31
+ #include "fuse.h"
+ #include "fuse_lowlevel.h"
+=20
+@@ -101,3 +102,5 @@ void fuse_session_process_buf_int(struct fuse_session *=
+se,
+=20
+ /* room needed in buffer to accommodate header */
+ #define FUSE_BUFFER_HEADER_SIZE 0x1000
 +
-+        fuse_log(FUSE_LOG_DEBUG, "%s: Waiting for Queue %d event\n", __fun=
-c__,
-+                 qi->qidx);
-+        int poll_res =3D ppoll(pf, 1, NULL, NULL);
-+
-+        if (poll_res =3D=3D -1) {
-+            if (errno =3D=3D EINTR) {
-+                fuse_log(FUSE_LOG_INFO, "%s: ppoll interrupted, going arou=
-nd\n",
-+                         __func__);
-+                continue;
-+            }
-+            fuse_log(FUSE_LOG_ERR, "fv_queue_thread ppoll: %m\n");
-+            break;
-+        }
-+        assert(poll_res =3D=3D 1);
-+        if (pf[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-+            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x Queue %=
-d\n",
-+                     __func__, pf[0].revents, qi->qidx);
-+            break;
-+        }
-+        assert(pf[0].revents & POLLIN);
-+        fuse_log(FUSE_LOG_DEBUG, "%s: Got queue event on Queue %d\n", __fu=
-nc__,
-+                 qi->qidx);
-+
-+        eventfd_t evalue;
-+        if (eventfd_read(qi->kick_fd, &evalue)) {
-+            fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
-+            break;
-+        }
-+        if (qi->virtio_dev->se->debug) {
-+            fprintf(stderr, "%s: Queue %d gave evalue: %zx\n", __func__,
-+                    qi->qidx, (size_t)evalue);
-+        }
++#endif
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index ca1ea78fba..f8b22ce346 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -13,6 +13,7 @@
+ #include "standard-headers/linux/fuse.h"
+ #include "fuse_misc.h"
+ #include "fuse_opt.h"
++#include "fuse_virtio.h"
+=20
+ #include <assert.h>
+ #include <errno.h>
+@@ -2220,6 +2221,11 @@ struct fuse_session *fuse_session_new(struct fuse_ar=
+gs *args,
+         goto out4;
      }
 =20
-     return NULL;
++    if (!se->vu_socket_path) {
++        fprintf(stderr, "fuse: missing -o vhost_user_socket option\n");
++        goto out4;
++    }
++
+     se->bufsize =3D FUSE_MAX_MAX_PAGES * getpagesize() + FUSE_BUFFER_HEADE=
+R_SIZE;
+=20
+     list_init_req(&se->list);
+@@ -2242,54 +2248,7 @@ out1:
+=20
+ int fuse_session_mount(struct fuse_session *se)
+ {
+-    int fd;
+-
+-    /*
+-     * Make sure file descriptors 0, 1 and 2 are open, otherwise chaos
+-     * would ensue.
+-     */
+-    do {
+-        fd =3D open("/dev/null", O_RDWR);
+-        if (fd > 2) {
+-            close(fd);
+-        }
+-    } while (fd >=3D 0 && fd <=3D 2);
+-
+-    /*
+-     * To allow FUSE daemons to run without privileges, the caller may ope=
+n
+-     * /dev/fuse before launching the file system and pass on the file
+-     * descriptor by specifying /dev/fd/N as the mount point. Note that th=
+e
+-     * parent process takes care of performing the mount in this case.
+-     */
+-    fd =3D fuse_mnt_parse_fuse_fd(mountpoint);
+-    if (fd !=3D -1) {
+-        if (fcntl(fd, F_GETFD) =3D=3D -1) {
+-            fuse_log(FUSE_LOG_ERR, "fuse: Invalid file descriptor /dev/fd/=
+%u\n",
+-                     fd);
+-            return -1;
+-        }
+-        se->fd =3D fd;
+-        return 0;
+-    }
+-
+-    /* Open channel */
+-    fd =3D fuse_kern_mount(mountpoint, se->mo);
+-    if (fd =3D=3D -1) {
+-        return -1;
+-    }
+-    se->fd =3D fd;
+-
+-    /* Save mountpoint */
+-    se->mountpoint =3D strdup(mountpoint);
+-    if (se->mountpoint =3D=3D NULL) {
+-        goto error_out;
+-    }
+-
+-    return 0;
+-
+-error_out:
+-    fuse_kern_unmount(mountpoint, fd);
+-    return -1;
++    return virtio_session_mount(se);
+ }
+=20
+ int fuse_session_fd(struct fuse_session *se)
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+new file mode 100644
+index 0000000000..cbef6ffdda
+--- /dev/null
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -0,0 +1,79 @@
++/*
++ * virtio-fs glue for FUSE
++ * Copyright (C) 2018 Red Hat, Inc. and/or its affiliates
++ *
++ * Authors:
++ *   Dave Gilbert  <dgilbert@redhat.com>
++ *
++ * Implements the glue between libfuse and libvhost-user
++ *
++ * This program can be distributed under the terms of the GNU LGPLv2.
++ * See the file COPYING.LIB
++ */
++
++#include "fuse_i.h"
++#include "standard-headers/linux/fuse.h"
++#include "fuse_misc.h"
++#include "fuse_opt.h"
++#include "fuse_virtio.h"
++
++#include <stdint.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <sys/un.h>
++#include <unistd.h>
++
++/* From spec */
++struct virtio_fs_config {
++    char tag[36];
++    uint32_t num_queues;
++};
++
++int virtio_session_mount(struct fuse_session *se)
++{
++    struct sockaddr_un un;
++    mode_t old_umask;
++
++    if (strlen(se->vu_socket_path) >=3D sizeof(un.sun_path)) {
++        fuse_log(FUSE_LOG_ERR, "Socket path too long\n");
++        return -1;
++    }
++
++    se->fd =3D -1;
++
++    /*
++     * Create the Unix socket to communicate with qemu
++     * based on QEMU's vhost-user-bridge
++     */
++    unlink(se->vu_socket_path);
++    strcpy(un.sun_path, se->vu_socket_path);
++    size_t addr_len =3D sizeof(un);
++
++    int listen_sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
++    if (listen_sock =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "vhost socket creation: %m\n");
++        return -1;
++    }
++    un.sun_family =3D AF_UNIX;
++
++    /*
++     * Unfortunately bind doesn't let you set the mask on the socket,
++     * so set umask to 077 and restore it later.
++     */
++    old_umask =3D umask(0077);
++    if (bind(listen_sock, (struct sockaddr *)&un, addr_len) =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "vhost socket bind: %m\n");
++        umask(old_umask);
++        return -1;
++    }
++    umask(old_umask);
++
++    if (listen(listen_sock, 1) =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "vhost socket listen: %m\n");
++        return -1;
++    }
++
++    return -1;
++}
+diff --git a/tools/virtiofsd/fuse_virtio.h b/tools/virtiofsd/fuse_virtio.h
+new file mode 100644
+index 0000000000..8f2edb69ca
+--- /dev/null
++++ b/tools/virtiofsd/fuse_virtio.h
+@@ -0,0 +1,23 @@
++/*
++ * virtio-fs glue for FUSE
++ * Copyright (C) 2018 Red Hat, Inc. and/or its affiliates
++ *
++ * Authors:
++ *   Dave Gilbert  <dgilbert@redhat.com>
++ *
++ * Implements the glue between libfuse and libvhost-user
++ *
++ * This program can be distributed under the terms of the GNU LGPLv2.
++ *  See the file COPYING.LIB
++ */
++
++#ifndef FUSE_VIRTIO_H
++#define FUSE_VIRTIO_H
++
++#include "fuse_i.h"
++
++struct fuse_session;
++
++int virtio_session_mount(struct fuse_session *se);
++
++#endif
 --=20
 2.24.1
 
