@@ -2,100 +2,79 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6DA9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 422CBC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:30:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75E7E22525
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:28:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AE8B206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:30:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQGUC80c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75E7E22525
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evXAF1sI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE8B206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itwNx-0005wO-CS
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 11:28:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36976)
+	id 1itwPt-0007SS-0A
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 11:30:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1itwN6-0004wG-Ps
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:27:21 -0500
+ (envelope-from <stefanha@redhat.com>) id 1itwP9-0006zY-86
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:29:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1itwN4-0002vd-A7
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:27:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22605
+ (envelope-from <stefanha@redhat.com>) id 1itwP8-0003uQ-Bd
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:29:27 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33898
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1itwN4-0002vF-6L
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:27:18 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1itwP8-0003uE-7I
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:29:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579624037;
+ s=mimecast20190719; t=1579624165;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ObnXMVLixb7W8aUnHhyzGhIwT9m7etDtZMKzg1gq/R8=;
- b=bQGUC80cXDxatKPtcQ9CM0bvzOR+8vzJhCxMsQuAmArrTlVf4/0TBuQMVlmqrBnBItYLPO
- bU+BeBrgp9QaboJeDCX4675FfT3jVdr3Hy+bnL/cducIaNGGcPSVuVog7UBXCyI6x5I/fu
- oBDu5dzevWzEBvv5GEJlSyn2gKsuZyM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-63d58APiMJKh9Khv7yd3qw-1; Tue, 21 Jan 2020 11:27:15 -0500
-Received: by mail-wm1-f70.google.com with SMTP id o24so570788wmh.0
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 08:27:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HpDJDcVh0R2d5kNLvddhR3AlT9Puti21RBbZkMveJ6c=;
- b=HMPAvVe/Y4vAs8jRvcX069DOicYyKnEe+u/oGwY1jjJdelsKR/+Qbr4JRtobxDPhnz
- nBkNrArV3m9b4CnS0AwLrU1L83nPDey1E7e+1eepSj/y19b4hBttycWzZO5g2SrJR9Pv
- BBvn7zdEVFD9Z7AJgpBBJAEvZavZUwWXGWOqViS8iVA0w4sdEt56kWkoelOHbsDmPHiP
- OH+LSkyZHQuTFKjsLh6td82rMix8/P2iUy0JJVfKr6rXFcvV4ioF/2t1gTVOHXcjM0W8
- FYuyBB03qU1oqLg+k6TX/j/2ri+hgME07NEFUIQfgGoI21iLPjYJu30QmCEKxRzd7BH+
- m7nA==
-X-Gm-Message-State: APjAAAVR4n0NQpKVW6UkEdW+jwxVaxft60tTwswI1n4LUGtMRYkkype2
- ZtekorpXGjRprn+3X6bYm2bJsbGCyBDToO8nkDeSEpBs2amSL6HgKfTOfyPpLQZMjONDDHqMAq7
- QuLO/UtW5So4SEAA=
-X-Received: by 2002:a1c:1f51:: with SMTP id f78mr5069387wmf.60.1579624033851; 
- Tue, 21 Jan 2020 08:27:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyyt69KzBvbuxGLLp5BGEUiMBLKEqADj7SKKb1zdPXFkGoSUKOBebmHCtzdW2zW6+Wi+Oil9A==
-X-Received: by 2002:a1c:1f51:: with SMTP id f78mr5069355wmf.60.1579624033557; 
- Tue, 21 Jan 2020 08:27:13 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a?
- ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
- by smtp.gmail.com with ESMTPSA id q3sm4337331wmj.38.2020.01.21.08.27.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jan 2020 08:27:12 -0800 (PST)
-Subject: Re: [PATCH v2 00/10] Cleanups around the 'current_machine' global
- variable
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200121110349.25842-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <11145254-2dfe-a699-2f92-b11b287d7ab8@redhat.com>
-Date: Tue, 21 Jan 2020 17:27:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=r9o52lM8R3rbgH89aHwnoVUf52Sbu854YyBQ4rr4Y34=;
+ b=evXAF1sIsLMidSJjWdwExP6x93yPNrkbbldkmLxC3t89WGWjQqr6+QKAzC6XJ+aCejDS+G
+ 1oq42raVLnix2JRF5czLFuGWIfBIrWhnI3nQd/vb5MDvpyEJwXlgWTCRxIxUHM5YsL347C
+ I34FZhipzY5GFi+Kf0vXi25767cHHfA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-pPI7GaRCO4yuyhzKYjmBlw-1; Tue, 21 Jan 2020 11:29:21 -0500
+X-MC-Unique: pPI7GaRCO4yuyhzKYjmBlw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E5781007290;
+ Tue, 21 Jan 2020 16:29:20 +0000 (UTC)
+Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 84B1D3AF;
+ Tue, 21 Jan 2020 16:29:17 +0000 (UTC)
+Date: Tue, 21 Jan 2020 16:29:16 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Bulekov, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v7 12/20] exec: keep ram block across fork when using qtest
+Message-ID: <20200121162916.GG641751@stefanha-x1.localdomain>
+References: <20200120055410.22322-1-alxndr@bu.edu>
+ <20200120055410.22322-18-alxndr@bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <20200121110349.25842-1-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: 63d58APiMJKh9Khv7yd3qw-1
+In-Reply-To: <20200120055410.22322-18-alxndr@bu.edu>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="YH9Qf6Fh2G5kB/85"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,33 +86,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Like Xu <like.xu@linux.intel.com>,
- David Hildenbrand <david@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/01/20 12:03, Philippe Mathieu-Daud=C3=A9 wrote:
-> v1 was "Replace current_machine by qdev_get_machine()":
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg669611.html
->=20
-> But Markus objected, see:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg670122.html
-> and older discussion:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg611338.html
->=20
-> This series salvage patches from v1, and add other trivial cleanups.
->=20
-> Can the ARM/PPC/S390 patches could go via their own tree, and the
-> rest via Paolo's 'misc' tree?
+--YH9Qf6Fh2G5kB/85
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think they're trivial enough so (with the exception of patch 7) I have
-queued them.
+On Mon, Jan 20, 2020 at 05:54:59AM +0000, Bulekov, Alexander wrote:
+> Ram blocks were marked MADV_DONTFORK breaking fuzzing-tests which
+> execute each test-input in a forked process.
+>=20
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> ---
+>  exec.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 
-Paolo
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--YH9Qf6Fh2G5kB/85
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4nJtwACgkQnKSrs4Gr
+c8h6XAf+OJC3nPQ/T/0cbVbIYHdk6+qzIjwZPwo81KYw/4M8qDYcNXB4yu9Y2Dkj
+v8htOFXkSImBqF0mP3ELy8zK4wh9lkjYI2vtwK3SnqMxyde2XSuWr+3BQtrNmanf
+xahPWlyNgJiBuN8RLP6zOBkxrWchvTkioccdYBHeTcagw5oqMtweOGs7+oTF/tf0
+eDNbxTzzxDpZgrP+VYP5DqTyeu5kt4WWsmHlpNUc5jpSxCZSf2j5FcxUZdREE5OQ
+K1pBRKatrQ50Pj1BjpbSyvK8FQt/mNCDvZC7a+MNeX00akQCeGFdwQd5E0lK20v+
+HavEzgTd41pZDd1Jyu/ht1n2p2g7Qg==
+=fibY
+-----END PGP SIGNATURE-----
+
+--YH9Qf6Fh2G5kB/85--
 
 
