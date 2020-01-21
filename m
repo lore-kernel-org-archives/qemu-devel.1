@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6870FC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E27BBC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:30:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28D1B206A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:30:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF49E217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:30:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPHH47Ga"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28D1B206A2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWHq+fYI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF49E217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittbw-0000R3-AD
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:30:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51881)
+	id 1ittcO-0000pD-LM
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:30:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itseG-0000Kn-Iu
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:52 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsiJ-0003yO-6i
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itseB-0003JX-VZ
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32107
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itsiE-00053d-Ua
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29938
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itseB-0003JM-Qn
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:43 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsiE-00053V-QV
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609723;
+ s=mimecast20190719; t=1579609974;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Iy6y18NA0x3CVD+nJHZzBHPr8twGWmLNdz/OdW4k/fw=;
- b=bPHH47Ga7WO6F8tEi6AkcwYme+5mvcYtVIROYoKRLWYKAxmvRlSzDnvWahjUkrOc05+FVr
- 9vhKdpVf0Y5rs+zrnF0s7KYRoi3vddqgDPVDsC4f9P3LX8U7Ejrj3aeRARMLO1mO8Emvr6
- j8VqCPpbRmkXj3TN6w0/951FWfC8yVI=
+ bh=BXvdQUhT25fEokO+91yJZNZHXsX1sCtbQ6dSjDej4j8=;
+ b=iWHq+fYIjIHXF7PpBI2Qs9mkK5vLHyoNTFLM7gRTLQfRvAzq5+yl4UT0VZnQM0oMV+CLFs
+ 2fimhxf82qnH4gmSVVFlbGIrigJ5AEyVJOlzGl2NZyz/Btjqg/isEaHapMg2z3EOX91G7a
+ NfVeJtzhNsk78cHf9yseVKIos9a13BQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-NH6-jftiPmq8E5aIh_884Q-1; Tue, 21 Jan 2020 07:28:41 -0500
+ us-mta-212-MD6non1hN0efprRX2ZUQbw-1; Tue, 21 Jan 2020 07:32:53 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6308B800D4C;
- Tue, 21 Jan 2020 12:28:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C2B4107ACC9;
+ Tue, 21 Jan 2020 12:32:52 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A49EA60BE0;
- Tue, 21 Jan 2020 12:28:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FCAB60BE0;
+ Tue, 21 Jan 2020 12:32:50 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 051/109] virtiofsd: add seccomp whitelist
-Date: Tue, 21 Jan 2020 12:23:35 +0000
-Message-Id: <20200121122433.50803-52-dgilbert@redhat.com>
+Subject: [PATCH v2 105/109] virtiofsd: add --thread-pool-size=NUM option
+Date: Tue, 21 Jan 2020 12:24:29 +0000
+Message-Id: <20200121122433.50803-106-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: NH6-jftiPmq8E5aIh_884Q-1
+X-MC-Unique: MD6non1hN0efprRX2ZUQbw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,258 +94,97 @@ Sender: "Qemu-devel"
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Only allow system calls that are needed by virtiofsd.  All other system
-calls cause SIGSYS to be directed at the thread and the process will
-coredump.
-
-Restricting system calls reduces the kernel attack surface and limits
-what the process can do when compromised.
+Add an option to control the size of the thread pool.  Requests are now
+processed in parallel by default.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-with additional entries by:
-Signed-off-by: Ganesh Maharaj Mahalingam <ganesh.mahalingam@intel.com>
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Signed-off-by: piaojun <piaojun@huawei.com>
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-Signed-off-by: Eric Ren <renzhen@linux.alibaba.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- Makefile                         |   2 +-
- tools/virtiofsd/Makefile.objs    |   5 +-
- tools/virtiofsd/passthrough_ll.c |   2 +
- tools/virtiofsd/seccomp.c        | 150 +++++++++++++++++++++++++++++++
- tools/virtiofsd/seccomp.h        |  14 +++
- 5 files changed, 171 insertions(+), 2 deletions(-)
- create mode 100644 tools/virtiofsd/seccomp.c
- create mode 100644 tools/virtiofsd/seccomp.h
+ tools/virtiofsd/fuse_i.h        | 1 +
+ tools/virtiofsd/fuse_lowlevel.c | 7 ++++++-
+ tools/virtiofsd/fuse_virtio.c   | 5 +++--
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index a87e06ad93..967d59c98a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -327,7 +327,7 @@ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
- vhost-user-json-y +=3D contrib/vhost-user-gpu/50-qemu-gpu.json
- endif
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index 1447d86866..4e47e5880d 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -72,6 +72,7 @@ struct fuse_session {
+     int   vu_listen_fd;
+     int   vu_socketfd;
+     struct fv_VuDev *virtio_dev;
++    int thread_pool_size;
+ };
 =20
--ifdef CONFIG_LINUX
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP),yy)
- HELPERS-y +=3D virtiofsd$(EXESUF)
- vhost-user-json-y +=3D tools/virtiofsd/50-qemu-virtiofsd.json
- endif
-diff --git a/tools/virtiofsd/Makefile.objs b/tools/virtiofsd/Makefile.objs
-index 45a807500d..076f667e46 100644
---- a/tools/virtiofsd/Makefile.objs
-+++ b/tools/virtiofsd/Makefile.objs
-@@ -5,5 +5,8 @@ virtiofsd-obj-y =3D buffer.o \
-                   fuse_signals.o \
-                   fuse_virtio.o \
-                   helper.o \
--                  passthrough_ll.o
-+                  passthrough_ll.o \
-+                  seccomp.o
-=20
-+seccomp.o-cflags :=3D $(SECCOMP_CFLAGS)
-+seccomp.o-libs :=3D $(SECCOMP_LIBS)
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 752beb459a..8748e64f33 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -58,6 +58,7 @@
+ struct fuse_chan {
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 8ae45d9c58..2ce3e739fd 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -27,6 +27,7 @@
+ #include <sys/file.h>
  #include <unistd.h>
 =20
- #include "passthrough_helpers.h"
-+#include "seccomp.h"
++#define THREAD_POOL_SIZE 64
 =20
- struct lo_map_elem {
-     union {
-@@ -2090,6 +2091,7 @@ static void setup_sandbox(struct lo_data *lo, struct =
-fuse_session *se)
- {
-     setup_namespaces(lo, se);
-     setup_mounts(lo->source);
-+    setup_seccomp();
+ #define OFFSET_MAX 0x7fffffffffffffffLL
+=20
+@@ -2521,6 +2522,7 @@ static const struct fuse_opt fuse_ll_opts[] =3D {
+     LL_OPTION("allow_root", deny_others, 1),
+     LL_OPTION("--socket-path=3D%s", vu_socket_path, 0),
+     LL_OPTION("--fd=3D%d", vu_listen_fd, 0),
++    LL_OPTION("--thread-pool-size=3D%d", thread_pool_size, 0),
+     FUSE_OPT_END
+ };
+=20
+@@ -2541,7 +2543,9 @@ void fuse_lowlevel_help(void)
+         "    -o allow_root              allow access by root\n"
+         "    --socket-path=3DPATH         path for the vhost-user socket\n=
+"
+         "    --fd=3DFDNUM                 fd number of vhost-user socket\n=
+"
+-        "    -o auto_unmount            auto unmount on process terminatio=
+n\n");
++        "    -o auto_unmount            auto unmount on process terminatio=
+n\n"
++        "    --thread-pool-size=3DNUM     thread pool size limit (default =
+%d)\n",
++        THREAD_POOL_SIZE);
  }
 =20
- int main(int argc, char *argv[])
-diff --git a/tools/virtiofsd/seccomp.c b/tools/virtiofsd/seccomp.c
-new file mode 100644
-index 0000000000..2aa4d3cc66
---- /dev/null
-+++ b/tools/virtiofsd/seccomp.c
-@@ -0,0 +1,150 @@
-+/*
-+ * Seccomp sandboxing for virtiofsd
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "seccomp.h"
-+#include "fuse_i.h"
-+#include "fuse_log.h"
-+#include <errno.h>
-+#include <glib.h>
-+#include <seccomp.h>
-+#include <stdlib.h>
-+
-+/* Bodge for libseccomp 2.4.2 which broke ppoll */
-+#if !defined(__SNR_ppoll) && defined(__SNR_brk)
-+#ifdef __NR_ppoll
-+#define __SNR_ppoll __NR_ppoll
-+#else
-+#define __SNR_ppoll __PNR_ppoll
-+#endif
-+#endif
-+
-+static const int syscall_whitelist[] =3D {
-+    /* TODO ireg sem*() syscalls */
-+    SCMP_SYS(brk),
-+    SCMP_SYS(capget), /* For CAP_FSETID */
-+    SCMP_SYS(capset),
-+    SCMP_SYS(clock_gettime),
-+    SCMP_SYS(clone),
-+#ifdef __NR_clone3
-+    SCMP_SYS(clone3),
-+#endif
-+    SCMP_SYS(close),
-+    SCMP_SYS(copy_file_range),
-+    SCMP_SYS(dup),
-+    SCMP_SYS(eventfd2),
-+    SCMP_SYS(exit),
-+    SCMP_SYS(exit_group),
-+    SCMP_SYS(fallocate),
-+    SCMP_SYS(fchmodat),
-+    SCMP_SYS(fchownat),
-+    SCMP_SYS(fcntl),
-+    SCMP_SYS(fdatasync),
-+    SCMP_SYS(fgetxattr),
-+    SCMP_SYS(flistxattr),
-+    SCMP_SYS(flock),
-+    SCMP_SYS(fremovexattr),
-+    SCMP_SYS(fsetxattr),
-+    SCMP_SYS(fstat),
-+    SCMP_SYS(fstatfs),
-+    SCMP_SYS(fsync),
-+    SCMP_SYS(ftruncate),
-+    SCMP_SYS(futex),
-+    SCMP_SYS(getdents),
-+    SCMP_SYS(getdents64),
-+    SCMP_SYS(getegid),
-+    SCMP_SYS(geteuid),
-+    SCMP_SYS(getpid),
-+    SCMP_SYS(gettid),
-+    SCMP_SYS(gettimeofday),
-+    SCMP_SYS(linkat),
-+    SCMP_SYS(lseek),
-+    SCMP_SYS(madvise),
-+    SCMP_SYS(mkdirat),
-+    SCMP_SYS(mknodat),
-+    SCMP_SYS(mmap),
-+    SCMP_SYS(mprotect),
-+    SCMP_SYS(mremap),
-+    SCMP_SYS(munmap),
-+    SCMP_SYS(newfstatat),
-+    SCMP_SYS(open),
-+    SCMP_SYS(openat),
-+    SCMP_SYS(ppoll),
-+    SCMP_SYS(prctl), /* TODO restrict to just PR_SET_NAME? */
-+    SCMP_SYS(preadv),
-+    SCMP_SYS(pread64),
-+    SCMP_SYS(pwritev),
-+    SCMP_SYS(pwrite64),
-+    SCMP_SYS(read),
-+    SCMP_SYS(readlinkat),
-+    SCMP_SYS(recvmsg),
-+    SCMP_SYS(renameat),
-+    SCMP_SYS(renameat2),
-+    SCMP_SYS(rt_sigaction),
-+    SCMP_SYS(rt_sigprocmask),
-+    SCMP_SYS(rt_sigreturn),
-+    SCMP_SYS(sendmsg),
-+    SCMP_SYS(setresgid),
-+    SCMP_SYS(setresuid),
-+#ifdef __NR_setresgid32
-+    SCMP_SYS(setresgid32),
-+#endif
-+#ifdef __NR_setresuid32
-+    SCMP_SYS(setresuid32),
-+#endif
-+    SCMP_SYS(set_robust_list),
-+    SCMP_SYS(symlinkat),
-+    SCMP_SYS(time), /* Rarely needed, except on static builds */
-+    SCMP_SYS(tgkill),
-+    SCMP_SYS(unlinkat),
-+    SCMP_SYS(utimensat),
-+    SCMP_SYS(write),
-+    SCMP_SYS(writev),
-+};
-+
-+void setup_seccomp(void)
-+{
-+    scmp_filter_ctx ctx;
-+    size_t i;
-+
-+#ifdef SCMP_ACT_KILL_PROCESS
-+    ctx =3D seccomp_init(SCMP_ACT_KILL_PROCESS);
-+    /* Handle a newer libseccomp but an older kernel */
-+    if (!ctx && errno =3D=3D EOPNOTSUPP) {
-+        ctx =3D seccomp_init(SCMP_ACT_TRAP);
-+    }
-+#else
-+    ctx =3D seccomp_init(SCMP_ACT_TRAP);
-+#endif
-+    if (!ctx) {
-+        fuse_log(FUSE_LOG_ERR, "seccomp_init() failed\n");
-+        exit(1);
-+    }
-+
-+    for (i =3D 0; i < G_N_ELEMENTS(syscall_whitelist); i++) {
-+        if (seccomp_rule_add(ctx, SCMP_ACT_ALLOW,
-+                             syscall_whitelist[i], 0) !=3D 0) {
-+            fuse_log(FUSE_LOG_ERR, "seccomp_rule_add syscall %d",
-+                     syscall_whitelist[i]);
-+            exit(1);
-+        }
-+    }
-+
-+    /* libvhost-user calls this for post-copy migration, we don't need it =
-*/
-+    if (seccomp_rule_add(ctx, SCMP_ACT_ERRNO(ENOSYS),
-+                         SCMP_SYS(userfaultfd), 0) !=3D 0) {
-+        fuse_log(FUSE_LOG_ERR, "seccomp_rule_add userfaultfd failed\n");
-+        exit(1);
-+    }
-+
-+    if (seccomp_load(ctx) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "seccomp_load() failed\n");
-+        exit(1);
-+    }
-+
-+    seccomp_release(ctx);
-+}
-diff --git a/tools/virtiofsd/seccomp.h b/tools/virtiofsd/seccomp.h
-new file mode 100644
-index 0000000000..86bce72652
---- /dev/null
-+++ b/tools/virtiofsd/seccomp.h
-@@ -0,0 +1,14 @@
-+/*
-+ * Seccomp sandboxing for virtiofsd
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef VIRTIOFSD_SECCOMP_H
-+#define VIRTIOFSD_SECCOMP_H
-+
-+void setup_seccomp(void);
-+
-+#endif /* VIRTIOFSD_SECCOMP_H */
+ void fuse_session_destroy(struct fuse_session *se)
+@@ -2595,6 +2599,7 @@ struct fuse_session *fuse_session_new(struct fuse_arg=
+s *args,
+     }
+     se->fd =3D -1;
+     se->vu_listen_fd =3D -1;
++    se->thread_pool_size =3D THREAD_POOL_SIZE;
+     se->conn.max_write =3D UINT_MAX;
+     se->conn.max_readahead =3D UINT_MAX;
+=20
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 0dcf2ef57a..9f6582343c 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -572,10 +572,11 @@ static void *fv_queue_thread(void *opaque)
+     struct fv_QueueInfo *qi =3D opaque;
+     struct VuDev *dev =3D &qi->virtio_dev->dev;
+     struct VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
++    struct fuse_session *se =3D qi->virtio_dev->se;
+     GThreadPool *pool;
+=20
+-    pool =3D g_thread_pool_new(fv_queue_worker, qi, 1 /* TODO max_threads =
+*/,
+-                             TRUE, NULL);
++    pool =3D g_thread_pool_new(fv_queue_worker, qi, se->thread_pool_size, =
+TRUE,
++                             NULL);
+     if (!pool) {
+         fuse_log(FUSE_LOG_ERR, "%s: g_thread_pool_new failed\n", __func__)=
+;
+         return NULL;
 --=20
 2.24.1
 
