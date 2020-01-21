@@ -2,88 +2,76 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B9CC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 21:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AECC8C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 21:48:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57B9521734
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 21:39:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7380024125
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 21:48:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qLFpkxlj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B9521734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1gcJ9Bl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7380024125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu1FJ-0004xQ-Ay
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 16:39:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48241)
+	id 1iu1Nm-0000eS-JX
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 16:48:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iu1Eg-0004We-6i
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 16:38:59 -0500
+ (envelope-from <amorenoz@redhat.com>) id 1iu1Mv-00009k-FA
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 16:47:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iu1Ef-0007Ap-7K
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 16:38:58 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35280)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iu1Ee-0007AP-Vt; Tue, 21 Jan 2020 16:38:57 -0500
-Received: by mail-wr1-x442.google.com with SMTP id g17so5070136wro.2;
- Tue, 21 Jan 2020 13:38:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4YI519z4F/iZ1loOmyQ18PERAwvamdmtU/8VAEDn3Sc=;
- b=qLFpkxljfehHzepiuArqbAWqzdoTh8PXV7gXp1KvXJ/LHNvt0qwIGxcD5QWLGYIIFo
- CJ5v0gOGfOGLAu3Mg/TK8D3nIbPUgkw/xdZ2UXy6jZuZ7jZUyMIwlS7NkMrL/ozd5MmI
- T3zcaIJNd4OZ3MJANdq186Gqm10Op76eN4bSUfB8peHmlij8YWeFhTaC20WQEfldf771
- sig9M9JrjUXjUtubs4H+QpLD+0aUlsJVU4vAXpPJ52GJNNRM2GNkY7RGerI0XaDTMH30
- bgICpLs8liPeaXDRqiJCRV5J8IdqrU1pQcuEyYhOg5JdHXP7dHRDhRZCcwyyk5hNN4pl
- Bkfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=4YI519z4F/iZ1loOmyQ18PERAwvamdmtU/8VAEDn3Sc=;
- b=emakqITmzsqK8La6R7qLC72Z3IXMnnpwV+fqnLDIt4vYUku8Ke3AnU0tRlON90P6Av
- WJSEsMUq3L8GdxI3Y4UpNV+J0HdiHHGsEUymD6EFqIQ4D8dJllWFpc98FD6wBTpAWWBP
- jRj4jAKRJpyTdqKlKZ9Os+1HWX9hVv5a68oRf1AqZ/j5TYtARk70pITpmMbQ9p0qoNkZ
- Z+si8xS0SjYb+0DIAXendQ89apx2yCwkmBomPVWQLOZ8BCBGL6s10RW8K3aJP61nP3ta
- 4FJjC9wPpu7j+s00PGPa1hClscqQghAxfsFxRl2ImGqnrwymIAVPpFIEDVMfk3Xxwq1g
- WeCw==
-X-Gm-Message-State: APjAAAXbX37fRSnqRXY8Ya3ZlnpYOzFo3AsClE7tHk++qLMn7lXlG9wg
- pEhjlSWP+NWJUnsVmZ5AJPgRSdMV
-X-Google-Smtp-Source: APXvYqxKKa1S1gJwA3U0iFR9pou1ob+vTlGudSEvWDtkiVqD0KzYMROJy9s7VcgLggnL/SUyZXpaLA==
-X-Received: by 2002:a5d:5708:: with SMTP id a8mr6989032wrv.79.1579642735385;
- Tue, 21 Jan 2020 13:38:55 -0800 (PST)
-Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id v22sm935609wml.11.2020.01.21.13.38.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 13:38:54 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org,
-	Alistair Francis <alistair@alistair23.me>
-Subject: [PATCH] hw/misc/stm32f4xx_syscfg: Fix copy/paste error
-Date: Tue, 21 Jan 2020 22:38:53 +0100
-Message-Id: <20200121213853.9601-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <amorenoz@redhat.com>) id 1iu1Ms-0002Kq-Iq
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 16:47:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54764
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <amorenoz@redhat.com>) id 1iu1Ms-0002KI-99
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 16:47:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579643245;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=UMiy88bOQtu4xqt4S9ELD7gw90pvQESxI0GR2ETqe+M=;
+ b=D1gcJ9BlTzntvn+WfEK0hAlx3k/oxMXZBNAtwcKiVNk0RCCSTsoMRNu+wkks+U0LuRaqa+
+ FmvAZFQmBIel03C0DJsGpRVBL4GZczeSVMf9iPzPdmGIXAh6drtSY/DTZJrOwq7KbMLxJ8
+ nsazYQSSQ3ZbTLn66J9mn6tdJxcV9mo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-n5nbgkltOBq9KnmrqiXlmw-1; Tue, 21 Jan 2020 16:46:14 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F01A10120B1
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 21:46:14 +0000 (UTC)
+Received: from amorenoz.users.ipa.redhat.com (ovpn-204-34.brq.redhat.com
+ [10.40.204.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B126C1001B2C;
+ Tue, 21 Jan 2020 21:46:04 +0000 (UTC)
+From: Adrian Moreno <amorenoz@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] vhost-user: only set slave channel for first vq
+Date: Tue, 21 Jan 2020 22:45:53 +0100
+Message-Id: <20200121214553.28459-1-amorenoz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: n5nbgkltOBq9KnmrqiXlmw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,34 +83,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: marcandre.lureau@redhat.com, jasowang@redhat.com,
+ Adrian Moreno <amorenoz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Missed in 870c034da0b, hopefully reported by Coverity.
+When multiqueue is enabled, a vhost_dev is created for each queue
+pair. However, only one slave channel is needed.
 
-Fixes: Coverity CID 1412793 (Incorrect expression)
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Fixes: 4bbeeba023f2 (vhost-user: add slave-req-fd support)
+Cc: marcandre.lureau@redhat.com
+Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- hw/misc/stm32f4xx_syscfg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/virtio/vhost-user.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/misc/stm32f4xx_syscfg.c b/hw/misc/stm32f4xx_syscfg.c
-index dbcdca59f8..f960e4ea1e 100644
---- a/hw/misc/stm32f4xx_syscfg.c
-+++ b/hw/misc/stm32f4xx_syscfg.c
-@@ -47,7 +47,7 @@ static void stm32f4xx_syscfg_set_irq(void *opaque, int irq, int level)
-     STM32F4xxSyscfgState *s = opaque;
-     int icrreg = irq / 4;
-     int startbit = (irq & 3) * 4;
--    uint8_t config = config = irq / 16;
-+    uint8_t config = irq / 16;
- 
-     trace_stm32f4xx_syscfg_set_irq(irq / 16, irq % 16, level);
- 
--- 
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index d27a10fcc6..68a8db0ace 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -1458,9 +1458,11 @@ static int vhost_user_backend_init(struct vhost_dev =
+*dev, void *opaque)
+                    "VHOST_USER_PROTOCOL_F_LOG_SHMFD feature.");
+     }
+=20
+-    err =3D vhost_setup_slave_channel(dev);
+-    if (err < 0) {
+-        return err;
++    if (dev->vq_index =3D=3D 0) {
++        err =3D vhost_setup_slave_channel(dev);
++        if (err < 0) {
++            return err;
++        }
+     }
+=20
+     u->postcopy_notifier.notify =3D vhost_user_postcopy_notifier;
+--=20
 2.21.1
 
 
