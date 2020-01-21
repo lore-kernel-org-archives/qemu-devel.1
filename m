@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967F4C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0020C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:22:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6296521569
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:21:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B768206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:22:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ao10bAfM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6296521569
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vi9ZAqET"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B768206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittT4-0005JP-29
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:21:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51709)
+	id 1ittTp-0006TZ-1t
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:22:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsdY-0008I6-Kx
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:06 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsg2-00027A-F8
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsdX-00030h-6z
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54257
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itsfy-0004B8-HI
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48973
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsdX-00030Q-31
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:03 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsfy-0004Az-D9
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609682;
+ s=mimecast20190719; t=1579609834;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TC17oc2oT4DIGvk8/uwq+oCPGEm9ym9A5fjjYbXWvts=;
- b=ao10bAfMTFG6wznVbG6aPt88/8rBMA4qnGBDt6AY4vrT3lZGnl4c41x0AngtQ5pPhSkGhJ
- 4PD2lMcVkmfXMBTDU65DT7P9dWdclC2kOnkcDfhVgeAdgMWvCv+FiirLK8vv34pC3pSflN
- gbqVkmrvKYvQQJDEqxkuswnKh5J0DN0=
+ bh=ZFTixNTKxkBnL9TBpL5FWZQEJLiYkhPL1lFErAf5EfU=;
+ b=Vi9ZAqET/pY8nIcgIzsZud7IlAhxy0t0teJsL3jUC2nmq5FdbKMziEy/8TY4YCbY4udRMN
+ +lIjyOXa/6f6moz0Je3z6gTv9vcHmzfW61vTAvl50uW0PI2ViEtGuxX5ueU17pC8RF1UtR
+ 7BNjAy3U2I6ghgx4GKfilhMUj59jx+o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-hV_pRRFgPa6fcCLAlxIjxQ-1; Tue, 21 Jan 2020 07:28:01 -0500
+ us-mta-214-SbcwUFYOMnygZmbLGmX0RA-1; Tue, 21 Jan 2020 07:30:30 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C9DD937C2;
- Tue, 21 Jan 2020 12:28:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EAD718FF66C;
+ Tue, 21 Jan 2020 12:30:29 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1BE5B60BE0;
- Tue, 21 Jan 2020 12:27:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85CAC60BE0;
+ Tue, 21 Jan 2020 12:30:27 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 040/109] virtiofsd: Plumb fuse_bufvec through to
- do_write_buf
-Date: Tue, 21 Jan 2020 12:23:24 +0000
-Message-Id: <20200121122433.50803-41-dgilbert@redhat.com>
+Subject: [PATCH v2 066/109] vhost-user: Print unexpected slave message types
+Date: Tue, 21 Jan 2020 12:23:50 +0000
+Message-Id: <20200121122433.50803-67-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: hV_pRRFgPa6fcCLAlxIjxQ-1
+X-MC-Unique: SbcwUFYOMnygZmbLGmX0RA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,157 +94,28 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Let fuse_session_process_buf_int take a fuse_bufvec * instead of a
-fuse_buf;  and then through to do_write_buf - where in the best
-case it can pass that straight through to op.write_buf without copying
-(other than skipping a header).
+When we receive an unexpected message type on the slave fd, print
+the type.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tools/virtiofsd/fuse_i.h        |  2 +-
- tools/virtiofsd/fuse_lowlevel.c | 61 ++++++++++++++++++++++-----------
- tools/virtiofsd/fuse_virtio.c   |  3 +-
- 3 files changed, 44 insertions(+), 22 deletions(-)
+ hw/virtio/vhost-user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index 45995f3246..a20854f1c4 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -100,7 +100,7 @@ int fuse_send_reply_iov_nofree(fuse_req_t req, int erro=
-r, struct iovec *iov,
- void fuse_free_req(fuse_req_t req);
-=20
- void fuse_session_process_buf_int(struct fuse_session *se,
--                                  const struct fuse_buf *buf,
-+                                  struct fuse_bufvec *bufv,
-                                   struct fuse_chan *ch);
-=20
-=20
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index db144c3fd6..84a9d5f993 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -1005,11 +1005,12 @@ static void do_write(fuse_req_t req, fuse_ino_t nod=
-eid, const void *inarg)
- }
-=20
- static void do_write_buf(fuse_req_t req, fuse_ino_t nodeid, const void *in=
-arg,
--                         const struct fuse_buf *ibuf)
-+                         struct fuse_bufvec *ibufv)
- {
-     struct fuse_session *se =3D req->se;
--    struct fuse_bufvec bufv =3D {
--        .buf[0] =3D *ibuf,
-+    struct fuse_bufvec *pbufv =3D ibufv;
-+    struct fuse_bufvec tmpbufv =3D {
-+        .buf[0] =3D ibufv->buf[0],
-         .count =3D 1,
-     };
-     struct fuse_write_in *arg =3D (struct fuse_write_in *)inarg;
-@@ -1019,22 +1020,31 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t=
- nodeid, const void *inarg,
-     fi.fh =3D arg->fh;
-     fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
-=20
--    fi.lock_owner =3D arg->lock_owner;
--    fi.flags =3D arg->flags;
--    if (!(bufv.buf[0].flags & FUSE_BUF_IS_FD)) {
--        bufv.buf[0].mem =3D PARAM(arg);
--    }
--
--    bufv.buf[0].size -=3D
--        sizeof(struct fuse_in_header) + sizeof(struct fuse_write_in);
--    if (bufv.buf[0].size < arg->size) {
--        fuse_log(FUSE_LOG_ERR, "fuse: do_write_buf: buffer size too small\=
-n");
--        fuse_reply_err(req, EIO);
--        return;
-+    if (ibufv->count =3D=3D 1) {
-+        fi.lock_owner =3D arg->lock_owner;
-+        fi.flags =3D arg->flags;
-+        if (!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD)) {
-+            tmpbufv.buf[0].mem =3D PARAM(arg);
-+        }
-+        tmpbufv.buf[0].size -=3D
-+            sizeof(struct fuse_in_header) + sizeof(struct fuse_write_in);
-+        if (tmpbufv.buf[0].size < arg->size) {
-+            fuse_log(FUSE_LOG_ERR,
-+                     "fuse: do_write_buf: buffer size too small\n");
-+            fuse_reply_err(req, EIO);
-+            return;
-+        }
-+        tmpbufv.buf[0].size =3D arg->size;
-+        pbufv =3D &tmpbufv;
-+    } else {
-+        /*
-+         *  Input bufv contains the headers in the first element
-+         * and the data in the rest, we need to skip that first element
-+         */
-+        ibufv->buf[0].size =3D 0;
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index d27a10fcc6..9ec8c2a27c 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -1061,7 +1061,7 @@ static void slave_read(void *opaque)
+                                                           fd[0]);
+         break;
+     default:
+-        error_report("Received unexpected msg type.");
++        error_report("Received unexpected msg type. (%d)", hdr.request);
+         ret =3D -EINVAL;
      }
--    bufv.buf[0].size =3D arg->size;
 =20
--    se->op.write_buf(req, nodeid, &bufv, arg->offset, &fi);
-+    se->op.write_buf(req, nodeid, pbufv, arg->offset, &fi);
- }
-=20
- static void do_flush(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
-@@ -2026,13 +2036,24 @@ static const char *opname(enum fuse_opcode opcode)
- void fuse_session_process_buf(struct fuse_session *se,
-                               const struct fuse_buf *buf)
- {
--    fuse_session_process_buf_int(se, buf, NULL);
-+    struct fuse_bufvec bufv =3D { .buf[0] =3D *buf, .count =3D 1 };
-+    fuse_session_process_buf_int(se, &bufv, NULL);
- }
-=20
-+/*
-+ * Restriction:
-+ *   bufv is normally a single entry buffer, except for a write
-+ *   where (if it's in memory) then the bufv may be multiple entries,
-+ *   where the first entry contains all headers and subsequent entries
-+ *   contain data
-+ *   bufv shall not use any offsets etc to make the data anything
-+ *   other than contiguous starting from 0.
-+ */
- void fuse_session_process_buf_int(struct fuse_session *se,
--                                  const struct fuse_buf *buf,
-+                                  struct fuse_bufvec *bufv,
-                                   struct fuse_chan *ch)
- {
-+    const struct fuse_buf *buf =3D bufv->buf;
-     struct fuse_in_header *in;
-     const void *inarg;
-     struct fuse_req *req;
-@@ -2110,7 +2131,7 @@ void fuse_session_process_buf_int(struct fuse_session=
- *se,
-=20
-     inarg =3D (void *)&in[1];
-     if (in->opcode =3D=3D FUSE_WRITE && se->op.write_buf) {
--        do_write_buf(req, in->nodeid, inarg, buf);
-+        do_write_buf(req, in->nodeid, inarg, bufv);
-     } else {
-         fuse_ll_ops[in->opcode].func(req, in->nodeid, inarg);
-     }
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 635f87756a..fd588a4829 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -501,7 +501,8 @@ static void *fv_queue_thread(void *opaque)
-             /* TODO! Endianness of header */
-=20
-             /* TODO: Add checks for fuse_session_exited */
--            fuse_session_process_buf_int(se, &fbuf, &ch);
-+            struct fuse_bufvec bufv =3D { .buf[0] =3D fbuf, .count =3D 1 }=
-;
-+            fuse_session_process_buf_int(se, &bufv, &ch);
-=20
-             if (!qi->reply_sent) {
-                 fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
 --=20
 2.24.1
 
