@@ -2,79 +2,78 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B71C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A99C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:47:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03F9024125
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C2FC24653
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 16:46:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aj7cX100"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F9024125
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FURGLX8d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C2FC24653
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itwdT-0003kx-0a
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 11:44:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39524)
+	id 1itwg6-0006g5-Mb
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 11:46:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39730)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1itwcX-0002bm-NY
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:43:20 -0500
+ (envelope-from <imammedo@redhat.com>) id 1itwdR-00040i-W4
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1itwcU-0004Tf-3G
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:43:17 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59021
+ (envelope-from <imammedo@redhat.com>) id 1itwdP-0004s1-BP
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:44:13 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52866
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1itwcT-0004TV-Vc
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:43:14 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1itwdP-0004rk-82
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 11:44:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579624993;
+ s=mimecast20190719; t=1579625050;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pWct7Uk8tqbj99oOVIyOC//AXgfMOiuPMVrLwlQTX5I=;
- b=Aj7cX100nS7bQlJRkqexpyfFAmbkm2dJaH5nNFcyVqSOO5EQGcnKZqLclQBA05z9x6Ux8h
- zp6P64yI80YaF1UxRmbRpzwqNoIsIHGiK1KhRUJ1jsM/mqzB79Z3+iZ16yAh7IPiH31nhG
- eFetgkSbsibhDAxHvrN0pZKsF5vqYo4=
+ bh=0omZmkBpIhBYf6i0mXCKdz2nwdo8ra+0Cp4/KojE5LA=;
+ b=FURGLX8dW6xPh5UZX0Ao4DLmY8hQnDoZXG6GcxuUy91zOm4ODqlJAOKdc7dLFFvTGYwSuo
+ WMIiquK1gNfLa0r+MzyCd5ndaeJU5dauVHSP1wwCPsTlDruVGlT/xPo0shhrKjIXSTD79M
+ chcs3fqVpQQr4yA93TePpve/EKWNGVc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-BdzHuPfdNTitEAum3S_8nA-1; Tue, 21 Jan 2020 11:43:11 -0500
-X-MC-Unique: BdzHuPfdNTitEAum3S_8nA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-417-xoN0wRqPO9Seujy0_V-X5g-1; Tue, 21 Jan 2020 11:44:07 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9F4B1137866;
- Tue, 21 Jan 2020 16:43:10 +0000 (UTC)
-Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9580D85748;
- Tue, 21 Jan 2020 16:42:56 +0000 (UTC)
-Date: Tue, 21 Jan 2020 16:42:55 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Bulekov, Alexander" <alxndr@bu.edu>
-Subject: Re: [PATCH v7 18/20] fuzz: add virtio-net fuzz target
-Message-ID: <20200121164255.GH641751@stefanha-x1.localdomain>
-References: <20200120055410.22322-1-alxndr@bu.edu>
- <20200120055410.22322-26-alxndr@bu.edu>
-MIME-Version: 1.0
-In-Reply-To: <20200120055410.22322-26-alxndr@bu.edu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3989E101EFFC;
+ Tue, 21 Jan 2020 16:44:06 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CB8948BE30;
+ Tue, 21 Jan 2020 16:44:04 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 64/82] ppc/{ppc440_bamboo,sam460ex}: drop RAM size fixup
+Date: Tue, 21 Jan 2020 17:41:44 +0100
+Message-Id: <1579624904-47593-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <20200121092640.22ea1f4b@redhat.com>
+References: <20200121092640.22ea1f4b@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: xoN0wRqPO9Seujy0_V-X5g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6lXr1rPCNTf1w0X8"
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,78 +85,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <lvivier@redhat.com>
+Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---6lXr1rPCNTf1w0X8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+If user provided non-sense RAM size, board will complain and
+continue running with max RAM size supported or sometimes
+crash like this:
+  %QEMU -M bamboo -m 1
+    exec.c:1926: find_ram_offset: Assertion `size !=3D 0' failed.
+    Aborted (core dumped)
+Also RAM is going to be allocated by generic code, so it won't be
+possible for board to fix things up for user.
 
-On Mon, Jan 20, 2020 at 05:55:08AM +0000, Bulekov, Alexander wrote:
-> diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
-> new file mode 100644
-> index 0000000000..3b1b79fd93
-> --- /dev/null
-> +++ b/tests/qtest/fuzz/virtio_net_fuzz.c
-> @@ -0,0 +1,190 @@
-> +/*
-> + * virtio-net Fuzzing Target
-> + *
-> + * Copyright Red Hat Inc., 2019
-> + *
-> + * Authors:
-> + *  Alexander Bulekov   <alxndr@bu.edu>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "tests/qtest/libqtest.h"
-> +#include "tests/qtest/libqos/virtio-net.h"
-> +#include "fuzz.h"
-> +#include "fork_fuzz.h"
-> +#include "qos_fuzz.h"
-> +
-> +#define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
-> +#define QVIRTIO_RX_VQ 0
-> +#define QVIRTIO_TX_VQ 1
-> +#define QVIRTIO_CTRL_VQ 2
-> +
-> +#define VIRTIO_CONFIG_S_NEEDS_RESET 0x40
+Make it error message and exit to force user fix CLI,
+instead of accepting non-sense CLI values.
+That also fixes crash issue, since wrongly calculated size
+isn't used to allocate RAM
 
-Please use #include "standard-headers/linux/virtio_config.h" instead of
-duplicating this constant.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  * s/ppc4xx_sdram_adjust/ppc4xx_sdram_prep/
+     (BALATON Zoltan <balaton@eik.bme.hu>)
+  * print possible valid ram size id not all RAM was distributed
+  * initialize ram_bases/ram_bases at the same time we are checking
+    that user supplied RAM would fit available banks and drop nested
+    loop that were duplicating the same calculations.
+  * coincidentally fix crash when -m is less than minimal bank size
+v3:
+  * s/ppc4xx_sdram_prep/ppc4xx_sdram_banks/
+      (BALATON Zoltan <balaton@eik.bme.hu>)
+  * fix subject line in commit message
+v3.1
+  * add lost 'break' statement in 'j' loop
 
-> +
-> +static int *sv;
+CC: balaton@eik.bme.hu
+CC: david@gibson.dropbear.id.au
+CC: qemu-ppc@nongnu.org
+---
+ include/hw/ppc/ppc4xx.h |  9 ++++----
+ hw/ppc/ppc440_bamboo.c  | 11 ++++------
+ hw/ppc/ppc4xx_devs.c    | 57 ++++++++++++++++++++++++++-------------------=
+----
+ hw/ppc/sam460ex.c       |  5 ++---
+ 4 files changed, 40 insertions(+), 42 deletions(-)
 
-Please make this easier to understand:
-
-  /* The -netdev socketpair fds */
-  static int sockfds[2];
-
---6lXr1rPCNTf1w0X8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4nKg8ACgkQnKSrs4Gr
-c8iKywgAyHKoHi6RaQRtiR52cMk/N4M2fOcRZb4Kig7InJBMmoF2tiohbpAApjBS
-fJ8DcZFPqz4iGUJEPBEe6QUMWpnhip/vqM1KMA24tbkk1gFTqLkZVjRQn0cESZjK
-pG2UeH3MXOULdPYFG8FK9Nzh99tkX8wS2bmh11iv39ezLinJA8tiKycfjBpDONVw
-9wAeancjy2+q/pui1u5y7lrDn5uAeEOMUW21JHs5S0vn31kGGm4eKRVqLtycoUbt
-PGnyqJOVhOocHOLQBFTCzBdAekN9SSU9jYKjDs5SuUu8NAFYDlQy+GSpL8O9wkQk
-n3k2nnAuuGSNac9DVEMQ9xYqtKLElg==
-=90O8
------END PGP SIGNATURE-----
-
---6lXr1rPCNTf1w0X8--
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index 7d82259..b8c8f32 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -42,11 +42,10 @@ enum {
+ qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
+                        uint32_t dcr_base, int has_ssr, int has_vr);
+=20
+-ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+-                               MemoryRegion ram_memories[],
+-                               hwaddr ram_bases[],
+-                               hwaddr ram_sizes[],
+-                               const ram_addr_t sdram_bank_sizes[]);
++void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
++                        MemoryRegion ram_memories[],
++                        hwaddr ram_bases[], hwaddr ram_sizes[],
++                        const ram_addr_t sdram_bank_sizes[]);
+=20
+ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
+                         MemoryRegion ram_memories[],
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index b782641..577f7c2 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -158,7 +158,6 @@ static void main_cpu_reset(void *opaque)
+=20
+ static void bamboo_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+@@ -203,10 +202,8 @@ static void bamboo_init(MachineState *machine)
+     /* SDRAM controller */
+     memset(ram_bases, 0, sizeof(ram_bases));
+     memset(ram_sizes, 0, sizeof(ram_sizes));
+-    ram_size =3D ppc4xx_sdram_adjust(ram_size, PPC440EP_SDRAM_NR_BANKS,
+-                                   ram_memories,
+-                                   ram_bases, ram_sizes,
+-                                   ppc440ep_sdram_bank_sizes);
++    ppc4xx_sdram_banks(ram_size, PPC440EP_SDRAM_NR_BANKS, ram_memories,
++                       ram_bases, ram_sizes, ppc440ep_sdram_bank_sizes);
+     /* XXX 440EP's ECC interrupts are on UIC1, but we've only created UIC0=
+. */
+     ppc4xx_sdram_init(env, pic[14], PPC440EP_SDRAM_NR_BANKS, ram_memories,
+                       ram_bases, ram_sizes, 1);
+@@ -268,7 +265,7 @@ static void bamboo_init(MachineState *machine)
+     /* Load initrd. */
+     if (initrd_filename) {
+         initrd_size =3D load_image_targphys(initrd_filename, RAMDISK_ADDR,
+-                                          ram_size - RAMDISK_ADDR);
++                                          machine->ram_size - RAMDISK_ADDR=
+);
+=20
+         if (initrd_size < 0) {
+             error_report("could not load ram disk '%s' at %x",
+@@ -279,7 +276,7 @@ static void bamboo_init(MachineState *machine)
+=20
+     /* If we're loading a kernel directly, we must load the device tree to=
+o. */
+     if (kernel_filename) {
+-        if (bamboo_load_device_tree(FDT_ADDR, ram_size, RAMDISK_ADDR,
++        if (bamboo_load_device_tree(FDT_ADDR, machine->ram_size, RAMDISK_A=
+DDR,
+                                     initrd_size, kernel_cmdline) < 0) {
+             error_report("couldn't load device tree");
+             exit(1);
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index c2e5013..5a3bb80 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -673,16 +673,16 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq ir=
+q, int nbanks,
+  * The 4xx SDRAM controller supports a small number of banks, and each ban=
+k
+  * must be one of a small set of sizes. The number of banks and the suppor=
+ted
+  * sizes varies by SoC. */
+-ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+-                               MemoryRegion ram_memories[],
+-                               hwaddr ram_bases[],
+-                               hwaddr ram_sizes[],
+-                               const ram_addr_t sdram_bank_sizes[])
++void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
++                        MemoryRegion ram_memories[],
++                        hwaddr ram_bases[], hwaddr ram_sizes[],
++                        const ram_addr_t sdram_bank_sizes[])
+ {
+     MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
+     ram_addr_t size_left =3D ram_size;
+     ram_addr_t base =3D 0;
+     ram_addr_t bank_size;
++    int last_bank =3D 0;
+     int i;
+     int j;
+=20
+@@ -690,7 +690,12 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, in=
+t nr_banks,
+         for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
+             bank_size =3D sdram_bank_sizes[j];
+             if (bank_size <=3D size_left) {
++                ram_bases[i] =3D base;
++                ram_sizes[i] =3D bank_size;
++                base +=3D bank_size;
+                 size_left -=3D bank_size;
++                last_bank =3D i;
++                break;
+             }
+         }
+         if (!size_left) {
+@@ -699,34 +704,32 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, i=
+nt nr_banks,
+         }
+     }
+=20
+-    ram_size -=3D size_left;
+     if (size_left) {
+-        error_report("Truncating memory to %" PRId64 " MiB to fit SDRAM"
+-                     " controller limits", ram_size / MiB);
++        ram_addr_t used_size =3D ram_size - size_left;
++        GString *s =3D g_string_new(NULL);
++
++        for (i =3D 0; sdram_bank_sizes[i]; i++) {
++            g_string_append_printf(s, "%" PRIi64 "%s",
++                                   sdram_bank_sizes[i] / MiB,
++                                   sdram_bank_sizes[i + 1] ? " ," : "");
++        }
++        error_report("Max %d banks of %s MB DIMM/bank supported",
++            nr_banks, s->str);
++        error_report("Possible valid RAM size: %" PRIi64,
++            used_size ? used_size / MiB : sdram_bank_sizes[i - 1] / MiB);
++
++        g_string_free(s, true);
++        exit(EXIT_FAILURE);
+     }
+=20
+     memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_si=
+ze);
+=20
+-    size_left =3D ram_size;
+-    for (i =3D 0; i < nr_banks && size_left; i++) {
+-        for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
+-            bank_size =3D sdram_bank_sizes[j];
+-
+-            if (bank_size <=3D size_left) {
+-                char name[32];
+-                snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
+-                memory_region_init_alias(&ram_memories[i], NULL, name, ram=
+,
+-                                         base, bank_size);
+-                ram_bases[i] =3D base;
+-                ram_sizes[i] =3D bank_size;
+-                base +=3D bank_size;
+-                size_left -=3D bank_size;
+-                break;
+-            }
+-        }
++    for (i =3D 0; i <=3D last_bank; i++) {
++        char name[32];
++        snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
++        memory_region_init_alias(&ram_memories[i], NULL, name, ram,
++                                 ram_bases[i], ram_sizes[i]);
+     }
+-
+-    return ram_size;
+ }
+=20
+ /*************************************************************************=
+****/
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 437e214..949acba 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -324,9 +324,8 @@ static void sam460ex_init(MachineState *machine)
+     /* SDRAM controller */
+     /* put all RAM on first bank because board has one slot
+      * and firmware only checks that */
+-    machine->ram_size =3D ppc4xx_sdram_adjust(machine->ram_size, 1,
+-                                   ram_memories, ram_bases, ram_sizes,
+-                                   ppc460ex_sdram_bank_sizes);
++    ppc4xx_sdram_banks(machine->ram_size, 1, ram_memories, ram_bases, ram_=
+sizes,
++                       ppc460ex_sdram_bank_sizes);
+=20
+     /* FIXME: does 460EX have ECC interrupts? */
+     ppc440_sdram_init(env, SDRAM_NR_BANKS, ram_memories,
+--=20
+2.7.4
 
 
