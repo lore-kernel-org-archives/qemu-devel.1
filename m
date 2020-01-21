@@ -2,117 +2,91 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B62C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 349E2C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:29:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D302424653
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:29:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02F4D24653
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:29:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HF2l5647"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D302424653
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="lpZPOQKI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02F4D24653
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituWd-0001wD-Oe
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:29:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36700)
+	id 1ituXA-0002bH-OG
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:29:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ittwH-00006S-Jc
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:51:33 -0500
+ (envelope-from <dme@dme.org>) id 1ittEx-00067w-2O
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:06:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ittwD-0000WB-38
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:51:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30791
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ittwC-0000Vk-TW
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:51:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579614684;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=dIeexc3Ll1RtE14QBGDRC/W+OPSUXGgCBhAz9qQyROs=;
- b=HF2l5647LDd81z0sRPWESEV380dBGcO/H2AST4kxPvokzdhvnQpUb6RuOqRxxZpw96VGZl
- sf2ixPXov7QFiEzYTIM063Z1++FgkEtQnNboSsV+hl8wV7z3axXA7zQrsoFEKfv4fdSTk3
- Mx28GaRwnYtJBTInCkU+bf+ZYG0Rf+s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-60HbP8q0NMeyMxzefIwBCQ-1; Tue, 21 Jan 2020 08:51:20 -0500
-X-MC-Unique: 60HbP8q0NMeyMxzefIwBCQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E4B9800D48;
- Tue, 21 Jan 2020 13:51:19 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-116.ams2.redhat.com
- [10.36.117.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D56E1001DE1;
- Tue, 21 Jan 2020 13:51:18 +0000 (UTC)
-Subject: Re: [PATCH 2/2] iotests: add test for backup-top failure on
- permission activation
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20200116155452.30972-1-vsementsov@virtuozzo.com>
- <20200116155452.30972-3-vsementsov@virtuozzo.com>
- <eedd42b6-bf4e-f6de-13a4-412d389fdb09@redhat.com>
- <ea9219cd-8cc1-8cc0-d568-a51013ba74a4@virtuozzo.com>
- <f52b6ff5-e993-d567-cbbe-1d6d158908da@redhat.com>
- <0e865df2-7d21-b18f-b73c-2948577b9dcb@virtuozzo.com>
- <1313e55e-0eb1-890a-4e8e-2517f1e80d38@redhat.com>
- <04a32d71-31da-a3e3-5c5f-cc6465fc9402@virtuozzo.com>
- <6923bc19-d203-63af-b206-8fe18e4a01c6@redhat.com>
- <6e0c4e88-6745-a668-6946-237032fdbedd@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <29434a72-d2cc-5976-cbd7-ceac714d4d65@redhat.com>
-Date: Tue, 21 Jan 2020 14:51:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <dme@dme.org>) id 1ittEv-0000Yd-KC
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:06:42 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43005)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dme@dme.org>) id 1ittEv-0000Xk-79
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:06:41 -0500
+Received: by mail-wr1-x443.google.com with SMTP id q6so3073781wro.9
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 05:06:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:cc:subject:in-reply-to:references:from:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=X6IpToNerzxu/UmHRFFFZS33bFkAzW7a5xSrf8XB9Rs=;
+ b=lpZPOQKItAHcba3s3sl7iOSwsN+UXgtBjLML3/+gY7uqdunLXkq0loj4PHmqeelV7D
+ Za/YDnwDdiFS4hQaJaYl/vInVlX63OpGjerPrkGAmWfuzjC/99ikNY7OFI2FCIsaYfpd
+ xq37Fk5YcP0KGiybyn0dozD19xuvEUBuPg1vigs7dMZ6y076VOXd7xC5f6ZcWiEPAgBm
+ 2O/y6E4pQPRALDy8rJ+5gRIjjIWBM6GR8hRrbPUwqUNf2yQHYTh0RIYp8JIMTSSK7pVY
+ k3gyhk6/1hVqEtUnW+zGaa57lzRcYVgS/VuiKQ06oXuN7vdm0nF+fbLJedqe2cW2qm8B
+ 0oOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=X6IpToNerzxu/UmHRFFFZS33bFkAzW7a5xSrf8XB9Rs=;
+ b=DKwd5jLwUOnDtYODSgOhKT+ML9gUdGjYs3Y40IZqHl3TIMqFBrjUAg7WTPRkH176XS
+ eQJH1VoqEMXVFieqW0hIR7r6MMeCudyDFj49AUMKkLS7IS9y75aILueIcFoV8Nf1r7VS
+ zQj8srkhLIHMBJMtgSAx/oDfbRmnOyu/LGpAsuLnnMKysb5IUvgr8PXSdous7ZV6liWb
+ 0oRNJaAoXlDeXpFlJJQAEqQbItNvlYkvLYJZk5iJekoAFNRNPN7kOywA/VbX8IP3loc5
+ yIQLPvh2RUegkpXVsy5dz4e4KcTPZ9KkzQFjvWnMOQKDoVJeMH4LB/CUuI0ANZOT1hfb
+ KVpA==
+X-Gm-Message-State: APjAAAWwctyV0usfz3zYh5DPVy7Pwf+5B9k0JJ/gGM/orax6Jcw3ozU9
+ yoO9zt7SMLxeqa9d6hAIwzFADw==
+X-Google-Smtp-Source: APXvYqxVVE8658QmN36ateJITM2hoXE091Euy75WtdeLUarwoV09TN5dGvP/RSVnJnI+dwPhyysRKQ==
+X-Received: by 2002:adf:f98c:: with SMTP id f12mr4931583wrr.138.1579611999713; 
+ Tue, 21 Jan 2020 05:06:39 -0800 (PST)
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net.
+ [81.149.164.25])
+ by smtp.gmail.com with ESMTPSA id t8sm52464016wrp.69.2020.01.21.05.06.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Jan 2020 05:06:38 -0800 (PST)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 1fe2b62a;
+ Tue, 21 Jan 2020 13:06:38 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH] qemu-img: Add --target-is-zero to convert
+In-Reply-To: <8382f271-ef06-edf4-c641-bc6cc1b3c25d@redhat.com>
+References: <id:m21rryz8al.fsf@dme.org>
+ <20200117103434.1363985-1-david.edmondson@oracle.com>
+ <8382f271-ef06-edf4-c641-bc6cc1b3c25d@redhat.com>
+X-HGTTG: heart-of-gold
+From: David Edmondson <dme@dme.org>
+Date: Tue, 21 Jan 2020 13:06:38 +0000
+Message-ID: <m2ftg9vu01.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <6e0c4e88-6745-a668-6946-237032fdbedd@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,197 +98,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB
-Content-Type: multipart/mixed; boundary="MOxbylmV4dcuCgHwAoK6NprGhlsfNkEcf"
+On Monday, 2020-01-20 at 19:33:43 -05, John Snow wrote:
 
---MOxbylmV4dcuCgHwAoK6NprGhlsfNkEcf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> CC qemu-block and block maintainers
+>
+> On 1/17/20 5:34 AM, David Edmondson wrote:
+>> In many cases the target of a convert operation is a newly provisioned
+>> target that the user knows is blank (filled with zeroes). In this
+>> situation there is no requirement for qemu-img to wastefully zero out
+>> the entire device.
+>>=20
+>
+> Is there no way to convince bdrv_has_zero_init to return what we want
+> already in this case?
 
-On 21.01.20 14:48, Vladimir Sementsov-Ogievskiy wrote:
-> 21.01.2020 15:39, Max Reitz wrote:
->> On 21.01.20 11:40, Vladimir Sementsov-Ogievskiy wrote:
->>> 21.01.2020 12:41, Max Reitz wrote:
->>>> On 21.01.20 10:23, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 21.01.2020 12:14, Max Reitz wrote:
->>>>>> On 20.01.20 18:20, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>> 20.01.2020 20:04, Max Reitz wrote:
->>>>>>>> On 16.01.20 16:54, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>>>> This test checks that bug is really fixed by previous commit.
->>>>>>>>>
->>>>>>>>> Cc: qemu-stable@nongnu.org # v4.2.0
->>>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo=
-.com>
->>>>>>>>> ---
->>>>>>>>>      tests/qemu-iotests/283     | 75 ++++++++++++++++++++++++++++=
-++++++++++
->>>>>>>>>      tests/qemu-iotests/283.out |  8 ++++
->>>>>>>>>      tests/qemu-iotests/group   |  1 +
->>>>>>>>>      3 files changed, 84 insertions(+)
->>>>>>>>>      create mode 100644 tests/qemu-iotests/283
->>>>>>>>>      create mode 100644 tests/qemu-iotests/283.out
->>>>>>>>
->>>>>>>> The test looks good to me, I just have a comment nit and a note on=
- the
->>>>>>>> fact that this should probably be queued only after Thomas=E2=80=
-=99s =E2=80=9CEnable
->>>>>>>> more iotests during "make check-block"=E2=80=9D series.
->>>>>>>>
->>>>>>>>> diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
->>>>>>>>> new file mode 100644
->>>>>>>>> index 0000000000..f0f216d109
->>>>>>>>> --- /dev/null
->>>>>>>>> +++ b/tests/qemu-iotests/283
->>>>>>>>> @@ -0,0 +1,75 @@
->>>>>>>>> +#!/usr/bin/env python
->>>>>>>>> +#
->>>>>>>>> +# Test for backup-top filter permission activation failure
->>>>>>>>> +#
->>>>>>>>> +# Copyright (c) 2019 Virtuozzo International GmbH.
->>>>>>>>> +#
->>>>>>>>> +# This program is free software; you can redistribute it and/or =
-modify
->>>>>>>>> +# it under the terms of the GNU General Public License as publis=
-hed by
->>>>>>>>> +# the Free Software Foundation; either version 2 of the License,=
- or
->>>>>>>>> +# (at your option) any later version.
->>>>>>>>> +#
->>>>>>>>> +# This program is distributed in the hope that it will be useful=
-,
->>>>>>>>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
->>>>>>>>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>>>>>>>> +# GNU General Public License for more details.
->>>>>>>>> +#
->>>>>>>>> +# You should have received a copy of the GNU General Public Lice=
-nse
->>>>>>>>> +# along with this program.  If not, see <http://www.gnu.org/lice=
-nses/>.
->>>>>>>>> +#
->>>>>>>>> +
->>>>>>>>> +import iotests
->>>>>>>>> +
->>>>>>>>> +# The test is unrelated to formats, restrict it to qcow2 to avoi=
-d extra runs
->>>>>>>>> +iotests.verify_image_format(supported_fmts=3D['qcow2'])
->>>>>>>>> +
->>>>>>>>> +size =3D 1024 * 1024
->>>>>>>>> +
->>>>>>>>> +"""
->>>>>>>>> +On activation, backup-top is going to unshare write permission o=
-n its
->>>>>>>>> +source child. It will be impossible for the following configurat=
-ion:
->>>>>>>>
->>>>>>>> =E2=80=9CThe following configuration will become impossible=E2=80=
-=9D?
->>>>>>>
->>>>>>> Hmm, no, the configuration is possible. But "it", i.e. "unshare wri=
-te permission",
->>>>>>> is impossible with such configuration..
->>>>>>
->>>>>> But backup_top always unshares the write permission on the source.
->>>>>
->>>>> Yes, and I just try to say, that this action will fail. And the test =
-checks that it
->>>>> fails (and it crashes with current master instead of fail).
->>>>
->>>> OK.  So what I was trying to say is that the comment currently only
->>>> states that this will fail.  I=E2=80=99d prefer it to also reassure me=
- that it=E2=80=99s
->>>> correct that this fails (because all writes on the backup source must =
-go
->>>> through backup_top), and that this is exactly what we want to test her=
-e.
->>>>
->>>> On first reading, I was wondering why exactly this comment would tell =
-me
->>>> all these things, because I didn=E2=80=99t know what the test wants to=
- test in
->>>> the first place.
->>>>
->>>> Max
->>>
->>> Hmm, something like:
->>>
->>> Backup wants to copy a point-in-time state of the source node. So, it c=
-atches all writes
->>> to the source node by appending backup-top filter above it. So we handl=
-e all changes which
->>> comes from source node parents. To prevent appearing of new writing par=
-ents during the
->>> progress, backup-top unshares write permission on its source child. Thi=
-s has additional
->>> implication: as this "unsharing" is propagated by default by backing/fi=
-le children,
->>> backup-top conflicts with any side parents of source sub-tree with writ=
-e permission.
->>> And this is in good relation with the general idea: with such parents w=
-e can't guarantee
->>> point-in-time backup.
->>
->> Works for me (thanks :-)), but a shorter =E2=80=9CWhen performing a back=
-up, all
->> writes on the source subtree must go through the backup-top filter so it
->> can copy all data to the target before it is changed.  Therefore,
->> backup-top cannot allow other nodes to change data on its source child.=
-=E2=80=9D
->> would work for me just as well.
->>
->>> So, trying to backup the configuration with writing side parents of
->>> source sub-tree nodes should fail. Let's test it.
->=20
-> But than, we need somehow link part about appending backup-top and so-on.=
-..
->=20
-> When performing a backup, all writes on the source subtree must go throug=
-h the backup-top filter so it can copy all data to the target before it is =
-changed.
-> backup-top filter is appended above source node, to achieve this thing, s=
-o all parents of source node are handled.
-> A configuration with side parents of source sub-tree with write permissio=
-n is unsupported (we'd have append several backup-top filter like nodes to =
-handle such parents).
-> The test create an example of such configuration and checks that backup f=
-ails.
+In the current HEAD code, bdrv_has_zero_init will never be called for
+=E2=80=9Cconvert -n=E2=80=9D (skip target volume creation).
 
-Sounds good!
+If -n is not specified the host_device block driver doesn't provide a
+bdrv_has_zero_init function, so it's assumed not supported.
 
-(Except maybe s/that backup fails/that a backup is then not allowed/?
-=E2=80=9Cbackup fails=E2=80=9D might also mean that the job just produces g=
-arbage.)
+> I cannot recall off hand, but wonder if there's an advanced syntax
+> method of specifying the target image that can set this flag already.
 
-Max
+I couldn't see one, but I'd be happy to learn of its existence. My first
+approach was to add a raw specific option and add it using
+--target-image-opts, resulting in something like:
 
+qemu-img convert -n --target-image-opts sparse.qcow2 \
+	driver=3Draw,file.filename=3D/dev/sdg,assume-blank=3Don
 
---MOxbylmV4dcuCgHwAoK6NprGhlsfNkEcf--
+(assume-blank=3Don is the new bit). This worked, but is only useful for
+raw targets.
 
---8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The discussion here led me to switch to --target-is-zero.
 
------BEGIN PGP SIGNATURE-----
+Mark Kanda sent me some comments suggesting that I get rid of the new
+target_is_zero boolean and simply set has_zero_init, which I will do
+before sending out another patch if this overall approach is considered
+appropriate.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4nAdQACgkQ9AfbAGHV
-z0CIewf/TxgDyjDNTKjcR4jyOncw85uAy1BWw7DDG+233s4Qdm4DRROf75gx+mSs
-08S+/b1YaaPHJPRanOvezkIj7ibyt+pL1Ek/j3AK/0qFd5jMSJCtV5tY30oBIgQh
-oKEGjwWdZ36bYynymimCpMCGxhSBxN71IM2woqLsDSIvwgtTCq1XqCkJRjrdUSDj
-FaZF0YskY8tDUPOLP6L6sZrW77pL+KFbHkTHw+Ndt9Czqd4TFGFjlSsKmiZu4ZFx
-qb14GhFcDLgH2Gbw9Zl8VNd9nmkTMS7YRlaqiCIU2Aza+W7r2lckiq5J74KwELCJ
-qulpmVq8Zz3fZTSEjx1oKs/L32okUw==
-=VExs
------END PGP SIGNATURE-----
+>> Add a new option, --target-is-zero, allowing the user to indicate that
+>> an existing target device is already zero filled.
+>> ---
+>>  qemu-img.c | 19 ++++++++++++++++---
+>>  1 file changed, 16 insertions(+), 3 deletions(-)
+>>=20
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index 95a24b9762..56ca727e8c 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -70,6 +70,7 @@ enum {
+>>      OPTION_PREALLOCATION =3D 265,
+>>      OPTION_SHRINK =3D 266,
+>>      OPTION_SALVAGE =3D 267,
+>> +    OPTION_TARGET_IS_ZERO =3D 268,
+>>  };
+>>=20=20
+>>  typedef enum OutputFormat {
+>> @@ -1593,6 +1594,7 @@ typedef struct ImgConvertState {
+>>      bool copy_range;
+>>      bool salvage;
+>>      bool quiet;
+>> +    bool target_is_zero;
+>>      int min_sparse;
+>>      int alignment;
+>>      size_t cluster_sectors;
+>> @@ -1984,10 +1986,11 @@ static int convert_do_copy(ImgConvertState *s)
+>>      int64_t sector_num =3D 0;
+>>=20=20
+>>      /* Check whether we have zero initialisation or can get it efficien=
+tly */
+>> -    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
+>> +    s->has_zero_init =3D s->target_is_zero;
+>> +
+>> +    if (!s->has_zero_init && s->target_is_new && s->min_sparse &&
+>> +        !s->target_has_backing) {
+>>          s->has_zero_init =3D bdrv_has_zero_init(blk_bs(s->target));
+>> -    } else {
+>> -        s->has_zero_init =3D false;
+>>      }
+>>=20=20
+>>      if (!s->has_zero_init && !s->target_has_backing &&
+>> @@ -2076,6 +2079,7 @@ static int img_convert(int argc, char **argv)
+>>          .buf_sectors        =3D IO_BUF_SIZE / BDRV_SECTOR_SIZE,
+>>          .wr_in_order        =3D true,
+>>          .num_coroutines     =3D 8,
+>> +        .target_is_zero     =3D false,
+>>      };
+>>=20=20
+>>      for(;;) {
+>> @@ -2086,6 +2090,7 @@ static int img_convert(int argc, char **argv)
+>>              {"force-share", no_argument, 0, 'U'},
+>>              {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_O=
+PTS},
+>>              {"salvage", no_argument, 0, OPTION_SALVAGE},
+>> +            {"target-is-zero", no_argument, 0, OPTION_TARGET_IS_ZERO},
+>>              {0, 0, 0, 0}
+>>          };
+>>          c =3D getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
+>> @@ -2209,6 +2214,9 @@ static int img_convert(int argc, char **argv)
+>>          case OPTION_TARGET_IMAGE_OPTS:
+>>              tgt_image_opts =3D true;
+>>              break;
+>> +        case OPTION_TARGET_IS_ZERO:
+>> +            s.target_is_zero =3D true;
+>> +            break;
+>>          }
+>>      }
+>>=20=20
+>> @@ -2247,6 +2255,11 @@ static int img_convert(int argc, char **argv)
+>>          warn_report("This will become an error in future QEMU versions.=
+");
+>>      }
+>>=20=20
+>> +    if (s.target_is_zero && !skip_create) {
+>> +        error_report("--target-is-zero requires use of -n flag");
+>> +        goto fail_getopt;
+>> +    }
+>> +
+>>      s.src_num =3D argc - optind - 1;
+>>      out_filename =3D s.src_num >=3D 1 ? argv[argc - 1] : NULL;
+>>=20=20
+>>=20
 
---8R0So51TRF9pGUyQaW8Avl4BW4VWvu8hB--
-
+dme.
+--=20
+Please forgive me if I act a little strange, for I know not what I do.
 
