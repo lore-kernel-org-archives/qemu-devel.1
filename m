@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 081C7C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC00C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5AB62087E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:19:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC1A02070C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BjLvc8ec"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5AB62087E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5m6s3Jv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC1A02070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituMv-0006cm-LJ
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:19:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52877)
+	id 1ituPd-0000uT-Gg
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:21:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsi8-0003nL-6I
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:52 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsiQ-00047L-Ul
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsi4-00050D-1e
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:47 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30568
+ (envelope-from <dgilbert@redhat.com>) id 1itsiN-00055q-3P
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:06 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38492
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsi3-000508-UE
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:43 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsiM-00055m-Um
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609963;
+ s=mimecast20190719; t=1579609982;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IjT5oYMPD4mCz1BM6jWV0B/dQuRDPXbhFF3mo6CCHfw=;
- b=BjLvc8ecbGwXBCVX+DyVNsB8mNukGG0D8lgunv0Li9whS/dqmwOtJJ8j1BqzfVdfjBa5eF
- NXzzjIhuxILHzVVRRdj817uMAWnyLiVQIte8nJ2qvqENehKCdCrht4ElRYU0uQ0uRbm680
- +kwftV+2JhU9T42j6TLEwsRnLgsRsa8=
+ bh=VaMuJQ0kEqF+Mn8YbHpGchU2mMcZGwcQFfJqCMKUjBY=;
+ b=M5m6s3Jvylg2NSR83KprmJGetEmR2UtLfEwc/lRAE2jVITCaXsEPEMqF58H00Zcl3Ir8au
+ DWm8ScUShmJ+is0Ry+Qhl0qVco8ivyLUEeya++E2YTRLOhUCZaoCIrnF3Vif96mU6waK7L
+ cdvukopavUG1UD9ui+w6nzfNcV3xYe0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-jY4L26EGPR6H2RpenOuy-A-1; Tue, 21 Jan 2020 07:32:42 -0500
+ us-mta-226-FYKC2diNNCmf8XtOlb-Pyg-1; Tue, 21 Jan 2020 07:33:00 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E44CE800D41;
- Tue, 21 Jan 2020 12:32:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E6771005510;
+ Tue, 21 Jan 2020 12:32:59 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0310760BE0;
- Tue, 21 Jan 2020 12:32:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 57C0F60BE0;
+ Tue, 21 Jan 2020 12:32:52 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 101/109] virtiofsd: use fuse_buf_writev to replace
- fuse_buf_write for better performance
-Date: Tue, 21 Jan 2020 12:24:25 +0000
-Message-Id: <20200121122433.50803-102-dgilbert@redhat.com>
+Subject: [PATCH v2 106/109] virtiofsd: Convert lo_destroy to take the
+ lo->mutex lock itself
+Date: Tue, 21 Jan 2020 12:24:30 +0000
+Message-Id: <20200121122433.50803-107-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: jY4L26EGPR6H2RpenOuy-A-1
+X-MC-Unique: FYKC2diNNCmf8XtOlb-Pyg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,65 +93,102 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: piaojun <piaojun@huawei.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-fuse_buf_writev() only handles the normal write in which src is buffer
-and dest is fd. Specially if src buffer represents guest physical
-address that can't be mapped by the daemon process, IO must be bounced
-back to the VMM to do it by fuse_buf_copy().
+lo_destroy was relying on some implicit knowledge of the locking;
+we can avoid this if we create an unref_inode that doesn't take
+the lock and then grab it for the whole of the lo_destroy.
 
-Signed-off-by: Jun Piao <piaojun@huawei.com>
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Suggested-by: Vivek Goyal <vgoyal@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tools/virtiofsd/buffer.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ tools/virtiofsd/passthrough_ll.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/tools/virtiofsd/buffer.c b/tools/virtiofsd/buffer.c
-index 70980550d2..b75f871680 100644
---- a/tools/virtiofsd/buffer.c
-+++ b/tools/virtiofsd/buffer.c
-@@ -33,7 +33,6 @@ size_t fuse_buf_size(const struct fuse_bufvec *bufv)
-     return size;
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 4c656b4a60..3c450c15b4 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -1344,14 +1344,13 @@ static void lo_unlink(fuse_req_t req, fuse_ino_t pa=
+rent, const char *name)
+     lo_inode_put(lo, &inode);
  }
 =20
--__attribute__((unused))
- static ssize_t fuse_buf_writev(struct fuse_buf *out_buf,
-                                struct fuse_bufvec *in_buf)
+-static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
+e,
+-                                 uint64_t n)
++/* To be called with lo->mutex held */
++static void unref_inode(struct lo_data *lo, struct lo_inode *inode, uint64=
+_t n)
  {
-@@ -262,12 +261,29 @@ static int fuse_bufvec_advance(struct fuse_bufvec *bu=
-fv, size_t len)
- ssize_t fuse_buf_copy(struct fuse_bufvec *dstv, struct fuse_bufvec *srcv,
-                       enum fuse_buf_copy_flags flags)
- {
--    size_t copied =3D 0;
-+    size_t copied =3D 0, i;
-=20
-     if (dstv =3D=3D srcv) {
-         return fuse_buf_size(dstv);
+     if (!inode) {
+         return;
      }
 =20
-+    /*
-+     * use writev to improve bandwidth when all the
-+     * src buffers already mapped by the daemon
-+     * process
-+     */
-+    for (i =3D 0; i < srcv->count; i++) {
-+        if (srcv->buf[i].flags & FUSE_BUF_IS_FD) {
-+            break;
-+        }
-+    }
-+    if ((i =3D=3D srcv->count) && (dstv->count =3D=3D 1) &&
-+        (dstv->idx =3D=3D 0) &&
-+        (dstv->buf[0].flags & FUSE_BUF_IS_FD)) {
-+        dstv->buf[0].pos +=3D dstv->off;
-+        return fuse_buf_writev(&dstv->buf[0], srcv);
+-    pthread_mutex_lock(&lo->mutex);
+     assert(inode->nlookup >=3D n);
+     inode->nlookup -=3D n;
+     if (!inode->nlookup) {
+@@ -1362,15 +1361,24 @@ static void unref_inode_lolocked(struct lo_data *lo=
+, struct lo_inode *inode,
+         }
+         g_hash_table_destroy(inode->posix_locks);
+         pthread_mutex_destroy(&inode->plock_mutex);
+-        pthread_mutex_unlock(&lo->mutex);
+=20
+         /* Drop our refcount from lo_do_lookup() */
+         lo_inode_put(lo, &inode);
+-    } else {
+-        pthread_mutex_unlock(&lo->mutex);
+     }
+ }
+=20
++static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
+e,
++                                 uint64_t n)
++{
++    if (!inode) {
++        return;
 +    }
 +
-     for (;;) {
-         const struct fuse_buf *src =3D fuse_bufvec_current(srcv);
-         const struct fuse_buf *dst =3D fuse_bufvec_current(dstv);
++    pthread_mutex_lock(&lo->mutex);
++    unref_inode(lo, inode, n);
++    pthread_mutex_unlock(&lo->mutex);
++}
++
+ static void lo_forget_one(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup=
+)
+ {
+     struct lo_data *lo =3D lo_data(req);
+@@ -2458,13 +2466,7 @@ static void lo_destroy(void *userdata)
+ {
+     struct lo_data *lo =3D (struct lo_data *)userdata;
+=20
+-    /*
+-     * Normally lo->mutex must be taken when traversing lo->inodes but
+-     * lo_destroy() is a serialized request so no races are possible here.
+-     *
+-     * In addition, we cannot acquire lo->mutex since unref_inode() takes =
+it
+-     * too and this would result in a recursive lock.
+-     */
++    pthread_mutex_lock(&lo->mutex);
+     while (true) {
+         GHashTableIter iter;
+         gpointer key, value;
+@@ -2475,8 +2477,9 @@ static void lo_destroy(void *userdata)
+         }
+=20
+         struct lo_inode *inode =3D value;
+-        unref_inode_lolocked(lo, inode, inode->nlookup);
++        unref_inode(lo, inode, inode->nlookup);
+     }
++    pthread_mutex_unlock(&lo->mutex);
+ }
+=20
+ static struct fuse_lowlevel_ops lo_oper =3D {
 --=20
 2.24.1
 
