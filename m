@@ -2,80 +2,81 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5AC6C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3569C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:11:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9055E217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:11:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F5D6217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:11:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gzr60tPz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9055E217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXsPHAiB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5D6217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituFp-0006Zq-Ht
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:11:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52754)
+	id 1ituFx-0006mm-21
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:11:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsha-0003Hi-Bn
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:17 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ituCM-0002cW-D9
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itshW-0004n1-Os
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:14 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27387
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itshW-0004mm-Kr
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609930;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XTrM0XC+BoDNjN37Jb9ct5yq0vjmGmSWo3Fs3ZOCpyc=;
- b=Gzr60tPzd9O6OU4edZgG6ZrkFy+1JO461xttrXv2GOfNjPfymmFM6ncS704vobPHlvqXBF
- AHosuxY6pryruEStcgEtzocXrwvg0qYPCk098hfGu8IdcB5N+qpxkUoTC0e4a+icRj620L
- IacVDpHEBYD+At8pH8UillRAh5i5Rxw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-G4TMCgA0PYelKYNUEz5fCg-1; Tue, 21 Jan 2020 07:32:09 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC487107ACC9;
- Tue, 21 Jan 2020 12:32:07 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 13CDF60BE0;
- Tue, 21 Jan 2020 12:32:05 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
- berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 093/109] virtiofsd: add man page
-Date: Tue, 21 Jan 2020 12:24:17 +0000
-Message-Id: <20200121122433.50803-94-dgilbert@redhat.com>
-In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
-References: <20200121122433.50803-1-dgilbert@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ituCL-0000bo-6e
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:08:06 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42767)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ituCL-0000bX-1n
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:08:05 -0500
+Received: by mail-oi1-x243.google.com with SMTP id 18so2607579oin.9
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 06:08:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Dtq4GEHNbtHbv8UM2MbbYuRO7vvCC0elQwHfGqvU8vc=;
+ b=FXsPHAiB6kBXA3ZZjRHINi4SEz1bLadGeMhspCgB8ElkLiYTGpb1M+pYUjtajQ8F3G
+ 2Q/Ln00oM/wVikzchUaWneWLZTZu2M7YUt2uSCNuqMYYQWIoNRBgpxBgTL5P9Dz2ZVsm
+ 6X+/kJRdTuH/ZIVVWX7o/BU5+byz0Rhx+3FfTeNerx3EfGN4Qic5tRuwSGyMqKCKI2+J
+ P8JG95KzpK1mhMCCaEHzVgppEQ3D6g2umKOFy/IdNEqO4KlLkZ9B3USKuw8Cno0kJnI2
+ /upNhayvvnX3gSgqvvfuGDlkFn6+QpEVOSqGueRBa5wJln1Gn9D3wOBMNYMzbS5IFVy7
+ gjcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Dtq4GEHNbtHbv8UM2MbbYuRO7vvCC0elQwHfGqvU8vc=;
+ b=pTRlRoK3FWUxopZQzm9bxCWiR4cTgIdfoUJ5++xEM9hukXf9Peng3y7VxrjqGAyBRX
+ W8R9BvJbePG/ggjas8e/YNdGEQ7b4SCJK8nV0Q+RMTxefmWVQULhwETxioe1Y8wO0/Ig
+ jlBvUD0sfc0RpVw2Ru5hPUPkIdnhlxtQYNCS29m+w7htrHFFrXW0R3gP/Uc5Om5xgDbO
+ q2CME2xBP7G4eM5CTx8bBTA79f3zPrsBgnZghG5u0g+GyMcSnr6J9gX7bGuhXXfTiIoy
+ CSfUYq9hkUANt9jjXmmkqSN7DnpPvVtn+AAR6NUb7/GrwV7zxCTU0OG26Gma+d/LqhTN
+ UORA==
+X-Gm-Message-State: APjAAAWSzSAMr0ebyfu1kwRse4ai6D8Ab03PLAN/i+sMBqsFvQcNLJRe
+ ZrOwJJ5s9swXIPkLT8VJybOHA5aZmHoI1LPmEvE=
+X-Google-Smtp-Source: APXvYqzCpDWGyinZn3Ki+YzuHoBQW8QetOyXDLNJ9WjcI2HyzAd5nTLfJJdvy3m9ZPwV3GlmR+xOMAdgl3ba0EVYhWs=
+X-Received: by 2002:aca:1b08:: with SMTP id b8mr3135855oib.62.1579615684192;
+ Tue, 21 Jan 2020 06:08:04 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: G4TMCgA0PYelKYNUEz5fCg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <324a-5e231180-7-6946d180@169257031>
+ <20200120145024.GJ345995@stefanha-x1.localdomain>
+In-Reply-To: <20200120145024.GJ345995@stefanha-x1.localdomain>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 21 Jan 2020 15:07:53 +0100
+Message-ID: <CAL1e-=in3inmtH=4ZjM2bxnVPJz2GVW4pwTJ8PVkWoqiunPPfA@mail.gmail.com>
+Subject: Re: [GSoC/Outreachy QEMU project proposal] Measure and Analyze QEMU
+ Performance
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,189 +88,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
+Cc: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+On Mon, Jan 20, 2020 at 3:51 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Sat, Jan 18, 2020 at 03:08:37PM +0100, Aleksandar Markovic wrote:
+> > 3) The community will be given all devised performance measurement methods in the form of easily reproducible step-by-step setup and execution procedures.
+>
+> Tracking performance is a good idea and something that has not been done
+> upstream yet.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Thanks for the interest, Stefan!
 
-with additions by:
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+>  A few questions:
+>
+>  * Will benchmarks be run automatically (e.g. nightly or weekly) on
+>    someone's hardware or does every TCG architecture maintainer need to
+>    run them manually for themselves?
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- Makefile                       |   7 +++
- tools/virtiofsd/virtiofsd.texi | 104 +++++++++++++++++++++++++++++++++
- 2 files changed, 111 insertions(+)
- create mode 100644 tools/virtiofsd/virtiofsd.texi
+If the community wants it, definitely yes. Once the methodology is
+developed, it should be straightforward to setup nightly and/or weekly
+benchmarks - that could definitely include sending mails with reports
+to the entire list or just individuals or subgroups. The recipient
+choice is just a matter or having decent criteria about
+appropriateness of information within the message (e.g. not to flood
+the list with the data most people are not really interested).
 
-diff --git a/Makefile b/Makefile
-index 2375a1f81c..ba7e2e5ebc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -353,6 +353,9 @@ DOCS+=3D$(MANUAL_BUILDDIR)/index.html
- ifdef CONFIG_VIRTFS
- DOCS+=3Dfsdev/virtfs-proxy-helper.1
- endif
-+ifdef CONFIG_LINUX
-+DOCS+=3Dtools/virtiofsd/virtiofsd.1
-+endif
- ifdef CONFIG_TRACE_SYSTEMTAP
- DOCS+=3Dscripts/qemu-trace-stap.1
- endif
-@@ -857,6 +860,9 @@ ifdef CONFIG_VIRTFS
- =09$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
- =09$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
- endif
-+ifdef CONFIG_LINUX
-+=09$(INSTALL_DATA) tools/virtiofsd/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
-+endif
-=20
- install-datadir:
- =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
-@@ -1065,6 +1071,7 @@ qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.=
-texi qemu-monitor-info.texi
- qemu.1: qemu-option-trace.texi
- qemu-img.1: qemu-img.texi qemu-option-trace.texi qemu-img-cmds.texi
- fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
-+tools/virtiofsd/virtiofsd.1: tools/virtiofsd/virtiofsd.texi
- qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
- docs/qemu-block-drivers.7: docs/qemu-block-drivers.texi
- docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
-diff --git a/tools/virtiofsd/virtiofsd.texi b/tools/virtiofsd/virtiofsd.tex=
-i
-new file mode 100644
-index 0000000000..d7a2528f7d
---- /dev/null
-+++ b/tools/virtiofsd/virtiofsd.texi
-@@ -0,0 +1,104 @@
-+@example
-+@c man begin SYNOPSIS
-+@command{virtiofsd} [OPTION] @option{--socket-path=3D}@var{path}|@option{-=
--fd=3D}@var{fdnum} @option{-o source=3D}@var{path}
-+@c man end
-+@end example
-+
-+@c man begin DESCRIPTION
-+
-+Share a host directory tree with a guest through a virtio-fs device.  This
-+program is a vhost-user backend that implements the virtio-fs device.  Eac=
-h
-+virtio-fs device instance requires its own virtiofsd process.
-+
-+This program is designed to work with QEMU's @code{--device vhost-user-fs-=
-pci}
-+but should work with any virtual machine monitor (VMM) that supports
-+vhost-user.  See the EXAMPLES section below.
-+
-+This program must be run as the root user.  Upon startup the program will
-+switch into a new file system namespace with the shared directory tree as =
-its
-+root.  This prevents "file system escapes" due to symlinks and other file
-+system objects that might lead to files outside the shared directory.  The
-+program also sandboxes itself using seccomp(2) to prevent ptrace(2) and ot=
-her
-+vectors that could allow an attacker to compromise the system after gainin=
-g
-+control of the virtiofsd process.
-+
-+@c man end
-+
-+@c man begin OPTIONS
-+@table @option
-+@item -h, --help
-+Print help.
-+@item -V, --version
-+Print version.
-+@item -d, -o debug
-+Enable debug output.
-+@item --syslog
-+Print log messages to syslog instead of stderr.
-+@item -o flock|no_flock
-+enable/disable flock.
-+The default is @var{no_flock}.
-+@item -o log_level=3D@var{level}
-+Print only log messages matching @var{level} or more severe.  @var{level} =
-is
-+one of @code{err}, @code{warn}, @code{info}, or @code{debug}.  The default=
- is
-+@var{info}.
-+@item -o norace
-+Disable racy fallback.
-+The default is false.
-+@item -o posix_lock|no_posix_lock
-+Enable/Disable remote posix lock.
-+The default is @var{posix_lock}.
-+@item -o readdirplus|no_readdirplus
-+Enable/Disable readdirplus.
-+The default is @var{readdirplus}
-+@item -o source=3D@var{path}
-+Share host directory tree located at @var{path}.  This option is required.
-+@item -o timeout=3D<number>
-+I/O timeout (second).
-+The default depends on cache=3D option.
-+@item -o writeback|no_writeback
-+Enable/Disable writeback cache. The cache alows the FUSE client
-+to buffer and merge write requests.
-+The default is @var{no_writeback}.
-+@item -o xattr|no_xattr
-+Enable/Disable Extended attributes (xattr) of the files and directories.
-+The default is @var{no_xattr}.
-+@item --socket-path=3D@var{path}, -o vhost_user_socket=3D@var{path}
-+Listen on vhost-user UNIX domain socket at @var{path}.
-+@item --fd=3D@var{fdnum}
-+Accept connections from vhost-user UNIX domain socket file descriptor @var=
-{fdnum}.  The file descriptor must already be listening for connections.
-+@item --thread-pool-size=3D@var{num}
-+Restrict the number of worker threads per request queue to @var{num}.  The=
- default is 64.
-+@item --cache=3D@code{none}|@code{auto}|@code{always}
-+Select the desired trade-off between coherency and performance.  @code{non=
-e}
-+forbids the FUSE client from caching to achieve best coherency at the cost=
- of
-+performance.  @code{auto} acts similar to NFS with a 1 second metadata cac=
-he
-+timeout.  @code{always} sets a long cache lifetime at the expense of coher=
-ency.
-+@end table
-+@c man end
-+
-+@c man begin EXAMPLES
-+Export @code{/var/lib/fs/vm001/} on vhost-user UNIX domain socket @code{/v=
-ar/run/vm001-vhost-fs.sock}:
-+
-+@example
-+host# virtiofsd --socket-path=3D/var/run/vm001-vhost-fs.sock -o source=3D/=
-var/lib/fs/vm001
-+host# qemu-system-x86_64 \
-+    -chardev socket,id=3Dchar0,path=3D/var/run/vm001-vhost-fs.sock \
-+    -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs \
-+    -object memory-backend-file,id=3Dmem,size=3D4G,mem-path=3D/dev/shm,sha=
-re=3Don \
-+    -numa node,memdev=3Dmem \
-+    ...
-+guest# mount -t virtio_fs myfs /mnt
-+@end example
-+@c man end
-+
-+@ignore
-+@setfilename virtiofsd
-+@settitle QEMU virtio-fs shared file system daemon
-+
-+@c man begin COPYRIGHT
-+Copyright (C) 2019-2020 Red Hat, Inc.
-+
-+This is free software; see the source for copying conditions.  There is NO
-+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE=
-.
-+@c man end
-+@end ignore
---=20
-2.24.1
+For linux-user tests, they are typically very quick, and nightly tests
+are quite feasible to run. On someone hardware, of course, and
+consistently always on the same hardware, if possible. If it makes
+sense, one could setup multiple test beds with a variety of hardware
+setups.
 
+For system mode tests, I knoe they are much more difficult to
+automate, and, on top of that, there could be greater risk of
+hangs/crashes Also, considering the number of machines we support,
+those tests could consume much more time - perhaps even one day would
+not be sufficient, if we have many machines and boot/shutdown
+variants. For these reason, perhaps weekly executions would be more
+appropriate for them, and, in general, given greater complexity, the
+expectation from system-mode performance tests should be better kept
+quite low for now.
+
+>  * Where will the benchmark result history be stored?
+>
+
+If emailing is set up, the results could be reconstructed from emails.
+But, yes, it would be better if the result history is kept somewhere
+on an internet-connected file server
+
+Yours,
+Aleksandar
+
+> Stefan
 
