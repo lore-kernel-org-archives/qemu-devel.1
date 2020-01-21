@@ -2,90 +2,157 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 052A8C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 23:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B4A1C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 23:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8B19217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 23:45:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 271BF20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 23:54:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KBhPjM/L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8B19217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CmFV+AvC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 271BF20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu3Cs-0006Zi-Kq
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 18:45:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58886)
+	id 1iu3LN-0000b8-BS
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 18:54:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1iu39J-0001f3-3e
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 18:41:34 -0500
+ (envelope-from <jsnow@redhat.com>) id 1iu3KX-0008VA-6L
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 18:53:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1iu39H-0004rt-7L
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 18:41:32 -0500
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:38334)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1iu39F-0004pi-Mh
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 18:41:30 -0500
-Received: by mail-pj1-x1042.google.com with SMTP id l35so2418776pje.3
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 15:41:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=subject:date:message-id:mime-version:content-transfer-encoding:cc
- :from:to:in-reply-to:references;
- bh=UcbAsElOHsZ2fudjqh0fovhZKSCABUkGsAOTf1+yuLM=;
- b=KBhPjM/L6CReskcfc+Pldb+g2v31FCSgZk060EoYc+7tS+zUUn5qWSfO+Olrelu3/l
- 321yNSPWRi4jm2/GNd1/rfLLPJszDIhgejtk4k3M2di9us9/9OiRUo/8DLVpwc2OS2+n
- Mk3bZIVSWli0x1gVPxFyVMfXhnQk5l4Fk0cddgjsWcZxLG/K+DYz1kiS/V4HTJG6QACJ
- ceWBwkD8upOMqlEQZJz1SeSBPRQ37pMnOMOQH1CFeOCWtOUN78Wnov0yXX2Wit5x6DPi
- USRFOQBeqIr5i+/hf+JxfZzFp5xwvqk+so2ZKiR714/eo/KR+Cwh4JzdLc5L0lO33GKG
- lppA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to:in-reply-to:references;
- bh=UcbAsElOHsZ2fudjqh0fovhZKSCABUkGsAOTf1+yuLM=;
- b=Z892+cx6kiun6d7us1nry29fKN94/i3ybv8yNtrTlLotWP3w9m01Q+wWPxRwtgeceK
- xJgMZ1+yuh45hhhrATOnAi5zTomuBCwWaFq6jAKi/E7DZovzjVRBb9FDLq89uyl56lMQ
- fFL2qcKhaLX/LgN2C6B9FjSwpIc4uyiJOkWdIhAdzq068YOjOP/YVC8KArM8BA1ZvKCQ
- zQM7tEvhc5SzDDtDhu9ROove85X7DrkHuKaduFZa1wCJIGL+CXJVFN2HkjrDVYB6qVfM
- XMPgIXwYY2KcwXQe7GcQP8YtPTcDhFFf3EGUHFP3vlSpY0MtMOXCySa+ZVe+7NlRrVen
- L0mg==
-X-Gm-Message-State: APjAAAWsQTpNEqDh5YhNJ0hUk416i46bxzqw+hcMlL3vFaPqLp0jmO9Z
- kF6IpZlzMtn8ezSSB29BHHGhSP3igqY=
-X-Google-Smtp-Source: APXvYqwOUrQFTqzU94rWmMk7cbz6wahj/b9tmTxm5sncjQk1WPLfB7H4Xh//vRUC/9cUFF420oq7CQ==
-X-Received: by 2002:a17:902:34a:: with SMTP id
- 68mr7665022pld.250.1579650086876; 
- Tue, 21 Jan 2020 15:41:26 -0800 (PST)
-Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
- by smtp.gmail.com with ESMTPSA id x21sm44075185pfn.164.2020.01.21.15.41.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 15:41:26 -0800 (PST)
-Subject: [PULL 3/5] target/riscv: Fix tb->flags FS status
-Date: Tue, 21 Jan 2020 14:57:00 -0800
-Message-Id: <20200121225703.148465-4-palmerdabbelt@google.com>
-X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+ (envelope-from <jsnow@redhat.com>) id 1iu3KU-0002QH-Ko
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 18:53:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44091
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iu3KU-0002Pn-6J
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 18:53:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579650785;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=gK+HxLlZkzMysiDF8AGHyLeASadCTjiXYn94WrsNyu4=;
+ b=CmFV+AvC09iLYEuiFU9l3F2BlkfVg49uMMia3qIQMSqJ2ipFh/aJG+bCMsspFYNPCtiF2z
+ LQh37k4W99QNUssC0s9S1V0JoQy4FOP5kSeK94Myvmj4AeWkTEH67edznpufMGNkkQXVBn
+ hkNScuIyGXH5DJAwqEb0tRcOkyF5zow=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-282-27MoJe51NhCrpO07QYE6-A-1; Tue, 21 Jan 2020 18:53:03 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD543DB23;
+ Tue, 21 Jan 2020 23:53:02 +0000 (UTC)
+Received: from [10.18.17.91] (dhcp-17-91.bos.redhat.com [10.18.17.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 249905DA70;
+ Tue, 21 Jan 2020 23:53:01 +0000 (UTC)
+Subject: Re: [PATCH] qemu-options.hx: remove stray quote
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190924231325.25444-1-jsnow@redhat.com>
+ <87o8z9rkvy.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <11dd22ea-7517-6d18-1da0-4a366d107514@redhat.com>
+Date: Tue, 21 Jan 2020 18:53:01 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Cc: qemu-devel@nongnu.org,       qemu-riscv@nongnu.org,
- ShihPo Hung <shihpo.hung@sifive.com>,
- Richard Henderson <richard.henderson@linaro.org>, 
- Palmer Dabbelt <palmerdabbelt@google.com>
-From: Palmer Dabbelt <palmerdabbelt@google.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-Reply-To: <20200121225703.148465-1-palmerdabbelt@google.com>
-References: <20200121225703.148465-1-palmerdabbelt@google.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+In-Reply-To: <87o8z9rkvy.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 27MoJe51NhCrpO07QYE6-A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,53 +164,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: ShihPo Hung <shihpo.hung@sifive.com>
 
-It was found that running libquantum on riscv-linux qemu produced an
-incorrect result. After investigation, FP registers are not saved
-during context switch due to incorrect mstatus.FS.
 
-In current implementation tb->flags merges all non-disabled state to
-dirty. This means the code in mark_fs_dirty in translate.c that
-handles initial and clean states is unreachable.
+On 9/25/19 1:43 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  qemu-options.hx | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index 2a04ca6ac5..629a7b1186 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -1192,7 +1192,7 @@ Instead of @option{-fda}, @option{-fdb}, you can use:
+>>  By default, @var{interface} is "ide" and @var{index} is automatically
+>>  incremented:
+>>  @example
+>> -@value{qemu_system_x86} -drive file=a -drive file=b"
+>> +@value{qemu_system_x86} -drive file=a -drive file=b
+>>  @end example
+>>  is interpreted like:
+>>  @example
+> 
+> Messed up more than ten years ago, in commit e0e7ada1d55, faithfully
+> copied around ever since.  Makes me wonder how much this part of
+> qemu-doc is actually read.
+> 
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
 
-This patch fixes it and is successfully tested with:
-  libquantum
+Not worth the calories to merge it into a trivial roundup, either. Maybe
+the error can get copied into the ReST version, too.
 
-Thanks to Richard for pointing out the actual bug.
-
-v3: remove the redundant condition
-v2: root cause FS problem
-
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: ShihPo Hung <shihpo.hung@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
----
- target/riscv/cpu.h | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index e59343e13c..de0a8d893a 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -293,10 +293,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
- #ifdef CONFIG_USER_ONLY
-     *flags = TB_FLAGS_MSTATUS_FS;
- #else
--    *flags = cpu_mmu_index(env, 0);
--    if (riscv_cpu_fp_enabled(env)) {
--        *flags |= TB_FLAGS_MSTATUS_FS;
--    }
-+    *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
- #endif
- }
- 
--- 
-2.25.0.341.g760bfbb309-goog
+--js
 
 
