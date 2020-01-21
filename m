@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E127C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE70CC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:59:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAA862051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:59:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7699E2051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:59:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jcx9Puv4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAA862051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QNiStnkg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7699E2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itt8J-00081e-Lo
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 07:59:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51865)
+	id 1itt8M-00083S-8t
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 07:59:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itseC-0000Jf-Bg
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:48 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itscE-0006yW-Pv
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itse8-0003I1-Fv
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44937
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itscD-0002FM-Ix
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29959
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itse8-0003HN-BL
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:40 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itscD-0002F5-Ew
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609719;
+ s=mimecast20190719; t=1579609601;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HhyW5z+VaszQlDaA17fYn0il9TBlWPtFWVYu+Yolavw=;
- b=Jcx9Puv4NpxGK/nD1KcrxOM9ntHreA8Yl4666sjBdPygWHoyBOyeysz1leoonzzAlErOzR
- 1Cnrq+0I9hzWIrfN30HXdPn8kzbQoZcySfy6tw/D21RiHeDRt4EBo1mSNc+TNiYpsxyXgX
- HZug1Q2J52X7USkwhyjsfUprRG7nVpM=
+ bh=w7YfF3meRUVNH+x5xaGPlsTlJ9Oq8Lk6gorjtTbKOe8=;
+ b=QNiStnkgI7e9a+/cv02WTGLIiDLgKoPU303gawylW1Xxi6F2cnZBf9RD1WqgtK/BT4HwXc
+ +qcvtaBhKqfRuNAhHTPiGER7sHwhMndLAJZhnwnk2lspt1GXvRCeMGdxrUOe3Z1jy8QUBY
+ BmLLt13f0sRrF6bPEOVqCfWVR7EiE6A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-3ZoZusIDMs6m_meGbDmGmg-1; Tue, 21 Jan 2020 07:28:37 -0500
+ us-mta-236-oEK4bt8CNWWQ-I9udM4Tfg-1; Tue, 21 Jan 2020 07:26:39 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B7B98010C5;
- Tue, 21 Jan 2020 12:28:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE15D800A02;
+ Tue, 21 Jan 2020 12:26:38 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8C85660BE0;
- Tue, 21 Jan 2020 12:28:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0CC6160BE0;
+ Tue, 21 Jan 2020 12:26:31 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 049/109] virtiofsd: move to an empty network namespace
-Date: Tue, 21 Jan 2020 12:23:33 +0000
-Message-Id: <20200121122433.50803-50-dgilbert@redhat.com>
+Subject: [PATCH v2 026/109] virtiofsd: Add Makefile wiring for virtiofsd
+ contrib
+Date: Tue, 21 Jan 2020 12:23:10 +0000
+Message-Id: <20200121122433.50803-27-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 3ZoZusIDMs6m_meGbDmGmg-1
+X-MC-Unique: oEK4bt8CNWWQ-I9udM4Tfg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,52 +93,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-If the process is compromised there should be no network access.  Use an
-empty network namespace to sandbox networking.
+Wire up the building of the virtiofsd in tools.
 
+virtiofsd relies on Linux-specific system calls and seccomp.  Anyone
+wishing to port it to other host operating systems should do so
+carefully and without reducing security.
+
+Only allow building on Linux hosts.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ Makefile                      | 10 ++++++++++
+ Makefile.objs                 |  1 +
+ tools/virtiofsd/Makefile.objs |  9 +++++++++
+ 3 files changed, 20 insertions(+)
+ create mode 100644 tools/virtiofsd/Makefile.objs
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index e6ecf95e31..0d061de438 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1943,6 +1943,19 @@ static void print_capabilities(void)
-     printf("}\n");
- }
+diff --git a/Makefile b/Makefile
+index afa5cb6548..b4ffb0c3d9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -327,6 +327,10 @@ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
+ vhost-user-json-y +=3D contrib/vhost-user-gpu/50-qemu-gpu.json
+ endif
 =20
-+/*
-+ * Called after our UNIX domain sockets have been created, now we can move=
- to
-+ * an empty network namespace to prevent TCP/IP and other network activity=
- in
-+ * case this process is compromised.
-+ */
-+static void setup_net_namespace(void)
-+{
-+    if (unshare(CLONE_NEWNET) !=3D 0) {
-+        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNET): %m\n");
-+        exit(1);
-+    }
-+}
++ifdef CONFIG_LINUX
++HELPERS-y +=3D virtiofsd$(EXESUF)
++endif
 +
- /* This magic is based on lxc's lxc_pivot_root() */
- static void setup_pivot_root(const char *source)
- {
-@@ -2034,6 +2047,7 @@ static void setup_mount_namespace(const char *source)
-  */
- static void setup_sandbox(struct lo_data *lo)
- {
-+    setup_net_namespace();
-     setup_mount_namespace(lo->source);
- }
+ # Sphinx does not allow building manuals into the same directory as
+ # the source files, so if we're doing an in-tree QEMU build we must
+ # build the manuals into a subdirectory (and then install them from
+@@ -429,6 +433,7 @@ dummy :=3D $(call unnest-vars,, \
+                 elf2dmp-obj-y \
+                 ivshmem-client-obj-y \
+                 ivshmem-server-obj-y \
++                virtiofsd-obj-y \
+                 rdmacm-mux-obj-y \
+                 libvhost-user-obj-y \
+                 vhost-user-scsi-obj-y \
+@@ -668,6 +673,11 @@ rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+ =09$(call LINK, $^)
 =20
++ifdef CONFIG_LINUX # relies on Linux-specific syscalls
++virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
++=09$(call LINK, $^)
++endif
++
+ vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) li=
+bqemuutil.a libqemustub.a
+ =09$(call LINK, $^)
+=20
+diff --git a/Makefile.objs b/Makefile.objs
+index 7c1e50f9d6..ff396b9209 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -123,6 +123,7 @@ vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
+ rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
+ vhost-user-input-obj-y =3D contrib/vhost-user-input/
+ vhost-user-gpu-obj-y =3D contrib/vhost-user-gpu/
++virtiofsd-obj-y =3D tools/virtiofsd/
+=20
+ ######################################################################
+ trace-events-subdirs =3D
+diff --git a/tools/virtiofsd/Makefile.objs b/tools/virtiofsd/Makefile.objs
+new file mode 100644
+index 0000000000..45a807500d
+--- /dev/null
++++ b/tools/virtiofsd/Makefile.objs
+@@ -0,0 +1,9 @@
++virtiofsd-obj-y =3D buffer.o \
++                  fuse_opt.o \
++                  fuse_log.o \
++                  fuse_lowlevel.o \
++                  fuse_signals.o \
++                  fuse_virtio.o \
++                  helper.o \
++                  passthrough_ll.o
++
 --=20
 2.24.1
 
