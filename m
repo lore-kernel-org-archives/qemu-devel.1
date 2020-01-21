@@ -2,86 +2,63 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D96C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 07:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C05DC47409
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 07:39:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FACC21734
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 07:33:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAq9tny5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FACC21734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3C3824125
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 07:39:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C3824125
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ito22-00062r-Ct
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 02:33:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47599)
+	id 1ito7z-0007aB-Vk
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 02:39:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ito0v-0005Zs-D8
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:31:59 -0500
+ (envelope-from <groug@kaod.org>) id 1ito7H-00073I-AH
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:38:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ito0p-00055x-Kc
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:31:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52211
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ito7E-0000U7-Cl
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:38:27 -0500
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:48307)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ito0p-00055S-An
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:31:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579591906;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=H8fhPLulwmKAbAGZd05laaXzW81eyFGVFOMHBU6mKI0=;
- b=KAq9tny519eo9ugcSA8J7Sj08tr89u94YBWgzwxpufljG51mKkSoEnisnnk5EUZ47OpY5P
- qaauNA/oNxFja3k3d1nA8mYpncf/5MO7KIA17Yvgodoo8kbx11sLTZs3sfyWsyYPi3sPhT
- YWoLChrH4Sunn4VuoVu92tqWaL8h7vQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-VK6iPduRMCCWEBPbJY7BFw-1; Tue, 21 Jan 2020 02:31:43 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACE0910054E3
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 07:31:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E3C18BE27;
- Tue, 21 Jan 2020 07:31:32 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 07FD91138600; Tue, 21 Jan 2020 08:31:31 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 1/2] qdev: Introduce qdev_get_bus_device
-References: <20200115224025.538368-1-jusual@redhat.com>
- <20200115224025.538368-2-jusual@redhat.com>
- <b3aec4e2-ef6d-5864-e29c-578c6cb7577f@redhat.com>
-Date: Tue, 21 Jan 2020 08:31:30 +0100
-In-Reply-To: <b3aec4e2-ef6d-5864-e29c-578c6cb7577f@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 16 Jan 2020 19:13:33
- +0100")
-Message-ID: <87o8uxjmel.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ito7E-0000TA-6Z
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 02:38:24 -0500
+Received: from player771.ha.ovh.net (unknown [10.108.57.150])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id DF094129698
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 08:38:21 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player771.ha.ovh.net (Postfix) with ESMTPSA id EA1F0E84B2EA;
+ Tue, 21 Jan 2020 07:38:13 +0000 (UTC)
+Date: Tue, 21 Jan 2020 08:38:11 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
+Message-ID: <20200121083811.75112e56@bahia.lan>
+In-Reply-To: <20200121034126.GB265522@umbus.fritz.box>
+References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
+ <6fb96fed-9590-aa7c-cf00-038ab776ccb5@kaod.org>
+ <20200121034126.GB265522@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: VK6iPduRMCCWEBPbJY7BFw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/d6bj9c9m3.zFpIHu2m6GhT/";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 12280471762345499110
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudejgddutdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtsehgtderreertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.43.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,140 +70,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>,
+ qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+--Sig_/d6bj9c9m3.zFpIHu2m6GhT/
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> Hi Julia,
->
-> Cc'ing Markus for the qdev/qbus analysis.
->
-> On 1/15/20 11:40 PM, Julia Suvorova wrote:
->> For bus devices, it is useful to be able to handle the parent device.
->>
->> Signed-off-by: Julia Suvorova <jusual@redhat.com>
->> ---
->>   hw/core/qdev.c                      |  5 +++++
->>   hw/pci-bridge/pci_expander_bridge.c |  4 +++-
->>   hw/scsi/scsi-bus.c                  |  4 +++-
->>   hw/usb/bus.c                        |  4 +++-
->>   hw/usb/dev-smartcard-reader.c       | 32 +++++++++++++++++++++--------
->>   hw/virtio/virtio-pci.c              | 16 +++++++++++++--
->>   include/hw/qdev-core.h              |  2 ++
->
-> Please consider using the scripts/git.orderfile config.
->
->>   7 files changed, 54 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->> index 9f1753f5cf..ad8226e240 100644
->> --- a/hw/core/qdev.c
->> +++ b/hw/core/qdev.c
->> @@ -114,6 +114,11 @@ void qdev_set_parent_bus(DeviceState *dev, BusState=
- *bus)
->>       }
->>   }
->>   +DeviceState *qdev_get_bus_device(const DeviceState *dev)
->
-> We have qdev_get_bus_hotplug_handler(), this follow the naming, OK.
->
->> +{
->> +    return dev->parent_bus ? dev->parent_bus->parent : NULL;
->> +}
->> +
->>   /* Create a new device.  This only initializes the device state
->>      structure and allows properties to be set.  The device still needs
->>      to be realized.  See qdev-core.h.  */
->> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_exp=
-ander_bridge.c
->> index 0592818447..63a6c07406 100644
->> --- a/hw/pci-bridge/pci_expander_bridge.c
->> +++ b/hw/pci-bridge/pci_expander_bridge.c
->> @@ -125,9 +125,11 @@ static char *pxb_host_ofw_unit_address(const SysBus=
-Device *dev)
->>       assert(position >=3D 0);
->>         pxb_dev_base =3D DEVICE(pxb_dev);
->> -    main_host =3D PCI_HOST_BRIDGE(pxb_dev_base->parent_bus->parent);
->> +    main_host =3D PCI_HOST_BRIDGE(qdev_get_bus_device(pxb_dev_base));
->>       main_host_sbd =3D SYS_BUS_DEVICE(main_host);
->>   +    g_assert(main_host);
->
-> I found myself stuck reviewing this patch for 25min, I'm not sure
-> what's bugging me yet, so I'll take notes a-la-Markus-style.
->
-> We have the qdev API, with DeviceState.
->
->
-> We have the qbus API, with BusState.
->
-> A BusState is not a DeviceState but a raw Object.
+On Tue, 21 Jan 2020 14:41:26 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-It's a completely separate kind of Object.
+> On Wed, Jan 15, 2020 at 07:10:47PM +0100, C=C3=A9dric Le Goater wrote:
+> > On 1/15/20 6:48 PM, Greg Kurz wrote:
+> > > Migration can potentially race with CAS reboot. If the migration thre=
+ad
+> > > completes migration after CAS has set spapr->cas_reboot but before the
+> > > mainloop could pick up the reset request and reset the machine, the
+> > > guest is migrated unrebooted and the destination doesn't reboot it
+> > > either because it isn't aware a CAS reboot was needed (eg, because a
+> > > device was added before CAS). This likely result in a broken or hung
+> > > guest.
+> > >=20
+> > > Even if it is small, the window between CAS and CAS reboot is enough =
+to
+> > > re-qualify spapr->cas_reboot as state that we should migrate. Add a n=
+ew
+> > > subsection for that and always send it when a CAS reboot is pending.
+> > > This may cause migration to older QEMUs to fail but it is still better
+> > > than end up with a broken guest.
+> > >=20
+> > > The destination cannot honour the CAS reboot request from a post load
+> > > handler because this must be done after the guest is fully restored.
+> > > It is thus done from a VM change state handler.
+> > >=20
+> > > Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> >=20
+> > C=C3=A9dric Le Goater <clg@kaod.org>
+> >=20
+> > Nice work ! That was quite complex to catch !
+>=20
+> It is a very nice analysis.  However, I'm disinclined to merge this
+> for the time being.
+>=20
+> My preferred approach would be to just eliminate CAS reboots
+> altogether, since that has other benefits.  I'm feeling like this
+> isn't super-urgent, since CAS reboots are extremely rare in practice,
+> now that we've eliminated the one for the irq switchover.
+>=20
 
-> It keeps a pointer to the a DeviceState parent, a HotplugHandler, and
-> a list of BusChild.
->
->
-> BusChild are neither DeviceState nor Object, but keep a pointer the a
-> DeviceState.
+Yeah. The only _true_ need for CAS rebooting now seems to be hotplug
+before CAS, which is likely not something frequent.
 
-It's a thin wrapper around DeviceState to support collecting the
-DeviceState into a list.
+> However, if it's not looking like we'll be ready to do that as the
+> qemu-5.0 release approaches, then I'll be more than willing to
+> reconsider this.
+>=20
 
-> TYPE_HOTPLUG_HANDLER is an interface. It can be implemented by any
-> object, but its API seems expects a DeviceState as argument.
+I hope we can drop CAS reboot in time.
 
-What do you mean by "interface expects an argument"?
+--Sig_/d6bj9c9m3.zFpIHu2m6GhT/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-The interface methods all take a HotplugHandler * and a DeviceState *.
-The latter is the device being plugged / unplugged, the former is its
-hotplug handler.  In the generic case, @dev's hotplug handler is
-qdev_get_hotplug_handler(dev).
+-----BEGIN PGP SIGNATURE-----
 
-> Looking at examples implementing TYPE_HOTPLUG_HANDLER:
->
-> - TYPE_USB_BUS. It inherits TYPE_BUS. Handlers will be called with
-> USBDevice as argument (TYPE_USB_DEVICE -> TYPE_DEVICE).
->
-> - TYPE_PCI_BRIDGE_DEV. Inherits TYPE_PCI_BRIDGE -> TYPE_PCI_DEVICE ->=20
-> TYPE_DEVICE. Handlers expects PCIDevice (TYPE_PCI_DEVICE).
->
-> - TYPE_PC_MACHINE. It inherits TYPE_X86_MACHINE -> TYPE_MACHINE ->=20
-> TYPE_OBJECT. Not a TYPE_BUS. Handlers for TYPE_PC_DIMM, TYPE_CPU and
-> TYPE_VIRTIO_PMEM_PCI. Complex... TYPE_PC_DIMM/TYPE_CPU are
-> TYPE_DEVICE.
-> For TYPE_VIRTIO_PMEM_PCI we have VirtIOPMEMPCI -> VirtIOPCIProxy ->=20
-> PCIDevice.
->
-> - USB_CCID_DEV. Inherits TYPE_USB_DEVICE -> TYPE_DEVICE. Only one
-> 'unplug' handler which likely expects USBCCIDState.
->
-> - TYPE_SCSI_BUS. Inherits TYPE_BUS. Also a single 'unplug' handler
-> expecting SCSIDevice.
->
-> - TYPE_VIRTIO_SCSI. Inherits TYPE_VIRTIO_SCSI_COMMON ->=20
-> TYPE_VIRTIO_DEVICE -> TYPE_DEVICE. Handlers expect VirtIOSCSI.
->
->
-> No simple pattern so far.
->
->
-> Looking back at qbus. qbus_initfn() enforces a TYPE_HOTPLUG_HANDLER
-> property on BusState (which is not a DeviceState). So IIUC TYPE_BUS
-> also implements TYPE_HOTPLUG_HANDLER.
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl4mqmMACgkQcdTV5YIv
+c9ZXPA//Vtypgf9BtbRF1opMUSFMPVWK1WIyv3fPrLVCtyF7B7vEO6366nlB57Mh
+SkBAOHC7LcqZ4RCbrvtsu2c3Q68ngiH9wA+zfKe88+SVM7husOY9sIbYADEgi7N4
+tW8/7tz3v9MIDWipzCpV8ul+Nu10mpo5FW8vW6WX2LSNJRQUiKfJHGgM9mnlVmmb
+FKIgKkE6R1Smu/nv2vB4ZlwUvqsqRcjBtXYqIFetGbK9mApa2YuUCDQBWZuYhrpe
+X6ZdW4ymPuZkDtkyk8qFagZnrIB7VBf2Fq22CRUej4BCbhBXztDR05wK0PMoNS9h
+QLdmGAq/3bSdduXQRThkhGvFr3fGLztiARJyX0UzdmX3F/TydAwqE6x+xctY20lB
+HVOkefw4msFqQNK4wR9xMg7zeCB63rLAsuBfgb3EfuwvQHNEwXvBX6YJxeyNEfs0
+FHptbCIdMdMM6Ln84IRaziwDorXp3e8ge9NQTEGNeEQ30BW4wGuwUDnFf9/MwbMP
+NrHGhPJhuh23Vshp0Dlru7Q9AubAiRd+cI9KZ+0iBnpReE+6JnFVIo3YGHlAJ9qJ
+HuReyQmy6TwIf8BWypvNON5dvCzqkqJIPaE61qLsWK6Mkp1LO4WWabokHaTHbmEr
+GNtJoWhluN9e8hcDdVymVJ09s5cgvCskfCnqSse7KP1fRgz2Ves=
+=8GCg
+-----END PGP SIGNATURE-----
 
-I think this merely creates a reference to the concrete bus's hotplug
-handler.  TYPE_BUS is abstract, and doesn't implement any interfaces
-(its .interfaces is empty).
-
-Anything else you'd like me to check for you?
-
-[...]
-
+--Sig_/d6bj9c9m3.zFpIHu2m6GhT/--
 
