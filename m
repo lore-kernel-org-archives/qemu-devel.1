@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E208C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A827C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:17:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18B3821569
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D78C621569
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:17:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOICBrnt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B3821569
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jVkm74vk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D78C621569
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittOm-0000VH-5y
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:16:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52013)
+	id 1ittPc-0001L0-7D
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:17:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51533)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itseg-0000jB-Tb
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:29:19 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itscw-0007UU-9a
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:27:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsed-0003Vd-5z
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:29:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41168
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itscu-0002k5-M1
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:27:26 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55564
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsed-0003VJ-2K
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:29:11 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsct-0002jO-Rw
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:27:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609750;
+ s=mimecast20190719; t=1579609643;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pnaCpbATK9Pk464FLy+TmsRjWFNXizehNMyAKFhJqUU=;
- b=XOICBrntJ1aAaaJ7B0EjkLs8KIwARjxn5imJkG0L9+uGbYx/b4OzC4cD5ulurb/NKBlXmS
- PVNKBBefqncxAHeUH+79awjYquNpObyikCs+vKi407wYkmttbMeSOcH+pzzDjY4mAeIKVF
- WJMZiFdtm6pok3nU9omISLzxFXoW61E=
+ bh=pEkkZ7XH2L3BLblUGK/p2Uzth+/Msrj8Lpi/38xr4y4=;
+ b=jVkm74vkgaTWIMLjSjzCODSlB5WiHzfEf/FocclM9vleSJHN/+//YmkGEQxP3HdfB8xo3H
+ 510KpZPcSdY6+08iTocCiSU/xp8HLCfqPXNxslyimgf1sdwcolj78yHd1Da3bYqeTvv7Qw
+ 78S1ZZO5yIOXnSurHbKQtqOpIBZb6SQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-r_ZubbLXMuWcRZN5Wfe09g-1; Tue, 21 Jan 2020 07:29:09 -0500
+ us-mta-226-NMf8nvETOpilnpe7e270kw-1; Tue, 21 Jan 2020 07:27:19 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17C84100550E;
- Tue, 21 Jan 2020 12:29:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15BDB190D340;
+ Tue, 21 Jan 2020 12:27:18 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 23ECD60BE0;
- Tue, 21 Jan 2020 12:29:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C8B2560BE0;
+ Tue, 21 Jan 2020 12:27:13 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 057/109] docs:  Add docs/tools
-Date: Tue, 21 Jan 2020 12:23:41 +0000
-Message-Id: <20200121122433.50803-58-dgilbert@redhat.com>
+Subject: [PATCH v2 036/109] virtiofsd: passthrough_ll: add dirp_map to hide
+ lo_dirp pointers
+Date: Tue, 21 Jan 2020 12:23:20 +0000
+Message-Id: <20200121122433.50803-37-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: r_ZubbLXMuWcRZN5Wfe09g-1
+X-MC-Unique: NMf8nvETOpilnpe7e270kw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,108 +93,226 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Create docs/tools based on docs/dev based on docs/devel.
+Do not expose lo_dirp pointers to clients.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- Makefile             |  9 ++++++++-
- docs/index.rst       |  1 +
- docs/tools/conf.py   | 16 ++++++++++++++++
- docs/tools/index.rst | 12 ++++++++++++
- 4 files changed, 37 insertions(+), 1 deletion(-)
- create mode 100644 docs/tools/conf.py
- create mode 100644 docs/tools/index.rst
+ tools/virtiofsd/passthrough_ll.c | 103 +++++++++++++++++++++++--------
+ 1 file changed, 76 insertions(+), 27 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 18f52d6270..2375a1f81c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -822,6 +822,7 @@ endef
- install-sphinxdocs: sphinxdocs
- =09$(call install-manual,interop)
- =09$(call install-manual,specs)
-+=09$(call install-manual,tools)
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 6896875465..927473d74a 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -55,27 +55,10 @@
 =20
- install-doc: $(DOCS) install-sphinxdocs
- =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
-@@ -1009,7 +1010,10 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.m=
-ak
- # and handles "don't rebuild things unless necessary" itself.
- # The '.doctrees' files are cached information to speed this up.
- .PHONY: sphinxdocs
--sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/interop=
-/index.html $(MANUAL_BUILDDIR)/specs/index.html
-+sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
-+            $(MANUAL_BUILDDIR)/interop/index.html \
-+            $(MANUAL_BUILDDIR)/specs/index.html \
-+            $(MANUAL_BUILDDIR)/tools/index.html
+ #include "passthrough_helpers.h"
 =20
- # Canned command to build a single manual
- # Arguments: $1 =3D manual name, $2 =3D Sphinx builder ('html' or 'man')
-@@ -1029,6 +1033,9 @@ $(MANUAL_BUILDDIR)/interop/index.html: $(call manual-=
-deps,interop)
- $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
- =09$(call build-manual,specs,html)
+-/*
+- * We are re-using pointers to our `struct lo_inode`
+- * elements as inodes. This means that we must be able to
+- * store uintptr_t values in a fuse_ino_t variable. The following
+- * incantation checks this condition at compile time.
+- */
+-#if defined(__GNUC__) &&                                      \
+-    (__GNUC__ > 4 || __GNUC__ =3D=3D 4 && __GNUC_MINOR__ >=3D 6) && \
+-    !defined __cplusplus
+-_Static_assert(sizeof(fuse_ino_t) >=3D sizeof(uintptr_t),
+-               "fuse_ino_t too small to hold uintptr_t values!");
+-#else
+-struct _uintptr_to_must_hold_fuse_ino_t_dummy_struct {
+-    unsigned _uintptr_to_must_hold_fuse_ino_t
+-        : ((sizeof(fuse_ino_t) >=3D sizeof(uintptr_t)) ? 1 : -1);
+-};
+-#endif
+-
+ struct lo_map_elem {
+     union {
+         struct lo_inode *inode;
++        struct lo_dirp *dirp;
+         ssize_t freelist;
+     };
+     bool in_use;
+@@ -122,6 +105,7 @@ struct lo_data {
+     int timeout_set;
+     struct lo_inode root; /* protected by lo->mutex */
+     struct lo_map ino_map; /* protected by lo->mutex */
++    struct lo_map dirp_map; /* protected by lo->mutex */
+ };
 =20
-+$(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools)
-+=09$(call build-manual,tools,html)
-+
- $(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
- =09$(call build-manual,interop,man)
+ static const struct fuse_opt lo_opts[] =3D {
+@@ -251,6 +235,20 @@ static void lo_map_remove(struct lo_map *map, size_t k=
+ey)
+     map->freelist =3D key;
+ }
 =20
-diff --git a/docs/index.rst b/docs/index.rst
-index baa5791c17..f15ca17bf4 100644
---- a/docs/index.rst
-+++ b/docs/index.rst
-@@ -13,4 +13,5 @@ Welcome to QEMU's documentation!
-    interop/index
-    devel/index
-    specs/index
-+   tools/index
++/* Assumes lo->mutex is held */
++static ssize_t lo_add_dirp_mapping(fuse_req_t req, struct lo_dirp *dirp)
++{
++    struct lo_map_elem *elem;
++
++    elem =3D lo_map_alloc_elem(&lo_data(req)->dirp_map);
++    if (!elem) {
++        return -1;
++    }
++
++    elem->dirp =3D dirp;
++    return elem - lo_data(req)->dirp_map.elems;
++}
++
+ /* Assumes lo->mutex is held */
+ static ssize_t lo_add_inode_mapping(fuse_req_t req, struct lo_inode *inode=
+)
+ {
+@@ -860,9 +858,19 @@ struct lo_dirp {
+     off_t offset;
+ };
 =20
-diff --git a/docs/tools/conf.py b/docs/tools/conf.py
-new file mode 100644
-index 0000000000..f9f76ff597
---- /dev/null
-+++ b/docs/tools/conf.py
-@@ -0,0 +1,16 @@
-+# -*- coding: utf-8 -*-
-+#
-+# QEMU documentation build configuration file for the 'tools' manual.
-+#
-+# This includes the top level conf file and then makes any necessary tweak=
-s.
-+import sys
-+import os
+-static struct lo_dirp *lo_dirp(struct fuse_file_info *fi)
++static struct lo_dirp *lo_dirp(fuse_req_t req, struct fuse_file_info *fi)
+ {
+-    return (struct lo_dirp *)(uintptr_t)fi->fh;
++    struct lo_data *lo =3D lo_data(req);
++    struct lo_map_elem *elem;
 +
-+qemu_docdir =3D os.path.abspath("..")
-+parent_config =3D os.path.join(qemu_docdir, "conf.py")
-+exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
++    pthread_mutex_lock(&lo->mutex);
++    elem =3D lo_map_get(&lo->dirp_map, fi->fh);
++    pthread_mutex_unlock(&lo->mutex);
++    if (!elem) {
++        return NULL;
++    }
 +
-+# This slightly misuses the 'description', but is the best way to get
-+# the manual title to appear in the sidebar.
-+html_theme_options['description'] =3D u'Tools'
++    return elem->dirp;
+ }
+=20
+ static void lo_opendir(fuse_req_t req, fuse_ino_t ino,
+@@ -872,6 +880,7 @@ static void lo_opendir(fuse_req_t req, fuse_ino_t ino,
+     struct lo_data *lo =3D lo_data(req);
+     struct lo_dirp *d;
+     int fd;
++    ssize_t fh;
+=20
+     d =3D calloc(1, sizeof(struct lo_dirp));
+     if (d =3D=3D NULL) {
+@@ -891,7 +900,14 @@ static void lo_opendir(fuse_req_t req, fuse_ino_t ino,
+     d->offset =3D 0;
+     d->entry =3D NULL;
+=20
+-    fi->fh =3D (uintptr_t)d;
++    pthread_mutex_lock(&lo->mutex);
++    fh =3D lo_add_dirp_mapping(req, d);
++    pthread_mutex_unlock(&lo->mutex);
++    if (fh =3D=3D -1) {
++        goto out_err;
++    }
 +
-diff --git a/docs/tools/index.rst b/docs/tools/index.rst
-new file mode 100644
-index 0000000000..adbcd3bc72
---- /dev/null
-+++ b/docs/tools/index.rst
-@@ -0,0 +1,12 @@
-+.. This is the top level page for the 'tools' manual.
++    fi->fh =3D fh;
+     if (lo->cache =3D=3D CACHE_ALWAYS) {
+         fi->keep_cache =3D 1;
+     }
+@@ -902,6 +918,9 @@ out_errno:
+     error =3D errno;
+ out_err:
+     if (d) {
++        if (d->dp) {
++            closedir(d->dp);
++        }
+         if (fd !=3D -1) {
+             close(fd);
+         }
+@@ -919,17 +938,21 @@ static int is_dot_or_dotdot(const char *name)
+ static void lo_do_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
+                           off_t offset, struct fuse_file_info *fi, int plu=
+s)
+ {
+-    struct lo_dirp *d =3D lo_dirp(fi);
+-    char *buf;
++    struct lo_dirp *d;
++    char *buf =3D NULL;
+     char *p;
+     size_t rem =3D size;
+-    int err;
++    int err =3D ENOMEM;
+=20
+     (void)ino;
+=20
++    d =3D lo_dirp(req, fi);
++    if (!d) {
++        goto error;
++    }
 +
+     buf =3D calloc(1, size);
+     if (!buf) {
+-        err =3D ENOMEM;
+         goto error;
+     }
+     p =3D buf;
+@@ -1027,8 +1050,21 @@ static void lo_readdirplus(fuse_req_t req, fuse_ino_=
+t ino, size_t size,
+ static void lo_releasedir(fuse_req_t req, fuse_ino_t ino,
+                           struct fuse_file_info *fi)
+ {
+-    struct lo_dirp *d =3D lo_dirp(fi);
++    struct lo_data *lo =3D lo_data(req);
++    struct lo_dirp *d;
 +
-+QEMU tools
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+     (void)ino;
 +
-+This manual documents various tools included with QEMU.
++    d =3D lo_dirp(req, fi);
++    if (!d) {
++        fuse_reply_err(req, EBADF);
++        return;
++    }
 +
-+Contents:
++    pthread_mutex_lock(&lo->mutex);
++    lo_map_remove(&lo->dirp_map, fi->fh);
++    pthread_mutex_unlock(&lo->mutex);
 +
-+.. toctree::
-+   :maxdepth: 2
+     closedir(d->dp);
+     free(d);
+     fuse_reply_err(req, 0);
+@@ -1080,8 +1116,18 @@ static void lo_fsyncdir(fuse_req_t req, fuse_ino_t i=
+no, int datasync,
+                         struct fuse_file_info *fi)
+ {
+     int res;
+-    int fd =3D dirfd(lo_dirp(fi)->dp);
++    struct lo_dirp *d;
++    int fd;
++
+     (void)ino;
++
++    d =3D lo_dirp(req, fi);
++    if (!d) {
++        fuse_reply_err(req, EBADF);
++        return;
++    }
++
++    fd =3D dirfd(d->dp);
+     if (datasync) {
+         res =3D fdatasync(fd);
+     } else {
+@@ -1613,6 +1659,8 @@ int main(int argc, char *argv[])
+     root_elem =3D lo_map_reserve(&lo.ino_map, lo.root.fuse_ino);
+     root_elem->inode =3D &lo.root;
+=20
++    lo_map_init(&lo.dirp_map);
++
+     if (fuse_parse_cmdline(&args, &opts) !=3D 0) {
+         return 1;
+     }
+@@ -1709,6 +1757,7 @@ err_out2:
+ err_out1:
+     fuse_opt_free_args(&args);
+=20
++    lo_map_destroy(&lo.dirp_map);
+     lo_map_destroy(&lo.ino_map);
+=20
+     if (lo.root.fd >=3D 0) {
 --=20
 2.24.1
 
