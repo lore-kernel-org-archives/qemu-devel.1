@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D62C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E198CC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B698C2064C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC1D12064C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 12:49:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZIAQ4FSH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B698C2064C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AquusQuu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC1D12064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itsvW-0001r6-01
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 07:46:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51215)
+	id 1itsyO-0004Vm-Jm
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 07:49:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsbj-0006IF-Hw
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:15 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsbr-0006UK-DJ
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsbe-00023D-Rq
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:11 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48357
+ (envelope-from <dgilbert@redhat.com>) id 1itsbn-000257-GS
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:19 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23600
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsbe-000234-ON
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:06 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsbn-000251-C2
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609566;
+ s=mimecast20190719; t=1579609574;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AQltFcREjY9lT4b/x+npGaKIspnP1AyKwA0zFEDhKpc=;
- b=ZIAQ4FSHVkz94Zf35FszkV34iWfXbsv/NYGntoY0jZ7YmbJtde8mlJwKkj7rRA/s0dfqLU
- 2SQ8bDNKvgzg+TodGxQg/UVRzJI34JEGPpm85myv5Wh25V+Sz6XaRIio+PCpYOzYxxzcIm
- zjmYWhPqGH0TYicTVbDYA7NR9ZbsOe4=
+ bh=n9QRGQwrD9MXJeuaF8Houp/eHbV/AEFGeYGplMHhTYM=;
+ b=AquusQuuw4WHYF/FNzbNkCh6OPgbA790n6WPFeVbWg/PMTGJoBGvoXa7+gD7sduDBv8zW+
+ Gv8NSjL2VMoSDxwTPBaPts32E9/W724rxcvfa9NMRCrqoMMLbtnemy9QpiU8Ryc3qtBctE
+ l4O5ig6Y2upHpEN38j7neSOchVt7vdo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-bcQ92fplMtOvJ5mz9sgq8g-1; Tue, 21 Jan 2020 07:26:02 -0500
+ us-mta-416-Z7DKl93QP2OP8WN8sihX-w-1; Tue, 21 Jan 2020 07:26:13 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04341800D5B;
- Tue, 21 Jan 2020 12:26:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 880281800D78;
+ Tue, 21 Jan 2020 12:26:12 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 92CDD60BE0;
- Tue, 21 Jan 2020 12:25:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7898F60BE0;
+ Tue, 21 Jan 2020 12:26:10 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 018/109] virtiofsd: Start wiring up vhost-user
-Date: Tue, 21 Jan 2020 12:23:02 +0000
-Message-Id: <20200121122433.50803-19-dgilbert@redhat.com>
+Subject: [PATCH v2 021/109] virtiofsd: Start queue threads
+Date: Tue, 21 Jan 2020 12:23:05 +0000
+Message-Id: <20200121122433.50803-22-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: bcQ92fplMtOvJ5mz9sgq8g-1
+X-MC-Unique: Z7DKl93QP2OP8WN8sihX-w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,238 +94,152 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Listen on our unix socket for the connection from QEMU, when we get it
-initialise vhost-user and dive into our own loop variant (currently
-dummy).
+Start a thread for each queue when we get notified it's been started.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+fix by:
+Signed-off-by: Jun Piao <piaojun@huawei.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tools/virtiofsd/fuse_i.h         |  4 ++
- tools/virtiofsd/fuse_lowlevel.c  |  5 ++
- tools/virtiofsd/fuse_lowlevel.h  |  7 +++
- tools/virtiofsd/fuse_virtio.c    | 87 +++++++++++++++++++++++++++++++-
- tools/virtiofsd/fuse_virtio.h    |  2 +
- tools/virtiofsd/passthrough_ll.c |  7 +--
- 6 files changed, 106 insertions(+), 6 deletions(-)
+ tools/virtiofsd/fuse_virtio.c | 89 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 89 insertions(+)
 
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index 82d6ac7115..ec04449069 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -13,6 +13,8 @@
- #include "fuse.h"
- #include "fuse_lowlevel.h"
-=20
-+struct fv_VuDev;
-+
- struct fuse_req {
-     struct fuse_session *se;
-     uint64_t unique;
-@@ -65,6 +67,8 @@ struct fuse_session {
-     size_t bufsize;
-     int error;
-     char *vu_socket_path;
-+    int   vu_socketfd;
-+    struct fv_VuDev *virtio_dev;
- };
-=20
- struct fuse_chan {
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index f8b22ce346..9b64cc1531 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -2260,6 +2260,11 @@ void fuse_session_unmount(struct fuse_session *se)
- {
- }
-=20
-+int fuse_lowlevel_is_virtio(struct fuse_session *se)
-+{
-+    return se->vu_socket_path !=3D NULL;
-+}
-+
- #ifdef linux
- int fuse_req_getgroups(fuse_req_t req, int size, gid_t list[])
- {
-diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowleve=
-l.h
-index 3509790368..46c97edbe2 100644
---- a/tools/virtiofsd/fuse_lowlevel.h
-+++ b/tools/virtiofsd/fuse_lowlevel.h
-@@ -1786,6 +1786,13 @@ void fuse_req_interrupt_func(fuse_req_t req, fuse_in=
-terrupt_func_t func,
-  */
- int fuse_req_interrupted(fuse_req_t req);
-=20
-+/**
-+ * Check if the session is connected via virtio
-+ *
-+ * @param se session object
-+ * @return 1 if the session is a virtio session
-+ */
-+int fuse_lowlevel_is_virtio(struct fuse_session *se);
-=20
- /*
-  * Inquiry functions
 diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index cbef6ffdda..2ae3c764dd 100644
+index 4819e56568..2a94bb3cca 100644
 --- a/tools/virtiofsd/fuse_virtio.c
 +++ b/tools/virtiofsd/fuse_virtio.c
-@@ -19,18 +19,78 @@
-=20
- #include <stdint.h>
- #include <stdio.h>
-+#include <stdlib.h>
- #include <string.h>
- #include <sys/socket.h>
- #include <sys/types.h>
- #include <sys/un.h>
- #include <unistd.h>
-=20
-+#include "contrib/libvhost-user/libvhost-user.h"
-+
-+/*
-+ * We pass the dev element into libvhost-user
-+ * and then use it to get back to the outer
-+ * container for other data.
-+ */
-+struct fv_VuDev {
-+    VuDev dev;
-+    struct fuse_session *se;
-+};
-+
- /* From spec */
- struct virtio_fs_config {
-     char tag[36];
-     uint32_t num_queues;
- };
-=20
-+/*
-+ * Callback from libvhost-user if there's a new fd we're supposed to liste=
-n
-+ * to, typically a queue kick?
-+ */
-+static void fv_set_watch(VuDev *dev, int fd, int condition, vu_watch_cb cb=
-,
-+                         void *data)
-+{
-+    fuse_log(FUSE_LOG_WARNING, "%s: TODO! fd=3D%d\n", __func__, fd);
-+}
-+
-+/*
-+ * Callback from libvhost-user if we're no longer supposed to listen on an=
- fd
-+ */
-+static void fv_remove_watch(VuDev *dev, int fd)
-+{
-+    fuse_log(FUSE_LOG_WARNING, "%s: TODO! fd=3D%d\n", __func__, fd);
-+}
-+
-+/* Callback from libvhost-user to panic */
-+static void fv_panic(VuDev *dev, const char *err)
-+{
-+    fuse_log(FUSE_LOG_ERR, "%s: libvhost-user: %s\n", __func__, err);
-+    /* TODO: Allow reconnects?? */
-+    exit(EXIT_FAILURE);
-+}
-+
-+static bool fv_queue_order(VuDev *dev, int qidx)
-+{
-+    return false;
-+}
-+
-+static const VuDevIface fv_iface =3D {
-+    /* TODO: Add other callbacks */
-+    .queue_is_processed_in_order =3D fv_queue_order,
-+};
-+
-+int virtio_loop(struct fuse_session *se)
-+{
-+    fuse_log(FUSE_LOG_INFO, "%s: Entry\n", __func__);
-+
-+    while (1) {
-+        /* TODO: Add stuffing */
-+    }
-+
-+    fuse_log(FUSE_LOG_INFO, "%s: Exit\n", __func__);
-+}
-+
- int virtio_session_mount(struct fuse_session *se)
- {
-     struct sockaddr_un un;
-@@ -75,5 +135,30 @@ int virtio_session_mount(struct fuse_session *se)
-         return -1;
-     }
-=20
--    return -1;
-+    fuse_log(FUSE_LOG_INFO, "%s: Waiting for vhost-user socket connection.=
-..\n",
-+             __func__);
-+    int data_sock =3D accept(listen_sock, NULL, NULL);
-+    if (data_sock =3D=3D -1) {
-+        fuse_log(FUSE_LOG_ERR, "vhost socket accept: %m\n");
-+        close(listen_sock);
-+        return -1;
-+    }
-+    close(listen_sock);
-+    fuse_log(FUSE_LOG_INFO, "%s: Received vhost-user socket connection\n",
-+             __func__);
-+
-+    /* TODO: Some cleanup/deallocation! */
-+    se->virtio_dev =3D calloc(sizeof(struct fv_VuDev), 1);
-+    if (!se->virtio_dev) {
-+        fuse_log(FUSE_LOG_ERR, "%s: virtio_dev calloc failed\n", __func__)=
-;
-+        close(data_sock);
-+        return -1;
-+    }
-+
-+    se->vu_socketfd =3D data_sock;
-+    se->virtio_dev->se =3D se;
-+    vu_init(&se->virtio_dev->dev, 2, se->vu_socketfd, fv_panic, fv_set_wat=
-ch,
-+            fv_remove_watch, &fv_iface);
-+
-+    return 0;
- }
-diff --git a/tools/virtiofsd/fuse_virtio.h b/tools/virtiofsd/fuse_virtio.h
-index 8f2edb69ca..23026d6e4c 100644
---- a/tools/virtiofsd/fuse_virtio.h
-+++ b/tools/virtiofsd/fuse_virtio.h
-@@ -20,4 +20,6 @@ struct fuse_session;
-=20
- int virtio_session_mount(struct fuse_session *se);
-=20
-+int virtio_loop(struct fuse_session *se);
-+
- #endif
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index ea7c2d96bb..fcb588f370 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -35,6 +35,7 @@
-  * \include passthrough_ll.c
+@@ -11,6 +11,7 @@
+  * See the file COPYING.LIB
   */
 =20
-+#include "fuse_virtio.h"
- #include "fuse_lowlevel.h"
- #include <assert.h>
- #include <dirent.h>
-@@ -1394,11 +1395,7 @@ int main(int argc, char *argv[])
-     fuse_daemonize(opts.foreground);
++#include "qemu/osdep.h"
+ #include "fuse_virtio.h"
+ #include "fuse_i.h"
+ #include "standard-headers/linux/fuse.h"
+@@ -30,6 +31,15 @@
 =20
-     /* Block until ctrl+c or fusermount -u */
--    if (opts.singlethread) {
--        ret =3D fuse_session_loop(se);
--    } else {
--        ret =3D fuse_session_loop_mt(se, opts.clone_fd);
--    }
-+    ret =3D virtio_loop(se);
+ #include "contrib/libvhost-user/libvhost-user.h"
 =20
-     fuse_session_unmount(se);
- err_out3:
++struct fv_QueueInfo {
++    pthread_t thread;
++    struct fv_VuDev *virtio_dev;
++
++    /* Our queue index, corresponds to array position */
++    int qidx;
++    int kick_fd;
++};
++
+ /*
+  * We pass the dev element into libvhost-user
+  * and then use it to get back to the outer
+@@ -38,6 +48,13 @@
+ struct fv_VuDev {
+     VuDev dev;
+     struct fuse_session *se;
++
++    /*
++     * The following pair of fields are only accessed in the main
++     * virtio_loop
++     */
++    size_t nqueues;
++    struct fv_QueueInfo **qi;
+ };
+=20
+ /* From spec */
+@@ -83,6 +100,75 @@ static void fv_panic(VuDev *dev, const char *err)
+     exit(EXIT_FAILURE);
+ }
+=20
++static void *fv_queue_thread(void *opaque)
++{
++    struct fv_QueueInfo *qi =3D opaque;
++    fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __func_=
+_,
++             qi->qidx, qi->kick_fd);
++    while (1) {
++        /* TODO */
++    }
++
++    return NULL;
++}
++
++/* Callback from libvhost-user on start or stop of a queue */
++static void fv_queue_set_started(VuDev *dev, int qidx, bool started)
++{
++    struct fv_VuDev *vud =3D container_of(dev, struct fv_VuDev, dev);
++    struct fv_QueueInfo *ourqi;
++
++    fuse_log(FUSE_LOG_INFO, "%s: qidx=3D%d started=3D%d\n", __func__, qidx=
+,
++             started);
++    assert(qidx >=3D 0);
++
++    /*
++     * Ignore additional request queues for now.  passthrough_ll.c must be
++     * audited for thread-safety issues first.  It was written with a
++     * well-behaved client in mind and may not protect against all types o=
+f
++     * races yet.
++     */
++    if (qidx > 1) {
++        fuse_log(FUSE_LOG_ERR,
++                 "%s: multiple request queues not yet implemented, please =
+only "
++                 "configure 1 request queue\n",
++                 __func__);
++        exit(EXIT_FAILURE);
++    }
++
++    if (started) {
++        /* Fire up a thread to watch this queue */
++        if (qidx >=3D vud->nqueues) {
++            vud->qi =3D realloc(vud->qi, (qidx + 1) * sizeof(vud->qi[0]));
++            assert(vud->qi);
++            memset(vud->qi + vud->nqueues, 0,
++                   sizeof(vud->qi[0]) * (1 + (qidx - vud->nqueues)));
++            vud->nqueues =3D qidx + 1;
++        }
++        if (!vud->qi[qidx]) {
++            vud->qi[qidx] =3D calloc(sizeof(struct fv_QueueInfo), 1);
++            assert(vud->qi[qidx]);
++            vud->qi[qidx]->virtio_dev =3D vud;
++            vud->qi[qidx]->qidx =3D qidx;
++        } else {
++            /* Shouldn't have been started */
++            assert(vud->qi[qidx]->kick_fd =3D=3D -1);
++        }
++        ourqi =3D vud->qi[qidx];
++        ourqi->kick_fd =3D dev->vq[qidx].kick_fd;
++        if (pthread_create(&ourqi->thread, NULL, fv_queue_thread, ourqi)) =
+{
++            fuse_log(FUSE_LOG_ERR, "%s: Failed to create thread for queue =
+%d\n",
++                     __func__, qidx);
++            assert(0);
++        }
++    } else {
++        /* TODO: Kill the thread */
++        assert(qidx < vud->nqueues);
++        ourqi =3D vud->qi[qidx];
++        ourqi->kick_fd =3D -1;
++    }
++}
++
+ static bool fv_queue_order(VuDev *dev, int qidx)
+ {
+     return false;
+@@ -92,6 +178,9 @@ static const VuDevIface fv_iface =3D {
+     .get_features =3D fv_get_features,
+     .set_features =3D fv_set_features,
+=20
++    /* Don't need process message, we've not got any at vhost-user level *=
+/
++    .queue_set_started =3D fv_queue_set_started,
++
+     .queue_is_processed_in_order =3D fv_queue_order,
+ };
+=20
 --=20
 2.24.1
 
