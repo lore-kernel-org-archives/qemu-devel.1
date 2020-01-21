@@ -2,80 +2,104 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AB8C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7857C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:51:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7356322522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:49:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DEA822522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 10:51:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5EiV/2a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7356322522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i2Wlt6cO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DEA822522
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itr5l-00060r-LM
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 05:49:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37653)
+	id 1itr7m-0007yh-D2
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 05:51:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1itr4y-0005Ug-Cm
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 05:48:17 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1itr6P-0006Vo-Cd
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 05:49:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1itr4w-0008CG-9k
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 05:48:16 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40966)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1itr4w-0008Bx-2b
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 05:48:14 -0500
-Received: by mail-lj1-x241.google.com with SMTP id h23so2223105ljc.8
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 02:48:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lMK1nIIc9wgbENUnqtEmN31Kd3XFiwVAAC0pNc62PnE=;
- b=e5EiV/2afZIaFggbEeaaG3XaCw44/2xrZRhjopVqVbR9CgS27nd56j6DcQY5xgt5F2
- sJ2bnUrtrxVVpnioGPgoG0R4lI/mnU5Q4SYU0p+w20ZAfdnndnB08FaDHgH1+lALLQB2
- tzvIHNB5/pMwDwM/FPGkedz2T+qrGw9IH5mpabcgfLxVDO6DwSJrs8IQm8UL036knz8R
- LjC2Ms8r4c3GhUDHW8I39F3KReFsaQEFvQU3igseuEzXxh3vdBZFYiGv5COQGFwv4Koo
- 3bmgWVph0hHPxA1jfK4P38/tCu52YONNiORNWD9O/YGt48PB+OkkhmA0Gcnh0+iyz5I+
- jP0Q==
+ (envelope-from <pbonzini@redhat.com>) id 1itr6O-0000uE-3K
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 05:49:45 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27367
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1itr6N-0000tv-Vm
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 05:49:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579603783;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FSa46ZYyGmie/bVkHIG0X5JHtwyUvx9RKZ7BbDRX9ZM=;
+ b=i2Wlt6cOqD0vEJgwsAkUf8YuRZMz/AJu201qi38dmcGhPHhLxhX9S3xbiTT6zuRNsVD1QY
+ FYPmvdNL1FLcMXNixPN/ZXEhqd3y4ODyVhEtVVMiJ/bWd5M5oFUkPL+XCuEfb7beP4GLsf
+ YxTaVkPcL2TXUYy40pNxaQ8mM139+xg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-fsE5l_Q0NCSJJ-ZPn9pzXQ-1; Tue, 21 Jan 2020 05:49:38 -0500
+Received: by mail-wr1-f69.google.com with SMTP id w6so1126118wrm.16
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 02:49:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lMK1nIIc9wgbENUnqtEmN31Kd3XFiwVAAC0pNc62PnE=;
- b=Tlrvz9CtjsGqd5kBLDK+ehggkUTBJBC4Qx7XiCZEopi+e0oJDfCUMwTfi2uLFpQcd7
- XI95Ou6l1PBAmtAjCvT/QbzDBZ4RaR0viBf65cGR18d8LW5mjl7c5ZFzy9/Xl2vSKOov
- mq4MfqLOrUzFx9vuenkoC2/vWZ6ssBpxiP+C4fQZCfJGCT8NKXrYCgyXeP8AtrIjSbj7
- iU74LjMLWe9DVN3dX/MgjX0vM73mmosP7+uzXSzXOaQ7unyEK2PJzaSRBeM+QlUXtdhq
- xjXEyQZ/RzBP1AS+HviV+aRvUWtzCe4H4HsEvQzMm2GoBCpzV+TbGAqYTP/OANRr/op5
- qMDg==
-X-Gm-Message-State: APjAAAWC4K8cDCQMvwZXLInll+63YGwIjUtlA0uVDTnGcTgUUCCGJWgS
- es1e9hitCCYtGI/r8Ef8fR0tpyxRsj3WyzZJuDc=
-X-Google-Smtp-Source: APXvYqzdh2tZvajYtbMCsNEYmmrZPJJ+p2gbrzLfXOTOJV74LnbQ7WAlRXMkiwLM+qt63NSVovbCoIE3oMthYaFCwcg=
-X-Received: by 2002:a2e:9157:: with SMTP id q23mr2287937ljg.196.1579603692988; 
- Tue, 21 Jan 2020 02:48:12 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=IDMnGMJ6Cs/whFH4XpRx3WeUmxqpk22bAwxooOpZMug=;
+ b=PYi/89ZLw/gA/3YOPttoc3AtJUUt4hu6Faq3BXZAIHnfO9f1PzGTKoL/kCSigfdfOO
+ 1809lk8f+eMA4eaM1GdfO5b5YJQaWiaJaRoXruZ96S3KLCEh1ZGpfIlDkiddp+5UlTxs
+ dAAOdasFjDCHJ4H/0+u4JJTU3rBAG2RtNs61Xp0K1zIYN6NXwd9dkN8L0Vn3sAjwxZ48
+ LnKk4vaYsYelFcDOiXIMmpcXwmcUh4fxVXZ049R5tW6WpMeFXHE4FsBvMChQNiiI73yS
+ W+IS4VVsjjAhXPD+GaXZcKapz9xAm6QzWyP39BMR9XUTtC4+MZgi83sUcmclVP4Uxr9q
+ PQmQ==
+X-Gm-Message-State: APjAAAUJ9eTvJo4P6odSinPGQoqJerWKN40pYwc1Byq3sIXqbDSC4+e6
+ NAl9CW7rsJC8xBr9YJuNCYBjPvTqt0lNodvCe+HqflYu9jNGC3YYX1rascmNYdF+8fL/+RyBANe
+ J4jNuEqJbtgiLPY4=
+X-Received: by 2002:a1c:23d7:: with SMTP id j206mr3830829wmj.39.1579603777204; 
+ Tue, 21 Jan 2020 02:49:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzGgPRbDGWXfiDpsQoV7Fde7/+KMQy7QRwbv8JZ8kZVmU295Mk9Ff6VypESFdv/IqR1lYIGdA==
+X-Received: by 2002:a1c:23d7:: with SMTP id j206mr3830811wmj.39.1579603776906; 
+ Tue, 21 Jan 2020 02:49:36 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a?
+ ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
+ by smtp.gmail.com with ESMTPSA id k7sm3243589wmi.19.2020.01.21.02.49.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Jan 2020 02:49:36 -0800 (PST)
+Subject: Re: [PATCH 0/6] Fix more GCC9 -O3 warnings
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>
+References: <20191217173252.4672-1-philmd@redhat.com>
+ <84fthiaahd.wl-Peter.Chubb@data61.csiro.au>
+ <87a77q9njk.fsf@dusky.pond.sub.org>
+ <97c34bbd-79d2-070e-a35e-4fdf68b2e291@redhat.com>
+ <db49a831-df35-c209-5db5-0631a5ef2497@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <12b8431d-3d29-cdbe-b952-eac23c35be0a@redhat.com>
+Date: Tue, 21 Jan 2020 11:49:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20200121100732.28734-1-ianjiang.ict@gmail.com>
-In-Reply-To: <20200121100732.28734-1-ianjiang.ict@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 Jan 2020 20:47:46 +1000
-Message-ID: <CAKmqyKNpg4j4nZU19TNtJPs-oypOq=9mHJaM0ios=MbppKYfwg@mail.gmail.com>
-Subject: Re: [PATCH] riscv: Fix bug in setting xPIE of CSR for MRET and SRET
- instructions
-To: Ian Jiang <ianjiang.ict@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
+In-Reply-To: <db49a831-df35-c209-5db5-0631a5ef2497@redhat.com>
+Content-Language: en-US
+X-MC-Unique: fsE5l_Q0NCSJJ-ZPn9pzXQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,56 +111,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Hannes Reinecke <hare@suse.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 21, 2020 at 8:08 PM Ian Jiang <ianjiang.ict@gmail.com> wrote:
->
-> According to the RISC-V specification, when executing an MRET or SRET
-> instruction, xPIE in mstatus or sstatus should be set to 1. The orginal
-> QEMU does not give the right operations.
-> This patch fix the problem.
->
-> Signed-off-by: Ian Jiang <ianjiang.ict@gmail.com>
+On 20/01/20 20:02, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Paolo,
+>=20
+> On 1/18/20 8:24 PM, Paolo Bonzini wrote:
+>> On 18/12/19 07:05, Markus Armbruster wrote:
+>>> "Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>
+>>> writes:
+>>>
+>>>>>>>>> "Philippe" =3D=3D Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>=
+ writes:
+>>>>
+>>>> Philippe> Fix some trivial warnings when building with -O3.
+>>>>
+>>>> For compatibility with lint and other older checkers, it'd be good
+>>>> to keep
+>>>> this as /* FALLTHROUGH */ (which gcc should accept according to its
+>>>> manual).
+>>>
+>>> We have hundreds of /* fall through */ comments already.
+>>>
+>>>> Fixing the comments' placement is a different matter, and should be
+>>>> done.=C2=A0 Seems to me that until gcc started warning for this, noone=
+ had
+>>>> actually run a checker, and the comments were just for human info.
+>>>>
+>>>> Peter C
+>>>
+>>
+>> Queued, thanks.
+>=20
+> Thanks, but I sent a v2 (20191218192526.13845-1-philmd@redhat.com) with:
+>=20
+> - addressed Thomas and Aleksandar comments
+> - dropped 'hw/scsi/megasas: Silent GCC9 duplicated-cond warning'
+> - dropped 'qemu-io-cmds: Silent GCC9 format-overflow warning'
+>=20
+> See:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg666280.html
+>=20
+> Can you queue it instead?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Yes, I replaced it.
 
-Alistair
+Paolo
 
-> ---
->  target/riscv/op_helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index 331cc36232..e87c9115bc 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -93,7 +93,7 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
->          env->priv_ver >= PRIV_VERSION_1_10_0 ?
->          MSTATUS_SIE : MSTATUS_UIE << prev_priv,
->          get_field(mstatus, MSTATUS_SPIE));
-> -    mstatus = set_field(mstatus, MSTATUS_SPIE, 0);
-> +    mstatus = set_field(mstatus, MSTATUS_SPIE, 1);
->      mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
->      riscv_cpu_set_mode(env, prev_priv);
->      env->mstatus = mstatus;
-> @@ -118,7 +118,7 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
->          env->priv_ver >= PRIV_VERSION_1_10_0 ?
->          MSTATUS_MIE : MSTATUS_UIE << prev_priv,
->          get_field(mstatus, MSTATUS_MPIE));
-> -    mstatus = set_field(mstatus, MSTATUS_MPIE, 0);
-> +    mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
->      mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
->      riscv_cpu_set_mode(env, prev_priv);
->      env->mstatus = mstatus;
-> --
-> 2.17.1
->
->
 
