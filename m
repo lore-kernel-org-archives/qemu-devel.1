@@ -2,156 +2,76 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B13C32771
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 00:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB28C32771
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2566322522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 00:34:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04BB422522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:12:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKdjymPM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2566322522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7JpA9cD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04BB422522
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ithVA-0005Cm-Cu
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 19:34:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39150)
+	id 1iti68-00032i-3n
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 20:12:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41924)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1ithUN-0004Kj-MR
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 19:33:52 -0500
+ (envelope-from <ianjiang.ict@gmail.com>) id 1iti5Z-0002cm-0q
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:12:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1ithUL-0004CB-IW
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 19:33:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36973
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ithUL-0004Bw-EG
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 19:33:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579566828;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=FyQ+4L0iJFiaKOw4ETxmUhE9fuSrU5HOEz0faTOy9Cw=;
- b=PKdjymPMBmv7EeVNfvr/Z4bPA829yBTBSu9ZMf7E3y5dyEHuTYYydpFCSY7r98zzrTm3yj
- qZudci2EXDiYt0LxjKa9ozaQjjX/8wYOQHRhqFLezT4izLvDAfCN4jCOwPOZzHW+VO//Yw
- k4aKcO6tzjEGWQs7wgQONrYZZXL2Rsw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-XE4UMi8-PAifbU_dJ7-qdQ-1; Mon, 20 Jan 2020 19:33:45 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BD27184AD23;
- Tue, 21 Jan 2020 00:33:44 +0000 (UTC)
-Received: from [10.18.17.91] (dhcp-17-91.bos.redhat.com [10.18.17.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACEEC84DB8;
- Tue, 21 Jan 2020 00:33:43 +0000 (UTC)
-Subject: Re: [PATCH] qemu-img: Add --target-is-zero to convert
-To: David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
-References: <id:m21rryz8al.fsf@dme.org>
- <20200117103434.1363985-1-david.edmondson@oracle.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <8382f271-ef06-edf4-c641-bc6cc1b3c25d@redhat.com>
-Date: Mon, 20 Jan 2020 19:33:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <ianjiang.ict@gmail.com>) id 1iti5X-00010R-Ua
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:12:16 -0500
+Received: from mail-il1-x12d.google.com ([2607:f8b0:4864:20::12d]:42246)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ianjiang.ict@gmail.com>)
+ id 1iti5X-00010B-No
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:12:15 -0500
+Received: by mail-il1-x12d.google.com with SMTP id t2so1004250ilq.9
+ for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 17:12:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=/6Ka4PLgO8Wd32BMRnyXtOdzjnqlZcZTuENvmyYqQxo=;
+ b=l7JpA9cDCGLTZPrEE59GjwJgtSfiY3uw1ZIjI6OmPhqKjs2ttDQkpO4IE8KIJZ4UPe
+ gVpkRRAr0qiVAfnvLx/zzAMdFtAPSSx9uKXArfNrnlZnCPZT36C6zU8LJQiOE0uFGys9
+ mUCy8Zo6HyZtnmy/EtdKkVwdQP4uUDAnyFNb6W73Yyo+6twuvzr8zmzGo8w1ney7R+69
+ DlbySvPoqgGm+u9ziKAszjahKyA5AVXyIhumX9uF2dTlBtDdJ3zHQuw2+/1hPZ+w9wE7
+ dtgRvmJYOObOTbMPAayV1hohChOV5tNHXZItpI9cwCjj+Dbgwlg05mb8kw+yUd7atl7c
+ DVwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=/6Ka4PLgO8Wd32BMRnyXtOdzjnqlZcZTuENvmyYqQxo=;
+ b=D9LykAqhhV+KTJGvhDkW4Tt64F4QR3FQMeCCVkcdhB8g0TaGziROhoulfLyYPTGyn2
+ xhMz0B7c0vAfx6tiAyYo58nWhSxR5U0kIzVho3V/hmTq7xRZJVNxah9BZSJHkcK7rlr1
+ iCWJKW5z5Z+9lczLSD5rIJMGKXLYw/nt0973B9Ri6qsGyYR1x1mjUe4KsSwwkAplklGf
+ bJLpkNCMvo0rxMb47+cEeVuHCYuxNGlmhmOvuwrsVjZs1NNo2S5pE7jQgS/yT5KMAHWC
+ SBvoO533gvXDmwKzilVIeSSzPQr8TvKbnF164w/94DT197H5rxnYuC6g3spTriCCskcK
+ /yhA==
+X-Gm-Message-State: APjAAAWQeCnpXQEorgqIatqRQMmMatx3UehvRAX4iZ4qArXOstp46Ett
+ MdOrxjk81Ws1qMh0fheD4aSvanSxMar7xmIHAoUIYbaivII=
+X-Google-Smtp-Source: APXvYqz6V+aSy+LzbZthOwI90UvNijaqMMq6CX0vL9sbmqnE2Is6BpWno5L8tHWk6wLD6tFOZ/65YYdJblOVlci3amw=
+X-Received: by 2002:a92:8d88:: with SMTP id w8mr1612970ill.71.1579569134652;
+ Mon, 20 Jan 2020 17:12:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200117103434.1363985-1-david.edmondson@oracle.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: XE4UMi8-PAifbU_dJ7-qdQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+From: Ian Jiang <ianjiang.ict@gmail.com>
+Date: Tue, 21 Jan 2020 09:12:03 +0800
+Message-ID: <CAMAD20n_9Xj6HqgYzB-_Ra71f=_YyS4WkAFJK6VExOA50Bfcjw@mail.gmail.com>
+Subject: riscv: How to check floating point support is currently enabled?
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="0000000000002b5312059c9c1968"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::12d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,105 +83,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CC qemu-block and block maintainers
+--0000000000002b5312059c9c1968
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/17/20 5:34 AM, David Edmondson wrote:
-> In many cases the target of a convert operation is a newly provisioned
-> target that the user knows is blank (filled with zeroes). In this
-> situation there is no requirement for qemu-img to wastefully zero out
-> the entire device.
-> 
+The function riscv_cpu_fp_enabled() is used for checking whether floating
+point support is currently enabled. In fact it checks the FS field in the
+mstatus MSR.
 
-Is there no way to convince bdrv_has_zero_init to return what we want
-already in this case? I cannot recall off hand, but wonder if there's an
-advanced syntax method of specifying the target image that can set this
-flag already.
+target/riscv/cpu_helper.c
+ 76 bool riscv_cpu_fp_enabled(CPURISCVState *env)
+ 77 {
+ 78     if (env->mstatus & MSTATUS_FS) {
+ 79         return true;
+ 80     }
+ 81
+ 82     return false;
+ 83 }
 
-> Add a new option, --target-is-zero, allowing the user to indicate that
-> an existing target device is already zero filled.
-> ---
->  qemu-img.c | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 95a24b9762..56ca727e8c 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -70,6 +70,7 @@ enum {
->      OPTION_PREALLOCATION = 265,
->      OPTION_SHRINK = 266,
->      OPTION_SALVAGE = 267,
-> +    OPTION_TARGET_IS_ZERO = 268,
->  };
->  
->  typedef enum OutputFormat {
-> @@ -1593,6 +1594,7 @@ typedef struct ImgConvertState {
->      bool copy_range;
->      bool salvage;
->      bool quiet;
-> +    bool target_is_zero;
->      int min_sparse;
->      int alignment;
->      size_t cluster_sectors;
-> @@ -1984,10 +1986,11 @@ static int convert_do_copy(ImgConvertState *s)
->      int64_t sector_num = 0;
->  
->      /* Check whether we have zero initialisation or can get it efficiently */
-> -    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
-> +    s->has_zero_init = s->target_is_zero;
-> +
-> +    if (!s->has_zero_init && s->target_is_new && s->min_sparse &&
-> +        !s->target_has_backing) {
->          s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
-> -    } else {
-> -        s->has_zero_init = false;
->      }
->  
->      if (!s->has_zero_init && !s->target_has_backing &&
-> @@ -2076,6 +2079,7 @@ static int img_convert(int argc, char **argv)
->          .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
->          .wr_in_order        = true,
->          .num_coroutines     = 8,
-> +        .target_is_zero     = false,
->      };
->  
->      for(;;) {
-> @@ -2086,6 +2090,7 @@ static int img_convert(int argc, char **argv)
->              {"force-share", no_argument, 0, 'U'},
->              {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
->              {"salvage", no_argument, 0, OPTION_SALVAGE},
-> +            {"target-is-zero", no_argument, 0, OPTION_TARGET_IS_ZERO},
->              {0, 0, 0, 0}
->          };
->          c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
-> @@ -2209,6 +2214,9 @@ static int img_convert(int argc, char **argv)
->          case OPTION_TARGET_IMAGE_OPTS:
->              tgt_image_opts = true;
->              break;
-> +        case OPTION_TARGET_IS_ZERO:
-> +            s.target_is_zero = true;
-> +            break;
->          }
->      }
->  
-> @@ -2247,6 +2255,11 @@ static int img_convert(int argc, char **argv)
->          warn_report("This will become an error in future QEMU versions.");
->      }
->  
-> +    if (s.target_is_zero && !skip_create) {
-> +        error_report("--target-is-zero requires use of -n flag");
-> +        goto fail_getopt;
-> +    }
-> +
->      s.src_num = argc - optind - 1;
->      out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
->  
-> 
+This will cause a problem that the SD bit in mstatus is not set to 1 when
+FS in mstatus is modified from '00'b to '11'b with write_mstatus().
 
+file target/riscv/csr.c, func write_mstatus():
+350     dirty = (riscv_cpu_fp_enabled(env) &&
+351              ((mstatus & MSTATUS_FS) == MSTATUS_FS)) |
+352             ((mstatus & MSTATUS_XS) == MSTATUS_XS);
+353     mstatus = set_field(mstatus, MSTATUS_SD, dirty);
+354     env->mstatus = mstatus;
+
+So checking fields D and F in the misa MSR (bit 3 and bit 5) may be an
+better way. That is
+bool riscv_cpu_fp_enabled(CPURISCVState *env)
+    if (env->misa & (MISA_F | MISA_F) {
+        return true;
+    }
+    return false;
+}
+
+
+--
+Ian Jiang
+
+--0000000000002b5312059c9c1968
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>The function=C2=A0riscv_cpu_fp_enabled() is used for=
+=C2=A0checking whether floating point support is currently enabled. In fact=
+ it checks the FS field in the mstatus MSR.</div><div><br></div><div>target=
+/riscv/cpu_helper.c<br></div><div>=C2=A076 bool riscv_cpu_fp_enabled(CPURIS=
+CVState *env)<br>=C2=A077 {<br>=C2=A078 =C2=A0 =C2=A0 if (env-&gt;mstatus &=
+amp; MSTATUS_FS) {<br>=C2=A079 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return true;<br>=
+=C2=A080 =C2=A0 =C2=A0 }<br>=C2=A081 <br>=C2=A082 =C2=A0 =C2=A0 return fals=
+e;<br>=C2=A083 }<br></div><div><br></div><div>This will cause a problem tha=
+t the SD bit in mstatus is not set to 1 when=C2=A0 FS in mstatus is modifie=
+d from &#39;00&#39;b to &#39;11&#39;b with write_mstatus().</div><div><br><=
+/div><div>file=C2=A0target/riscv/csr.c, func write_mstatus():<br></div><div=
+>350 =C2=A0 =C2=A0 dirty =3D (riscv_cpu_fp_enabled(env) &amp;&amp;<br>351 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0((mstatus &amp; MSTATUS_FS)=
+ =3D=3D MSTATUS_FS)) |<br>352 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ((m=
+status &amp; MSTATUS_XS) =3D=3D MSTATUS_XS);<br>353 =C2=A0 =C2=A0 mstatus =
+=3D set_field(mstatus, MSTATUS_SD, dirty);<br>354 =C2=A0 =C2=A0 env-&gt;mst=
+atus =3D mstatus;<br></div><div><br></div>So checking fields D and F in the=
+ misa MSR (bit 3 and bit 5) may be an better way. That is=C2=A0<div>bool ri=
+scv_cpu_fp_enabled(CPURISCVState *env)<br></div><div>=C2=A0 =C2=A0 if (env-=
+&gt;misa &amp; (MISA_F | MISA_F) {</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 re=
+turn true;</div><div>=C2=A0 =C2=A0 }</div><div>=C2=A0 =C2=A0 return false;<=
+/div><div>}</div><div><br></div><div><br clear=3D"all"><div><div dir=3D"ltr=
+" class=3D"gmail_signature" data-smartmail=3D"gmail_signature">--<br>Ian Ji=
+ang</div></div></div></div>
+
+--0000000000002b5312059c9c1968--
 
