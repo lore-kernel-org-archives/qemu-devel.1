@@ -2,99 +2,84 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E498DC33CAA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 06:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4FB0C33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 06:41:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF71D22522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 06:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FD2D21734
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 06:41:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="du6hqKA6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF71D22522
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpMkr3rk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD2D21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itn8s-0000I5-Q7
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 01:36:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43430)
+	id 1itnEI-0001oG-O4
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 01:41:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1itn86-00086f-8H
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 01:35:15 -0500
+ (envelope-from <armbru@redhat.com>) id 1itnDO-0001OF-AP
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 01:40:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1itn84-0007lu-VK
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 01:35:14 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54327
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1itnDK-0003jH-9m
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 01:40:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36332
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1itn84-0007lR-RW
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 01:35:12 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1itnDK-0003iM-5R
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 01:40:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579588512;
+ s=mimecast20190719; t=1579588837;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4OUvEKKlROGtujXMnDJksWS4Q2yXG8c0+NRjLFjnsrc=;
- b=du6hqKA6iaGxmOIF3X7rPk8smq0LthRHkZGtIX2wX/2UadVLXJc5Fywctt7hlJ10AxoNik
- S2rI30cFWfym3mtaLW3Za/VFO+8BL2qEVGsOqQsxxLfR1JTA9hyiU1j53MZMeckCC2kdLD
- rnlszLKHKbb/H9shcdVUQ9hwg8ylgyo=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-yvt5ZF4lNem0HdBYJkOpvw-1; Tue, 21 Jan 2020 01:35:09 -0500
-Received: by mail-qv1-f72.google.com with SMTP id l1so980116qvu.13
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 22:35:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=+bCOxOtxPTd6B2o3yuNHhUE10cJLKnqqqRdS8U7GWlU=;
- b=treNJOUITvT+2n1Ng+d5aig6uSLcpm9joduqvdBbowo4C/CKT861HVO7CcLoBmvF8N
- IhlUwbxdNALwqtvZTMw1ktjM//q1jY9DqkNUqMZst/kAIAnRDsIKOy9pzMXKoLi4Uby5
- /iAaOFlvjZr7bupgtD7VbxeNWtKTQULYGWijYM/2Is1KvDXRP9yPZ5+WhMih81M2GXzO
- P4jbK/XQK79MKR6gtUwbAM2OojE+B0fZ2j1boS6kHBpYz95rnNVnNlKlDNHhjf7Z2zqe
- hIXqdAydld5jO+EXxGYoHbujXSeMjjblIcrrenpviU5c2Kgos7E+HQXFcWWmzK8fb5XM
- oV4w==
-X-Gm-Message-State: APjAAAUVZMt3ufg2I/FR90tNbYQN3JJJRl3AG9XN2Tj7yvPOJQYFZJCy
- coYsPyla/nJ66UcgnnLC24GAwiqoVc68CQVNVWMVtUDReqJq8ig4AS8asNndPkfLMGiN6Kes13H
- lh8wOxaVDE6z7YUA=
-X-Received: by 2002:a05:620a:910:: with SMTP id
- v16mr3222712qkv.194.1579588508770; 
- Mon, 20 Jan 2020 22:35:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxbZGOkbB02PHy4i4uyyq3w0lri1W4iIRLseJTC17U89Z2zqgOzHLlW7uaqFZMVNySQJaphhg==
-X-Received: by 2002:a05:620a:910:: with SMTP id
- v16mr3222704qkv.194.1579588508473; 
- Mon, 20 Jan 2020 22:35:08 -0800 (PST)
-Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
- by smtp.gmail.com with ESMTPSA id e3sm18728863qtb.65.2020.01.20.22.35.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jan 2020 22:35:07 -0800 (PST)
-Date: Tue, 21 Jan 2020 01:35:01 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH 1/2] arm/virt/acpi: remove meaningless sub device "PR0"
- from PCI0
-Message-ID: <20200121005533-mutt-send-email-mst@kernel.org>
-References: <20191219064759.35053-1-guoheyi@huawei.com>
- <20191219064759.35053-2-guoheyi@huawei.com>
- <20200113133702.1dea867b@redhat.com>
+ bh=T502W+tNmoY/8XD6lfwWY5SwVrNcBz7ESJ+n2i5q8Is=;
+ b=GpMkr3rkQSjHF9BwiFN5vh3IpX1+tjB9RKdbHawo0MPow3ixb+SsFoa0iS1drorgfAl/Yw
+ mee6Bd6IR/saPNsIbkNNRXae3voJ2B4a0VswoPH8BdvU0f70+2TBSP8e63JbCOtwTsq0Uc
+ BnBxCRiwNgDr/Bj9eGNdGM+SqRWMtds=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-144-cQx8sjYJOzanumP-DqhC1w-1; Tue, 21 Jan 2020 01:40:33 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EEFE8017CC;
+ Tue, 21 Jan 2020 06:40:32 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E76F683860;
+ Tue, 21 Jan 2020 06:40:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 75F121138600; Tue, 21 Jan 2020 07:40:28 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: Proposal for handling .hx files with Sphinx
+References: <CAFEAcA-_Y0Qaw-S83tMAph21opaDx-2y6aPbv5J_J0Bo4bgJuA@mail.gmail.com>
+ <96e75f84-fc52-9f19-3733-671aec6dc7fc@redhat.com>
+Date: Tue, 21 Jan 2020 07:40:28 +0100
+In-Reply-To: <96e75f84-fc52-9f19-3733-671aec6dc7fc@redhat.com> (John Snow's
+ message of "Mon, 20 Jan 2020 19:20:22 -0500")
+Message-ID: <87k15ll3c3.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200113133702.1dea867b@redhat.com>
-X-MC-Unique: yvt5ZF4lNem0HdBYJkOpvw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: cQx8sjYJOzanumP-DqhC1w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,97 +92,136 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 13, 2020 at 01:37:02PM +0100, Igor Mammedov wrote:
-> On Thu, 19 Dec 2019 14:47:58 +0800
-> Heyi Guo <guoheyi@huawei.com> wrote:
->=20
-> > The sub device "PR0" under PCI0 in ACPI/DSDT does not make any sense,
-> > so simply remote it.
-> Could you make commit message more concrete so it would say
-> why it doesn't make any sense.
->=20
-> It seems to be there to describe root port,
-> I'd rather have PCI folk ack if it's ok to remove it.
+John Snow <jsnow@redhat.com> writes:
 
-An empty device like this doesn't really do anything useful I think.
-commit log needs to be fixed up though.
-
-
-> >=20
-> > Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-> >=20
-> > ---
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Igor Mammedov <imammedo@redhat.com>
-> > Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> > Cc: qemu-arm@nongnu.org
-> > Cc: qemu-devel@nongnu.org
-> > ---
-> >  hw/arm/virt-acpi-build.c          |   4 ----
-> >  tests/data/acpi/virt/DSDT         | Bin 18462 -> 18449 bytes
-> >  tests/data/acpi/virt/DSDT.memhp   | Bin 19799 -> 19786 bytes
-> >  tests/data/acpi/virt/DSDT.numamem | Bin 18462 -> 18449 bytes
-> >  4 files changed, 4 deletions(-)
-> >=20
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index bd5f771e9b..9f4c7d1889 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -317,10 +317,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const Me=
-mMapEntry *memmap,
-> >      aml_append(method, aml_return(buf));
-> >      aml_append(dev, method);
-> > =20
-> > -    Aml *dev_rp0 =3D aml_device("%s", "RP0");
-> > -    aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
-> > -    aml_append(dev, dev_rp0);
-> > -
-> >      Aml *dev_res0 =3D aml_device("%s", "RES0");
-> >      aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")))=
+> On 1/17/20 12:30 PM, Peter Maydell wrote:
+>> Currently our manual creation includes some .texi files which
+>> are autogenerated from .hx files by running scripts/hxtool.
+>> .hx files are a simple format, where where a line is either a
+>> directive or literal text to be output:
+>>=20
+>> HXCOMM
+>>  -- comment lines, ignored
+>> STEXI/ETEXI
+>>  -- mark start/end of chunks of text to put into the texinfo output only
+>> DEFHEADING/ARCHHEADING
+>>  -- appear in the .h file output verbatim (they are defined as C macros)=
 ;
-> >      crs =3D aml_resource_template();
-> > diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
-> > index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3d=
-32ec856feb388be4c 100644
-> > GIT binary patch
-> > delta 39
-> > vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW) =20
-> >=20
-> > delta 50
-> > zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I =20
-> > G{V4!>hYx%J =20
-> >=20
-> > diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DSD=
-T.memhp
-> > index 41ccc6431b917252bcbaac86c33b340c796be5ce..69ad844f65d047973a3e551=
-98beecd45a35b8fce 100644
-> > GIT binary patch
-> > delta 40
-> > wcmcaUi}BPfMlP3Nmk=3D*s1_q}3iCof5t(P{ccXBfI+}XT|v(|RAjk`1(02g)*ivR!s
-> >=20
-> > delta 51
-> > zcmX>#i}Cs_MlP3NmymE@1_mbiiCof5O_w*ScXBdy-rc;3v(}c2J1D>)o+IATC1|sb =20
-> > HyBr$;t7;Fc
-> >=20
-> > diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/D=
-SDT.numamem
-> > index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3d=
-32ec856feb388be4c 100644
-> > GIT binary patch
-> > delta 39
-> > vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW) =20
-> >=20
-> > delta 50
-> > zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I =20
-> > G{V4!>hYx%J =20
-> >=20
+>>     for texi output they are parsed to add in header sections
+>>=20
+>> For Sphinx, rather than creating a file to include, the most
+>> natural way to handle this is to have a small custom Sphinx
+>> extension which will read the .hx file and process it. So
+>> instead of "makefile produces foo.texi from foo.hx, qemu-doc.texi
+>> says '@include foo.texi'", we have "qemu-doc.rst says
+>> 'hxtool-doc:: foo.hx', the Sphinx extension for hxtool has
+>> code that runs to handle that Sphinx directive, it reads the .hx
+>> file and emits the appropriate documentation contents". (This is
+>> pretty much the same way the kerneldoc extension works right now.
+>> It also has the advantage that it should work for third-party
+>> services like readthedocs that expect to build the docs directly
+>> with sphinx rather than by invoking our makefiles.)
+>>=20
+>> We'll need to update what the markup is to handle having rST
+>> fragments in it. A very minimalist approach to this would
+>> simply define a new pair of SRST/ERST directives marking the
+>> start/end of chunks of rST text to go into the rST only.
+>> (We might be able to do better than that later, as there's
+>> some repetition currently going on. But we'll probably get
+>> a better idea of how easy it is to avoid the repetition if
+>> we start with a simple conversion.)
+>>=20
+>> Here's what we do with hx files at the moment. We have four:
+>>=20
+>>  hmp-commands.hx
+>>    -- defines monitor commands used by monitor.c; generates
+>>       qemu-monitor.texi, used by qemu-doc.texi
+>>  hmp-commands-info.hx
+>>    -- ditto, for the "info" command's subcommand;
+>>       generates qemu-monitor-info.texi, used by qemu-doc.texi
+>>=20
+>> These two use only the "put this in the texi or in the .h file"
+>> functionality, alternating "raw C code defining an entry for the
+>> monitor command array" with "lump of raw texi for the docs".
+>>=20
+>>  qemu-img-cmds.hx
+>>    -- defines options for qemu-img, used by qemu-img.texi
+>>=20
+>> This uses the STEXI/ETEXI directives to alternate C and texi.
+>> In the for-the-h-file section the only content is always a DEF()
+>> macro invocation defining the option; in the texi is only the
+>> synopsis of the command. This means there's a lot of repetition,
+>> as the DEF macro includes an argument giving the text of the
+>> option synopsis, and then the texi also has that synopsis with
+>> some extra markup. Finally the main qemu-img.texi repeats the
+>> marked-up synopsis later on when it has the actual main documentation
+>> of each command.
+>>=20
+>>  qemu-options.hx
+>>    -- options for qemu proper, used by qemu-doc.texi
+>>=20
+>> This uses only the DEF, DEFHEADING, ARCHHEADING macros
+>> in the for-the-h-file sections (and the DEFHEADING/ARCHHEADING
+>> are read also for texi generation). This also repeats the
+>> synopsis in the DEF macro and in the texi fragment.
+>>=20
+>> So I think my current view is that we should do the very
+>> simple "add SRST/ERST directives" to start with:
+>>  * scripts/hxtool needs to recognize them and just ignore
+>>    the text inside them
+>>  * write the hxtool sphinx extension (shouldn't be too hard)
+>>  * conversion of any particular .hx file then involves
+>>    replacing the STEXI ...texi stuff... ETEXI sections with
+>>    SRST ...rst stuff... ERST. There's no need for any
+>>    particular .hx file to support both texi and rst output
+>>    at the same time
+>>=20
+>> I would initially start with qemu-img-cmds.hx, since that's
+>> pulled in by qemu-img.texi, which we can convert in the
+>> same way I've been doing qemu-nbd and other standalone-ish
+>> manpages. The others are part of the big fat qemu-doc.texi,
+>> which is probably going to be the very last thing we convert...
+>>=20
+>
+> At one point I did a quick mockup of turning qemu-img-cmds.hx into json
+> and wrote a small tool I called "pxtool" that was used for generating
+> all the rest of the subsequent information -- an attempt at getting rid
+> of .hx files *entirely*.
+>
+> The idea at heart was: "Can we remove .hx files and describe everything
+> in terms of the QAPI schema instead?"
+>
+> I'm still a bit partial to that idea, but realize there are some nasty
+> complexities when it comes to describing the QEMU CLI as a schema. One
+> of those is that I doubt we even have a full understanding of what the
+> CLI syntax is at all.
+
+My CLI QAPIfication prototype[*] gets rid of qemu-options.hx.  Three
+more are left: hmp-commands.hx, hmp-commands-info.hx, qemu-img-cmds.hx.
+No idea whether these could and should be QAPIfied.
+
+Going beyond prototype is hard, not least for the reason you mentioned.
+
+> Still, I do want to ask: Are we sure we want to double-down on keeping
+> the .hx files around instead of trying to move to a more generic data
+> format?
+
+One the one hand, I'd prefer to invest as little as practical into .hx.
+On the other hand, adding more hard dependencies on QAPIfication is not
+a good idea.
+
+What's the stupidest solution that could possibly work now?  Is it the
+one Peter sketched?
+
+
+
+[*] https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg00209.html
+Message-Id: <20171002152552.27999-1-armbru@redhat.com>
+https://repo.or.cz/qemu/armbru.git/shortlog/refs/heads/qapi-cmdline
 
 
