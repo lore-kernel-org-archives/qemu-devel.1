@@ -2,100 +2,102 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 844A2C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F612C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:03:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EE3D217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:01:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E690A217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iNLJyaWP";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="uvyiCuGf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE3D217F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="A/jigAZi";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ibCusGzl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E690A217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itpPi-0000Au-4j
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:01:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55237)
+	id 1itpRe-0001ih-Ud
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:03:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55257)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=2824cb5c5=Anup.Patel@wdc.com>)
- id 1itpO1-00071t-7Y
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:59:50 -0500
+ id 1itpO2-00073m-Nm
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=2824cb5c5=Anup.Patel@wdc.com>)
- id 1itpO0-00058j-1v
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:59:49 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:23932)
+ id 1itpO1-00059Z-2m
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:59:50 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:23944)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=2824cb5c5=Anup.Patel@wdc.com>)
- id 1itpNv-00052I-E6; Tue, 21 Jan 2020 03:59:44 -0500
+ id 1itpNv-00054Q-Sm; Tue, 21 Jan 2020 03:59:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
  t=1579597184; x=1611133184;
- h=from:to:cc:subject:date:message-id:
- content-transfer-encoding:mime-version;
- bh=Tlm0ImV8eIuzFbEQvXaeXRpyGZGdrpzsXb9GkgRHMss=;
- b=iNLJyaWPy7oxlKD/jyixmItj0V/c+Ybn8XcqELpT/tvpjNqmotwZKRrM
- ib4Hx8T4+1EqRSg+0cnZT6YIl3ZPZutU672mQj7FN7Tv9CvQ+JgjMzbMi
- qEjm3ZrBJzRIwfe25FQTgr2huHUhea7eSeUevmB6ku/OEYII6X++092KG
- 3vFE5lEcdCdBy7I9s8WFEPf0/nj1El2SylumTiYbAyvRwtNmssPKQRXSl
- Fi3qsoEWRjCe7yQjZOWlWBGQPKy1SaCM73BZNWEo9x6Jf3S7SxYiGLVFN
- brWku2y2m+AKn6imm3c9/88MPPsIVqKOMHxLW8so8v49BgIi8oyu6pCTV g==;
-IronPort-SDR: CxGPbuNHlNPpbD5p8knFxp20KvlfLMGhH0OL8VlWkGjSeZqxEpCiMjj00sTXQ5f6zJOrT/sWtZ
- e7VV4CDuzTTpbT8il13vHS6WI4ddY43y/+gzwsTddzpoJYKNdyKOul5ioYiXKIbYF8nWcjadR+
- tbPdykQ2OVpCjaG4W4PswY8Ul3C79UE299t1qo7CwLpK9vUOiUhK4C94MvU0R9VmmwCsf8369P
- NulN84QGV9Y8Ix6bM+Im8pIZVJGeBzj/FQFAe2T1/kHOVMmxVkphDKhYQM3TIl4chX3PQOYApP
- nl4=
-X-IronPort-AV: E=Sophos;i="5.70,345,1574092800"; d="scan'208";a="132437023"
-Received: from mail-cys01nam02lp2052.outbound.protection.outlook.com (HELO
- NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.52])
- by ob1.hgst.iphmx.com with ESMTP; 21 Jan 2020 16:59:40 +0800
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=TmubP0aukutzoQv+IOjP80oasdL2wH5nwCYUI4ebVLY=;
+ b=A/jigAZiFeMSJV5a9ZkfDbp/cvp9/Z55fKcbpTDJfCo4KKbUZVPP+fII
+ VnkCMldGNM6stPrJXMPJQgGekkzCZtaZddnDr7elwsb0EDdIsDHYiyPlN
+ rIisODA+lyhOWcRz3K8TY04sKzkeq6FGS2yOvFPw5Zq0nkAf6k6UI1dBo
+ Un+fwYS7t696XU+3H5qEkRJHQnKCOKLs/nSGpbNGQSwb8/YWOVpdWgsLk
+ JN/ccHbXX1SzRZcAU9+MeLa9u9eeRSyG4u0okCUKmq+0x7jofSVzFRaue
+ +nvnIvz7ZLgRw9abtSOKQ+hwGUYQrdMJ1Fi9znSmpvLfltK200Cyu1BsJ A==;
+IronPort-SDR: MBkCi7AS6XJ81rOs4KiE60NhzhzcEthYs83Qwf17lbaAasSxoogq0WbUusLVtpilk9hpX50ReT
+ VlLFuwd6CIAA0phReWkNLlCa2cENa+bKtyWrMMRr+A9AgpTs85vYnWgUxDmnyfnT/702jIElwF
+ SOHHpDavKJq5ub1uWco+wSRE5GzZ6bgLuaofmCqSyBuJ//491UQ46Adnsudp5T7hAa2IYZHr9f
+ Q8mLhgjYLslUVm4wy8vAbndOR9Om26YSETVS9IFJqmzSFvH2yOqsIREPYLa3f0kZdCI8IUbTYD
+ /2k=
+X-IronPort-AV: E=Sophos;i="5.70,345,1574092800"; d="scan'208";a="132437027"
+Received: from mail-cys01nam02lp2059.outbound.protection.outlook.com (HELO
+ NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.59])
+ by ob1.hgst.iphmx.com with ESMTP; 21 Jan 2020 16:59:43 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m4oDFS+sMSZEWfy3j1140LDufn3tNKUo6EBdoqyXOSkqODAWN6hnNt0iBv6LT0DbWLc2eu4pswxcIEyKBOTPgu5iJfTaybM1meCkVeXfdfBkQK+8oeABb01SVOa0lswG7ELofcReBku38g8TKTS/KsE4cPbaasqX3SL0NckLqLtl/mQQwd/A8F5uA4FbCzfu7OgnGxF2zLULVJssGUXLxGeRoZ6sI82jRw9DzKuvVri6pELD+/hQJPO8tTBB24RL8cBZMhW1IyZjJ3f4pyXuwjTgjb4cYVcSK87c26ldKReWQ9+GxIc8hNg01qijjmfP7kT3fGrl4zt7Oofs/Z9Tng==
+ b=Paw3NomDoXM9d8MpnFMN8VJD2t2BJLFVenctX6FznmYopaNrXHCaLKG0MlbmTgA6axPjuSUWKX3S2qBcwgVJfz+2tx0q5mAE2m8jhZ+b8nz1AeO/bw8DEhf31ZFGoqsbBX6n/GZExCrSuwxRfv/V4Kt6KCnnnoTdeCoslvsattUKeXEmL3GAYHYyRp+OOMHb8zt1uadvUqKF5gERgG1dt2kMUoIRaEWNc+Qzx8xc8epjjroo8142BrexlVtewtu50qs8yKB2PerTpqlZQzillcAMXHH2EeASzDirx0jDh3Yu1PcSdR5pb7aSenualygjNFmzUEaPF2Z9EJ43Zsa8CQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bSvCstKqJhvm1PUbS/1LmS0cpXEi6lr0bODGzILJXaM=;
- b=RveX3u/PdngZnEbYuna6UQM5SGXcCuP5G5Anfbh0AHot6AapVsVHZW8O5Gkou6MYAEYYjEkct8BWtFq089wh3KUMDw7vWGz3hEw8tXZSNSyR7zme5/2TQ434u5ke3t/tpf720oN8AKu2Ag9ZlN9gK9gXFbd2q3zSReeQ71Ot4Vwhv1QiH2TGwN2Px4Uegutnc8Kquz0WWvJ2eDKaHVJDV26OimaObumeGCicZUu+sUfuWUHaQDZX2FuRTwI/vLl/CYxJNHvdsae5IuO4Of8X4gT3VY26AJvZB5aN/FA0Sfddtk7f6c9ajvxwLTdwQ2KFRhJ4I9LGqsg4WF43ingicQ==
+ bh=n4P+I2jArYjL2qzLeCt7MRRXL73EePqrTq1BNEZAhbw=;
+ b=lhyPm7WLMWAo4cWjBsJxAGkjm2piPAxi+wLZnmU/RF2FRyPAvfSOitA4H8a06vmLetRe/VZMcOBSPu+MxziBnudLOIYrI0umg+1gsIJDjPt3XQUHxlKP8jAPRjIB8R+/GSHwQB9q+9WSYbxqkYrJ+DfrN3sRcHrOgLbr61IALZ2GHKj1mF0hPGGAI5frRWnu6MoS1ZXgBqCl5ujg4gZRdzn0YqnAUwoJjt71q4gxdZkuXxK903wZsF9Kykm1bge8vaCTmx9UBHjgXC9WArjH23jA+XeHqQlD0LzVlDJlyDJHh5RPGfF0I1GmnEOFWXB2i2vi9C3/rYitr0FgQyF6og==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bSvCstKqJhvm1PUbS/1LmS0cpXEi6lr0bODGzILJXaM=;
- b=uvyiCuGfosrnrFpzj0GYvte5MpCeQBBtee7OytsQR7XeAGMupuikJIvBIAacIMt85OJGBJo/N97J45+ZVsqaqq0ClPP42/6NDq2pKWTntp85ukef5Q0zjuovFmxDUn858v1WHlj77fiYx3yKuU8CShuHxEsdr6NJpnzrl/ckqxg=
+ bh=n4P+I2jArYjL2qzLeCt7MRRXL73EePqrTq1BNEZAhbw=;
+ b=ibCusGzlby7uZDt5xGy1AcpO5I5XMClEoVE7mAHffzXnB6l1qqJic95e9T22kr1fvJCG15nm98I0tgQxmBWc9+ocCtZKK1T0VkrPRFmmwM5SAjs9zjpjZonWi+pqlxN0PXsfhK73AScY4kIVPmKM1k3rG1M5WOMwVjXBiexSLsA=
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
  MN2PR04MB5839.namprd04.prod.outlook.com (20.179.21.93) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.21; Tue, 21 Jan 2020 08:59:36 +0000
+ 15.20.2644.21; Tue, 21 Jan 2020 08:59:41 +0000
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::a9a0:3ffa:371f:ad89]) by MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::a9a0:3ffa:371f:ad89%7]) with mapi id 15.20.2644.027; Tue, 21 Jan 2020
- 08:59:36 +0000
+ 08:59:41 +0000
 Received: from wdc.com (129.253.179.161) by
  MAXPR0101CA0061.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:e::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.19 via Frontend
- Transport; Tue, 21 Jan 2020 08:59:33 +0000
+ Transport; Tue, 21 Jan 2020 08:59:38 +0000
 From: Anup Patel <Anup.Patel@wdc.com>
 To: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt
  <palmer@dabbelt.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar
  Karandikar <sagark@eecs.berkeley.edu>
-Subject: [PATCH 0/2] RISC-V TIME CSR for privileged mode
-Thread-Topic: [PATCH 0/2] RISC-V TIME CSR for privileged mode
-Thread-Index: AQHV0DkaO9M7k6us1ESwit6CjZ6jNA==
-Date: Tue, 21 Jan 2020 08:59:36 +0000
-Message-ID: <20200121085910.28834-1-anup.patel@wdc.com>
+Subject: [PATCH 1/2] target/riscv: Emulate TIME CSRs for privileged mode
+Thread-Topic: [PATCH 1/2] target/riscv: Emulate TIME CSRs for privileged mode
+Thread-Index: AQHV0DkdWjUbgqPzqU2PcaK7gIVjnA==
+Date: Tue, 21 Jan 2020 08:59:41 +0000
+Message-ID: <20200121085910.28834-2-anup.patel@wdc.com>
+References: <20200121085910.28834-1-anup.patel@wdc.com>
+In-Reply-To: <20200121085910.28834-1-anup.patel@wdc.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -110,31 +112,31 @@ x-mailer: git-send-email 2.17.1
 x-originating-ip: [129.253.179.161]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: e6384103-b819-4b4f-6281-08d79e503d33
+x-ms-office365-filtering-correlation-id: 428f87ef-4001-4d3f-9f83-08d79e504054
 x-ms-traffictypediagnostic: MN2PR04MB5839:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB583910D61A1253716AC1F6F08D0D0@MN2PR04MB5839.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <MN2PR04MB5839F577B9BC584332F2D40E8D0D0@MN2PR04MB5839.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-ms-oob-tlc-oobclassifiers: OLM:5236;
 x-forefront-prvs: 0289B6431E
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(376002)(366004)(39860400002)(346002)(396003)(136003)(189003)(199004)(186003)(16526019)(8676002)(478600001)(8936002)(81166006)(81156014)(26005)(8886007)(966005)(2616005)(956004)(55016002)(2906002)(1076003)(4326008)(44832011)(110136005)(86362001)(52116002)(7696005)(71200400001)(54906003)(5660300002)(36756003)(316002)(66946007)(66476007)(66556008)(4744005)(64756008)(66446008);
+ SFS:(10019020)(4636009)(376002)(366004)(39860400002)(346002)(396003)(136003)(189003)(199004)(186003)(16526019)(8676002)(478600001)(8936002)(81166006)(81156014)(26005)(8886007)(2616005)(956004)(55016002)(2906002)(6666004)(1076003)(4326008)(44832011)(110136005)(86362001)(52116002)(7696005)(71200400001)(54906003)(5660300002)(36756003)(316002)(66946007)(66476007)(66556008)(64756008)(66446008);
  DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR04MB5839;
  H:MN2PR04MB6061.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; MX:1; A:1; 
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: c7kPpHSA6XN7nVtJh6FxQ+YzErwy+3apRDBJx47wwOxNC2KSsgIxcUvz2Hhhe+5+NCuNnMP//kSBHGGN4Pv4s9W8wj+vieAY/RpYndR5RQ5o05bKbaK3hVWIqIX3FLSD7DMwhZ+qhSaHiuSPQem/Gl+7Cg7pFek+BWakrtLnpRnZDPKgKDUAhvgsFb6+bf8CEL7hOeB5QTidUjCOE0TUOmVvL1+9OgmwznrpUZ0bHVl4j4TMmmr2Qpi/1PjiIcgIX+/EQt6XW8TQ5ToA+woQ7cM22P6d5Q4bSdRBVLSAmNn11skq45DuD0QH4oUQzq1qDCnwGBxqrZvZnIv1ALFnpHtU42rLjPgchW8mfz+07uHq4HEOSMmTRMOXZgXWvN6wBO5wNQf60wZ6yvgSEmbxbHAZg+6MVi7VUsaJ6x84LyxPt/CNb/VS5vH9AzyHRJEW/TFRFkFu/q9oTI4+KRv5016REEbAumCrO/chZqS1OHAZJbs6yy8EDXHPLQT7LfLhJrumLZLIYYlTJ8bgNtXlDg==
+x-microsoft-antispam-message-info: /486ok5Q0aIgH8qTid4KUeI/Kg0SO4hHMsPnW3uSD6XmY5UpZ/wdLQ2MNY5z2Fs94ZzOzCP+aUU3BkLwrcFa/+6Qgvy7BCYRIUf7HSdfezbb/Q2qilI/y+LPsAFIeQYPM7oRmnuieFwW0xUVpD5SS8GthYn8tHta8BTOmKA8AJrBvGWHaN3QD4EEtKPXwQX9UXnZ3umUkRJiAUHoLy3blZfn7COLNJzvfRS10JptvJd8R5fYELlZt29Ytq+epzKvPZJE72odx9yfGtBaQIpD6sa/O80f2MgFNMAFVEsWwYVCaxqBihXv5INHpRetEZ6NhQ9TlAcu99NhKg67Oms2UfYJ/yIiN0KqvZq6ZmlFDv5PxxLdFE1ZPer+woSWCdOtxCsa5IviRUpiBUb90EGl14AI4mQAm06Dfz1I2+IC2TXNuVOjh60XRRuff/dVUj/t
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e6384103-b819-4b4f-6281-08d79e503d33
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 08:59:36.2031 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 428f87ef-4001-4d3f-9f83-08d79e504054
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 08:59:41.2633 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IQCQ2vfME+7/kwZDFL6gphvxpEsLcqwvXS8zgmQWSumhsUcn7wilj6bL5twibUGWqeK2mJBUIMHYcBMCNnB/jg==
+X-MS-Exchange-CrossTenant-userprincipalname: T2oK0NKrkz2ydDvwoWatNuFHMuQwvMniC3is2L/2wXHPWvOq2k0ml3FsR8jOxT7a89264/rNzLbELUav7XR9dQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB5839
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
 X-Received-From: 216.71.153.141
@@ -157,25 +159,210 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds emulation of TIME CSRs for privileged mode. With
-this series, we see approximately 25+% improvement in hackbench
-numbers for non-virtualized (or Host) Linux and 40+% improvement
-in hackbench numbers for Guest/VM Linux.
+Currently, TIME CSRs are emulated only for user-only mode. This
+patch add TIME CSRs emulation for privileged mode.
 
-These patches are based on mainline/alistair/riscv-hyp-ext-v0.5.1
-branch of https://github.com/kvm-riscv/qemu.git and can be found
-in riscv_time_csr_v1 branch of same repo.
+For privileged mode, the TIME CSRs will return value provided
+by rdtime callback which is registered by QEMU machine/platform
+emulation (i.e. CLINT emulation). If rdtime callback is not
+available then the monitor (i.e. OpenSBI) will trap-n-emulate
+TIME CSRs in software.
 
-Anup Patel (2):
-  target/riscv: Emulate TIME CSRs for privileged mode
-  hw/riscv: Provide rdtime callback for TCG in CLINT emulation
+We see 25+% performance improvement in hackbench numbers when
+TIME CSRs are not trap-n-emulated.
 
- hw/riscv/sifive_clint.c   |  1 +
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+---
  target/riscv/cpu.h        |  5 +++
  target/riscv/cpu_helper.c |  5 +++
  target/riscv/csr.c        | 80 +++++++++++++++++++++++++++++++++++++--
- 4 files changed, 87 insertions(+), 4 deletions(-)
+ 3 files changed, 86 insertions(+), 4 deletions(-)
 
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 53bc6af5f7..473e01da6c 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -169,6 +169,7 @@ struct CPURISCVState {
+     target_ulong htval;
+     target_ulong htinst;
+     target_ulong hgatp;
++    uint64_t htimedelta;
+=20
+     /* Virtual CSRs */
+     target_ulong vsstatus;
+@@ -204,6 +205,9 @@ struct CPURISCVState {
+     /* physical memory protection */
+     pmp_table_t pmp_state;
+=20
++    /* machine specific rdtime callback */
++    uint64_t (*rdtime_fn)(void);
++
+     /* True if in debugger mode.  */
+     bool debugger;
+ #endif
+@@ -325,6 +329,7 @@ void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env)=
+;
+ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts);
+ uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value=
+);
+ #define BOOL_TO_MASK(x) (-!!(x)) /* helper for riscv_cpu_update_mip value =
+*/
++void riscv_cpu_set_rdtime_fn(CPURISCVState *env, uint64_t (*fn)(void));
+ #endif
+ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv);
+=20
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 7166e6199e..c85f44d933 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -250,6 +250,11 @@ uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t =
+mask, uint32_t value)
+     return old;
+ }
+=20
++void riscv_cpu_set_rdtime_fn(CPURISCVState *env, uint64_t (*fn)(void))
++{
++    env->rdtime_fn =3D fn;
++}
++
+ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
+ {
+     if (newpriv > PRV_M) {
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index b28058f9d5..a55b543735 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -238,6 +238,30 @@ static int read_timeh(CPURISCVState *env, int csrno, t=
+arget_ulong *val)
+=20
+ #else /* CONFIG_USER_ONLY */
+=20
++static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    uint64_t delta =3D riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
++
++    if (!env->rdtime_fn)
++        return -1;
++
++    *val =3D env->rdtime_fn() + delta;
++    return 0;
++}
++
++#if defined(TARGET_RISCV32)
++static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    uint64_t delta =3D riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
++
++    if (!env->rdtime_fn)
++        return -1;
++
++    *val =3D (env->rdtime_fn() + delta) >> 32;
++    return 0;
++}
++#endif
++
+ /* Machine constants */
+=20
+ #define M_MODE_INTERRUPTS  (MIP_MSIP | MIP_MTIP | MIP_MEIP)
+@@ -931,6 +955,52 @@ static int write_hgatp(CPURISCVState *env, int csrno, =
+target_ulong val)
+     return 0;
+ }
+=20
++static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *va=
+l)
++{
++    if (!env->rdtime_fn)
++        return -1;
++
++#if defined(TARGET_RISCV32)
++    *val =3D env->htimedelta & 0xffffffff;
++#else
++    *val =3D env->htimedelta;
++#endif
++    return 0;
++}
++
++static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong va=
+l)
++{
++    if (!env->rdtime_fn)
++        return -1;
++
++#if defined(TARGET_RISCV32)
++    env->htimedelta =3D deposit64(env->htimedelta, 0, 32, (uint64_t)val);
++#else
++    env->htimedelta =3D val;
++#endif
++    return 0;
++}
++
++#if defined(TARGET_RISCV32)
++static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *v=
+al)
++{
++    if (!env->rdtime_fn)
++        return -1;
++
++    *val =3D env->htimedelta >> 32;
++    return 0;
++}
++
++static int write_htimedeltah(CPURISCVState *env, int csrno, target_ulong v=
+al)
++{
++    if (!env->rdtime_fn)
++        return -1;
++
++    env->htimedelta =3D deposit64(env->htimedelta, 32, 32, (uint64_t)val);
++    return 0;
++}
++#endif
++
+ /* Virtual CSR Registers */
+ static int read_vsstatus(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+@@ -1203,14 +1273,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE]=
+ =3D {
+     [CSR_INSTRETH] =3D            { ctr,  read_instreth                   =
+    },
+ #endif
+=20
+-    /* User-level time CSRs are only available in linux-user
+-     * In privileged mode, the monitor emulates these CSRs */
+-#if defined(CONFIG_USER_ONLY)
++    /* In privileged mode, the monitor will have to emulate TIME CSRs only=
+ if
++     * rdtime callback is not provided by machine/platform emulation */
+     [CSR_TIME] =3D                { ctr,  read_time                       =
+    },
+ #if defined(TARGET_RISCV32)
+     [CSR_TIMEH] =3D               { ctr,  read_timeh                      =
+    },
+ #endif
+-#endif
+=20
+ #if !defined(CONFIG_USER_ONLY)
+     /* Machine Timers and Counters */
+@@ -1276,6 +1344,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] =
+=3D {
+     [CSR_HTVAL] =3D               { hmode,   read_htval,       write_htval=
+      },
+     [CSR_HTINST] =3D              { hmode,   read_htinst,      write_htins=
+t     },
+     [CSR_HGATP] =3D               { hmode,   read_hgatp,       write_hgatp=
+      },
++    [CSR_HTIMEDELTA] =3D          { hmode,   read_htimedelta,  write_htime=
+delta },
++#if defined(TARGET_RISCV32)
++    [CSR_HTIMEDELTAH] =3D         { hmode,   read_htimedeltah, write_htime=
+deltah},
++#endif
+=20
+     [CSR_VSSTATUS] =3D            { hmode,   read_vsstatus,    write_vssta=
+tus   },
+     [CSR_VSIP] =3D                { hmode,   NULL,     NULL,     rmw_vsip =
+      },
 --=20
 2.17.1
 
