@@ -2,110 +2,126 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_RHS_DOB,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E842EC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:17:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7351C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A424824125
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:17:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83D6F20882
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:17:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W1eLdSUk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A424824125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dJNgvTAi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D6F20882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itpf1-00083a-AS
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:17:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56969)
+	id 1itpfY-0000D6-Ab
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:17:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57143)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1itpcw-00065U-Ea
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:15:17 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itpdm-00074P-M6
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:16:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1itpcs-00048F-I9
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:15:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44098
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1itpcs-000481-EO
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:15:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579598110;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9EeByPziH/9G17hnHkebYIvYZBekUby+rW2YqZHXEdY=;
- b=W1eLdSUkXCuCkNL5HP/Q0cf6bOS+ARQdNVRfp1zWO7Z9LHNKdj69qC09d/0qRl6noImriY
- SJvOxuT5TXFs2Ew5YwLUmB8xH674kXwSO1do1j10yc4iHw8kXXONde42p8MJXS/2h+cD7W
- wBsjFTs54OgFhoWMyXryejVx1iyt3PQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-eAdCdcVtOyuixLzi0qYSkA-1; Tue, 21 Jan 2020 04:15:03 -0500
-X-MC-Unique: eAdCdcVtOyuixLzi0qYSkA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6360107ACC7;
- Tue, 21 Jan 2020 09:15:01 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 006375C541;
- Tue, 21 Jan 2020 09:14:59 +0000 (UTC)
-Subject: Re: [PATCH 2/2] iotests: add test for backup-top failure on
- permission activation
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itpdi-0004a1-UA
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:16:06 -0500
+Received: from mail-eopbgr150117.outbound.protection.outlook.com
+ ([40.107.15.117]:4778 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1itpdi-0004Yj-AY; Tue, 21 Jan 2020 04:16:02 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BUfWDXvjKAXd5oLDWq+UZEsJXsU6rpsNVTzaROcwL91hVMt7ePASA0MUMqPE8yVfnGPJ90iReuyiT9BAE8sPyCabCwIO8H9Mboz3nF9J5g8Ls2KDBFHtL9giX1K19SxB1Pdfl67Yp56fSTi8WUQTcaHBBYK/J7kVJtO1hxKSBLVAMfQOX/2xsb8gJvcf8gCVg66gRNGgkXIbJ/mT57FMaqq2EXjHA1ULdReak9doq0LO7pKViXb0Fb3S/R+QYPAt80P8O3NkdVudDBgNCHkqBp1ObJ7sUmIRfn2WSAlOO8He7EWVDLoHKD+Cc+Zpj3qFXcib2XS6iNIyej2i/qeyHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fTlAmSJtxJOlCnLyt+T5+1miwShNYOBhAOvZd14vDHQ=;
+ b=YhO8/yU78AOPbjaTaYNkyibaSzSHyKnX5xcUsbM/Z5yDCYxv/r549/cTaPtFC3TXpk65K68I76cJxj9VRC446AdXLccSYtqa/WT8HZFqF4XmoSIIf/W5GkNr0bgyTDV5Zd2emgApVnQm2U23G46u1u5cHof/JEs7BZQYXFGuqcfX+mQtnkbRGeATk0rM/3g1v39JEPR/ULfAeJj8JFGBRefkXlzjPti1dcFsvsMwiIY2YrQWLVG7eH4cTVtSePyrWkFzbggL8LeZR5L40+F3FnokgK5iWwD7gmYU918jdhD5gFwAso7m2KzUFswieXji5ay3sk2YMerou5IcG9mHOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fTlAmSJtxJOlCnLyt+T5+1miwShNYOBhAOvZd14vDHQ=;
+ b=dJNgvTAiaM+u3St+CEM2s5FVvaTPKR7E9FvP138OxbJ9Vu+KkAOe139BZ60tm/T8YQZECQ0VTB100NJMgXm7ncB2j5vJPN9CSD+RZBi7eh7LUltoBlCw8qPG5Nk3QDQNB7J52hhgPlzAfwRLDbtBdwE8BxK8QnuGr5UjC+hbLdc=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4865.eurprd08.prod.outlook.com (10.255.96.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.24; Tue, 21 Jan 2020 09:15:58 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.027; Tue, 21 Jan 2020
+ 09:15:58 +0000
+Received: from [172.16.24.200] (185.231.240.5) by
+ AM0PR0402CA0020.eurprd04.prod.outlook.com (2603:10a6:208:15::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.19 via Frontend
+ Transport; Tue, 21 Jan 2020 09:15:57 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20200116155452.30972-1-vsementsov@virtuozzo.com>
- <20200116155452.30972-3-vsementsov@virtuozzo.com>
- <eedd42b6-bf4e-f6de-13a4-412d389fdb09@redhat.com>
- <ea9219cd-8cc1-8cc0-d568-a51013ba74a4@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f52b6ff5-e993-d567-cbbe-1d6d158908da@redhat.com>
-Date: Tue, 21 Jan 2020 10:14:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+Subject: Re: [PATCH v3 04/10] hbitmap: drop meta bitmaps as they are unused
+Thread-Topic: [PATCH v3 04/10] hbitmap: drop meta bitmaps as they are unused
+Thread-Index: AQHVtlOfjJFz1HLGS0Gzm2LfZzDgPKfzmLyAgACH1YD//9p+AIAABloAgAAogoCAAOAzAA==
+Date: Tue, 21 Jan 2020 09:15:57 +0000
+Message-ID: <2a47f7f4-8d29-1af1-2832-aebd4795b86f@virtuozzo.com>
+References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
+ <20191219100348.24827-5-vsementsov@virtuozzo.com>
+ <a42037d5-0d62-d916-a814-ba755b6ad9a4@redhat.com>
+ <e6d654fb-7c04-c709-6b2a-3801ae1008d6@virtuozzo.com>
+ <0cf94b1f-e7cb-081a-34ab-63a7d9ba80ce@redhat.com>
+ <3b4f3ef4-adc7-1fda-44cc-b16b497cb110@virtuozzo.com>
+ <166c4439-58cb-072b-b3b0-e51d4952673a@redhat.com>
+In-Reply-To: <166c4439-58cb-072b-b3b0-e51d4952673a@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: AM0PR0402CA0020.eurprd04.prod.outlook.com
+ (2603:10a6:208:15::33) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20200121121556128
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7b9cdb83-acdb-46ce-e726-08d79e528683
+x-ms-traffictypediagnostic: AM6PR08MB4865:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB4865D0D86F2A3CF155050541C10D0@AM6PR08MB4865.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0289B6431E
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39850400004)(396003)(346002)(136003)(376002)(366004)(189003)(199004)(31696002)(16576012)(110136005)(71200400001)(316002)(2906002)(36756003)(26005)(53546011)(8936002)(86362001)(4326008)(16526019)(52116002)(6486002)(2616005)(956004)(186003)(54906003)(81156014)(107886003)(81166006)(31686004)(8676002)(5660300002)(508600001)(66946007)(66446008)(64756008)(66556008)(66476007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4865;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 7jnhkGqML6VS5fgKTFmi0OmJvxJ6/yrzd7BtLCwZ7pGQaqVcz6zCTYAKB1HpWQHqK94gQVt10NbbqIwbD+thJsxWfJfd+e1LUioc9Xtg3EiQ5Hc5howf7gIRhsV5cG7aXG5AEzNrxo00BvYPvxetCOpu7EgbP4hHtwNKLBLQPdTLvGQWeL/XAcwmSY1XV1EIu3LsHm3RU6mJkwRFCd43AxubXHlTfNY9QyaoEIWARUB8ZQrg/KVjmMQEkOKDtcR4JgKwtspWBLR03niL0dtZQrY6O+d07vy/edv6AVh2DdJmqjknQyG3xQdUdx8d44OsBmw1rYOgUKQr79Pu+4O1wbZJ/ea2+PLeNbXjXBjUXRe5sx+3TQOaaTAaxUR8TcsdS51xYWacmqoPlF9TaPEJeO+rsQa4wKQ8Go0SWlJDFAsBowFReFIhuUwOfLvIZwJz
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <860FBB70DD45BB4DB071825A6F2F2229@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <ea9219cd-8cc1-8cc0-d568-a51013ba74a4@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9m6UqGIy8gI6bRihZ3hz4XGZ5KrgIuIEM"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b9cdb83-acdb-46ce-e726-08d79e528683
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 09:15:57.9111 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /1y2SIawByGAwcEgM1hWGe8AiKA8USfV+5ebrex3+F8q2fGzUawZqNhmWp40k9SCQ+6tZe7u4XXxoy2jk1K0fo167A549JwHUXEBRLkdT6o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4865
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.15.117
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,219 +134,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9m6UqGIy8gI6bRihZ3hz4XGZ5KrgIuIEM
-Content-Type: multipart/mixed; boundary="0SLr97T1UZ5oaX2rDHtWxHR8QNgGXZ9vV"
-
---0SLr97T1UZ5oaX2rDHtWxHR8QNgGXZ9vV
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 20.01.20 18:20, Vladimir Sementsov-Ogievskiy wrote:
-> 20.01.2020 20:04, Max Reitz wrote:
->> On 16.01.20 16:54, Vladimir Sementsov-Ogievskiy wrote:
->>> This test checks that bug is really fixed by previous commit.
->>>
->>> Cc: qemu-stable@nongnu.org # v4.2.0
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>   tests/qemu-iotests/283     | 75 +++++++++++++++++++++++++++++++++++++=
-+
->>>   tests/qemu-iotests/283.out |  8 ++++
->>>   tests/qemu-iotests/group   |  1 +
->>>   3 files changed, 84 insertions(+)
->>>   create mode 100644 tests/qemu-iotests/283
->>>   create mode 100644 tests/qemu-iotests/283.out
->>
->> The test looks good to me, I just have a comment nit and a note on the
->> fact that this should probably be queued only after Thomas=E2=80=99s =E2=
-=80=9CEnable
->> more iotests during "make check-block"=E2=80=9D series.
->>
->>> diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
->>> new file mode 100644
->>> index 0000000000..f0f216d109
->>> --- /dev/null
->>> +++ b/tests/qemu-iotests/283
->>> @@ -0,0 +1,75 @@
->>> +#!/usr/bin/env python
->>> +#
->>> +# Test for backup-top filter permission activation failure
->>> +#
->>> +# Copyright (c) 2019 Virtuozzo International GmbH.
->>> +#
->>> +# This program is free software; you can redistribute it and/or modify
->>> +# it under the terms of the GNU General Public License as published by
->>> +# the Free Software Foundation; either version 2 of the License, or
->>> +# (at your option) any later version.
->>> +#
->>> +# This program is distributed in the hope that it will be useful,
->>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>> +# GNU General Public License for more details.
->>> +#
->>> +# You should have received a copy of the GNU General Public License
->>> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
-.
->>> +#
->>> +
->>> +import iotests
->>> +
->>> +# The test is unrelated to formats, restrict it to qcow2 to avoid extr=
-a runs
->>> +iotests.verify_image_format(supported_fmts=3D['qcow2'])
->>> +
->>> +size =3D 1024 * 1024
->>> +
->>> +"""
->>> +On activation, backup-top is going to unshare write permission on its
->>> +source child. It will be impossible for the following configuration:
->>
->> =E2=80=9CThe following configuration will become impossible=E2=80=9D?
->=20
-> Hmm, no, the configuration is possible. But "it", i.e. "unshare write per=
-mission",
-> is impossible with such configuration..
-
-But backup_top always unshares the write permission on the source.
-
->> I think there should be some note that this is exactly what we want to
->> test, i.e. what happens when this impossible configuration is attempted
->> by starting a backup.  (And maybe why this isn=E2=80=99t allowed; namely=
- because
->> we couldn=E2=80=99t do CBW for such write accesses.)
->>
->>> +
->>> +    =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=90  target  =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=90
->>> +    =E2=94=82 target =E2=94=82 =E2=97=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80 =E2=94=82 backup_top  =E2=94=82
->>> +    =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=98          =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=98
->>> +                            =E2=94=82
->>> +                            =E2=94=82 backing
->>> +                            =E2=96=BC
->>> +                        =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=90
->>> +                        =E2=94=82   source    =E2=94=82
->>> +                        =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=98
->>> +                            =E2=94=82
->>> +                            =E2=94=82 file
->>> +                            =E2=96=BC
->>> +                        =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=90  write perm   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=90
->>> +                        =E2=94=82    base     =E2=94=82 =E2=97=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80 =E2=94=82 other =E2=94=82
->>> +                        =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=98               =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=98
->>
->> Cool Unicode art. :-)
->=20
-> I found the great tool: https://dot-to-ascii.ggerganov.com/
-
-Thanks!
-
-Max
-
->>> +
->>> +Write unsharing will be propagated to the "source->base"link and will
->>> +conflict with other node write permission.
->>> +
->>> +(Note, that we can't just consider source to be direct child of other,
->>> +as in this case this link will be broken, when backup_top is appended)
->>> +"""
->>> +
->>> +vm =3D iotests.VM()
->>> +vm.launch()
->>> +
->>> +vm.qmp_log('blockdev-add', **{'node-name': 'target', 'driver': 'null-c=
-o'})
->>> +
->>> +vm.qmp_log('blockdev-add', **{
->>> +    'node-name': 'source',
->>> +    'driver': 'blkdebug',
->>> +    'image': {'node-name': 'base', 'driver': 'null-co', 'size': size}
->>> +})
->>> +
->>> +vm.qmp_log('blockdev-add', **{
->>> +    'node-name': 'other',
->>> +    'driver': 'blkdebug',
->>> +    'image': 'base',
->>> +    'take-child-perms': ['write']
->>> +})
->>> +
->>> +vm.qmp_log('blockdev-backup', sync=3D'full', device=3D'source', target=
-=3D'target')
->>> +
->>> +vm.shutdown()
->>
->> [...]
->>
->>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
->>> index cb2b789e44..d827e8c821 100644
->>> --- a/tests/qemu-iotests/group
->>> +++ b/tests/qemu-iotests/group
->>> @@ -288,3 +288,4 @@
->>>   277 rw quick
->>>   279 rw backing quick
->>>   280 rw migration quick
->>> +283 auto quick
->>
->> Hm.  This would be the first Python test in auto.
->=20
-> Missed that. It's OK to define it just "quick" and update later.
->=20
->>  Thomas=E2=80=99s series has
->> at least one patch that seems useful to come before we do this, namely
->> =E2=80=9CSkip Python-based tests if QEMU does not support virtio-blk=E2=
-=80=9D.  So I
->> suppose his series should come before this, then.
->>
->> Max
->>
->=20
->=20
-
-
-
---0SLr97T1UZ5oaX2rDHtWxHR8QNgGXZ9vV--
-
---9m6UqGIy8gI6bRihZ3hz4XGZ5KrgIuIEM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4mwREACgkQ9AfbAGHV
-z0C6Kgf/XTgVYJPMTcJ53v5iJ2Eo2rfKCoUOBH8CWR3PHqXEUL6aBxCY9XB1cBN/
-ZIjoqmp3qzkArVAhYQjdO0etee6hidjPTEjNyHHjDz7Kt4JGcNpUXRNcInUff/nv
-i86m/62rj3YHkTt3M8y5RUz/jGNWBgf2xRuWK1kUrrSuSxyf+TO/ujAURruI+/7N
-Sd7ygUJo8GbpizIU/aqisuR5LQzTF4AoeHp8sG2+k/tqKo+YhvQnR0+qah6XWasP
-0hondoZt+xOd+7dPEeeX+r/glsKyw5LrT3ZvHex7+KaKBbE6Jbohynt886VecBqQ
-DzLSIZp7SNQ1d2RGyOXdQ4q3zSgy5Q==
-=W0hH
------END PGP SIGNATURE-----
-
---9m6UqGIy8gI6bRihZ3hz4XGZ5KrgIuIEM--
-
+MjAuMDEuMjAyMCAyMjo1MywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8yMC8yMCAxMToyOCBB
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4gDQo+Pj4+IEknbSBhIGJp
+dCBub3QgZm9sbG93IHdoYXQgeW91IG1lYW4uIEkgY2FuIGp1c3Qgbm90ZSwgdGhhdCBkaXJ0eS1i
+aXRtYXAuYw0KPj4+PiBwYXJ0IG9mIG1ldGEgYml0bWFwcyB3YXMgcmVjZW50bHkgcmVtb3ZlZCwg
+YW5kIGhiaXRtYXAuYyBwYXJ0IEkgZm9yZ290IHRvDQo+Pj4+IHJlbW92ZS4uLg0KPj4+DQo+Pj4g
+WWVzLCBidXQgd2hvIHVzZWQgdGhhdCBkaXJ0eS1iaXRtYXAuYyBpbnRlcmZhY2U/wqAgQXMgZmFy
+IGFzIEkgY2FuIHRlbGwsDQo+Pj4gbm9ib2R5Lg0KPj4NCj4+IFllcywgYXMgZmFyIGFzIEkga25v
+dywgbm9ib2R5IGFuZCBuZXZlci4NCj4+DQo+Pj4NCj4+Pj4gTWV0YSBiaXRtYXBzIHdlcmUgaW50
+ZW5kZWQgdG8gY29udHJvbCBsaXZlIG1pZ3JhdGlvbiBvZiBiaXRtYXBzIGFuZCB0bw0KPj4+PiBp
+bXBsZW1lbnQgc29tZXRoaW5nIGxpa2UgcGFydGlhbCBzeW5jIG9mIGJpdG1hcHMgKHdyaXRlIHRv
+IHFjb3cyIG9ubHkNCj4+Pj4gY2hhbmdlZCBwYXJ0IG9mIGJpdG1hcCksIGJ1dCBtaWdyYXRpb24g
+aW1wbGVtZW50ZWQgaW4gb3RoZXIgd2F5DQo+Pj4+IChwb3N0Y29weSkgYW5kIHRoZSBzZWNvbmQg
+dGhpbmcgd2FzIG5vdCBpbXBsZW1lbnRlZC4NCj4+Pg0KPj4+IE9LLsKgIEkgd2FzIHdvbmRlcmlu
+ZyB3aHkgdGhleSB3ZXJlIGltcGxlbWVudGVkIHdpdGhvdXQgZXZlciBoYXZpbmcgYmVlbg0KPj4+
+IHVzZWQgKGFzIGZhciBhcyBJIGNhbiB0ZWxsKS4NCj4+Pg0KPj4NCj4+IEl0IHdhcyB0b28gb3B0
+aW1pc3RpYyBwcmVwYXJhdG9yeSBzZXJpZXMuDQo+IA0KPiBNYXRjaGVzIG15IHJlY29sbGVjdGlv
+biAod2UgaGFkIHNldmVyYWwgaWRlYXMgYWJvdXQgaG93IHRvIHRhY2tsZSBpdDsgbWV0YS1iaXRt
+YXBzIHdhcyBwcm9wb3NlZCBhcyBvbmUgaWRlYSBhbmQgdGhpcyBjb2RlIGxhbmRlZCwgYnV0IHdl
+IG5ldmVyIGFjdHVhbGx5IGZpbmlzaGVkIHRoYXQgaWRlYSBiZWZvcmUgYSBiZXR0ZXIgb25lIHdh
+cyBhY3R1YWxseSBjb2RlZCwgc28gdGhpcyBoYXMgYWx3YXlzIGJlZW4gZGVhZCBjb2RlKS4NCj4g
+DQo+Pg0KPj4gKEkgY2FuIG5ldmVyIGZpbmFsbHkgdW5kZXJzdGFuZCwgc2VyaWVzIC0gd2hvIGEg
+dGhleSBvciB3aGF0IGlzIGl0Pw0KPj4gwqDCoCBQbHVyYWwgb3Igc2luZ3VsYXI/DQo+IA0KPiBF
+bmdsaXNoIGlzIGZ1bm55OyAic2VyaWVzIiBpcyBvbmUgb2YgdGhlIGZldyB3b3JkcyB0aGF0IHdv
+cmtzIGFzIGJvdGggc2luZ3VsYXIgYW5kIHBsdXJhbCAoYW5vdGhlciBleGFtcGxlIGlzICJzaGVl
+cCIpLg0KDQpPSywgdGhhbmtzKSBBY3R1YWxseSwgUnVzc2lhbiBoYXMgc3VjaCB3b3JkcyB0b28g
+KNGI0YLQsNC90Ys9cGFudHMsINC90L7QttC90LjRhtGLPXNjaXNzb3JzLCBpbnRlcmVzdGluZyB0
+aGF0IGZpcnN0IGV4YW1wbGVzDQp3aGljaCBjYW1lIGluIG15IG1pbmQgaGFzIHNhbWUgZmVhdHVy
+ZSBpbiBFbmdsaXNoIHRvbykuDQoNCj4gDQo+PiBUaGV5IHdlcmUgdG9vIG9wdGltaXN0aWMgc2Vy
+aWVzPyBTb3VuZHMgd2VpcmQuLg0KPiANCj4gTXkgc3BpbjogIlRoZSBvcmlnaW5hbCBzZXJpZXMg
+d2FzIHRvbyBvcHRpbWlzdGljLiINCj4gDQo+PiDCoMKgIEFuZCBpZiBvbmUgc2VyaWVzIGlzIHNl
+cmllcywgdGhhbiB3aGF0IGFib3V0IHNldmVyYWwgc2VyaWVzZXM/DQo+PiDCoMKgIE9LLCBsZXQn
+cyBzYXksIGl0IHdhcyB0b28gb3B0aW1pc3RpYyBwcmVwYXJhdG9yeSBwYXRjaCBzZXQgOikNCj4+
+DQo+Pg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
