@@ -2,63 +2,95 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A93D7C33CAA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 04:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11480C35240
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 04:21:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7357322522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 04:06:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C73A622314
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 04:21:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="I10hBHol"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7357322522
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="GOMa7viZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MKMEv4Bm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C73A622314
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itko3-0003te-O5
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 23:06:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57146)
+	id 1itl35-00082M-Rc
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 23:21:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1itklT-0001Cz-2i
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 23:03:44 -0500
+ (envelope-from <andrew@aj.id.au>) id 1itl27-0007QU-5J
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 23:20:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1itklR-0000RP-Oc
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 23:03:42 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:60539 helo=ozlabs.org)
+ (envelope-from <andrew@aj.id.au>) id 1itl26-000214-9a
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 23:20:55 -0500
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:50027)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1itklR-0000Pm-3Y; Mon, 20 Jan 2020 23:03:41 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 481vzD0QwBz9sRK; Tue, 21 Jan 2020 15:03:36 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1579579416;
- bh=qxCC7i66vqG1QudTFycwu7hHeDQM+dmDPpeVj6+8+58=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=I10hBHolKccSb9jbtXbSkOrGQjPU8fCnO5qRSeJeykpFLH4blVXEq1nfNtqoPxgN5
- WagdKUilAjBZs9/A/uHDvbTIHy1JQ+vY7zv3hJXkHkXSB39HiDh9KugRtU4+CquocK
- DcC7AVibdkcuezEWtpgmrzwzxA6G7lOfz2ZxE6dg=
-Date: Tue, 21 Jan 2020 15:02:55 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [PATCH v8 5/6] hw/ppc/Kconfig: Enable TPM_SPAPR as part of
- PSERIES config
-Message-ID: <20200121040255.GF265522@umbus.fritz.box>
-References: <20200108161012.1821385-1-stefanb@linux.ibm.com>
- <20200108161012.1821385-6-stefanb@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="SnV5plBeK2Ge1I9g"
-Content-Disposition: inline
-In-Reply-To: <20200108161012.1821385-6-stefanb@linux.ibm.com>
+ (Exim 4.71) (envelope-from <andrew@aj.id.au>)
+ id 1itl23-0001yU-Kf; Mon, 20 Jan 2020 23:20:52 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.nyi.internal (Postfix) with ESMTP id ADF792205E;
+ Mon, 20 Jan 2020 23:20:49 -0500 (EST)
+Received: from imap2 ([10.202.2.52])
+ by compute4.internal (MEProxy); Mon, 20 Jan 2020 23:20:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
+ mime-version:message-id:in-reply-to:references:date:from:to:cc
+ :subject:content-type; s=fm1; bh=VBrbv77ECOPhybIGyD94COf/XRVeLbz
+ 9ixNwM2zHyKo=; b=GOMa7viZ2vx01W5FbOYki/Gij3d5eS5xbFDAzbjdZ44bd4g
+ x9sgBB1tIWA9VPNXtxnYAgpXmR/U/xd29UPTCoikmGbCX7P5JosGxWqJWwO2sGys
+ AkCNpoPRwmYdYUKn5HL8yphVJISNFtUY87o9I9VzeDT6ItPTqGp3FVnmG7Lson54
+ KzRrMR9UPChdFcQWrz8U23NWFDj8aD72gEJ8pWOiAnqHE+QNbO+IOt97IjLmq5Js
+ vFM9CJ2iAOEs+u6L+Nj89nix+EmmAH2fli3ij9A9MPtNhRSfDcl7zIrKGC+VTr9b
+ NVD+l/3dGB96917HB6BbKi+AwiSjA2arf9hxzQg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=VBrbv7
+ 7ECOPhybIGyD94COf/XRVeLbz9ixNwM2zHyKo=; b=MKMEv4Bm9KcPsIwbl29Ut3
+ 3T1vRJjcaZCMdh8sEhcqBDqWXN0vTZbk4vuF2T9vwFqbziBJwJJ907cgejfeTKw8
+ opBTGCThyKE4anDBYgoKytGQYdWlk8MWCZM+ltYw3/IYUa1EIrdXsTHi2DS26T+l
+ 3sisCeML9mNXZx3ScERiFgTF5PN3w5XT+Tp/g84lgT3wZe1gIwqzEmfNKAMWmy9R
+ OyzrXPpuoCFCVbfmhDuUVCCdmypkp9VIoXwMNQCF0o5Swyf4P2AmY0zCA9G24Rsh
+ IIa+bAJ7X+Kj3tRHRWnV+Qb5KQWuy+83YtWKSOZ+xamD8JYT8m+4P2ZPNImQW+Iw
+ ==
+X-ME-Sender: <xms:IHwmXsoG6vmlFbtWWfuJTLcQg4OHm3onwHhVuSVpt3ZmL0pHO4X8kQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedugedrudejgdeijecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpedftehnughr
+ vgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucevlhhush
+ htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnhgurhgvfiesrghj
+ rdhiugdrrghu
+X-ME-Proxy: <xmx:IXwmXubJeDNjSzP7hqA3GwzjaJ3KJXlB0deUZkDviG5B5vIdeiBNqQ>
+ <xmx:IXwmXpwaCQT-xl2cmpZWp-wWT89kMjMbLpG7zX7i8siWN06a5HFEgg>
+ <xmx:IXwmXlCyJrJFMuhcIM6foYjaWi1PSc-HnJSabdAiLD5vKZlQocffBg>
+ <xmx:IXwmXpTGKO5UqIwEkKsffNOEMgogh4rJiGTEFduder48SpQdMgXfrA>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+ id D9FF5E00A2; Mon, 20 Jan 2020 23:20:48 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.1.7-754-g09d1619-fmstable-20200113v1
+Mime-Version: 1.0
+Message-Id: <bd9b60c0-6785-4499-a454-a97940177cee@www.fastmail.com>
+In-Reply-To: <20200121013302.43839-2-joel@jms.id.au>
+References: <20200121013302.43839-1-joel@jms.id.au>
+ <20200121013302.43839-2-joel@jms.id.au>
+Date: Tue, 21 Jan 2020 14:50:27 +1030
+From: "Andrew Jeffery" <andrew@aj.id.au>
+To: "Joel Stanley" <joel@jms.id.au>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ "Peter Maydell" <peter.maydell@linaro.org>
+Subject: Re: [PATCH 1/2] aspeed/scu: Create separate write callbacks
+Content-Type: text/plain
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 66.111.4.27
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,67 +102,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---SnV5plBeK2Ge1I9g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 08, 2020 at 11:10:11AM -0500, Stefan Berger wrote:
-> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
->=20
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+On Tue, 21 Jan 2020, at 12:03, Joel Stanley wrote:
+> This splits the common write callback into separate ast2400 and ast2500
+> implementations. This makes it clearer when implementing differing
+> behaviour.
+> 
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-> index f927ec9c74..b5b3519158 100644
-> --- a/hw/ppc/Kconfig
-> +++ b/hw/ppc/Kconfig
-> @@ -10,6 +10,7 @@ config PSERIES
->      select XICS_SPAPR
->      select XIVE_SPAPR
->      select MSI_NONBROKEN
-> +    select TPM_SPAPR
-> =20
->  config SPAPR_RNG
->      bool
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---SnV5plBeK2Ge1I9g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4md+4ACgkQbDjKyiDZ
-s5KvCw//RELt+rg71BeRDLxisycHe9E1fL0zLnOiyvVmDz/QqmC4i+NhRyzbReUm
-RhGF2GA+9jxbX/yvciB3ieENbgx+zZDCE3bfKtzruXq2XIZ6mT+T8xOVkDp1Z4hr
-o0p/bshiAMxeuznGj6sYVQUJt3+dygBuNFs1LcuMIX9Dx5kX9CIj/5BEC7I9Ny53
-tmpR/V52uZ6iWXq+2ZQsJbtd6eMfp5OzbfLrFOfldHRkHMdIQOzleQUNYyNfsdao
-AJRoaJrVCNT47PV5wZT1ox8+GOc1LpfOHHgQxRb2kdGm14JylaTumKmqr8hEosBr
-Z3w/Dugpas1lv6ybOOm2SKDkjKSgI4dRse0eD87hEgQVgSdtHyMDowsQe0+qyBfV
-8OvFEIOSzNt1U76RfzqMzKoD908m7Ogn/KUA67dIhznRFiDcdUO1yMHo+iBP83U7
-q1QMUvH8QmBmFotllwyzQF6gRlsG10OYfk74XlVOmf2EfHrXm7Zj4h3CI7ELclE9
-T53GSNNOT3a4UHjnHrXMh+I7Og/YiEAYmTbwezRv4mCwszZX4UmskMb4ik5G1a+0
-4F30hLCLwUZ7tFh4Wny4KeqldojqW/K5mcClV8ImbkHi3F+MdzcpOeN5KRutUJTk
-SbQDGPQnkS2O6Is3pzmobrRzWn/6y+ZslCIfibAW8tDlH1wxxOw=
-=W9am
------END PGP SIGNATURE-----
-
---SnV5plBeK2Ge1I9g--
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
 
