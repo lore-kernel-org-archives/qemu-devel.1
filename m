@@ -2,69 +2,124 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E83B5C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5BFC33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:36:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AC9D22522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:34:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC9D22522
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2C61122522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:36:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HX4dp919"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C61122522
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itpvc-00015y-LO
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:34:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58768)
+	id 1itpx4-0002db-An
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:36:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1itpuT-0000ch-Mt
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:33:23 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itpwN-00024N-CH
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1itpuP-0003jE-15
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:33:21 -0500
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:51517)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1itpuO-0003fn-NP
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:33:16 -0500
-Received: from player726.ha.ovh.net (unknown [10.109.146.166])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id C4B23268A87
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 10:33:07 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player726.ha.ovh.net (Postfix) with ESMTPSA id E6382E5E2A0B;
- Tue, 21 Jan 2020 09:32:57 +0000 (UTC)
-Date: Tue, 21 Jan 2020 10:32:55 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
-Message-ID: <20200121103255.6a25aaa9@bahia.lan>
-In-Reply-To: <20200121034332.GC265522@umbus.fritz.box>
-References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
- <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
- <20200116094848.555c170d@bahia.lan>
- <2dda458a-dfa1-ab23-4a97-d27d9266226b@redhat.com>
- <20200116131435.3985e86e@bahia.lan>
- <20200116192902.63674769@bahia.lan> <20200117091608.GV54439@umbus>
- <20200117164427.2c238412@bahia.lan>
- <20200120090438.75ff9e65@bahia.lan>
- <20200121034332.GC265522@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1itpwK-0004eP-Pd
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:35:19 -0500
+Received: from mail-eopbgr70129.outbound.protection.outlook.com
+ ([40.107.7.129]:12036 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1itpwJ-0004dU-V6; Tue, 21 Jan 2020 04:35:16 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BnMpCCpPkP2Dw/AnnC2K8ORPiXaWnjDmK8udC+12/zsk9Cx1Cp/jcdE+rc3/N6aZSzar//ef9Bjk6rbC/qSR6qymKfnzC8aLtAPcPMXOHszaUldInbAh135bEowhk7mDHeMDjhao5ztMAyymyWvGc63pjJ/ghgLyEYIezQEX6NHQTXiNFM+UJtJfYvprKqqDNy1Xz6B8qSO9BcsnT5IpvCnV1en8Xg+oPd9RaUuiA/vzyMBBrhZztj6hMAEkDgtxVYDSYiwo3EKVEggJP1w+P8fpc6CY7RpYeu+btlolgdS3jcYYDAo6ZF6C3XbMmDYhwY45H0nqMjfauuOnI/7X2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yBkVxs+6TEtUZpDASWt3plV6vFIoVv/kC7hqQOTaXxA=;
+ b=GtXHNI4caxGSz24WS+cKOxNGNqsxDcQS8ucDu+P7hDLnGUsLMZXv62CTtx05B+W1ZvWJx6tjrNk+vssBu6sEhs9P1diYtSZmlWJ71RotNNlUInq4dlJ13HxtAP70nnVGbGMVt59A4o0DaN1glVZcICLm8Nw0vBSuiejKmzt8H5J9pLNCrtnZe2M1a9vOzwldOl3O4/8Tfq4gvI1CVep3dvPvDeR6QX3eh0g1ff5NPci7AdANWjp2UDsH80VyPPMt14B5IVGwDV+DnYVh2wiihBP/6Hi/B/j9/boNgJUFYBanZan/nKzW9KPbFs3yjmr/EP0lpSQBI9HidmjtL/ebDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yBkVxs+6TEtUZpDASWt3plV6vFIoVv/kC7hqQOTaXxA=;
+ b=HX4dp919tFEMllJFDGsR00t2IM3o+oxUy3ra/K5lX1sBQIagJ8rQT5Sjzx8UJCgp33/WBfbhWPGV8IltaqcI8c9xyDkRFYGKPCbZjSWDyeu6xMykRqVDyLqeDyf+vsIu3JwWZ/BEHilOFJW25BYAryIFd6KiiQXtjFWET14ndIs=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4835.eurprd08.prod.outlook.com (10.255.96.144) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.18; Tue, 21 Jan 2020 09:35:12 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2644.027; Tue, 21 Jan 2020
+ 09:35:12 +0000
+Received: from [172.16.24.200] (185.231.240.5) by
+ AM0PR01CA0018.eurprd01.prod.exchangelabs.com (2603:10a6:208:69::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.19 via Frontend
+ Transport; Tue, 21 Jan 2020 09:35:12 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v3 06/10] block/dirty-bitmap: add _next_dirty API
+Thread-Topic: [PATCH v3 06/10] block/dirty-bitmap: add _next_dirty API
+Thread-Index: AQHVtlOgdeEZtpGHH0igSKd2umc3c6fzul2AgABpNwCAAOvqAA==
+Date: Tue, 21 Jan 2020 09:35:12 +0000
+Message-ID: <17e0811e-8f4d-20e9-75a3-0c11702900bb@virtuozzo.com>
+References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
+ <20191219100348.24827-7-vsementsov@virtuozzo.com>
+ <0350481a-12ad-1608-79f1-b9f433963565@redhat.com>
+ <2641fe67-1035-e00b-131d-513aec6752a8@virtuozzo.com>
+In-Reply-To: <2641fe67-1035-e00b-131d-513aec6752a8@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: AM0PR01CA0018.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:69::31) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20200121123510216
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2210e5ad-ef39-44f0-100c-08d79e5536c6
+x-ms-traffictypediagnostic: AM6PR08MB4835:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB48354D55E701BBCD4C388562C10D0@AM6PR08MB4835.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1122;
+x-forefront-prvs: 0289B6431E
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39850400004)(376002)(136003)(396003)(346002)(366004)(199004)(189003)(31686004)(54906003)(4326008)(2616005)(110136005)(16576012)(186003)(71200400001)(5660300002)(956004)(2906002)(316002)(6486002)(107886003)(8676002)(81166006)(81156014)(8936002)(52116002)(66556008)(64756008)(86362001)(26005)(16526019)(66446008)(31696002)(66946007)(66476007)(36756003)(508600001)(53546011)(14143004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4835;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3NANguwDG+1RqfWAm3e+VxIhBhzWqtJoT8A6JbIz5avVeH/qvj7fEfJ2u38onHa3ZK84Ynr47vFw/1kOh1YZLh5ZZPig6KxW1VkEe0x7VOflTa7ur+MAqAiLedTaeMYXY0EI6u6Nzw1wi9O0MeASdGosICWQk02Kjbk1UrIBfF0eKiI1smHboH14McDr84MPJZBlTGdp8k6/Fx1UM8Gye8mn98Q1EW33e/CJ34CM0WZ8kD3bBL4cTVviKLDrKpHernh96JlgKwenjbw+Z9DkEjoHbRkRYZiLm4c6LO9QRfNQPGxg1NLSsk6LRr9ANMJuMuvo69B30wCdpk4C9yPTl+VzLURblKkmDcZVxkaHabpUXdxhYP/iXpfLkT/Z69GfAPYnSabeLW7WSSTNOV42o6Xt9QYpL9HoTwhWTKix4Ir4znGEvZvqsirDLK5n2kEXW9wV4RhOcJlrI3+d6fVpMPLKJTDVeojEkRXkkRi3QNo=
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <4180810DAE5EE54DB8EC136367464BEA@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/578btjyBBbawmx1OQRBuzVH";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 14218708451905149414
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudekgddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgesghdtreerredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.39.65
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2210e5ad-ef39-44f0-100c-08d79e5536c6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 09:35:12.5622 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dZjper1EB80mGgTHmjGoXq/ShS3kcPE+7eFrC6eiX7DQ0+A+Dqx8tKoPme3Y8PHiS/qQvkiboFa6LGXt7LaedweTY+qxZmyM5UonfNnVhf4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4835
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.129
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,267 +131,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/578btjyBBbawmx1OQRBuzVH
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+20.01.2020 19:30, Vladimir Sementsov-Ogievskiy wrote:
+> 20.01.2020 16:14, Max Reitz wrote:
+>> On 19.12.19 11:03, Vladimir Sementsov-Ogievskiy wrote:
+>>> We have bdrv_dirty_bitmap_next_zero, let's add corresponding
+>>> bdrv_dirty_bitmap_next_dirty, which is more comfortable to use than
+>>> bitmap iterators in some cases.
+>>>
+>>> For test modify test_hbitmap_next_zero_check_range to check both
+>>> next_zero and next_dirty and add some new checks.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>> =A0 include/block/dirty-bitmap.h |=A0=A0 2 +
+>>> =A0 include/qemu/hbitmap.h=A0=A0=A0=A0=A0=A0 |=A0 13 ++++
+>>> =A0 block/dirty-bitmap.c=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 6 ++
+>>> =A0 tests/test-hbitmap.c=A0=A0=A0=A0=A0=A0=A0=A0 | 130 ++++++++++++++++=
+++++---------------
+>>> =A0 util/hbitmap.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 60 ++=
+++++++--------
+>>> =A0 5 files changed, 126 insertions(+), 85 deletions(-)
+>>
+>> [...]
+>>
+>>> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+>>> index b6e85f3d5d..a4b032b270 100644
+>>> --- a/include/qemu/hbitmap.h
+>>> +++ b/include/qemu/hbitmap.h
+>>> @@ -297,6 +297,19 @@ void hbitmap_free(HBitmap *hb);
+>>> =A0=A0 */
+>>> =A0 void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_=
+t first);
+>>> +/*
+>>> + * hbitmap_next_dirty:
+>>> + *
+>>> + * Find next dirty bit within selected range. If not found, return -1.
+>>> + *
+>>> + * @hb: The HBitmap to operate on
+>>> + * @start: The bit to start from.
+>>> + * @count: Number of bits to proceed. If @start+@count > bitmap size, =
+the whole
+>>> + * bitmap is looked through. You can use UINT64_MAX as @count to searc=
+h up to
+>>
+>> I would=92ve said s/looked through/scanned/, but it matches
+>> hbitmap_next_zero()=92s documentation, so it=92s fine.
+>>
+>> But definitely s/UINT64_MAX/INT64_MAX/.
+>>
+>>> + * the bitmap end.
+>>> + */
+>>> +int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t c=
+ount);
+>>> +
+>>> =A0 /* hbitmap_next_zero:
+>>> =A0=A0 *
+>>> =A0=A0 * Find next not dirty bit within selected range. If not found, r=
+eturn -1.
+>>
+>> [...]
+>>
+>>> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+>>> index 0e1e5c64dd..e3f1b3f361 100644
+>>> --- a/tests/test-hbitmap.c
+>>> +++ b/tests/test-hbitmap.c
+>>> @@ -816,92 +816,108 @@ static void test_hbitmap_iter_and_reset(TestHBit=
+mapData *data,
+>>> =A0=A0=A0=A0=A0 hbitmap_iter_next(&hbi);
+>>> =A0 }
+>>> -static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint6=
+4_t start,
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint6=
+4_t count)
+>>> +static void test_hbitmap_next_x_check_range(TestHBitmapData *data,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64_t start=
+,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64_t count=
+)
+>>
+>> Why not change the parameters to be signed while we=92re already here?
 
-On Tue, 21 Jan 2020 14:43:32 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Now I think that better to do it in previous patch.
 
-> On Mon, Jan 20, 2020 at 09:04:38AM +0100, Greg Kurz wrote:
-> > On Fri, 17 Jan 2020 16:44:27 +0100
-> > Greg Kurz <groug@kaod.org> wrote:
-> >=20
-> > > On Fri, 17 Jan 2020 19:16:08 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >=20
-> > > > On Thu, Jan 16, 2020 at 07:29:02PM +0100, Greg Kurz wrote:
-> > > > > On Thu, 16 Jan 2020 13:14:35 +0100
-> > > > > Greg Kurz <groug@kaod.org> wrote:
-> > > > >=20
-> > > > > > On Thu, 16 Jan 2020 11:37:24 +0100
-> > > > > > Laurent Vivier <lvivier@redhat.com> wrote:
-> > > > > >=20
-> > > > > > > On 16/01/2020 09:48, Greg Kurz wrote:
-> > > > > > > > On Wed, 15 Jan 2020 19:10:37 +0100
-> > > > > > > > Laurent Vivier <lvivier@redhat.com> wrote:
-> > > > > > > >=20
-> > > > > > > >> Hi,
-> > > > > > > >>
-> > > > > > > >> On 15/01/2020 18:48, Greg Kurz wrote:
-> > > > > > > >>> Migration can potentially race with CAS reboot. If the mi=
-gration thread
-> > > > > > > >>> completes migration after CAS has set spapr->cas_reboot b=
-ut before the
-> > > > > > > >>> mainloop could pick up the reset request and reset the ma=
-chine, the
-> > > > > > > >>> guest is migrated unrebooted and the destination doesn't =
-reboot it
-> > > > > > > >>> either because it isn't aware a CAS reboot was needed (eg=
-, because a
-> > > > > > > >>> device was added before CAS). This likely result in a bro=
-ken or hung
-> > > > > > > >>> guest.
-> > > > > > > >>>
-> > > > > > > >>> Even if it is small, the window between CAS and CAS reboo=
-t is enough to
-> > > > > > > >>> re-qualify spapr->cas_reboot as state that we should migr=
-ate. Add a new
-> > > > > > > >>> subsection for that and always send it when a CAS reboot =
-is pending.
-> > > > > > > >>> This may cause migration to older QEMUs to fail but it is=
- still better
-> > > > > > > >>> than end up with a broken guest.
-> > > > > > > >>>
-> > > > > > > >>> The destination cannot honour the CAS reboot request from=
- a post load
-> > > > > > > >>> handler because this must be done after the guest is full=
-y restored.
-> > > > > > > >>> It is thus done from a VM change state handler.
-> > > > > > > >>>
-> > > > > > > >>> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> > > > > > > >>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > > > > >>> ---
-> > > > > > > >>>
-> > > > > > > >>
-> > > > > > > >> I'm wondering if the problem can be related with the fact =
-that
-> > > > > > > >> main_loop_should_exit() could release qemu_global_mutex in
-> > > > > > > >> pause_all_vcpus() in the reset case?
-> > > > > > > >>
-> > > > > > > >> 1602 static bool main_loop_should_exit(void)
-> > > > > > > >> 1603 {
-> > > > > > > >> ...
-> > > > > > > >> 1633     request =3D qemu_reset_requested();
-> > > > > > > >> 1634     if (request) {
-> > > > > > > >> 1635         pause_all_vcpus();
-> > > > > > > >> 1636         qemu_system_reset(request);
-> > > > > > > >> 1637         resume_all_vcpus();
-> > > > > > > >> 1638         if (!runstate_check(RUN_STATE_RUNNING) &&
-> > > > > > > >> 1639                 !runstate_check(RUN_STATE_INMIGRATE))=
- {
-> > > > > > > >> 1640             runstate_set(RUN_STATE_PRELAUNCH);
-> > > > > > > >> 1641         }
-> > > > > > > >> 1642     }
-> > > > > > > >> ...
-> > > > > > > >>
-> > > > > > > >> I already sent a patch for this kind of problem (in curren=
-t Juan pull
-> > > > > > > >> request):
-> > > > > > > >>
-> > > > > > > >> "runstate: ignore finishmigrate -> prelaunch transition"
-> > > > > > > >>
-> > > > > > > >=20
-> > > > > > > > IIUC your patch avoids an invalid 'prelaunch' -> 'postmigra=
-te' runstate
-> > > > > > > > transition that can happen if the migration thread sets the=
- runstate to
-> > > > > > > > 'finishmigrate' when pause_all_vcpus() releases the main lo=
-op mutex.
-> > > > > > > >=20
-> > > > > > > > ie. symptom of the problem is QEMU aborting, correct ? The =
-issue I'm
-> > > > > > > > trying to fix is a guest breakage caused by a discrepancy b=
-etween
-> > > > > > > > QEMU and the guest after migration has succeeded.
-> > > > > > > >=20
-> > > > > > > >> but I don't know if it could fix this one.
-> > > > > > > >>
-> > > > > > > >=20
-> > > > > > > > I don't think so and your patch kinda illustrates it. If th=
-e runstate
-> > > > > > > > is 'finishmigrate' when returning from pause_all_vcpus(), t=
-his means
-> > > > > > > > that state was sent to the destination before we could actu=
-ally reset
-> > > > > > > > the machine.
-> > > > > > >=20
-> > > > > > > Yes, you're right.
-> > > > > > >=20
-> > > > > > > But the question behind my comment was: is it expected to hav=
-e a pending
-> > > > > > > reset while we are migrating?
-> > > > > > >=20
-> > > > > >=20
-> > > > > > Nothing prevents qemu_system_reset_request() to be called when =
-migration
-> > > > > > is active.=20
-> > > > > >=20
-> > > > > > > Perhaps H_CAS can return H_BUSY and wait the end of the migra=
-tion and
-> > > > > > > then be fully executed on destination?
-> > > > > > >=20
-> > > > > >=20
-> > > > > > And so we would need to teach SLOF to try H_CAS again until it =
-stops
-> > > > > > returning H_BUSY ? It seems safer to migrate the CAS reboot fla=
-g IMHO.
-> > > > > >=20
-> > > > >=20
-> > > > > Ok I've tried that with a patched SLOF that sleeps 500ms and trie=
-s CAS
-> > > > > again if H_BUSY was returned. It fixes the issue but it looks a b=
-it
-> > > > > ugly because of the polling with an arbitrary timeout in SLOF... =
-I'm
-> > > > > not very comfortable either with calling migration_is_active() fr=
-om
-> > > > > the CAS code in QEMU.
-> > > > >=20
-> > > > > David,
-> > > > >=20
-> > > > > Any suggestion ?
-> > > >=20
-> > > > Yeah, I think looping in SLOF is a worse idea than migrating the
-> > > > cas_reboot flag.
-> > > >=20
-> > > > But.. a better solution still might be to just remove the remaining
-> > > > causes for CAS reboot entirely.  CAS reboots pretty much suck when
-> > > > they happen, anyway.
-> > > >=20
-> > >=20
-> > > I Agree.
-> > >=20
-> > > > With the irq changeover condition removed, I think the remaining
-> > > > causes are more theoretical than practical situations at this point.
-> > > >=20
-> > >=20
-> > > FWIW, hotpluggging a PCI device before CAS result in a hung guest (no=
-t yet
-> > > investigated the details).
-> >=20
-> > commit 10f12e6450407b18b4d5a6b50d3852dcfd7fff75
-> > Author: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > Date:   Wed Aug 30 15:21:41 2017 -0300
-> >=20
-> >     hw/ppc: CAS reset on early device hotplug
-> >=20
-> > I'll have a look to see what can be done here.
+>>
+>> [...]
+>>
+>>> diff --git a/util/hbitmap.c b/util/hbitmap.c
+>>> index df22f06be6..d23f4b9678 100644
+>>> --- a/util/hbitmap.c
+>>> +++ b/util/hbitmap.c
+>>> @@ -193,6 +193,30 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBi=
+tmap *hb, uint64_t first)
+>>> =A0=A0=A0=A0=A0 }
+>>> =A0 }
+>>> +int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t c=
+ount)
+>>> +{
+>>> +=A0=A0=A0 HBitmapIter hbi;
+>>> +=A0=A0=A0 int64_t firt_dirty_off;
+>>
+>> Pre-existing, but isn=92t this just a typo that you could fix here?=A0 (=
+i.e.
+>> s/firt/first/)
+>>
+>> Apart from this minor things:
 >=20
-> Ah.. yes, that one might be a bit tricky.
+> Agree with them.
+>=20
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>>> +=A0=A0=A0 uint64_t end;
+>>> +
+>>> +=A0=A0=A0 assert(start >=3D 0 && count >=3D 0);
+>>> +
+>>> +=A0=A0=A0 if (start >=3D hb->orig_size || count =3D=3D 0) {
+>>> +=A0=A0=A0=A0=A0=A0=A0 return -1;
+>>> +=A0=A0=A0 }
+>>> +
+>>> +=A0=A0=A0 end =3D count > hb->orig_size - start ?
+>>
+>=20
 >=20
 
-So far it seems to be related to SLOF not being able to create
-new nodes in the DT when parsing the FDT returned by CAS. SLOF
-stops the parsing and returns an error. The guest ends up with
-a broken DT and eventually hangs later (in my case the kernel
-believes it is going to do hash while radix was negotiated with
-QEMU). I need to dig some more.
 
-> > But I agree the other check is more theoretical:
-> >=20
-> >     /* capabilities that have been added since CAS-generated guest rese=
-t.
-> >      * if capabilities have since been removed, generate another reset
-> >      */
-> >     spapr->cas_reboot =3D !spapr_ovec_subset(ov5_cas_old, spapr->ov5_ca=
-s);
-> >=20
-> > Unless changing kernels or tempering with the kernel command line, I do=
-n't
-> > see how some capabilities could change between the two CAS in practice.
->=20
-> Well, we want to be robust and it's at least theoretically possible
-> that the guest will request different things on subsequent reboots.
-
-Yes but in the latter case a full machine reset occurs and
-spapr->ov5_cas gets cleared, ie. spapr_ovec_subset() returns
-true in the check above no matter what.
-
-> However I believe that the original rationale for this check was that
-> while we could add things to the device tree for added capabilities,
-> we didn't have a way to roll back the changes for removed
-> capabilities.
->=20
-
-IIUC this is specifically for "removed capabilities since last
-CAS". This can happen if:
-1) we're already processing a CAS reboot or,
-2) a freshly rebooted guest calls CAS twice without being rebooted
-   in between.
-
-Since a freshly booted or rebooted guest can only trigger a CAS
-reboot because of a "hotplug-before-CAS", if we manage to get rid
-of this limitation, 1) cannot happen anymore.
-
-The linux kernel seems to be only calling "ibm,client-architecture-support"
-once during early boot so 2) should _never_ happen. Do we care to support
-this scenario anyway ?
-
-> Now that we fully rebuild the device tree at CAS, I think this test
-> can probably just go, although there's some double checking to do.
->=20
-
-I tend to agree.
-
---Sig_/578btjyBBbawmx1OQRBuzVH
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl4mxUcACgkQcdTV5YIv
-c9aOGQ//W0+aUR9HRIbFBNUlDui5dfup6048TfmEz99ezsTKYWVS6YT5KcueKc7v
-ECZfK5BZ3oy64Fq/EkdrAM6Wpn121A7o8sdcCWn7qqXYCkCzmlXhbjM0FXKXQmHz
-Vtg4mipbNKDng2MJb0GvfCyE8X624Y+pC3HlUzvJpc4Tgo0sEqtRHvLNYFeacnYh
-2aRzHXiPrTViX07El4ikxeSHaKLonKcPTdgGemj+bsDXpaOeLJlFckE+PLpgXnrB
-2ysu3O1f1Q4zQ61OHfvtdfrdJJ4gXj1HYN/mdfeJO1a6GQZ0QKflkVKCH8QMs30F
-iwNt6yG4aM3qv2hvjX1yi5XgGegUO536kecPZp0R9IO7DW4o3T0lAAWyk0DOsDKk
-z+CIAD4VmI0NKjuU0yXr8W9SB4076lj/09u+Ovni4QirF1GOFituy7JUB7UgYJ6Z
-KRcsSZWASKKjKkDBIvTsGylWgS5eHWMWJ5S9rFfB2JwyQXTf+MTseRARW/j9um6X
-cY92avy5ruz7A44XdxLrOHRUelInSf8rPS+lKw0vOE8uwDLFqSRmmyNXfQf6iqZ6
-BDngKiGVBVINaV3ooqjBnoJv/wj7YT9IC2aXLR9OLDnXNU+TP4V/5Y9msXMJAjCG
-RQvKo2IoqnGp9Uy/WU8NIwsZ2PWrK6IlX+xstGRlDjn1uAMd154=
-=B4fg
------END PGP SIGNATURE-----
-
---Sig_/578btjyBBbawmx1OQRBuzVH--
+--=20
+Best regards,
+Vladimir
 
