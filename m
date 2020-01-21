@@ -2,63 +2,83 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D3EC32771
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 577B6C32771
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 02:35:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A285422522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EA5522522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 02:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Mc7SE8q4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A285422522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQ3yqI+L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EA5522522
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itign-0004dj-Qd
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 20:50:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45029)
+	id 1itjO9-0004e9-6K
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 21:35:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <b1eae734604cdbda0cecf1fbb7d103dd249642ee@lizzy.crudebyte.com>)
- id 1iticW-0001Gq-FD
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:46:21 -0500
+ (envelope-from <alistair23@gmail.com>) id 1itjNM-0003jL-Fy
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 21:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <b1eae734604cdbda0cecf1fbb7d103dd249642ee@lizzy.crudebyte.com>)
- id 1iticV-0007on-4f
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:46:20 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:57503)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71)
- (envelope-from <b1eae734604cdbda0cecf1fbb7d103dd249642ee@lizzy.crudebyte.com>)
- id 1iticU-0007JR-Tf
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:46:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=ByUYiVdvoBSwlhivjSmx2Q2G2RuIKbbuG2BmPS71kXA=; b=Mc7SE
- 8q48huHLSEyPaNWJLE9fEsc/WaRXtgZReTlWkH80HGWcqW1WD4rrB/JTTNQdQ9lW5f5usoLh9/zo+
- Ye7tf+Km2RJZBxCscjLG9tDT4wQn79RCz1JbY4mCzVplqxPmnbjILPX+YmEbW4URvSopdcbxjoA/l
- /YYxB3xHdxfNgzSrfumKP8wLor0lYjCWOUNJs75RjTfFlTZCUNSWJfESd10S3Z6bArCunIeWHUFkl
- 6F+AeEHjoxQjIKaKtFh6lh9qfEpKaGAYeaTqFWL+UTdj79lChjLPl3VCByyfnuyowbZ+ieo/rx5Px
- Z28SnNfTkHmm9/gtNLCcpk1KQ/VEg==;
-Message-Id: <b1eae734604cdbda0cecf1fbb7d103dd249642ee.1579567020.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1579567019.git.qemu_oss@crudebyte.com>
-References: <cover.1579567019.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Tue, 21 Jan 2020 01:23:55 +0100
-Subject: [PATCH v4 08/11] 9pfs: readdir benchmark
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.194.90.13
+ (envelope-from <alistair23@gmail.com>) id 1itjNL-0004tc-7l
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 21:34:44 -0500
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:42518)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1itjNK-0004sc-V8; Mon, 20 Jan 2020 21:34:43 -0500
+Received: by mail-lf1-x144.google.com with SMTP id y19so888299lfl.9;
+ Mon, 20 Jan 2020 18:34:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=JDjK8f1wNDnYnv5MklAFUQW2n0lqeI71GG2vg7iUWG8=;
+ b=fQ3yqI+LFK7V/MhmaV3QyECDozlmW8wLhOlzrtdO8cnsSJcvgQGgN4r7Srxu03Ck8/
+ KGX8HttVcq1QoSKZu3LbFcdxyhVVhZnbA7ze1N1Xp18eXsnv0ty8e/Ic8Y/9Ml2+RNwr
+ E2VXjl6Cgt4ri5bQkx2d7WRLKnzvq1Mg1Sa8OywfFmAOn2QljpGQOhtOlRMz6RWVeDLD
+ qWxR1Vx2Q2b+xgt7JPqmlE7JF8511+AWxZC6nusnOLX010bT+YbmPHK+XIIVa065ZeSp
+ mh9ri4n2g7GqI0kZBPdxAvNfsW9W6RM+GChS0ODuTV4ByOSlA3Hf2Lyc+vevV9O8z4kv
+ RuDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=JDjK8f1wNDnYnv5MklAFUQW2n0lqeI71GG2vg7iUWG8=;
+ b=gwQ3yhebHEki7ZpRRigOtCrztjrEzjcfQ4t7oPiz9Y0rjRUcGe6bCCA9cPXnguwEs0
+ oqvL4y1WJ8vNu2dY2KIjA3TZ+cIaSCVaYP+t2RuPuB1LlXfYI0nJowgjrWb6WQqrVXnH
+ xFcPNs87nJHSvNQvxAL0c/kEgUbbk+RLPhwzSsoQe30lUH49jO2uskpCU4/lzFNvTBov
+ QOa4/mWI8dBsAaUki3lZ6GhEUEuHCEB/V3wivdTBos3zZ0uNsDp3RjgGAx9Tryr3F52D
+ X2vMqqfyeDM2osPs3aFE3tl5vOEKalUIwSGXyZAjHVL7BUnUjYWaiVkKaOTg5eUBDD6M
+ 3dTg==
+X-Gm-Message-State: APjAAAXq0rRfqs2vfsnel2uHLMJpO7kiE1nIr4OZYMiE08c9ELLO2oXy
+ +tphV6yf7PsMkhYDh8Y+D4XKm25LuATTyt3DpYc=
+X-Google-Smtp-Source: APXvYqw+3qRIWTmWXGfPKfh6gCC8kCPwZ+5YpcF3HQEaQfU+tYMBKfnBc9rAHgV1Sq8HY/jRCwrcqy7zuAF5VWSIdxA=
+X-Received: by 2002:ac2:4422:: with SMTP id w2mr1278069lfl.178.1579574080791; 
+ Mon, 20 Jan 2020 18:34:40 -0800 (PST)
+MIME-Version: 1.0
+References: <20200120235159.18510-1-f4bug@amsat.org>
+ <20200120235159.18510-2-f4bug@amsat.org>
+In-Reply-To: <20200120235159.18510-2-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 21 Jan 2020 12:34:11 +1000
+Message-ID: <CAKmqyKOCx5kc9ZvPCB9nJ6W3UZV6K1ji=zWvgo9_30U6BLQWBA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/7] hw/arm/raspi: Remove obsolete use of -smp to set
+ the soc 'enabled-cpus'
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,132 +90,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm <qemu-arm@nongnu.org>,
+ "Emilio G . Cota" <cota@braap.org>, Cleber Rosa <crosa@redhat.com>,
+ Laurent Bonnans <laurent.bonnans@here.com>,
+ Cheng Xiang <ext-cheng.xiang@here.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch is not intended to be merged. It just provides a
-temporary benchmark foundation for coneniently A/B comparison
-of the subsequent 9p readdir optimization patches:
+On Tue, Jan 21, 2020 at 9:53 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> Since we enabled parallel TCG code generation for softmmu (see
+> commit 3468b59 "tcg: enable multiple TCG contexts in softmmu")
+> and its subsequent fix (commit 72649619 "add .min_cpus and
+> .default_cpus fields to machine_class"), the raspi machines are
+> restricted to always use their 4 cores:
+>
+> See in hw/arm/raspi2 (with BCM283X_NCPUS set to 4):
+>
+>   222 static void raspi2_machine_init(MachineClass *mc)
+>   223 {
+>   224     mc->desc =3D "Raspberry Pi 2";
+>   230     mc->max_cpus =3D BCM283X_NCPUS;
+>   231     mc->min_cpus =3D BCM283X_NCPUS;
+>   232     mc->default_cpus =3D BCM283X_NCPUS;
+>   235 };
+>   236 DEFINE_MACHINE("raspi2", raspi2_machine_init)
+>
+> We can no longer use the -smp option, as we get:
+>
+>   $ qemu-system-arm -M raspi2 -smp 1
+>   qemu-system-arm: Invalid SMP CPUs 1. The min CPUs supported by machine =
+'raspi2' is 4
+>
+> Since we can not set the TYPE_BCM283x SOC "enabled-cpus" with -smp,
+> remove the unuseful code.
+>
+> We can achieve the same by using the '-global bcm2836.enabled-cpus=3D1'
+> option.
+>
+> Reported-by: Laurent Bonnans <laurent.bonnans@here.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-* hw/9pfs/9p-synth: increase amount of simulated files for
-  readdir test to 2000 files.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-* tests/virtio-9p: measure wall time that elapsed between
-  sending T_readdir request and arrival of R_readdir response
-  and print out that measured duration, as well as amount of
-  directory entries received, and the amount of bytes of the
-  response message.
+Alistair
 
-* tests/virtio-9p: increased msize to 256kiB to allow
-  retrieving all 2000 files (simulated by 9pfs synth driver)
-  with only one T_readdir request.
-
-Running this benchmark is fairly quick & simple and does not
-require any guest OS installation or other prerequisites:
-
-cd build
-make && make tests/qtest/qos-test
-export QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
-tests/qtest/qos-test -p $(tests/qtest/qos-test -l | grep readdir/basic)
-
-Since this benchmark uses the 9pfs synth driver, the host
-machine's I/O hardware (SSDs/HDDs) is not relevant for the
-benchmark result, because the synth backend's readdir
-implementation returns immediately (without any blocking I/O
-that would incur with a real-life fs driver) and just returns
-already prepared, simulated directory entries directly from RAM.
-So this benchmark focuses on the efficiency of the 9pfs
-controller code (or top half) for readdir request handling.
-
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- hw/9pfs/9p-synth.h           |  2 +-
- tests/qtest/virtio-9p-test.c | 37 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 37 insertions(+), 2 deletions(-)
-
-diff --git a/hw/9pfs/9p-synth.h b/hw/9pfs/9p-synth.h
-index 036d7e4a5b..7d6cedcdac 100644
---- a/hw/9pfs/9p-synth.h
-+++ b/hw/9pfs/9p-synth.h
-@@ -58,7 +58,7 @@ int qemu_v9fs_synth_add_file(V9fsSynthNode *parent, int mode,
- /* for READDIR test */
- #define QTEST_V9FS_SYNTH_READDIR_DIR "ReadDirDir"
- #define QTEST_V9FS_SYNTH_READDIR_FILE "ReadDirFile%d"
--#define QTEST_V9FS_SYNTH_READDIR_NFILES 100
-+#define QTEST_V9FS_SYNTH_READDIR_NFILES 2000
- 
- /* Any write to the "FLUSH" file is handled one byte at a time by the
-  * backend. If the byte is zero, the backend returns success (ie, 1),
-diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index e47b286340..d71b37aa6c 100644
---- a/tests/qtest/virtio-9p-test.c
-+++ b/tests/qtest/virtio-9p-test.c
-@@ -15,6 +15,18 @@
- #include "libqos/virtio-9p.h"
- #include "libqos/qgraph.h"
- 
-+/*
-+ * to benchmark the real time (not CPU time) that elapsed between start of
-+ * a request and arrival of its response
-+ */
-+static double wall_time(void)
-+{
-+    struct timeval t;
-+    struct timezone tz;
-+    gettimeofday(&t, &tz);
-+    return t.tv_sec + t.tv_usec * 0.000001;
-+}
-+
- #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
- static QGuestAllocator *alloc;
- 
-@@ -36,7 +48,7 @@ static void pci_config(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(tag);
- }
- 
--#define P9_MAX_SIZE 4096 /* Max size of a T-message or R-message */
-+#define P9_MAX_SIZE (256 * 1024) /* Max size of a T-message or R-message */
- 
- typedef struct {
-     QTestState *qts;
-@@ -600,12 +612,35 @@ static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rlopen(req, &qid, NULL);
- 
-+    const double start = wall_time();
-+
-     /*
-      * submit count = msize - 11, because 11 is the header size of Rreaddir
-      */
-     req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - 11, 0);
-+    const double treaddir = wall_time();
-     v9fs_req_wait_for_reply(req, NULL);
-+    const double waitforreply = wall_time();
-     v9fs_rreaddir(req, &count, &nentries, &entries);
-+    const double end = wall_time();
-+
-+    printf("\nTime client spent on sending T_readdir: %fs\n\n",
-+           treaddir - start);
-+
-+    printf("Time client spent for waiting for reply from server: %fs "
-+           "[MOST IMPORTANT]\n", waitforreply - start);
-+    printf("(This is the most important value, because it reflects the time\n"
-+           "the 9p server required to process and return the result of the\n"
-+           "T_readdir request.)\n\n");
-+
-+    printf("Total client time: %fs\n", end - start);
-+    printf("(NOTE: this time is not relevant; this huge time comes from\n"
-+           "inefficient qtest_memread() calls. So you can discard this\n"
-+           "value as a problem of this test client implementation while\n"
-+           "processing the received server T_readdir reply.)\n\n");
-+
-+    printf("Details of response message data: R_readddir nentries=%d "
-+           "rbytes=%d\n", nentries, count);
- 
-     /*
-      * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
--- 
-2.20.1
-
+> ---
+> Cc: Emilio G. Cota <cota@braap.org>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/arm/raspi.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 6a510aafc1..3996f6c63a 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -192,8 +192,6 @@ static void raspi_init(MachineState *machine, int ver=
+sion)
+>      /* Setup the SOC */
+>      object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ra=
+m),
+>                                     &error_abort);
+> -    object_property_set_int(OBJECT(&s->soc), machine->smp.cpus, "enabled=
+-cpus",
+> -                            &error_abort);
+>      int board_rev =3D version =3D=3D 3 ? 0xa02082 : 0xa21041;
+>      object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
+>                              &error_abort);
+> --
+> 2.21.1
+>
+>
 
