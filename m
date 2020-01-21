@@ -2,81 +2,53 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E027C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DABB6C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 066592070C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:23:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cxQABB9q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 066592070C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AE5C5217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:25:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE5C5217F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituRg-0003e6-TU
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:23:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52997)
+	id 1ituSq-0005Jj-MC
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:25:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsiU-0004Ba-Gz
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:14 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ittle-0003vq-Uy
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsiQ-00057G-KK
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36482
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ittlb-00037H-2x
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:40:30 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:54222 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsiQ-000575-GS
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609986;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8OxUQJ0n4TnYy5rAqGurLPWMkVWTfkYHO7FzsKlmGRU=;
- b=cxQABB9qg1CHJR7B+eY5zDNc91aLNAJyLkJRM7Uslcz8fdA23hS7BL4qFHkTncTT1u70EM
- wv4+WgKd+2L2+HCajKN0fS5duzVwqyqtpozg4L5HNCUcMM2oS7yDPDOz7OsxGsSLQsxsu0
- TzMDCuHRfkPzjkcKxj5PeNU+rmdAwXk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-FLbjSsafOP2WCvLR_F44CQ-1; Tue, 21 Jan 2020 07:33:05 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7AC0800D48;
- Tue, 21 Jan 2020 12:33:03 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 25F8F60BE0;
- Tue, 21 Jan 2020 12:33:01 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
- berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 108/109] virtiofsd: stop all queue threads on exit in
- virtio_loop()
-Date: Tue, 21 Jan 2020 12:24:32 +0000
-Message-Id: <20200121122433.50803-109-dgilbert@redhat.com>
-In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
-References: <20200121122433.50803-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: FLbjSsafOP2WCvLR_F44CQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1ittla-0002U0-S3
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:40:27 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id A17D91A4596;
+ Tue, 21 Jan 2020 14:39:15 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 77B5C1A456A;
+ Tue, 21 Jan 2020 14:39:15 +0100 (CET)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/5] target/mips: Misc MIPS fixes and improvements for 5.0
+Date: Tue, 21 Jan 2020 14:38:52 +0100
+Message-Id: <1579613937-5774-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,61 +60,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
+Cc: aleksandar.rikalo@rt-rk.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eryu Guan <eguan@linux.alibaba.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On guest graceful shutdown, virtiofsd receives VHOST_USER_GET_VRING_BASE
-request from VMM and shuts down virtqueues by calling fv_set_started(),
-which joins fv_queue_thread() threads. So when virtio_loop() returns,
-there should be no thread is still accessing data in fuse session and/or
-virtio dev.
+This series contains a variety of fixes and improvements for
+target MIPS.
 
-But on abnormal exit, e.g. guest got killed for whatever reason,
-vhost-user socket is closed and virtio_loop() breaks out the main loop
-and returns to main(). But it's possible fv_queue_worker()s are still
-working and accessing fuse session and virtio dev, which results in
-crash or use-after-free.
+v2->v3:
 
-Fix it by stopping fv_queue_thread()s before virtio_loop() returns,
-to make sure there's no-one could access fuse session and virtio dev.
+    - added micromips R6 disassembler
 
-Reported-by: Qingming Su <qingming.su@linux.alibaba.com>
-Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tools/virtiofsd/fuse_virtio.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Aleksandar Markovic (3):
+  target/mips: Rectify documentation on deprecating r4k machine
+  target/mips: Add support for MIPS<32|64>R6 CRC32 ISA
+  disas: mips: Add micromips R6 disassembler
 
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 9f6582343c..aca28aafc1 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -815,6 +815,18 @@ int virtio_loop(struct fuse_session *se)
-         }
-     }
-=20
-+    /*
-+     * Make sure all fv_queue_thread()s quit on exit, as we're about to
-+     * free virtio dev and fuse session, no one should access them anymore=
-.
-+     */
-+    for (int i =3D 0; i < se->virtio_dev->nqueues; i++) {
-+        if (!se->virtio_dev->qi[i])
-+            continue;
-+
-+        fuse_log(FUSE_LOG_INFO, "%s: Stopping queue %d thread\n", __func__=
-, i);
-+        fv_queue_cleanup_thread(se->virtio_dev, i);
-+    }
-+
-     fuse_log(FUSE_LOG_INFO, "%s: Exit\n", __func__);
-=20
-     return 0;
---=20
-2.24.1
+Yongbok Kim (2):
+  target/mips: Amend CP0 WatchHi register implementation
+  target/mips: Add implementation of GINVT instruction
+
+ disas/Makefile.objs     |    1 +
+ disas/micromips_r6.c    | 5669 +++++++++++++++++++++++++++++++++++++++++++++++
+ disas/mips.c            |   10 +
+ include/disas/dis-asm.h |    1 +
+ qemu-deprecated.texi    |    2 +-
+ target/mips/cpu.c       |    4 +
+ target/mips/cpu.h       |    4 +-
+ target/mips/helper.c    |   20 +-
+ target/mips/helper.h    |    7 +
+ target/mips/internal.h  |    1 +
+ target/mips/machine.c   |    6 +-
+ target/mips/op_helper.c |  171 +-
+ target/mips/translate.c |  215 +-
+ 13 files changed, 6077 insertions(+), 34 deletions(-)
+ create mode 100644 disas/micromips_r6.c
+
+-- 
+2.7.4
 
 
