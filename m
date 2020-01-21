@@ -2,62 +2,62 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A89C33CAA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE61CC33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:49:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 017E922314
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:47:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dklvFt4e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 017E922314
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id A2C8122314
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:49:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2C8122314
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itkVa-0006Jk-6X
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 22:47:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55439)
+	id 1itkXr-0007or-Sy
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 22:49:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1itkSE-0002ZK-Ow
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:43:52 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1itkX5-00078D-35
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:48:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1itkSC-0006Gv-G8
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:43:50 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:52929 helo=ozlabs.org)
+ (envelope-from <guoheyi@huawei.com>) id 1itkX3-0000o5-Tm
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:48:51 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38382 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1itkSB-00069B-NQ; Mon, 20 Jan 2020 22:43:48 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 481vXF5znQz9sRk; Tue, 21 Jan 2020 14:43:41 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1579578221;
- bh=IL28vbsxJD+xNHZVccIrpbDXRHZqH2KQ5C9QVLEmht4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=dklvFt4ez2hRONwHGLmN3dwsUw5qSdYDiu1qnCvQzE0zS5L4gU+s28ZVZ5wTDcS5Z
- /jTnn4KBsIU6hOd5aaeeLdEWbdirSm7o4cdxF2mTvsbK2abW7WRjfabaDn8pyQT55G
- TRy/eUBn9I2l9acmX5dNgaCVadFMT6dBaPPoq45U=
-Date: Tue, 21 Jan 2020 14:41:26 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
-Message-ID: <20200121034126.GB265522@umbus.fritz.box>
-References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
- <6fb96fed-9590-aa7c-cf00-038ab776ccb5@kaod.org>
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1itkX1-0000gv-1A; Mon, 20 Jan 2020 22:48:47 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 4110858C8C31749A7AB5;
+ Tue, 21 Jan 2020 11:48:39 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Tue, 21 Jan 2020
+ 11:48:29 +0800
+Subject: Re: [PATCH 1/2] arm/virt/acpi: remove meaningless sub device "PR0"
+ from PCI0
+To: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>
+References: <20191219064759.35053-1-guoheyi@huawei.com>
+ <20191219064759.35053-2-guoheyi@huawei.com>
+ <20200113133702.1dea867b@redhat.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <613eaf96-c49d-11ac-1204-8c762a8295cc@huawei.com>
+Date: Tue, 21 Jan 2020 11:48:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
-Content-Disposition: inline
-In-Reply-To: <6fb96fed-9590-aa7c-cf00-038ab776ccb5@kaod.org>
+In-Reply-To: <20200113133702.1dea867b@redhat.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,82 +69,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>,
- qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon
+ Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Julia,
 
---IiVenqGWf+H9Y6IX
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Could you provide some comments or advice?
 
-On Wed, Jan 15, 2020 at 07:10:47PM +0100, C=C3=A9dric Le Goater wrote:
-> On 1/15/20 6:48 PM, Greg Kurz wrote:
-> > Migration can potentially race with CAS reboot. If the migration thread
-> > completes migration after CAS has set spapr->cas_reboot but before the
-> > mainloop could pick up the reset request and reset the machine, the
-> > guest is migrated unrebooted and the destination doesn't reboot it
-> > either because it isn't aware a CAS reboot was needed (eg, because a
-> > device was added before CAS). This likely result in a broken or hung
-> > guest.
-> >=20
-> > Even if it is small, the window between CAS and CAS reboot is enough to
-> > re-qualify spapr->cas_reboot as state that we should migrate. Add a new
-> > subsection for that and always send it when a CAS reboot is pending.
-> > This may cause migration to older QEMUs to fail but it is still better
-> > than end up with a broken guest.
-> >=20
-> > The destination cannot honour the CAS reboot request from a post load
-> > handler because this must be done after the guest is fully restored.
-> > It is thus done from a VM change state handler.
-> >=20
-> > Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
->=20
-> C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> Nice work ! That was quite complex to catch !
+Thanks,
 
-It is a very nice analysis.  However, I'm disinclined to merge this
-for the time being.
+Heyi
 
-My preferred approach would be to just eliminate CAS reboots
-altogether, since that has other benefits.  I'm feeling like this
-isn't super-urgent, since CAS reboots are extremely rare in practice,
-now that we've eliminated the one for the irq switchover.
+=D4=DA 2020/1/13 20:37, Igor Mammedov =D0=B4=B5=C0:
+> On Thu, 19 Dec 2019 14:47:58 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
+>
+>> The sub device "PR0" under PCI0 in ACPI/DSDT does not make any sense,
+>> so simply remote it.
+> Could you make commit message more concrete so it would say
+> why it doesn't make any sense.
+>
+> It seems to be there to describe root port,
+> I'd rather have PCI folk ack if it's ok to remove it.
+>
+>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>
+>> ---
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+>> Cc: qemu-arm@nongnu.org
+>> Cc: qemu-devel@nongnu.org
+>> ---
+>>   hw/arm/virt-acpi-build.c          |   4 ----
+>>   tests/data/acpi/virt/DSDT         | Bin 18462 -> 18449 bytes
+>>   tests/data/acpi/virt/DSDT.memhp   | Bin 19799 -> 19786 bytes
+>>   tests/data/acpi/virt/DSDT.numamem | Bin 18462 -> 18449 bytes
+>>   4 files changed, 4 deletions(-)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index bd5f771e9b..9f4c7d1889 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -317,10 +317,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const M=
+emMapEntry *memmap,
+>>       aml_append(method, aml_return(buf));
+>>       aml_append(dev, method);
+>>  =20
+>> -    Aml *dev_rp0 =3D aml_device("%s", "RP0");
+>> -    aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+>> -    aml_append(dev, dev_rp0);
+>> -
+>>       Aml *dev_res0 =3D aml_device("%s", "RES0");
+>>       aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")=
+));
+>>       crs =3D aml_resource_template();
+>> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
+>> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3=
+d32ec856feb388be4c 100644
+>> GIT binary patch
+>> delta 39
+>> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
+>>
+>> delta 50
+>> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
+>> G{V4!>hYx%J
+>>
+>> diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DS=
+DT.memhp
+>> index 41ccc6431b917252bcbaac86c33b340c796be5ce..69ad844f65d047973a3e55=
+198beecd45a35b8fce 100644
+>> GIT binary patch
+>> delta 40
+>> wcmcaUi}BPfMlP3Nmk=3D*s1_q}3iCof5t(P{ccXBfI+}XT|v(|RAjk`1(02g)*ivR!s
+>>
+>> delta 51
+>> zcmX>#i}Cs_MlP3NmymE@1_mbiiCof5O_w*ScXBdy-rc;3v(}c2J1D>)o+IATC1|sb
+>> HyBr$;t7;Fc
+>>
+>> diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/=
+DSDT.numamem
+>> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3=
+d32ec856feb388be4c 100644
+>> GIT binary patch
+>> delta 39
+>> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
+>>
+>> delta 50
+>> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
+>> G{V4!>hYx%J
+>>
+>
+> .
 
-However, if it's not looking like we'll be ready to do that as the
-qemu-5.0 release approaches, then I'll be more than willing to
-reconsider this.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---IiVenqGWf+H9Y6IX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4mcuYACgkQbDjKyiDZ
-s5KhWhAAwfifalIuzoezNhnsPhzdJyXjjyQXvrU3kPK3sef8Hxs+jMYNFxhH7wpp
-zt8S6yWsi65FPA/plky5x8M4VmaUyjNJAKz6SEAFn7MtMPu2RBMmAAQcG17BV7im
-ckK0bNRpwRxqLajtDEQM6fVEpNiYU08Ct7h+ZA6mseoOOkU9Ol8D0HjpTWRwBIxg
-BSFj8Y0/vXFGYYSqDGYQJKtuCiYeqPhN6TtxazKhhotOUiAUcAw0T26qpGsKA6Bc
-baKpJw1p7ebk/ysXvGq+oIUJPmKKye+7YAiBOsB/HW/3pOlKXQyhP4FNL4i8i8d6
-/ixll+dAPohD40urxHQQIp0cemMVV7w/w17qFN8rfKa2PqWxjFDRmuuhX4A0QZuX
-BYm3s4eJ8YfftHatHqfs25530V+skrH5Ls1gch2PGovg+bDCKTb2lpw1WH9zksu5
-osBTESXpXXQs13z+rzdAwdBqalwhnMZh2e11COeRa1rwqcmf/O3YfqwFfYW25qvV
-RN6o7sZYW74RpkTLj276o5fk90+fL8xHs8UAPCk2UV3iaWjaca+j8Y+8yHtXsOSh
-/PenUOeOuJ6Sipltr1NIkfNPY3xxB/mBfQ+DE4zLbpq4ZKe2wZUhRUTGp5dMbPfJ
-2je8Xb4MTWKummGXWO355g1QLz8X5es5NyNsSvwqVP6spLNlXiQ=
-=Ro2T
------END PGP SIGNATURE-----
-
---IiVenqGWf+H9Y6IX--
 
