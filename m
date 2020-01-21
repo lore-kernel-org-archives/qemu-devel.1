@@ -2,89 +2,82 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0497CC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 11:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57258C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 11:30:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF0D22522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 11:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21FE122522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 11:30:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fUwSpXIF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF0D22522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="PQejQbJE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21FE122522
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itrdS-0004cM-Gc
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 06:23:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42810)
+	id 1itrjl-00067u-BO
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 06:30:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1itrco-000453-L1
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 06:23:15 -0500
+ (envelope-from <anup@brainfault.org>) id 1itrj2-0005fN-AR
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 06:29:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1itrcn-0005BB-NE
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 06:23:14 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39799)
+ (envelope-from <anup@brainfault.org>) id 1itrj1-0000HV-9g
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 06:29:40 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35276)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1itrcn-0005Ae-Ei; Tue, 21 Jan 2020 06:23:13 -0500
-Received: by mail-pl1-x644.google.com with SMTP id g6so1208315plp.6;
- Tue, 21 Jan 2020 03:23:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:subject:to:cc:references:in-reply-to:mime-version
- :user-agent:message-id:content-transfer-encoding;
- bh=oO5EnIrEtGfi6tXgcOJJXq3O0vyXm0dIqs1G2RYuqtc=;
- b=fUwSpXIFczjwzWIBmHKgw6xjDNvii0IFej2ot67oqFFl/qHlkKdy8szxsynFeOF+53
- r5Ib/Zd+lr3TtgmqmhQ+ZNKHWN4SdHezu6TR1sUyuP23fsNEaZAQlFqHjj/qEgDQWWTW
- C0C9cSFJyj8pf3fztZJ+mHHijkh5n25RNGbzdIR/D7O69/O7fOc1528rpZC2d2fH+3sV
- 2wBS9B/oNZjggBmdApTmyc1FWzdGh3hMM5vX6HkTzRW+hCaYKyF0IUeCx6SJ3opk+5vD
- IvkPQ5MWatnNIMarW8f+3LE7bqgTHs/HFkHjTMMdZVBiNjOHem5ZGyzBx+kXVRaTllpl
- VE8g==
+ (Exim 4.71) (envelope-from <anup@brainfault.org>) id 1itrj1-0000Er-0R
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 06:29:39 -0500
+Received: by mail-wr1-x442.google.com with SMTP id g17so2791559wro.2
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 03:29:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lydaG8bVLqnVOyu1nadKohiTA5PIw0cXjo6ZrAjWbjY=;
+ b=PQejQbJErEwrIW+pIg5LmvrDWYnBeKv6rSuK62BxMmNN010r+J7xvNqP4ccpgf5/h3
+ cMEAUJESQ/3FbZjXC8U4nPRVjP2/Ezb+YFmI/wVGHUNQFIY1Xj4GGd64tygW8hojMXbI
+ zctjIitEAdvtL0ydE3Jil0BWUDGNVQP0NneLKI8OsfX3izLCX1dWKQ0Fw2wtzrH9E1nU
+ r0GzAWNncdbUuGpeSBbcnw9exEaPoyp1y0sEpchGq1CppCG89PP5mcJ0lf6i+OCjpliY
+ g2Q+FkLCL7NBt7I52hNNx+XI/2HT2dLejLvy3vM7kopMYPebQouxjam4dpJvmUhX8DwE
+ C2dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
- :mime-version:user-agent:message-id:content-transfer-encoding;
- bh=oO5EnIrEtGfi6tXgcOJJXq3O0vyXm0dIqs1G2RYuqtc=;
- b=ZAVb23UJrwhS1TDuO/1KQfYV97SGKQeqGMR45t2dEyXvCYf6u8tcG6Y6wrFrxOhxYN
- uroU9jZPhVgOKTJgIivYA2yNXLzdzwra308bAtCDzqX4pCJwFDlcehlJKlnm34LjLqqg
- gLJf5L/NgMSxzM07Ux5WaawZbnPlcM5ugedkdwltVVh6+9gpeYFwGtFLqRzPRhHYnX7J
- +YI/jLO3+3BQGRZI4XNUHNRJ/rqyTGb3zkxuNFK8rRi7+DmbsCKyB3yQSqY19J3dN9Bh
- W0LX/ccODIuBfN5y1FwtGJBOZua4tiQz+4LNgAubBPMr71lQsYvLrOLnwfKwqmMZkgua
- mlLA==
-X-Gm-Message-State: APjAAAXiRAF4TOfn11Gy22X92qc6j7u2kyIz/aLuTiyMy6WkxvWjWWSk
- B/1OcMfnG9JT5XRqU7yDjZg=
-X-Google-Smtp-Source: APXvYqzFf0PgySrkudF+oC0YYx4d1ZO98IFYZk1OncEtTvmU5VXTQcvhxfM6DtKdXbQLPeHgyJ/K/g==
-X-Received: by 2002:a17:90a:b30b:: with SMTP id
- d11mr4845699pjr.22.1579605792258; 
- Tue, 21 Jan 2020 03:23:12 -0800 (PST)
-Received: from localhost (193-116-65-251.tpgi.com.au. [193.116.65.251])
- by smtp.gmail.com with ESMTPSA id w20sm43064214pfi.86.2020.01.21.03.23.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 03:23:11 -0800 (PST)
-Date: Tue, 21 Jan 2020 21:20:03 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] Implement qemu_thread_yield for posix,
- use it in mttcg to handle EXCP_YIELD
-To: Alex =?iso-8859-1?q?Benn=E9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190717054655.14104-1-npiggin@gmail.com>
- <87h81vdtv2.fsf@linaro.org>
-In-Reply-To: <87h81vdtv2.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lydaG8bVLqnVOyu1nadKohiTA5PIw0cXjo6ZrAjWbjY=;
+ b=c6M2UvE3rE1UKqQqfKeKsirXxhJJA//QzjXcvdTBxM3BB6U99OzAbE/FNngYMJXw0z
+ OcN1Qd35Et2by80pHF4GOqI2GeubVv13cHq+LTsuHfGbDI6jAmno8eEdVDJF4FmaI8X5
+ 3qA3RcKuuYTqxowpplFf2Eb9O6vVt4Ut7p6s//a4iV/VmuZUfCkhvjTy5oZjBsmiSrqQ
+ nIgRRQBrcWtCCZCW1daHmM2g56xDQoMAuRudn2hA0+dHQJj7pcRFiFDoQKtxQzIOkvgK
+ B28C7wXMoOReMTjoCFsPGkkthXbvjJ28uydYlPDkP66Y6FmMku0/VIXwJz1xG9uzMD4H
+ 8Dcg==
+X-Gm-Message-State: APjAAAWih1K6XPLVCVkdTfwAivhyV5j/WKCZ/mONUE9OH85S/Qd0sRAm
+ 58MrRhmiPZCbMkPu5QHyg45Denwm4bV5gAGZ6n6M8g==
+X-Google-Smtp-Source: APXvYqxLIY73pPZwumCqJezxhUDfu/EFg/R+RRS10+I++enEAGYbK+WwGKfxq722u3SuPcbjXkPhb1G5dyswTiw8XFg=
+X-Received: by 2002:a5d:5345:: with SMTP id t5mr5079984wrv.0.1579606177368;
+ Tue, 21 Jan 2020 03:29:37 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1579604990.qzk2f3181l.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <cover.1575914822.git.alistair.francis@wdc.com>
+ <b1313a76928acfe101247e33248f000e1f82f558.1575914822.git.alistair.francis@wdc.com>
+ <mhng-1d91cb12-dd7c-4160-9e39-a1d5a9f5023a@palmerdabbelt-glaptop>
+ <CAKmqyKOfqHn9PBsDeb65JSovszT4qF_3eNRUGA5AaG4_zhyiTA@mail.gmail.com>
+In-Reply-To: <CAKmqyKOfqHn9PBsDeb65JSovszT4qF_3eNRUGA5AaG4_zhyiTA@mail.gmail.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 21 Jan 2020 16:59:24 +0530
+Message-ID: <CAAhSdy0efUTu3LOayfD__TYcWN9h7dkz_w=PkK-sS6t2fdpFnA@mail.gmail.com>
+Subject: Re: [PATCH v1 17/36] target/riscv: Set VS bits in mideleg for Hyp
+ extension
+To: Alistair Francis <alistair23@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,43 +89,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
- =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Benn=C3=A9e's on December 20, 2019 11:11 pm:
->=20
-> Nicholas Piggin <npiggin@gmail.com> writes:
->=20
->> This is a bit of proof of concept in case mttcg becomes more important
->> yield could be handled like this. You can have by accident or deliberate=
-ly
->> force vCPUs onto the same physical CPU and cause inversion issues when t=
-he
->> lock holder was preempted by the waiter. This is lightly tested but not
->> to the point of measuring performance difference.
->=20
-> Sorry I'm so late replying.
+On Tue, Jan 21, 2020 at 4:43 PM Alistair Francis <alistair23@gmail.com> wrote:
+>
+> On Wed, Jan 8, 2020 at 12:07 PM Palmer Dabbelt <palmerdabbelt@google.com> wrote:
+> >
+> > On Mon, 09 Dec 2019 10:11:24 PST (-0800), Alistair Francis wrote:
+> > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > > ---
+> > >  target/riscv/csr.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> > > index a4b598d49a..fc38c45a7e 100644
+> > > --- a/target/riscv/csr.c
+> > > +++ b/target/riscv/csr.c
+> > > @@ -449,6 +449,9 @@ static int read_mideleg(CPURISCVState *env, int csrno, target_ulong *val)
+> > >  static int write_mideleg(CPURISCVState *env, int csrno, target_ulong val)
+> > >  {
+> > >      env->mideleg = (env->mideleg & ~delegable_ints) | (val & delegable_ints);
+> > > +    if (riscv_has_ext(env, RVH)) {
+> > > +        env->mideleg |= VS_MODE_INTERRUPTS;
+> > > +    }
+> > >      return 0;
+> > >  }
+> >
+> > Do you have any idea why?  The spec is explicit that this is the case, but I'm
+> > surprised.
+>
+> I'm not sure why, maybe to simplfy hardware design?
 
-That's fine if you'll also forgive me :)
+As-per my understanding, the VS-mode interrupts can be
+taken only when V=1 and these are injected by HS-mode
+using HIP CSR.
 
-> Really this comes down to what EXCP_YIELD semantics are meant to mean.
-> For ARM it's a hint operation because we also have WFE which should halt
-> until there is some sort of change of state. In those cases exiting the
-> main-loop and sitting in wait_for_io should be the correct response. If
-> a vCPU is suspended waiting on the halt condition doesn't it have the
-> same effect?
+If we allow VS-mode interrupts to be taken in M-mode then
+it means HS-mode can now inject interrupts for M-mode using
+HIP CSR. This cannot be allowed hence VS-mode interrupts
+are force delegated to S-mode in MIDELEG.
 
-For powerpc H_CONFER, the vCPU does not want to wait for ever, but just
-give up a some time slice on the physical CPU and allow other vCPUs to
-run. But it's not necessary that one does run (if they are all sleeping,
-the hypervisor must prevent deadlock). How would you wait on such a
-conditon?
-
-Thanks,
-Nick
-=
+Regards,
+Anup
 
