@@ -3,79 +3,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8AA7C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2BCC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:15:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93DA2217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:14:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0970322314
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:15:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fintelia.io header.i=@fintelia.io header.b="sxcIyj4K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93DA2217F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fintelia.io
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TZT22/30"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0970322314
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituIa-00027H-9U
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:14:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59318)
+	id 1ituJF-0002uK-07
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:15:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1ittRH-0003nQ-Ma
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:19:29 -0500
+ (envelope-from <thuth@redhat.com>) id 1ittRj-0004AE-D1
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:19:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1ittRE-0007Bj-0p
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:19:27 -0500
-Received: from rs224.mailgun.us ([209.61.151.224]:27369)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1ittRB-00079C-6B
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:19:23 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=fintelia.io; q=dns/txt;
- s=pic; 
- t=1579612763; h=Content-Type: Cc: To: Subject: Message-ID: Date: From:
- In-Reply-To: References: MIME-Version: Sender;
- bh=FPLCMDiSkQF/kfQwaJ9geG60O7odRN9ix3UGXChDxjU=;
- b=sxcIyj4KGNCsFBFpsHYCeyQpxvL9fw7tw43AjMoOi9P4/U550txuVR592WiL+JRCyd7cd0iM
- 3uZe2z8VPfe1a6N+RcRIVgFVYVjbbUxbUUTnjXxko69sLt+b468KrhlH/4SxhJIOMcXkzm8L
- Vk8UAVCV6lt9aXezAnmLtabiy2GAhkgrbdn9zgsXiRmjLCBiRE0gYr5M6ud0XrJQNzRMA9bI
- mauOvWkQV59Xb9hhgZ0mS4L1kexAv3Oex0n6YVD3iFNgH1UJFyCQQ99jecMuKw0Gn+T6EBKm
- xb4lfYpGeLZgqooHY/LAaPhzdxn/8eVo7qcVroe7XkSZ6XKkBwZxlQ==
-X-Mailgun-Sending-Ip: 209.61.151.224
-X-Mailgun-Sid: WyJlMGM5NSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOWI0ZTc2Il0=
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com
- [209.85.208.180])
- by mxa.mailgun.org with ESMTP id 5e26fa53.7fbc18108df0-smtp-out-n01;
- Tue, 21 Jan 2020 13:19:15 -0000 (UTC)
-Received: by mail-lj1-f180.google.com with SMTP id j1so2747219lja.2;
- Tue, 21 Jan 2020 05:19:15 -0800 (PST)
-X-Gm-Message-State: APjAAAWx3JQUGinFyRg92BwSFG8JEhRPAAZy+vzue5kEUkWnGjlPJnEc
- ZAO5MFlXaumlAVjU6941iS7dIzy/4BHUvCypQBU=
-X-Google-Smtp-Source: APXvYqyonyOKJN95NoJvd8Vm29+1Rvu04DJ5zbVd3JYirFsYel2VZW9aBjMECDY9eD1r7OJ2JLVavrk+fNjHkEC+Xys=
-X-Received: by 2002:a05:651c:321:: with SMTP id
- b1mr16692354ljp.62.1579612754311; 
- Tue, 21 Jan 2020 05:19:14 -0800 (PST)
-MIME-Version: 1.0
-References: <62fcfe747245cf8edcabcbe8f1f0b59be035fad6.1579584948.git.alistair.francis@wdc.com>
-In-Reply-To: <62fcfe747245cf8edcabcbe8f1f0b59be035fad6.1579584948.git.alistair.francis@wdc.com>
-From: Jonathan Behrens <jonathan@fintelia.io>
-Date: Tue, 21 Jan 2020 08:18:48 -0500
-X-Gmail-Original-Message-ID: <CANnJOVFD5yH-fnfjO2u3zTBCgq-OVsBNZMB6-CKdXftU_03qzg@mail.gmail.com>
-Message-ID: <CANnJOVFD5yH-fnfjO2u3zTBCgq-OVsBNZMB6-CKdXftU_03qzg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/1] target/riscv: Correctly implement TSR trap
-To: Alistair Francis <alistair.francis@wdc.com>
-Content-Type: multipart/alternative; boundary="0000000000001a7e3d059ca64113"
+ (envelope-from <thuth@redhat.com>) id 1ittRf-0007WU-MY
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:19:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51900
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ittRf-0007W4-HL
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:19:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579612791;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=bEifm2WHBJ8rLbC141yzBForohpXBApuTOH+9ClYcN0=;
+ b=TZT22/30u4g7waBzLahaZagS0WiZ60ieXliQuT0Tx6QhX8LoG5ZRZF16xVUEaM4D9l4ahD
+ vQ1WfIGxBl3Okdp6L43w6iExvIJufDM3zBEX4uwJfHTyJ1bz32MIAvp/15dp7RmriWjgS8
+ NEAqhcQZyZzch+zHMFa7NwdCfcJhT0E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-uskWf_w9P8uPOmHbSfhQ3Q-1; Tue, 21 Jan 2020 08:19:47 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA5C48024D5;
+ Tue, 21 Jan 2020 13:19:42 +0000 (UTC)
+Received: from thuth.com (ovpn-116-121.ams2.redhat.com [10.36.116.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 338A685734;
+ Tue, 21 Jan 2020 13:19:40 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] gitlab-ci: Refresh the list of iotests
+Date: Tue, 21 Jan 2020 14:19:36 +0100
+Message-Id: <20200121131936.8214-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: uskWf_w9P8uPOmHbSfhQ3Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.61.151.224
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,113 +81,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair23@gmail.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001a7e3d059ca64113
-Content-Type: text/plain; charset="UTF-8"
+iotest 147 and 205 have recently been marked as "NBD-only", so they
+are currently simply skipped and thus can be removed.
 
-Looks good to me. Though this is I think the third bug in privilege
-checking in op_helper.c which is only like 150 lines long total. It would
-be really good to fully double check that there aren't any more lurking
-there...
+iotest 129 occasionally fails in the gitlab-CI, and according to Max,
+there are some known issues with this test (see for example this URL:
+https://lists.nongnu.org/archive/html/qemu-block/2019-06/msg00499.html ),
+so for the time being, let's disable it until the problems are fixed.
 
-Reviewed-by: Jonathan Behrens <jonathan@fintelia.io
-<palmerdabbelt@google.com>>
+The iotests 040, 127, 203 and 256 are scheduled to become part of "make
+check-block", so we also do not have to test them seperately here anymore.
 
-On Tue, Jan 21, 2020 at 12:45 AM Alistair Francis <alistair.francis@wdc.com>
-wrote:
+On the other side, new iotests have been added to the QEMU repository
+in the past months, so we can now add some new test > 256 instead.
 
-> As reported in: https://bugs.launchpad.net/qemu/+bug/1851939 we weren't
-> correctly handling illegal instructions based on the value of MSTATUS_TSR
-> and the current privledge level.
->
-> This patch fixes the issue raised in the bug by raising an illegal
-> instruction if TSR is set and we are in S-Mode.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/op_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index 331cc36232..eed8eea6f2 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -83,7 +83,7 @@ target_ulong helper_sret(CPURISCVState *env,
-> target_ulong cpu_pc_deb)
->      }
->
->      if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
-> -        get_field(env->mstatus, MSTATUS_TSR)) {
-> +        get_field(env->mstatus, MSTATUS_TSR) && !(env->priv >= PRV_M)) {
->          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
->      }
->
-> --
-> 2.24.1
->
->
->
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .gitlab-ci.yml | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
---0000000000001a7e3d059ca64113
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index d9a90f795d..52d73c1c72 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -51,12 +51,12 @@ build-tcg-disabled:
+  - make check-qapi-schema
+  - cd tests/qemu-iotests/
+  - ./check -raw 001 002 003 004 005 008 009 010 011 012 021 025 032 033 04=
+8
+-            052 063 077 086 101 104 106 113 147 148 150 151 152 157 159 16=
+0
+-            163 170 171 183 184 192 194 197 205 208 215 221 222 226 227 23=
+6
+- - ./check -qcow2 028 040 051 056 057 058 065 067 068 082 085 091 095 096 =
+102
+-            122 124 127 129 132 139 142 144 145 147 151 152 155 157 165 19=
+4
+-            196 197 200 202 203 205 208 209 215 216 218 222 227 234 246 24=
+7
+-            248 250 254 255 256
++            052 063 077 086 101 104 106 113 148 150 151 152 157 159 160 16=
+3
++            170 171 183 184 192 194 197 208 215 221 222 226 227 236 253 27=
+7
++ - ./check -qcow2 028 051 056 057 058 065 067 068 082 085 091 095 096 102 =
+122
++            124 132 139 142 144 145 151 152 155 157 165 194 196 197 200 20=
+2
++            208 209 215 216 218 222 227 234 246 247 248 250 254 255 257 25=
+8
++            260 261 262 263 264 270 272 273 277 279
+=20
+ build-user:
+  script:
+--=20
+2.18.1
 
-<div dir=3D"ltr"><div>Looks good to me. Though this is I think the third bu=
-g in privilege checking in op_helper.c which is only like 150 lines long to=
-tal. It would be really good to fully double check that there aren&#39;t an=
-y more lurking there...<br></div><div><br></div><div>Reviewed-by: Jonathan =
-Behrens &lt;<a href=3D"mailto:jonathan@fintelia.io">jonathan@fintelia.io</a=
-><a href=3D"mailto:palmerdabbelt@google.com" target=3D"_blank"></a>&gt;</di=
-v></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr=
-">On Tue, Jan 21, 2020 at 12:45 AM Alistair Francis &lt;<a href=3D"mailto:a=
-listair.francis@wdc.com">alistair.francis@wdc.com</a>&gt; wrote:<br></div><=
-blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
-eft:1px solid rgb(204,204,204);padding-left:1ex">As reported in: <a href=3D=
-"https://bugs.launchpad.net/qemu/+bug/1851939" rel=3D"noreferrer" target=3D=
-"_blank">https://bugs.launchpad.net/qemu/+bug/1851939</a> we weren&#39;t<br=
->
-correctly handling illegal instructions based on the value of MSTATUS_TSR<b=
-r>
-and the current privledge level.<br>
-<br>
-This patch fixes the issue raised in the bug by raising an illegal<br>
-instruction if TSR is set and we are in S-Mode.<br>
-<br>
-Signed-off-by: Alistair Francis &lt;<a href=3D"mailto:alistair.francis@wdc.=
-com" target=3D"_blank">alistair.francis@wdc.com</a>&gt;<br>
----<br>
-=C2=A0target/riscv/op_helper.c | 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c<br>
-index 331cc36232..eed8eea6f2 100644<br>
---- a/target/riscv/op_helper.c<br>
-+++ b/target/riscv/op_helper.c<br>
-@@ -83,7 +83,7 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong=
- cpu_pc_deb)<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0if (env-&gt;priv_ver &gt;=3D PRIV_VERSION_1_10_0 &amp;&=
-amp;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 get_field(env-&gt;mstatus, MSTATUS_TSR)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 get_field(env-&gt;mstatus, MSTATUS_TSR) &amp;&=
-amp; !(env-&gt;priv &gt;=3D PRV_M)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0riscv_raise_exception(env, RISCV_EXCP_ILL=
-EGAL_INST, GETPC());<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
--- <br>
-2.24.1<br>
-<br>
-<br>
-</blockquote></div>
-
---0000000000001a7e3d059ca64113--
 
