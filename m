@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D478FC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C23C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:24:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AB0A206A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:23:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1C20206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:24:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HiFPREHv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AB0A206A2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hn9d3D4X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1C20206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittV2-000819-Gv
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:23:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52213)
+	id 1ittVg-0000P0-Jf
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:24:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51742)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsfn-0001kW-Gw
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:27 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsdj-0008MT-7b
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsfj-000463-GW
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:23 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57720
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itsdf-00033w-5J
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44748
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsfj-00045M-BP
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:19 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsde-00033W-VI
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609818;
+ s=mimecast20190719; t=1579609690;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Cd7MHlODkbFLPZaBRZM3VhImlj/yWK2Gg6eQIEyLu+Q=;
- b=HiFPREHv4sF46wUWGkff0Uwcf0e+genBzwkj8EOdTuysriSZlL5ORIkqI74ANiuYeMBy2A
- I4XmceGfdLS9wBlRUvx46S9piwXMpfUcIssSNNAWm3pMJP18EJQyy2iS0aC0M1x6HrR+Wm
- wlYjtjrn97uF19rtLQZDJFmWjxhUy2Q=
+ bh=dBF2Y9nkezpnXKnGhywn1BsxUXsjHbXc0YWyFevohj0=;
+ b=hn9d3D4XEt9E0jF1lSKmqqO/tLAuUHPa06DegpNAZA3Iw85g/qABJsaBmVch1Jd8rhisTy
+ anTIOMUXR+giO04+naujWMWI2yC5rNkBSwutLxw0CHxWSu7VLAjjm0jA0AYEHOafFVA/LU
+ o3iegj7aExmzY8gB+/yrvfuy4/jdLM4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-U1iEdNRTPCG_XduZzJxA5g-1; Tue, 21 Jan 2020 07:30:15 -0500
+ us-mta-65-OuZijAa6OLO-M6oAH_Umvw-1; Tue, 21 Jan 2020 07:28:08 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AE6B93980;
- Tue, 21 Jan 2020 12:30:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D73C9937C2;
+ Tue, 21 Jan 2020 12:28:06 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B806660BE0;
- Tue, 21 Jan 2020 12:30:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1A6FC60BE0;
+ Tue, 21 Jan 2020 12:28:04 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 062/109] virtiofsd: Add timestamp to the log with
- FUSE_LOG_DEBUG level
-Date: Tue, 21 Jan 2020 12:23:46 +0000
-Message-Id: <20200121122433.50803-63-dgilbert@redhat.com>
+Subject: [PATCH v2 042/109] virtiofsd: add fuse_mbuf_iter API
+Date: Tue, 21 Jan 2020 12:23:26 +0000
+Message-Id: <20200121122433.50803-43-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: U1iEdNRTPCG_XduZzJxA5g-1
+X-MC-Unique: OuZijAa6OLO-M6oAH_Umvw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,64 +92,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-virtiofsd has some threads, so we see a lot of logs with debug option.
-It would be useful for debugging if we can see the timestamp.
+Introduce an API for consuming bytes from a buffer with size checks.
+All FUSE operations will be converted to use this safe API instead of
+void *inarg.
 
-Add nano second timestamp, which got by get_clock(), to the log with
-FUSE_LOG_DEBUG level if the syslog option isn't set.
-
-The log is like as:
-
-  ]# ./virtiofsd -d -o vhost_user_socket=3D/tmp/vhostqemu0 -o source=3D/tmp=
-/share0 -o cache=3Dauto
-  ...
-  [5365943125463727] [ID: 00000002] fv_queue_thread: Start for queue 0 kick=
-_fd 9
-  [5365943125568644] [ID: 00000002] fv_queue_thread: Waiting for Queue 0 ev=
-ent
-  [5365943125573561] [ID: 00000002] fv_queue_thread: Got queue event on Que=
-ue 0
-
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ tools/virtiofsd/buffer.c      | 28 ++++++++++++++++++++
+ tools/virtiofsd/fuse_common.h | 49 ++++++++++++++++++++++++++++++++++-
+ 2 files changed, 76 insertions(+), 1 deletion(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 991de69334..a7fb34ac0c 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -35,6 +35,8 @@
-  * \include passthrough_ll.c
-  */
+diff --git a/tools/virtiofsd/buffer.c b/tools/virtiofsd/buffer.c
+index db1885ab19..918e0f41e0 100644
+--- a/tools/virtiofsd/buffer.c
++++ b/tools/virtiofsd/buffer.c
+@@ -267,3 +267,31 @@ ssize_t fuse_buf_copy(struct fuse_bufvec *dstv, struct=
+ fuse_bufvec *srcv,
 =20
-+#include "qemu/osdep.h"
-+#include "qemu/timer.h"
- #include "fuse_virtio.h"
- #include "fuse_log.h"
- #include "fuse_lowlevel.h"
-@@ -2275,7 +2277,13 @@ static void log_func(enum fuse_log_level level, cons=
-t char *fmt, va_list ap)
-     }
-=20
-     if (current_log_level =3D=3D FUSE_LOG_DEBUG) {
--        localfmt =3D g_strdup_printf("[ID: %08ld] %s", syscall(__NR_gettid=
-), fmt);
-+        if (!use_syslog) {
-+            localfmt =3D g_strdup_printf("[%" PRId64 "] [ID: %08ld] %s",
-+                                       get_clock(), syscall(__NR_gettid), =
-fmt);
-+        } else {
-+            localfmt =3D g_strdup_printf("[ID: %08ld] %s", syscall(__NR_ge=
-ttid),
-+                                       fmt);
+     return copied;
+ }
++
++void *fuse_mbuf_iter_advance(struct fuse_mbuf_iter *iter, size_t len)
++{
++    void *ptr;
++
++    if (len > iter->size - iter->pos) {
++        return NULL;
++    }
++
++    ptr =3D iter->mem + iter->pos;
++    iter->pos +=3D len;
++    return ptr;
++}
++
++const char *fuse_mbuf_iter_advance_str(struct fuse_mbuf_iter *iter)
++{
++    const char *str =3D iter->mem + iter->pos;
++    size_t remaining =3D iter->size - iter->pos;
++    size_t i;
++
++    for (i =3D 0; i < remaining; i++) {
++        if (str[i] =3D=3D '\0') {
++            iter->pos +=3D i + 1;
++            return str;
 +        }
-         fmt =3D localfmt;
-     }
++    }
++    return NULL;
++}
+diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
+index bd9bf861f0..deac132081 100644
+--- a/tools/virtiofsd/fuse_common.h
++++ b/tools/virtiofsd/fuse_common.h
+@@ -747,10 +747,57 @@ size_t fuse_buf_size(const struct fuse_bufvec *bufv);
+ ssize_t fuse_buf_copy(struct fuse_bufvec *dst, struct fuse_bufvec *src,
+                       enum fuse_buf_copy_flags flags);
 =20
++/**
++ * Memory buffer iterator
++ *
++ */
++struct fuse_mbuf_iter {
++    /**
++     * Data pointer
++     */
++    void *mem;
++
++    /**
++     * Total length, in bytes
++     */
++    size_t size;
++
++    /**
++     * Offset from start of buffer
++     */
++    size_t pos;
++};
++
++/* Initialize memory buffer iterator from a fuse_buf */
++#define FUSE_MBUF_ITER_INIT(fbuf) \
++    ((struct fuse_mbuf_iter){     \
++        .mem =3D fbuf->mem,         \
++        .size =3D fbuf->size,       \
++        .pos =3D 0,                 \
++    })
++
++/**
++ * Consume bytes from a memory buffer iterator
++ *
++ * @param iter memory buffer iterator
++ * @param len number of bytes to consume
++ * @return pointer to start of consumed bytes or
++ *         NULL if advancing beyond end of buffer
++ */
++void *fuse_mbuf_iter_advance(struct fuse_mbuf_iter *iter, size_t len);
++
++/**
++ * Consume a NUL-terminated string from a memory buffer iterator
++ *
++ * @param iter memory buffer iterator
++ * @return pointer to the string or
++ *         NULL if advancing beyond end of buffer or there is no NUL-termi=
+nator
++ */
++const char *fuse_mbuf_iter_advance_str(struct fuse_mbuf_iter *iter);
++
+ /*
+  * Signal handling
+  */
+-
+ /**
+  * Exit session on HUP, TERM and INT signals and ignore PIPE signal
+  *
 --=20
 2.24.1
 
