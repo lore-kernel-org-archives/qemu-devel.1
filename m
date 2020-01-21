@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B41C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DEAC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:30:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42611206A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0D99206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:30:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2yVqiAc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42611206A2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2C+iKLj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0D99206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittaF-0006dR-Um
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:28:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52429)
+	id 1ittbV-0008NX-Kc
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:30:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsgL-0002WE-He
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:01 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsgV-0002aL-2R
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsgH-0004KC-Jf
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20338
+ (envelope-from <dgilbert@redhat.com>) id 1itsgN-0004MK-R6
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:05 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25014
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsgH-0004Jt-F6
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:53 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsgN-0004MD-GR
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609852;
+ s=mimecast20190719; t=1579609859;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7I+V95tfiGdmTIs1NMqsbZqtH1qQn4wQdyfjZFiICug=;
- b=D2yVqiAcR6TTwdJI6oKuYuib1uU+Q88lxCttkNVwlwI4L3MPjBjPq+NlB2fg0E/FpLRh5h
- +rpdwFulS/iHb1M5v/xexWQg/Tt34ZYLUUikWU4OERRs/yjcUPzX6HPx66J/jE4giemUqZ
- ITDOCQDgiwhsi4Wqp5/zGA1LGE9yepQ=
+ bh=QbMS0kP6iKeNqu2Mv7H+soNaPN09g0beLkqrgUlqAWQ=;
+ b=U2C+iKLjGFlTVGVzmExAo9PaB4ud5jJp/egn6l3carspsKBU5kUsent63gBS7ODYe9Xo/Q
+ aAzfWAmc7CRVSfEqpIWSTrJmztLJ5+x/z2c+iubpdzpKCFG/t7lk9JK5JWe0GwZHYOELxt
+ ivj/WRCbZfA+X2qgv+Z1RMS+RHV6ZUo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-mXxodNsMO4KontWDWEjeIg-1; Tue, 21 Jan 2020 07:30:47 -0500
+ us-mta-117-q6YIOOoyOnukdUWNzaMZZA-1; Tue, 21 Jan 2020 07:30:57 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F5D6801A04;
- Tue, 21 Jan 2020 12:30:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 603428C7A53;
+ Tue, 21 Jan 2020 12:30:56 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E764A60BE0;
- Tue, 21 Jan 2020 12:30:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 933ED60BE0;
+ Tue, 21 Jan 2020 12:30:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 070/109] virtiofsd: passthrough_ll: control readdirplus
-Date: Tue, 21 Jan 2020 12:23:54 +0000
-Message-Id: <20200121122433.50803-71-dgilbert@redhat.com>
+Subject: [PATCH v2 073/109] virtiofsd: extract root inode init into
+ setup_root()
+Date: Tue, 21 Jan 2020 12:23:57 +0000
+Message-Id: <20200121122433.50803-74-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: mXxodNsMO4KontWDWEjeIg-1
+X-MC-Unique: q6YIOOoyOnukdUWNzaMZZA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,60 +95,92 @@ Sender: "Qemu-devel"
 
 From: Miklos Szeredi <mszeredi@redhat.com>
 
-Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
----
- tools/virtiofsd/helper.c         | 3 +++
- tools/virtiofsd/passthrough_ll.c | 7 ++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+Inititialize the root inode in a single place.
 
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index c8cb88afdd..36eb273d8e 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -154,6 +154,9 @@ void fuse_cmdline_help(void)
-            "                               allowed (default: 10)\n"
-            "    -o norace                  disable racy fallback\n"
-            "                               default: false\n"
-+           "    -o readdirplus|no_readdirplus\n"
-+           "                               enable/disable readirplus\n"
-+           "                               default: readdirplus\n"
-           );
- }
-=20
+Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+dgilbert:
+with fix suggested by Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 35 +++++++++++++++++++++++---------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
+
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
 _ll.c
-index ae364a4825..b15633a044 100644
+index 2d2c10ada9..f71085bf1b 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -117,6 +117,8 @@ struct lo_data {
-     double timeout;
-     int cache;
-     int timeout_set;
-+    int readdirplus_set;
-+    int readdirplus_clear;
-     struct lo_inode root; /* protected by lo->mutex */
-     struct lo_map ino_map; /* protected by lo->mutex */
-     struct lo_map dirp_map; /* protected by lo->mutex */
-@@ -140,6 +142,8 @@ static const struct fuse_opt lo_opts[] =3D {
-     { "cache=3Dauto", offsetof(struct lo_data, cache), CACHE_NORMAL },
-     { "cache=3Dalways", offsetof(struct lo_data, cache), CACHE_ALWAYS },
-     { "norace", offsetof(struct lo_data, norace), 1 },
-+    { "readdirplus", offsetof(struct lo_data, readdirplus_set), 1 },
-+    { "no_readdirplus", offsetof(struct lo_data, readdirplus_clear), 1 },
-     FUSE_OPT_END
- };
- static bool use_syslog =3D false;
-@@ -478,7 +482,8 @@ static void lo_init(void *userdata, struct fuse_conn_in=
-fo *conn)
-         fuse_log(FUSE_LOG_DEBUG, "lo_init: activating flock locks\n");
-         conn->want |=3D FUSE_CAP_FLOCK_LOCKS;
+@@ -2351,6 +2351,30 @@ static void log_func(enum fuse_log_level level, cons=
+t char *fmt, va_list ap)
      }
--    if (lo->cache =3D=3D CACHE_NEVER) {
-+    if ((lo->cache =3D=3D CACHE_NEVER && !lo->readdirplus_set) ||
-+        lo->readdirplus_clear) {
-         fuse_log(FUSE_LOG_DEBUG, "lo_init: disabling readdirplus\n");
-         conn->want &=3D ~FUSE_CAP_READDIRPLUS;
+ }
+=20
++static void setup_root(struct lo_data *lo, struct lo_inode *root)
++{
++    int fd, res;
++    struct stat stat;
++
++    fd =3D open("/", O_PATH);
++    if (fd =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", lo->source);
++        exit(1);
++    }
++
++    res =3D fstatat(fd, "", &stat, AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
++    if (res =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "fstatat(%s): %m\n", lo->source);
++        exit(1);
++    }
++
++    root->is_symlink =3D false;
++    root->fd =3D fd;
++    root->ino =3D stat.st_ino;
++    root->dev =3D stat.st_dev;
++    root->refcount =3D 2;
++}
++
+ int main(int argc, char *argv[])
+ {
+     struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
+@@ -2426,8 +2450,6 @@ int main(int argc, char *argv[])
+     if (lo.debug) {
+         current_log_level =3D FUSE_LOG_DEBUG;
      }
+-    lo.root.refcount =3D 2;
+-
+     if (lo.source) {
+         struct stat stat;
+         int res;
+@@ -2446,7 +2468,6 @@ int main(int argc, char *argv[])
+     } else {
+         lo.source =3D "/";
+     }
+-    lo.root.is_symlink =3D false;
+     if (!lo.timeout_set) {
+         switch (lo.cache) {
+         case CACHE_NEVER:
+@@ -2466,13 +2487,6 @@ int main(int argc, char *argv[])
+         exit(1);
+     }
+=20
+-    lo.root.fd =3D open(lo.source, O_PATH);
+-
+-    if (lo.root.fd =3D=3D -1) {
+-        fuse_log(FUSE_LOG_ERR, "open(\"%s\", O_PATH): %m\n", lo.source);
+-        exit(1);
+-    }
+-
+     se =3D fuse_session_new(&args, &lo_oper, sizeof(lo_oper), &lo);
+     if (se =3D=3D NULL) {
+         goto err_out1;
+@@ -2495,6 +2509,7 @@ int main(int argc, char *argv[])
+=20
+     setup_sandbox(&lo, se, opts.syslog);
+=20
++    setup_root(&lo, &lo.root);
+     /* Block until ctrl+c or fusermount -u */
+     ret =3D virtio_loop(se);
+=20
 --=20
 2.24.1
 
