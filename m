@@ -2,80 +2,80 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B86C2C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E311C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:45:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83F82217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:43:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A3E72070C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GEhcFCQq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F82217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wOh8i0Cj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A3E72070C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittol-0007hy-4x
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:43:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52817)
+	id 1ittqJ-00013B-5Z
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:45:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56588)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsht-0003WS-O4
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:34 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1itt8P-0000Ep-P1
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itshs-0004wa-Lk
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:33 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27245
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itshs-0004wM-Hx
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609952;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JTpjZPadHNrcDZKv51V6CLKGvZ7oo/FweuUesYbxnBo=;
- b=GEhcFCQqJImsnsNcK4QDopz4MtGHF1TZwN27/vCFETzld0RR40uHb7z0pHlHrughRYKIE6
- SqJyYfABqrEk8NhdZTkdmKHgAIEBDD/P78rqsT19g6E95ULBcZ3nbrp/vx2jlT+qdauc4g
- PYvRuPeqQCZVCRAp36LsVQHtMKPHT7k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-rMHCKgNHNhS0wpgAnik7nA-1; Tue, 21 Jan 2020 07:32:27 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB2E58017CC;
- Tue, 21 Jan 2020 12:32:26 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DFB0F60BE0;
- Tue, 21 Jan 2020 12:32:24 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
- berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 098/109] virtiofsd: Reset O_DIRECT flag during file open
-Date: Tue, 21 Jan 2020 12:24:22 +0000
-Message-Id: <20200121122433.50803-99-dgilbert@redhat.com>
-In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
-References: <20200121122433.50803-1-dgilbert@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1itt8O-0003V8-7J
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:59:57 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33405)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1itt8N-0003UZ-VV
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:59:56 -0500
+Received: by mail-ot1-x342.google.com with SMTP id b18so2838222otp.0
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 04:59:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8LNvrZuo+j2W+nRtUVI62IXEJewAIvxTmhTAWfc3HLo=;
+ b=wOh8i0CjU0QQOma6koBelMSu4J8ijwcwi7WOjTPhSi0Vd6IjLeXi/wdjJAGSqjATL2
+ C7xaxh0mAGeoa+sKcfNLDfvOUWAmdMRuJMVcHREwta3jrIF1sFe3Bv2FdsY+M0AMhaCh
+ zOhGVWwOVHoZSv+BgYYX4wl31RaOOmewjfFN5/VA0ZHt9HWof+YpHQPNsiefRtJ6Nv5V
+ kBTDfw1PrJrQua+RRjuq5iRAH/M/8q6zG0x1UzsLu22Fk1tFDVcOYVOVkL9PJE48hZNp
+ xKcXJFQCNpf3/9kk5kGMbudD17ADh6iGU9NeQ2MYVuzpMEHK7gZFNuiTaslYhtjHPbjv
+ eE6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8LNvrZuo+j2W+nRtUVI62IXEJewAIvxTmhTAWfc3HLo=;
+ b=bN5LulYeKOwrY+ZX4li2msLr19XkpC1yLRqQk10+8McW7LjdLruhnAxKieI93gB9Cm
+ dHTmgo7tdSfwu71eogSvcBq5RGDDzarjzENtYTDhbUCPyC7QRGGZd5GuH6y/R61123nW
+ Y+hOMmF8EXMuYx1bn2IWbdvp00mK0ay8g3h2lVZIDjRniE2YlydHSviAJNGeEiibu0VB
+ NmftSRlYXUcHEIQ6qFOj0tqr+kW+vi2aoZq6aRX4jGRtjYAJFjWBQoIeSu48UVIC0lt+
+ vFxgpTfTRx9UapTvmlfWlkqfkOhHRly2UfaACgTDVd4m6J3t4i2zPMiCk1LZUvP2Wmbf
+ VjgA==
+X-Gm-Message-State: APjAAAWKwItQ+WUOfa4ngMXTv6tO3lU9iObvrijhniDf9Ohvt/ZZMOIZ
+ PqITdAucoT/OBXnVzzr8e9GUKgSpx45IPl5Ynhwe2rXC+as=
+X-Google-Smtp-Source: APXvYqyDbM4wdR0u67AdICVKmM4PY0gT3y1Mw7nzeKJ0coVYYnbNpFg/bW7F0pMNVrJz2eheFktUYzb1NTG4QYw9EPI=
+X-Received: by 2002:a05:6830:1586:: with SMTP id
+ i6mr3306209otr.221.1579611594879; 
+ Tue, 21 Jan 2020 04:59:54 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: rMHCKgNHNhS0wpgAnik7nA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20200121122138.1708193-1-laurent@vivier.eu>
+In-Reply-To: <20200121122138.1708193-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Jan 2020 12:59:43 +0000
+Message-ID: <CAFEAcA92RXwihkxmG6-E8=6AV==s1nGZgmCm3FwmUoH+fu2uLA@mail.gmail.com>
+Subject: Re: [PULL 0/1] M68k for 5.0 patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,65 +87,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vivek Goyal <vgoyal@redhat.com>
+On Tue, 21 Jan 2020 at 12:22, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit d83bbedab5a2758fbb7866c06472feb3f3bf079b:
+>
+>   Makefile: add missing mkdir MANUAL_BUILDDIR (2020-01-21 11:56:17 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-for-5.0-pull-request
+>
+> for you to fetch changes up to 322f244aaa80a5208090d41481c1c09c6face66b:
+>
+>   m68k: Fix regression causing Single-Step via GDB/RSP to not single step (2020-01-21 13:05:45 +0100)
+>
+> ----------------------------------------------------------------
+> Fix m68k single-stepping with remote gdb
+>
+> ----------------------------------------------------------------
+>
+> Laurent Vivier (1):
+>   m68k: Fix regression causing Single-Step via GDB/RSP to not single
+>     step
+>
+>  target/m68k/translate.c | 42 ++++++++++++++++++++++++++---------------
+>  1 file changed, 27 insertions(+), 15 deletions(-)
 
-If an application wants to do direct IO and opens a file with O_DIRECT
-in guest, that does not necessarily mean that we need to bypass page
-cache on host as well. So reset this flag on host.
 
-If somebody needs to bypass page cache on host as well (and it is safe to
-do so), we can add a knob in daemon later to control this behavior.
+Applied, thanks.
 
-I check virtio-9p and they do reset O_DIRECT flag.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- tools/virtiofsd/passthrough_ll.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 4c3a48325f..cadfa676ca 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1721,6 +1721,13 @@ static void lo_create(fuse_req_t req, fuse_ino_t par=
-ent, const char *name,
-         goto out;
-     }
-=20
-+    /*
-+     * O_DIRECT in guest should not necessarily mean bypassing page
-+     * cache on host as well. If somebody needs that behavior, it
-+     * probably should be a configuration knob in daemon.
-+     */
-+    fi->flags &=3D ~O_DIRECT;
-+
-     fd =3D openat(parent_inode->fd, name, (fi->flags | O_CREAT) & ~O_NOFOL=
-LOW,
-                 mode);
-     err =3D fd =3D=3D -1 ? errno : 0;
-@@ -1950,6 +1957,13 @@ static void lo_open(fuse_req_t req, fuse_ino_t ino, =
-struct fuse_file_info *fi)
-         fi->flags &=3D ~O_APPEND;
-     }
-=20
-+    /*
-+     * O_DIRECT in guest should not necessarily mean bypassing page
-+     * cache on host as well. If somebody needs that behavior, it
-+     * probably should be a configuration knob in daemon.
-+     */
-+    fi->flags &=3D ~O_DIRECT;
-+
-     sprintf(buf, "%i", lo_fd(req, ino));
-     fd =3D openat(lo->proc_self_fd, buf, fi->flags & ~O_NOFOLLOW);
-     if (fd =3D=3D -1) {
---=20
-2.24.1
-
+-- PMM
 
