@@ -2,53 +2,80 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DABB6C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBEBC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE5C5217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:25:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE5C5217F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 888BE2070C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:26:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bk4+fN+4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 888BE2070C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituSq-0005Jj-MC
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:25:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34495)
+	id 1ituTk-0006Og-Ii
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:26:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ittle-0003vq-Uy
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:40:34 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsiZ-0004Gy-CG
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ittlb-00037H-2x
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:40:30 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54222 helo=mail.rt-rk.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itsiV-000598-C1
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45463
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ittla-0002U0-S3
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:40:27 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id A17D91A4596;
- Tue, 21 Jan 2020 14:39:15 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 77B5C1A456A;
- Tue, 21 Jan 2020 14:39:15 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/5] target/mips: Misc MIPS fixes and improvements for 5.0
-Date: Tue, 21 Jan 2020 14:38:52 +0100
-Message-Id: <1579613937-5774-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsiV-00058r-85
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579609990;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ydaat2+5npPJRpXsNzmdy8r1dEns28YO0wBkb1oTcEM=;
+ b=bk4+fN+40RbLmQoyZ0kchTjCjWNNt2SYXNTAp/hvy3nCiW/JxmabD5fdu4iHOlXlr4MWRH
+ EpkqEm7/bPfp4wRxxlbqbC6kP7aEQCYpjzJqdUo82gUiQVOXfmWtXisCtpulKUmU2/eJt0
+ 5v5cFbJpm67TUIV4OD1KZ/9Rwg9Mi4U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-YL5dNJ2KMEWny3EncFHy9g-1; Tue, 21 Jan 2020 07:33:09 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79C9A800D41;
+ Tue, 21 Jan 2020 12:33:08 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E7DE60FC4;
+ Tue, 21 Jan 2020 12:33:04 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
+ berrange@redhat.com, slp@redhat.com, philmd@redhat.com
+Subject: [PATCH v2 109/109] virtiofsd: add some options to the help message
+Date: Tue, 21 Jan 2020 12:24:33 +0000
+Message-Id: <20200121122433.50803-110-dgilbert@redhat.com>
+In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
+References: <20200121122433.50803-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: YL5dNJ2KMEWny3EncFHy9g-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,46 +87,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@rt-rk.com, amarkovic@wavecomp.com
+Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 
-This series contains a variety of fixes and improvements for
-target MIPS.
+Add following options to the help message:
+- cache
+- flock|no_flock
+- norace
+- posix_lock|no_posix_lock
+- readdirplus|no_readdirplus
+- timeout
+- writeback|no_writeback
+- xattr|no_xattr
 
-v2->v3:
+Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 
-    - added micromips R6 disassembler
+dgilbert: Split cache, norace, posix_lock, readdirplus off
+  into our own earlier patches that added the options
 
-Aleksandar Markovic (3):
-  target/mips: Rectify documentation on deprecating r4k machine
-  target/mips: Add support for MIPS<32|64>R6 CRC32 ISA
-  disas: mips: Add micromips R6 disassembler
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/helper.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Yongbok Kim (2):
-  target/mips: Amend CP0 WatchHi register implementation
-  target/mips: Add implementation of GINVT instruction
-
- disas/Makefile.objs     |    1 +
- disas/micromips_r6.c    | 5669 +++++++++++++++++++++++++++++++++++++++++++++++
- disas/mips.c            |   10 +
- include/disas/dis-asm.h |    1 +
- qemu-deprecated.texi    |    2 +-
- target/mips/cpu.c       |    4 +
- target/mips/cpu.h       |    4 +-
- target/mips/helper.c    |   20 +-
- target/mips/helper.h    |    7 +
- target/mips/internal.h  |    1 +
- target/mips/machine.c   |    6 +-
- target/mips/op_helper.c |  171 +-
- target/mips/translate.c |  215 +-
- 13 files changed, 6077 insertions(+), 34 deletions(-)
- create mode 100644 disas/micromips_r6.c
-
--- 
-2.7.4
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index a19959926c..8f00737b1a 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -149,6 +149,8 @@ void fuse_cmdline_help(void)
+            "    -o cache=3D<mode>            cache mode. could be one of \=
+"auto, "
+            "always, none\"\n"
+            "                               default: auto\n"
++           "    -o flock|no_flock          enable/disable flock\n"
++           "                               default: no_flock\n"
+            "    -o log_level=3D<level>       log level, default to \"info\=
+"\n"
+            "                               level could be one of \"debug, =
+"
+            "info, warn, err\"\n"
+@@ -163,7 +165,13 @@ void fuse_cmdline_help(void)
+            "    -o readdirplus|no_readdirplus\n"
+            "                               enable/disable readirplus\n"
+            "                               default: readdirplus\n"
+-          );
++           "    -o timeout=3D<number>        I/O timeout (second)\n"
++           "                               default: depends on cache=3D op=
+tion.\n"
++           "    -o writeback|no_writeback  enable/disable writeback cache\=
+n"
++           "                               default: no_writeback\n"
++           "    -o xattr|no_xattr          enable/disable xattr\n"
++           "                               default: no_xattr\n"
++           );
+ }
+=20
+ static int fuse_helper_opt_proc(void *data, const char *arg, int key,
+--=20
+2.24.1
 
 
