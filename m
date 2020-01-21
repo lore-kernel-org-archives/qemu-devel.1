@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF34C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 018F2C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:10:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D932820882
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC950207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:10:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Byg0lRMu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D932820882
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JByx/Bu5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC950207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittGw-0007qY-No
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:08:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52331)
+	id 1ittIt-0001dh-DT
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:10:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51875)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsg6-0002DH-Vs
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:46 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itseD-0000KJ-8B
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsg3-0004DY-21
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:42 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37691
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1itse9-0003Ib-Bn
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57571
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsg2-0004DO-UI
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:30:39 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itse9-0003IB-6d
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:28:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609838;
+ s=mimecast20190719; t=1579609720;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=saxJp3gmNUaoX28RCBi9UCp8pebRIGJmfaOnCtZ8AMk=;
- b=Byg0lRMu7EWjzreaMU6Um4xncA+QgXI7ys9BNuMoFO/wdjf+/3WEnVSdbrSJxgzPz9dn4G
- Kr4qaTcoFjmrZJuh61LB4QqZKMX7NbraA5rNppZaq50n6UTvVVne3TkRgxa8yPAK8NsnH9
- VDgU99L/2AiAJPbde7GTW1IHpgBytGI=
+ bh=zVu4+dOBOSZm4ajqCmhCBPv5dYoX27g/ueg33XYeO40=;
+ b=JByx/Bu5KiaLpIipJRcX6b3I8/MtAkjSJKGENDNLy9nc68kQFwRjJ89j2B9Fg2dkJepPjf
+ jZyBWbFjLTywW3/hssJu4nL1Dy4YBKVxrzOKQSlW1Fjd3KKahvn354oT92j5Z4r510nIjX
+ jal1pAQCO/Lfcs9WS01UxynPfLjrAMk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-yfCZIGSfPBGcjPx1gKiTBw-1; Tue, 21 Jan 2020 07:30:35 -0500
+ us-mta-380-Zw6V0lE2OC62pXSYG_JP9A-1; Tue, 21 Jan 2020 07:28:39 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 027CC802B94;
- Tue, 21 Jan 2020 12:30:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57DB010054E3;
+ Tue, 21 Jan 2020 12:28:38 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8B36D60BE0;
- Tue, 21 Jan 2020 12:30:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9AF4C60BE0;
+ Tue, 21 Jan 2020 12:28:36 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 067/109] contrib/libvhost-user: Protect slave fd with mutex
-Date: Tue, 21 Jan 2020 12:23:51 +0000
-Message-Id: <20200121122433.50803-68-dgilbert@redhat.com>
+Subject: [PATCH v2 050/109] virtiofsd: move to a new pid namespace
+Date: Tue, 21 Jan 2020 12:23:34 +0000
+Message-Id: <20200121122433.50803-51-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: yfCZIGSfPBGcjPx1gKiTBw-1
+X-MC-Unique: Zw6V0lE2OC62pXSYG_JP9A-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,121 +92,218 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-In future patches we'll be performing commands on the slave-fd driven
-by commands on queues, since those queues will be driven by individual
-threads we need to make sure they don't attempt to use the slave-fd
-for multiple commands in parallel.
+virtiofsd needs access to /proc/self/fd.  Let's move to a new pid
+namespace so that a compromised process cannot see another other
+processes running on the system.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+One wrinkle in this approach: unshare(CLONE_NEWPID) affects *child*
+processes and not the current process.  Therefore we need to fork the
+pid 1 process that will actually run virtiofsd and leave a parent in
+waitpid(2).  This is not the same thing as daemonization and parent
+processes should not notice a difference.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 24 ++++++++++++++++++++----
- contrib/libvhost-user/libvhost-user.h |  3 +++
- 2 files changed, 23 insertions(+), 4 deletions(-)
+ tools/virtiofsd/passthrough_ll.c | 134 ++++++++++++++++++++-----------
+ 1 file changed, 86 insertions(+), 48 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
-libvhost-user.c
-index ec27b78ff1..63e41062a4 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -392,26 +392,37 @@ vu_send_reply(VuDev *dev, int conn_fd, VhostUserMsg *=
-vmsg)
-     return vu_message_write(dev, conn_fd, vmsg);
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 0d061de438..752beb459a 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -50,7 +50,10 @@
+ #include <string.h>
+ #include <sys/file.h>
+ #include <sys/mount.h>
++#include <sys/prctl.h>
+ #include <sys/syscall.h>
++#include <sys/types.h>
++#include <sys/wait.h>
+ #include <sys/xattr.h>
+ #include <unistd.h>
+=20
+@@ -1944,24 +1947,95 @@ static void print_capabilities(void)
  }
 =20
-+/*
-+ * Processes a reply on the slave channel.
-+ * Entered with slave_mutex held and releases it before exit.
-+ * Returns true on success.
-+ */
- static bool
- vu_process_message_reply(VuDev *dev, const VhostUserMsg *vmsg)
+ /*
+- * Called after our UNIX domain sockets have been created, now we can move=
+ to
+- * an empty network namespace to prevent TCP/IP and other network activity=
+ in
+- * case this process is compromised.
++ * Move to a new mount, net, and pid namespaces to isolate this process.
+  */
+-static void setup_net_namespace(void)
++static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
  {
-     VhostUserMsg msg_reply;
-+    bool result =3D false;
-=20
-     if ((vmsg->flags & VHOST_USER_NEED_REPLY_MASK) =3D=3D 0) {
--        return true;
-+        result =3D true;
-+        goto out;
-     }
-=20
-     if (!vu_message_read(dev, dev->slave_fd, &msg_reply)) {
--        return false;
-+        goto out;
-     }
-=20
-     if (msg_reply.request !=3D vmsg->request) {
-         DPRINT("Received unexpected msg type. Expected %d received %d",
-                vmsg->request, msg_reply.request);
--        return false;
-+        goto out;
-     }
-=20
--    return msg_reply.payload.u64 =3D=3D 0;
-+    result =3D msg_reply.payload.u64 =3D=3D 0;
+-    if (unshare(CLONE_NEWNET) !=3D 0) {
+-        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNET): %m\n");
++    pid_t child;
 +
-+out:
-+    pthread_mutex_unlock(&dev->slave_mutex);
-+    return result;
++    /*
++     * Create a new pid namespace for *child* processes.  We'll have to
++     * fork in order to enter the new pid namespace.  A new mount namespac=
+e
++     * is also needed so that we can remount /proc for the new pid
++     * namespace.
++     *
++     * Our UNIX domain sockets have been created.  Now we can move to
++     * an empty network namespace to prevent TCP/IP and other network
++     * activity in case this process is compromised.
++     */
++    if (unshare(CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWNET) !=3D 0) {
++        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWPID | CLONE_NEWNS): %m\n"=
+);
++        exit(1);
++    }
++
++    child =3D fork();
++    if (child < 0) {
++        fuse_log(FUSE_LOG_ERR, "fork() failed: %m\n");
++        exit(1);
++    }
++    if (child > 0) {
++        pid_t waited;
++        int wstatus;
++
++        /* The parent waits for the child */
++        do {
++            waited =3D waitpid(child, &wstatus, 0);
++        } while (waited < 0 && errno =3D=3D EINTR && !se->exited);
++
++        /* We were terminated by a signal, see fuse_signals.c */
++        if (se->exited) {
++            exit(0);
++        }
++
++        if (WIFEXITED(wstatus)) {
++            exit(WEXITSTATUS(wstatus));
++        }
++
++        exit(1);
++    }
++
++    /* Send us SIGTERM when the parent thread terminates, see prctl(2) */
++    prctl(PR_SET_PDEATHSIG, SIGTERM);
++
++    /*
++     * If the mounts have shared propagation then we want to opt out so ou=
+r
++     * mount changes don't affect the parent mount namespace.
++     */
++    if (mount(NULL, "/", NULL, MS_REC | MS_SLAVE, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_SLAVE): %m\n");
++        exit(1);
++    }
++
++    /* The child must remount /proc to use the new pid namespace */
++    if (mount("proc", "/proc", "proc",
++              MS_NODEV | MS_NOEXEC | MS_NOSUID | MS_RELATIME, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(/proc): %m\n");
++        exit(1);
++    }
++
++    /* Now we can get our /proc/self/fd directory file descriptor */
++    lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
++    if (lo->proc_self_fd =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
+         exit(1);
+     }
  }
 =20
- /* Kick the log_call_fd if required. */
-@@ -1105,10 +1116,13 @@ bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq=
- *vq, int fd,
-         return false;
-     }
+-/* This magic is based on lxc's lxc_pivot_root() */
+-static void setup_pivot_root(const char *source)
++/*
++ * Make the source directory our root so symlinks cannot escape and no oth=
+er
++ * files are accessible.  Assumes unshare(CLONE_NEWNS) was already called.
++ */
++static void setup_mounts(const char *source)
+ {
+     int oldroot;
+     int newroot;
 =20
-+    pthread_mutex_lock(&dev->slave_mutex);
-     if (!vu_message_write(dev, dev->slave_fd, &vmsg)) {
-+        pthread_mutex_unlock(&dev->slave_mutex);
-         return false;
-     }
-=20
-+    /* Also unlocks the slave_mutex */
-     return vu_process_message_reply(dev, &vmsg);
++    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, sou=
+rce);
++        exit(1);
++    }
++
++    /* This magic is based on lxc's lxc_pivot_root() */
+     oldroot =3D open("/", O_DIRECTORY | O_RDONLY | O_CLOEXEC);
+     if (oldroot < 0) {
+         fuse_log(FUSE_LOG_ERR, "open(/): %m\n");
+@@ -2008,47 +2082,14 @@ static void setup_pivot_root(const char *source)
+     close(oldroot);
  }
 =20
-@@ -1628,6 +1642,7 @@ vu_deinit(VuDev *dev)
-         close(dev->slave_fd);
-         dev->slave_fd =3D -1;
-     }
-+    pthread_mutex_destroy(&dev->slave_mutex);
+-static void setup_proc_self_fd(struct lo_data *lo)
+-{
+-    lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
+-    if (lo->proc_self_fd =3D=3D -1) {
+-        fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
+-        exit(1);
+-    }
+-}
+-
+-/*
+- * Make the source directory our root so symlinks cannot escape and no oth=
+er
+- * files are accessible.
+- */
+-static void setup_mount_namespace(const char *source)
+-{
+-    if (unshare(CLONE_NEWNS) !=3D 0) {
+-        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNS): %m\n");
+-        exit(1);
+-    }
+-
+-    if (mount(NULL, "/", NULL, MS_REC | MS_SLAVE, NULL) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_PRIVATE): %m\n");
+-        exit(1);
+-    }
+-
+-    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, sou=
+rce);
+-        exit(1);
+-    }
+-
+-    setup_pivot_root(source);
+-}
+-
+ /*
+  * Lock down this process to prevent access to other processes or files ou=
+tside
+  * source directory.  This reduces the impact of arbitrary code execution =
+bugs.
+  */
+-static void setup_sandbox(struct lo_data *lo)
++static void setup_sandbox(struct lo_data *lo, struct fuse_session *se)
+ {
+-    setup_net_namespace();
+-    setup_mount_namespace(lo->source);
++    setup_namespaces(lo, se);
++    setup_mounts(lo->source);
+ }
 =20
-     if (dev->sock !=3D -1) {
-         close(dev->sock);
-@@ -1663,6 +1678,7 @@ vu_init(VuDev *dev,
-     dev->remove_watch =3D remove_watch;
-     dev->iface =3D iface;
-     dev->log_call_fd =3D -1;
-+    pthread_mutex_init(&dev->slave_mutex, NULL);
-     dev->slave_fd =3D -1;
-     dev->max_queues =3D max_queues;
+ int main(int argc, char *argv[])
+@@ -2172,10 +2213,7 @@ int main(int argc, char *argv[])
 =20
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/=
-libvhost-user.h
-index 46b600799b..1844b6f8d4 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -19,6 +19,7 @@
- #include <stddef.h>
- #include <sys/poll.h>
- #include <linux/vhost.h>
-+#include <pthread.h>
- #include "standard-headers/linux/virtio_ring.h"
+     fuse_daemonize(opts.foreground);
 =20
- /* Based on qemu/hw/virtio/vhost-user.c */
-@@ -355,6 +356,8 @@ struct VuDev {
-     VuVirtq *vq;
-     VuDevInflightInfo inflight_info;
-     int log_call_fd;
-+    /* Must be held while using slave_fd */
-+    pthread_mutex_t slave_mutex;
-     int slave_fd;
-     uint64_t log_size;
-     uint8_t *log_table;
+-    /* Must be after daemonize to get the right /proc/self/fd */
+-    setup_proc_self_fd(&lo);
+-
+-    setup_sandbox(&lo);
++    setup_sandbox(&lo, se);
+=20
+     /* Block until ctrl+c or fusermount -u */
+     ret =3D virtio_loop(se);
 --=20
 2.24.1
 
