@@ -2,60 +2,65 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A61C33CAA
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AFCBC3F68F
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B41D92253D
+	by mail.kernel.org (Postfix) with ESMTPS id CC29224125
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 03:45:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gmEXcE0C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B41D92253D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="JF99jYDg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC29224125
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itkTb-0003qu-If
+	id 1itkTb-0003r6-Ga
 	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 22:45:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55442)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55435)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1itkSE-0002ZM-SX
+ (envelope-from <dgibson@ozlabs.org>) id 1itkSE-0002ZJ-Lx
  for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1itkSC-0006HI-P9
+ (envelope-from <dgibson@ozlabs.org>) id 1itkSC-0006H0-GL
  for qemu-devel@nongnu.org; Mon, 20 Jan 2020 22:43:50 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:46773 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:60707 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1itkSB-00068S-Ka; Mon, 20 Jan 2020 22:43:48 -0500
+ id 1itkSB-00069F-Mk; Mon, 20 Jan 2020 22:43:48 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 481vXF26kCz9sRf; Tue, 21 Jan 2020 14:43:40 +1100 (AEDT)
+ id 481vXF747Rz9sRK; Tue, 21 Jan 2020 14:43:41 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1579578221;
- bh=xQUGnjNLE5inVSFA9Nf/iUoC9pW2KVvYZwwgQsOQdxs=;
+ d=gibson.dropbear.id.au; s=201602; t=1579578222;
+ bh=AORKeOJjd3mN3oqdZy48iMYVh1Af/SllZtLMPwJzK2o=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gmEXcE0CUyPCDPJu7MN4F/WiLjpzTv5f64QJeFP+vXZciPVjPt4DtpPLpB80+wSAU
- Eo5VxfoGfuibPXcv3nNpTplDbuEv87xZi/HyuoLGQsUOLVpj08aWWqFwwkTlx+G24E
- NaKIOVt7CHaT5rVnV9K9E3HDmmYp0SUu873ol9wU=
-Date: Tue, 21 Jan 2020 14:32:41 +1100
+ b=JF99jYDgTum2qO53SbKw2MhYnjRaQnSU5R6ZKF4l22cHX076I3awao5ZXZQLH/wnp
+ Hp3s+Ef7lvDg49KvR7CTZCVDfwYM0y8T6TCcfSRPqBvvFhICnpg1p8q6h0iT/S53f1
+ FmrEbs8o7pEty7XeBOgPubcvbfj+XYm+bnY+5Vug=
+Date: Tue, 21 Jan 2020 14:43:32 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Fabiano Rosas <farosas@linux.ibm.com>
-Subject: Re: [PATCH v6 3/3] target/ppc: support single stepping with KVM HV
-Message-ID: <20200121033241.GM54439@umbus>
-References: <20200110151344.278471-1-farosas@linux.ibm.com>
- <20200110151344.278471-4-farosas@linux.ibm.com>
- <20200120023555.GK54439@umbus> <87d0bd28hl.fsf@linux.ibm.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
+Message-ID: <20200121034332.GC265522@umbus.fritz.box>
+References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
+ <ed2df775-b4d5-4ea7-ccf6-637c037f897b@redhat.com>
+ <20200116094848.555c170d@bahia.lan>
+ <2dda458a-dfa1-ab23-4a97-d27d9266226b@redhat.com>
+ <20200116131435.3985e86e@bahia.lan>
+ <20200116192902.63674769@bahia.lan> <20200117091608.GV54439@umbus>
+ <20200117164427.2c238412@bahia.lan>
+ <20200120090438.75ff9e65@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="CoKeqzoheR24UlpS"
+ protocol="application/pgp-signature"; boundary="ABTtc+pdwF7KHXCz"
 Content-Disposition: inline
-In-Reply-To: <87d0bd28hl.fsf@linux.ibm.com>
+In-Reply-To: <20200120090438.75ff9e65@bahia.lan>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 203.11.71.1
@@ -70,323 +75,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---CoKeqzoheR24UlpS
-Content-Type: text/plain; charset=us-ascii
+--ABTtc+pdwF7KHXCz
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 20, 2020 at 05:11:50PM -0300, Fabiano Rosas wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
+On Mon, Jan 20, 2020 at 09:04:38AM +0100, Greg Kurz wrote:
+> On Fri, 17 Jan 2020 16:44:27 +0100
+> Greg Kurz <groug@kaod.org> wrote:
 >=20
-> >> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> >> index 103bfe9dc2..b69f8565aa 100644
-> >> --- a/target/ppc/cpu.h
-> >> +++ b/target/ppc/cpu.h
-> >> @@ -440,6 +440,10 @@ typedef struct ppc_v3_pate_t {
-> >>  #define msr_ts   ((env->msr >> MSR_TS1)  & 3)
-> >>  #define msr_tm   ((env->msr >> MSR_TM)   & 1)
-> >> =20
-> >> +#define srr1_ir ((env->spr[SPR_SRR1] >> MSR_IR) & 1)
-> >> +#define srr1_dr ((env->spr[SPR_SRR1] >> MSR_DR) & 1)
-> >> +#define srr1_se ((env->spr[SPR_SRR1] >> MSR_SE) & 1)
-> >
-> > I'd prefer not to introduce these.  The msr_xx macros are already kind
-> > of dubious because they assume the meaning of 'env' in the context
-> > they're used.  I'm ok to use them because they're so useful, so
-> > often.  These srr1 variants however are used in far fewer situations.
-> > So, I'd prefer to just open code these as (env->spr[SPR_SRR1] &
-> > MSR_IR) in the relatively few places they're used for now.
-> >
+> > On Fri, 17 Jan 2020 19:16:08 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >=20
+> > > On Thu, Jan 16, 2020 at 07:29:02PM +0100, Greg Kurz wrote:
+> > > > On Thu, 16 Jan 2020 13:14:35 +0100
+> > > > Greg Kurz <groug@kaod.org> wrote:
+> > > >=20
+> > > > > On Thu, 16 Jan 2020 11:37:24 +0100
+> > > > > Laurent Vivier <lvivier@redhat.com> wrote:
+> > > > >=20
+> > > > > > On 16/01/2020 09:48, Greg Kurz wrote:
+> > > > > > > On Wed, 15 Jan 2020 19:10:37 +0100
+> > > > > > > Laurent Vivier <lvivier@redhat.com> wrote:
+> > > > > > >=20
+> > > > > > >> Hi,
+> > > > > > >>
+> > > > > > >> On 15/01/2020 18:48, Greg Kurz wrote:
+> > > > > > >>> Migration can potentially race with CAS reboot. If the migr=
+ation thread
+> > > > > > >>> completes migration after CAS has set spapr->cas_reboot but=
+ before the
+> > > > > > >>> mainloop could pick up the reset request and reset the mach=
+ine, the
+> > > > > > >>> guest is migrated unrebooted and the destination doesn't re=
+boot it
+> > > > > > >>> either because it isn't aware a CAS reboot was needed (eg, =
+because a
+> > > > > > >>> device was added before CAS). This likely result in a broke=
+n or hung
+> > > > > > >>> guest.
+> > > > > > >>>
+> > > > > > >>> Even if it is small, the window between CAS and CAS reboot =
+is enough to
+> > > > > > >>> re-qualify spapr->cas_reboot as state that we should migrat=
+e. Add a new
+> > > > > > >>> subsection for that and always send it when a CAS reboot is=
+ pending.
+> > > > > > >>> This may cause migration to older QEMUs to fail but it is s=
+till better
+> > > > > > >>> than end up with a broken guest.
+> > > > > > >>>
+> > > > > > >>> The destination cannot honour the CAS reboot request from a=
+ post load
+> > > > > > >>> handler because this must be done after the guest is fully =
+restored.
+> > > > > > >>> It is thus done from a VM change state handler.
+> > > > > > >>>
+> > > > > > >>> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> > > > > > >>> Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > > > >>> ---
+> > > > > > >>>
+> > > > > > >>
+> > > > > > >> I'm wondering if the problem can be related with the fact th=
+at
+> > > > > > >> main_loop_should_exit() could release qemu_global_mutex in
+> > > > > > >> pause_all_vcpus() in the reset case?
+> > > > > > >>
+> > > > > > >> 1602 static bool main_loop_should_exit(void)
+> > > > > > >> 1603 {
+> > > > > > >> ...
+> > > > > > >> 1633     request =3D qemu_reset_requested();
+> > > > > > >> 1634     if (request) {
+> > > > > > >> 1635         pause_all_vcpus();
+> > > > > > >> 1636         qemu_system_reset(request);
+> > > > > > >> 1637         resume_all_vcpus();
+> > > > > > >> 1638         if (!runstate_check(RUN_STATE_RUNNING) &&
+> > > > > > >> 1639                 !runstate_check(RUN_STATE_INMIGRATE)) {
+> > > > > > >> 1640             runstate_set(RUN_STATE_PRELAUNCH);
+> > > > > > >> 1641         }
+> > > > > > >> 1642     }
+> > > > > > >> ...
+> > > > > > >>
+> > > > > > >> I already sent a patch for this kind of problem (in current =
+Juan pull
+> > > > > > >> request):
+> > > > > > >>
+> > > > > > >> "runstate: ignore finishmigrate -> prelaunch transition"
+> > > > > > >>
+> > > > > > >=20
+> > > > > > > IIUC your patch avoids an invalid 'prelaunch' -> 'postmigrate=
+' runstate
+> > > > > > > transition that can happen if the migration thread sets the r=
+unstate to
+> > > > > > > 'finishmigrate' when pause_all_vcpus() releases the main loop=
+ mutex.
+> > > > > > >=20
+> > > > > > > ie. symptom of the problem is QEMU aborting, correct ? The is=
+sue I'm
+> > > > > > > trying to fix is a guest breakage caused by a discrepancy bet=
+ween
+> > > > > > > QEMU and the guest after migration has succeeded.
+> > > > > > >=20
+> > > > > > >> but I don't know if it could fix this one.
+> > > > > > >>
+> > > > > > >=20
+> > > > > > > I don't think so and your patch kinda illustrates it. If the =
+runstate
+> > > > > > > is 'finishmigrate' when returning from pause_all_vcpus(), thi=
+s means
+> > > > > > > that state was sent to the destination before we could actual=
+ly reset
+> > > > > > > the machine.
+> > > > > >=20
+> > > > > > Yes, you're right.
+> > > > > >=20
+> > > > > > But the question behind my comment was: is it expected to have =
+a pending
+> > > > > > reset while we are migrating?
+> > > > > >=20
+> > > > >=20
+> > > > > Nothing prevents qemu_system_reset_request() to be called when mi=
+gration
+> > > > > is active.=20
+> > > > >=20
+> > > > > > Perhaps H_CAS can return H_BUSY and wait the end of the migrati=
+on and
+> > > > > > then be fully executed on destination?
+> > > > > >=20
+> > > > >=20
+> > > > > And so we would need to teach SLOF to try H_CAS again until it st=
+ops
+> > > > > returning H_BUSY ? It seems safer to migrate the CAS reboot flag =
+IMHO.
+> > > > >=20
+> > > >=20
+> > > > Ok I've tried that with a patched SLOF that sleeps 500ms and tries =
+CAS
+> > > > again if H_BUSY was returned. It fixes the issue but it looks a bit
+> > > > ugly because of the polling with an arbitrary timeout in SLOF... I'm
+> > > > not very comfortable either with calling migration_is_active() from
+> > > > the CAS code in QEMU.
+> > > >=20
+> > > > David,
+> > > >=20
+> > > > Any suggestion ?
+> > >=20
+> > > Yeah, I think looping in SLOF is a worse idea than migrating the
+> > > cas_reboot flag.
+> > >=20
+> > > But.. a better solution still might be to just remove the remaining
+> > > causes for CAS reboot entirely.  CAS reboots pretty much suck when
+> > > they happen, anyway.
+> > >=20
+> >=20
+> > I Agree.
+> >=20
+> > > With the irq changeover condition removed, I think the remaining
+> > > causes are more theoretical than practical situations at this point.
+> > >=20
+> >=20
+> > FWIW, hotpluggging a PCI device before CAS result in a hung guest (not =
+yet
+> > investigated the details).
 >=20
-> Ok. No problem.
+> commit 10f12e6450407b18b4d5a6b50d3852dcfd7fff75
+> Author: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> Date:   Wed Aug 30 15:21:41 2017 -0300
 >=20
-> >>  #define DBCR0_ICMP (1 << 27)
-> >>  #define DBCR0_BRT (1 << 26)
-> >>  #define DBSR_ICMP (1 << 27)
-> >> @@ -1158,6 +1162,16 @@ struct CPUPPCState {
-> >>      uint32_t tm_vscr;
-> >>      uint64_t tm_dscr;
-> >>      uint64_t tm_tar;
-> >> +
-> >> +    /* Used for software single step */
-> >> +    target_ulong sstep_srr0;
-> >> +    target_ulong sstep_srr1;
-> >> +    target_ulong sstep_insn;
-> >> +    target_ulong trace_handler_addr;
-> >> +    int sstep_kind;
-> >
-> > Won't you need to migrate this extra state, at least some of the time?
-> >
+>     hw/ppc: CAS reset on early device hotplug
 >=20
-> Ah. I haven't looked into this yet. Will do that for the next
-> version. Need to learn a bit about migration first.
->=20
-> >> +#define SSTEP_REGULAR 0
-> >> +#define SSTEP_PENDING 1
-> >> +#define SSTEP_GUEST   2
-> >
-> > Some comments on what these modes mean would be useful.
-> >
->=20
-> Ok.
->=20
-> >> +static uint32_t ppc_gdb_read_insn(CPUState *cs, target_ulong addr)
-> >> +{
-> >> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> +    CPUPPCState *env =3D &cpu->env;
-> >> +    uint32_t insn;
-> >> +
-> >> +    cpu_memory_rw_debug(cs, addr, (uint8_t *)&insn, sizeof(insn), 0);
-> >> +
-> >> +    if (msr_le) {
-> >> +        return ldl_le_p(&insn);
-> >> +    } else {
-> >> +        return ldl_be_p(&insn);
-> >> +    }
-> >
-> > I think you can just use cpu_ldl_code() for this.
-> >
->=20
-> I'll look into it.
->=20
-> >> +static void kvm_insert_singlestep_breakpoint(CPUState *cs, bool mmu_o=
-n)
-> >> +{
-> >> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> +    CPUPPCState *env =3D &cpu->env;
-> >> +    target_ulong bp_addr;
-> >> +    target_ulong saved_msr =3D env->msr;
-> >> +
-> >> +    bp_addr =3D ppc_get_trace_int_handler_addr(cs, mmu_on);
-> >> +    if (env->nip =3D=3D bp_addr) {
-> >> +        /*
-> >> +         * We are trying to step the interrupt handler address itself;
-> >> +         * move the breakpoint to the next instruction.
-> >> +         */
-> >> +        bp_addr +=3D 4;
-> >
-> > What if the first instruction of the interrupt handler is a branch?
-> >
->=20
-> Well, I need to displace the breakpoint somehow. I don't think I can
-> handle this particular case without having _some_ knowledge of the
-> handler's code. The ones I've seen so far don't have a branch as first
-> instruction.
+> I'll have a look to see what can be done here.
 
-So, at least for unconditional branches it's possible - you could
-parse the instruction and place your breakpoint on the target.  For
-conditional branches it would be much harder, but they are much less
-likely as the very first instruction on the interrupt vector.
+Ah.. yes, that one might be a bit tricky.
 
-I do think we should at least detect and flag some sort of error in
-this situation though.
+> But I agree the other check is more theoretical:
+>=20
+>     /* capabilities that have been added since CAS-generated guest reset.
+>      * if capabilities have since been removed, generate another reset
+>      */
+>     spapr->cas_reboot =3D !spapr_ovec_subset(ov5_cas_old, spapr->ov5_cas);
+>=20
+> Unless changing kernels or tempering with the kernel command line, I don't
+> see how some capabilities could change between the two CAS in practice.
 
-> >> +    }
-> >> +
-> >> +    /*
-> >> +     * The actual access by the guest might be made in a mode
-> >> +     * different than we are now (due to rfid) so temporarily set the
-> >> +     * MSR to reflect that during the breakpoint placement.
-> >> +     *
-> >> +     * Note: we need this because breakpoints currently use
-> >> +     * cpu_memory_rw_debug, which does the memory accesses from the
-> >> +     * guest point of view.
-> >> +     */
-> >> +    if ((msr_ir & msr_dr) !=3D mmu_on) {
-> >
-> > Should be msr_ir && msr_dr - you only get away with bitwise and by
-> > accident.
-> >
->=20
-> Ack.
->=20
-> >> +        if (mmu_on) {
-> >> +            env->msr |=3D (1ULL << MSR_IR | 1ULL << MSR_DR);
-> >> +        } else {
-> >> +            env->msr &=3D ~(1ULL << MSR_IR | 1ULL << MSR_DR);
-> >> +        }
-> >> +    }
-> >
-> > Wouldn't it be simpler to unconditionally set env->msr based on
-> > mmu_on.
-> >
->=20
-> Yes.
->=20
-> >> +
-> >> +    kvm_insert_breakpoint(cs, bp_addr, 4, GDB_BREAKPOINT_SW);
-> >
-> > Hrm.... I don't actually see how changing env->msr helps you here.
-> > AFAICT if kvm_insert_breakpoint() resolves to kvm_arch_sw_breakpoint()
-> > it doesn't rely on the MSR value at all.  If it resolves to
-> > kvm_arch_hw_breakpoint(), then it looks like it just stashes
-> > information to be pushed into KVM when we re-enter the guest.  None of
-> > the information stashed appears to depend on the current MSR, and once
-> > we re-enter the MSR will already have been restored.
-> >
->
-> This is the call chain:
->=20
-> kvm_arch_insert_sw_breakpoint -> cpu_memory_rw_debug ->
-> cpu_get_phys_page_attrs_debug -> ppc_cpu_get_phys_page_debug ->
-> ppc64_v3_get_phys_page_debug -> ppc_radix64_get_phys_page_debug:
->=20
->     /* Handle Real Mode */
->     if (msr_dr =3D=3D 0) {
->         /* In real mode top 4 effective addr bits (mostly) ignored */
->         return eaddr & 0x0FFFFFFFFFFFFFFFULL;
->     }
+Well, we want to be robust and it's at least theoretically possible
+that the guest will request different things on subsequent reboots.
+However I believe that the original rationale for this check was that
+while we could add things to the device tree for added capabilities,
+we didn't have a way to roll back the changes for removed
+capabilities.
 
-Ah, right.  Basically the issue is that kvm_insert_breakpoint() takes
-an effective address, not a real address, but it might be happening in
-a different context than we're executing right now.
-
-Ok, that makes sense.  Though.. aren't you always inserting the
-breakpoint into an interrupt vector?  So wouldn't it always be MMU
-off?  Under what circumstances would this get called with mmu_on =3D
-true?
-
-> Actually, I think there is a bug after ppc_cpu_get_phys_page_debug
-> somewhere. There are some cases where GDB wants to read/write to some
-> memory, but it gets denied access. Presumably because of one such
-> discrepancy as the one above. I need to spend more time looking at this
-> to define the problem properly, though.
-
-Hm, ok.
-
-> >> +    /*
-> >> +     * MSR_SE =3D 1 will cause a Trace Interrupt in the guest after t=
-he
-> >> +     * next instruction executes. If this is a rfid, use SRR1 instead
-> >> +     * of MSR.
-> >> +     */
-> >> +    if (rfid) {
-> >> +        if ((env->spr[SPR_SRR1] >> MSR_SE) & 1) {
-> >> +            /*
-> >> +             * The guest is doing a single step itself. Make sure we
-> >> +             * restore it later.
-> >> +             */
-> >> +            env->sstep_kind =3D SSTEP_GUEST;
-> >> +        }
-> >> +
-> >> +        env->spr[SPR_SRR1] |=3D (1ULL << MSR_SE);
-> >> +        mmu_on =3D srr1_ir & srr1_dr;
-> >
-> > s/&/&&/
-> >
->=20
-> Ack.
->=20
-> >> +    } else {
-> >> +        env->msr |=3D (1ULL << MSR_SE);
-> >> +        mmu_on =3D msr_ir & msr_dr;
-> >
-> > s/&/&&/
-> >
->=20
-> Ack.
->=20
-> > Also, what happens if the guest is using MSR[DR] !=3D MSR[IR]?  It's
-> > rare, but it is occasionally useful.
->=20
-> I understand from the ISA that for the purposes of AIL, both bits need
-> to be set. So mmu_on =3D 0 is correct here.
-
-I'm not sure what you mean by "for the purposes of AIL".
-
->=20
-> >> +    }
-> >> +
-> >> +    kvm_insert_singlestep_breakpoint(cs, mmu_on);
-> >> +}
-> >> +
-> >> +void kvm_singlestep_ail_change(CPUState *cs)
-> >> +{
-> >> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> +    CPUPPCState *env =3D &cpu->env;
-> >> +
-> >> +    if (kvm_arch_can_singlestep(cs)) {
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    /*
-> >> +     * The instruction being stepped altered the interrupt vectors
-> >> +     * location (AIL). Re-insert the single step breakpoint at the new
-> >> +     * location
-> >> +     */
-> >> +    kvm_remove_breakpoint(cs, env->trace_handler_addr, 4, GDB_BREAKPO=
-INT_SW);
-> >> +    kvm_insert_singlestep_breakpoint(cs, (msr_ir & msr_dr));
-> >
-> > s/&/&&/
-> >
->=20
-> Ack.
->=20
-> >> +}
-> >> +
-> >>  void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug=
- *dbg)
-> >>  {
-> >>      int n;
-> >> @@ -1585,6 +1781,98 @@ void kvm_arch_update_guest_debug(CPUState *cs, =
-struct kvm_guest_debug *dbg)
-> >>      }
-> >>  }
-> >> =20
-> >> +/* Revert any side-effects caused during single step */
-> >> +static void restore_singlestep_env(CPUState *cs)
-> >> +{
-> >> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> +    CPUPPCState *env =3D &cpu->env;
-> >> +    uint32_t insn =3D env->sstep_insn;
-> >> +    int reg;
-> >> +    int spr;
-> >> +
-> >> +    env->spr[SPR_SRR0] =3D env->sstep_srr0;
-> >> +    env->spr[SPR_SRR1] =3D env->sstep_srr1;
-> >> +
-> >> +    if (ppc_gdb_get_op(insn) !=3D OP_MOV) {
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    reg =3D ppc_gdb_get_rt(insn);
-> >> +
-> >> +    switch (ppc_gdb_get_xop(insn)) {
-> >> +    case XOP_MTSPR:
-> >> +        /*
-> >> +         * mtspr: the guest altered the SRR, so do not use the
-> >> +         *        pre-step value.
-> >> +         */
-> >> +        spr =3D ppc_gdb_get_spr(insn);
-> >> +        if (spr =3D=3D SPR_SRR0 || spr =3D=3D SPR_SRR1) {
-> >> +            env->spr[spr] =3D env->gpr[reg];
-> >> +        }
-> >> +        break;
-> >> +    case XOP_MFMSR:
-> >> +        /*
-> >> +         * mfmsr: clear MSR_SE bit to avoid the guest knowing
-> >> +         *         that it is being single-stepped.
-> >> +         */
-> >> +        env->gpr[reg] &=3D ~(1ULL << MSR_SE);
-> >
-> > Don't you need to check for the case where the guest also thinks it is
-> > single stepping here?
-> >
->=20
-> Hm. I had this in some previous version but removed it for some
-> reason. I'll review it.
->=20
->=20
-> Thanks
->=20
+Now that we fully rebuild the device tree at CAS, I think this test
+can probably just go, although there's some double checking to do.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -394,25 +283,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---CoKeqzoheR24UlpS
+--ABTtc+pdwF7KHXCz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4mcNcACgkQbDjKyiDZ
-s5L5PBAAjxb4ZXOdh0zAgqWHTJWw7jXmt+Yoi6IJANvtuLf9QIaEa4p2atyVngnW
-TFtQcPvl0N8epAD2g+0S6HxgEsXVyJ1maidZBe5LIZkyRWseJ6VXkZkFs4P3hk0y
-1oJHQk+naSZXdYYdhMssjukiy9yfKZ+UJctD8zKhNLWUU7udiRWkkCPkKVYiPEz/
-UEIQyB/Ah1gU3Fy1B0e3Ktqi7JHkAS+eIJnpRJjMJuzVkjjtI8oL42mBleVI+GOs
-JoylwbnewopyDJ0GdTbgdAo74wt7OGbXVWE3h4+YeZC0QspirbQaiBrJKk4KBW66
-rVqzmkSx57yEiZCn1yleqBk+R295kmGtWdfYPs5vBMBRxLzf/C+PIY77C2r1PZio
-xnoSkfRxpoMV5lN2D8VszJyGqqDQJOrswadspvHAJahpImaQXuQwe75mPzgw+V+/
-VEh1968lDMcM9DI7Gq2zvc9ss5QF6tsyziWwA1fYTsPGAdlzYqmNUB0M6lMBff/5
-NCvLUfVt/5trcbh3Gx+/HBuKwsjvPGHzUAxF4S7X9UqsaGAyUoIJPKPBx4+HMbPh
-8EvMocYcDeMiJaQ/xiUZOotu69xxyX7UY8DksAT+RSAQ3A9gkL3WmjyfueMwmzxM
-hp32Zlm/NJGaCtSD+qXkrQtWvy4m9Ami4KdkNHfGYfdwrzsbl/Y=
-=eRCi
+iQIyBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4mc2QACgkQbDjKyiDZ
+s5L5XA/4lzJNYoTdFSDXIRyWMAv88vRTbduTxF42lAmlk+6ylfz6JKqHuFscaqdH
+mueb50aTYCQHuoE4jJ+APw+R8cbWhnR9ok9OQNQf58hfbmfDYB//Av9l+uqo30WB
+8jNfPppNmX9nO2Oj4nftLflKewD5+p5uDA3hCXKkl3A0zCq58F2paVGDozaTY685
+sjHgCQ533Lqa7qR1AD1OxR//o1yunFMO50sIy+82l0qOkufpQwZwyr5FRfa6TE8T
+giEU/nneA+lucRXdLeX/ZqIhEihgdPS8CgY1dEMGXxM5mgtJg/afQID5DHnsTFoc
++SbvqoIak/I+Fl0cmVpjEgwibS64kAMshXYDUSWG65WECL9oRF6+/eVZWVmvOfoE
+8p11ntvYQ4D99m13B9O5Yqv2dhKYqdBdkwBg9ORNYtwPmOwSnqx4n2EVfrg/oVCK
+DNVZwBSuZQRCws4jDDSXDHScY95OAkZKAXqq6cz1J7Na/qUusvumir737jcMH6GM
+7zlcZSBamNVrfauQ4HxIqAaLB0PHn1ZaGDHpHQFJux4Tz25L9+1x/ShueW8kjxqo
+ubHyO7zsOpTHS+yrSYUlz0Tz6PbZ5MjEhTQzbktfCL68+8RH99A7Qxg/sJbDtcj5
+rrsGsT2VyTxJMjx/yqB33iW6DAcHFaoSqX22QP51DAWJi03rUA==
+=ceRl
 -----END PGP SIGNATURE-----
 
---CoKeqzoheR24UlpS--
+--ABTtc+pdwF7KHXCz--
 
