@@ -2,79 +2,98 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA197C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 17:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1783C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 17:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 849EE2073A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 17:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A9B0206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 17:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Loyg30p0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 849EE2073A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CeEc7Dh8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A9B0206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itwyc-00075D-Jn
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 12:06:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42445)
+	id 1itwzz-0000cP-Gm
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 12:07:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itwuf-0002gF-R6
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 12:02:05 -0500
+ (envelope-from <philmd@redhat.com>) id 1itww3-00045K-Lb
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 12:03:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itwub-0007T5-5m
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 12:02:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51914
+ (envelope-from <philmd@redhat.com>) id 1itww0-00080l-42
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 12:03:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40873
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itwua-0007SU-BT
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 12:01:57 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1itwvz-0007zL-V2
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 12:03:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579626115;
+ s=mimecast20190719; t=1579626199;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DXk2tGXoihmF7/L5PFpCPk6zwjR/ZPEqaqockUJBnGs=;
- b=Loyg30p0+gBPtjRqZxJ6sSw+qoHS0fICjEeBked5huHJCix7XKIW/i0j+CM5Zxe7V5/I6i
- 3LaZUEMpHge51LAPv2jns/rdH25gKoUGw40j//185rd4OVob//0yA9H/u264ntKL5R9dW3
- EfeZIwvXsiia4g1iNorSt8ti8VtliI8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-wBIK0vugNniOQfikcuFZnQ-1; Tue, 21 Jan 2020 12:01:53 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD83D8A2DE0;
- Tue, 21 Jan 2020 17:01:51 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B398A87ED0;
- Tue, 21 Jan 2020 17:01:42 +0000 (UTC)
-Date: Tue, 21 Jan 2020 17:01:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 000/109] virtiofs daemon [all]
-Message-ID: <20200121170139.GO2929@work-vm>
-References: <20200121122433.50803-1-dgilbert@redhat.com>
- <a2099661-8c69-5cdb-2b17-21bf0842c8f5@redhat.com>
+ bh=xRX2EjUtag2CzbYLx2o87s148bToPtUn09IwfnpXNH0=;
+ b=CeEc7Dh8n31GEFvPTxDI4yezMgPDswICLAeGZA5NkkhjQcAGfsko4DjMzf/Jx2LveL6+kR
+ YsgvCpPkAjjUUofMBgYFiHemqfVLmWAOXOLHH/HxepYT721sJRMpIvjdcdR9ulKdyavlv5
+ Bry0+QIMRWneuL6kj7hsXvADUqtSGRk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-293-3iP8S6HnPxWe3T2nxv1ezA-1; Tue, 21 Jan 2020 12:03:15 -0500
+Received: by mail-wm1-f70.google.com with SMTP id q206so915616wme.9
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 09:03:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mkIT8RL/08rmPa4rnNnr6gIVLYdKNmvKrNqsrNEVJVw=;
+ b=mIC8JWmVVJdu8K8f7PSUn2oe1pGx6PovwkVF3KGrKgvLiMJonfBYRafg9lEYfcF5wf
+ J+10D/02Na5LasvxtpE3BLU/4S6Uyn/ceUeVD67PnlRTJjMZcFoTplz6SU2s+F5JqnkZ
+ NNkOc1uTc9WxqErhirZ9wkQwi2PIgJWqIMIgVIUOL1y1Iz1cClLI7s9tlacb78ulej+t
+ 3XgvNDGpfkK3ZD2RNY2SbkPoR2m+icE/kwHU/XmpHC4tla7WNj/KJr+qMn6w7qBupAZk
+ NLK5gwtVURr9G26JEoW4gQSJ7uKGez/vD46PAmwXvybmD1J3wPXfqQ2529KFPxD5devN
+ QP2w==
+X-Gm-Message-State: APjAAAXjQWhFU/nmibbkRC88Uo5I/ZBVjB789F8FIyA9E/aVdK5G8Iep
+ TW4vG1JPRIiTegS8dqtyH/hGQ9IhEYTEy63bK98Up6zDeQ9Gl7APmj+G0aQ3bQYE/x+fCm4bF1a
+ bBuWu53gJxfn6pgU=
+X-Received: by 2002:adf:e692:: with SMTP id r18mr6267173wrm.413.1579626193882; 
+ Tue, 21 Jan 2020 09:03:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxFUP9LEKY7/pCZIgUVRWMlTXTr+x3HLWzJch503UnpiXGsq/QNFftZdgmPuLTI2DMEZb+CrQ==
+X-Received: by 2002:adf:e692:: with SMTP id r18mr6267129wrm.413.1579626193455; 
+ Tue, 21 Jan 2020 09:03:13 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id s1sm5077303wmc.23.2020.01.21.09.03.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Jan 2020 09:03:12 -0800 (PST)
+Subject: Re: [PATCH v41 14/21] hw/avr: Add example board configuration
+To: Igor Mammedov <imammedo@redhat.com>, Michael Rolnik <mrolnik@gmail.com>
+References: <20200118191416.19934-1-mrolnik@gmail.com>
+ <20200118191416.19934-15-mrolnik@gmail.com>
+ <20200121173653.5c69ff35@Igors-MacBook-Pro>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a2cf6f92-8240-e078-e174-4fd09ec72fd9@redhat.com>
+Date: Tue, 21 Jan 2020 18:03:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <a2099661-8c69-5cdb-2b17-21bf0842c8f5@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: wBIK0vugNniOQfikcuFZnQ-1
+In-Reply-To: <20200121173653.5c69ff35@Igors-MacBook-Pro>
+Content-Language: en-US
+X-MC-Unique: 3iP8S6HnPxWe3T2nxv1ezA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -89,453 +108,561 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, berrange@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, misono.tomohiro@jp.fujitsu.com, stefanha@redhat.com,
- vgoyal@redhat.com
+Cc: thuth@redhat.com, me@xcancerberox.com.ar, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, dovgaluk@ispras.ru, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> On 1/21/20 1:22 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >=20
-> > Hi,
-> >    This is a full set for virtiofsd - a daemon
-> > that implements the user space side of virtiofs.
-> >=20
-> > I've addressed most review comments from V1; we've got
-> > 95 Reviewed-by's out of 110 - I'd like to get a PULL out ASAP.
-> >=20
-> > The set pulls in a big chunk of the upstream libfuse library
-> > (unmodified so that it's easy to check it really is upstream),
-> > chops all the stuff out we don't need and then adds the
-> > new transport we need.  I've formatted everything into qemu's code styl=
-e -
-> > using indent and the clang tools for the files I've imported.
-> >=20
-> > We can't just link with libfuse, since we have to make ABI incompatible
-> > changes for the new transport and it's quite invasive; the library is
-> > designed to be the basis for multiple filesystems, but all on the same
-> > transport.
-> >=20
-> > Running this daemon is typically done with:
-> >=20
-> >     ./virtiofsd --socket-path=3D/path/socket -o source=3D/path/to/fs
-> >=20
-> > connected to a qemu that's then started with:
-> >     -chardev socket,id=3Dchar0,path=3D/path/socket -device vhost-user-f=
-s-pci,queue-size=3D1024,chardev=3Dchar0,tag=3Dmyfs
-> >=20
-> > and then in the guest mount with:
-> >     mount -t virtiofs myfs /mnt
-> >=20
-> > Our development branch is: https://gitlab.com/virtio-fs/qemu/tree/virti=
-o-fs-dev
+On 1/21/20 5:36 PM, Igor Mammedov wrote:
+> On Sat, 18 Jan 2020 21:14:09 +0200
+> Michael Rolnik <mrolnik@gmail.com> wrote:
 >=20
-> FWIW this branch contains more than this series, because it failed to bui=
-ld
-> on 32-bit:
+>> A simple board setup that configures an AVR CPU to run a given firmware =
+image.
+>> This is all that's useful to implement without peripheral emulation as A=
+VR CPUs include a lot of on-board peripherals.
+>>
+>> NOTE: this is not a real board !!!!
+>> NOTE: it's used for CPU testing!!!!
+>>
+>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+>> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>=20
+>> Nacked-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ^^^ picked wrong tag?
 
-Right; it's got a whole bunch of stuff that's not ready yet - that's why
-it's -dev.
+No, this is the correct one :)
 
-> $ make virtiofsd
->   CC      tools/virtiofsd/fuse_lowlevel.o
-> tools/virtiofsd/fuse_lowlevel.c: In function 'do_removemapping':
-> tools/virtiofsd/fuse_lowlevel.c:1956:60: error: format '%ld' expects
-> argument of type 'long int', but argument 4 has type 'unsigned int'
-> [-Werror=3Dformat=3D]
->              "do_removemapping: invalid in, expected %d * %ld, has %ld -
-> %ld\n",
->                                                             ^
-> tools/virtiofsd/fuse_lowlevel.c:1956:69: error: format '%ld' expects
-> argument of type 'long int', but argument 5 has type 'size_t {aka unsigne=
-d
-> int}' [-Werror=3Dformat=3D]
->              "do_removemapping: invalid in, expected %d * %ld, has %ld -
-> %ld\n",
->                                                                      ^
-> tools/virtiofsd/fuse_lowlevel.c:1956:75: error: format '%ld' expects
-> argument of type 'long int', but argument 6 has type 'size_t {aka unsigne=
-d
-> int}' [-Werror=3Dformat=3D]
->              "do_removemapping: invalid in, expected %d * %ld, has %ld -
-> %ld\n",
->=20
->    ^
->=20
-> And the offending patch is not included in the 109:
->=20
-> $ git show 62d82cfbe5a
-> commit 62d82cfbe5a2ad05ae3215f2461b76aa9915108d
-> Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Date:   Fri Jul 6 18:03:49 2018 +0100
->=20
->     DAX: virtiofsd: Add setup/remove mappings fuse commands
->=20
-> Consider pushing tags with version, so it is easier to diff (virtio-fs-de=
-v
-> got force-pushed).
+I disagreed with this patch in previous versions, and suggested a=20
+replacement: model the Arduino boards instead, which is clearly specified.
 
-Yep, I already did; it's:
+I ended up implementing it:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg672163.html
 
-https://gitlab.com/virtio-fs/qemu/tree/virtio-fs-as-posted-2020-01-21
+Michael said he'll test it.
+If he is OK with it, I prefer we not merge the 'sample' board and=20
+directly use the Arduino one.
 
+>> ---
+>>   include/elf.h        |   2 +
+>>   include/hw/elf_ops.h |   6 +-
+>>   include/hw/loader.h  |   6 +-
+>>   hw/avr/sample.c      | 295 +++++++++++++++++++++++++++++++++++++++++++
+>>   hw/core/loader.c     |  15 ++-
+>>   hw/riscv/boot.c      |   2 +-
+>>   hw/Kconfig           |   1 +
+>>   hw/avr/Kconfig       |   6 +
+>>   hw/avr/Makefile.objs |   1 +
+>>   9 files changed, 323 insertions(+), 11 deletions(-)
+>>   create mode 100644 hw/avr/sample.c
+>>   create mode 100644 hw/avr/Kconfig
+>>   create mode 100644 hw/avr/Makefile.objs
+>>
+>> diff --git a/include/elf.h b/include/elf.h
+>> index 3501e0c8d0..53cdfa23b7 100644
+>> --- a/include/elf.h
+>> +++ b/include/elf.h
+>> @@ -202,6 +202,8 @@ typedef struct mips_elf_abiflags_v0 {
+>>   #define EM_MOXIE           223     /* Moxie processor family */
+>>   #define EM_MOXIE_OLD       0xFEED
+>>  =20
+>> +#define EM_AVR 83 /* AVR 8-bit microcontroller */
+>> +
+>>   /* This is the info that is needed to parse the dynamic section of the=
+ file */
+>>   #define DT_NULL=09=090
+>>   #define DT_NEEDED=091
+>> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+>> index e07d276df7..70de85fa72 100644
+>> --- a/include/hw/elf_ops.h
+>> +++ b/include/hw/elf_ops.h
+>> @@ -316,7 +316,8 @@ static int glue(load_elf, SZ)(const char *name, int =
+fd,
+>>                                 void *translate_opaque,
+>>                                 int must_swab, uint64_t *pentry,
+>>                                 uint64_t *lowaddr, uint64_t *highaddr,
+>> -                              int elf_machine, int clear_lsb, int data_=
+swab,
+>> +                              uint32_t *pe_flags, int elf_machine,
+>> +                              int clear_lsb, int data_swab,
+>>                                 AddressSpace *as, bool load_rom,
+>>                                 symbol_fn_t sym_cb)
+>>   {
+>> @@ -594,6 +595,9 @@ static int glue(load_elf, SZ)(const char *name, int =
+fd,
+>>           }
+>>       }
+>>  =20
+>> +    if (pe_flags) {
+>> +        *pe_flags =3D (uint32_t)(elf_sword)ehdr.e_flags;
+>> +    }
+>>       if (lowaddr)
+>>           *lowaddr =3D (uint64_t)(elf_sword)low;
+>>       if (highaddr)
+>> diff --git a/include/hw/loader.h b/include/hw/loader.h
+>> index 48a96cd559..22b59e15ba 100644
+>> --- a/include/hw/loader.h
+>> +++ b/include/hw/loader.h
+>> @@ -101,6 +101,7 @@ const char *load_elf_strerror(int error);
+>>    * @pentry: Populated with program entry point. Ignored if NULL.
+>>    * @lowaddr: Populated with lowest loaded address. Ignored if NULL.
+>>    * @highaddr: Populated with highest loaded address. Ignored if NULL.
+>> + * @pe_flags: Populated with e_flags. Ignore if NULL.
+>>    * @bigendian: Expected ELF endianness. 0 for LE otherwise BE
+>>    * @elf_machine: Expected ELF machine type
+>>    * @clear_lsb: Set to mask off LSB of addresses (Some architectures us=
+e
+>> @@ -131,8 +132,9 @@ int load_elf_ram_sym(const char *filename,
+>>                        uint64_t (*elf_note_fn)(void *, void *, bool),
+>>                        uint64_t (*translate_fn)(void *, uint64_t),
+>>                        void *translate_opaque, uint64_t *pentry,
+>> -                     uint64_t *lowaddr, uint64_t *highaddr, int big_end=
+ian,
+>> -                     int elf_machine, int clear_lsb, int data_swab,
+>> +                     uint64_t *lowaddr, uint64_t *highaddr, uint32_t *p=
+e_flags,
+>> +                     int big_endian, int elf_machine,
+>> +                     int clear_lsb, int data_swab,
+>>                        AddressSpace *as, bool load_rom, symbol_fn_t sym_=
+cb);
+>>  =20
+>>   /** load_elf_ram:
+>> diff --git a/hw/avr/sample.c b/hw/avr/sample.c
+>> new file mode 100644
+>> index 0000000000..95094a8d6c
+>> --- /dev/null
+>> +++ b/hw/avr/sample.c
+>> @@ -0,0 +1,295 @@
+>> +/*
+>> + * QEMU AVR CPU
+>> + *
+>> + * Copyright (c) 2019 Michael Rolnik
+>> + *
+>> + * This library is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU Lesser General Public
+>> + * License as published by the Free Software Foundation; either
+>> + * version 2.1 of the License, or (at your option) any later version.
+>> + *
+>> + * This library is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>> + * Lesser General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU Lesser General Public
+>> + * License along with this library; if not, see
+>> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+>> + */
+>> +
+>> +/*
+>> + *  NOTE:
+>> + *      This is not a real AVR board, this is an example!
+>> + *      The CPU is an approximation of an ATmega2560, but is missing va=
+rious
+>> + *      built-in peripherals.
+>> + *
+>> + *      This example board loads provided binary file into flash memory=
+ and
+>> + *      executes it from 0x00000000 address in the code memory space.
+>> + *
+>> + *      Currently used for AVR CPU validation
+>> + *
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu-common.h"
+>> +#include "cpu.h"
+>> +#include "hw/hw.h"
+>> +#include "sysemu/sysemu.h"
+>> +#include "sysemu/qtest.h"
+>> +#include "ui/console.h"
+>> +#include "hw/boards.h"
+>> +#include "hw/loader.h"
+>> +#include "qemu/error-report.h"
+>> +#include "exec/address-spaces.h"
+>> +#include "include/hw/sysbus.h"
+>> +#include "include/hw/char/avr_usart.h"
+>> +#include "include/hw/timer/avr_timer16.h"
+>> +#include "include/hw/misc/avr_mask.h"
+>> +#include "elf.h"
+>> +#include "hw/misc/unimp.h"
+>> +
+>> +#define SIZE_FLASH 0x00040000
+>> +#define SIZE_SRAM 0x00002000
+>> +/*
+>> + * Size of additional "external" memory, as if the AVR were configured =
+to use
+>> + * an external RAM chip.
+>> + * Note that the configuration registers that normally enable this feat=
+ure are
+>> + * unimplemented.
+>> + */
+>> +#define SIZE_EXMEM 0x00000000
+>> +
+>> +/* Offsets of peripherals in emulated memory space (i.e. not host addre=
+sses)  */
+>> +#define PRR0_BASE 0x64
+>> +#define PRR1_BASE 0x65
+>> +#define USART_BASE 0xc0
+>> +#define TIMER1_BASE 0x80
+>> +#define TIMER1_IMSK_BASE 0x6f
+>> +#define TIMER1_IFR_BASE 0x36
+>> +
+>> +/* Interrupt numbers used by peripherals */
+>> +#define USART_RXC_IRQ 24
+>> +#define USART_DRE_IRQ 25
+>> +#define USART_TXC_IRQ 26
+>> +
+>> +#define TIMER1_CAPT_IRQ 15
+>> +#define TIMER1_COMPA_IRQ 16
+>> +#define TIMER1_COMPB_IRQ 17
+>> +#define TIMER1_COMPC_IRQ 18
+>> +#define TIMER1_OVF_IRQ 19
+>> +
+>> +/*  Power reduction     */
+>> +#define PRR1_BIT_PRTIM5     0x05    /*  Timer/Counter5  */
+>> +#define PRR1_BIT_PRTIM4     0x04    /*  Timer/Counter4  */
+>> +#define PRR1_BIT_PRTIM3     0x03    /*  Timer/Counter3  */
+>> +#define PRR1_BIT_PRUSART3   0x02    /*  USART3  */
+>> +#define PRR1_BIT_PRUSART2   0x01    /*  USART2  */
+>> +#define PRR1_BIT_PRUSART1   0x00    /*  USART1  */
+>> +
+>> +#define PRR0_BIT_PRTWI      0x06    /*  TWI */
+>> +#define PRR0_BIT_PRTIM2     0x05    /*  Timer/Counter2  */
+>> +#define PRR0_BIT_PRTIM0     0x04    /*  Timer/Counter0  */
+>> +#define PRR0_BIT_PRTIM1     0x03    /*  Timer/Counter1  */
+>> +#define PRR0_BIT_PRSPI      0x02    /*  Serial Peripheral Interface */
+>> +#define PRR0_BIT_PRUSART0   0x01    /*  USART0  */
+>> +#define PRR0_BIT_PRADC      0x00    /*  ADC */
+>> +
+>> +#define configCPU_CLOCK_HZ ((unsigned long)16000000)
+>> +
+>> +typedef struct {
+>> +    MachineClass parent;
+>> +} SampleMachineClass;
+>> +
+>> +typedef struct {
+>> +    MachineState parent;
+>> +    MemoryRegion *ram;
+>> +    MemoryRegion *flash;
+>> +    AVRUsartState *usart0;
+>> +    AVRTimer16State *timer1;
+>> +    AVRMaskState *prr[2];
+>> +} SampleMachineState;
+>> +
+>> +#define TYPE_SAMPLE_MACHINE MACHINE_TYPE_NAME("sample")
+>> +
+>> +#define SAMPLE_MACHINE(obj) \
+>> +    OBJECT_CHECK(SampleMachineState, obj, TYPE_SAMPLE_MACHINE)
+>> +#define SAMPLE_MACHINE_GET_CLASS(obj) \
+>> +    OBJECT_GET_CLASS(SampleMachineClass, obj, TYPE_SAMPLE_MACHINE)
+>> +#define SAMPLE_MACHINE_CLASS(klass) \
+>> +    OBJECT_CLASS_CHECK(SampleMachineClass, klass, TYPE_SAMPLE_MACHINE)
+>> +
+>> +static void sample_init(MachineState *machine)
+>> +{
+>> +    SampleMachineState *sms =3D SAMPLE_MACHINE(machine);
+>> +    MemoryRegion *system_memory =3D get_system_memory();
+>> +    AVRCPU *cpu;
+>> +    const char *firmware =3D NULL;
+>> +    const char *filename =3D NULL;
+>> +    const char *cpu_type =3D NULL;
+>> +    uint32_t e_flags;
+>> +    int bytes_loaded;
+>> +    SysBusDevice *busdev;
+>> +    DeviceState *cpudev;
+>> +
+>> +    system_memory =3D get_system_memory();
+>> +    sms->ram =3D g_new(MemoryRegion, 1);
+>> +    sms->flash =3D g_new(MemoryRegion, 1);
+>> +
+>> +    /* if ELF file is provided, determine CPU type reading ELF e_flags =
+*/
+>> +    cpu_type =3D machine->cpu_type;
+>> +    firmware =3D machine->firmware;
+>> +    if (firmware !=3D NULL) {
+>> +        filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
+>> +        if (filename =3D=3D NULL) {
+>> +            error_report("Unable to find %s", firmware);
+>> +            exit(1);
+>> +        }
+>> +
+>> +        bytes_loaded =3D load_elf_ram_sym(filename, NULL, NULL, NULL, N=
+ULL, NULL,
+>> +                NULL, &e_flags, 0, EM_AVR, 0, 0, NULL, 0, 0);
+>> +        if (bytes_loaded > 0) {
+>> +            cpu_type =3D avr_flags_to_cpu_type(e_flags, cpu_type);
+>> +        }
+>> +    }
+>> +
+>> +    cpu =3D AVR_CPU(cpu_create(cpu_type));
+>> +    cpudev =3D DEVICE(cpu);
+>> +
+>> +    memory_region_init_rom(sms->flash, NULL, "avr.flash", SIZE_FLASH,
+>> +            &error_fatal);
+>> +    memory_region_add_subregion(system_memory, OFFSET_CODE, sms->flash)=
+;
+>> +
+>> +    /* following are atmel2560 device */
+>> +    create_unimplemented_device("usart 3", OFFSET_DATA + 0x0130, 0x0007=
+);
+>> +    create_unimplemented_device("timer-counter-16bit 5",
+>> +            OFFSET_DATA + 0x0120, 0x000e);
+>> +    create_unimplemented_device("gpio L", OFFSET_DATA + 0x0109, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio K", OFFSET_DATA + 0x0106, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio J", OFFSET_DATA + 0x0103, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio H", OFFSET_DATA + 0x0100, 0x0003)=
+;
+>> +    create_unimplemented_device("usart 2", OFFSET_DATA + 0x00d0, 0x0007=
+);
+>> +    create_unimplemented_device("usart 1", OFFSET_DATA + 0x00c8, 0x0007=
+);
+>> +    create_unimplemented_device("twi", OFFSET_DATA + 0x00b8, 0x0006);
+>> +    create_unimplemented_device("timer-counter-async-8bit 2",
+>> +            OFFSET_DATA + 0x00b0, 0x0007);
+>> +    create_unimplemented_device("timer-counter-16bit 4",
+>> +            OFFSET_DATA + 0x00a0, 0x000e);
+>> +    create_unimplemented_device("timer-counter-16bit 3",
+>> +            OFFSET_DATA + 0x0090, 0x000e);
+>> +    create_unimplemented_device("ac / adc",
+>> +            OFFSET_DATA + 0x0078, 0x0008);
+>> +    create_unimplemented_device("ext-mem-iface",
+>> +            OFFSET_DATA + 0x0074, 0x0002);
+>> +    create_unimplemented_device("int-controller",
+>> +            OFFSET_DATA + 0x0068, 0x0006);
+>> +    create_unimplemented_device("sys",
+>> +            OFFSET_DATA + 0x0060, 0x0007);
+>> +    create_unimplemented_device("spi",
+>> +            OFFSET_DATA + 0x004c, 0x0003);
+>> +    create_unimplemented_device("ext-mem-iface",
+>> +            OFFSET_DATA + 0x004a, 0x0002);
+>> +    create_unimplemented_device("timer-counter-pwm-8bit 0",
+>> +            OFFSET_DATA + 0x0044, 0x0005);
+>> +    create_unimplemented_device("ext-mem-iface",
+>> +            OFFSET_DATA + 0x003e, 0x0005);
+>> +    create_unimplemented_device("int-controller",
+>> +            OFFSET_DATA + 0x0035, 0x0009);
+>> +    create_unimplemented_device("gpio G", OFFSET_DATA + 0x0032, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio F", OFFSET_DATA + 0x002f, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio E", OFFSET_DATA + 0x002c, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio D", OFFSET_DATA + 0x0029, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio C", OFFSET_DATA + 0x0026, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio B", OFFSET_DATA + 0x0023, 0x0003)=
+;
+>> +    create_unimplemented_device("gpio A", OFFSET_DATA + 0x0020, 0x0003)=
+;
+>> +
+>> +    memory_region_allocate_system_memory(
+>> +        sms->ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
+>> +    memory_region_add_subregion(system_memory, OFFSET_DATA + 0x200, sms=
+->ram);
+>> +
+>> +    /* Power Reduction built-in peripheral */
+>> +    sms->prr[0] =3D AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
+>> +                    OFFSET_DATA + PRR0_BASE, NULL));
+>> +    sms->prr[1] =3D AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
+>> +                    OFFSET_DATA + PRR1_BASE, NULL));
+>> +
+>> +    /* USART 0 built-in peripheral */
+>> +    sms->usart0 =3D AVR_USART(object_new(TYPE_AVR_USART));
+>> +    busdev =3D SYS_BUS_DEVICE(sms->usart0);
+>> +    qdev_prop_set_chr(DEVICE(sms->usart0), "chardev", serial_hd(0));
+>> +    object_property_set_bool(OBJECT(sms->usart0), true, "realized",
+>> +            &error_fatal);
+>> +    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
+>> +    /*
+>> +     * These IRQ numbers don't match the datasheet because we're counti=
+ng from
+>> +     * zero and not including reset.
+>> +     */
+>> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, USART_RXC_IR=
+Q));
+>> +    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, USART_DRE_IR=
+Q));
+>> +    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, USART_TXC_IR=
+Q));
+>> +    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[1]), PRR1_BIT_PRUSART1,
+>> +            qdev_get_gpio_in(DEVICE(sms->usart0), 0));
+>> +
+>> +    /* Timer 1 built-in periphal */
+>> +    sms->timer1 =3D AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
+>> +    object_property_set_uint(OBJECT(sms->timer1), 1, "id", &error_abort=
+);
+>> +    object_property_set_uint(OBJECT(sms->timer1), configCPU_CLOCK_HZ,
+>> +                                 "cpu-frequency-hz", &error_abort);
+>> +    object_property_set_bool(OBJECT(sms->timer1), true, "realized",
+>> +            &error_fatal);
+>> +    busdev =3D SYS_BUS_DEVICE(sms->timer1);
+>> +    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
+>> +    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
+>> +    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
+>> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, TIMER1_CAPT_=
+IRQ));
+>> +    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, TIMER1_COMPA=
+_IRQ));
+>> +    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, TIMER1_COMPB=
+_IRQ));
+>> +    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(cpudev, TIMER1_COMPC=
+_IRQ));
+>> +    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(cpudev, TIMER1_OVF_I=
+RQ));
+>> +    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[0]), PRR0_BIT_PRTIM1,
+>> +            qdev_get_gpio_in(DEVICE(sms->timer1), 0));
+>> +
+>> +    /* Load firmware (contents of flash) trying to auto-detect format *=
+/
+>> +    if (filename !=3D NULL) {
+>> +        bytes_loaded =3D load_elf(
+>> +            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0=
+, 0);
+>> +        if (bytes_loaded < 0) {
+>> +            bytes_loaded =3D load_image_targphys(
+>> +                filename, OFFSET_CODE, SIZE_FLASH);
+>> +        }
+>> +        if (bytes_loaded < 0) {
+>> +            error_report(
+>> +                "Unable to load firmware image %s as ELF or raw binary"=
+,
+>> +                firmware);
+>> +            exit(1);
+>> +        }
+>> +    }
+>> +}
+>> +
+>> +static void sample_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+>> +
+>> +    mc->desc =3D "AVR sample/example board (ATmega2560)";
+>> +    mc->init =3D sample_init;
+>> +    mc->default_cpus =3D 1;
+>> +    mc->min_cpus =3D mc->default_cpus;
+>> +    mc->max_cpus =3D mc->default_cpus;
+>> +    mc->default_cpu_type =3D AVR_CPU_TYPE_NAME("avr5");
+>> +    mc->is_default =3D 1;
+>> +}
+>> +
+>> +static const TypeInfo sample_info =3D {
+>> +    .name =3D TYPE_SAMPLE_MACHINE,
+>> +    .parent =3D TYPE_MACHINE,
+>> +    .instance_size =3D sizeof(SampleMachineState),
+>> +    .class_size =3D sizeof(SampleMachineClass),
+>> +    .class_init =3D sample_class_init,
+>> +};
+>> +
+>> +static void sample_machine_init(void)
+>> +{
+>> +    type_register_static(&sample_info);
+>> +}
+>> +
+>> +type_init(sample_machine_init);
+>> diff --git a/hw/core/loader.c b/hw/core/loader.c
+>> index 5099f27dc8..9961b4423b 100644
+>> --- a/hw/core/loader.c
+>> +++ b/hw/core/loader.c
+>> @@ -438,7 +438,7 @@ int load_elf_ram(const char *filename,
+>>   {
+>>       return load_elf_ram_sym(filename, elf_note_fn,
+>>                               translate_fn, translate_opaque,
+>> -                            pentry, lowaddr, highaddr, big_endian,
+>> +                            pentry, lowaddr, highaddr, NULL, big_endian=
+,
+>>                               elf_machine, clear_lsb, data_swab, as,
+>>                               load_rom, NULL);
+>>   }
+>> @@ -448,8 +448,9 @@ int load_elf_ram_sym(const char *filename,
+>>                        uint64_t (*elf_note_fn)(void *, void *, bool),
+>>                        uint64_t (*translate_fn)(void *, uint64_t),
+>>                        void *translate_opaque, uint64_t *pentry,
+>> -                     uint64_t *lowaddr, uint64_t *highaddr, int big_end=
+ian,
+>> -                     int elf_machine, int clear_lsb, int data_swab,
+>> +                     uint64_t *lowaddr, uint64_t *highaddr, uint32_t *p=
+e_flags,
+>> +                     int big_endian, int elf_machine,
+>> +                     int clear_lsb, int data_swab,
+>>                        AddressSpace *as, bool load_rom, symbol_fn_t sym_=
+cb)
+>>   {
+>>       int fd, data_order, target_data_order, must_swab, ret =3D ELF_LOAD=
+_FAILED;
+>> @@ -490,13 +491,13 @@ int load_elf_ram_sym(const char *filename,
+>>       if (e_ident[EI_CLASS] =3D=3D ELFCLASS64) {
+>>           ret =3D load_elf64(filename, fd, elf_note_fn,
+>>                            translate_fn, translate_opaque, must_swab,
+>> -                         pentry, lowaddr, highaddr, elf_machine, clear_=
+lsb,
+>> -                         data_swab, as, load_rom, sym_cb);
+>> +                         pentry, lowaddr, highaddr, pe_flags, elf_machi=
+ne,
+>> +                         clear_lsb, data_swab, as, load_rom, sym_cb);
+>>       } else {
+>>           ret =3D load_elf32(filename, fd, elf_note_fn,
+>>                            translate_fn, translate_opaque, must_swab,
+>> -                         pentry, lowaddr, highaddr, elf_machine, clear_=
+lsb,
+>> -                         data_swab, as, load_rom, sym_cb);
+>> +                         pentry, lowaddr, highaddr, pe_flags, elf_machi=
+ne,
+>> +                         clear_lsb, data_swab, as, load_rom, sym_cb);
+>>       }
+>>  =20
+>>    fail:
+>> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+>> index 027303d2a3..746ca1f795 100644
+>> --- a/hw/riscv/boot.c
+>> +++ b/hw/riscv/boot.c
+>> @@ -119,7 +119,7 @@ target_ulong riscv_load_kernel(const char *kernel_fi=
+lename, symbol_fn_t sym_cb)
+>>       uint64_t kernel_entry, kernel_high;
+>>  =20
+>>       if (load_elf_ram_sym(kernel_filename, NULL, NULL, NULL,
+>> -                         &kernel_entry, NULL, &kernel_high, 0,
+>> +                         &kernel_entry, NULL, &kernel_high, NULL, 0,
+>>                            EM_RISCV, 1, 0, NULL, true, sym_cb) > 0) {
+>>           return kernel_entry;
+>>       }
+>> diff --git a/hw/Kconfig b/hw/Kconfig
+>> index ecf491bf04..f80dff3b75 100644
+>> --- a/hw/Kconfig
+>> +++ b/hw/Kconfig
+>> @@ -43,6 +43,7 @@ source watchdog/Kconfig
+>>   # arch Kconfig
+>>   source arm/Kconfig
+>>   source alpha/Kconfig
+>> +source avr/Kconfig
+>>   source cris/Kconfig
+>>   source hppa/Kconfig
+>>   source i386/Kconfig
+>> diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+>> new file mode 100644
+>> index 0000000000..92aa1e6afb
+>> --- /dev/null
+>> +++ b/hw/avr/Kconfig
+>> @@ -0,0 +1,6 @@
+>> +config AVR_SAMPLE
+>> +    bool
+>> +    select AVR_TIMER16
+>> +    select AVR_USART
+>> +    select AVR_MASK
+>> +    select UNIMP
+>> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+>> new file mode 100644
+>> index 0000000000..626b7064b3
+>> --- /dev/null
+>> +++ b/hw/avr/Makefile.objs
+>> @@ -0,0 +1 @@
+>> +obj-y +=3D sample.o
 >=20
-> We don't need libslirp/capstone/dtc but they are still built:
-
-Hmm now wth are those dependencies coming from....
-
-Dave
-
-> $ make virtiofsd
->   GEN     config-host.h
-> make[1]: Entering directory 'slirp'
->   CC      slirp/src/state.o
->   CC      slirp/src/tcp_timer.o
->   CC      slirp/src/dhcpv6.o
->   CC      slirp/src/ip_input.o
->   CC      slirp/src/ip6_icmp.o
->   CC      slirp/src/bootp.o
->   CC      slirp/src/ip6_input.o
->   CC      slirp/src/slirp.o
->   CC      slirp/src/vmstate.o
->   CC      slirp/src/ip_output.o
->   CC      slirp/src/ncsi.o
->   CC      slirp/src/tcp_output.o
->   CC      slirp/src/ndp_table.o
->   CC      slirp/src/version.o
->   CC      slirp/src/misc.o
->   CC      slirp/src/ip6_output.o
->   CC      slirp/src/mbuf.o
->   CC      slirp/src/tftp.o
->   CC      slirp/src/arp_table.o
->   CC      slirp/src/util.o
->   CC      slirp/src/socket.o
->   CC      slirp/src/sbuf.o
->   CC      slirp/src/stream.o
->   CC      slirp/src/dnssearch.o
->   CC      slirp/src/udp.o
->   CC      slirp/src/tcp_input.o
->   CC      slirp/src/if.o
->   CC      slirp/src/cksum.o
->   CC      slirp/src/tcp_subr.o
->   CC      slirp/src/udp6.o
->   CC      slirp/src/ip_icmp.o
->   AR      slirp/libslirp.a
-> make[1]: Leaving directory 'slirp'
->          DEP dtc/libfdt/fdt_overlay.c
->          DEP dtc/libfdt/fdt_addresses.c
->          DEP dtc/libfdt/fdt_empty_tree.c
->          DEP dtc/libfdt/fdt_strerror.c
->          DEP dtc/libfdt/fdt_rw.c
->          DEP dtc/libfdt/fdt_sw.c
->          DEP dtc/libfdt/fdt_wip.c
->          DEP dtc/libfdt/fdt_ro.c
->          DEP dtc/libfdt/fdt.c
->          DEP dtc/util.c
->          DEP dtc/fdtoverlay.c
->          DEP dtc/fdtput.c
->          DEP dtc/fdtget.c
->          DEP dtc/fdtdump.c
->          DEP convert-dtsv0-lexer.lex.c
->          DEP dtc/srcpos.c
->          BISON dtc-parser.tab.c
->          DEP dtc-parser.tab.c
->          LEX dtc-lexer.lex.c
->          DEP dtc-lexer.lex.c
->          DEP dtc/treesource.c
->          DEP dtc/livetree.c
->          DEP dtc/fstree.c
->          DEP dtc/flattree.c
->          DEP dtc/dtc.c
->          DEP dtc/data.c
->          DEP dtc/checks.c
->          CC libfdt/fdt.o
->          CC libfdt/fdt_ro.o
->          CC libfdt/fdt_wip.o
->          CC libfdt/fdt_sw.o
->          CC libfdt/fdt_rw.o
->          CC libfdt/fdt_strerror.o
->          CC libfdt/fdt_empty_tree.o
->          CC libfdt/fdt_addresses.o
->          CC libfdt/fdt_overlay.o
->          AR libfdt/libfdt.a
-> arm-linux-gnueabihf-ar: creating libfdt/libfdt.a
-> a - libfdt/fdt.o
-> a - libfdt/fdt_ro.o
-> a - libfdt/fdt_wip.o
-> a - libfdt/fdt_sw.o
-> a - libfdt/fdt_rw.o
-> a - libfdt/fdt_strerror.o
-> a - libfdt/fdt_empty_tree.o
-> a - libfdt/fdt_addresses.o
-> a - libfdt/fdt_overlay.o
->   CC      cs.o
->   CC      utils.o
->   CC      SStream.o
->   CC      MCInstrDesc.o
->   CC      MCRegisterInfo.o
->   CC      arch/ARM/ARMDisassembler.o
->   CC      arch/ARM/ARMInstPrinter.o
->   CC      arch/ARM/ARMMapping.o
->   CC      arch/ARM/ARMModule.o
->   CC      arch/AArch64/AArch64BaseInfo.o
->   CC      arch/AArch64/AArch64Disassembler.o
->   CC      arch/AArch64/AArch64InstPrinter.o
->   CC      arch/AArch64/AArch64Mapping.o
->   CC      arch/AArch64/AArch64Module.o
->   CC      arch/Mips/MipsDisassembler.o
->   CC      arch/Mips/MipsInstPrinter.o
->   CC      arch/Mips/MipsMapping.o
->   CC      arch/Mips/MipsModule.o
->   CC      arch/PowerPC/PPCDisassembler.o
->   CC      arch/PowerPC/PPCInstPrinter.o
->   CC      arch/PowerPC/PPCMapping.o
->   CC      arch/PowerPC/PPCModule.o
->   CC      arch/Sparc/SparcDisassembler.o
->   CC      arch/Sparc/SparcInstPrinter.o
->   CC      arch/Sparc/SparcMapping.o
->   CC      arch/Sparc/SparcModule.o
->   CC      arch/SystemZ/SystemZDisassembler.o
->   CC      arch/SystemZ/SystemZInstPrinter.o
->   CC      arch/SystemZ/SystemZMapping.o
->   CC      arch/SystemZ/SystemZModule.o
->   CC      arch/SystemZ/SystemZMCTargetDesc.o
->   CC      arch/X86/X86DisassemblerDecoder.o
->   CC      arch/X86/X86Disassembler.o
->   CC      arch/X86/X86IntelInstPrinter.o
->   CC      arch/X86/X86ATTInstPrinter.o
->   CC      arch/X86/X86Mapping.o
->   CC      arch/X86/X86Module.o
->   CC      arch/XCore/XCoreDisassembler.o
->   CC      arch/XCore/XCoreInstPrinter.o
->   CC      arch/XCore/XCoreMapping.o
->   CC      arch/XCore/XCoreModule.o
->   CC      MCInst.o
->   AR      libcapstone.a
->   CC      tools/virtiofsd/buffer.o
->   CC      tools/virtiofsd/fuse_opt.o
->   CC      tools/virtiofsd/fuse_log.o
->   CC      tools/virtiofsd/fuse_lowlevel.o
->   ...
 >=20
-> FYI Paolo queued this patch, so libfdt shouldn't get compiled anymore:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg671667.html
->=20
-> > This code is going into tools/virtiofsd  based on the previous long
-> > discussion.
-> >=20
-> > Thank you to all those who have contributed code and to those who have
-> > reviewed the previous version.
-> >=20
-> > Dave
-> >=20
-> > Dr. David Alan Gilbert (35):
-> >    virtiofsd: Pull in upstream headers
-> >    virtiofsd: Pull in kernel's fuse.h
-> >    virtiofsd: Add auxiliary .c's
-> >    virtiofsd: Add fuse_lowlevel.c
-> >    virtiofsd: Add passthrough_ll
-> >    virtiofsd: Trim down imported files
-> >    virtiofsd: Format imported files to qemu style
-> >    virtiofsd: Fix fuse_daemonize ignored return values
-> >    virtiofsd: Fix common header and define for QEMU builds
-> >    virtiofsd: Trim out compatibility code
-> >    virtiofsd: Add options for virtio
-> >    virtiofsd: Open vhost connection instead of mounting
-> >    virtiofsd: Start wiring up vhost-user
-> >    virtiofsd: Add main virtio loop
-> >    virtiofsd: get/set features callbacks
-> >    virtiofsd: Start queue threads
-> >    virtiofsd: Poll kick_fd for queue
-> >    virtiofsd: Start reading commands from queue
-> >    virtiofsd: Send replies to messages
-> >    virtiofsd: Keep track of replies
-> >    virtiofsd: Add Makefile wiring for virtiofsd contrib
-> >    virtiofsd: Fast path for virtio read
-> >    virtiofs: Add maintainers entry
-> >    virtiofsd: Plumb fuse_bufvec through to do_write_buf
-> >    virtiofsd: Pass write iov's all the way through
-> >    virtiofsd: cap-ng helpers
-> >    docs:  Add docs/tools
-> >    virtiofsd: Handle reinit
-> >    virtiofsd: Handle hard reboot
-> >    virtiofsd: Kill threads when queues are stopped
-> >    vhost-user: Print unexpected slave message types
-> >    contrib/libvhost-user: Protect slave fd with mutex
-> >    virtiofsd: Clean up inodes on destroy
-> >    libvhost-user: Fix some memtable remap cases
-> >    virtiofsd: Convert lo_destroy to take the lo->mutex lock itself
-> >=20
-> > Eric Ren (1):
-> >    virtiofsd: fix incorrect error handling in lo_do_lookup
-> >=20
-> > Eryu Guan (3):
-> >    virtiofsd: print log only when priority is high enough
-> >    virtiofsd: convert more fprintf and perror to use fuse log infra
-> >    virtiofsd: stop all queue threads on exit in virtio_loop()
-> >=20
-> > Jiufei Xue (1):
-> >    virtiofsd: support nanosecond resolution for file timestamp
-> >=20
-> > Liu Bo (6):
-> >    virtiofsd: fix error handling in main()
-> >    virtiofsd: cleanup allocated resource in se
-> >    virtiofsd: fix memory leak on lo.source
-> >    virtiofsd: add helper for lo_data cleanup
-> >    virtiofsd: enable PARALLEL_DIROPS during INIT
-> >    Virtiofsd: fix memory leak on fuse queueinfo
-> >=20
-> > Masayoshi Mizuma (4):
-> >    virtiofsd: Add ID to the log with FUSE_LOG_DEBUG level
-> >    virtiofsd: Add timestamp to the log with FUSE_LOG_DEBUG level
-> >    virtiofsd: Prevent multiply running with same vhost_user_socket
-> >    virtiofsd: add some options to the help message
-> >=20
-> > Miklos Szeredi (10):
-> >    virtiofsd: passthrough_ll: add fallback for racy ops
-> >    virtiofsd: passthrough_ll: add renameat2 support
-> >    virtiofsd: passthrough_ll: disable readdirplus on cache=3Dnever
-> >    virtiofsd: passthrough_ll: control readdirplus
-> >    virtiofsd: rename unref_inode() to unref_inode_lolocked()
-> >    virtiofsd: fail when parent inode isn't known in lo_do_lookup()
-> >    virtiofsd: extract root inode init into setup_root()
-> >    virtiofsd: passthrough_ll: clean up cache related options
-> >    virtiofsd: passthrough_ll: use hashtable
-> >    virtiofsd: passthrough_ll: fix refcounting on remove/rename
-> >=20
-> > Misono Tomohiro (1):
-> >    virtiofsd: Fix data corruption with O_APPEND write in writeback mode
-> >=20
-> > Peng Tao (1):
-> >    virtiofsd: do not always set FUSE_FLOCK_LOCKS
-> >=20
-> > Stefan Hajnoczi (37):
-> >    virtiofsd: remove mountpoint dummy argument
-> >    virtiofsd: remove unused notify reply support
-> >    virtiofsd: add -o source=3DPATH to help output
-> >    virtiofsd: add --fd=3DFDNUM fd passing option
-> >    virtiofsd: make -f (foreground) the default
-> >    virtiofsd: add vhost-user.json file
-> >    virtiofsd: add --print-capabilities option
-> >    virtiofsd: passthrough_ll: add lo_map for ino/fh indirection
-> >    virtiofsd: passthrough_ll: add ino_map to hide lo_inode pointers
-> >    virtiofsd: passthrough_ll: add dirp_map to hide lo_dirp pointers
-> >    virtiofsd: passthrough_ll: add fd_map to hide file descriptors
-> >    virtiofsd: validate path components
-> >    virtiofsd: add fuse_mbuf_iter API
-> >    virtiofsd: validate input buffer sizes in do_write_buf()
-> >    virtiofsd: check input buffer size in fuse_lowlevel.c ops
-> >    virtiofsd: prevent ".." escape in lo_do_lookup()
-> >    virtiofsd: prevent ".." escape in lo_do_readdir()
-> >    virtiofsd: use /proc/self/fd/ O_PATH file descriptor
-> >    virtiofsd: sandbox mount namespace
-> >    virtiofsd: move to an empty network namespace
-> >    virtiofsd: move to a new pid namespace
-> >    virtiofsd: add seccomp whitelist
-> >    virtiofsd: set maximum RLIMIT_NOFILE limit
-> >    virtiofsd: fix libfuse information leaks
-> >    virtiofsd: add security guide document
-> >    virtiofsd: add --syslog command-line option
-> >    virtiofsd: use fuse_lowlevel_is_virtio() in fuse_session_destroy()
-> >    virtiofsd: prevent fv_queue_thread() vs virtio_loop() races
-> >    virtiofsd: make lo_release() atomic
-> >    virtiofsd: prevent races with lo_dirp_put()
-> >    virtiofsd: rename inode->refcount to inode->nlookup
-> >    virtiofsd: add man page
-> >    virtiofsd: introduce inode refcount to prevent use-after-free
-> >    virtiofsd: process requests in a thread pool
-> >    virtiofsd: prevent FUSE_INIT/FUSE_DESTROY races
-> >    virtiofsd: fix lo_destroy() resource leaks
-> >    virtiofsd: add --thread-pool-size=3DNUM option
-> >=20
-> > Vivek Goyal (6):
-> >    virtiofsd: Make fsync work even if only inode is passed in
-> >    virtiofsd: passthrough_ll: create new files in caller's context
-> >    virtiofsd: Parse flag FUSE_WRITE_KILL_PRIV
-> >    virtiofsd: Drop CAP_FSETID if client asked for it
-> >    virtiofsd: Support remote posix locks
-> >    virtiofsd: Reset O_DIRECT flag during file open
-> >=20
-> > Xiao Yang (2):
-> >    vitriofsd/passthrough_ll: fix fallocate() ifdefs
-> >    virtiofsd/passthrough_ll: Pass errno to fuse_reply_err()
-> >=20
-> > piaojun (2):
-> >    virtiofsd: add definition of fuse_buf_writev()
-> >    virtiofsd: use fuse_buf_writev to replace fuse_buf_write for better
-> >      performance
-> >=20
-> >   .gitignore                                |    1 +
-> >   MAINTAINERS                               |    8 +
-> >   Makefile                                  |   27 +-
-> >   Makefile.objs                             |    1 +
-> >   configure                                 |   16 +
-> >   contrib/libvhost-user/libvhost-user.c     |   57 +-
-> >   contrib/libvhost-user/libvhost-user.h     |    6 +
-> >   docs/index.rst                            |    1 +
-> >   docs/interop/vhost-user.json              |    4 +-
-> >   docs/tools/conf.py                        |   16 +
-> >   docs/tools/index.rst                      |   14 +
-> >   docs/tools/virtiofsd-security.rst         |  118 +
-> >   hw/virtio/vhost-user.c                    |    2 +-
-> >   include/standard-headers/linux/fuse.h     |  891 ++++++
-> >   scripts/update-linux-headers.sh           |    1 +
-> >   tools/virtiofsd/50-qemu-virtiofsd.json.in |    5 +
-> >   tools/virtiofsd/Makefile.objs             |   12 +
-> >   tools/virtiofsd/buffer.c                  |  351 +++
-> >   tools/virtiofsd/fuse.h                    | 1249 +++++++++
-> >   tools/virtiofsd/fuse_common.h             |  860 ++++++
-> >   tools/virtiofsd/fuse_i.h                  |  115 +
-> >   tools/virtiofsd/fuse_log.c                |   40 +
-> >   tools/virtiofsd/fuse_log.h                |   74 +
-> >   tools/virtiofsd/fuse_lowlevel.c           | 2779 +++++++++++++++++++
-> >   tools/virtiofsd/fuse_lowlevel.h           | 2023 ++++++++++++++
-> >   tools/virtiofsd/fuse_misc.h               |   60 +
-> >   tools/virtiofsd/fuse_opt.c                |  449 +++
-> >   tools/virtiofsd/fuse_opt.h                |  272 ++
-> >   tools/virtiofsd/fuse_signals.c            |   97 +
-> >   tools/virtiofsd/fuse_virtio.c             |  985 +++++++
-> >   tools/virtiofsd/fuse_virtio.h             |   33 +
-> >   tools/virtiofsd/helper.c                  |  349 +++
-> >   tools/virtiofsd/passthrough_helpers.h     |   51 +
-> >   tools/virtiofsd/passthrough_ll.c          | 3006 ++++++++++++++++++++=
-+
-> >   tools/virtiofsd/seccomp.c                 |  164 ++
-> >   tools/virtiofsd/seccomp.h                 |   16 +
-> >   tools/virtiofsd/virtiofsd.texi            |  104 +
-> >   37 files changed, 14242 insertions(+), 15 deletions(-)
-> >   create mode 100644 docs/tools/conf.py
-> >   create mode 100644 docs/tools/index.rst
-> >   create mode 100644 docs/tools/virtiofsd-security.rst
-> >   create mode 100644 include/standard-headers/linux/fuse.h
-> >   create mode 100644 tools/virtiofsd/50-qemu-virtiofsd.json.in
-> >   create mode 100644 tools/virtiofsd/Makefile.objs
-> >   create mode 100644 tools/virtiofsd/buffer.c
-> >   create mode 100644 tools/virtiofsd/fuse.h
-> >   create mode 100644 tools/virtiofsd/fuse_common.h
-> >   create mode 100644 tools/virtiofsd/fuse_i.h
-> >   create mode 100644 tools/virtiofsd/fuse_log.c
-> >   create mode 100644 tools/virtiofsd/fuse_log.h
-> >   create mode 100644 tools/virtiofsd/fuse_lowlevel.c
-> >   create mode 100644 tools/virtiofsd/fuse_lowlevel.h
-> >   create mode 100644 tools/virtiofsd/fuse_misc.h
-> >   create mode 100644 tools/virtiofsd/fuse_opt.c
-> >   create mode 100644 tools/virtiofsd/fuse_opt.h
-> >   create mode 100644 tools/virtiofsd/fuse_signals.c
-> >   create mode 100644 tools/virtiofsd/fuse_virtio.c
-> >   create mode 100644 tools/virtiofsd/fuse_virtio.h
-> >   create mode 100644 tools/virtiofsd/helper.c
-> >   create mode 100644 tools/virtiofsd/passthrough_helpers.h
-> >   create mode 100644 tools/virtiofsd/passthrough_ll.c
-> >   create mode 100644 tools/virtiofsd/seccomp.c
-> >   create mode 100644 tools/virtiofsd/seccomp.h
-> >   create mode 100644 tools/virtiofsd/virtiofsd.texi
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
