@@ -2,81 +2,79 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3569C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E83C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:12:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F5D6217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:11:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8138E217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:12:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXsPHAiB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5D6217F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kG11sCTL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8138E217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituFx-0006mm-21
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:11:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40469)
+	id 1ituGX-0007aP-T4
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:12:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ituCM-0002cW-D9
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:08:07 -0500
+ (envelope-from <fintelia@gmail.com>) id 1ittJh-0003BN-LY
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:11:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ituCL-0000bo-6e
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:08:06 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42767)
+ (envelope-from <fintelia@gmail.com>) id 1ittJg-0003AZ-BI
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:11:37 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:36570)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ituCL-0000bX-1n
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:08:05 -0500
-Received: by mail-oi1-x243.google.com with SMTP id 18so2607579oin.9
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 06:08:04 -0800 (PST)
+ (Exim 4.71) (envelope-from <fintelia@gmail.com>)
+ id 1ittJd-00038j-Ha; Tue, 21 Jan 2020 08:11:33 -0500
+Received: by mail-lf1-x142.google.com with SMTP id f24so2237159lfh.3;
+ Tue, 21 Jan 2020 05:11:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Dtq4GEHNbtHbv8UM2MbbYuRO7vvCC0elQwHfGqvU8vc=;
- b=FXsPHAiB6kBXA3ZZjRHINi4SEz1bLadGeMhspCgB8ElkLiYTGpb1M+pYUjtajQ8F3G
- 2Q/Ln00oM/wVikzchUaWneWLZTZu2M7YUt2uSCNuqMYYQWIoNRBgpxBgTL5P9Dz2ZVsm
- 6X+/kJRdTuH/ZIVVWX7o/BU5+byz0Rhx+3FfTeNerx3EfGN4Qic5tRuwSGyMqKCKI2+J
- P8JG95KzpK1mhMCCaEHzVgppEQ3D6g2umKOFy/IdNEqO4KlLkZ9B3USKuw8Cno0kJnI2
- /upNhayvvnX3gSgqvvfuGDlkFn6+QpEVOSqGueRBa5wJln1Gn9D3wOBMNYMzbS5IFVy7
- gjcg==
+ :cc; bh=n+O6NkyOPzJuZtsFRRj/7c77BA+yueZ6QCF2y/JENJk=;
+ b=kG11sCTL3MU7NnD3BW1oqiYi+hEIMLpM18ci+2T8TaIvokMMhmRlxboCXhIck8rNG+
+ KKfBgoeyL6laTnUO5Qw0+LcRfcXd8Rl0DoiFBu6eImpuKdFy2cT1Tz8JYwvxgOvwY29F
+ i7WsvSW3c2MepzTvOa8d99uH+yCS6e1IkocjXzbhgRmaz57fkh93WJCz2At7Oshr+yvM
+ 4otBefH7N5tLxF0kIm0xMzhqg+AAoToNMA0/perPluKeBnIpZtXBRg9UBgrQzeeHTKIf
+ 7Ka7OWV87TayoDJuyg1ZdVdP/Z/wvcT9U0Xp44Je5Wmfug4XAQYetqOyK8QaurhOonwZ
+ v0KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Dtq4GEHNbtHbv8UM2MbbYuRO7vvCC0elQwHfGqvU8vc=;
- b=pTRlRoK3FWUxopZQzm9bxCWiR4cTgIdfoUJ5++xEM9hukXf9Peng3y7VxrjqGAyBRX
- W8R9BvJbePG/ggjas8e/YNdGEQ7b4SCJK8nV0Q+RMTxefmWVQULhwETxioe1Y8wO0/Ig
- jlBvUD0sfc0RpVw2Ru5hPUPkIdnhlxtQYNCS29m+w7htrHFFrXW0R3gP/Uc5Om5xgDbO
- q2CME2xBP7G4eM5CTx8bBTA79f3zPrsBgnZghG5u0g+GyMcSnr6J9gX7bGuhXXfTiIoy
- CSfUYq9hkUANt9jjXmmkqSN7DnpPvVtn+AAR6NUb7/GrwV7zxCTU0OG26Gma+d/LqhTN
- UORA==
-X-Gm-Message-State: APjAAAWSzSAMr0ebyfu1kwRse4ai6D8Ab03PLAN/i+sMBqsFvQcNLJRe
- ZrOwJJ5s9swXIPkLT8VJybOHA5aZmHoI1LPmEvE=
-X-Google-Smtp-Source: APXvYqzCpDWGyinZn3Ki+YzuHoBQW8QetOyXDLNJ9WjcI2HyzAd5nTLfJJdvy3m9ZPwV3GlmR+xOMAdgl3ba0EVYhWs=
-X-Received: by 2002:aca:1b08:: with SMTP id b8mr3135855oib.62.1579615684192;
- Tue, 21 Jan 2020 06:08:04 -0800 (PST)
+ bh=n+O6NkyOPzJuZtsFRRj/7c77BA+yueZ6QCF2y/JENJk=;
+ b=gfuGZbMLwgOT4X9MgcPpTFgfHbVUck1wS6CgjMokhdFb7EJucPbyK1inQrbO3rQRx4
+ B1lgCmXf+PulgbR4N1MquyfH6thmLj1Y70FcEumX/GcETzb4zmL00b9nxRzU1sH/yekl
+ zPQ/BjLcQCdyGrpaFhYwnQDBAO6wWXFW2YxklFuKctPrIIfnZWlpcxcLq+Wgx//GCIjB
+ X4BBw7x1y30OJfzRZWy4Li8Sf7mSJ4HAs2KqQBmBWWRnr3mefjbCKqGWtQOEDxPPy3n+
+ QnvggT9asjKYRrjI+pfg8z8Zc3xiWLEzuZps4NEGlYvgBwvZTRIqi3DYZMl6ETaQ29mW
+ 9//A==
+X-Gm-Message-State: APjAAAUCRWAwi/Lbi26FHIFgT9lwZufH2p1yf9L5dMKOZvNKZQq3kvWq
+ 2tpmvSNCpwZLfPOAcxCTD5XQtUkbzP1chRmD/Hw=
+X-Google-Smtp-Source: APXvYqwedYNY8e5XcfSJOmahUhBfbirEy3W7iG0UhfonbcZ/sXWmb5bnImgV1cj8Q/+UKFpDuvZBmx1GQtc7PQAUeTs=
+X-Received: by 2002:a19:5503:: with SMTP id n3mr2649930lfe.136.1579612291830; 
+ Tue, 21 Jan 2020 05:11:31 -0800 (PST)
 MIME-Version: 1.0
-References: <324a-5e231180-7-6946d180@169257031>
- <20200120145024.GJ345995@stefanha-x1.localdomain>
-In-Reply-To: <20200120145024.GJ345995@stefanha-x1.localdomain>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 21 Jan 2020 15:07:53 +0100
-Message-ID: <CAL1e-=in3inmtH=4ZjM2bxnVPJz2GVW4pwTJ8PVkWoqiunPPfA@mail.gmail.com>
-Subject: Re: [GSoC/Outreachy QEMU project proposal] Measure and Analyze QEMU
- Performance
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20200121085910.28834-1-anup.patel@wdc.com>
+In-Reply-To: <20200121085910.28834-1-anup.patel@wdc.com>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Tue, 21 Jan 2020 08:11:05 -0500
+Message-ID: <CANnJOVHw=-yL2=j3L2XNkqYjDGnULkc-NQRzuWm2k=BWRH7EGQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] RISC-V TIME CSR for privileged mode
+To: Anup Patel <Anup.Patel@wdc.com>
+Content-Type: multipart/alternative; boundary="0000000000008997d5059ca625e4"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2a00:1450:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,61 +86,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 20, 2020 at 3:51 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+--0000000000008997d5059ca625e4
+Content-Type: text/plain; charset="UTF-8"
+
+This series doesn't seem to touch mcounteren.TM which should be hardwired
+to zero if no callback in provided, and writable otherwise. (I had a patch
+to do the hardwiring unconditionally, but it seems to have been
+accidentally dropped.) Other than that, I think the design is quite good.
+
+Jonathan
+
+On Tue, Jan 21, 2020 at 3:59 AM Anup Patel <Anup.Patel@wdc.com> wrote:
+
+> This series adds emulation of TIME CSRs for privileged mode. With
+> this series, we see approximately 25+% improvement in hackbench
+> numbers for non-virtualized (or Host) Linux and 40+% improvement
+> in hackbench numbers for Guest/VM Linux.
 >
-> On Sat, Jan 18, 2020 at 03:08:37PM +0100, Aleksandar Markovic wrote:
-> > 3) The community will be given all devised performance measurement methods in the form of easily reproducible step-by-step setup and execution procedures.
+> These patches are based on mainline/alistair/riscv-hyp-ext-v0.5.1
+> branch of https://github.com/kvm-riscv/qemu.git and can be found
+> in riscv_time_csr_v1 branch of same repo.
 >
-> Tracking performance is a good idea and something that has not been done
-> upstream yet.
-
-Thanks for the interest, Stefan!
-
->  A few questions:
+> Anup Patel (2):
+>   target/riscv: Emulate TIME CSRs for privileged mode
+>   hw/riscv: Provide rdtime callback for TCG in CLINT emulation
 >
->  * Will benchmarks be run automatically (e.g. nightly or weekly) on
->    someone's hardware or does every TCG architecture maintainer need to
->    run them manually for themselves?
-
-If the community wants it, definitely yes. Once the methodology is
-developed, it should be straightforward to setup nightly and/or weekly
-benchmarks - that could definitely include sending mails with reports
-to the entire list or just individuals or subgroups. The recipient
-choice is just a matter or having decent criteria about
-appropriateness of information within the message (e.g. not to flood
-the list with the data most people are not really interested).
-
-For linux-user tests, they are typically very quick, and nightly tests
-are quite feasible to run. On someone hardware, of course, and
-consistently always on the same hardware, if possible. If it makes
-sense, one could setup multiple test beds with a variety of hardware
-setups.
-
-For system mode tests, I knoe they are much more difficult to
-automate, and, on top of that, there could be greater risk of
-hangs/crashes Also, considering the number of machines we support,
-those tests could consume much more time - perhaps even one day would
-not be sufficient, if we have many machines and boot/shutdown
-variants. For these reason, perhaps weekly executions would be more
-appropriate for them, and, in general, given greater complexity, the
-expectation from system-mode performance tests should be better kept
-quite low for now.
-
->  * Where will the benchmark result history be stored?
+>  hw/riscv/sifive_clint.c   |  1 +
+>  target/riscv/cpu.h        |  5 +++
+>  target/riscv/cpu_helper.c |  5 +++
+>  target/riscv/csr.c        | 80 +++++++++++++++++++++++++++++++++++++--
+>  4 files changed, 87 insertions(+), 4 deletions(-)
+>
+> --
+> 2.17.1
+>
+>
 >
 
-If emailing is set up, the results could be reconstructed from emails.
-But, yes, it would be better if the result history is kept somewhere
-on an internet-connected file server
+--0000000000008997d5059ca625e4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yours,
-Aleksandar
+<div dir=3D"ltr"><div>This series doesn&#39;t seem to touch mcounteren.TM w=
+hich should be hardwired to zero if no callback in provided, and writable o=
+therwise. (I had a patch to do the hardwiring unconditionally, but it seems=
+ to have been accidentally dropped.) Other than that, I think the design is=
+ quite good.</div><div><br></div><div>Jonathan<br></div></div><br><div clas=
+s=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jan 21, 202=
+0 at 3:59 AM Anup Patel &lt;<a href=3D"mailto:Anup.Patel@wdc.com">Anup.Pate=
+l@wdc.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">This series adds emulation of TIME CSRs for privileged mode. Wit=
+h<br>
+this series, we see approximately 25+% improvement in hackbench<br>
+numbers for non-virtualized (or Host) Linux and 40+% improvement<br>
+in hackbench numbers for Guest/VM Linux.<br>
+<br>
+These patches are based on mainline/alistair/riscv-hyp-ext-v0.5.1<br>
+branch of <a href=3D"https://github.com/kvm-riscv/qemu.git" rel=3D"noreferr=
+er" target=3D"_blank">https://github.com/kvm-riscv/qemu.git</a> and can be =
+found<br>
+in riscv_time_csr_v1 branch of same repo.<br>
+<br>
+Anup Patel (2):<br>
+=C2=A0 target/riscv: Emulate TIME CSRs for privileged mode<br>
+=C2=A0 hw/riscv: Provide rdtime callback for TCG in CLINT emulation<br>
+<br>
+=C2=A0hw/riscv/sifive_clint.c=C2=A0 =C2=A0|=C2=A0 1 +<br>
+=C2=A0target/riscv/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 5 +++<br>
+=C2=A0target/riscv/cpu_helper.c |=C2=A0 5 +++<br>
+=C2=A0target/riscv/csr.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 80 ++++++++++++++++++=
++++++++++++++++++++--<br>
+=C2=A04 files changed, 87 insertions(+), 4 deletions(-)<br>
+<br>
+-- <br>
+2.17.1<br>
+<br>
+<br>
+</blockquote></div>
 
-> Stefan
+--0000000000008997d5059ca625e4--
 
