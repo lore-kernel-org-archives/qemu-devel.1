@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD147C32771
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3C9C32771
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67EE422522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:41:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A809122522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 01:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="XIGp6jEM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67EE422522
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="VebecD0Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A809122522
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itiY3-0005TE-EP
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 20:41:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43833)
+	id 1itiZF-0006hM-Aq
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jan 2020 20:42:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cbd48794ab09613589719b37b147589cda5af6dd@lizzy.crudebyte.com>)
- id 1itiRS-0008NK-W8
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:34:57 -0500
+ (envelope-from <e0b4402722a877178f8fb6a8ad7b64bb20150613@lizzy.crudebyte.com>)
+ id 1itiST-0000SD-JW
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:35:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cbd48794ab09613589719b37b147589cda5af6dd@lizzy.crudebyte.com>)
- id 1itiRQ-0001Sr-O4
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:34:54 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:57321)
+ (envelope-from <e0b4402722a877178f8fb6a8ad7b64bb20150613@lizzy.crudebyte.com>)
+ id 1itiSR-00029a-Nz
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:35:57 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:53057)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71)
- (envelope-from <cbd48794ab09613589719b37b147589cda5af6dd@lizzy.crudebyte.com>)
- id 1itiRQ-0000t8-46
- for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:34:52 -0500
+ (envelope-from <e0b4402722a877178f8fb6a8ad7b64bb20150613@lizzy.crudebyte.com>)
+ id 1itiSP-0001Sy-Lm
+ for qemu-devel@nongnu.org; Mon, 20 Jan 2020 20:35:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=Fe+xvHBH+W/OJ5evLYdrouJVmXHQs6/wXF8sQxABiiI=; b=XIGp6
- jEM1MUwcWRwcQpjLZqrUZpFXmNED9Cl3zoIc/izoVbScFf+QlFYH4OheOXwtcjQ/bR8G7xFnrTMI2
- bvx8sGHudjLz6ukKBITOJjWPMzK6kgN24s1JMLpZ9av8VUPl7rWqBgAJvTWCyWZuJGmPGyo1YSavf
- Av5eTuZ1CEU4HgIJ21CdqTV09cWBI2UlWfbki8XwkgCm7RCf+aS5cvPpLCI0dhLlphnHw2OgurRLQ
- 958EWDXYvL2KKuHZXcio9eVnIFttymsTWWr+b/+1GcWd83KLbMgF4Q+/Qo6jUL74xC2XHlDfaaNUv
- O6UC7lKWjCfmgzjeonwH+fUzPb6wQ==;
-Message-Id: <cbd48794ab09613589719b37b147589cda5af6dd.1579567020.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=WKwu7yNyh9qQeh/eltLcH7EfLZ3cAmjWAlwS67wA88Y=; b=Vebec
+ D0Yl7VvI6sPtmwprzA0LXmhOzBLCzRhSkS2cNVYLHXeSOEh9RumnESpMjp9W4FAmh23ICeA+NRFdV
+ anKtWYAKzLtJ7MSD4+HOQ4w20y23mS2/O/HH6v4+fPBW0bssVnycbm4Cs2GZPJQGu0jcX6frYOLHa
+ A9a2gx6YtztAMFCI2sTkkRlEok70uKGZR5GXH7BANqyWjzBsFVLb5t0QYBKqByTaI0f6sJDO0WZ4e
+ MLmPFkNK/npQjx4LEvPYNHZhLNLW4LtuJEBFCTpcJJcQC4qljAcxIZcWcrTY2U8WgBDj/aixcfKrv
+ CFTSsVeW9HkvP/6ET6MUxJQns7QaQ==;
+Message-Id: <e0b4402722a877178f8fb6a8ad7b64bb20150613.1579567020.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1579567019.git.qemu_oss@crudebyte.com>
 References: <cover.1579567019.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Tue, 21 Jan 2020 01:30:10 +0100
-Subject: [PATCH v4 10/11] 9pfs: T_readdir latency optimization
+Date: Tue, 21 Jan 2020 01:12:00 +0100
+Subject: [PATCH v4 05/11] tests/virtio-9p: added readdir test
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -74,478 +74,216 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make top half really top half and bottom half really bottom half:
-
-Each T_readdir request handling is hopping between threads (main
-I/O thread and background I/O driver threads) several times for
-every individual directory entry, which sums up to huge latencies
-for handling just a single T_readdir request.
-
-Instead of doing that, collect now all required directory entries
-(including all potentially required stat buffers for each entry) in
-one rush on a background I/O thread from fs driver, then assemble
-the entire resulting network response message for the readdir
-request on main I/O thread. The fs driver is still aborting the
-directory entry retrieval loop (on the background I/O thread) as
-soon as it would exceed the client's requested maximum R_readdir
-response size. So we should not have any performance penalty by
-doing this.
+The first readdir test simply checks the amount of directory
+entries returned by 9pfs server, according to the created amount
+of virtual files on 9pfs synth driver side. Then the subsequent
+readdir test also checks whether all directory entries have the
+expected file names (as created on 9pfs synth driver side),
+ignoring their precise order in result list though.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- hw/9pfs/9p.c    | 124 +++++++++++++++-----------------
- hw/9pfs/9p.h    |  23 ++++++
- hw/9pfs/codir.c | 183 +++++++++++++++++++++++++++++++++++++++++++++---
- hw/9pfs/coth.h  |   3 +
- 4 files changed, 254 insertions(+), 79 deletions(-)
+ tests/qtest/virtio-9p-test.c | 152 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 152 insertions(+)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 18370183c4..e0ca45d46b 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -971,30 +971,6 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
-     return 0;
+diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+index 06263edb53..2167322985 100644
+--- a/tests/qtest/virtio-9p-test.c
++++ b/tests/qtest/virtio-9p-test.c
+@@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t len)
+     req->r_off += len;
  }
  
--static int coroutine_fn dirent_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
--                                      struct dirent *dent, V9fsQID *qidp)
--{
--    struct stat stbuf;
--    V9fsPath path;
--    int err;
--
--    v9fs_path_init(&path);
--
--    err = v9fs_co_name_to_path(pdu, &fidp->path, dent->d_name, &path);
--    if (err < 0) {
--        goto out;
--    }
--    err = v9fs_co_lstat(pdu, &path, &stbuf);
--    if (err < 0) {
--        goto out;
--    }
--    err = stat_to_qid(pdu, &stbuf, qidp);
--
--out:
--    v9fs_path_free(&path);
--    return err;
--}
--
- V9fsPDU *pdu_alloc(V9fsState *s)
- {
-     V9fsPDU *pdu = NULL;
-@@ -2314,7 +2290,7 @@ out_nofid:
-     pdu_complete(pdu, err);
- }
- 
--static size_t v9fs_readdir_data_size(V9fsString *name)
-+size_t v9fs_readdir_response_size(V9fsString *name)
- {
-     /*
-      * Size of each dirent on the wire: size of qid (13) + size of offset (8)
-@@ -2323,6 +2299,18 @@ static size_t v9fs_readdir_data_size(V9fsString *name)
-     return 24 + v9fs_string_size(name);
- }
- 
-+static void v9fs_free_dirents(struct V9fsDirEnt *e)
++static void v9fs_uint8_read(P9Req *req, uint8_t *val)
 +{
-+    struct V9fsDirEnt *next = NULL;
++    v9fs_memread(req, val, 1);
++}
++
+ static void v9fs_uint16_write(P9Req *req, uint16_t val)
+ {
+     uint16_t le_val = cpu_to_le16(val);
+@@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
+     le32_to_cpus(val);
+ }
+ 
++static void v9fs_uint64_read(P9Req *req, uint64_t *val)
++{
++    v9fs_memread(req, val, 8);
++    le64_to_cpus(val);
++}
++
+ /* len[2] string[len] */
+ static uint16_t v9fs_string_size(const char *string)
+ {
+@@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
+         id == P9_RLOPEN ? "RLOPEN" :
+         id == P9_RWRITE ? "RWRITE" :
+         id == P9_RFLUSH ? "RFLUSH" :
++        id == P9_RREADDIR ? "READDIR" :
+         "<unknown>";
+ }
+ 
+@@ -348,6 +360,82 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
+     v9fs_req_free(req);
+ }
+ 
++/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
++static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
++                            uint32_t count, uint16_t tag)
++{
++    P9Req *req;
++
++    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
++    v9fs_uint32_write(req, fid);
++    v9fs_uint64_write(req, offset);
++    v9fs_uint32_write(req, count);
++    v9fs_req_send(req);
++    return req;
++}
++
++struct V9fsDirent {
++    v9fs_qid qid;
++    uint64_t offset;
++    uint8_t type;
++    char *name;
++    struct V9fsDirent *next;
++};
++
++/* size[4] Rreaddir tag[2] count[4] data[count] */
++static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
++                          struct V9fsDirent **entries)
++{
++    uint32_t local_count;
++    struct V9fsDirent *e = NULL;
++    uint16_t slen;
++    uint32_t n = 0;
++
++    v9fs_req_recv(req, P9_RREADDIR);
++    v9fs_uint32_read(req, &local_count);
++
++    if (count) {
++        *count = local_count;
++    }
++
++    for (int32_t togo = (int32_t)local_count;
++         togo >= 13 + 8 + 1 + 2;
++         togo -= 13 + 8 + 1 + 2 + slen, ++n)
++    {
++        if (!e) {
++            e = g_malloc(sizeof(struct V9fsDirent));
++            if (entries) {
++                *entries = e;
++            }
++        } else {
++            e = e->next = g_malloc(sizeof(struct V9fsDirent));
++        }
++        e->next = NULL;
++        /* qid[13] offset[8] type[1] name[s] */
++        v9fs_memread(req, &e->qid, 13);
++        v9fs_uint64_read(req, &e->offset);
++        v9fs_uint8_read(req, &e->type);
++        v9fs_string_read(req, &slen, &e->name);
++    }
++
++    if (nentries) {
++        *nentries = n;
++    }
++
++    v9fs_req_free(req);
++}
++
++static void v9fs_free_dirents(struct V9fsDirent *e)
++{
++    struct V9fsDirent *next = NULL;
 +
 +    for (; e; e = next) {
 +        next = e->next;
-+        g_free(e->dent);
-+        g_free(e->st);
++        g_free(e->name);
 +        g_free(e);
 +    }
 +}
 +
- static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-                                         int32_t max_count)
- {
-@@ -2331,54 +2319,53 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-     V9fsString name;
-     int len, err = 0;
-     int32_t count = 0;
--    off_t saved_dir_pos;
-     struct dirent *dent;
-+    struct stat *st;
-+    struct V9fsDirEnt *entries = NULL;
+ /* size[4] Tlopen tag[2] fid[4] flags[4] */
+ static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
+                           uint16_t tag)
+@@ -480,6 +568,69 @@ static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
+     g_free(wqid);
+ }
  
--    /* save the directory position */
--    saved_dir_pos = v9fs_co_telldir(pdu, fidp);
--    if (saved_dir_pos < 0) {
--        return saved_dir_pos;
--    }
--
--    while (1) {
--        v9fs_readdir_lock(&fidp->fs.dir);
-+    /*
-+     * inode remapping requires the device id, which in turn might be
-+     * different for different directory entries, so if inode remapping is
-+     * enabled we have to make a full stat for each directory entry
-+     */
-+    const bool dostat = pdu->s->ctx.export_flags & V9FS_REMAP_INODES;
- 
--        err = v9fs_co_readdir(pdu, fidp, &dent);
--        if (err || !dent) {
--            break;
--        }
--        v9fs_string_init(&name);
--        v9fs_string_sprintf(&name, "%s", dent->d_name);
--        if ((count + v9fs_readdir_data_size(&name)) > max_count) {
--            v9fs_readdir_unlock(&fidp->fs.dir);
-+    /*
-+     * Fetch all required directory entries altogether on a background IO
-+     * thread from fs driver. We don't want to do that for each entry
-+     * individually, because hopping between threads (this main IO thread
-+     * and background IO driver thread) would sum up to huge latencies.
-+     */
-+    count = v9fs_co_readdir_lowlat(pdu, fidp, &entries, max_count, dostat);
-+    if (count < 0) {
-+        err = count;
-+        count = 0;
-+        goto out;
++static bool fs_dirents_contain_name(struct V9fsDirent *e, const char* name)
++{
++    for (; e; e = e->next) {
++        if (!strcmp(e->name, name)) {
++            return true;
++        }
 +    }
-+    count = 0;
- 
--            /* Ran out of buffer. Set dir back to old position and return */
--            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
--            v9fs_string_free(&name);
--            return count;
--        }
-+    for (struct V9fsDirEnt *e = entries; e; e = e->next) {
-+        dent = e->dent;
- 
-         if (pdu->s->ctx.export_flags & V9FS_REMAP_INODES) {
--            /*
--             * dirent_to_qid() implies expensive stat call for each entry,
--             * we must do that here though since inode remapping requires
--             * the device id, which in turn might be different for
--             * different entries; we cannot make any assumption to avoid
--             * that here.
--             */
--            err = dirent_to_qid(pdu, fidp, dent, &qid);
-+            st = e->st;
-+            /* e->st should never be NULL, but just to be sure */
-+            if (!st) {
-+                err = -1;
-+                break;
-+            }
++    return false;
++}
 +
-+            /* remap inode */
-+            err = stat_to_qid(pdu, st, &qid);
-             if (err < 0) {
--                v9fs_readdir_unlock(&fidp->fs.dir);
--                v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
--                v9fs_string_free(&name);
--                return err;
-+                break;
-             }
-         } else {
-             /*
-              * Fill up just the path field of qid because the client uses
-              * only that. To fill the entire qid structure we will have
-              * to stat each dirent found, which is expensive. For the
--             * latter reason we don't call dirent_to_qid() here. Only drawback
-+             * latter reason we don't call stat_to_qid() here. Only drawback
-              * is that no multi-device export detection of stat_to_qid()
-              * would be done and provided as error to the user here. But
-              * user would get that error anyway when accessing those
-@@ -2391,25 +2378,26 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-             qid.version = 0;
-         }
- 
-+        v9fs_string_init(&name);
-+        v9fs_string_sprintf(&name, "%s", dent->d_name);
++static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
++{
++    QVirtio9P *v9p = obj;
++    alloc = t_alloc;
++    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
++    uint16_t nqid;
++    v9fs_qid qid;
++    uint32_t count, nentries;
++    struct V9fsDirent *entries = NULL;
++    P9Req *req;
 +
-         /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
-         len = pdu_marshal(pdu, 11 + count, "Qqbs",
-                           &qid, dent->d_off,
-                           dent->d_type, &name);
- 
--        v9fs_readdir_unlock(&fidp->fs.dir);
-+        v9fs_string_free(&name);
- 
-         if (len < 0) {
--            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
--            v9fs_string_free(&name);
--            return len;
-+            err = len;
-+            break;
-         }
++    fs_attach(v9p, NULL, t_alloc);
++    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
++    v9fs_req_wait_for_reply(req, NULL);
++    v9fs_rwalk(req, &nqid, NULL);
++    g_assert_cmpint(nqid, ==, 1);
 +
-         count += len;
--        v9fs_string_free(&name);
--        saved_dir_pos = dent->d_off;
-     }
- 
--    v9fs_readdir_unlock(&fidp->fs.dir);
--
-+out:
++    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
++    v9fs_req_wait_for_reply(req, NULL);
++    v9fs_rlopen(req, &qid, NULL);
++
++    /*
++     * submit count = msize - 11, because 11 is the header size of Rreaddir
++     */
++    req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - 11, 0);
++    v9fs_req_wait_for_reply(req, NULL);
++    v9fs_rreaddir(req, &count, &nentries, &entries);
++
++    /*
++     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
++     * dir entries with only one readdir request.
++     */
++    g_assert_cmpint(
++        nentries, ==,
++        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
++    );
++
++    /*
++     * Check all file names exist in returned entries, ignore their order
++     * though.
++     */
++    g_assert_cmpint(fs_dirents_contain_name(entries, "."), ==, true);
++    g_assert_cmpint(fs_dirents_contain_name(entries, ".."), ==, true);
++    for (int i = 0; i < QTEST_V9FS_SYNTH_READDIR_NFILES; ++i) {
++        char *name = g_strdup_printf(QTEST_V9FS_SYNTH_READDIR_FILE, i);
++        g_assert_cmpint(fs_dirents_contain_name(entries, name), ==, true);
++        g_free(name);
++    }
++
 +    v9fs_free_dirents(entries);
-     if (err < 0) {
-         return err;
-     }
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index 6fffe44f5a..1dbb0ad189 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -215,6 +215,28 @@ static inline void v9fs_readdir_init(V9fsDir *dir)
-     qemu_mutex_init(&dir->readdir_mutex);
- }
- 
-+/*
-+ * Type for 9p fs drivers' (a.k.a. 9p backends) result of readdir requests,
-+ * which is a chained list of directory entries.
-+ */
-+typedef struct V9fsDirEnt {
-+    /* mandatory (must not be NULL) information for all readdir requests */
-+    struct dirent *dent;
-+    /*
-+     * optional (may be NULL): A full stat of each directory entry is just
-+     * done if explicitly told to fs driver.
-+     */
-+    struct stat *st;
-+    /*
-+     * instead of an array, directory entries are always returned as
-+     * chained list, that's because the amount of entries retrieved by fs
-+     * drivers is dependent on the individual entries' name (since response
-+     * messages are size limited), so the final amount cannot be estimated
-+     * before hand
-+     */
-+    struct V9fsDirEnt *next;
-+} V9fsDirEnt;
-+
- /*
-  * Filled by fs driver on open and other
-  * calls.
-@@ -419,6 +441,7 @@ void v9fs_path_init(V9fsPath *path);
- void v9fs_path_free(V9fsPath *path);
- void v9fs_path_sprintf(V9fsPath *path, const char *fmt, ...);
- void v9fs_path_copy(V9fsPath *dst, const V9fsPath *src);
-+size_t v9fs_readdir_response_size(V9fsString *name);
- int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
-                       const char *name, V9fsPath *path);
- int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
-index 73f9a751e1..6ce7dc8cde 100644
---- a/hw/9pfs/codir.c
-+++ b/hw/9pfs/codir.c
-@@ -18,28 +18,189 @@
- #include "qemu/main-loop.h"
- #include "coth.h"
- 
-+/*
-+ * This is solely executed on a background IO thread.
-+ */
-+static int do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, struct dirent **dent)
-+{
-+    int err = 0;
-+    V9fsState *s = pdu->s;
-+    struct dirent *entry;
-+
-+    errno = 0;
-+    entry = s->ops->readdir(&s->ctx, &fidp->fs);
-+    if (!entry && errno) {
-+        *dent = NULL;
-+        err = -errno;
-+    } else {
-+        *dent = entry;
-+    }
-+    return err;
++    g_free(wnames[0]);
 +}
 +
-+/*
-+ * TODO: This will be removed for performance reasons.
-+ * Use v9fs_co_readdir_lowlat() instead.
-+ */
- int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-                                  struct dirent **dent)
+ static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
  {
-     int err;
--    V9fsState *s = pdu->s;
- 
-     if (v9fs_request_cancelled(pdu)) {
-         return -EINTR;
-     }
--    v9fs_co_run_in_worker(
--        {
--            struct dirent *entry;
-+    v9fs_co_run_in_worker({
-+        err = do_readdir(pdu, fidp, dent);
-+    });
-+    return err;
-+}
-+
-+/*
-+ * This is solely executed on a background IO thread.
-+ *
-+ * See v9fs_co_readdir_lowlat() (as its only user) below for details.
-+ */
-+static int do_readdir_lowlat(V9fsPDU *pdu, V9fsFidState *fidp,
-+                             struct V9fsDirEnt **entries,
-+                             int32_t maxsize, bool dostat)
-+{
-+    V9fsState *s = pdu->s;
-+    V9fsString name;
-+    int len, err = 0;
-+    int32_t size = 0;
-+    off_t saved_dir_pos;
-+    struct dirent *dent;
-+    struct V9fsDirEnt *e = NULL;
-+    V9fsPath path;
-+    struct stat stbuf;
-+
-+    *entries = NULL;
-+    v9fs_path_init(&path);
-+
-+    /*
-+     * TODO: Here should be a warn_report_once() if lock failed.
-+     *
-+     * With a good 9p client we should not get into concurrency here,
-+     * because a good client would not use the same fid for concurrent
-+     * requests. We do the lock here for safety reasons though. However
-+     * the client would then suffer performance issues, so better log that
-+     * issue here.
-+     */
-+    v9fs_readdir_lock(&fidp->fs.dir);
-+
-+    /* save the directory position */
-+    saved_dir_pos = s->ops->telldir(&s->ctx, &fidp->fs);
-+    if (saved_dir_pos < 0) {
-+        err = saved_dir_pos;
-+        goto out;
-+    }
-+
-+    while (true) {
-+        /* get directory entry from fs driver */
-+        err = do_readdir(pdu, fidp, &dent);
-+        if (err || !dent) {
-+            break;
-+        }
-+
-+        /*
-+         * stop this loop as soon as it would exceed the allowed maximum
-+         * response message size for the directory entries collected so far,
-+         * because anything beyond that size would need to be discarded by
-+         * 9p controller (main thread / top half) anyway
-+         */
-+        v9fs_string_init(&name);
-+        v9fs_string_sprintf(&name, "%s", dent->d_name);
-+        len = v9fs_readdir_response_size(&name);
-+        v9fs_string_free(&name);
-+        if (size + len > maxsize) {
-+            /* this is not an error case actually */
-+            break;
-+        }
-+
-+        /* append next node to result chain */
-+        if (!e) {
-+            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
-+        } else {
-+            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
-+        }
-+        e->dent = g_malloc0(sizeof(struct dirent));
-+        memcpy(e->dent, dent, sizeof(struct dirent));
- 
--            errno = 0;
--            entry = s->ops->readdir(&s->ctx, &fidp->fs);
--            if (!entry && errno) {
-+        /* perform a full stat() for directory entry if requested by caller */
-+        if (dostat) {
-+            err = s->ops->name_to_path(
-+                &s->ctx, &fidp->path, dent->d_name, &path
-+            );
-+            if (err < 0) {
-                 err = -errno;
--            } else {
--                *dent = entry;
--                err = 0;
-+                break;
-             }
--        });
-+
-+            err = s->ops->lstat(&s->ctx, &path, &stbuf);
-+            if (err < 0) {
-+                err = -errno;
-+                break;
-+            }
-+
-+            e->st = g_malloc0(sizeof(struct stat));
-+            memcpy(e->st, &stbuf, sizeof(struct stat));
-+        }
-+
-+        size += len;
-+        saved_dir_pos = dent->d_off;
-+    }
-+
-+    /* restore (last) saved position */
-+    s->ops->seekdir(&s->ctx, &fidp->fs, saved_dir_pos);
-+
-+out:
-+    v9fs_readdir_unlock(&fidp->fs.dir);
-+    v9fs_path_free(&path);
-+    if (err < 0) {
-+        return err;
-+    }
-+    return size;
-+}
-+
-+/**
-+ * @brief Low latency variant of fs driver readdir handling.
-+ *
-+ * Retrieves the requested (max. amount of) directory entries from the fs
-+ * driver. This function must only be called by the main IO thread (top half).
-+ * Internally this function call will be dispatched to a background IO thread
-+ * (bottom half) where it is eventually executed by the fs driver.
-+ *
-+ * The old readdir implementation above just retrieves always one dir entry
-+ * per call. The problem of that implementation above is that latency is
-+ * added for (retrieval of) each directory entry, which in practice lead to
-+ * latencies of several hundred ms for readdir of only one directory.
-+ *
-+ * This is avoided in this function by letting the fs driver retrieve all
-+ * required directory entries with only call of this function and hence with
-+ * only a single fs driver request.
-+ *
-+ * @param pdu - the causing 9p (T_readdir) client request
-+ * @param fidp - already opened directory where readdir shall be performed on
-+ * @param entries - output for directory entries (must not be NULL)
-+ * @param maxsize - maximum result message body size (in bytes)
-+ * @param dostat - whether a stat() should be performed and returned for
-+ *                 each directory entry
-+ * @returns resulting response message body size (in bytes) on success,
-+ *          negative error code otherwise
-+ */
-+int coroutine_fn v9fs_co_readdir_lowlat(V9fsPDU *pdu, V9fsFidState *fidp,
-+                                        struct V9fsDirEnt **entries,
-+                                        int32_t maxsize, bool dostat)
-+{
-+    int err = 0;
-+
-+    if (v9fs_request_cancelled(pdu)) {
-+        return -EINTR;
-+    }
-+    v9fs_co_run_in_worker({
-+        err = do_readdir_lowlat(pdu, fidp, entries, maxsize, dostat);
-+    });
-     return err;
+     QVirtio9P *v9p = obj;
+@@ -658,6 +809,7 @@ static void register_virtio_9p_test(void)
+                  NULL);
+     qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
+                  NULL);
++    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
  }
  
-diff --git a/hw/9pfs/coth.h b/hw/9pfs/coth.h
-index c2cdc7a9ea..1249dbe6df 100644
---- a/hw/9pfs/coth.h
-+++ b/hw/9pfs/coth.h
-@@ -49,6 +49,9 @@
- void co_run_in_worker_bh(void *);
- int coroutine_fn v9fs_co_readlink(V9fsPDU *, V9fsPath *, V9fsString *);
- int coroutine_fn v9fs_co_readdir(V9fsPDU *, V9fsFidState *, struct dirent **);
-+int coroutine_fn v9fs_co_readdir_lowlat(V9fsPDU *, V9fsFidState *,
-+                                        struct V9fsDirEnt **,
-+                                        int32_t, bool);
- off_t coroutine_fn v9fs_co_telldir(V9fsPDU *, V9fsFidState *);
- void coroutine_fn v9fs_co_seekdir(V9fsPDU *, V9fsFidState *, off_t);
- void coroutine_fn v9fs_co_rewinddir(V9fsPDU *, V9fsFidState *);
+ libqos_init(register_virtio_9p_test);
 -- 
 2.20.1
 
