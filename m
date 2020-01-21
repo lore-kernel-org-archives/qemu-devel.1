@@ -2,93 +2,90 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BB1C33CAA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A08C33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B663922522
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:43:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61B6022522
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBMNSPZJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B663922522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="axnazXxb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B6022522
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itmKT-0007kF-VP
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 00:43:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39138)
+	id 1itmLP-0000CB-En
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 00:44:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1itmJe-0007GE-MD
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:43:07 -0500
+ (envelope-from <prvs=2824d4cde=alistair.francis@wdc.com>)
+ id 1itmKF-0007n7-G3
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:43:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1itmJd-0008Op-Ig
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:43:06 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39720
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <prvs=2824d4cde=alistair.francis@wdc.com>)
+ id 1itmKE-0000FJ-3P
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:43:43 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:8430)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1itmJd-0008OV-FH
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:43:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579585384;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ke6kdANLkx+TogH4Xqrewy892//8qh6EzCqpSTQVWPE=;
- b=VBMNSPZJGhz7YqW8vDlb800agbXA/xbbE2GoEPja3Y5a4874gJUxa1KZpVeRjyuTjxAD6W
- SE9/oeVrLOzS72+Xm2CJBSptuji0pLId6xuRuNmw1eoP0Zl88GOrBCdxAQbLgfoVPHtihj
- HjJoJo6EM1dfKq7JRUy4cPbeT0MkiDg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-Cw9DBNv4MJKNQ-gScUsuUg-1; Tue, 21 Jan 2020 00:43:01 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B280218A6EC1;
- Tue, 21 Jan 2020 05:43:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F194C89E9D;
- Tue, 21 Jan 2020 05:42:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 87CA41138600; Tue, 21 Jan 2020 06:42:47 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: Making QEMU easier for management tools and applications
-References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
- <1EFEF446-AFEA-429F-B6BA-3206A7C41836@redhat.com>
- <20200108104306.GC5057@dhcp-200-226.str.redhat.com>
- <97F153BD-FB8A-46C7-90D0-9E894B9E0292@redhat.com>
- <20200108133842.GE5057@dhcp-200-226.str.redhat.com>
- <87d0bmchq0.fsf@dusky.pond.sub.org>
- <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200120100849.GB345995@stefanha-x1.localdomain>
-Date: Tue, 21 Jan 2020 06:42:47 +0100
-In-Reply-To: <20200120100849.GB345995@stefanha-x1.localdomain> (Stefan
- Hajnoczi's message of "Mon, 20 Jan 2020 10:08:49 +0000")
-Message-ID: <871rrtmkko.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <prvs=2824d4cde=alistair.francis@wdc.com>)
+ id 1itmKD-0000Dz-17; Tue, 21 Jan 2020 00:43:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1579585422; x=1611121422;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=FMdWdt/Z43YWUxuzhWdNT2m+FqenMICqOXGj1pOq2Lg=;
+ b=axnazXxbRnkt37uTWwvSngn4ZQumYZF+NDzwZ2rvm3s2mg9v4ipU9O6k
+ WtG3jiTqYpt7MjLIpt6Cag39qqbpVdDWLgll9k24h0Q506CsReabWh/ru
+ WqIPhi/p0r0WdHHN6Cj3e3CvjxcHIJbWqPQGI6WRJslbthL1E3QaovBD0
+ 1skpcvi2pToz5cZ/cZQLstRqFgE55XjwIZm361oDRkGXVMZwWXIDS23g3
+ 6YrJMGXuaeX58x8+RR7Bs6mQ6Qwiq7cucFdfQfihAItFZR5ZOK8l25fUJ
+ vt/p1tZI9VaMB+DBTVISaq5+OvrB4/fyisASwZp6hO8LraOOLgb0aBP3R g==;
+IronPort-SDR: 4VOcymynlmdcPSsjKwRxnxi08wzEV5E3l/ba2Ap0cSyp2Hfaq+hqZF5dHSLz/qOMxK6xHdz2F+
+ ZESrc4k8pBS+8fZlbwr/0eEW4OvdnqLLa3rr3/NECZB5x5nqWHUhrc+pg2HN+QI7hitjTeufKc
+ dg4MgM9AvkfZf3F1ZJHZoAP99uf/bwYbntGyo4Mw1BFEfVhl5xbTww3ikYtb4/S0ApliW1En7J
+ X8hCLVgLZLeupXrrHjkxhZRoXi7CwLnH7LgYyLS6Gn2IJdFnaDG8BNsTE1k3br1d5N7BuBtiq3
+ nmk=
+X-IronPort-AV: E=Sophos;i="5.70,344,1574092800"; d="scan'208";a="128661668"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 21 Jan 2020 13:43:38 +0800
+IronPort-SDR: Db/JG4eSK859bhXNKSl4/AHkl5JJ8uOGXZBQ+BthxzrvsJbqZO86vc22My8t+QtkoWO2yYYBYl
+ VBwQhIjEPuKwCKaU1pPhKo0acrouXB5mbkWduaR+ZLnuzGGa02nIia89DbQqU7vNinHRoWf/tI
+ OkXRqV+nKboXdojyB9uBYlUFzNsFJel5iAcXPuXgVPEpWrNwbbZUcZRJZjc8ZOSkg7PESNXG35
+ panr6py7Yk65i86JiLlAEnjXgI/bjm6GoZfbW7UU86RoJTVLop9z1+YcAWEh9c6sGWKfcoKkdg
+ 1cdbGG9EEcu+yuv/X/GoCA9P
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 20 Jan 2020 21:37:04 -0800
+IronPort-SDR: exNu54BcSpl0NYhcPJIRR0Mi8PJs7ladHxmDqrjivEp12sfX104CeHIGf3LAKqzYAkpDDju/Ko
+ EncOac9eygkopobwJlm3buSZRj9mXl+yUUjdbQM/wRtU3he7aCxnpqLtbnz7KMwOO5A4eA8No+
+ +ZjSaz4D16XxDrzx8Q6JQTnY/icEiRrLAY+WJ0nG9WoBArQwhMEexrRYLbHR9iqwWwT1e9gjuo
+ sYSqz/CysEqYTyLfHDsEyHmyKfDnexnovIrCMD8spalRACwB7rHnShl1Khi4kFEMXY0Ox0OeSv
+ jio=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.158.235])
+ by uls-op-cesaip02.wdc.com with ESMTP; 20 Jan 2020 21:43:37 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v1 1/1] target/riscv: Correctly implement TSR trap
+Date: Mon, 20 Jan 2020 21:36:57 -0800
+Message-Id: <62fcfe747245cf8edcabcbe8f1f0b59be035fad6.1579584948.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: Cw9DBNv4MJKNQ-gScUsuUg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.153.144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,59 +97,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-devel <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@gmail.com> writes:
+As reported in: https://bugs.launchpad.net/qemu/+bug/1851939 we weren't
+correctly handling illegal instructions based on the value of MSTATUS_TSR
+and the current privledge level.
 
-> On Wed, Jan 15, 2020 at 01:15:17PM +0100, Markus Armbruster wrote:
->> Christophe de Dinechin <dinechin@redhat.com> writes:
->> >> On 15 Jan 2020, at 10:20, Markus Armbruster <armbru@redhat.com> wrote=
-:
->> * qemuMonitorJSONSetIOThread() uses it to control iothread's properties
->>   poll-max-ns, poll-grow, poll-shrink.  Their use with -object is
->>   documented (in qemu-options.hx), their use with qom-set is not.
->
-> I'm happy to use a different interface.
->
-> Writing a boilerplate "iothread-set-poll-params" QMP command in C would
-> be a step backwards.
+This patch fixes the issue raised in the bug by raising an illegal
+instruction if TSR is set and we are in S-Mode.
 
-No argument.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/op_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Maybe the QAPI code generator could map something like this:
->
->   { 'command': 'iothread-set-poll-params',
->     'data': {
->         'id': 'str',
-> =09'*max-ns': 'uint64',
-> =09'*grow': 'uint64',
-> =09'*shrink': 'uint64'
->     },
->     'map-to-qom-set': 'IOThread'
->   }
->
-> And turn it into QOM accessors on the IOThread object.
-
-I think a generic "set this configuration to that value" command is just
-fine.  qom-set fails on several counts, though:
-
-* Tolerable: qom-set is not actually generic, it applies only to QOM.
-
-* qom-set lets you set tons of stuff that is not meant to be changed at
-  run time.  If it breaks your guest, you get to keep the pieces.
-
-* There is virtually no documentation on what can be set to what values,
-  and their semantics.
-
-In its current state, QOM is a user interface superfund site.
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 331cc36232..eed8eea6f2 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -83,7 +83,7 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+     }
+ 
+     if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
+-        get_field(env->mstatus, MSTATUS_TSR)) {
++        get_field(env->mstatus, MSTATUS_TSR) && !(env->priv >= PRV_M)) {
+         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+     }
+ 
+-- 
+2.24.1
 
 
