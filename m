@@ -2,81 +2,96 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC00C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE43C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:22:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC1A02070C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:21:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 433AC217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:22:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5m6s3Jv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC1A02070C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9ZBMktV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 433AC217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituPd-0000uT-Gg
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:21:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52966)
+	id 1ituQa-000245-VO
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:22:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsiQ-00047L-Ul
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:08 -0500
+ (envelope-from <armbru@redhat.com>) id 1itthn-00076i-Lh
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:36:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsiN-00055q-3P
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:06 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38492
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1itthj-0001BY-OD
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:36:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32083
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsiM-00055m-Um
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:33:03 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1itthh-0001AY-63
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 08:36:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609982;
+ s=mimecast20190719; t=1579613784;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VaMuJQ0kEqF+Mn8YbHpGchU2mMcZGwcQFfJqCMKUjBY=;
- b=M5m6s3Jvylg2NSR83KprmJGetEmR2UtLfEwc/lRAE2jVITCaXsEPEMqF58H00Zcl3Ir8au
- DWm8ScUShmJ+is0Ry+Qhl0qVco8ivyLUEeya++E2YTRLOhUCZaoCIrnF3Vif96mU6waK7L
- cdvukopavUG1UD9ui+w6nzfNcV3xYe0=
+ bh=aKFmG+VH3qtK/rSykzfEgRKOqBe5zdCv+opTMiziEwE=;
+ b=b9ZBMktVUG+EnuBszIpc9WiPzulVkgqPHa95TIbhuQ2WDXu9CYpqMnKOjZKHkOhJ80ifND
+ t5WJ6a09kic34K0WO8LmNuu2r36weKngWp149eQlWSVzUC0vfZC+iBKUfdGS5A6h5eHutv
+ fV3FjX8rMPhSQhZR2TNc1O0SZUIqlJo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-FYKC2diNNCmf8XtOlb-Pyg-1; Tue, 21 Jan 2020 07:33:00 -0500
+ us-mta-415-sBeNYlefNcK2wXTR3NtOKg-1; Tue, 21 Jan 2020 08:36:23 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E6771005510;
- Tue, 21 Jan 2020 12:32:59 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 57C0F60BE0;
- Tue, 21 Jan 2020 12:32:52 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
- berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 106/109] virtiofsd: Convert lo_destroy to take the
- lo->mutex lock itself
-Date: Tue, 21 Jan 2020 12:24:30 +0000
-Message-Id: <20200121122433.50803-107-dgilbert@redhat.com>
-In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
-References: <20200121122433.50803-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0343E107ACC7;
+ Tue, 21 Jan 2020 13:36:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A258C60BE0;
+ Tue, 21 Jan 2020 13:36:18 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2B5631138600; Tue, 21 Jan 2020 14:36:17 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Integrating QOM into QAPI (was: Making QEMU easier for management
+ tools and applications)
+References: <20200108104306.GC5057@dhcp-200-226.str.redhat.com>
+ <97F153BD-FB8A-46C7-90D0-9E894B9E0292@redhat.com>
+ <20200108133842.GE5057@dhcp-200-226.str.redhat.com>
+ <87d0bmchq0.fsf@dusky.pond.sub.org>
+ <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200120100849.GB345995@stefanha-x1.localdomain>
+ <871rrtmkko.fsf@dusky.pond.sub.org>
+ <20200121113224.GD630615@stefanha-x1.localdomain>
+ <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
+Date: Tue, 21 Jan 2020 14:36:17 +0100
+In-Reply-To: <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
+ (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 21 Jan 2020
+ 16:03:59 +0400")
+Message-ID: <87wo9lc4oe.fsf_-_@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: FYKC2diNNCmf8XtOlb-Pyg-1
+X-MC-Unique: sBeNYlefNcK2wXTR3NtOKg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,108 +103,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-lo_destroy was relying on some implicit knowledge of the locking;
-we can avoid this if we create an unref_inode that doesn't take
-the lock and then grab it for the whole of the lo_destroy.
+> Hi
+>
+> On Tue, Jan 21, 2020 at 3:32 PM Stefan Hajnoczi <stefanha@gmail.com> wrot=
+e:
+>>
+>> On Tue, Jan 21, 2020 at 06:42:47AM +0100, Markus Armbruster wrote:
+>> > Stefan Hajnoczi <stefanha@gmail.com> writes:
+>> >
+>> > > On Wed, Jan 15, 2020 at 01:15:17PM +0100, Markus Armbruster wrote:
+>> > >> Christophe de Dinechin <dinechin@redhat.com> writes:
+>> > >> >> On 15 Jan 2020, at 10:20, Markus Armbruster <armbru@redhat.com> =
+wrote:
+>> > >> * qemuMonitorJSONSetIOThread() uses it to control iothread's proper=
+ties
+>> > >>   poll-max-ns, poll-grow, poll-shrink.  Their use with -object is
+>> > >>   documented (in qemu-options.hx), their use with qom-set is not.
+>> > >
+>> > > I'm happy to use a different interface.
+>> > >
+>> > > Writing a boilerplate "iothread-set-poll-params" QMP command in C wo=
+uld
+>> > > be a step backwards.
+>> >
+>> > No argument.
+>> >
+>> > > Maybe the QAPI code generator could map something like this:
+>> > >
+>> > >   { 'command': 'iothread-set-poll-params',
+>> > >     'data': {
+>> > >         'id': 'str',
+>> > >     '*max-ns': 'uint64',
+>> > >     '*grow': 'uint64',
+>> > >     '*shrink': 'uint64'
+>> > >     },
+>> > >     'map-to-qom-set': 'IOThread'
+>> > >   }
+>> > >
+>> > > And turn it into QOM accessors on the IOThread object.
+>> >
+>> > I think a generic "set this configuration to that value" command is ju=
+st
+>> > fine.  qom-set fails on several counts, though:
+>> >
+>> > * Tolerable: qom-set is not actually generic, it applies only to QOM.
+>> >
+>> > * qom-set lets you set tons of stuff that is not meant to be changed a=
+t
+>> >   run time.  If it breaks your guest, you get to keep the pieces.
+>> >
+>> > * There is virtually no documentation on what can be set to what value=
+s,
+>> >   and their semantics.
+>> >
+>> > In its current state, QOM is a user interface superfund site.
+>>
+>> Thoughts about a solution:
+>>
+>> Static QOM properties should be declared via QAPI instead of
+>> imperatively via QOM APIs.  That way they are introspectable and type
+>> information is present in the schema.
+>>
+>> The QAPI code generator could emit a function that is callable from
+>> .class_init().  This eliminates the need to manually call
+>> object_class_property_add().
 
-Suggested-by: Vivek Goyal <vgoyal@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tools/virtiofsd/passthrough_ll.c | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
+We need to make up our minds what exactly we want generated.  Then we
+can design the QAPI language, and code up the generator.
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 4c656b4a60..3c450c15b4 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1344,14 +1344,13 @@ static void lo_unlink(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name)
-     lo_inode_put(lo, &inode);
- }
-=20
--static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
-e,
--                                 uint64_t n)
-+/* To be called with lo->mutex held */
-+static void unref_inode(struct lo_data *lo, struct lo_inode *inode, uint64=
-_t n)
- {
-     if (!inode) {
-         return;
-     }
-=20
--    pthread_mutex_lock(&lo->mutex);
-     assert(inode->nlookup >=3D n);
-     inode->nlookup -=3D n;
-     if (!inode->nlookup) {
-@@ -1362,15 +1361,24 @@ static void unref_inode_lolocked(struct lo_data *lo=
-, struct lo_inode *inode,
-         }
-         g_hash_table_destroy(inode->posix_locks);
-         pthread_mutex_destroy(&inode->plock_mutex);
--        pthread_mutex_unlock(&lo->mutex);
-=20
-         /* Drop our refcount from lo_do_lookup() */
-         lo_inode_put(lo, &inode);
--    } else {
--        pthread_mutex_unlock(&lo->mutex);
-     }
- }
-=20
-+static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
-e,
-+                                 uint64_t n)
-+{
-+    if (!inode) {
-+        return;
-+    }
-+
-+    pthread_mutex_lock(&lo->mutex);
-+    unref_inode(lo, inode, n);
-+    pthread_mutex_unlock(&lo->mutex);
-+}
-+
- static void lo_forget_one(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup=
-)
- {
-     struct lo_data *lo =3D lo_data(req);
-@@ -2458,13 +2466,7 @@ static void lo_destroy(void *userdata)
- {
-     struct lo_data *lo =3D (struct lo_data *)userdata;
-=20
--    /*
--     * Normally lo->mutex must be taken when traversing lo->inodes but
--     * lo_destroy() is a serialized request so no races are possible here.
--     *
--     * In addition, we cannot acquire lo->mutex since unref_inode() takes =
-it
--     * too and this would result in a recursive lock.
--     */
-+    pthread_mutex_lock(&lo->mutex);
-     while (true) {
-         GHashTableIter iter;
-         gpointer key, value;
-@@ -2475,8 +2477,9 @@ static void lo_destroy(void *userdata)
-         }
-=20
-         struct lo_inode *inode =3D value;
--        unref_inode_lolocked(lo, inode, inode->nlookup);
-+        unref_inode(lo, inode, inode->nlookup);
-     }
-+    pthread_mutex_unlock(&lo->mutex);
- }
-=20
- static struct fuse_lowlevel_ops lo_oper =3D {
---=20
-2.24.1
+Skeleton QOM type, to help with the discussion:
+
+    #define TYPE_FOO "foo"
+
+    #define FOO(obj) OBJECT_CHECK(Foo, (obj), TYPE_FOO)
+    #define FOO_CLASS(klass) \
+        OBJECT_CLASS_CHECK(FooClass, (klass), TYPE_FOO)
+    #define FOO_GET_CLASS(obj) \
+        OBJECT_GET_CLASS(FooClass, (obj), TYPE_FOO)
+
+    typedef FooClass {
+        ParentClass parent_class;
+        ... // hand-written per-class state
+    }
+
+    struct Chardev {
+        ParentObject parent_obj;
+        ... // hand-written instance (per-object) state
+    };
+
+    static const TypeInfo char_type_info =3D {
+        .name =3D TYPE_FOO,
+        .parent =3D TYPE_OBJECT,
+        .instance_size =3D sizeof(Foo),
+        .instance_init =3D ...,                   // methods to initialize
+        .instance_post_init =3D ...,              // and finalize instances=
+,
+        .instance_finalize =3D ...,               // all optional
+        .abstract =3D ...,                        // true or false (d'oh)
+        .class_size =3D sizeof(FooClass),
+        .class_init =3D ...,                      // methods to initialize
+        .class_base_init =3D ...,                 // classes, optional
+        .class_data =3D ...,                      // extra argument for the=
+m
+        .interfaces =3D ...
+    };
+
+There's substantial boilerplate, with plenty of hand-written code in the
+gaps.  What of the boilerplate do we plan to generate?  How do we plan
+to fill the gaps, if any?
+
+A "property" is always a property of an instance.  It can either be
+registered with the instance (with object_property_add() & friends) or
+the class (with object_class_property_add() & friends).  Yes, the naming
+is confusing.
+
+To have QAPI register properties with the class, it needs to generate
+a variation of
+
+    object_class_property_add(cls, prop_name, type_name,
+                              get, set, release, opaque, &err)
+
+for each property "somewhere", so it runs within .class_init().  For
+real QAPI integration, the property's type must be a QAPI type.  QAPI
+needs to generate the callbacks get(), set() and release() then.
+
+Existing properties could conceivably do funny things in their
+handwritten callbacks, defying conversion to this scheme.  There's just
+one way to find out: attempt to convert all of them.
+
+> I have this in mind too. First step is probably to move as much as
+> possible as class properties.
+
+We don't *have* to move "as much as possible" to support such a QAPI
+integration, only the ones we want to expose to the user via QAPI.  But
+we *want* to, because its an improvement on its own.
+
+>                               Please review
+> https://patchew.org/QEMU/20200110153039.1379601-1-marcandre.lureau@redhat=
+.com/,
+> I have more of this kind of qdev/qom cleanups pending.
+
+Please lend Marc-Andr=C3=A9 a hand whenever this work touches your area of
+expertise :)
 
 
