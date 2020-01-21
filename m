@@ -2,108 +2,103 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF2BBC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 08:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D71D4C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 08:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C98421734
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 08:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 985DB21734
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 08:18:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2s4KH2o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C98421734
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P4nZdP1g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 985DB21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itoag-00065V-NU
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 03:08:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50255)
+	id 1itojk-0001p7-LB
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 03:18:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ldoktor@redhat.com>) id 1itoZY-0005M0-PK
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:07:44 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1itoik-00015v-B6
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ldoktor@redhat.com>) id 1itoZU-0004fc-RR
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:07:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53844
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1itoie-0008L5-9m
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:17:08 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43567
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1itoZU-0004fA-MO
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:07:36 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1itoid-0008Kt-SI
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 03:17:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579594055;
+ s=mimecast20190719; t=1579594622;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=8kDzbXV4HOvQTk0xfAKcFTGkikVQ3+jj9NgNvHl4Wxw=;
- b=D2s4KH2oZ6Y6E5GNp/981Ap/Y5zJMg2sxVRLYwltNFE5mP6hDUJ+PjC5ziheFY+TaIRe8e
- 8ZajCpkc7FXgC0iOsTZq1bYOC62MkbjR8Ig/kUKKM5nLT11FKDcs+6Se/n05X1NU/JoAqd
- 6tV/PlFg5oqFAQ7tkCBLhUrl6by+GHk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-BvS024emNdeAGwBRCu0dLg-1; Tue, 21 Jan 2020 03:07:34 -0500
-X-MC-Unique: BvS024emNdeAGwBRCu0dLg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 031F2107ACCC;
- Tue, 21 Jan 2020 08:07:33 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-206-44.brq.redhat.com
- [10.40.206.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1187819C58;
- Tue, 21 Jan 2020 08:07:31 +0000 (UTC)
-Subject: Re: [GSoC/Outreachy QEMU project proposal] Measure and Analyze QEMU
- Performance
-To: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <324a-5e231180-7-6946d180@169257031>
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-Autocrypt: addr=ldoktor@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFcV6vsBCADa8NUYov+a+AmCEEUB3stiiMM0NQc1WwlcxGoMxKHcqqIj/kdPhUDvFS32
- V94V7en1Lx+cpXKRMZP3n+3WG+VZWLwaktJgqrECZ161zE7xF5d1H3CLmwStbe6Cw1oR4LYQ
- HBpuqFEA5znoLuTTsP1uXs9h1cYNzX7hmOTvPCLJfDJ1iv954FsgCGtoVvl4CoxaR3u2VNOs
- hXsTTVyJM6gDTsyqn0uvLOHGWGIGVhDkLV4hv6pSdiKrtQKWIUji3Z8x41MbZybmJxHkpOVz
- Jl3jnNE3CbiEq77Is9LMI4yTF2CESs3V4XMBLfZPLrQBC0gzjeRxwCnbdOZRwY5KI457ABEB
- AAG0K0x1a2FzIERva3RvciAoUmVkIEhhdCkgPGxkb2t0b3JAcmVkaGF0LmNvbT6JAVQEEwEI
- AD8CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAFiEEpApMRcQDTeAqWtSDJrNi5H/PIsEF
- Al4caiwFCQsFbrUACgkQJrNi5H/PIsErWAf2OeTv2KSo5ukikdSA/iNItDXqqMhgrN0JbMad
- b82VYKKCFP+NXQy26NQqcKjaJlmv1Q4rYDfLvz+1gvnir6l9gg47g/EPC5s2UxGOlGz8fzgH
- cHne02PFEUKCNSlSZTJW8DCwFKN4VkPGqungJvDd9i8gC9B/TB3HH4IHr82mA3BnQ3wml9KH
- KXRoEJVR15cd6kKU55MRG0mq6VzYnW5Wwyxf0ZC6+R2tQgzxsvxRVPvQXSbcGv3kWoPgRo5a
- 8IWzMB194tWVYNaqhMUPKZsgBUGF3JdzrwgDBAuC16mKgyMDrzH3X0ZZ3TXH+mQBXu/px5L8
- BMz/WAibkjPVTeqeuQENBFcV6vsBCADDwkgr2llR9lY1mKsEjA56+R1m7VouGAfzgR9fDjTK
- cwQVrW39zRto6K4s1xVt2ccsa9QBAnag3/6t0akRYhNVKMPEVh/ck6fJJkmEudCAYwbiPeZ0
- Vky5s8bUYkS65s8AAHSG5F+NBO86+kgrTcnYflwyi6DzrY4c6dP6Z+icau5ORI7Q8GrfC18/
- 5neAsK4QOSYRlKHggrGzQKgtTgrFZFAemhM7FwCIfOPxybmpu7cJvUqtfPx0SZiEKrZ+kV/+
- H4Z8Q7yBT8gIkPxZBQdhxUrRtuJmyQJxI4a1K2PCrRCqK1kxtyw8Sx63/YvfPjgws+5UCm9z
- 3A5Gz/eJP0GHABEBAAGJATwEGAEIACYCGwwWIQSkCkxFxANN4Cpa1IMms2Lkf88iwQUCXhxq
- TwUJCwVutQAKCRAms2Lkf88iwdfeCACyrlND9Kk27optBo2LMBJmoJAOJTl4o8YvWkrGFzK5
- NxWCpaRJCOCfQanACRDW3oEyd4CdLF4GXWsGhIgGymP2+/McpZXJdFwgHNQWtyZ8GHJW/TXr
- GphJ9FLskb2xh83RrLYy29eF+GeZcVLsGP1ZCLz3I6byhbEfklqKymB1q4bQl2cEijm/VK25
- cYpTtNa0SZiNCmfGqfQ60BtDHCjZm1x9GO+67pJmL2FuO0Tq2TtT+SgU1ZKbSYdPWPk2ZetD
- 8RRkaPlrVRVGgW1w1/pCS29BHWaazjkmAVHE2Idh6O+7usA/G1Q3OEjWmJpmfwyKHI/rMv/f
- zMoMrrqg5DNH
-Message-ID: <a752c621-1c72-e43a-51d8-6b586a2a229b@redhat.com>
-Date: Tue, 21 Jan 2020 09:07:30 +0100
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RX1NdiofVns1m/RGUlWU8JirtGlYxfdz1v121edX3KY=;
+ b=P4nZdP1gjd5t2XErxFrQqmiMnPgrWleVxGiQM9WrMLLc7o4sz0lS/nF0xq2InDlQCuOsC9
+ 4TzFzDsbWgiJctFw4D5avr8jWt+rZC6SRd6KUf4436iegrcbpZ7Q+mcMIfFseo3kAn3C38
+ cPouKrhmreHZI0uFcwzVsFqUpFuTg0U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-YOVfLOBIMZqdF_-k389Ysg-1; Tue, 21 Jan 2020 03:16:59 -0500
+Received: by mail-wm1-f72.google.com with SMTP id 7so180094wmf.9
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 00:16:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=0ONI3DX+wbnBxyyZWtshIjjq2Pe9PrcPf4FEH3DCsuQ=;
+ b=MFXdr/SKzTbUTDBToWUrAYLuHByIfNfzscs6AmAmNK8LAxKihJI6/CfU5ZP5FtQjKr
+ kOCqIDNLkG4BRFp3BqXsERyU31OKoCgFaxxjWsgE+dYUSnZ9m7Q2KVmcbHE1VbOdt1Mf
+ eNPa43Vtrx1PRRc5icq5DY3Gc8FVUH7psja3VBIbgbsxyP426b74oaMufwf2o1kEc3qv
+ aefdEX47Ai7G4Z9XC7qxZOY0e+ub1os7zRCX+aPA7o1EYVE8zVb7mBGqL6hjcTulZRrE
+ 9vmw3bchloupyE6mItazKqUuDkLt/7MTyNFTs1iB/uNdeFOozYJphimX9nCNrbnxCCbg
+ 2n3w==
+X-Gm-Message-State: APjAAAWtXd0k47utHjqZ7Dbi4YP9AH0g5sbcLRX4R8NHeXFCVmN79WO8
+ T3K4O0N9x62aWvqwPza97PUKmDcevOUU5/p0TtxgUslYQe/PXHMC4WSLPMmP2wZemC74tuvjApe
+ 67B3Zt4sPdL9FE7Q=
+X-Received: by 2002:adf:eb8e:: with SMTP id t14mr3771906wrn.384.1579594618208; 
+ Tue, 21 Jan 2020 00:16:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzJ4S7Z1uyZI3b8qTsKkk8IVlc89bCyKr3IpZ5L4O0PIwZ+rsizLQFvbSVwxcqw2/fhOJa+Qg==
+X-Received: by 2002:adf:eb8e:: with SMTP id t14mr3771878wrn.384.1579594617828; 
+ Tue, 21 Jan 2020 00:16:57 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e0d6:d2cd:810b:30a9?
+ ([2001:b07:6468:f312:e0d6:d2cd:810b:30a9])
+ by smtp.gmail.com with ESMTPSA id p17sm51204552wrx.20.2020.01.21.00.16.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Jan 2020 00:16:57 -0800 (PST)
+Subject: Re: [RFC PATCH] qapi: Incorrect attempt to fix building with
+ MC146818RTC=n
+To: Markus Armbruster <armbru@redhat.com>
+References: <20191231184916.10235-1-philmd@redhat.com>
+ <875zhfzc9l.fsf@dusky.pond.sub.org>
+ <a06fd97c-b149-2f24-1180-4e4efa8ff79d@redhat.com>
+ <87wo9ll5on.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b0559940-7b97-901b-5729-587d8649eede@redhat.com>
+Date: Tue, 21 Jan 2020 09:16:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <324a-5e231180-7-6946d180@169257031>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <87wo9ll5on.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-MC-Unique: YOVfLOBIMZqdF_-k389Ysg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="uvPoIkb5Wyilu6IR5esC08ulqj2idmwfY"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,155 +110,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uvPoIkb5Wyilu6IR5esC08ulqj2idmwfY
-Content-Type: multipart/mixed; boundary="kEuqaIKBX7BKufxL7i8Q6S4bzY2q5qtJm"
+On 21/01/20 06:49, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>=20
+>> On 13/01/20 15:01, Markus Armbruster wrote:
+>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>>
+>>>> When configured with --without-default-devices and setting
+>>>> MC146818RTC=3Dn, the build fails:
+>>>>
+>>>>     LINK    x86_64-softmmu/qemu-system-x86_64
+>>>>   /usr/bin/ld: qapi/qapi-commands-misc-target.o: in function `qmp_mars=
+hal_rtc_reset_reinjection':
+>>>>   qapi/qapi-commands-misc-target.c:46: undefined reference to `qmp_rtc=
+_reset_reinjection'
+>>>>   /usr/bin/ld: qapi/qapi-commands-misc-target.c:46: undefined referenc=
+e to `qmp_rtc_reset_reinjection'
+>>>>   collect2: error: ld returned 1 exit status
+>>>>   make[1]: *** [Makefile:206: qemu-system-x86_64] Error 1
+>>>>   make: *** [Makefile:483: x86_64-softmmu/all] Error 2
+>>>>
+>>>> This patch tries to fix this, but this is incorrect because QAPI
+>>>> scripts only provide TARGET definitions, so with MC146818RTC=3Dy we
+>>>> get:
+>>>>
+>>>>   hw/rtc/mc146818rtc.c:113:6: error: no previous prototype for =E2=80=
+=98qmp_rtc_reset_reinjection=E2=80=99 [-Werror=3Dmissing-prototypes]
+>>>>     113 | void qmp_rtc_reset_reinjection(Error **errp)
+>>>>         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>   cc1: all warnings being treated as errors
+>>>>   make[1]: *** [rules.mak:69: hw/rtc/mc146818rtc.o] Error 1
+>>>>
+>>>> Any idea? :)
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>> ---
+>>>>  qapi/misc-target.json | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+>>>> index a00fd821eb..8e49c113d1 100644
+>>>> --- a/qapi/misc-target.json
+>>>> +++ b/qapi/misc-target.json
+>>>> @@ -41,7 +41,7 @@
+>>>>  #
+>>>>  ##
+>>>>  { 'command': 'rtc-reset-reinjection',
+>>>> -  'if': 'defined(TARGET_I386)' }
+>>>> +  'if': 'defined(TARGET_I386) && defined(CONFIG_MC146818RTC)' }
+>>>> =20
+>>>> =20
+>>>>  ##
+>>>
+>>> The generated qapi-commands-misc-target.h duly has
+>>>
+>>>     #if defined(TARGET_I386) && defined(CONFIG_MC146818RTC)
+>>>     void qmp_rtc_reset_reinjection(Error **errp);
+>>>     void qmp_marshal_rtc_reset_reinjection(QDict *args, QObject **ret, =
+Error **errp);
+>>>     #endif /* defined(TARGET_I386) && defined(CONFIG_MC146818RTC) */
+>>>
+>>> mc146818rtc.c includes it.  But since it doesn't include
+>>> config-devices.h, CONFIG_MC146818RTC remains undefined, and the
+>>> prototype gets suppressed.
+>>>
+>>> Crude fix: make mc146818rtc.c #include "config-devices.h".
+>>
+>> Can we modify the code generator to leave out the #if from the header,
+>> and only include it in the .c file?  An extra prototype is harmless.
+>=20
+> Is *everything* we generate into headers just as harmless?
 
---kEuqaIKBX7BKufxL7i8Q6S4bzY2q5qtJm
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+It should be, since it's just the C version of some JSON.  The only
+problematic thing could be different definitions of the same command for
+multiple targets, and I think we want to avoid that anyway.
 
-Dne 18. 01. 20 v 15:08 Aleksandar Markovic napsal(a):
-> Hi, everybody.
->=20
-> I am going to propose several ideas for QEMU participation in GSoC/Outrea=
-chy in next few days. This is the first one. Please feel free to give an ho=
-nest feedback.
->=20
-> Yours,
-> Aleksandar
->=20
+To see it a different way, these are the "C bindings" to QMP, just that
+the implementation is an in-process call rather than RPC.  If the QAPI
+code generator was also able to generate Python bindings and the like,
+they would have to be the same for all QEMU binaries, wouldn't they?
 
-Hello Aleksandr,
-
-sounds like a good plan, I'd like to be involved as well.
-
-Why? At Rad Hat I'm exploring a way to monitor qemu performance. At this po=
-int it's x86_64 whole system only, but it should be flexible enough to work=
- on various setups. Good news is we're in a process of upstreamizing our se=
-tup so it might actually serve for the part II of your proposal. It's not r=
-eady yet as it contains many ugly and downstream parts, but I'm replacing t=
-he custom modules with Ansible and cleaning things from internal parts as h=
-aving it upstream is a high priority at this point. Our motivation is to al=
-low public upstream testing (again, starting with x86, but more will hopefu=
-lly come).
-
-Your proposal is fairly generic, I'm wondering which way it will turn. I li=
-ke the part I, it might catch low-level changes and should lower the variab=
-ility of results. In part II I'm a bit scared of how the scope will grow (b=
-ased on what I saw in my experiment). You have host, host kernel, host syst=
-em, qemu, guest kernel, guest system and than the tested app, which might r=
-esult in a great jitter. Additionally qemu contains many features that need=
- to be utilized, you have various disk formats, block devices, various pass=
-through options, ... as well as host/guest tune settings. It's gonna be har=
-d to not to get lost in the depth and to deliver something useful while ext=
-endable for the future...
-
-Anyway, please keep me in the loop and good luck with leading this into the=
- right direction...
-
-Regards,
-Luk=C3=A1=C5=A1
-
->=20
->=20
-> *Measure and Analyze Performance of
-> QEMU User and System Mode Emulation*
->=20
->=20
-> _/PLANNED ACTIVITIES/_
->=20
-> PART I: (user mode)
->=20
-> =C2=A0=C2=A0 a) select around a dozen test programs (resembling component=
-s of SPEC benchmark, but must be open source, and preferably license compat=
-ible with QEMU); test programs should be distributed like this: 4-5 FPU CPU=
--intensive, 4-5 non-FPU CPU intensive, 1-2 I/O intensive;
-> =C2=A0=C2=A0 b) measure execution time and other performance data in user=
- mode across all platforms for ToT:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - try to improve performance if ther=
-e is an obvious bottleneck (but this is unlikely);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - develop tests that will be protect=
-ion against performance regressions in future.
-> =C2=A0=C2=A0 c) measure execution time in user-mode for selected platform=
-s for all QEMU versions in last 5 years:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - confirm performance improvements a=
-nd/or detect performance degradations.
-> =C2=A0=C2=A0 d) summarize all results in a comprehensive form, using also=
- graphics/data visualization.
->=20
-> PART II: (system mode)
->=20
-> =C2=A0=C2=A0 a) measure execution time and other performance data for boo=
-t/shutdown cycle for selected machines for ToT:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - try to improve performance if ther=
-e is an obvious bottleneck;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - develop tests that will be protect=
-ion against performance regressions in future.
-> =C2=A0=C2=A0 b) summarize all results in a comprehensive form.
->=20
->=20
-> /_DELIVERABLES_/
->=20
-> 1) Each maintainer for target will be given a list of top 25 functions in=
- terms of spent host time for each benchmark described in the previous sect=
-ion. Additional information and observations will be also provided, if the =
-judgment is they are useful and relevant.
->=20
-> 2) Each maintainer for machine (that has successful boot/shutdown cycle) =
-will be given a list of top 25 functions in terms of spent host time during=
- boot/shutdown cycle. Additional information and observations will be also =
-provided, if the judgment is they are useful and relevant.
->=20
-> 3) The community will be given all devised performance measurement method=
-s in the form of easily reproducible step-by-step setup and execution proce=
-dures.
->=20
-> (parts 1) and 2) will be, of course, published to everybody, maintainers =
-are simply singled out as main recipients and decision-makers on possible n=
-ext action items)
->=20
-> Deliverable will be distributed over wide time interval (in other words, =
-they will not be presented just at the end of project, but gradually during=
- project execution).
->=20
->=20
-> /Mentor:/ Aleksandar Markovic (myself) (but, I am perfectly fine if someb=
-ody else wants to mentor the project, if interested)
->=20
-> /Student:/ open
->=20
->=20
-> That would be all, feel free to ask for additional info and/or clarificat=
-ion.
-> =C2=A0
-
-
-
---kEuqaIKBX7BKufxL7i8Q6S4bzY2q5qtJm--
-
---uvPoIkb5Wyilu6IR5esC08ulqj2idmwfY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEpApMRcQDTeAqWtSDJrNi5H/PIsEFAl4msUIACgkQJrNi5H/P
-IsEDOQf+Pd27dtJaAusgrBEiOgs8w3Fi+/U18OCw5M7JQU6NTkqDWQX8ThETXanH
-A8TZdPjbZvPE5YldPQHEwE+rSAqGjCJvNwayqY8uufvE27DTPVjgTpC1Y87lEQZB
-fgcl/CNBko1iEKgKuiODXMQdtW9LijKAgKYa9ZMJoz7+/qmO+x+XTRcT6IbRuBzC
-0CY2Kzp7jLVYu9PtLeON3vdn7qUnjS39uI86tnS5a1tnGuoC/yQhKx6Nj6DsZ+R1
-dLNyC8PF7CPxds9kGhkzQ+6q8vpmrhaV5WjqMXIh31uqP0/lW8HZdWy6gAiI9C7s
-lPMo6J297JJB6CWWId8BRvyIpPEjkg==
-=YWnn
------END PGP SIGNATURE-----
-
---uvPoIkb5Wyilu6IR5esC08ulqj2idmwfY--
+Paolo
 
 
