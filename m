@@ -2,54 +2,90 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6490C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD2AC33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7953C2253D
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:41:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7953C2253D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4984324653
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 14:42:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mxGp1PPp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4984324653
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ituim-0000gf-6V
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:41:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44716)
+	id 1itujl-00025P-Vo
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 09:42:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ituVz-0001WI-AV
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:28:24 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ituhI-0007r0-VL
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:40:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ituVx-0000hv-He
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:28:23 -0500
-Received: from relay.sw.ru ([185.231.240.75]:50832)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ituVt-0000dj-5v; Tue, 21 Jan 2020 09:28:17 -0500
-Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1ituVp-0000mn-3N; Tue, 21 Jan 2020 17:28:13 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 2/2] iotests: add test for backup-top failure on permission
- activation
-Date: Tue, 21 Jan 2020 17:28:02 +0300
-Message-Id: <20200121142802.21467-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200121142802.21467-1-vsementsov@virtuozzo.com>
-References: <20200121142802.21467-1-vsementsov@virtuozzo.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1ituhH-00087D-L8
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:40:04 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33856)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ituhH-00086G-EL
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 09:40:03 -0500
+Received: by mail-wm1-x342.google.com with SMTP id w5so2254501wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 06:40:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=R6Az3gwoWZNkDFLQXHPIGyziLTtcKolDITyBwaRAT3w=;
+ b=mxGp1PPpktnA7AC7aVThJvIPrnc9A6FzNzAUk5pTEWhdgoNsIuZ9wbHRAw3afGMQDx
+ un3FdLlU9TJPfShC3Vhnb8P1HPkh0ysiekZuo9JgmNVFQYhcM2WYgqsrGYfAdxFc0go9
+ RvPJugMSFq2Ef3kwTQXsmI/con2VTzg7lj6JnmOnNGVCqZ0ANhuns7xTmYXNehCqieUO
+ NdmagefTJbbZ0rNq11eU0gCyyXvImxTtC6TYODqtt+xXkM/55W8s3M0laMO+QCABT+NQ
+ CquLAlSL7cEs9mrsgOQ8CYPJvQ+9pWSNpfoZ4Gmvn1lptEl9zpa7iiC2xhfRpjNlUXWm
+ 5NtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=R6Az3gwoWZNkDFLQXHPIGyziLTtcKolDITyBwaRAT3w=;
+ b=I5RG7/46zL1r1j/XnXVXyW6i8+KZDpUqepiAjmLbR/Ez1ml4TKqvmDOQl/3C5gHp/r
+ VZl4zS7PLiEWPYtx+HSULw8W75b11zVXs1lzOFhcdQg6QPYYtFm12SJvH8fxQaOusvof
+ oTyRTHUWHzWUe4pMlVhScFJWl2XDeQ6D3lo7cduqkLdeVm3uRFoauQk7HRuUGPKFv1nP
+ djlIE07Mevm6RZ9ShyPmTW7B3/1i0rksXnFveF+cSvZGn4MtFq1rVTU6MtZnJNBAhEdt
+ 3WT8sJY99RISlHFqOMNgai0YEx7hJlFL/C5wjln/bqBgJicdmxbPAcXzjEtJWfbWSKJQ
+ j1Vw==
+X-Gm-Message-State: APjAAAUgcSTIYBIRdwN/rL9F96Q99AURdKUbXL2moJ1e7NGJ9IQVj6DG
+ ZIX4dGiBEsJ/qTjE6aKPuQgx2A==
+X-Google-Smtp-Source: APXvYqx2lePNWimjTWeUFUiSLJtp89OirYYrs9mVeQAbFaeAz6IM5RXwuYQYyzdCnyapXgXw3O9KnQ==
+X-Received: by 2002:a05:600c:2383:: with SMTP id
+ m3mr4838116wma.32.1579617601169; 
+ Tue, 21 Jan 2020 06:40:01 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g25sm44627wmh.3.2020.01.21.06.39.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Jan 2020 06:40:00 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6C3101FF87;
+ Tue, 21 Jan 2020 14:39:59 +0000 (GMT)
+References: <20200121131936.8214-1-thuth@redhat.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] gitlab-ci: Refresh the list of iotests
+In-reply-to: <20200121131936.8214-1-thuth@redhat.com>
+Date: Tue, 21 Jan 2020 14:39:59 +0000
+Message-ID: <87d0bc27r4.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,146 +97,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-stable@nongnu.org, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test checks that bug is really fixed by previous commit.
 
-Cc: qemu-stable@nongnu.org # v4.2.0
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/283     | 92 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/283.out |  8 ++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 101 insertions(+)
- create mode 100644 tests/qemu-iotests/283
- create mode 100644 tests/qemu-iotests/283.out
+Thomas Huth <thuth@redhat.com> writes:
 
-diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
-new file mode 100644
-index 0000000000..293e557bd9
---- /dev/null
-+++ b/tests/qemu-iotests/283
-@@ -0,0 +1,92 @@
-+#!/usr/bin/env python
-+#
-+# Test for backup-top filter permission activation failure
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+
-+# The test is unrelated to formats, restrict it to qcow2 to avoid extra runs
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+
-+size = 1024 * 1024
-+
-+""" Test description
-+
-+When performing a backup, all writes on the source subtree must go through the
-+backup-top filter so it can copy all data to the target before it is changed.
-+backup-top filter is appended above source node, to achieve this thing, so all
-+parents of source node are handled. A configuration with side parents of source
-+sub-tree with write permission is unsupported (we'd have append several
-+backup-top filter like nodes to handle such parents). The test create an
-+example of such configuration and checks that a backup is then not allowed
-+(blockdev-backup command should fail).
-+
-+The configuration:
-+
-+    ┌────────┐  target  ┌─────────────┐
-+    │ target │ ◀─────── │ backup_top  │
-+    └────────┘          └─────────────┘
-+                            │
-+                            │ backing
-+                            ▼
-+                        ┌─────────────┐
-+                        │   source    │
-+                        └─────────────┘
-+                            │
-+                            │ file
-+                            ▼
-+                        ┌─────────────┐  write perm   ┌───────┐
-+                        │    base     │ ◀──────────── │ other │
-+                        └─────────────┘               └───────┘
-+
-+On activation (see .active field of backup-top state in block/backup-top.c),
-+backup-top is going to unshare write permission on its source child. Write
-+unsharing will be propagated to the "source->base" link and will conflict with
-+other node write permission. So permission update will fail and backup job will
-+not be started.
-+
-+Note, that the only thing which prevents backup of running on such
-+configuration is default permission propagation scheme. It may be altered by
-+different block drivers, so backup will run in invalid configuration. But
-+something is better than nothing. Also, before the previous commit (commit
-+preceding this test creation), starting backup on such configuration led to
-+crash, so current "something" is a lot better, and this test actual goal is
-+to check that crash is fixed :)
-+"""
-+
-+vm = iotests.VM()
-+vm.launch()
-+
-+vm.qmp_log('blockdev-add', **{'node-name': 'target', 'driver': 'null-co'})
-+
-+vm.qmp_log('blockdev-add', **{
-+    'node-name': 'source',
-+    'driver': 'blkdebug',
-+    'image': {'node-name': 'base', 'driver': 'null-co', 'size': size}
-+})
-+
-+vm.qmp_log('blockdev-add', **{
-+    'node-name': 'other',
-+    'driver': 'blkdebug',
-+    'image': 'base',
-+    'take-child-perms': ['write']
-+})
-+
-+vm.qmp_log('blockdev-backup', sync='full', device='source', target='target')
-+
-+vm.shutdown()
-diff --git a/tests/qemu-iotests/283.out b/tests/qemu-iotests/283.out
-new file mode 100644
-index 0000000000..daaf5828c1
---- /dev/null
-+++ b/tests/qemu-iotests/283.out
-@@ -0,0 +1,8 @@
-+{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "target"}}
-+{"return": {}}
-+{"execute": "blockdev-add", "arguments": {"driver": "blkdebug", "image": {"driver": "null-co", "node-name": "base", "size": 1048576}, "node-name": "source"}}
-+{"return": {}}
-+{"execute": "blockdev-add", "arguments": {"driver": "blkdebug", "image": "base", "node-name": "other", "take-child-perms": ["write"]}}
-+{"return": {}}
-+{"execute": "blockdev-backup", "arguments": {"device": "source", "sync": "full", "target": "target"}}
-+{"error": {"class": "GenericError", "desc": "Cannot set permissions for backup-top filter: Conflicts with use by other as 'image', which uses 'write' on base"}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 9d30a4b6c4..1904223020 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -289,3 +289,4 @@
- 279 rw backing quick
- 280 rw migration quick
- 281 rw quick
-+283 auto quick
--- 
-2.21.0
+> iotest 147 and 205 have recently been marked as "NBD-only", so they
+> are currently simply skipped and thus can be removed.
+>
+> iotest 129 occasionally fails in the gitlab-CI, and according to Max,
+> there are some known issues with this test (see for example this URL:
+> https://lists.nongnu.org/archive/html/qemu-block/2019-06/msg00499.html ),
+> so for the time being, let's disable it until the problems are fixed.
+>
+> The iotests 040, 127, 203 and 256 are scheduled to become part of "make
+> check-block", so we also do not have to test them seperately here anymore.
+>
+> On the other side, new iotests have been added to the QEMU repository
+> in the past months, so we can now add some new test > 256 instead.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
+Queued to testing/next, thanks.
+
+> ---
+>  .gitlab-ci.yml | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index d9a90f795d..52d73c1c72 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -51,12 +51,12 @@ build-tcg-disabled:
+>   - make check-qapi-schema
+>   - cd tests/qemu-iotests/
+>   - ./check -raw 001 002 003 004 005 008 009 010 011 012 021 025 032 033 =
+048
+> -            052 063 077 086 101 104 106 113 147 148 150 151 152 157 159 =
+160
+> -            163 170 171 183 184 192 194 197 205 208 215 221 222 226 227 =
+236
+> - - ./check -qcow2 028 040 051 056 057 058 065 067 068 082 085 091 095 09=
+6 102
+> -            122 124 127 129 132 139 142 144 145 147 151 152 155 157 165 =
+194
+> -            196 197 200 202 203 205 208 209 215 216 218 222 227 234 246 =
+247
+> -            248 250 254 255 256
+> +            052 063 077 086 101 104 106 113 148 150 151 152 157 159 160 =
+163
+> +            170 171 183 184 192 194 197 208 215 221 222 226 227 236 253 =
+277
+> + - ./check -qcow2 028 051 056 057 058 065 067 068 082 085 091 095 096 10=
+2 122
+> +            124 132 139 142 144 145 151 152 155 157 165 194 196 197 200 =
+202
+> +            208 209 215 216 218 222 227 234 246 247 248 250 254 255 257 =
+258
+> +            260 261 262 263 264 270 272 273 277 279
+>=20=20
+>  build-user:
+>   script:
+
+
+--=20
+Alex Benn=C3=A9e
 
