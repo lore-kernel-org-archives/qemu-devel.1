@@ -2,80 +2,80 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E311C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C564C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A3E72070C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 491152070C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:46:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wOh8i0Cj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A3E72070C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFFTIbc1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 491152070C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittqJ-00013B-5Z
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:45:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56588)
+	id 1ittrV-0002Ml-NW
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:46:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1itt8P-0000Ep-P1
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:59:58 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsgZ-0002bH-TI
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1itt8O-0003V8-7J
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:59:57 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33405)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1itt8N-0003UZ-VV
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:59:56 -0500
-Received: by mail-ot1-x342.google.com with SMTP id b18so2838222otp.0
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 04:59:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8LNvrZuo+j2W+nRtUVI62IXEJewAIvxTmhTAWfc3HLo=;
- b=wOh8i0CjU0QQOma6koBelMSu4J8ijwcwi7WOjTPhSi0Vd6IjLeXi/wdjJAGSqjATL2
- C7xaxh0mAGeoa+sKcfNLDfvOUWAmdMRuJMVcHREwta3jrIF1sFe3Bv2FdsY+M0AMhaCh
- zOhGVWwOVHoZSv+BgYYX4wl31RaOOmewjfFN5/VA0ZHt9HWof+YpHQPNsiefRtJ6Nv5V
- kBTDfw1PrJrQua+RRjuq5iRAH/M/8q6zG0x1UzsLu22Fk1tFDVcOYVOVkL9PJE48hZNp
- xKcXJFQCNpf3/9kk5kGMbudD17ADh6iGU9NeQ2MYVuzpMEHK7gZFNuiTaslYhtjHPbjv
- eE6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8LNvrZuo+j2W+nRtUVI62IXEJewAIvxTmhTAWfc3HLo=;
- b=bN5LulYeKOwrY+ZX4li2msLr19XkpC1yLRqQk10+8McW7LjdLruhnAxKieI93gB9Cm
- dHTmgo7tdSfwu71eogSvcBq5RGDDzarjzENtYTDhbUCPyC7QRGGZd5GuH6y/R61123nW
- Y+hOMmF8EXMuYx1bn2IWbdvp00mK0ay8g3h2lVZIDjRniE2YlydHSviAJNGeEiibu0VB
- NmftSRlYXUcHEIQ6qFOj0tqr+kW+vi2aoZq6aRX4jGRtjYAJFjWBQoIeSu48UVIC0lt+
- vFxgpTfTRx9UapTvmlfWlkqfkOhHRly2UfaACgTDVd4m6J3t4i2zPMiCk1LZUvP2Wmbf
- VjgA==
-X-Gm-Message-State: APjAAAWKwItQ+WUOfa4ngMXTv6tO3lU9iObvrijhniDf9Ohvt/ZZMOIZ
- PqITdAucoT/OBXnVzzr8e9GUKgSpx45IPl5Ynhwe2rXC+as=
-X-Google-Smtp-Source: APXvYqyDbM4wdR0u67AdICVKmM4PY0gT3y1Mw7nzeKJ0coVYYnbNpFg/bW7F0pMNVrJz2eheFktUYzb1NTG4QYw9EPI=
-X-Received: by 2002:a05:6830:1586:: with SMTP id
- i6mr3306209otr.221.1579611594879; 
- Tue, 21 Jan 2020 04:59:54 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1itsgY-0004PZ-5w
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:11 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24007
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsgX-0004P4-Dj
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579609868;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Gmq+VTb9X4BI7w0va1chHwVtCIz06hc+H1t9fYPxhG0=;
+ b=CFFTIbc1311CV9eNDAVJJAOPcNw34L2c/314H+En3osd6tyKD7ytmMzwGAtbKHsfPxZs0i
+ NE3B/n/MuhC4ZqsmoQhOwXBHE2MDxqkFfDCp5P6W3UQzFQDhK4Z4k1SwVbn4nG3Z6RobyH
+ sx30O4AiTHQODWKTLR4xxpYEwPStzAs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-SEA_tU7hPMGTwRfj1AvEiQ-1; Tue, 21 Jan 2020 07:31:06 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CA37DBD9;
+ Tue, 21 Jan 2020 12:31:05 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 452E260BE0;
+ Tue, 21 Jan 2020 12:31:01 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
+ berrange@redhat.com, slp@redhat.com, philmd@redhat.com
+Subject: [PATCH v2 075/109] virtiofsd: passthrough_ll: use hashtable
+Date: Tue, 21 Jan 2020 12:23:59 +0000
+Message-Id: <20200121122433.50803-76-dgilbert@redhat.com>
+In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
+References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-References: <20200121122138.1708193-1-laurent@vivier.eu>
-In-Reply-To: <20200121122138.1708193-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Jan 2020 12:59:43 +0000
-Message-ID: <CAFEAcA92RXwihkxmG6-E8=6AV==s1nGZgmCm3FwmUoH+fu2uLA@mail.gmail.com>
-Subject: Re: [PULL 0/1] M68k for 5.0 patches
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: SEA_tU7hPMGTwRfj1AvEiQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,42 +87,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jan 2020 at 12:22, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit d83bbedab5a2758fbb7866c06472feb3f3bf079b:
->
->   Makefile: add missing mkdir MANUAL_BUILDDIR (2020-01-21 11:56:17 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu-m68k.git tags/m68k-for-5.0-pull-request
->
-> for you to fetch changes up to 322f244aaa80a5208090d41481c1c09c6face66b:
->
->   m68k: Fix regression causing Single-Step via GDB/RSP to not single step (2020-01-21 13:05:45 +0100)
->
-> ----------------------------------------------------------------
-> Fix m68k single-stepping with remote gdb
->
-> ----------------------------------------------------------------
->
-> Laurent Vivier (1):
->   m68k: Fix regression causing Single-Step via GDB/RSP to not single
->     step
->
->  target/m68k/translate.c | 42 ++++++++++++++++++++++++++---------------
->  1 file changed, 27 insertions(+), 15 deletions(-)
+From: Miklos Szeredi <mszeredi@redhat.com>
 
+Improve performance of inode lookup by using a hash table.
 
-Applied, thanks.
+Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 81 ++++++++++++++++++--------------
+ 1 file changed, 45 insertions(+), 36 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 528820aa71..e0f76b37b7 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -84,13 +84,15 @@ struct lo_map {
+     ssize_t freelist;
+ };
+=20
++struct lo_key {
++    ino_t ino;
++    dev_t dev;
++};
++
+ struct lo_inode {
+-    struct lo_inode *next; /* protected by lo->mutex */
+-    struct lo_inode *prev; /* protected by lo->mutex */
+     int fd;
+     bool is_symlink;
+-    ino_t ino;
+-    dev_t dev;
++    struct lo_key key;
+     uint64_t refcount; /* protected by lo->mutex */
+     fuse_ino_t fuse_ino;
+ };
+@@ -119,7 +121,8 @@ struct lo_data {
+     int timeout_set;
+     int readdirplus_set;
+     int readdirplus_clear;
+-    struct lo_inode root; /* protected by lo->mutex */
++    struct lo_inode root;
++    GHashTable *inodes; /* protected by lo->mutex */
+     struct lo_map ino_map; /* protected by lo->mutex */
+     struct lo_map dirp_map; /* protected by lo->mutex */
+     struct lo_map fd_map; /* protected by lo->mutex */
+@@ -573,7 +576,7 @@ retry:
+         }
+         goto fail_unref;
+     }
+-    if (stat.st_dev !=3D inode->dev || stat.st_ino !=3D inode->ino) {
++    if (stat.st_dev !=3D inode->key.dev || stat.st_ino !=3D inode->key.ino=
+) {
+         if (!retries) {
+             fuse_log(FUSE_LOG_WARNING,
+                      "%s: failed to match last\n", __func__);
+@@ -753,19 +756,20 @@ out_err:
+ static struct lo_inode *lo_find(struct lo_data *lo, struct stat *st)
+ {
+     struct lo_inode *p;
+-    struct lo_inode *ret =3D NULL;
++    struct lo_key key =3D {
++        .ino =3D st->st_ino,
++        .dev =3D st->st_dev,
++    };
+=20
+     pthread_mutex_lock(&lo->mutex);
+-    for (p =3D lo->root.next; p !=3D &lo->root; p =3D p->next) {
+-        if (p->ino =3D=3D st->st_ino && p->dev =3D=3D st->st_dev) {
+-            assert(p->refcount > 0);
+-            ret =3D p;
+-            ret->refcount++;
+-            break;
+-        }
++    p =3D g_hash_table_lookup(lo->inodes, &key);
++    if (p) {
++        assert(p->refcount > 0);
++        p->refcount++;
+     }
+     pthread_mutex_unlock(&lo->mutex);
+-    return ret;
++
++    return p;
+ }
+=20
+ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *nam=
+e,
+@@ -810,8 +814,6 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
+nt, const char *name,
+         close(newfd);
+         newfd =3D -1;
+     } else {
+-        struct lo_inode *prev, *next;
+-
+         saverr =3D ENOMEM;
+         inode =3D calloc(1, sizeof(struct lo_inode));
+         if (!inode) {
+@@ -822,17 +824,12 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pa=
+rent, const char *name,
+         inode->refcount =3D 1;
+         inode->fd =3D newfd;
+         newfd =3D -1;
+-        inode->ino =3D e->attr.st_ino;
+-        inode->dev =3D e->attr.st_dev;
++        inode->key.ino =3D e->attr.st_ino;
++        inode->key.dev =3D e->attr.st_dev;
+=20
+         pthread_mutex_lock(&lo->mutex);
+         inode->fuse_ino =3D lo_add_inode_mapping(req, inode);
+-        prev =3D &lo->root;
+-        next =3D prev->next;
+-        next->prev =3D inode;
+-        inode->next =3D next;
+-        inode->prev =3D prev;
+-        prev->next =3D inode;
++        g_hash_table_insert(lo->inodes, &inode->key, inode);
+         pthread_mutex_unlock(&lo->mutex);
+     }
+     e->ino =3D inode->fuse_ino;
+@@ -1162,14 +1159,8 @@ static void unref_inode_lolocked(struct lo_data *lo,=
+ struct lo_inode *inode,
+     assert(inode->refcount >=3D n);
+     inode->refcount -=3D n;
+     if (!inode->refcount) {
+-        struct lo_inode *prev, *next;
+-
+-        prev =3D inode->prev;
+-        next =3D inode->next;
+-        next->prev =3D prev;
+-        prev->next =3D next;
+-
+         lo_map_remove(&lo->ino_map, inode->fuse_ino);
++        g_hash_table_remove(lo->inodes, &inode->key);
+         pthread_mutex_unlock(&lo->mutex);
+         close(inode->fd);
+         free(inode);
+@@ -1369,7 +1360,7 @@ static void lo_do_readdir(fuse_req_t req, fuse_ino_t =
+ino, size_t size,
+=20
+         /* Hide root's parent directory */
+         if (dinode =3D=3D &lo->root && strcmp(name, "..") =3D=3D 0) {
+-            e.attr.st_ino =3D lo->root.ino;
++            e.attr.st_ino =3D lo->root.key.ino;
+             e.attr.st_mode =3D DT_DIR << 12;
+         }
+=20
+@@ -2370,11 +2361,26 @@ static void setup_root(struct lo_data *lo, struct l=
+o_inode *root)
+=20
+     root->is_symlink =3D false;
+     root->fd =3D fd;
+-    root->ino =3D stat.st_ino;
+-    root->dev =3D stat.st_dev;
++    root->key.ino =3D stat.st_ino;
++    root->key.dev =3D stat.st_dev;
+     root->refcount =3D 2;
+ }
+=20
++static guint lo_key_hash(gconstpointer key)
++{
++    const struct lo_key *lkey =3D key;
++
++    return (guint)lkey->ino + (guint)lkey->dev;
++}
++
++static gboolean lo_key_equal(gconstpointer a, gconstpointer b)
++{
++    const struct lo_key *la =3D a;
++    const struct lo_key *lb =3D b;
++
++    return la->ino =3D=3D lb->ino && la->dev =3D=3D lb->dev;
++}
++
+ int main(int argc, char *argv[])
+ {
+     struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
+@@ -2392,7 +2398,7 @@ int main(int argc, char *argv[])
+     umask(0);
+=20
+     pthread_mutex_init(&lo.mutex, NULL);
+-    lo.root.next =3D lo.root.prev =3D &lo.root;
++    lo.inodes =3D g_hash_table_new(lo_key_hash, lo_key_equal);
+     lo.root.fd =3D -1;
+     lo.root.fuse_ino =3D FUSE_ROOT_ID;
+     lo.cache =3D CACHE_AUTO;
+@@ -2522,6 +2528,9 @@ err_out2:
+ err_out1:
+     fuse_opt_free_args(&args);
+=20
++    if (lo.inodes) {
++        g_hash_table_destroy(lo.inodes);
++    }
+     lo_map_destroy(&lo.fd_map);
+     lo_map_destroy(&lo.dirp_map);
+     lo_map_destroy(&lo.ino_map);
+--=20
+2.24.1
 
--- PMM
 
