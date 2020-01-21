@@ -2,79 +2,89 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE8DC33CAA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D233AC33CAA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 141C1217F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DFDA21734
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 05:33:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3vyh+5Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 141C1217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fWpI1q74"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DFDA21734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itm2m-0003za-5D
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 00:25:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37679)
+	id 1itmAZ-0005sM-SI
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 00:33:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1itm1t-0003VY-Oe
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:24:46 -0500
+ (envelope-from <armbru@redhat.com>) id 1itm9y-0005SK-Ny
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:33:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1itm1s-0007aN-QJ
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:24:45 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36086)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1itm1s-0007Yg-Hh
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:24:44 -0500
-Received: by mail-lj1-x241.google.com with SMTP id r19so1378538ljg.3
- for <qemu-devel@nongnu.org>; Mon, 20 Jan 2020 21:24:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JgYLu+ecg66nyMT/dA5S1LUeTMvzdK1H3FONJ7AyROc=;
- b=f3vyh+5ZgceYKQQyxzLb4gmkImYWdKkM0xltQiqFWpjEffUgjMsbqapuPsS/j8uJxU
- AxllYxGd6N5YLI2e5CaS9eY6Z2Asp+9i0BS/1pv99/KPLYAdzuo55lTpGEfCtBkG8W8Q
- WPwD18qZwdfvzo6mkT8Fl57zss2yZ+L/wQZRJYPkonOkRLUoAookykFzhR3xUeoh2MLE
- MJY/g82nho9V6fzRBJnMEA4vNaf1DNvgpuV9vHbCX3gLx4hfaE6q3mw8OI14DPPin69v
- cin7zhlGTLbWSmmrLvJVp+BW2GtFb6Jju3gTUxpmpxbxYdY5Gx96rhiF+7GTZyUNcm9U
- TRSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JgYLu+ecg66nyMT/dA5S1LUeTMvzdK1H3FONJ7AyROc=;
- b=JrKrinmH16r7jclPPRbmMPGLw9bGk6RIaFIMeojHRL9H5ZdUz56RTHfAbdi67AwaVx
- AeVebBWB+M/jtien/zzIvcIDs4NBwqOXydHnHb0w1VHegCaGJUhsUPxKe1+clhpaAASM
- PZXlc5oPaKemyWhfECOnfhPRX0hPn8IzMEStrtvHvPCKMi5UkHsQMeUNjOxQuF/Hq7xI
- hgmnlWFMXGA1+0ufDdgqPJ79hO6gJqNc//ytLSm9zrh5r8qYCWwvz2o2+sNfBmY6HkMj
- wbivW2jNY0j9U3pJdGIM0r6gZc6wccpuXfWA4uNWh+7MCusg8oX/8pH8366Wn//Djt5b
- RrgQ==
-X-Gm-Message-State: APjAAAWxVtt/XBxSmOA22upfz3USOM7doC6GoSCWj9rBdbxaKK2YuVWd
- LXzq+wh4VMHOxg+6kdxn/ItgdVT8VGD3L41+wOA=
-X-Google-Smtp-Source: APXvYqz6Si8v+Rz96isOeLxdA5fFyUwBxS2XQdL9a3GyH675Hg8/hpo/nw7c44Q/BsjIj7jQZvmF8JDfWQysk9EgH9M=
-X-Received: by 2002:a2e:461a:: with SMTP id t26mr15081347lja.204.1579584282336; 
- Mon, 20 Jan 2020 21:24:42 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1itm9w-0003lc-IH
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:33:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37830
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1itm9w-0003ku-2i
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 00:33:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579584782;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iX9rdrOgW6eXhs6U7rsdfxpXKdEc94deRi7vmjrQuiA=;
+ b=fWpI1q74pJIdIjEX1/t+g0wHwz8izVhzSqphekiMNnJ2TcjLpivZbUZJVhg6O2YqhCNxlv
+ gmc137mEB+3oMM9H5aGVFtXuNua+fKCloi4ivISYuxFMdkqyCyYiKwSywt+3ITbK71wI8z
+ 0rjevRkMzPkmDW2IMLZ0/ts/2vcvDK8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-pP8xcB7UPf6gNO--xQczsA-1; Tue, 21 Jan 2020 00:33:02 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A6F9184AD2A;
+ Tue, 21 Jan 2020 05:32:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 299F45D9D6;
+ Tue, 21 Jan 2020 05:32:52 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 80C0A1138600; Tue, 21 Jan 2020 06:32:51 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] What should a virtual board emulate?
+References: <20190319144013.26584-1-pbonzini@redhat.com>
+ <alpine.BSF.2.21.9999.1903192350550.11467@zero.eik.bme.hu>
+ <87imwe847x.fsf_-_@dusky.pond.sub.org>
+ <CAAdtpL5Z1OXqZ_zzA0RLq9soydNtTFt2oCOEfui1rq19bLKUgA@mail.gmail.com>
+ <d9d5ac96-c0f5-dd83-d305-10e20c745dd1@redhat.com>
+ <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
+ <6b5459b5-deb2-e70c-deab-fa7246b43e38@redhat.com>
+Date: Tue, 21 Jan 2020 06:32:51 +0100
+In-Reply-To: <6b5459b5-deb2-e70c-deab-fa7246b43e38@redhat.com> (Paolo
+ Bonzini's message of "Sat, 18 Jan 2020 21:46:17 +0100")
+Message-ID: <877e1lml18.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200120085817.7000-1-ianjiang.ict@gmail.com>
-In-Reply-To: <20200120085817.7000-1-ianjiang.ict@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 Jan 2020 15:24:15 +1000
-Message-ID: <CAKmqyKN+B_WgRcS5Vg3MKk6Vzc6Uq0OAdW6+W9kzMw5add9bwQ@mail.gmail.com>
-Subject: Re: [PATCH] riscv: Fix defination of TW bits in mstatus CSR
-To: Ian Jiang <ianjiang.ict@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: pP8xcB7UPf6gNO--xQczsA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,45 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 20, 2020 at 6:59 PM Ian Jiang <ianjiang.ict@gmail.com> wrote:
->
-> The origin defination of TW bits in mstatus is not correct.
-> This patch fixes the problem.
->
-> Signed-off-by: Ian Jiang <ianjiang.ict@gmail.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> On 04/01/20 22:16, Philippe Mathieu-Daud=C3=A9 wrote:
+>> 1/ the Radeon chip is soldered on the motherboard,
+>>=20
+>> 2/ the default BIOS expects the Radeon chip to be
+>> =C2=A0=C2=A0 unconditionally present,
+>>=20
+>> I insist this patch is incorrect for the particular case of the
+>> Fuloong2e board. I plan to revert it when I post the test.
+>>=20
+>> BTW I'm not using --nodefault, I'm running default ./configure:
+>>=20
+>> qemu-system-mips64el -M fulong2e -bios pmon_2e.bin \
+>> -display none -vga none -serial stdio
+>
+> But if you're not specifying -nodefaults, why are you specifying a
+> configuration that your BIOS does not support?  You should just remove
+> -vga none and leave in -display none.
 
-Alistair
+Is there any use for -vga none with this machine?  If no, then rejecting
+it cleanly would be nicer than having the machine hang.
 
-> ---
->  target/riscv/cpu_bits.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-> index e99834856c..fb2e0b340e 100644
-> --- a/target/riscv/cpu_bits.h
-> +++ b/target/riscv/cpu_bits.h
-> @@ -349,7 +349,7 @@
->  #define MSTATUS_MXR         0x00080000
->  #define MSTATUS_VM          0x1F000000 /* until: priv-1.9.1 */
->  #define MSTATUS_TVM         0x00100000 /* since: priv-1.10 */
-> -#define MSTATUS_TW          0x20000000 /* since: priv-1.10 */
-> +#define MSTATUS_TW          0x00200000 /* since: priv-1.10 */
->  #define MSTATUS_TSR         0x40000000 /* since: priv-1.10 */
->  #define MSTATUS_MTL         0x4000000000ULL
->  #define MSTATUS_MPV         0x8000000000ULL
-> --
-> 2.17.1
->
->
 
