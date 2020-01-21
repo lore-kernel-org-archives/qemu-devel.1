@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1815C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27766C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:04:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D22A2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:04:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E88362051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:04:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c4WG5zds"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D22A2051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zu/dFX7q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E88362051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ittCT-0003K7-A5
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:04:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51366)
+	id 1ittCX-0003QW-PY
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:04:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51930)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itscK-00076B-4g
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:50 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itseX-0000VC-J3
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:29:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itscI-0002GN-IM
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29233
+ (envelope-from <dgilbert@redhat.com>) id 1itseT-0003QZ-JU
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:29:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26693
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itscI-0002GH-Dz
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:26:46 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itseT-0003PC-Fv
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:29:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609606;
+ s=mimecast20190719; t=1579609738;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zualVJnuuXpl6/Pdtv9LeqTT4rFRhcJUc2mo7tQMMUs=;
- b=c4WG5zdsGLTmcLUkSrjTjcEB6SDdSchYkz4Hit+y84JoqiInvP2l+NJyy4Q8Nk8yX6JQ/4
- nsf5M1nbN39IPCovKc2NhLv+i7aumlh5NrVNp6B69kUQMa5vxRP7Y1UffL26rIgUG3O8Cx
- F++8f2Gu6K6be5NHTFSdQIiMPSoGRlg=
+ bh=b6iYJX+2+Iy0D8smU5ukjVL/qx0vBxETehkGh1p53Ys=;
+ b=Zu/dFX7qOwpU8RxQpbcBbmwFzx3HqlTbr57J9Uxt5y4BE4sxANnT3JTUH6tDfUjpbLMibE
+ CJMWiVs2lGcYtep3w9S1BveHcsfwJLygJIl8Rni6nblXPtpvHv0Ny6IJ+HoONsm+zF3qxc
+ OzjMP3C9MxKARIgxIUiMaxrZQcoXUvM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-7zi6IP4TNIyVuxbX-Lq6-g-1; Tue, 21 Jan 2020 07:26:44 -0500
+ us-mta-314-CVdvfJcXNv-DbVi7eqTZhA-1; Tue, 21 Jan 2020 07:28:56 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E3B8A0CBF;
- Tue, 21 Jan 2020 12:26:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB7A8800D41;
+ Tue, 21 Jan 2020 12:28:55 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 17D0460C81;
- Tue, 21 Jan 2020 12:26:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B481E60BE0;
+ Tue, 21 Jan 2020 12:28:53 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 027/109] virtiofsd: Fast path for virtio read
-Date: Tue, 21 Jan 2020 12:23:11 +0000
-Message-Id: <20200121122433.50803-28-dgilbert@redhat.com>
+Subject: [PATCH v2 054/109] virtiofsd: Drop CAP_FSETID if client asked for it
+Date: Tue, 21 Jan 2020 12:23:38 +0000
+Message-Id: <20200121122433.50803-55-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 7zi6IP4TNIyVuxbX-Lq6-g-1
+X-MC-Unique: CVdvfJcXNv-DbVi7eqTZhA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,230 +92,162 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Vivek Goyal <vgoyal@redhat.com>
 
-Readv the data straight into the guests buffer.
+If client requested killing setuid/setgid bits on file being written, drop
+CAP_FSETID capability so that setuid/setgid bits are cleared upon write
+automatically.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-With fix by:
-Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
-Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+pjdfstest chown/12.t needs this.
+
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+  dgilbert: reworked for libcap-ng
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 ---
- tools/virtiofsd/fuse_lowlevel.c |   5 +
- tools/virtiofsd/fuse_virtio.c   | 162 ++++++++++++++++++++++++++++++++
- tools/virtiofsd/fuse_virtio.h   |   4 +
- 3 files changed, 171 insertions(+)
+ tools/virtiofsd/passthrough_ll.c | 105 +++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
 
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index ded7268dc5..5c182676a6 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -474,6 +474,11 @@ static int fuse_send_data_iov_fallback(struct fuse_ses=
-sion *se,
-         return fuse_send_msg(se, ch, iov, iov_count);
-     }
-=20
-+    if (fuse_lowlevel_is_virtio(se) && buf->count =3D=3D 1 &&
-+        buf->buf[0].flags =3D=3D (FUSE_BUF_IS_FD | FUSE_BUF_FD_SEEK)) {
-+        return virtio_send_data_iov(se, ch, iov, iov_count, buf, len);
-+    }
-+
-     abort(); /* Will have taken vhost path */
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index bf939d06ae..3f7ec85938 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -200,6 +200,91 @@ static int load_capng(void)
      return 0;
- }
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index f1adeb6345..7e2711b504 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -230,6 +230,168 @@ err:
-     return ret;
  }
 =20
 +/*
-+ * Callback from fuse_send_data_iov_* when it's virtio and the buffer
-+ * is a single FD with FUSE_BUF_IS_FD | FUSE_BUF_FD_SEEK
-+ * We need send the iov and then the buffer.
-+ * Return 0 on success
++ * Helpers for dropping and regaining effective capabilities. Returns 0
++ * on success, error otherwise
 + */
-+int virtio_send_data_iov(struct fuse_session *se, struct fuse_chan *ch,
-+                         struct iovec *iov, int count, struct fuse_bufvec =
-*buf,
-+                         size_t len)
++static int drop_effective_cap(const char *cap_name, bool *cap_dropped)
 +{
-+    int ret =3D 0;
-+    VuVirtqElement *elem;
-+    VuVirtq *q;
++    int cap, ret;
 +
-+    assert(count >=3D 1);
-+    assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
-+
-+    struct fuse_out_header *out =3D iov[0].iov_base;
-+    /* TODO: Endianness! */
-+
-+    size_t iov_len =3D iov_size(iov, count);
-+    size_t tosend_len =3D iov_len + len;
-+
-+    out->len =3D tosend_len;
-+
-+    fuse_log(FUSE_LOG_DEBUG, "%s: count=3D%d len=3D%zd iov_len=3D%zd\n", _=
-_func__,
-+             count, len, iov_len);
-+
-+    /* unique =3D=3D 0 is notification which we don't support */
-+    assert(out->unique);
-+
-+    /* For virtio we always have ch */
-+    assert(ch);
-+    assert(!ch->qi->reply_sent);
-+    elem =3D ch->qi->qe;
-+    q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
-+
-+    /* The 'in' part of the elem is to qemu */
-+    unsigned int in_num =3D elem->in_num;
-+    struct iovec *in_sg =3D elem->in_sg;
-+    size_t in_len =3D iov_size(in_sg, in_num);
-+    fuse_log(FUSE_LOG_DEBUG, "%s: elem %d: with %d in desc of length %zd\n=
-",
-+             __func__, elem->index, in_num, in_len);
-+
-+    /*
-+     * The elem should have room for a 'fuse_out_header' (out from fuse)
-+     * plus the data based on the len in the header.
-+     */
-+    if (in_len < sizeof(struct fuse_out_header)) {
-+        fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n",
-+                 __func__, elem->index);
-+        ret =3D E2BIG;
-+        goto err;
-+    }
-+    if (in_len < tosend_len) {
-+        fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd\n",
-+                 __func__, elem->index, tosend_len);
-+        ret =3D E2BIG;
-+        goto err;
++    cap =3D capng_name_to_capability(cap_name);
++    if (cap < 0) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "capng_name_to_capability(%s) failed:%s\n",
++                 cap_name, strerror(errno));
++        goto out;
 +    }
 +
-+    /* TODO: Limit to 'len' */
++    if (load_capng()) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "load_capng() failed\n");
++        goto out;
++    }
 +
-+    /* First copy the header data from iov->in_sg */
-+    copy_iov(iov, count, in_sg, in_num, iov_len);
++    /* We dont have this capability in effective set already. */
++    if (!capng_have_capability(CAPNG_EFFECTIVE, cap)) {
++        ret =3D 0;
++        goto out;
++    }
 +
-+    /*
-+     * Build a copy of the the in_sg iov so we can skip bits in it,
-+     * including changing the offsets
-+     */
-+    struct iovec *in_sg_cpy =3D calloc(sizeof(struct iovec), in_num);
-+    assert(in_sg_cpy);
-+    memcpy(in_sg_cpy, in_sg, sizeof(struct iovec) * in_num);
-+    /* These get updated as we skip */
-+    struct iovec *in_sg_ptr =3D in_sg_cpy;
-+    int in_sg_cpy_count =3D in_num;
++    if (capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, cap)) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "capng_update(DROP,) failed\n");
++        goto out;
++    }
 +
-+    /* skip over parts of in_sg that contained the header iov */
-+    size_t skip_size =3D iov_len;
-+
-+    size_t in_sg_left =3D 0;
-+    do {
-+        while (skip_size !=3D 0 && in_sg_cpy_count) {
-+            if (skip_size >=3D in_sg_ptr[0].iov_len) {
-+                skip_size -=3D in_sg_ptr[0].iov_len;
-+                in_sg_ptr++;
-+                in_sg_cpy_count--;
-+            } else {
-+                in_sg_ptr[0].iov_len -=3D skip_size;
-+                in_sg_ptr[0].iov_base +=3D skip_size;
-+                break;
-+            }
-+        }
-+
-+        int i;
-+        for (i =3D 0, in_sg_left =3D 0; i < in_sg_cpy_count; i++) {
-+            in_sg_left +=3D in_sg_ptr[i].iov_len;
-+        }
-+        fuse_log(FUSE_LOG_DEBUG,
-+                 "%s: after skip skip_size=3D%zd in_sg_cpy_count=3D%d "
-+                 "in_sg_left=3D%zd\n",
-+                 __func__, skip_size, in_sg_cpy_count, in_sg_left);
-+        ret =3D preadv(buf->buf[0].fd, in_sg_ptr, in_sg_cpy_count,
-+                     buf->buf[0].pos);
-+
-+        if (ret =3D=3D -1) {
-+            ret =3D errno;
-+            fuse_log(FUSE_LOG_DEBUG, "%s: preadv failed (%m) len=3D%zd\n",
-+                     __func__, len);
-+            free(in_sg_cpy);
-+            goto err;
-+        }
-+        fuse_log(FUSE_LOG_DEBUG, "%s: preadv ret=3D%d len=3D%zd\n", __func=
-__,
-+                 ret, len);
-+        if (ret < len && ret) {
-+            fuse_log(FUSE_LOG_DEBUG, "%s: ret < len\n", __func__);
-+            /* Skip over this much next time around */
-+            skip_size =3D ret;
-+            buf->buf[0].pos +=3D ret;
-+            len -=3D ret;
-+
-+            /* Lets do another read */
-+            continue;
-+        }
-+        if (!ret) {
-+            /* EOF case? */
-+            fuse_log(FUSE_LOG_DEBUG, "%s: !ret in_sg_left=3D%zd\n", __func=
-__,
-+                     in_sg_left);
-+            break;
-+        }
-+        if (ret !=3D len) {
-+            fuse_log(FUSE_LOG_DEBUG, "%s: ret!=3Dlen\n", __func__);
-+            ret =3D EIO;
-+            free(in_sg_cpy);
-+            goto err;
-+        }
-+        in_sg_left -=3D ret;
-+        len -=3D ret;
-+    } while (in_sg_left);
-+    free(in_sg_cpy);
-+
-+    /* Need to fix out->len on EOF */
-+    if (len) {
-+        struct fuse_out_header *out_sg =3D in_sg[0].iov_base;
-+
-+        tosend_len -=3D len;
-+        out_sg->len =3D tosend_len;
++    if (capng_apply(CAPNG_SELECT_CAPS)) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "drop:capng_apply() failed\n");
++        goto out;
 +    }
 +
 +    ret =3D 0;
-+
-+    vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
-+    vu_queue_notify(&se->virtio_dev->dev, q);
-+
-+err:
-+    if (ret =3D=3D 0) {
-+        ch->qi->reply_sent =3D true;
++    if (cap_dropped) {
++        *cap_dropped =3D true;
 +    }
 +
++out:
 +    return ret;
 +}
 +
- /* Thread function for individual queues, created when a queue is 'started=
-' */
- static void *fv_queue_thread(void *opaque)
- {
-diff --git a/tools/virtiofsd/fuse_virtio.h b/tools/virtiofsd/fuse_virtio.h
-index 135a14875a..cc676b9193 100644
---- a/tools/virtiofsd/fuse_virtio.h
-+++ b/tools/virtiofsd/fuse_virtio.h
-@@ -26,4 +26,8 @@ int virtio_loop(struct fuse_session *se);
- int virtio_send_msg(struct fuse_session *se, struct fuse_chan *ch,
-                     struct iovec *iov, int count);
-=20
-+int virtio_send_data_iov(struct fuse_session *se, struct fuse_chan *ch,
-+                         struct iovec *iov, int count,
-+                         struct fuse_bufvec *buf, size_t len);
++static int gain_effective_cap(const char *cap_name)
++{
++    int cap;
++    int ret =3D 0;
 +
- #endif
++    cap =3D capng_name_to_capability(cap_name);
++    if (cap < 0) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "capng_name_to_capability(%s) failed:%s\n",
++                 cap_name, strerror(errno));
++        goto out;
++    }
++
++    if (load_capng()) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "load_capng() failed\n");
++        goto out;
++    }
++
++    if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, cap)) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "capng_update(ADD,) failed\n");
++        goto out;
++    }
++
++    if (capng_apply(CAPNG_SELECT_CAPS)) {
++        ret =3D errno;
++        fuse_log(FUSE_LOG_ERR, "gain:capng_apply() failed\n");
++        goto out;
++    }
++    ret =3D 0;
++
++out:
++    return ret;
++}
++
+ static void lo_map_init(struct lo_map *map)
+ {
+     map->elems =3D NULL;
+@@ -1576,6 +1661,7 @@ static void lo_write_buf(fuse_req_t req, fuse_ino_t i=
+no,
+     (void)ino;
+     ssize_t res;
+     struct fuse_bufvec out_buf =3D FUSE_BUFVEC_INIT(fuse_buf_size(in_buf))=
+;
++    bool cap_fsetid_dropped =3D false;
+=20
+     out_buf.buf[0].flags =3D FUSE_BUF_IS_FD | FUSE_BUF_FD_SEEK;
+     out_buf.buf[0].fd =3D lo_fi_fd(req, fi);
+@@ -1587,12 +1673,31 @@ static void lo_write_buf(fuse_req_t req, fuse_ino_t=
+ ino,
+                  out_buf.buf[0].size, (unsigned long)off);
+     }
+=20
++    /*
++     * If kill_priv is set, drop CAP_FSETID which should lead to kernel
++     * clearing setuid/setgid on file.
++     */
++    if (fi->kill_priv) {
++        res =3D drop_effective_cap("FSETID", &cap_fsetid_dropped);
++        if (res !=3D 0) {
++            fuse_reply_err(req, res);
++            return;
++        }
++    }
++
+     res =3D fuse_buf_copy(&out_buf, in_buf, 0);
+     if (res < 0) {
+         fuse_reply_err(req, -res);
+     } else {
+         fuse_reply_write(req, (size_t)res);
+     }
++
++    if (cap_fsetid_dropped) {
++        res =3D gain_effective_cap("FSETID");
++        if (res) {
++            fuse_log(FUSE_LOG_ERR, "Failed to gain CAP_FSETID\n");
++        }
++    }
+ }
+=20
+ static void lo_statfs(fuse_req_t req, fuse_ino_t ino)
 --=20
 2.24.1
 
