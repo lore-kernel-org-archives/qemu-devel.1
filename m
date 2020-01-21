@@ -2,80 +2,75 @@ Return-Path: <SRS0=2jXw=3K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67BCCC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B504C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:58:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3049220882
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:57:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 532C224654
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 09:58:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z0nkWYOq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3049220882
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ONZlPPJW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 532C224654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itqHr-0005kh-7i
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:57:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60508)
+	id 1itqIx-0007FY-GK
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 04:58:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1itqCx-0007cA-Ba
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:52:28 -0500
+ (envelope-from <cohuck@redhat.com>) id 1itqFt-0003Lx-7p
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:55:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1itqCw-0005aV-99
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:52:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32181
+ (envelope-from <cohuck@redhat.com>) id 1itqFo-00076U-Mu
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:55:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45988
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1itqCw-0005a3-5B
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:52:26 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1itqFo-00076N-Jz
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 04:55:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579600345;
+ s=mimecast20190719; t=1579600524;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SESDgoYHaT2EdHh2wdhmxq9LXKAhecSvK7Rz0OkkUgI=;
- b=Z0nkWYOqCQNCZI8D2qyU/EpULycAjcZW7OLXBCirM85HbT0Li7wyZAeYElX8LCJ4bMDBsN
- uIVdkjXZR5l88GxPEHsyihXLNZSCoeiLlMMJDhyZhQ29UybIwav2lSEchTJUyFuNK8lQi3
- U47G3Hj42luR7+e1UaYIz/FPuLzd4Ug=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=JFtQi7X5O9S0H7Cnwdmrnm+saB1n2yEL3XL+Mjc5ZQA=;
+ b=ONZlPPJWLcRQlHU+nyY4jezvMTEG34h1fhm3re6CU0YLXyQbWT01fCVBoUHoC9tqQEnSI9
+ rWHF5ge77EXKA2XraOQ/zH6rTugLtpdLggcmS+q7ua4oIlaXcxglu3r5Svczf6kriz7s4f
+ ifB77+sldfg8M+VSJk+CWzBvj5R+vJY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-NZx9BpA7Ocen6QSO_AsOXA-1; Tue, 21 Jan 2020 04:52:24 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-69--1AV7HBMNIql8dsbXwtR7Q-1; Tue, 21 Jan 2020 04:55:14 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5814A800D41;
- Tue, 21 Jan 2020 09:52:23 +0000 (UTC)
-Received: from thuth.com (ovpn-116-121.ams2.redhat.com [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDB9110027A9;
- Tue, 21 Jan 2020 09:52:17 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Subject: [PATCH v5 5/6] iotests: Skip Python-based tests if QEMU does not
- support virtio-blk
-Date: Tue, 21 Jan 2020 10:52:04 +0100
-Message-Id: <20200121095205.26323-6-thuth@redhat.com>
-In-Reply-To: <20200121095205.26323-1-thuth@redhat.com>
-References: <20200121095205.26323-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: NZx9BpA7Ocen6QSO_AsOXA-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F2381922960;
+ Tue, 21 Jan 2020 09:55:13 +0000 (UTC)
+Received: from localhost (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E2BE7DB34;
+ Tue, 21 Jan 2020 09:55:10 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: qemu-s390x@nongnu.org
+Subject: [PATCH] s390x/event-facility: fix error propagation
+Date: Tue, 21 Jan 2020 10:55:06 +0100
+Message-Id: <20200121095506.8537-1-cohuck@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: -1AV7HBMNIql8dsbXwtR7Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,58 +82,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to enable some of the python-based tests in the "auto" group,
-and these tests require virtio-blk to work properly. Running iotests
-without virtio-blk likely does not make too much sense anyway, so instead
-of adding a check for the availability of virtio-blk to each and every
-test (which does not sound very appealing), let's rather add a check for
-this a central spot in the "check" script instead (so that it is still
-possible to run "make check" for qemu-system-tricore for example).
+We currently check (by error) if the passed-in Error pointer errp
+is non-null and return after realizing the first child of the
+event facility in that case. Symptom is that 'virsh shutdown'
+does not work, as the sclpquiesce device is not realized.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Fix this by (correctly) checking the local Error err.
+
+Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Fixes: 3d508334dd2c ("s390x/event-facility: Fix realize() error API violati=
+ons")
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- tests/qemu-iotests/check | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ hw/s390x/event-facility.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 2890785a10..1629b6c914 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -642,7 +642,15 @@ fi
- python_usable=3Dfalse
- if $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >=3D (3,6) else =
-1)'
- then
--    python_usable=3Dtrue
-+    # Our python framework also requires virtio-blk
-+    if "$QEMU_PROG" -M none -device help | grep -q virtio-blk >/dev/null 2=
->&1
-+    then
-+        python_usable=3Dtrue
-+    else
-+        python_unusable_because=3D"Missing virtio-blk in QEMU binary"
-+    fi
-+else
-+    python_unusable_because=3D"Unsupported Python version"
- fi
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 8a93b8a1da97..9d6972afa8b3 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -338,7 +338,7 @@ static void sclp_events_bus_realize(BusState *bus, Erro=
+r **errp)
+         DeviceState *dev =3D kid->child;
 =20
- default_machine=3D$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//=
-p')
-@@ -830,7 +838,7 @@ do
-                 run_command=3D"$PYTHON $seq"
-             else
-                 run_command=3D"false"
--                echo "Unsupported Python version" > $seq.notrun
-+                echo "$python_unusable_because" > $seq.notrun
-             fi
-         else
-             run_command=3D"./$seq"
+         object_property_set_bool(OBJECT(dev), true, "realized", &err);
+-        if (errp) {
++        if (err) {
+             error_propagate(errp, err);
+             return;
+         }
 --=20
-2.18.1
+2.21.1
 
 
