@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C67C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91673C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:57:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C642621569
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:55:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C75621569
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jan 2020 13:57:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLX4bf94"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C642621569
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNTRWwkr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C75621569
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1itu0W-0004xv-UN
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:55:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52556)
+	id 1itu21-0006zN-Ll
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 08:57:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1itsgt-0002mU-HU
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:36 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1itsiC-0003rf-3L
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1itsgp-0004Wq-FA
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23074
+ (envelope-from <dgilbert@redhat.com>) id 1itsi8-00051Y-DA
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31515
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsgp-0004Wg-Au
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:31:27 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1itsi8-00051K-9G
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 07:32:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579609886;
+ s=mimecast20190719; t=1579609967;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3ozsmQl6KOPGLJgk2hV37YZWCjzN9L1vPcnpRewKjF0=;
- b=BLX4bf94fYaBoUKMqlTw0G3EnCcQNfQQC2U+/VFzlpUzLzEOjNKAV4vDzGcRvc2iQZ3dTB
- o2HA5XSCe+KlcmWn794wn+EXClv6Eb8mItfis8GLSi3TlIqTIDi1YVSyXwEvvcCuwq8HSP
- kTMD2kS4+4sFfGLU4Un5VPrTGG5uYc0=
+ bh=cUeFPdME+vm3TzQVjRCoGIKY7xBnM50sNI8HRXdHPyI=;
+ b=UNTRWwkrLwidvhvsfuKVFeuu5INBpLjFot2enxhHV/uWCf4LEb2ip0ZWzGMa/9w+VhK85i
+ ei6cCFFqezUrYU+CCsxuj5MIHSIQfsgNRRLCB87ZHmNId6VUiP+ZudmdodVywJhRBWrEUC
+ FdRo7LMPL2FIVgFFrFhrmOUouuYFE8o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-scDMFCPvNrW16L_0KRRFGQ-1; Tue, 21 Jan 2020 07:31:25 -0500
+ us-mta-286-zXS8zYAHOOKGulwaHBVztA-1; Tue, 21 Jan 2020 07:32:46 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F57E107ACCC;
- Tue, 21 Jan 2020 12:31:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 547E3800D41;
+ Tue, 21 Jan 2020 12:32:45 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 319FA60BE0;
- Tue, 21 Jan 2020 12:31:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FA8760BE0;
+ Tue, 21 Jan 2020 12:32:43 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
  berrange@redhat.com, slp@redhat.com, philmd@redhat.com
-Subject: [PATCH v2 080/109] virtiofsd: fix memory leak on lo.source
-Date: Tue, 21 Jan 2020 12:24:04 +0000
-Message-Id: <20200121122433.50803-81-dgilbert@redhat.com>
+Subject: [PATCH v2 103/109] virtiofsd: prevent FUSE_INIT/FUSE_DESTROY races
+Date: Tue, 21 Jan 2020 12:24:27 +0000
+Message-Id: <20200121122433.50803-104-dgilbert@redhat.com>
 In-Reply-To: <20200121122433.50803-1-dgilbert@redhat.com>
 References: <20200121122433.50803-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: scDMFCPvNrW16L_0KRRFGQ-1
+X-MC-Unique: zXS8zYAHOOKGulwaHBVztA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,49 +92,91 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Bo <bo.liu@linux.alibaba.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-valgrind reported that lo.source is leaked on quiting, but it was defined
-as (const char*) as it may point to a const string "/".
+When running with multiple threads it can be tricky to handle
+FUSE_INIT/FUSE_DESTROY in parallel with other request types or in
+parallel with themselves.  Serialize FUSE_INIT and FUSE_DESTROY so that
+malicious clients cannot trigger race conditions.
 
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ tools/virtiofsd/fuse_i.h        |  1 +
+ tools/virtiofsd/fuse_lowlevel.c | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 4e01a37ddb..462c250382 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -115,7 +115,7 @@ struct lo_data {
-     int writeback;
-     int flock;
-     int xattr;
--    const char *source;
-+    char *source;
-     double timeout;
-     int cache;
-     int timeout_set;
-@@ -2497,9 +2497,8 @@ int main(int argc, char *argv[])
-             fuse_log(FUSE_LOG_ERR, "source is not a directory\n");
-             exit(1);
-         }
--
-     } else {
--        lo.source =3D "/";
-+        lo.source =3D strdup("/");
-     }
-     if (!lo.timeout_set) {
-         switch (lo.cache) {
-@@ -2570,5 +2569,7 @@ err_out1:
-         close(lo.root.fd);
-     }
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index a20854f1c4..1447d86866 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -61,6 +61,7 @@ struct fuse_session {
+     struct fuse_req list;
+     struct fuse_req interrupts;
+     pthread_mutex_t lock;
++    pthread_rwlock_t init_rwlock;
+     int got_destroy;
+     int broken_splice_nonblock;
+     uint64_t notify_ctr;
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index fe332bcb90..8ae45d9c58 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -2430,6 +2430,19 @@ void fuse_session_process_buf_int(struct fuse_sessio=
+n *se,
+     req->ctx.pid =3D in->pid;
+     req->ch =3D ch;
 =20
-+    free(lo.source);
++    /*
++     * INIT and DESTROY requests are serialized, all other request types
++     * run in parallel.  This prevents races between FUSE_INIT and ordinar=
+y
++     * requests, FUSE_INIT and FUSE_INIT, FUSE_INIT and FUSE_DESTROY, and
++     * FUSE_DESTROY and FUSE_DESTROY.
++     */
++    if (in->opcode =3D=3D FUSE_INIT || in->opcode =3D=3D CUSE_INIT ||
++        in->opcode =3D=3D FUSE_DESTROY) {
++        pthread_rwlock_wrlock(&se->init_rwlock);
++    } else {
++        pthread_rwlock_rdlock(&se->init_rwlock);
++    }
 +
-     return ret ? 1 : 0;
+     err =3D EIO;
+     if (!se->got_init) {
+         enum fuse_opcode expected;
+@@ -2487,10 +2500,13 @@ void fuse_session_process_buf_int(struct fuse_sessi=
+on *se,
+     } else {
+         fuse_ll_ops[in->opcode].func(req, in->nodeid, &iter);
+     }
++
++    pthread_rwlock_unlock(&se->init_rwlock);
+     return;
+=20
+ reply_err:
+     fuse_reply_err(req, err);
++    pthread_rwlock_unlock(&se->init_rwlock);
  }
+=20
+ #define LL_OPTION(n, o, v)                     \
+@@ -2535,6 +2551,7 @@ void fuse_session_destroy(struct fuse_session *se)
+             se->op.destroy(se->userdata);
+         }
+     }
++    pthread_rwlock_destroy(&se->init_rwlock);
+     pthread_mutex_destroy(&se->lock);
+     free(se->cuse_data);
+     if (se->fd !=3D -1) {
+@@ -2628,6 +2645,7 @@ struct fuse_session *fuse_session_new(struct fuse_arg=
+s *args,
+     list_init_req(&se->list);
+     list_init_req(&se->interrupts);
+     fuse_mutex_init(&se->lock);
++    pthread_rwlock_init(&se->init_rwlock, NULL);
+=20
+     memcpy(&se->op, op, op_size);
+     se->owner =3D getuid();
 --=20
 2.24.1
 
