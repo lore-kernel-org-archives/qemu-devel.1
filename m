@@ -2,85 +2,62 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 012F2C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB08CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:35:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFCF724685
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:34:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZ2lgJzc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFCF724685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9FAE224688
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:35:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FAE224688
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuEHI-00016X-HF
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 06:34:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38961)
+	id 1iuEHw-0001vB-By
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 06:35:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39013)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iuEG2-0008Pm-7C
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:15 -0500
+ (envelope-from <groug@kaod.org>) id 1iuEGY-0000a3-HS
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iuEG1-00073a-7O
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:14 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52489)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iuEG0-000718-US
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:13 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p9so6444409wmc.2
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 03:33:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=HrnBG3s59mGnDKtHgk/uHCxnSAkuu7gFD6rieyacomk=;
- b=kZ2lgJzcqMEFPFkSMDcHlw/LcD6CRLqpjkeOmDhCaNKwi3QF9AKPeCnKVo+a0nM/kj
- mSmU5FXiCOHdAwbrKummdOlG0XDyeS39k0TMI+fKTkOzR8yyLov+IW8+hRAVzYYuGgGV
- oOOOn2e9UjZgzTreq6QEBOLLc1Ur0Tx70f9vg1WczV5bCaTIiXPTte96p1kOoGlJnROa
- OhJIreeLWUAuHbzZdSdB4E6kF/YGzhnSUym5od8N4Ph7gSHJACcknZfuGu74hYNzg4DA
- 8MPvzv0uH6gFbnh4zblBKPpbzkvcQmIeK9JwLuw1tWJQqjb0+pynBhTlQqWYt7vnicfc
- 540g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=HrnBG3s59mGnDKtHgk/uHCxnSAkuu7gFD6rieyacomk=;
- b=uRKnucMFT1bpE9LfhxRbEeKkMp7e+HDzgQLa5hIc9FxeXXkoS8/GbDwq89wvJpjRu5
- AdeaBx740yCp2/47KKP+224nH7Oc+SDMMp9lAN7mwbOlhjfBZOmTWSsrrRrvzFCvmZSp
- N7TyNg/e+UCdhGczboXhO3hIiw5yJRcKsgZ8hhSNdoRKkueORwPXlj5zHinHVOvO+PEE
- btG73iKJauhwDOf/VDNJwpuIJtFjdw6RRO0AlhHErn/Lt03BIDnBevl9ZDJazEpmMNrx
- RH11XjH17SQ0MlhdlJjqIzDgb6Ed2uRRk+GY9NXTNF4Hd+ZZ1UVqwLq/JIkdlxcuFOIP
- pwuw==
-X-Gm-Message-State: APjAAAXZXMrCZiRNnZ7n5GtTJZ4KBmjNUdwsqVAkM+67A8Jc9JMPD4+M
- Hx6dMvv/wE3n8XZc0auL1ZI=
-X-Google-Smtp-Source: APXvYqwKaV/9ayZHomYuhjMPjGiGEoH4kDOzhctnDlds9fYmWSF+bze3oFe2gO+a9VL1RUnQK8fHYw==
-X-Received: by 2002:a7b:c956:: with SMTP id i22mr2598081wml.67.1579692791638; 
- Wed, 22 Jan 2020 03:33:11 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id g21sm3562477wmh.17.2020.01.22.03.33.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 03:33:10 -0800 (PST)
-Date: Wed, 22 Jan 2020 11:33:09 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] vhost: coding style fix
-Message-ID: <20200122113309.GB663955@stefanha-x1.localdomain>
-References: <20200122080840.592054-1-mst@redhat.com>
+ (envelope-from <groug@kaod.org>) id 1iuEGW-0007EP-Bn
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:45 -0500
+Received: from 20.mo4.mail-out.ovh.net ([46.105.33.73]:41062)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuEGV-0007D3-4a
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:44 -0500
+Received: from player690.ha.ovh.net (unknown [10.108.35.12])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id 2C17F2210A2
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 12:33:39 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player690.ha.ovh.net (Postfix) with ESMTPSA id 4EE5DE615C0A;
+ Wed, 22 Jan 2020 11:33:29 +0000 (UTC)
+Date: Wed, 22 Jan 2020 12:33:27 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Ganesh Goudar <ganeshgr@linux.ibm.com>
+Subject: Re: [PATCH v20 7/7] ppc: spapr: Activate the FWNMI functionality
+Message-ID: <20200122123327.469dc7df@bahia.lan>
+In-Reply-To: <20200117093855.19074-8-ganeshgr@linux.ibm.com>
+References: <20200117093855.19074-1-ganeshgr@linux.ibm.com>
+ <20200117093855.19074-8-ganeshgr@linux.ibm.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gj572EiMnwbLXET9"
-Content-Disposition: inline
-In-Reply-To: <20200122080840.592054-1-mst@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3680285321814776082
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddtgddvhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.33.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,42 +69,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
+ qemu-devel@nongnu.org, paulus@ozlabs.org, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 17 Jan 2020 15:08:55 +0530
+Ganesh Goudar <ganeshgr@linux.ibm.com> wrote:
 
---gj572EiMnwbLXET9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> From: Aravinda Prasad <arawinda.p@gmail.com>
+> 
+> This patch sets the default value of SPAPR_CAP_FWNMI_MCE
+> to SPAPR_CAP_ON for machine type 4.2.
+> 
 
-On Wed, Jan 22, 2020 at 03:08:49AM -0500, Michael S. Tsirkin wrote:
-> Drop a trailing whitespace. Make line shorter.
->=20
-> Fixes: 76525114736e8 ("vhost: Only align sections for vhost-user")
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Now that 4.2 has been released, we want this for 5.0...
+
+> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
 > ---
->  hw/virtio/vhost.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/ppc/spapr.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index c8bc2fa9f3..a81c18b6b6 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4454,7 +4454,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
+> -    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
+> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_ON;
+>      spapr_caps_add_properties(smc, &error_abort);
+>      smc->irq = &spapr_irq_dual;
+>      smc->dr_phb_enabled = true;
+> @@ -4544,6 +4544,7 @@ static void spapr_machine_4_1_class_options(MachineClass *mc)
+>      smc->smp_threads_vsmt = false;
+>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+>      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+... this should go to spapr_machine_4_2_class_options().
 
---gj572EiMnwbLXET9
-Content-Type: application/pgp-signature; name="signature.asc"
+>  }
+>  
+>  DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4oMvUACgkQnKSrs4Gr
-c8iGXAf+MjqNvXc8S7yRcZuQ+Z7HaoqN8NNIHsMQFRVuKgFQ211N4BW/C6xHO7p7
-F06U3Z146O24mBVsHR/f+NOvElN5syC+LtpAyTt9LVIFCyGV9TM3FZVNKy9QRhYA
-Ij/3hwr/fdFM4ez5pXtBifAOB+uoTltl9R+UnTivOdm1f7Ohi2BHegz768xfYOig
-Q+yjRgsoNKisPHt0OaImnfWiDS8hzqvf3FKwXAjNWYHZOwiSJ71v9sbKlCDCXXvF
-E9OAnxSJZUcHbyKbS+ZFoRKIwp7GacAP7SLySYdGnc3liGUwayeWV81iqCzgzBwH
-oGh6a1vKzNLTJbVdllWHgxviykl9Tw==
-=I6Lg
------END PGP SIGNATURE-----
-
---gj572EiMnwbLXET9--
 
