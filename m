@@ -2,94 +2,62 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D5C7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41CFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:48:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B33C24684
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:43:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5pTtyhg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B33C24684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BEE522465A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:48:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEE522465A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuFLl-0001iO-AL
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 07:43:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46614)
+	id 1iuFQn-0003op-Dw
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 07:48:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuFL4-0001BX-1z
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:42:31 -0500
+ (envelope-from <groug@kaod.org>) id 1iuFPl-0003Cm-E8
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:47:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuFL2-00028D-LO
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:42:29 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:50731)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iuFL2-00027m-Eq
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:42:28 -0500
-Received: by mail-wm1-x329.google.com with SMTP id a5so6682434wmb.0
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 04:42:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=hvdNhYJJhe+r8BPIxhc7oclt+wINj2ihQ5/ARLp+CkU=;
- b=b5pTtyhgAIG5bK2n+KNoUB17p7u4G6Mu/PlPuB5zt9RuLLLCrqIwoNyExIDxG0PJIq
- MIPr7cTZurUAu5AgZ2384ZyF2Ya8wqa5PoeQsc7PxoHNuCJS3hJub/ihIiUihwOhIom2
- 0cQDXmOpRr0E5ZrvvYnfMrBxwRGSiPzW73RjixznpLcxTeEmfQuyNJhonGrARPFE3G//
- w05O0OJYIeDEZ3lQrjpVYB+xmYA3eqxE8/hIDEwiOXjqGpj0q/JBbB/j0rP6onM+u5UY
- Z8AYUEIlgHYk8PVy1+pMYC4wCiohBsGnGyp+Fhh9VD8tfQkOLFWiRfYH1bESEgHiMcAb
- KRxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=hvdNhYJJhe+r8BPIxhc7oclt+wINj2ihQ5/ARLp+CkU=;
- b=BX6r630bKNMe5ZlAMYUKPfzDrtWXt+Lw2GJXa61XyUbvrorTiKosFouUudSeNOEFFp
- nySPtfxRnR3UYrAdnsCvQF+dK4/fbTSiVcjWzGK0OifxKt6MTI3NpvJu03I9TYZ3leIw
- DgR8dSM43DOD333aLAXOb7xe9tkvR8k6esbP3j+EfZ2ytTHb4W4R8l7WzE+RginzMYZR
- 3HRJg/9Sg2Nh5X7S4wmQGG62RYuqkvpqX/MFfJlt5O99IuOV3qp5pz7+ocnAFdC9yUgc
- NUtu7MOQ62/QcnKzcXwVbXIzJqqLzbqC18EA7zJbPIgP6/pTrBhJY5yhaDs3WTBvuRXD
- i4eg==
-X-Gm-Message-State: APjAAAVwjDpu/QUNY36pVaISp/QFUdBF3D6+ke+qgqe2yJ4hmQk1hXiG
- rwRb86e8v+41vyeDDLNIJs6IRmalCLB54mXOf88=
-X-Google-Smtp-Source: APXvYqz4QoMuBOFgbREzsA6Pz2hDL0bgkXS1rfEXLLip64pz4wouGQx6JX/1y4ewr1vq1aMoHBdU3UsN/uDKtgyKMlk=
-X-Received: by 2002:a05:600c:24ca:: with SMTP id
- 10mr2958455wmu.4.1579696946719; 
- Wed, 22 Jan 2020 04:42:26 -0800 (PST)
+ (envelope-from <groug@kaod.org>) id 1iuFPj-00046x-TR
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:47:21 -0500
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:44483)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuFPj-00046A-Nv
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:47:19 -0500
+Received: from player699.ha.ovh.net (unknown [10.108.16.238])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6F6EF1AB32A
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 13:47:17 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player699.ha.ovh.net (Postfix) with ESMTPSA id D8372E7B9D46;
+ Wed, 22 Jan 2020 12:47:10 +0000 (UTC)
+Date: Wed, 22 Jan 2020 13:47:08 +0100
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
+Message-ID: <20200122134708.21a4cbb5@bahia.lan>
+In-Reply-To: <6fb96fed-9590-aa7c-cf00-038ab776ccb5@kaod.org>
+References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
+ <6fb96fed-9590-aa7c-cf00-038ab776ccb5@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <87d0bmchq0.fsf@dusky.pond.sub.org>
- <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200120100849.GB345995@stefanha-x1.localdomain>
- <871rrtmkko.fsf@dusky.pond.sub.org>
- <20200121113224.GD630615@stefanha-x1.localdomain>
- <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
- <87wo9lc4oe.fsf_-_@dusky.pond.sub.org> <20200121143658.GB597037@redhat.com>
- <871rrs97ld.fsf@dusky.pond.sub.org>
- <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
- <87y2tzzrwo.fsf@linaro.org> <87wo9ju19n.fsf@dusky.pond.sub.org>
-In-Reply-To: <87wo9ju19n.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 22 Jan 2020 16:42:13 +0400
-Message-ID: <CAJ+F1CLu6xNJ834qWpJ6Bx1PHhv5QutdK2-Nzp+J2q80YV5tzA@mail.gmail.com>
-Subject: Re: Integrating QOM into QAPI
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Ovh-Tracer-Id: 4923560293687662987
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddtgdegudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinheprhgvughhrghtrdgtohhmnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.60.232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,89 +69,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- QEMU <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On Wed, 15 Jan 2020 19:10:47 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-On Wed, Jan 22, 2020 at 4:25 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
-> >> Actually, we are not that far off from being able to use GObject
-> >> altogether (I hacked something like that to play with), but I
-> >> disgress...
-> >
-> > As a mostly hands off observer who mainly c&p's QOM code when he has to
-> > I have to ask is this a long term plan?
-> >
-> > I've always found having our own hand rolled object system a little
-> > incongruous given we lean heavily on the rest of glib.
->
-> I vaguely remember claims that GObject falls short of our needs.  Sadly,
-> I don't remember the details.  This is why major features should come
-> with a design document.
->
-> https://wiki.qemu.org/Features/QOM ain't: it does not mention GObject.
-> I'm afraid that page has fallen too far behind the code to be useful to
-> anyone not familiar with the code.
+> On 1/15/20 6:48 PM, Greg Kurz wrote:
+> > Migration can potentially race with CAS reboot. If the migration thread
+> > completes migration after CAS has set spapr->cas_reboot but before the
+> > mainloop could pick up the reset request and reset the machine, the
+> > guest is migrated unrebooted and the destination doesn't reboot it
+> > either because it isn't aware a CAS reboot was needed (eg, because a
+> > device was added before CAS). This likely result in a broken or hung
+> > guest.
+> >=20
+> > Even if it is small, the window between CAS and CAS reboot is enough to
+> > re-qualify spapr->cas_reboot as state that we should migrate. Add a new
+> > subsection for that and always send it when a CAS reboot is pending.
+> > This may cause migration to older QEMUs to fail but it is still better
+> > than end up with a broken guest.
+> >=20
+> > The destination cannot honour the CAS reboot request from a post load
+> > handler because this must be done after the guest is fully restored.
+> > It is thus done from a VM change state handler.
+> >=20
+> > Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+>=20
+> C=C3=A9dric Le Goater <clg@kaod.org>
+>=20
 
-From the top of my mind, this is the pain point when trying to use GObject:
-- static/inlined object, not supported by GObject, unlikely to ever be
-- few users in qemu, transition possible.
-- 64k limit of GObject, for some reason, unlikely to change but I will
-take a look. Some users in qemu, code adaptation possible.
-- dynamic properties, possible in GObject with hacks, but not
-recommended and going to be deprecated from what I remember
-- "array" properties - would need extra layer/tweaks for compatibility
-- link properties - would need special handling
-- different limitations for type names and properties names
+I guess you mean:
 
-A possible initial approach is to have all the type system and object
-allocation done by GObject under the hood (what I hacked), while
-keeping all the properties handled by QOM. Then, figure out a
-migration to GObject properties (which are also being refactored a bit
-upstream). If there is enough interest, I will keep investigating. But
-for now, helping with meson seems more urgent.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
->
-> >> So introducing GObject-like macros? sure!
-> >>
-> >> There are plenty of refactoring to do. The problem when touching the
-> >> whole code-base, imho, is review time. It may take a couple of
-> >> hours/days to come up with a cocci/spatch, and make various patches
-> >> here and there. But it takes often weeks and a lot of constant push to
-> >> various folks to get all the reviews (as seens by the qdev prop-ptr
-> >> series earlier for example). How can we better address whole code-base
-> >> changes?
-> >
-> > The problem with review time - especially for QOM - is having domain
-> > knowledge to understand what is happening.
-> >
-> > Are we happy that the existing qdev/qmp tests sufficiently exercise
-> > QEMU's object model? Perhaps with a little extra tweaking of the tests
-> > we could dump the object hierarchy and then compare it to the hierarchy
-> > presented after modification. That might make it easier to have
-> > confidence that these large scale but mostly mechanical changes don't
-> > change anything externally visible?
->
-> Comparing the composition tree complete with properties and property
-> values before and after feels like a useful regression test.  Any
-> takers?
->
+?
 
+> Nice work ! That was quite complex to catch !
+>=20
+> Thanks,
+>=20
+> C.
+>=20
+> > ---
+> >=20
+> > This patch is supposed to fix the interrupt controller mode inconsisten=
+cy
+> > between QEMU and the guest reported in this BZ:
+> >=20
+> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1781315 (requires auth)
+> >=20
+> > Even if interrupt controller selection doesn't involve CAS reboot anymo=
+re,
+> > we still have other conditions that require CAS reboot.
+> > ---
+> >  hw/ppc/spapr.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 43 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 30a5fbd3bea6..bf2763aa16e5 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1959,6 +1959,31 @@ static const VMStateDescription vmstate_spapr_dt=
+b =3D {
+> >      },
+> >  };
+> > =20
+> > +static bool spapr_cas_reboot_needed(void *opaque)
+> > +{
+> > +    SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+> > +
+> > +    /*
+> > +     * This causes the "spapr_cas_reboot" subsection to always be
+> > +     * sent if migration raced with CAS. This causes older QEMUs
+> > +     * that don't know about the subsection to fail migration but
+> > +     * it is still better than end up with a broken guest on the
+> > +     * destination.
+> > +     */
+> > +    return spapr->cas_reboot;
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_spapr_cas_reboot =3D {
+> > +    .name =3D "spapr_cas_reboot",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .needed =3D spapr_cas_reboot_needed,
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_BOOL(cas_reboot, SpaprMachineState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    },
+> > +};
+> > +
+> >  static const VMStateDescription vmstate_spapr =3D {
+> >      .name =3D "spapr",
+> >      .version_id =3D 3,
+> > @@ -1992,6 +2017,7 @@ static const VMStateDescription vmstate_spapr =3D=
+ {
+> >          &vmstate_spapr_dtb,
+> >          &vmstate_spapr_cap_large_decr,
+> >          &vmstate_spapr_cap_ccf_assist,
+> > +        &vmstate_spapr_cas_reboot,
+> >          NULL
+> >      }
+> >  };
+> > @@ -2577,6 +2603,21 @@ static PCIHostState *spapr_create_default_phb(vo=
+id)
+> >      return PCI_HOST_BRIDGE(dev);
+> >  }
+> > =20
+> > +static void spapr_change_state_handler(void *opaque, int running,
+> > +                                       RunState state)
+> > +{
+> > +    SpaprMachineState *spapr =3D opaque;
+> > +
+> > +    if (running && spapr->cas_reboot) {
+> > +        /*
+> > +         * This happens when resuming from migration if the source
+> > +         * processed a CAS but didn't have time to trigger the CAS
+> > +         * reboot. Do it now.
+> > +         */
+> > +        qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
+> > +    }
+> > +}
+> > +
+> >  /* pSeries LPAR / sPAPR hardware init */
+> >  static void spapr_machine_init(MachineState *machine)
+> >  {
+> > @@ -2970,6 +3011,8 @@ static void spapr_machine_init(MachineState *mach=
+ine)
+> > =20
+> >          kvmppc_spapr_enable_inkernel_multitce();
+> >      }
+> > +
+> > +    qemu_add_vm_change_state_handler(spapr_change_state_handler, spapr=
+);
+> >  }
+> > =20
+> >  static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+> >=20
+>=20
 
---=20
-Marc-Andr=C3=A9 Lureau
 
