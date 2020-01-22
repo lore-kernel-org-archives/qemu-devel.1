@@ -6,40 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E8BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 992A6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:22:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B759521734
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:21:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B759521734
+	by mail.kernel.org (Postfix) with ESMTPS id 6D00D217F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:22:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D00D217F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuGse-0005Nr-O8
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:21:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58735)
+	id 1iuGtp-0007Hb-Bs
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:22:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iuGqu-0003j6-VY
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:31 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iuGoI-0000sw-FS
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:16:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iuGqt-0005yb-KF
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:28 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:34571)
+ (envelope-from <laurent@vivier.eu>) id 1iuGoH-0004BD-9h
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:16:46 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:33319)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGqt-0005y9-B3
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:27 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGoH-0004A7-0f
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:16:45 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MVubb-1j4PiY0kZp-00RuNb; Wed, 22 Jan 2020 15:19:07 +0100
-Subject: Re: [PATCH v8 02/13] linux-user: Add support for getting/setting RTC
- time and alarm using ioctls
-To: Filip Bozuta <Filip.Bozuta@rt-rk.com>, qemu-devel@nongnu.org
-References: <1579117007-7565-1-git-send-email-Filip.Bozuta@rt-rk.com>
- <1579117007-7565-3-git-send-email-Filip.Bozuta@rt-rk.com>
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MaIGB-1j8nOv0Fsb-00WDhp; Wed, 22 Jan 2020 15:16:40 +0100
+Subject: Re: [PATCH 12/12] linux-user: Add support for KCOV_INIT_TRACE ioctl
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1579214991-19602-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1579214991-19602-13-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <24d8110d-5a7a-626d-4ad6-d005a3ec7c84@vivier.eu>
-Date: Wed, 22 Jan 2020 15:19:06 +0100
+Message-ID: <8f21a86d-1031-64c9-2281-2b3a3001fffc@vivier.eu>
+Date: Wed, 22 Jan 2020 15:16:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1579117007-7565-3-git-send-email-Filip.Bozuta@rt-rk.com>
+In-Reply-To: <1579214991-19602-13-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:CrTomKNQtcmJNYZ87LsKWLQL+2di9D7cj7GZ7E5dl5vX/7MT8VQ
- KTToCGJuEyzcdyXyC7kX+dEyDKLQiiNvu/aiqxnF9F5m7SU56C3Xnhk3HOoKgrCXM770IuJ
- ZNP6zUDHdiSbPvlxqyIrGFlzm7GSXn+OdypcOOUAfxzdDVRTWMsKGfPaIxao4wXqz5K+hAf
- kj8hvl+AFOPqAknUg1WUQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:kl7/TFrl/hA=:F66/G06qNwbXLoU6J8gGbe
- y5ZzWBF+lcCOO4085zVlxrGh6hl6fOmqubYm2qcITg900djWkRkYeuGaX8uxexr3uH5H6rIBl
- spSddsqK3Fz46Ig51vzMTTQdLC9QPoXu/9wBqZ59FAAieQCM3ePZSGpopeXNUjejNv5jVXG/1
- hQnPQ7Gg1Nll1wdsTf91AGNz73gtPVMG/e8Lb2XVrHXnlpI3cPPexVyUSuhJgeel54ltC9WPT
- APKqny9sdallHxQzq8b9hdndLNrIzj8W2NJNhIQWYEzB8fOu/YLnqtGkg20BE2KmC3GfFdLYi
- LcK1EPeUCUW+kFelXFrB13WMSxvjfZaTFv2+DAhN5Ifi6ty30UM4uoJq8qyGxU37uDE4SPrVx
- sb4lJ8cIFyPyxp7WDguTBrx1us/yLtx+mLDPbsvMgaHswgTFc484a0nWH2GtDHFoKDf1UcbW9
- UL3DM8xtZ3yNMLf7encQxQ/ErpwVxhTNR0M0vaxJwo997Qi3C1wJCd/GQJ28j6PQUWVwzZOtH
- dUr74djuEC3QWyLUV4vg+pYo2rzvcNmwm/6nW3Pv0HtBPIfHEvwP7EMHGNEKsiEZoojdwkdRk
- RwqdUfg8jS7dbF7EoGzfpnUC5i49sFVzAN2kU2WSbcAQJ2coJUhcuUXaAozkFy5Yy72OX7S7U
- HozW9f50Jw4KcGIPL2vHNEVpgzqAhs8iMeRkOKTe5vexq9Nx14nKguuqIpNLFeLXMhh7rgYvZ
- notH5GfJpLPXOCZn2aiOmZfPjmD1bT5RacWBxsUYTZt8qxI0yYyU7X/KM+BA0CZzSZFn3Hq2E
- aZq2LK5qpNR9cT3xebSrN5MOMYS8kajF0E0tts4/KsEIMv3FRxGhVvgrNTRorJ7xH8TkoL/
+X-Provags-ID: V03:K1:CIhbSTpytgIH7S5CI+kWSqeMDRQHgHxdIim/KKUto/Mq53VVQJ4
+ ZRquPFMNjEvwr91yDD1eCKTBunwSsq19FxqNsvcH87r/Osxwx3lhIFGbvi6dmI4nu4v0V0H
+ nG6K4D9kN2Xz9PoLLYbIu9YgDq2SZLtyFzKM97FRiQXQbHovbdqcBgTisgGE6S3gsmNA6Ct
+ VdkE8A1lGjOCb1Iey82uQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9pBK6oH9rcE=:oVDfRRDqYmwNyKk+LCxCKY
+ tIyWVHKRGIL0k78TGu8Yc8ahGG1EDxN1018pcWN64XrOovb7C8tW/h0U6GnRaVExqWfntBOzo
+ Z/uA/bMCioyQT7F03mio7FDAtu0Never3g605pWYqNysLABeZ/eK6kCd/5G01KaG3olyj0n6v
+ TzwBTLDTtYkyzqP4Zg5Pa4m4WmZSwL2aHk3B2rQikjh1ukrXxbW+2X7qPLttSVjS23I8nw9I3
+ +i6CLiSEdjzuOWSoIJUKoOSDH5YxfmXM1P9BpMHdXNGbIZFyjtN/b0NrmZdna1NYrC5t69AGB
+ j8R1B8MWEW+P0MHNOR1QxurEDj1HwZ1fjPL5GkJ0XH5Pz0l/wv/NEC2pyFVDSBl9tX4BnFvow
+ 0/kzPKswxoqEJVqHDVsh8DM4gFYcOAVU3Q9wtZ4aEMv1A0Hn5yU1R+8BlG9gQDLq0pRTqHH+L
+ nY7VoTIObmZq/LZdCYgs9ftLQRtgHiMcHDX59j9lpI0tSDYLZ6dgd4qtDGNFOU6AKQNUV7mH+
+ PmvK6V3k3b14w+DAB79IDtdJQB+OpZDJEV3O8uUv9RvrY5rkwrOjq1dYZ2H0ifDe+cmrqXhSX
+ kgZRoBzX5zmoL3S36wdI0gsc50IED7l1K21wISCLCQ7iuckUP9dj4T70FbGvzcISp+1J4HtJJ
+ Xiryw5zVky33rO3t5gCfteZii4IU+RFcydosu13o5HjfIA9umGpQK0nzs569u0l5wWsQav/aQ
+ EQ1aGg2hhoUJd2CUih8cogbNVWfj0fzOagxo/SF673m1S+CyWV1Wq+mGF1Mg7lKE14KmvJ+vg
+ Hd3JlOGEnhgF7hxqaSyUychZqSO6/12JK3SPXMJQJz2kuffu8c=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.24
+X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,120 +122,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, arnd@arndb.de,
- richard.henderson@linaro.org, jcmvbkbc@gmail.com, amarkovic@wavecomp.com,
- philmd@redhat.com
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 15/01/2020 à 20:36, Filip Bozuta a écrit :
-> This patch implements functionalities of following ioctls:
+Le 16/01/2020 à 23:49, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> RTC_RD_TIME - Getting RTC time
-> 
->     Returns this RTC's time in the following structure:
-> 
->         struct rtc_time {
->             int tm_sec;
->             int tm_min;
->             int tm_hour;
->             int tm_mday;
->             int tm_mon;
->             int tm_year;
->             int tm_wday;     /* unused */
->             int tm_yday;     /* unused */
->             int tm_isdst;    /* unused */
->         };
-> 
->     The fields in this structure have the same meaning and ranges
->     as the tm structure described in gmtime man page. A pointer
->     to this structure should be passed as the third ioctl's argument.
-> 
-> RTC_SET_TIME - Setting RTC time
-> 
->     Sets this RTC's time to the time specified by the rtc_time
->     structure pointed to by the third ioctl's argument. To set
->     the RTC's time the process must be privileged (i.e., have the
->     CAP_SYS_TIME capability).
-> 
-> RTC_ALM_READ, RTC_ALM_SET - Getting/Setting alarm time
-> 
->     Read and set the alarm time, for RTCs that support alarms.
->     The alarm interrupt must be separately enabled or disabled
->     using the RTC_AIE_ON, RTC_AIE_OFF requests. The third
->     ioctl's argument is a pointer to a rtc_time structure. Only
->     the tm_sec, tm_min, and tm_hour fields of this structure are
->     used.
-> 
-> Implementation notes:
-> 
->     All ioctls in this patch have pointer to a structure rtc_time
->     as their third argument. That is the reason why corresponding
->     definition is added in linux-user/syscall_types.h. Since all
->     elements of this structure are of type 'int', the rest of the
->     implementation is straightforward.
+> KCOV_INIT_TRACE ioctl plays the role in kernel coverage tracing.
+> This ioctl's third argument is of type 'unsigned long', and the
+> implementation in QEMU is straightforward.
 > 
 > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  linux-user/ioctls.h        |  4 ++++
->  linux-user/syscall_defs.h  |  4 ++++
->  linux-user/syscall_types.h | 11 +++++++++++
->  3 files changed, 19 insertions(+)
+>  linux-user/ioctls.h       | 1 +
+>  linux-user/syscall_defs.h | 1 +
+>  2 files changed, 2 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 97741c7..f472794 100644
+> index 39b3825..1da71dd 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -77,6 +77,10 @@
->       IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
->       IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
->       IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
-> +     IOCTL(RTC_ALM_READ, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-> +     IOCTL(RTC_ALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-> +     IOCTL(RTC_RD_TIME, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-> +     IOCTL(RTC_SET_TIME, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
->  
->       IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
->       IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
+> @@ -556,4 +556,5 @@
+>  #ifdef CONFIG_KCOV
+>    IOCTL(KCOV_ENABLE, 0, TYPE_NULL)
+>    IOCTL(KCOV_DISABLE, 0, TYPE_NULL)
+> +  IOCTL(KCOV_INIT_TRACE, IOC_R, TYPE_ULONG)
+>  #endif
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index f91579a..f0bf09d 100644
+> index c8999ef..bf71b3a 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -772,6 +772,10 @@ struct target_pollfd {
->  #define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
->  #define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
->  #define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
-> +#define TARGET_RTC_ALM_READ         TARGET_IOR('p', 0x08, struct rtc_time)
-> +#define TARGET_RTC_ALM_SET          TARGET_IOW('p', 0x07, struct rtc_time)
-> +#define TARGET_RTC_RD_TIME          TARGET_IOR('p', 0x09, struct rtc_time)
-> +#define TARGET_RTC_SET_TIME         TARGET_IOW('p', 0x0a, struct rtc_time)
+> @@ -2464,6 +2464,7 @@ struct target_mtpos {
+>  /* kcov ioctls */
+>  #define TARGET_KCOV_ENABLE     TARGET_IO('c', 100)
+>  #define TARGET_KCOV_DISABLE    TARGET_IO('c', 101)
+> +#define TARGET_KCOV_INIT_TRACE TARGET_IOR('c', 1, abi_ulong)
 >  
->  #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
->         defined(TARGET_XTENSA)
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index 4e36983..a35072a 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -255,6 +255,17 @@ STRUCT(blkpg_partition,
->         MK_ARRAY(TYPE_CHAR, BLKPG_DEVNAMELTH), /* devname */
->         MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
->  
-> +STRUCT(rtc_time,
-> +       TYPE_INT, /* tm_sec */
-> +       TYPE_INT, /* tm_min */
-> +       TYPE_INT, /* tm_hour */
-> +       TYPE_INT, /* tm_mday */
-> +       TYPE_INT, /* tm_mon */
-> +       TYPE_INT, /* tm_year */
-> +       TYPE_INT, /* tm_wday */
-> +       TYPE_INT, /* tm_yday */
-> +       TYPE_INT) /* tm_isdst */
-> +
->  STRUCT(blkpg_ioctl_arg,
->         TYPE_INT, /* op */
->         TYPE_INT, /* flags */
+>  struct target_sysinfo {
+>      abi_long uptime;                /* Seconds since boot */
 > 
 
 Applied to my linux-user branch.
