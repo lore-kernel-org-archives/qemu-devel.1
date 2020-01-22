@@ -2,84 +2,64 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F860C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1207C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:33:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 667292465A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86A5C21835
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:33:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdskpnNQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 667292465A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hvd6QhI8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86A5C21835
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu9a5-0005uB-Fk
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:33:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34546)
+	id 1iu9aF-00067P-Hs
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:33:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34531)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iu9ZM-00058Z-PK
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:32:53 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iu9ZJ-00058W-Iz
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:32:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iu9ZL-0000Gg-TE
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:32:52 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33369
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1iu9ZD-0000EQ-3p
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:32:48 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54109 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iu9ZL-0000GO-QW
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:32:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579674771;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QtQJIajwIeiF+vNoxyUr6Gd1aW7sCrbw05DjemTpC3o=;
- b=HdskpnNQq63FNCHzBRufn9qgtrNpR3GiChMH7sdA7UcqgrOxQaxz9LY5OsMNakOALCJJi2
- Zf6c9BMr9354f+SXfmfF7A/eq1RTFcb/Wrqf3RLrl7Oq7+FNBsvKBBiKfY2orAmOtr3EUa
- a5sPDDZmwh3b55McovVm5Zeij8kFJXY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-a3XkUcSrNZGbXx3pWE913g-1; Wed, 22 Jan 2020 01:32:49 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4200018A8C8A;
- Wed, 22 Jan 2020 06:32:48 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A52460BE0;
- Wed, 22 Jan 2020 06:32:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0CC161138600; Wed, 22 Jan 2020 07:32:44 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v4 1/4] qapi: Add a 'coroutine' flag for commands
-References: <20200121181122.15941-1-kwolf@redhat.com>
- <20200121181122.15941-2-kwolf@redhat.com>
-Date: Wed, 22 Jan 2020 07:32:44 +0100
-In-Reply-To: <20200121181122.15941-2-kwolf@redhat.com> (Kevin Wolf's message
- of "Tue, 21 Jan 2020 19:11:19 +0100")
-Message-ID: <87lfq0yp9v.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iu9ZB-0000Bo-M5; Wed, 22 Jan 2020 01:32:43 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 482bDZ3QsKz9sRR; Wed, 22 Jan 2020 17:32:30 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1579674750;
+ bh=ZY2mUl1dYF34Byto530RG21mrFlRLmLeWCt6q8hf0ik=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=hvd6QhI82Hnx8EfzKNe3QdXPJ0VNuG0iIX7MuAnQPMwNxm3LjV3tODEV/eafAOnwg
+ 4XYk1reeiOyTbznbqaaStJq9nfqQ1BS75Rw23OmAk4TX3PgZ1hf07XZQ7J3NowKbpB
+ AQrskv0yh/mDDZTA9GeUJUCXhsyAcWX4PXo2e9eY=
+Date: Wed, 22 Jan 2020 17:32:22 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH qemu v5] spapr: Kill SLOF
+Message-ID: <20200122063222.GJ2347@umbus.fritz.box>
+References: <20200110020925.98711-1-aik@ozlabs.ru>
+ <20200121051100.GG265522@umbus.fritz.box>
+ <2aee3928-0acb-65ee-de54-de2e8106a6ba@ozlabs.ru>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: a3XkUcSrNZGbXx3pWE913g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="x0KprKst+ZOYEj2z"
+Content-Disposition: inline
+In-Reply-To: <2aee3928-0acb-65ee-de54-de2e8106a6ba@ozlabs.ru>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,26 +71,1790 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
 
-> This patch adds a new 'coroutine' flag to QMP command definitions that
-> tells the QMP dispatcher that the command handler is safe to be run in a
-> coroutine.
+--x0KprKst+ZOYEj2z
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm afraid I missed this question in my review of v3: when is a handler
-*not* safe to be run in a coroutine?
+On Tue, Jan 21, 2020 at 06:25:36PM +1100, Alexey Kardashevskiy wrote:
+>=20
+>=20
+> On 21/01/2020 16:11, David Gibson wrote:
+> > On Fri, Jan 10, 2020 at 01:09:25PM +1100, Alexey Kardashevskiy wrote:
+> >> The Petitboot bootloader is way more advanced than SLOF is ever going =
+to
+> >> be as Petitboot comes with the full-featured Linux kernel with all
+> >> the drivers, and initramdisk with quite user friendly interface.
+> >> The problem with ditching SLOF is that an unmodified pseries kernel can
+> >> either start via:
+> >> 1. kexec, this requires presence of RTAS and skips
+> >> ibm,client-architecture-support entirely;
+> >> 2. normal boot, this heavily relies on the OF1275 client interface to
+> >> fetch the device tree and do early setup (claim memory).
+> >>
+> >> This adds a new bios-less mode to the pseries machine: "bios=3Don|off".
+> >> When enabled, QEMU does not load SLOF and jumps to the kernel from
+> >> "-kernel".
+> >=20
+> > I don't love the name "bios" for this flag, since BIOS tends to refer
+> > to old-school x86 firmware.  Given the various plans we're considering
+> > the future, I'd suggest "firmware=3Dslof" for the current in-guest SLOF
+> > mode, and say "firmware=3Dvof" (Virtual Open Firmware) for the new
+> > model.  We can consider firmware=3Dpetitboot or firmware=3Dnone (for
+> > direct kexec-style boot into -kernel) or whatever in the future
+>=20
+> Ok. We could also enforce default loading addresses for SLOF/kernel/grub
+> and drop "kernel-addr", although it is going to be confusing if it
+> changes in not so obvious way...
 
-> The documentation of the new flag pretends that this flag is already
-> used as intended, which it isn't yet after this patch. We'll implement
-> this in another patch in this series.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Yes, I think that would be confusing, so I think adding the
+kernel-addr override is a good idea, I'd just like it split out for
+clarity.
 
+> In fact, I will ideally need 3 flags:
+> -bios: on|off to stop loading SLOF;
+> -kernel-addr: 0x0 for slof/kernel; 0x20000 for grub;
+
+I'm happy for that one to be separate from the "firmware style"
+option.
+
+> -kernel-translate-hack: on|off - as grub is linked to run from 0x20000
+> and it only works when placed there, the hack breaks it.
+
+Hrm.  I don't really understand what this one is about.  That doesn't
+really seem like something the user would ever want to fiddle with
+directly.
+
+> Or we can pass grub via -bios and not via -kernel but strictly speaking
+> there is still a firmware - that new 20 bytes blob so it would not be
+> accurate.
+>=20
+> We can put this all into a single
+> -firmware slof|vof|grub|linux. Not sure.
+
+I'm not thinking of "grub" as a separate option - that would be the
+same as "vof".  Using vof + no -kernel we'd need to scan the disks in
+the same way SLOF does, and look for a boot partition, which will
+probably contain a GRUB image.  Then we'd need enough faked OF client
+calls to let GRUB operate.
+
+> >> The client interface is implemented exactly as RTAS - a 20 bytes blob,
+> >> right next after the RTAS blob. The entry point is passed to the kernel
+> >> via GPR5.
+> >>
+> >> This implements a handful of client interface methods just to get goin=
+g.
+> >> In particular, this implements the device tree fetching,
+> >> ibm,client-architecture-support and instantiate-rtas.
+> >>
+> >> This implements changing FDT properties for RTAS (for vmlinux and zIma=
+ge)
+> >> and initramdisk location (for zImage). To make this work, this skips
+> >> fdt_pack() when bios=3Doff as not packing the blob leaves some room for
+> >> appending.
+> >>
+> >> This assigns "phandles" to device tree nodes as there is no more SLOF
+> >> and OF nodes addresses of which served as phandle values.
+> >> This keeps predefined nodes (such as XICS/NVLINK/...) unchanged.
+> >> phandles are regenerated at every FDT rebuild.
+> >>
+> >> When bios=3Doff, this adds "/chosen" every time QEMU builds a tree.
+> >>
+> >> This implements "claim" which the client (Linux) uses for memory
+> >> allocation; this is also  used by QEMU for claiming kernel/initrd imag=
+es,
+> >> client interface entry point, RTAS and the initial stack.
+> >>
+> >> While at this, add a "kernel-addr" machine parameter to allow moving
+> >> the kernel in memory. This is useful for debugging if the kernel is
+> >> loaded at @0, although not necessary.
+> >>
+> >> This adds basic instances support which are managed by a hashmap
+> >> ihandle->[phandle, DeviceState, Chardev].
+> >>
+> >> Note that a 64bit PCI fix is required for Linux:
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/com=
+mit/?id=3Ddf5be5be8735e
+> >>
+> >> The test command line:
+> >>
+> >> qemu-system-ppc64 \
+> >> -nodefaults \
+> >> -chardev stdio,id=3DSTDIO0,signal=3Doff,mux=3Don \
+> >> -device spapr-vty,id=3Dsvty0,reg=3D0x71000110,chardev=3DSTDIO0 \
+> >> -mon id=3DMON0,chardev=3DSTDIO0,mode=3Dreadline \
+> >> -nographic \
+> >> -vga none \
+> >> -kernel pbuild/kernel-le-guest/arch/powerpc/boot/zImage.pseries \
+> >> -machine pseries,bios=3Doff,cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ib=
+s=3Dbroken \
+> >> -m 4G \
+> >> -enable-kvm \
+> >> -initrd pb/rootfs.cpio.xz \
+> >> -device nec-usb-xhci,id=3Dnec-usb-xhci0 \
+> >> -netdev tap,id=3DTAP0,helper=3D/home/aik/qemu-bridge-helper --br=3Dbr0=
+ \
+> >> -device virtio-net-pci,id=3Dvnet0,netdev=3DTAP0 img/f30le.qcow2 \
+> >> -snapshot \
+> >> -smp 8,threads=3D8 \
+> >> -trace events=3Dqemu_trace_events \
+> >> -d guest_errors \
+> >> -chardev socket,id=3DSOCKET0,server,nowait,path=3Dqemu.mon.ssh54088 \
+> >> -mon chardev=3DSOCKET0,mode=3Dcontrol
+> >>
+> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >=20
+> > It'd be nice to split this patch up a bit, though I'll admit it's not
+> > very obvious where to do so.
+>=20
+>=20
+> v6 is a patchset.
+>=20
+> >> ---
+> >> Changes:
+> >> v5:
+> >> * made instances keep device and chardev pointers
+> >> * removed VIO dependencies
+> >> * print error if RTAS memory is not claimed as it should have been
+> >> * pack FDT as "quiesce"
+> >>
+> >> v4:
+> >> * fixed open
+> >> * validate ihandles in "call-method"
+> >>
+> >> v3:
+> >> * fixed phandles allocation
+> >> * s/__be32/uint32_t/ as we do not normally have __be32 type in qemu
+> >> * fixed size of /chosen/stdout
+> >> * bunch of renames
+> >> * do not create rtas properties at all, let the client deal with it;
+> >> instead setprop allows changing these in the FDT
+> >> * no more packing FDT when bios=3Doff - nobody needs it and getprop do=
+es not
+> >> work otherwise
+> >> * allow updating initramdisk device tree properties (for zImage)
+> >> * added instances
+> >> * fixed stdout on OF's "write"
+> >> * removed special handling for stdout in OF client, spapr-vty handles =
+it
+> >> instead
+> >>
+> >> v2:
+> >> * fixed claim()
+> >> * added "setprop"
+> >> * cleaner client interface and RTAS blobs management
+> >> * boots to petitboot and further to the target system
+> >> * more trace points
+> >> ---
+> >>  hw/ppc/Makefile.objs     |   1 +
+> >>  include/hw/ppc/spapr.h   |  28 +-
+> >>  hw/ppc/spapr.c           | 266 ++++++++++++++--
+> >>  hw/ppc/spapr_hcall.c     |  74 +++--
+> >>  hw/ppc/spapr_of_client.c | 633 +++++++++++++++++++++++++++++++++++++++
+> >>  hw/ppc/trace-events      |  12 +
+> >>  6 files changed, 959 insertions(+), 55 deletions(-)
+> >>  create mode 100644 hw/ppc/spapr_of_client.c
+> >>
+> >> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> >> index 101e9fc59185..20efc0aa6f9b 100644
+> >> --- a/hw/ppc/Makefile.objs
+> >> +++ b/hw/ppc/Makefile.objs
+> >> @@ -6,6 +6,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o=
+ spapr_rtas.o
+> >>  obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o
+> >>  obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o spapr_irq.o
+> >>  obj-$(CONFIG_PSERIES) +=3D spapr_tpm_proxy.o
+> >> +obj-$(CONFIG_PSERIES) +=3D spapr_of_client.o
+> >>  obj-$(CONFIG_SPAPR_RNG) +=3D  spapr_rng.o
+> >>  # IBM PowerNV
+> >>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv=
+_psi.o pnv_occ.o pnv_bmc.o
+> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >> index 61f005c6f686..efc2c70abf99 100644
+> >> --- a/include/hw/ppc/spapr.h
+> >> +++ b/include/hw/ppc/spapr.h
+> >> @@ -105,6 +105,11 @@ struct SpaprCapabilities {
+> >>      uint8_t caps[SPAPR_CAP_NUM];
+> >>  };
+> >> =20
+> >> +typedef struct {
+> >> +    uint64_t start;
+> >> +    uint64_t size;
+> >> +} SpaprOfClaimed;
+> >> +
+> >=20
+> > Can we split more of the fake-OF code into a new file?
+>=20
+>=20
+> Done in v6, I quite reworked it, this is why I told you to ping me
+> before you review this one :)
+
+Oops, I forgot.  Sorry.
+
+> >>  /**
+> >>   * SpaprMachineClass:
+> >>   */
+> >> @@ -160,6 +165,13 @@ struct SpaprMachineState {
+> >>      void *fdt_blob;
+> >>      long kernel_size;
+> >>      bool kernel_le;
+> >> +    uint64_t kernel_addr;
+> >> +    bool bios_enabled;
+> >> +    uint32_t rtas_base;
+> >> +    GArray *claimed; /* array of SpaprOfClaimed */
+> >> +    uint64_t claimed_base;
+> >> +    GHashTable *of_instances; /* ihandle -> SpaprOfInstance */
+> >> +    uint32_t of_instance_last;
+> >>      uint32_t initrd_base;
+> >>      long initrd_size;
+> >>      uint64_t rtc_offset; /* Now used only during incoming migration */
+> >> @@ -510,7 +522,8 @@ struct SpaprMachineState {
+> >>  /* Client Architecture support */
+> >>  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+> >>  #define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
+> >> -#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
+> >> +#define KVMPPC_H_CLIENT         (KVMPPC_HCALL_BASE + 0x5)
+> >> +#define KVMPPC_HCALL_MAX        KVMPPC_H_CLIENT
+> >> =20
+> >>  /*
+> >>   * The hcall range 0xEF00 to 0xEF80 is reserved for use in facilitati=
+ng
+> >> @@ -538,6 +551,11 @@ void spapr_register_hypercall(target_ulong opcode=
+, spapr_hcall_fn fn);
+> >>  target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+> >>                               target_ulong *args);
+> >> =20
+> >> +target_ulong do_client_architecture_support(PowerPCCPU *cpu,
+> >> +                                            SpaprMachineState *spapr,
+> >> +                                            target_ulong addr,
+> >> +                                            target_ulong fdt_bufsize);
+> >> +
+> >>  /* Virtual Processor Area structure constants */
+> >>  #define VPA_MIN_SIZE           640
+> >>  #define VPA_SIZE_OFFSET        0x4
+> >> @@ -769,6 +787,11 @@ struct SpaprEventLogEntry {
+> >>  void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t sp=
+ace);
+> >>  void spapr_events_init(SpaprMachineState *sm);
+> >>  void spapr_dt_events(SpaprMachineState *sm, void *fdt);
+> >> +uint64_t spapr_do_of_client_claim(SpaprMachineState *spapr, uint64_t =
+virt,
+> >> +                                  uint64_t size, uint64_t align);
+> >> +
+> >> +uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *p=
+ath);
+> >> +int spapr_h_client(SpaprMachineState *spapr, target_ulong client_args=
+);
+> >>  void close_htab_fd(SpaprMachineState *spapr);
+> >>  void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr);
+> >>  void spapr_free_hpt(SpaprMachineState *spapr);
+> >> @@ -891,4 +914,7 @@ void spapr_check_pagesize(SpaprMachineState *spapr=
+, hwaddr pagesize,
+> >>  #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the plat=
+form */
+> >> =20
+> >>  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+> >> +
+> >> +void spapr_instantiate_rtas(SpaprMachineState *spapr, uint32_t base);
+> >> +
+> >>  #endif /* HW_SPAPR_H */
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index e62c89b3dd40..76ce8b973082 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -896,6 +896,55 @@ out:
+> >>      return ret;
+> >>  }
+> >> =20
+> >> +/*
+> >> + * Below is a compiled version of RTAS blob and OF client interface e=
+ntry point.
+> >> + *
+> >> + * gcc -nostdlib  -mbig -o spapr-rtas.img spapr-rtas.S
+> >> + * objcopy  -O binary -j .text  spapr-rtas.img spapr-rtas.bin
+> >> + *
+> >> + *   .globl  _start
+> >> + *   _start:
+> >> + *           mr      4,3
+> >> + *           lis     3,KVMPPC_H_RTAS@h
+> >> + *           ori     3,3,KVMPPC_H_RTAS@l
+> >> + *           sc      1
+> >> + *           blr
+> >> + *           mr      4,3
+> >> + *           lis     3,KVMPPC_H_CLIENT@h
+> >> + *           ori     3,3,KVMPPC_H_CLIENT@l
+> >> + *           sc      1
+> >> + *           blr
+> >> + */
+> >> +static struct {
+> >=20
+> > Should be able to add a 'const' here.
+> >=20
+> >> +    uint8_t rtas[20], client[20];
+> >> +} QEMU_PACKED rtas_client_blob =3D {
+> >> +    .rtas =3D {
+> >> +        0x7c, 0x64, 0x1b, 0x78,
+> >> +        0x3c, 0x60, 0x00, 0x00,
+> >> +        0x60, 0x63, 0xf0, 0x00,
+> >> +        0x44, 0x00, 0x00, 0x22,
+> >> +        0x4e, 0x80, 0x00, 0x20
+> >> +    },
+> >> +    .client =3D {
+> >> +        0x7c, 0x64, 0x1b, 0x78,
+> >> +        0x3c, 0x60, 0x00, 0x00,
+> >> +        0x60, 0x63, 0xf0, 0x05,
+> >> +        0x44, 0x00, 0x00, 0x22,
+> >> +        0x4e, 0x80, 0x00, 0x20
+> >> +    }
+> >> +};
+> >=20
+> > I'd split this into two variables - there's not really any connection
+> > between the two, AFAICT.
+> >=20
+> > Note that I'm getting closer to merging the fwnmi stuff at which point
+> > you'll need to pad the RTAS blob with a bunch of extra space for
+> > taking the fwnmi dumps.
+> >=20
+> >> +
+> >> +void spapr_instantiate_rtas(SpaprMachineState *spapr, uint32_t base)
+> >> +{
+> >> +    if (spapr_do_of_client_claim(spapr, base, sizeof(rtas_client_blob=
+=2Ertas),
+> >> +                                 0) !=3D -1) {
+> >=20
+> > Wait.. =3D=3D -1 is the success case?  That's a very surprising interfa=
+ce.
+>=20
+>=20
+> This is a sort of an assert. spapr_do_of_client_claim() returns an
+> address and the client is expected to claim the memory which it wants
+> RTAS to be copied to, this makes sure it either happened or we claimed
+> it here.
+
+Ah!  Ok, I understand.
+
+> >> +        error_report("The OF client did not claim RTAS memory at 0x%x=
+", base);
+> >=20
+> > Error message is hard to follow.  Maybe "Could not claim memory
+> > for RTAS"
+
+Which makes my suggestion here a bad one too.
+
+> >=20
+> >> +    }
+> >> +    spapr->rtas_base =3D base;
+> >> +    cpu_physical_memory_write(base, rtas_client_blob.rtas,
+> >> +                              sizeof(rtas_client_blob.rtas));
+> >> +}
+> >> +
+> >>  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+> >>  {
+> >>      MachineState *ms =3D MACHINE(spapr);
+> >> @@ -980,6 +1029,11 @@ static void spapr_dt_rtas(SpaprMachineState *spa=
+pr, void *fdt)
+> >>      _FDT(fdt_setprop(fdt, rtas, "ibm,lrdr-capacity",
+> >>                       lrdr_capacity, sizeof(lrdr_capacity)));
+> >> =20
+> >> +    if (!spapr->bios_enabled) {
+> >> +        _FDT(fdt_setprop_cell(fdt, rtas, "rtas-size",
+> >> +                              sizeof(rtas_client_blob.rtas)));
+> >> +    }
+> >> +
+> >>      spapr_dt_rtas_tokens(fdt, rtas);
+> >>  }
+> >> =20
+> >> @@ -1057,7 +1111,7 @@ static void spapr_dt_chosen(SpaprMachineState *s=
+papr, void *fdt)
+> >>      }
+> >> =20
+> >>      if (spapr->kernel_size) {
+> >> -        uint64_t kprop[2] =3D { cpu_to_be64(KERNEL_LOAD_ADDR),
+> >> +        uint64_t kprop[2] =3D { cpu_to_be64(spapr->kernel_addr),
+> >=20
+> > Hrm, I really think I would like to see the change to adjustable
+> > kernel_addr split out - it puts a bunch of noise into the main kill
+> > slof patch.
+>=20
+> Sure, I'll do that if we decide to proceed with this.
+>=20
+>=20
+> >=20
+> >>                                cpu_to_be64(spapr->kernel_size) };
+> >> =20
+> >>          _FDT(fdt_setprop(fdt, chosen, "qemu,boot-kernel",
+> >> @@ -1245,7 +1299,8 @@ void *spapr_build_fdt(SpaprMachineState *spapr, =
+bool reset, size_t space)
+> >>      /* Build memory reserve map */
+> >>      if (reset) {
+> >>          if (spapr->kernel_size) {
+> >> -            _FDT((fdt_add_mem_rsv(fdt, KERNEL_LOAD_ADDR, spapr->kerne=
+l_size)));
+> >> +            _FDT((fdt_add_mem_rsv(fdt, spapr->kernel_addr,
+> >> +                                  spapr->kernel_size)));
+> >>          }
+> >>          if (spapr->initrd_size) {
+> >>              _FDT((fdt_add_mem_rsv(fdt, spapr->initrd_base,
+> >> @@ -1268,12 +1323,56 @@ void *spapr_build_fdt(SpaprMachineState *spapr=
+, bool reset, size_t space)
+> >>          }
+> >>      }
+> >> =20
+> >> +    if (!spapr->bios_enabled) {
+> >> +        uint32_t phandle;
+> >> +        int i, offset, proplen =3D 0;
+> >> +        const void *prop;
+> >> +        bool found =3D false;
+> >> +        GArray *phandles =3D g_array_new(false, false, sizeof(uint32_=
+t));
+> >> +
+> >> +        /* Find all predefined phandles */
+> >> +        for (offset =3D fdt_next_node(fdt, -1, NULL);
+> >> +             offset >=3D 0;
+> >> +             offset =3D fdt_next_node(fdt, offset, NULL)) {
+> >> +            prop =3D fdt_getprop_namelen(fdt, offset, "phandle", 7, &=
+proplen);
+> >=20
+> > You can just use fdt_getprop() rather than the namelen variant (that's
+> > only really useful when you don't have a \0-terminated string with the
+> > name).
+>=20
+> Ok, will fix. There are just too many similar functions in libfdt.h and
+> fdt_getprop() could be inlined, probably.
+
+It won't be inlined, but I think it will be tail-call optimized so it
+might as well be.  That is, I think the .o will look something like:
+
+fdt_getprop:
+	jiggle some registers
+	bl	strlen
+	jiggle some regs
+fdt_getprop_namelen:
+	...
+	blr
+
+> >> +            if (prop && proplen =3D=3D sizeof(uint32_t)) {
+> >> +                phandle =3D fdt32_ld(prop);
+> >> +                g_array_append_val(phandles, phandle);
+> >> +            }
+> >> +        }
+> >> +
+> >> +        /* Assign phandles skipping the predefined ones */
+> >> +        for (offset =3D fdt_next_node(fdt, -1, NULL), phandle =3D 1;
+> >> +             offset >=3D 0;
+> >> +             offset =3D fdt_next_node(fdt, offset, NULL), ++phandle) {
+> >> +            prop =3D fdt_getprop_namelen(fdt, offset, "phandle", 7, &=
+proplen);
+> >> +            if (prop) {
+> >> +                continue;
+> >> +            }
+> >> +            /* Check if the current phandle is not allocated already =
+*/
+> >> +            for ( ; ; ++phandle) {
+> >> +                for (i =3D 0, found =3D false; i < phandles->len; ++i=
+) {
+> >> +                    if (phandle =3D=3D g_array_index(phandles, uint32=
+_t, i)) {
+> >> +                        found =3D true;
+> >> +                        break;
+> >> +                    }
+> >> +                }
+> >> +                if (!found) {
+> >> +                    break;
+> >> +                }
+> >> +            }
+> >> +            _FDT(fdt_setprop_cell(fdt, offset, "phandle", phandle));
+> >> +        }
+> >> +        g_array_unref(phandles);
+> >> +    }
+> >> +
+> >>      return fdt;
+> >>  }
+> >> =20
+> >>  static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+> >>  {
+> >> -    return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
+> >> +    SpaprMachineState *spapr =3D opaque;
+> >> +    return (addr & 0x0fffffff) + spapr->kernel_addr;
+> >>  }
+> >> =20
+> >>  static void emulate_spapr_hypercall(PPCVirtualHypervisor *vhyp,
+> >> @@ -1660,24 +1759,89 @@ static void spapr_machine_reset(MachineState *=
+machine)
+> >>       */
+> >>      fdt_addr =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FDT_MAX_SIZE;
+> >> =20
+> >> +    /* Set up the entry state */
+> >> +    if (!spapr->bios_enabled) {
+> >> +        if (spapr->claimed) {
+> >> +            g_array_unref(spapr->claimed);
+> >> +        }
+> >> +        if (spapr->of_instances) {
+> >> +            g_hash_table_unref(spapr->of_instances);
+> >> +        }
+> >> +
+> >> +        spapr->claimed =3D g_array_new(false, false, sizeof(SpaprOfCl=
+aimed));
+> >> +        spapr->of_instances =3D g_hash_table_new(g_direct_hash, g_dir=
+ect_equal);
+> >> +
+> >> +        spapr->claimed_base =3D 0x10000; /* Avoid using the first sys=
+tem page */
+> >> +
+> >> +        spapr_cpu_set_entry_state(first_ppc_cpu, spapr->kernel_addr,
+> >> +                                  spapr->initrd_base);
+> >> +        first_ppc_cpu->env.gpr[4] =3D spapr->initrd_size;
+> >> +
+> >> +        if (spapr_do_of_client_claim(spapr, spapr->kernel_addr,
+> >> +                                  spapr->kernel_size, 0) =3D=3D -1) {
+> >> +            error_report("Memory for kernel is in use");
+> >> +            exit(1);
+> >> +        }
+> >> +        if (spapr_do_of_client_claim(spapr, spapr->initrd_base,
+> >> +                                  spapr->initrd_size, 0) =3D=3D -1) {
+> >> +            error_report("Memory for initramdisk is in use");
+> >> +            exit(1);
+> >> +        }
+> >> +        first_ppc_cpu->env.gpr[1] =3D spapr_do_of_client_claim(spapr,=
+ 0, 0x40000,
+> >> +                                                             0x10000);
+> >> +        if (first_ppc_cpu->env.gpr[1] =3D=3D -1) {
+> >> +            error_report("Memory allocation for stack failed");
+> >> +            exit(1);
+> >> +        }
+> >> +
+> >> +        first_ppc_cpu->env.gpr[5] =3D
+> >> +            spapr_do_of_client_claim(spapr, 0, sizeof(rtas_client_blo=
+b.client),
+> >> +                                     sizeof(rtas_client_blob.client));
+> >> +        if (first_ppc_cpu->env.gpr[5] =3D=3D -1) {
+> >> +            error_report("Memory allocation for OF client failed");
+> >> +            exit(1);
+> >> +        }
+> >> +        cpu_physical_memory_write(first_ppc_cpu->env.gpr[5],
+> >> +                                  rtas_client_blob.client,
+> >> +                                  sizeof(rtas_client_blob.client));
+> >> +    } else {
+> >> +        spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, f=
+dt_addr);
+> >> +        first_ppc_cpu->env.gpr[5] =3D 0; /* 0 =3D kexec !0 =3D prom_i=
+nit */
+> >> +    }
+> >> +
+> >>      fdt =3D spapr_build_fdt(spapr, true, FDT_MAX_SIZE);
+> >> =20
+> >> -    rc =3D fdt_pack(fdt);
+> >> -
+> >> -    /* Should only fail if we've built a corrupted tree */
+> >> -    assert(rc =3D=3D 0);
+> >> -
+> >> -    /* Load the fdt */
+> >> -    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+> >> -    cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
+> >>      g_free(spapr->fdt_blob);
+> >>      spapr->fdt_size =3D fdt_totalsize(fdt);
+> >>      spapr->fdt_initial_size =3D spapr->fdt_size;
+> >>      spapr->fdt_blob =3D fdt;
+> >> =20
+> >> -    /* Set up the entry state */
+> >> -    spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, fdt_a=
+ddr);
+> >> -    first_ppc_cpu->env.gpr[5] =3D 0;
+> >> +    if (spapr->bios_enabled) {
+> >> +        /* Load the fdt */
+> >> +        rc =3D fdt_pack(spapr->fdt_blob);
+> >> +        /* Should only fail if we've built a corrupted tree */
+> >> +        assert(rc =3D=3D 0);
+> >> +
+> >> +        spapr->fdt_size =3D fdt_totalsize(spapr->fdt_blob);
+> >> +        spapr->fdt_initial_size =3D spapr->fdt_size;
+> >> +        qemu_fdt_dumpdtb(spapr->fdt_blob, spapr->fdt_size);
+> >=20
+> > I think we should still have a dumpdtb call on the !bios path.
+> >=20
+> >> +        cpu_physical_memory_write(fdt_addr, spapr->fdt_blob, spapr->f=
+dt_size);
+> >> +    } else {
+> >> +        char *stdout_path =3D spapr_vio_stdout_path(spapr->vio_bus);
+> >> +        int offset =3D fdt_path_offset(fdt, "/chosen");
+> >> +
+> >> +        /*
+> >> +         * SLOF-less setup requires an open instance of stdout for ea=
+rly
+> >> +         * kernel printk. By now all phandles are settled so we can o=
+pen
+> >> +         * the default serial console.
+> >> +         * We skip writing FDT as nothing expects it; OF client inter=
+face is
+> >> +         * going to be used for reading the device tree.
+> >> +         */
+> >> +        if (stdout_path) {
+> >> +            _FDT(fdt_setprop_cell(fdt, offset, "stdout",
+> >> +                                  spapr_of_client_open(spapr, stdout_=
+path)));
+> >> +        }
+> >> +    }
+> >> =20
+> >>      spapr->cas_reboot =3D false;
+> >>  }
+> >> @@ -2897,12 +3061,12 @@ static void spapr_machine_init(MachineState *m=
+achine)
+> >>          uint64_t lowaddr =3D 0;
+> >> =20
+> >>          spapr->kernel_size =3D load_elf(kernel_filename, NULL,
+> >> -                                      translate_kernel_address, NULL,
+> >> +                                      translate_kernel_address, spapr,
+> >>                                        NULL, &lowaddr, NULL, 1,
+> >>                                        PPC_ELF_MACHINE, 0, 0);
+> >>          if (spapr->kernel_size =3D=3D ELF_LOAD_WRONG_ENDIAN) {
+> >>              spapr->kernel_size =3D load_elf(kernel_filename, NULL,
+> >> -                                          translate_kernel_address, N=
+ULL, NULL,
+> >> +                                          translate_kernel_address, s=
+papr, NULL,
+> >>                                            &lowaddr, NULL, 0, PPC_ELF_=
+MACHINE,
+> >>                                            0, 0);
+> >>              spapr->kernel_le =3D spapr->kernel_size > 0;
+> >> @@ -2918,7 +3082,7 @@ static void spapr_machine_init(MachineState *mac=
+hine)
+> >>              /* Try to locate the initrd in the gap between the kernel
+> >>               * and the firmware. Add a bit of space just in case
+> >>               */
+> >> -            spapr->initrd_base =3D (KERNEL_LOAD_ADDR + spapr->kernel_=
+size
+> >> +            spapr->initrd_base =3D (spapr->kernel_addr + spapr->kerne=
+l_size
+> >>                                    + 0x1ffff) & ~0xffff;
+> >>              spapr->initrd_size =3D load_image_targphys(initrd_filenam=
+e,
+> >>                                                       spapr->initrd_ba=
+se,
+> >> @@ -2932,20 +3096,22 @@ static void spapr_machine_init(MachineState *m=
+achine)
+> >>          }
+> >>      }
+> >> =20
+> >> -    if (bios_name =3D=3D NULL) {
+> >> -        bios_name =3D FW_FILE_NAME;
+> >> +    if (spapr->bios_enabled) {
+> >> +        if (bios_name =3D=3D NULL) {
+> >> +            bios_name =3D FW_FILE_NAME;
+> >> +        }
+> >> +        filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> >> +        if (!filename) {
+> >> +            error_report("Could not find LPAR firmware '%s'", bios_na=
+me);
+> >> +            exit(1);
+> >> +        }
+> >> +        fw_size =3D load_image_targphys(filename, 0, FW_MAX_SIZE);
+> >> +        if (fw_size <=3D 0) {
+> >> +            error_report("Could not load LPAR firmware '%s'", filenam=
+e);
+> >> +            exit(1);
+> >> +        }
+> >> +        g_free(filename);
+> >>      }
+> >> -    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> >> -    if (!filename) {
+> >> -        error_report("Could not find LPAR firmware '%s'", bios_name);
+> >> -        exit(1);
+> >> -    }
+> >> -    fw_size =3D load_image_targphys(filename, 0, FW_MAX_SIZE);
+> >> -    if (fw_size <=3D 0) {
+> >> -        error_report("Could not load LPAR firmware '%s'", filename);
+> >> -        exit(1);
+> >> -    }
+> >> -    g_free(filename);
+> >> =20
+> >>      /* FIXME: Should register things through the MachineState's qdev
+> >>       * interface, this is a legacy from the sPAPREnvironment structure
+> >> @@ -3162,6 +3328,32 @@ static void spapr_set_vsmt(Object *obj, Visitor=
+ *v, const char *name,
+> >>      visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> >>  }
+> >> =20
+> >> +static void spapr_get_kernel_addr(Object *obj, Visitor *v, const char=
+ *name,
+> >> +                                  void *opaque, Error **errp)
+> >> +{
+> >> +    visit_type_uint64(v, name, (uint64_t *)opaque, errp);
+> >> +}
+> >> +
+> >> +static void spapr_set_kernel_addr(Object *obj, Visitor *v, const char=
+ *name,
+> >> +                                  void *opaque, Error **errp)
+> >> +{
+> >> +    visit_type_uint64(v, name, (uint64_t *)opaque, errp);
+> >> +}
+> >> +
+> >> +static bool spapr_get_bios_enabled(Object *obj, Error **errp)
+> >> +{
+> >> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
+> >> +
+> >> +    return spapr->bios_enabled;
+> >> +}
+> >> +
+> >> +static void spapr_set_bios_enabled(Object *obj, bool value, Error **e=
+rrp)
+> >> +{
+> >> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
+> >> +
+> >> +    spapr->bios_enabled =3D value;
+> >> +}
+> >> +
+> >>  static char *spapr_get_ic_mode(Object *obj, Error **errp)
+> >>  {
+> >>      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
+> >> @@ -3267,6 +3459,20 @@ static void spapr_instance_init(Object *obj)
+> >>      object_property_add_bool(obj, "vfio-no-msix-emulation",
+> >>                               spapr_get_msix_emulation, NULL, NULL);
+> >> =20
+> >> +    object_property_add(obj, "kernel-addr", "uint64", spapr_get_kerne=
+l_addr,
+> >> +                        spapr_set_kernel_addr, NULL, &spapr->kernel_a=
+ddr,
+> >> +                        &error_abort);
+> >> +    object_property_set_description(obj, "kernel-addr",
+> >> +                                    stringify(KERNEL_LOAD_ADDR)
+> >> +                                    " for -kernel is the default",
+> >> +                                    NULL);
+> >> +    spapr->kernel_addr =3D KERNEL_LOAD_ADDR;
+> >> +    object_property_add_bool(obj, "bios", spapr_get_bios_enabled,
+> >> +                            spapr_set_bios_enabled, NULL);
+> >> +    object_property_set_description(obj, "bios", "Conrols whether to =
+load bios",
+> >> +                                    NULL);
+> >> +    spapr->bios_enabled =3D true;
+> >> +
+> >>      /* The machine class defines the default interrupt controller mod=
+e */
+> >>      spapr->irq =3D smc->irq;
+> >>      object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
+> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> >> index f1799b1b707d..f2d8823d2c3a 100644
+> >> --- a/hw/ppc/spapr_hcall.c
+> >> +++ b/hw/ppc/spapr_hcall.c
+> >> @@ -1660,15 +1660,11 @@ static bool spapr_hotplugged_dev_before_cas(vo=
+id)
+> >>      return false;
+> >>  }
+> >> =20
+> >> -static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> >> -                                                  SpaprMachineState *=
+spapr,
+> >> -                                                  target_ulong opcode,
+> >> -                                                  target_ulong *args)
+> >> +target_ulong do_client_architecture_support(PowerPCCPU *cpu,
+> >> +                                            SpaprMachineState *spapr,
+> >> +                                            target_ulong addr,
+> >> +                                            target_ulong fdt_bufsize)
+> >>  {
+> >> -    /* Working address in data buffer */
+> >> -    target_ulong addr =3D ppc64_phys_to_real(args[0]);
+> >> -    target_ulong fdt_buf =3D args[1];
+> >> -    target_ulong fdt_bufsize =3D args[2];
+> >>      target_ulong ov_table;
+> >>      uint32_t cas_pvr;
+> >>      SpaprOptionVector *ov1_guest, *ov5_guest, *ov5_cas_old;
+> >> @@ -1816,7 +1812,6 @@ static target_ulong h_client_architecture_suppor=
+t(PowerPCCPU *cpu,
+> >> =20
+> >>      if (!spapr->cas_reboot) {
+> >>          void *fdt;
+> >> -        SpaprDeviceTreeUpdateHeader hdr =3D { .version_id =3D 1 };
+> >> =20
+> >>          /* If spapr_machine_reset() did not set up a HPT but one is n=
+ecessary
+> >>           * (because the guest isn't going to use radix) then set it u=
+p here. */
+> >> @@ -1825,21 +1820,7 @@ static target_ulong h_client_architecture_suppo=
+rt(PowerPCCPU *cpu,
+> >>              spapr_setup_hpt_and_vrma(spapr);
+> >>          }
+> >> =20
+> >> -        if (fdt_bufsize < sizeof(hdr)) {
+> >> -            error_report("SLOF provided insufficient CAS buffer "
+> >> -                         TARGET_FMT_lu " (min: %zu)", fdt_bufsize, si=
+zeof(hdr));
+> >> -            exit(EXIT_FAILURE);
+> >> -        }
+> >> -
+> >> -        fdt_bufsize -=3D sizeof(hdr);
+> >> -
+> >> -        fdt =3D spapr_build_fdt(spapr, false, fdt_bufsize);
+> >> -        _FDT((fdt_pack(fdt)));
+> >> -
+> >> -        cpu_physical_memory_write(fdt_buf, &hdr, sizeof(hdr));
+> >> -        cpu_physical_memory_write(fdt_buf + sizeof(hdr), fdt,
+> >> -                                  fdt_totalsize(fdt));
+> >> -        trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
+> >> +        fdt =3D spapr_build_fdt(spapr, !spapr->bios_enabled, fdt_bufs=
+ize);
+> >> =20
+> >>          g_free(spapr->fdt_blob);
+> >>          spapr->fdt_size =3D fdt_totalsize(fdt);
+> >> @@ -1854,6 +1835,41 @@ static target_ulong h_client_architecture_suppo=
+rt(PowerPCCPU *cpu,
+> >>      return H_SUCCESS;
+> >>  }
+> >> =20
+> >> +static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> >> +                                                  SpaprMachineState *=
+spapr,
+> >> +                                                  target_ulong opcode,
+> >> +                                                  target_ulong *args)
+> >> +{
+> >> +    /* Working address in data buffer */
+> >> +    target_ulong addr =3D ppc64_phys_to_real(args[0]);
+> >> +    target_ulong fdt_buf =3D args[1];
+> >> +    target_ulong fdt_bufsize =3D args[2];
+> >> +    target_ulong ret;
+> >> +    SpaprDeviceTreeUpdateHeader hdr =3D { .version_id =3D 1 };
+> >> +
+> >> +    if (fdt_bufsize < sizeof(hdr)) {
+> >> +        error_report("SLOF provided insufficient CAS buffer "
+> >> +                     TARGET_FMT_lu " (min: %zu)", fdt_bufsize, sizeof=
+(hdr));
+> >> +        exit(EXIT_FAILURE);
+> >> +    }
+> >> +
+> >> +    fdt_bufsize -=3D sizeof(hdr);
+> >> +
+> >> +    ret =3D do_client_architecture_support(cpu, spapr, addr, fdt_bufs=
+ize);
+> >> +    if (ret =3D=3D H_SUCCESS) {
+> >> +        _FDT((fdt_pack(spapr->fdt_blob)));
+> >> +        spapr->fdt_size =3D fdt_totalsize(spapr->fdt_blob);
+> >> +        spapr->fdt_initial_size =3D spapr->fdt_size;
+> >> +
+> >> +        cpu_physical_memory_write(fdt_buf, &hdr, sizeof(hdr));
+> >> +        cpu_physical_memory_write(fdt_buf + sizeof(hdr), spapr->fdt_b=
+lob,
+> >> +                                  spapr->fdt_size);
+> >> +        trace_spapr_cas_continue(spapr->fdt_size + sizeof(hdr));
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >>  static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+> >>                                                SpaprMachineState *spap=
+r,
+> >>                                                target_ulong opcode,
+> >> @@ -1998,6 +2014,14 @@ static target_ulong h_update_dt(PowerPCCPU *cpu=
+, SpaprMachineState *spapr,
+> >>      return H_SUCCESS;
+> >>  }
+> >> =20
+> >> +static target_ulong h_client(PowerPCCPU *cpu, SpaprMachineState *spap=
+r,
+> >> +                             target_ulong opcode, target_ulong *args)
+> >=20
+> > As I said in an earlier revision, please explan these names from just
+> > "client", for readability by people who aren't already thinking about
+> > open firmware.
+>=20
+> Yeah, I missed this one.
+>=20
+>=20
+> >=20
+> >> +{
+> >> +    target_ulong client_args =3D ppc64_phys_to_real(args[0]);
+> >> +
+> >> +    return spapr_h_client(spapr, client_args);
+> >> +}
+> >> +
+> >>  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1=
+];
+> >>  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPP=
+C_HCALL_BASE + 1];
+> >>  static spapr_hcall_fn svm_hypercall_table[(SVM_HCALL_MAX - SVM_HCALL_=
+BASE) / 4 + 1];
+> >> @@ -2121,6 +2145,8 @@ static void hypercall_register_types(void)
+> >> =20
+> >>      spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+> >> =20
+> >> +    spapr_register_hypercall(KVMPPC_H_CLIENT, h_client);
+> >> +
+> >>      /* Virtual Processor Home Node */
+> >>      spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
+> >>                               h_home_node_associativity);
+> >> diff --git a/hw/ppc/spapr_of_client.c b/hw/ppc/spapr_of_client.c
+> >> new file mode 100644
+> >> index 000000000000..24d854b76e51
+> >> --- /dev/null
+> >> +++ b/hw/ppc/spapr_of_client.c
+> >=20
+> > I'd suggest expanding this file to cover as much as you can of the
+> > virtual OF stuff, not just the client interface.
+>=20
+> This is done in v6.
+>=20
+>=20
+> >=20
+> >> @@ -0,0 +1,633 @@
+> >> +#include "qemu/osdep.h"
+> >> +#include "qemu-common.h"
+> >> +#include "qapi/error.h"
+> >> +#include "exec/memory.h"
+> >> +#include "hw/ppc/spapr.h"
+> >> +#include "hw/ppc/spapr_vio.h"
+> >> +#include "chardev/char.h"
+> >> +#include "qom/qom-qobject.h"
+> >> +#include "trace.h"
+> >> +
+> >> +typedef struct {
+> >> +    DeviceState *dev;
+> >> +    Chardev *cdev;
+> >> +    uint32_t phandle;
+> >> +} SpaprOfInstance;
+> >> +
+> >> +/*
+> >> + * OF 1275 "nextprop" description suggests is it 32 bytes max but
+> >> + * LoPAPR defines "ibm,query-interrupt-source-number" which is 33 cha=
+rs long.
+> >> + */
+> >> +#define OF_PROPNAME_LEN_MAX 64
+> >> +
+> >> +/* Defined as Big Endian */
+> >> +struct prom_args {
+> >> +    uint32_t service;
+> >> +    uint32_t nargs;
+> >> +    uint32_t nret;
+> >> +    uint32_t args[10];
+> >> +};
+> >> +
+> >> +static void readstr(hwaddr pa, char *buf, int size)
+> >> +{
+> >> +    cpu_physical_memory_read(pa, buf, size - 1);
+> >> +    buf[size - 1] =3D 0;
+> >> +}
+> >=20
+> > I'd still like to see this return some kind of error if it had to
+> > truncate what was passed by the client.
+>=20
+>=20
+> But truncating will produce error anyway - libfdt won't find stuff,
+> etc.
+
+Probably, but I think the error will be much more comprehensible if we
+catch it here.
+
+> >> +
+> >> +static bool _cmpservice(const char *s, size_t len,
+> >=20
+> > Don't use leading _ please - in userland those are reserved for the
+> > system libraries.
+> >=20
+> >> +                        unsigned nargs, unsigned nret,
+> >> +                        const char *s1, size_t len1,
+> >> +                        unsigned nargscheck, unsigned nretcheck)
+> >> +{
+> >> +    if (strcmp(s, s1)) {
+> >> +        return false;
+> >> +    }
+> >> +    if (nargscheck =3D=3D 0 && nretcheck =3D=3D 0) {
+> >> +        return true;
+> >> +    }
+> >> +    if (nargs !=3D nargscheck || nret !=3D nretcheck) {
+> >> +        trace_spapr_of_client_error_param(s, nargscheck, nretcheck, n=
+args,
+> >> +                                          nret);
+> >> +        return false;
+> >> +    }
+> >> +
+> >> +    return true;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_finddevice(const void *fdt, uint32_t nodead=
+dr)
+> >> +{
+> >> +    char node[256];
+> >=20
+> > Is 256 enough?  OF paths can get pretty long...
+>=20
+>=20
+> Hard to imagine that 255 is not enough though. Long parts of the path
+> would be scsi drive id, PHB but in between we can only have a bunch of
+> PCI bridges and these are not so long.
+
+Hm, ok.  I had a look on a Boston and the longest path I see there is
+75 characters, I thought it might be a lot more.
+
+> What do you think is an appropriate limit?
+>=20
+>=20
+> >=20
+> >> +    int ret;
+> >> +
+> >> +    readstr(nodeaddr, node, sizeof(node));
+> >> +    ret =3D fdt_path_offset(fdt, node);
+> >> +    if (ret >=3D 0) {
+> >> +        ret =3D fdt_get_phandle(fdt, ret);
+> >> +    }
+> >> +
+> >> +    return (uint32_t) ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_getprop(const void *fdt, uint32_t nodeph,
+> >> +                                  uint32_t pname, uint32_t valaddr,
+> >> +                                  uint32_t vallen)
+> >> +{
+> >> +    char propname[OF_PROPNAME_LEN_MAX + 1];
+> >> +    uint32_t ret =3D 0;
+> >> +    int proplen =3D 0;
+> >> +    const void *prop;
+> >> +
+> >> +    readstr(pname, propname, sizeof(propname));
+> >> +    prop =3D fdt_getprop_namelen(fdt, fdt_node_offset_by_phandle(fdt,=
+ nodeph),
+> >> +                               propname, strlen(propname), &proplen);
+> >=20
+> > Again, you don't need _namelen.
+> >=20
+> >> +    if (prop) {
+> >> +        int cb =3D MIN(proplen, vallen);
+> >> +
+> >> +        cpu_physical_memory_write(valaddr, prop, cb);
+> >> +        ret =3D cb;
+> >=20
+> > If I'm reading 1275 correctly, the return value should be the
+> > untruncated length of the property.
+>=20
+>=20
+> "Size is either the actual size of the property". I'd think the actual
+> size is what we actually copied to the buffer but @proplen is probably
+> what they meant, I'll change to that and see what breaks.
+>=20
+>=20
+>=20
+> >> +    } else {
+> >> +        ret =3D -1;
+> >> +    }
+> >> +    trace_spapr_of_client_getprop(nodeph, propname, ret);
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_getproplen(const void *fdt, uint32_t nodeph,
+> >> +                                     uint32_t pname)
+> >> +{
+> >> +    char propname[OF_PROPNAME_LEN_MAX + 1];
+> >> +    uint32_t ret =3D 0;
+> >> +    int proplen =3D 0;
+> >> +    const void *prop;
+> >> +
+> >> +    readstr(pname, propname, sizeof(propname));
+> >> +
+> >> +    prop =3D fdt_getprop_namelen(fdt, fdt_node_offset_by_phandle(fdt,=
+ nodeph),
+> >> +                               propname, strlen(propname), &proplen);
+> >=20
+> > No _namelen.
+> >=20
+> >> +    if (prop) {
+> >> +        ret =3D proplen;
+> >> +    } else {
+> >> +        ret =3D -1;
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_setprop(SpaprMachineState *spapr,
+> >> +                                  uint32_t nodeph, uint32_t pname,
+> >> +                                  uint32_t valaddr, uint32_t vallen)
+> >> +{
+> >> +    char propname[OF_PROPNAME_LEN_MAX + 1];
+> >> +    uint32_t ret =3D -1;
+> >> +    int offset;
+> >=20
+> > A comment noting that you're only allowing a very restricted set of
+> > setprops would be good.
+>=20
+>=20
+> Is not that quite clear from the code itself? Okay...
+
+Well, kinda.  The rationale for it would be useful here though.
+
+> >> +    readstr(pname, propname, sizeof(propname));
+> >> +    if (vallen =3D=3D sizeof(uint32_t)) {
+> >> +        uint32_t val32 =3D ldl_be_phys(first_cpu->as, valaddr);
+> >> +
+> >> +        if ((strcmp(propname, "linux,rtas-base") =3D=3D 0) ||
+> >> +            (strcmp(propname, "linux,rtas-entry") =3D=3D 0)) {
+> >> +            spapr->rtas_base =3D val32;
+> >> +        } else if (strcmp(propname, "linux,initrd-start") =3D=3D 0) {
+> >> +            spapr->initrd_base =3D val32;
+> >> +        } else if (strcmp(propname, "linux,initrd-end") =3D=3D 0) {
+> >> +            spapr->initrd_size =3D val32 - spapr->initrd_base;
+> >> +        } else {
+> >> +            goto trace_exit;
+> >> +        }
+> >> +    } else if (vallen =3D=3D sizeof(uint64_t)) {
+> >> +        uint64_t val64 =3D ldq_be_phys(first_cpu->as, valaddr);
+> >> +
+> >> +        if (strcmp(propname, "linux,initrd-start") =3D=3D 0) {
+> >> +            spapr->initrd_base =3D val64;
+> >> +        } else if (strcmp(propname, "linux,initrd-end") =3D=3D 0) {
+> >> +            spapr->initrd_size =3D val64 - spapr->initrd_base;
+> >> +        } else {
+> >> +            goto trace_exit;
+> >> +        }
+> >> +    } else {
+> >> +        goto trace_exit;
+> >> +    }
+> >> +
+> >> +    offset =3D fdt_node_offset_by_phandle(spapr->fdt_blob, nodeph);
+> >> +    if (offset >=3D 0) {
+> >> +        uint8_t data[vallen];
+> >> +
+> >> +        cpu_physical_memory_read(valaddr, data, vallen);
+> >> +        if (!fdt_setprop(spapr->fdt_blob, offset, propname, data, val=
+len)) {
+> >> +            ret =3D vallen;
+> >> +        }
+> >> +    }
+> >> +
+> >> +trace_exit:
+> >> +    trace_spapr_of_client_setprop(nodeph, propname, ret);
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_nextprop(const void *fdt, uint32_t phandle,
+> >> +                                   uint32_t prevaddr, uint32_t namead=
+dr)
+> >> +{
+> >> +    int offset =3D fdt_node_offset_by_phandle(fdt, phandle);
+> >> +    char prev[OF_PROPNAME_LEN_MAX + 1];
+> >> +    const char *tmp;
+> >> +
+> >> +    readstr(prevaddr, prev, sizeof(prev));
+> >> +    for (offset =3D fdt_first_property_offset(fdt, offset);
+> >> +         offset >=3D 0;
+> >> +         offset =3D fdt_next_property_offset(fdt, offset)) {
+> >> +
+> >> +        if (!fdt_getprop_by_offset(fdt, offset, &tmp, NULL)) {
+> >> +            return 0;
+> >> +        }
+> >> +        if (prev[0] =3D=3D '\0' || strcmp(prev, tmp) =3D=3D 0) {
+> >> +            if (prev[0] !=3D '\0') {
+> >> +                offset =3D fdt_next_property_offset(fdt, offset);
+> >> +                if (offset < 0) {
+> >> +                    return 0;
+> >> +                }
+> >> +            }
+> >> +            if (!fdt_getprop_by_offset(fdt, offset, &tmp, NULL)) {
+> >> +                return 0;
+> >> +            }
+> >> +            cpu_physical_memory_write(nameaddr, tmp, strlen(tmp) + 1);
+> >> +            return 1;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_peer(const void *fdt, uint32_t phandle)
+> >> +{
+> >> +    int ret;
+> >> +
+> >> +    if (phandle =3D=3D 0) {
+> >> +        ret =3D fdt_path_offset(fdt, "/");
+> >> +    } else {
+> >> +        ret =3D fdt_next_subnode(fdt, fdt_node_offset_by_phandle(fdt,=
+ phandle));
+> >> +    }
+> >> +
+> >> +    if (ret < 0) {
+> >> +        ret =3D 0;
+> >> +    } else {
+> >> +        ret =3D fdt_get_phandle(fdt, ret);
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_child(const void *fdt, uint32_t phandle)
+> >> +{
+> >> +    int ret =3D fdt_first_subnode(fdt, fdt_node_offset_by_phandle(fdt=
+, phandle));
+> >> +
+> >> +    if (ret < 0) {
+> >> +        ret =3D 0;
+> >> +    } else {
+> >> +        ret =3D fdt_get_phandle(fdt, ret);
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_parent(const void *fdt, uint32_t phandle)
+> >> +{
+> >> +    int ret =3D fdt_parent_offset(fdt, fdt_node_offset_by_phandle(fdt=
+, phandle));
+> >> +
+> >> +    if (ret < 0) {
+> >> +        ret =3D 0;
+> >> +    } else {
+> >> +        ret =3D fdt_get_phandle(fdt, ret);
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static DeviceState *of_client_find_qom_dev(BusState *bus, const char =
+*path)
+> >> +{
+> >> +    BusChild *kid;
+> >> +
+> >> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
+> >> +        const char *p =3D qdev_get_fw_dev_path(kid->child);
+> >> +        BusState *child;
+> >> +
+> >> +        if (p && strcmp(path, p) =3D=3D 0) {
+> >> +            return kid->child;
+> >> +        }
+> >> +        QLIST_FOREACH(child, &kid->child->child_bus, sibling) {
+> >> +            DeviceState *d =3D of_client_find_qom_dev(child, path);
+> >> +
+> >> +            if (d) {
+> >> +                return d;
+> >> +            }
+> >> +        }
+> >> +    }
+> >> +    return NULL;
+> >> +}
+> >> +
+> >> +uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *p=
+ath)
+> >> +{
+> >> +    int offset;
+> >> +    uint32_t ret =3D 0;
+> >> +    SpaprOfInstance *inst;
+> >> +
+> >> +    if (spapr->of_instance_last =3D=3D 0xFFFFFFFF) {
+> >> +        /* We do not recycle ihandles yet */
+> >> +        goto trace_exit;
+> >> +    }
+> >> +    offset =3D fdt_path_offset(spapr->fdt_blob, path);
+> >> +    if (offset < 0) {
+> >> +        trace_spapr_of_client_error_unknown_path(path);
+> >> +        goto trace_exit;
+> >> +    }
+> >> +
+> >> +    inst =3D g_new(SpaprOfInstance, 1);
+> >> +    inst->phandle =3D fdt_get_phandle(spapr->fdt_blob, offset);
+> >> +    g_assert(inst->phandle);
+> >> +    ++spapr->of_instance_last;
+> >> +    inst->dev =3D of_client_find_qom_dev(sysbus_get_default(), path);
+> >> +    g_hash_table_insert(spapr->of_instances,
+> >> +                        GINT_TO_POINTER(spapr->of_instance_last),
+> >> +                        inst);
+> >> +    ret =3D spapr->of_instance_last;
+> >> +
+> >> +    if (inst->dev) {
+> >> +        const char *cdevstr =3D object_property_get_str(OBJECT(inst->=
+dev),
+> >> +                                                      "chardev", NULL=
+);
+> >> +
+> >> +        if (cdevstr) {
+> >> +            inst->cdev =3D qemu_chr_find(cdevstr);
+> >> +        }
+> >> +    }
+> >> +
+> >> +trace_exit:
+> >> +    trace_spapr_of_client_open(path, inst ? inst->phandle : 0, ret);
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_open(SpaprMachineState *spapr, uint32_t pat=
+haddr)
+> >> +{
+> >> +    char path[256];
+> >> +
+> >> +    readstr(pathaddr, path, sizeof(path));
+> >> +
+> >> +    return spapr_of_client_open(spapr, path);
+> >> +}
+> >> +
+> >> +static void of_client_close(SpaprMachineState *spapr, uint32_t ihandl=
+e)
+> >> +{
+> >> +    if (!g_hash_table_remove(spapr->of_instances, GINT_TO_POINTER(iha=
+ndle))) {
+> >> +        trace_spapr_of_client_error_unknown_ihandle_close(ihandle);
+> >> +    }
+> >> +}
+> >> +
+> >> +static uint32_t of_client_instance_to_package(SpaprMachineState *spap=
+r,
+> >> +                                              uint32_t ihandle)
+> >> +{
+> >> +    gpointer instp =3D g_hash_table_lookup(spapr->of_instances,
+> >> +                                        GINT_TO_POINTER(ihandle));
+> >> +
+> >> +    if (!instp) {
+> >> +        return -1;
+> >> +    }
+> >> +
+> >> +    return ((SpaprOfInstance *)instp)->phandle;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_package_to_path(const void *fdt, uint32_t p=
+handle,
+> >> +                                          uint32_t buf, uint32_t len)
+> >> +{
+> >> +    char tmp[256];
+> >> +
+> >> +    if (0 =3D=3D fdt_get_path(fdt, fdt_node_offset_by_phandle(fdt, ph=
+andle), tmp,
+> >> +                          sizeof(tmp))) {
+> >> +        tmp[sizeof(tmp) - 1] =3D 0;
+> >> +        cpu_physical_memory_write(buf, tmp, MIN(len, strlen(tmp)));
+> >> +    }
+> >> +    return len;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_instance_to_path(SpaprMachineState *spapr,
+> >> +                                           uint32_t ihandle, uint32_t=
+ buf,
+> >> +                                           uint32_t len)
+> >> +{
+> >> +    uint32_t phandle =3D of_client_instance_to_package(spapr, ihandle=
+);
+> >> +
+> >> +    if (phandle !=3D -1) {
+> >> +        return of_client_package_to_path(spapr->fdt_blob, phandle, bu=
+f, len);
+> >> +    }
+> >> +
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_write(SpaprMachineState *spapr, uint32_t ih=
+andle,
+> >> +                                uint32_t buf, uint32_t len)
+> >> +{
+> >> +    char tmp[256];
+> >> +    int toread, toprint, cb =3D MIN(len, 1024);
+> >> +    SpaprOfInstance *inst =3D (SpaprOfInstance *)
+> >> +        g_hash_table_lookup(spapr->of_instances, GINT_TO_POINTER(ihan=
+dle));
+> >> +
+> >> +    while (cb > 0) {
+> >> +        toread =3D MIN(cb + 1, sizeof(tmp));
+> >> +        readstr(buf, tmp, toread);
+> >> +        toprint =3D strlen(tmp);
+> >> +        if (inst && inst->cdev) {
+> >> +            toprint =3D qemu_chr_write(inst->cdev, (uint8_t *) tmp, t=
+oprint,
+> >> +                                     true);
+> >> +        } else {
+> >> +            /* We normally open stdout so this is fallback */
+> >> +            printf("DBG[%d]%s", ihandle, tmp);
+> >> +        }
+> >> +        buf +=3D toprint;
+> >> +        cb -=3D toprint;
+> >> +    }
+> >> +
+> >> +    return len;
+> >> +}
+> >> +
+> >> +static bool of_client_claim_avail(GArray *claimed, uint64_t virt, uin=
+t64_t size)
+> >> +{
+> >> +    int i;
+> >> +    SpaprOfClaimed *c;
+> >> +
+> >> +    for (i =3D 0; i < claimed->len; ++i) {
+> >> +        c =3D &g_array_index(claimed, SpaprOfClaimed, i);
+> >> +        if ((c->start <=3D virt && virt < c->start + c->size) ||
+> >> +            (virt <=3D c->start && c->start < virt + size)) {
+> >> +            return false;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    return true;
+> >> +}
+> >> +
+> >> +static void of_client_claim_add(GArray *claimed, uint64_t virt, uint6=
+4_t size)
+> >> +{
+> >> +    SpaprOfClaimed newclaim;
+> >> +
+> >> +    newclaim.start =3D virt;
+> >> +    newclaim.size =3D size;
+> >> +    g_array_append_val(claimed, newclaim);
+> >> +}
+> >> +
+> >> +/*
+> >> + * "claim" claims memory at @virt if @align=3D=3D0; otherwise it allo=
+cates
+> >> + * memory at the requested alignment.
+> >> + */
+> >> +uint64_t spapr_do_of_client_claim(SpaprMachineState *spapr, uint64_t =
+virt,
+> >> +                                  uint64_t size, uint64_t align)
+> >> +{
+> >> +    uint32_t ret;
+> >> +
+> >> +    if (align =3D=3D 0) {
+> >> +        if (!of_client_claim_avail(spapr->claimed, virt, size)) {
+> >> +            return -1;
+> >> +        }
+> >> +        ret =3D virt;
+> >> +    } else {
+> >> +        align =3D pow2ceil(align);
+> >=20
+> > Should this be a pow2ceil, or should it just return an error if align
+> > is not a power of 2. > Note that aligning something to 4 bytes will
+> > (probably) make it *not* aligned to 3 bytes.
+>=20
+> I did not see any notes about the specific alignment requirements here,
+> the idea is that clients may just not expect unaligned memory at all; I
+> could probably just drop it and see what happens...
+
+I don't follow you.  Isn't the align value coming from the client?
+
+> >> +        spapr->claimed_base =3D (spapr->claimed_base + align - 1) & ~=
+(align - 1);
+> >> +        while (1) {
+> >> +            if (spapr->claimed_base >=3D spapr->rma_size) {
+> >> +                perror("Out of memory");
+> >=20
+> > error_report() or qemu_log() or something and a message with some more
+> > specificity, please.
+>=20
+>=20
+> What kind of specificity is missing here?
+
+That it's on the OF claim interface specifically, and how much they
+were trying to claim.
+
+> >> +                return -1;
+> >> +            }
+> >> +            if (of_client_claim_avail(spapr->claimed, spapr->claimed_=
+base,
+> >> +                                      size)) {
+> >> +                break;
+> >> +            }
+> >> +            spapr->claimed_base +=3D size;
+> >> +        }
+> >> +        ret =3D spapr->claimed_base;
+> >> +    }
+> >> +
+> >> +    spapr->claimed_base =3D MAX(spapr->claimed_base, ret + size);
+> >> +    of_client_claim_add(spapr->claimed, virt, size);
+> >> +    trace_spapr_of_client_claim(virt, size, align, ret);
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_claim(SpaprMachineState *spapr, uint32_t vi=
+rt,
+> >> +                                uint32_t size, uint32_t align)
+> >> +{
+> >> +    if (align) {
+> >> +        return -1;
+> >> +    }
+> >> +    if (!of_client_claim_avail(spapr->claimed, virt, size)) {
+> >> +        return -1;
+> >> +    }
+> >> +
+> >> +    spapr->claimed_base =3D MAX(spapr->claimed_base, virt + size);
+> >> +    of_client_claim_add(spapr->claimed, virt, size);
+> >> +    trace_spapr_of_client_claim(virt, size, align, virt);
+> >=20
+> > Huh.  So do_of_client_claim() is never used from of_client_claim(),
+> > only from "internal" claimers.  It definitely needs a different name.
+>=20
+>=20
+> It is used in v6. Linux always passes non-zero @virt but grub does not.
+>=20
+>=20
+> >> +    return virt;
+> >> +}
+> >> +
+> >> +static uint32_t of_client_call_method(SpaprMachineState *spapr,
+> >> +                                      uint32_t methodaddr, uint32_t i=
+handle,
+> >> +                                      uint32_t param, uint32_t *ret2)
+> >> +{
+> >> +    uint32_t ret =3D -1;
+> >> +    char path[256] =3D "", method[256] =3D "";
+> >> +    uint32_t phandle =3D of_client_instance_to_package(spapr, ihandle=
+);
+> >> +    int offset;
+> >> +
+> >> +    if (!ihandle) {
+> >> +        goto trace_exit;
+> >> +    }
+> >> +
+> >> +    readstr(methodaddr, method, sizeof(method));
+> >> +    phandle =3D of_client_instance_to_package(spapr, ihandle);
+> >> +    if (!phandle) {
+> >> +        goto trace_exit;
+> >> +    }
+> >> +
+> >> +    offset =3D fdt_node_offset_by_phandle(spapr->fdt_blob, phandle);
+> >> +    if (offset < 0) {
+> >> +        goto trace_exit;
+> >> +    }
+> >> +
+> >> +    if (fdt_get_path(spapr->fdt_blob, offset, path, sizeof(path))) {
+> >> +        goto trace_exit;
+> >> +    }
+> >> +
+> >> +    if (strcmp(path, "/") =3D=3D 0) {
+> >> +        if (strcmp(method, "ibm,client-architecture-support") =3D=3D =
+0) {
+> >> +
+> >> +#define FDT_MAX_SIZE            0x100000
+> >> +            ret =3D do_client_architecture_support(POWERPC_CPU(first_=
+cpu), spapr,
+> >> +                                                 param, FDT_MAX_SIZE);
+> >> +            *ret2 =3D 0;
+> >> +        }
+> >> +    } else if (strcmp(path, "/rtas") =3D=3D 0) {
+> >> +        if (strcmp(method, "instantiate-rtas") =3D=3D 0) {
+> >> +            spapr_instantiate_rtas(spapr, param);
+> >> +            ret =3D 0;
+> >> +            *ret2 =3D param; /* rtasbase */
+> >> +        }
+> >> +    } else {
+> >> +        trace_spapr_of_client_error_unknown_method(method);
+> >> +    }
+> >> +
+> >> +trace_exit:
+> >> +    trace_spapr_of_client_method(ihandle, method, param, phandle, pat=
+h, ret);
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static void of_client_quiesce(SpaprMachineState *spapr)
+> >> +{
+> >> +    int rc =3D fdt_pack(spapr->fdt_blob);
+> >> +    /* Should only fail if we've built a corrupted tree */
+> >> +    assert(rc =3D=3D 0);
+> >> +
+> >> +    spapr->fdt_size =3D fdt_totalsize(spapr->fdt_blob);
+> >> +    spapr->fdt_initial_size =3D spapr->fdt_size;
+> >> +}
+> >> +
+> >> +int spapr_h_client(SpaprMachineState *spapr, target_ulong of_client_a=
+rgs)
+> >> +{
+> >> +    struct prom_args args =3D { 0 };
+> >> +    char service[64];
+> >> +    unsigned nargs, nret;
+> >> +    int i, servicelen;
+> >> +
+> >> +    cpu_physical_memory_read(of_client_args, &args, sizeof(args));
+> >> +    nargs =3D be32_to_cpu(args.nargs);
+> >> +    nret =3D be32_to_cpu(args.nret);
+> >> +    readstr(be32_to_cpu(args.service), service, sizeof(service));
+> >> +    servicelen =3D strlen(service);
+> >> +
+> >> +#define cmpservice(s, a, r) \
+> >> +    _cmpservice(service, servicelen, nargs, nret, (s), sizeof(s), (a)=
+, (r))
+> >> +
+> >> +    if (cmpservice("finddevice", 1, 1)) {
+> >> +        args.args[nargs] =3D of_client_finddevice(spapr->fdt_blob,
+> >> +                                                be32_to_cpu(args.args=
+[0]));
+> >> +    } else if (cmpservice("getprop", 4, 1)) {
+> >> +        args.args[nargs] =3D of_client_getprop(spapr->fdt_blob,
+> >> +                                             be32_to_cpu(args.args[0]=
+),
+> >> +                                             be32_to_cpu(args.args[1]=
+),
+> >> +                                             be32_to_cpu(args.args[2]=
+),
+> >> +                                             be32_to_cpu(args.args[3]=
+));
+> >> +    } else if (cmpservice("getproplen", 2, 1)) {
+> >> +        args.args[nargs] =3D of_client_getproplen(spapr->fdt_blob,
+> >> +                                                be32_to_cpu(args.args=
+[0]),
+> >> +                                                be32_to_cpu(args.args=
+[1]));
+> >> +    } else if (cmpservice("setprop", 4, 1)) {
+> >> +        args.args[nargs] =3D of_client_setprop(spapr,
+> >> +                                             be32_to_cpu(args.args[0]=
+),
+> >> +                                             be32_to_cpu(args.args[1]=
+),
+> >> +                                             be32_to_cpu(args.args[2]=
+),
+> >> +                                             be32_to_cpu(args.args[3]=
+));
+> >> +    } else if (cmpservice("nextprop", 3, 1)) {
+> >> +        args.args[nargs] =3D of_client_nextprop(spapr->fdt_blob,
+> >> +                                              be32_to_cpu(args.args[0=
+]),
+> >> +                                              be32_to_cpu(args.args[1=
+]),
+> >> +                                              be32_to_cpu(args.args[2=
+]));
+> >> +    } else if (cmpservice("peer", 1, 1)) {
+> >> +        args.args[nargs] =3D of_client_peer(spapr->fdt_blob,
+> >> +                                          be32_to_cpu(args.args[0]));
+> >> +    } else if (cmpservice("child", 1, 1)) {
+> >> +        args.args[nargs] =3D of_client_child(spapr->fdt_blob,
+> >> +                                           be32_to_cpu(args.args[0]));
+> >> +    } else if (cmpservice("parent", 1, 1)) {
+> >> +        args.args[nargs] =3D of_client_parent(spapr->fdt_blob,
+> >> +                                            be32_to_cpu(args.args[0])=
+);
+> >> +    } else if (cmpservice("open", 1, 1)) {
+> >> +        args.args[nargs] =3D of_client_open(spapr, be32_to_cpu(args.a=
+rgs[0]));
+> >> +    } else if (cmpservice("close", 1, 0)) {
+> >> +        of_client_close(spapr, be32_to_cpu(args.args[0]));
+> >> +    } else if (cmpservice("instance-to-package", 1, 1)) {
+> >> +        args.args[nargs] =3D
+> >> +            of_client_instance_to_package(spapr,
+> >> +                                          be32_to_cpu(args.args[0]));
+> >> +    } else if (cmpservice("package-to-path", 3, 1)) {
+> >> +        args.args[nargs] =3D of_client_package_to_path(spapr->fdt_blo=
+b,
+> >> +                                                     be32_to_cpu(args=
+=2Eargs[0]),
+> >> +                                                     be32_to_cpu(args=
+=2Eargs[1]),
+> >> +                                                     be32_to_cpu(args=
+=2Eargs[2]));
+> >> +    } else if (cmpservice("instance-to-path", 3, 1)) {
+> >> +        args.args[nargs] =3D
+> >> +            of_client_instance_to_path(spapr,
+> >> +                                       be32_to_cpu(args.args[0]),
+> >> +                                       be32_to_cpu(args.args[1]),
+> >> +                                       be32_to_cpu(args.args[2]));
+> >> +    } else if (cmpservice("write", 3, 1)) {
+> >> +        args.args[nargs] =3D of_client_write(spapr,
+> >> +                                           be32_to_cpu(args.args[0]),
+> >> +                                           be32_to_cpu(args.args[1]),
+> >> +                                           be32_to_cpu(args.args[2]));
+> >> +    } else if (cmpservice("claim", 3, 1)) {
+> >> +        args.args[nargs] =3D of_client_claim(spapr,
+> >> +                                           be32_to_cpu(args.args[0]),
+> >> +                                           be32_to_cpu(args.args[1]),
+> >> +                                           be32_to_cpu(args.args[2]));
+> >> +    } else if (cmpservice("call-method", 3, 2)) {
+> >> +        args.args[nargs] =3D of_client_call_method(spapr,
+> >> +                                                 be32_to_cpu(args.arg=
+s[0]),
+> >> +                                                 be32_to_cpu(args.arg=
+s[1]),
+> >> +                                                 be32_to_cpu(args.arg=
+s[2]),
+> >> +                                                 &args.args[nargs + 1=
+]);
+> >> +    } else if (cmpservice("quiesce", 0, 0)) {
+> >> +        of_client_quiesce(spapr);
+> >> +    } else if (cmpservice("exit", 0, 0)) {
+> >> +        error_report("Stopped as the VM requested \"exit\"");
+> >> +        vm_stop(RUN_STATE_PAUSED);
+> >> +    } else {
+> >> +        trace_spapr_of_client_error_unknown_service(service, nargs, n=
+ret);
+> >> +        args.args[nargs] =3D -1;
+> >=20
+> > You've never bounds checked nargs at this point.
+> >=20
+> >> +    }
+> >> +
+> >> +    for (i =3D 0; i < nret; ++i) {
+> >=20
+> > And likewise you might not have bounds checked nret.
+>=20
+> Oh, true. Thanks,
+>=20
+>=20
+> >=20
+> >> +        args.args[nargs + i] =3D be32_to_cpu(args.args[nargs + i]);
+> >> +    }
+> >> +    cpu_physical_memory_write(of_client_args, &args, sizeof(args));
+> >> +
+> >> +    return H_SUCCESS;
+> >> +}
+> >> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> >> index 9ea620f23c85..e2d1e58d07c3 100644
+> >> --- a/hw/ppc/trace-events
+> >> +++ b/hw/ppc/trace-events
+> >> @@ -21,6 +21,18 @@ spapr_update_dt(unsigned cb) "New blob %u bytes"
+> >>  spapr_update_dt_failed_size(unsigned cbold, unsigned cbnew, unsigned =
+magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+> >>  spapr_update_dt_failed_check(unsigned cbold, unsigned cbnew, unsigned=
+ magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+> >> =20
+> >> +# spapr_client.c
+> >> +spapr_of_client_error_param(const char *method, int nargscheck, int n=
+retcheck, int nargs, int nret) "%s takes/returns %d/%d, not %d/%d"
+> >> +spapr_of_client_error_unknown_service(const char *service, int nargs,=
+ int nret) "%s args=3D%d rets=3D%d"
+> >> +spapr_of_client_error_unknown_method(const char *method) "%s"
+> >> +spapr_of_client_error_unknown_ihandle_close(uint32_t ihandle) "0x%x"
+> >> +spapr_of_client_error_unknown_path(const char *path) "%s"
+> >> +spapr_of_client_claim(uint32_t virt, uint32_t size, uint32_t align, u=
+int32_t ret) "virt=3D0x%x size=3D0x%x align=3D0x%x =3D> 0x%x"
+> >> +spapr_of_client_method(uint32_t ihandle, const char *method, uint32_t=
+ param, uint32_t phandle, const char *path, uint32_t ret) "0x%x \"%s\" para=
+m=3D0x%x ph=3D0x%x \"%s\" =3D> 0x%x"
+> >> +spapr_of_client_getprop(uint32_t ph, const char *prop, uint32_t ret) =
+"phandle=3D0x%x \"%s\" =3D> 0x%x"
+> >> +spapr_of_client_setprop(uint32_t ph, const char *prop, uint32_t ret) =
+"phandle=3D0x%x \"%s\" =3D> 0x%x"
+> >> +spapr_of_client_open(const char *path, uint32_t phandle, uint32_t iha=
+ndle) "%s 0x%x =3D> 0x%x"
+> >> +
+> >>  # spapr_hcall_tpm.c
+> >>  spapr_h_tpm_comm(const char *device_path, uint64_t operation) "tpm_de=
+vice_path=3D%s operation=3D0x%"PRIu64
+> >>  spapr_tpm_execute(uint64_t data_in, uint64_t data_in_sz, uint64_t dat=
+a_out, uint64_t data_out_sz) "data_in=3D0x%"PRIx64", data_in_sz=3D%"PRIu64"=
+, data_out=3D0x%"PRIx64", data_out_sz=3D%"PRIu64
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--x0KprKst+ZOYEj2z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4n7HQACgkQbDjKyiDZ
+s5JX1g/+KYHkeyP9RiEYRB9O9XLRZilzDt0HT5vB2EHjHGXfsaX3wvOixqIYv6Vs
+MQnrSXgh1I62UAEoZx3yfST+niXNx+XAFpuF+/nqqOVSUXBMJrThnyJPgGw62tgD
+AjjyEMLT5LFFHPKWDONuvRBQL0ATPDzBMfLA8D4BepApRnRRAIskWe7GpuKtcmo+
+gGVefQV3Uq1uQNnjOt9HzXoBqEo4aBbsVIH5fYyWJUIF78PQvPOaYOR4x5v1D/+r
+JeZ+o3+EE02XmqMLGSNjMiIOEXKE8yYc6ZuTQcxOXJzBH/iajMNLhY7VJrIMukI8
+g4G6wZLOWon9MwQASUa5XNXj3OiPoW7nGOxJpr5mMst+G458dlAuErreq8/kzUEl
+4gVEay/55VDqRbDN0/O7pLperKspfJSOQyy8jLwe4LzSOcRqOFJ8T6rGODq7sLhg
+F8vGViExZjsgkSpwW5gcvN1NxBH0GhJmikluVBaNdYziC1iiVylisCDVX2zWUi7s
+6BuFoKrWxRwQA3Pz6TtoiUq1JYkyalC7v8ae9Y9xtlM9HHxo6SjXVQhEza64awiQ
+HYLr0RweLDBmE6L3+KjvM1nek7L2NJNZdy8wUIMQar+dzrggmk/uZ/aDttqc4Gzy
+TQDHKePovqCu78DIFDTLn6dcNkR5MS84bo369ddN/TYBL3wfdgo=
+=scjL
+-----END PGP SIGNATURE-----
+
+--x0KprKst+ZOYEj2z--
 
