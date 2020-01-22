@@ -2,160 +2,97 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA646C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 23:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7604EC32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 23:29:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C92724655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 23:15:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A56D24655
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 23:29:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P2b/6MM2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C92724655
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDrNlOFT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A56D24655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuPDd-0001ba-NE
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 18:15:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39607)
+	id 1iuPR4-0003kb-BE
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 18:29:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iuPCj-0000sf-C6
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 18:14:34 -0500
+ (envelope-from <philmd@redhat.com>) id 1iuPQT-0003JN-MR
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 18:28:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iuPCg-0007Rd-9c
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 18:14:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30317
+ (envelope-from <philmd@redhat.com>) id 1iuPQR-0001Bx-Mq
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 18:28:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27338
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iuPCc-0007KJ-Ds
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 18:14:27 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuPQR-0001BF-Fs
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 18:28:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579734865;
+ s=mimecast20190719; t=1579735722;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4BQlK5AeGG/DQiKM3AwFuwKR2vcKj8uZY5bojWALn8o=;
- b=P2b/6MM2slriKx21l2/jaE/dd17JMgzk1lgkJxr66L/Uy1asfOQI6X54GICsELr2KtTl8p
- LSyPWgyQxG1ds8Uf977Id0cb+XHCcD4ZraHDZVtQOiltPUvRuPIXYmH4uwvJmoUkC4MFb2
- UtbkErUKspKsOggJhk8XEVkAs2d1r5g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-vH4sYW-ZM7OmPtrk5rT5JQ-1; Wed, 22 Jan 2020 18:14:23 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 472DF8D4261;
- Wed, 22 Jan 2020 23:14:22 +0000 (UTC)
-Received: from [10.18.17.116] (dhcp-17-116.bos.redhat.com [10.18.17.116])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BAA005D9E2;
- Wed, 22 Jan 2020 23:14:15 +0000 (UTC)
-Subject: Re: [PATCH v3 0/2] ide: Fix incorrect handling of some PRDTs and add
- the corresponding unit-test
-To: Alexander Popov <alex.popov@linux.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, qemu-stable@nongnu.org, pmatouse@redhat.com,
- sstabellini@kernel.org, mdroth@linux.vnet.ibm.com, pjp@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>,
- Kashyap Chamarthy <kashyap.cv@gmail.com>,
- Darren Kenny <darren.kenny@oracle.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
-References: <20191223175117.508990-1-alex.popov@linux.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <65254fe8-7865-f045-9e0c-1d56dd9fe8eb@redhat.com>
-Date: Wed, 22 Jan 2020 18:14:15 -0500
+ in-reply-to:in-reply-to:references:references;
+ bh=tAL/NYp36LhOZuHZIGYxG6F/UGpw5zX58J0lKHxSjPs=;
+ b=SDrNlOFTYx6u3zIhmb5RCLT7ZBukS5Tvi3tM5r/TahDKk8jqCtxFmWDAP1nijZWG0R4JyC
+ PW8C5upqQmUw7NPO/v+zIzmOr57/aygjjzrbkJrxTvYglvNi8dKhEOM+nwc9eCtgXhTjR6
+ SwBe3yO2IB08uhViTgXNEhqjyfUhu/8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-cTM0WH-wMPiUSRFhvrrMHA-1; Wed, 22 Jan 2020 18:28:40 -0500
+Received: by mail-wr1-f70.google.com with SMTP id c6so830804wrm.18
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 15:28:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tAL/NYp36LhOZuHZIGYxG6F/UGpw5zX58J0lKHxSjPs=;
+ b=No1IoB70JsBHTzo9f0XlMeUcTuDViZAa5EGZpYgtS2dO745jtq1UmB6GkH0tZIsdwH
+ 0WlXOKetpqJBiO8DfBkpkc8PsasHu8YZ63Tf33OBp31bJ2weisEO714TqJdhtkXRtQXK
+ d3EMmAXyY9ciA3DgjwJUYhsRZ62IlJVBhp+g84v48GlQCHZauz/Jr3JcymtYWmW55i7j
+ qDdUggkMx7EtKejjqb8nOPWlfk/bOleHu0uuVRHO9s45cCwZYXN/qD9JOYQwE2znUwxc
+ 4ylAoRxhRaxNXCEJPA9QdTnUaWSEHa/ch05CzeeLy4ZcdMj0mG5vXoSFc/u+29AU9qI9
+ 5MmA==
+X-Gm-Message-State: APjAAAXcSezMubuPu01TjgpZzaQeDTD6v5sVBLR6qmUQByQOHhci6DCc
+ SZ12Ogoc419TJFCx5BstzqhwlITS9NXdyClq11dJAdk3v1BkrgzxEmT9NOHVtMBs+FD6KjyYMwp
+ gbFSpUxFGbD6U7a4=
+X-Received: by 2002:a7b:c08d:: with SMTP id r13mr605903wmh.104.1579735719746; 
+ Wed, 22 Jan 2020 15:28:39 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy/scKYg31dmqbA1i3IdkqJDWoPu6OpjuFMRA7tSzXtHzD/kYhm7YkvjmzeA01qF55eSneA0Q==
+X-Received: by 2002:a7b:c08d:: with SMTP id r13mr605885wmh.104.1579735719439; 
+ Wed, 22 Jan 2020 15:28:39 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id p17sm506412wrx.20.2020.01.22.15.28.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Jan 2020 15:28:38 -0800 (PST)
+Subject: Re: [PULL 00/11] target/hppa patch queue
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Sven Schnelle <svens@stackframe.org>, Helge Deller <deller@gmx.de>
+References: <20200122023256.27556-1-richard.henderson@linaro.org>
+ <b7c91905-f1bb-a3ea-e39c-08a27b2ff36e@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <da98d952-80e6-750a-3324-32723037b94f@redhat.com>
+Date: Thu, 23 Jan 2020 00:28:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191223175117.508990-1-alex.popov@linux.com>
+In-Reply-To: <b7c91905-f1bb-a3ea-e39c-08a27b2ff36e@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: vH4sYW-ZM7OmPtrk5rT5JQ-1
+X-MC-Unique: cTM0WH-wMPiUSRFhvrrMHA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -171,41 +108,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 12/23/19 12:51 PM, Alexander Popov wrote:
-> Fuzzing the Linux kernel with syzkaller allowed to find how to crash qemu
-> using a special SCSI_IOCTL_SEND_COMMAND. It hits the assertion in
-> ide_dma_cb() introduced in the commit a718978ed58a in July 2015.
+On 1/22/20 3:47 AM, Richard Henderson wrote:
+> On 1/21/20 4:32 PM, Richard Henderson wrote:
+>> The following changes since commit 3e08b2b9cb64bff2b73fa9128c0e49bfcde0dd40:
+>>
+>>    Merge remote-tracking branch 'remotes/philmd-gitlab/tags/edk2-next-20200121' into staging (2020-01-21 15:29:25 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>    https://github.com/rth7680/qemu.git tags/pull-pa-20200121
+>>
+>> for you to fetch changes up to a66cfb7306b7cf7a023e11536fdd942f3f9276b9:
+>>
+>>    target/hppa: Allow, but diagnose, LDCW aligned only mod 4 (2020-01-21 15:51:54 -1000)
+>>
+>> ----------------------------------------------------------------
+>> Improve LASI emulation
+>> Add Artist graphics
+>> Fix main memory allocation
+>> Improve LDCW emulation wrt real hw
 > 
-> This patch series fixes incorrect handling of some PRDTs in ide_dma_cb()
-> and improves the ide-test to cover more PRDT cases (including one
-> that causes that particular qemu crash).
-> 
-> Changes from v2 (thanks to Kevin Wolf for the feedback):
->  - the assertion about prepare_buf() return value is improved;
->  - the patch order is reversed to keep the tree bisectable;
->  - the unit-test performance is improved -- now it runs 8 seconds
->    instead of 3 minutes on my laptop.
-> 
-> Alexander Popov (2):
->   ide: Fix incorrect handling of some PRDTs in ide_dma_cb()
->   tests/ide-test: Create a single unit-test covering more PRDT cases
-> 
->  hw/ide/core.c    |  30 +++++---
->  tests/ide-test.c | 174 ++++++++++++++++++++---------------------------
->  2 files changed, 96 insertions(+), 108 deletions(-)
-> 
+> Ho hum.  Cancel this.  It breaks the hppa boot-serial test.
 
-Thanks, applied to my IDE tree:
+This is due to patch #7 "Add emulation of Artist graphics":
 
-https://github.com/jnsnow/qemu/commits/ide
-https://github.com/jnsnow/qemu.git
+130     /* Graphics setup. */
+131     if (machine->enable_graphics && vga_interface_type != VGA_NONE) {
+132         dev = qdev_create(NULL, "artist");
+133         qdev_init_nofail(dev);
+134         s = SYS_BUS_DEVICE(dev);
+135         sysbus_mmio_map(s, 0, LASI_GFX_HPA);
+136         sysbus_mmio_map(s, 1, ARTIST_FB_ADDR);
+137     }
 
---js
+The hppa boot-serial test use the default options, so the Artist chipset 
+is mapped, and the firmware test/use it.
+
+We can test like the 40p, using VGA_NONE:
+
+-- >8 --
+diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-test.c
+index 05c7f44457..971254ae62 100644
+--- a/tests/qtest/boot-serial-test.c
++++ b/tests/qtest/boot-serial-test.c
+@@ -135,7 +135,7 @@ static testdef_t tests[] = {
+        sizeof(kernel_plml605), kernel_plml605 },
+      { "moxie", "moxiesim", "", "TT", sizeof(bios_moxiesim), 0, 
+bios_moxiesim },
+      { "arm", "raspi2", "", "TT", sizeof(bios_raspi2), 0, bios_raspi2 },
+-    { "hppa", "hppa", "", "SeaBIOS wants SYSTEM HALT" },
++    { "hppa", "hppa", "-vga none", "SeaBIOS wants SYSTEM HALT" },
+      { "aarch64", "virt", "-cpu cortex-a57", "TT", sizeof(kernel_aarch64),
+        kernel_aarch64 },
+      { "arm", "microbit", "", "T", sizeof(kernel_nrf51), kernel_nrf51 },
+---
+
+You should squash this change in patch #7 (because it belongs there) but 
+please add a comment, because it is not obvious.
+
+Thanks,
+
+Phil.
 
 
