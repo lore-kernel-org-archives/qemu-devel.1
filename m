@@ -2,84 +2,62 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94082C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8B6C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:19:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48FD72465B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:15:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QIEq1GTB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48FD72465B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 66EF72465B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:19:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EF72465B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuNLm-0002Kl-Ag
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 16:15:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59699)
+	id 1iuNPn-0004aH-J2
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 16:19:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iuNKs-0001gM-H9
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:51 -0500
+ (envelope-from <groug@kaod.org>) id 1iuNP6-0004Ad-Ie
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iuNKq-0004pP-7h
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32336
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1iuNP5-0001hz-2A
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:19:12 -0500
+Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:38959)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iuNKq-0004mE-11
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579727685;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZONaJQW6ixWtyG8u3GwluaKwmNpCLKbcqSmMNoJmmdo=;
- b=QIEq1GTBo3wQAK/Q64ZdEQQD7uBaCL1oKa7Fs28Odfm2n1EMh9AMpqhIQYSSJd+QZVuyxD
- 1dHmTgOsyrAdaoJ/HfU2Jl5vi2RTDzMOA2UPIx9ZEnZ+i9ppy/e+krSv6Yr4Fqx7iifd/p
- ort17rQNqMw3kxqdlkepxfBoybEiAF0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-rJMd3JHpPVyyQdEayRp3iA-1; Wed, 22 Jan 2020 16:14:42 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B726ADBA3;
- Wed, 22 Jan 2020 21:14:40 +0000 (UTC)
-Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E0BF19C70;
- Wed, 22 Jan 2020 21:14:40 +0000 (UTC)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuNP4-0001hG-S5
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:19:11 -0500
+Received: from player798.ha.ovh.net (unknown [10.108.42.88])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 66BBB12D2AE
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 22:19:08 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player798.ha.ovh.net (Postfix) with ESMTPSA id ABB68EA2B88A;
+ Wed, 22 Jan 2020 21:19:06 +0000 (UTC)
+Date: Wed, 22 Jan 2020 22:19:05 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
 Subject: Re: [PATCH v4 06/11] tests/virtio-9p: added splitted readdir test
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
+Message-ID: <20200122221905.055f9f93@bahia.lan>
+In-Reply-To: <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
 References: <cover.1579567019.git.qemu_oss@crudebyte.com>
  <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5dac4bf8-64aa-708e-d546-1eaea85bd792@redhat.com>
-Date: Wed, 22 Jan 2020 15:14:39 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: rJMd3JHpPVyyQdEayRp3iA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13567938304788175168
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddtgddugedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 178.33.251.49
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,24 +69,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/20/20 6:16 PM, Christian Schoenebeck wrote:
+On Tue, 21 Jan 2020 01:16:21 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+
 > The previous, already existing readdir test simply used a 'count'
 > parameter big enough to retrieve all directory entries with a
 > single Treaddir request.
 > 
 > In this new 'splitted' readdir test, directory entries are
-
-English is weird; the past tense of 'split' is 'split', not 'splitted'
-
 > retrieved, splitted over several Treaddir requests by picking small
-
-and again
-
 > 'count' parameters which force the server to truncate the response.
 > So the test client sends as many Treaddir requests as necessary to
 > get all directory entries. Currently this test covers actually two
@@ -117,20 +91,130 @@ and again
 > 
 > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 > ---
->   tests/qtest/virtio-9p-test.c | 91 ++++++++++++++++++++++++++++++++++++
->   1 file changed, 91 insertions(+)
+
+Not sure it is really needed to check with multiple values for 'count',
+but it doesn't eat too many cycles so I guess it doesn't hurt.
+
+Applied as well.
+
+>  tests/qtest/virtio-9p-test.c | 91 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 91 insertions(+)
 > 
-
->   
+> diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> index 2167322985..8b0d94546e 100644
+> --- a/tests/qtest/virtio-9p-test.c
+> +++ b/tests/qtest/virtio-9p-test.c
+> @@ -578,6 +578,7 @@ static bool fs_dirents_contain_name(struct V9fsDirent *e, const char* name)
+>      return false;
+>  }
+>  
+> +/* basic readdir test where reply fits into a single response message */
+>  static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
+>  {
+>      QVirtio9P *v9p = obj;
+> @@ -631,6 +632,95 @@ static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
+>      g_free(wnames[0]);
+>  }
+>  
 > +/* readdir test where overall request is splitted over several messages */
-
-and again
-
 > +static void fs_readdir_split(void *obj, void *data, QGuestAllocator *t_alloc)
 > +{
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> +    QVirtio9P *v9p = obj;
+> +    alloc = t_alloc;
+> +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
+> +    uint16_t nqid;
+> +    v9fs_qid qid;
+> +    uint32_t count, nentries, npartialentries;
+> +    struct V9fsDirent *entries, *tail, *partialentries;
+> +    P9Req *req;
+> +    int subtest;
+> +    int fid;
+> +    uint64_t offset;
+> +    /* the Treaddir 'count' parameter values to be tested */
+> +    const uint32_t vcount[] = { 512, 256 };
+> +    const int nvcount = sizeof(vcount) / sizeof(uint32_t);
+> +
+> +    fs_attach(v9p, NULL, t_alloc);
+> +
+> +    /* iterate over all 'count' parameter values to be tested with Treaddir */
+> +    for (subtest = 0; subtest < nvcount; ++subtest) {
+> +        fid = subtest + 1;
+> +        offset = 0;
+> +        entries = NULL;
+> +        nentries = 0;
+> +        tail = NULL;
+> +
+> +        req = v9fs_twalk(v9p, 0, fid, 1, wnames, 0);
+> +        v9fs_req_wait_for_reply(req, NULL);
+> +        v9fs_rwalk(req, &nqid, NULL);
+> +        g_assert_cmpint(nqid, ==, 1);
+> +
+> +        req = v9fs_tlopen(v9p, fid, O_DIRECTORY, 0);
+> +        v9fs_req_wait_for_reply(req, NULL);
+> +        v9fs_rlopen(req, &qid, NULL);
+> +
+> +        /*
+> +         * send as many Treaddir requests as required to get all directory
+> +         * entries
+> +         */
+> +        while (true) {
+> +            npartialentries = 0;
+> +            partialentries = NULL;
+> +
+> +            req = v9fs_treaddir(v9p, fid, offset, vcount[subtest], 0);
+> +            v9fs_req_wait_for_reply(req, NULL);
+> +            v9fs_rreaddir(req, &count, &npartialentries, &partialentries);
+> +            if (npartialentries > 0 && partialentries) {
+> +                if (!entries) {
+> +                    entries = partialentries;
+> +                    nentries = npartialentries;
+> +                    tail = partialentries;
+> +                } else {
+> +                    tail->next = partialentries;
+> +                    nentries += npartialentries;
+> +                }
+> +                while (tail->next) {
+> +                    tail = tail->next;
+> +                }
+> +                offset = tail->offset;
+> +            } else {
+> +                break;
+> +            }
+> +        }
+> +
+> +        g_assert_cmpint(
+> +            nentries, ==,
+> +            QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
+> +        );
+> +
+> +        /*
+> +         * Check all file names exist in returned entries, ignore their order
+> +         * though.
+> +         */
+> +        g_assert_cmpint(fs_dirents_contain_name(entries, "."), ==, true);
+> +        g_assert_cmpint(fs_dirents_contain_name(entries, ".."), ==, true);
+> +        for (int i = 0; i < QTEST_V9FS_SYNTH_READDIR_NFILES; ++i) {
+> +            char *name = g_strdup_printf(QTEST_V9FS_SYNTH_READDIR_FILE, i);
+> +            g_assert_cmpint(fs_dirents_contain_name(entries, name), ==, true);
+> +            g_free(name);
+> +        }
+> +
+> +        v9fs_free_dirents(entries);
+> +    }
+> +
+> +    g_free(wnames[0]);
+> +}
+> +
+>  static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
+>  {
+>      QVirtio9P *v9p = obj;
+> @@ -810,6 +900,7 @@ static void register_virtio_9p_test(void)
+>      qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
+>                   NULL);
+>      qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
+> +    qos_add_test("fs/readdir/split", "virtio-9p", fs_readdir_split, NULL);
+>  }
+>  
+>  libqos_init(register_virtio_9p_test);
 
 
