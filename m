@@ -2,92 +2,134 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE33DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CD8C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:26:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA39624655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:24:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F75C24672
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:26:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSsNjzGj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA39624655
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zv2JvlvO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F75C24672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuBJq-0007w5-Sn
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 03:24:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45889)
+	id 1iuBLJ-0000Wo-HX
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 03:26:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46080)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iuBJ5-0007FE-4W
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:24:12 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iuBKj-0008V3-EC
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:25:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iuBJ3-0006ox-Ua
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:24:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22759
+ (envelope-from <lvivier@redhat.com>) id 1iuBKi-0007fD-CI
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:25:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48756
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iuBJ3-0006nr-Q5
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:24:09 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iuBKi-0007f6-8N
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:25:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579681449;
+ s=mimecast20190719; t=1579681551;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PqMC5ATtymyogmyk9DOIESKGj6xAnGTXxyJxkbqP1fM=;
- b=hSsNjzGj9OgAs754TdWgHjTzC66GTKV9INHM07QVk40dn+kqt8+CFDLRwPrzrd2uDb2CGL
- 5qwKGB+4OAZWU0YdOrH5BS65S09ApW0YG1h4wuxUMcLVVs5JABxVeJV2PuDQA6FLAw/FZF
- XzCXfzI7GObby+AaQ6AzaCEI4qoB28U=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-8k1579LWOSKB486q1S2HXQ-1; Wed, 22 Jan 2020 03:24:07 -0500
-Received: by mail-wm1-f72.google.com with SMTP id g26so1060937wmk.6
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 00:24:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=9CB3c1RgKQtL6GIuLgiLd8m8lbT5ybTkGXxDqzVPwqI=;
- b=s0rnOy5rt+U2mtYMEvyos8qGybr4o9Kqv6QUlc6lcPpWa3bStb3vM/uXwuN1weO3TX
- 6IWq+U5Sejxv+nIhhOxSWDy6xD/Ir4JiYDvp7tQsMOqJKsRJSj85cIcjz+JxgkYblCsb
- pM9J1TN3nsOt7jMM94kIxLJd1WMdBJFgbA/Y7k0iW5d4wTHHMwmepqbVR6uo2cG9AQXh
- wDBHUwNuZNrB7Pd5Q2/3Lab45QW7A7WHwRHNkkHA1rxfXtV0L31cGStIBwVEp2nm2sFl
- nvpbwIIkKc+PWvTb+xBkmznIHs1miJafWQb823LqbAonbjTzi0PeVEdzPfBJO3vRQk1g
- Ox4Q==
-X-Gm-Message-State: APjAAAV6RpIoazAhn/Hf8F0gArMdupKhGOu2UexjKXdGryVXSD06ayn0
- 5+vj2Rgeql+xoSGjhe1RVTRAuxS+ZG4dEY9IsfrJ/vAEXCLvuZZmC116e2hlQmF6tbONdvpf9B3
- puvUNfZkgnJuzcB4=
-X-Received: by 2002:a7b:c935:: with SMTP id h21mr1559253wml.173.1579681446230; 
- Wed, 22 Jan 2020 00:24:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw4pGRQw2MOBdhkwrpfKACw+YIDKNWHU3FopMP3GQ2nRE7TttIAWR9UgHuwDTfrOFfiAUcvkw==
-X-Received: by 2002:a7b:c935:: with SMTP id h21mr1559210wml.173.1579681445926; 
- Wed, 22 Jan 2020 00:24:05 -0800 (PST)
-Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
- by smtp.gmail.com with ESMTPSA id
- e6sm58416087wru.44.2020.01.22.00.24.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 00:24:05 -0800 (PST)
-Date: Wed, 22 Jan 2020 03:24:02 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Stevens <stevensd@chromium.org>
-Subject: Re: [virtio-dev][RFC PATCH v2 0/2] Cross-device resource sharing
-Message-ID: <20200122032328-mutt-send-email-mst@kernel.org>
-References: <CAD=HUj71Z_eQUj93LZYOAc+Prj9ohym1oJtiLWzCy5=T-cNxCQ@mail.gmail.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=s0wkE+ImRWXld4LJR+qew1z82fJGvVYEbMB+sxPenD4=;
+ b=Zv2JvlvOdNYBxeY6JAnQLlOn0CPsEqJQ0J9xnkkkoMC1orpzdByTfTpwmXl/VOS5U46B09
+ C4UR7uoiWV/bee/EqjgXBRzlqvAleRQmKNdJAlPVXDWoDq7j/7xLDuRFSwAX44N52/t0uQ
+ xNy/c/J6zwyaKOW4gTUoYS8KIZYhI94=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-UB1uGhKmPqyjzpQ6DiBm-A-1; Wed, 22 Jan 2020 03:25:49 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC1DE800D4E
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 08:25:48 +0000 (UTC)
+Received: from [10.40.204.119] (ovpn-204-119.brq.redhat.com [10.40.204.119])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 405EA60C85;
+ Wed, 22 Jan 2020 08:25:41 +0000 (UTC)
+Subject: Re: [PATCH 1/5] bios-tables-test: tell people how to update
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+References: <20200122080538.591734-1-mst@redhat.com>
+ <20200122080538.591734-2-mst@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <2b22fca4-df8c-f5b0-b171-4c47bd85da60@redhat.com>
+Date: Wed, 22 Jan 2020 09:25:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAD=HUj71Z_eQUj93LZYOAc+Prj9ohym1oJtiLWzCy5=T-cNxCQ@mail.gmail.com>
-X-MC-Unique: 8k1579LWOSKB486q1S2HXQ-1
+In-Reply-To: <20200122080538.591734-2-mst@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: UB1uGhKmPqyjzpQ6DiBm-A-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -102,49 +144,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, Zach Reizner <zachr@chromium.org>,
- Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?iso-8859-1?Q?St=E9phane?= Marchesin <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 22, 2020 at 04:16:15PM +0900, David Stevens wrote:
-> This RFC comes from the recent discussion on buffer sharing [1],
-> specifically about the need to share resources between different
-> virtio devices. For a concrete use case, this can be used to share
-> virtio-gpu allocated buffers with the recently proposed virtio video
-> device [2], without the need to memcpy decoded frames through the
-> guest.
->=20
-> [1] https://markmail.org/thread/jeh5xjjxvylyrbur
-> [2] https://markmail.org/thread/yb25fim2dqfuktgf
+On 22/01/2020 09:05, Michael S. Tsirkin wrote:
+> For now just a pointer to the source file.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  tests/qtest/bios-tables-test.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+> index 3ab4872bd7..6b5f24bf62 100644
+> --- a/tests/qtest/bios-tables-test.c
+> +++ b/tests/qtest/bios-tables-test.c
+> @@ -426,7 +426,9 @@ static void test_acpi_asl(test_data *data)
+>  
+>          fprintf(stderr,
+>                  "acpi-test: Warning! %.4s binary file mismatch. "
+> -                "Actual [aml:%s], Expected [aml:%s].\n",
+> +                "Actual [aml:%s], Expected [aml:%s].\n"
+> +                "See source file tests/qtest/bios-tables-test.c "
+> +                "for instructions on how to update expected files.\n",
+>                  exp_sdt->aml, sdt->aml_file, exp_sdt->aml_file);
+>  
+>          all_tables_match = all_tables_match &&
+> 
 
-
-Wrong list- this belongs on virtio-comment.
-dev is for implementation discussions.
-
-> Changes v1 -> v2:
-> Rename exported resource to exported object
-> Rename the virtio-gpu export command
->=20
-> David Stevens (2):
->   content: define what an exported object is
->   virtio-gpu: add the ability to export resources
->=20
->  content.tex    | 18 ++++++++++++++++++
->  virtio-gpu.tex | 30 ++++++++++++++++++++++++++++++
->  2 files changed, 48 insertions(+)
->=20
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
 
