@@ -7,84 +7,87 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 372A0C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D0ACC32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:54:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03AD724655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3879E24655
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:54:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiswUwMw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03AD724655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CAJJ+Hjm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3879E24655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37599 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu9u6-0000yi-Ux
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:54:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36130)
+	id 1iu9uC-000183-Sg
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:54:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iu9qH-0004Z1-IA
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:22 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iu9qG-0007zM-DF
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:21 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58141)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu9qG-0007z1-7P
+ (envelope-from <mst@redhat.com>) id 1iu9qF-0004WQ-Hm
  for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:20 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <mst@redhat.com>) id 1iu9qE-0007yC-58
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:19 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33753
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu9qD-0007xu-Vg
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579675819;
+ s=mimecast20190719; t=1579675817;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eTnESgkc4Q1IE7eK3yhiRdRiKjKhsh/o/b9VSLnbvfo=;
- b=hiswUwMw68AN1N1j+9iSbSgxV19ksggwCSGghn3CcOtPGzbegVCcWwr6YxMQ2zKfYNJSqI
- T647Y0XbVBJvwsDDhl1/pv2dBvxpjb112AFxzd1i5nsgFNI5lM7nrYXy0gkg3KK8Qm7xHC
- l0vtWmm5c8+cFNFfV+wcgMBBOLy97ZE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-FBqd-OhINJm1EoHkMhSgYw-1; Wed, 22 Jan 2020 01:50:18 -0500
-Received: by mail-wr1-f72.google.com with SMTP id f10so2615867wro.14
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 22:50:18 -0800 (PST)
+ bh=lSs10h7+g5GHkd748u1YKdPjMw3sPPNZXswgwHDuFfc=;
+ b=CAJJ+HjmtCcz/x5Dh7DlvmrcHT5xL6LtrrN5DMs+lkywLJ+wReeskqmfLXwPLrP5vgKYVQ
+ f1XCeFUhtA/X0PjYrkvzsbrjulAIFhW236+1W9Osqw1YmFETucxG+9z3isOuMKnkFf889S
+ Rkr9wFS3gs6UNLCR0Xz6hvF8wGejMbc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-95-_7qJTYvVMXuLpGYHNb_1MQ-1; Wed, 22 Jan 2020 01:50:15 -0500
+Received: by mail-wr1-f71.google.com with SMTP id c17so2593750wrp.10
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 22:50:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=eAd3+nCoRQPzLOmjcY8CULrwvjv4VOu8uY/RSRtK8kQ=;
- b=L4gSOo7H6IS5IBXVX2Qso8GLYVuDPO00/o9nRx5Ao4BKRLJSFpAeV5zkwjpWNwmTGE
- sgEjCAiBupA0WQE3d/Kj1WGyZ4WIFaEGYINmccLlifxzTK9+zchl1DRd5XdZGDVNtTqx
- YSg999dES7pjRy+e5us0LvZLeWmmTpbED+ASbl53VJ/1jKzTYcHD4fRw/dS6vbFBSyn2
- jSuwDthTNGzdzsYExt2dR2S6r0bWdvYljDWtWDmv10C1l0QMmU5Trf6d0O8rLHjJCunW
- ST3e1fp/3L2ZLj3K0WSJdLnmiIqhK3/qkpFU2uhRHoXGCqt027cYqcS/CwMYvA3DCMRn
- TiMA==
-X-Gm-Message-State: APjAAAWvEXXryXnaDwbeBJN+BymHjBXR8bFa2uDEQRrvtZhAfe0Qt6cv
- evw6QnzCpBlvuNLfFNwNIykW3aWHyCtlWjKwP8O8g/KyC0MBdJsAcVAdypnIXjPsBirRaEExmmE
- kYqZiWQMdqP1xjGs=
-X-Received: by 2002:a1c:5401:: with SMTP id i1mr1123841wmb.99.1579675816929;
- Tue, 21 Jan 2020 22:50:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwPpNTZDpcmcF3BWq96vfyY7ZlgRBlaWVLC6h1CP8jwUBjCsqKS5d70mZxmBwomw/7qxB1sNw==
-X-Received: by 2002:a1c:5401:: with SMTP id i1mr1123818wmb.99.1579675816715;
- Tue, 21 Jan 2020 22:50:16 -0800 (PST)
+ bh=bshZ29A7PK62drys54Y2NwFiWKvTA5OkiFM7lPNvHYk=;
+ b=naJEXgm7825di9cQuu3C2a7XjO10xks6k1G87J0mSo30tMlBO3udKA8rHqNo+jGatW
+ AHB60YpY24Oth88XwOiYoVJtehUeKXBx4IA39RvfKEqBgkvMo85P9kjidq1xxdPA5Ed2
+ pA/2seleoiFb0PuRHk6OP0RePlgA3csmfaMHetNK1DAjUhanbIEYLiR8gSaxin/cPVf/
+ pG0HT6YhOvyKN+m3tNzulYC7E8Cl2rhdBgYfU5SKFTONwaGKSyTmLNB3oJR0Hw9WKJnL
+ blw2CmvGB4Rk5s96f1ed3dzhoRSRHdELIppwSigTRbsUZcOSWZ9UsUiYEDw2VT3timeQ
+ 7a6g==
+X-Gm-Message-State: APjAAAXxY5YDQLvfvRmdyKik/wb5SkUZAnCQ/lyZ/cIqKa226K3yD9LI
+ Lk46aztFQjnxLkOFUqgRdKX+Hf02qoFslaUzXeGjpClJLiYZ+DbG9Cg+NTT1KJAXsX+LUAjMzeV
+ 0WH9rIVCGAOmuzNc=
+X-Received: by 2002:a05:600c:2c08:: with SMTP id
+ q8mr1191565wmg.45.1579675813998; 
+ Tue, 21 Jan 2020 22:50:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxPWKcokBZRNLx3gYOad0TILV3PJbsCjBCNiF7W1ZNDIJ+8+nDlLRA9JoOIEK3yv0oksQsCAg==
+X-Received: by 2002:a05:600c:2c08:: with SMTP id
+ q8mr1191549wmg.45.1579675813801; 
+ Tue, 21 Jan 2020 22:50:13 -0800 (PST)
 Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
  by smtp.gmail.com with ESMTPSA id
- m10sm56751619wrx.19.2020.01.21.22.50.15
+ w8sm2855363wmm.0.2020.01.21.22.50.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 22:50:16 -0800 (PST)
-Date: Wed, 22 Jan 2020 01:50:14 -0500
+ Tue, 21 Jan 2020 22:50:13 -0800 (PST)
+Date: Wed, 22 Jan 2020 01:50:11 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 09/17] bios-tables-test: document expected file update
-Message-ID: <20200122064907.512501-10-mst@redhat.com>
+Subject: [PULL v2 08/17] acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command
+Message-ID: <20200122064907.512501-9-mst@redhat.com>
 References: <20200122064907.512501-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200122064907.512501-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: FBqd-OhINJm1EoHkMhSgYw-1
+X-MC-Unique: _7qJTYvVMXuLpGYHNb_1MQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -104,70 +107,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document the flow for the case where contributor
-updates the expected files.
+From: Igor Mammedov <imammedo@redhat.com>
 
+Firmware can enumerate present at boot APs by broadcasting wakeup IPI,
+so that woken up secondary CPUs could register them-selves.
+However in CPU hotplug case, it would need to know architecture
+specific CPU IDs for possible and hotplugged CPUs so it could
+prepare environment for and wake hotplugged AP.
+
+Reuse and extend existing CPU hotplug interface to return architecture
+specific ID for currently selected CPU in 2 registers:
+ - lower 32 bits in ACPI_CPU_CMD_DATA_OFFSET_RW
+ - upper 32 bits in ACPI_CPU_CMD_DATA2_OFFSET_R
+
+On x86, firmware will use CPHP_GET_CPU_ID_CMD for fetching the APIC ID
+when handling hotplug SMI.
+
+Later, CPHP_GET_CPU_ID_CMD will be used on ARM to retrieve MPIDR,
+which serves the similar to APIC ID purpose.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1575896942-331151-10-git-send-email-imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 ---
- tests/qtest/bios-tables-test.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ docs/specs/acpi_cpu_hotplug.txt | 3 +++
+ hw/acpi/cpu.c                   | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.=
-c
-index f1ac2d7e96..3ab4872bd7 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -16,7 +16,10 @@
-  * 1. add empty files for new tables, if any, under tests/data/acpi
-  * 2. list any changed files in tests/bios-tables-test-allowed-diff.h
-  * 3. commit the above *before* making changes that affect the tables
-- * Maintainer:
-+ *
-+ * Contributor or ACPI Maintainer (steps 4-7 need to be redone to resolve =
-conflicts
-+ * in binary commit created in step 6):
-+ *
-  * After 1-3 above tests will pass but ignore differences with the expecte=
-d files.
-  * You will also notice that tests/bios-tables-test-allowed-diff.h lists
-  * a bunch of files. This is your hint that you need to do the below:
-@@ -28,13 +31,23 @@
-  * output. If not - disassemble them yourself in any way you like.
-  * Look at the differences - make sure they make sense and match what the
-  * changes you are merging are supposed to do.
-+ * Save the changes, preferably in form of ASL diff for the commit log in
-+ * step 6.
-  *
-  * 5. From build directory, run:
-  *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
-- * 6. Now commit any changes.
-- * 7. Before doing a pull request, make sure tests/bios-tables-test-allowe=
-d-diff.h
-- *    is empty - this will ensure following changes to ACPI tables will
-- *    be noticed.
-+ * 6. Now commit any changes to the expected binary, include diff from ste=
-p 4
-+ *    in commit log.
-+ * 7. Before sending patches to the list (Contributor)
-+ *    or before doing a pull request (Maintainer), make sure
-+ *    tests/bios-tables-test-allowed-diff.h is empty - this will ensure
-+ *    following changes to ACPI tables will be noticed.
-+ *
-+ * The resulting patchset/pull request then looks like this:
-+ * - patch 1: list changed files in tests/bios-tables-test-allowed-diff.h.
-+ * - patches 2 - n: real changes, may contain multiple patches.
-+ * - patch n + 1: update golden master binaries and empty
-+ *   tests/bios-tables-test-allowed-diff.h
-  */
+diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
+txt
+index cb99cf3c8e..a8ce5e7402 100644
+--- a/docs/specs/acpi_cpu_hotplug.txt
++++ b/docs/specs/acpi_cpu_hotplug.txt
+@@ -47,6 +47,7 @@ read access:
+     [0x0-0x3] Command data 2: (DWORD access)
+               if value last stored in 'Command field':
+                 0: reads as 0x0
++                3: upper 32 bits of architecture specific CPU ID value
+                 other values: reserved
+     [0x4] CPU device status fields: (1 byte access)
+         bits:
+@@ -61,6 +62,8 @@ read access:
+     [0x8] Command data: (DWORD access)
+           contains 0 unless value last stored in 'Command field' is one of=
+:
+               0: contains 'CPU selector' value of a CPU with pending event=
+[s]
++              3: lower 32 bits of architecture specific CPU ID value
++                 (in x86 case: APIC ID)
 =20
- #include "qemu/osdep.h"
+ write access:
+     offset:
+diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+index d475c06953..e2c957ce00 100644
+--- a/hw/acpi/cpu.c
++++ b/hw/acpi/cpu.c
+@@ -18,6 +18,7 @@ enum {
+     CPHP_GET_NEXT_CPU_WITH_EVENT_CMD =3D 0,
+     CPHP_OST_EVENT_CMD =3D 1,
+     CPHP_OST_STATUS_CMD =3D 2,
++    CPHP_GET_CPU_ID_CMD =3D 3,
+     CPHP_CMD_MAX
+ };
+=20
+@@ -75,6 +76,9 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr addr,=
+ unsigned size)
+         case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
+            val =3D cpu_st->selector;
+            break;
++        case CPHP_GET_CPU_ID_CMD:
++           val =3D cdev->arch_id & 0xFFFFFFFF;
++           break;
+         default:
+            break;
+         }
+@@ -85,6 +89,9 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr addr,=
+ unsigned size)
+         case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
+            val =3D 0;
+            break;
++        case CPHP_GET_CPU_ID_CMD:
++           val =3D cdev->arch_id >> 32;
++           break;
+         default:
+            break;
+         }
 --=20
 MST
 
