@@ -2,62 +2,73 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89548C33CAF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E83C8C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:06:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5078121835
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:02:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5078121835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id BD8C12465B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:06:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD8C12465B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuIT2-0008PY-5w
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 11:02:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42862)
+	id 1iuIWw-0002iU-V6
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 11:06:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1iuIRP-0007Gb-Rv
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:01:18 -0500
+ (envelope-from <bounces@canonical.com>) id 1iuIVk-0001oZ-DI
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:05:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1iuIRN-0006qk-4X
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:01:15 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:33059)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1iuIRJ-0006ok-ID; Wed, 22 Jan 2020 11:01:13 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 50B8E748DCC;
- Wed, 22 Jan 2020 17:01:07 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 102DF748DCE; Wed, 22 Jan 2020 17:01:07 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 0EE59748DCD;
- Wed, 22 Jan 2020 17:01:07 +0100 (CET)
-Date: Wed, 22 Jan 2020 17:01:07 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v3 64/82] ppc/{ppc440_bamboo,sam460ex}: drop RAM size fixup
-In-Reply-To: <20200122095630.1891cab1@redhat.com>
-Message-ID: <alpine.BSF.2.21.99999.352.2001221645230.35550@zero.eik.bme.hu>
-References: <20200121092640.22ea1f4b@redhat.com>
- <1579624904-47593-1-git-send-email-imammedo@redhat.com>
- <alpine.BSF.2.21.99999.352.2001211900240.27287@zero.eik.bme.hu>
- <20200122095630.1891cab1@redhat.com>
-User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
+ (envelope-from <bounces@canonical.com>) id 1iuIVj-00013M-5d
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:05:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54070)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iuIVj-000130-08
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:05:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iuIVh-0007Yv-JV
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:05:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 818DB2E80C8
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:05:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 Jan 2020 15:58:31 -0000
+From: Daniel Berrange <1860575@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange lemonboy
+X-Launchpad-Bug-Reporter: The Lemon Man (lemonboy)
+X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
+References: <157970748795.4848.1694391096642821939.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157970871114.4879.13125884642613054475.malone@soybean.canonical.com>
+Subject: [Bug 1860575] Re: qemu64 CPU model is incorrect
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7122e6f2bfb8ccedb7f96d9852471a3422977ffc
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,324 +77,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Reply-To: Bug 1860575 <1860575@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 Jan 2020, Igor Mammedov wrote:
-> On Tue, 21 Jan 2020 20:31:48 +0100 (CET)
-> BALATON Zoltan <balaton@eik.bme.hu> wrote:
->
->> On Tue, 21 Jan 2020, Igor Mammedov wrote:
->>> If user provided non-sense RAM size, board will complain and
->>> continue running with max RAM size supported or sometimes
->>> crash like this:
->>>  %QEMU -M bamboo -m 1
->>>    exec.c:1926: find_ram_offset: Assertion `size != 0' failed.
->>>    Aborted (core dumped)
->>> Also RAM is going to be allocated by generic code, so it won't be
->>> possible for board to fix things up for user.
->>>
->>> Make it error message and exit to force user fix CLI,
->>> instead of accepting non-sense CLI values.
->>> That also fixes crash issue, since wrongly calculated size
->>> isn't used to allocate RAM
->>>
->>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>> ---
->>> v2:
->>>  * s/ppc4xx_sdram_adjust/ppc4xx_sdram_prep/
->>>     (BALATON Zoltan <balaton@eik.bme.hu>)
->>>  * print possible valid ram size id not all RAM was distributed
->>>  * initialize ram_bases/ram_bases at the same time we are checking
->>>    that user supplied RAM would fit available banks and drop nested
->>>    loop that were duplicating the same calculations.
->>>  * coincidentally fix crash when -m is less than minimal bank size
->>> v3:
->>>  * s/ppc4xx_sdram_prep/ppc4xx_sdram_banks/
->>>      (BALATON Zoltan <balaton@eik.bme.hu>)
->>>  * fix subject line in commit message
->>> v3.1
->>>  * add lost 'break' statement in 'j' loop
->>>
->>> CC: balaton@eik.bme.hu
->>> CC: david@gibson.dropbear.id.au
->>> CC: qemu-ppc@nongnu.org
->>> ---
->>> include/hw/ppc/ppc4xx.h |  9 ++++----
->>> hw/ppc/ppc440_bamboo.c  | 11 ++++------
->>> hw/ppc/ppc4xx_devs.c    | 57 ++++++++++++++++++++++++++-----------------------
->>> hw/ppc/sam460ex.c       |  5 ++---
->>> 4 files changed, 40 insertions(+), 42 deletions(-)
->>>
->>> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
->>> index 7d82259..b8c8f32 100644
->>> --- a/include/hw/ppc/ppc4xx.h
->>> +++ b/include/hw/ppc/ppc4xx.h
->>> @@ -42,11 +42,10 @@ enum {
->>> qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
->>>                        uint32_t dcr_base, int has_ssr, int has_vr);
->>>
->>> -ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
->>> -                               MemoryRegion ram_memories[],
->>> -                               hwaddr ram_bases[],
->>> -                               hwaddr ram_sizes[],
->>> -                               const ram_addr_t sdram_bank_sizes[]);
->>> +void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
->>> +                        MemoryRegion ram_memories[],
->>> +                        hwaddr ram_bases[], hwaddr ram_sizes[],
->>> +                        const ram_addr_t sdram_bank_sizes[]);
->>>
->>> void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
->>>                         MemoryRegion ram_memories[],
->>> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
->>> index b782641..577f7c2 100644
->>> --- a/hw/ppc/ppc440_bamboo.c
->>> +++ b/hw/ppc/ppc440_bamboo.c
->>> @@ -158,7 +158,6 @@ static void main_cpu_reset(void *opaque)
->>>
->>> static void bamboo_init(MachineState *machine)
->>> {
->>> -    ram_addr_t ram_size = machine->ram_size;
->>>     const char *kernel_filename = machine->kernel_filename;
->>>     const char *kernel_cmdline = machine->kernel_cmdline;
->>>     const char *initrd_filename = machine->initrd_filename;
->>> @@ -203,10 +202,8 @@ static void bamboo_init(MachineState *machine)
->>>     /* SDRAM controller */
->>>     memset(ram_bases, 0, sizeof(ram_bases));
->>>     memset(ram_sizes, 0, sizeof(ram_sizes));
->>> -    ram_size = ppc4xx_sdram_adjust(ram_size, PPC440EP_SDRAM_NR_BANKS,
->>> -                                   ram_memories,
->>> -                                   ram_bases, ram_sizes,
->>> -                                   ppc440ep_sdram_bank_sizes);
->>> +    ppc4xx_sdram_banks(ram_size, PPC440EP_SDRAM_NR_BANKS, ram_memories,
->>
->>
->> Is ram_size still valid here or should this be machine->ram_size as well?
-> it is, as there is global ram_size which is equal to machine->ram_size.
-> As for this line I can s/ram_size/machine->ram_size/ on respin
-> if you'd like to.
->
-> Cleaning up global ram_size and machine->ram_size should be another series.
-> When all patches from this series get merged it should be easier to remove
-> global ram_size variable altogether and maybe machine->ram_size as well.
+Your analysis of the problem with family makes sense & we do have
+mechanism to fix this in QEMU while keeping back compat for existing
+deployments.
 
-As you see fit. If ram_size is still valid here you can change it in later 
-patch or do it now if you like. I wasn't sure because you seemed to change 
-every other appearance of this and I was not aware of the global with same 
-name.
+I'm curious as to the actual errors LLVM reports ?
 
-Using machine->ram_size is probably clearer because 1) it was using that 
-before and 2) function gets machine as parameter so it's easier to see 
-where it comes from than using the global.
+FWIW, even though qemu64 is the default CPU, practically everyone would
+be better off choosing one of the other CPU models explicitly to better
+suit their desired use case. There is some guidance here
+https://qemu.weilnetz.de/doc/qemu-doc.html#cpu_005fmodels
 
-(If in future patch you remove both the ram_size global and 
-machine->ram_size how would a machine know how much ram it should have?)
+-- =
 
->>> +                       ram_bases, ram_sizes, ppc440ep_sdram_bank_sizes);
->>>     /* XXX 440EP's ECC interrupts are on UIC1, but we've only created UIC0. */
->>>     ppc4xx_sdram_init(env, pic[14], PPC440EP_SDRAM_NR_BANKS, ram_memories,
->>>                       ram_bases, ram_sizes, 1);
->>> @@ -268,7 +265,7 @@ static void bamboo_init(MachineState *machine)
->>>     /* Load initrd. */
->>>     if (initrd_filename) {
->>>         initrd_size = load_image_targphys(initrd_filename, RAMDISK_ADDR,
->>> -                                          ram_size - RAMDISK_ADDR);
->>> +                                          machine->ram_size - RAMDISK_ADDR);
->>>
->>>         if (initrd_size < 0) {
->>>             error_report("could not load ram disk '%s' at %x",
->>> @@ -279,7 +276,7 @@ static void bamboo_init(MachineState *machine)
->>>
->>>     /* If we're loading a kernel directly, we must load the device tree too. */
->>>     if (kernel_filename) {
->>> -        if (bamboo_load_device_tree(FDT_ADDR, ram_size, RAMDISK_ADDR,
->>> +        if (bamboo_load_device_tree(FDT_ADDR, machine->ram_size, RAMDISK_ADDR,
->>>                                     initrd_size, kernel_cmdline) < 0) {
->>>             error_report("couldn't load device tree");
->>>             exit(1);
->>> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
->>> index c2e5013..5a3bb80 100644
->>> --- a/hw/ppc/ppc4xx_devs.c
->>> +++ b/hw/ppc/ppc4xx_devs.c
->>> @@ -673,16 +673,16 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
->>>  * The 4xx SDRAM controller supports a small number of banks, and each bank
->>>  * must be one of a small set of sizes. The number of banks and the supported
->>>  * sizes varies by SoC. */
->>> -ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
->>> -                               MemoryRegion ram_memories[],
->>> -                               hwaddr ram_bases[],
->>> -                               hwaddr ram_sizes[],
->>> -                               const ram_addr_t sdram_bank_sizes[])
->>> +void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
->>> +                        MemoryRegion ram_memories[],
->>> +                        hwaddr ram_bases[], hwaddr ram_sizes[],
->>> +                        const ram_addr_t sdram_bank_sizes[])
->>> {
->>>     MemoryRegion *ram = g_malloc0(sizeof(*ram));
->>>     ram_addr_t size_left = ram_size;
->>>     ram_addr_t base = 0;
->>>     ram_addr_t bank_size;
->>> +    int last_bank = 0;
->>>     int i;
->>>     int j;
->>>
->>> @@ -690,7 +690,12 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
->>>         for (j = 0; sdram_bank_sizes[j] != 0; j++) {
->>>             bank_size = sdram_bank_sizes[j];
->>>             if (bank_size <= size_left) {
->>
->> Does this blow up if values in sdram_bank_sizes are not sorted from big to
->> small? If so this should be noted in the comment above.
->
-> would something like this work for you?
->
-> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-> index 1db7e41..153ce42 100644
-> --- a/hw/ppc/ppc4xx_devs.c
-> +++ b/hw/ppc/ppc4xx_devs.c
-> @@ -668,7 +668,8 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
->
-> /* Split RAM between SDRAM banks.
->  *
-> - * sdram_bank_sizes[] must be 0-terminated.
-> + * sdram_bank_sizes[] must be sorted by sizes[i] > sizes[i+1] rule
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1860575
 
-Maybe: "must be in descending order, that is sizes[i] > sizes[i+1]" just 
-to make it clearer but your version is also correct.
+Title:
+  qemu64 CPU model is incorrect
 
-> + * and must be 0-terminated.
->  *
->  * The 4xx SDRAM controller supports a small number of banks, and each bank
->  * must be one of a small set of sizes. The number of banks and the supported
->
->>
->>> +                ram_bases[i] = base;
->>> +                ram_sizes[i] = bank_size;
->>> +                base += bank_size;
->>>                 size_left -= bank_size;
->>> +                last_bank = i;
->>> +                break;
->>
->> I'm not sure how it is supposed to work. (I never knew as this is not my
->> code but was there before.) AFAIU the idea was to use as many available
->> bank sizes first on one ram_base before moving on to the next. This does
->> not seem to do that and will go to the next ram after populating the first
->> bank if I understood correctly. But the original code was also not going
->> through with that and in the second loop only used the first bank selected
->> so that does not make much sense.
->>
->> The problem here is that e.g. sam460ex has only one RAM slot so its
->> firmware does not bother checking any other slot (even if the SoC could
->> handle 4 slots) so unless we put everything (possibly with different
->> banks) in the first RAM slot it won't work. The other constraint is the
->> SoC's memory controller that encodes ram_base and ram_size in a single
->> register and only allows certain sizes.
->>
->> What happens if we try to set 1.5GB or 768MB? I think SPD could represent
->> that using different bank sizes even if uncommon (I wrote
->> spd_data_generate() in hw/i2c/smbus_eeprom.c but that was a long ago and
->> forgot about it since) but probably the ppc440 SDRAM controller does not
->> have values for this size so not sure if it would work. Currently this
->> functions lets 1.5G and 768M through and that much RAM is allocated but
->> only 1G or 512M will be mapped.
->>
->> I guess the situation is not worse after your changes with not allocating
->> unmapped RAM, the machine still gets the same amount (only annoying users
->> about it).
-> Probably it's like you're saying (current logic tries to put as much as RAM
-> into slot as possible and then move to the next slot).
->
-> But then rewriting RAM distribution logic is certainly out of scope of
-> this series. And probably should be done by some one who knows how this
-> specific hw is supposed to work.
+Status in QEMU:
+  New
 
-Yes, I did not mean you should rewrite it just trying to understand what 
-this function was trying to do and if it still does the same after your 
-patches. I'm still not quite sure but I think this version is good enough 
-now.
+Bug description:
+  At the moment the "qemu64" CPU is defined as follows:
 
-Regards,
-BALATON Zoltan
+  ```
+          .vendor =3D CPUID_VENDOR_AMD,
+          .family =3D 6,
+          .model =3D 6,
+          .stepping =3D 3,
+  ```
 
->>>             }
->>>         }
->>>         if (!size_left) {
->>> @@ -699,34 +704,32 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
->>>         }
->>>     }
->>>
->>> -    ram_size -= size_left;
->>>     if (size_left) {
->>> -        error_report("Truncating memory to %" PRId64 " MiB to fit SDRAM"
->>> -                     " controller limits", ram_size / MiB);
->>> +        ram_addr_t used_size = ram_size - size_left;
->>> +        GString *s = g_string_new(NULL);
->>> +
->>> +        for (i = 0; sdram_bank_sizes[i]; i++) {
->>> +            g_string_append_printf(s, "%" PRIi64 "%s",
->>> +                                   sdram_bank_sizes[i] / MiB,
->>> +                                   sdram_bank_sizes[i + 1] ? " ," : "");
->>> +        }
->>> +        error_report("Max %d banks of %s MB DIMM/bank supported",
->>> +            nr_banks, s->str);
->>> +        error_report("Possible valid RAM size: %" PRIi64,
->>> +            used_size ? used_size / MiB : sdram_bank_sizes[i - 1] / MiB);
->>> +
->>> +        g_string_free(s, true);
->>> +        exit(EXIT_FAILURE);
->>>     }
->>>
->>>     memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_size);
->>>
->>> -    size_left = ram_size;
->>> -    for (i = 0; i < nr_banks && size_left; i++) {
->>> -        for (j = 0; sdram_bank_sizes[j] != 0; j++) {
->>> -            bank_size = sdram_bank_sizes[j];
->>> -
->>> -            if (bank_size <= size_left) {
->>> -                char name[32];
->>> -                snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
->>> -                memory_region_init_alias(&ram_memories[i], NULL, name, ram,
->>> -                                         base, bank_size);
->>> -                ram_bases[i] = base;
->>> -                ram_sizes[i] = bank_size;
->>> -                base += bank_size;
->>> -                size_left -= bank_size;
->>> -                break;
->>> -            }
->>> -        }
->>> +    for (i = 0; i <= last_bank; i++) {
->>> +        char name[32];
->>> +        snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
->>> +        memory_region_init_alias(&ram_memories[i], NULL, name, ram,
->>> +                                 ram_bases[i], ram_sizes[i]);
->>>     }
->>> -
->>> -    return ram_size;
->>> }
->>>
->>> /*****************************************************************************/
->>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
->>> index 437e214..949acba 100644
->>> --- a/hw/ppc/sam460ex.c
->>> +++ b/hw/ppc/sam460ex.c
->>> @@ -324,9 +324,8 @@ static void sam460ex_init(MachineState *machine)
->>>     /* SDRAM controller */
->>>     /* put all RAM on first bank because board has one slot
->>>      * and firmware only checks that */
->>> -    machine->ram_size = ppc4xx_sdram_adjust(machine->ram_size, 1,
->>> -                                   ram_memories, ram_bases, ram_sizes,
->>> -                                   ppc460ex_sdram_bank_sizes);
->>> +    ppc4xx_sdram_banks(machine->ram_size, 1, ram_memories, ram_bases, ram_sizes,
->>> +                       ppc460ex_sdram_bank_sizes);
->>>
->>>     /* FIXME: does 460EX have ECC interrupts? */
->>>     ppc440_sdram_init(env, SDRAM_NR_BANKS, ram_memories,
->>>
->>
->
->
->
+  According to Wikipedia [1] this means the CPU is defined as part of the
+  K7 family while the AMD64 ISA was only introduced with the K8 series!
+
+  This causes some software such as LLVM to notice the problem (32-bit cpu
+  with 64-bit capability reported in the cpuid flag) and produce various
+  error messages.
+
+  The simple solution would be to upgrade this definition to use the Sledge=
+hammer
+  family (15) instead. =
+
+
+  [1] https://en.wikipedia.org/wiki/List_of_AMD_CPU_microarchitectures
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1860575/+subscriptions
 
