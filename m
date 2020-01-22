@@ -6,38 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F1FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E37C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAE862465A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:03:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE862465A
+	by mail.kernel.org (Postfix) with ESMTPS id 0F5E72465A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:05:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5E72465A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuGbP-0006GW-Rt
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:03:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56416)
+	id 1iuGdI-0007Ij-6I
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:05:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iuGZM-0004wE-P2
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:01:22 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iuGcY-0006q2-Q0
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:04:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iuGZK-0002rG-UI
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:01:20 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:60653)
+ (envelope-from <laurent@vivier.eu>) id 1iuGcX-0004XV-MZ
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:04:38 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:41353)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGZK-0002pr-Ke
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:01:18 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGcX-0004X1-DV
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:04:37 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MBltK-1ikPCB0ol2-00CDg5; Wed, 22 Jan 2020 15:01:15 +0100
-Subject: Re: [PATCH] linux-user: Reserve space for brk
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200117230245.5040-1-richard.henderson@linaro.org>
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mwwm5-1jo9EM3gU7-00yNAX; Wed, 22 Jan 2020 15:04:22 +0100
+Subject: Re: [PATCH 01/12] linux-user: Add support for FS_IOC_<GET|SET>VERSION
+ ioctls
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1579214991-19602-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1579214991-19602-2-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,32 +83,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <27e64eac-915f-fe58-7402-baf531b3f306@vivier.eu>
-Date: Wed, 22 Jan 2020 15:01:14 +0100
+Message-ID: <7cb21df7-95cd-f872-a8da-2f91ecb645d8@vivier.eu>
+Date: Wed, 22 Jan 2020 15:04:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200117230245.5040-1-richard.henderson@linaro.org>
+In-Reply-To: <1579214991-19602-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:D4hktJoH8qvNEgwu9mKsPqwa6KmHFnpkiWytC98luVumqFpJDmw
- XmUjPBsfIF21gFCrbUYs5QXI47w8w3vNb3mbnqAdssxRHqLU7mH/lEGL28DIlMK8gkBCdjz
- ejmwlkaGGUrO9wUJbmQzlGXpOEDAwrs0UeHS8XfJyC0YsgzZfo/MBsf/5ViTeEUhZhWypJW
- StV4xGG9shWZ0Lz6IkQoQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:aNumNPssHyw=:8OVCGFZEmmXMlvwf19O7DR
- N3KDEiwXfvE1QZEFgqljU5WKUIErcoycxrz2ECcSgZd1X6HMm8PJIqrTIitQvY6aS6SAh50GQ
- n1tHv9qw8V84AOl8378jD3p/FVfYMYZDPT1dCAFsQwTh5ZzT96+zqUzu+kSTVhDRiB5Qo+qxj
- yEMNtuGyqc1hU5ry+VdphmzUu7M7cZgstG40RKKh2NOExg9zrHHT/a1fp1ZiKaVSb0DzuRJFM
- TQ+RkA2kNxfAU6d0GEQbZuOpw2g519QF6RQMZnoyHH8stvwO3NKVdLLMmnoquZqvSE7xImMZa
- UzJZ2w9j7idakSDywaPARrFNa1rj3FsY/aaYfqynXiEdGlKTOjNw3oym1u2bfy8rvcCCj/800
- P1W9SXS78i2VJWoLRzpFaxx2ZBSdCJx+cLf8h/y+N/9q5ZrNBwtPphfQCqhgtP+NTCufy/zw3
- GTYqU95YtM+Mni7wdYyDdH9LOxHSmXxVs+lwHDy8fTD5ZleLi9fYXwvHUKVTFdtDbj0i4XLaH
- nxAqrAgnKauAv5Qk1ALoLREBsN1QPT2LVhV7Yg532mtDTQFLdt/RvaHsyK9GaMEYtyzZe/A9S
- dqfHr7LA2zEyNw73TAHoLB/2PUrfUOjTh5QJmPMHpAPYkIHe5kplAD51AmWHToOEOxHefJ+Yb
- rhskCIN2FfOSZbl+YaQdYztvxjLY42BwYVEy62XsKDOmslwIBdz++5rOF+1AHubYArjEhl5W0
- 3GZS8D7P3z6AGOzeR8egC9L1v32fOa7ndeUQ9gYYL2H9Ex0Odzw8DGBudsX+dVnUgh+T0fnVP
- RidsXQYDWmKSjE+KpQEmfARJNP7ri8F0O5bj/U8zJz7QLpfAwg=
+X-Provags-ID: V03:K1:0iJLtmaH0T2NGr9aWFhxqz6gCfi1zTK6pCJTrxD9w+MD71DoeOT
+ SwAD109i0JG0HHnTQ2CK4zKRSysEyFZq1CKzJ7jdyrId3N3UUl7QtPWWz6jFzU0g0JEIcNq
+ Ac62rytENJsJsmV1nA3BPIyHs3v8Y0O9R8NlK5K+Y94uW7Zxmywun6slcICLMmUopsk2LB/
+ W6xAG7GrgOlXArAoNByxw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hagRY2saSmM=:sBWVL2RwpCgPFpz7K8CBN0
+ hx7aj1thAGDSkKgqZKIiaPYVG+qzw1LcTl44hjWQ5tpoQk/NIvsdat3uqeAo3jVg5IE/SZuAM
+ aPMOOzYAwkTJFrV+mSjiQ47gIQUbnxkPBzEuzmPnKof0M5cOeUP9JH1+gds8JQyCtNvN/eBT/
+ ScAZOCarEJAJniC6JUGGgVrhWOiKmTJfX1WNNC6AUIp5c1hxCfCm12gFOdsab3WHCowQre+jF
+ 7jofLk2wIwl4tiGcIMRNcMxj2VHeA2asHO+8VBC7Meu+ENZtqe06fRUr8wFM3johx9bc0YN0z
+ DkaZBeBw3hUY6WhfXtdOrdfmerInFGNQ5z8P/33wMr+DTY9QXLrWgBB3iAPzeTvkUYWqfPdT6
+ j/HYQwHKTEAHgk6OAf5MM3QQ4X3slpaHCsHSI05pZD2x2vjmvgAczF7OiYP6ta3B9oNLDCdEg
+ IkampSHEKJl7RrG5zyLBefOBKccZ20STjoDGEWGs6ab3njO1ar+WXRtuwbcIfyKGU0GIyvCMW
+ rnp0Z2YwHpPRJpKLeX4RYROW24A9phbgPYTmv9p+J7kEz1Hq/skJVbD11N+dX1O09vvIqP3nX
+ DFTbLaU8mbweG7/yhVf9mXadVx4MwGw6EW6LZenWzAenLQHHEDkvkglnCnCzVE+bjQLCryULA
+ zhGzbRf0WkVdBuVz545VHnlK7DY6pOhB+Wc8cVoIfxPvEjrlJJZeIxWSKfnD+nAEkuHw3JvcS
+ 0W7CRUMLlBLFtpl6eq0w7MlDamLY1HkJlMUk0+UMdzKKAC9UgIqGS8rmwwCb2jEumJh3nx52L
+ fMWvXfevAz7+vK+8J+ObVeH4zlFEai5RQiqMO5i9RYlVHqQxss=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 217.72.192.74
@@ -121,162 +123,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 18/01/2020 à 00:02, Richard Henderson a écrit :
-> With bad luck, we can wind up with no space at all for brk,
-> which will generally cause the guest malloc to fail.
+Le 16/01/2020 à 23:49, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> This bad luck is easier to come by with ET_DYN (PIE) binaries,
-> where either the stack or the interpreter (ld.so) gets placed
-> immediately after the main executable.
+> A very specific thing for these two ioctls is that their code
+> implies that their third argument is of type 'long', but the
+> kernel uses that argument as if it is of type 'int'. This anomaly
+> is recognized also in commit 6080723 (linux-user: Implement
+> FS_IOC_GETFLAGS and FS_IOC_SETFLAGS ioctls).
 > 
-> But there's nothing preventing this same thing from happening
-> with ET_EXEC (normal) binaries, during probe_guest_base().
-> 
-> In both cases, reserve some extra space via mmap and release
-> it back to the system after loading the interpreter and
-> allocating the stack.
-> 
-> The choice of 16MB is somewhat arbitrary.  It's enough for libc
-> to get going, but without being so large that 32-bit guests or
-> 32-bit hosts are in danger of running out of virtual address space.
-> It is expected that libc will be able to fall back to mmap arenas
-> after the limited brk space is exhausted.
-> 
-> Launchpad: https://bugs.launchpad.net/qemu/+bug/1749393
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
+>  linux-user/ioctls.h       | 2 ++
+>  linux-user/syscall_defs.h | 8 +++++---
+>  2 files changed, 7 insertions(+), 3 deletions(-)
 > 
-> Note that the LP comments mention the fix for this in the kernel,
-> and about there being a "guaranteed 128MB gap" for x86_64.  As far
-> as I can see, this "gap" is part of the unmapped_area() algorithm.
-> For qemu, this would correspond to mmap_find_vma(), except that,
-> except when we fall back to mmap_find_vma_reserved(), we are not
-> 100% in control over the allocation.
-> 
-> 
-> r~
-> 
-> ---
->  linux-user/qemu.h    |  1 +
->  linux-user/elfload.c | 73 +++++++++++++++++++++++++++++++++-----------
->  2 files changed, 57 insertions(+), 17 deletions(-)
-> 
-> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-> index f6f5fe5fbb..560a68090e 100644
-> --- a/linux-user/qemu.h
-> +++ b/linux-user/qemu.h
-> @@ -35,6 +35,7 @@ struct image_info {
->          abi_ulong       end_data;
->          abi_ulong       start_brk;
->          abi_ulong       brk;
-> +        abi_ulong       reserve_brk;
->          abi_ulong       start_mmap;
->          abi_ulong       start_stack;
->          abi_ulong       stack_limit;
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 07b16cc0f4..2edb5d5b31 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -10,6 +10,7 @@
->  #include "qemu/path.h"
->  #include "qemu/queue.h"
->  #include "qemu/guest-random.h"
-> +#include "qemu/units.h"
+> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+> index c6b9d6a..c44f42e 100644
+> --- a/linux-user/ioctls.h
+> +++ b/linux-user/ioctls.h
+> @@ -138,6 +138,8 @@
 >  
->  #ifdef _ARCH_PPC64
->  #undef ARCH_DLINFO
-> @@ -2364,24 +2365,51 @@ static void load_elf_image(const char *image_name, int image_fd,
->          }
->      }
+>       IOCTL(FS_IOC_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
+>       IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+> +     IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
+> +     IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
 >  
-> -    load_addr = loaddr;
-> -    if (ehdr->e_type == ET_DYN) {
-> -        /* The image indicates that it can be loaded anywhere.  Find a
-> -           location that can hold the memory space required.  If the
-> -           image is pre-linked, LOADDR will be non-zero.  Since we do
-> -           not supply MAP_FIXED here we'll use that address if and
-> -           only if it remains available.  */
-> -        load_addr = target_mmap(loaddr, hiaddr - loaddr, PROT_NONE,
-> -                                MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
-> -                                -1, 0);
-> -        if (load_addr == -1) {
-> -            goto exit_perror;
-> +    if (pinterp_name != NULL) {
-> +        /*
-> +         * This is the main executable.
-> +         *
-> +         * Reserve extra space for brk.
-> +         * We hold on to this space while placing the interpreter
-> +         * and the stack, lest they be placed immediately after
-> +         * the data segment and block allocation from the brk.
-> +         *
-> +         * 16MB is chosen as "large enough" without being so large
-> +         * as to allow the result to not fit with a 32-bit guest on
-> +         * a 32-bit host.
-> +         */
-> +        info->reserve_brk = 16 * MiB;
-> +        hiaddr += info->reserve_brk;
-> +
-> +        if (ehdr->e_type == ET_EXEC) {
-> +            /*
-> +             * Make sure that the low address does not conflict with
-> +             * MMAP_MIN_ADDR or the QEMU application itself.
-> +             */
-> +            probe_guest_base(image_name, loaddr, hiaddr);
->          }
-> -    } else if (pinterp_name != NULL) {
-> -        /* This is the main executable.  Make sure that the low
-> -           address does not conflict with MMAP_MIN_ADDR or the
-> -           QEMU application itself.  */
-> -        probe_guest_base(image_name, loaddr, hiaddr);
-> +    }
-> +
-> +    /*
-> +     * Reserve address space for all of this.
-> +     *
-> +     * In the case of ET_EXEC, we supply MAP_FIXED so that we get
-> +     * exactly the address range that is required.
-> +     *
-> +     * Otherwise this is ET_DYN, and we are searching for a location
-> +     * that can hold the memory space required.  If the image is
-> +     * pre-linked, LOADDR will be non-zero, and the kernel should
-> +     * honor that address if it happens to be free.
-> +     *
-> +     * In both cases, we will overwrite pages in this range with mappings
-> +     * from the executable.
-> +     */
-> +    load_addr = target_mmap(loaddr, hiaddr - loaddr, PROT_NONE,
-> +                            MAP_PRIVATE | MAP_ANON | MAP_NORESERVE |
-> +                            (ehdr->e_type == ET_EXEC ? MAP_FIXED : 0),
-> +                            -1, 0);
-> +    if (load_addr == -1) {
-> +        goto exit_perror;
->      }
->      load_bias = load_addr - loaddr;
+>  #ifdef CONFIG_USBFS
+>    /* USB ioctls */
+> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> index 98c2119..f68a8b6 100644
+> --- a/linux-user/syscall_defs.h
+> +++ b/linux-user/syscall_defs.h
+> @@ -911,12 +911,14 @@ struct target_pollfd {
+>  #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
+>  #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
 >  
-> @@ -2860,6 +2888,17 @@ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
->      bprm->core_dump = &elf_core_dump;
->  #endif
+> -/* Note that the ioctl numbers claim type "long" but the actual type
+> - * used by the kernel is "int".
+> +/*
+> + * Note that the ioctl numbers for FS_IOC_<GET|SET><FLAGS|VERSION>
+> + * claim type "long" but the actual type used by the kernel is "int".
+>   */
+>  #define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
+>  #define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
+> -
+> +#define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
+> +#define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+>  #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
 >  
-> +    /*
-> +     * If we reserved extra space for brk, release it now.
-> +     * The implementation of do_brk in syscalls.c expects to be able
-> +     * to mmap pages in this space.
-> +     */
-> +    if (info->reserve_brk) {
-> +        abi_ulong start_brk = HOST_PAGE_ALIGN(info->brk);
-> +        abi_ulong end_brk = HOST_PAGE_ALIGN(info->brk + info->reserve_brk);
-> +        target_munmap(start_brk, end_brk - start_brk);
-> +    }
-> +
->      return 0;
->  }
->  
+>  /* usb ioctls */
 > 
 
 Applied to my linux-user branch.
