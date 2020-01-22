@@ -2,89 +2,87 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91911C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11853C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59A672253D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:09:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC7122253D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:10:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIh3H4M0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A672253D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ceiKSfQl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC7122253D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuB4t-0001Ox-20
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 03:09:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44092)
+	id 1iuB5y-0002tL-Vh
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 03:10:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44117)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iuB3W-0008Tj-7v
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:08:08 -0500
+ (envelope-from <mst@redhat.com>) id 1iuB4L-00014P-7g
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:08:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iuB3U-0007KC-Fm
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:08:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28879
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iuB4K-0007mD-6A
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:08:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42158
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iuB3U-0007Jz-B8
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:08:04 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iuB4J-0007lh-Oj
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:08:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579680483;
+ s=mimecast20190719; t=1579680535;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=H5hK2ahvlTWZjoA0qHEeWEGLkqAnLHJ+H54RsXOgeXo=;
- b=WIh3H4M0X1OW6zwfCymawG3/bYqnHfGcVKbF7/zujPmBnKEsvq2VjQ1umROWOAq5nzfszm
- AJKBI55IC892sWkJeJkduNC0JWrUVqJ13VcZdtoMyXv/Ul0pXoIAmpAxZCz5g1iKUizt8c
- mY7SZJOLLnlM+WaUwiBjnXhCfCl6B8k=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-81XfhTS-NLKiJxi7xIGI5g-1; Wed, 22 Jan 2020 03:07:57 -0500
-Received: by mail-wm1-f70.google.com with SMTP id l11so1256123wmi.0
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 00:07:56 -0800 (PST)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=7jbGyeuMwv2CGwDe+4+FRf90DJhJt/iFUIQrlaWheaQ=;
+ b=ceiKSfQliLlFe4JtR+FCRuqY4ImfuLU1RNoxNxC/gG09mv0B0m8ioxiMsVR9Zy5hg737bP
+ LdXGM5VrCAx+0z6w2Ca2Uutn9kADF3D01grNsaEMrrV8d1iqwivdOSP5ZcQiMKcv1tK/LI
+ 5RWX9QKfAN4U7wjNIEdtrdYRuN+w4fA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-BhE86HY7PcGrtnSIe6cAGA-1; Wed, 22 Jan 2020 03:08:53 -0500
+Received: by mail-wm1-f69.google.com with SMTP id 18so1720584wmp.0
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 00:08:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Mk1bRKTzOOm9GAJ9gm/7q17RgkrdHOw7irvGhD8As98=;
- b=r3aCSmgHhxKBq9nGcFz79Zf63aJSLgXeycVf2lc4v+hgomz0oC0/BAk9EhQTC8WyHZ
- 2OoocI8ggPBiMaxILSGxTywwe7AqGSSquq+YZHYwBI7NNe8tXWFjehooOh/ZR0wGT9JI
- a1ghDfdCyONDyjafBqhMMOkAMeADnIMAjBWB3t2EkmSmkI2bJG+63is8X58zSjl6wEaS
- lZlLuvMaR7C5i38eQ7SQkft3sDMl7jucUjekUM23tj1U+2vB0YZ7myofn8qwu9qW+u3s
- thBsNmvpEI7xFdAWkSBcGX6hqjFruQVYRZ3eLXPaeafQSuj3srmS/apvriiUN8Nr4l80
- lAKA==
-X-Gm-Message-State: APjAAAVMHPnOE9fNEvdgkyx12tLGxQMvES1GpcJ/farVds8BtpQSkZJp
- CQjxHqnXbl6FOU8DZZE/JOKIXRvfUVqouAiTRhQzpgploQ5skx0pSS0wKh34Um1Wr8pnKP64ilx
- SvtGceFWyCWS9Jic=
-X-Received: by 2002:a5d:6441:: with SMTP id d1mr9447836wrw.93.1579680475436;
- Wed, 22 Jan 2020 00:07:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx9DyfR6v47IaU2iNU5AfroMkwyXL0B8e/UoJUi2aYWRxRdb8XqV3Ei+ukFvO75Fb7GkBwQHg==
-X-Received: by 2002:a5d:6441:: with SMTP id d1mr9447809wrw.93.1579680475099;
- Wed, 22 Jan 2020 00:07:55 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=am4EjmW9E48Zpqsim6RC+G3gEvfWGSqcNR38rpxPe+M=;
+ b=PUKx0qZeY8UYfivAdRwKXt1kSDAkbt/YrUtir4kfRGbpv5c5T6bhZ7ENHYIjy2y0IR
+ iYCMaOJoKxSvBI7uSijYsFRouhHVwDSkXp3Kyn44gFUjs5UwsA36044lVFDpX0wBCHpt
+ Q5qf5dCNosYvDfko+02+gsNEjavGvCtU8zJXsMNJABvEAsdvlXtRmNIvPRIAFqHbBfGh
+ 4z2XJm8QOWvVjyPDDF76f9whd7kPsZobqoJ50bxYuNu+wBFP4Co3JIRK1g1uVsEnqKzL
+ LcZ6XNyCLGrI7rT8fTyel75NqGvJ+07mCInp4PzelHwyFnt/7RnWp6OAxvPqeMRugMrl
+ ivnA==
+X-Gm-Message-State: APjAAAX+2g1fZ38uNFJfr5J5pmxG2r1eGkmPJFcWu2kXwIUpr3rsYHq6
+ d4M91ih7gh4ikNN/DhsNzpCljBFVX+UwvsF9XLiWjqr4unXy2NrcAcU7zi0uFIT3upbb5TO0C1N
+ vaxOXDrDS4H+aBq4=
+X-Received: by 2002:a7b:c5d8:: with SMTP id n24mr1635057wmk.50.1579680532034; 
+ Wed, 22 Jan 2020 00:08:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzrZOzsPTrSqe1EBoOCeqZIekp8akD6S4z76xWyyQgINF0VSqBAyqI8TLorxk5OAbuHuJUwuA==
+X-Received: by 2002:a7b:c5d8:: with SMTP id n24mr1634997wmk.50.1579680531355; 
+ Wed, 22 Jan 2020 00:08:51 -0800 (PST)
 Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
  by smtp.gmail.com with ESMTPSA id
- k82sm2940771wmf.10.2020.01.22.00.07.54
+ m7sm56021634wrr.40.2020.01.22.00.08.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 00:07:54 -0800 (PST)
-Date: Wed, 22 Jan 2020 03:07:52 -0500
+ Wed, 22 Jan 2020 00:08:50 -0800 (PST)
+Date: Wed, 22 Jan 2020 03:08:49 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: Re: [PULL v2 00/17] virtio, pc: fixes, features
-Message-ID: <20200122030732-mutt-send-email-mst@kernel.org>
-References: <20200122064907.512501-1-mst@redhat.com>
- <157967700947.9468.10998353016922296572@f6d1ed32ca6b>
+Subject: [PATCH] vhost: coding style fix
+Message-ID: <20200122080840.592054-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <157967700947.9468.10998353016922296572@f6d1ed32ca6b>
-X-MC-Unique: 81XfhTS-NLKiJxi7xIGI5g-1
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
+X-MC-Unique: BhE86HY7PcGrtnSIe6cAGA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -92,7 +90,7 @@ Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,136 +102,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 21, 2020 at 11:10:10PM -0800, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200122064907.512501-1-mst@redhat.=
-com/
->=20
->=20
->=20
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below fo=
-r
-> more information:
->=20
-> Type: series
-> Message-id: 20200122064907.512501-1-mst@redhat.com
-> Subject: [PULL v2 00/17] virtio, pc: fixes, features
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
-> From https://github.com/patchew-project/qemu
->  * [new tag]         patchew/20200122064907.512501-1-mst@redhat.com -> pa=
-tchew/20200122064907.512501-1-mst@redhat.com
-> Switched to a new branch 'test'
-> 920a20e i386:acpi: Remove _HID from the SMBus ACPI entry
-> cd87503 vhost: Only align sections for vhost-user
-> 9ef0893 vhost: Add names to section rounded warning
-> 61681af vhost-vsock: delete vqs in vhost_vsock_unrealize to avoid memleak=
-s
-> ee96146 virtio-scsi: convert to new virtio_delete_queue
-> c221c38 virtio-scsi: delete vqs in unrealize to avoid memleaks
-> 4a878a8 virtio-9p-device: convert to new virtio_delete_queue
-> addbaec virtio-9p-device: fix memleak in virtio_9p_device_unrealize
-> 9a05a8d bios-tables-test: document expected file update
-> 0478609 acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command
-> 5765438 acpi: cpuhp: spec: add typical usecases
-> 23f1ef6 acpi: cpuhp: introduce 'Command data 2' field
-> aa3f3fa acpi: cpuhp: spec: clarify store into 'Command data' when 'Comman=
-d field' =3D=3D 0
-> a245ce7 acpi: cpuhp: spec: fix 'Command data' description
-> d310d0d acpi: cpuhp: spec: clarify 'CPU selector' register usage and endi=
-anness
-> b6b3688 tests: q35: MCH: add default SMBASE SMRAM lock test
-> 522df3f q35: implement 128K SMRAM at default SMBASE address
->=20
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> 1/17 Checking commit 522df3f88659 (q35: implement 128K SMRAM at default S=
-MBASE address)
-> 2/17 Checking commit b6b368876a2f (tests: q35: MCH: add default SMBASE SM=
-RAM lock test)
-> 3/17 Checking commit d310d0d464eb (acpi: cpuhp: spec: clarify 'CPU select=
-or' register usage and endianness)
-> 4/17 Checking commit a245ce7de00c (acpi: cpuhp: spec: fix 'Command data' =
-description)
-> 5/17 Checking commit aa3f3fa5fc4e (acpi: cpuhp: spec: clarify store into =
-'Command data' when 'Command field' =3D=3D 0)
-> 6/17 Checking commit 23f1ef67a7a0 (acpi: cpuhp: introduce 'Command data 2=
-' field)
-> 7/17 Checking commit 5765438a9869 (acpi: cpuhp: spec: add typical usecase=
-s)
-> 8/17 Checking commit 04786095aecf (acpi: cpuhp: add CPHP_GET_CPU_ID_CMD c=
-ommand)
-> 9/17 Checking commit 9a05a8d4907a (bios-tables-test: document expected fi=
-le update)
-> WARNING: line over 80 characters
-> #23: FILE: tests/qtest/bios-tables-test.c:20:
-> + * Contributor or ACPI Maintainer (steps 4-7 need to be redone to resolv=
-e conflicts
->=20
-> total: 0 errors, 1 warnings, 38 lines checked
->=20
-> Patch 9/17 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 10/17 Checking commit addbaecb1d51 (virtio-9p-device: fix memleak in virt=
-io_9p_device_unrealize)
-> 11/17 Checking commit 4a878a8af35b (virtio-9p-device: convert to new virt=
-io_delete_queue)
-> 12/17 Checking commit c221c38c4eb0 (virtio-scsi: delete vqs in unrealize =
-to avoid memleaks)
-> 13/17 Checking commit ee961460de93 (virtio-scsi: convert to new virtio_de=
-lete_queue)
-> 14/17 Checking commit 61681af92804 (vhost-vsock: delete vqs in vhost_vsoc=
-k_unrealize to avoid memleaks)
-> 15/17 Checking commit 9ef0893d58b6 (vhost: Add names to section rounded w=
-arning)
-> 16/17 Checking commit cd875038bb0f (vhost: Only align sections for vhost-=
-user)
-> ERROR: trailing whitespace
-> #49: FILE: hw/virtio/vhost.c:554:
-> +    if (dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER) {  =
- $
->=20
-> WARNING: line over 80 characters
-> #64: FILE: hw/virtio/vhost.c:569:
-> +        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gp=
-a, mrs_size,
->=20
-> total: 1 errors, 1 warnings, 43 lines checked
->=20
-> Patch 16/17 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> 17/17 Checking commit 920a20e6fd35 (i386:acpi: Remove _HID from the SMBus=
- ACPI entry)
+Drop a trailing whitespace. Make line shorter.
 
+Fixes: 76525114736e8 ("vhost: Only align sections for vhost-user")
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/vhost.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-This is benighn, will fix with a follow-up patch.
-
-> =3D=3D=3D OUTPUT END =3D=3D=3D
->=20
-> Test command exited with code: 1
->=20
->=20
-> The full log is available at
-> http://patchew.org/logs/20200122064907.512501-1-mst@redhat.com/testing.ch=
-eckpatch/?type=3Dmessage.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 25fd469179..9edfadc81d 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -551,7 +551,7 @@ static void vhost_region_add_section(struct vhost_dev *=
+dev,
+     trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
+                                    mrs_host);
+=20
+-    if (dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER) {  =
+=20
++    if (dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER) {
+         /* Round the section to it's page size */
+         /* First align the start down to a page boundary */
+         size_t mrs_page =3D qemu_ram_pagesize(mrs_rb);
+@@ -566,8 +566,8 @@ static void vhost_region_add_section(struct vhost_dev *=
+dev,
+         if (alignage) {
+             mrs_size +=3D mrs_page - alignage;
+         }
+-        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gpa,=
+ mrs_size,
+-                                               mrs_host);
++        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gpa,
++                                               mrs_size, mrs_host);
+     }
+=20
+     if (dev->n_tmp_sections) {
+--=20
+MST
 
 
