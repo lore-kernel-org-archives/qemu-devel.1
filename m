@@ -2,98 +2,56 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66BDCC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:06:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EDCFC32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:18:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3012024655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:06:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhiqXg00"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3012024655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0879624655
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:18:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0879624655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu9A5-0007bL-Co
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:06:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60048)
+	id 1iu9LZ-00011b-3G
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:18:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33761)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iu8yp-000382-AZ
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:55:08 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iu9Ku-0000aT-JU
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:17:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iu8yl-00062s-Sx
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:55:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54182
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu8yl-00062g-Ok
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:55:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579672503;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=e6oF8ptLJSLl44PBoGi3WUQj8MqGR3g9tIutmWvq7mo=;
- b=UhiqXg00+4m7kQss8ADPYOd9FtUMlmDH5a8qylVnGxzdPTpy3ObRtqpSB1J+PWCKJxMcqJ
- oCUNo0bHS9QqD/T6bgAso22TkpOQiV2QImVE5GXo+y64B9at7DhmxEHBwQ6K+LJg/ry3MY
- DL1hyH4Oi/V0tomiAj8Xan9uBb67ixU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-j5dODfXyPTKeQBrDKtHMlg-1; Wed, 22 Jan 2020 00:52:09 -0500
-Received: by mail-wr1-f71.google.com with SMTP id f15so2574345wrr.2
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 21:52:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=e+M60MZmw7NUe0xGRZqvTtNyN03f8rI9bLRMhM9s7VE=;
- b=fUEyQxMxIX5n2/6Ow5ZbTrnLLLszeKaNuTa4DHpws85Yns7kgd8ez9Cj9/4fPKHnh+
- 61K5+fmjVoggIAYg3a90D9jZon1L8wncNSKyisb2HkBLJzQr2cGUJmNFehPFVpCkTMsx
- nj/YSJMQfyWT3iK9mqIrIq+s+v56+E4EgZz3kRo09+ZuoN9bZsmkS3xtRalfjJWt5bxK
- hbaLIDph2rfVWV3MtIPdKU/MZCCV5GPIbn8RYcS+RgVzZPf91TXvBVtfrroYrQLzBk9f
- wEyBiF8E5SzPcJDBW1et59wmddz7EhTW5C2Y9+IvTst/6KrlB1ONKDPm+sWGP+9bU+tp
- zwSw==
-X-Gm-Message-State: APjAAAWgHyLrrH2reAF69rDA3sT0YxJ8GmFqshoECZbE9LYEKzq/FioS
- Zhtt8m2RXDcqzbrEzBYKca4GvMxgOuLETyYBSaHgIpSBVIjTz9tEDle3SdU83gbu5pB6oTKCXrW
- bInWJETh492ANIxo=
-X-Received: by 2002:adf:a746:: with SMTP id e6mr9011703wrd.329.1579672328245; 
- Tue, 21 Jan 2020 21:52:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyZGZhfi5cSW135aQDcfYrg1Tze217waWTrmf2dO4TP3H98PyupYZ7VaRELggtTnlNCZ8LCxA==
-X-Received: by 2002:adf:a746:: with SMTP id e6mr9011679wrd.329.1579672328008; 
- Tue, 21 Jan 2020 21:52:08 -0800 (PST)
-Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
- by smtp.gmail.com with ESMTPSA id
- z21sm2573980wml.5.2020.01.21.21.52.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 21:52:07 -0800 (PST)
-Date: Wed, 22 Jan 2020 00:52:05 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 07/17] acpi: cpuhp: spec: add typical usecases
-Message-ID: <20200122055115.429945-8-mst@redhat.com>
-References: <20200122055115.429945-1-mst@redhat.com>
-MIME-Version: 1.0
+ (envelope-from <no-reply@patchew.org>) id 1iu9Ks-00021l-Sa
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:17:56 -0500
+Resent-Date: Wed, 22 Jan 2020 01:17:56 -0500
+Resent-Message-Id: <E1iu9Ks-00021l-Sa@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21119)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iu9Ks-00020L-Kr
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:17:54 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579673862142539.0028253180434;
+ Tue, 21 Jan 2020 22:17:42 -0800 (PST)
 In-Reply-To: <20200122055115.429945-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: j5dODfXyPTKeQBrDKtHMlg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Subject: Re: [PULL 00/17] virtio, pc: fixes, features
+Message-ID: <157967386115.8714.16146185353755623209@f6d1ed32ca6b>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mst@redhat.com
+Date: Tue, 21 Jan 2020 22:17:42 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,117 +63,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
-
-Document work-flows for
-  * enabling/detecting modern CPU hotplug interface
-  * finding a CPU with pending 'insert/remove' event
-  * enumerating present and possible CPUs
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1575896942-331151-9-git-send-email-imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
----
- docs/specs/acpi_cpu_hotplug.txt | 51 +++++++++++++++++++++++++++++++--
- 1 file changed, 48 insertions(+), 3 deletions(-)
-
-diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
-txt
-index 9879f9ef7e..cb99cf3c8e 100644
---- a/docs/specs/acpi_cpu_hotplug.txt
-+++ b/docs/specs/acpi_cpu_hotplug.txt
-@@ -15,14 +15,14 @@ CPU present bitmap for:
-   PIIX-PM  (IO port 0xaf00-0xaf1f, 1-byte access)
-   One bit per CPU. Bit position reflects corresponding CPU APIC ID. Read-o=
-nly.
-   The first DWORD in bitmap is used in write mode to switch from legacy
--  to new CPU hotplug interface, write 0 into it to do switch.
-+  to modern CPU hotplug interface, write 0 into it to do switch.
- ---------------------------------------------------------------
- QEMU sets corresponding CPU bit on hot-add event and issues SCI
- with GPE.2 event set. CPU present map is read by ACPI BIOS GPE.2 handler
- to notify OS about CPU hot-add events. CPU hot-remove isn't supported.
-=20
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
--ACPI CPU hotplug interface registers:
-+Modern ACPI CPU hotplug interface registers:
- -------------------------------------
- Register block base address:
-     ICH9-LPC IO port 0x0cd8
-@@ -67,6 +67,7 @@ write access:
-     [0x0-0x3] CPU selector: (DWORD access)
-               selects active CPU device. All following accesses to other
-               registers will read/store data from/to selected CPU.
-+              Valid values: [0 .. max_cpus)
-     [0x4] CPU device control fields: (1 byte access)
-         bits:
-             0: reserved, OSPM must clear it before writing to register.
-@@ -98,4 +99,48 @@ write access:
-               2: stores value into OST status register, triggers
-                  ACPI_DEVICE_OST QMP event from QEMU to external applicati=
-ons
-                  with current values of OST event and status registers.
--            other values: reserved
-+              other values: reserved
-+
-+Typical usecases:
-+    - (x86) Detecting and enabling modern CPU hotplug interface.
-+      QEMU starts with legacy CPU hotplug interface enabled. Detecting and
-+      switching to modern interface is based on the 2 legacy CPU hotplug f=
-eatures:
-+        1. Writes into CPU bitmap are ignored.
-+        2. CPU bitmap always has bit#0 set, corresponding to boot CPU.
-+
-+      Use following steps to detect and enable modern CPU hotplug interfac=
-e:
-+        1. Store 0x0 to the 'CPU selector' register,
-+           attempting to switch to modern mode
-+        2. Store 0x0 to the 'CPU selector' register,
-+           to ensure valid selector value
-+        3. Store 0x0 to the 'Command field' register,
-+        4. Read the 'Command data 2' register.
-+           If read value is 0x0, the modern interface is enabled.
-+           Otherwise legacy or no CPU hotplug interface available
-+
-+    - Get a cpu with pending event
-+      1. Store 0x0 to the 'CPU selector' register.
-+      2. Store 0x0 to the 'Command field' register.
-+      3. Read the 'CPU device status fields' register.
-+      4. If both bit#1 and bit#2 are clear in the value read, there is no =
-CPU
-+         with a pending event and selected CPU remains unchanged.
-+      5. Otherwise, read the 'Command data' register. The value read is th=
-e
-+         selector of the CPU with the pending event (which is already
-+         selected).
-+
-+    - Enumerate CPUs present/non present CPUs
-+      01. Set the present CPU count to 0.
-+      02. Set the iterator to 0.
-+      03. Store 0x0 to the 'CPU selector' register, to ensure that it's in
-+          a valid state and that access to other registers won't be ignore=
-d.
-+      04. Store 0x0 to the 'Command field' register to make 'Command data'
-+          register return 'CPU selector' value of selected CPU
-+      05. Read the 'CPU device status fields' register.
-+      06. If bit#0 is set, increment the present CPU count.
-+      07. Increment the iterator.
-+      08. Store the iterator to the 'CPU selector' register.
-+      09. Read the 'Command data' register.
-+      10. If the value read is not zero, goto 05.
-+      11. Otherwise store 0x0 to the 'CPU selector' register, to put it
-+          into a valid state and exit.
-+          The iterator at this point equals "max_cpus".
---=20
-MST
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyMjA1NTExNS40Mjk5
+NDUtMS1tc3RAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwMTIyMDU1MTE1LjQyOTk0NS0x
+LW1zdEByZWRoYXQuY29tClN1YmplY3Q6IFtQVUxMIDAwLzE3XSB2aXJ0aW8sIHBjOiBmaXhlcywg
+ZmVhdHVyZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1w
+YXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNo
+LnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBw
+YXRjaGV3LzIwMjAwMTIyMDU1MTE1LjQyOTk0NS0xLW1zdEByZWRoYXQuY29tIC0+IHBhdGNoZXcv
+MjAyMDAxMjIwNTUxMTUuNDI5OTQ1LTEtbXN0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0JwpkYmJiZTdiIGkzODY6YWNwaTogUmVtb3ZlIF9ISUQgZnJvbSB0aGUgU01C
+dXMgQUNQSSBlbnRyeQpiZDEwYTZiIHZob3N0OiBPbmx5IGFsaWduIHNlY3Rpb25zIGZvciB2aG9z
+dC11c2VyCmFiNDY5NmMgdmhvc3Q6IEFkZCBuYW1lcyB0byBzZWN0aW9uIHJvdW5kZWQgd2Fybmlu
+Zwo3YzgzZmYyIHZob3N0LXZzb2NrOiBkZWxldGUgdnFzIGluIHZob3N0X3Zzb2NrX3VucmVhbGl6
+ZSB0byBhdm9pZCBtZW1sZWFrcwpiN2E2ZmE5IHZpcnRpby1zY3NpOiBjb252ZXJ0IHRvIG5ldyB2
+aXJ0aW9fZGVsZXRlX3F1ZXVlCmMxNTFjYWMgdmlydGlvLXNjc2k6IGRlbGV0ZSB2cXMgaW4gdW5y
+ZWFsaXplIHRvIGF2b2lkIG1lbWxlYWtzCjQzYjI1NzYgdmlydGlvLTlwLWRldmljZTogY29udmVy
+dCB0byBuZXcgdmlydGlvX2RlbGV0ZV9xdWV1ZQoyMzNlZGU5IHZpcnRpby05cC1kZXZpY2U6IGZp
+eCBtZW1sZWFrIGluIHZpcnRpb185cF9kZXZpY2VfdW5yZWFsaXplCmNiY2E3YjQgYmlvcy10YWJs
+ZXMtdGVzdDogZG9jdW1lbnQgZXhwZWN0ZWQgZmlsZSB1cGRhdGUKODg5MjQ1YyBhY3BpOiBjcHVo
+cDogYWRkIENQSFBfR0VUX0NQVV9JRF9DTUQgY29tbWFuZApkNjkzOTU0IGFjcGk6IGNwdWhwOiBz
+cGVjOiBhZGQgdHlwaWNhbCB1c2VjYXNlcwoxYzk2N2U0IGFjcGk6IGNwdWhwOiBpbnRyb2R1Y2Ug
+J0NvbW1hbmQgZGF0YSAyJyBmaWVsZAoyYzg3MTU0IGFjcGk6IGNwdWhwOiBzcGVjOiBjbGFyaWZ5
+IHN0b3JlIGludG8gJ0NvbW1hbmQgZGF0YScgd2hlbiAnQ29tbWFuZCBmaWVsZCcgPT0gMAo4NzVl
+MmFmIGFjcGk6IGNwdWhwOiBzcGVjOiBmaXggJ0NvbW1hbmQgZGF0YScgZGVzY3JpcHRpb24KMTZj
+MTVkNiBhY3BpOiBjcHVocDogc3BlYzogY2xhcmlmeSAnQ1BVIHNlbGVjdG9yJyByZWdpc3RlciB1
+c2FnZSBhbmQgZW5kaWFubmVzcwpiMzIwN2IzIHRlc3RzOiBxMzU6IE1DSDogYWRkIGRlZmF1bHQg
+U01CQVNFIFNNUkFNIGxvY2sgdGVzdAowMjgyM2RiIHEzNTogaW1wbGVtZW50IDEyOEsgU01SQU0g
+YXQgZGVmYXVsdCBTTUJBU0UgYWRkcmVzcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNyBDaGVj
+a2luZyBjb21taXQgMDI4MjNkYjM0MzdkIChxMzU6IGltcGxlbWVudCAxMjhLIFNNUkFNIGF0IGRl
+ZmF1bHQgU01CQVNFIGFkZHJlc3MpCjIvMTcgQ2hlY2tpbmcgY29tbWl0IGIzMjA3YjM5OThhOSAo
+dGVzdHM6IHEzNTogTUNIOiBhZGQgZGVmYXVsdCBTTUJBU0UgU01SQU0gbG9jayB0ZXN0KQozLzE3
+IENoZWNraW5nIGNvbW1pdCAxNmMxNWQ2YWIwNTcgKGFjcGk6IGNwdWhwOiBzcGVjOiBjbGFyaWZ5
+ICdDUFUgc2VsZWN0b3InIHJlZ2lzdGVyIHVzYWdlIGFuZCBlbmRpYW5uZXNzKQo0LzE3IENoZWNr
+aW5nIGNvbW1pdCA4NzVlMmFmMDkyZTkgKGFjcGk6IGNwdWhwOiBzcGVjOiBmaXggJ0NvbW1hbmQg
+ZGF0YScgZGVzY3JpcHRpb24pCjUvMTcgQ2hlY2tpbmcgY29tbWl0IDJjODcxNTQ0ZDk4NiAoYWNw
+aTogY3B1aHA6IHNwZWM6IGNsYXJpZnkgc3RvcmUgaW50byAnQ29tbWFuZCBkYXRhJyB3aGVuICdD
+b21tYW5kIGZpZWxkJyA9PSAwKQo2LzE3IENoZWNraW5nIGNvbW1pdCAxYzk2N2U0YzdlMGEgKGFj
+cGk6IGNwdWhwOiBpbnRyb2R1Y2UgJ0NvbW1hbmQgZGF0YSAyJyBmaWVsZCkKNy8xNyBDaGVja2lu
+ZyBjb21taXQgZDY5Mzk1NGFiNmU0IChhY3BpOiBjcHVocDogc3BlYzogYWRkIHR5cGljYWwgdXNl
+Y2FzZXMpCjgvMTcgQ2hlY2tpbmcgY29tbWl0IDg4OTI0NWNiMDIxZiAoYWNwaTogY3B1aHA6IGFk
+ZCBDUEhQX0dFVF9DUFVfSURfQ01EIGNvbW1hbmQpCjkvMTcgQ2hlY2tpbmcgY29tbWl0IGNiY2E3
+YjRjYzRiMCAoYmlvcy10YWJsZXMtdGVzdDogZG9jdW1lbnQgZXhwZWN0ZWQgZmlsZSB1cGRhdGUp
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzogRklMRTogdGVzdHMvcXRlc3Qv
+Ymlvcy10YWJsZXMtdGVzdC5jOjIwOgorICogQ29udHJpYnV0b3Igb3IgQUNQSSBNYWludGFpbmVy
+IChzdGVwcyA0LTcgbmVlZCB0byBiZSByZWRvbmUgdG8gcmVzb2x2ZSBjb25mbGljdHMKCnRvdGFs
+OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8xNyBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoxMC8xNyBDaGVja2luZyBjb21taXQgMjMzZWRlOTM0NTI0
+ICh2aXJ0aW8tOXAtZGV2aWNlOiBmaXggbWVtbGVhayBpbiB2aXJ0aW9fOXBfZGV2aWNlX3VucmVh
+bGl6ZSkKMTEvMTcgQ2hlY2tpbmcgY29tbWl0IDQzYjI1NzY2ZmU4ZCAodmlydGlvLTlwLWRldmlj
+ZTogY29udmVydCB0byBuZXcgdmlydGlvX2RlbGV0ZV9xdWV1ZSkKMTIvMTcgQ2hlY2tpbmcgY29t
+bWl0IGMxNTFjYWMwZWJmOCAodmlydGlvLXNjc2k6IGRlbGV0ZSB2cXMgaW4gdW5yZWFsaXplIHRv
+IGF2b2lkIG1lbWxlYWtzKQoxMy8xNyBDaGVja2luZyBjb21taXQgYjdhNmZhOTg3YWJiICh2aXJ0
+aW8tc2NzaTogY29udmVydCB0byBuZXcgdmlydGlvX2RlbGV0ZV9xdWV1ZSkKMTQvMTcgQ2hlY2tp
+bmcgY29tbWl0IDdjODNmZjI5ZWYxZiAodmhvc3QtdnNvY2s6IGRlbGV0ZSB2cXMgaW4gdmhvc3Rf
+dnNvY2tfdW5yZWFsaXplIHRvIGF2b2lkIG1lbWxlYWtzKQoxNS8xNyBDaGVja2luZyBjb21taXQg
+YWI0Njk2Y2ZjYTJhICh2aG9zdDogQWRkIG5hbWVzIHRvIHNlY3Rpb24gcm91bmRlZCB3YXJuaW5n
+KQoxNi8xNyBDaGVja2luZyBjb21taXQgYmQxMGE2YjE3ZWI2ICh2aG9zdDogT25seSBhbGlnbiBz
+ZWN0aW9ucyBmb3Igdmhvc3QtdXNlcikKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ5OiBG
+SUxFOiBody92aXJ0aW8vdmhvc3QuYzo1NTQ6CisgICAgaWYgKGRldi0+dmhvc3Rfb3BzLT5iYWNr
+ZW5kX3R5cGUgPT0gVkhPU1RfQkFDS0VORF9UWVBFX1VTRVIpIHsgICAkCgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojNjQ6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC5jOjU2OToKKyAg
+ICAgICAgdHJhY2Vfdmhvc3RfcmVnaW9uX2FkZF9zZWN0aW9uX2FsaWduZWQoc2VjdGlvbi0+bXIt
+Pm5hbWUsIG1yc19ncGEsIG1yc19zaXplLAoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA0
+MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNi8xNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+MTcvMTcgQ2hlY2tpbmcgY29tbWl0IGRiYmJlN2I0ZmYzZCAoaTM4NjphY3BpOiBSZW1vdmUgX0hJ
+RCBmcm9tIHRoZSBTTUJ1cyBBQ1BJIGVudHJ5KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
+dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDEyMjA1NTExNS40Mjk5NDUtMS1tc3RAcmVkaGF0
+LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
