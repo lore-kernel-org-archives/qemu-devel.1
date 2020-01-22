@@ -2,75 +2,77 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9424AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F59C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FEF821835
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8DB021569
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 16:51:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wfs5+G7u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FEF821835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CU0w2X5h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8DB021569
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuJB2-0000km-78
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 11:48:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50066)
+	id 1iuJE6-0003VR-D7
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 11:51:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iuJ8U-0007dl-Jj
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:45:47 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iuJBf-0001md-EX
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:49:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iuJ8S-0000gs-7k
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:45:45 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43186
+ (envelope-from <cohuck@redhat.com>) id 1iuJBe-0001wm-A8
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:49:03 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20978
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iuJ8R-0000gI-Qk
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:45:44 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iuJBe-0001wO-69
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 11:49:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579711542;
+ s=mimecast20190719; t=1579711741;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8HKTKA/iNVLjRvLNsFLbeJb0kNCt11tIQ5v5MJ/xzbk=;
- b=Wfs5+G7uGrlfWvpmPtWQiuV56NSuGUn8DROjGA67McGfF2JH3qXfbfWZlj9fH45ZkxJFpB
- 3nCcAHuisIlP5j7ST1f7HQiLdCRZJEURcTMWblvk5D9GXctro6O8i63aBI/6/kwGGGXofa
- b1hGLXJFeGYCGM3MCr0YBeaRMfSUwmk=
+ bh=eSz5VX2O9AYyHC1te8CSiocSt+Pqx7f6H7tbPqVOGJ8=;
+ b=CU0w2X5hTU7a82C/2Xpn46yMgDFk2qjJuMO11EOhcOidtVHDsrctqKaP3+pnaNHWiF3jN5
+ RKCuDMKjFy9QI0eqZ6bqiPlFFhVgRCfPUBMcJTW+hgeroO25uePc+sLVistWEnBEE0+WZ3
+ DR1Dgggj5VTDDyU8XNINJTadWVv/0GM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-45VAGMhzNYmZjP4UinEIzg-1; Wed, 22 Jan 2020 11:45:38 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-114-yJij60BcNOyunofK5gaUFA-1; Wed, 22 Jan 2020 11:48:58 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F01A7800D4E;
- Wed, 22 Jan 2020 16:45:37 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F6B066834;
- Wed, 22 Jan 2020 16:45:37 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 1/5] block/nbd: Fix hang in .bdrv_close()
-Date: Wed, 22 Jan 2020 17:45:28 +0100
-Message-Id: <20200122164532.178040-2-mreitz@redhat.com>
-In-Reply-To: <20200122164532.178040-1-mreitz@redhat.com>
-References: <20200122164532.178040-1-mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE0F4800D41;
+ Wed, 22 Jan 2020 16:48:56 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FBA186426;
+ Wed, 22 Jan 2020 16:48:53 +0000 (UTC)
+Date: Wed, 22 Jan 2020 17:48:51 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v5] target/s390x/kvm: Enable adapter interruption
+ suppression again
+Message-ID: <20200122174851.07d4b833.cohuck@redhat.com>
+In-Reply-To: <20200122101437.5069-1-thuth@redhat.com>
+References: <20200122101437.5069-1-thuth@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 45VAGMhzNYmZjP4UinEIzg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: yJij60BcNOyunofK5gaUFA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -85,67 +87,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When nbd_close() is called from a coroutine, the connection_co never
-gets to run, and thus nbd_teardown_connection() hangs.
+On Wed, 22 Jan 2020 11:14:37 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-This is because aio_co_enter() only puts the connection_co into the main
-coroutine's wake-up queue, so this main coroutine needs to yield and
-wait for connection_co to terminate.
+> The AIS feature has been disabled late in the v2.10 development cycle since
+> there were some issues with migration (see commit 3f2d07b3b01ea61126b -
+> "s390x/ais: for 2.10 stable: disable ais facility"). We originally wanted
+> to enable it again for newer machine types, but apparently we forgot to do
+> this so far. Let's do it now for the machines that support proper CPU models.
+> 
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v5: Use cpu_model_allowed() as suggested by David. Seems to work as far
+>      as I can test it without PCI cards, but ping-pong migration with
+>      "-cpu host" from/to an older version of QEMU is now not working
+>      anymore - but I think that's kind of expected since "-cpu host"
+>      is not migration-safe anyway.
+> 
+>  target/s390x/kvm.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/nbd.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/block/nbd.c b/block/nbd.c
-index d085554f21..6d3b22f844 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -70,6 +70,7 @@ typedef struct BDRVNBDState {
-     CoMutex send_mutex;
-     CoQueue free_sema;
-     Coroutine *connection_co;
-+    Coroutine *teardown_co;
-     QemuCoSleepState *connection_co_sleep_ns_state;
-     bool drained;
-     bool wait_drained_end;
-@@ -203,7 +204,15 @@ static void nbd_teardown_connection(BlockDriverState *=
-bs)
-             qemu_co_sleep_wake(s->connection_co_sleep_ns_state);
-         }
-     }
--    BDRV_POLL_WHILE(bs, s->connection_co);
-+    if (qemu_in_coroutine()) {
-+        s->teardown_co =3D qemu_coroutine_self();
-+        /* connection_co resumes us when it terminates */
-+        qemu_coroutine_yield();
-+        s->teardown_co =3D NULL;
-+    } else {
-+        BDRV_POLL_WHILE(bs, s->connection_co);
-+    }
-+    assert(!s->connection_co);
- }
-=20
- static bool nbd_client_connecting(BDRVNBDState *s)
-@@ -395,6 +404,9 @@ static coroutine_fn void nbd_connection_entry(void *opa=
-que)
-         s->ioc =3D NULL;
-     }
-=20
-+    if (s->teardown_co) {
-+        aio_co_wake(s->teardown_co);
-+    }
-     aio_wait_kick();
- }
-=20
---=20
-2.24.1
+Thanks, applied.
 
 
