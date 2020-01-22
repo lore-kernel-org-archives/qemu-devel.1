@@ -2,116 +2,93 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E3FC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 00:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A2AC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 00:16:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8378424655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 00:04:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E617321734
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 00:16:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="HQzzolMS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8378424655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZMuI2fAU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E617321734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu3VO-0004Hl-Is
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 19:04:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60852)
+	id 1iu3h0-0006ct-2E
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 19:16:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robhenry@microsoft.com>) id 1iu3Ui-0003rH-9E
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 19:03:41 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iu3gH-00068c-IK
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 19:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robhenry@microsoft.com>) id 1iu3Uf-0004LR-US
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 19:03:39 -0500
-Received: from mail-mw2nam10on2121.outbound.protection.outlook.com
- ([40.107.94.121]:17632 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <robhenry@microsoft.com>)
- id 1iu3Uf-0004Ci-NA
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 19:03:37 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NFt4ymE0OBPClshTZ1yA4wsDrPv2dty9JYPHst7ymz/3EeYI8U80KtLvJL9KxLj/BzzjPwM/QoFZKg/wyFJ4+zNUt4or9hkq26SxQXqEHkTYT7p8Eh6+oy5IVEyZNZwWylNUoKjimjtZdA4Qs+YG+RJ/jnfkApB+uEy3U+w4rFi9dcT2FR/kcjto55+UUugEkw19pF3zLbRjgMOmb0lOBvUeAX9ut8fSWI9ycynBiKiGonRohx542WjvYQz7bVHYyOXAWm0hhbtW6jXhTrTs/CthtHV+wTnvtlp9TqZ8wX9RA5Fve4Y4IJ/71AYD9GZKyHjoGYbFe7vJXDck0vddzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tPXobQ+omGicBT+31SypUuwGx4SC7mSNWc7Gh8dMbH4=;
- b=Hrr/MqsShPEpANsmxbWnPuD2wiWXpMn+43yf6dtf4a3vfoiOF/KaqXTSVe+m0GETRO/g6Yu00OsOfG+Bs6kd6GImd68pv+aRBEtoIJ6EYzA8zKs1ZUsvJrbt+kRKOFTyraY8XHmktrrykhlzifrZgJ9h9Y9Col5eYAxFzgEaHfMcq4j/vkEJIqSmdONX3aX8wU7kNkBjvdMW3pP+bIK/pAmDc5jURsvmUerEn+rLDGLwoRIGdb3VoBl2cMdK40wZwEj4BWZoQpd9U72VipbVOG3c0zmD7gzUP6dASwTTM0lzuddyXd/OOtBaMHWq/q9lo8yWXIF7iXSRqNCeO/8i9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tPXobQ+omGicBT+31SypUuwGx4SC7mSNWc7Gh8dMbH4=;
- b=HQzzolMSgNi1HfLkCDMp508rEf5ktpnD5Ti2CCM7mDmZueoJyxH3J1oq4+lCgNqEtDb/J7AroyQfkK1D+lNLFKAlpsELPgtJ8oiEHuhCLCKHP0bSg375kgT4Iq7ogCtzkmi3pqYBQQKGlxvt9Sk23gO+eN8i7uvAUdKCLFz8i74=
-Received: from BL0PR2101MB1026.namprd21.prod.outlook.com (52.132.20.149) by
- BL0PR2101MB0980.namprd21.prod.outlook.com (52.132.23.154) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.10; Wed, 22 Jan 2020 00:03:35 +0000
-Received: from BL0PR2101MB1026.namprd21.prod.outlook.com
- ([fe80::acbf:dcfe:4658:e7d4]) by BL0PR2101MB1026.namprd21.prod.outlook.com
- ([fe80::acbf:dcfe:4658:e7d4%5]) with mapi id 15.20.2686.004; Wed, 22 Jan 2020
- 00:03:35 +0000
-From: Robert Henry <robhenry@microsoft.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: plugin interface function qemu_plugin_mem_size_shift
-Thread-Topic: plugin interface function qemu_plugin_mem_size_shift
-Thread-Index: AQHV0Lcu2/sUXSRsnUiX6/LNMzlQLg==
-Date: Wed, 22 Jan 2020 00:03:35 +0000
-Message-ID: <BL0PR2101MB1026AF0CA590021284C39D1BD60C0@BL0PR2101MB1026.namprd21.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-01-22T00:03:34.998Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard; 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=robhenry@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:8:edf4:6cd7:184f:ce6b]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 22256153-3379-42b9-520e-08d79ece8680
-x-ms-traffictypediagnostic: BL0PR2101MB0980:
-x-microsoft-antispam-prvs: <BL0PR2101MB098077FC15D24E1086607AB5D60C0@BL0PR2101MB0980.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 029097202E
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(366004)(136003)(39860400002)(396003)(376002)(346002)(189003)(199004)(558084003)(52536014)(66446008)(6916009)(2906002)(91956017)(76116006)(64756008)(66556008)(8990500004)(66946007)(33656002)(66476007)(10290500003)(6506007)(19627405001)(7696005)(478600001)(186003)(8936002)(316002)(86362001)(8676002)(5660300002)(55016002)(81166006)(81156014)(71200400001)(9686003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BL0PR2101MB0980;
- H:BL0PR2101MB1026.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: B6XVIK5zPboa8leY0Li17VgAyYOTIOQSnarHqofAu4+TCArMk1A9oM2RhevI60Y2eN7wcyiIjCrwZk6kCGhiSXJK/BWtFl4DVen0DRgkjzCd56FUoPHqaeqg5QT7yaUFP7bteSzMWRkqSV2eFYTTdvbFNnYTzb8KfNWs2DdGJPaCIyVGXGkYtRbOmTPCtjb/jSLa9/8LtBul0p4rpDZuH2/i9XPBy0z5yTFqRM4V+uhN5b0R0flwVewyj5NEANHV0e0cJGwWX9HFVmgPEOeG5utWK4oHvF36JRPelqn+GoUUW9AXbj54e2t4Vg/jkh9fGhL11izKRAJSoUbOmDiTGorHCeS68Voiz8uJMhb1Xr05AURMdxRpgdB/TR0VkD/IHC1OxcnAm6QjjhQ8jzw9OQca27xyM+iawXmfC5ZLjp9SMFcLgYnLCx1x3rNBsQ3U
-x-ms-exchange-antispam-messagedata: DD4eDlGS+b6DU7san0QyI8qVvNZ8sslVYLeFeU/9+/K6uOy3G2/Axa5kjslzF9W8OAlMuGK4tEK3Vq/uNoYnXqiXvKPdbDFG+4Jju48Zjfpnu8oGiMLx+5yARgjg2ibBh1Y3yyuakMYZb8DJq53NFpS+zJhaN30j9EJN42Q5UrOEk3oHNOuPFpHEM3dez5GeJfRnTfewIF3Me/G558lsvQ==
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/alternative;
- boundary="_000_BL0PR2101MB1026AF0CA590021284C39D1BD60C0BL0PR2101MB1026_"
+ (envelope-from <richard.henderson@linaro.org>) id 1iu3gG-0004Ug-BK
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 19:15:37 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:40222)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iu3gG-0004Sz-49
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 19:15:36 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id bg7so2451001pjb.5
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 16:15:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=JP2A2A+YwbCKbxa2Lfh+e4kBFhR2R3kmpg0TJ84tCqA=;
+ b=ZMuI2fAUGh6ngLzN8F7QHnAjMVQG5VGIdbw5cOROcJ7RzofrXZkCjClddU5wCBCOT5
+ QGNV3602dVQOq0im60oeoCoJk65YVeGaTnUAyNlOxdaHzdlMqkuJI8KbGU4BCuUQCP/B
+ I/cdOB4LEs0xnRdKkc41kVY+L+bTMfOtPj1cvOwxDZX3S3bp9cM5hXnY3nd6jD37uGxX
+ 9G8ZP11R+u5Oa0cG6rp7KfZv5m30QqPPy1KZNEC5Iq/cbyTQ3b4r5oPhTLKCijnTr7gC
+ LD1jvL4WJbrdPUDhsHbGCTYO6O8jcEF1KJnJZywB+VUi5lbrBIBTOWT93cBdflvteyWs
+ cceg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JP2A2A+YwbCKbxa2Lfh+e4kBFhR2R3kmpg0TJ84tCqA=;
+ b=Tzw8zO6P21TzSbeTB1AWSmcDAMy5F+KXqW+ZkgAxF7m03Wd4QCwMDN+zgujScjN5y3
+ FOht9h7+L33lTH6YehcrG+d1A6wLLZ2XWKB05V3DB2+N40Y5eJTyk7uvrArjsR4tXy9m
+ XPuz1Ivi9Bw+Svxnlz8s6oP6v1E2MNAY8PrDbggO2DKzUO1sgbyyLjMFMKcuIvBQA9j1
+ PyrzsFRlBiDi4sF76dUHyL3EwadGJMP5epk/n8ECGKDm80rZnP9s8sVLjalg8daKViHJ
+ 7qFlnVKyYmp/dbMMVz1+LVPwldX2WyhPfQHUx7kwxLo3dFTLIByPXHWIWxLw7/uDkvua
+ /reg==
+X-Gm-Message-State: APjAAAVTgAC1GvtC8115+eNncfRi/qPGUJYZhqbLH1xFhUw3LuZqwemu
+ qE0OzJqBDCD8w+C8T9t08pR66w==
+X-Google-Smtp-Source: APXvYqw4lyxyXDsSoTVoUYbn/uPEslyqLKdvf3KG+fvkUz4Z8S84tPxS7kIa9jYqhlIYAmQDFgK1wg==
+X-Received: by 2002:a17:902:463:: with SMTP id
+ 90mr8408800ple.213.1579652134724; 
+ Tue, 21 Jan 2020 16:15:34 -0800 (PST)
+Received: from [10.5.50.117] (rrcs-173-198-77-92.west.biz.rr.com.
+ [173.198.77.92])
+ by smtp.gmail.com with ESMTPSA id 65sm45476273pfu.140.2020.01.21.16.15.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Jan 2020 16:15:33 -0800 (PST)
+Subject: Re: [PATCH 2/5] docs/sphinx: Add new hxtool Sphinx extension
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200121191033.28195-1-peter.maydell@linaro.org>
+ <20200121191033.28195-3-peter.maydell@linaro.org>
+ <5fa9a519-d9c8-13b6-2d38-efa12c29780d@linaro.org>
+ <CAFEAcA9ty4srYsjbGDEQshttcA97yFco=7fLGV8SV2oT7FeQ+A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a7a086da-a9d0-57f4-0f93-d43928872c16@linaro.org>
+Date: Tue, 21 Jan 2020 14:15:30 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22256153-3379-42b9-520e-08d79ece8680
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2020 00:03:35.2109 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: peAKF08DtSpW188FzL0ZMTfvxyzjvevTrpgDVCDjG8stM2HgtL4CVBRzDoAVo6ooGsB40newrVrtm9pWhNeGLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR2101MB0980
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.94.121
+In-Reply-To: <CAFEAcA9ty4srYsjbGDEQshttcA97yFco=7fLGV8SV2oT7FeQ+A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,46 +100,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_BL0PR2101MB1026AF0CA590021284C39D1BD60C0BL0PR2101MB1026_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On 1/21/20 12:22 PM, Peter Maydell wrote:
+>> This doesn't seem to work for me.
+>>
+>> make[1]: Leaving directory '/home/rth/qemu/qemu/slirp'
+>> CONFDIR="/home/rth/qemu/run/etc/qemu" sphinx-build  -W -b html -D
+>> version=4.2.50 -D release="4.2.50 (rth)" -d .doctrees/devel-html
+>> /home/rth/qemu/qemu/docs/devel docs/devel
+>> Running Sphinx v1.8.5
+>>
+>> Extension error:
+>> Could not import extension hxtool (exception: cannot import name ExtensionError)
+>> make: *** [Makefile:1022: docs/devel/index.html] Error 2
+> 
+> I suspect this is an incompatibility (or possibly just a
+> dropped back-compatibility I was accidentally relying on)
+> between Sphinx 1.7 and 1.8. (I tested with a 1.6 and a 1.7.)
+> 
+> It looks like ExtensionError is now in sphinx.errors, so if you
+> change
+> +from sphinx.application import ExtensionError
+> 
+> to "from sphinx.errors import ExtensionError" does that help?
 
-I don't understand what
-  unsigned int qemu_plugin_mem_size_shift(qemu_plugin_meminfo_t info);
-does.   The documentation in qemu-plugin.h is silent on this matter.  It ap=
-pears to expose more of the guts of qemu that I don't yet know.
+Yep, that's it.  Thanks,
 
---_000_BL0PR2101MB1026AF0CA590021284C39D1BD60C0BL0PR2101MB1026_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);" spellcheck=3D"false">
-I don't understand what&nbsp;</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);" spellcheck=3D"false">
-&nbsp;&nbsp;<span>unsigned int qemu_plugin_mem_size_shift(qemu_plugin_memin=
-fo_t info);<br>
-</span><span></span></div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);" spellcheck=3D"false">
-<span spellcheck=3D"false">does.&nbsp; &nbsp;The documentation in qemu-plug=
-in.h is silent on this matter.&nbsp; It appears to expose more of the guts =
-of qemu that I don't yet know.</span></div>
-</body>
-</html>
-
---_000_BL0PR2101MB1026AF0CA590021284C39D1BD60C0BL0PR2101MB1026_--
+r~
 
