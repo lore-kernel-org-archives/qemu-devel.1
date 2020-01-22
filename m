@@ -7,85 +7,88 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C7F7C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 466B4C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:56:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5E8F20678
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:56:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12C4024656
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:56:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMtyoXEH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E8F20678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zxbpio/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12C4024656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu8zn-0003aK-HS
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 00:56:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59829)
+	id 1iu8zz-0003zB-JZ
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 00:56:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iu8vz-0007Yp-2U
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:12 -0500
+ (envelope-from <mst@redhat.com>) id 1iu8vq-0007Iw-19
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iu8vx-0004cU-QL
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33585
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iu8vo-0004Z1-R9
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38127
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu8vx-0004cJ-MG
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:09 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu8vo-0004Yo-NO
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579672329;
+ s=mimecast20190719; t=1579672320;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/cZSw7eZYA9nW+mh3jM5ZF40fdaxfgONBvpYjIhz74s=;
- b=dMtyoXEHm5gXBLNRU8TeG/ZmyyfRGDIfC7l0h082s91ySpIGR6FH+UjuQlefZYb/WpZ45Q
- C2j+KP8BBHIp3iGT9mTtBuqUIz+hdX/aLNsqMwNpYy/yWSWX8mPp4HtKrt0lasWPLvUmSf
- 383Z35iU6rDz3mcSaS03nNHTONAZUSc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-0nLVVY3ZPBq9MPe51RtuHQ-1; Wed, 22 Jan 2020 00:52:07 -0500
-Received: by mail-wr1-f69.google.com with SMTP id z10so2535397wrt.21
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 21:52:06 -0800 (PST)
+ bh=OhMnOXw2jltLb3g6o0bZN0GY8d9d1JsgKnb3ojyU5uY=;
+ b=Zxbpio/6QHFCyxbioShwCzqYxFU7rGG8pf/iMknyq0FWzy2/wvgq2PSwVXQFI0Iic1Nsyb
+ qgIUp4B/8ixZuosIp6lriny101fl2vQfEO31eVoTY7IqIH8XYJo7FlSPVknLHJLSB/SD7m
+ OTM0AXrc4OuzUWnHt4xORJvQonWoHQ8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-dusI85DqPsaZghcQFV1JHw-1; Wed, 22 Jan 2020 00:51:57 -0500
+Received: by mail-wr1-f72.google.com with SMTP id h30so2535738wrh.5
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 21:51:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=mG4C1N5iHUE7eCiLg4lfrsmbX/tB8VxXvzlNPjmYI5U=;
- b=qT6cepfZr+JaIIHFBzDOoC2DCWFC0Fg9NCUrN8Z9MftfNdwvJFaDFaR0mjw67NbfpM
- RCaXamiIYP1vixfX0x5wk9zLi4Dlmu6vYNbfnRYiSNIcIgyKwvPxFpGOnlvYWScoFCtB
- 2LzjkQrgwQCpcyyj7s315HvIt5Z8Cgpn0j/luHdBnR8GBGu1AJ+N7G0/uTRAfr/nPv2q
- XQltGjakH2FNJ5NEPlc0hucQvvT8Re6XkgF86DnqxQfWEgcLRDmG931lNz2CtzmEpEpo
- +fdbfrv170iKFm3TcM1eTH/frNP+JSbbl2LxJ39NJTe8UGu8rKXkL4aJTuRgtbFwbbxi
- 5Dmg==
-X-Gm-Message-State: APjAAAUUGjeHGlIM2xcJAuv31/nOXf0ky0k+1IdahbYb2hRSO8T5ig6d
- C2dLDcpkRfUT2peLCFAUMoFtpUYf5SkKAN4kLbhsdFAFF6LuqCtUhJN/Ioor/EYLyCTVojbbBGV
- xD6HRg8s5mZphzyI=
-X-Received: by 2002:a5d:6a0f:: with SMTP id m15mr9483248wru.40.1579672325405; 
- Tue, 21 Jan 2020 21:52:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwUX6qhJ9g+CBVqdg5HZ9saccMcQTgF0aEefn1nCA+alG3ee+Tu9cJFJTax4Ebc9vHi7RJoyg==
-X-Received: by 2002:a5d:6a0f:: with SMTP id m15mr9483220wru.40.1579672325104; 
- Tue, 21 Jan 2020 21:52:05 -0800 (PST)
+ bh=SmP96JjZ61jUtUgNUruj35mPI4zb3UYO5pk5xajyjow=;
+ b=KrWY3UP7x8Ienpn/fTQQ8hl3eAHwZs6J3otBKiF/CCkDgiC6K317fwzqNrHGaOehhO
+ gO7zIjd9kQLlGowo6KsI0e10pIfCZa0GbWfoUE5qJabst0VunFttFg4U4eWWW3JS2SYF
+ MWvFFtEPnFzVyjkJHGjC1zDAEChjMOyb5pIfiZZScxd4yGTs0QVDzf/uXmXntC3pbCeR
+ 81VUGqrlWc8agsxrgps9VZ8WDW7aV9s++PFv7u6D7wecquUDnbaT3a5DbHN8KQcYOe/2
+ X0UiOdT2DGBr7gp1TUuRg3L7VgkX+Ek1ddbPwqcgt8A3kl1XPNZegoD+6CJt4By57R9R
+ AndQ==
+X-Gm-Message-State: APjAAAUg5MfHMIYy2gdJckmx8K3PRgrpo8Akfww3veKkYQhsVntGwGAx
+ bizeckJU2y/K/7ViOpLlLxHvCM/HqBcLqCOuiFvz/E8DhIp5c4071d+gd4K8Zhv9fnmihdINkoi
+ LyxHUpDdTFp0mGLo=
+X-Received: by 2002:a05:600c:411:: with SMTP id
+ q17mr947227wmb.180.1579672316550; 
+ Tue, 21 Jan 2020 21:51:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxFPa95+06DfGK12UXuDyZp0doPjrsE3Fyrto7Z07jDIP3SWiHL65fuuZs/qbWUE3oaXaGxGA==
+X-Received: by 2002:a05:600c:411:: with SMTP id
+ q17mr947221wmb.180.1579672316381; 
+ Tue, 21 Jan 2020 21:51:56 -0800 (PST)
 Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
  by smtp.gmail.com with ESMTPSA id
- z83sm2549268wmg.2.2020.01.21.21.52.04
+ t1sm2495642wma.43.2020.01.21.21.51.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 21:52:04 -0800 (PST)
-Date: Wed, 22 Jan 2020 00:52:03 -0500
+ Tue, 21 Jan 2020 21:51:55 -0800 (PST)
+Date: Wed, 22 Jan 2020 00:51:54 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/17] acpi: cpuhp: introduce 'Command data 2' field
-Message-ID: <20200122055115.429945-7-mst@redhat.com>
+Subject: [PULL 03/17] acpi: cpuhp: spec: clarify 'CPU selector' register
+ usage and endianness
+Message-ID: <20200122055115.429945-4-mst@redhat.com>
 References: <20200122055115.429945-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200122055115.429945-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: 0nLVVY3ZPBq9MPe51RtuHQ-1
+X-MC-Unique: dusI85DqPsaZghcQFV1JHw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -93,7 +96,7 @@ Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,97 +116,58 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-No functional change in practice, patch only aims to properly
-document (in spec and code) intended usage of the reserved space.
-
-The new field is to be used for 2 purposes:
-  - detection of modern CPU hotplug interface using
-    CPHP_GET_NEXT_CPU_WITH_EVENT_CMD command.
-    procedure will be described in follow up patch:
-      "acpi: cpuhp: spec: add typical usecases"
-  - for returning upper 32 bits of architecture specific CPU ID,
-    for new CPHP_GET_CPU_ID_CMD command added by follow up patch:
-      "acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command"
-
-Change is backward compatible with 4.2 and older machines, as field was
-unconditionally reserved and always returned 0x0 if modern CPU hotplug
-interface was enabled.
+* Move reserved registers to the top of the section, so reader would be
+  aware of effects when reading registers description.
+* State registers endianness explicitly at the beginning of the section
+* Describe registers behavior in case of 'CPU selector' register contains
+  value that doesn't point to a possible CPU.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1575896942-331151-8-git-send-email-imammedo@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <1575896942-331151-5-git-send-email-imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 ---
- docs/specs/acpi_cpu_hotplug.txt |  5 ++++-
- hw/acpi/cpu.c                   | 11 +++++++++++
- hw/acpi/trace-events            |  1 +
- 3 files changed, 16 insertions(+), 1 deletion(-)
+ docs/specs/acpi_cpu_hotplug.txt | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
 txt
-index 8fb9ad22e6..9879f9ef7e 100644
+index ee219c8358..4e65286ff5 100644
 --- a/docs/specs/acpi_cpu_hotplug.txt
 +++ b/docs/specs/acpi_cpu_hotplug.txt
-@@ -44,7 +44,10 @@ keeps the current value.
+@@ -30,6 +30,18 @@ Register block base address:
+ Register block size:
+     ACPI_CPU_HOTPLUG_REG_LEN =3D 12
 =20
++All accesses to registers described below, imply little-endian byte order.
++
++Reserved resisters behavior:
++   - write accesses are ignored
++   - read accesses return all bits set to 0.
++
++The last stored value in 'CPU selector' must refer to a possible CPU, othe=
+rwise
++  - reads from any register return 0
++  - writes to any other register are ignored until valid value is stored i=
+nto it
++On QEMU start, 'CPU selector' is initialized to a valid value, on reset it
++keeps the current value.
++
  read access:
      offset:
--    [0x0-0x3] reserved
-+    [0x0-0x3] Command data 2: (DWORD access)
-+              if value last stored in 'Command field':
-+                0: reads as 0x0
-+                other values: reserved
-     [0x4] CPU device status fields: (1 byte access)
-         bits:
-            0: Device is enabled and may be used by guest
-diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-index 87f30a31d7..d475c06953 100644
---- a/hw/acpi/cpu.c
-+++ b/hw/acpi/cpu.c
-@@ -12,6 +12,7 @@
- #define ACPI_CPU_FLAGS_OFFSET_RW 4
- #define ACPI_CPU_CMD_OFFSET_WR 5
- #define ACPI_CPU_CMD_DATA_OFFSET_RW 8
-+#define ACPI_CPU_CMD_DATA2_OFFSET_R 0
-=20
- enum {
-     CPHP_GET_NEXT_CPU_WITH_EVENT_CMD =3D 0,
-@@ -79,6 +80,16 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr addr=
-, unsigned size)
-         }
-         trace_cpuhp_acpi_read_cmd_data(cpu_st->selector, val);
-         break;
-+    case ACPI_CPU_CMD_DATA2_OFFSET_R:
-+        switch (cpu_st->command) {
-+        case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
-+           val =3D 0;
-+           break;
-+        default:
-+           break;
-+        }
-+        trace_cpuhp_acpi_read_cmd_data2(cpu_st->selector, val);
-+        break;
-     default:
-         break;
-     }
-diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
-index 96b8273297..afbc77de1c 100644
---- a/hw/acpi/trace-events
-+++ b/hw/acpi/trace-events
-@@ -23,6 +23,7 @@ cpuhp_acpi_read_flags(uint32_t idx, uint8_t flags) "idx[0=
-x%"PRIx32"] flags: 0x%"
- cpuhp_acpi_write_idx(uint32_t idx) "set active cpu idx: 0x%"PRIx32
- cpuhp_acpi_write_cmd(uint32_t idx, uint8_t cmd) "idx[0x%"PRIx32"] cmd: 0x%=
-"PRIx8
- cpuhp_acpi_read_cmd_data(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] da=
-ta: 0x%"PRIx32
-+cpuhp_acpi_read_cmd_data2(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] d=
-ata: 0x%"PRIx32
- cpuhp_acpi_cpu_has_events(uint32_t idx, bool ins, bool rm) "idx[0x%"PRIx32=
-"] inserting: %d, removing: %d"
- cpuhp_acpi_clear_inserting_evt(uint32_t idx) "idx[0x%"PRIx32"]"
- cpuhp_acpi_clear_remove_evt(uint32_t idx) "idx[0x%"PRIx32"]"
+     [0x0-0x3] reserved
+@@ -86,9 +98,3 @@ write access:
+                  ACPI_DEVICE_OST QMP event from QEMU to external applicati=
+ons
+                  with current values of OST event and status registers.
+             other values: reserved
+-
+-Selecting CPU device beyond possible range has no effect on platform:
+-   - write accesses to CPU hot-plug registers not documented above are
+-     ignored
+-   - read accesses to CPU hot-plug registers not documented above return
+-     all bits set to 0.
 --=20
 MST
 
