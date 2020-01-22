@@ -2,85 +2,78 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E34AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B99A2C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:36:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A8D424655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8238224655
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:36:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yq3QPzhB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A8D424655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fqBPtiCQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8238224655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuDLF-0007Lz-GZ
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 05:34:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58742)
+	id 1iuDNZ-0000Bc-I9
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 05:36:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iuDKW-0006sX-27
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:33:49 -0500
+ (envelope-from <stevensd@chromium.org>) id 1iuDMs-0008CI-F5
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iuDKU-0007Zo-Sr
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:33:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25663
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iuDKU-0007Zb-Pe
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:33:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579689226;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=3/8yPemxHC6JRS37fD2zl9msSgWkWK9ptGjPXYFd5/8=;
- b=Yq3QPzhBxvdLcJEjRpMbVJAqEDuv5Ifz5t6uYqAh2fePZrnV7bK27UzrPAZ1+EuLemPQjU
- khWFdmeIgE+FFIh1gwIma5b7vh85rumyeEBmj/j4BhLDFD/+2cKINyzkXiy/+XiBpxdDfN
- ho84kRYkNoWtFePb2a9IdmY5l2rDep8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-QW1s1Q5tPs-jrYs9LL_sFA-1; Wed, 22 Jan 2020 05:33:42 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1871C8010D6;
- Wed, 22 Jan 2020 10:33:41 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-176.ams2.redhat.com [10.36.116.176])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 12FBC86430;
- Wed, 22 Jan 2020 10:33:36 +0000 (UTC)
-Subject: Re: [PATCH v5] target/s390x/kvm: Enable adapter interruption
- suppression again
-To: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
-References: <20200122101437.5069-1-thuth@redhat.com>
- <20200122112910.5b8f74c9.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f4e87ccf-5484-c305-aff1-13feccd5dabb@redhat.com>
-Date: Wed, 22 Jan 2020 11:33:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <stevensd@chromium.org>) id 1iuDMr-0001G0-7e
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:36:14 -0500
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:38184)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stevensd@chromium.org>)
+ id 1iuDMr-0001Fk-20
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:36:13 -0500
+Received: by mail-qv1-xf42.google.com with SMTP id t6so2973741qvs.5
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 02:36:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=H5Q/enJnAE03WTWBi8/aJYWnHF9Q/si1wZbqxm7qIMY=;
+ b=fqBPtiCQCcZp2HC/nOiTouELonf4sqDNI/IBFXf7075Q64Gm5fRAt6cuuTd5TkHAFn
+ ACm/H1jSYCz30slLh+dprH8A2pFlIaRdDyMPXPN6E09TTSNRwGlX7As7Rbui+WKHxqf5
+ KG9+ELa5YuiFfGc/so0Wr4FwcTv4j8k2ErWvM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=H5Q/enJnAE03WTWBi8/aJYWnHF9Q/si1wZbqxm7qIMY=;
+ b=Vrn3N5dTQhNFD0bSHlU8tGSfFP+vE+4tGyggRHbbxLGptGHHNXwYXCvNyAu6TnZtFf
+ VgaM1Brip6WHbICE73pAedd4xyIBIVOqmbhjYWXW6BDl2okOuXZPgg1a0+oC9xua75pN
+ K2WG8JsFj4TfqD1c9PH0hO5gfpH9haq0nCgRMWQZtJZMPMUnL43lsz6FX5ByOCCR3ENk
+ xna8tmB/mpbRKusVjTTe22cVqbh4/6fFr8C/R+boW2wWtDH3dt6JZIcDP52HofyTSoTx
+ AKOZ+caUpchoLZrGCVqfDW1V6bTDUFZI8XVY3seJN8peTQak/yX/vpX7QGY2vNDbH8gP
+ apbQ==
+X-Gm-Message-State: APjAAAWmILSOlZoiBnDUUm9sRhxMxoC/DDG6tEcZJ+XBWe77WDMHsnpZ
+ 3YsHvdItKwsPJ+hRMYvS+orzdmYpzAMP0m452fSw2w==
+X-Google-Smtp-Source: APXvYqyRYf1MLrUGY5LDFuW9isDnVb669Ork06kqaKh8XkIeXpMX9ZNprssj+aBOVO/q6kR+u1z7exc/TSUW6p0S454=
+X-Received: by 2002:a05:6214:287:: with SMTP id
+ l7mr9831933qvv.142.1579689372249; 
+ Wed, 22 Jan 2020 02:36:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200122112910.5b8f74c9.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: QW1s1Q5tPs-jrYs9LL_sFA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <CAD=HUj7N8dpEvf0Be8fg-qpFFTQOqzZX_kVoFB=BWp8S4uEFvg@mail.gmail.com>
+ <20200122032433-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200122032433-mutt-send-email-mst@kernel.org>
+From: David Stevens <stevensd@chromium.org>
+Date: Wed, 22 Jan 2020 19:36:01 +0900
+Message-ID: <CAD=HUj7cXK65Hj1rrL9KKoa6oWzBBwf8J_kSU2beJwzD4q06Fw@mail.gmail.com>
+Subject: Re: [virtio-dev][RFC PATCH v1 2/2] virtio-gpu: add the ability to
+ export resources
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,68 +85,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, Zach Reizner <zachr@chromium.org>,
+ Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/01/2020 11.29, Cornelia Huck wrote:
-> On Wed, 22 Jan 2020 11:14:37 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> The AIS feature has been disabled late in the v2.10 development cycle since
->> there were some issues with migration (see commit 3f2d07b3b01ea61126b -
->> "s390x/ais: for 2.10 stable: disable ais facility"). We originally wanted
->> to enable it again for newer machine types, but apparently we forgot to do
->> this so far. Let's do it now for the machines that support proper CPU models.
->>
->> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1756946
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  v5: Use cpu_model_allowed() as suggested by David. Seems to work as far
->>      as I can test it without PCI cards, but ping-pong migration with
->>      "-cpu host" from/to an older version of QEMU is now not working
->>      anymore - but I think that's kind of expected since "-cpu host"
->>      is not migration-safe anyway.
-> 
-> Ok, so I'll wait for test results with pci cards before queuing this :)
+> ok but how is this then used? will there be more commands to pass
+> this uuid to another device?
 
-Ok, Matthew, could you please test one more time?
+This is intended to be used with the virtio video device being
+discussed here https://markmail.org/thread/ingyqlps4rbcuazh. I don't
+have a specific patch for how that will work, but it will likely be an
+extension to VIRTIO_VIDEO_T_RESOURCE_CREATE.
 
->>  target/s390x/kvm.c | 9 ++++++---
->>  1 file changed, 6 insertions(+), 3 deletions(-)
->>
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index 15260aeb9a..30112e529c 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -365,10 +365,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>      /*
->>       * The migration interface for ais was introduced with kernel 4.13
->>       * but the capability itself had been active since 4.12. As migration
->> -     * support is considered necessary let's disable ais in the 2.10
->> -     * machine.
->> +     * support is considered necessary, we only try to enable this for
->> +     * newer machine types if KVM_CAP_S390_AIS_MIGRATION is available.
->>       */
->> -    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
->> +    if (cpu_model_allowed() && kvm_kernel_irqchip_allowed() &&
->> +        kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
->> +        kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
->> +    }
->>  
->>      kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
->>      return 0;
-> 
-> Side note: as you do not add a new _allowed() function, you don't add
-> the clarifying comment anymore -- any value in doing so as a separate
-> patch? And maybe stating as well that new features of that type should
-> rely on the cpu model?
+> > +The response contains a uuid which identifies the exported object created from
+> > +the host private resource.
+>
+> Are the uuids as specified in rfc-4122? I guess we need to link to that spec then
 
-Yes, I'm planning to send a patch once this one here got accepted.
+I don't think it's terribly important to specify how the uuids are
+generated, as long as they're actually unique. That being said, I'm
+not opposed to defining them as rfc-4122 version 4 uuids. Although if
+we do that, it should go in the patch that defines what exported
+objects and uuids are in the context of virtio, not in the virtio-gpu
+section.
 
- Thomas
+> > Note that if the resource has an attached backing,
+> > +modifications made to the host private resource through the exported object by
+> > +other devices are not visible in the attached backing until they are
+> > transferred
+> > +into the backing.
+> > +
+>
+> s/host/device/?
 
+The virtio-gpu is based around "resources private to the host", to
+quote the existing specification. I think consistency with that
+language is important.
+
+-David
 
