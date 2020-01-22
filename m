@@ -2,77 +2,76 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A69F7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65243C47409
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:15:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 723432467F
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AC3A2468B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:15:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OgjwJ6ip"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 723432467F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ChgZD444"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC3A2468B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuD21-0000tt-Jb
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 05:14:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56351)
+	id 1iuD3C-00024P-Rf
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 05:15:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@chromium.org>) id 1iuD1G-0000Rf-F0
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:13:55 -0500
+ (envelope-from <thuth@redhat.com>) id 1iuD2D-0001Fz-A7
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:14:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@chromium.org>) id 1iuD1F-0001Km-Eg
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:13:54 -0500
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:44827)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stevensd@chromium.org>)
- id 1iuD1F-0001KJ-9A
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:13:53 -0500
-Received: by mail-qk1-x742.google.com with SMTP id v195so5672023qkb.11
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 02:13:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=v/v4gsunZW3/SK3txv49RS3OswX6Moo8iJj9KiNLNZk=;
- b=OgjwJ6ipmysY8QY7m+iVUYCtrCC4Gq60ZF7VknltICjgEeV/IlRhLkejG3/BbyPeKZ
- jZHigYJ61VVy0eMV+i703qL93FoYcUV7YXryizSnFXClFrKTVwvIxlB4EqXxNhRibPUH
- x+01SFXzBtGJJegbKdhk19B3e2dZw+OX9l5jM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=v/v4gsunZW3/SK3txv49RS3OswX6Moo8iJj9KiNLNZk=;
- b=Ulif7wIxXyYMf3TsLj2/uST0wXp/CdtYlRwEXHPm5wswoTIaLBPumTvl/4iBf/BBRh
- nqmX+meTbZPPbaWJAbo1s6o7BE/Q7iIn9FoXEEkhznx2PWNKcBahp3S9W0DgLr0y/fdb
- w5vDL+GCSemHX5JiE6zw1sAq16w1JNo5w3PTp2Q/T9XsqKOtG9voWFoVy6ttNmRvzOvJ
- f5+B2Ro/zRy63E277nNZVm0ud/rYakrX1kAegQteR+e18huEckl7x/kKUBi3vBJvhi/L
- QiCuCHLRQoDe1VBdGEoupsfQ/GfOIhdCSt9I9D0MtFB/yq12xzfQfjuKA47JL+7SeV1U
- ECPw==
-X-Gm-Message-State: APjAAAX6c0p/NAaFYpmKmyebdeTjeP4/eLY48MQ8JkzJ7bucjIv7y6QY
- iJwjbS3x9AhLT8K2b77i0/nWVFoPXQAnk23HBA9trw==
-X-Google-Smtp-Source: APXvYqwUv897TNxhaRUh9087ToKhnGrEv4kyAiCMXN4m5pnLcbNPvv45TSY+d77prKdAy3FM+9B3p4HD4eKhdGOjIxA=
-X-Received: by 2002:a37:63c7:: with SMTP id x190mr9140006qkb.232.1579688032385; 
- Wed, 22 Jan 2020 02:13:52 -0800 (PST)
-MIME-Version: 1.0
-References: <CAD=HUj640QfNwO4J_tdcSx36YOVAVT_dZUXYuKPaCKvZVWeHsg@mail.gmail.com>
- <20200122032103-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200122032103-mutt-send-email-mst@kernel.org>
-From: David Stevens <stevensd@chromium.org>
-Date: Wed, 22 Jan 2020 19:13:41 +0900
-Message-ID: <CAD=HUj4pORJK1SQ2+n_oiXJyGaKqakSiOGcXdRCGSAMnuxY4cw@mail.gmail.com>
-Subject: Re: [virtio-dev][RFC PATCH v1 1/2] content: define what an exported
- object is
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+ (envelope-from <thuth@redhat.com>) id 1iuD2C-0001v4-63
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:14:53 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40062
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iuD2C-0001uh-2Z
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:14:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579688091;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ZmX2jPilf71MNC5Ou1D5wX6NdOjL6s/916TdAgY+aR0=;
+ b=ChgZD444lkk2eDAszgTapsholAOAFOtUqFvbhYponDl4nuJqgLSWvG/k8ztRfkaCdNaopD
+ HjEzcE/x9kM5HGYBwFwwduq2GtPALeXN60GHBbKsllYHbj5vH5M/Oxp6vwt4yPzNINv6NA
+ OQKeYBezF0PCpJeyS4RBwVopSVp9gs4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-tN15L0DQPIOr4X905MzNZQ-1; Wed, 22 Jan 2020 05:14:48 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E64711882CC0;
+ Wed, 22 Jan 2020 10:14:46 +0000 (UTC)
+Received: from thuth.com (ovpn-116-176.ams2.redhat.com [10.36.116.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D95A45D9E2;
+ Wed, 22 Jan 2020 10:14:42 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org
+Subject: [PATCH v5] target/s390x/kvm: Enable adapter interruption suppression
+ again
+Date: Wed, 22 Jan 2020 11:14:37 +0100
+Message-Id: <20200122101437.5069-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: tN15L0DQPIOr4X905MzNZQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,50 +83,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, Zach Reizner <zachr@chromium.org>,
- Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Matthew Rosato <mjrosato@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > +When an object created by one virtio device needs to be
-> > +shared with a seperate virtio device, the first device can
-> > +export the object by generating a \field{uuid}
->
-> This is a field where?
+The AIS feature has been disabled late in the v2.10 development cycle since
+there were some issues with migration (see commit 3f2d07b3b01ea61126b -
+"s390x/ais: for 2.10 stable: disable ais facility"). We originally wanted
+to enable it again for newer machine types, but apparently we forgot to do
+this so far. Let's do it now for the machines that support proper CPU model=
+s.
 
-It's a property of the exported object, but I guess it doesn't really
-correspond to any concrete field. I'll remove \field.
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1756946
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v5: Use cpu_model_allowed() as suggested by David. Seems to work as far
+     as I can test it without PCI cards, but ping-pong migration with
+     "-cpu host" from/to an older version of QEMU is now not working
+     anymore - but I think that's kind of expected since "-cpu host"
+     is not migration-safe anyway.
 
-> > which the
-> > +guest can pass to the second device to identify the object.
->
-> s/guest/Driver/ ?
+ target/s390x/kvm.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-The uuid can be passed to a second device controlled by a different
-driver, so I think 'driver' by itself is ambiguous. I'm using guest as
-a shorthand for 'system which includes the drivers and software which
-sits on top of the drivers', and that meaning does seem to be
-compatible with language in the rest of the spec. If that shorthand
-isn't acceptable, I can rewrite the sentence passively as '... a uuid
-which can then be passed to a second device ...'.
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 15260aeb9a..30112e529c 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -365,10 +365,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     /*
+      * The migration interface for ais was introduced with kernel 4.13
+      * but the capability itself had been active since 4.12. As migration
+-     * support is considered necessary let's disable ais in the 2.10
+-     * machine.
++     * support is considered necessary, we only try to enable this for
++     * newer machine types if KVM_CAP_S390_AIS_MIGRATION is available.
+      */
+-    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
++    if (cpu_model_allowed() && kvm_kernel_irqchip_allowed() &&
++        kvm_check_extension(s, KVM_CAP_S390_AIS_MIGRATION)) {
++        kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
++    }
+=20
+     kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
+     return 0;
+--=20
+2.18.1
 
-> Also - what are guest and host here?
-
-There are a number of places in the virtio spec where 'guest' is used
-to refer to the system where drivers run and where 'host' is used to
-refer to the system where devices run. I guess those terms aren't
-concretely defined within the spec, but they do seem to have a well
-understood meaning. Or is the guest/host language discouraged in new
-additions to the spec?
-
--David
 
