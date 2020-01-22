@@ -2,82 +2,77 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A8DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A69F7C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:14:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 109E32467A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:11:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 723432467F
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 10:14:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hYq/0/H4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109E32467A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OgjwJ6ip"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 723432467F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuCyc-0007zA-71
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 05:11:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56092)
+	id 1iuD21-0000tt-Jb
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 05:14:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iuCy0-0007Wz-KH
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:10:33 -0500
+ (envelope-from <stevensd@chromium.org>) id 1iuD1G-0000Rf-F0
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:13:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iuCxy-0007Un-GU
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:10:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25827
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iuCxy-0007UU-Cn
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:10:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579687829;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BiqQYtlrZX930JyyV03yykakkR1Qx393BqKdxILk8X8=;
- b=hYq/0/H45c3LM8qD/x2N2yZzOllVI9+vz4Zu0J+USaDWh4cOKitxRHYkVizGPT1mJPjXSZ
- hj01XKYcmuq5Kt3BBAD/0kiG0AnXA6awyySHJJkOhVJSw657csde6KGBJt4X2GKiUmoa0J
- kpZ9+4cE6iC/OvRO8wAiXAXTD37LaCY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-wn8ZbvLoPamCf9fUWqvlAQ-1; Wed, 22 Jan 2020 05:10:27 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CEC4107ACC5;
- Wed, 22 Jan 2020 10:10:26 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-57.ams2.redhat.com [10.36.117.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BF5C85738;
- Wed, 22 Jan 2020 10:10:22 +0000 (UTC)
-Date: Wed, 22 Jan 2020 11:10:21 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v4 1/4] qapi: Add a 'coroutine' flag for commands
-Message-ID: <20200122101021.GB5268@linux.fritz.box>
-References: <20200121181122.15941-1-kwolf@redhat.com>
- <20200121181122.15941-2-kwolf@redhat.com>
- <87lfq0yp9v.fsf@dusky.pond.sub.org>
+ (envelope-from <stevensd@chromium.org>) id 1iuD1F-0001Km-Eg
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:13:54 -0500
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:44827)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stevensd@chromium.org>)
+ id 1iuD1F-0001KJ-9A
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 05:13:53 -0500
+Received: by mail-qk1-x742.google.com with SMTP id v195so5672023qkb.11
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 02:13:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=v/v4gsunZW3/SK3txv49RS3OswX6Moo8iJj9KiNLNZk=;
+ b=OgjwJ6ipmysY8QY7m+iVUYCtrCC4Gq60ZF7VknltICjgEeV/IlRhLkejG3/BbyPeKZ
+ jZHigYJ61VVy0eMV+i703qL93FoYcUV7YXryizSnFXClFrKTVwvIxlB4EqXxNhRibPUH
+ x+01SFXzBtGJJegbKdhk19B3e2dZw+OX9l5jM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=v/v4gsunZW3/SK3txv49RS3OswX6Moo8iJj9KiNLNZk=;
+ b=Ulif7wIxXyYMf3TsLj2/uST0wXp/CdtYlRwEXHPm5wswoTIaLBPumTvl/4iBf/BBRh
+ nqmX+meTbZPPbaWJAbo1s6o7BE/Q7iIn9FoXEEkhznx2PWNKcBahp3S9W0DgLr0y/fdb
+ w5vDL+GCSemHX5JiE6zw1sAq16w1JNo5w3PTp2Q/T9XsqKOtG9voWFoVy6ttNmRvzOvJ
+ f5+B2Ro/zRy63E277nNZVm0ud/rYakrX1kAegQteR+e18huEckl7x/kKUBi3vBJvhi/L
+ QiCuCHLRQoDe1VBdGEoupsfQ/GfOIhdCSt9I9D0MtFB/yq12xzfQfjuKA47JL+7SeV1U
+ ECPw==
+X-Gm-Message-State: APjAAAX6c0p/NAaFYpmKmyebdeTjeP4/eLY48MQ8JkzJ7bucjIv7y6QY
+ iJwjbS3x9AhLT8K2b77i0/nWVFoPXQAnk23HBA9trw==
+X-Google-Smtp-Source: APXvYqwUv897TNxhaRUh9087ToKhnGrEv4kyAiCMXN4m5pnLcbNPvv45TSY+d77prKdAy3FM+9B3p4HD4eKhdGOjIxA=
+X-Received: by 2002:a37:63c7:: with SMTP id x190mr9140006qkb.232.1579688032385; 
+ Wed, 22 Jan 2020 02:13:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87lfq0yp9v.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: wn8ZbvLoPamCf9fUWqvlAQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <CAD=HUj640QfNwO4J_tdcSx36YOVAVT_dZUXYuKPaCKvZVWeHsg@mail.gmail.com>
+ <20200122032103-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200122032103-mutt-send-email-mst@kernel.org>
+From: David Stevens <stevensd@chromium.org>
+Date: Wed, 22 Jan 2020 19:13:41 +0900
+Message-ID: <CAD=HUj4pORJK1SQ2+n_oiXJyGaKqakSiOGcXdRCGSAMnuxY4cw@mail.gmail.com>
+Subject: Re: [virtio-dev][RFC PATCH v1 1/2] content: define what an exported
+ object is
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::742
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,37 +84,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: virtio-dev@lists.oasis-open.org, Zach Reizner <zachr@chromium.org>,
+ Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.01.2020 um 07:32 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
->=20
-> > This patch adds a new 'coroutine' flag to QMP command definitions that
-> > tells the QMP dispatcher that the command handler is safe to be run in =
-a
-> > coroutine.
->=20
-> I'm afraid I missed this question in my review of v3: when is a handler
-> *not* safe to be run in a coroutine?
+> > +When an object created by one virtio device needs to be
+> > +shared with a seperate virtio device, the first device can
+> > +export the object by generating a \field{uuid}
+>
+> This is a field where?
 
-That's a hard one to answer fully.
+It's a property of the exported object, but I guess it doesn't really
+correspond to any concrete field. I'll remove \field.
 
-Basically, I think the biggest problem is with calling functions that
-change their behaviour if run in a coroutine compared to running them
-outside of coroutine context. In most cases the differences like having
-a nested event loop instead of yielding are just fine, but they are
-still subtly different.
+> > which the
+> > +guest can pass to the second device to identify the object.
+>
+> s/guest/Driver/ ?
 
-I know this is vague, but I can assure you that problematic cases exist.
-I hit one of them with my initial hack that just moved everything into a
-coroutine. It was related to graph modifications and bdrv_drain and
-resulted in a hang. For the specifics, I would have to try and reproduce
-the problem again.
+The uuid can be passed to a second device controlled by a different
+driver, so I think 'driver' by itself is ambiguous. I'm using guest as
+a shorthand for 'system which includes the drivers and software which
+sits on top of the drivers', and that meaning does seem to be
+compatible with language in the rest of the spec. If that shorthand
+isn't acceptable, I can rewrite the sentence passively as '... a uuid
+which can then be passed to a second device ...'.
 
-Kevin
+> Also - what are guest and host here?
 
+There are a number of places in the virtio spec where 'guest' is used
+to refer to the system where drivers run and where 'host' is used to
+refer to the system where devices run. I guess those terms aren't
+concretely defined within the spec, but they do seem to have a well
+understood meaning. Or is the guest/host language discouraged in new
+additions to the spec?
+
+-David
 
