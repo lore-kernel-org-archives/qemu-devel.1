@@ -2,82 +2,96 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1CCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E566C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B416A24655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:24:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 594582467A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:26:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYXF11pd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B416A24655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cvNNL5oA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 594582467A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuF3s-0000Rp-P9
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 07:24:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44384)
+	id 1iuF5K-0001gc-HU
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 07:26:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iuF35-00086a-QA
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:23:57 -0500
+ (envelope-from <armbru@redhat.com>) id 1iuF4D-0000sp-Qk
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:25:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iuF34-0006rf-6p
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:23:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46941
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1iuF4C-000882-GK
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:25:05 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33219
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iuF34-0006qm-1N
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:23:54 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iuF4C-00087P-CR
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:25:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579695832;
+ s=mimecast20190719; t=1579695904;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=I8gcYQXyIwskRNCsQ61hKn8N3sdHS3jhvH2mpZHBb1Y=;
- b=ZYXF11pdjFZNiQYno5HEAcUSdH+uEYJUYGT0w3qmU+pMQtENgTDxcghUo1t+PlRoekRaHT
- /t7Jr79eW9lvrM78OKWbkj9mUBzYq6GhmeeTvAUsTUax3me6Ekr8nRwXTdbvEgq63vZ+Zb
- qcKHKHiuzKJACYeSTHc2FyiQDzGgEIM=
+ bh=HJ8VTUTsR0A3bUokoEfG5TZFK+goq8/I1dZOnP0Zl+U=;
+ b=cvNNL5oAplTbKMcyRLvpG/MX+aJDVPY6wlvZhBOKbPxwyt51CTpMcobIUZr9NcqCvxEMXO
+ i+NwZBXELKlG7L9/UluF0/IOZSzpTrrGH97QfqdLeYEIRcfUEBV3XVGcnZtFKcRixLS4bJ
+ KcgB51bDktUJTz73iqrCJd+DG2PLZLU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348--Jm0omTQPiCHe0XYJvi0uA-1; Wed, 22 Jan 2020 07:23:47 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-384-FTjmu_cbNJiYe8SFKJZ2qQ-1; Wed, 22 Jan 2020 07:25:00 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C281A100550E;
- Wed, 22 Jan 2020 12:23:45 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-57.ams2.redhat.com [10.36.117.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A020B10018FF;
- Wed, 22 Jan 2020 12:23:35 +0000 (UTC)
-Date: Wed, 22 Jan 2020 13:23:34 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alexander Popov <alex.popov@linux.com>
-Subject: Re: [PATCH v3 0/2] ide: Fix incorrect handling of some PRDTs and add
- the corresponding unit-test
-Message-ID: <20200122122334.GA13482@linux.fritz.box>
-References: <20191223175117.508990-1-alex.popov@linux.com>
- <f3bd803f-aa03-e6bd-2b6a-ef6172a38f4e@linux.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E13E08010ED;
+ Wed, 22 Jan 2020 12:24:58 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 89FF060FA2;
+ Wed, 22 Jan 2020 12:24:53 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1F3901138600; Wed, 22 Jan 2020 13:24:52 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: Integrating QOM into QAPI
+References: <87d0bmchq0.fsf@dusky.pond.sub.org>
+ <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200120100849.GB345995@stefanha-x1.localdomain>
+ <871rrtmkko.fsf@dusky.pond.sub.org>
+ <20200121113224.GD630615@stefanha-x1.localdomain>
+ <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
+ <87wo9lc4oe.fsf_-_@dusky.pond.sub.org>
+ <20200121143658.GB597037@redhat.com>
+ <871rrs97ld.fsf@dusky.pond.sub.org>
+ <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
+ <87y2tzzrwo.fsf@linaro.org>
+Date: Wed, 22 Jan 2020 13:24:52 +0100
+In-Reply-To: <87y2tzzrwo.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
+ message of "Wed, 22 Jan 2020 10:50:31 +0000")
+Message-ID: <87wo9ju19n.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <f3bd803f-aa03-e6bd-2b6a-ef6172a38f4e@linux.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: -Jm0omTQPiCHe0XYJvi0uA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: FTjmu_cbNJiYe8SFKJZ2qQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,55 +103,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrea Arcangeli <aarcange@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>, sstabellini@kernel.org,
- pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
- qemu-devel@nongnu.org, Kashyap Chamarthy <kashyap.cv@gmail.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- John Snow <jsnow@redhat.com>, pjp@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, "Denis V.
+ Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel@nongnu.org,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.01.2020 um 12:53 hat Alexander Popov geschrieben:
-> On 23.12.2019 20:51, Alexander Popov wrote:
-> > Fuzzing the Linux kernel with syzkaller allowed to find how to crash qe=
-mu
-> > using a special SCSI_IOCTL_SEND_COMMAND. It hits the assertion in
-> > ide_dma_cb() introduced in the commit a718978ed58a in July 2015.
-> >=20
-> > This patch series fixes incorrect handling of some PRDTs in ide_dma_cb(=
-)
-> > and improves the ide-test to cover more PRDT cases (including one
-> > that causes that particular qemu crash).
-> >=20
-> > Changes from v2 (thanks to Kevin Wolf for the feedback):
-> >  - the assertion about prepare_buf() return value is improved;
-> >  - the patch order is reversed to keep the tree bisectable;
-> >  - the unit-test performance is improved -- now it runs 8 seconds
-> >    instead of 3 minutes on my laptop.
-> >=20
-> > Alexander Popov (2):
-> >   ide: Fix incorrect handling of some PRDTs in ide_dma_cb()
-> >   tests/ide-test: Create a single unit-test covering more PRDT cases
-> >=20
-> >  hw/ide/core.c    |  30 +++++---
-> >  tests/ide-test.c | 174 ++++++++++++++++++++---------------------------
-> >  2 files changed, 96 insertions(+), 108 deletions(-)
->=20
-> Hello!
->=20
-> Pinging again about this fix and unit-test...
->=20
-> It's ready. Kevin Wolf has reviewed this (thanks a lot!).
->=20
-> What is next?
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-I asked John about it just yesterday (if he will merge it or if he would
-prefer me to take it through my tree) and he promised to take a look
-very soon.
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>> Actually, we are not that far off from being able to use GObject
+>> altogether (I hacked something like that to play with), but I
+>> disgress...
+>
+> As a mostly hands off observer who mainly c&p's QOM code when he has to
+> I have to ask is this a long term plan?
+>
+> I've always found having our own hand rolled object system a little
+> incongruous given we lean heavily on the rest of glib.
 
-Kevin
+I vaguely remember claims that GObject falls short of our needs.  Sadly,
+I don't remember the details.  This is why major features should come
+with a design document.
+
+https://wiki.qemu.org/Features/QOM ain't: it does not mention GObject.
+I'm afraid that page has fallen too far behind the code to be useful to
+anyone not familiar with the code.
+
+>> So introducing GObject-like macros? sure!
+>>
+>> There are plenty of refactoring to do. The problem when touching the
+>> whole code-base, imho, is review time. It may take a couple of
+>> hours/days to come up with a cocci/spatch, and make various patches
+>> here and there. But it takes often weeks and a lot of constant push to
+>> various folks to get all the reviews (as seens by the qdev prop-ptr
+>> series earlier for example). How can we better address whole code-base
+>> changes?
+>
+> The problem with review time - especially for QOM - is having domain
+> knowledge to understand what is happening.
+>
+> Are we happy that the existing qdev/qmp tests sufficiently exercise
+> QEMU's object model? Perhaps with a little extra tweaking of the tests
+> we could dump the object hierarchy and then compare it to the hierarchy
+> presented after modification. That might make it easier to have
+> confidence that these large scale but mostly mechanical changes don't
+> change anything externally visible?
+
+Comparing the composition tree complete with properties and property
+values before and after feels like a useful regression test.  Any
+takers?
 
 
