@@ -7,87 +7,86 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1D6C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61622C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AA6524655
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3108824656
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:51:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmXO31Vl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AA6524655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKPCECOI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3108824656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu9rg-00065E-Ud
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:51:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36014)
+	id 1iu9rj-00069M-KP
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:51:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iu9pz-0004BL-FP
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:04 -0500
+ (envelope-from <mst@redhat.com>) id 1iu9q1-0004Dm-8C
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iu9py-0007ln-6y
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29451
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iu9q0-0007mp-0y
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:05 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35789
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu9py-0007lW-3A
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:02 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu9pz-0007mN-U2
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579675801;
+ s=mimecast20190719; t=1579675803;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gDntRjnqkdZXlC1JZeGY/cuEoEt7aTCjD9wGxlyp8Vo=;
- b=SmXO31Vl4fDKrsKcNV7a7mqHNOYKBmcV+izLp4vqsTjslx6UMwk0hQ1wRd9iAb3zqs+tXz
- kfL9cVBLASLFwkGJJO82POyTXHSR/AN3s5BlPlPmaKqFacoABgzpALY5mtNFqiEg6wXU/Z
- T573WsnNG/W8FaYSvCtznNzvupRuicg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-J74QtcqLM5yMbq1W3TlZRw-1; Wed, 22 Jan 2020 01:49:58 -0500
-Received: by mail-wm1-f70.google.com with SMTP id y125so1198709wmg.1
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 22:49:58 -0800 (PST)
+ bh=OhMnOXw2jltLb3g6o0bZN0GY8d9d1JsgKnb3ojyU5uY=;
+ b=XKPCECOIYCNN5ELf1rOb4s8RxaUTT5BZzpU4C06ngcrAAPfuuTYM2v5oscFtf8jbmKEPqL
+ fKYs4lfE7JcPJkvPTbgV6dMGNUuMAG7DhFZs6qPsTSASK1AOAsNO7cH+x0RcmUn5RjSE2o
+ 7i9T2YTpZzV8RlL/HKHcUSvhcenH/3k=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-5o02YcEENCSAkhOHlraSHQ-1; Wed, 22 Jan 2020 01:50:01 -0500
+Received: by mail-wr1-f69.google.com with SMTP id c17so2593422wrp.10
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 22:50:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=o0n2DkkmVlJvF/kJjOaBKtOGbZzvtHQ/1x2pWKeDMgM=;
- b=aqriCnkQKpnajKP9mXa5IYKIk2mj+WubffQh1U/9YZcPfAI6jftld5QSRsnIE+ymPY
- vACubJiPPe+Ers6oIn9OYT0ylcgSz19Z6uMRm7iBcrY47oapsINrArlW3f7ffvKoB/IN
- uBTQzL4USw53b1DFlojWc29hGPQLar9m9DPxgX3rlFAHKFkSjFP4js975itbpUFLhJlq
- nVLbmgHSEBvNFtHjy+hDGaBpC4XTjAyXFlalCwE8E9Dk8lfBueentKckhdTGgiWQf3de
- lx3HZBEEwSwYpgm0978jNr3FkcwInymh0YD5Q6Z4Wp/N73y4nvNXuv6FFZgvoQrcdM9X
- +UKw==
-X-Gm-Message-State: APjAAAUxArFssmLB54ctJ1AvW4Bt46hmRI+4Ae1w3nd5VvmmYLhUerNu
- HMo/wLstL4unExxFtvHmMzzXx5cjj/HULlIkzlUHARspsHXsrwuxaY18hlaEfCcaNJ7kvWo6Y0d
- 8qNyCjoxcFR1lYK8=
-X-Received: by 2002:a05:600c:295a:: with SMTP id
- n26mr1165078wmd.187.1579675797051; 
- Tue, 21 Jan 2020 22:49:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz7lNdKQRvFMYzuaNRNe5P9x+q7sqeW7xFV4t1tmTPZcMgS0CvmaoiTFVp8t3jqVRgkfhH7aw==
-X-Received: by 2002:a05:600c:295a:: with SMTP id
- n26mr1165060wmd.187.1579675796807; 
- Tue, 21 Jan 2020 22:49:56 -0800 (PST)
+ bh=SmP96JjZ61jUtUgNUruj35mPI4zb3UYO5pk5xajyjow=;
+ b=DWwcm1HA9DS/L4CBCy06jTCqwxbY1BE512YlXHEgXvnBZe6X63KQtu4JMtNIjHNweX
+ R2JJN3b3IiOG3rtWsGCYZtuOU5whC1VBTxZoFdSU+Nk41jJJ+I5s2t2C0X9p5agxI2aG
+ GDcW6xgogF/yzOLfn5CRS9qIjbuWqZ0HLUCKPv/yf3C+8RZx6k7sYEmvSsQJpMw6w+Gc
+ h6vVymveFYZvD5n3bQg8sz1s898bbqQXffC3BMUe9WEShpeUdaSUFXZe9ADslrpd2S8r
+ 0hslTzPnGPekFyz7lR5mwOsuO6EwQLJ0Bc3Vx3m2eXLx3Qa3Mgmxe8oqGS6RUMeT3hI1
+ AF8A==
+X-Gm-Message-State: APjAAAWJL3fRWWAgkZmvcYmwqc4/7H8UUwF7DkU7XABti82PvUNXPjrc
+ g5qE1XaEY0qwOtiofLlsiN+MXM64QBCyKeR0tKVPRkzuuIB5b3KTcCkjTpXLrXj9YlcW6bQdRXt
+ 3qx2rGA13YpLXJdg=
+X-Received: by 2002:a5d:6a02:: with SMTP id m2mr9301023wru.52.1579675799777;
+ Tue, 21 Jan 2020 22:49:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz/z4TBfVfpzHdyQUXU8UAQxjV4KrXxGxYxakvbRkT1DN4c8z2JdmwGrjJqoE32nvTFYJqpcw==
+X-Received: by 2002:a5d:6a02:: with SMTP id m2mr9301007wru.52.1579675799548;
+ Tue, 21 Jan 2020 22:49:59 -0800 (PST)
 Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
  by smtp.gmail.com with ESMTPSA id
- k11sm2542585wmc.20.2020.01.21.22.49.55
+ c9sm1926408wme.41.2020.01.21.22.49.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 22:49:56 -0800 (PST)
-Date: Wed, 22 Jan 2020 01:49:54 -0500
+ Tue, 21 Jan 2020 22:49:59 -0800 (PST)
+Date: Wed, 22 Jan 2020 01:49:57 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 02/17] tests: q35: MCH: add default SMBASE SMRAM lock test
-Message-ID: <20200122064907.512501-3-mst@redhat.com>
+Subject: [PULL v2 03/17] acpi: cpuhp: spec: clarify 'CPU selector' register
+ usage and endianness
+Message-ID: <20200122064907.512501-4-mst@redhat.com>
 References: <20200122064907.512501-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200122064907.512501-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: J74QtcqLM5yMbq1W3TlZRw-1
+X-MC-Unique: 5o02YcEENCSAkhOHlraSHQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -95,7 +94,7 @@ Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,159 +106,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-test lockable SMRAM at default SMBASE feature, introduced by
-patch "q35: implement 128K SMRAM at default SMBASE address"
+* Move reserved registers to the top of the section, so reader would be
+  aware of effects when reading registers description.
+* State registers endianness explicitly at the beginning of the section
+* Describe registers behavior in case of 'CPU selector' register contains
+  value that doesn't point to a possible CPU.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1575899217-333105-1-git-send-email-imammedo@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <1575896942-331151-5-git-send-email-imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/qtest/q35-test.c | 105 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+ docs/specs/acpi_cpu_hotplug.txt | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/tests/qtest/q35-test.c b/tests/qtest/q35-test.c
-index a68183d513..c922d81bc0 100644
---- a/tests/qtest/q35-test.c
-+++ b/tests/qtest/q35-test.c
-@@ -186,6 +186,109 @@ static void test_tseg_size(const void *data)
-     qtest_quit(qts);
- }
+diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
+txt
+index ee219c8358..4e65286ff5 100644
+--- a/docs/specs/acpi_cpu_hotplug.txt
++++ b/docs/specs/acpi_cpu_hotplug.txt
+@@ -30,6 +30,18 @@ Register block base address:
+ Register block size:
+     ACPI_CPU_HOTPLUG_REG_LEN =3D 12
 =20
-+#define SMBASE 0x30000
-+#define SMRAM_TEST_PATTERN 0x32
-+#define SMRAM_TEST_RESET_PATTERN 0x23
++All accesses to registers described below, imply little-endian byte order.
 +
-+static void test_smram_smbase_lock(void)
-+{
-+    QPCIBus *pcibus;
-+    QPCIDevice *pcidev;
-+    QDict *response;
-+    QTestState *qts;
-+    int i;
++Reserved resisters behavior:
++   - write accesses are ignored
++   - read accesses return all bits set to 0.
 +
-+    qts =3D qtest_init("-M q35");
++The last stored value in 'CPU selector' must refer to a possible CPU, othe=
+rwise
++  - reads from any register return 0
++  - writes to any other register are ignored until valid value is stored i=
+nto it
++On QEMU start, 'CPU selector' is initialized to a valid value, on reset it
++keeps the current value.
 +
-+    pcibus =3D qpci_new_pc(qts, NULL);
-+    g_assert(pcibus !=3D NULL);
-+
-+    pcidev =3D qpci_device_find(pcibus, 0);
-+    g_assert(pcidev !=3D NULL);
-+
-+    /* check that SMRAM is not enabled by default */
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) =3D=3D 0)=
-;
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), =3D=3D, SMRAM_TEST_PATTERN);
-+
-+    /* check that writing junk to 0x9c before before negotiating is ignore=
-d */
-+    for (i =3D 0; i < 0xff; i++) {
-+        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
-+        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) =3D=
-=3D 0);
-+    }
-+
-+    /* enable SMRAM at SMBASE */
-+    qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, 0xff);
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) =3D=3D 0x=
-01);
-+    /* lock SMRAM at SMBASE */
-+    qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, 0x02);
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) =3D=3D 0x=
-02);
-+
-+    /* check that SMRAM at SMBASE is locked and can't be unlocked */
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), =3D=3D, 0xff);
-+    for (i =3D 0; i <=3D 0xff; i++) {
-+        /* make sure register is immutable */
-+        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
-+        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) =3D=
-=3D 0x02);
-+
-+        /* RAM access should go into black hole */
-+        qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
-+        g_assert_cmpint(qtest_readb(qts, SMBASE), =3D=3D, 0xff);
-+    }
-+
-+    /* reset */
-+    response =3D qtest_qmp(qts, "{'execute': 'system_reset', 'arguments': =
-{} }");
-+    g_assert(response);
-+    g_assert(!qdict_haskey(response, "error"));
-+    qobject_unref(response);
-+
-+    /* check RAM at SMBASE is available after reset */
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), =3D=3D, SMRAM_TEST_PATTERN);
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) =3D=3D 0)=
-;
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_RESET_PATTERN);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), =3D=3D, SMRAM_TEST_RESET_PAT=
-TERN);
-+
-+    g_free(pcidev);
-+    qpci_free_pc(pcibus);
-+
-+    qtest_quit(qts);
-+}
-+
-+static void test_without_smram_base(void)
-+{
-+    QPCIBus *pcibus;
-+    QPCIDevice *pcidev;
-+    QTestState *qts;
-+    int i;
-+
-+    qts =3D qtest_init("-M pc-q35-4.1");
-+
-+    pcibus =3D qpci_new_pc(qts, NULL);
-+    g_assert(pcibus !=3D NULL);
-+
-+    pcidev =3D qpci_device_find(pcibus, 0);
-+    g_assert(pcidev !=3D NULL);
-+
-+    /* check that RAM is accessible */
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), =3D=3D, SMRAM_TEST_PATTERN);
-+
-+    /* check that writing to 0x9c succeeds */
-+    for (i =3D 0; i <=3D 0xff; i++) {
-+        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
-+        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) =3D=
-=3D i);
-+    }
-+
-+    /* check that RAM is still accessible */
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN + 1);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), =3D=3D, (SMRAM_TEST_PATTERN =
-+ 1));
-+
-+    g_free(pcidev);
-+    qpci_free_pc(pcibus);
-+
-+    qtest_quit(qts);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -197,5 +300,7 @@ int main(int argc, char **argv)
-     qtest_add_data_func("/q35/tseg-size/8mb", &tseg_8mb, test_tseg_size);
-     qtest_add_data_func("/q35/tseg-size/ext/16mb", &tseg_ext_16mb,
-                         test_tseg_size);
-+    qtest_add_func("/q35/smram/smbase_lock", test_smram_smbase_lock);
-+    qtest_add_func("/q35/smram/legacy_smbase", test_without_smram_base);
-     return g_test_run();
- }
+ read access:
+     offset:
+     [0x0-0x3] reserved
+@@ -86,9 +98,3 @@ write access:
+                  ACPI_DEVICE_OST QMP event from QEMU to external applicati=
+ons
+                  with current values of OST event and status registers.
+             other values: reserved
+-
+-Selecting CPU device beyond possible range has no effect on platform:
+-   - write accesses to CPU hot-plug registers not documented above are
+-     ignored
+-   - read accesses to CPU hot-plug registers not documented above return
+-     all bits set to 0.
 --=20
 MST
 
