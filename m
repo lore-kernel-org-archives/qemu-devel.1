@@ -2,145 +2,85 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13848C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:34:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 012F2C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:34:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D224124685
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:34:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFCF724685
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 11:34:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nZZcBJ9i";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="u5GUXj0Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D224124685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZ2lgJzc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFCF724685
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuEGy-0000c3-J9
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 06:34:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38725)
+	id 1iuEHI-00016X-HF
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 06:34:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=283669e78=Anup.Patel@wdc.com>)
- id 1iuEDk-0006GW-8k
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:30:53 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iuEG2-0008Pm-7C
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=283669e78=Anup.Patel@wdc.com>)
- id 1iuEDj-0005X3-5j
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:30:52 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:46465)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=283669e78=Anup.Patel@wdc.com>)
- id 1iuEDg-0005V5-Sm; Wed, 22 Jan 2020 06:30:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1579692648; x=1611228648;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=QUdjXHvZYGhIxcPmCCCSRo13/+yzfwhSXZJiKKQ1ehU=;
- b=nZZcBJ9icwT7Nh/la5VMd0BamiahCAv2UGF13OHghRy2SN7NjAO36ZHu
- UtIO7Z+ziBbcQnb6W26tVDlz96jmUAE0mtNkSjUbpTifDbeFNmDoTRBm6
- t9l2dpLh6efdkSaiFjyDj0F8Yd+z3vjcumBRJyKs3jE3x1YPMOCtoyLm4
- DTmXu4P8Zropr3Qq946X2dNMoHAmC1mLkXn9DkcYYt43Vd8Yp2OozfATG
- d35lY/DafWb39HWQ16WcdX6REIO68L1/xL3bMfjAS+iueDFKHFik4clOt
- a+6a1gtfHeBx/86Rp/Dzj4fou4M6LVvWO4DX6/g4gvWLilRRiwJU10AHa A==;
-IronPort-SDR: +rGC3Kn2Aljyzthi7RQ24wSRFCCxfY+8eK3+RnjLKIvfe24lCpoXeKMOm/OMfwXZ5Ow0KaprNu
- wLyMgB4tRVQvyyKKWc0xdS1mplfM+OVHKqCw8FXI2NC4P96pwqnrNXFchEJ7LxJPsmbNcKp5xU
- iCnTY1SDX14McbLYfKNOQpFuXJL3jFrOrDkwZ3BHMUuqoJ8DZUXrm0GmRtHfYApxzq3B4J1PAN
- 2/SXnBzFVPmtqdlSnqiREELVYu8ZiefU6f5Zd847ec7R0tNEsHQijKtZuRLJM4deLkJ89/dqkC
- dTA=
-X-IronPort-AV: E=Sophos;i="5.70,349,1574092800"; d="scan'208";a="128180892"
-Received: from mail-dm6nam11lp2168.outbound.protection.outlook.com (HELO
- NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.168])
- by ob1.hgst.iphmx.com with ESMTP; 22 Jan 2020 19:30:45 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gpLX/aTeYlkyqfoJFsXBpfovjbc7vAfQJuinOm0tQmmlxCbmKx9Gn673yysjhtjdOPoVO9NoWE6J1iwlMpxMeSfRWQ2TbKywLtBeCG1qSTSy9l7fD/YbBJX9Ars2iTIttVlJa+b4EYD50uKB1m8N6kl9q/VSwnpjCrMfB+l4clb8G6tA9p8of5MK5YUdskKpfeAmkGovbAsMqH85jh9FMdzhHOiK08v04YstHjVKncS+fb+0nP+4h0ws5TqEfdeLQiJSn1VClDbGDnzokdgyOZv3TI0QoAKQDQySNfYzfJsUKNnfyLzvMvASlGQAtE06uig+TMO2TQ3q8X1wp0UJFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4OR2RKPoBcM/yeZn0LSDHFMU/6WqlG7ys+EZ922rzU0=;
- b=REXMC7fx0j/3+JxVaFlrmfGcQCBJVI74zwDRJhXS4UZzKaWt9UXBlKyUh930SzOkBg/G1mm4wvbQNVYIrD99x6RqBfrPDdycoleBdtSrBSAXtbWd+ZZjTf1Uxvcl/Kagfqjq1CNJrGyILqKuSrZUTjPS4muPRzBxol2ZI0y5c86W/DOZSoP+VmzNcqYLCEofGwSaHhAtPG0DH1ECqKtaE3eLTSao2kPwYNeEs2qOG5PBOsTR1iNHMW6+/A14bBr9F2BbwuJkEiA9JxEe/N7Uk3hIc1PyWVzGYTWl3x1wddFKxskk1GoBL+IvJTqRLiSWvU3EOeEfzAFxsNLRveXxDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4OR2RKPoBcM/yeZn0LSDHFMU/6WqlG7ys+EZ922rzU0=;
- b=u5GUXj0Q5DhAHFU2RQeVv1CxQGWivvABVOAJh9uM28A381Uj6o7XU5V/yExkJ/2JkFcS25+zVCkLicjY57QGvTFqCebgriIEJOHlDAfRzqRCX1FOOX20VpfckDnw3Q9qpFEi/sN6P3LFeCDFLymIVJip7vVUocKM8js9aHPSXBs=
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
- MN2PR04MB6767.namprd04.prod.outlook.com (10.186.146.87) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20; Wed, 22 Jan 2020 11:30:37 +0000
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::a9a0:3ffa:371f:ad89]) by MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::a9a0:3ffa:371f:ad89%7]) with mapi id 15.20.2644.027; Wed, 22 Jan 2020
- 11:30:37 +0000
-Received: from wdc.com (106.51.28.174) by
- MAXPR01CA0114.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:5d::32) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20 via Frontend Transport; Wed, 22 Jan 2020 11:30:33 +0000
-From: Anup Patel <Anup.Patel@wdc.com>
-To: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar
- Karandikar <sagark@eecs.berkeley.edu>
-Subject: [PATCH v2 2/2] hw/riscv: Provide rdtime callback for TCG in CLINT
- emulation
-Thread-Topic: [PATCH v2 2/2] hw/riscv: Provide rdtime callback for TCG in
- CLINT emulation
-Thread-Index: AQHV0Rdd+O8Iu3G4LkqEuMZYW+MuQQ==
-Date: Wed, 22 Jan 2020 11:30:36 +0000
-Message-ID: <20200122112952.94284-3-anup.patel@wdc.com>
-References: <20200122112952.94284-1-anup.patel@wdc.com>
-In-Reply-To: <20200122112952.94284-1-anup.patel@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: MAXPR01CA0114.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:5d::32) To MN2PR04MB6061.namprd04.prod.outlook.com
- (2603:10b6:208:d8::15)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Anup.Patel@wdc.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [106.51.28.174]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3df0973a-0be5-4a30-fee0-08d79f2e8025
-x-ms-traffictypediagnostic: MN2PR04MB6767:|MN2PR04MB6767:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6767E1F7A4AA691810E650908D0C0@MN2PR04MB6767.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1443;
-x-forefront-prvs: 029097202E
-x-forefront-antispam-report: SFV:SPM;
- SFS:(10019020)(4636009)(366004)(136003)(346002)(39860400002)(376002)(396003)(189003)(199004)(478600001)(8886007)(36756003)(110136005)(4326008)(44832011)(54906003)(316002)(55016002)(2616005)(1006002)(86362001)(2906002)(186003)(71200400001)(16526019)(8676002)(81166006)(956004)(81156014)(66946007)(66556008)(66476007)(55236004)(66446008)(64756008)(26005)(1076003)(8936002)(5660300002)(52116002)(7696005)(4744005)(20680400001)(32040200004);
- DIR:OUT; SFP:1501; SCL:5; SRVR:MN2PR04MB6767;
- H:MN2PR04MB6061.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; CAT:OSPM; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: hjwo34Oxf5f9pL7+Rp1XvKEz1DS/KpnUd+XPBa6QfveRxO5+tNZDMhhrWPQY9eW+vRkbqXbfbnDxZMmiIr2tS++cHXKP6nx4oFWMtRtIrqYj17fe9hVzMyX7hBZNoj4pxBl9Jppcse6Y8IcSDNq6Bk6ytdT63AVPxssDGKRPPinzGGxhDj3wwTIJ9UMVIJOx4zKhN925bFJjbV26Yw6fWS7v1Q49Wfv80u/itOVfNTZmBekztkczI2J2mybfgJcxr8C0kw0+Vc9KDink1F5tWA13CKGvm5n68v2/6jE2A8h29N2OmFcGe3lGXzIyamHLW8CVxl5MGFixytyMjNg1YR0iPNchctq+nBGAJh3wf0nZLgcWjsD2u27lz3fBgbIx43TgvFIC2Cmiuls7IQ3NiyaWtLGNiBjfqMcjnyh4iIXM6bZsgA+7B5R66B5xMIeKh1yEh8DLYPE1AK6Cy0BrQpxgr0uAa6yyoY/zMC+fFnHApZ/ufCjR1ApAAaVpaTTw0GpvVCyWM6vfpOHZx8oFEgNyN0AGR0X78KUubKvowGNeF66AIN79A93v6x+ZoC5Vgo2GDxZsM5FWjNPT7fn5Oa0/j+eLy5hL0+4aiUyml8MAOZlKHGWD6xmQv4ulc1Dis9X099ZvqhV7sael36fq3+iBTbYAIHPTJxFt9u/Aqm07upB6AMxHwpD6hraSbI9XT1MV8KHviJ7sD8pTNgubeBj4fmMmmygyiciLiqu7b1eKIijkh/wL6y2prp+OSLNow2P0VHy3rTFUbivbhEMCel2bJhueJRY81SDmhLEUz+otLAbtT2C41AX0AgfG08fy
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <stefanha@gmail.com>) id 1iuEG1-00073a-7O
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:14 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52489)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iuEG0-000718-US
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 06:33:13 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p9so6444409wmc.2
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 03:33:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=HrnBG3s59mGnDKtHgk/uHCxnSAkuu7gFD6rieyacomk=;
+ b=kZ2lgJzcqMEFPFkSMDcHlw/LcD6CRLqpjkeOmDhCaNKwi3QF9AKPeCnKVo+a0nM/kj
+ mSmU5FXiCOHdAwbrKummdOlG0XDyeS39k0TMI+fKTkOzR8yyLov+IW8+hRAVzYYuGgGV
+ oOOOn2e9UjZgzTreq6QEBOLLc1Ur0Tx70f9vg1WczV5bCaTIiXPTte96p1kOoGlJnROa
+ OhJIreeLWUAuHbzZdSdB4E6kF/YGzhnSUym5od8N4Ph7gSHJACcknZfuGu74hYNzg4DA
+ 8MPvzv0uH6gFbnh4zblBKPpbzkvcQmIeK9JwLuw1tWJQqjb0+pynBhTlQqWYt7vnicfc
+ 540g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=HrnBG3s59mGnDKtHgk/uHCxnSAkuu7gFD6rieyacomk=;
+ b=uRKnucMFT1bpE9LfhxRbEeKkMp7e+HDzgQLa5hIc9FxeXXkoS8/GbDwq89wvJpjRu5
+ AdeaBx740yCp2/47KKP+224nH7Oc+SDMMp9lAN7mwbOlhjfBZOmTWSsrrRrvzFCvmZSp
+ N7TyNg/e+UCdhGczboXhO3hIiw5yJRcKsgZ8hhSNdoRKkueORwPXlj5zHinHVOvO+PEE
+ btG73iKJauhwDOf/VDNJwpuIJtFjdw6RRO0AlhHErn/Lt03BIDnBevl9ZDJazEpmMNrx
+ RH11XjH17SQ0MlhdlJjqIzDgb6Ed2uRRk+GY9NXTNF4Hd+ZZ1UVqwLq/JIkdlxcuFOIP
+ pwuw==
+X-Gm-Message-State: APjAAAXZXMrCZiRNnZ7n5GtTJZ4KBmjNUdwsqVAkM+67A8Jc9JMPD4+M
+ Hx6dMvv/wE3n8XZc0auL1ZI=
+X-Google-Smtp-Source: APXvYqwKaV/9ayZHomYuhjMPjGiGEoH4kDOzhctnDlds9fYmWSF+bze3oFe2gO+a9VL1RUnQK8fHYw==
+X-Received: by 2002:a7b:c956:: with SMTP id i22mr2598081wml.67.1579692791638; 
+ Wed, 22 Jan 2020 03:33:11 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id g21sm3562477wmh.17.2020.01.22.03.33.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Jan 2020 03:33:10 -0800 (PST)
+Date: Wed, 22 Jan 2020 11:33:09 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] vhost: coding style fix
+Message-ID: <20200122113309.GB663955@stefanha-x1.localdomain>
+References: <20200122080840.592054-1-mst@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3df0973a-0be5-4a30-fee0-08d79f2e8025
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2020 11:30:36.8077 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GkVjjdsnar43D0WsMEH6+hUr4sedg0Ddbuy6eHfYIoZBkeKf3bvqgOdd7tqs3qkKnL2E4pbANmKxiLFsAtu1JA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6767
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 216.71.154.42
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="gj572EiMnwbLXET9"
+Content-Disposition: inline
+In-Reply-To: <20200122080840.592054-1-mst@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,38 +92,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Atish Patra <Atish.Patra@wdc.com>, Anup Patel <Anup.Patel@wdc.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Anup Patel <anup@brainfault.org>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch extends CLINT emulation to provide rdtime callback for
-TCG. This rdtime callback will be called wheneven TIME CSRs are
-read in privileged modes.
 
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/riscv/sifive_clint.c | 1 +
- 1 file changed, 1 insertion(+)
+--gj572EiMnwbLXET9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-index e5a8f75cee..805503dc27 100644
---- a/hw/riscv/sifive_clint.c
-+++ b/hw/riscv/sifive_clint.c
-@@ -236,6 +236,7 @@ DeviceState *sifive_clint_create(hwaddr addr, hwaddr si=
-ze, uint32_t num_harts,
-         if (!env) {
-             continue;
-         }
-+        riscv_cpu_set_rdtime_fn(env, cpu_riscv_read_rtc);
-         env->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                   &sifive_clint_timer_cb, cpu);
-         env->timecmp =3D 0;
---=20
-2.17.1
+On Wed, Jan 22, 2020 at 03:08:49AM -0500, Michael S. Tsirkin wrote:
+> Drop a trailing whitespace. Make line shorter.
+>=20
+> Fixes: 76525114736e8 ("vhost: Only align sections for vhost-user")
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  hw/virtio/vhost.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--gj572EiMnwbLXET9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4oMvUACgkQnKSrs4Gr
+c8iGXAf+MjqNvXc8S7yRcZuQ+Z7HaoqN8NNIHsMQFRVuKgFQ211N4BW/C6xHO7p7
+F06U3Z146O24mBVsHR/f+NOvElN5syC+LtpAyTt9LVIFCyGV9TM3FZVNKy9QRhYA
+Ij/3hwr/fdFM4ez5pXtBifAOB+uoTltl9R+UnTivOdm1f7Ohi2BHegz768xfYOig
+Q+yjRgsoNKisPHt0OaImnfWiDS8hzqvf3FKwXAjNWYHZOwiSJ71v9sbKlCDCXXvF
+E9OAnxSJZUcHbyKbS+ZFoRKIwp7GacAP7SLySYdGnc3liGUwayeWV81iqCzgzBwH
+oGh6a1vKzNLTJbVdllWHgxviykl9Tw==
+=I6Lg
+-----END PGP SIGNATURE-----
+
+--gj572EiMnwbLXET9--
 
