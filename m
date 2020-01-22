@@ -2,67 +2,65 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E448C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B114FC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5399924656
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:04:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5399924656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B55B24655
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:14:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="j2/d3ymN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B55B24655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu6K3-0005X0-A1
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 22:04:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46309)
+	id 1iu6T5-0002H3-Jc
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 22:14:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47843)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1iu6IX-0004P0-QZ
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:03:22 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iu6R4-0001M2-Mz
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:12:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1iu6IS-000206-4F
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:03:16 -0500
-Received: from mgwym02.jp.fujitsu.com ([211.128.242.41]:32059)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
- id 1iu6IR-0001yI-Kb
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:03:12 -0500
-Received: from yt-mxauth.gw.nic.fujitsu.com (unknown [192.168.229.68]) by
- mgwym02.jp.fujitsu.com with smtp
- id 697f_6462_67b58087_9085_41db_8929_3d04f1f68b7e;
- Wed, 22 Jan 2020 12:02:59 +0900
-Received: from g01jpfmpwyt03.exch.g01.fujitsu.local
- (g01jpfmpwyt03.exch.g01.fujitsu.local [10.128.193.57])
- by yt-mxauth.gw.nic.fujitsu.com (Postfix) with ESMTP id F3FC2AC00A7
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 12:02:58 +0900 (JST)
-Received: from g01jpexchyt33.g01.fujitsu.local (unknown [10.128.193.4])
- by g01jpfmpwyt03.exch.g01.fujitsu.local (Postfix) with ESMTP id CEDF346E73C;
- Wed, 22 Jan 2020 12:02:57 +0900 (JST)
-Received: from luna3.soft.fujitsu.com (10.124.196.199) by
- g01jpexchyt33.g01.fujitsu.local (10.128.193.36) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 22 Jan 2020 12:02:57 +0900
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-To: <dgilbert@redhat.com>
-Subject: Re: [PATCH v2 070/109] virtiofsd: passthrough_ll: control readdirplus
-Date: Wed, 22 Jan 2020 12:11:40 +0900
-Message-ID: <20200122031140.31529-1-misono.tomohiro@jp.fujitsu.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200121122433.50803-71-dgilbert@redhat.com>
-References: <20200121122433.50803-71-dgilbert@redhat.com>
+ (envelope-from <dgibson@ozlabs.org>) id 1iu6R3-00073A-1W
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:12:06 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:46671 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iu6R0-00070e-Mo; Tue, 21 Jan 2020 22:12:04 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 482Vn74fj0z9sP6; Wed, 22 Jan 2020 14:11:55 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1579662715;
+ bh=2+GcYO8V3KBH6KFQCUuzrtg4uo2/hRcOVyPLuYtyofU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=j2/d3ymNaGxzDbvdJfhPxiHbCqpPFR9R27wfLozRXIwjNtJo06g5Upqqcqvc3rp3I
+ T0t/11HloWj1WA/avvl2sz75FxXFZ4HBe3Copb3lVv9Kf5AaVvDghi4LH3g3rqfOa/
+ kZalPqvzXM7Q3KKHEFNx8tP/rmIfM9isyoyNcjP8=
+Date: Wed, 22 Jan 2020 14:11:49 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Subject: Re: [PATCH v6 3/3] target/ppc: support single stepping with KVM HV
+Message-ID: <20200122031149.GE2347@umbus.fritz.box>
+References: <20200110151344.278471-1-farosas@linux.ibm.com>
+ <20200110151344.278471-4-farosas@linux.ibm.com>
+ <20200120023555.GK54439@umbus> <87d0bd28hl.fsf@linux.ibm.com>
+ <20200121033241.GM54439@umbus> <87y2u0wod4.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-SecurityPolicyCheck-GC: OK by FENCE-Mail
-X-TM-AS-GCONF: 00
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="nHwqXXcoX0o6fKCv"
+Content-Disposition: inline
+In-Reply-To: <87y2u0wod4.fsf@linux.ibm.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 211.128.242.41
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,76 +72,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, berrange@redhat.com, slp@redhat.com,
- misono.tomohiro@jp.fujitsu.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- philmd@redhat.com, vgoyal@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Miklos Szeredi <mszeredi@redhat.com>
-> 
-> Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
-> ---
->  tools/virtiofsd/helper.c         | 3 +++
->  tools/virtiofsd/passthrough_ll.c | 7 ++++++-
->  2 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-> index c8cb88afdd..36eb273d8e 100644
-> --- a/tools/virtiofsd/helper.c
-> +++ b/tools/virtiofsd/helper.c
-> @@ -154,6 +154,9 @@ void fuse_cmdline_help(void)
->             "                               allowed (default: 10)\n"
->             "    -o norace                  disable racy fallback\n"
->             "                               default: false\n"
-> +           "    -o readdirplus|no_readdirplus\n"
-> +           "                               enable/disable readirplus\n"
-> +           "                               default: readdirplus\n"
 
-Actually, default behavior is
- 1. no_readdirplus if cache=none
- 2. readdirplus otherwise.
-So help message should be fixed.
+--nHwqXXcoX0o6fKCv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-other than that
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+On Tue, Jan 21, 2020 at 05:23:03PM -0300, Fabiano Rosas wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
+>=20
+> (...)
+> >> > Hrm.... I don't actually see how changing env->msr helps you here.
+> >> > AFAICT if kvm_insert_breakpoint() resolves to kvm_arch_sw_breakpoint=
+()
+> >> > it doesn't rely on the MSR value at all.  If it resolves to
+> >> > kvm_arch_hw_breakpoint(), then it looks like it just stashes
+> >> > information to be pushed into KVM when we re-enter the guest.  None =
+of
+> >> > the information stashed appears to depend on the current MSR, and on=
+ce
+> >> > we re-enter the MSR will already have been restored.
+> >> >
+> >>
+> >> This is the call chain:
+> >>=20
+> >> kvm_arch_insert_sw_breakpoint -> cpu_memory_rw_debug ->
+> >> cpu_get_phys_page_attrs_debug -> ppc_cpu_get_phys_page_debug ->
+> >> ppc64_v3_get_phys_page_debug -> ppc_radix64_get_phys_page_debug:
+> >>=20
+> >>     /* Handle Real Mode */
+> >>     if (msr_dr =3D=3D 0) {
+> >>         /* In real mode top 4 effective addr bits (mostly) ignored */
+> >>         return eaddr & 0x0FFFFFFFFFFFFFFFULL;
+> >>     }
+> >
+> > Ah, right.  Basically the issue is that kvm_insert_breakpoint() takes
+> > an effective address, not a real address, but it might be happening in
+> > a different context than we're executing right now.
+> >
+> > Ok, that makes sense.  Though.. aren't you always inserting the
+> > breakpoint into an interrupt vector?  So wouldn't it always be MMU
+> > off?  Under what circumstances would this get called with mmu_on =3D
+> > true?
+>=20
+> Well, the MSR state at the moment of the breakpoint is that of the
+> currently executing instruction.
 
->            );
->  }
->  
-> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-> index ae364a4825..b15633a044 100644
-> --- a/tools/virtiofsd/passthrough_ll.c
-> +++ b/tools/virtiofsd/passthrough_ll.c
-> @@ -117,6 +117,8 @@ struct lo_data {
->      double timeout;
->      int cache;
->      int timeout_set;
-> +    int readdirplus_set;
-> +    int readdirplus_clear;
->      struct lo_inode root; /* protected by lo->mutex */
->      struct lo_map ino_map; /* protected by lo->mutex */
->      struct lo_map dirp_map; /* protected by lo->mutex */
-> @@ -140,6 +142,8 @@ static const struct fuse_opt lo_opts[] = {
->      { "cache=auto", offsetof(struct lo_data, cache), CACHE_NORMAL },
->      { "cache=always", offsetof(struct lo_data, cache), CACHE_ALWAYS },
->      { "norace", offsetof(struct lo_data, norace), 1 },
-> +    { "readdirplus", offsetof(struct lo_data, readdirplus_set), 1 },
-> +    { "no_readdirplus", offsetof(struct lo_data, readdirplus_clear), 1 },
->      FUSE_OPT_END
->  };
->  static bool use_syslog = false;
-> @@ -478,7 +482,8 @@ static void lo_init(void *userdata, struct fuse_conn_info *conn)
->          fuse_log(FUSE_LOG_DEBUG, "lo_init: activating flock locks\n");
->          conn->want |= FUSE_CAP_FLOCK_LOCKS;
->      }
-> -    if (lo->cache == CACHE_NEVER) {
-> +    if ((lo->cache == CACHE_NEVER && !lo->readdirplus_set) ||
-> +        lo->readdirplus_clear) {
->          fuse_log(FUSE_LOG_DEBUG, "lo_init: disabling readdirplus\n");
->          conn->want &= ~FUSE_CAP_READDIRPLUS;
->      }
-> -- 
-> 2.24.1
+Uh... at the moment of setting the breakpoint, or the moment of
+hitting the breakpoint.
+
+> So this gets called with mmu_on =3D true
+> very often because we're often debugging code than runs with
+> IR|DR=3D1.
+
+Uh... but isn't the whole point here that the state of mmu_on might
+not match the MSR state.  So the two sentences above don't seem to
+mesh together.
+
+What I think I'm understanding from the code is that in order to *set*
+the breakpoint, you need to set up the MSR to match what you expect it
+will be when you *hit* the breakpoint.  Yes?
+
+But since the breakpoint is always placed in an interrupt vector,
+won't that always be real mode?  Or is this one of the vectors that
+can be entered in virtual mode on recent chips?
+
+> However, we could be at a point when IR|DR=3D1, but the next traced
+> instruction will execute with IR|DR=3D0. This happens at the rfid at the
+> end of __enter_rtas, for instance.
+>=20
+> So ppc_radix64_get_phys_page_debug will check the MSR, see that we are
+> (now) not in real mode and proceed with the page table walk, which could
+> fail.
+>=20
+> In the particular case of the __enter_rtas rfid, we have PIDR=3D1 [1] so
+> if we don't exit ppc_radix64_get_phys_page_debug at the msr_dr =3D=3D 0
+> check, it will fail to translate the address.
+>=20
+> 1 - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3Deeb715c3e995fbdda0cc05e61216c6c5609bce66
+>=20
+> >> Actually, I think there is a bug after ppc_cpu_get_phys_page_debug
+> >> somewhere. There are some cases where GDB wants to read/write to some
+> >> memory, but it gets denied access. Presumably because of one such
+> >> discrepancy as the one above. I need to spend more time looking at this
+> >> to define the problem properly, though.
+> >
+> > Hm, ok.
+> >
+> >> >> +    /*
+> >> >> +     * MSR_SE =3D 1 will cause a Trace Interrupt in the guest afte=
+r the
+> >> >> +     * next instruction executes. If this is a rfid, use SRR1 inst=
+ead
+> >> >> +     * of MSR.
+> >> >> +     */
+> >> >> +    if (rfid) {
+> >> >> +        if ((env->spr[SPR_SRR1] >> MSR_SE) & 1) {
+> >> >> +            /*
+> >> >> +             * The guest is doing a single step itself. Make sure =
+we
+> >> >> +             * restore it later.
+> >> >> +             */
+> >> >> +            env->sstep_kind =3D SSTEP_GUEST;
+> >> >> +        }
+> >> >> +
+> >> >> +        env->spr[SPR_SRR1] |=3D (1ULL << MSR_SE);
+> >> >> +        mmu_on =3D srr1_ir & srr1_dr;
+> >> >
+> >> > s/&/&&/
+> >> >
+> >>=20
+> >> Ack.
+> >>=20
+> >> >> +    } else {
+> >> >> +        env->msr |=3D (1ULL << MSR_SE);
+> >> >> +        mmu_on =3D msr_ir & msr_dr;
+> >> >
+> >> > s/&/&&/
+> >> >
+> >>=20
+> >> Ack.
+> >>=20
+> >> > Also, what happens if the guest is using MSR[DR] !=3D MSR[IR]?  It's
+> >> > rare, but it is occasionally useful.
+> >>=20
+> >> I understand from the ISA that for the purposes of AIL, both bits need
+> >> to be set. So mmu_on =3D 0 is correct here.
+> >
+> > I'm not sure what you mean by "for the purposes of AIL".
+> >
+>=20
+> The reason I'm tracking the translation state here is to be able to tell
+> what will be the value of AIL, since an Alternate Interrupt Location is
+> not used when translation is disabled. In the ISA, under "Alternate
+> Interrupt Location" the only mention of MSR_IR !=3D MSR_DR is:
+>=20
+> "Other interrupts that occur when MSR IR=3D0 or MSR DR=3D0, are taken as
+> if LPCR AIL=3D0."
+>=20
+> and my interpretation of that text is that AIL value is 0 when IR DR are
+> either 0b00, 0b01 or 0b10.
+>=20
+> So "for the purposes of AIL", I'm considering either IR=3D0 or DR=3D0 as
+> meaning MMU off.
+
+But AFAICT the mmu_on flag you're setting here has influences other
+than tracking AIL.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--nHwqXXcoX0o6fKCv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4nvXUACgkQbDjKyiDZ
+s5Khtg//dv1egbLER60V8Ko87AO8ubqBjjPmadoT1cLPboR/zWgzjYFNlrsgk4Oz
+4ydWMxOeIGy8+s0JVaP9UYDrDvSVCGq3vvmmnOWSAc3q/RgwK+gAH3dRNR8DFb7z
+KaLsIvXqZn0OYNXwyZgBEm6LmOcxPuQUyGDI0Nbrz494xXZ3/FnQXQhwuZzWasye
+e3uhoMx47N2S51GbzQGsGEmzAw155Gv7Zh/M9K8A/KN7gQnGB0uHCE6arlll2JVO
+9bW8U7st0GdeUEaxn0I0FgI0/zSulwe4CcISZDoOWKBilYGIhjvoCftWAyrzBOIA
+92+YYhzb2E8lQUbTD/AHHeZfV2cXy/1v4Zhp/jnEXNZuFSTNzHNkJHYO1SdbYlhv
+V0cR7cVLyH02WrBWrPtu0q5xB6s9Lmu4bMNnoQ161HzQuMgvXSMk9aHGg0KDTA0f
+uFzZqEcfqiOZKabN4QITwDSeV41BE2IcxaYZXv6QRuyCRzxXH+IWvveryd/c+VMH
+1viLZXFCUtWguyVa0A9sROJ6t07GqRa3+WRxJhfd96BHEey4QwIlaGecG0NvL3jz
+Zn/Ypq+NvMzHiIaAerXyz93l49oGfoEtqxjcnByLPp1HwyWHHzIcI6il62Fja2iM
+1wu5Zz+IPNAA7mUnDTZdFjCXNL0hXf8v1D6yzUX4b8UzHHQZ2LM=
+=fem+
+-----END PGP SIGNATURE-----
+
+--nHwqXXcoX0o6fKCv--
 
