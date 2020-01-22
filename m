@@ -2,158 +2,84 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A7BC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94082C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:15:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B4612465B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:07:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48FD72465B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:15:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JTG8XDxJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4612465B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QIEq1GTB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48FD72465B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuNDr-0007Ti-Ee
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 16:07:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58295)
+	id 1iuNLm-0002Kl-Ag
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 16:15:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iuNCx-0006dU-OD
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:06:41 -0500
+ (envelope-from <eblake@redhat.com>) id 1iuNKs-0001gM-H9
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iuNCw-0000Jt-CH
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:06:39 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49970
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1iuNKq-0004pP-7h
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32336
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iuNCw-0000J3-8V
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:06:38 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iuNKq-0004mE-11
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579727197;
+ s=mimecast20190719; t=1579727685;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=g2Ixw/3mkaR2Fx4pdqpHgCbmYogC3mwwFqoW9SCnF40=;
- b=JTG8XDxJDUPBLj7XTQsJuajPgNu+602MUEFgSZAVkBtHueVEXe71tVh/D7HMVqzk4pz6Uo
- B0qioDlt/QNr88qJ2I0Ba5J94roVcBukE0kg0HIHXPkB/KMgnlPCZfkVy7Ww04+Q5qWXMb
- 1R2KYommrVZph6KnFmjGYgYBTngnQlM=
+ in-reply-to:in-reply-to:references:references;
+ bh=ZONaJQW6ixWtyG8u3GwluaKwmNpCLKbcqSmMNoJmmdo=;
+ b=QIEq1GTBo3wQAK/Q64ZdEQQD7uBaCL1oKa7Fs28Odfm2n1EMh9AMpqhIQYSSJd+QZVuyxD
+ 1dHmTgOsyrAdaoJ/HfU2Jl5vi2RTDzMOA2UPIx9ZEnZ+i9ppy/e+krSv6Yr4Fqx7iifd/p
+ ort17rQNqMw3kxqdlkepxfBoybEiAF0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-s-HR450wPYGlOCMTxQsqpA-1; Wed, 22 Jan 2020 16:06:35 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-323-rJMd3JHpPVyyQdEayRp3iA-1; Wed, 22 Jan 2020 16:14:42 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43D9E8010D9;
- Wed, 22 Jan 2020 21:06:33 +0000 (UTC)
-Received: from [10.18.17.116] (dhcp-17-116.bos.redhat.com [10.18.17.116])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDC6760C81;
- Wed, 22 Jan 2020 21:06:26 +0000 (UTC)
-Subject: Re: [PATCH v3 0/2] ide: Fix incorrect handling of some PRDTs and add
- the corresponding unit-test
-To: Kevin Wolf <kwolf@redhat.com>, Alexander Popov <alex.popov@linux.com>
-References: <20191223175117.508990-1-alex.popov@linux.com>
- <f3bd803f-aa03-e6bd-2b6a-ef6172a38f4e@linux.com>
- <20200122122334.GA13482@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <198248f3-1f82-620b-e407-59b88f84199d@redhat.com>
-Date: Wed, 22 Jan 2020 16:06:26 -0500
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B726ADBA3;
+ Wed, 22 Jan 2020 21:14:40 +0000 (UTC)
+Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E0BF19C70;
+ Wed, 22 Jan 2020 21:14:40 +0000 (UTC)
+Subject: Re: [PATCH v4 06/11] tests/virtio-9p: added splitted readdir test
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
+References: <cover.1579567019.git.qemu_oss@crudebyte.com>
+ <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <5dac4bf8-64aa-708e-d546-1eaea85bd792@redhat.com>
+Date: Wed, 22 Jan 2020 15:14:39 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200122122334.GA13482@linux.fritz.box>
+In-Reply-To: <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: s-HR450wPYGlOCMTxQsqpA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: rJMd3JHpPVyyQdEayRp3iA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -165,61 +91,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrea Arcangeli <aarcange@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>, sstabellini@kernel.org,
- pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
- qemu-devel@nongnu.org, Kashyap Chamarthy <kashyap.cv@gmail.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- pjp@redhat.com
+Cc: Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 1/22/20 7:23 AM, Kevin Wolf wrote:
-> Am 22.01.2020 um 12:53 hat Alexander Popov geschrieben:
->> On 23.12.2019 20:51, Alexander Popov wrote:
->>> Fuzzing the Linux kernel with syzkaller allowed to find how to crash qemu
->>> using a special SCSI_IOCTL_SEND_COMMAND. It hits the assertion in
->>> ide_dma_cb() introduced in the commit a718978ed58a in July 2015.
->>>
->>> This patch series fixes incorrect handling of some PRDTs in ide_dma_cb()
->>> and improves the ide-test to cover more PRDT cases (including one
->>> that causes that particular qemu crash).
->>>
->>> Changes from v2 (thanks to Kevin Wolf for the feedback):
->>>  - the assertion about prepare_buf() return value is improved;
->>>  - the patch order is reversed to keep the tree bisectable;
->>>  - the unit-test performance is improved -- now it runs 8 seconds
->>>    instead of 3 minutes on my laptop.
->>>
->>> Alexander Popov (2):
->>>   ide: Fix incorrect handling of some PRDTs in ide_dma_cb()
->>>   tests/ide-test: Create a single unit-test covering more PRDT cases
->>>
->>>  hw/ide/core.c    |  30 +++++---
->>>  tests/ide-test.c | 174 ++++++++++++++++++++---------------------------
->>>  2 files changed, 96 insertions(+), 108 deletions(-)
->>
->> Hello!
->>
->> Pinging again about this fix and unit-test...
->>
->> It's ready. Kevin Wolf has reviewed this (thanks a lot!).
->>
->> What is next?
+On 1/20/20 6:16 PM, Christian Schoenebeck wrote:
+> The previous, already existing readdir test simply used a 'count'
+> parameter big enough to retrieve all directory entries with a
+> single Treaddir request.
 > 
-> I asked John about it just yesterday (if he will merge it or if he would
-> prefer me to take it through my tree) and he promised to take a look
-> very soon.
+> In this new 'splitted' readdir test, directory entries are
+
+English is weird; the past tense of 'split' is 'split', not 'splitted'
+
+> retrieved, splitted over several Treaddir requests by picking small
+
+and again
+
+> 'count' parameters which force the server to truncate the response.
+> So the test client sends as many Treaddir requests as necessary to
+> get all directory entries. Currently this test covers actually two
+> tests: a sequence of Treaddir requests with count=512 and then a
+> subsequent test with a sequence of Treaddir requests with count=256.
 > 
-> Kevin
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> ---
+>   tests/qtest/virtio-9p-test.c | 91 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 91 insertions(+)
 > 
 
-Going to merge it today.
+>   
+> +/* readdir test where overall request is splitted over several messages */
 
---js
+and again
+
+> +static void fs_readdir_split(void *obj, void *data, QGuestAllocator *t_alloc)
+> +{
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
