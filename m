@@ -2,94 +2,82 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8906AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 18:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F50C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 18:12:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B54B24656
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 18:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C7A72465A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 18:12:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EvELew3t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B54B24656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCpS4F3M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C7A72465A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuKKj-00073F-G0
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 13:02:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60709)
+	id 1iuKUC-0000pz-Gz
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 13:12:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iuKJj-0006Pe-Aq
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 13:01:28 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuKTU-0000Nr-Uz
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 13:11:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iuKJh-0006Ok-W1
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 13:01:27 -0500
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:52522)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iuKJh-0006O3-N9
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 13:01:25 -0500
-Received: by mail-pj1-x1041.google.com with SMTP id a6so243767pjh.2
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 10:01:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=dnfEHm9HyvHwYytPGYJoBTQnFgHXFDV5JHgJbsUbubM=;
- b=EvELew3t9C9qZj014SRkfqEN60weeaUmTuhckcpurUYG1I1TPiERtnCb2MF7WGX8C+
- yHT4YS0elW6LG7hoks4TgIQBRZlvGOeghCieZ8YTkLgjtC6nDPbrGpkcWgFzPkrOovJA
- MsyXfHLFBpPlBdpAh4udY/1DpS9WAKaFrXlFs4zTqMpzYjjwi7f5p2c8UtTYIIXyVcJS
- /zQrZdsL2bXKE1JEF3Gc+7wOWZPKtDSK6A2DPy4SHHfOHY0WRqlyMH0bCdOwuZroq0UD
- zv2JWnJrFTnCbS/9KhLHBcw6Pe/p+nN2TBiSoP0/qwWnYBzdEFe9HiN2lMLFxSYXEK46
- 8yaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=dnfEHm9HyvHwYytPGYJoBTQnFgHXFDV5JHgJbsUbubM=;
- b=n5L0sMkf3cGmBwyamyVrTjKkxmkWg7IQz/vLEY9oMPmNzDajhgB/NzlZOJZ+7IiD7g
- AjBuoScoPwtFGXiKl9P5YKeTAzr+FZQyLOr5ryt5qZ3NQEAqbupnwZqsV8pMf2O7PgL3
- hRf/Ks2cjhn+1yUmFznfjryZfLVwBOL+Ruq34Has8fUZs8AUwA9m3es4S37KgjgNbl4P
- 5deeq64hgIiLTiIzIxZWjzh5Tlu5OoB+xQiSz2GaeZn2RT+inCTZB+SK/kw3XEDQKMHY
- V+gEvkSXF7gEoBBJbDj1PyPGSFB9dPVT7wRDzM0+6HkN6pbtq9Bbeed2IQL8tA6OqXYU
- EImQ==
-X-Gm-Message-State: APjAAAXWrPhP1MR24nKXG/nhkeVVgd/RMxCVGwIybe1Cbvc5Kzsk2/wr
- rPTb8LyPtH+fPKyfkm1fKevOAZHGmpw=
-X-Google-Smtp-Source: APXvYqy/U6WZoLxoA9VIsB9RPVOKWUFloVPaAoO0yWvn7m1nPwjBC7yflupRXMgaHBzxslGZ8K5C+g==
-X-Received: by 2002:a17:90b:4004:: with SMTP id
- ie4mr4386592pjb.49.1579716084164; 
- Wed, 22 Jan 2020 10:01:24 -0800 (PST)
-Received: from [10.5.50.117] (rrcs-173-198-77-92.west.biz.rr.com.
- [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id u13sm4184989pjn.29.2020.01.22.10.01.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jan 2020 10:01:23 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH] Implement qemu_thread_yield for posix,
- use it in mttcg to handle EXCP_YIELD
-To: David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190717054655.14104-1-npiggin@gmail.com>
- <87h81vdtv2.fsf@linaro.org> <1579604990.qzk2f3181l.astroid@bobo.none>
- <87ftg827ug.fsf@linaro.org> <20200122032659.GG2347@umbus.fritz.box>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3f9572c3-508e-0bd1-a5d4-7e42fa168986@linaro.org>
-Date: Wed, 22 Jan 2020 08:01:18 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <dgilbert@redhat.com>) id 1iuKTR-0002Gd-Bh
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 13:11:30 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42566
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuKTR-0002Fj-7f
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 13:11:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579716688;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jC83L89yNK6jT0NJcxZF+nRgSUPF01iGRViL2/wrVnE=;
+ b=YCpS4F3MV/W2eGG97WW1trLftgw7blPFW54naZkhD2WWHsUInrL1/sktyQGI3dGWUSnbB5
+ LKyvmplg+nX/Nw72lIJqMsQQbgnCzSyjhy3SWIBjOTxaoT79opOV6aWzTNcwnEp0oPKGCB
+ tJOxgCuoiON0ifVKQYb3o2m0rN1pi84=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-J_bzlYbKNZeoWG6ra_aRAA-1; Wed, 22 Jan 2020 13:11:26 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F3651882CC2;
+ Wed, 22 Jan 2020 18:11:25 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 068DB5C1BB;
+ Wed, 22 Jan 2020 18:11:16 +0000 (UTC)
+Date: Wed, 22 Jan 2020 18:11:14 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Subject: Re: [PATCH v2 109/109] virtiofsd: add some options to the help message
+Message-ID: <20200122181114.GP3263@work-vm>
+References: <20200121122433.50803-110-dgilbert@redhat.com>
+ <20200122063532.18649-1-misono.tomohiro@jp.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <20200122032659.GG2347@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+In-Reply-To: <20200122063532.18649-1-misono.tomohiro@jp.fujitsu.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: J_bzlYbKNZeoWG6ra_aRAA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,44 +89,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, Nicholas Piggin <npiggin@gmail.com>,
- qemu-devel@nongnu.org
+Cc: m.mizuma@jp.fujitsu.com, berrange@redhat.com, slp@redhat.com,
+ qemu-devel@nongnu.org, stefanha@redhat.com, philmd@redhat.com,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/21/20 5:26 PM, David Gibson wrote:
-> However, a more common use of qemu is the "pseries" machine type,
-> which emulates only a guest (in the cpu architectural sense) with qemu
-> taking the place of the hypervisor as well as emulating the cpus.  In
-> that case the H_CONFER hypercall goes to qemu.
-> 
->> If you are running QEMU as a KVM monitor this is still outside of it's
->> scope as all the scheduling shenanigans are dealt with inside the
->> kernel.
->>
->> From QEMU's TCG point of view we want to concern ourselves with what the
->> real hardware would do - which I think in this case is drop to the
->> hypervisor and let it sort it out.
-> 
-> Right, but with the "pseries" machine type qemu *is* the hypervisor.
+* Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
+> > From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+> >=20
+> > Add following options to the help message:
+> > - cache
+> > - flock|no_flock
+> > - norace
+> > - posix_lock|no_posix_lock
+> > - readdirplus|no_readdirplus
+> > - timeout
+> > - writeback|no_writeback
+> > - xattr|no_xattr
+> >=20
+> > Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+> >=20
+> > dgilbert: Split cache, norace, posix_lock, readdirplus off
+> >   into our own earlier patches that added the options
+> >=20
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com><Paste>
+>=20
+> Hello,
+>=20
+> I think we also need to remove unused options from help message as well.
+> Could you please review following patch and add or fold to this patch
+> if it is ok.
+>=20
+> Thanks,
+> Misono
 
-In which case this behaviour doesn't seem implausible.
+Thanks, I've merged that into the 'Trim down imported files'
 
-I will note that "pthread_yield" isn't standardized; "sched_yield" is the one
-in POSIX.  Though that says nothing about how that syscall might affect a
-hypothetical many-to-one pthread implementation.  You could, I suppose, have a
-configure test for pthread_yield.
+> =3D=3D=3D=3D=3D
+> [PATCH] virtiofsd: Remove unused options
+>=20
+> Following options came from libfuse but not used in virtiofs:
+>  - allow_other (always set to 1 in guest kernel)
+>  - auto_unmount
+>  - -s (singlethread)
+>=20
+> Let's remove unused options from help in order not to confuse users.
+>=20
+> Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+> ---
+>  tools/virtiofsd/fuse_lowlevel.c | 12 +++---------
+>  tools/virtiofsd/fuse_lowlevel.h |  1 -
+>  tools/virtiofsd/helper.c        |  2 --
+>  3 files changed, 3 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowle=
+vel.c
+> index 2ce3e739fd..00554c6aa7 100644
+> --- a/tools/virtiofsd/fuse_lowlevel.c
+> +++ b/tools/virtiofsd/fuse_lowlevel.c
+> @@ -2539,11 +2539,9 @@ void fuse_lowlevel_help(void)
+>       * potentially of interest to an end-user
+>       */
+>      printf(
+> -        "    -o allow_other             allow access by all users\n"
+>          "    -o allow_root              allow access by root\n"
+>          "    --socket-path=3DPATH         path for the vhost-user socket=
+\n"
+>          "    --fd=3DFDNUM                 fd number of vhost-user socket=
+\n"
+> -        "    -o auto_unmount            auto unmount on process terminat=
+ion\n"
+>          "    --thread-pool-size=3DNUM     thread pool size limit (defaul=
+t %d)\n",
+>          THREAD_POOL_SIZE);
+>  }
+> @@ -2612,14 +2610,10 @@ struct fuse_session *fuse_session_new(struct fuse=
+_args *args,
+>           * Allowing access only by root is done by instructing
+>           * kernel to allow access by everyone, and then restricting
+>           * access to root and mountpoint owner in libfuse.
+> +         *
+> +         * Note: allow_other is set to 1 in guest kernel for virtiofs
+> +         * so nothing needs to be done here
+>           */
+> -        /*
+> -         * We may be adding the option a second time, but
+> -         * that doesn't hurt.
+> -         */
+> -        if (fuse_opt_add_arg(args, "-oallow_other") =3D=3D -1) {
+> -            goto out2;
+> -        }
+>      }
 
-Also, the win32 implementation would be SwitchToThread():
+I took out the surrounding 'if' as well because there was nothing left
+except for the comment.
 
-https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-switchtothread
+Dave
 
-It looks like one need do nothing for the single-threaded implementation,
-qemu_tcg_rr_cpu_thread_fn, as any return to the main loop will select the next
-round-robin cpu.  But a note to say that's been tested would be nice.
+>      if (args->argc =3D=3D 1 && args->argv[0][0] =3D=3D '-') {
+>          fuse_log(FUSE_LOG_ERR,
+> diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowle=
+vel.h
+> index 3a7213f42f..aa5f62c846 100644
+> --- a/tools/virtiofsd/fuse_lowlevel.h
+> +++ b/tools/virtiofsd/fuse_lowlevel.h
+> @@ -1820,7 +1820,6 @@ void fuse_cmdline_help(void);
+>   */
+> =20
+>  struct fuse_cmdline_opts {
+> -    int singlethread;
+>      int foreground;
+>      int debug;
+>      int nodefault_subtype;
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 8f00737b1a..9dd4199800 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -47,7 +47,6 @@ static const struct fuse_opt fuse_helper_opts[] =3D {
+>      FUSE_OPT_KEY("debug", FUSE_OPT_KEY_KEEP),
+>      FUSE_HELPER_OPT("-f", foreground),
+>      FUSE_HELPER_OPT_VALUE("--daemonize", foreground, 0),
+> -    FUSE_HELPER_OPT("-s", singlethread),
+>      FUSE_HELPER_OPT("fsname=3D", nodefault_subtype),
+>      FUSE_OPT_KEY("fsname=3D", FUSE_OPT_KEY_KEEP),
+>      FUSE_HELPER_OPT("subtype=3D", nodefault_subtype),
+> @@ -145,7 +144,6 @@ void fuse_cmdline_help(void)
+>             "    --syslog                   log to syslog (default stderr=
+)\n"
+>             "    -f                         foreground operation\n"
+>             "    --daemonize                run in background\n"
+> -           "    -s                         disable multi-threaded operat=
+ion\n"
+>             "    -o cache=3D<mode>            cache mode. could be one of=
+ \"auto, "
+>             "always, none\"\n"
+>             "                               default: auto\n"
+> --=20
+> 2.21.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-
-r~
 
