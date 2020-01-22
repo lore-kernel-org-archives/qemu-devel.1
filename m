@@ -2,63 +2,119 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7378CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 19:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F03C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 20:47:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3705D21835
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 19:57:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3705D21835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6810524655
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 20:47:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+3Lb/3T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6810524655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuM84-00058K-CQ
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 14:57:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49198)
+	id 1iuMuV-0001YE-IC
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 15:47:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iuM7T-0004im-JI
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 14:56:57 -0500
+ (envelope-from <rth7680@gmail.com>) id 1iuMtl-00015Y-Ig
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 15:46:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iuM7S-00025g-1F
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 14:56:55 -0500
-Received: from 14.mo3.mail-out.ovh.net ([188.165.43.98]:59880)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuM7R-00024G-Qa
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 14:56:53 -0500
-Received: from player718.ha.ovh.net (unknown [10.109.146.137])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 4A91323EAB6
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 20:56:51 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player718.ha.ovh.net (Postfix) with ESMTPSA id A783EE6F02CF;
- Wed, 22 Jan 2020 19:56:49 +0000 (UTC)
-Date: Wed, 22 Jan 2020 20:56:46 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v4 05/11] tests/virtio-9p: added readdir test
-Message-ID: <20200122205646.66b19a39@bahia.lan>
-In-Reply-To: <e0b4402722a877178f8fb6a8ad7b64bb20150613.1579567020.git.qemu_oss@crudebyte.com>
-References: <cover.1579567019.git.qemu_oss@crudebyte.com>
- <e0b4402722a877178f8fb6a8ad7b64bb20150613.1579567020.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <rth7680@gmail.com>) id 1iuMtk-0007Lu-GG
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 15:46:49 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:33381)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1iuMtk-0007LR-AQ
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 15:46:48 -0500
+Received: by mail-pl1-x643.google.com with SMTP id ay11so328065plb.0
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 12:46:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wybqKnJPhlYDhZ8Ef0C4EWbKWjqIszAbAFW5ofwNpME=;
+ b=l+3Lb/3TO4mepjffHh0FoyvlW7Pxz1RAXxGlkyYtmHmkNVYgNDvJ0vW+q3qnyWmLay
+ v8rF46YoWDsl/TV095p+r8PaXh4VCpDg4OxE+HG611k7n9jbhcYsBDihVYp4sVisTj21
+ +ItoUfTwX86IcPy3LV4dI4sCBMChl8Z/IsHMNvlhINdDL4bq1JkpTRW/Nk5eSFZoQ9xj
+ igecNIWOexaYBP0kCHEjZxCGo/v9yhC/dFKtPORW1cRdF5s4Bpekzrl6Ruk0nA4lG/eT
+ fKvQwCttlQuuR1+WZMA7WdTVC+f7C8moKtqiew2wSOyvIhmWsZoy4Eo4nXNzqhMJdJWs
+ KJfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=wybqKnJPhlYDhZ8Ef0C4EWbKWjqIszAbAFW5ofwNpME=;
+ b=ReGmpX2Qct9+SJtGg4UH1ZBfLumNCPZeJ3yUxbcXssWKsbpFAyHHz6quWhn41ILKHV
+ dUoMZCZd4xPQkz2IS/GdWbOezoaN2FCFnJ0dQjUpAZQ1OgMy67MmcJJa/9B6aIY6b5js
+ jbMvvFXQ1cI9kk8TC3K99OTEbeve5dieU8vzfa9RB9Nwd2Q8vTQyWMkXllSJBFbDIXmC
+ en1Liw9e5F5TiuDp4bwuUM5ceZTuJMY86LDxmFhXzpbTgEu7etC6Zkj7BMyW9AE7vJgF
+ WL/aPB+194P9TAekwjtymT1uP0n7w9OKwBOeoL7hpzbANmQirlXbtMkcdVcaXC/NRAU2
+ 5xew==
+X-Gm-Message-State: APjAAAWt7BFU1PADb3/XcL4Ty83LCI70nYhorWyqpt8lFN4eVeLgurYZ
+ FvmgGZpCNHZXJ+aOGa+55Go=
+X-Google-Smtp-Source: APXvYqwOEPf/uOAaIdSOidg92HBeTQBE/O2DOCBapwmXnyYgFEol4FsZAY3rnfyAFPRvBRrRuNDXMw==
+X-Received: by 2002:a17:90b:355:: with SMTP id
+ fh21mr351549pjb.51.1579726006467; 
+ Wed, 22 Jan 2020 12:46:46 -0800 (PST)
+Received: from ?IPv6:2607:fb90:580:a104:4475:e6b8:8600:af4a?
+ ([2607:fb90:580:a104:4475:e6b8:8600:af4a])
+ by smtp.googlemail.com with ESMTPSA id d4sm4351082pjz.12.2020.01.22.12.46.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Jan 2020 12:46:45 -0800 (PST)
+Subject: Re: [PATCH v4 00/18] hw/avr: Introduce few Arduino boards
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Michael Rolnik <mrolnik@gmail.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200120220107.17825-1-f4bug@amsat.org>
+ <CAK4993jBdx4WniPqLs2YLUnv5rXhGL2SC9bjbjeVmO5bvkRgoQ@mail.gmail.com>
+ <CAAdtpL5FdzYga1sA+nsN4+JP2QMO5NMRDtdcJ0v1prHgjxZ+QQ@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+ mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+ n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+ rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+ Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+ n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+ AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFYBBMBAgBCAhsDBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAIZARYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweUY
+ BQkP1h/pAAoJEK0ScMxN0CebqDsH/0YyfnXk+Dc++H37VCEKgRet2i1ATFzxRnifkvmdxha0
+ V+PVptQ2fwSe+w3KxoFecD8W75nysmUjrU/FicW9yU5YRlGONPZjruG02/KzmhA5PzWJdYO3
+ i/t0qRayvWIcX2qA/flsXEbmb/BbAFM05LQIdcOu74eiBFe5CBCOWBDJeneE1urIE0hSYxoh
+ nCcG60ULrNj13ohZ4zAEluoY32qIo7/OPWmtR88cPrEbZT8k+RqgZbsotzaPT1/RlL74fL8k
+ ofYfTgKAFH7eEy6fF2nzDp2GThVn+3sA62xtpSXUf/X1m75B40KOcq1EQbHypNTmBc1wt13e
+ ibhPNEVX2am5AQ0EUa4sLwEIALITHfH3gciRNfQIe7awDTDvn6H3C6gDyCAnv5LiuLTLZiyK
+ NZp3lNO3rPowyKrGT2RIDlumlqPgdeHzqEEX91YK0yk2vdFvwU04rJ4D+qRgdUPoeICLD1zo
+ PwOv2FaY6Tf8dKYas1RHF5QU5yQNey8j7IYYoE2yGPn2PtBmvtmK4iLataUEvx0U385Zr+jf
+ HscqwTiToryeDC8Io/9BsMvAssE5Yf5URS2nJ7LFOvc4njsQJPF1i9egBXaIloqv7p2hVCKJ
+ Hl5UWIxitQ9QQIl6iU4LCpz8mVYTXwv48IAVpbUf7+ak9V9Kk3jCeQnlxCJBUHjUhoIzinbS
+ JHPHtkkAEQEAAYkBPAQYAQIAJgIbDBYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweVIBQkP
+ 1iAZAAoJEK0ScMxN0CebGHUH/RtouOlWl6To97tQsTJUq/2YwmRpFOsvV0/zCX4fKBGAbeZi
+ VaELSt2+3UEErA+n8HwbQmjJ6IrdhA9GustOpOyCcbLVSMwql/OlAwBtDzCcC8dTU4zcuY2a
+ rGG2A8i5krU85G9r1wowVcWZBsdmW7/dKiNoadLQiig4bHNiSaV4ograas5efyEjqTxiY+yG
+ hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
+ erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
+ q9OBIdA=
+Message-ID: <dfffa872-86fb-9cac-5738-93e88d5accc8@twiddle.net>
+Date: Wed, 22 Jan 2020 10:46:40 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 12178296344191473984
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddtgdduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedukedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 188.165.43.98
+In-Reply-To: <CAAdtpL5FdzYga1sA+nsN4+JP2QMO5NMRDtdcJ0v1prHgjxZ+QQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,230 +126,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jan 2020 01:12:00 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-
-> The first readdir test simply checks the amount of directory
-> entries returned by 9pfs server, according to the created amount
-> of virtual files on 9pfs synth driver side. Then the subsequent
-> readdir test also checks whether all directory entries have the
-> expected file names (as created on 9pfs synth driver side),
-> ignoring their precise order in result list though.
+On 1/21/20 11:23 AM, Philippe Mathieu-Daudé wrote:
+>> 4. There is difference between -bios and -kernel (arduino boars crash when -bios is used, but this seems because I run avr6 on avr5 CPU). I would be happy if you explained what is the difference between these two arguments.
 > 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
-
-LGTM
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-I've applied patches 4 and 5 as well.
-
->  tests/qtest/virtio-9p-test.c | 152 +++++++++++++++++++++++++++++++++++
->  1 file changed, 152 insertions(+)
+> qemu man page is not very helpful...
 > 
-> diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-> index 06263edb53..2167322985 100644
-> --- a/tests/qtest/virtio-9p-test.c
-> +++ b/tests/qtest/virtio-9p-test.c
-> @@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t len)
->      req->r_off += len;
->  }
->  
-> +static void v9fs_uint8_read(P9Req *req, uint8_t *val)
-> +{
-> +    v9fs_memread(req, val, 1);
-> +}
-> +
->  static void v9fs_uint16_write(P9Req *req, uint16_t val)
->  {
->      uint16_t le_val = cpu_to_le16(val);
-> @@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
->      le32_to_cpus(val);
->  }
->  
-> +static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-> +{
-> +    v9fs_memread(req, val, 8);
-> +    le64_to_cpus(val);
-> +}
-> +
->  /* len[2] string[len] */
->  static uint16_t v9fs_string_size(const char *string)
->  {
-> @@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
->          id == P9_RLOPEN ? "RLOPEN" :
->          id == P9_RWRITE ? "RWRITE" :
->          id == P9_RFLUSH ? "RFLUSH" :
-> +        id == P9_RREADDIR ? "READDIR" :
->          "<unknown>";
->  }
->  
-> @@ -348,6 +360,82 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
->      v9fs_req_free(req);
->  }
->  
-> +/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-> +static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
-> +                            uint32_t count, uint16_t tag)
-> +{
-> +    P9Req *req;
-> +
-> +    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-> +    v9fs_uint32_write(req, fid);
-> +    v9fs_uint64_write(req, offset);
-> +    v9fs_uint32_write(req, count);
-> +    v9fs_req_send(req);
-> +    return req;
-> +}
-> +
-> +struct V9fsDirent {
-> +    v9fs_qid qid;
-> +    uint64_t offset;
-> +    uint8_t type;
-> +    char *name;
-> +    struct V9fsDirent *next;
-> +};
-> +
-> +/* size[4] Rreaddir tag[2] count[4] data[count] */
-> +static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
-> +                          struct V9fsDirent **entries)
-> +{
-> +    uint32_t local_count;
-> +    struct V9fsDirent *e = NULL;
-> +    uint16_t slen;
-> +    uint32_t n = 0;
-> +
-> +    v9fs_req_recv(req, P9_RREADDIR);
-> +    v9fs_uint32_read(req, &local_count);
-> +
-> +    if (count) {
-> +        *count = local_count;
-> +    }
-> +
-> +    for (int32_t togo = (int32_t)local_count;
-> +         togo >= 13 + 8 + 1 + 2;
-> +         togo -= 13 + 8 + 1 + 2 + slen, ++n)
-> +    {
-> +        if (!e) {
-> +            e = g_malloc(sizeof(struct V9fsDirent));
-> +            if (entries) {
-> +                *entries = e;
-> +            }
-> +        } else {
-> +            e = e->next = g_malloc(sizeof(struct V9fsDirent));
-> +        }
-> +        e->next = NULL;
-> +        /* qid[13] offset[8] type[1] name[s] */
-> +        v9fs_memread(req, &e->qid, 13);
-> +        v9fs_uint64_read(req, &e->offset);
-> +        v9fs_uint8_read(req, &e->type);
-> +        v9fs_string_read(req, &slen, &e->name);
-> +    }
-> +
-> +    if (nentries) {
-> +        *nentries = n;
-> +    }
-> +
-> +    v9fs_req_free(req);
-> +}
-> +
-> +static void v9fs_free_dirents(struct V9fsDirent *e)
-> +{
-> +    struct V9fsDirent *next = NULL;
-> +
-> +    for (; e; e = next) {
-> +        next = e->next;
-> +        g_free(e->name);
-> +        g_free(e);
-> +    }
-> +}
-> +
->  /* size[4] Tlopen tag[2] fid[4] flags[4] */
->  static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
->                            uint16_t tag)
-> @@ -480,6 +568,69 @@ static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
->      g_free(wqid);
->  }
->  
-> +static bool fs_dirents_contain_name(struct V9fsDirent *e, const char* name)
-> +{
-> +    for (; e; e = e->next) {
-> +        if (!strcmp(e->name, name)) {
-> +            return true;
-> +        }
-> +    }
-> +    return false;
-> +}
-> +
-> +static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-> +{
-> +    QVirtio9P *v9p = obj;
-> +    alloc = t_alloc;
-> +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-> +    uint16_t nqid;
-> +    v9fs_qid qid;
-> +    uint32_t count, nentries;
-> +    struct V9fsDirent *entries = NULL;
-> +    P9Req *req;
-> +
-> +    fs_attach(v9p, NULL, t_alloc);
-> +    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rwalk(req, &nqid, NULL);
-> +    g_assert_cmpint(nqid, ==, 1);
-> +
-> +    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rlopen(req, &qid, NULL);
-> +
-> +    /*
-> +     * submit count = msize - 11, because 11 is the header size of Rreaddir
-> +     */
-> +    req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - 11, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rreaddir(req, &count, &nentries, &entries);
-> +
-> +    /*
-> +     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
-> +     * dir entries with only one readdir request.
-> +     */
-> +    g_assert_cmpint(
-> +        nentries, ==,
-> +        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-> +    );
-> +
-> +    /*
-> +     * Check all file names exist in returned entries, ignore their order
-> +     * though.
-> +     */
-> +    g_assert_cmpint(fs_dirents_contain_name(entries, "."), ==, true);
-> +    g_assert_cmpint(fs_dirents_contain_name(entries, ".."), ==, true);
-> +    for (int i = 0; i < QTEST_V9FS_SYNTH_READDIR_NFILES; ++i) {
-> +        char *name = g_strdup_printf(QTEST_V9FS_SYNTH_READDIR_FILE, i);
-> +        g_assert_cmpint(fs_dirents_contain_name(entries, name), ==, true);
-> +        g_free(name);
-> +    }
-> +
-> +    v9fs_free_dirents(entries);
-> +    g_free(wnames[0]);
-> +}
-> +
->  static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
->  {
->      QVirtio9P *v9p = obj;
-> @@ -658,6 +809,7 @@ static void register_virtio_9p_test(void)
->                   NULL);
->      qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
->                   NULL);
-> +    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
->  }
->  
->  libqos_init(register_virtio_9p_test);
+>        -bios file
+>            Set the filename for the BIOS.
+> 
+>        -kernel bzImage
+>            Use bzImage as kernel image. The kernel can be either a
+> Linux kernel or in multiboot format.
+> 
+> Paolo, Peter, do you have a simple explanation?
 
+It depends on your target board.  They *can* do very different things.
+
+E.g. for "pc" (x86) machine, -bios sets the seabios image to use, and -kernel
+loads a kernel image that seabios will invoke.
+
+E.g. for "dp264" (alpha) machine, -bios sets the palcode image to use and
+-kernel loads a kernel image.  Note that in this case, the alpha kernel relies
+on palcode services, so both must be present for the system to work.
+
+E.g. for "virt" (arm) machine, -bios loads a raw image at which the reset
+vector will be pointed, whereas -kernel loads a linux kernel image and follows
+the arm-linux kernel boot protocol.  In other words the images are treated very
+differently.
+
+I don't know what, if anything, an avr kernel would require from boot services.
+ I suspect the two options *could* be treated identically.
+
+
+r~
 
