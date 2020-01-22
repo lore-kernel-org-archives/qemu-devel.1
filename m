@@ -2,62 +2,83 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F41CFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D22AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:07:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEE522465A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 12:48:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEE522465A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 580FE2467A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:07:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d4qXCyl8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 580FE2467A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuFQn-0003op-Dw
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 07:48:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47197)
+	id 1iuFjW-00014K-Dj
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 08:07:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iuFPl-0003Cm-E8
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:47:22 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iuFio-0000fU-JU
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iuFPj-00046x-TR
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:47:21 -0500
-Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:44483)
+ (envelope-from <wainersm@redhat.com>) id 1iuFin-0008TA-H9
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:07:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48431
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuFPj-00046A-Nv
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 07:47:19 -0500
-Received: from player699.ha.ovh.net (unknown [10.108.16.238])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6F6EF1AB32A
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 13:47:17 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player699.ha.ovh.net (Postfix) with ESMTPSA id D8372E7B9D46;
- Wed, 22 Jan 2020 12:47:10 +0000 (UTC)
-Date: Wed, 22 Jan 2020 13:47:08 +0100
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] spapr: Migrate CAS reboot flag
-Message-ID: <20200122134708.21a4cbb5@bahia.lan>
-In-Reply-To: <6fb96fed-9590-aa7c-cf00-038ab776ccb5@kaod.org>
-References: <157911051688.345768.16136592081655557565.stgit@bahia.lan>
- <6fb96fed-9590-aa7c-cf00-038ab776ccb5@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iuFin-0008Sr-DY
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:07:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579698420;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YdzQ5XQ9EtKzUM46zwtUHNkSRblrDf4zl9xHGKZuKkA=;
+ b=d4qXCyl8HJS76gRoMsjNBwabLRdLtb6qMwhkaX4wBWkWU1RZdDdZsLW891m719QK9SG0fB
+ 0hHEeJ+ACm/FVUuCQb2MEdhvBeWQkYCsX2oCpQPx/47Efrc7ambeE/k41h+YW8DEIBAJO0
+ ijWIhupIel6ZN+ci4wwkCYprv7p0mIo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-QJvMUGx8OF2d75Abiu8Xdg-1; Wed, 22 Jan 2020 08:06:59 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DBDD800D4E
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 13:06:58 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-68.gru2.redhat.com
+ [10.97.116.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC88285732;
+ Wed, 22 Jan 2020 13:06:54 +0000 (UTC)
+Subject: Re: [PATCH] vhost: coding style fix
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+References: <20200122080840.592054-1-mst@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <2b0670f2-f14e-b4f6-ad01-d1b2b28bdf06@redhat.com>
+Date: Wed, 22 Jan 2020 11:06:53 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 4923560293687662987
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddtgdegudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinheprhgvughhrghtrdgtohhmnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+In-Reply-To: <20200122080840.592054-1-mst@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: QJvMUGx8OF2d75Abiu8Xdg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.60.232
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,149 +90,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Lukas Doktor <ldoktor@redhat.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 15 Jan 2020 19:10:47 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-> On 1/15/20 6:48 PM, Greg Kurz wrote:
-> > Migration can potentially race with CAS reboot. If the migration thread
-> > completes migration after CAS has set spapr->cas_reboot but before the
-> > mainloop could pick up the reset request and reset the machine, the
-> > guest is migrated unrebooted and the destination doesn't reboot it
-> > either because it isn't aware a CAS reboot was needed (eg, because a
-> > device was added before CAS). This likely result in a broken or hung
-> > guest.
-> >=20
-> > Even if it is small, the window between CAS and CAS reboot is enough to
-> > re-qualify spapr->cas_reboot as state that we should migrate. Add a new
-> > subsection for that and always send it when a CAS reboot is pending.
-> > This may cause migration to older QEMUs to fail but it is still better
-> > than end up with a broken guest.
-> >=20
-> > The destination cannot honour the CAS reboot request from a post load
-> > handler because this must be done after the guest is fully restored.
-> > It is thus done from a VM change state handler.
-> >=20
-> > Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
->=20
-> C=C3=A9dric Le Goater <clg@kaod.org>
->=20
+On 1/22/20 6:08 AM, Michael S. Tsirkin wrote:
+> Drop a trailing whitespace. Make line shorter.
 
-I guess you mean:
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+hmmm... wondering why Patchew didn't catch that. Any idea?
 
-?
+- Wainer
 
-> Nice work ! That was quite complex to catch !
->=20
-> Thanks,
->=20
-> C.
->=20
-> > ---
-> >=20
-> > This patch is supposed to fix the interrupt controller mode inconsisten=
-cy
-> > between QEMU and the guest reported in this BZ:
-> >=20
-> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1781315 (requires auth)
-> >=20
-> > Even if interrupt controller selection doesn't involve CAS reboot anymo=
-re,
-> > we still have other conditions that require CAS reboot.
-> > ---
-> >  hw/ppc/spapr.c |   43 +++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 43 insertions(+)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 30a5fbd3bea6..bf2763aa16e5 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1959,6 +1959,31 @@ static const VMStateDescription vmstate_spapr_dt=
-b =3D {
-> >      },
-> >  };
-> > =20
-> > +static bool spapr_cas_reboot_needed(void *opaque)
-> > +{
-> > +    SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
-> > +
-> > +    /*
-> > +     * This causes the "spapr_cas_reboot" subsection to always be
-> > +     * sent if migration raced with CAS. This causes older QEMUs
-> > +     * that don't know about the subsection to fail migration but
-> > +     * it is still better than end up with a broken guest on the
-> > +     * destination.
-> > +     */
-> > +    return spapr->cas_reboot;
-> > +}
-> > +
-> > +static const VMStateDescription vmstate_spapr_cas_reboot =3D {
-> > +    .name =3D "spapr_cas_reboot",
-> > +    .version_id =3D 1,
-> > +    .minimum_version_id =3D 1,
-> > +    .needed =3D spapr_cas_reboot_needed,
-> > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_BOOL(cas_reboot, SpaprMachineState),
-> > +        VMSTATE_END_OF_LIST()
-> > +    },
-> > +};
-> > +
-> >  static const VMStateDescription vmstate_spapr =3D {
-> >      .name =3D "spapr",
-> >      .version_id =3D 3,
-> > @@ -1992,6 +2017,7 @@ static const VMStateDescription vmstate_spapr =3D=
- {
-> >          &vmstate_spapr_dtb,
-> >          &vmstate_spapr_cap_large_decr,
-> >          &vmstate_spapr_cap_ccf_assist,
-> > +        &vmstate_spapr_cas_reboot,
-> >          NULL
-> >      }
-> >  };
-> > @@ -2577,6 +2603,21 @@ static PCIHostState *spapr_create_default_phb(vo=
-id)
-> >      return PCI_HOST_BRIDGE(dev);
-> >  }
-> > =20
-> > +static void spapr_change_state_handler(void *opaque, int running,
-> > +                                       RunState state)
-> > +{
-> > +    SpaprMachineState *spapr =3D opaque;
-> > +
-> > +    if (running && spapr->cas_reboot) {
-> > +        /*
-> > +         * This happens when resuming from migration if the source
-> > +         * processed a CAS but didn't have time to trigger the CAS
-> > +         * reboot. Do it now.
-> > +         */
-> > +        qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
-> > +    }
-> > +}
-> > +
-> >  /* pSeries LPAR / sPAPR hardware init */
-> >  static void spapr_machine_init(MachineState *machine)
-> >  {
-> > @@ -2970,6 +3011,8 @@ static void spapr_machine_init(MachineState *mach=
-ine)
-> > =20
-> >          kvmppc_spapr_enable_inkernel_multitce();
-> >      }
-> > +
-> > +    qemu_add_vm_change_state_handler(spapr_change_state_handler, spapr=
-);
-> >  }
-> > =20
-> >  static int spapr_kvm_type(MachineState *machine, const char *vm_type)
-> >=20
->=20
+>
+> Fixes: 76525114736e8 ("vhost: Only align sections for vhost-user")
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>   hw/virtio/vhost.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 25fd469179..9edfadc81d 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -551,7 +551,7 @@ static void vhost_region_add_section(struct vhost_dev *dev,
+>       trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
+>                                      mrs_host);
+>   
+> -    if (dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER) {
+> +    if (dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER) {
+>           /* Round the section to it's page size */
+>           /* First align the start down to a page boundary */
+>           size_t mrs_page = qemu_ram_pagesize(mrs_rb);
+> @@ -566,8 +566,8 @@ static void vhost_region_add_section(struct vhost_dev *dev,
+>           if (alignage) {
+>               mrs_size += mrs_page - alignage;
+>           }
+> -        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gpa, mrs_size,
+> -                                               mrs_host);
+> +        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gpa,
+> +                                               mrs_size, mrs_host);
+>       }
+>   
+>       if (dev->n_tmp_sections) {
 
 
