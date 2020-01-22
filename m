@@ -2,63 +2,56 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5479EC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE14C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:35:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F8C5207E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:32:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Hhg46VNQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F8C5207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 862162071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 03:35:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 862162071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu6lA-0008TY-BN
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 22:32:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49127)
+	id 1iu6nZ-00016b-Nz
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 22:35:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49509)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iu6iK-0005WP-C8
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:29:57 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iu6n1-0000fi-1B
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:34:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iu6iI-0001bb-UB
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:29:56 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:53577 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iu6iE-0001To-NN; Tue, 21 Jan 2020 22:29:51 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 482W9j75b1z9sRs; Wed, 22 Jan 2020 14:29:45 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1579663786;
- bh=sn7xKkZ6SItaNbo3lEJZZA3KUS2uXO/WN/19CMVZwOE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Hhg46VNQxseDJKZbEu4w2qPWCbV5khGsoXPQ9sCoRvkzqti+FCinPnDVncC+Vgicw
- IuxWYcdaClGCGthT/xv0UGFBTzYEVinzMBsXi8YQBPkmIH/tj6BETd7Pjry4hS5cjC
- C6lgmjDOJ7LKU9okJFXR4l+0KPBtOBQJiL2Ns+cI=
-Date: Wed, 22 Jan 2020 14:28:56 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 09/10] accel: Replace current_machine->accelerator by
- current_accel() wrapper
-Message-ID: <20200122032856.GI2347@umbus.fritz.box>
-References: <20200121110349.25842-1-philmd@redhat.com>
- <20200121110349.25842-10-philmd@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iu6mz-0004wf-GV
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:34:46 -0500
+Resent-Date: Tue, 21 Jan 2020 22:34:46 -0500
+Resent-Message-Id: <E1iu6mz-0004wf-GV@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21174)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iu6mz-0004vx-8W
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 22:34:45 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579664076835568.023596618176;
+ Tue, 21 Jan 2020 19:34:36 -0800 (PST)
+In-Reply-To: <20200122023256.27556-1-richard.henderson@linaro.org>
+Subject: Re: [PULL 00/11] target/hppa patch queue
+Message-ID: <157966407584.8714.10235144275848665189@f6d1ed32ca6b>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="X+nYw8KZ/oNxZ8JS"
-Content-Disposition: inline
-In-Reply-To: <20200121110349.25842-10-philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Tue, 21 Jan 2020 19:34:36 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,196 +63,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Like Xu <like.xu@linux.intel.com>,
- David Hildenbrand <david@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyMjAyMzI1Ni4yNzU1
+Ni0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDEyMjAy
+MzI1Ni4yNzU1Ni0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1BVTEwg
+MDAvMTFdIHRhcmdldC9ocHBhIHBhdGNoIHF1ZXVlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApmYXRhbDogZ2l0IGZldGNoX3BhY2s6IGV4cGVjdGVkIEFDSy9OQUssIGdvdCAnRVJSIHVw
+bG9hZC1wYWNrOiBub3Qgb3VyIHJlZiAzYTdiNWE4MzFjMDM5OGU5M2QxMjBkY2M2NTRhY2VmYmI1
+MDU2ZWUyJwpmYXRhbDogVGhlIHJlbW90ZSBlbmQgaHVuZyB1cCB1bmV4cGVjdGVkbHkKZXJyb3I6
+IENvdWxkIG5vdCBmZXRjaCAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+ClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICJwYXRjaGV3LXRlc3Rl
+ci9zcmMvcGF0Y2hldy1jbGkiLCBsaW5lIDUyMSwgaW4gdGVzdF9vbmUKICAgIGdpdF9jbG9uZV9y
+ZXBvKGNsb25lLCByWyJyZXBvIl0sIHJbImhlYWQiXSwgbG9nZiwgVHJ1ZSkKICBGaWxlICJwYXRj
+aGV3LXRlc3Rlci9zcmMvcGF0Y2hldy1jbGkiLCBsaW5lIDQ4LCBpbiBnaXRfY2xvbmVfcmVwbwog
+ICAgc3Rkb3V0PWxvZ2YsIHN0ZGVycj1sb2dmKQogIEZpbGUgIi9vcHQvcmgvcmgtcHl0aG9uMzYv
+cm9vdC91c3IvbGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4gY2hl
+Y2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJv
+Y2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ3JlbW90ZScsICdhZGQn
+LCAnLWYnLCAnLS1taXJyb3I9ZmV0Y2gnLCAnM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NCcsICdodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUnXScg
+cmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMS4KCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
+YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDEyMjAyMzI1Ni4yNzU1Ni0xLXJp
+Y2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
+Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
 
---X+nYw8KZ/oNxZ8JS
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jan 21, 2020 at 12:03:48PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> We actually want to access the accelerator, not the machine, so
-> use the current_accel() wrapper instead.
->=20
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-ppc parts
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
-> v2:
-> - Reworded description
-> - Remove unused include in arm/kvm64
-> ---
->  accel/kvm/kvm-all.c | 4 ++--
->  accel/tcg/tcg-all.c | 2 +-
->  memory.c            | 2 +-
->  target/arm/kvm64.c  | 5 ++---
->  target/i386/kvm.c   | 2 +-
->  target/ppc/kvm.c    | 2 +-
->  vl.c                | 2 +-
->  7 files changed, 9 insertions(+), 10 deletions(-)
->=20
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 1ada2f4ecb..c111312dfd 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -164,7 +164,7 @@ static NotifierList kvm_irqchip_change_notifiers =3D
-> =20
->  int kvm_get_max_memslots(void)
->  {
-> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> +    KVMState *s =3D KVM_STATE(current_accel());
-> =20
->      return s->nr_slots;
->  }
-> @@ -1848,7 +1848,7 @@ static int kvm_max_vcpu_id(KVMState *s)
-> =20
->  bool kvm_vcpu_id_is_valid(int vcpu_id)
->  {
-> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> +    KVMState *s =3D KVM_STATE(current_accel());
->      return vcpu_id >=3D 0 && vcpu_id < kvm_max_vcpu_id(s);
->  }
-> =20
-> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-> index 1dc384c8d2..1802ce02f6 100644
-> --- a/accel/tcg/tcg-all.c
-> +++ b/accel/tcg/tcg-all.c
-> @@ -124,7 +124,7 @@ static void tcg_accel_instance_init(Object *obj)
-> =20
->  static int tcg_init(MachineState *ms)
->  {
-> -    TCGState *s =3D TCG_STATE(current_machine->accelerator);
-> +    TCGState *s =3D TCG_STATE(current_accel());
-> =20
->      tcg_exec_init(s->tb_size * 1024 * 1024);
->      cpu_interrupt_handler =3D tcg_handle_interrupt;
-> diff --git a/memory.c b/memory.c
-> index d7b9bb6951..854798791e 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -3104,7 +3104,7 @@ void mtree_info(bool flatview, bool dispatch_tree, =
-bool owner)
->          };
->          GArray *fv_address_spaces;
->          GHashTable *views =3D g_hash_table_new(g_direct_hash, g_direct_e=
-qual);
-> -        AccelClass *ac =3D ACCEL_GET_CLASS(current_machine->accelerator);
-> +        AccelClass *ac =3D ACCEL_GET_CLASS(current_accel());
-> =20
->          if (ac->has_memory) {
->              fvi.ac =3D ac;
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 876184b8fe..e3c580e749 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -26,7 +26,6 @@
->  #include "sysemu/kvm.h"
->  #include "sysemu/kvm_int.h"
->  #include "kvm_arm.h"
-> -#include "hw/boards.h"
->  #include "internals.h"
-> =20
->  static bool have_guest_debug;
-> @@ -613,14 +612,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatur=
-es *ahcf)
-> =20
->  bool kvm_arm_aarch32_supported(CPUState *cpu)
->  {
-> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> +    KVMState *s =3D KVM_STATE(current_accel());
-> =20
->      return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
->  }
-> =20
->  bool kvm_arm_sve_supported(CPUState *cpu)
->  {
-> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> +    KVMState *s =3D KVM_STATE(current_accel());
-> =20
->      return kvm_check_extension(s, KVM_CAP_ARM_SVE);
->  }
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 7ee3202634..eddb930065 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -147,7 +147,7 @@ bool kvm_allows_irq0_override(void)
-> =20
->  static bool kvm_x2apic_api_set_flags(uint64_t flags)
->  {
-> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> +    KVMState *s =3D KVM_STATE(current_accel());
-> =20
->      return !kvm_vm_enable_cap(s, KVM_CAP_X2APIC_API, 0, flags);
->  }
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index b5799e62b4..45ede6b6d9 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -258,7 +258,7 @@ static void kvm_get_smmu_info(struct kvm_ppc_smmu_inf=
-o *info, Error **errp)
-> =20
->  struct ppc_radix_page_info *kvm_get_radix_page_info(void)
->  {
-> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> +    KVMState *s =3D KVM_STATE(current_accel());
->      struct ppc_radix_page_info *radix_page_info;
->      struct kvm_ppc_rmmu_info rmmu_info;
->      int i;
-> diff --git a/vl.c b/vl.c
-> index 71d3e7eefb..a8ea36f4f8 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2812,7 +2812,7 @@ static void configure_accelerators(const char *prog=
-name)
->      }
-> =20
->      if (init_failed) {
-> -        AccelClass *ac =3D ACCEL_GET_CLASS(current_machine->accelerator);
-> +        AccelClass *ac =3D ACCEL_GET_CLASS(current_accel());
->          error_report("falling back to %s", ac->name);
->      }
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---X+nYw8KZ/oNxZ8JS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4nwXgACgkQbDjKyiDZ
-s5KQjA/5AWHyv4v6rfJAATtSyWrFZBMM6JSp8t5nXhPeVMbRZJElTj+aZQlJnojH
-S+d5VMUyzr1uv31BqsV69lL0mLlh9P/JDtmqFxA0sxQ+c3vSjQFcMTa9tpgaZtP7
-CcgB2B3xU/FGn3D7Z+NeUvqhSON6Gz3Gf1+pHZVQNAC6CgGGIZl1BGaGZO8mh+HT
-og9me7Latm/gyadx1C2t7XiqnI54aKFiA67H6ACROcmOJmXrUXfBE01hCoutAY64
-xMJq250XMXj0Ug9rDRH29JfIAOMbHKPwBi8kOJu/21xtz0M2GqJRQ1AVWW0UuJ7U
-t88m11vBAP/mjbtbcc00VOKuIvPNuodRYenraiIsBrdO05Pv32ug+NSNFK6kyhAv
-CG7Z4pIQsLaqoLt16HbxCbrOPSZZY1i5e+MiLPs3kC+kcR9JVMxtAMybKbYQpnGE
-lXp5pYiAx2ZRjgpPpCMmJ/RRDxHworeUu+8r95bBmYJiDsl+gFjCb2EyYIrU43NP
-OVzla3QhyRF0I8m8SQFf6/QEN2OP3QQhNUscP4qXT7UOqttsRzPeKqhTqxM9RVUz
-UQ/R+COp+4wvNuVWsPzF7ZpCeFNDzaXoYy3FYGNJqqGXlZUUectKrUiMx678D4f/
-WgNH6A7V1i7Pf77T480gOkYCFz2sQoQTuOVqesfEFqisLEimELY=
-=F7CM
------END PGP SIGNATURE-----
-
---X+nYw8KZ/oNxZ8JS--
 
