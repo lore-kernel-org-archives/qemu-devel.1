@@ -2,69 +2,75 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD4DC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA554C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:44:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24CFF21835
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:30:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6994F2465A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:44:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="P+PA3jrg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CFF21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h9z6FWMa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6994F2465A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuNZY-0006w7-5t
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 16:30:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33569)
+	id 1iuNng-00023r-DC
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 16:44:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35366)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iuNYu-0006Vv-LD
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:29:22 -0500
+ (envelope-from <eblake@redhat.com>) id 1iuNms-0001XF-2O
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:43:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iuNYs-00008x-Pf
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:29:20 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:39869)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1iuNYq-0008U3-V8
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:29:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=ZtMPVKaMIykc4lbQujZ+52Mx+fC2yvkExvTrpcXgFgA=; b=P+PA3jrgRO3YT6QR8O4K+H7Av3
- M5ApBsGkXHu/VLMA/Rpkw70DDVQ5Oh4mFpMFe6KOKQzG/A3LKxJPR8wrHIrv9tqh0xsjR2n+nEtzn
- Irh579025PjulGmETkYarQn7N0xyu6P7KTkeye9bY/iBomFbkFtVXpAdVe5aUzmzCj2C8f8OmiB/q
- vy0IDGMLOXReibPyGkYTD6SlCdFHvTMXmY1DLqQAhjPQx7szQXcFsE6KCJ7Y8DRh8j4iMTeyyVrDJ
- +LxqY43XWSZ6LzFr/WLiaLgHyUB+qTP/+v2nexHqlC4DVQCpJS6Suxo/53n8rtEgqYUWIVgDyGIGm
- zhm+q4gTkOFIqD40p4FgRFGGAMsbxUIavbd2w0UOtsMpQ8jxlnouK2pFwDfJiunXbNmDuJR0K5Ssc
- BvzhkAbnDxeY6U8qbZPOT+jpjnsx3ag8xemrmREcVCOCSXuJGUCCdmJ77w8kGbU/L/hMmvQNTkNUg
- OkyIssGjtlEmkYBHac9MPAzt+bcRqHLfVFkFZVffaZt24hI/2oIoE0GYB8ctR4fsD2NLqa8wsanqA
- 6K32/NHuo5XLapZ/zm+2gj1Uxqln/9EscLeJjvaBrBo17Snb/56mous+0pVryzg7ZGbWjai5ZRP77
- I8bt6xL1Bnn1fmvdczptXj2Ov90BoPlk4P47LIdBg=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v4 06/11] tests/virtio-9p: added splitted readdir test
-Date: Wed, 22 Jan 2020 22:29:12 +0100
-Message-ID: <35106419.zRHx49BoVS@silver>
-In-Reply-To: <5dac4bf8-64aa-708e-d546-1eaea85bd792@redhat.com>
-References: <cover.1579567019.git.qemu_oss@crudebyte.com>
- <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
- <5dac4bf8-64aa-708e-d546-1eaea85bd792@redhat.com>
+ (envelope-from <eblake@redhat.com>) id 1iuNmo-0000Il-Sc
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:43:44 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23141
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iuNmo-0000I0-Gp
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:43:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579729421;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=NIYENMK/IGSpmXoGf/xMHicwVYMpgkpSuCil0QvoqKc=;
+ b=h9z6FWMa8kYhgadpMWc7eLV0F5iqgjxwVjjPtGVctWYrFMvjYyM6DjTN9rh4s+g7nYwDi4
+ BGu/7deTah8d734W7OwdR1bSFnN/wZVYDcB8sgYHeTDuamgle29x/I+qemQsyaCZs8yrpx
+ jY161SxDYO/2vRmzPLg+sd0CV50VXk0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-U2bULztoPqSjxIz00n-WDQ-1; Wed, 22 Jan 2020 16:43:40 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CE5C18C8C02;
+ Wed, 22 Jan 2020 21:43:38 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-117-16.phx2.redhat.com [10.3.117.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D71245C1BB;
+ Wed, 22 Jan 2020 21:43:35 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qemu-nbd: Removed deprecated --partition option
+Date: Wed, 22 Jan 2020 15:43:28 -0600
+Message-Id: <20200122214328.1413664-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: U2bULztoPqSjxIz00n-WDQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.189.157.229
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,27 +82,326 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "reviewer:Incompatible changes" <libvir-list@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mittwoch, 22. Januar 2020 22:14:39 CET Eric Blake wrote:
-> On 1/20/20 6:16 PM, Christian Schoenebeck wrote:
-> > The previous, already existing readdir test simply used a 'count'
-> > parameter big enough to retrieve all directory entries with a
-> > single Treaddir request.
-> > 
-> > In this new 'splitted' readdir test, directory entries are
-> 
-> English is weird; the past tense of 'split' is 'split', not 'splitted'
+The option was deprecated in 4.0.0 (commit 0ae2d546); it's now been
+long enough with no complaints to follow through with that process.
 
-Just an attempt to fix a language defect. You're right of course Eric.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-deprecated.texi |  49 ++++++----------
+ qemu-nbd.c           | 133 +------------------------------------------
+ qemu-nbd.texi        |  13 ++---
+ 3 files changed, 24 insertions(+), 171 deletions(-)
 
-Greg, should I resend that patch fixed or can you just awk it? Whatever is 
-more comfortable to you.
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 8471eef9c22d..1b4c638db8e0 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -304,37 +304,6 @@ The above, converted to the current supported format:
 
-Best regards,
-Christian Schoenebeck
+ @section Related binaries
 
+-@subsection qemu-nbd --partition (since 4.0.0)
+-
+-The ``qemu-nbd --partition $digit'' code (also spelled @option{-P})
+-can only handle MBR partitions, and has never correctly handled
+-logical partitions beyond partition 5.  If you know the offset and
+-length of the partition (perhaps by using @code{sfdisk} within the
+-guest), you can achieve the effect of exporting just that subset of
+-the disk by use of the @option{--image-opts} option with a raw
+-blockdev using the @code{offset} and @code{size} parameters layered on
+-top of any other existing blockdev. For example, if partition 1 is
+-100MiB long starting at 1MiB, the old command:
+-
+-@code{qemu-nbd -t -P 1 -f qcow2 file.qcow2}
+-
+-can be rewritten as:
+-
+-@code{qemu-nbd -t --image-opts driver=3Draw,offset=3D1M,size=3D100M,file.d=
+river=3Dqcow2,file.backing.driver=3Dfile,file.backing.filename=3Dfile.qcow2=
+}
+-
+-Alternatively, the @code{nbdkit} project provides a more powerful
+-partition filter on top of its nbd plugin, which can be used to select
+-an arbitrary MBR or GPT partition on top of any other full-image NBD
+-export.  Using this to rewrite the above example results in:
+-
+-@code{qemu-nbd -t -k /tmp/sock -f qcow2 file.qcow2 &}
+-@code{nbdkit -f --filter=3Dpartition nbd socket=3D/tmp/sock partition=3D1}
+-
+-Note that if you are exposing the export via /dev/nbd0, it is easier
+-to just export the entire image and then mount only /dev/nbd0p1 than
+-it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
+-subset of the image.
+-
+ @subsection qemu-img convert -n -o (since 4.2.0)
+
+ All options specified in @option{-o} are image creation options, so
+@@ -383,3 +352,21 @@ trouble after a recent upgrade.
+
+ The "autoload" parameter has been ignored since 2.12.0. All bitmaps
+ are automatically loaded from qcow2 images.
++
++@section Related binaries
++
++@subsection qemu-nbd --partition (removed in 5.0.0)
++
++The ``qemu-nbd --partition $digit'' code (also spelled @option{-P})
++could only handle MBR partitions, and never correctly handled logical
++partitions beyond partition 5.  Exporting a partition can still be
++done by utilizing the @option{--image-opts} option with a raw blockdev
++using the @code{offset} and @code{size} parameters layered on top of
++any other existing blockdev. For example, if partition 1 is 100MiB
++long starting at 1MiB, the old command:
++
++@code{qemu-nbd -t -P 1 -f qcow2 file.qcow2}
++
++can be rewritten as:
++
++@code{qemu-nbd -t --image-opts driver=3Draw,offset=3D1M,size=3D100M,file.d=
+river=3Dqcow2,file.backing.driver=3Dfile,file.backing.filename=3Dfile.qcow2=
+}
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index bc125370dd36..e6f2eb76a3f2 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -100,7 +100,6 @@ static void usage(const char *name)
+ "\n"
+ "Exposing part of the image:\n"
+ "  -o, --offset=3DOFFSET       offset into the image\n"
+-"  -P, --partition=3DNUM       only expose partition NUM\n"
+ "  -B, --bitmap=3DNAME         expose a persistent dirty bitmap\n"
+ "\n"
+ "General purpose options:\n"
+@@ -156,96 +155,6 @@ QEMU_COPYRIGHT "\n"
+     , name);
+ }
+
+-struct partition_record
+-{
+-    uint8_t bootable;
+-    uint8_t start_head;
+-    uint32_t start_cylinder;
+-    uint8_t start_sector;
+-    uint8_t system;
+-    uint8_t end_head;
+-    uint8_t end_cylinder;
+-    uint8_t end_sector;
+-    uint32_t start_sector_abs;
+-    uint32_t nb_sectors_abs;
+-};
+-
+-static void read_partition(uint8_t *p, struct partition_record *r)
+-{
+-    r->bootable =3D p[0];
+-    r->start_head =3D p[1];
+-    r->start_cylinder =3D p[3] | ((p[2] << 2) & 0x0300);
+-    r->start_sector =3D p[2] & 0x3f;
+-    r->system =3D p[4];
+-    r->end_head =3D p[5];
+-    r->end_cylinder =3D p[7] | ((p[6] << 2) & 0x300);
+-    r->end_sector =3D p[6] & 0x3f;
+-
+-    r->start_sector_abs =3D ldl_le_p(p + 8);
+-    r->nb_sectors_abs   =3D ldl_le_p(p + 12);
+-}
+-
+-static int find_partition(BlockBackend *blk, int partition,
+-                          uint64_t *offset, uint64_t *size)
+-{
+-    struct partition_record mbr[4];
+-    uint8_t data[MBR_SIZE];
+-    int i;
+-    int ext_partnum =3D 4;
+-    int ret;
+-
+-    ret =3D blk_pread(blk, 0, data, sizeof(data));
+-    if (ret < 0) {
+-        error_report("error while reading: %s", strerror(-ret));
+-        exit(EXIT_FAILURE);
+-    }
+-
+-    if (data[510] !=3D 0x55 || data[511] !=3D 0xaa) {
+-        return -EINVAL;
+-    }
+-
+-    for (i =3D 0; i < 4; i++) {
+-        read_partition(&data[446 + 16 * i], &mbr[i]);
+-
+-        if (!mbr[i].system || !mbr[i].nb_sectors_abs) {
+-            continue;
+-        }
+-
+-        if (mbr[i].system =3D=3D 0xF || mbr[i].system =3D=3D 0x5) {
+-            struct partition_record ext[4];
+-            uint8_t data1[MBR_SIZE];
+-            int j;
+-
+-            ret =3D blk_pread(blk, mbr[i].start_sector_abs * MBR_SIZE,
+-                            data1, sizeof(data1));
+-            if (ret < 0) {
+-                error_report("error while reading: %s", strerror(-ret));
+-                exit(EXIT_FAILURE);
+-            }
+-
+-            for (j =3D 0; j < 4; j++) {
+-                read_partition(&data1[446 + 16 * j], &ext[j]);
+-                if (!ext[j].system || !ext[j].nb_sectors_abs) {
+-                    continue;
+-                }
+-
+-                if ((ext_partnum + j + 1) =3D=3D partition) {
+-                    *offset =3D (uint64_t)ext[j].start_sector_abs << 9;
+-                    *size =3D (uint64_t)ext[j].nb_sectors_abs << 9;
+-                    return 0;
+-                }
+-            }
+-            ext_partnum +=3D 4;
+-        } else if ((i + 1) =3D=3D partition) {
+-            *offset =3D (uint64_t)mbr[i].start_sector_abs << 9;
+-            *size =3D (uint64_t)mbr[i].nb_sectors_abs << 9;
+-            return 0;
+-        }
+-    }
+-
+-    return -ENOENT;
+-}
+-
+ static void termsig_handler(int signum)
+ {
+     atomic_cmpxchg(&state, RUNNING, TERMINATE);
+@@ -620,7 +529,7 @@ int main(int argc, char **argv)
+     int64_t fd_size;
+     QemuOpts *sn_opts =3D NULL;
+     const char *sn_id_or_name =3D NULL;
+-    const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:B:L";
++    const char *sopt =3D "hVb:o:p:rsnc:dvk:e:f:tl:x:T:D:B:L";
+     struct option lopt[] =3D {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -629,7 +538,6 @@ int main(int argc, char **argv)
+         { "socket", required_argument, NULL, 'k' },
+         { "offset", required_argument, NULL, 'o' },
+         { "read-only", no_argument, NULL, 'r' },
+-        { "partition", required_argument, NULL, 'P' },
+         { "bitmap", required_argument, NULL, 'B' },
+         { "connect", required_argument, NULL, 'c' },
+         { "disconnect", no_argument, NULL, 'd' },
+@@ -660,7 +568,6 @@ int main(int argc, char **argv)
+     int ch;
+     int opt_ind =3D 0;
+     int flags =3D BDRV_O_RDWR;
+-    int partition =3D 0;
+     int ret =3D 0;
+     bool seen_cache =3D false;
+     bool seen_discard =3D false;
+@@ -796,15 +703,6 @@ int main(int argc, char **argv)
+             readonly =3D true;
+             flags &=3D ~BDRV_O_RDWR;
+             break;
+-        case 'P':
+-            warn_report("The '-P' option is deprecated; use --image-opts w=
+ith "
+-                        "a raw device wrapper for subset exports instead")=
+;
+-            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
+-                partition < 1 || partition > 8) {
+-                error_report("Invalid partition '%s'", optarg);
+-                exit(EXIT_FAILURE);
+-            }
+-            break;
+         case 'B':
+             bitmap =3D optarg;
+             break;
+@@ -901,7 +799,7 @@ int main(int argc, char **argv)
+             error_report("List mode is incompatible with a file name");
+             exit(EXIT_FAILURE);
+         }
+-        if (export_name || export_description || dev_offset || partition |=
+|
++        if (export_name || export_description || dev_offset ||
+             device || disconnect || fmt || sn_id_or_name || bitmap ||
+             seen_aio || seen_discard || seen_cache) {
+             error_report("List mode is incompatible with per-device settin=
+gs");
+@@ -1165,33 +1063,6 @@ int main(int argc, char **argv)
+     }
+     fd_size -=3D dev_offset;
+
+-    if (partition) {
+-        uint64_t limit;
+-
+-        if (dev_offset) {
+-            error_report("Cannot request partition and offset together");
+-            exit(EXIT_FAILURE);
+-        }
+-        ret =3D find_partition(blk, partition, &dev_offset, &limit);
+-        if (ret < 0) {
+-            error_report("Could not find partition %d: %s", partition,
+-                         strerror(-ret));
+-            exit(EXIT_FAILURE);
+-        }
+-        /*
+-         * MBR partition limits are (32-bit << 9); this assert lets
+-         * the compiler know that we can't overflow 64 bits.
+-         */
+-        assert(dev_offset + limit >=3D dev_offset);
+-        if (dev_offset + limit > fd_size) {
+-            error_report("Discovered partition %d at offset %" PRIu64
+-                         " size %" PRIu64 ", but size exceeds file length =
+%"
+-                         PRId64, partition, dev_offset, limit, fd_size);
+-            exit(EXIT_FAILURE);
+-        }
+-        fd_size =3D limit;
+-    }
+-
+     export =3D nbd_export_new(bs, dev_offset, fd_size, export_name,
+                             export_description, bitmap, readonly, shared >=
+ 1,
+                             nbd_export_closed, writethrough, NULL,
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 7f55657722bd..36f4188a3f27 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -55,11 +55,6 @@ Force the use of the block driver for format @var{fmt} i=
+nstead of
+ auto-detecting.
+ @item -r, --read-only
+ Export the disk as read-only.
+-@item -P, --partition=3D@var{num}
+-Deprecated: Only expose MBR partition @var{num}.  Understands physical
+-partitions 1-4 and logical partition 5. New code should instead use
+-@option{--image-opts} with the raw driver wrapping a subset of the
+-original image.
+ @item -B, --bitmap=3D@var{name}
+ If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
+ that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
+@@ -161,13 +156,13 @@ qemu-nbd \
+   --image-opts driver=3Draw,offset=3D1M,size=3D1M,file.driver=3Dfile,file.=
+filename=3Dfile.raw
+ @end example
+
+-Serve a read-only copy of just the first MBR partition of a guest
+-image over a Unix socket with as many as 5 simultaneous readers, with
+-a persistent process forked as a daemon:
++Serve a read-only copy of a guest image over a Unix socket with as
++many as 5 simultaneous readers, with a persistent process forked as a
++daemon:
+
+ @example
+ qemu-nbd --fork --persistent --shared=3D5 --socket=3D/path/to/sock \
+-  --partition=3D1 --read-only --format=3Dqcow2 file.qcow2
++  --read-only --format=3Dqcow2 file.qcow2
+ @end example
+
+ Expose the guest-visible contents of a qcow2 file via a block device
+--=20
+2.24.1
 
 
