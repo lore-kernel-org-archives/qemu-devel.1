@@ -2,84 +2,91 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E212C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1E4C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 638BD21835
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A32621835
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBLooOK7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 638BD21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WV5tgeAH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A32621835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuIPB-0005MM-AE
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 10:58:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42242)
+	id 1iuIPl-0005vf-Oc
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 10:59:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iuIOD-0004kn-2j
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:57:58 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iuIOd-00052T-4O
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:58:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iuIOB-00059C-0q
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:57:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42963
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuIOA-00057t-Ln
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:57:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579708673;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/JWpPGji3kgFRsMhOFA7oPbh0Zz6YotJqMdLGGrFDmI=;
- b=EBLooOK7JJWpg14W0+U2Sfg4kiKUgBLrzWrkkbiTxJhlcLyN77czGs55V5gaTTDW+MM9/6
- HlhrkmA01+tCfBUoEg4nIOEVRSEAuYZiLA3GjpX4sRMa4auDgq4RvMzKlKlD3amp5hHyQM
- fg8hnJ5rOhwlZjXTwwdIrULOOV9ND0Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-jFZFRUmzNrWnDpeEb2Ihxg-1; Wed, 22 Jan 2020 10:57:50 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8C7B1005516;
- Wed, 22 Jan 2020 15:57:49 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F71F9CA3;
- Wed, 22 Jan 2020 15:57:40 +0000 (UTC)
-Date: Wed, 22 Jan 2020 15:57:38 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 062/109] virtiofsd: Add timestamp to the log with
- FUSE_LOG_DEBUG level
-Message-ID: <20200122155738.GK3263@work-vm>
-References: <20200121122433.50803-1-dgilbert@redhat.com>
- <20200121122433.50803-63-dgilbert@redhat.com>
- <5e3fca8d-446a-d550-c53e-a805b452248d@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iuIOb-0005Qt-M6
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:58:22 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33960)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iuIOb-0005PO-De
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:58:21 -0500
+Received: by mail-wr1-x442.google.com with SMTP id t2so7894256wrr.1
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 07:58:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ekluN5ztgjB8EcDqO/2bE6Fuh6sFlHgRZqqmMfNFXIM=;
+ b=WV5tgeAHoNONfZKcQXN8RqR85sTy0JbRFZ9iq0d8RjHVamr9jZeSJHV/IBcJ9iAqW/
+ oJ3pkcriiy+ssapisV5f5USwliFJpu1My+mWvTr4DT5aJ2ovJhILK2iNeoesvHfDUm+5
+ M7BZj0GRJapdpBb4FKUOXaO50aPWe31Bcv6JtVKohjMwFpl20ZDdBeOd7+cztOd/5GUH
+ rhYP0y+kmNkdYau3bugVmXAxTXgniDvMcMNejXcxMrvLo+Wo8sBoWim+B6nE3dkmxvrG
+ wX1RMcdvWCWlJ9eZdO/iYwtTFHqPFk+HozLxYMAlHVQk7s2JpQtA17i4w2L3E3DCCzVX
+ bgyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ekluN5ztgjB8EcDqO/2bE6Fuh6sFlHgRZqqmMfNFXIM=;
+ b=QZUMTBfSk8ZrreyuUv0RvxeBQUp7n9PLHI4RRXzmN4SGSxMqgGz5n7pvdxS8bxE9Dq
+ ViixfuHmMlVj+RZfwcZbvt45rD5KFVs2wdHqLiLU/PcD1mUeAfRuFWfyG5GQ5zw09lQp
+ DTGqAOqL+5fpSSOF50u3CYqAac8+3Gh8qkac8mRWB0Lv7B5hzyWNfa3WedJnZtgEOJ4L
+ dGwbfZYZU381Mprqgp67u61TlFJmU9Q28OJZvMagUId3WV2ql48Sy/6ysdozTLjuwBfJ
+ 0Ch61k1tlyKu9dOxf+3kpU26MDNjijBCDppNhqJFlxmdGNcyGwPnII/2HhEjvCtRWCxD
+ ZfAQ==
+X-Gm-Message-State: APjAAAUNQoyFx1klpL+nxAUtYcSDRk/4+TLLE+/FhBzICY0jvwKmc78F
+ Ww3ahwSLp5HmXa5geVNzJr81pw==
+X-Google-Smtp-Source: APXvYqxbR0ZD0DdKCToeRLfTHjTtX3ylsXODEaC8lmoLVSe5nopprmWke0YF3QyRHjAkqS6L3f6U6w==
+X-Received: by 2002:adf:e6d2:: with SMTP id y18mr11808527wrm.262.1579708699426; 
+ Wed, 22 Jan 2020 07:58:19 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o16sm5047168wmc.18.2020.01.22.07.58.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Jan 2020 07:58:18 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id B6E2F1FF87;
+ Wed, 22 Jan 2020 15:58:17 +0000 (GMT)
+References: <20200122102223.20036-1-alex.bennee@linaro.org>
+ <20200122102223.20036-3-alex.bennee@linaro.org>
+ <00813be1-eadb-b3c8-2a3c-084302de78b6@redhat.com>
+ <9b180dab-246b-1b1e-8ec8-6585227330a7@redhat.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v1 2/3] tests/docker: better handle symlinked libs
+In-reply-to: <9b180dab-246b-1b1e-8ec8-6585227330a7@redhat.com>
+Date: Wed, 22 Jan 2020 15:58:17 +0000
+Message-ID: <87muafzdnq.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <5e3fca8d-446a-d550-c53e-a805b452248d@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: jFZFRUmzNrWnDpeEb2Ihxg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,91 +98,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m.mizuma@jp.fujitsu.com, berrange@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, misono.tomohiro@jp.fujitsu.com, stefanha@redhat.com,
- vgoyal@redhat.com
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, f4bug@amsat.org,
+ cota@braap.org, stefanha@redhat.com, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> On 1/21/20 1:23 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-> >=20
-> > virtiofsd has some threads, so we see a lot of logs with debug option.
-> > It would be useful for debugging if we can see the timestamp.
-> >=20
-> > Add nano second timestamp, which got by get_clock(), to the log with
-> > FUSE_LOG_DEBUG level if the syslog option isn't set.
-> >=20
-> > The log is like as:
-> >=20
-> >    ]# ./virtiofsd -d -o vhost_user_socket=3D/tmp/vhostqemu0 -o source=
-=3D/tmp/share0 -o cache=3Dauto
->=20
-> First ']' is incorrect copy/pasting?
 
-Oops yes, removed.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> >    ...
-> >    [5365943125463727] [ID: 00000002] fv_queue_thread: Start for queue 0=
- kick_fd 9
-> >    [5365943125568644] [ID: 00000002] fv_queue_thread: Waiting for Queue=
- 0 event
-> >    [5365943125573561] [ID: 00000002] fv_queue_thread: Got queue event o=
-n Queue 0
-> >=20
-> > Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-> > ---
-> >   tools/virtiofsd/passthrough_ll.c | 10 +++++++++-
-> >   1 file changed, 9 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthr=
-ough_ll.c
-> > index 991de69334..a7fb34ac0c 100644
-> > --- a/tools/virtiofsd/passthrough_ll.c
-> > +++ b/tools/virtiofsd/passthrough_ll.c
-> > @@ -35,6 +35,8 @@
-> >    * \include passthrough_ll.c
-> >    */
-> > +#include "qemu/osdep.h"
->=20
-> I think this include belongs to patch #011 "virtiofsd: Fix common header =
-and
-> define for QEMU builds".
+> On 1/22/20 2:24 PM, Wainer dos Santos Moschetta wrote:
+>> On 1/22/20 8:22 AM, Alex Benn=C3=A9e wrote:
+>>> When we are copying we want to ensure we grab the first
+>>> resolution (the found in path section). However even that binary might
+>>> be a symlink so lets make sure we chase the symlinks to copy the right
+>>> binary to where it can be found.
+>>>
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> ---
+>>>   tests/docker/docker.py | 3 ++-
+>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+>>> index 31d8adf836..96d4326d53 100755
+>>> --- a/tests/docker/docker.py
+>>> +++ b/tests/docker/docker.py
+>>> @@ -109,7 +109,7 @@ def _get_so_libs(executable):
+>>>       ensure theright data is copied."""
+>>>       libs =3D []
+>>> -    ldd_re =3D re.compile(r"(/.*/)(\S*)")
+>>> +    ldd_re =3D re.compile(r"=3D> ?(/.*/)(\S*)")
+>
+> Why the 'optional space' after "=3D>"?
 
-Moved.
+Actually what I want is an optional "=3D> "
 
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->=20
+>
+>>>       try:
+>>>           ldd_output =3D subprocess.check_output(["ldd",
+>>> executable]).decode('utf-8')
+>>>           for line in ldd_output.split("\n"):
+>>> @@ -145,6 +145,7 @@ def _copy_binary_with_libs(src, bin_dest, dest_dir):
+>>>       if libs:
+>>>           for l in libs:
+>>>               so_path =3D os.path.dirname(l)
+>>> +            real_l =3D os.path.realpath(l)
+>> real_l is not used.
+>
+> I suppose the idea is to use it as:
+>
+>                 _copy_with_mkdir(real_l, dest_dir, so_path)
 
-Thanks.
+Yes - looks like I need to retest.
 
-> > +#include "qemu/timer.h"
-> >   #include "fuse_virtio.h"
-> >   #include "fuse_log.h"
-> >   #include "fuse_lowlevel.h"
-> > @@ -2275,7 +2277,13 @@ static void log_func(enum fuse_log_level level, =
-const char *fmt, va_list ap)
-> >       }
-> >       if (current_log_level =3D=3D FUSE_LOG_DEBUG) {
-> > -        localfmt =3D g_strdup_printf("[ID: %08ld] %s", syscall(__NR_ge=
-ttid), fmt);
-> > +        if (!use_syslog) {
-> > +            localfmt =3D g_strdup_printf("[%" PRId64 "] [ID: %08ld] %s=
-",
-> > +                                       get_clock(), syscall(__NR_getti=
-d), fmt);
-> > +        } else {
-> > +            localfmt =3D g_strdup_printf("[ID: %08ld] %s", syscall(__N=
-R_gettid),
-> > +                                       fmt);
-> > +        }
-> >           fmt =3D localfmt;
-> >       }
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>> - Wainer
+>>=20
+>>>               _copy_with_mkdir(l, dest_dir, so_path)
+>>=20
 
+
+--=20
+Alex Benn=C3=A9e
 
