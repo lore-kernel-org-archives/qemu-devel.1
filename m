@@ -2,105 +2,55 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6575C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E47C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 22:01:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 988632465B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 21:57:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dL3bs1zT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 988632465B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D53452253D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 22:01:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D53452253D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuO08-0005mY-8S
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 16:57:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36594)
+	id 1iuO4T-0008Dw-Uo
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 17:01:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iuNzN-00057C-Fd
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:56:42 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iuO3l-0007hW-Ke
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iuNzL-0007N2-Py
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:56:40 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28963
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuNzL-0007L5-ML
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:56:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579730198;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9UIMsL7RQuXazB+NBZtSif4F+CvJHgqVfvSk9MlPEhk=;
- b=dL3bs1zTVH503Fm+2UBiLX2fOoggrUpSVXWWGl7O7J68hsl7E2ZB1nXkVOCu/2QXMPnemy
- vULwqtfFJjNgtfUIsRse3iwQILHnE9TIsgpY4PxX4gx3Uyz7MYVspfAw7JGO1g7wokEJSR
- MRqeUg8L92XvNBDp5v778xKGTHRQEAk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-hup48hQONKqoWZSycfS4Ag-1; Wed, 22 Jan 2020 16:56:31 -0500
-Received: by mail-wm1-f72.google.com with SMTP id b9so141098wmj.6
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 13:56:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=dxwDltlM8cLM8KfoOaZhqIqUY1xKJAHyicLitykzf+g=;
- b=ViBaob1ChIxoq2sfX3fnBt1JbKVbNxijylEUcfsOlZnujzJ5Mw8OK0G+4LjUUmM+bT
- yi7LxKyU7lURku0MCfExZ/6KjbTqPwuTlbWbCK4qy71o2lyTL/YuoLsYQAFAx2NYQcz2
- T/lS7KVCFVDpFm73dotSNIPrwY8CNznepEvu2FE+B/cytDxI639TchMx5dDBVaAJL+fr
- 5FvoosNhgYGdGKZp1FQ5B7D9/oHpojfDag7Md7+4E9RqY8e9/E4J2PfvFkC9FBalXDjc
- Vme0jqtw23uSApDFj2Cb0pSztetssI8N7Cn4rUmzgBMDngfs5AzVCRr6DWnZUMzuXvg7
- wrwQ==
-X-Gm-Message-State: APjAAAWS+wdBUdsh3vCjxhl1t7RiVMoRcbzviFZ0MTOsCHpgGjNYOA11
- HNVr8TeiQTdquRbH0pYQV3+TwshAgd1kYjdudYpEK0S1uuZBUjfE60GwD8K/nJYQTWJ89gi2bgG
- Nx56r+9JKTatU2oM=
-X-Received: by 2002:a1c:7c11:: with SMTP id x17mr294845wmc.168.1579730190574; 
- Wed, 22 Jan 2020 13:56:30 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyinPjHo7YBusadh9t+lOvG9BKZ15VLyjUHKiNN4rm2Im2phxzvncZaTkKeNTTxnI5RJgwGYg==
-X-Received: by 2002:a1c:7c11:: with SMTP id x17mr294822wmc.168.1579730190379; 
- Wed, 22 Jan 2020 13:56:30 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id n10sm235773wrt.14.2020.01.22.13.56.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jan 2020 13:56:29 -0800 (PST)
-Subject: Re: [PATCH v4 00/18] hw/avr: Introduce few Arduino boards
-To: Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Michael Rolnik <mrolnik@gmail.com>, Peter Maydell
- <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20200120220107.17825-1-f4bug@amsat.org>
- <CAK4993jBdx4WniPqLs2YLUnv5rXhGL2SC9bjbjeVmO5bvkRgoQ@mail.gmail.com>
- <CAAdtpL5FdzYga1sA+nsN4+JP2QMO5NMRDtdcJ0v1prHgjxZ+QQ@mail.gmail.com>
- <dfffa872-86fb-9cac-5738-93e88d5accc8@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <55776734-bd8c-fe88-5a8c-e5d223154235@redhat.com>
-Date: Wed, 22 Jan 2020 22:56:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <no-reply@patchew.org>) id 1iuO3j-0003iT-Gh
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:01:12 -0500
+Resent-Date: Wed, 22 Jan 2020 17:01:12 -0500
+Resent-Message-Id: <E1iuO3j-0003iT-Gh@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21147)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iuO3h-0003ac-Pn; Wed, 22 Jan 2020 17:01:11 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579730453018339.5587962865312;
+ Wed, 22 Jan 2020 14:00:53 -0800 (PST)
+In-Reply-To: <20200122214328.1413664-1-eblake@redhat.com>
+Subject: Re: [PATCH] qemu-nbd: Removed deprecated --partition option
+Message-ID: <157973045167.12545.12062020819235641885@f6d1ed32ca6b>
 MIME-Version: 1.0
-In-Reply-To: <dfffa872-86fb-9cac-5738-93e88d5accc8@twiddle.net>
-Content-Language: en-US
-X-MC-Unique: hup48hQONKqoWZSycfS4Ag-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: eblake@redhat.com
+Date: Wed, 22 Jan 2020 14:00:53 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,61 +62,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/22/20 9:46 PM, Richard Henderson wrote:
-> On 1/21/20 11:23 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> 4. There is difference between -bios and -kernel (arduino boars crash w=
-hen -bios is used, but this seems because I run avr6 on avr5 CPU). I would =
-be happy if you explained what is the difference between these two argument=
-s.
->>
->> qemu man page is not very helpful...
->>
->>         -bios file
->>             Set the filename for the BIOS.
->>
->>         -kernel bzImage
->>             Use bzImage as kernel image. The kernel can be either a
->> Linux kernel or in multiboot format.
->>
->> Paolo, Peter, do you have a simple explanation?
->=20
-> It depends on your target board.  They *can* do very different things.
->=20
-> E.g. for "pc" (x86) machine, -bios sets the seabios image to use, and -ke=
-rnel
-> loads a kernel image that seabios will invoke.
->=20
-> E.g. for "dp264" (alpha) machine, -bios sets the palcode image to use and
-> -kernel loads a kernel image.  Note that in this case, the alpha kernel r=
-elies
-> on palcode services, so both must be present for the system to work.
->=20
-> E.g. for "virt" (arm) machine, -bios loads a raw image at which the reset
-> vector will be pointed, whereas -kernel loads a linux kernel image and fo=
-llows
-> the arm-linux kernel boot protocol.  In other words the images are treate=
-d very
-> differently.
->=20
-> I don't know what, if anything, an avr kernel would require from boot ser=
-vices.
->   I suspect the two options *could* be treated identically.
-
-I think -bios used to be dumb, and originally it would only load a=20
-binary blob at a fixed memory address (like mapping a ROM or a parallel=20
-flash).
-And -kernel was a bit smarter, understanding ELF format. It can set=20
-(Linux) arch-specific registers, in particular when used with -append=20
-(cmdline) and -dtb (device tree).
-
-At some point -bios got to understand ELF too, so QEMU could load ROMs=20
-mapped at different base address (and not force a default one).
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyMjIxNDMyOC4xNDEz
+NjY0LTEtZWJsYWtlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBK
+PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGNoZWNrLXF0
+ZXN0LWFhcmNoNjQ6IHRlc3RzL3F0ZXN0L2Jvb3Qtc2VyaWFsLXRlc3QKICBURVNUICAgIGNoZWNr
+LXF0ZXN0LWFhcmNoNjQ6IHRlc3RzL3F0ZXN0L21pZ3JhdGlvbi10ZXN0CioqCkVSUk9SOi90bXAv
+cWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxMTI1OmNoYXJfc2VyaWFsX3Rlc3Q6ICdj
+aHInIHNob3VsZCBub3QgYmUgTlVMTApFUlJPUiAtIEJhaWwgb3V0ISBFUlJPUjovdG1wL3FlbXUt
+dGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTEyNTpjaGFyX3NlcmlhbF90ZXN0OiAnY2hyJyBz
+aG91bGQgbm90IGJlIE5VTEwKbWFrZTogKioqIFtjaGVjay11bml0XSBFcnJvciAxCm1ha2U6ICoq
+KiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCnFlbXUtc3lzdGVtLWFhcmNoNjQ6IC1h
+Y2NlbCBrdm06IGludmFsaWQgYWNjZWxlcmF0b3Iga3ZtCnFlbXUtc3lzdGVtLWFhcmNoNjQ6IGZh
+bGxpbmcgYmFjayB0byB0Y2cKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
+ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywg
+Jy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlk
+PWJjYWQ1ODk0YmIxYjQzZjJiMTI1MDcyZjY2MzFjZjMzJywgJy11JywgJzEwMDMnLCAnLS1zZWN1
+cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJ
+U1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdK
+PTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9E
+SVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRv
+Y2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLTdwcDQza2tkL3NyYy9kb2NrZXItc3JjLjIwMjAtMDEtMjItMTYuNDkuMzAuMjQ4
+MzM6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1
+bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRl
+cj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWJjYWQ1ODk0YmIxYjQzZjJi
+MTI1MDcyZjY2MzFjZjMzCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFd
+OiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTdwcDQza2tk
+L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoK
+cmVhbCAgICAxMW0yMS45MDVzCnVzZXIgICAgMG04LjU3MHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMTIyMjE0MzI4LjE0MTM2NjQt
+MS1lYmxha2VAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1l
+c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+czovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEByZWRoYXQuY29t
 
 
