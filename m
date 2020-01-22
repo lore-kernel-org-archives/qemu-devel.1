@@ -2,65 +2,106 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 288D4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E215C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFB002071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:31:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB002071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id CCD622071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 15:33:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g4GOrLGt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD622071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuHym-00011Z-43
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 10:31:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38781)
+	id 1iuI0j-000294-Tk
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 10:33:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1iuHxx-0000Qs-36
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:30:50 -0500
+ (envelope-from <philmd@redhat.com>) id 1iuHzt-0001a2-7Q
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1iuHxv-00058L-K1
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:30:49 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59934 helo=huawei.com)
+ (envelope-from <philmd@redhat.com>) id 1iuHzr-0006Er-Jw
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:32:48 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47293
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1iuHxr-00053I-Qz; Wed, 22 Jan 2020 10:30:44 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 59C2A38D4F1D3B71379D;
- Wed, 22 Jan 2020 23:30:33 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Wed, 22 Jan 2020
- 23:30:22 +0800
-Subject: Re: [PATCH v22 8/9] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-9-git-send-email-gengdongjiu@huawei.com>
- <CAFEAcA_=PgkrWjwPxD89fCi85XPpcTHssXkSmE04Ctoj7AX0kA@mail.gmail.com>
- <c89db331-cb94-8e0b-edf8-25bfb64f826d@huawei.com>
- <CAFEAcA_Qs3p=iEU+D5iqjyZYpPQO0D16AWvjp0wcvbvRNdGAGg@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <a6030ba3-c82b-af4c-950c-4e15c315ad41@huawei.com>
-Date: Wed, 22 Jan 2020 23:30:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuHzr-0006CE-GN
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 10:32:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579707166;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pU0QcvAiNbvXp4G4rm89cpxoCBSxcWLHa0O2UdTctWA=;
+ b=g4GOrLGtL34NpeSAqYk34jj0nqqF/xpHEgq2z4I+rSk22PBb2+uIuNlwa59H6pphVMA6cH
+ 7bWTK1n7jW+yKlcoF1AIAVIIXqCbVpJ+zDxpq07dXzFKvBL86UHkgzPJyLDcP4M6MMenQo
+ uyCzX90sfy39twqUisPsluzjl3x6ES0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-60-kTvSk_VxNS2Ex35Oz9uY0A-1; Wed, 22 Jan 2020 10:32:44 -0500
+Received: by mail-wr1-f71.google.com with SMTP id o6so3232009wrp.8
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 07:32:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yvucSfhyk0QeZRoMux79CrjMoPzwd2C4gIJnIqlB10c=;
+ b=ffXIKHMX6VwXuKJdhLNqVUnKpAG5yymfRYCn7MM4l/FlOub6UiTr64rFAz6EzBjHwl
+ 92OhcP2b2B2sWMFMK/AYJISNwCPeCtrUJ0zMCTt7vDg0MRTeSVAnQbGdLw5RCBFsgBzq
+ cK4u/Ky6J/bMhRdyvtOSij0Mh6oExC8X7XJtFp2BBVjKjfZAayyFYJPg7jP4wrgm5NOv
+ DLyZfNfOK4CI7hyVmzIckouEK0a/61jAJ2pvmBpVMny5V73l3qAdlhTTCqwRaVHwVvcL
+ 8pu1JKenrPxzZiGfOoEqYWF24Eki4Te05X38fsZM0IYWf1axxkSYtFOn6Du3Y391LuZ5
+ 4Fag==
+X-Gm-Message-State: APjAAAUEh9d1uCHORRpD7YMl521McAuwV2S1O1adYE//N0W9DSAPkotb
+ EPGBJco5zETOmJy+LfLIim7nAJPE2Lw/1uMjnVgHxb6CjhBOASfA2qsnZBpr4BkRB3Msq22posr
+ 0kk+uop+j3PQlgeU=
+X-Received: by 2002:a05:600c:2301:: with SMTP id
+ 1mr3621738wmo.147.1579707163193; 
+ Wed, 22 Jan 2020 07:32:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyJ3NiM9aSjmUUTmzz7TkoaMFjBPUJBuoZV2CZ24/vbEDqMZGyYENXbnXhUAP7yZpT/njPqXQ==
+X-Received: by 2002:a05:600c:2301:: with SMTP id
+ 1mr3621720wmo.147.1579707162975; 
+ Wed, 22 Jan 2020 07:32:42 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id q11sm58156365wrp.24.2020.01.22.07.32.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Jan 2020 07:32:42 -0800 (PST)
+Subject: Re: [PATCH v2 011/109] virtiofsd: Fix common header and define for
+ QEMU builds
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
+ berrange@redhat.com, slp@redhat.com
+References: <20200121122433.50803-1-dgilbert@redhat.com>
+ <20200121122433.50803-12-dgilbert@redhat.com>
+ <8bf51480-fdef-14b5-2d4f-0068fa94e808@redhat.com>
+Message-ID: <f4d282dc-5de9-c3c8-f0e4-ff40a576a7a3@redhat.com>
+Date: Wed, 22 Jan 2020 16:32:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Qs3p=iEU+D5iqjyZYpPQO0D16AWvjp0wcvbvRNdGAGg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <8bf51480-fdef-14b5-2d4f-0068fa94e808@redhat.com>
 Content-Language: en-US
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+X-MC-Unique: kTvSk_VxNS2Ex35Oz9uY0A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,170 +113,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
- qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: m.mizuma@jp.fujitsu.com, misono.tomohiro@jp.fujitsu.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/1/20 20:15, Peter Maydell wrote:
-> On Fri, 17 Jan 2020 at 10:05, gengdongjiu <gengdongjiu@huawei.com> wrot=
-e:
+On 1/21/20 4:24 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/21/20 1:22 PM, Dr. David Alan Gilbert (git) wrote:
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >>
->> On 2020/1/17 0:28, Peter Maydell wrote:
->>> On Wed, 8 Jan 2020 at 11:33, Dongjiu Geng <gengdongjiu@huawei.com> wr=
-ote:
->>>
->>>> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->>>> +{
->>>> +    ram_addr_t ram_addr;
->>>> +    hwaddr paddr;
->>>> +
->>>> +    assert(code =3D=3D BUS_MCEERR_AR || code =3D=3D BUS_MCEERR_AO);
->>>> +
->>>> +    if (acpi_enabled && addr &&
->>>> +            object_property_get_bool(qdev_get_machine(), "ras", NUL=
-L)) {
->>>> +        ram_addr =3D qemu_ram_addr_from_host(addr);
->>>> +        if (ram_addr !=3D RAM_ADDR_INVALID &&
->>>> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, =
-&paddr)) {
->>>> +            kvm_hwpoison_page_add(ram_addr);
->>>> +            /*
->>>> +             * Asynchronous signal will be masked by main thread, s=
-o
->>>> +             * only handle synchronous signal.
->>>> +             */
->>>
->>> I don't understand this comment. (I think we've had discussions
->>> about it before, but it's still not clear to me.)
->>>
->>> This function (kvm_arch_on_sigbus_vcpu()) will be called in two conte=
-xts:
->>>
->>> (1) in the vcpu thread:
->>>   * the real SIGBUS handler sigbus_handler() sets a flag and arranges
->>>     for an immediate vcpu exit
->>>   * the vcpu thread reads the flag on exit from KVM_RUN and
->>>     calls kvm_arch_on_sigbus_vcpu() directly
->>>   * the error could be MCEERR_AR or MCEERR_AOFor the vcpu thread, the=
- error can be MCEERR_AR or MCEERR_AO,
->> but kernel/KVM usually uses MCEERR_AR(action required) instead of MCEE=
-RR_AO, because it needs do action immediately. For MCEERR_AO error, the a=
-ction is optional and the error can be ignored.
->> At least I do not find Linux kernel/KVM deliver MCEERR_AO in the vcpu =
-threads.
+>> All of the fuse files include config.h and define GNU_SOURCE
+>> where we don't have either under our build - remove them.
+>> Fixup path to the kernel's fuse.h in the QEMUs world.
 >>
->>> (2) MCE errors on other threads:
->>>   * here SIGBUS is blocked, so MCEERR_AR (action-required)
->>>     errors will cause the kernel to just kill the QEMU process
->>>   * MCEERR_AO errors will be handled via the iothread's use
->>>     of signalfd(), so kvm_on_sigbus() will get called from
->>>     the main thread, and it will call kvm_arch_on_sigbus_vcpu()
->>>   * in this case the passed in CPUState will (arbitrarily) be that
->>>     for the first vCPU
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>> =C2=A0 tools/virtiofsd/buffer.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 | 3 ---
+>> =C2=A0 tools/virtiofsd/fuse_i.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 | 3 +++
+>> =C2=A0 tools/virtiofsd/fuse_lowlevel.c=C2=A0 | 5 +----
+>> =C2=A0 tools/virtiofsd/fuse_opt.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
+1 -
+>> =C2=A0 tools/virtiofsd/fuse_signals.c=C2=A0=C2=A0 | 1 -
+>> =C2=A0 tools/virtiofsd/passthrough_ll.c | 7 +------
+>> =C2=A0 6 files changed, 5 insertions(+), 15 deletions(-)
 >>
->> For the MCE errors on other threads, it can only handle MCEERR_AO. If =
-it is MCEERR_AR, the QEMU will assert and exit[2].
+>> diff --git a/tools/virtiofsd/buffer.c b/tools/virtiofsd/buffer.c
+>> index 5df946c82c..db1885ab19 100644
+>> --- a/tools/virtiofsd/buffer.c
+>> +++ b/tools/virtiofsd/buffer.c
+>> @@ -9,9 +9,6 @@
+>> =C2=A0=C2=A0 * See the file COPYING.LIB
+>> =C2=A0=C2=A0 */
+>> -#define _GNU_SOURCE
+>> -
+>> -#include "config.h"
+>> =C2=A0 #include "fuse_i.h"
+>> =C2=A0 #include "fuse_lowlevel.h"
+>> =C2=A0 #include <assert.h>
+>> diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+>> index e63cb58388..bae06992e0 100644
+>> --- a/tools/virtiofsd/fuse_i.h
+>> +++ b/tools/virtiofsd/fuse_i.h
+>> @@ -6,6 +6,9 @@
+>> =C2=A0=C2=A0 * See the file COPYING.LIB
+>> =C2=A0=C2=A0 */
+>> +#define FUSE_USE_VERSION 31
+>> +
+>> +
+>> =C2=A0 #include "fuse.h"
+>> =C2=A0 #include "fuse_lowlevel.h"
+>> diff --git a/tools/virtiofsd/fuse_lowlevel.c=20
+>> b/tools/virtiofsd/fuse_lowlevel.c
+>> index b3d26cab66..f76f3d3fdc 100644
+>> --- a/tools/virtiofsd/fuse_lowlevel.c
+>> +++ b/tools/virtiofsd/fuse_lowlevel.c
+>> @@ -9,11 +9,8 @@
+>> =C2=A0=C2=A0 * See the file COPYING.LIB
+>> =C2=A0=C2=A0 */
+>> -#define _GNU_SOURCE
+>> -
+>> -#include "config.h"
+>> =C2=A0 #include "fuse_i.h"
+>> -#include "fuse_kernel.h"
+>> +#include "standard-headers/linux/fuse.h"
+>> =C2=A0 #include "fuse_misc.h"
+>> =C2=A0 #include "fuse_opt.h"
+>> diff --git a/tools/virtiofsd/fuse_opt.c b/tools/virtiofsd/fuse_opt.c
+>> index edd36f4a3b..1fee55e266 100644
+>> --- a/tools/virtiofsd/fuse_opt.c
+>> +++ b/tools/virtiofsd/fuse_opt.c
+>> @@ -10,7 +10,6 @@
+>> =C2=A0=C2=A0 */
+>> =C2=A0 #include "fuse_opt.h"
+>> -#include "config.h"
+>> =C2=A0 #include "fuse_i.h"
+>> =C2=A0 #include "fuse_misc.h"
+>> diff --git a/tools/virtiofsd/fuse_signals.c=20
+>> b/tools/virtiofsd/fuse_signals.c
+>> index 19d6791cb9..10a6f88088 100644
+>> --- a/tools/virtiofsd/fuse_signals.c
+>> +++ b/tools/virtiofsd/fuse_signals.c
+>> @@ -8,7 +8,6 @@
+>> =C2=A0=C2=A0 * See the file COPYING.LIB
+>> =C2=A0=C2=A0 */
+>> -#include "config.h"
+>> =C2=A0 #include "fuse_i.h"
+>> =C2=A0 #include "fuse_lowlevel.h"
+>> diff --git a/tools/virtiofsd/passthrough_ll.c=20
+>> b/tools/virtiofsd/passthrough_ll.c
+>> index 9377718d9d..e702f7dec6 100644
+>> --- a/tools/virtiofsd/passthrough_ll.c
+>> +++ b/tools/virtiofsd/passthrough_ll.c
+>> @@ -35,15 +35,10 @@
+>> =C2=A0=C2=A0 * \include passthrough_ll.c
+>> =C2=A0=C2=A0 */
+>> -#define _GNU_SOURCE
+>> -#define FUSE_USE_VERSION 31
+>> -
+>> -#include "config.h"
+>> -
+>> +#include "fuse_lowlevel.h"
+>> =C2=A0 #include <assert.h>
+>> =C2=A0 #include <dirent.h>
+>> =C2=A0 #include <errno.h>
+>> -#include <fuse_lowlevel.h>
+>> =C2=A0 #include <inttypes.h>
+>> =C2=A0 #include <limits.h>
+>> =C2=A0 #include <pthread.h>
 >>
->> Case1: Other APP indeed can send MCEERR_AO to QEMU=EF=BC=8C QEMU handl=
-e it via the iothread's use of signalfd() through above path.
->> Case2: But if the MCEERR_AO is delivered by kernel, I see QEMU ignore =
-it because SIGBUS is masked in main thread[3], for this case, I do not se=
-e QEMU handle it via signalfd() for MCEERR_AO errors from my test.
 >=20
-> SIGBUS is blocked in the main thread because we use signalfd().
-> The function sigfd_handler() should be called and it will then
-> manually invoke the correct function for the signal.
->=20
->> For Case1=EF=BC=8CI think we should not let guest know it, because it =
-is not triggered by guest. only other APP send SIGBUS to tell QEMU do som=
-ethings.
->=20
-> I don't understand what you mean here by "other app" or
-> "guest" triggering of MCEERR. I thought that an MCEERR meant
-> "the hardware has detected that there is a problem with the
-> RAM". If there's a problem with the RAM and it's the RAM that's
-> being used as guest RAM, we need to tell the guest, surely ?
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-  sure, If the error is guest RAM, we need to test the guest.
-  I mean if the RAM that is being used as QEMU RAM(not guest RAM), we sho=
-uld not tell the guest.
-  OR if another user space manually send SIGBUS to qemu, such as using "k=
-ill -s SIGBUS xxx" commands, we should not tell the guest.
-
->=20
->> For Case2=EF=BC=8Cit does not call call kvm_arch_on_sigbus_vcpu().
->=20
-> It should do. The code you quote calls that function
-> for that case:
-  According to our analysis, I also think it should call the function for=
- that case.
-  But from my test, I see  kvm_arch_on_sigbus_vcpu() is not called when K=
-VM/Kernel delivers SIGBUS to QEMU main thread.
-  So I am also confused. I haven't even dig into the reason yet.
-
- If anyone has done the test or knows the reason, welcome comments.
-
-
->=20
->> [1]:
->> /* Called synchronously (via signalfd) in main thread.  */
->> int kvm_on_sigbus(int code, void *addr)
->> {
->> #ifdef KVM_HAVE_MCE_INJECTION
->>     /* Action required MCE kills the process if SIGBUS is blocked.  Be=
-cause
->>      * that's what happens in the I/O thread, where we handle MCE via =
-signalfd,
->>      * we can only get action optional here.
->>      */
->> [2]: assert(code !=3D BUS_MCEERR_AR);
->>     kvm_arch_on_sigbus_vcpu(first_cpu, code, addr);
->>     return 0;
->> #else
->>     return 1;
->> #endif
->> }
->=20
->=20
->> Above all, from my test, for MCEERR_AO error which is triggered by gue=
-st, it not call
-> kvm_arch_on_sigbus_vcpu().
->=20
-> I'm not sure what you mean by "triggered by guest". I assume that
-> exactly what kind of errors the kernel can report and when will
-> depend to some extent on the underlying hardware/firmware
-> implementation of reporting of memory errors, but in principle
-> the ABI allows the kernel to send SIGBUS_(BUS_MCEERR_AO) to the
-> main thread, the signal should be handled by signalfd, our code
-> for working with multiple fds should mean that the main thread
-> calls sigfd_handler() to deal with reading bytes from the signalfd
-> fd, and that function should then call sigbus_handler(), which
-> calls kvm_on_sigbus(), which calls kvm_arch_on_sigbus_vcpu().
-> If something in that code path is not working then we need to
-> find out what it is.
-
-  I agree with you, we need to check why it does not call sigbus_handler(=
-) for the SIGBUS delivered by kernel/KVM.
-  But I think it can  put it in another series, this series we only handl=
-e the SIGBUS_(BUS_MCEERR_AR), whether do you think it is OK?
-  Of course I will update the comments that you ever mentioned.
-
-  By the way, If using "kill -s SIGBUS xxx" command to send SIGBUS to QEM=
-U main thread, it indeed will be handled by signalfd.
-
->=20
-> thanks
-> -- PMM
-> .
->=20
+Shouldn't these files include "qemu/osdep.h" first, like the rest of the=20
+QEMU C files?
 
 
