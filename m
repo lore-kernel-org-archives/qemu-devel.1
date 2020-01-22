@@ -2,90 +2,88 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBD7C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D943C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:56:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7021B24656
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:56:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 483E324672
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 06:56:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgT5Vh2/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7021B24656
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="df14W4uU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483E324672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu9wT-0004Jb-3c
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:56:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36069)
+	id 1iu9wd-0004ZH-SR
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 01:56:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36159)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iu9q9-0004PT-RN
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:14 -0500
+ (envelope-from <mst@redhat.com>) id 1iu9qP-0004gj-K5
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iu9q8-0007tw-4a
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:13 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29527
+ (envelope-from <mst@redhat.com>) id 1iu9qO-00084g-5N
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:29 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40928
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu9q8-0007tJ-0p
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:12 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu9qO-00084N-1I
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 01:50:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579675811;
+ s=mimecast20190719; t=1579675827;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/cZSw7eZYA9nW+mh3jM5ZF40fdaxfgONBvpYjIhz74s=;
- b=MgT5Vh2/vdVKdOGbDdAD5FoVn9eioK7BeEozrBSGGTQFWTu3eg/ytRNI4+kDflHUNnn1rV
- aAxq0dy1UVqzxOfgLJgP9FaluQSyf4N9BMHgU+eeaXO75yHUi1xBQQ86v5ft7VmzUm9aNE
- xqfztIxGpgm4WRExqwxkFy681+S7pA8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-Lh2_6RaOO3Wx6ovUnuiYLw-1; Wed, 22 Jan 2020 01:50:09 -0500
-Received: by mail-wr1-f71.google.com with SMTP id y7so2614156wrm.3
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 22:50:09 -0800 (PST)
+ bh=GhFIalaTxU91OoV48DnFSPFNJm8dAicRjzIYIIHrgm0=;
+ b=df14W4uU5zRFKdRpaO1ruSdB/SvGAtenE4t5IBhW9FpQJeYe2cdtdUI/6wPLjyXtmMVoUM
+ lcXqGhX09zW6//vqrG5V0CkMZjFaTgJLmQquix8sD9YSqCRaprpIBo113GmqFBOqTufqkP
+ vcUolyHgf9xjQ/r0T3mNq1E3vvs7y6Q=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-QOgTGeNuM3G95B4JYUv1pg-1; Wed, 22 Jan 2020 01:50:25 -0500
+Received: by mail-wr1-f72.google.com with SMTP id t3so2574428wrm.23
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 22:50:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=mG4C1N5iHUE7eCiLg4lfrsmbX/tB8VxXvzlNPjmYI5U=;
- b=dSOfJuWx7qQ0H26qE3NBrJlEmNt42FjklYM/T4BUG0di9lGPVNrrr24k1BLHfQTYzV
- xsbhqKjGE0fQCp2nTmD1tKTOoLYlXNmSflAncuOCFWqCZVP3wJbUHEoRH7/LMWk8AJ36
- 6akm9HWcSeKLWge+JgX27cL2h7WaZsZP7g6owmEt9IoYFd8it+ruWpq+xysJSkVIlFOv
- Wp5FV2pLOsiYsxLbIRJzGCfi1/TT6IRoTGZDplOvoTND9Fw04YHDpMn1januUkX/hkm0
- FYGUlq+cDMFwZYCDvgsmiE2eLK9vYhl9jQR0s7wfsmIiPzN7H9yuhDKXbuAbRG6SOyJR
- iZ1A==
-X-Gm-Message-State: APjAAAVuycPiUILXWZQC3gihB/HL7qaESpLsXDHK3uF27ObeJugFwSIh
- Kb0PoTynV76gjzWNghLxubcLKhbO/65sgXO14kOVitFw4ef7srPgp7VZYbbk/kUrAhRnnWADOXr
- bAtBSIumYngN5xlo=
-X-Received: by 2002:a1c:8086:: with SMTP id b128mr1143514wmd.80.1579675808208; 
- Tue, 21 Jan 2020 22:50:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyPtNcs+OpU2rYOHlfVnPU+mPkyzbYPd2t1DyTP8iFaYdRVyQHPdnI/DDwxOtGvqtNCdJ2OIw==
-X-Received: by 2002:a1c:8086:: with SMTP id b128mr1143501wmd.80.1579675808010; 
- Tue, 21 Jan 2020 22:50:08 -0800 (PST)
+ bh=fOfds3FYn0MZPs9ppwu2iVTjnTK6UfVjQJxMiUG3xkc=;
+ b=IUWA3gekm1BskcWnejX8KP/GDk3JtgxR3l3NDZ8BMxu1zBJcqS4P2pz75iNamImdYl
+ DtnYz8f2CAX/TpnZUDCeqfA7o3za8x2yi0VlWqH9cAsuGuPmH4Avly26ewFdG1zBM1SB
+ XUHuGcf2ywCdADMtX/g9Ej2wDW0EoFNgcW8DI5UwP95tDHtAvalkJqE6G3WRuhBZXDbg
+ xoIDTT5J5N9SrdlM1Ajb1aQDRs3tfKH5FY8q4BT9+V8DHvNNMO5tf7lhmGucOvIqadxi
+ XsX8HyaFD0NTl5u4EPEHnvVzP6z3caQiSsDrI2eRzwsFbi8oFQcEjo5bUz6U7Mq3ITQJ
+ Cn0A==
+X-Gm-Message-State: APjAAAW1tav3ZDSvxMb4TvGMdjcnXClZMOoa0FlmS6mgtg9TPN/QJGzS
+ /41rZZVjsI3FqAS1+tPx6qc3imx+Aa+17nvOxpEaHzxSwIxRNy97DgrVPTMS0ohT/mHt+G+/IrJ
+ rmcriX9L6npu6R7w=
+X-Received: by 2002:adf:ee92:: with SMTP id b18mr8784568wro.281.1579675824164; 
+ Tue, 21 Jan 2020 22:50:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxdQlrbxWN/WmLmJoNENTrtKjaMbLN28809nFRCUwfmJyX8Fl3IbinJE+XCNnYVoim1DfOiAQ==
+X-Received: by 2002:adf:ee92:: with SMTP id b18mr8784535wro.281.1579675823939; 
+ Tue, 21 Jan 2020 22:50:23 -0800 (PST)
 Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
  by smtp.gmail.com with ESMTPSA id
- t1sm2691642wma.43.2020.01.21.22.50.06
+ d8sm54802647wrx.71.2020.01.21.22.50.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 22:50:07 -0800 (PST)
-Date: Wed, 22 Jan 2020 01:50:05 -0500
+ Tue, 21 Jan 2020 22:50:23 -0800 (PST)
+Date: Wed, 22 Jan 2020 01:50:20 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 06/17] acpi: cpuhp: introduce 'Command data 2' field
-Message-ID: <20200122064907.512501-7-mst@redhat.com>
-References: <20200122064907.512501-1-mst@redhat.com>
+Subject: Re: [PULL 00/17] virtio, pc: fixes, features
+Message-ID: <20200122015007-mutt-send-email-mst@kernel.org>
+References: <20200122055115.429945-1-mst@redhat.com>
+ <157967421148.8714.13063905979235625106@f6d1ed32ca6b>
 MIME-Version: 1.0
-In-Reply-To: <20200122064907.512501-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: Lh2_6RaOO3Wx6ovUnuiYLw-1
+In-Reply-To: <157967421148.8714.13063905979235625106@f6d1ed32ca6b>
+X-MC-Unique: QOgTGeNuM3G95B4JYUv1pg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -105,106 +103,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+On Tue, Jan 21, 2020 at 10:23:32PM -0800, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200122055115.429945-1-mst@redhat.=
+com/
+>=20
+>=20
+>=20
+> Hi,
+>=20
+> This series failed the docker-quick@centos7 build test. Please find the t=
+esting commands and
+> their output below. If you have Docker installed, you can probably reprod=
+uce it
+> locally.
 
-No functional change in practice, patch only aims to properly
-document (in spec and code) intended usage of the reserved space.
+OK just a missing expected file. Will send v2.
 
-The new field is to be used for 2 purposes:
-  - detection of modern CPU hotplug interface using
-    CPHP_GET_NEXT_CPU_WITH_EVENT_CMD command.
-    procedure will be described in follow up patch:
-      "acpi: cpuhp: spec: add typical usecases"
-  - for returning upper 32 bits of architecture specific CPU ID,
-    for new CPHP_GET_CPU_ID_CMD command added by follow up patch:
-      "acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command"
-
-Change is backward compatible with 4.2 and older machines, as field was
-unconditionally reserved and always returned 0x0 if modern CPU hotplug
-interface was enabled.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1575896942-331151-8-git-send-email-imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
----
- docs/specs/acpi_cpu_hotplug.txt |  5 ++++-
- hw/acpi/cpu.c                   | 11 +++++++++++
- hw/acpi/trace-events            |  1 +
- 3 files changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
-txt
-index 8fb9ad22e6..9879f9ef7e 100644
---- a/docs/specs/acpi_cpu_hotplug.txt
-+++ b/docs/specs/acpi_cpu_hotplug.txt
-@@ -44,7 +44,10 @@ keeps the current value.
-=20
- read access:
-     offset:
--    [0x0-0x3] reserved
-+    [0x0-0x3] Command data 2: (DWORD access)
-+              if value last stored in 'Command field':
-+                0: reads as 0x0
-+                other values: reserved
-     [0x4] CPU device status fields: (1 byte access)
-         bits:
-            0: Device is enabled and may be used by guest
-diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-index 87f30a31d7..d475c06953 100644
---- a/hw/acpi/cpu.c
-+++ b/hw/acpi/cpu.c
-@@ -12,6 +12,7 @@
- #define ACPI_CPU_FLAGS_OFFSET_RW 4
- #define ACPI_CPU_CMD_OFFSET_WR 5
- #define ACPI_CPU_CMD_DATA_OFFSET_RW 8
-+#define ACPI_CPU_CMD_DATA2_OFFSET_R 0
-=20
- enum {
-     CPHP_GET_NEXT_CPU_WITH_EVENT_CMD =3D 0,
-@@ -79,6 +80,16 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr addr=
-, unsigned size)
-         }
-         trace_cpuhp_acpi_read_cmd_data(cpu_st->selector, val);
-         break;
-+    case ACPI_CPU_CMD_DATA2_OFFSET_R:
-+        switch (cpu_st->command) {
-+        case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
-+           val =3D 0;
-+           break;
-+        default:
-+           break;
-+        }
-+        trace_cpuhp_acpi_read_cmd_data2(cpu_st->selector, val);
-+        break;
-     default:
-         break;
-     }
-diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
-index 96b8273297..afbc77de1c 100644
---- a/hw/acpi/trace-events
-+++ b/hw/acpi/trace-events
-@@ -23,6 +23,7 @@ cpuhp_acpi_read_flags(uint32_t idx, uint8_t flags) "idx[0=
-x%"PRIx32"] flags: 0x%"
- cpuhp_acpi_write_idx(uint32_t idx) "set active cpu idx: 0x%"PRIx32
- cpuhp_acpi_write_cmd(uint32_t idx, uint8_t cmd) "idx[0x%"PRIx32"] cmd: 0x%=
-"PRIx8
- cpuhp_acpi_read_cmd_data(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] da=
-ta: 0x%"PRIx32
-+cpuhp_acpi_read_cmd_data2(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] d=
-ata: 0x%"PRIx32
- cpuhp_acpi_cpu_has_events(uint32_t idx, bool ins, bool rm) "idx[0x%"PRIx32=
-"] inserting: %d, removing: %d"
- cpuhp_acpi_clear_inserting_evt(uint32_t idx) "idx[0x%"PRIx32"]"
- cpuhp_acpi_clear_remove_evt(uint32_t idx) "idx[0x%"PRIx32"]"
---=20
-MST
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> make docker-image-centos7 V=3D1 NETWORK=3D1
+> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>=20
+> Using expected file 'tests/data/acpi/q35/DSDT.acpihmat'
+> acpi-test: Warning! DSDT binary file mismatch. Actual [aml:/tmp/aml-JWZVE=
+0], Expected [aml:tests/data/acpi/q35/DSDT.acpihmat].
+> to see ASL diff between mismatched files install IASL, rebuild QEMU from =
+scratch and re-run tests with V=3D1 environment variable set**
+> ERROR:/tmp/qemu-test/src/tests/qtest/bios-tables-test.c:490:test_acpi_asl=
+: assertion failed: (all_tables_match)
+> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/bios-tables-test.c=
+:490:test_acpi_asl: assertion failed: (all_tables_match)
+> make: *** [check-qtest-x86_64] Error 1
+> make: *** Waiting for unfinished jobs....
+>   TEST    iotest-qcow2: 049
+>   TEST    iotest-qcow2: 050
+> ---
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '=
+--label', 'com.qemu.instance.uuid=3Dbf9f3c03d7fd4eeab2985d10a998dce8', '-u'=
+, '1001', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TARGET_L=
+IST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D14', '-e=
+', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccache', =
+'-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/=
+var/tmp/patchew-tester-tmp-7wut4nre/src/docker-src.2020-01-22-01.10.32.9979=
+:/var/tmp/qemu:z,ro', 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']' r=
+eturned non-zero exit status 2.
+> filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3Dbf9f3c03d7fd4eeab298=
+5d10a998dce8
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-7wut4nre/src'
+> make: *** [docker-run-test-quick@centos7] Error 2
+>=20
+> real    12m59.608s
+> user    0m10.933s
+>=20
+>=20
+> The full log is available at
+> http://patchew.org/logs/20200122055115.429945-1-mst@redhat.com/testing.do=
+cker-quick@centos7/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
 
