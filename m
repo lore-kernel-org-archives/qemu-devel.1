@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D39E3C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 22:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C30C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 22:40:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9534E2253D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 22:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9907A2253D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 22:40:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPaeEQ2F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9534E2253D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nv+YDu+D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9907A2253D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuOds-0007FU-Ij
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 17:38:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33957)
+	id 1iuOfg-0000pI-RN
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 17:40:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iuOYy-0001xO-JK
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:33:29 -0500
+ (envelope-from <philmd@redhat.com>) id 1iuOZ5-00023p-Aw
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:33:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iuOYx-0001la-IZ
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:33:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43308
+ (envelope-from <philmd@redhat.com>) id 1iuOZ3-0001s5-EG
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:33:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33890
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuOYw-0001kG-8g
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:33:26 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuOZ3-0001r8-8x
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 17:33:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579732405;
+ s=mimecast20190719; t=1579732412;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LUDnoyq16U5np06iAFR+GXWOHXUpAtrYy/aZrfRRKw4=;
- b=cPaeEQ2FIyk9C4fv1dhJyyT9Ywns6mGQrnrUJPn0KB+wx6lMCh30Y03fiIiysInta4VCvO
- KRdYsW0gpbb8ccr06pEcH+4fWBCVJMvp2OdLbZlga2B0MoGeG+7Lsab0MFoZ5BPuiHhLjl
- LxEA+qwWZ39Yt9JEhbf7vtMw2d/J8oE=
+ bh=6BfEXEJk/FNg8im5gWHkwQZ/daMJUMlm2g5Q0qhEjXk=;
+ b=Nv+YDu+Dq3DXmv0/oBsRYlL2gwiroboqomRgTeoTfl6NIvcOumdbO1EeS9umTBnRr2iSwU
+ ch+RUQMXYNqXdMptHIXPsA7aNkvI7jdfhOShCUwp7SkunElL1P9M00VOP+FxFTUe+o/IS9
+ 4JvW7WMy+h4xxIDkcKjKMc/20iaNoFs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-61-elifdNFq_TCyrRH8-0w-1; Wed, 22 Jan 2020 17:33:22 -0500
+ us-mta-111-ArhIvvKeM3uEB4XKBW0mRQ-1; Wed, 22 Jan 2020 17:33:29 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 524451800D78;
- Wed, 22 Jan 2020 22:33:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AAE0DB60;
+ Wed, 22 Jan 2020 22:33:28 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-78.brq.redhat.com [10.40.204.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F190786443;
- Wed, 22 Jan 2020 22:33:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B2CE8845A5;
+ Wed, 22 Jan 2020 22:33:25 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: "Michael S . Tsirkin" <mst@redhat.com>,
  Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-Subject: [PATCH 3/6] tests/acceptance/virtio_seg_max_adjust: List machine
- being tested
-Date: Wed, 22 Jan 2020 23:32:44 +0100
-Message-Id: <20200122223247.30419-4-philmd@redhat.com>
+Subject: [PATCH 5/6] tests/acceptance/virtio_seg_max_adjust: Restrict to X86
+ architecture
+Date: Wed, 22 Jan 2020 23:32:46 +0100
+Message-Id: <20200122223247.30419-6-philmd@redhat.com>
 In-Reply-To: <20200122223247.30419-1-philmd@redhat.com>
 References: <20200122223247.30419-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 61-elifdNFq_TCyrRH8-0w-1
+X-MC-Unique: ArhIvvKeM3uEB4XKBW0mRQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -95,52 +95,124 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add logging for easier debugging of failures:
+Running on mainstream KVM architectures, we get:
 
-  $ avocado --show=3Dmachine run tests/acceptance/virtio_seg_max_adjust.py
+- Aarch64
+
+  Timeout.
+
+  job.log:
+  -------
+  No machine specified, and there is no default
+  Use -machine help to list supported machines
+
+- MIPS:
+
+   (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: argument of t=
+ype 'NoneType' is not iterable (0.14 s)
+
+  job.log:
+  -------
+  Could not load MIPS bios 'mipsel_bios.bin', and no -kernel argument was s=
+pecified
+
+- PowerPC
+
+   (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: invalid liter=
+al for int() with base 10: 'sxxm' (0.16 s)
+
+  job.log:
+  -------
+  >>> {'execute': 'query-machines'}
+  <<< {'return': [{'hotpluggable-cpus': True, 'name': 'pseries-2.12-sxxm', =
+'numa-mem-supported': True, 'default-cpu-type': 'power8_v2.0-powerpc64-cpu'=
+, 'cpu-max': 1024, 'deprecated': False}, ...
+
+- S390X:
+
+   (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: invalid liter=
+al for int() with base 10: 'virtio' (0.14 s)
+
+  job.log:
+  -------
+  Traceback (most recent call last):
+    File "virtio_seg_max_adjust.py", line 139, in test_machine_types
+      if self.seg_max_adjust_enabled(m):
+    File "virtio_seg_max_adjust.py", line 113, in seg_max_adjust_enabled
+      major =3D int(ver[0])
+  ValueError: invalid literal for int() with base 10: 'virtio'
+  >>> {'execute': 'query-machines'}
+  <<< {'return': [{'hotpluggable-cpus': True, 'name': 's390-ccw-virtio-4.0'=
+, 'numa-mem-supported': False, 'default-cpu-type': 'qemu-s390x-cpu', 'cpu-m=
+ax': 248, 'deprecated': False}, ...
+
+Assuming this test is only expected to run on the X86 architecture,
+restrict the test to this particular architecture.
+
+When this test is run on other architecture, the tests will be skipped.
+
+Examples:
+
+- running on S390X:
+
+ (1/1) tests/acceptance/virtio_seg_max_adjust.py:VirtioMaxSegSettingsCheck.=
+test_machine_types: SKIP: Architecture 's390' unsupported
+
+- running on Aarch64 setting the QEMU binary path:
+
+  $ uname -m && avocado --show=3Dapp run -p qemu_bin=3Dx86_64-softmmu/qemu-=
+system-x86_64 tests/acceptance/virtio_seg_max_adjust.py
+  aarch64
+  JOB ID     : 92b7fae8868920aada0cb143f9571dffdf60931d
+  JOB LOG    : job-results/job-2020-01-22T17.54-92b7fae/job.log
    (1/1) tests/acceptance/virtio_seg_max_adjust.py:VirtioMaxSegSettingsChec=
-k.test_machine_types:
-  machine: {'name': 'pc-i440fx-2.12', 'seg_max_adjust': 'false', 'device': =
-'virtio-scsi-pci'}
-  machine: {'name': 'pc-i440fx-2.0', 'seg_max_adjust': 'false', 'device': '=
-virtio-scsi-pci'}
-  machine: {'name': 'pc-q35-4.2', 'seg_max_adjust': 'false', 'device': 'vir=
-tio-scsi-pci'}
-  machine: {'name': 'pc-i440fx-2.5', 'seg_max_adjust': 'false', 'device': '=
-virtio-scsi-pci'}
-  machine: {'name': 'pc-i440fx-4.2', 'seg_max_adjust': 'false', 'device': '=
-virtio-scsi-pci'}
-  ...
+k.test_machine_types: PASS (25.99 s)
+  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
+CANCEL 0
+  JOB TIME   : 26.13 s
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/acceptance/virtio_seg_max_adjust.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/acceptance/virtio_seg_max_adjust.py | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance/v=
 irtio_seg_max_adjust.py
-index 51a2dd76e8..f679b0eec7 100755
+index ad736bcda3..2fc6bfcbd8 100755
 --- a/tests/acceptance/virtio_seg_max_adjust.py
 +++ b/tests/acceptance/virtio_seg_max_adjust.py
-@@ -21,6 +21,7 @@
- import sys
- import os
- import re
-+import logging
-=20
+@@ -26,6 +26,7 @@ import logging
  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pytho=
 n'))
  from qemu.machine import QEMUMachine
-@@ -73,6 +74,9 @@ class VirtioMaxSegSettingsCheck(Test):
-         return query_ok, props, error
+ from avocado_qemu import Test
++from avocado.core.exceptions import TestSkipError
 =20
-     def check_mt(self, mt, dev_type_name):
-+        mt['device'] =3D dev_type_name # Only for the debug() call.
-+        logger =3D logging.getLogger('machine')
-+        logger.debug(mt)
+ #list of machine types and virtqueue properties to test
+ VIRTIO_SCSI_PROPS =3D {'seg_max_adjust': 'seg_max_adjust'}
+@@ -117,12 +118,22 @@ class VirtioMaxSegSettingsCheck(Test):
+         return False
+=20
+     def test_machine_types(self):
++        """
++        :avocado: tags=3Darch:i386
++        :avocado: tags=3Darch:x86_64
++        """
+         EXCLUDED_MACHINES =3D ['none', 'isapc', 'microvm']
+         if os.geteuid() !=3D 0:
+             EXCLUDED_MACHINES +=3D ['xenfv', 'xenpv']
+         # collect all machine types except the ones in EXCLUDED_MACHINES
          with QEMUMachine(self.qemu_bin) as vm:
-             vm.set_machine(mt["name"])
-             for s in VM_DEV_PARAMS[dev_type_name]:
+             vm.launch()
++            # Skip test if target is not X86
++            # TODO: Move this check to Avocado (based on the test tags)
++            target_arch =3D vm.command('query-target')['arch']
++            if target_arch not in ['i386', 'x86_64']:
++                errmsg =3D "Architecture '%s' unsupported" % target_arch
++                raise TestSkipError(errmsg)
+             machines =3D [m['name'] for m in vm.command('query-machines')]
+             vm.shutdown()
+         for m in EXCLUDED_MACHINES:
 --=20
 2.21.1
 
