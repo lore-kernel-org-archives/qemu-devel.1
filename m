@@ -2,91 +2,76 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7149C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 01:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B240C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 01:29:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EC632253D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 01:27:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAE672253D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 01:29:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ILxg713a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC632253D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qs90CitZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAE672253D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu4oH-0000o8-KJ
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 20:27:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38864)
+	id 1iu4q6-0002dg-Uq
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jan 2020 20:29:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38972)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iu4nI-0000Fq-Kb
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 20:26:57 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iu4oU-000196-QV
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 20:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iu4nH-00043f-9t
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 20:26:56 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34920)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iu4nH-00043Q-3b
- for qemu-devel@nongnu.org; Tue, 21 Jan 2020 20:26:55 -0500
-Received: by mail-pf1-x443.google.com with SMTP id i23so2463782pfo.2
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 17:26:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Pp16kqLpiEIyAGHOLDB5F5XDcQRr9/fLT5GRMKH+yXw=;
- b=ILxg713aGeQ9egQymNxSuXStlT2t0GFABSc4CbfRZRht+coExjcQeM0JWc5uIAz5I0
- ohnnXAsVueVr1NZx1pEIApH1JdQDWZmnyrrTkTDUqgDK50iCXPpDgvgjt7pxII0rSqvu
- n4pTuk3HMCPTyQ31PGXyeZGJ57M63fyvaIBrgtQ7/diaZY5Qfe7ArF+q6Im+3WYNRPQp
- 2WlzbQpeTABa0j2j1srD7QBdUAux0ygDOAWHo5fMWxPZE6p7aDqEUrGZk+PaPqBy0nWC
- d09H3cQ74Z25rAZVkMwT7D4H3lq/W/VBZZyu443/Kgrv+8fEZ9N5svzTEttvUad74NOM
- R7GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Pp16kqLpiEIyAGHOLDB5F5XDcQRr9/fLT5GRMKH+yXw=;
- b=ofC35uA8AdW0kOt9u2OB6e900IvAD2/3A513J78fOcGHoJRHxrUl2KcmWTm5WEk+rR
- yiONiVhxdMytltOIR8Gb3kWKiPoZT38uzEFeW6CVVUw1T+5kaX3/mfbfQm2RyMIvI5YE
- janrqMMwhqn4AVAhF77mlI70GofL00+Kh9JiBaLmWtQI9N7VzW18LE4zGJBybGi6xljt
- E98P1glCCvm2c65q2jO4E/Rw4f3ZbHdfYitaIOjnS7PcySxYWe/clLijai3Lfr3KE7bE
- nS4ZzgtUJGTkC39CuYqlvG6yqZdpcFKy9MT/udPxoFlyhnXnBi8XgVuFvzUcgRBS3S1A
- rQ1A==
-X-Gm-Message-State: APjAAAVysXN+hCjsMocodglpDQxBaHkFJwmLxSAt3iSqWBMuA2o5UCRU
- 61PPNnJ6Hscu6auMf+GQhFWCcg==
-X-Google-Smtp-Source: APXvYqxQHZFHoqWoh/O4jd1powqUGPfcr+QqKjgiXNsCW39l4cU8zwA6SYVXdVi+SLLMiYWDaFLz2g==
-X-Received: by 2002:a63:5b0a:: with SMTP id p10mr8370478pgb.228.1579656413790; 
- Tue, 21 Jan 2020 17:26:53 -0800 (PST)
-Received: from [10.5.50.117] (rrcs-173-198-77-92.west.biz.rr.com.
- [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id u3sm43802068pga.72.2020.01.21.17.26.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jan 2020 17:26:52 -0800 (PST)
-Subject: Re: [PATCH] scripts/git.orderfile: Display decodetree before C source
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191230082856.30556-1-philmd@redhat.com>
- <4bf7c585-fe7f-c574-d706-2317e6bcbceb@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <404a7378-5ad4-1a5a-e280-551293cf970b@linaro.org>
-Date: Tue, 21 Jan 2020 15:26:48 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <wainersm@redhat.com>) id 1iu4oS-0004Ln-73
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 20:28:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52123
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iu4oR-0004LM-QK
+ for qemu-devel@nongnu.org; Tue, 21 Jan 2020 20:28:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579656487;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ZGnOeCb+HX3ZYT+0UWuqmdl4QzEYfGj2k0sOkWcJtyI=;
+ b=Qs90CitZuSEVeFoCu/mWgPfZVnjfXygrM7v1hHLBsf1suD27iHWI1W4GsFfeSDotHolr8B
+ Ixiyg5x2mt118tvmUkHPO4HoOUyZbJtu44UpvYU0A0tivL9cM8gnD0N5k/bAaicUJZbH6I
+ SMvNAciBxfnnJwW31gOC7cIiaLDLnng=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-5q-g39xrPe-tlUqHBZ_LUA-1; Tue, 21 Jan 2020 20:28:03 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 180FF107ACCA;
+ Wed, 22 Jan 2020 01:28:02 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-78.gru2.redhat.com
+ [10.97.116.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B15385733;
+ Wed, 22 Jan 2020 01:27:56 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/4] Acceptance tests: boot Linux with KVM test
+Date: Tue, 21 Jan 2020 22:27:49 -0300
+Message-Id: <20200122012753.9846-1-wainersm@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4bf7c585-fe7f-c574-d706-2317e6bcbceb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 5q-g39xrPe-tlUqHBZ_LUA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,29 +83,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Stafford Horne <shorne@gmail.com>, Sven Schnelle <svens@stackframe.org>
+Cc: philmd@redhat.com, thuth@redhat.com, alex.bennee@linaro.org,
+ ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/18/20 12:09 AM, Philippe Mathieu-Daudé wrote:
-> Cc'ing qemu-trivial@
-> 
-> On 12/30/19 9:28 AM, Philippe Mathieu-Daudé wrote:
->> To avoid scrolling each instruction when reviewing tcg
->> helpers written for the decodetree script, display the
->> .decode files (similar to header declarations) before
->> the C source (implementation of previous declarations).
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+This adds boot Linux tests for x86_64, aarch64, ppc64, and s390x
+targets which, unlike others, enable the KVM acceleration. Likewise
+it was added test cases for tcg.
 
-Queued to tcg-next, since no one else has picked this up.
+It is introduced an infraestructure on avocado_qemu framework
+so that:
+a) simply tagging the test with `accel:kvm` (or `accel:tcg`) will
+automatically set the corresponding '-accel' on the launched
+QEMU;
+b) test is canceled if the accelerator is not enabled on the QEMU
+binary or not available in the host.
 
+The acceptance builder on Travis was changed too in order to make
+the test run.
 
-r~
+Changes v2 -> v3:
+- Uses '-accel kvm' rather than '-enable-kvm' when automatically setting
+  the accelerator [thuth]
+- Added patch 04 which enable the KVM acceptance tests to run on
+  Travis [thuth]
+v2: [PATCH v2 0/3] Acceptance tests: boot Linux with KVM test
+- https://www.mail-archive.com/qemu-devel@nongnu.org/msg666238.html
+v1: [PATCH 0/3] Acceptance tests: boot Linux with KVM test
+- https://www.mail-archive.com/qemu-devel@nongnu.org/msg627498.html
+
+Tree:
+- Git: https://github.com/wainersm/qemu
+- Branch: acceptance_kvm_test-v3
+
+CI:
+- Travis (PASS): https://travis-ci.org/wainersm/qemu/builds/640172969
+
+Wainer dos Santos Moschetta (4):
+  tests/acceptance: avocado_qemu: Introduce the 'accel' test parameter
+  tests/acceptance: boot_linux_console: Add boot Linux with kvm tests
+  tests/acceptance: avocado_qemu: Refactor the handler of 'machine'
+    parameter
+  travis.yml: Enable acceptance KVM tests
+
+ .travis.yml                               |  7 +-
+ docs/devel/testing.rst                    | 16 +++++
+ tests/acceptance/avocado_qemu/__init__.py | 27 ++++++-
+ tests/acceptance/boot_linux_console.py    | 88 +++++++++++++++++------
+ 4 files changed, 115 insertions(+), 23 deletions(-)
+
+--=20
+2.23.0
+
 
