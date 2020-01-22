@@ -2,95 +2,83 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA66C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57402C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:39:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E804E20704
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:36:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 216C920704
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:39:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DL6hvIhQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E804E20704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oj0hp0QD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216C920704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuGB0-0003N9-Uq
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 08:36:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52827)
+	id 1iuGDm-0004kj-8d
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 08:39:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53361)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuG80-0000UZ-7s
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:33:09 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iuGCr-00047U-K5
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:38:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuG7y-0007L7-Vo
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:33:04 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:36750)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iuG7x-0007K7-OF
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:33:02 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id z3so7312465wru.3
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 05:33:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=jN2vido7RVcdsuXC6Q0jrNKP6lf2qgX3krbtnMY9Dac=;
- b=DL6hvIhQO75gVTasrgXfNpsaH9HVS91nsRkDUDDDJe8Cp6DIsYXVf3kaqn0LFEM64V
- BBavYfHaK2oez7Re0METXc+i9GbElijw+uJ0iohQftRG2EeymtNzn+42A6vEidX8G1f2
- MvNeGD0ZBXFtjKNSsfYkztFBoN4x7ewdkig3FWO2WGqKgmP3+TFI+3hpramNpyYQV0WX
- MIEJtLIBegHDNKU1hHLVFFnHTeyvgQi40QoGK3gl3VVn/hxJsn0v6xOfGSHnVJ1zZAW/
- b2SEa441fZ5JzO94VOBgsy9GtHinwwt14V9wOnDSvHM/9glgGLCnp7vwZKUCkfBE2gxd
- PGtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=jN2vido7RVcdsuXC6Q0jrNKP6lf2qgX3krbtnMY9Dac=;
- b=J9jwZpHkPBCC45cjSDcx+VmNrDhfub8ZJECl7mKyzzrCHJRy95Fb7nJfRZ7iv7Wndj
- MFHWAfkmS+eEQoJ9XHnNaPHjA5HRugUREaoDc4an1slIZkXKlidND/YIm9SQlZLKeyXv
- ZhNBAN58OMkCYKaygVMeWIG7UGlwaXt61n1jufHvLEqFGe14L1yxi47nZeZs6/cEV90Z
- MPojdJ6Pd+vOmUMW6TD6OZNjp2HSCCQPMVlrxhieRqcq1DkRdVBx0NGHV/XCFYCRdS0s
- KGUYv098uAN+GVGO6KdL65qBzOz7NRo9gKYya+qkcLAuxO2P3NtZM1AJ+JK96DVurAxK
- 5/sg==
-X-Gm-Message-State: APjAAAXB4JiW5ZTnYbzGoeqwRy1MuI1TevnuyLZieOSNei6ck2VqUpjC
- kg+B0Jx/5Lgf+TldUuTmBrUFsNlsVKtCzIpoD0opF6jt
-X-Google-Smtp-Source: APXvYqxnQGtRnZB401gqA85CdaJCiXPIygvPLViufZg5hp5whafRAdR3R6GCM7epL3KNVEULU5/caGoPrXZf3jYV/ZY=
-X-Received: by 2002:a5d:438c:: with SMTP id i12mr11142627wrq.196.1579699980059; 
- Wed, 22 Jan 2020 05:33:00 -0800 (PST)
+ (envelope-from <wainersm@redhat.com>) id 1iuGCp-0002Fo-Jc
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:38:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48819
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iuGCp-0002F3-Cj
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:38:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579700282;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=V2DbjmjaIUD592zRYJbkcAaQOtdIDRefwiLI3DsEIaA=;
+ b=Oj0hp0QDngxU7ds5nibF2QFB6UUzE5xRCgEFTC4QhpZ5h7v2sKfXqpdJzxGWaFGbus6QPY
+ 2e96V/G8Gdx7BZ0+XnpeOPAPwMb24FP4tUNO2iiXWTCkVHp2tvROytLnfH7r+A8RzeqeFA
+ gLWM6WmGG3DHowhJJBVCilYAdpJgLkI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-S72rqEE1Pa6ay-915SFwWw-1; Wed, 22 Jan 2020 08:38:00 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E46408010CB;
+ Wed, 22 Jan 2020 13:37:58 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-68.gru2.redhat.com
+ [10.97.116.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 71B867C35A;
+ Wed, 22 Jan 2020 13:37:50 +0000 (UTC)
+Subject: Re: [PATCH v1 0/3] current testing/next queue
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200122102223.20036-1-alex.bennee@linaro.org>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <f4d6b334-1a4f-78be-c0d1-f53cf2e288d6@redhat.com>
+Date: Wed, 22 Jan 2020 11:37:48 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <87d0bmchq0.fsf@dusky.pond.sub.org>
- <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200120100849.GB345995@stefanha-x1.localdomain>
- <871rrtmkko.fsf@dusky.pond.sub.org>
- <20200121113224.GD630615@stefanha-x1.localdomain>
- <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
- <87wo9lc4oe.fsf_-_@dusky.pond.sub.org> <20200121143658.GB597037@redhat.com>
- <871rrs97ld.fsf@dusky.pond.sub.org>
- <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
- <87y2tzzrwo.fsf@linaro.org> <87wo9ju19n.fsf@dusky.pond.sub.org>
- <CAJ+F1CLu6xNJ834qWpJ6Bx1PHhv5QutdK2-Nzp+J2q80YV5tzA@mail.gmail.com>
- <CAFEAcA8az0CWubXqm5i+HhAukg1GYwaiazLw97d5tKGzjKjqwg@mail.gmail.com>
-In-Reply-To: <CAFEAcA8az0CWubXqm5i+HhAukg1GYwaiazLw97d5tKGzjKjqwg@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 22 Jan 2020 17:32:47 +0400
-Message-ID: <CAJ+F1C+kD0fUZDuU0uS-ri42NBXKoqOdg6CZr0czoXFE1aQLrQ@mail.gmail.com>
-Subject: Re: Integrating QOM into QAPI
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200122102223.20036-1-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: S72rqEE1Pa6ay-915SFwWw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,38 +90,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- John Snow <jsnow@redhat.com>, Christophe de Dinechin <dinechin@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Hi Alex,
 
-On Wed, Jan 22, 2020 at 5:28 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
+On 1/22/20 8:22 AM, Alex Benn=C3=A9e wrote:
+> Hi,
 >
-> On Wed, 22 Jan 2020 at 12:42, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
-> > From the top of my mind, this is the pain point when trying to use GObj=
-ect:
-> > - static/inlined object, not supported by GObject, unlikely to ever be
-> > - few users in qemu, transition possible.
+> There isn't much in my queue at the moment. The move of the various
+> compilers to buster fixes one of the shippable problems. I have a
+> longer series cooking to support multiarch docker builds which I'll
+> try and get posted by the end of this week.
+
+Do you mind to pick this up too? ->
+
+[PATCH 0/1] travis.yml: Missing genisoimage package
+
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg669898.html
+
+- Wainer
+
+
 >
-> Isn't there lots of use of this in the device emulation, or am I
-> misunderstanding what the restriction is?
+> Alex Benn=C3=A9e (2):
+>    tests/docker: move most cross compilers to buster base
+>    tests/docker: better handle symlinked libs
+>
+> Thomas Huth (1):
+>    gitlab-ci: Refresh the list of iotests
+>
+>   .gitlab-ci.yml                                   | 12 ++++++------
+>   tests/docker/Makefile.include                    | 16 ++++++++--------
+>   tests/docker/docker.py                           |  3 ++-
+>   tests/docker/dockerfiles/debian-amd64.docker     |  2 +-
+>   .../docker/dockerfiles/debian-armel-cross.docker |  2 +-
+>   .../docker/dockerfiles/debian-armhf-cross.docker |  2 +-
+>   .../dockerfiles/debian-mips64el-cross.docker     |  2 +-
+>   .../dockerfiles/debian-mipsel-cross.docker       |  2 +-
+>   .../dockerfiles/debian-ppc64el-cross.docker      |  2 +-
+>   .../docker/dockerfiles/debian-s390x-cross.docker |  2 +-
+>   10 files changed, 23 insertions(+), 22 deletions(-)
+>
 
-There are a bunch, from what I remember. Yes, that's a bit painful,
-but spatch managed to rewrite most of dev.subdev.foo to
-dev.subdev->foo iirc.
-
-
---=20
-Marc-Andr=C3=A9 Lureau
 
