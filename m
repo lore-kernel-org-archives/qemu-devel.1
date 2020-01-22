@@ -2,50 +2,47 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C73DC33CB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D7EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:25:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7642C2467E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:25:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7642C2467E
+	by mail.kernel.org (Postfix) with ESMTPS id 82D722467F
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:25:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D722467F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuG0r-0000d1-Ub
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 08:25:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51913)
+	id 1iuG0t-0000h9-Vw
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 08:25:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iuFyw-0006mk-Mb
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iuFyw-0006mX-2l
  for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iuFyv-0002Ma-Fh
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iuFyv-0002MA-2L
  for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:23:42 -0500
-Received: from relay.sw.ru ([185.231.240.75]:42290)
+Received: from relay.sw.ru ([185.231.240.75]:42282)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iuFys-0002Hz-Mk; Wed, 22 Jan 2020 08:23:38 -0500
+ id 1iuFys-0002Hx-Fg; Wed, 22 Jan 2020 08:23:38 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iuFyk-00057B-F8; Wed, 22 Jan 2020 16:23:30 +0300
+ id 1iuFyj-00057B-4J; Wed, 22 Jan 2020 16:23:29 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 6/7] migration: handle to_src_file on target only for ram
- postcopy
-Date: Wed, 22 Jan 2020 16:23:27 +0300
-Message-Id: <20200122132328.31156-7-vsementsov@virtuozzo.com>
+Subject: [PATCH 0/7] Fix crashes on early shutdown during bitmaps postcopy
+Date: Wed, 22 Jan 2020 16:23:21 +0300
+Message-Id: <20200122132328.31156-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200122132328.31156-1-vsementsov@virtuozzo.com>
-References: <20200122132328.31156-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
@@ -68,61 +65,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If only bitmaps postcopy migration enabled and not ram, this assertion
-will fire, as we don't have to_src_file for bitmaps postcopy migration.
+Hi all!
 
-migrate_postcopy_ram() accesses migrations state, which may be freed in
-main thread, so, we should ref/unref it in postcopy incoming thread.
+Patches 5 and 6 fixes two crashes, triggered by new test case in patch
+7.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- migration/savevm.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+Vladimir Sementsov-Ogievskiy (7):
+  migration/block-dirty-bitmap: refactor incoming state to be one struct
+  migration/block-dirty-bitmap: rename finish_lock to just lock
+  migration/block-dirty-bitmap: simplify dirty_bitmap_load_complete
+  migration/block-dirty-bitmap: keep bitmap state for all bitmaps
+  migration/block-dirty-bitmap: cancel migration on shutdown
+  migration: handle to_src_file on target only for ram postcopy
+  qemu-iotests/199: add early shutdown case to bitmaps postcopy
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index adfdca26ac..143755389e 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1832,6 +1832,9 @@ static void *postcopy_ram_listen_thread(void *opaque)
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     QEMUFile *f = mis->from_src_file;
-     int load_res;
-+    MigrationState *migr = migrate_get_current();
-+
-+    object_ref(OBJECT(migr));
- 
-     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-                                    MIGRATION_STATUS_POSTCOPY_ACTIVE);
-@@ -1898,6 +1901,8 @@ static void *postcopy_ram_listen_thread(void *opaque)
-     mis->have_listen_thread = false;
-     postcopy_state_set(POSTCOPY_INCOMING_END);
- 
-+    object_unref(OBJECT(migr));
-+
-     return NULL;
- }
- 
-@@ -2457,12 +2462,14 @@ static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-     qemu_fclose(mis->from_src_file);
-     mis->from_src_file = NULL;
- 
--    assert(mis->to_src_file);
--    qemu_file_shutdown(mis->to_src_file);
--    qemu_mutex_lock(&mis->rp_mutex);
--    qemu_fclose(mis->to_src_file);
--    mis->to_src_file = NULL;
--    qemu_mutex_unlock(&mis->rp_mutex);
-+    if (migrate_postcopy_ram()) {
-+        assert(mis->to_src_file);
-+        qemu_file_shutdown(mis->to_src_file);
-+        qemu_mutex_lock(&mis->rp_mutex);
-+        qemu_fclose(mis->to_src_file);
-+        mis->to_src_file = NULL;
-+        qemu_mutex_unlock(&mis->rp_mutex);
-+    }
- 
-     migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-                       MIGRATION_STATUS_POSTCOPY_PAUSED);
+ migration/migration.h          |   1 +
+ migration/block-dirty-bitmap.c | 171 +++++++++++++++++++++------------
+ migration/migration.c          |   7 ++
+ migration/savevm.c             |  19 ++--
+ tests/qemu-iotests/199         |  12 ++-
+ tests/qemu-iotests/199.out     |   4 +-
+ 6 files changed, 142 insertions(+), 72 deletions(-)
+
 -- 
 2.21.0
 
