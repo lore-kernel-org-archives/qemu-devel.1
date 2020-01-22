@@ -2,137 +2,91 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9424C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B75EFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A056C2253D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:53:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 835142253D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 08:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cYIz1yAh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A056C2253D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ghmlxeaF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 835142253D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuBky-0005YN-Oj
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 03:53:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47908)
+	id 1iuBmN-0006T4-Oa
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 03:54:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iuBk5-00057k-8X
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:52:06 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iuBla-00061w-Un
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:53:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iuBk3-0002D2-Bp
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:52:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51466
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iuBk3-0002Cc-89
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:52:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579683122;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=I/HUf0Yxajf+Axhjrlie7BT9i0IzaUxohUwlqBIF6Qc=;
- b=cYIz1yAhqsSq73jtnIh3mEPcTXLmvNDGqlCJbLE+t4dZF+ynmZB20CS+rWpramu0hxP9JF
- mA0rDco8QXI084g83p5pqjMVC3yD0+WIfRupDwh+zRg3xTDu/cSuyco0o6NpxiQ4q2Q02Z
- niekMjnkoqLq8H2QjcnX8bH2UoyFE/M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-KYRjOiDiPK60oGl89RxaMw-1; Wed, 22 Jan 2020 03:52:00 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D9838017CC
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 08:51:59 +0000 (UTC)
-Received: from [10.40.204.119] (ovpn-204-119.brq.redhat.com [10.40.204.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6377E858BE;
- Wed, 22 Jan 2020 08:51:55 +0000 (UTC)
-Subject: Re: [PATCH 4/5] bios-tables-test: fix path to allowed diff
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-References: <20200122080538.591734-1-mst@redhat.com>
- <20200122080538.591734-5-mst@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <cdd3d0b0-35cc-6ed6-b0ac-596f244c8dfb@redhat.com>
-Date: Wed, 22 Jan 2020 09:51:54 +0100
+ (envelope-from <richard.henderson@linaro.org>) id 1iuBlZ-0002e3-L8
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:53:38 -0500
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:34631)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iuBlZ-0002cf-EO
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 03:53:37 -0500
+Received: by mail-pj1-x1043.google.com with SMTP id s94so1878455pjc.1
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 00:53:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fxvInQhLwgQsSRDv0TQJGl7JNZlCjysHEQDi1SvkAl8=;
+ b=ghmlxeaFjR/bjygvzMNLkTQCeUOxP4tBHxX3FM9feKCiFtj6bueAL66Mmy5WOb+CC+
+ KxIC7jirLib2ab8dopRDOt4kGeDcTDRAJ4Bd5Z0IYfV2O4i+uV9Hclwm/nM1LrooX0uF
+ Oeg8N9mtwmTCUjsruKqgpaFU0cvLWrt8Z1AZeo+DF7zWCHNSpbnst7uZF44rqIA7tdvu
+ ZKyQwnzAmfX709nE0/b2D0MRbNugr16G4l++8wCNHEXS0ROHwcNAndKJm8Vx07u/MsPQ
+ TZ+uwsZfcYNTjA1mjjEOZ3YNQFrXgwZupCWBgwvrjnzYe5G/WDuWk/xc5uYSQAeoZLju
+ D8Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fxvInQhLwgQsSRDv0TQJGl7JNZlCjysHEQDi1SvkAl8=;
+ b=CNTOrJgneRVAZSiwFgii7Nz8zc4hX1SDv20eAAn/IwlbeszlhgqVRKzPtF9RR11jBV
+ L+WXDC1I+lVzGKM4zjaVecVewUbi0kXloXBqVIf7A5t7zgYF8xE0n92v3crsqyHsU+M+
+ FEorPwrU9eKmjAChnVgkY4Pcbu7HBYOQK/5F0wiJX8lYbK8NBrqPPFze13sE9z2fNNXD
+ jVRkz7GR9h/O/ONrlbmeiHPgZQUO+6GoxD+RyjLAjbBNgtezmGyg1p1iNS89iGCk8z8x
+ 7C8ft353tDf0Tn+ZqrUkADHumdf7rZ0CjPMTFOQ4tEQxsp7DB/H1KjfGs+q23Skpuf+t
+ 0cuw==
+X-Gm-Message-State: APjAAAWeZe58bHaVN+EOaRUvwCmUshZdFdSVbk1Cn7VLNjuNe17E3dy3
+ mNeI7UcVBft1FhOqOm7zvFIihw==
+X-Google-Smtp-Source: APXvYqxR2cjcqVIjUPTyCkQiF6lchqOuqGUqcbF2J56lGRt32Dram4iKq1ptjdxVp9fmjsJbSbAXnQ==
+X-Received: by 2002:a17:902:d205:: with SMTP id
+ t5mr9838891ply.138.1579683212628; 
+ Wed, 22 Jan 2020 00:53:32 -0800 (PST)
+Received: from [10.5.50.117] (rrcs-173-198-77-92.west.biz.rr.com.
+ [173.198.77.92])
+ by smtp.gmail.com with ESMTPSA id y14sm45642908pfe.147.2020.01.22.00.53.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Jan 2020 00:53:31 -0800 (PST)
+Subject: Re: [PATCH] riscv: Format Rd of FMV.W.X with NoN-boxing
+To: Ian Jiang <ianjiang.ict@gmail.com>, qemu-devel@nongnu.org
+References: <20200122072448.18510-1-ianjiang.ict@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b9084f13-0836-7f74-a870-608bf3f8f6a9@linaro.org>
+Date: Tue, 21 Jan 2020 22:53:27 -1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200122080538.591734-5-mst@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: KYRjOiDiPK60oGl89RxaMw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200122072448.18510-1-ianjiang.ict@gmail.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -144,34 +98,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: palmer@dabbelt.com, Alistair.Francis@wdc.com, sagark@eecs.berkeley.edu,
+ kbastian@mail.uni-paderborn.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/01/2020 09:06, Michael S. Tsirkin wrote:
-> Fixes: 1e8a1fae7464 ("test: Move qtests to a separate directory")
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 1/21/20 9:24 PM, Ian Jiang wrote:
+> For FMV.W.X that moves the lower 32 bits of an integer register to a
+> floating-point register, Rd should encoded with NoN-boxing scheme.
+> Note: This applies to RV64 only.
+> 
+> Signed-off-by: Ian Jiang <ianjiang.ict@gmail.com>
 > ---
->  tests/qtest/bios-tables-test.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  target/riscv/insn_trans/trans_rvf.inc.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-> index 6ec1c5be64..6535ab7f04 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -21,7 +21,7 @@
->   * in binary commit created in step 6):
->   *
->   * After 1-3 above tests will pass but ignore differences with the expected files.
-> - * You will also notice that tests/bios-tables-test-allowed-diff.h lists
-> + * You will also notice that tests/qtest/bios-tables-test-allowed-diff.h lists
->   * a bunch of files. This is your hint that you need to do the below:
->   * 4. Run
->   *      make check V=1
+> diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
+> index 172dbfa919..62b7a36567 100644
+> --- a/target/riscv/insn_trans/trans_rvf.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvf.inc.c
+> @@ -368,6 +368,7 @@ static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
+>  
+>  #if defined(TARGET_RISCV64)
+>      tcg_gen_mov_i64(cpu_fpr[a->rd], t0);
+> +    tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd], 0xffffffff00000000ULL);
+>  #else
+>      tcg_gen_extu_i32_i64(cpu_fpr[a->rd], t0);
+>  #endif
 > 
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+This doesn't look right.  There's nothing in the spec that says the nan-boxing
+is restricted to rv64.  NaN-boxing is all about FLEN, not XLEN.
 
+
+r~
 
