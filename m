@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E37C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97995C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:07:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F5E72465A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:05:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5E72465A
+	by mail.kernel.org (Postfix) with ESMTPS id 702132467C
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:07:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 702132467C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuGdI-0007Ij-6I
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:05:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56834)
+	id 1iuGf6-0000Dm-Kx
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:07:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57009)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iuGcY-0006q2-Q0
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:04:39 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iuGeV-0008DD-11
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:06:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iuGcX-0004XV-MZ
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:04:38 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:41353)
+ (envelope-from <laurent@vivier.eu>) id 1iuGeT-0005oZ-SX
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:06:38 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:48745)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGcX-0004X1-DV
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:04:37 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGeT-0005nv-Je
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:06:37 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mwwm5-1jo9EM3gU7-00yNAX; Wed, 22 Jan 2020 15:04:22 +0100
-Subject: Re: [PATCH 01/12] linux-user: Add support for FS_IOC_<GET|SET>VERSION
+ 1MqapC-1jPDgc2XPk-00mdWc; Wed, 22 Jan 2020 15:06:22 +0100
+Subject: Re: [PATCH 02/12] linux-user: Add support for FS_IOC32_<GET|SET>FLAGS
  ioctls
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1579214991-19602-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1579214991-19602-2-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1579214991-19602-3-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,32 +83,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <7cb21df7-95cd-f872-a8da-2f91ecb645d8@vivier.eu>
-Date: Wed, 22 Jan 2020 15:04:20 +0100
+Message-ID: <74ca50e0-0ebd-efb1-60da-f46ec9ca85eb@vivier.eu>
+Date: Wed, 22 Jan 2020 15:06:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1579214991-19602-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1579214991-19602-3-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:0iJLtmaH0T2NGr9aWFhxqz6gCfi1zTK6pCJTrxD9w+MD71DoeOT
- SwAD109i0JG0HHnTQ2CK4zKRSysEyFZq1CKzJ7jdyrId3N3UUl7QtPWWz6jFzU0g0JEIcNq
- Ac62rytENJsJsmV1nA3BPIyHs3v8Y0O9R8NlK5K+Y94uW7Zxmywun6slcICLMmUopsk2LB/
- W6xAG7GrgOlXArAoNByxw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hagRY2saSmM=:sBWVL2RwpCgPFpz7K8CBN0
- hx7aj1thAGDSkKgqZKIiaPYVG+qzw1LcTl44hjWQ5tpoQk/NIvsdat3uqeAo3jVg5IE/SZuAM
- aPMOOzYAwkTJFrV+mSjiQ47gIQUbnxkPBzEuzmPnKof0M5cOeUP9JH1+gds8JQyCtNvN/eBT/
- ScAZOCarEJAJniC6JUGGgVrhWOiKmTJfX1WNNC6AUIp5c1hxCfCm12gFOdsab3WHCowQre+jF
- 7jofLk2wIwl4tiGcIMRNcMxj2VHeA2asHO+8VBC7Meu+ENZtqe06fRUr8wFM3johx9bc0YN0z
- DkaZBeBw3hUY6WhfXtdOrdfmerInFGNQ5z8P/33wMr+DTY9QXLrWgBB3iAPzeTvkUYWqfPdT6
- j/HYQwHKTEAHgk6OAf5MM3QQ4X3slpaHCsHSI05pZD2x2vjmvgAczF7OiYP6ta3B9oNLDCdEg
- IkampSHEKJl7RrG5zyLBefOBKccZ20STjoDGEWGs6ab3njO1ar+WXRtuwbcIfyKGU0GIyvCMW
- rnp0Z2YwHpPRJpKLeX4RYROW24A9phbgPYTmv9p+J7kEz1Hq/skJVbD11N+dX1O09vvIqP3nX
- DFTbLaU8mbweG7/yhVf9mXadVx4MwGw6EW6LZenWzAenLQHHEDkvkglnCnCzVE+bjQLCryULA
- zhGzbRf0WkVdBuVz545VHnlK7DY6pOhB+Wc8cVoIfxPvEjrlJJZeIxWSKfnD+nAEkuHw3JvcS
- 0W7CRUMLlBLFtpl6eq0w7MlDamLY1HkJlMUk0+UMdzKKAC9UgIqGS8rmwwCb2jEumJh3nx52L
- fMWvXfevAz7+vK+8J+ObVeH4zlFEai5RQiqMO5i9RYlVHqQxss=
+X-Provags-ID: V03:K1:vk1RUNjLGzeRwK452rtnrDbfwep6ercIPF3XwLoATbiCpjXVLMT
+ urvuaKIIsQ26YmySqAHs0jwcRWEyRnJ8QaW6HprFaiw5ehftu5v8vmJwBqOdR0F9UJkOMrL
+ cyqZDqwc1fAz5Fh1YdnuKc9svCIxPb74TMVLDlL9a6cQJ/t6MbvEqDos97u8t5KFX0z8SAk
+ F0cxYiGwBxE8uO/C+c7jw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KL2PxYieeGA=:Po6Ei40BOOdhkOv4Vb1wt8
+ uj8NtOMUQLEBBks9JEeT1o/xcczWX7lMZ3jeztyXu5v5T/VMgiGOQmsd9+lBetIS3muvWDd9N
+ BMkSQcux7e34QAJkh9lb+6/t9MZLcO3FBHldmpTBtcP4KQuNyJP9PsAuNrU1gguxPYvUQNt+4
+ vax0EfFTMXd+bAaZPavw73TSWkJmQK3VFw6kxDqXLbd+5bUc5BLoKJ5DYTl9dkoV7fEjTxPPg
+ ke2216Mllvif96Kn4MCt8svCQbYJ3jL8EuCIEPjwSdWsZWUhHjcIWioxjaz+0eTZhWYvz6efD
+ Zise9K8r/zhYtF0Q6Nbi38yJj/nx/+vLfAamMEHu2yGekt+6MEC8AjRN8Z3uPnB8Ea764559F
+ 54ibJBqLjkUpAZczBdN/OW544krlYnOwApJou+O0z3yXGA/jlc8SWxKk2gnGj+pEjgAo/JVxg
+ DxRYQdxIwUcC42ZpCUZpYZFkeoUlvcDAKBqo0wDh/kBiF1zBcHog7iERD6pnahEg3qTBaNny7
+ aOqIIs2ZlCWzgDq3pQzVgOUqdG+MwDe+uJaPKj1X78XK8+fLObXti4s1/dB4rLRMj/nlqY7kg
+ 6lmtWjmV0MWiTWFxrHhP/VC7WRnnok1fSs6ZhImdzu3F/lt+rRplZRJyLYRF6hEFJrQCKZNH5
+ lwRUbnOPFYlpY9XpIsuEWMPJMATOUSkNNfdAS+pQcJkz5X02DGsJG+nJI0zeLdQ1wcm1y9F8O
+ 2izQCmD/vPC01D8YlYlmVjFhhGyztvtWT96sZ7EfBFzmU/qupmLE9No/TYpPRm1N/fq97SdIr
+ dAH59wrANJpSvZncyMMnJSlUQdrkBJGX0Rr4HUHgTYrulsvGEY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 217.72.192.74
@@ -131,54 +131,44 @@ Sender: "Qemu-devel"
 Le 16/01/2020 à 23:49, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> A very specific thing for these two ioctls is that their code
-> implies that their third argument is of type 'long', but the
-> kernel uses that argument as if it is of type 'int'. This anomaly
-> is recognized also in commit 6080723 (linux-user: Implement
-> FS_IOC_GETFLAGS and FS_IOC_SETFLAGS ioctls).
+> These FS_IOC32_<GET|SET>FLAGS ioctls are identical to
+> FS_IOC_<GET|SET>FLAGS ioctls, but without the anomaly of their
+> number defined as if their third argument is of type long, while
+> it is treated internally in kernel as is of type int.
 > 
 > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
 >  linux-user/ioctls.h       | 2 ++
->  linux-user/syscall_defs.h | 8 +++++---
->  2 files changed, 7 insertions(+), 3 deletions(-)
+>  linux-user/syscall_defs.h | 2 ++
+>  2 files changed, 4 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index c6b9d6a..c44f42e 100644
+> index c44f42e..4fd6939 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -138,6 +138,8 @@
->  
->       IOCTL(FS_IOC_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
+> @@ -140,6 +140,8 @@
 >       IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
-> +     IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-> +     IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
+>       IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
+>       IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
+> +     IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
+> +     IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
 >  
 >  #ifdef CONFIG_USBFS
 >    /* USB ioctls */
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 98c2119..f68a8b6 100644
+> index f68a8b6..964b2b4 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -911,12 +911,14 @@ struct target_pollfd {
->  #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
->  #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
->  
-> -/* Note that the ioctl numbers claim type "long" but the actual type
-> - * used by the kernel is "int".
-> +/*
-> + * Note that the ioctl numbers for FS_IOC_<GET|SET><FLAGS|VERSION>
-> + * claim type "long" but the actual type used by the kernel is "int".
->   */
->  #define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
->  #define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
-> -
-> +#define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
-> +#define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+> @@ -920,6 +920,8 @@ struct target_pollfd {
+>  #define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
+>  #define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
 >  #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
+> +#define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
+> +#define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
 >  
 >  /* usb ioctls */
+>  #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
 > 
 
 Applied to my linux-user branch.
