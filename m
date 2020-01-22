@@ -2,83 +2,93 @@ Return-Path: <SRS0=Oie8=3L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D22AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32298C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:12:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 580FE2467A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:07:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d4qXCyl8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 580FE2467A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 06F4A20678
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 13:12:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F4A20678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuFjW-00014K-Dj
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 08:07:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50030)
+	id 1iuFng-0002Kp-7l
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 08:12:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50414)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iuFio-0000fU-JU
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:07:03 -0500
+ (envelope-from <groug@kaod.org>) id 1iuFmz-0001uS-6K
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:11:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iuFin-0008TA-H9
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:07:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48431
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iuFin-0008Sr-DY
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:07:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579698420;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YdzQ5XQ9EtKzUM46zwtUHNkSRblrDf4zl9xHGKZuKkA=;
- b=d4qXCyl8HJS76gRoMsjNBwabLRdLtb6qMwhkaX4wBWkWU1RZdDdZsLW891m719QK9SG0fB
- 0hHEeJ+ACm/FVUuCQb2MEdhvBeWQkYCsX2oCpQPx/47Efrc7ambeE/k41h+YW8DEIBAJO0
- ijWIhupIel6ZN+ci4wwkCYprv7p0mIo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-QJvMUGx8OF2d75Abiu8Xdg-1; Wed, 22 Jan 2020 08:06:59 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DBDD800D4E
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 13:06:58 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-68.gru2.redhat.com
- [10.97.116.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC88285732;
- Wed, 22 Jan 2020 13:06:54 +0000 (UTC)
-Subject: Re: [PATCH] vhost: coding style fix
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-References: <20200122080840.592054-1-mst@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <2b0670f2-f14e-b4f6-ad01-d1b2b28bdf06@redhat.com>
-Date: Wed, 22 Jan 2020 11:06:53 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <groug@kaod.org>) id 1iuFmx-0003Lq-IU
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:11:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51678)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuFmx-0003Kt-Ba
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 08:11:19 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00MCw6gh050597
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 08:11:17 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xp1jh14js-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 08:11:16 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Wed, 22 Jan 2020 13:11:14 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 22 Jan 2020 13:11:13 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00MDBCrF47841426
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 22 Jan 2020 13:11:12 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A989C4C059;
+ Wed, 22 Jan 2020 13:11:12 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 80CD64C046;
+ Wed, 22 Jan 2020 13:11:12 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.182.163])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 22 Jan 2020 13:11:12 +0000 (GMT)
+Subject: [PATCH] spapr: Don't allow multiple active vCPUs at CAS
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 22 Jan 2020 14:11:12 +0100
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <20200122080840.592054-1-mst@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: QJvMUGx8OF2d75Abiu8Xdg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-TM-AS-GCONF: 00
+x-cbid: 20012213-0016-0000-0000-000002DFB0CB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012213-0017-0000-0000-000033425C41
+Message-Id: <157969867170.571404.12117797348882189656.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-17_05:2020-01-16,
+ 2020-01-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ clxscore=1034 bulkscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
+ malwarescore=0 mlxlogscore=681 mlxscore=0 impostorscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001220119
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,50 +100,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dgilbert@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+According to the description of "ibm,client-architecture-support" that
+can found in LoPAPR "B.6.2.3 Root Node Methods":
 
-On 1/22/20 6:08 AM, Michael S. Tsirkin wrote:
-> Drop a trailing whitespace. Make line shorter.
+If multiple partition processors or threads are active at the time of
+the ibm,client-architecture-support method call, or an error is detected
+in the format of the ibm,architecture.vec structure, the err? boolean
+shall be TRUE; else FALSE.
 
+We certainly don't want to temper with the platform or with the PCR of
+the other vCPUs if they happen to be active. Ensure we have only one
+active vCPU and fail CAS otherwise. This is just for conformance and
+robustness, it doesn't fix any known bugs.
 
-hmmm... wondering why Patchew didn't catch that. Any idea?
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_hcall.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-- Wainer
-
->
-> Fixes: 76525114736e8 ("vhost: Only align sections for vhost-user")
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->   hw/virtio/vhost.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 25fd469179..9edfadc81d 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -551,7 +551,7 @@ static void vhost_region_add_section(struct vhost_dev *dev,
->       trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
->                                      mrs_host);
->   
-> -    if (dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER) {
-> +    if (dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER) {
->           /* Round the section to it's page size */
->           /* First align the start down to a page boundary */
->           size_t mrs_page = qemu_ram_pagesize(mrs_rb);
-> @@ -566,8 +566,8 @@ static void vhost_region_add_section(struct vhost_dev *dev,
->           if (alignage) {
->               mrs_size += mrs_page - alignage;
->           }
-> -        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gpa, mrs_size,
-> -                                               mrs_host);
-> +        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gpa,
-> +                                               mrs_size, mrs_host);
->       }
->   
->       if (dev->n_tmp_sections) {
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index ffb14641f9d3..b8bb66b5c0d4 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1676,6 +1676,18 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     Error *local_err = NULL;
+     bool raw_mode_supported = false;
+     bool guest_xive;
++    CPUState *cs;
++
++    /* CAS is supposed to be called early when only the boot vCPU is active. */
++    CPU_FOREACH(cs) {
++        if (cs == CPU(cpu)) {
++            continue;
++        }
++        if (!cs->halted) {
++            warn_report("guest has multiple active vCPUs at CAS, which is not allowed");
++            return H_MULTI_THREADS_ACTIVE;
++        }
++    }
+ 
+     cas_pvr = cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &local_err);
+     if (local_err) {
 
 
