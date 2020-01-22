@@ -7,85 +7,85 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DE4C32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C3BC32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:59:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 307C124656
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:59:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1420724656
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 05:59:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jj3wwXLU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307C124656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyKEzAKa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1420724656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iu92a-0007Hq-5U
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 00:59:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59991)
+	id 1iu92j-0007Vy-L2
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 00:59:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iu8xq-0001nu-Tr
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:54:08 -0500
+ (envelope-from <mst@redhat.com>) id 1iu8vs-0007MT-LB
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iu8xo-0005Ri-JI
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:54:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29458
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iu8vr-0004aB-Ic
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:04 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37581
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu8xo-0005RP-76
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:54:04 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iu8vr-0004Zt-Eq
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 00:52:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579672443;
+ s=mimecast20190719; t=1579672323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Kg8dkgToII+17yCLdud4DGcpR3GxCmqyAmpoGaHxRIE=;
- b=Jj3wwXLUF4gMe7A08vas7jDQkoqP/WNg6lBf2Y0ElnPo+8kvhOQv6Blr1/s9kuA68F0LkN
- 3tdKyvNU2eEovRiTGfxfB17Xo7C8DSNDiRpfiMwtv3Fpz832wtoYZcRP+LNNawVDgjfCqJ
- PBi4dt5s5NNkjCiLX2X4nUKeXg8Fw24=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-LrByhLWrNPewE7YTwpX4bQ-1; Wed, 22 Jan 2020 00:51:52 -0500
-Received: by mail-wr1-f70.google.com with SMTP id u12so2541389wrt.15
- for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 21:51:52 -0800 (PST)
+ bh=ZL7cOBRrNjS5xV9Me0lJk0ipNP0N1056GF7w4b0GCrQ=;
+ b=VyKEzAKajt2wXLtVhR6yF/51JLSVEjvvn8DhtPoA9S5TNg+dkAqURi3SQIVMBsLUxwGVMt
+ OexukHSQn3c/yknyPkrMk3TL8TUhwJm3jYs4O5JixJ5svHx/CGohXVvs0Jvp5TjrQ6DemV
+ NTS62IrtQQ4F1XzeDdYVgZmZIjrLG/E=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-iw2ccxv8Mg2IAs6DJsBzqg-1; Wed, 22 Jan 2020 00:52:01 -0500
+Received: by mail-wm1-f70.google.com with SMTP id w205so1612109wmb.5
+ for <qemu-devel@nongnu.org>; Tue, 21 Jan 2020 21:52:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=SZlgsbuRexepbyzGOJZSIRK1RX+EEBHf43p6wbErIqU=;
- b=DuD8tg/UsNk82F9ytUakruxQDVYI6bZL3o6rgNys5cNGM/alJCMv7QkB1p9bb+oRKB
- xE41Kofap7IKVd+/hOkeVtNB45oQfPL1U7banK0AWj5fH+tZa5yD+U+AuMersrPKpSlj
- 0mertCKN/8jLdnBtrV/Bubms/3Pb9RB00f5Bs0Ll2qUizYzauXbN+rUDWv40nfK22wI8
- 5QQl3yGOa8MhNP9ZM+iH4ynbHNVn6dBOmwv0SYSMWwOqW0Xf9Ry0yAvv5jHhJz4nRYmk
- Ta6syx1WZCulhxI+xezDuNSRtJE+hn17Tu+c/zr4gycEVzu+eqrV1f2UqWsI16JGwZb4
- gM5A==
-X-Gm-Message-State: APjAAAUTuwTaW+kUCTwZaJu6tbedM3vsgISUhac3MRYm29K26v+PbbVN
- +7dG9SXhp1UNsjHMWwjF02tqCWiKFB4gPdf7HnktofHUX5u1ooEPQw6fAWGnPE7DdRZZ8qsRa6C
- tWdHqtQJdkb90qKw=
-X-Received: by 2002:a7b:c764:: with SMTP id x4mr942887wmk.116.1579672311217;
- Tue, 21 Jan 2020 21:51:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwroddXB183Av7YTe/uaeAeCm9DV46TOq3TXFhEDVoQLGpHnuJraS7I7XVNmGCnsbHtE2juxQ==
-X-Received: by 2002:a7b:c764:: with SMTP id x4mr942865wmk.116.1579672310923;
- Tue, 21 Jan 2020 21:51:50 -0800 (PST)
+ bh=0NReYyn4JQkVdN7PoAGTBso0lphxyHmehPnh64blNL8=;
+ b=LPa2zhy6d3RPqEHrnFGU6EKyzLakhruHMQ/fiIZFwVD4wDsZYGWwGg8omqlZKhSAg1
+ YJG4t0hpfRv1Jn8JZeJ5nc9NLoydkMCxdjFNAeVJBlSGQFJitoog0YpxCM/TS5z1lw2O
+ ayQWoUNXC12WEdY7lV/MUAbrwvBsM9c6lU1p9+7/b5cy3WW4767vt3vzbmEh9sDwY5xt
+ ZqiMOVta0kFJmIGk5eWP3of+8ZhhXRQCy30Qw9dJ73De8q0ZFfKG1ciO9XkrF30xnvLV
+ 6T4rh4hlV4hACBVCojrGVLOyn/OZyhC0nx2QMw/ewzSuh/1Mal+7dDAg1sOSVYq+Zg4Z
+ 694Q==
+X-Gm-Message-State: APjAAAXmVy3+a9hn1w6HXMd7FieAEUTpsA6qVGE0aEU1hHzl+jBEepa5
+ Qg37JoA67LvgsZuP/9fqohGkv9Fd3aPrQ/hyllBl72mmIWknj7MbfwO0nIwKxl6mRegIanPw9Ai
+ 1hf7QmjrCG9A8g8w=
+X-Received: by 2002:a5d:428c:: with SMTP id k12mr9504381wrq.57.1579672319513; 
+ Tue, 21 Jan 2020 21:51:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzJsLnWpbO69m7ffZVTXV+HI3Bj2YrvoXhVtlT4qRybSTj6bD6vJ4e+WbI+gsf2RFn8fJjJ/A==
+X-Received: by 2002:a5d:428c:: with SMTP id k12mr9504361wrq.57.1579672319214; 
+ Tue, 21 Jan 2020 21:51:59 -0800 (PST)
 Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
  by smtp.gmail.com with ESMTPSA id
- p17sm55606443wrx.20.2020.01.21.21.51.49
+ i10sm56700439wru.16.2020.01.21.21.51.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jan 2020 21:51:50 -0800 (PST)
-Date: Wed, 22 Jan 2020 00:51:48 -0500
+ Tue, 21 Jan 2020 21:51:58 -0800 (PST)
+Date: Wed, 22 Jan 2020 00:51:57 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/17] q35: implement 128K SMRAM at default SMBASE address
-Message-ID: <20200122055115.429945-2-mst@redhat.com>
+Subject: [PULL 04/17] acpi: cpuhp: spec: fix 'Command data' description
+Message-ID: <20200122055115.429945-5-mst@redhat.com>
 References: <20200122055115.429945-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200122055115.429945-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: LrByhLWrNPewE7YTwpX4bQ-1
+X-MC-Unique: iw2ccxv8Mg2IAs6DJsBzqg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -93,7 +93,7 @@ Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,261 +105,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-It's not what real HW does, implementing which would be overkill [**]
-and would require complex cross stack changes (QEMU+firmware) to make
-it work.
-So considering that SMRAM is owned by MCH, for simplicity (ab)use
-reserved Q35 register, which allows QEMU and firmware easily init
-and make RAM at SMBASE available only from SMM context.
+Correct returned value description in case 'Command field' =3D=3D 0x0,
+it's not PXM but CPU selector value with pending event
 
-Patch uses commit (2f295167e0 q35/mch: implement extended TSEG sizes)
-for inspiration and uses reserved register in config space at 0x9c
-offset [*] to extend q35 pci-host with ability to use 128K at
-0x30000 as SMRAM and hide it (like TSEG) from non-SMM context.
-
-Usage:
-  1: write 0xff in the register
-  2: if the feature is supported, follow up read from the register
-     should return 0x01. At this point RAM at 0x30000 is still
-     available for SMI handler configuration from non-SMM context
-  3: writing 0x02 in the register, locks SMBASE area, making its contents
-     available only from SMM context. In non-SMM context, reads return
-     0xff and writes are ignored. Further writes into the register are
-     ignored until the system reset.
-
-*) https://www.mail-archive.com/qemu-devel@nongnu.org/msg455991.html
-**) https://www.mail-archive.com/qemu-devel@nongnu.org/msg646965.html
+In addition describe 0 blanket value in case of not supported
+'Command field' value.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1575896942-331151-3-git-send-email-imammedo@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <1575896942-331151-6-git-send-email-imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Laszlo Ersek <lersek@redhat.com>
 ---
- include/hw/pci-host/q35.h | 10 +++++
- hw/i386/pc.c              |  4 +-
- hw/pci-host/q35.c         | 84 +++++++++++++++++++++++++++++++++++----
- 3 files changed, 90 insertions(+), 8 deletions(-)
+ docs/specs/acpi_cpu_hotplug.txt | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-index b3bcf2e632..976fbae599 100644
---- a/include/hw/pci-host/q35.h
-+++ b/include/hw/pci-host/q35.h
-@@ -32,6 +32,7 @@
- #include "hw/acpi/ich9.h"
- #include "hw/pci-host/pam.h"
- #include "hw/i386/intel_iommu.h"
-+#include "qemu/units.h"
+diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
+txt
+index 4e65286ff5..d5108720bf 100644
+--- a/docs/specs/acpi_cpu_hotplug.txt
++++ b/docs/specs/acpi_cpu_hotplug.txt
+@@ -56,9 +56,8 @@ read access:
+            3-7: reserved and should be ignored by OSPM
+     [0x5-0x7] reserved
+     [0x8] Command data: (DWORD access)
+-          in case of error or unsupported command reads is 0xFFFFFFFF
+-          current 'Command field' value:
+-              0: returns PXM value corresponding to device
++          contains 0 unless value last stored in 'Command field' is one of=
+:
++              0: contains 'CPU selector' value of a CPU with pending event=
+[s]
 =20
- #define TYPE_Q35_HOST_DEVICE "q35-pcihost"
- #define Q35_HOST_DEVICE(obj) \
-@@ -54,6 +55,8 @@ typedef struct MCHPCIState {
-     MemoryRegion smram_region, open_high_smram;
-     MemoryRegion smram, low_smram, high_smram;
-     MemoryRegion tseg_blackhole, tseg_window;
-+    MemoryRegion smbase_blackhole, smbase_window;
-+    bool has_smram_at_smbase;
-     Range pci_hole;
-     uint64_t below_4g_mem_size;
-     uint64_t above_4g_mem_size;
-@@ -97,6 +100,13 @@ typedef struct Q35PCIHost {
- #define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY  0xffff
- #define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX    0xfff
-=20
-+#define MCH_HOST_BRIDGE_SMBASE_SIZE            (128 * KiB)
-+#define MCH_HOST_BRIDGE_SMBASE_ADDR            0x30000
-+#define MCH_HOST_BRIDGE_F_SMBASE               0x9c
-+#define MCH_HOST_BRIDGE_F_SMBASE_QUERY         0xff
-+#define MCH_HOST_BRIDGE_F_SMBASE_IN_RAM        0x01
-+#define MCH_HOST_BRIDGE_F_SMBASE_LCK           0x02
-+
- #define MCH_HOST_BRIDGE_PCIEXBAR               0x60    /* 64bit register *=
-/
- #define MCH_HOST_BRIDGE_PCIEXBAR_SIZE          8       /* 64bit register *=
-/
- #define MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT       0xb0000000
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 8054bc4147..a6302a772d 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -93,7 +93,9 @@
- #include "fw_cfg.h"
- #include "trace.h"
-=20
--GlobalProperty pc_compat_4_2[] =3D {};
-+GlobalProperty pc_compat_4_2[] =3D {
-+    { "mch", "smbase-smram", "off" },
-+};
- const size_t pc_compat_4_2_len =3D G_N_ELEMENTS(pc_compat_4_2);
-=20
- GlobalProperty pc_compat_4_1[] =3D {};
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 158d270b9f..6342f73b9f 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -275,20 +275,20 @@ static const TypeInfo q35_host_info =3D {
-  * MCH D0:F0
-  */
-=20
--static uint64_t tseg_blackhole_read(void *ptr, hwaddr reg, unsigned size)
-+static uint64_t blackhole_read(void *ptr, hwaddr reg, unsigned size)
- {
-     return 0xffffffff;
- }
-=20
--static void tseg_blackhole_write(void *opaque, hwaddr addr, uint64_t val,
--                                 unsigned width)
-+static void blackhole_write(void *opaque, hwaddr addr, uint64_t val,
-+                            unsigned width)
- {
-     /* nothing */
- }
-=20
--static const MemoryRegionOps tseg_blackhole_ops =3D {
--    .read =3D tseg_blackhole_read,
--    .write =3D tseg_blackhole_write,
-+static const MemoryRegionOps blackhole_ops =3D {
-+    .read =3D blackhole_read,
-+    .write =3D blackhole_write,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
-     .valid.min_access_size =3D 1,
-     .valid.max_access_size =3D 4,
-@@ -430,6 +430,46 @@ static void mch_update_ext_tseg_mbytes(MCHPCIState *mc=
-h)
-     }
- }
-=20
-+static void mch_update_smbase_smram(MCHPCIState *mch)
-+{
-+    PCIDevice *pd =3D PCI_DEVICE(mch);
-+    uint8_t *reg =3D pd->config + MCH_HOST_BRIDGE_F_SMBASE;
-+    bool lck;
-+
-+    if (!mch->has_smram_at_smbase) {
-+        return;
-+    }
-+
-+    if (*reg =3D=3D MCH_HOST_BRIDGE_F_SMBASE_QUERY) {
-+        pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] =3D
-+            MCH_HOST_BRIDGE_F_SMBASE_LCK;
-+        *reg =3D MCH_HOST_BRIDGE_F_SMBASE_IN_RAM;
-+        return;
-+    }
-+
-+    /*
-+     * default/reset state, discard written value
-+     * which will disable SMRAM balackhole at SMBASE
-+     */
-+    if (pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] =3D=3D 0xff) {
-+        *reg =3D 0x00;
-+    }
-+
-+    memory_region_transaction_begin();
-+    if (*reg & MCH_HOST_BRIDGE_F_SMBASE_LCK) {
-+        /* disable all writes */
-+        pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] &=3D
-+            ~MCH_HOST_BRIDGE_F_SMBASE_LCK;
-+        *reg =3D MCH_HOST_BRIDGE_F_SMBASE_LCK;
-+        lck =3D true;
-+    } else {
-+        lck =3D false;
-+    }
-+    memory_region_set_enabled(&mch->smbase_blackhole, lck);
-+    memory_region_set_enabled(&mch->smbase_window, lck);
-+    memory_region_transaction_commit();
-+}
-+
- static void mch_write_config(PCIDevice *d,
-                               uint32_t address, uint32_t val, int len)
- {
-@@ -456,6 +496,10 @@ static void mch_write_config(PCIDevice *d,
-                        MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE)) {
-         mch_update_ext_tseg_mbytes(mch);
-     }
-+
-+    if (ranges_overlap(address, len, MCH_HOST_BRIDGE_F_SMBASE, 1)) {
-+        mch_update_smbase_smram(mch);
-+    }
- }
-=20
- static void mch_update(MCHPCIState *mch)
-@@ -464,6 +508,7 @@ static void mch_update(MCHPCIState *mch)
-     mch_update_pam(mch);
-     mch_update_smram(mch);
-     mch_update_ext_tseg_mbytes(mch);
-+    mch_update_smbase_smram(mch);
-=20
-     /*
-      * pci hole goes from end-of-low-ram to io-apic.
-@@ -514,6 +559,9 @@ static void mch_reset(DeviceState *qdev)
-                      MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY);
-     }
-=20
-+    d->config[MCH_HOST_BRIDGE_F_SMBASE] =3D 0;
-+    d->wmask[MCH_HOST_BRIDGE_F_SMBASE] =3D 0xff;
-+
-     mch_update(mch);
- }
-=20
-@@ -563,7 +611,7 @@ static void mch_realize(PCIDevice *d, Error **errp)
-     memory_region_add_subregion(&mch->smram, 0xfeda0000, &mch->high_smram)=
-;
-=20
-     memory_region_init_io(&mch->tseg_blackhole, OBJECT(mch),
--                          &tseg_blackhole_ops, NULL,
-+                          &blackhole_ops, NULL,
-                           "tseg-blackhole", 0);
-     memory_region_set_enabled(&mch->tseg_blackhole, false);
-     memory_region_add_subregion_overlap(mch->system_memory,
-@@ -575,6 +623,27 @@ static void mch_realize(PCIDevice *d, Error **errp)
-     memory_region_set_enabled(&mch->tseg_window, false);
-     memory_region_add_subregion(&mch->smram, mch->below_4g_mem_size,
-                                 &mch->tseg_window);
-+
-+    /*
-+     * This is not what hardware does, so it's QEMU specific hack.
-+     * See commit message for details.
-+     */
-+    memory_region_init_io(&mch->smbase_blackhole, OBJECT(mch), &blackhole_=
-ops,
-+                          NULL, "smbase-blackhole",
-+                          MCH_HOST_BRIDGE_SMBASE_SIZE);
-+    memory_region_set_enabled(&mch->smbase_blackhole, false);
-+    memory_region_add_subregion_overlap(mch->system_memory,
-+                                        MCH_HOST_BRIDGE_SMBASE_ADDR,
-+                                        &mch->smbase_blackhole, 1);
-+
-+    memory_region_init_alias(&mch->smbase_window, OBJECT(mch),
-+                             "smbase-window", mch->ram_memory,
-+                             MCH_HOST_BRIDGE_SMBASE_ADDR,
-+                             MCH_HOST_BRIDGE_SMBASE_SIZE);
-+    memory_region_set_enabled(&mch->smbase_window, false);
-+    memory_region_add_subregion(&mch->smram, MCH_HOST_BRIDGE_SMBASE_ADDR,
-+                                &mch->smbase_window);
-+
-     object_property_add_const_link(qdev_get_machine(), "smram",
-                                    OBJECT(&mch->smram), &error_abort);
-=20
-@@ -601,6 +670,7 @@ uint64_t mch_mcfg_base(void)
- static Property mch_props[] =3D {
-     DEFINE_PROP_UINT16("extended-tseg-mbytes", MCHPCIState, ext_tseg_mbyte=
-s,
-                        16),
-+    DEFINE_PROP_BOOL("smbase-smram", MCHPCIState, has_smram_at_smbase, tru=
-e),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
+ write access:
+     offset:
+@@ -81,9 +80,9 @@ write access:
+           value:
+             0: selects a CPU device with inserting/removing events and
+                following reads from 'Command data' register return
+-               selected CPU (CPU selector value). If no CPU with events
+-               found, the current CPU selector doesn't change and
+-               corresponding insert/remove event flags are not set.
++               selected CPU ('CPU selector' value).
++               If no CPU with events found, the current 'CPU selector' doe=
+sn't
++               change and corresponding insert/remove event flags are not =
+modified.
+             1: following writes to 'Command data' register set OST event
+                register in QEMU
+             2: following writes to 'Command data' register set OST status
 --=20
 MST
 
