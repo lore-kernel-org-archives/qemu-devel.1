@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA9CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E8BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:21:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F17121734
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:20:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F17121734
+	by mail.kernel.org (Postfix) with ESMTPS id B759521734
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jan 2020 14:21:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B759521734
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuGsM-0004nS-5V
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:20:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58708)
+	id 1iuGse-0005Nr-O8
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 09:21:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iuGqX-0003DR-W1
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:07 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iuGqu-0003j6-VY
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iuGqW-0005kg-Jy
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:05 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:41803)
+ (envelope-from <laurent@vivier.eu>) id 1iuGqt-0005yb-KF
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:28 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:34571)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGqW-0005k7-An
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:04 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuGqt-0005y9-B3
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 09:19:27 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N4yyQ-1jdTUZ0jkC-010sv1; Wed, 22 Jan 2020 15:18:31 +0100
-Subject: Re: [PATCH v8 01/13] linux-user: Add support for enabling/disabling
- RTC features using ioctls
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MVubb-1j4PiY0kZp-00RuNb; Wed, 22 Jan 2020 15:19:07 +0100
+Subject: Re: [PATCH v8 02/13] linux-user: Add support for getting/setting RTC
+ time and alarm using ioctls
 To: Filip Bozuta <Filip.Bozuta@rt-rk.com>, qemu-devel@nongnu.org
 References: <1579117007-7565-1-git-send-email-Filip.Bozuta@rt-rk.com>
- <1579117007-7565-2-git-send-email-Filip.Bozuta@rt-rk.com>
+ <1579117007-7565-3-git-send-email-Filip.Bozuta@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,35 +83,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <23e04d51-620f-97d8-5a0e-cbd482550f6e@vivier.eu>
-Date: Wed, 22 Jan 2020 15:18:30 +0100
+Message-ID: <24d8110d-5a7a-626d-4ad6-d005a3ec7c84@vivier.eu>
+Date: Wed, 22 Jan 2020 15:19:06 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1579117007-7565-2-git-send-email-Filip.Bozuta@rt-rk.com>
+In-Reply-To: <1579117007-7565-3-git-send-email-Filip.Bozuta@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SoEGkuUJHAbQD6OwT3X5+L/9lywv8yMLZOglR7zs731Vh4c04eJ
- 4ADKMXHyoipRbBRucl43XqxFtCOTA4mkDJAyZfzX/xTXRuowb35iVKLlwrE+RbI/Qv4LQby
- dHG1uOm3/942qfuJcLcrA29a+4GkGOdfPQtOx+K+doBlYvxOodo4zYC8lcbSF63nmDbcUB+
- iT50tpHft0UCd3h/h0zlQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:HTOffc5/JgU=:er+Jafj4aCq6ixwYttX4Bm
- s257qj5AWq/OkIBmkbdAgDaFX9/szdqzbyQUNGpuXtpCC7cvBHabSUqCgciPpfdbSRvUtAggn
- DSKSlIpPh1E1btCVmWIkpVij/tNx+ilVADLV/u5YNopCuronq6sadY64StxsQfptl5DFiqUrh
- ZmOM0GPjdwQkazfFc2BDqIYlqyUsmr6Chu2HkEGFHeLR1GzpkSkFbcmEiSahxj4ak3QLZRwOl
- uj2k9d8zNlzDzouqFe3HMsrL8AiilQWbzrxNrJAPrDuNBZ05IIvBhMDbSRNfZqKAR9r5EDLfj
- nCLJiBL9fcCf4o6VWAt7K7ZXRwjXV4K1I0fgLK7OZs9XotBgwnUHdshH0aYvCUXkRuNAeQTbs
- Ff625BNxkood6xJXvcOebz4OdJH168SjpS92cL51QW18A327XqqUOHKO2kOodpRioh4aDd9k9
- Dw4SlZCugkRno5ZeSjMgMK+ZJ2nPpVq//z8hzpJk3UDcrz9B0pgTysgqE6BW6DsGKvr5D/Edr
- JwRqPSurrsneHuWw8nHebYXPShcM+n2uLhSWyNvYu7On/GuBbP47W52w+7HyK+O9NZC6h1RZr
- +WZ5sArUKKUNlRDHYzKnMwWwhDEu2bM8OANCx7CbOrynW7TgH/byZDlEsA9VTAPIII4iBBbfN
- UxQquGs3LSb8FmVJW4b7XlUfAb1CxeXP4Dx3wRQLpA/fvF1Qo1CmMh2maBzdphyND+kptYOOS
- ZF6QT40bsj4STHG46HnEj11mKVrr3GAYBSkZwVCpYBXRkorRUT30v7zw3pCZPZbxn4B9DAy5W
- PaChhz8NQcVxADtqviZeM8x5NnZs6V0QGaYULkvTZ8zu2lpWOA=
+X-Provags-ID: V03:K1:CrTomKNQtcmJNYZ87LsKWLQL+2di9D7cj7GZ7E5dl5vX/7MT8VQ
+ KTToCGJuEyzcdyXyC7kX+dEyDKLQiiNvu/aiqxnF9F5m7SU56C3Xnhk3HOoKgrCXM770IuJ
+ ZNP6zUDHdiSbPvlxqyIrGFlzm7GSXn+OdypcOOUAfxzdDVRTWMsKGfPaIxao4wXqz5K+hAf
+ kj8hvl+AFOPqAknUg1WUQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:kl7/TFrl/hA=:F66/G06qNwbXLoU6J8gGbe
+ y5ZzWBF+lcCOO4085zVlxrGh6hl6fOmqubYm2qcITg900djWkRkYeuGaX8uxexr3uH5H6rIBl
+ spSddsqK3Fz46Ig51vzMTTQdLC9QPoXu/9wBqZ59FAAieQCM3ePZSGpopeXNUjejNv5jVXG/1
+ hQnPQ7Gg1Nll1wdsTf91AGNz73gtPVMG/e8Lb2XVrHXnlpI3cPPexVyUSuhJgeel54ltC9WPT
+ APKqny9sdallHxQzq8b9hdndLNrIzj8W2NJNhIQWYEzB8fOu/YLnqtGkg20BE2KmC3GfFdLYi
+ LcK1EPeUCUW+kFelXFrB13WMSxvjfZaTFv2+DAhN5Ifi6ty30UM4uoJq8qyGxU37uDE4SPrVx
+ sb4lJ8cIFyPyxp7WDguTBrx1us/yLtx+mLDPbsvMgaHswgTFc484a0nWH2GtDHFoKDf1UcbW9
+ UL3DM8xtZ3yNMLf7encQxQ/ErpwVxhTNR0M0vaxJwo997Qi3C1wJCd/GQJ28j6PQUWVwzZOtH
+ dUr74djuEC3QWyLUV4vg+pYo2rzvcNmwm/6nW3Pv0HtBPIfHEvwP7EMHGNEKsiEZoojdwkdRk
+ RwqdUfg8jS7dbF7EoGzfpnUC5i49sFVzAN2kU2WSbcAQJ2coJUhcuUXaAozkFy5Yy72OX7S7U
+ HozW9f50Jw4KcGIPL2vHNEVpgzqAhs8iMeRkOKTe5vexq9Nx14nKguuqIpNLFeLXMhh7rgYvZ
+ notH5GfJpLPXOCZn2aiOmZfPjmD1bT5RacWBxsUYTZt8qxI0yYyU7X/KM+BA0CZzSZFn3Hq2E
+ aZq2LK5qpNR9cT3xebSrN5MOMYS8kajF0E0tts4/KsEIMv3FRxGhVvgrNTRorJ7xH8TkoL/
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.73
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,105 +133,110 @@ Sender: "Qemu-devel"
 Le 15/01/2020 à 20:36, Filip Bozuta a écrit :
 > This patch implements functionalities of following ioctls:
 > 
-> RTC_AIE_ON, RTC_AIE_OFF - Alarm interrupt enabling on/off
+> RTC_RD_TIME - Getting RTC time
 > 
->     Enable or disable the alarm interrupt, for RTCs that support
->     alarms.  The third ioctl's argument is ignored.
+>     Returns this RTC's time in the following structure:
 > 
-> RTC_UIE_ON, RTC_UIE_OFF - Update interrupt enabling on/off
+>         struct rtc_time {
+>             int tm_sec;
+>             int tm_min;
+>             int tm_hour;
+>             int tm_mday;
+>             int tm_mon;
+>             int tm_year;
+>             int tm_wday;     /* unused */
+>             int tm_yday;     /* unused */
+>             int tm_isdst;    /* unused */
+>         };
 > 
->     Enable or disable the interrupt on every clock update, for
->     RTCs that support this once-per-second interrupt. The third
->     ioctl's argument is ignored.
+>     The fields in this structure have the same meaning and ranges
+>     as the tm structure described in gmtime man page. A pointer
+>     to this structure should be passed as the third ioctl's argument.
 > 
-> RTC_PIE_ON, RTC_PIE_OFF - Periodic interrupt enabling on/off
+> RTC_SET_TIME - Setting RTC time
 > 
->     Enable or disable the periodic interrupt, for RTCs that sup‐
->     port these periodic interrupts. The third ioctl's argument
->     is ignored. Only a privileged process (i.e., one having the
->     CAP_SYS_RESOURCE capability) can enable the periodic interrupt
->     if the frequency is currently set above the value specified in
->     /proc/sys/dev/rtc/max-user-freq.
+>     Sets this RTC's time to the time specified by the rtc_time
+>     structure pointed to by the third ioctl's argument. To set
+>     the RTC's time the process must be privileged (i.e., have the
+>     CAP_SYS_TIME capability).
 > 
-> RTC_WIE_ON, RTC_WIE_OFF - Watchdog interrupt enabling on/off
+> RTC_ALM_READ, RTC_ALM_SET - Getting/Setting alarm time
 > 
->     Enable or disable the Watchdog interrupt, for RTCs that sup-
->     port this Watchdog interrupt. The third ioctl's argument is
->     ignored.
+>     Read and set the alarm time, for RTCs that support alarms.
+>     The alarm interrupt must be separately enabled or disabled
+>     using the RTC_AIE_ON, RTC_AIE_OFF requests. The third
+>     ioctl's argument is a pointer to a rtc_time structure. Only
+>     the tm_sec, tm_min, and tm_hour fields of this structure are
+>     used.
 > 
 > Implementation notes:
 > 
->     Since all of involved ioctls have NULL as their third argument,
->     their implementation was straightforward.
-> 
->     The line '#include <linux/rtc.h>' was added to recognize
->     preprocessor definitions for these ioctls. This needs to be
->     done only once in this series of commits. Also, the content
->     of this file (with respect to ioctl definitions) remained
->     unchanged for a long time, therefore there is no need to
->     worry about supporting older Linux kernel version.
+>     All ioctls in this patch have pointer to a structure rtc_time
+>     as their third argument. That is the reason why corresponding
+>     definition is added in linux-user/syscall_types.h. Since all
+>     elements of this structure are of type 'int', the rest of the
+>     implementation is straightforward.
 > 
 > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 > ---
->  linux-user/ioctls.h       |  9 +++++++++
->  linux-user/syscall.c      |  1 +
->  linux-user/syscall_defs.h | 10 ++++++++++
->  3 files changed, 20 insertions(+)
+>  linux-user/ioctls.h        |  4 ++++
+>  linux-user/syscall_defs.h  |  4 ++++
+>  linux-user/syscall_types.h | 11 +++++++++++
+>  3 files changed, 19 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index c6b9d6a..97741c7 100644
+> index 97741c7..f472794 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -69,6 +69,15 @@
->       IOCTL(KDSETLED, 0, TYPE_INT)
->       IOCTL_SPECIAL(KDSIGACCEPT, 0, do_ioctl_kdsigaccept, TYPE_INT)
+> @@ -77,6 +77,10 @@
+>       IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
+>       IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
+>       IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
+> +     IOCTL(RTC_ALM_READ, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
+> +     IOCTL(RTC_ALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
+> +     IOCTL(RTC_RD_TIME, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
+> +     IOCTL(RTC_SET_TIME, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
 >  
-> +     IOCTL(RTC_AIE_ON, 0, TYPE_NULL)
-> +     IOCTL(RTC_AIE_OFF, 0, TYPE_NULL)
-> +     IOCTL(RTC_UIE_ON, 0, TYPE_NULL)
-> +     IOCTL(RTC_UIE_OFF, 0, TYPE_NULL)
-> +     IOCTL(RTC_PIE_ON, 0, TYPE_NULL)
-> +     IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
-> +     IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
-> +     IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
-> +
 >       IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
 >       IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
->       IOCTL(BLKRRPART, 0, TYPE_NULL)
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index ce399a5..74c3c08 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -107,6 +107,7 @@
->  #include <netpacket/packet.h>
->  #include <linux/netlink.h>
->  #include <linux/if_alg.h>
-> +#include <linux/rtc.h>
->  #include "linux_loop.h"
->  #include "uname.h"
->  
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 98c2119..f91579a 100644
+> index f91579a..f0bf09d 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -763,6 +763,16 @@ struct target_pollfd {
->  #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
->  #define TARGET_KDSIGACCEPT     0x4B4E
+> @@ -772,6 +772,10 @@ struct target_pollfd {
+>  #define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
+>  #define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
+>  #define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
+> +#define TARGET_RTC_ALM_READ         TARGET_IOR('p', 0x08, struct rtc_time)
+> +#define TARGET_RTC_ALM_SET          TARGET_IOW('p', 0x07, struct rtc_time)
+> +#define TARGET_RTC_RD_TIME          TARGET_IOR('p', 0x09, struct rtc_time)
+> +#define TARGET_RTC_SET_TIME         TARGET_IOW('p', 0x0a, struct rtc_time)
 >  
-> +/* real time clock ioctls */
-> +#define TARGET_RTC_AIE_ON           TARGET_IO('p', 0x01)
-> +#define TARGET_RTC_AIE_OFF          TARGET_IO('p', 0x02)
-> +#define TARGET_RTC_UIE_ON           TARGET_IO('p', 0x03)
-> +#define TARGET_RTC_UIE_OFF          TARGET_IO('p', 0x04)
-> +#define TARGET_RTC_PIE_ON           TARGET_IO('p', 0x05)
-> +#define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
-> +#define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
-> +#define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
-> +
 >  #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
 >         defined(TARGET_XTENSA)
->  #define TARGET_FIOGETOWN       TARGET_IOR('f', 123, int)
+> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+> index 4e36983..a35072a 100644
+> --- a/linux-user/syscall_types.h
+> +++ b/linux-user/syscall_types.h
+> @@ -255,6 +255,17 @@ STRUCT(blkpg_partition,
+>         MK_ARRAY(TYPE_CHAR, BLKPG_DEVNAMELTH), /* devname */
+>         MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
+>  
+> +STRUCT(rtc_time,
+> +       TYPE_INT, /* tm_sec */
+> +       TYPE_INT, /* tm_min */
+> +       TYPE_INT, /* tm_hour */
+> +       TYPE_INT, /* tm_mday */
+> +       TYPE_INT, /* tm_mon */
+> +       TYPE_INT, /* tm_year */
+> +       TYPE_INT, /* tm_wday */
+> +       TYPE_INT, /* tm_yday */
+> +       TYPE_INT) /* tm_isdst */
+> +
+>  STRUCT(blkpg_ioctl_arg,
+>         TYPE_INT, /* op */
+>         TYPE_INT, /* flags */
 > 
 
 Applied to my linux-user branch.
