@@ -2,79 +2,77 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8B0C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47978C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:09:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49C362253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:08:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10AA62253D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:09:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2P3ye9M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C362253D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4xLt5Q0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10AA62253D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubI2-00041H-VY
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:08:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35656)
+	id 1iubIw-0005XD-Jw
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:09:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35587)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuasR-0006Iy-QG
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:24 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuasN-0006C3-VU
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuasQ-0004Xu-Rw
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53858
+ (envelope-from <imammedo@redhat.com>) id 1iuasM-0004VY-Mt
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60105
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuasQ-0004Xm-Od
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:22 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuasM-0004Un-Jh
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779742;
+ s=mimecast20190719; t=1579779736;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xIXPLjVlQwCxTpnHTQXJxzDVBIqJT9Y1zzNQZLC8wcg=;
- b=X2P3ye9Mqsbj9MTa35Wg3HDhURTUVbLmgH+SihEazChC2AlIWX/s1Tq7UzxKXMn0OyDzBI
- rFn3gx4Lah5JvxKWyctdKO6KC0n78DfzfYZ+TYy8kIiaTNrV3gR0R8YqhGoSNAZNfh199x
- mPkqBqF7Mqa6ee4HJShPRkih3DNbTKY=
+ bh=SX085jJowBIOhfkapAD0OA+rJwwYPHNqd3f3zfCoRZs=;
+ b=S4xLt5Q0ZrBs9RZbYTGURMnA2FxaGGnWtVwzYgmrcdEAXDhzTSZEC5GOIc0Nu3cAHaH0pS
+ EZuB9vwbjYkWhOwZ2LAE2mHANXLqvjuS0TRTtlL2YcGIOF3W7Hjr+abGMcdRYINWzGXTXM
+ 7Ev9oND/kqzG2eiidvsQwOqIO/s+gHo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-51Kqh7CpNv6h7yAQpOTSMw-1; Thu, 23 Jan 2020 06:42:21 -0500
+ us-mta-204-BloihjZEM7-uYuOE57y6cw-1; Thu, 23 Jan 2020 06:42:12 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D4721800D48
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:42:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F4F610120AE;
+ Thu, 23 Jan 2020 11:42:11 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A755310016EB
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:42:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 605FD10842B0;
+ Thu, 23 Jan 2020 11:42:10 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 37/80] null-machine: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:38:02 +0100
-Message-Id: <1579779525-20065-38-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 32/80] arm/xilinx_zynq: drop RAM size fixup
+Date: Thu, 23 Jan 2020 12:37:57 +0100
+Message-Id: <1579779525-20065-33-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 51Kqh7CpNv6h7yAQpOTSMw-1
+X-MC-Unique: BloihjZEM7-uYuOE57y6cw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,51 +84,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alistair@alistair23.me,
+ edgar.iglesias@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+If user provided non-sense RAM size, board will complain and
+continue running with max RAM size supported.
+Also RAM is going to be allocated by generic code, so it won't be
+possible for board to fix things up for user.
+
+Make it error message and exit to force user fix CLI,
+instead of accepting non-sense CLI values.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/core/null-machine.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+CC: peter.maydell@linaro.org
+CC: qemu-arm@nongnu.org
+CC: edgar.iglesias@gmail.com
+CC: alistair@alistair23.me
+---
+ hw/arm/xilinx_zynq.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index 1aa0a9a..cb47d9d 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -32,11 +32,8 @@ static void machine_none_init(MachineState *mch)
-     }
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 3a0fa5b..df950fc 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -158,7 +158,6 @@ static inline void zynq_init_spi_flashes(uint32_t base_=
+addr, qemu_irq irq,
 =20
-     /* RAM at address zero */
--    if (mch->ram_size) {
--        MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+ static void zynq_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
+     ARMCPU *cpu;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+     MemoryRegion *ext_ram =3D g_new(MemoryRegion, 1);
+@@ -168,6 +167,12 @@ static void zynq_init(MachineState *machine)
+     qemu_irq pic[64];
+     int n;
+=20
++    /* max 2GB ram */
++    if (machine->ram_size > 0x80000000) {
++        error_report("RAM size more than %d is not supported", 0x80000000)=
+;
++        exit(EXIT_FAILURE);
++    }
++
+     cpu =3D ARM_CPU(object_new(machine->cpu_type));
+=20
+     /* By default A9 CPUs have EL3 enabled.  This board does not
+@@ -184,14 +189,9 @@ static void zynq_init(MachineState *machine)
+                             &error_fatal);
+     object_property_set_bool(OBJECT(cpu), true, "realized", &error_fatal);
+=20
+-    /* max 2GB ram */
+-    if (ram_size > 0x80000000) {
+-        ram_size =3D 0x80000000;
+-    }
 -
--        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_si=
-ze);
--        memory_region_add_subregion(get_system_memory(), 0, ram);
-+    if (mch->ram) {
-+        memory_region_add_subregion(get_system_memory(), 0, mch->ram);
-     }
+     /* DDR remapped to address zero.  */
+     memory_region_allocate_system_memory(ext_ram, NULL, "zynq.ext_ram",
+-                                         ram_size);
++                                         machine->ram_size);
+     memory_region_add_subregion(address_space_mem, 0, ext_ram);
 =20
-     if (mch->kernel_filename) {
-@@ -52,6 +49,7 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->init =3D machine_none_init;
-     mc->max_cpus =3D 1;
-     mc->default_ram_size =3D 0;
-+    mc->default_ram_id =3D "ram";
- }
+     /* 256K of on-chip memory */
+@@ -300,7 +300,7 @@ static void zynq_init(MachineState *machine)
+     sysbus_connect_irq(busdev, 0, pic[40 - IRQ_OFFSET]);
+     sysbus_mmio_map(busdev, 0, 0xF8007000);
 =20
- DEFINE_MACHINE("none", machine_none_machine_init)
+-    zynq_binfo.ram_size =3D ram_size;
++    zynq_binfo.ram_size =3D machine->ram_size;
+     zynq_binfo.nb_cpus =3D 1;
+     zynq_binfo.board_id =3D 0xd32;
+     zynq_binfo.loader_start =3D 0;
 --=20
 2.7.4
 
