@@ -2,82 +2,62 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E62C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C648C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FCEB24125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:28:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZsS3MsuD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FCEB24125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0EADB24125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:32:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EADB24125
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuZif-0002BI-Hl
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:28:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40836)
+	id 1iuZmL-0003iT-82
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:32:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iuZhs-0001jd-5y
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:27:25 -0500
+ (envelope-from <groug@kaod.org>) id 1iuZlg-0003JA-OE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:31:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iuZhq-0004hU-Nd
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:27:24 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57202
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1iuZlf-0000Xq-8l
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:31:20 -0500
+Received: from 19.mo4.mail-out.ovh.net ([87.98.179.66]:60390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iuZhq-0004h6-JH
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:27:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579775242;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=flblt3mbOJxMrL/syVcaKF/9GxAXlaSvW5i1MYU7pRk=;
- b=ZsS3MsuDO5HZrlxNWgsm44Z67Oqop1x51nwt3JJlv2JlKrIVIEL1wGcjEByA++6NdIYqQR
- PPw0TZyatCOOtC7X7iWyMDSAYXnyZ/yxeziRZoa68Lo3+kzbTZ9xrHTZSeK7Aix5YOcQyl
- s80TKHBm/bh5nxepk1s+EV45GGOacnw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-E1y0yfMQPsqulBrVLhykSA-1; Thu, 23 Jan 2020 05:27:18 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFF55107ACC5;
- Thu, 23 Jan 2020 10:27:16 +0000 (UTC)
-Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0950E5C296;
- Thu, 23 Jan 2020 10:27:08 +0000 (UTC)
-Date: Thu, 23 Jan 2020 10:27:05 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: Making QEMU easier for management tools and applications
-Message-ID: <20200123102705.GC657556@redhat.com>
-References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
- <20191224130035.GC2710539@redhat.com>
- <a95b7572-d863-bc88-66aa-3beed679cefe@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuZle-0000KS-TL
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:31:19 -0500
+Received: from player763.ha.ovh.net (unknown [10.108.16.182])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3D97C214FB9
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:31:07 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player763.ha.ovh.net (Postfix) with ESMTPSA id 2CE83E88957E;
+ Thu, 23 Jan 2020 10:31:04 +0000 (UTC)
+Date: Thu, 23 Jan 2020 11:30:58 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v4 06/11] tests/virtio-9p: added splitted readdir test
+Message-ID: <20200123113058.17e2c88d@bahia.lan>
+In-Reply-To: <17952898.t909x8hp7r@silver>
+References: <cover.1579567019.git.qemu_oss@crudebyte.com>
+ <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
+ <20200122221905.055f9f93@bahia.lan> <17952898.t909x8hp7r@silver>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <a95b7572-d863-bc88-66aa-3beed679cefe@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: E1y0yfMQPsqulBrVLhykSA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 8496322174974335296
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddvgddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejieefrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 87.98.179.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,95 +69,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 22, 2020 at 05:42:10PM -0500, John Snow wrote:
->=20
->=20
-> On 12/24/19 8:00 AM, Daniel P. Berrang=C3=A9 wrote:
-> > Based on experiance in libvirt, this is an even larger job than (4),
-> > as the feature set here is huge.  Much of it directly ties into the
-> > config problem, as to deal with SELinux / namespace setup the code
-> > needs to understand what resources to provide access to. This
-> > requires a way to express 100% coverage of all QEMU configuration
-> > in use & analyse it to determine what resources it implies. So this
-> > ties strongly into QAPI-ification completion.
->=20
-> Is it totally bonkers to suggest that QEMU provide a method of digesting
-> a given configuration and returning a configuration object that a
-> standalone jailer can use?
->=20
-> So we have a QEMU manager, the generic jailer, and QEMU. QEMU and the
-> manager cooperate to produce the jailing configuration, and the jailer
-> does what we ask it to.
+On Wed, 22 Jan 2020 23:36:22 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-It isn't clear what you mean by "QEMU" here. If this QEMU, the system
-emulator process, then this is the untrustworthy part of the stack,
-so the jailer must not use any data that QEMU is providing. In fact
-during startup the jailer does its work before QEMU even exists.
+> On Mittwoch, 22. Januar 2020 22:19:05 CET Greg Kurz wrote:
+> > On Tue, 21 Jan 2020 01:16:21 +0100
+> > 
+> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > > The previous, already existing readdir test simply used a 'count'
+> > > parameter big enough to retrieve all directory entries with a
+> > > single Treaddir request.
+> > > 
+> > > In this new 'splitted' readdir test, directory entries are
+> > > retrieved, splitted over several Treaddir requests by picking small
+> > > 'count' parameters which force the server to truncate the response.
+> > > So the test client sends as many Treaddir requests as necessary to
+> > > get all directory entries. Currently this test covers actually two
+> > > tests: a sequence of Treaddir requests with count=512 and then a
+> > > subsequent test with a sequence of Treaddir requests with count=256.
+> > > 
+> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > > ---
+> > 
+> > Not sure it is really needed to check with multiple values for 'count',
+> > but it doesn't eat too many cycles so I guess it doesn't hurt.
+> 
+> Yes, it is a cheap test, nobody will feel the difference. One could argue 
+> about the precise 'count' values being used ...
+> 
+> > 
+> > Applied as well.
+> > 
+> > >  tests/qtest/virtio-9p-test.c | 91 ++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 91 insertions(+)
+> > > 
+> > > diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> > > index 2167322985..8b0d94546e 100644
+> > > --- a/tests/qtest/virtio-9p-test.c
+> > > +++ b/tests/qtest/virtio-9p-test.c
+> > > @@ -578,6 +578,7 @@ static bool fs_dirents_contain_name(struct V9fsDirent
+> > > *e, const char* name)> 
+> > >      return false;
+> > >  
+> > >  }
+> > > 
+> > > +/* basic readdir test where reply fits into a single response message */
+> > > 
+> > >  static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
+> > >  {
+> > >  
+> > >      QVirtio9P *v9p = obj;
+> > > 
+> > > @@ -631,6 +632,95 @@ static void fs_readdir(void *obj, void *data,
+> > > QGuestAllocator *t_alloc)> 
+> > >      g_free(wnames[0]);
+> > >  
+> > >  }
+> > > 
+> > > +/* readdir test where overall request is splitted over several messages
+> > > */
+> > > +static void fs_readdir_split(void *obj, void *data, QGuestAllocator
+> > > *t_alloc) +{
+> > > +    QVirtio9P *v9p = obj;
+> > > +    alloc = t_alloc;
+> > > +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
+> > > +    uint16_t nqid;
+> > > +    v9fs_qid qid;
+> > > +    uint32_t count, nentries, npartialentries;
+> > > +    struct V9fsDirent *entries, *tail, *partialentries;
+> > > +    P9Req *req;
+> > > +    int subtest;
+> > > +    int fid;
+> > > +    uint64_t offset;
+> > > +    /* the Treaddir 'count' parameter values to be tested */
+> > > +    const uint32_t vcount[] = { 512, 256 };
+> 
+> ... here. But IMO it does make sense preserving the function's overall 
+> structure to allow testing with different 'count' values if necessary. Because 
+> that way this test could e.g. guard potential bugs when server's Treaddir 
+> handler is rolling back (or not) the dir offset for instance, which server has 
+> to do (or not) according to this 'count' value and the precise file name 
+> length of the individual directory entries.
+> 
 
-There are aspects to the confinement that use / rely on knowledge that
-QEMU doesn't normally have, or are expressed in a different way that
-which QEMU uses, or needs to take a different imlpementation approach to
-that which QEMU normally has.
+I still agree it is useful to be able to check different values but I
+now realize that it shouldn't be done like this because adding new
+values to vcount[] doesn't scale well with the MAX_REQ limitation I
+mentioned in another mail. More values, especially small ones, are
+likely to trigger "Failed to decode VirtFS request type 40" at some
+point. 
 
-For networking, for example, from QEMU's config POV, there's just a
-TAP file descriptor. There are then a huge number of ways in which
-that TAP FD has been connected to the network in the host that are
-invisible to QEMU. Plain bridge, openvswitch bridge, macvtap device
-all with varying configs. Knowledge of this is relevant to the manager
-process and the jailer but irrelevant to QEMU.
+I now think that fs_readdir_split() should rather get count as
+an argument and only do one run. By default we would only call
+this with an appropriate value, ideally derived from the test
+environment (number of files, size of filenames... etc...).
+If someone needs to test a specific value, it is easy as adding
+a new qos_add_test() line.
 
-When configuring disks we have technical issues. For example we need
-to identify the full backing chain and grant the appropriate permissions
-on this. Even if there was a libqemublock.so, libvirt would not use this
-because the QEMU storage code design is not reliable & minimal enough.
-For example to just query the backing file, QEMU opens the qcow2 and
-parses all the data about it, building up L1/L2 tables, and other
-data structures involved. It is trivial to create qcow2 files which
-result in both memory and CPU denial of service merely from opening
-the file.  Libvirt's approach to this is minimalist just having a
-data table of offsets to the key fields in each file format. So we
-can extract the backing file & its format without reading anything
-else from the disk.
+This would ensure at least that each run starts with the same
+fixed number of possible requests, ie. MAX_REQ minus the cost of
+fs_attach().
 
-When configuring chardevs there is a choice of how to do it - we
-could just pass the UNIX socket path in, or we could create the
-UNIX socket ourselves & pass in the pre-opened FD. Both are equally
-functional from QEMU's POV and the end user's POV, but passing a
-pre-opened FD is more convenient for libvirt's needs as it allowed
-for race-free startups sychronization between libvirt & QEMU, or
-rather QMP.  The different options here though, have different
-needs on the jailer, because extra steps are needed when passing
-pre-opened FD to get the SELinux labelling right. QEMU doesn't
-know which approach the mgmt app will want to take, so we can't
-ask QEMU how the jailer should be configured - the mgmt app needs
-to make that decision.
+So I'll revert this patch for now.
 
-Essentially we have 2 configuration formats - the high level one
-that the mgmt app layer uses & the low level one that QEMU uses.
-The component in the stack which maps between the two config
-formats, is that one that has the knowledge to configure the
-jailer. This isn't QEMU. It is whatever is immediately above QEMU,
-currently libvirt, but something conceptually equivalent to the
-role libvirt's QEMU driver impl fills.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+> Whatever precise 'count' tests are desired, it would only mean a one line 
+> change here.
+> 
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
 
 
