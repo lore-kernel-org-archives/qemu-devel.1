@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC56DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:15:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A65EFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:16:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 771E320704
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:15:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7151D20704
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:16:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+Y7okPd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 771E320704
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cWZ9XkAq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7151D20704
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iug50-0002rs-VI
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:15:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53172)
+	id 1iug5x-00046W-1o
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:16:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52691)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iucuf-0001oe-BT
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:50 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iuctp-0000Si-4d
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iucue-0001R0-8r
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35060
+ (envelope-from <pbonzini@redhat.com>) id 1iucto-0000NK-1P
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32663
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iucud-0001Qd-W4
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:48 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuctn-0000M3-UN
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579787567;
+ s=mimecast20190719; t=1579787515;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bIJKW7r6m3lfEsrrQFwr4hlFi3X2sjt8/eoVtOOO/2M=;
- b=c+Y7okPdE25gXeYvJdk/Em0B0Sfn3SbzLQc5LDeH/BxWlX0OeFlj+9kEwJIVob0Se2DWkO
- Mzl/yEwPzJIaPNL8H7JCA5NR9ki6/xRnE4+L6vVLO65p4s5GNArYpGQkSvjSZwkyTeqaxu
- jvFLTRTmzXTpcL1+/Z3IMjjg4qp0+io=
+ bh=fhWeL2ADPT5bDg7/jmj0T6OuctAf6BKtCLK+BXLaiNI=;
+ b=cWZ9XkAq9ImSW/nN6EmOdBjIRMAqJWGasQqsv1vxDrVbuEaJcI5EwYcHE/UnV6ycMj4AJu
+ 3+7onYjrcsrxXiUjXw8m+ditbKKh1cq4ja1oqPb1SGHxycyAcGCIrTJjHs6FiHzR06dDRh
+ Uu4W0LhFqJzqOTgqI56+a/n/IXXhiZM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-JvTf-q1pOWO2_vnm09GUrQ-1; Thu, 23 Jan 2020 08:52:46 -0500
+ us-mta-394-x_LqWXKjOuuAZoip8sIFhw-1; Thu, 23 Jan 2020 08:51:54 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3159199116
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:52:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 463F46C199
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:51:53 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2FE871CB;
- Thu, 23 Jan 2020 13:52:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBDE6857A5;
+ Thu, 23 Jan 2020 13:51:50 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 56/59] qdev: use object_property_help()
-Date: Thu, 23 Jan 2020 14:50:46 +0100
-Message-Id: <1579787449-27599-57-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 28/59] accel: Introduce the current_accel() wrapper
+Date: Thu, 23 Jan 2020 14:50:18 +0100
+Message-Id: <1579787449-27599-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
 References: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: JvTf-q1pOWO2_vnm09GUrQ-1
+X-MC-Unique: x_LqWXKjOuuAZoip8sIFhw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -85,78 +85,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Use the common function introduced earlier, and report default value.
+The accel/ code only accesses the MachineState::accel field.
+As we simply want to access the accelerator, not the machine,
+add a current_accel() wrapper.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200110153039.1379601-27-marcandre.lureau@redhat.com>
-[Sort the properties, following what is done for -object ...,help. - Paolo]
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20200121110349.25842-9-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qdev-monitor.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ accel/accel.c          | 5 +++++
+ include/sysemu/accel.h | 2 ++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index c929262..8ce71a2 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -37,6 +37,7 @@
- #include "sysemu/sysemu.h"
- #include "migration/misc.h"
- #include "migration/migration.h"
-+#include "qemu/cutils.h"
+diff --git a/accel/accel.c b/accel/accel.c
+index 1c5c3a6..cb555e3 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -63,6 +63,11 @@ int accel_init_machine(AccelState *accel, MachineState *=
+ms)
+     return ret;
+ }
 =20
- /*
-  * Aliases were a bad idea from the start.  Let's keep them
-@@ -256,6 +257,8 @@ int qdev_device_help(QemuOpts *opts)
-     const char *driver;
-     ObjectPropertyInfoList *prop_list;
-     ObjectPropertyInfoList *prop;
-+    GPtrArray *array;
-+    int i;
++AccelState *current_accel(void)
++{
++    return current_machine->accelerator;
++}
++
+ void accel_setup_post(MachineState *ms)
+ {
+     AccelState *accel =3D ms->accelerator;
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index d4c1429..47e5788 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -70,4 +70,6 @@ int accel_init_machine(AccelState *accel, MachineState *m=
+s);
+ /* Called just before os_setup_post (ie just before drop OS privs) */
+ void accel_setup_post(MachineState *ms);
 =20
-     driver =3D qemu_opt_get(opts, "driver");
-     if (driver && is_help_option(driver)) {
-@@ -285,19 +288,20 @@ int qdev_device_help(QemuOpts *opts)
-     } else {
-         qemu_printf("There are no options for %s.\n", driver);
-     }
-+    array =3D g_ptr_array_new();
-     for (prop =3D prop_list; prop; prop =3D prop->next) {
--        int len;
--        qemu_printf("  %s=3D<%s>%n", prop->value->name, prop->value->type,=
- &len);
--        if (prop->value->has_description) {
--            if (len < 24) {
--                qemu_printf("%*s", 24 - len, "");
--            }
--            qemu_printf(" - %s\n", prop->value->description);
--        } else {
--            qemu_printf("\n");
--        }
--    }
--
-+        g_ptr_array_add(array,
-+                        object_property_help(prop->value->name,
-+                                             prop->value->type,
-+                                             prop->value->default_value,
-+                                             prop->value->description));
-+    }
-+    g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp0);
-+    for (i =3D 0; i < array->len; i++) {
-+        printf("%s\n", (char *)array->pdata[i]);
-+    }
-+    g_ptr_array_set_free_func(array, g_free);
-+    g_ptr_array_free(array, true);
-     qapi_free_ObjectPropertyInfoList(prop_list);
-     return 1;
-=20
++AccelState *current_accel(void);
++
+ #endif
 --=20
 1.8.3.1
 
