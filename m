@@ -7,75 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755B6C32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A642C32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B24C24125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:20:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A93D21835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:21:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WG27qCDA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B24C24125
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bJTqS4LA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A93D21835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuQEe-0002vs-6f
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:20:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54769)
+	id 1iuQFX-0003fC-2M
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:21:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54866)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPzY-0002Et-TA
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:09 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzi-0002IO-LP
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPzP-0002FH-WA
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:59 -0500
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:40055)
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzZ-0002LA-Re
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:09 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:38423)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iuPzO-0002CM-2j
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:50 -0500
-Received: by mail-pl1-f172.google.com with SMTP id s21so516727plr.7
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:04:47 -0800 (PST)
+ id 1iuPzZ-0002Kz-Lf
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:01 -0500
+Received: by mail-pf1-f195.google.com with SMTP id x185so615368pfc.5
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:05:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=a+ohCuWxChJ09Cd0wwMggUAUlrmcUhoiEbuSt9zP5do=;
- b=WG27qCDA3EFixmDjA6MQ0YHNDMLOxOLLaImMYYB+j6djNP/U+CGbLKPvp9nmNDgUG+
- NHVrNvWJ7mIhXcE0zmQo8hGsa4GVDGUEq/y2lmo2rSddv8zVbqJzDRWDeWUOrdBSfbbV
- 0rWCW7hWlRap+9Cy7U5zAM5cCOtH7CFxG90YYcTgg6IsAWibCxW9uAzWXNHr/ERfZpZa
- 8rmCd4FemgveG5X2zu3SKM90jWMX6M7+ldmxO4C+SjrIHwBrN5lokEx9oENwdKYQ3MlB
- Os6/A5g48twz1dEnWyEt+lNbG/nyeHC/0/3jleGi/M0egzPi5zf5ApZckGUvJbobNuVT
- VKkw==
+ bh=zvq+Ll0OMhGkeTT4nxRG0eqc6IV0o3wiUiAqy9VRhew=;
+ b=bJTqS4LA1A8MVdsHkoi16Putg4JfpuR+BuFYOHUy7bd7Q8OeFqtwQHVjpx+QJ4TAP8
+ pouQItys7bJq5QJpaqwiTczAPnbXXNO7TeKDZrtvRzLoY1zYBRzcKB3mFOO06Q2ew4v/
+ s4mtnSiHk0l/yHN2o9PV0vXUWdXf9Q8Ws6x82j5o3PunFM96RmxiMKEy9J+sVl6qFPeo
+ Xriot1TygdW839qC85ejxXu/6BwqoFpPXRcn5b5lLLSri4JQw8njS+WReH9UY+Y+erhu
+ rcGM/IlVUapLJai6ec7+F1vqkP7vTI8CN4STBo1ql6QkIjc2trbZKdjXLNupy0FD9E3l
+ zfyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=a+ohCuWxChJ09Cd0wwMggUAUlrmcUhoiEbuSt9zP5do=;
- b=unILoIOvLAz8L0TPM6WUXLGXK949OAbqYZARTMiHgTmk0prV8y4W3pWC24lsnzvhcd
- 3JytaXF7oaBSK1HM9hlX4KslCTtyub0yhJCDjrOWb49JSerXnxB0s20Hjpu2AkykRFAT
- kN837YjYz67F/hYWAD0LuEuHTo4QQtwpg6agrTMVU4QLmdWBuvnvGxvT6GAY76K4e/32
- U0WSTN5Kp+fJmAUa6O2bVI2A11FEKtoJ2+TCrIkqnHiv5WvXMMAnAMA080WD3FD9LPY/
- 8EI9pa2ZW4v3++pAwcwjeebo2ZLX7MYWYlvcKeiAM1ffrK45GG1gLQJ0T3MzqQNVQmry
- G9pg==
-X-Gm-Message-State: APjAAAWhjKN7dpdsJcBppLQ3Vf188RWi19lx5TGoB6HikbFlz+bk2oj6
- hFX0tBwcNOwV3MCo1ztrH+4x0lctbC4=
-X-Google-Smtp-Source: APXvYqx7Vlamp/acI4jmw2OsVIMgWyd+Q1R59i4M78UWsAMi1hizzeSv888DYL7WsPAyPq7sKgelYA==
-X-Received: by 2002:a17:902:758c:: with SMTP id
- j12mr6986004pll.33.1579737826764; 
- Wed, 22 Jan 2020 16:03:46 -0800 (PST)
+ bh=zvq+Ll0OMhGkeTT4nxRG0eqc6IV0o3wiUiAqy9VRhew=;
+ b=mX4UkbXZ8HQstHIW2YKxd6JqEHm9elfi8Vq6+NHDGUq/slj6F7phlr6ttpa22rTgZL
+ PqRBKtdGUfGCuroo194BhbMEp5WpNQ4wGm4nD5bWaHNHDiwvxehC/jui7/WYbLPRPJBH
+ 2UZgV5wz9uZpXYv0zC8+tJ5uTm/SaXnKqqFsjgn6DSdmlhzlx/ZgkUW3dAyl5PwefMs7
+ z3Z6ODwLGYXWNlKP2yRB5ePC5qIpBvPZrrf4yfu5EfjLASZR9TwRgEy/XmnKdobxE/Ob
+ sZZ6ZcBilshHXWGQgcSnKaiyK94QmwJz3ek9x41oWNRXNDxzldOfnzrrTTZJyCcxuPIQ
+ pVFw==
+X-Gm-Message-State: APjAAAWdXpdRHCN1w9f5y398JRYaCCZ6pwAmh/mHN8qhGjn/sLyPLL1s
+ zzVrFUuvbXhvhtF/zVLPfq0KB5OcmeQ=
+X-Google-Smtp-Source: APXvYqwnxiV3tZ7Vms0RUI215SYPIYvVOlcZaANAvzEkqKywqTpnqm3gSBSQZ02/xt0S4D/kzgChPw==
+X-Received: by 2002:aa7:8699:: with SMTP id d25mr4899835pfo.139.1579737840374; 
+ Wed, 22 Jan 2020 16:04:00 -0800 (PST)
 Received: from localhost.localdomain (rrcs-173-198-77-92.west.biz.rr.com.
  [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.03.44
+ by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.03.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 16:03:46 -0800 (PST)
+ Wed, 22 Jan 2020 16:03:59 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc1 15/24] target/avr: Register AVR support with the rest of
- QEMU
-Date: Wed, 22 Jan 2020 14:02:58 -1000
-Message-Id: <20200123000307.11541-16-richard.henderson@linaro.org>
+Subject: [PATCH rc1 21/24] target/avr: Update build system
+Date: Wed, 22 Jan 2020 14:03:04 -1000
+Message-Id: <20200123000307.11541-22-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200123000307.11541-1-richard.henderson@linaro.org>
 References: <20200123000307.11541-1-richard.henderson@linaro.org>
@@ -84,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.214.172
+X-Received-From: 209.85.210.195
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,93 +105,97 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Add AVR related definitions into QEMU
+Make AVR support buildable
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <20200118191416.19934-17-mrolnik@gmail.com>
+Message-Id: <20200118191416.19934-19-mrolnik@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- qapi/machine.json          |  3 ++-
- include/disas/dis-asm.h    | 19 +++++++++++++++++++
- include/sysemu/arch_init.h |  1 +
- arch_init.c                |  2 ++
- 4 files changed, 24 insertions(+), 1 deletion(-)
+ configure                       |  7 +++++++
+ default-configs/avr-softmmu.mak |  5 +++++
+ target/avr/Makefile.objs        | 34 +++++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 target/avr/Makefile.objs
 
-diff --git a/qapi/machine.json b/qapi/machine.json
-index b3d30bc816..f2dc385167 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -21,11 +21,12 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# avr: since 5.0
- #
- # Since: 3.0
- ##
- { 'enum' : 'SysEmuTarget',
--  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', 'lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index e9c7dd8eb4..79bbc8b498 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -211,6 +211,25 @@ enum bfd_architecture
- #define bfd_mach_m32r          0  /* backwards compatibility */
-   bfd_arch_mn10200,    /* Matsushita MN10200 */
-   bfd_arch_mn10300,    /* Matsushita MN10300 */
-+  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-+#define bfd_mach_avr1       1
-+#define bfd_mach_avr2       2
-+#define bfd_mach_avr25      25
-+#define bfd_mach_avr3       3
-+#define bfd_mach_avr31      31
-+#define bfd_mach_avr35      35
-+#define bfd_mach_avr4       4
-+#define bfd_mach_avr5       5
-+#define bfd_mach_avr51      51
-+#define bfd_mach_avr6       6
-+#define bfd_mach_avrtiny    100
-+#define bfd_mach_avrxmega1  101
-+#define bfd_mach_avrxmega2  102
-+#define bfd_mach_avrxmega3  103
-+#define bfd_mach_avrxmega4  104
-+#define bfd_mach_avrxmega5  105
-+#define bfd_mach_avrxmega6  106
-+#define bfd_mach_avrxmega7  107
-   bfd_arch_cris,       /* Axis CRIS */
- #define bfd_mach_cris_v0_v10   255
- #define bfd_mach_cris_v32      32
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 62c6fe4cf1..893df26ce2 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -24,6 +24,7 @@ enum {
-     QEMU_ARCH_NIOS2 = (1 << 17),
-     QEMU_ARCH_HPPA = (1 << 18),
-     QEMU_ARCH_RISCV = (1 << 19),
-+    QEMU_ARCH_AVR = (1 << 20),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/arch_init.c b/arch_init.c
-index 705d0b94ad..6a741165b2 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -89,6 +89,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_XTENSA)
- #define QEMU_ARCH QEMU_ARCH_XTENSA
-+#elif defined(TARGET_AVR)
-+#define QEMU_ARCH QEMU_ARCH_AVR
- #endif
- 
- const uint32_t arch_type = QEMU_ARCH;
+diff --git a/configure b/configure
+index 557e4382ea..94e79ca634 100755
+--- a/configure
++++ b/configure
+@@ -7612,6 +7612,10 @@ case "$target_name" in
+     mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
++  avr)
++    gdb_xml_files="avr-cpu.xml"
++    target_compiler=$cross_cc_avr
++  ;;
+   cris)
+   ;;
+   hppa)
+@@ -7831,6 +7835,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+       disas_config "ARM_A64"
+     fi
+   ;;
++  avr)
++    disas_config "AVR"
++  ;;
+   cris)
+     disas_config "CRIS"
+   ;;
+diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
+new file mode 100644
+index 0000000000..80218add98
+--- /dev/null
++++ b/default-configs/avr-softmmu.mak
+@@ -0,0 +1,5 @@
++# Default configuration for avr-softmmu
++
++# Boards:
++#
++CONFIG_ARDUINO=y
+diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
+new file mode 100644
+index 0000000000..7523e0c6e2
+--- /dev/null
++++ b/target/avr/Makefile.objs
+@@ -0,0 +1,34 @@
++#
++#  QEMU AVR CPU
++#
++#  Copyright (c) 2019 Michael Rolnik
++#
++#  This library is free software; you can redistribute it and/or
++#  modify it under the terms of the GNU Lesser General Public
++#  License as published by the Free Software Foundation; either
++#  version 2.1 of the License, or (at your option) any later version.
++#
++#  This library is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++#  Lesser General Public License for more details.
++#
++#  You should have received a copy of the GNU Lesser General Public
++#  License along with this library; if not, see
++#  <http://www.gnu.org/licenses/lgpl-2.1.html>
++#
++
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++decode-y = $(SRC_PATH)/target/avr/insn.decode
++
++target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
++	$(call quiet-command, \
++	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
++	  "GEN", $(TARGET_DIR)$@)
++
++target/avr/translate.o: target/avr/decode_insn.inc.c
++
++obj-y += translate.o cpu.o helper.o
++obj-y += gdbstub.o
++obj-y += disas.o
++obj-$(CONFIG_SOFTMMU) += machine.o
 -- 
 2.20.1
 
