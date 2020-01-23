@@ -2,74 +2,73 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCAFFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E25C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:35:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9283524125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95E9524125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:35:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lboa/ALc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9283524125
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QwD3+7TQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E9524125
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiFo-0002Ln-OM
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:35:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41109)
+	id 1iuiFu-0002d8-Pb
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:35:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufdg-0004hr-1w
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:29 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iugrG-0007Gk-H2
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufde-0006Oh-9Y
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43019
+ (envelope-from <cohuck@redhat.com>) id 1iugrE-0006Z3-DN
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:05:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32933
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufde-0006O9-6M
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:26 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iugrE-0006XL-9L
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:05:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798045;
+ s=mimecast20190719; t=1579802731;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1yNZ903nBsp45b/CUHR2twKT/7zvjV6NUQqNyOO4Jko=;
- b=Lboa/ALcJlQ68pFjNGS62XwPMqtFuoiDbtV3vP1z640sYdtroOyeYMPIglLSGvYuIp3OHG
- 6MNDtR0nhgCP9bxHrRw27ZhvOimCvB/zChP8ptLX0LZ9vPKDRYgwYdg/zI4kQH28ChNMhs
- vPu7fcJAipLmZu/29+3+giVeScI0CYg=
+ bh=x8ECowen03UM/thnC8zSZXoaw7I96p1lJYDU5no04Ek=;
+ b=QwD3+7TQaIVK2yCAk/VrvfgwSkjqBeU1XMkzfp5LvTPykiXf0WcFq1trpaOzUiSfrddFVt
+ EidJwgi0h7ZGXYxgraWf0z6EuSukIZlx0otpHaEFTc6sqiF52fL1H2mKcCFFWF8vDheWe0
+ WSJ3WFyQZyo1aUICJHMlcmhjeOy69NE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-d1L4HzFwM6SvrEDWFU2kig-1; Thu, 23 Jan 2020 11:47:21 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-226-ePSgKyGkP62k2Lpk0oTySA-1; Thu, 23 Jan 2020 13:05:27 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16BD3802A26
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:21 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
- [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6496228991;
- Thu, 23 Jan 2020 16:47:20 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 026/108] virtiofsd: Keep track of replies
-Date: Thu, 23 Jan 2020 16:45:08 +0000
-Message-Id: <20200123164630.91498-27-dgilbert@redhat.com>
-In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
-References: <20200123164630.91498-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80433100550E;
+ Thu, 23 Jan 2020 18:05:26 +0000 (UTC)
+Received: from gondolin (ovpn-116-120.ams2.redhat.com [10.36.116.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DF6A5D9E2;
+ Thu, 23 Jan 2020 18:05:22 +0000 (UTC)
+Date: Thu, 23 Jan 2020 19:05:19 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH REPOST v3 36/80] s390x/s390-virtio-ccw: use memdev for RAM
+Message-ID: <20200123190519.7b87aaa8.cohuck@redhat.com>
+In-Reply-To: <1579779525-20065-37-git-send-email-imammedo@redhat.com>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+ <1579779525-20065-37-git-send-email-imammedo@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: d1L4HzFwM6SvrEDWFU2kig-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: ePSgKyGkP62k2Lpk0oTySA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -87,109 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Thu, 23 Jan 2020 12:38:01 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Keep track of whether we sent a reply to a request; this is a bit
-paranoid but it means:
-  a) We should always recycle an element even if there was an error
-     in the request
-  b) Never try and send two replies on one queue element
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>   MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> ---
+> CC: rth@twiddle.net
+> CC: david@redhat.com
+> CC: cohuck@redhat.com
+> CC: pasic@linux.ibm.com
+> CC: borntraeger@de.ibm.com
+> CC: qemu-s390x@nongnu.org
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/fuse_virtio.c | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
-
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 05d0e29f12..f1adeb6345 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -44,6 +44,7 @@ struct fv_QueueInfo {
-=20
-     /* The element for the command currently being processed */
-     VuVirtqElement *qe;
-+    bool reply_sent;
- };
-=20
- /*
-@@ -178,6 +179,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
-e_chan *ch,
- {
-     VuVirtqElement *elem;
-     VuVirtq *q;
-+    int ret =3D 0;
-=20
-     assert(count >=3D 1);
-     assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
-@@ -191,6 +193,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
-e_chan *ch,
-     assert(out->unique);
-     /* For virtio we always have ch */
-     assert(ch);
-+    assert(!ch->qi->reply_sent);
-     elem =3D ch->qi->qe;
-     q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
-=20
-@@ -208,19 +211,23 @@ int virtio_send_msg(struct fuse_session *se, struct f=
-use_chan *ch,
-     if (in_len < sizeof(struct fuse_out_header)) {
-         fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n",
-                  __func__, elem->index);
--        return -E2BIG;
-+        ret =3D -E2BIG;
-+        goto err;
-     }
-     if (in_len < tosend_len) {
-         fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd\n",
-                  __func__, elem->index, tosend_len);
--        return -E2BIG;
-+        ret =3D -E2BIG;
-+        goto err;
-     }
-=20
-     copy_iov(iov, count, in_sg, in_num, tosend_len);
-     vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
-     vu_queue_notify(&se->virtio_dev->dev, q);
-+    ch->qi->reply_sent =3D true;
-=20
--    return 0;
-+err:
-+    return ret;
- }
-=20
- /* Thread function for individual queues, created when a queue is 'started=
-' */
-@@ -296,6 +303,9 @@ static void *fv_queue_thread(void *opaque)
-                 break;
-             }
-=20
-+            qi->qe =3D elem;
-+            qi->reply_sent =3D false;
-+
-             if (!fbuf.mem) {
-                 fbuf.mem =3D malloc(se->bufsize);
-                 assert(fbuf.mem);
-@@ -331,6 +341,13 @@ static void *fv_queue_thread(void *opaque)
-             /* TODO: Add checks for fuse_session_exited */
-             fuse_session_process_buf_int(se, &fbuf, &ch);
-=20
-+            if (!qi->reply_sent) {
-+                fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
-+                         __func__, elem->index);
-+                /* I think we've still got to recycle the element */
-+                vu_queue_push(dev, q, elem, 0);
-+                vu_queue_notify(dev, q);
-+            }
-             qi->qe =3D NULL;
-             free(elem);
-             elem =3D NULL;
---=20
-2.24.1
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
 
