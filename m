@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 854B3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 068BFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 575B42077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:07:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCFEA2077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:08:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Su6rzzDB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 575B42077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eMTdtjWy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCFEA2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhp4-0000OL-4r
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:07:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41475)
+	id 1iuhpk-0001I5-Jo
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:08:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufeB-0005FK-16
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:00 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuff7-0006LD-68
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufe9-0006gY-Fo
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:58 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24012
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iuff6-0000L8-2C
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58816
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufe9-0006g6-Cb
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:57 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuff5-0000Kp-Vl
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798077;
+ s=mimecast20190719; t=1579798135;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pucqjnQfkQgODQBaQLuvW2l9M7uY/arYC5AvJoD6Bd0=;
- b=Su6rzzDB/T8yRcQYyLD+B1tdo7ZXuWo1sYecgazH34vtnhFLJvoRzrrgvQYOPyDXMsQanG
- YMya7jnvoLhmNp0O1hk0F5ciB/2KqHGB6XAXOTBC+qBiXAyTUnz8OmS7CtL0jsU2Ngi9Xu
- bVhYTw/X5VNx9aOL/yg/EstHiU8UEbE=
+ bh=qShNWf35tmc6YSFybHWSCOvYBzhSa1CQWXZKP8VjPDE=;
+ b=eMTdtjWyhs7bURVPTaJk0xbyZ3cRJi2fgkUfijNwe1vzRzUvwXKpDcDExr1vPCF6FAiwx7
+ dEjXlz1VY3uKjW4RWSX82we0hqlwqTD+Aa2UPvJxp0MSic2Lt4ylXzVCaBiYKCGzCLOW4D
+ xn6UThd75rjmFzUqcXtaBKTYWvQ6Bpw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-0Q1Q1o6bO8iJ8iRiIMAMpA-1; Thu, 23 Jan 2020 11:47:55 -0500
+ us-mta-155-O5zSMASUP2SzPTGxth4K1w-1; Thu, 23 Jan 2020 11:48:54 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5BF5190B2B5
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 222C6108BD0C
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:53 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
  [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0CD7819C69;
- Thu, 23 Jan 2020 16:47:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F05D19C69;
+ Thu, 23 Jan 2020 16:48:52 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 055/108] virtiofsd: Drop CAP_FSETID if client asked for it
-Date: Thu, 23 Jan 2020 16:45:37 +0000
-Message-Id: <20200123164630.91498-56-dgilbert@redhat.com>
+Subject: [PULL 105/108] virtiofsd: Convert lo_destroy to take the lo->mutex
+ lock itself
+Date: Thu, 23 Jan 2020 16:46:27 +0000
+Message-Id: <20200123164630.91498-106-dgilbert@redhat.com>
 In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
 References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 0Q1Q1o6bO8iJ8iRiIMAMpA-1
+X-MC-Unique: O5zSMASUP2SzPTGxth4K1w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,163 +92,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vivek Goyal <vgoyal@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-If client requested killing setuid/setgid bits on file being written, drop
-CAP_FSETID capability so that setuid/setgid bits are cleared upon write
-automatically.
+lo_destroy was relying on some implicit knowledge of the locking;
+we can avoid this if we create an unref_inode that doesn't take
+the lock and then grab it for the whole of the lo_destroy.
 
-pjdfstest chown/12.t needs this.
-
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-  dgilbert: reworked for libcap-ng
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Reviewed-by: Sergio Lopez <slp@redhat.com>
+Suggested-by: Vivek Goyal <vgoyal@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 105 +++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+ tools/virtiofsd/passthrough_ll.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
 _ll.c
-index 97e7c75667..d53cb1e005 100644
+index eb001b9d1e..fc15d61510 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -201,6 +201,91 @@ static int load_capng(void)
-     return 0;
+@@ -1344,14 +1344,13 @@ static void lo_unlink(fuse_req_t req, fuse_ino_t pa=
+rent, const char *name)
+     lo_inode_put(lo, &inode);
  }
 =20
-+/*
-+ * Helpers for dropping and regaining effective capabilities. Returns 0
-+ * on success, error otherwise
-+ */
-+static int drop_effective_cap(const char *cap_name, bool *cap_dropped)
-+{
-+    int cap, ret;
-+
-+    cap =3D capng_name_to_capability(cap_name);
-+    if (cap < 0) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "capng_name_to_capability(%s) failed:%s\n",
-+                 cap_name, strerror(errno));
-+        goto out;
-+    }
-+
-+    if (load_capng()) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "load_capng() failed\n");
-+        goto out;
-+    }
-+
-+    /* We dont have this capability in effective set already. */
-+    if (!capng_have_capability(CAPNG_EFFECTIVE, cap)) {
-+        ret =3D 0;
-+        goto out;
-+    }
-+
-+    if (capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, cap)) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "capng_update(DROP,) failed\n");
-+        goto out;
-+    }
-+
-+    if (capng_apply(CAPNG_SELECT_CAPS)) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "drop:capng_apply() failed\n");
-+        goto out;
-+    }
-+
-+    ret =3D 0;
-+    if (cap_dropped) {
-+        *cap_dropped =3D true;
-+    }
-+
-+out:
-+    return ret;
-+}
-+
-+static int gain_effective_cap(const char *cap_name)
-+{
-+    int cap;
-+    int ret =3D 0;
-+
-+    cap =3D capng_name_to_capability(cap_name);
-+    if (cap < 0) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "capng_name_to_capability(%s) failed:%s\n",
-+                 cap_name, strerror(errno));
-+        goto out;
-+    }
-+
-+    if (load_capng()) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "load_capng() failed\n");
-+        goto out;
-+    }
-+
-+    if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, cap)) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "capng_update(ADD,) failed\n");
-+        goto out;
-+    }
-+
-+    if (capng_apply(CAPNG_SELECT_CAPS)) {
-+        ret =3D errno;
-+        fuse_log(FUSE_LOG_ERR, "gain:capng_apply() failed\n");
-+        goto out;
-+    }
-+    ret =3D 0;
-+
-+out:
-+    return ret;
-+}
-+
- static void lo_map_init(struct lo_map *map)
+-static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
+e,
+-                                 uint64_t n)
++/* To be called with lo->mutex held */
++static void unref_inode(struct lo_data *lo, struct lo_inode *inode, uint64=
+_t n)
  {
-     map->elems =3D NULL;
-@@ -1577,6 +1662,7 @@ static void lo_write_buf(fuse_req_t req, fuse_ino_t i=
-no,
-     (void)ino;
-     ssize_t res;
-     struct fuse_bufvec out_buf =3D FUSE_BUFVEC_INIT(fuse_buf_size(in_buf))=
-;
-+    bool cap_fsetid_dropped =3D false;
-=20
-     out_buf.buf[0].flags =3D FUSE_BUF_IS_FD | FUSE_BUF_FD_SEEK;
-     out_buf.buf[0].fd =3D lo_fi_fd(req, fi);
-@@ -1588,12 +1674,31 @@ static void lo_write_buf(fuse_req_t req, fuse_ino_t=
- ino,
-                  out_buf.buf[0].size, (unsigned long)off);
+     if (!inode) {
+         return;
      }
 =20
-+    /*
-+     * If kill_priv is set, drop CAP_FSETID which should lead to kernel
-+     * clearing setuid/setgid on file.
-+     */
-+    if (fi->kill_priv) {
-+        res =3D drop_effective_cap("FSETID", &cap_fsetid_dropped);
-+        if (res !=3D 0) {
-+            fuse_reply_err(req, res);
-+            return;
-+        }
-+    }
-+
-     res =3D fuse_buf_copy(&out_buf, in_buf);
-     if (res < 0) {
-         fuse_reply_err(req, -res);
-     } else {
-         fuse_reply_write(req, (size_t)res);
+-    pthread_mutex_lock(&lo->mutex);
+     assert(inode->nlookup >=3D n);
+     inode->nlookup -=3D n;
+     if (!inode->nlookup) {
+@@ -1362,15 +1361,24 @@ static void unref_inode_lolocked(struct lo_data *lo=
+, struct lo_inode *inode,
+         }
+         g_hash_table_destroy(inode->posix_locks);
+         pthread_mutex_destroy(&inode->plock_mutex);
+-        pthread_mutex_unlock(&lo->mutex);
+=20
+         /* Drop our refcount from lo_do_lookup() */
+         lo_inode_put(lo, &inode);
+-    } else {
+-        pthread_mutex_unlock(&lo->mutex);
      }
-+
-+    if (cap_fsetid_dropped) {
-+        res =3D gain_effective_cap("FSETID");
-+        if (res) {
-+            fuse_log(FUSE_LOG_ERR, "Failed to gain CAP_FSETID\n");
-+        }
-+    }
  }
 =20
- static void lo_statfs(fuse_req_t req, fuse_ino_t ino)
++static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
+e,
++                                 uint64_t n)
++{
++    if (!inode) {
++        return;
++    }
++
++    pthread_mutex_lock(&lo->mutex);
++    unref_inode(lo, inode, n);
++    pthread_mutex_unlock(&lo->mutex);
++}
++
+ static void lo_forget_one(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup=
+)
+ {
+     struct lo_data *lo =3D lo_data(req);
+@@ -2458,13 +2466,7 @@ static void lo_destroy(void *userdata)
+ {
+     struct lo_data *lo =3D (struct lo_data *)userdata;
+=20
+-    /*
+-     * Normally lo->mutex must be taken when traversing lo->inodes but
+-     * lo_destroy() is a serialized request so no races are possible here.
+-     *
+-     * In addition, we cannot acquire lo->mutex since unref_inode() takes =
+it
+-     * too and this would result in a recursive lock.
+-     */
++    pthread_mutex_lock(&lo->mutex);
+     while (true) {
+         GHashTableIter iter;
+         gpointer key, value;
+@@ -2475,8 +2477,9 @@ static void lo_destroy(void *userdata)
+         }
+=20
+         struct lo_inode *inode =3D value;
+-        unref_inode_lolocked(lo, inode, inode->nlookup);
++        unref_inode(lo, inode, inode->nlookup);
+     }
++    pthread_mutex_unlock(&lo->mutex);
+ }
+=20
+ static struct fuse_lowlevel_ops lo_oper =3D {
 --=20
 2.24.1
 
