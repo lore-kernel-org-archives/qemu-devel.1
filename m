@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A642C32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED02EC32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:22:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A93D21835
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1F2324673
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:22:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bJTqS4LA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A93D21835
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AeDRwnVI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F2324673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuQFX-0003fC-2M
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:21:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54866)
+	id 1iuQGU-0004vB-Dc
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:22:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPzi-0002IO-LP
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:21 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzZ-0002F9-Rs
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPzZ-0002LA-Re
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:09 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38423)
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzR-0002GM-1M
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:00 -0500
+Received: from mail-pf1-f176.google.com ([209.85.210.176]:45709)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iuPzZ-0002Kz-Lf
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:01 -0500
-Received: by mail-pf1-f195.google.com with SMTP id x185so615368pfc.5
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:05:01 -0800 (PST)
+ id 1iuPzQ-0002FR-Po
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:52 -0500
+Received: by mail-pf1-f176.google.com with SMTP id 2so597813pfg.12
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:04:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zvq+Ll0OMhGkeTT4nxRG0eqc6IV0o3wiUiAqy9VRhew=;
- b=bJTqS4LA1A8MVdsHkoi16Putg4JfpuR+BuFYOHUy7bd7Q8OeFqtwQHVjpx+QJ4TAP8
- pouQItys7bJq5QJpaqwiTczAPnbXXNO7TeKDZrtvRzLoY1zYBRzcKB3mFOO06Q2ew4v/
- s4mtnSiHk0l/yHN2o9PV0vXUWdXf9Q8Ws6x82j5o3PunFM96RmxiMKEy9J+sVl6qFPeo
- Xriot1TygdW839qC85ejxXu/6BwqoFpPXRcn5b5lLLSri4JQw8njS+WReH9UY+Y+erhu
- rcGM/IlVUapLJai6ec7+F1vqkP7vTI8CN4STBo1ql6QkIjc2trbZKdjXLNupy0FD9E3l
- zfyg==
+ bh=SwL4bj5FyPVtbDbu1kSJciAaavdFuuCM9S3gjDN6Z6k=;
+ b=AeDRwnVIv0ulImf6reL/yVqGxFj/1If6iiGxF/deGZ/enIXdSuzKDBrnHrdt5S2CnR
+ AmibAmn+UuabFcI3Bcb3hFTTKvw5tndMydSLBX153B1Q7tSLefKtOUincCDHcT/W1Z9O
+ /7/irvSZCMSEpZqXGl32UWoo0ibQKZYj2zNn7yXBHpTXrceLktC50MeEPJbUqQU5n7A2
+ kjk/Q0youS27Li82tADKdIT+JwvGwcJajguqmRO55NeAaRjoYEXazA4NPO9Zyqlqcxlh
+ HP5dD/BRZIW4LcJPYBhaVbIMCcRwCJLXByhwQmzVQliDIJWP8N77cPfRjAWsHXq7JWHy
+ N+eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zvq+Ll0OMhGkeTT4nxRG0eqc6IV0o3wiUiAqy9VRhew=;
- b=mX4UkbXZ8HQstHIW2YKxd6JqEHm9elfi8Vq6+NHDGUq/slj6F7phlr6ttpa22rTgZL
- PqRBKtdGUfGCuroo194BhbMEp5WpNQ4wGm4nD5bWaHNHDiwvxehC/jui7/WYbLPRPJBH
- 2UZgV5wz9uZpXYv0zC8+tJ5uTm/SaXnKqqFsjgn6DSdmlhzlx/ZgkUW3dAyl5PwefMs7
- z3Z6ODwLGYXWNlKP2yRB5ePC5qIpBvPZrrf4yfu5EfjLASZR9TwRgEy/XmnKdobxE/Ob
- sZZ6ZcBilshHXWGQgcSnKaiyK94QmwJz3ek9x41oWNRXNDxzldOfnzrrTTZJyCcxuPIQ
- pVFw==
-X-Gm-Message-State: APjAAAWdXpdRHCN1w9f5y398JRYaCCZ6pwAmh/mHN8qhGjn/sLyPLL1s
- zzVrFUuvbXhvhtF/zVLPfq0KB5OcmeQ=
-X-Google-Smtp-Source: APXvYqwnxiV3tZ7Vms0RUI215SYPIYvVOlcZaANAvzEkqKywqTpnqm3gSBSQZ02/xt0S4D/kzgChPw==
-X-Received: by 2002:aa7:8699:: with SMTP id d25mr4899835pfo.139.1579737840374; 
- Wed, 22 Jan 2020 16:04:00 -0800 (PST)
+ bh=SwL4bj5FyPVtbDbu1kSJciAaavdFuuCM9S3gjDN6Z6k=;
+ b=gHJajbttmRxuoF6oP+00cE323Z82gBlHFKfZAxCDblnrRpsGFAFYeq64nmRXPGzqfN
+ vcL61XOZijBWXoB/THXZwxj2y9HEyp1SkK+vC+BbwRzrNo38YphWkDbqoX9wN/VO6+Ts
+ K3ZD/nVYaNEKxBdiSq217de3+puqJipNy0FY1GFQ9zH9Awf4FFl1pvvO/nXr3ZVBL/av
+ Fnt9YJQUp7zfhQN+/+visjWD9sp9avF2ha3fHiGFdBt5Zbnxa5fVG5xj+xULusJbDKUA
+ jd+4zHknMF7SBDe8CJZEDjtQGkovtSBLvZu1qZguZ+AMCEX7vqmh900LuZ6mAu/ZDYxJ
+ cSAw==
+X-Gm-Message-State: APjAAAVBlhel4eeZeXCFvd97b3Os2V475ZVkHUTnC8c5G2b65TPBuivI
+ FitSpnpIfkrjWrH/TCY16MV7vQfxpeU=
+X-Google-Smtp-Source: APXvYqz2+BsSLGxet0myOuXqpRmoSj4EnxUvcci69RPDzKVXv2ycZ+PX64qQmE8zW1dsopTIzdqmuw==
+X-Received: by 2002:a65:680f:: with SMTP id l15mr940576pgt.307.1579737831348; 
+ Wed, 22 Jan 2020 16:03:51 -0800 (PST)
 Received: from localhost.localdomain (rrcs-173-198-77-92.west.biz.rr.com.
  [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.03.58
+ by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.03.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 16:03:59 -0800 (PST)
+ Wed, 22 Jan 2020 16:03:50 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc1 21/24] target/avr: Update build system
-Date: Wed, 22 Jan 2020 14:03:04 -1000
-Message-Id: <20200123000307.11541-22-richard.henderson@linaro.org>
+Subject: [PATCH rc1 17/24] target/avr: Update MAINTAINERS file
+Date: Wed, 22 Jan 2020 14:03:00 -1000
+Message-Id: <20200123000307.11541-18-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200123000307.11541-1-richard.henderson@linaro.org>
 References: <20200123000307.11541-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.195
+X-Received-From: 209.85.210.176
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,9 +95,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: thuth@redhat.com, me@xcancerberox.com.ar, S.E.Harris@kent.ac.uk,
- dovgaluk@ispras.ru, Aleksandar Markovic <amarkovic@wavecomp.com>,
- imammedo@redhat.com, mrolnik@gmail.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ dovgaluk@ispras.ru, imammedo@redhat.com, mrolnik@gmail.com,
  aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -105,97 +104,61 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Make AVR support buildable
+Include AVR maintaners in MAINTAINERS file
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <20200118191416.19934-19-mrolnik@gmail.com>
+Message-Id: <20200118191416.19934-22-mrolnik@gmail.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[rth: Squash ordering fixes from f4bug]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- configure                       |  7 +++++++
- default-configs/avr-softmmu.mak |  5 +++++
- target/avr/Makefile.objs        | 34 +++++++++++++++++++++++++++++++++
- 3 files changed, 46 insertions(+)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 target/avr/Makefile.objs
+ MAINTAINERS | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/configure b/configure
-index 557e4382ea..94e79ca634 100755
---- a/configure
-+++ b/configure
-@@ -7612,6 +7612,10 @@ case "$target_name" in
-     mttcg="yes"
-     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-   ;;
-+  avr)
-+    gdb_xml_files="avr-cpu.xml"
-+    target_compiler=$cross_cc_avr
-+  ;;
-   cris)
-   ;;
-   hppa)
-@@ -7831,6 +7835,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-       disas_config "ARM_A64"
-     fi
-   ;;
-+  avr)
-+    disas_config "AVR"
-+  ;;
-   cris)
-     disas_config "CRIS"
-   ;;
-diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
-new file mode 100644
-index 0000000000..80218add98
---- /dev/null
-+++ b/default-configs/avr-softmmu.mak
-@@ -0,0 +1,5 @@
-+# Default configuration for avr-softmmu
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2c768ed3d8..8caa94f782 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -163,6 +163,14 @@ S: Maintained
+ F: hw/arm/smmu*
+ F: include/hw/arm/smmu*
+ 
++AVR TCG CPUs
++M: Michael Rolnik <mrolnik@gmail.com>
++R: Sarah Harris <S.E.Harris@kent.ac.uk>
++S: Maintained
++F: target/avr/
++F: default-configs/avr-softmmu.mak
++F: gdb-xml/avr-cpu.xml
 +
-+# Boards:
-+#
-+CONFIG_ARDUINO=y
-diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
-new file mode 100644
-index 0000000000..7523e0c6e2
---- /dev/null
-+++ b/target/avr/Makefile.objs
-@@ -0,0 +1,34 @@
-+#
-+#  QEMU AVR CPU
-+#
-+#  Copyright (c) 2019 Michael Rolnik
-+#
-+#  This library is free software; you can redistribute it and/or
-+#  modify it under the terms of the GNU Lesser General Public
-+#  License as published by the Free Software Foundation; either
-+#  version 2.1 of the License, or (at your option) any later version.
-+#
-+#  This library is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+#  Lesser General Public License for more details.
-+#
-+#  You should have received a copy of the GNU Lesser General Public
-+#  License along with this library; if not, see
-+#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-+#
+ CRIS TCG CPUs
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+ S: Maintained
+@@ -880,6 +888,24 @@ F: include/hw/*/nrf51*.h
+ F: include/hw/*/microbit*.h
+ F: tests/qtest/microbit-test.c
+ 
++AVR Machines
++-------------
 +
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+decode-y = $(SRC_PATH)/target/avr/insn.decode
++Atmel MCU
++M: Michael Rolnik <mrolnik@gmail.com>
++R: Sarah Harris <S.E.Harris@kent.ac.uk>
++S: Maintained
++F: hw/avr/
++F: hw/char/atmel_usart.c
++F: include/hw/char/atmel_usart.h
++F: hw/timer/atmel_timer16.c
++F: include/hw/timer/atmel_timer16.h
++F: hw/misc/atmel_power.c
++F: include/hw/misc/atmel_power.h
++F: hw/misc/avr_mask.c
++F: include/hw/misc/avr_mask.h
++F: tests/acceptance/machine_avr6.py
 +
-+target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
-+	$(call quiet-command, \
-+	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
-+	  "GEN", $(TARGET_DIR)$@)
-+
-+target/avr/translate.o: target/avr/decode_insn.inc.c
-+
-+obj-y += translate.o cpu.o helper.o
-+obj-y += gdbstub.o
-+obj-y += disas.o
-+obj-$(CONFIG_SOFTMMU) += machine.o
+ CRIS Machines
+ -------------
+ Axis Dev88
 -- 
 2.20.1
 
