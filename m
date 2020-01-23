@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED605C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:49:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B3DEC33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:49:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C149C21D7E
+	by mail.kernel.org (Postfix) with ESMTPS id E722C22464
 	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:49:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="admaxu+0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C149C21D7E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOzkxU+I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E722C22464
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhXj-0005H5-IP
+	id 1iuhXj-0005F8-FH
 	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:49:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41177)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41159)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufdk-0004lT-CS
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:33 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufdj-0006RP-8c
+ (envelope-from <dgilbert@redhat.com>) id 1iufdj-0004jr-88
  for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:32 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32267
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdj-0006Ql-5x
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgilbert@redhat.com>) id 1iufdh-0006QO-QT
  for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35831
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdh-0006Pl-NZ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798050;
+ s=mimecast20190719; t=1579798048;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lj9ybDQyvN3fBqhUPDkPLVFN9fpotOGLEAZ1wOYsfuk=;
- b=admaxu+09M6CtLE+5GLgi6wp9+L9GHFwsr/+V54L+2bYHosWvbEu/c7LLFJS+NI4z6ofut
- AAU18Lih2wGVZx3CSHgFoGBqaACtWwRUeyuk3uuJsRADl6KrtKlz/aky4bUnJLKSt6CcuA
- Br4KYhVrijwcvoYC8e0WHy6zQ9p7/aU=
+ bh=GecZLFNgbt9puS1dpkZtIJjkHeSDvk6GvBLw3x562/s=;
+ b=QOzkxU+IBSZU4H+dKdTa3TwzBWpVppDURMophl8bXKj7YrX1m49em8QN/eG6/F4tyJ39S9
+ TjT9zgGxAYIXZkIs241QFf4S74Hn9vVK7Hqf0mOfmJW5h5yytFSIFCo9rpTWVzTKKRelnk
+ m4jJO993grg7QfHgeSTsnYMkIqOSwVw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-QizME4TbN_G1yOSzkC1Fjg-1; Thu, 23 Jan 2020 11:47:28 -0500
+ us-mta-183-Dqtj1luRPZOyxaIbHGWisg-1; Thu, 23 Jan 2020 11:47:26 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 169F192DFF
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1802D80256C
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:25 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
  [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6243719C69;
- Thu, 23 Jan 2020 16:47:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D16619C69;
+ Thu, 23 Jan 2020 16:47:24 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 032/108] virtiofsd: add --print-capabilities option
-Date: Thu, 23 Jan 2020 16:45:14 +0000
-Message-Id: <20200123164630.91498-33-dgilbert@redhat.com>
+Subject: [PULL 030/108] virtiofsd: make -f (foreground) the default
+Date: Thu, 23 Jan 2020 16:45:12 +0000
+Message-Id: <20200123164630.91498-31-dgilbert@redhat.com>
 In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
 References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: QizME4TbN_G1yOSzkC1Fjg-1
+X-MC-Unique: Dqtj1luRPZOyxaIbHGWisg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,106 +93,62 @@ Sender: "Qemu-devel"
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Add the --print-capabilities option as per vhost-user.rst "Backend
-programs conventions".  Currently there are no advertised features.
+According to vhost-user.rst "Backend program conventions", backend
+programs should run in the foregound by default.  Follow the
+conventions so libvirt and other management tools can control virtiofsd
+in a standard way.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- docs/interop/vhost-user.json     |  4 +++-
- tools/virtiofsd/fuse_lowlevel.h  |  1 +
- tools/virtiofsd/helper.c         |  2 ++
- tools/virtiofsd/passthrough_ll.c | 12 ++++++++++++
- 4 files changed, 18 insertions(+), 1 deletion(-)
+ tools/virtiofsd/helper.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-index ce0ef74db5..ef8ac5941f 100644
---- a/docs/interop/vhost-user.json
-+++ b/docs/interop/vhost-user.json
-@@ -31,6 +31,7 @@
- # @rproc-serial: virtio remoteproc serial link
- # @scsi: virtio scsi
- # @vsock: virtio vsock transport
-+# @fs: virtio fs (since 4.2)
- #
- # Since: 4.0
- ##
-@@ -50,7 +51,8 @@
-       'rpmsg',
-       'rproc-serial',
-       'scsi',
--      'vsock'
-+      'vsock',
-+      'fs'
-   ]
- }
-=20
-diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowleve=
-l.h
-index f6b34700af..0d61df8110 100644
---- a/tools/virtiofsd/fuse_lowlevel.h
-+++ b/tools/virtiofsd/fuse_lowlevel.h
-@@ -1794,6 +1794,7 @@ struct fuse_cmdline_opts {
-     int nodefault_subtype;
-     int show_version;
-     int show_help;
-+    int print_capabilities;
-     unsigned int max_idle_threads;
- };
-=20
 diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index a3645fc807..b8ec5ac8dc 100644
+index 676032e71f..a3645fc807 100644
 --- a/tools/virtiofsd/helper.c
 +++ b/tools/virtiofsd/helper.c
-@@ -40,6 +40,7 @@ static const struct fuse_opt fuse_helper_opts[] =3D {
-     FUSE_HELPER_OPT("--help", show_help),
-     FUSE_HELPER_OPT("-V", show_version),
-     FUSE_HELPER_OPT("--version", show_version),
-+    FUSE_HELPER_OPT("--print-capabilities", print_capabilities),
-     FUSE_HELPER_OPT("-d", debug),
-     FUSE_HELPER_OPT("debug", debug),
-     FUSE_HELPER_OPT("-d", foreground),
-@@ -135,6 +136,7 @@ void fuse_cmdline_help(void)
- {
-     printf("    -h   --help                print help\n"
+@@ -29,6 +29,11 @@
+     {                                               \
+         t, offsetof(struct fuse_cmdline_opts, p), 1 \
+     }
++#define FUSE_HELPER_OPT_VALUE(t, p, v)              \
++    {                                               \
++        t, offsetof(struct fuse_cmdline_opts, p), v \
++    }
++
+=20
+ static const struct fuse_opt fuse_helper_opts[] =3D {
+     FUSE_HELPER_OPT("-h", show_help),
+@@ -42,6 +47,7 @@ static const struct fuse_opt fuse_helper_opts[] =3D {
+     FUSE_OPT_KEY("-d", FUSE_OPT_KEY_KEEP),
+     FUSE_OPT_KEY("debug", FUSE_OPT_KEY_KEEP),
+     FUSE_HELPER_OPT("-f", foreground),
++    FUSE_HELPER_OPT_VALUE("--daemonize", foreground, 0),
+     FUSE_HELPER_OPT("fsname=3D", nodefault_subtype),
+     FUSE_OPT_KEY("fsname=3D", FUSE_OPT_KEY_KEEP),
+     FUSE_HELPER_OPT("subtype=3D", nodefault_subtype),
+@@ -131,6 +137,7 @@ void fuse_cmdline_help(void)
             "    -V   --version             print version\n"
-+           "    --print-capabilities       print vhost-user.json\n"
             "    -d   -o debug              enable debug output (implies -f=
 )\n"
             "    -f                         foreground operation\n"
-            "    --daemonize                run in background\n"
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 037c5d7b26..cd27c09f59 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1298,6 +1298,14 @@ static struct fuse_lowlevel_ops lo_oper =3D {
-     .lseek =3D lo_lseek,
- };
++           "    --daemonize                run in background\n"
+            "    -o max_idle_threads        the maximum number of idle work=
+er "
+            "threads\n"
+            "                               allowed (default: 10)\n");
+@@ -158,6 +165,7 @@ int fuse_parse_cmdline(struct fuse_args *args, struct f=
+use_cmdline_opts *opts)
+     memset(opts, 0, sizeof(struct fuse_cmdline_opts));
 =20
-+/* Print vhost-user.json backend program capabilities */
-+static void print_capabilities(void)
-+{
-+    printf("{\n");
-+    printf("  \"type\": \"fs\"\n");
-+    printf("}\n");
-+}
-+
- int main(int argc, char *argv[])
- {
-     struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
-@@ -1328,6 +1336,10 @@ int main(int argc, char *argv[])
-         fuse_lowlevel_version();
-         ret =3D 0;
-         goto err_out1;
-+    } else if (opts.print_capabilities) {
-+        print_capabilities();
-+        ret =3D 0;
-+        goto err_out1;
-     }
+     opts->max_idle_threads =3D 10;
++    opts->foreground =3D 1;
 =20
-     if (fuse_opt_parse(&args, &lo, lo_opts, NULL) =3D=3D -1) {
+     if (fuse_opt_parse(args, opts, fuse_helper_opts, fuse_helper_opt_proc)=
+ =3D=3D
+         -1) {
 --=20
 2.24.1
 
