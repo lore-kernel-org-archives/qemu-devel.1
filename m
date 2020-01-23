@@ -7,86 +7,87 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D0BDC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D95DFC33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0554924655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F8F621569
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KgcNktff"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0554924655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGaZeiE4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F8F621569
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuWmW-00085z-Qg
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:20:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37424)
+	id 1iuWnV-0000aN-FX
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:21:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37654)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iuWdZ-0006FU-Pb
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:10:46 -0500
+ (envelope-from <mst@redhat.com>) id 1iuWe7-0006x1-88
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:11:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iuWdY-0008Gu-L0
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:10:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46630
+ (envelope-from <mst@redhat.com>) id 1iuWe6-0000L1-2Q
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:11:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51934
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iuWdY-0008Gb-H1
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:10:44 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iuWe5-0000Kk-UB
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:11:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579763444;
+ s=mimecast20190719; t=1579763477;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7X8PjfcFHzdyIHec4OG6du8gOrCYueQPk/uwOaIht1o=;
- b=KgcNktffRDUUXeEPOywAIeDhYmcJzvR+USkYIKBD7Qq6TB2RB2rZAIdChJD/7510j3brxl
- 70pZ/GBoE1UaOvK9VCEsrKkhVlcV+H5/4nJeDU+D4WKcAKYm9UxQQdxD7xe2eIenQMke4H
- R0E6uoM0G2CFNtTBDDIjvqJlNVSmg0Q=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-6N3gqnW8PHS1P5tzNg9wqQ-1; Thu, 23 Jan 2020 02:10:42 -0500
-Received: by mail-wr1-f69.google.com with SMTP id z15so1327349wrw.0
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 23:10:41 -0800 (PST)
+ bh=lSs10h7+g5GHkd748u1YKdPjMw3sPPNZXswgwHDuFfc=;
+ b=OGaZeiE4ez1gO0SkZuVWAkQLa+wRSutCWM3NjR7xIl2FCj9U6Tf9FKndG7LsNBFwIFKR91
+ py+XkLBcboc91XLAWYvdMHJNJuQUdWaa0oWKeICdwAkqY3+8+5ufvRv0oH6IbCqPQsgrHQ
+ GvQgLulbLUtQCdd0qO3fg7viKVVwUrs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-1FtVqQYGMnSmhvJbI3y8Mw-1; Thu, 23 Jan 2020 02:10:35 -0500
+Received: by mail-wm1-f69.google.com with SMTP id e12so304654wma.7
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 23:10:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=dKz9Yp7TsPHys5pVT0H9YPlrICr7T8Twac2SXPW2Rdw=;
- b=HGhvHKWFQtdugSjL8XJFg6O5QS7vxPYT3uIUTh7KvlyCMoT0YlMmlNKDWdRlCnYwxQ
- x+bGBbH8gWEzt5t0Fr34L48JVchjNSFfy4+VmI3g5X+RVXa878TmwPOLsHIKvc5X3Vd5
- KPvXyUCCqzHQ9RFFFav8hqPpvQhuT4si0NVkhnpNS0U9rzSIz3OkHrhD1X5F1V/RZ8r5
- gs3lJiGCtARnOZBM71MFyWOC1UycSwyMmpn5R31auoqmdTS4J4vIkooiyrJjirvsrzOM
- 0AsHnW3t0zqftlkFGKKvzBZ1JUVS72pMbxE+HiEyMRh97rekYnzwRfrpVbXDZfEInsnU
- nA7Q==
-X-Gm-Message-State: APjAAAUcznQ2vxaacCHDrab5SgIEugVjJnV5IvPGXNvjGz+mvK0u4W9i
- FF9jp53o49gtsGWvxtZzxTZpEcIAA0CDOxV/vXBIF+OcFcmfKutz1jC4ubzzlj0pX+Z5z8tXBgA
- SNKM+2/ELPXk8UWo=
-X-Received: by 2002:a5d:49c7:: with SMTP id t7mr15325031wrs.369.1579763440659; 
- Wed, 22 Jan 2020 23:10:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzl4O84SI0buRHLFNMhF+WhO00ttiWcJjo+dmPXyU6bx5rIrFPh57ygI6ZyhG6ygl4+zDLi+A==
-X-Received: by 2002:a5d:49c7:: with SMTP id t7mr15325009wrs.369.1579763440413; 
- Wed, 22 Jan 2020 23:10:40 -0800 (PST)
+ bh=bshZ29A7PK62drys54Y2NwFiWKvTA5OkiFM7lPNvHYk=;
+ b=InB9evdijQeo+az1gfH5AdqjypMb+LcdFliFeb5lWiLkMdy26qd7j7iCQN19JjzMqn
+ YdjJTHnqYfydB9dHGkwm5seuKgqpU+JXYaCjabHQfYJc+nUIqOdZwrSpPEqXffd1rXBq
+ 0yW8usty3YtKuNGUswFH1kXty7tBum1hbwC8vHxLtxlnziwO9b27aD+XKsMHBwhn0wNi
+ 7HEcBnx798j7rSy2g9mNAx+sce/FSdG3WkQuSJsq1XV6KwabyBq8rk2AvEtwxEzHTIKf
+ 37DPGW3tUXTM3I5tePG5Oob/R6DJ2sm2QD+ksF+JvET1kq/z7y2LHnGV5jvtQnH/clVT
+ FTKQ==
+X-Gm-Message-State: APjAAAWEnrwi8fC/k+cvLHpSY8i2uKe24CgLttIGR9YBOI6YEwjfJmvr
+ aoy2ncRuvsWR3OoKsyoUtlz5bTFOuuDy7ZNi8TdgaQofKhHreiQz3QkpQN54/LU59bP4DK57nhZ
+ aFXe5Xb1wcwml4TM=
+X-Received: by 2002:a05:600c:d6:: with SMTP id
+ u22mr2491756wmm.77.1579763433814; 
+ Wed, 22 Jan 2020 23:10:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw25w3wi8+Fmbg0/xUdeTXLTw5Y1cHEVOhzg2+lgeUvQij5P2ur5ET2qLWpJU9dfv0+8swvAw==
+X-Received: by 2002:a05:600c:d6:: with SMTP id
+ u22mr2491735wmm.77.1579763433620; 
+ Wed, 22 Jan 2020 23:10:33 -0800 (PST)
 Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
  by smtp.gmail.com with ESMTPSA id
- d23sm1845357wra.30.2020.01.22.23.10.38
+ s15sm1819215wrp.4.2020.01.22.23.10.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 23:10:39 -0800 (PST)
-Date: Thu, 23 Jan 2020 02:10:38 -0500
+ Wed, 22 Jan 2020 23:10:32 -0800 (PST)
+Date: Thu, 23 Jan 2020 02:10:31 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 10/18] virtio-9p-device: fix memleak in
- virtio_9p_device_unrealize
-Message-ID: <20200123070913.626488-11-mst@redhat.com>
+Subject: [PULL v3 08/18] acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command
+Message-ID: <20200123070913.626488-9-mst@redhat.com>
 References: <20200123070913.626488-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200123070913.626488-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: 6N3gqnW8PHS1P5tzNg9wqQ-1
+X-MC-Unique: 1FtVqQYGMnSmhvJbI3y8Mw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -105,55 +106,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- Pan Nengyuan <pannengyuan@huawei.com>, Greg Kurz <groug@kaod.org>,
- Euler Robot <euler.robot@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-v->vq forgot to cleanup in virtio_9p_device_unrealize, the memory leak
-stack is as follow:
+Firmware can enumerate present at boot APs by broadcasting wakeup IPI,
+so that woken up secondary CPUs could register them-selves.
+However in CPU hotplug case, it would need to know architecture
+specific CPU IDs for possible and hotplugged CPUs so it could
+prepare environment for and wake hotplugged AP.
 
-Direct leak of 14336 byte(s) in 2 object(s) allocated from:
-  #0 0x7f819ae43970 (/lib64/libasan.so.5+0xef970)  ??:?
-  #1 0x7f819872f49d (/lib64/libglib-2.0.so.0+0x5249d)  ??:?
-  #2 0x55a3a58da624 (./x86_64-softmmu/qemu-system-x86_64+0x2c14624)  /mnt/s=
-db/qemu/hw/virtio/virtio.c:2327
-  #3 0x55a3a571bac7 (./x86_64-softmmu/qemu-system-x86_64+0x2a55ac7)  /mnt/s=
-db/qemu/hw/9pfs/virtio-9p-device.c:209
-  #4 0x55a3a58e7bc6 (./x86_64-softmmu/qemu-system-x86_64+0x2c21bc6)  /mnt/s=
-db/qemu/hw/virtio/virtio.c:3504
-  #5 0x55a3a5ebfb37 (./x86_64-softmmu/qemu-system-x86_64+0x31f9b37)  /mnt/s=
-db/qemu/hw/core/qdev.c:876
+Reuse and extend existing CPU hotplug interface to return architecture
+specific ID for currently selected CPU in 2 registers:
+ - lower 32 bits in ACPI_CPU_CMD_DATA_OFFSET_RW
+ - upper 32 bits in ACPI_CPU_CMD_DATA2_OFFSET_R
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Message-Id: <20200117060927.51996-2-pannengyuan@huawei.com>
+On x86, firmware will use CPHP_GET_CPU_ID_CMD for fetching the APIC ID
+when handling hotplug SMI.
+
+Later, CPHP_GET_CPU_ID_CMD will be used on ARM to retrieve MPIDR,
+which serves the similar to APIC ID purpose.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1575896942-331151-10-git-send-email-imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Acked-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 ---
- hw/9pfs/virtio-9p-device.c | 1 +
- 1 file changed, 1 insertion(+)
+ docs/specs/acpi_cpu_hotplug.txt | 3 +++
+ hw/acpi/cpu.c                   | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-index 991e175c82..ba35892940 100644
---- a/hw/9pfs/virtio-9p-device.c
-+++ b/hw/9pfs/virtio-9p-device.c
-@@ -218,6 +218,7 @@ static void virtio_9p_device_unrealize(DeviceState *dev=
-, Error **errp)
-     V9fsVirtioState *v =3D VIRTIO_9P(dev);
-     V9fsState *s =3D &v->state;
+diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
+txt
+index cb99cf3c8e..a8ce5e7402 100644
+--- a/docs/specs/acpi_cpu_hotplug.txt
++++ b/docs/specs/acpi_cpu_hotplug.txt
+@@ -47,6 +47,7 @@ read access:
+     [0x0-0x3] Command data 2: (DWORD access)
+               if value last stored in 'Command field':
+                 0: reads as 0x0
++                3: upper 32 bits of architecture specific CPU ID value
+                 other values: reserved
+     [0x4] CPU device status fields: (1 byte access)
+         bits:
+@@ -61,6 +62,8 @@ read access:
+     [0x8] Command data: (DWORD access)
+           contains 0 unless value last stored in 'Command field' is one of=
+:
+               0: contains 'CPU selector' value of a CPU with pending event=
+[s]
++              3: lower 32 bits of architecture specific CPU ID value
++                 (in x86 case: APIC ID)
 =20
-+    virtio_del_queue(vdev, 0);
-     virtio_cleanup(vdev);
-     v9fs_device_unrealize_common(s, errp);
- }
+ write access:
+     offset:
+diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+index d475c06953..e2c957ce00 100644
+--- a/hw/acpi/cpu.c
++++ b/hw/acpi/cpu.c
+@@ -18,6 +18,7 @@ enum {
+     CPHP_GET_NEXT_CPU_WITH_EVENT_CMD =3D 0,
+     CPHP_OST_EVENT_CMD =3D 1,
+     CPHP_OST_STATUS_CMD =3D 2,
++    CPHP_GET_CPU_ID_CMD =3D 3,
+     CPHP_CMD_MAX
+ };
+=20
+@@ -75,6 +76,9 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr addr,=
+ unsigned size)
+         case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
+            val =3D cpu_st->selector;
+            break;
++        case CPHP_GET_CPU_ID_CMD:
++           val =3D cdev->arch_id & 0xFFFFFFFF;
++           break;
+         default:
+            break;
+         }
+@@ -85,6 +89,9 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr addr,=
+ unsigned size)
+         case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
+            val =3D 0;
+            break;
++        case CPHP_GET_CPU_ID_CMD:
++           val =3D cdev->arch_id >> 32;
++           break;
+         default:
+            break;
+         }
 --=20
 MST
 
