@@ -6,71 +6,65 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70763C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D34C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:35:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4556C24673
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:26:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4556C24673
+	by mail.kernel.org (Postfix) with ESMTPS id E585F24673
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:35:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E585F24673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuVwr-0002e6-Dd
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 01:26:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38679)
+	id 1iuW5Y-00056c-0Z
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 01:35:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iuVw5-00029K-Rl
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:25:51 -0500
+ (envelope-from <bounces@canonical.com>) id 1iuW4w-0004hD-FX
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:34:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iuVw4-0006vc-21
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:25:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54428)
+ (envelope-from <bounces@canonical.com>) id 1iuW4v-0005sW-Ec
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:34:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55828)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iuVw3-0006ti-SF
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:25:47 -0500
+ id 1iuW4v-0005qH-8t
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:34:57 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iuVw2-0002Pv-P9
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:25:46 +0000
+ id 1iuW4t-0003Lm-Ue
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:34:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BC83F2E80C7
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:25:46 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E32862E806B
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:34:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jan 2020 06:17:52 -0000
-From: Frank Heimes <1859656@bugs.launchpad.net>
+Date: Thu, 23 Jan 2020 06:23:29 -0000
+From: Thomas Huth <1592351@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=maas; status=New; importance=Undecided;
- assignee=lee.trager@canonical.com; 
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
- assignee=maas; 
-X-Launchpad-Bug-Tags: s390x
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ltrager paelzer sfeole
-X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
-X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
-References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <157976027304.5723.8658664375212273651.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
- initial deploy
+X-Launchpad-Bug-Commenters: 1j9rwias dgilbert-h jirislaby th-huth tinywrkb
+X-Launchpad-Bug-Reporter: Jirislaby (jirislaby)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20160614104554.31869.91941.malonedeb@soybean.canonical.com>
+Message-Id: <157976060948.5598.13856768647406518454.malone@chaenomeles.canonical.com>
+Subject: [Bug 1592351] Re: mouse pointer offset with gtk,gl=on
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f00630c8865a3e3e0cc49d2c3324ca501176d1bb
+X-Launchpad-Hash: 923e8648b433ba6d924a6ee32408a5bf1ea4f205
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,86 +77,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
+Reply-To: Bug 1592351 <1592351@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: s390x
+FWIW: Commit f1aba960cc40 has been released with v3.1.0.
+
+** Changed in: qemu
+       Status: Confirmed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859656
+https://bugs.launchpad.net/bugs/1592351
 
 Title:
-  [2.6] Unable to reboot s390x KVM machine after initial deploy
+  mouse pointer offset with gtk,gl=3Don
 
-Status in MAAS:
-  New
 Status in QEMU:
-  Incomplete
-Status in Ubuntu on IBM z Systems:
-  Triaged
+  Fix Released
 
 Bug description:
-  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
-  Arch: S390x
+  When I turn gl=3Don for -display gtk, some Y offset is added to the
+  mouse pointer coordinates. That is, when I click on an icon, an icon
+  _above_ the one I clicked triggers.
 
-  Appears that MAAS can not find the s390x bootloader to boot from the
-  disk, not sure how maas determines this.  However this was working in
-  the past. I had originally thought that if the maas machine was
-  deployed then it defaulted to boot from disk.
+  Using xev, it seems to be offset of 10-12 pixels.
 
-  If I force the VM to book from disk, the VM starts up as expected.
+  It happens with all ps/2 mouse, -usbdevice mouse and -usbdevice
+  tablet.
 
-  Reproduce:
+  Without gl=3Don, the pointer is precise.
 
-  - Deploy Disco on S390x KVM instance
-  - Reboot it
-
-  on the KVM console...
-
-  Connected to domain s2lp6g001
-  Escape character is ^]
-  done
-  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
-  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
-  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
-  Trying pxelinux.cfg files...
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  Failed to load OS from network
-
-  =3D=3D> /var/log/maas/rackd.log <=3D=3D
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
-0x.bin requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
-5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-1-52-54-00-e5-d7-bb requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA0 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64B requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF6 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-A requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
- requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
-efault requested by 10.246.75.160
+  I have these qemu versions:
+  qemu-2.6.0-470.2.x86_64
+  qemu-ipxe-1.0.0-470.2.noarch
+  qemu-ksm-2.6.0-470.2.x86_64
+  qemu-kvm-2.6.0-470.2.x86_64
+  qemu-ovmf-x86_64-2015+git1462940744.321151f-2.1.noarch
+  qemu-ppc-2.6.0-470.2.x86_64
+  qemu-seabios-1.9.1-470.2.noarch
+  qemu-sgabios-8-470.2.noarch
+  qemu-tools-2.6.0-470.2.x86_64
+  qemu-vgabios-1.9.1-470.2.noarch
+  qemu-x86-2.6.0-470.2.x86_64
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1592351/+subscriptions
 
