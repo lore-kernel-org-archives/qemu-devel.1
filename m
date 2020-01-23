@@ -2,86 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C18C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FDFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:55:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9A5820718
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:54:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6158B20718
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:55:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BWMqJP9j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9A5820718
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t3Ynoa5d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6158B20718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuggH-0001NQ-43
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:54:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48442)
+	id 1iughM-0002vO-Vv
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:55:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iueRi-0000So-1y
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:03 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iudci-0002C7-GC
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:38:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iueRf-0003qM-6v
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:01 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:52890)
+ (envelope-from <peter.maydell@linaro.org>) id 1iudch-0002q4-6I
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:38:20 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44607)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iueRe-0003na-Tv
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:59 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id p9so3017264wmc.2
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:30:58 -0800 (PST)
+ id 1iudcg-0002pX-VT
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:38:19 -0500
+Received: by mail-oi1-x241.google.com with SMTP id d62so3041071oia.11
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:38:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=3M0DtLx0sP95WhjPX2VrG6MMgvUeMRuumjeaeKyOkwk=;
- b=BWMqJP9jrHzB7NBokm7LgesFstUO656MIyfeCEFRbY3AAoxxM16ZKBwjXBTVgvviL5
- e8RW9Y6JwBFzeUtkptLPwaqWjasDerg+3GsFX/lCS8dSxCi6jdo459PGqZrTd2V1SA+/
- eHuulrDbUeatUxNySqQD0UHmEllrE7800lzHUof+q5Vdz9c+jG5PLxsRPVlG881M1t5h
- 8GkBZlBJNqqCkRj2KaU4H5xE18U78+DKUhY/VHAB8He9R2UX44ykXCaNmINPmaPsHunJ
- 5dDi+lQ8Mkq2TnD5iUdUAFEfep95a7KZDMmgc+m5elxbJKyRbwW8n1NGvzvRw1FPCxRG
- ClDg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SxFvWTbqkliLVKhnhsE0xivx5tRZL7ECHFqrg4zoCWs=;
+ b=t3Ynoa5doxPYA1MNpIEqUKZpnmEB0pMKb4qWyR8hMx73z+z9UsQ1S8qqNleraxbpsi
+ 8AzKEaRbKO7Qn3hTuip1cbI0APNndmIGfxe78nsakW9fcveKMo+m0mYB1B/pbOpRtH13
+ gt33uImtYAWCWRee0l/vKSuAwE5O1KSPV68q0ODTd4UdqIMHkH74HlafXiJ7Xg7g6OPy
+ CcZoWeZ+Gnf4s8tPIC4szRfc0Q1XlOksjwzJLmma5AjDL3RHJOKxW8MqC/sNX1stSCFD
+ Ok2nM4vtOG5Z+twN1pyQ+oClZ+NChhkv2HtqrYlXrEE9lb4PP4zD9l4iRW5RVfvqAvVB
+ /U0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=3M0DtLx0sP95WhjPX2VrG6MMgvUeMRuumjeaeKyOkwk=;
- b=JCoecvk4XH8Esn9yo+w0gKPR2uCsJbj+xn0VNNTMtiemvoM28yfV7F6ap39ZxtzZuh
- f2qiVJcGUlyozhYzkcpQWrT22XCj3OmGQGKmFs5p9gzgnu4ZMFg5y5OvwmdTnuQDCTmd
- KMZ5bLOSa8YSR9Yg4Sj0NClqQXPe9tLB/tZX3eoUYJV/y2cnOBT14bwp3EdiUmU0E1xw
- GqERZ4wvgqrgCjQzcJA6vdxrulpPjE50cOuxcEt7lsV71VToZIVkfKxeFPb9787xLf+P
- WteB/Sr9dezH6NWAY1yObg/hghIGX4Q7Tq4HYS3dNV7/Y9p/1JeZMa5xCez1dx5/3w6T
- 3tkw==
-X-Gm-Message-State: APjAAAUuep8E8gIF+ziO78Ex1T/O6z9JXD5u9aalssB1v+GHtogSCgP5
- RvhC1zRhVtE2sHfhLDD/ultvKg/2XWndRw==
-X-Google-Smtp-Source: APXvYqwM3ZAS8KIB4Wrk2MAKdu75PKobP8/Fqa+gKdJTsqVFU0jzAeu5F8DKODfSZjHagYUJmS3maw==
-X-Received: by 2002:a1c:b7c4:: with SMTP id h187mr5029505wmf.105.1579793457540; 
- Thu, 23 Jan 2020 07:30:57 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s139sm2903592wme.35.2020.01.23.07.30.56
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Jan 2020 07:30:56 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 13/20] dma/pl330: Convert to support tracing
-Date: Thu, 23 Jan 2020 15:30:34 +0000
-Message-Id: <20200123153041.4248-14-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200123153041.4248-1-peter.maydell@linaro.org>
-References: <20200123153041.4248-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SxFvWTbqkliLVKhnhsE0xivx5tRZL7ECHFqrg4zoCWs=;
+ b=dTj7ytupuU06V4cHDYrJFoI9QuB8R3ofms6oPUThrmVK2AoZB7f8gauNIUrDnip71W
+ Vwze+nhSSvcjCiuKNy3n6D/Dr6wrpVAWNnHJnpvwsxRVFsYxNugXFA8bvV+xbQhxyJUo
+ 51LVxNh21wGQSkLJaAX0ZSULix9cn2VXo+Cg6WrY9hUGSaeccQNmuZIfVpG6PnCwIvSn
+ NCvgrzB9ZGxtNTEPc+sBdyDvpG4/kF5kvBbYI2uuNmaD5H/BgXspEWsgfeN0dvdE8PfM
+ X97mTPxZnkclsL+UYfPsTKOqxn0i5w/eU4xmapSkJFAp0M1PzxbEdN0wxCeqgoXscWwW
+ UhKw==
+X-Gm-Message-State: APjAAAVRBw7HHuQ1pEPU/E4oLdY3pRrFgiPu+Hx1FUljFgHN7aeustgk
+ LF/KYJQGbjpDuoAgFqGEkbhmnNUPnz8Voo7o5y9hiQ==
+X-Google-Smtp-Source: APXvYqwmRX/ekW9qSc+JUdv/mcFo538k/U4O8bMIa0IjfUSOLLpJybO6Hyc8y5OzKWvvGF7r+igYZ16gv3ircPN0Ibk=
+X-Received: by 2002:aca:3182:: with SMTP id
+ x124mr10786904oix.170.1579790298104; 
+ Thu, 23 Jan 2020 06:38:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200121225703.148465-1-palmerdabbelt@google.com>
+In-Reply-To: <20200121225703.148465-1-palmerdabbelt@google.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Jan 2020 14:38:07 +0000
+Message-ID: <CAFEAcA9YoAjASu4F1hZRjbq5S+h8GtBUVb9dgecMdaWb9YENEw@mail.gmail.com>
+Subject: Re: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 1
+To: Palmer Dabbelt <palmerdabbelt@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,324 +87,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Guenter Roeck <linux@roeck-us.net>
+On Tue, 21 Jan 2020 at 23:41, Palmer Dabbelt <palmerdabbelt@google.com> wrote:
+>
+> The following changes since commit 28b58f19d269633b3d14b6aebf1e92b3cd3ab56e:
+>
+>   ui/gtk: Get display refresh rate with GDK version 3.22 or later (2020-01-16 14:03:45 +0000)
+>
+> are available in the Git repository at:
+>
+>   git@github.com:palmer-dabbelt/qemu.git tags/riscv-for-master-5.0-sf1
+>
+> for you to fetch changes up to 82f014671cf057de51c4a577c9e2ad637dcec6f9:
+>
+>   target/riscv: update mstatus.SD when FS is set dirty (2020-01-16 10:03:15 -0800)
+>
+> ----------------------------------------------------------------
+> RISC-V Patches for the 5.0 Soft Freeze, Part 1
+>
+> This patch set contains a handful of collected fixes that I'd like to target
+> for the 5.0 soft freeze (I know that's a long way away, I just don't know what
+> else to call these):
+>
+> * A fix for a memory leak initializing the sifive_u board.
+> * Fixes to privilege mode emulation related to interrupts and fstatus.
+>
+> Notably absent is the H extension implementation.  That's pretty much reviewed,
+> but not quite ready to go yet and I didn't want to hold back these important
+> fixes.  This boots 32-bit and 64-bit Linux (buildroot this time, just for fun)
+> and passes "make check".
 
-Replace debug logging code with tracing.
+Hi. This pull request doesn't seem to be signed with the GPG
+key that I have on record for you...
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Message-id: 20200123052540.6132-2-linux@roeck-us.net
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/dma/pl330.c      | 88 ++++++++++++++++++++++++---------------------
- hw/dma/trace-events | 24 +++++++++++++
- 2 files changed, 72 insertions(+), 40 deletions(-)
-
-diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
-index f2bb2d9ac16..64519971ef9 100644
---- a/hw/dma/pl330.c
-+++ b/hw/dma/pl330.c
-@@ -25,19 +25,12 @@
- #include "sysemu/dma.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "trace.h"
- 
- #ifndef PL330_ERR_DEBUG
- #define PL330_ERR_DEBUG 0
- #endif
- 
--#define DB_PRINT_L(lvl, fmt, args...) do {\
--    if (PL330_ERR_DEBUG >= lvl) {\
--        fprintf(stderr, "PL330: %s:" fmt, __func__, ## args);\
--    } \
--} while (0)
--
--#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
--
- #define PL330_PERIPH_NUM            32
- #define PL330_MAX_BURST_LEN         128
- #define PL330_INSN_MAXSIZE          6
-@@ -319,6 +312,26 @@ typedef struct PL330InsnDesc {
-     void (*exec)(PL330Chan *, uint8_t opcode, uint8_t *args, int len);
- } PL330InsnDesc;
- 
-+static void pl330_hexdump(uint8_t *buf, size_t size)
-+{
-+    unsigned int b, i, len;
-+    char tmpbuf[80];
-+
-+    for (b = 0; b < size; b += 16) {
-+        len = size - b;
-+        if (len > 16) {
-+            len = 16;
-+        }
-+        tmpbuf[0] = '\0';
-+        for (i = 0; i < len; i++) {
-+            if ((i % 4) == 0) {
-+                strcat(tmpbuf, " ");
-+            }
-+            sprintf(tmpbuf + strlen(tmpbuf), " %02x", buf[b + i]);
-+        }
-+        trace_pl330_hexdump(b, tmpbuf);
-+    }
-+}
- 
- /* MFIFO Implementation
-  *
-@@ -582,7 +595,7 @@ static inline void pl330_queue_remove_tagged(PL330Queue *s, uint8_t tag)
- 
- static inline void pl330_fault(PL330Chan *ch, uint32_t flags)
- {
--    DB_PRINT("ch: %p, flags: %" PRIx32 "\n", ch, flags);
-+    trace_pl330_fault(ch, flags);
-     ch->fault_type |= flags;
-     if (ch->state == pl330_chan_fault) {
-         return;
-@@ -590,7 +603,7 @@ static inline void pl330_fault(PL330Chan *ch, uint32_t flags)
-     ch->state = pl330_chan_fault;
-     ch->parent->num_faulting++;
-     if (ch->parent->num_faulting == 1) {
--        DB_PRINT("abort interrupt raised\n");
-+        trace_pl330_fault_abort();
-         qemu_irq_raise(ch->parent->irq_abort);
-     }
- }
-@@ -648,7 +661,7 @@ static void pl330_dmaend(PL330Chan *ch, uint8_t opcode,
-             return;
-         }
-     }
--    DB_PRINT("DMA ending!\n");
-+    trace_pl330_dmaend();
-     pl330_fifo_tagged_remove(&s->fifo, ch->tag);
-     pl330_queue_remove_tagged(&s->read_queue, ch->tag);
-     pl330_queue_remove_tagged(&s->write_queue, ch->tag);
-@@ -683,7 +696,7 @@ static void pl330_dmago(PL330Chan *ch, uint8_t opcode, uint8_t *args, int len)
-     uint32_t pc;
-     PL330Chan *s;
- 
--    DB_PRINT("\n");
-+    trace_pl330_dmago();
- 
-     if (!ch->is_manager) {
-         pl330_fault(ch, PL330_FAULT_UNDEF_INSTR);
-@@ -740,9 +753,7 @@ static void pl330_dmald(PL330Chan *ch, uint8_t opcode, uint8_t *args, int len)
-     ch->stall = pl330_queue_put_insn(&ch->parent->read_queue, ch->src,
-                                     size, num, inc, 0, ch->tag);
-     if (!ch->stall) {
--        DB_PRINT("channel:%" PRId8 " address:%08" PRIx32 " size:%" PRIx32
--                 " num:%" PRId32 " %c\n",
--                 ch->tag, ch->src, size, num, inc ? 'Y' : 'N');
-+        trace_pl330_dmald(ch->tag, ch->src, size, num, inc ? 'Y' : 'N');
-         ch->src += inc ? size * num - (ch->src & (size - 1)) : 0;
-     }
- }
-@@ -782,7 +793,7 @@ static void pl330_dmakill(PL330Chan *ch, uint8_t opcode, uint8_t *args, int len)
-         ch->fault_type = 0;
-         ch->parent->num_faulting--;
-         if (ch->parent->num_faulting == 0) {
--            DB_PRINT("abort interrupt lowered\n");
-+            trace_pl330_dmakill();
-             qemu_irq_lower(ch->parent->irq_abort);
-         }
-     }
-@@ -800,6 +811,8 @@ static void pl330_dmalpend(PL330Chan *ch, uint8_t opcode,
-     uint8_t bs = opcode & 3;
-     uint8_t lc = (opcode & 4) >> 2;
- 
-+    trace_pl330_dmalpend(nf, bs, lc, ch->lc[lc], ch->request_flag);
-+
-     if (bs == 2) {
-         pl330_fault(ch, PL330_FAULT_OPERAND_INVALID);
-         return;
-@@ -813,12 +826,12 @@ static void pl330_dmalpend(PL330Chan *ch, uint8_t opcode,
-         if (nf) {
-             ch->lc[lc]--;
-         }
--        DB_PRINT("loop reiteration\n");
-+        trace_pl330_dmalpiter();
-         ch->pc -= args[0];
-         ch->pc -= len + 1;
-         /* "ch->pc -= args[0] + len + 1" is incorrect when args[0] == 256 */
-     } else {
--        DB_PRINT("loop fallthrough\n");
-+        trace_pl330_dmalpfallthrough();
-     }
- }
- 
-@@ -886,10 +899,10 @@ static void pl330_dmasev(PL330Chan *ch, uint8_t opcode, uint8_t *args, int len)
-     }
-     if (ch->parent->inten & (1 << ev_id)) {
-         ch->parent->int_status |= (1 << ev_id);
--        DB_PRINT("event interrupt raised %" PRId8 "\n", ev_id);
-+        trace_pl330_dmasev_evirq(ev_id);
-         qemu_irq_raise(ch->parent->irq[ev_id]);
-     }
--    DB_PRINT("event raised %" PRId8 "\n", ev_id);
-+    trace_pl330_dmasev_event(ev_id);
-     ch->parent->ev_status |= (1 << ev_id);
- }
- 
-@@ -914,9 +927,7 @@ static void pl330_dmast(PL330Chan *ch, uint8_t opcode, uint8_t *args, int len)
-     ch->stall = pl330_queue_put_insn(&ch->parent->write_queue, ch->dst,
-                                     size, num, inc, 0, ch->tag);
-     if (!ch->stall) {
--        DB_PRINT("channel:%" PRId8 " address:%08" PRIx32 " size:%" PRIx32
--                 " num:%" PRId32 " %c\n",
--                 ch->tag, ch->dst, size, num, inc ? 'Y' : 'N');
-+        trace_pl330_dmast(ch->tag, ch->dst, size, num, inc ? 'Y' : 'N');
-         ch->dst += inc ? size * num - (ch->dst & (size - 1)) : 0;
-     }
- }
-@@ -992,7 +1003,7 @@ static void pl330_dmawfe(PL330Chan *ch, uint8_t opcode,
-             }
-         }
-         ch->parent->ev_status &= ~(1 << ev_id);
--        DB_PRINT("event lowered %" PRIx8 "\n", ev_id);
-+        trace_pl330_dmawfe(ev_id);
-     } else {
-         ch->stall = 1;
-     }
-@@ -1135,7 +1146,7 @@ static int pl330_chan_exec(PL330Chan *ch)
-     ch->stall = 0;
-     insn = pl330_fetch_insn(ch);
-     if (!insn) {
--        DB_PRINT("pl330 undefined instruction\n");
-+        trace_pl330_chan_exec_undef();
-         pl330_fault(ch, PL330_FAULT_UNDEF_INSTR);
-         return 0;
-     }
-@@ -1175,10 +1186,9 @@ static int pl330_exec_cycle(PL330Chan *channel)
-         int len = q->len - (q->addr & (q->len - 1));
- 
-         dma_memory_read(&address_space_memory, q->addr, buf, len);
--        if (PL330_ERR_DEBUG > 1) {
--            DB_PRINT("PL330 read from memory @%08" PRIx32 " (size = %08x):\n",
--                      q->addr, len);
--            qemu_hexdump((char *)buf, stderr, "", len);
-+        trace_pl330_exec_cycle(q->addr, len);
-+        if (trace_event_get_state_backends(TRACE_PL330_HEXDUMP)) {
-+            pl330_hexdump(buf, len);
-         }
-         fifo_res = pl330_fifo_push(&s->fifo, buf, len, q->tag);
-         if (fifo_res == PL330_FIFO_OK) {
-@@ -1207,10 +1217,9 @@ static int pl330_exec_cycle(PL330Chan *channel)
-         }
-         if (fifo_res == PL330_FIFO_OK || q->z) {
-             dma_memory_write(&address_space_memory, q->addr, buf, len);
--            if (PL330_ERR_DEBUG > 1) {
--                DB_PRINT("PL330 read from memory @%08" PRIx32
--                         " (size = %08x):\n", q->addr, len);
--                qemu_hexdump((char *)buf, stderr, "", len);
-+            trace_pl330_exec_cycle(q->addr, len);
-+            if (trace_event_get_state_backends(TRACE_PL330_HEXDUMP)) {
-+                pl330_hexdump(buf, len);
-             }
-             if (q->inc) {
-                 q->addr += len;
-@@ -1252,8 +1261,8 @@ static int pl330_exec_channel(PL330Chan *channel)
- 
- static inline void pl330_exec(PL330State *s)
- {
--    DB_PRINT("\n");
-     int i, insr_exec;
-+    trace_pl330_exec();
-     do {
-         insr_exec = pl330_exec_channel(&s->manager);
- 
-@@ -1298,7 +1307,7 @@ static void pl330_debug_exec(PL330State *s)
-     args[2] = (s->dbg[1] >>  8) & 0xff;
-     args[3] = (s->dbg[1] >> 16) & 0xff;
-     args[4] = (s->dbg[1] >> 24) & 0xff;
--    DB_PRINT("chan id: %" PRIx8 "\n", chan_id);
-+    trace_pl330_debug_exec(chan_id);
-     if (s->dbg[0] & 1) {
-         ch = &s->chan[chan_id];
-     } else {
-@@ -1320,6 +1329,7 @@ static void pl330_debug_exec(PL330State *s)
-         ch->fault_type |= PL330_FAULT_DBG_INSTR;
-     }
-     if (ch->stall) {
-+        trace_pl330_debug_exec_stall();
-         qemu_log_mask(LOG_UNIMP, "pl330: stall of debug instruction not "
-                       "implemented\n");
-     }
-@@ -1334,7 +1344,7 @@ static void pl330_iomem_write(void *opaque, hwaddr offset,
-     PL330State *s = (PL330State *) opaque;
-     int i;
- 
--    DB_PRINT("addr: %08x data: %08x\n", (unsigned)offset, (unsigned)value);
-+    trace_pl330_iomem_write((unsigned)offset, (unsigned)value);
- 
-     switch (offset) {
-     case PL330_REG_INTEN:
-@@ -1343,7 +1353,7 @@ static void pl330_iomem_write(void *opaque, hwaddr offset,
-     case PL330_REG_INTCLR:
-         for (i = 0; i < s->num_events; i++) {
-             if (s->int_status & s->inten & value & (1 << i)) {
--                DB_PRINT("event interrupt lowered %d\n", i);
-+                trace_pl330_iomem_write_clr(i);
-                 qemu_irq_lower(s->irq[i]);
-             }
-         }
-@@ -1361,11 +1371,9 @@ static void pl330_iomem_write(void *opaque, hwaddr offset,
-         }
-         break;
-     case PL330_REG_DBGINST0:
--        DB_PRINT("s->dbg[0] = %08x\n", (unsigned)value);
-         s->dbg[0] = value;
-         break;
-     case PL330_REG_DBGINST1:
--        DB_PRINT("s->dbg[1] = %08x\n", (unsigned)value);
-         s->dbg[1] = value;
-         break;
-     default:
-@@ -1489,7 +1497,7 @@ static uint64_t pl330_iomem_read(void *opaque, hwaddr offset,
-         unsigned size)
- {
-     uint32_t ret = pl330_iomem_read_imp(opaque, offset);
--    DB_PRINT("addr: %08" HWADDR_PRIx " data: %08" PRIx32 "\n", offset, ret);
-+    trace_pl330_iomem_read((uint32_t)offset, ret);
-     return ret;
- }
- 
-diff --git a/hw/dma/trace-events b/hw/dma/trace-events
-index e4498428c52..5902ac5969d 100644
---- a/hw/dma/trace-events
-+++ b/hw/dma/trace-events
-@@ -20,3 +20,27 @@ sparc32_dma_enable_lower(void) "Lower DMA enable"
- 
- # i8257.c
- i8257_unregistered_dma(int nchan, int dma_pos, int dma_len) "unregistered DMA channel used nchan=%d dma_pos=%d dma_len=%d"
-+
-+# pl330.c
-+pl330_fault(void *ptr, uint32_t flags) "ch: %p, flags: 0x%"PRIx32
-+pl330_fault_abort(void) "abort interrupt raised"
-+pl330_dmaend(void) "DMA ending"
-+pl330_dmago(void) "DMA run"
-+pl330_dmald(uint32_t chan, uint32_t addr, uint32_t size, uint32_t num, uint32_t ch) "channel:%"PRId8" address:0x%08"PRIx32" size:0x%"PRIx32" num:%"PRId32"%c"
-+pl330_dmakill(void) "abort interrupt lowered"
-+pl330_dmalpend(uint8_t nf, uint8_t bs, uint8_t lc, uint8_t ch, uint8_t flag) "nf=0x%02x bs=0x%02x lc=0x%02x ch=0x%02x flag=0x%02x"
-+pl330_dmalpiter(void) "loop reiteration"
-+pl330_dmalpfallthrough(void) "loop fallthrough"
-+pl330_dmasev_evirq(uint8_t ev_id) "event interrupt raised %"PRId8
-+pl330_dmasev_event(uint8_t ev_id) "event raised %"PRId8
-+pl330_dmast(uint32_t chn, uint32_t addr, uint32_t sz, uint32_t num, uint32_t c) "channel:%"PRId8" address:0x%08"PRIx32" size:0x%"PRIx32" num:%"PRId32" %c"
-+pl330_dmawfe(uint8_t ev_id) "event lowered 0x%"PRIx8
-+pl330_chan_exec_undef(void) "undefined instruction"
-+pl330_exec_cycle(uint32_t addr, uint32_t size) "PL330 read from memory @0x%08"PRIx32" (size = 0x%08"PRIx32")"
-+pl330_hexdump(uint32_t offset, char *str) " 0x%04"PRIx32":%s"
-+pl330_exec(void) "pl330_exec"
-+pl330_debug_exec(uint8_t ch) "chan id: 0x%"PRIx8
-+pl330_debug_exec_stall(void) "stall of debug instruction not implemented"
-+pl330_iomem_write(uint32_t offset, uint32_t value) "addr: 0x%08"PRIx32" data: 0x%08"PRIx32
-+pl330_iomem_write_clr(int i) "event interrupt lowered %d"
-+pl330_iomem_read(uint32_t addr, uint32_t data) "addr: 0x%08"PRIx32" data: 0x%08"PRIx32
--- 
-2.20.1
-
+thanks
+-- PMM
 
