@@ -2,87 +2,74 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD52C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 21:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62526C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 22:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21AF820665
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 21:48:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWwLeOD6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21AF820665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F05620718
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 22:06:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F05620718
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iukL8-00043S-6g
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 16:48:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32947)
+	id 1iukch-0000Bu-DM
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 17:06:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iukK6-0003Oc-Jw
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:47:35 -0500
+ (envelope-from <bounces@canonical.com>) id 1iukbv-00080B-Mc
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iukK4-0007AD-PJ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:47:33 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58052
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iukK4-000796-D1
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:47:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579816051;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=a5TiTiL80aZ1ZCb8cAUGy47NCYXHjroeUujSWPr+YSc=;
- b=CWwLeOD652Hoa9CpSWwoO5oN/+/ghTlK0nv7voiluXCNsO+dSTZLxh8haj61jDpFaMweFf
- fLZa1TyC9C2lKUbhWZgXRz97Q/our0mjBFNwI0diqGbSHR+UOgdVKWGvzLiNAUNJYw+8Q+
- yo7fM0g9Anky7qC0Q0RSN8E8aB7xrP8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-Gj_I2IFSOWyiv5P5QJGo7Q-1; Thu, 23 Jan 2020 16:47:27 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4898107ACC5;
- Thu, 23 Jan 2020 21:47:26 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-27.gru2.redhat.com
- [10.97.116.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7EE378643E;
- Thu, 23 Jan 2020 21:47:21 +0000 (UTC)
-Subject: Re: [PATCH v3 2/4] tests/acceptance: boot_linux_console: Add boot
- Linux with kvm tests
-To: Andrew Jones <drjones@redhat.com>
-References: <20200122012753.9846-1-wainersm@redhat.com>
- <20200122012753.9846-3-wainersm@redhat.com>
- <20200122090246.oehdjxeotx5tz64l@kamzik.brq.redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <7106bfc9-067e-6864-c766-046372ed4bd0@redhat.com>
-Date: Thu, 23 Jan 2020 19:47:19 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <bounces@canonical.com>) id 1iukbu-00045O-5z
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:05:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33712)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iukbu-000423-0E
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:05:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iukbs-0002s9-1g
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 22:05:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id ED3182E80C9
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 22:05:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200122090246.oehdjxeotx5tz64l@kamzik.brq.redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Gj_I2IFSOWyiv5P5QJGo7Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Jan 2020 21:56:19 -0000
+From: Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: grassead rth vdehors
+X-Launchpad-Bug-Reporter: Adrien Grassein (grassead)
+X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+References: <157903678645.2454.11578772527064917210.malonedeb@soybean.canonical.com>
+Message-Id: <157981657960.5691.15660022070280707948.malone@wampee.canonical.com>
+Subject: [Bug 1859713] Re: ARM v8.3a pauth not working
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 66bc8673124ca7c9c0c7577f063baae07ac1265a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,68 +78,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, ehabkost@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, crosa@redhat.com, alex.bennee@linaro.org
+Reply-To: Bug 1859713 <1859713@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Now upstream as commit de0b1bae6461f67243282555475f88b2384a1eb9.
 
-On 1/22/20 7:02 AM, Andrew Jones wrote:
-> On Tue, Jan 21, 2020 at 10:27:51PM -0300, Wainer dos Santos Moschetta wrote:
->> +    def test_aarch64_virt_kvm(self):
->> +        """
->> +        :avocado: tags=arch:aarch64
->> +        :avocado: tags=machine:virt
->> +        :avocado: tags=accel:kvm
->> +        """
->> +        self.do_test_aarch64_virt()
->> +
->> +    def test_aarch64_virt_tcg(self):
->> +        """
->> +        :avocado: tags=arch:aarch64
->> +        :avocado: tags=machine:virt
->> +        :avocado: tags=accel:tcg
->> +        """
->> +        self.do_test_aarch64_virt()
->> +
-> Does do_test_aarch64_virt() add more machine parameters? Also, which cpu
-> type does it choose? The reason I ask is because aarch64 virt will fail to
-> run with KVM unless the appropriate gic version is specified (the
-> gic-version machine parameter). Also the cpu type must be 'host' or 'max'.
-> 'max' is the better choice as it also works for tcg. gic-version also
-> takes 'max' allowing it to auto-select the appropriate version. So if it's
-> not already there somewhere, then please ensure aarch64 has these
-> additional parameters:
->
->   machine:gic-version=max
->   cpu:max
+** Changed in: qemu
+       Status: Confirmed =3D> Fix Committed
 
+-- =
 
-The test was passing '-cpu cortex-a56', I replaced with '-cpu max'. 
-Also, now, it passes the gic version as you pointed out. I will send 
-those changes on a v4.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859713
 
-Other than that, I tried '-cpu max -machine virt' (without gic-version) 
-and QEMU crashed:
+Title:
+  ARM v8.3a pauth not working
 
-[root@virtlab-arm03 build]# ./aarch64-softmmu/qemu-system-aarch64 -accel 
-kvm -cpu max -machine virt -display none -vga none
-qemu-system-aarch64: PMU: KVM_SET_DEVICE_ATTR: Invalid argument
-qemu-system-aarch64: failed to set irq for PMU
-Aborted (core dumped)
+Status in QEMU:
+  Fix Committed
 
-----
+Bug description:
+  Host: Ubuntu 19.10 - x86_64 machine
+  QEMU version: 3a63b24a1bbf166e6f455fe43a6bbd8dea413d92 (master)
 
-Should I expect it to crash or rather nicely fail?
+  ARMV8.3 pauth is not working well.
 
-Thanks !
+  With a test code containing two pauth instructions:
+      - paciasp that sign LR with A key and sp as context;
+      - autiasp that verify the signature.
 
-- Wainer
+  Test:
+      - Run the program and corrupt LR just before autiasp (ex 0x3e00000400=
+660 instead of 0x3e000000400664)
 
+  Expected:
+      - autiasp places an invalid pointer in LR
 
->
-> Thanks,
-> drew
+  Result:
+      - autiasp successfully auth the pointer and places 0x0400660 in LR.
 
+  Further explanations:
+      Adding traces in qemu code shows that "pauth_computepac" is not robus=
+t enough against truncating.
+      With 0x31000000400664 as input of pauth_auth, we obtain "0x55b1d65b2c=
+138e14" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
+      With 0x310040008743ec as input of pauth (with same key), we obtain "0=
+x55b1d65b2c138ef4" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
+      Values of top_bit and bottom_bit are strictly the same and it should =
+not.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859713/+subscriptions
 
