@@ -2,78 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61AE1C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20BDDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:33:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A3302077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E169E2077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:33:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hoX6IDdf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A3302077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="firGSFmC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E169E2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iucZj-0007FK-IR
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:31:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40608)
+	id 1iucbg-0000ac-Vd
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:33:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iub9A-0002VB-K0
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:42 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub8t-00026R-Kq
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iub97-0005DY-OX
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37779
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iub8s-000530-3R
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24354
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iub97-0005DE-Eb
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:37 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub8r-00051z-N0
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780777;
+ s=mimecast20190719; t=1579780760;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/tN+lBVLn3pt3o4YBhLMASpYIaxSV/yTnqvOFAdRNOs=;
- b=hoX6IDdfWL+7BBO6hGvlr1yfepZHsOJ0ScM601G4586BBfm3JYLbDF6qTNwi0JX3AvwBDv
- sBIPtBetexsuby0/aomQ+uocE4YiKsJTPIUY9bV/cE4SkTr+v+DL+wULZ2C/HAUeEzeEGq
- jaxcXrVCyP1iyPpPZ4PU9F/PD6Hemos=
+ bh=1yNZ903nBsp45b/CUHR2twKT/7zvjV6NUQqNyOO4Jko=;
+ b=firGSFmCXONzVViiBANPGB1JlfLqMCwkw4h7Hp4Zrnac+7iYNpgXFu9kbH4jKlp4XnXRub
+ 1PF/e3JBB83pPgRtHrnNbYPo3G62yAQNW4kCYFFZKElC1RzJ4OX91KuxZ7RPbeZ5aNQF3y
+ +UxaWOClxHT6P/Jos9Y9af5/XMqbbq4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-Fkxcu9Y9MmG93lLHnOek3g-1; Thu, 23 Jan 2020 06:59:35 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-64-bBtK27k5NYmNlfI6PBqfZg-1; Thu, 23 Jan 2020 06:59:18 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A49F58017CC
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:34 +0000 (UTC)
-Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 65B9419C69;
- Thu, 23 Jan 2020 11:59:32 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 18/21] migration: Make no compression operations into its
- own structure
-Date: Thu, 23 Jan 2020 12:58:28 +0100
-Message-Id: <20200123115831.36842-19-quintela@redhat.com>
-In-Reply-To: <20200123115831.36842-1-quintela@redhat.com>
-References: <20200123115831.36842-1-quintela@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7AF71088391
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:17 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E89D1CB;
+ Thu, 23 Jan 2020 11:59:16 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 026/111] virtiofsd: Keep track of replies
+Date: Thu, 23 Jan 2020 11:57:16 +0000
+Message-Id: <20200123115841.138849-27-dgilbert@redhat.com>
+In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Fkxcu9Y9MmG93lLHnOek3g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: bBtK27k5NYmNlfI6PBqfZg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,436 +86,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It will be used later.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+Keep track of whether we sent a reply to a request; this is a bit
+paranoid but it means:
+  a) We should always recycle an element even if there was an error
+     in the request
+  b) Never try and send two replies on one queue element
 
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
-Move setup of ->ops helper to proper place (wei)
-Rename s/none/nocomp/ (dave)
-Introduce MULTIFD_FLAG_NOCOMP
-right order of arguments for print
----
- migration/migration.c |   9 +++
- migration/migration.h |   1 +
- migration/multifd.c   | 183 ++++++++++++++++++++++++++++++++++++++++--
- migration/multifd.h   |  22 +++++
- migration/ram.c       |   1 +
- 5 files changed, 208 insertions(+), 8 deletions(-)
+ tools/virtiofsd/fuse_virtio.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 3501bc3353..d25fdb3e6b 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2245,6 +2245,15 @@ int migrate_multifd_channels(void)
-     return s->parameters.multifd_channels;
- }
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 05d0e29f12..f1adeb6345 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -44,6 +44,7 @@ struct fv_QueueInfo {
 =20
-+int migrate_multifd_method(void)
-+{
-+    MigrationState *s;
-+
-+    s =3D migrate_get_current();
-+
-+    return s->parameters.multifd_compress;
-+}
-+
- int migrate_use_xbzrle(void)
- {
-     MigrationState *s;
-diff --git a/migration/migration.h b/migration/migration.h
-index 8473ddfc88..3b0b413a93 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -300,6 +300,7 @@ bool migrate_auto_converge(void);
- bool migrate_use_multifd(void);
- bool migrate_pause_before_switchover(void);
- int migrate_multifd_channels(void);
-+int migrate_multifd_method(void);
-=20
- int migrate_use_xbzrle(void);
- int64_t migrate_xbzrle_cache_size(void);
-diff --git a/migration/multifd.c b/migration/multifd.c
-index 1875bb3aaa..353140cd25 100644
---- a/migration/multifd.c
-+++ b/migration/multifd.c
-@@ -38,6 +38,132 @@ typedef struct {
-     uint64_t unused2[4];    /* Reserved for future use */
- } __attribute__((packed)) MultiFDInit_t;
-=20
-+/* Multifd without compression */
-+
-+/**
-+ * nocomp_send_setup: setup send side
-+ *
-+ * For no compression this function does nothing.
-+ *
-+ * Returns 0 for success or -1 for error
-+ *
-+ * @p: Params for the channel that we are using
-+ * @errp: pointer to an error
-+ */
-+static int nocomp_send_setup(MultiFDSendParams *p, Error **errp)
-+{
-+    return 0;
-+}
-+
-+/**
-+ * nocomp_send_cleanup: cleanup send side
-+ *
-+ * For no compression this function does nothing.
-+ *
-+ * @p: Params for the channel that we are using
-+ */
-+static void nocomp_send_cleanup(MultiFDSendParams *p, Error **errp)
-+{
-+    return;
-+}
-+
-+/**
-+ * nocomp_send_prepare: prepare date to be able to send
-+ *
-+ * For no compression we just have to calculate the size of the
-+ * packet.
-+ *
-+ * Returns 0 for success or -1 for error
-+ *
-+ * @p: Params for the channel that we are using
-+ * @used: number of pages used
-+ * @errp: pointer to an error
-+ */
-+static int nocomp_send_prepare(MultiFDSendParams *p, uint32_t used,
-+                               Error **errp)
-+{
-+    p->next_packet_size =3D used * qemu_target_page_size();
-+    p->flags |=3D MULTIFD_FLAG_NOCOMP;
-+    return 0;
-+}
-+
-+/**
-+ * nocomp_send_write: do the actual write of the data
-+ *
-+ * For no compression we just have to write the data.
-+ *
-+ * Returns 0 for success or -1 for error
-+ *
-+ * @p: Params for the channel that we are using
-+ * @used: number of pages used
-+ * @errp: pointer to an error
-+ */
-+static int nocomp_send_write(MultiFDSendParams *p, uint32_t used, Error **=
-errp)
-+{
-+    return qio_channel_writev_all(p->c, p->pages->iov, used, errp);
-+}
-+
-+/**
-+ * nocomp_recv_setup: setup receive side
-+ *
-+ * For no compression this function does nothing.
-+ *
-+ * Returns 0 for success or -1 for error
-+ *
-+ * @p: Params for the channel that we are using
-+ * @errp: pointer to an error
-+ */
-+static int nocomp_recv_setup(MultiFDRecvParams *p, Error **errp)
-+{
-+    return 0;
-+}
-+
-+/**
-+ * nocomp_recv_cleanup: setup receive side
-+ *
-+ * For no compression this function does nothing.
-+ *
-+ * @p: Params for the channel that we are using
-+ */
-+static void nocomp_recv_cleanup(MultiFDRecvParams *p)
-+{
-+}
-+
-+/**
-+ * nocomp_recv_pages: read the data from the channel into actual pages
-+ *
-+ * For no compression we just need to read things into the correct place.
-+ *
-+ * Returns 0 for success or -1 for error
-+ *
-+ * @p: Params for the channel that we are using
-+ * @used: number of pages used
-+ * @errp: pointer to an error
-+ */
-+static int nocomp_recv_pages(MultiFDRecvParams *p, uint32_t used, Error **=
-errp)
-+{
-+    if (p->flags !=3D MULTIFD_FLAG_NOCOMP) {
-+        error_setg(errp, "multifd %d: flags received %x flags expected %x"=
-,
-+                   p->id, p->flags, MULTIFD_FLAG_NOCOMP);
-+        return -1;
-+    }
-+    return qio_channel_readv_all(p->c, p->pages->iov, used, errp);
-+}
-+
-+static MultiFDMethods multifd_nocomp_ops =3D {
-+    .send_setup =3D nocomp_send_setup,
-+    .send_cleanup =3D nocomp_send_cleanup,
-+    .send_prepare =3D nocomp_send_prepare,
-+    .send_write =3D nocomp_send_write,
-+    .recv_setup =3D nocomp_recv_setup,
-+    .recv_cleanup =3D nocomp_recv_cleanup,
-+    .recv_pages =3D nocomp_recv_pages
-+};
-+
-+static MultiFDMethods *multifd_ops[MULTIFD_COMPRESS__MAX] =3D {
-+    [MULTIFD_COMPRESS_NONE] =3D &multifd_nocomp_ops,
-+};
-+
- static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
- {
-     MultiFDInit_t msg =3D {};
-@@ -246,6 +372,8 @@ struct {
-      * We will use atomic operations.  Only valid values are 0 and 1.
-      */
-     int exiting;
-+    /* multifd ops */
-+    MultiFDMethods *ops;
- } *multifd_send_state;
+     /* The element for the command currently being processed */
+     VuVirtqElement *qe;
++    bool reply_sent;
+ };
 =20
  /*
-@@ -397,6 +525,7 @@ void multifd_save_cleanup(void)
-     }
-     for (i =3D 0; i < migrate_multifd_channels(); i++) {
-         MultiFDSendParams *p =3D &multifd_send_state->params[i];
-+        Error *local_err =3D NULL;
-=20
-         socket_send_channel_destroy(p->c);
-         p->c =3D NULL;
-@@ -410,6 +539,10 @@ void multifd_save_cleanup(void)
-         p->packet_len =3D 0;
-         g_free(p->packet);
-         p->packet =3D NULL;
-+        multifd_send_state->ops->send_cleanup(p, &local_err);
-+        if (local_err) {
-+            migrate_set_error(migrate_get_current(), local_err);
-+        }
-     }
-     qemu_sem_destroy(&multifd_send_state->channels_ready);
-     g_free(multifd_send_state->params);
-@@ -494,7 +627,14 @@ static void *multifd_send_thread(void *opaque)
-             uint64_t packet_num =3D p->packet_num;
-             flags =3D p->flags;
-=20
--            p->next_packet_size =3D used * qemu_target_page_size();
-+            if (used) {
-+                ret =3D multifd_send_state->ops->send_prepare(p, used,
-+                                                            &local_err);
-+                if (ret !=3D 0) {
-+                    qemu_mutex_unlock(&p->mutex);
-+                    break;
-+                }
-+            }
-             multifd_send_fill_packet(p);
-             p->flags =3D 0;
-             p->num_packets++;
-@@ -513,8 +653,7 @@ static void *multifd_send_thread(void *opaque)
-             }
-=20
-             if (used) {
--                ret =3D qio_channel_writev_all(p->c, p->pages->iov,
--                                             used, &local_err);
-+                ret =3D multifd_send_state->ops->send_write(p, used, &loca=
-l_err);
-                 if (ret !=3D 0) {
-                     break;
-                 }
-@@ -596,6 +735,7 @@ int multifd_save_setup(Error **errp)
-     multifd_send_state->pages =3D multifd_pages_init(page_count);
-     qemu_sem_init(&multifd_send_state->channels_ready, 0);
-     atomic_set(&multifd_send_state->exiting, 0);
-+    multifd_send_state->ops =3D multifd_ops[migrate_multifd_method()];
-=20
-     for (i =3D 0; i < thread_count; i++) {
-         MultiFDSendParams *p =3D &multifd_send_state->params[i];
-@@ -615,6 +755,18 @@ int multifd_save_setup(Error **errp)
-         p->name =3D g_strdup_printf("multifdsend_%d", i);
-         socket_send_channel_create(multifd_new_send_channel_async, p);
-     }
-+
-+    for (i =3D 0; i < thread_count; i++) {
-+        MultiFDSendParams *p =3D &multifd_send_state->params[i];
-+        Error *local_err =3D NULL;
-+        int ret;
-+
-+        ret =3D multifd_send_state->ops->send_setup(p, &local_err);
-+        if (ret) {
-+            error_propagate(errp, local_err);
-+            return ret;
-+        }
-+    }
-     return 0;
- }
-=20
-@@ -626,6 +778,8 @@ struct {
-     QemuSemaphore sem_sync;
-     /* global number of generated multifd packets */
-     uint64_t packet_num;
-+    /* multifd ops */
-+    MultiFDMethods *ops;
- } *multifd_recv_state;
-=20
- static void multifd_recv_terminate_threads(Error *err)
-@@ -665,7 +819,6 @@ static void multifd_recv_terminate_threads(Error *err)
- int multifd_load_cleanup(Error **errp)
+@@ -178,6 +179,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
+e_chan *ch,
  {
-     int i;
--    int ret =3D 0;
+     VuVirtqElement *elem;
+     VuVirtq *q;
++    int ret =3D 0;
 =20
-     if (!migrate_use_multifd()) {
-         return 0;
-@@ -698,6 +851,7 @@ int multifd_load_cleanup(Error **errp)
-         p->packet_len =3D 0;
-         g_free(p->packet);
-         p->packet =3D NULL;
-+        multifd_recv_state->ops->recv_cleanup(p);
+     assert(count >=3D 1);
+     assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
+@@ -191,6 +193,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
+e_chan *ch,
+     assert(out->unique);
+     /* For virtio we always have ch */
+     assert(ch);
++    assert(!ch->qi->reply_sent);
+     elem =3D ch->qi->qe;
+     q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
+=20
+@@ -208,19 +211,23 @@ int virtio_send_msg(struct fuse_session *se, struct f=
+use_chan *ch,
+     if (in_len < sizeof(struct fuse_out_header)) {
+         fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n",
+                  __func__, elem->index);
+-        return -E2BIG;
++        ret =3D -E2BIG;
++        goto err;
      }
-     qemu_sem_destroy(&multifd_recv_state->sem_sync);
-     g_free(multifd_recv_state->params);
-@@ -705,7 +859,7 @@ int multifd_load_cleanup(Error **errp)
-     g_free(multifd_recv_state);
-     multifd_recv_state =3D NULL;
+     if (in_len < tosend_len) {
+         fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd\n",
+                  __func__, elem->index, tosend_len);
+-        return -E2BIG;
++        ret =3D -E2BIG;
++        goto err;
+     }
 =20
--    return ret;
-+    return 0;
+     copy_iov(iov, count, in_sg, in_num, tosend_len);
+     vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
+     vu_queue_notify(&se->virtio_dev->dev, q);
++    ch->qi->reply_sent =3D true;
+=20
+-    return 0;
++err:
++    return ret;
  }
 =20
- void multifd_recv_sync_main(void)
-@@ -770,6 +924,8 @@ static void *multifd_recv_thread(void *opaque)
-=20
-         used =3D p->pages->used;
-         flags =3D p->flags;
-+        /* recv methods don't know how to handle the SYNC flag */
-+        p->flags &=3D ~MULTIFD_FLAG_SYNC;
-         trace_multifd_recv(p->id, p->packet_num, used, flags,
-                            p->next_packet_size);
-         p->num_packets++;
-@@ -777,8 +933,7 @@ static void *multifd_recv_thread(void *opaque)
-         qemu_mutex_unlock(&p->mutex);
-=20
-         if (used) {
--            ret =3D qio_channel_readv_all(p->c, p->pages->iov,
--                                        used, &local_err);
-+            ret =3D multifd_recv_state->ops->recv_pages(p, used, &local_er=
-r);
-             if (ret !=3D 0) {
+ /* Thread function for individual queues, created when a queue is 'started=
+' */
+@@ -296,6 +303,9 @@ static void *fv_queue_thread(void *opaque)
                  break;
              }
-@@ -817,6 +972,7 @@ int multifd_load_setup(Error **errp)
-     multifd_recv_state->params =3D g_new0(MultiFDRecvParams, thread_count)=
-;
-     atomic_set(&multifd_recv_state->count, 0);
-     qemu_sem_init(&multifd_recv_state->sem_sync, 0);
-+    multifd_recv_state->ops =3D multifd_ops[migrate_multifd_method()];
 =20
-     for (i =3D 0; i < thread_count; i++) {
-         MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
-@@ -831,6 +987,18 @@ int multifd_load_setup(Error **errp)
-         p->packet =3D g_malloc0(p->packet_len);
-         p->name =3D g_strdup_printf("multifdrecv_%d", i);
-     }
++            qi->qe =3D elem;
++            qi->reply_sent =3D false;
 +
-+    for (i =3D 0; i < thread_count; i++) {
-+        MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
-+        Error *local_err =3D NULL;
-+        int ret;
-+
-+        ret =3D multifd_recv_state->ops->recv_setup(p, &local_err);
-+        if (ret) {
-+            error_propagate(errp, local_err);
-+            return ret;
-+        }
-+    }
-     return 0;
- }
+             if (!fbuf.mem) {
+                 fbuf.mem =3D malloc(se->bufsize);
+                 assert(fbuf.mem);
+@@ -331,6 +341,13 @@ static void *fv_queue_thread(void *opaque)
+             /* TODO: Add checks for fuse_session_exited */
+             fuse_session_process_buf_int(se, &fbuf, &ch);
 =20
-@@ -888,4 +1056,3 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Error *=
-*errp)
-     return atomic_read(&multifd_recv_state->count) =3D=3D
-            migrate_multifd_channels();
- }
--
-diff --git a/migration/multifd.h b/migration/multifd.h
-index d8b0205977..8edea4fdac 100644
---- a/migration/multifd.h
-+++ b/migration/multifd.h
-@@ -24,6 +24,7 @@ void multifd_send_sync_main(QEMUFile *f);
- int multifd_queue_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset);
-=20
- #define MULTIFD_FLAG_SYNC (1 << 0)
-+#define MULTIFD_FLAG_NOCOMP (1 << 1)
-=20
- /* This value needs to be a multiple of qemu_target_page_size() */
- #define MULTIFD_PACKET_SIZE (512 * 1024)
-@@ -96,6 +97,8 @@ typedef struct {
-     uint64_t num_pages;
-     /* syncs main thread and channels */
-     QemuSemaphore sem_sync;
-+    /* used for compression methods */
-+    void *data;
- }  MultiFDSendParams;
-=20
- typedef struct {
-@@ -133,7 +136,26 @@ typedef struct {
-     uint64_t num_pages;
-     /* syncs main thread and channels */
-     QemuSemaphore sem_sync;
-+    /* used for de-compression methods */
-+    void *data;
- } MultiFDRecvParams;
-=20
-+typedef struct {
-+    /* Setup for sending side */
-+    int (*send_setup)(MultiFDSendParams *p, Error **errp);
-+    /* Cleanup for sending side */
-+    void (*send_cleanup)(MultiFDSendParams *p, Error **errp);
-+    /* Prepare the send packet */
-+    int (*send_prepare)(MultiFDSendParams *p, uint32_t used, Error **errp)=
-;
-+    /* Write the send packet */
-+    int (*send_write)(MultiFDSendParams *p, uint32_t used, Error **errp);
-+    /* Setup for receiving side */
-+    int (*recv_setup)(MultiFDRecvParams *p, Error **errp);
-+    /* Cleanup for receiving side */
-+    void (*recv_cleanup)(MultiFDRecvParams *p);
-+    /* Read all pages */
-+    int (*recv_pages)(MultiFDRecvParams *p, uint32_t used, Error **errp);
-+} MultiFDMethods;
-+
- #endif
-=20
-diff --git a/migration/ram.c b/migration/ram.c
-index ed23ed1c7c..73a141bb60 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -43,6 +43,7 @@
- #include "page_cache.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-+#include "qapi/qapi-types-migration.h"
- #include "qapi/qapi-events-migration.h"
- #include "qapi/qmp/qerror.h"
- #include "trace.h"
++            if (!qi->reply_sent) {
++                fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
++                         __func__, elem->index);
++                /* I think we've still got to recycle the element */
++                vu_queue_push(dev, q, elem, 0);
++                vu_queue_notify(dev, q);
++            }
+             qi->qe =3D NULL;
+             free(elem);
+             elem =3D NULL;
 --=20
 2.24.1
 
