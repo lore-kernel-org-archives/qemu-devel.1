@@ -2,58 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2A9C33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3777C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:46:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 787C720704
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:45:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 787C720704
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 721A72073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:46:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JT86/FUX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 721A72073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudjh-0003yD-Us
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:45:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46121)
+	id 1iudkB-0004FT-Uu
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:46:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41651)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUO-0001Fl-Ip
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:42 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iubAf-0004ED-Ps
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000r1-Cu
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:40 -0500
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:52540)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000oh-1I
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:38 -0500
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 48E8643AD6;
- Thu, 23 Jan 2020 22:25:37 +0900 (JST)
-Received: from yo-satoh-debian.localdomain
- (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 1A2D7240091;
- Thu, 23 Jan 2020 22:25:37 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v29 18/22] hw/rx: Honor -accel qtest
-Date: Thu, 23 Jan 2020 22:25:21 +0900
-Message-Id: <20200123132525.80891-19-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200123132525.80891-1-ysato@users.sourceforge.jp>
-References: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+ (envelope-from <dgilbert@redhat.com>) id 1iubAd-0006Yx-Nw
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60545
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAb-0006WV-Um
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579780868;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5oYlmc2Il84lqScujTc5YeXrb+18UGXFy3QmjmDZgzc=;
+ b=JT86/FUXqZOv/pqM0ZmajxqGcfoa3STmvsjp55UqComr07gPxGiHTLrY9wXVlAkpoSeKPH
+ 4XF2k6+9w5X4t8bhrJzavALx+hHfoQhYQ8RBYkQn2r4nMkL0wAZuP/g1Yq832WPhAVTSkJ
+ lc/v2IkcMyNEh469Tg3iqNVBN15N/0Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-eqWe058ANsyI1I6Q2cWiXA-1; Thu, 23 Jan 2020 07:01:06 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89E1310120A6
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:05 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CE83985754;
+ Thu, 23 Jan 2020 12:01:04 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 097/111] virtiofsd: do not always set FUSE_FLOCK_LOCKS
+Date: Thu, 23 Jan 2020 11:58:27 +0000
+Message-Id: <20200123115841.138849-98-dgilbert@redhat.com>
+In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: eqWe058ANsyI1I6Q2cWiXA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.13
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,66 +86,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Peng Tao <tao.peng@linux.alibaba.com>
 
-Issue an error if no kernel, no bios, and not qtest'ing.
-Fixes make check-qtest-rx: test/qom-test.
+Right now we always enable it regardless of given commandlines.
+Fix it by setting the flag relying on the lo->flock bit.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-16-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Peng Tao <tao.peng@linux.alibaba.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
-We could squash this with the previous patch
----
- hw/rx/rx62n.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ tools/virtiofsd/passthrough_ll.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-index ac47f2a397..a0986fd15e 100644
---- a/hw/rx/rx62n.c
-+++ b/hw/rx/rx62n.c
-@@ -21,12 +21,14 @@
-=20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/rx/rx62n.h"
- #include "hw/loader.h"
- #include "hw/sysbus.h"
- #include "hw/qdev-properties.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
- #include "cpu.h"
-=20
- /*
-@@ -191,8 +193,14 @@ static void rx62n_realize(DeviceState *dev, Error **=
-errp)
-     memory_region_init_rom(&s->c_flash, NULL, "codeflash",
-                            RX62N_CFLASH_SIZE, errp);
-     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
-h);
-+
-     if (!s->kernel) {
--        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+        if (bios_name) {
-+            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+        }  else if (!qtest_enabled()) {
-+            error_report("No bios or kernel specified");
-+            exit(1);
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index ab1613586e..ccbbec18b0 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -546,9 +546,14 @@ static void lo_init(void *userdata, struct fuse_conn_i=
+nfo *conn)
+         fuse_log(FUSE_LOG_DEBUG, "lo_init: activating writeback\n");
+         conn->want |=3D FUSE_CAP_WRITEBACK_CACHE;
+     }
+-    if (lo->flock && conn->capable & FUSE_CAP_FLOCK_LOCKS) {
+-        fuse_log(FUSE_LOG_DEBUG, "lo_init: activating flock locks\n");
+-        conn->want |=3D FUSE_CAP_FLOCK_LOCKS;
++    if (conn->capable & FUSE_CAP_FLOCK_LOCKS) {
++        if (lo->flock) {
++            fuse_log(FUSE_LOG_DEBUG, "lo_init: activating flock locks\n");
++            conn->want |=3D FUSE_CAP_FLOCK_LOCKS;
++        } else {
++            fuse_log(FUSE_LOG_DEBUG, "lo_init: disabling flock locks\n");
++            conn->want &=3D ~FUSE_CAP_FLOCK_LOCKS;
 +        }
      }
 =20
-     /* Initialize CPU */
+     if (conn->capable & FUSE_CAP_POSIX_LOCKS) {
 --=20
-2.20.1
+2.24.1
 
 
