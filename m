@@ -7,81 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A1DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD9CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:42:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EBD121734
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 330A121734
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:42:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oWemyY4A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBD121734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="2bYxY1K1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330A121734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuebv-0004Iv-CM
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:41:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51789)
+	id 1iuecd-0004dN-GR
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:42:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrh-0005SX-Gl
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:46 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iucXL-00057m-W0
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrg-0004J4-7l
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:45 -0500
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:43676)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrg-0004FX-19
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:44 -0500
-Received: by mail-wr1-x430.google.com with SMTP id d16so3114262wre.10
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OEkIKTJLqtLn0CwQfnZ9UM16dUj1z1/bOKbRoffOWsI=;
- b=oWemyY4AgVFVMi0XwZ+H1fMp9qEDMOQJQsbfJZLA1hcLXuxhIG/o8EsrmjDQWhzHse
- Fa35WQHd3BtI5w8rXpQUTFzYgCTU0CbLW+So6jIi1GJKV490rAeMV+dWYXH9xPgahLCS
- SL8cYn4MKZEab2dhNSQW28mnaEYrfFh2EzYcFvNHuNFqtdD6YIK85edEw95v9OrYQbgv
- zku20sdkb3ivEpyXTWhrTh3luD1y3xKLrQx8sRFkKzpW10klTU4sH+9BF5Ibfk5luFW5
- Dw86FDgbrkXdwDkUC10cVBSzSesdFCZLMzW08sBG8lp/yXdINTU0q180L4VkxFPYvy+m
- FGZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=OEkIKTJLqtLn0CwQfnZ9UM16dUj1z1/bOKbRoffOWsI=;
- b=j+dabcxOQXYkK6OSABxnl8yNH0DXZyghB72SkZ5xO0zi0N8n62bSN7zIP81vE8lurL
- 2x/MtikeOIWkxCkabSemj0Hl9Tn7tCkYjGyW2pjhdOUVWCXiPnMJA6lLN3w8oL2cpMK/
- xMeXFmX6ZTeVAQnEWlgbqd4JMb1RxGcWf1fM4gavw+g7EQaAy/i91+eMlHBTrwI3o1ub
- lT0OunwqNvS7uyVgL6tOWfuyMewUsyGn3rc8pikEHZIwYclDtHj+IizZUOAQdetNYygi
- WE9q3o8Fo+ZPsP7cYrAKUguJJScLy+0bC+t3LwTMcgacaohZX8KRG5SDm0Gd4KLkVwzQ
- SXXA==
-X-Gm-Message-State: APjAAAU9ZKE9UEXS3Zsq0AccSMBE5Q8JEuNUe2BKKX6h7tBL7Gx2IO3t
- 7J082qBQDJy9fH27zL5KFF11+nG9
-X-Google-Smtp-Source: APXvYqxBl/DJ0zQMzmGHkHq3Ph9hV3cJLwPEB/XsmRuUzR8eYGytXlZ0jLB2IixBHMVTIOaDCJvSuQ==
-X-Received: by 2002:a5d:6305:: with SMTP id i5mr18054825wru.399.1579787382736; 
- Thu, 23 Jan 2020 05:49:42 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.42
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:42 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <damien.hedde@greensocs.com>) id 1iucXK-0003iM-JD
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:28:43 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:56764)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iucXK-0003hW-AE; Thu, 23 Jan 2020 08:28:42 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 6D77696F56;
+ Thu, 23 Jan 2020 13:28:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1579786121;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dzvKbyxikkccILCxuKcmdnhT6iGxt2vyARq+Np6UnOc=;
+ b=2bYxY1K1dG5Sh3ldZKJQN8SP8BibRI6cE3QXyH6YQPdGQgUpM/hlv/Uwbs5+gkZNt/oDwZ
+ 3JM8eBsUlUKdBwwmImcAUvUkF0ZoKhXxBpGWWwac3TwUb+zVNT+dH8kXNygwH9urDGTJ/V
+ dre1I3Lz9C0SKb5uooV1ycE3Lv5C7Vs=
+From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 41/59] object: do not free class properties
-Date: Thu, 23 Jan 2020 14:48:44 +0100
-Message-Id: <1579787342-27146-42-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH v8 07/11] hw/core/qdev: update hotplug reset regarding
+ resettable
+Date: Thu, 23 Jan 2020 14:28:19 +0100
+Message-Id: <20200123132823.1117486-8-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200123132823.1117486-1-damien.hedde@greensocs.com>
+References: <20200123132823.1117486-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::430
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1579786121;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dzvKbyxikkccILCxuKcmdnhT6iGxt2vyARq+Np6UnOc=;
+ b=uEHF7HbOQLZ4xns06KRXrcke7EW0X/fBoJK7Ctoohlh5K0/xndLW+Ly0Z3PO46AGm9L5Zi
+ JzakeRBqcgZizjP8jkw1F+db49rz+mBw4pQ+wCQ2pXgLapLzrmWwbCB2qIOQHEsALxTsyS
+ LM2AObxJU5/cumGFEPpBvTzAr6hXvEg=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579786121; a=rsa-sha256; cv=none;
+ b=1uXaVinekaoULMrbQDZzxWm41fRV0hV+Am8JbGIBJAYi1PcbvJ4G9NUXo9sm2qaFG8JPHh
+ zPCp70GtVhtUEKkwQGjkO7aqF4hzhhPGXGsn//32Gw7pQTmKKNBjKKo0JwOqpoUocHY8AR
+ 5GBrKAiZh1/LAx5sU6L0x9rj7xtLl1c=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,67 +91,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com,
+ Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
+ mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
+ pbonzini@redhat.com, philmd@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+This commit make use of the resettable API to reset the device being
+hotplugged when it is realized. Also it ensures it is put in a reset
+state coherent with the parent it is plugged into.
 
-The release callback is called during object_property_del_all(), on a
-live instance. But class properties are common among all
-instances. It is not currently called, because we don't release
-classes, but it would not be correct if we did.
+Note that there is a difference in the reset. Instead of resetting
+only the hotplugged device, we reset also its subtree (switch to
+resettable API). This is not expected to be a problem because
+sub-buses are just realized too. If a hotplugged device has any
+sub-buses it is logical to reset them too at this point.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200110153039.1379601-12-marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+The recently added should_be_hidden and PCI's partially_hotplugged
+mechanisms do not interfere with realize operation:
++ In the should_be_hidden use case, device creation is
+delayed.
++ The partially_hotplugged mechanism prevents a device to be
+unplugged and unrealized from qdev POV and unrealized.
+
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- qom/object.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index 1423344..30c4f82 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -2143,7 +2143,7 @@ object_class_property_add_str(ObjectClass *klass, const char *name,
-     rv = object_class_property_add(klass, name, "string",
-                               get ? property_get_str : NULL,
-                               set ? property_set_str : NULL,
--                              property_release_str,
-+                              NULL,
-                               prop, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -2236,7 +2236,7 @@ object_class_property_add_bool(ObjectClass *klass, const char *name,
-     rv = object_class_property_add(klass, name, "bool",
-                               get ? property_get_bool : NULL,
-                               set ? property_set_bool : NULL,
--                              property_release_bool,
-+                              NULL,
-                               prop, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -2328,7 +2328,7 @@ object_class_property_add_enum(ObjectClass *klass, const char *name,
-     rv = object_class_property_add(klass, name, typename,
-                               get ? property_get_enum : NULL,
-                               set ? property_set_enum : NULL,
--                              property_release_enum,
-+                              NULL,
-                               prop, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -2429,7 +2429,7 @@ object_class_property_add_tm(ObjectClass *klass, const char *name,
- 
-     rv = object_class_property_add(klass, name, "struct tm",
-                               get ? property_get_tm : NULL, NULL,
--                              property_release_tm,
-+                              NULL,
-                               prop, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
--- 
-1.8.3.1
+v7 update: inline resettable_state_clear()
 
+v6 update: clear the reset state before doing any reset. Although it
+is apparently highly improbable that a device be realized again after
+being unrealized. See here for a discussion about this point and the
+partially_hotplugged/shoud_be_hidden cases.
+https://lists.nongnu.org/archive/html/qemu-devel/2019-11/msg04897.html
+---
+ include/hw/resettable.h | 11 +++++++++++
+ hw/core/qdev.c          | 15 ++++++++++++++-
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/resettable.h b/include/hw/resettable.h
+index 96073354fd..5e215d94e4 100644
+--- a/include/hw/resettable.h
++++ b/include/hw/resettable.h
+@@ -153,6 +153,17 @@ struct ResettableState {
+     bool exit_phase_in_progress;
+ };
+=20
++/**
++ * resettable_state_clear:
++ * Clear the state. It puts the state to the initial (zeroed) state requ=
+ired
++ * to reuse an object. Typically used in realize step of base classes
++ * implementing the interface.
++ */
++static inline void resettable_state_clear(ResettableState *state)
++{
++    memset(state, 0, sizeof(ResettableState));
++}
++
+ /**
+  * resettable_reset:
+  * Trigger a reset on an object @obj of type @type. @obj must implement
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index ce23b35383..36bfcbc697 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -938,6 +938,12 @@ static void device_set_realized(Object *obj, bool va=
+lue, Error **errp)
+             }
+         }
+=20
++        /*
++         * Clear the reset state, in case the object was previously unre=
+alized
++         * with a dirty state.
++         */
++        resettable_state_clear(&dev->reset);
++
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+             object_property_set_bool(OBJECT(bus), true, "realized",
+                                          &local_err);
+@@ -946,7 +952,14 @@ static void device_set_realized(Object *obj, bool va=
+lue, Error **errp)
+             }
+         }
+         if (dev->hotplugged) {
+-            device_legacy_reset(dev);
++            /*
++             * Reset the device, as well as its subtree which, at this p=
+oint,
++             * should be realized too.
++             */
++            resettable_assert_reset(OBJECT(dev), RESET_TYPE_COLD);
++            resettable_change_parent(OBJECT(dev), OBJECT(dev->parent_bus=
+),
++                                     NULL);
++            resettable_release_reset(OBJECT(dev), RESET_TYPE_COLD);
+         }
+         dev->pending_deleted_event =3D false;
+=20
+--=20
+2.24.1
 
 
