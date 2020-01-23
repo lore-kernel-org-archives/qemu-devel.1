@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBEA3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D61C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:25:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 844F620678
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C883A2073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:25:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdPL64rE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 844F620678
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SIdrCzXE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C883A2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubY7-0000ND-VG
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:25:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36059)
+	id 1iubYN-0000hn-Ai
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:25:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuatQ-0007t2-RD
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:25 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuatH-0007cx-51
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuatP-00050G-PK
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49354
+ (envelope-from <imammedo@redhat.com>) id 1iuatF-0004vr-Px
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50348
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuatP-000507-L7
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:23 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuatF-0004vY-MU
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779803;
+ s=mimecast20190719; t=1579779793;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vlaI+NJqkKpJDj2h8l4U32ZK5Hv+WnO0QkVhHI/Z08E=;
- b=OdPL64rEOZcV8b9y1Y0HwzxZB2S6NQN42O67RFwe+2iKmPN5EOC3mDHhZwh1fvHzCxZ5aL
- zfVF9xosYtmNQZp+Tuu+dRgOW0HNWeO8liB8ynR76EQpeEPFHwf+Lp8RJ8YSIpRwLAiNK1
- RAw0AU5W67UAFYosMjNCzy8iyU2osIE=
+ bh=HW2hOlGHatT+KWCr9tF0l4lc+WU/7nCQ2rjNsVVusxs=;
+ b=SIdrCzXEhTz5n6sb1HEu9IfIJUymCrAYIqqTEUeYjDs988Qyfcyc9r6xPgkxx+qZ5IRzB0
+ rQ799aVnNNqfWr0DuaZCYQ3DCdNa4tPhE6XEDRpKQRAUrMPBB7K5bKGTrsGW78YYP3qL8V
+ tNZBnuJo1SaggYgrAH5pI88nIYFR8PM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-nKDpze0LObCnJq4h2sx0Gw-1; Thu, 23 Jan 2020 06:43:21 -0500
+ us-mta-113-Yf3SQWI3My2qAT99hur8vw-1; Thu, 23 Jan 2020 06:43:12 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA434100551D
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:43:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE9841800D48
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:43:10 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 23CBC100164D
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:43:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2F0AE100164D
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:43:10 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 56/80] mips/mips_r4k: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:38:21 +0100
-Message-Id: <1579779525-20065-57-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 50/80] mips/boston-cube: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:15 +0100
+Message-Id: <1579779525-20065-51-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: nKDpze0LObCnJq4h2sx0Gw-1
+X-MC-Unique: Yf3SQWI3My2qAT99hur8vw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -100,64 +100,51 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/mips/mips_r4k.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ hw/mips/boston.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index fd926a3..69b6549 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -171,13 +171,11 @@ static const int sector_len =3D 32 * KiB;
- static
- void mips_r4k_init(MachineState *machine)
- {
--    ram_addr_t ram_size =3D machine->ram_size;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     const char *initrd_filename =3D machine->initrd_filename;
-     char *filename;
-     MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *bios;
-     MemoryRegion *iomem =3D g_new(MemoryRegion, 1);
-     MemoryRegion *isa_io =3D g_new(MemoryRegion, 1);
-@@ -203,14 +201,12 @@ void mips_r4k_init(MachineState *machine)
-     qemu_register_reset(main_cpu_reset, reset_info);
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index 0df3a77..98ecd25 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -427,7 +427,7 @@ static void boston_mach_init(MachineState *machine)
+     DeviceState *dev;
+     BostonState *s;
+     Error *err =3D NULL;
+-    MemoryRegion *flash, *ddr, *ddr_low_alias, *lcd, *platreg;
++    MemoryRegion *flash, *ddr_low_alias, *lcd, *platreg;
+     MemoryRegion *sys_mem =3D get_system_memory();
+     XilinxPCIEHost *pcie2;
+     PCIDevice *ahci;
+@@ -473,14 +473,12 @@ static void boston_mach_init(MachineState *machine)
+     memory_region_init_rom(flash, NULL, "boston.flash", 128 * MiB, &err);
+     memory_region_add_subregion_overlap(sys_mem, 0x18000000, flash, 0);
 =20
-     /* allocate RAM */
--    if (ram_size > 256 * MiB) {
-+    if (machine->ram_size > 256 * MiB) {
-         error_report("Too much memory for this machine: %" PRId64 "MB,"
-                      " maximum 256MB", ram_size / MiB);
-         exit(1);
-     }
--    memory_region_allocate_system_memory(ram, NULL, "mips_r4k.ram", ram_si=
-ze);
--
--    memory_region_add_subregion(address_space_mem, 0, ram);
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+-    ddr =3D g_new(MemoryRegion, 1);
+-    memory_region_allocate_system_memory(ddr, NULL, "boston.ddr",
+-                                         machine->ram_size);
+-    memory_region_add_subregion_overlap(sys_mem, 0x80000000, ddr, 0);
++    memory_region_add_subregion_overlap(sys_mem, 0x80000000, machine->ram,=
+ 0);
 =20
-     memory_region_init_io(iomem, NULL, &mips_qemu_ops,
-                           NULL, "mips-qemu", 0x10000);
-@@ -261,7 +257,7 @@ void mips_r4k_init(MachineState *machine)
-     g_free(filename);
+     ddr_low_alias =3D g_new(MemoryRegion, 1);
+     memory_region_init_alias(ddr_low_alias, NULL, "boston_low.ddr",
+-                             ddr, 0, MIN(machine->ram_size, (256 * MiB)));
++                             machine->ram, 0,
++                             MIN(machine->ram_size, (256 * MiB)));
+     memory_region_add_subregion_overlap(sys_mem, 0, ddr_low_alias, 0);
 =20
-     if (kernel_filename) {
--        loaderparams.ram_size =3D ram_size;
-+        loaderparams.ram_size =3D machine->ram_size;
-         loaderparams.kernel_filename =3D kernel_filename;
-         loaderparams.kernel_cmdline =3D kernel_cmdline;
-         loaderparams.initrd_filename =3D initrd_filename;
-@@ -316,7 +312,7 @@ static void mips_machine_init(MachineClass *mc)
- #else
-     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
- #endif
--
-+    mc->default_ram_id =3D "mips_r4k.ram";
+     xilinx_pcie_init(sys_mem, 0,
+@@ -552,6 +550,7 @@ static void boston_mach_class_init(MachineClass *mc)
+     mc->init =3D boston_mach_init;
+     mc->block_default_type =3D IF_IDE;
+     mc->default_ram_size =3D 1 * GiB;
++    mc->default_ram_id =3D "boston.ddr";
+     mc->max_cpus =3D 16;
+     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("I6400");
  }
-=20
- DEFINE_MACHINE("mips", mips_machine_init)
 --=20
 2.7.4
 
