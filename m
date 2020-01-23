@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20BDDC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 830D9C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:33:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E169E2077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:33:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48CBA2077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:33:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="firGSFmC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E169E2077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="US7lu9uS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48CBA2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iucbg-0000ac-Vd
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:33:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40375)
+	id 1iuccM-00016k-Bt
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:33:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iub8t-00026R-Kq
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:24 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub9N-0002mn-UQ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iub8s-000530-3R
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24354
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iub9M-0005Oq-Lu
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51588
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub8r-00051z-N0
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:22 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub9M-0005Ob-IU
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780760;
+ s=mimecast20190719; t=1579780792;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1yNZ903nBsp45b/CUHR2twKT/7zvjV6NUQqNyOO4Jko=;
- b=firGSFmCXONzVViiBANPGB1JlfLqMCwkw4h7Hp4Zrnac+7iYNpgXFu9kbH4jKlp4XnXRub
- 1PF/e3JBB83pPgRtHrnNbYPo3G62yAQNW4kCYFFZKElC1RzJ4OX91KuxZ7RPbeZ5aNQF3y
- +UxaWOClxHT6P/Jos9Y9af5/XMqbbq4=
+ bh=A2OLDzwvIkswhQnYmC967hKOHC8UuZ0BirW2egCo2xI=;
+ b=US7lu9uSwi90C1qlvbrzBeHYg5eaH8HFyD7NaNqb5a5lpzhxKJXdInMIdFsBDf+rdpJ+eT
+ uiTMfrGsgx+/CVE9WNd/gDtGT3C4xXmqZq6M8VNwktIFCtrrct8/oRNTqpv/dyiVsoxnN6
+ tk2gdfDhMdmEfnqKjGluBTi+36aK65c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-bBtK27k5NYmNlfI6PBqfZg-1; Thu, 23 Jan 2020 06:59:18 -0500
+ us-mta-143-fEQlAa0lMV-mJiHccUBdKQ-1; Thu, 23 Jan 2020 06:59:50 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7AF71088391
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAFD28010C5
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:49 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0E89D1CB;
- Thu, 23 Jan 2020 11:59:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 42C551CB;
+ Thu, 23 Jan 2020 11:59:49 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 026/111] virtiofsd: Keep track of replies
-Date: Thu, 23 Jan 2020 11:57:16 +0000
-Message-Id: <20200123115841.138849-27-dgilbert@redhat.com>
+Subject: [PULL 053/111] virtiofsd: Parse flag FUSE_WRITE_KILL_PRIV
+Date: Thu, 23 Jan 2020 11:57:43 +0000
+Message-Id: <20200123115841.138849-54-dgilbert@redhat.com>
 In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
 References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: bBtK27k5NYmNlfI6PBqfZg-1
+X-MC-Unique: fEQlAa0lMV-mJiHccUBdKQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,104 +90,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Vivek Goyal <vgoyal@redhat.com>
 
-Keep track of whether we sent a reply to a request; this is a bit
-paranoid but it means:
-  a) We should always recycle an element even if there was an error
-     in the request
-  b) Never try and send two replies on one queue element
+Caller can set FUSE_WRITE_KILL_PRIV in write_flags. Parse it and pass it
+to the filesystem.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/fuse_virtio.c | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
+ tools/virtiofsd/fuse_common.h   | 6 +++++-
+ tools/virtiofsd/fuse_lowlevel.c | 4 +++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 05d0e29f12..f1adeb6345 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -44,6 +44,7 @@ struct fv_QueueInfo {
+diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
+index f8f6433743..686c42c0a5 100644
+--- a/tools/virtiofsd/fuse_common.h
++++ b/tools/virtiofsd/fuse_common.h
+@@ -93,8 +93,12 @@ struct fuse_file_info {
+      */
+     unsigned int cache_readdir:1;
 =20
-     /* The element for the command currently being processed */
-     VuVirtqElement *qe;
-+    bool reply_sent;
- };
-=20
- /*
-@@ -178,6 +179,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
-e_chan *ch,
- {
-     VuVirtqElement *elem;
-     VuVirtq *q;
-+    int ret =3D 0;
-=20
-     assert(count >=3D 1);
-     assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
-@@ -191,6 +193,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
-e_chan *ch,
-     assert(out->unique);
-     /* For virtio we always have ch */
-     assert(ch);
-+    assert(!ch->qi->reply_sent);
-     elem =3D ch->qi->qe;
-     q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
-=20
-@@ -208,19 +211,23 @@ int virtio_send_msg(struct fuse_session *se, struct f=
-use_chan *ch,
-     if (in_len < sizeof(struct fuse_out_header)) {
-         fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n",
-                  __func__, elem->index);
--        return -E2BIG;
-+        ret =3D -E2BIG;
-+        goto err;
-     }
-     if (in_len < tosend_len) {
-         fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd\n",
-                  __func__, elem->index, tosend_len);
--        return -E2BIG;
-+        ret =3D -E2BIG;
-+        goto err;
-     }
-=20
-     copy_iov(iov, count, in_sg, in_num, tosend_len);
-     vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
-     vu_queue_notify(&se->virtio_dev->dev, q);
-+    ch->qi->reply_sent =3D true;
-=20
--    return 0;
-+err:
-+    return ret;
- }
-=20
- /* Thread function for individual queues, created when a queue is 'started=
-' */
-@@ -296,6 +303,9 @@ static void *fv_queue_thread(void *opaque)
-                 break;
-             }
-=20
-+            qi->qe =3D elem;
-+            qi->reply_sent =3D false;
++    /* Indicates that suid/sgid bits should be removed upon write */
++    unsigned int kill_priv:1;
 +
-             if (!fbuf.mem) {
-                 fbuf.mem =3D malloc(se->bufsize);
-                 assert(fbuf.mem);
-@@ -331,6 +341,13 @@ static void *fv_queue_thread(void *opaque)
-             /* TODO: Add checks for fuse_session_exited */
-             fuse_session_process_buf_int(se, &fbuf, &ch);
++
+     /** Padding.  Reserved for future use*/
+-    unsigned int padding:25;
++    unsigned int padding:24;
+     unsigned int padding2:32;
 =20
-+            if (!qi->reply_sent) {
-+                fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
-+                         __func__, elem->index);
-+                /* I think we've still got to recycle the element */
-+                vu_queue_push(dev, q, elem, 0);
-+                vu_queue_notify(dev, q);
-+            }
-             qi->qe =3D NULL;
-             free(elem);
-             elem =3D NULL;
+     /*
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 02e1d83038..2d6dc5a680 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -1142,6 +1142,7 @@ static void do_write(fuse_req_t req, fuse_ino_t nodei=
+d,
+     memset(&fi, 0, sizeof(fi));
+     fi.fh =3D arg->fh;
+     fi.writepage =3D (arg->write_flags & FUSE_WRITE_CACHE) !=3D 0;
++    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
+=20
+     fi.lock_owner =3D arg->lock_owner;
+     fi.flags =3D arg->flags;
+@@ -1177,7 +1178,8 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t n=
+odeid,
+     fi.lock_owner =3D arg->lock_owner;
+     fi.flags =3D arg->flags;
+     fi.fh =3D arg->fh;
+-    fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
++    fi.writepage =3D !!(arg->write_flags & FUSE_WRITE_CACHE);
++    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
+=20
+     if (ibufv->count =3D=3D 1) {
+         assert(!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD));
 --=20
 2.24.1
 
