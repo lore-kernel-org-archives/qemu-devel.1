@@ -2,83 +2,77 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9757DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD39C33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63BFF2071E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:11:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C26E2071E
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:11:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BKebEUJc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63BFF2071E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Km2C4DTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C26E2071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60101 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuf4t-0005fo-T7
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:11:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51447)
+	id 1iuf4v-0005f6-9Q
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:11:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53064)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrQ-000524-54
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:29 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iucuT-0001VC-AQ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrO-0003PH-QS
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:27 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:51545)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrO-0003NM-Jn
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:26 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id t23so2642906wmi.1
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=a3Vb+m8pIg/1dpP/XvEglAqzMTsZNDlRtfXxmF7Em2c=;
- b=BKebEUJcRdIDLzX4bvuH2hSYhArhNnEu3syt5szEd5qZoSD0Jwl83Cwc0shkTOX6XU
- 0PR+QdilFtuPW19HFsL88DfNNjhioI/MokSeihtNUoAGuMIO9qIzANhELNmha1AWOaIZ
- TrrAdKsKX3FkkUrwjVN4T7W2PtO1aNWwPzBxUaQv/DB+Htqt9OMSbBhxavtRlXo96jt3
- lw0X+6LlFZ3dh73Xd7CN0lFNK+xhH9pn1ee7Gtx1X/7Vd/aqoqtcF44rsMhi586XYhg5
- hl9K2Wr9/+GOGQTvMvijFEC7ydDWcZx86puDgV4tVmI2pHUrckAx/MAzBqZpbWXQDTO1
- XCqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=a3Vb+m8pIg/1dpP/XvEglAqzMTsZNDlRtfXxmF7Em2c=;
- b=iwz4zqnO/W/TRN4HavXJG3ldYZoLJvPJ+6sVW+ljJQ7nfCMde7bu4Bijs+XLV7R62w
- mgzmSDfZ+CcmL9eVxsWMVs/EB4zRFZKvypRCh+dBj457mPtq0BnzOQqKZQcLTqx4BlKr
- CgH/+vB80SlQ8hmjZW6tq71IlRESCmeKvCfBanvRtpGCPRasJEW3mklJNGAyj8LWap2M
- uepJWy0ccNAnyh8vW1SQZS8Uhi83TmBfQSIJXYFR+Bl/jOJQ4u36IzzLTfAQRMWq2wIi
- 91f1p6U2EvulovpqEi5w6NKlollgT1dt0ajB6RphkVa2NGq8hZ/BwkgAfoF/RpykEWFb
- WRig==
-X-Gm-Message-State: APjAAAUmXHKvB11DM5G+JA1focdc8YjAXuELPMFkyXtky4QGuHxhmja5
- r4ArwUS1J7URL5wCmmhHcte1J5ez
-X-Google-Smtp-Source: APXvYqwpjt+zUCLrMp5EktQ2/r5SpanmA/igmsQC9I+RDMA6oLPp+OZRcdStGR8Ld1RD7tKMK5k5Ig==
-X-Received: by 2002:a05:600c:20f:: with SMTP id
- 15mr4286053wmi.128.1579787365492; 
- Thu, 23 Jan 2020 05:49:25 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:24 -0800 (PST)
+ (envelope-from <pbonzini@redhat.com>) id 1iucuR-0001Ji-VN
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29194
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iucuR-0001JW-SE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579787555;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GX+b1ImPAaBl326v1I8s12MpD2lknVA1E1FuR0YYiCs=;
+ b=Km2C4DTI9YZbMaMlk6xRkrejj7ZfpFqHXLEcHnQMKXNYiOFYQLeXl8bzV7QJ1Dc3/asFEQ
+ bpAiU+3toChBminhUrwYDCD4a9MnywzGyJtznrhX4D7PPXbyA4rOuUPWKhHprtGpsxZ0Z7
+ RfvR2IiUy4j7TS21rnocbEgmDROHeqc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299-WqbPiTGkNJumLjPI3BN1og-1; Thu, 23 Jan 2020 08:52:33 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89FD1939AD
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:52:32 +0000 (UTC)
+Received: from 640k.localdomain.com (unknown [10.36.112.13])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C34A01CB
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:52:31 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 21/59] virtio-scsi: delete vqs in unrealize to avoid memleaks
-Date: Thu, 23 Jan 2020 14:48:24 +0100
-Message-Id: <1579787342-27146-22-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+Subject: [PULL 49/59] qdev: rename DeviceClass.props
+Date: Thu, 23 Jan 2020 14:50:39 +0100
+Message-Id: <1579787449-27599-50-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
+References: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: WqbPiTGkNJumLjPI3BN1og-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,53 +84,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pan Nengyuan <pannengyuan@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+Ensure that conflicts in the future will cause a syntax error.
 
-This patch fix memleaks when attaching/detaching virtio-scsi device, the
-memory leak stack is as follow:
-
-Direct leak of 21504 byte(s) in 3 object(s) allocated from:
-  #0 0x7f491f2f2970 (/lib64/libasan.so.5+0xef970)  ??:?
-  #1 0x7f491e94649d (/lib64/libglib-2.0.so.0+0x5249d)  ??:?
-  #2 0x564d0f3919fa (./x86_64-softmmu/qemu-system-x86_64+0x2c3e9fa)  /mnt/sdb/qemu/hw/virtio/virtio.c:2333
-  #3 0x564d0f2eca55 (./x86_64-softmmu/qemu-system-x86_64+0x2b99a55)  /mnt/sdb/qemu/hw/scsi/virtio-scsi.c:912
-  #4 0x564d0f2ece7b (./x86_64-softmmu/qemu-system-x86_64+0x2b99e7b)  /mnt/sdb/qemu/hw/scsi/virtio-scsi.c:924
-  #5 0x564d0f39ee47 (./x86_64-softmmu/qemu-system-x86_64+0x2c4be47)  /mnt/sdb/qemu/hw/virtio/virtio.c:3531
-  #6 0x564d0f980224 (./x86_64-softmmu/qemu-system-x86_64+0x322d224)  /mnt/sdb/qemu/hw/core/qdev.c:865
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200117075547.60864-2-pannengyuan@huawei.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/virtio-scsi.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/core/qdev-properties.c | 2 +-
+ hw/core/qdev.c            | 8 ++++----
+ include/hw/qdev-core.h    | 7 ++++++-
+ qdev-monitor.c            | 2 +-
+ qom/qom-qmp-cmds.c        | 2 +-
+ 5 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 4bc73a3..858b3aa 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -943,7 +943,13 @@ void virtio_scsi_common_unrealize(DeviceState *dev)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-+    int i;
- 
-+    virtio_del_queue(vdev, 0);
-+    virtio_del_queue(vdev, 1);
-+    for (i = 0; i < vs->conf.num_queues; i++) {
-+        virtio_del_queue(vdev, i + 2);
-+    }
-     g_free(vs->cmd_vqs);
-     virtio_cleanup(vdev);
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 6ca7697..43a9153 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1071,7 +1071,7 @@ static Property *qdev_prop_find(DeviceState *dev, con=
+st char *name)
+     /* device properties */
+     class =3D object_get_class(OBJECT(dev));
+     do {
+-        prop =3D qdev_prop_walk(DEVICE_CLASS(class)->props, name);
++        prop =3D qdev_prop_walk(DEVICE_CLASS(class)->props_, name);
+         if (prop) {
+             return prop;
+         }
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 8047ac9..100e266 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -751,7 +751,7 @@ void qdev_alias_all_properties(DeviceState *target, Obj=
+ect *source)
+     do {
+         DeviceClass *dc =3D DEVICE_CLASS(class);
+=20
+-        for (prop =3D dc->props; prop && prop->name; prop++) {
++        for (prop =3D dc->props_; prop && prop->name; prop++) {
+             object_property_add_alias(source, prop->name,
+                                       OBJECT(target), prop->name,
+                                       &error_abort);
+@@ -954,7 +954,7 @@ static void device_initfn(Object *obj)
+=20
+     class =3D object_get_class(OBJECT(dev));
+     do {
+-        for (prop =3D DEVICE_CLASS(class)->props; prop && prop->name; prop=
+++) {
++        for (prop =3D DEVICE_CLASS(class)->props_; prop && prop->name; pro=
+p++) {
+             qdev_property_add_legacy(dev, prop, &error_abort);
+             qdev_property_add_static(dev, prop);
+         }
+@@ -1013,7 +1013,7 @@ static void device_class_base_init(ObjectClass *class=
+, void *data)
+     /* We explicitly look up properties in the superclasses,
+      * so do not propagate them to the subclasses.
+      */
+-    klass->props =3D NULL;
++    klass->props_ =3D NULL;
  }
--- 
+=20
+ static void device_unparent(Object *obj)
+@@ -1063,7 +1063,7 @@ static void device_class_init(ObjectClass *class, voi=
+d *data)
+=20
+ void device_class_set_props(DeviceClass *dc, Property *props)
+ {
+-    dc->props =3D props;
++    dc->props_ =3D props;
+ }
+=20
+ void device_class_set_parent_reset(DeviceClass *dc,
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 4065162..506ad35 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -100,7 +100,12 @@ typedef struct DeviceClass {
+     DECLARE_BITMAP(categories, DEVICE_CATEGORY_MAX);
+     const char *fw_name;
+     const char *desc;
+-    Property *props;
++
++    /*
++     * The underscore at the end ensures a compile-time error if someone
++     * assigns to dc->props instead of using device_class_set_props.
++     */
++    Property *props_;
+=20
+     /*
+      * Can this device be instantiated with -device / device_add?
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 3465a1e..c929262 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -748,7 +748,7 @@ static void qdev_print(Monitor *mon, DeviceState *dev, =
+int indent)
+     }
+     class =3D object_get_class(OBJECT(dev));
+     do {
+-        qdev_print_props(mon, dev, DEVICE_CLASS(class)->props, indent);
++        qdev_print_props(mon, dev, DEVICE_CLASS(class)->props_, indent);
+         class =3D object_class_get_parent(class);
+     } while (class !=3D object_class_by_name(TYPE_DEVICE));
+     bus_print_dev(dev->parent_bus, mon, dev, indent);
+diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+index f4494f9..ccd3aaa 100644
+--- a/qom/qom-qmp-cmds.c
++++ b/qom/qom-qmp-cmds.c
+@@ -137,7 +137,7 @@ static ObjectPropertyInfo *make_device_property_info(Ob=
+jectClass *klass,
+     Property *prop;
+=20
+     do {
+-        for (prop =3D DEVICE_CLASS(klass)->props; prop && prop->name; prop=
+++) {
++        for (prop =3D DEVICE_CLASS(klass)->props_; prop && prop->name; pro=
+p++) {
+             if (strcmp(name, prop->name) !=3D 0) {
+                 continue;
+             }
+--=20
 1.8.3.1
 
 
