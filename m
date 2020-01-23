@@ -2,100 +2,81 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0FBC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8351CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9922021D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:05:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FD4921D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:05:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pr7t8Lh1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9922021D7D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5vrsHRq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FD4921D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuij4-0007Nt-Ll
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:05:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47844)
+	id 1iuijM-0007sz-Dk
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:05:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iuhEQ-0006Lc-2s
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:29:31 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufen-0005zT-5h
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iuhEN-0005TH-Ol
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:29:28 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25681
+ (envelope-from <dgilbert@redhat.com>) id 1iufel-0008GM-S4
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:37 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25527
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuhEN-0005Sh-Kd
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:29:27 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufel-0008FQ-OX
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579804166;
+ s=mimecast20190719; t=1579798115;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4rWtqTu/+1viCQ5R6pcrx5pnYcc6j+Wtam76ISG6/Jg=;
- b=Pr7t8Lh1ElOrQ8F+aGuGkwnEhZ49LqmKp/J4vczCllQGDlNOO/j+3jO0NKHgPMnt+32zC+
- zANXE1Vhdi3ft0NI4giVpWmYOpciwurhOluswFWfn/hgO6ZRW+qe+4OL7bZDq871fdjpSI
- PGxzFtYw3neQWJVKBNLVa+ZCEerTd20=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-vbOuCjzKPoaB_6y84KsFzw-1; Thu, 23 Jan 2020 13:29:25 -0500
-Received: by mail-wr1-f70.google.com with SMTP id o6so2319238wrp.8
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:29:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8+88S/mukcu4lp7AZ1R7LomPnI5UULjF8AnaQP5sics=;
- b=PS3ul/TYGtBOvAbRPHM3olxRB03kHB5Mv7SPNNP3pdUE/KiCCvJ0TLpciNz3hIdmnZ
- TQopXMJF9XpOpTJhxdNbsq40Nr6uFZhazpLGoeIawaUjLmUE5Y8ZzMlj5I3PY0obC0cU
- sML/8mf9yo7Vjj44VRf1+dq0ePMc+nXo0QiqRS2HJZ68TpAPCG0zon32GuXj5QTHjW7t
- egASDRJqyMVoKK1A6oO/rQwf461Ore+Vs+hrB4lUD8hcsEB5AK5JBvH4GLWDuGMKCIC/
- PsFpTUZg9ZERxbGRXp4OWg+40AHaKG6RG78kDcQO2Gz7l92dZRK/WODgPjCfLw62hIBV
- jZHA==
-X-Gm-Message-State: APjAAAVtzsaB/sVggA343pfF/v0tS284M92cusJ4q16lldIW8O1PFIdx
- r2f5EzadQxHD4Ic9PYTj+tAH3okcGztnnnDa1NVzFIpvTBlqOREkbFdGBFGtrOEHCP1YoJQ3Sg3
- 6cTlqHMAFE64s8hw=
-X-Received: by 2002:adf:b648:: with SMTP id i8mr18832316wre.91.1579804163195; 
- Thu, 23 Jan 2020 10:29:23 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzi1W7xEwtL/zuTjX6HijBnBG6bDIMMQ6XPzbkJrw42ZheY85BMS/fjbcDqeud3tr4M8dQQCg==
-X-Received: by 2002:adf:b648:: with SMTP id i8mr18832304wre.91.1579804163024; 
- Thu, 23 Jan 2020 10:29:23 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z21sm3821258wml.5.2020.01.23.10.29.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jan 2020 10:29:22 -0800 (PST)
-Subject: Re: [PATCH] tests/boot-serial-test: Allow the HPPA machine to shudown
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20200123003603.11610-1-f4bug@amsat.org>
- <a71b6c89-b36c-ebb6-3ff4-c3866309125c@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0deda7d0-78a1-6618-e2b5-9b92b301557a@redhat.com>
-Date: Thu, 23 Jan 2020 19:29:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=yqvAf8xgYOQNZl5eAsbJzD9x3bslYjEazYf5twmm4N4=;
+ b=L5vrsHRqizQxaMQZCfl5uH+kxkFIyBBk6fd5YSjduYrpA85FxGCsyirzOwXcii9KEJLb38
+ XlS2xXiDnoVoclIfM3ZNpRZ0K8+PkkFY7YdP05lP+h1CsHw8vynx8tLSxFhmPsbFcW/kK5
+ 4uaeMABkB0JaSjjIkcV/zFMwaSdE1JU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-130-2qPmvdulMu-dldllSbSO1w-1; Thu, 23 Jan 2020 11:48:33 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 017CE803A52
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:33 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4C3D419C69;
+ Thu, 23 Jan 2020 16:48:32 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 087/108] virtiofsd: prevent fv_queue_thread() vs virtio_loop()
+ races
+Date: Thu, 23 Jan 2020 16:46:09 +0000
+Message-Id: <20200123164630.91498-88-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a71b6c89-b36c-ebb6-3ff4-c3866309125c@redhat.com>
-Content-Language: en-US
-X-MC-Unique: vbOuCjzKPoaB_6y84KsFzw-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 2qPmvdulMu-dldllSbSO1w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,53 +88,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
+We call into libvhost-user from the virtqueue handler thread and the
+vhost-user message processing thread without a lock.  There is nothing
+protecting the virtqueue handler thread if the vhost-user message
+processing thread changes the virtqueue or memory table while it is
+running.
 
-On 1/23/20 5:39 AM, Thomas Huth wrote:
-> On 23/01/2020 01.36, Philippe Mathieu-Daud=C3=A9 wrote:
->> The boot-serial test uses SeaBIOS on HPPA, and expects to read the
->> "SeaBIOS wants SYSTEM HALT" string, see [*]:
->>
->>   122 void __VISIBLE __noreturn hlt(void)
->>   123 {
->>   124     if (pdc_debug)
->>   125         printf("HALT initiated from %p\n",  __builtin_return_addre=
-ss(0));
->>   126     printf("SeaBIOS wants SYSTEM HALT.\n\n");
->>   127     asm volatile("\t.word 0xfffdead0": : :"memory");
->>   128     while (1);
->>   129 }
->>
->> A 'SYSTEM HALT' would really halts the CPU, but SeaBIOS implements
->> it as an infinite loop.
->>
->> If SeaBIOS does not use the expected serial port but another device,
->> we might poll the console indefinitely while the machine is halted.
->>
->> Allow the HPPA machine to 'shutdown'. When it does, we'll get
->> a qtest error:
->>
->>    $ make check-qtest-hppa
->>      TEST    check-qtest-hppa: tests/qtest/boot-serial-test
->>    ** (tests/qtest/boot-serial-test:31924): ERROR **: 01:12:37.604: Fail=
-ed to find expected string. Please check '/tmp/qtest-boot-serial-sjxoM6Q'
->>    ERROR - Bail out! FATAL-ERROR: Failed to find expected string. Please=
- check '/tmp/qtest-boot-serial-sjxoM6Q'
->>    make: *** [tests/Makefile.include:628: check-qtest-hppa] Error 1
->=20
-> The tests are run with -no-shutdown. Why does qemu exit in that case?
+This patch introduces a read-write lock.  Virtqueue handler threads are
+readers.  The vhost-user message processing thread is a writer.  This
+will allow concurrency for multiqueue in the future while protecting
+against fv_queue_thread() vs virtio_loop() races.
 
-Because the HPPA firmware called HALT.
+Note that the critical sections could be made smaller but it would be
+more invasive and require libvhost-user changes.  Let's start simple and
+improve performance later, if necessary.  Another option would be an
+RCU-style approach with lighter-weight primitives.
 
-> Sounds like a bug in another place, and not in the boot-serial-test.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/fuse_virtio.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-Yes, the bug is elsewhere, but with the bug the boot-serial-test hangs=20
-forever.... No output on the console, qtest waiting indefinitely.
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index fb8d6d1379..f6242f9338 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -58,6 +58,18 @@ struct fv_VuDev {
+     VuDev dev;
+     struct fuse_session *se;
+=20
++    /*
++     * Either handle virtqueues or vhost-user protocol messages.  Don't do
++     * both at the same time since that could lead to race conditions if
++     * virtqueues or memory tables change while another thread is accessin=
+g
++     * them.
++     *
++     * The assumptions are:
++     * 1. fv_queue_thread() reads/writes to virtqueues and only reads VuDe=
+v.
++     * 2. virtio_loop() reads/writes virtqueues and VuDev.
++     */
++    pthread_rwlock_t vu_dispatch_rwlock;
++
+     /*
+      * The following pair of fields are only accessed in the main
+      * virtio_loop
+@@ -415,6 +427,8 @@ static void *fv_queue_thread(void *opaque)
+              qi->qidx, qi->kick_fd);
+     while (1) {
+         struct pollfd pf[2];
++        int ret;
++
+         pf[0].fd =3D qi->kick_fd;
+         pf[0].events =3D POLLIN;
+         pf[0].revents =3D 0;
+@@ -461,6 +475,9 @@ static void *fv_queue_thread(void *opaque)
+             fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
+             break;
+         }
++        /* Mutual exclusion with virtio_loop() */
++        ret =3D pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock)=
+;
++        assert(ret =3D=3D 0); /* there is no possible error case */
+         /* out is from guest, in is too guest */
+         unsigned int in_bytes, out_bytes;
+         vu_queue_get_avail_bytes(dev, q, &in_bytes, &out_bytes, ~0, ~0);
+@@ -469,6 +486,7 @@ static void *fv_queue_thread(void *opaque)
+                  "%s: Queue %d gave evalue: %zx available: in: %u out: %u\=
+n",
+                  __func__, qi->qidx, (size_t)evalue, in_bytes, out_bytes);
+=20
++
+         while (1) {
+             bool allocated_bufv =3D false;
+             struct fuse_bufvec bufv;
+@@ -597,6 +615,8 @@ static void *fv_queue_thread(void *opaque)
+             free(elem);
+             elem =3D NULL;
+         }
++
++        pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
+     }
+ out:
+     pthread_mutex_destroy(&ch.lock);
+@@ -711,6 +731,8 @@ int virtio_loop(struct fuse_session *se)
+=20
+     while (!fuse_session_exited(se)) {
+         struct pollfd pf[1];
++        bool ok;
++        int ret;
+         pf[0].fd =3D se->vu_socketfd;
+         pf[0].events =3D POLLIN;
+         pf[0].revents =3D 0;
+@@ -735,7 +757,15 @@ int virtio_loop(struct fuse_session *se)
+         }
+         assert(pf[0].revents & POLLIN);
+         fuse_log(FUSE_LOG_DEBUG, "%s: Got VU event\n", __func__);
+-        if (!vu_dispatch(&se->virtio_dev->dev)) {
++        /* Mutual exclusion with fv_queue_thread() */
++        ret =3D pthread_rwlock_wrlock(&se->virtio_dev->vu_dispatch_rwlock)=
+;
++        assert(ret =3D=3D 0); /* there is no possible error case */
++
++        ok =3D vu_dispatch(&se->virtio_dev->dev);
++
++        pthread_rwlock_unlock(&se->virtio_dev->vu_dispatch_rwlock);
++
++        if (!ok) {
+             fuse_log(FUSE_LOG_ERR, "%s: vu_dispatch failed\n", __func__);
+             break;
+         }
+@@ -877,6 +907,7 @@ int virtio_session_mount(struct fuse_session *se)
+=20
+     se->vu_socketfd =3D data_sock;
+     se->virtio_dev->se =3D se;
++    pthread_rwlock_init(&se->virtio_dev->vu_dispatch_rwlock, NULL);
+     vu_init(&se->virtio_dev->dev, 2, se->vu_socketfd, fv_panic, fv_set_wat=
+ch,
+             fv_remove_watch, &fv_iface);
+=20
+@@ -892,6 +923,7 @@ void virtio_session_close(struct fuse_session *se)
+     }
+=20
+     free(se->virtio_dev->qi);
++    pthread_rwlock_destroy(&se->virtio_dev->vu_dispatch_rwlock);
+     free(se->virtio_dev);
+     se->virtio_dev =3D NULL;
+ }
+--=20
+2.24.1
 
 
