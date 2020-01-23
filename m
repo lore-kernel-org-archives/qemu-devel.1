@@ -7,74 +7,71 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F51AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C55C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57F302077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:53:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E2AF21734
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:55:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMuoJDVK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F302077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VjNbWCE1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E2AF21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iufj7-0001WA-Pp
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:53:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52238)
+	id 1iufla-0004PH-Pz
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:55:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57634)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iuct3-0007dq-5o
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:11 -0500
+ (envelope-from <ovoshcha@redhat.com>) id 1iudCa-0000U8-1Q
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:11:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iuct2-0006pU-0x
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23262
+ (envelope-from <ovoshcha@redhat.com>) id 1iudCY-0001ML-Ey
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:11:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39795
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuct1-0006pF-Up
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:07 -0500
+ (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1iudCY-0001LJ-Bs
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:11:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579787467;
+ s=mimecast20190719; t=1579788677;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sFBdusjTRivI83sKM4ZWIopYtK/Kmoyuru1DkptNNaY=;
- b=LMuoJDVKWj2uWth4m4IBu3t374QWpaLquuX8G/hes2ggeOwNJeE8dXGRHYEQRTCvGvTOva
- NxcUQc13wWo9qwRDWy4FH4+tPV9MNgCLzULzKV9GaoWXeQvxRP9ZeFCDoB1VTJ/PhFZH/Q
- /X9FhdFQmv/3y9KfrvZNeZDkxd0YE1E=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=qf+upfgHM9UbJpwPJ/l9fFPz6PQg3yqrvyzMt+T52mA=;
+ b=VjNbWCE1VtLbMrdsW2yeVgtoprQHgZjqeQ+2r+H0yI1ykDZ0onyAcCcgbahT+isarr0HRC
+ LkSkLntuNEBfWSv0LGM/Fb4gkbdEdbOVIkyJP+Uggkv9kbyuJCEUtcyHYW5kYEPK6iyiQC
+ yMmKG7zsDf6v4KJc0eSRp2jaga7fMhg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-UMrelfzONwm7B1DJ6aXS6w-1; Thu, 23 Jan 2020 08:51:06 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-200-GG8t7tOKNYWZzwpXuv8j5Q-1; Thu, 23 Jan 2020 09:09:08 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9110C1800D48
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:51:03 +0000 (UTC)
-Received: from 640k.localdomain.com (unknown [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 48A751CB;
- Thu, 23 Jan 2020 13:51:00 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EB6F8024D6
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 14:09:07 +0000 (UTC)
+Received: from kh066.redhat.com (ovpn-117-189.ams2.redhat.com [10.36.117.189])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88D481084382
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 14:09:06 +0000 (UTC)
+From: Oksana Vohchana <ovoshcha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/59] qom/object: Display more helpful message when an
- interface is missing
-Date: Thu, 23 Jan 2020 14:49:55 +0100
-Message-Id: <1579787449-27599-6-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
-References: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] Acceptance test: provides to use different transport for
+ migration
+Date: Thu, 23 Jan 2020 16:09:05 +0200
+Message-Id: <20200123140905.3586-1-ovoshcha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: UMrelfzONwm7B1DJ6aXS6w-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: GG8t7tOKNYWZzwpXuv8j5Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,72 +83,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Along with VM migration via TCP, we can use migration through EXEC
+and UNIX transport protocol
 
-When adding new devices implementing QOM interfaces, we might
-forgot to add the Kconfig dependency that pulls the required
-objects in when building.
-
-Since QOM dependencies are resolved at runtime, we don't get any
-link-time failures, and QEMU aborts while starting:
-
-  $ qemu ...
-  Segmentation fault (core dumped)
-
-  (gdb) bt
-  #0  0x00007ff6e96b1e35 in raise () from /lib64/libc.so.6
-  #1  0x00007ff6e969c895 in abort () from /lib64/libc.so.6
-  #2  0x00005572bc5051cf in type_initialize (ti=3D0x5572be6f1200) at qom/ob=
-ject.c:323
-  #3  0x00005572bc505074 in type_initialize (ti=3D0x5572be6f1800) at qom/ob=
-ject.c:301
-  #4  0x00005572bc505074 in type_initialize (ti=3D0x5572be6e48e0) at qom/ob=
-ject.c:301
-  #5  0x00005572bc506939 in object_class_by_name (typename=3D0x5572bc56109a=
-) at qom/object.c:959
-  #6  0x00005572bc503dd5 in cpu_class_by_name (typename=3D0x5572bc56109a, c=
-pu_model=3D0x5572be6d9930) at hw/core/cpu.c:286
-
-Since the caller has access to the qdev parent/interface names,
-we can simply display them to avoid starting a debugger:
-
-  $ qemu ...
-  qemu: missing interface 'fancy-if' for object 'fancy-dev'
-  Aborted (core dumped)
-
-This commit is similar to e02bdf1cecd2 ("Display more helpful message
-when an object type is missing").
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20200118162348.17823-1-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
 ---
- qom/object.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ tests/acceptance/migration.py | 50 ++++++++++++++++++++++++-----------
+ 1 file changed, 35 insertions(+), 15 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index 0d971ca..36123fb 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -317,6 +317,11 @@ static void type_initialize(TypeImpl *ti)
+diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+index a44c1ae58f..8bbe28d52d 100644
+--- a/tests/acceptance/migration.py
++++ b/tests/acceptance/migration.py
+@@ -10,10 +10,13 @@
+ # later.  See the COPYING file in the top-level directory.
 =20
-         for (i =3D 0; i < ti->num_interfaces; i++) {
-             TypeImpl *t =3D type_get_by_name(ti->interfaces[i].typename);
-+            if (!t) {
-+                error_report("missing interface '%s' for object '%s'",
-+                             ti->interfaces[i].typename, parent->name);
-+                abort();
-+            }
-             for (e =3D ti->class->interfaces; e; e =3D e->next) {
-                 TypeImpl *target_type =3D OBJECT_CLASS(e->data)->type;
 =20
++import tempfile
+ from avocado_qemu import Test
++from avocado import skipUnless\
+=20
+ from avocado.utils import network
+ from avocado.utils import wait
++from avocado.utils.path import find_command, CmdNotFoundError
+=20
+=20
+ class Migration(Test):
+@@ -24,6 +27,26 @@ class Migration(Test):
+     def migration_finished(vm):
+         return vm.command('query-migrate')['status'] in ('completed', 'fai=
+led')
+=20
++    def do_migrate(self, dest_uri, src_uri=3DNone):
++        source_vm =3D self.get_vm()
++        dest_vm =3D self.get_vm('-incoming', dest_uri)
++        dest_vm.launch()
++        if src_uri is None:
++            src_uri =3D dest_uri
++        source_vm.launch()
++        source_vm.qmp('migrate', uri=3Dsrc_uri)
++        self.assert_migration(source_vm, dest_vm)
++
++    def assert_migration(self, source_vm, dest_vm):
++        wait.wait_for(self.migration_finished,
++                      timeout=3Dself.timeout,
++                      step=3D0.1,
++                      args=3D(source_vm,))
++        self.assertEqual(source_vm.command('query-migrate')['status'], 'co=
+mpleted')
++        self.assertEqual(dest_vm.command('query-migrate')['status'], 'comp=
+leted')
++        self.assertEqual(dest_vm.command('query-status')['status'], 'runni=
+ng')
++        self.assertEqual(source_vm.command('query-status')['status'], 'pos=
+tmigrate')
++
+     def _get_free_port(self):
+         port =3D network.find_free_port()
+         if port is None:
+@@ -32,19 +55,16 @@ class Migration(Test):
+=20
+=20
+     def test_migration_with_tcp_localhost(self):
+-        source_vm =3D self.get_vm()
+         dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
+-        dest_vm =3D self.get_vm('-incoming', dest_uri)
+-        dest_vm.launch()
+-        source_vm.launch()
+-        source_vm.qmp('migrate', uri=3Ddest_uri)
+-        wait.wait_for(
+-            self.migration_finished,
+-            timeout=3Dself.timeout,
+-            step=3D0.1,
+-            args=3D(source_vm,)
+-        )
+-        self.assertEqual(dest_vm.command('query-migrate')['status'], 'comp=
+leted')
+-        self.assertEqual(source_vm.command('query-migrate')['status'], 'co=
+mpleted')
+-        self.assertEqual(dest_vm.command('query-status')['status'], 'runni=
+ng')
+-        self.assertEqual(source_vm.command('query-status')['status'], 'pos=
+tmigrate')
++        self.do_migrate(dest_uri)
++
++    def test_migration_with_unix(self):
++        with tempfile.TemporaryDirectory(prefix=3D'socket_') as socket_pat=
+h:
++            dest_uri =3D 'unix:%s/qemu-test.sock' % socket_path
++            self.do_migrate(dest_uri)
++    @skipUnless(find_command('nc', default=3DFalse), "nc command not found=
+ on the system")
++    def test_migration_with_exec(self):
++        free_port =3D self._get_free_port()
++        dest_uri =3D 'exec:nc -l localhost %u' % free_port
++        src_uri =3D 'exec:nc localhost %u' % free_port
++        self.do_migrate(dest_uri, src_uri)
 --=20
-1.8.3.1
-
+2.21.1
 
 
