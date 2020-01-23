@@ -2,80 +2,59 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46363C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E750C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:51:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F236E2073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:49:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X8/yAhuf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F236E2073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3481F2051A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:51:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3481F2051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudnb-0008Qt-89
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:49:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41911)
+	id 1iudpX-0002bs-Qe
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:51:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAu-0004N2-2E
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:30 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUP-0001HV-Uz
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAr-0006nu-OA
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27823
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAr-0006nU-Jn
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780885;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pfYejLp3p2IfBeM0FrCsJccHwHgdomwifKJrQcOxA08=;
- b=X8/yAhufl4bt9MBwxZw9wDryge/PC643CDNiO+r/QZ/ucYlgeUKvadodzQadG9VbGOJ8Bh
- kjDo+DuxOalMm9hJri6BjdAzIHMdaalFbXF8gzCqfwmS5Ml3LnBmOvouyqnlvcxDByRNdg
- 5dXwX9jxUmoxPiD/xo57siiYRDyN4FI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-ZL91oFtWOtK8YOF6g7-sbA-1; Thu, 23 Jan 2020 07:01:05 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 888E6100550E
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:04 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C30CE85754;
- Thu, 23 Jan 2020 12:01:03 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 096/111] virtiofsd: introduce inode refcount to prevent
- use-after-free
-Date: Thu, 23 Jan 2020 11:58:26 +0000
-Message-Id: <20200123115841.138849-97-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-References: <20200123115841.138849-1-dgilbert@redhat.com>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUL-0000ob-K2
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:41 -0500
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:59666)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUL-0000mQ-8f
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:37 -0500
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id BC1C8BCAFA;
+ Thu, 23 Jan 2020 22:25:34 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+ (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 6653524008E;
+ Thu, 23 Jan 2020 22:25:34 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v29 09/22] target/rx: Replace operand with prt_ldmi in
+ disassembler
+Date: Thu, 23 Jan 2020 22:25:12 +0900
+Message-Id: <20200123132525.80891-10-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+References: <20200123132525.80891-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: ZL91oFtWOtK8YOF6g7-sbA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,624 +66,310 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-If thread A is using an inode it must not be deleted by thread B when
-processing a FUSE_FORGET request.
+This has consistency with prt_ri().  It loads all data before
+beginning output.  It uses exactly one call to prt() to emit
+the full instruction.
 
-The FUSE protocol itself already has a counter called nlookup that is
-used in FUSE_FORGET messages.  We cannot trust this counter since the
-untrusted client can manipulate it via FUSE_FORGET messages.
-
-Introduce a new refcount to keep inodes alive for the required lifespan.
-lo_inode_put() must be called to release a reference.  FUSE's nlookup
-counter holds exactly one reference so that the inode stays alive as
-long as the client still wants to remember it.
-
-Note that the lo_inode->is_symlink field is moved to avoid creating a
-hole in the struct due to struct field alignment.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Reviewed-by: Sergio Lopez <slp@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-20-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tools/virtiofsd/passthrough_ll.c | 169 ++++++++++++++++++++++++++-----
- 1 file changed, 146 insertions(+), 23 deletions(-)
+ target/rx/disas.c | 77 +++++++++++++++++------------------------------
+ 1 file changed, 27 insertions(+), 50 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index e3a6d6b611..ab1613586e 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -97,7 +97,13 @@ struct lo_key {
-=20
- struct lo_inode {
-     int fd;
--    bool is_symlink;
-+
-+    /*
-+     * Atomic reference count for this object.  The nlookup field holds a
-+     * reference and release it when nlookup reaches 0.
-+     */
-+    gint refcount;
-+
-     struct lo_key key;
-=20
-     /*
-@@ -116,6 +122,8 @@ struct lo_inode {
-     fuse_ino_t fuse_ino;
-     pthread_mutex_t plock_mutex;
-     GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
-+
-+    bool is_symlink;
- };
-=20
- struct lo_cred {
-@@ -471,6 +479,23 @@ static ssize_t lo_add_inode_mapping(fuse_req_t req, st=
-ruct lo_inode *inode)
-     return elem - lo_data(req)->ino_map.elems;
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index 64342537ee..515b365528 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -135,18 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char o=
+ut[8], int ld, int mi)
+     sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
  }
 =20
-+static void lo_inode_put(struct lo_data *lo, struct lo_inode **inodep)
-+{
-+    struct lo_inode *inode =3D *inodep;
-+
-+    if (!inode) {
-+        return;
-+    }
-+
-+    *inodep =3D NULL;
-+
-+    if (g_atomic_int_dec_and_test(&inode->refcount)) {
-+        close(inode->fd);
-+        free(inode);
-+    }
-+}
-+
-+/* Caller must release refcount using lo_inode_put() */
- static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
+-static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
++static void prt_ldmi(DisasContext *ctx, const char *insn,
++                     int ld, int mi, int rs, int rd)
  {
-     struct lo_data *lo =3D lo_data(req);
-@@ -478,6 +503,9 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse_i=
-no_t ino)
+     static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
+     char dsp[8];
 =20
-     pthread_mutex_lock(&lo->mutex);
-     elem =3D lo_map_get(&lo->ino_map, ino);
-+    if (elem) {
-+        g_atomic_int_inc(&elem->inode->refcount);
-+    }
-     pthread_mutex_unlock(&lo->mutex);
-=20
-     if (!elem) {
-@@ -487,10 +515,23 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse=
-_ino_t ino)
-     return elem->inode;
- }
-=20
-+/*
-+ * TODO Remove this helper and force callers to hold an inode refcount unt=
-il
-+ * they are done with the fd.  This will be done in a later patch to make
-+ * review easier.
-+ */
- static int lo_fd(fuse_req_t req, fuse_ino_t ino)
- {
-     struct lo_inode *inode =3D lo_inode(req, ino);
--    return inode ? inode->fd : -1;
-+    int fd;
-+
-+    if (!inode) {
-+        return -1;
-+    }
-+
-+    fd =3D inode->fd;
-+    lo_inode_put(lo_data(req), &inode);
-+    return fd;
- }
-=20
- static void lo_init(void *userdata, struct fuse_conn_info *conn)
-@@ -545,6 +586,10 @@ static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
-     fuse_reply_attr(req, &buf, lo->timeout);
- }
-=20
-+/*
-+ * Increments parent->nlookup and caller must release refcount using
-+ * lo_inode_put(&parent).
-+ */
- static int lo_parent_and_name(struct lo_data *lo, struct lo_inode *inode,
-                               char path[PATH_MAX], struct lo_inode **paren=
-t)
- {
-@@ -582,6 +627,7 @@ retry:
-         p =3D &lo->root;
-         pthread_mutex_lock(&lo->mutex);
-         p->nlookup++;
-+        g_atomic_int_inc(&p->refcount);
-         pthread_mutex_unlock(&lo->mutex);
+     if (ld < 3) {
+         rx_index_addr(ctx, dsp, ld, mi);
+-        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
++        prt("%s\t%s[r%d]%s, r%d", insn, dsp, rs, sizes[mi], rd);
      } else {
-         *last =3D '\0';
-@@ -625,6 +671,7 @@ retry:
-=20
- fail_unref:
-     unref_inode_lolocked(lo, p, 1);
-+    lo_inode_put(lo, &p);
- fail:
-     if (retries) {
-         retries--;
-@@ -663,6 +710,7 @@ fallback:
-     if (res !=3D -1) {
-         res =3D utimensat(parent->fd, path, tv, AT_SYMLINK_NOFOLLOW);
-         unref_inode_lolocked(lo, parent, 1);
-+        lo_inode_put(lo, &parent);
+-        prt("r%d", rs);
++        prt("%s\tr%d, r%d", insn, rs, rd);
      }
-=20
-     return res;
-@@ -780,11 +828,13 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino=
-, struct stat *attr,
-             goto out_err;
-         }
-     }
-+    lo_inode_put(lo, &inode);
-=20
-     return lo_getattr(req, ino, fi);
-=20
- out_err:
-     saverr =3D errno;
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
+-    prt(", r%d", rd);
  }
 =20
-@@ -801,6 +851,7 @@ static struct lo_inode *lo_find(struct lo_data *lo, str=
-uct stat *st)
-     if (p) {
-         assert(p->nlookup > 0);
-         p->nlookup++;
-+        g_atomic_int_inc(&p->refcount);
-     }
-     pthread_mutex_unlock(&lo->mutex);
-=20
-@@ -820,6 +871,10 @@ static void posix_locks_value_destroy(gpointer data)
-     free(plock);
- }
-=20
-+/*
-+ * Increments nlookup and caller must release refcount using
-+ * lo_inode_put(&parent).
-+ */
- static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *nam=
-e,
-                         struct fuse_entry_param *e)
+ static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
+@@ -416,8 +416,7 @@ static bool trans_AND_ir(DisasContext *ctx, arg_AND_i=
+r *a)
+ /* and rs,rd */
+ static bool trans_AND_mr(DisasContext *ctx, arg_AND_mr *a)
  {
-@@ -827,7 +882,8 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-     int res;
-     int saverr;
-     struct lo_data *lo =3D lo_data(req);
--    struct lo_inode *inode, *dir =3D lo_inode(req, parent);
-+    struct lo_inode *inode =3D NULL;
-+    struct lo_inode *dir =3D lo_inode(req, parent);
-=20
-     /*
-      * name_to_handle_at() and open_by_handle_at() can reach here with fus=
-e
-@@ -868,6 +924,13 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t par=
-ent, const char *name,
-         }
-=20
-         inode->is_symlink =3D S_ISLNK(e->attr.st_mode);
-+
-+        /*
-+         * One for the caller and one for nlookup (released in
-+         * unref_inode_lolocked())
-+         */
-+        g_atomic_int_set(&inode->refcount, 2);
-+
-         inode->nlookup =3D 1;
-         inode->fd =3D newfd;
-         newfd =3D -1;
-@@ -883,6 +946,8 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-         pthread_mutex_unlock(&lo->mutex);
-     }
-     e->ino =3D inode->fuse_ino;
-+    lo_inode_put(lo, &inode);
-+    lo_inode_put(lo, &dir);
-=20
-     fuse_log(FUSE_LOG_DEBUG, "  %lli/%s -> %lli\n", (unsigned long long)pa=
-rent,
-              name, (unsigned long long)e->ino);
-@@ -894,6 +959,8 @@ out_err:
-     if (newfd !=3D -1) {
-         close(newfd);
-     }
-+    lo_inode_put(lo, &inode);
-+    lo_inode_put(lo, &dir);
-     return saverr;
+-    prt("and\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "and", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
-@@ -991,6 +1058,7 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_ino_=
-t parent,
+@@ -440,8 +439,7 @@ static bool trans_OR_ir(DisasContext *ctx, arg_OR_ir =
+*a)
+ /* or rs,rd */
+ static bool trans_OR_mr(DisasContext *ctx, arg_OR_mr *a)
  {
-     int res;
-     int saverr;
-+    struct lo_data *lo =3D lo_data(req);
-     struct lo_inode *dir;
-     struct fuse_entry_param e;
-     struct lo_cred old =3D {};
-@@ -1032,9 +1100,11 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_in=
-o_t parent,
-              name, (unsigned long long)e.ino);
-=20
-     fuse_reply_entry(req, &e);
-+    lo_inode_put(lo, &dir);
-     return;
-=20
- out:
-+    lo_inode_put(lo, &dir);
-     fuse_reply_err(req, saverr);
+-    prt("or\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "or", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
-@@ -1085,6 +1155,7 @@ fallback:
-     if (res !=3D -1) {
-         res =3D linkat(parent->fd, path, dfd, name, 0);
-         unref_inode_lolocked(lo, parent, 1);
-+        lo_inode_put(lo, &parent);
-     }
-=20
-     return res;
-@@ -1095,6 +1166,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, f=
-use_ino_t parent,
+@@ -463,8 +461,7 @@ static bool trans_XOR_ir(DisasContext *ctx, arg_XOR_i=
+r *a)
+ /* xor rs,rd */
+ static bool trans_XOR_mr(DisasContext *ctx, arg_XOR_mr *a)
  {
-     int res;
-     struct lo_data *lo =3D lo_data(req);
-+    struct lo_inode *parent_inode;
-     struct lo_inode *inode;
-     struct fuse_entry_param e;
-     int saverr;
-@@ -1104,17 +1176,18 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino,=
- fuse_ino_t parent,
-         return;
-     }
-=20
-+    parent_inode =3D lo_inode(req, parent);
-     inode =3D lo_inode(req, ino);
--    if (!inode) {
--        fuse_reply_err(req, EBADF);
--        return;
-+    if (!parent_inode || !inode) {
-+        errno =3D EBADF;
-+        goto out_err;
-     }
-=20
-     memset(&e, 0, sizeof(struct fuse_entry_param));
-     e.attr_timeout =3D lo->timeout;
-     e.entry_timeout =3D lo->timeout;
-=20
--    res =3D linkat_empty_nofollow(lo, inode, lo_fd(req, parent), name);
-+    res =3D linkat_empty_nofollow(lo, inode, parent_inode->fd, name);
-     if (res =3D=3D -1) {
-         goto out_err;
-     }
-@@ -1133,13 +1206,18 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino,=
- fuse_ino_t parent,
-              name, (unsigned long long)e.ino);
-=20
-     fuse_reply_entry(req, &e);
-+    lo_inode_put(lo, &parent_inode);
-+    lo_inode_put(lo, &inode);
-     return;
-=20
- out_err:
-     saverr =3D errno;
-+    lo_inode_put(lo, &parent_inode);
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
+-    prt("xor\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "xor", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
-+/* Increments nlookup and caller must release refcount using lo_inode_put(=
-) */
- static struct lo_inode *lookup_name(fuse_req_t req, fuse_ino_t parent,
-                                     const char *name)
+@@ -479,8 +476,7 @@ static bool trans_TST_ir(DisasContext *ctx, arg_TST_i=
+r *a)
+ /* tst rs, rd */
+ static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
  {
-@@ -1176,6 +1254,7 @@ static void lo_rmdir(fuse_req_t req, fuse_ino_t paren=
-t, const char *name)
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-     unref_inode_lolocked(lo, inode, 1);
-+    lo_inode_put(lo, &inode);
+-    prt("tst\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "tst", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
- static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
-@@ -1183,8 +1262,10 @@ static void lo_rename(fuse_req_t req, fuse_ino_t par=
-ent, const char *name,
-                       unsigned int flags)
+@@ -548,8 +544,7 @@ static bool trans_ADD_irr(DisasContext *ctx, arg_ADD_=
+irr *a)
+ /* add dsp[rs], rd */
+ static bool trans_ADD_mr(DisasContext *ctx, arg_ADD_mr *a)
  {
-     int res;
--    struct lo_inode *oldinode;
--    struct lo_inode *newinode;
-+    struct lo_inode *parent_inode;
-+    struct lo_inode *newparent_inode;
-+    struct lo_inode *oldinode =3D NULL;
-+    struct lo_inode *newinode =3D NULL;
-     struct lo_data *lo =3D lo_data(req);
+-    prt("add\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "add", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
 =20
-     if (!is_safe_path_component(name) || !is_safe_path_component(newname))=
+@@ -573,8 +568,7 @@ static bool trans_CMP_ir(DisasContext *ctx, arg_CMP_i=
+r *a)
+ /* cmp dsp[rs], rs2 */
+ static bool trans_CMP_mr(DisasContext *ctx, arg_CMP_mr *a)
  {
-@@ -1192,6 +1273,13 @@ static void lo_rename(fuse_req_t req, fuse_ino_t par=
-ent, const char *name,
-         return;
-     }
-=20
-+    parent_inode =3D lo_inode(req, parent);
-+    newparent_inode =3D lo_inode(req, newparent);
-+    if (!parent_inode || !newparent_inode) {
-+        fuse_reply_err(req, EBADF);
-+        goto out;
-+    }
-+
-     oldinode =3D lookup_name(req, parent, name);
-     newinode =3D lookup_name(req, newparent, newname);
-=20
-@@ -1204,8 +1292,8 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
- #ifndef SYS_renameat2
-         fuse_reply_err(req, EINVAL);
- #else
--        res =3D syscall(SYS_renameat2, lo_fd(req, parent), name,
--                       lo_fd(req, newparent), newname, flags);
-+        res =3D syscall(SYS_renameat2, parent_inode->fd, name,
-+                        newparent_inode->fd, newname, flags);
-         if (res =3D=3D -1 && errno =3D=3D ENOSYS) {
-             fuse_reply_err(req, EINVAL);
-         } else {
-@@ -1215,12 +1303,16 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-         goto out;
-     }
-=20
--    res =3D renameat(lo_fd(req, parent), name, lo_fd(req, newparent), newn=
-ame);
-+    res =3D renameat(parent_inode->fd, name, newparent_inode->fd, newname)=
-;
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
- out:
-     unref_inode_lolocked(lo, oldinode, 1);
-     unref_inode_lolocked(lo, newinode, 1);
-+    lo_inode_put(lo, &oldinode);
-+    lo_inode_put(lo, &newinode);
-+    lo_inode_put(lo, &parent_inode);
-+    lo_inode_put(lo, &newparent_inode);
+-    prt("cmp\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "cmp", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
- static void lo_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
-@@ -1244,6 +1336,7 @@ static void lo_unlink(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name)
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-     unref_inode_lolocked(lo, inode, 1);
-+    lo_inode_put(lo, &inode);
- }
-=20
- static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
-e,
-@@ -1265,8 +1358,9 @@ static void unref_inode_lolocked(struct lo_data *lo, =
-struct lo_inode *inode,
-         g_hash_table_destroy(inode->posix_locks);
-         pthread_mutex_destroy(&inode->plock_mutex);
-         pthread_mutex_unlock(&lo->mutex);
--        close(inode->fd);
--        free(inode);
-+
-+        /* Drop our refcount from lo_do_lookup() */
-+        lo_inode_put(lo, &inode);
-     } else {
-         pthread_mutex_unlock(&lo->mutex);
-     }
-@@ -1280,6 +1374,7 @@ static int unref_all_inodes_cb(gpointer key, gpointer=
- value, gpointer user_data)
-     inode->nlookup =3D 0;
-     lo_map_remove(&lo->ino_map, inode->fuse_ino);
-     close(inode->fd);
-+    lo_inode_put(lo, &inode); /* Drop our refcount from lo_do_lookup() */
-=20
-     return TRUE;
- }
-@@ -1306,6 +1401,7 @@ static void lo_forget_one(fuse_req_t req, fuse_ino_t =
-ino, uint64_t nlookup)
-              (unsigned long long)nlookup);
-=20
-     unref_inode_lolocked(lo, inode, nlookup);
-+    lo_inode_put(lo, &inode);
- }
-=20
- static void lo_forget(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup)
-@@ -1537,6 +1633,7 @@ static void lo_do_readdir(fuse_req_t req, fuse_ino_t =
-ino, size_t size,
-     err =3D 0;
- error:
-     lo_dirp_put(&d);
-+    lo_inode_put(lo, &dinode);
-=20
-     /*
-      * If there's an error, we can only signal it if we haven't stored
-@@ -1595,6 +1692,7 @@ static void lo_create(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
+@@ -589,8 +583,7 @@ static bool trans_SUB_ir(DisasContext *ctx, arg_SUB_i=
+r *a)
+ /* sub dsp[rs], rd */
+ static bool trans_SUB_mr(DisasContext *ctx, arg_SUB_mr *a)
  {
-     int fd;
-     struct lo_data *lo =3D lo_data(req);
-+    struct lo_inode *parent_inode;
-     struct fuse_entry_param e;
-     int err;
-     struct lo_cred old =3D {};
-@@ -1607,12 +1705,18 @@ static void lo_create(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-         return;
-     }
-=20
-+    parent_inode =3D lo_inode(req, parent);
-+    if (!parent_inode) {
-+        fuse_reply_err(req, EBADF);
-+        return;
-+    }
-+
-     err =3D lo_change_cred(req, &old);
-     if (err) {
-         goto out;
-     }
-=20
--    fd =3D openat(lo_fd(req, parent), name, (fi->flags | O_CREAT) & ~O_NOF=
-OLLOW,
-+    fd =3D openat(parent_inode->fd, name, (fi->flags | O_CREAT) & ~O_NOFOL=
-LOW,
-                 mode);
-     err =3D fd =3D=3D -1 ? errno : 0;
-     lo_restore_cred(&old);
-@@ -1625,8 +1729,8 @@ static void lo_create(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-         pthread_mutex_unlock(&lo->mutex);
-         if (fh =3D=3D -1) {
-             close(fd);
--            fuse_reply_err(req, ENOMEM);
--            return;
-+            err =3D ENOMEM;
-+            goto out;
-         }
-=20
-         fi->fh =3D fh;
-@@ -1639,6 +1743,8 @@ static void lo_create(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-     }
-=20
- out:
-+    lo_inode_put(lo, &parent_inode);
-+
-     if (err) {
-         fuse_reply_err(req, err);
-     } else {
-@@ -1712,16 +1818,18 @@ static void lo_getlk(fuse_req_t req, fuse_ino_t ino=
-, struct fuse_file_info *fi,
-     plock =3D
-         lookup_create_plock_ctx(lo, inode, fi->lock_owner, lock->l_pid, &r=
-et);
-     if (!plock) {
--        pthread_mutex_unlock(&inode->plock_mutex);
--        fuse_reply_err(req, ret);
--        return;
-+        saverr =3D ret;
-+        goto out;
-     }
-=20
-     ret =3D fcntl(plock->fd, F_OFD_GETLK, lock);
-     if (ret =3D=3D -1) {
-         saverr =3D errno;
-     }
-+
-+out:
-     pthread_mutex_unlock(&inode->plock_mutex);
-+    lo_inode_put(lo, &inode);
-=20
-     if (saverr) {
-         fuse_reply_err(req, saverr);
-@@ -1761,9 +1869,8 @@ static void lo_setlk(fuse_req_t req, fuse_ino_t ino, =
-struct fuse_file_info *fi,
-         lookup_create_plock_ctx(lo, inode, fi->lock_owner, lock->l_pid, &r=
-et);
-=20
-     if (!plock) {
--        pthread_mutex_unlock(&inode->plock_mutex);
--        fuse_reply_err(req, ret);
--        return;
-+        saverr =3D ret;
-+        goto out;
-     }
-=20
-     /* TODO: Is it alright to modify flock? */
-@@ -1772,7 +1879,11 @@ static void lo_setlk(fuse_req_t req, fuse_ino_t ino,=
- struct fuse_file_info *fi,
-     if (ret =3D=3D -1) {
-         saverr =3D errno;
-     }
-+
-+out:
-     pthread_mutex_unlock(&inode->plock_mutex);
-+    lo_inode_put(lo, &inode);
-+
-     fuse_reply_err(req, saverr);
+-    prt("sub\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "sub", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
-@@ -1898,6 +2009,7 @@ static void lo_flush(fuse_req_t req, fuse_ino_t ino, =
-struct fuse_file_info *fi)
-     pthread_mutex_unlock(&inode->plock_mutex);
-=20
-     res =3D close(dup(lo_fi_fd(req, fi)));
-+    lo_inode_put(lo_data(req), &inode);
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+@@ -611,8 +604,7 @@ static bool trans_SBB_rr(DisasContext *ctx, arg_SBB_r=
+r *a)
+ /* sbb dsp[rs], rd */
+ static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
+ {
+-    prt("sbb\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "sbb", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
  }
 =20
-@@ -2115,11 +2227,14 @@ out_free:
-     if (fd >=3D 0) {
-         close(fd);
-     }
-+
-+    lo_inode_put(lo, &inode);
-     return;
-=20
- out_err:
-     saverr =3D errno;
- out:
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
-     goto out_free;
- }
-@@ -2190,11 +2305,14 @@ out_free:
-     if (fd >=3D 0) {
-         close(fd);
-     }
-+
-+    lo_inode_put(lo, &inode);
-     return;
-=20
- out_err:
-     saverr =3D errno;
- out:
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
-     goto out_free;
- }
-@@ -2243,6 +2361,8 @@ out:
-     if (fd >=3D 0) {
-         close(fd);
-     }
-+
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
+@@ -640,8 +632,7 @@ static bool trans_MAX_ir(DisasContext *ctx, arg_MAX_i=
+r *a)
+ /* max dsp[rs], rd */
+ static bool trans_MAX_mr(DisasContext *ctx, arg_MAX_mr *a)
+ {
+-    prt("max\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "max", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
-@@ -2289,6 +2409,8 @@ out:
-     if (fd >=3D 0) {
-         close(fd);
-     }
-+
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
+@@ -656,8 +647,7 @@ static bool trans_MIN_ir(DisasContext *ctx, arg_MIN_i=
+r *a)
+ /* min dsp[rs], rd */
+ static bool trans_MIN_mr(DisasContext *ctx, arg_MIN_mr *a)
+ {
+-    prt("max\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "min", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
-@@ -2671,6 +2793,7 @@ static void setup_root(struct lo_data *lo, struct lo_=
-inode *root)
-     root->key.ino =3D stat.st_ino;
-     root->key.dev =3D stat.st_dev;
-     root->nlookup =3D 2;
-+    g_atomic_int_set(&root->refcount, 2);
+@@ -673,8 +663,7 @@ static bool trans_MUL_ir(DisasContext *ctx, arg_MUL_i=
+r *a)
+ /* mul dsp[rs], rd */
+ static bool trans_MUL_mr(DisasContext *ctx, arg_MUL_mr *a)
+ {
+-    prt("mul\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "mul", a->ld, a->mi, a->rs, a->rd);
+     return true;
  }
 =20
- static guint lo_key_hash(gconstpointer key)
+@@ -696,8 +685,7 @@ static bool trans_EMUL_ir(DisasContext *ctx, arg_EMUL=
+_ir *a)
+ /* emul dsp[rs], rd */
+ static bool trans_EMUL_mr(DisasContext *ctx, arg_EMUL_mr *a)
+ {
+-    prt("emul\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "emul", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -712,8 +700,7 @@ static bool trans_EMULU_ir(DisasContext *ctx, arg_EMU=
+LU_ir *a)
+ /* emulu dsp[rs], rd */
+ static bool trans_EMULU_mr(DisasContext *ctx, arg_EMULU_mr *a)
+ {
+-    prt("emulu\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "emulu", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -728,8 +715,7 @@ static bool trans_DIV_ir(DisasContext *ctx, arg_DIV_i=
+r *a)
+ /* div dsp[rs], rd */
+ static bool trans_DIV_mr(DisasContext *ctx, arg_DIV_mr *a)
+ {
+-    prt("div\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "div", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -744,8 +730,7 @@ static bool trans_DIVU_ir(DisasContext *ctx, arg_DIVU=
+_ir *a)
+ /* divu dsp[rs], rd */
+ static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
+ {
+-    prt("divu\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "divu", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1089,8 +1074,7 @@ static bool trans_FADD_ir(DisasContext *ctx, arg_FA=
+DD_ir *a)
+ /* fadd rs, rd */
+ static bool trans_FADD_mr(DisasContext *ctx, arg_FADD_mr *a)
+ {
+-    prt("fadd\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fadd", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1105,8 +1089,7 @@ static bool trans_FCMP_ir(DisasContext *ctx, arg_FC=
+MP_ir *a)
+ /* fcmp rs, rd */
+ static bool trans_FCMP_mr(DisasContext *ctx, arg_FCMP_mr *a)
+ {
+-    prt("fcmp\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fcmp", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1121,8 +1104,7 @@ static bool trans_FSUB_ir(DisasContext *ctx, arg_FS=
+UB_ir *a)
+ /* fsub rs, rd */
+ static bool trans_FSUB_mr(DisasContext *ctx, arg_FSUB_mr *a)
+ {
+-    prt("fsub\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fsub", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1130,8 +1112,7 @@ static bool trans_FSUB_mr(DisasContext *ctx, arg_FS=
+UB_mr *a)
+ /* ftoi rs, rd */
+ static bool trans_FTOI(DisasContext *ctx, arg_FTOI *a)
+ {
+-    prt("ftoi\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "ftoi", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1146,8 +1127,7 @@ static bool trans_FMUL_ir(DisasContext *ctx, arg_FM=
+UL_ir *a)
+ /* fmul rs, rd */
+ static bool trans_FMUL_mr(DisasContext *ctx, arg_FMUL_mr *a)
+ {
+-    prt("fmul\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fmul", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1162,8 +1142,7 @@ static bool trans_FDIV_ir(DisasContext *ctx, arg_FD=
+IV_ir *a)
+ /* fdiv rs, rd */
+ static bool trans_FDIV_mr(DisasContext *ctx, arg_FDIV_mr *a)
+ {
+-    prt("fdiv\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fdiv", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1171,8 +1150,7 @@ static bool trans_FDIV_mr(DisasContext *ctx, arg_FD=
+IV_mr *a)
+ /* round rs, rd */
+ static bool trans_ROUND(DisasContext *ctx, arg_ROUND *a)
+ {
+-    prt("round\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "round", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1180,8 +1158,7 @@ static bool trans_ROUND(DisasContext *ctx, arg_ROUN=
+D *a)
+ /* itof dsp[rs], rd */
+ static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
+ {
+-    prt("itof\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "itof", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
 --=20
-2.24.1
+2.20.1
 
 
