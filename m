@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A17FAC32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D934C32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D6C824125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:12:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B3F524125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:14:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZwyyANqx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D6C824125
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N8ok7RbO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B3F524125
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuQ7E-0002cS-8f
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:12:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54581)
+	id 1iuQ8H-00045B-Lx
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:14:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54750)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPzC-00028F-40
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:47 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzW-0002EE-FM
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPz3-0001z5-NO
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:37 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:39449)
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzN-0002Dj-Fw
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:57 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:38984)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iuPz3-0001yW-G5
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:29 -0500
-Received: by mail-pf1-f196.google.com with SMTP id q10so609914pfs.6
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:04:29 -0800 (PST)
+ id 1iuPzK-00028J-KN
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:47 -0500
+Received: by mail-pg1-f194.google.com with SMTP id 4so388496pgd.6
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:04:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zXV8kwpB1YEq5Vdk+d1pQVUnmUxRqGDEumGQUOCIABQ=;
- b=ZwyyANqxab3Ig7fd+aXEpgsoqOO6vQyoXSJ53+wjZePe5xamaZjTnG9C1B4HsVBHEy
- uDKb7gnr8bK+lCATgoSY3DycNUY+TS3TS/pbap7Q3DvKJflZB0ZTcQ+iT+aCPpNiksaf
- FTnf6Z30V7QHtuRVm5KQdKST5cmWFqBE173wlom3CXt0HtDGXW7LfhIygK+INMUPME3O
- aqxXM5hl+gaODdBBs0Z1/6SfFjCe4LjqcUzTvk32N6IuA9OndDID9vrd2IFwfWCyUWo2
- XdotgdwcX0YuJ5oRVQrJBesyyEGtQPdZ8sT56Kll+y0mHGV55HQrGOPiVFtBSj8eWf/S
- 1bpQ==
+ bh=RhmUpLrMM8mnirS5wfkIECdeckopeh6Ysfr4kR7YJ3E=;
+ b=N8ok7RbOgx9teXKXLfZNklX1RMK7USCWQHtfLibiqyRQheOHxIAsn6tApx+a7+Bz4W
+ b299T467c/JY2MJn+ufnMBFI0w1Ic8ZpltgwRPsc21r0BHrtYW1KscSif9rbi/ChiY3p
+ D4k4twshTBWPc0aIjwPTU6Ptxq6oBJa5xOaPoKSmrubrdLt/9f84zb+j2KFwMjVXacnc
+ 4JBu7Sm8cfyYvLn8g6DyJlcSooJULTEHy78PkobzpbnWxz+LPbCfPoXfPAvObc/+VrEI
+ xmh/zAxKA+++7mIS2PN/OzuVe8tqk2cm5ATGZL5bEzERgRN/Hl5zyRXAEHUm4scgBMKp
+ AG9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zXV8kwpB1YEq5Vdk+d1pQVUnmUxRqGDEumGQUOCIABQ=;
- b=ZUxDb/DJ7c4heAxN/C49eFTv4JFiiJHBbs0Odi5DJKhMiQMIyIGh1wPolcOmSV7xA1
- fkbu9vZtdtPAT5DT/l2PKdCWNVOFxDPE7vZjmNRvvrk6Pf+dI+YlhJlDGPFnRFqb1oDX
- 5mPqUZebLdphxkIiVZPb+7HMI6gefjNhf3eEKYIN42faTeadHOOrMl9peO32nfKGqxkW
- 6pOU3XCJ42mUstZCMewMcj70wX1wSHRsmyubOQ2FrgCqm3qx/dmfDZ5i2b+RoshLLOp6
- 2VqBMGEhsxXay/uvEQPeQuee2KslHX0jbVufo2eVB2M+xcmPtWMH6p442rIJLOd+6EXh
- MYjQ==
-X-Gm-Message-State: APjAAAWBSH0Is89fIG0Ew1nzD9MeJuUtfN/4pWJ9xYkxfsbi8C0Zhg/c
- GLSp4eoQyiGv/ZzLngJ98Fsmf+VtHu0=
-X-Google-Smtp-Source: APXvYqyeuAGIFhB7SdYsEVtUellqNUqnRzkz0ZfA6N7IYdewFEUt6LFI/zno2eZRVtwUmZHHCa5jsA==
-X-Received: by 2002:aa7:86c3:: with SMTP id h3mr5086580pfo.225.1579737808080; 
- Wed, 22 Jan 2020 16:03:28 -0800 (PST)
+ bh=RhmUpLrMM8mnirS5wfkIECdeckopeh6Ysfr4kR7YJ3E=;
+ b=e+7uDqqDJfN1MIHT77BkdpmGRvBAiqaDTQEFTovUu+HTqdp9taPxStGIE5IeY7CdFN
+ p3ySjk3cEjE7hnmJ9GqIXZiqDns8hfoX999/zkCd+JKnuHU8PyCrryrWkuhB9nSXrZ1l
+ Phw1LLfW/kdPJflTf2xeWiC4J8jv65DTZTuXBJPIBTjGdAy/f8Wgtc5x64e6LoDRnIji
+ 8v8TrG+bVsA8Av0y2Wi5A+zXK0B6JJqJMhH5cTpuab/MyW07VopccMhtesnr6yWNxaFW
+ rK7Dgva748QhxUmYHlgrhuzilIqRjUTBLMRXcBzu3zRqPhdX9mRH9yF9y/Qep11tdAwO
+ +Tsg==
+X-Gm-Message-State: APjAAAXVWMTU1/lALFniK1ch7AqauwU27Fc16t1DMP9zAew26YcUy1Rw
+ q7SXGZKhnnPI7ZR0Q4Dgn0tOv0EqHjk=
+X-Google-Smtp-Source: APXvYqwbpGAQuF3F7lI7h8ddLM6Y6Jfcq3Rw+oIT7UtQUZ8rkyW3IUa2/XDvU2Vd/zQOC5Pr0GwBNg==
+X-Received: by 2002:aa7:8d14:: with SMTP id j20mr5061107pfe.207.1579737819571; 
+ Wed, 22 Jan 2020 16:03:39 -0800 (PST)
 Received: from localhost.localdomain (rrcs-173-198-77-92.west.biz.rr.com.
  [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.03.25
+ by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.03.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 16:03:27 -0800 (PST)
+ Wed, 22 Jan 2020 16:03:38 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc1 07/24] target/avr: Add instruction translation - Bit and
- Bit-test Instructions
-Date: Wed, 22 Jan 2020 14:02:50 -1000
-Message-Id: <20200123000307.11541-8-richard.henderson@linaro.org>
+Subject: [PATCH rc1 12/24] hw/timer: Add limited support for Atmel 16 bit
+ timer peripheral
+Date: Wed, 22 Jan 2020 14:02:55 -1000
+Message-Id: <20200123000307.11541-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200123000307.11541-1-richard.henderson@linaro.org>
 References: <20200123000307.11541-1-richard.henderson@linaro.org>
@@ -83,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.196
+X-Received-From: 209.85.215.194
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,8 +96,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: thuth@redhat.com, me@xcancerberox.com.ar, S.E.Harris@kent.ac.uk,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  dovgaluk@ispras.ru, imammedo@redhat.com, mrolnik@gmail.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -105,294 +105,755 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-This includes:
-    - LSR, ROR
-    - ASR
-    - SWAP
-    - SBI, CBI
-    - BST, BLD
-    - BSET, BCLR
+These were designed to facilitate testing but should provide enough
+function to be useful in other contexts.  Only a subset of the functions
+of each peripheral is implemented, mainly due to the lack of a standard
+way to handle electrical connections (like GPIO pins).
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200118191416.19934-8-mrolnik@gmail.com>
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+Message-Id: <20200118191416.19934-13-mrolnik@gmail.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[rth: Squash info mtree fixes and a file rename from f4bug, which was:]
+Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/avr/translate.c | 241 +++++++++++++++++++++++++++++++++++++++++
- target/avr/insn.decode |  14 +++
- 2 files changed, 255 insertions(+)
+ include/hw/timer/atmel_timer16.h |  94 +++++
+ hw/timer/atmel_timer16.c         | 602 +++++++++++++++++++++++++++++++
+ hw/timer/Kconfig                 |   3 +
+ hw/timer/Makefile.objs           |   2 +
+ 4 files changed, 701 insertions(+)
+ create mode 100644 include/hw/timer/atmel_timer16.h
+ create mode 100644 hw/timer/atmel_timer16.c
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 4a62d9312a..58775af17c 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -2440,3 +2440,244 @@ static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
- 
-     return true;
- }
+diff --git a/include/hw/timer/atmel_timer16.h b/include/hw/timer/atmel_timer16.h
+new file mode 100644
+index 0000000000..f0516c41cf
+--- /dev/null
++++ b/include/hw/timer/atmel_timer16.h
+@@ -0,0 +1,94 @@
++/*
++ * Atmel AVR 16 bit timer
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Ed Robbins
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
 +/*
-+ * Bit and Bit-test Instructions
++ * Driver for 16 bit timers on 8 bit AVR devices.
++ * Note:
++ * On ATmega640/V-1280/V-1281/V-2560/V-2561/V timers 1, 3, 4 and 5 are 16 bit
 + */
-+static void gen_rshift_ZNVSf(TCGv R)
++
++#ifndef HW_TIMER_ATMEL_TIMER16_H
++#define HW_TIMER_ATMEL_TIMER16_H
++
++#include "hw/sysbus.h"
++#include "qemu/timer.h"
++#include "hw/hw.h"
++
++enum NextInterrupt {
++    OVERFLOW,
++    COMPA,
++    COMPB,
++    COMPC,
++    CAPT
++};
++
++#define TYPE_AVR_TIMER16 "atmel-timer16"
++#define AVR_TIMER16(obj) \
++    OBJECT_CHECK(AVRTimer16State, (obj), TYPE_AVR_TIMER16)
++
++typedef struct AVRTimer16State {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion iomem;
++    MemoryRegion imsk_iomem;
++    MemoryRegion ifr_iomem;
++    QEMUTimer *timer;
++    qemu_irq capt_irq;
++    qemu_irq compa_irq;
++    qemu_irq compb_irq;
++    qemu_irq compc_irq;
++    qemu_irq ovf_irq;
++
++    bool enabled;
++
++    /* registers */
++    uint8_t cra;
++    uint8_t crb;
++    uint8_t crc;
++    uint8_t cntl;
++    uint8_t cnth;
++    uint8_t icrl;
++    uint8_t icrh;
++    uint8_t ocral;
++    uint8_t ocrah;
++    uint8_t ocrbl;
++    uint8_t ocrbh;
++    uint8_t ocrcl;
++    uint8_t ocrch;
++    /*
++     * Reads and writes to CNT and ICR utilise a bizarre temporary
++     * register, which we emulate
++     */
++    uint8_t rtmp;
++    uint8_t imsk;
++    uint8_t ifr;
++
++    uint8_t id;
++    uint64_t cpu_freq_hz;
++    uint64_t freq_hz;
++    uint64_t period_ns;
++    uint64_t reset_time_ns;
++    enum NextInterrupt next_interrupt;
++} AVRTimer16State;
++
++#endif /* HW_TIMER_ATMEL_TIMER16_H */
+diff --git a/hw/timer/atmel_timer16.c b/hw/timer/atmel_timer16.c
+new file mode 100644
+index 0000000000..3b06d6e4e5
+--- /dev/null
++++ b/hw/timer/atmel_timer16.c
+@@ -0,0 +1,602 @@
++/*
++ * Atmel AVR 16 bit timer
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Ed Robbins
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++/*
++ * Driver for 16 bit timers on 8 bit AVR devices.
++ * Note:
++ * ATmega640/V-1280/V-1281/V-2560/V-2561/V timers 1, 3, 4 and 5 are 16 bit
++ */
++
++/*
++ * XXX TODO: Power Reduction Register support
++ *           prescaler pause support
++ *           PWM modes, GPIO, output capture pins, input compare pin
++ */
++
++#include "qemu/osdep.h"
++#include "hw/timer/atmel_timer16.h"
++#include "qemu/log.h"
++#include "hw/irq.h"
++#include "hw/qdev-properties.h"
++
++/* Register offsets */
++#define T16_CRA     0x0
++#define T16_CRB     0x1
++#define T16_CRC     0x2
++#define T16_CNTL    0x4
++#define T16_CNTH    0x5
++#define T16_ICRL    0x6
++#define T16_ICRH    0x7
++#define T16_OCRAL   0x8
++#define T16_OCRAH   0x9
++#define T16_OCRBL   0xa
++#define T16_OCRBH   0xb
++#define T16_OCRCL   0xc
++#define T16_OCRCH   0xd
++
++/* Field masks */
++#define T16_CRA_WGM01   0x3
++#define T16_CRA_COMC    0xc
++#define T16_CRA_COMB    0x30
++#define T16_CRA_COMA    0xc0
++#define T16_CRA_OC_CONF \
++    (T16_CRA_COMA | T16_CRA_COMB | T16_CRA_COMC)
++
++#define T16_CRB_CS      0x7
++#define T16_CRB_WGM23   0x18
++#define T16_CRB_ICES    0x40
++#define T16_CRB_ICNC    0x80
++
++#define T16_CRC_FOCC    0x20
++#define T16_CRC_FOCB    0x40
++#define T16_CRC_FOCA    0x80
++
++/* Fields masks both TIMSK and TIFR (interrupt mask/flag registers) */
++#define T16_INT_TOV    0x1 /* Timer overflow */
++#define T16_INT_OCA    0x2 /* Output compare A */
++#define T16_INT_OCB    0x4 /* Output compare B */
++#define T16_INT_OCC    0x8 /* Output compare C */
++#define T16_INT_IC     0x20 /* Input capture */
++
++/* Clock source values */
++#define T16_CLKSRC_STOPPED     0
++#define T16_CLKSRC_DIV1        1
++#define T16_CLKSRC_DIV8        2
++#define T16_CLKSRC_DIV64       3
++#define T16_CLKSRC_DIV256      4
++#define T16_CLKSRC_DIV1024     5
++#define T16_CLKSRC_EXT_FALLING 6
++#define T16_CLKSRC_EXT_RISING  7
++
++/* Timer mode values (not including PWM modes) */
++#define T16_MODE_NORMAL     0
++#define T16_MODE_CTC_OCRA   4
++#define T16_MODE_CTC_ICR    12
++
++/* Accessors */
++#define CLKSRC(t16) (t16->crb & T16_CRB_CS)
++#define MODE(t16)   (((t16->crb & T16_CRB_WGM23) >> 1) | \
++                     (t16->cra & T16_CRA_WGM01))
++#define CNT(t16)    VAL16(t16->cntl, t16->cnth)
++#define OCRA(t16)   VAL16(t16->ocral, t16->ocrah)
++#define OCRB(t16)   VAL16(t16->ocrbl, t16->ocrbh)
++#define OCRC(t16)   VAL16(t16->ocrcl, t16->ocrch)
++#define ICR(t16)    VAL16(t16->icrl, t16->icrh)
++
++/* Helper macros */
++#define VAL16(l, h) ((h << 8) | l)
++#define ERROR(fmt, args...) \
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: " fmt "\n", __func__, ## args)
++#define DB_PRINT(fmt, args...) /* Nothing */
++/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## args)*/
++
++static inline int64_t avr_timer16_ns_to_ticks(AVRTimer16State *t16, int64_t t)
 +{
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
++    if (t16->period_ns == 0) {
++        return 0;
++    }
++    return t / t16->period_ns;
 +}
 +
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
-+ *  loaded into the C Flag of the SREG. This operation effectively divides an
-+ *  unsigned value by two. The C Flag can be used to round the result.
-+ */
-+static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
++static void avr_timer16_update_cnt(AVRTimer16State *t16)
 +{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    /* update status register */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
-+    tcg_gen_movi_tl(cpu_Nf, 0);
-+    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
-+    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
-+
-+    return true;
++    uint16_t cnt;
++    cnt = avr_timer16_ns_to_ticks(t16, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
++                                       t16->reset_time_ns);
++    t16->cntl = (uint8_t)(cnt & 0xff);
++    t16->cnth = (uint8_t)((cnt & 0xff00) >> 8);
 +}
 +
-+/*
-+ *  Shifts all bits in Rd one place to the right. The C Flag is shifted into
-+ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, combined
-+ *  with ASR, effectively divides multi-byte signed values by two. Combined with
-+ *  LSR it effectively divides multi-byte unsigned values by two. The Carry Flag
-+ *  can be used to round the result.
-+ */
-+static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
++static inline void avr_timer16_recalc_reset_time(AVRTimer16State *t16)
 +{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_shli_tl(t0, cpu_Cf, 7);
-+    /* update status register */
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    /* update output register */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+    /* update status register */
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
++    t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
++                         CNT(t16) * t16->period_ns;
 +}
 +
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant. Bit 0
-+ *  is loaded into the C Flag of the SREG. This operation effectively divides a
-+ *  signed value by two without changing its sign. The Carry Flag can be used to
-+ *  round the result.
-+ */
-+static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
++static void avr_timer16_clock_reset(AVRTimer16State *t16)
 +{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    /* update status register */
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
-+    /* update output register */
-+    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+    /* update status register */
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
++    t16->cntl = 0;
++    t16->cnth = 0;
++    t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
 +}
 +
-+/*
-+ *  Swaps high and low nibbles in a register.
-+ */
-+static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
++static void avr_timer16_clksrc_update(AVRTimer16State *t16)
 +{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(t0, Rd, 0x0f);
-+    tcg_gen_shli_tl(t0, t0, 4);
-+    tcg_gen_andi_tl(t1, Rd, 0xf0);
-+    tcg_gen_shri_tl(t1, t1, 4);
-+    tcg_gen_or_tl(Rd, t0, t1);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Sets a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_ori_tl(data, data, 1 << a->bit);
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(port);
-+    tcg_temp_free_i32(data);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(data);
-+    tcg_temp_free_i32(port);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
-+ */
-+static bool trans_BST(DisasContext *ctx, arg_BST *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
-+    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Copies the T Flag in the SREG (Status Register) to bit b in register Rd.
-+ */
-+static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
-+    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
-+    tcg_gen_or_tl(Rd, Rd, t1);
-+
-+    tcg_temp_free_i32(t1);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Sets a single Flag or bit in SREG.
-+ */
-+static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x01);
++    uint16_t divider = 0;
++    switch (CLKSRC(t16)) {
++    case T16_CLKSRC_EXT_FALLING:
++    case T16_CLKSRC_EXT_RISING:
++        ERROR("external clock source unsupported");
++        goto end;
++    case T16_CLKSRC_STOPPED:
++        goto end;
++    case T16_CLKSRC_DIV1:
++        divider = 1;
 +        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x01);
++    case T16_CLKSRC_DIV8:
++        divider = 8;
 +        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x01);
++    case T16_CLKSRC_DIV64:
++        divider = 64;
 +        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x01);
++    case T16_CLKSRC_DIV256:
++        divider = 256;
 +        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x01);
++    case T16_CLKSRC_DIV1024:
++        divider = 1024;
 +        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x01);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x01);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x01);
-+        break;
++    default:
++        goto end;
++    }
++    t16->freq_hz = t16->cpu_freq_hz / divider;
++    t16->period_ns = NANOSECONDS_PER_SECOND / t16->freq_hz;
++    DB_PRINT("Timer frequency %" PRIu64 " hz, period %" PRIu64 " ns (%f s)",
++             t16->freq_hz, t16->period_ns, 1 / (double)t16->freq_hz);
++end:
++    return;
++}
++
++static void avr_timer16_set_alarm(AVRTimer16State *t16)
++{
++    if (CLKSRC(t16) == T16_CLKSRC_EXT_FALLING ||
++        CLKSRC(t16) == T16_CLKSRC_EXT_RISING ||
++        CLKSRC(t16) == T16_CLKSRC_STOPPED) {
++        /* Timer is disabled or set to external clock source (unsupported) */
++        goto end;
 +    }
 +
-+    return true;
++    uint64_t alarm_offset = 0xffff;
++    enum NextInterrupt next_interrupt = OVERFLOW;
++
++    switch (MODE(t16)) {
++    case T16_MODE_NORMAL:
++        /* Normal mode */
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
++            (t16->imsk & T16_INT_OCA)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
++        break;
++    case T16_MODE_CTC_OCRA:
++        /* CTC mode, top = ocra */
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
++       break;
++    case T16_MODE_CTC_ICR:
++        /* CTC mode, top = icr */
++        if (ICR(t16) < alarm_offset && ICR(t16) > CNT(t16)) {
++            alarm_offset = ICR(t16);
++            next_interrupt = CAPT;
++        }
++        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
++            (t16->imsk & T16_INT_OCA)) {
++            alarm_offset = OCRA(t16);
++            next_interrupt = COMPA;
++        }
++        break;
++    default:
++        ERROR("pwm modes are unsupported");
++        goto end;
++    }
++    if (OCRB(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
++        (t16->imsk & T16_INT_OCB)) {
++        alarm_offset = OCRB(t16);
++        next_interrupt = COMPB;
++    }
++    if (OCRC(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
++        (t16->imsk & T16_INT_OCC)) {
++        alarm_offset = OCRB(t16);
++        next_interrupt = COMPC;
++    }
++    alarm_offset -= CNT(t16);
++
++    t16->next_interrupt = next_interrupt;
++    uint64_t alarm_ns =
++        t16->reset_time_ns + ((CNT(t16) + alarm_offset) * t16->period_ns);
++    timer_mod(t16->timer, alarm_ns);
++
++    DB_PRINT("next alarm %" PRIu64 " ns from now",
++        alarm_offset * t16->period_ns);
++
++end:
++    return;
 +}
 +
-+/*
-+ *  Clears a single Flag in SREG.
-+ */
-+static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
++static void avr_timer16_interrupt(void *opaque)
 +{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x00);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x00);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x00);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x00);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x00);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x00);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x00);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x00);
-+        break;
++    AVRTimer16State *t16 = opaque;
++    uint8_t mode = MODE(t16);
++
++    avr_timer16_update_cnt(t16);
++
++    if (CLKSRC(t16) == T16_CLKSRC_EXT_FALLING ||
++        CLKSRC(t16) == T16_CLKSRC_EXT_RISING ||
++        CLKSRC(t16) == T16_CLKSRC_STOPPED) {
++        /* Timer is disabled or set to external clock source (unsupported) */
++        return;
 +    }
 +
-+    return true;
-+}
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode
-index 3f9304f8b0..4ee55862b2 100644
---- a/target/avr/insn.decode
-+++ b/target/avr/insn.decode
-@@ -158,3 +158,17 @@ XCH             1001 001 rd:5 0100
- LAC             1001 001 rd:5 0110
- LAS             1001 001 rd:5 0101
- LAT             1001 001 rd:5 0111
++    DB_PRINT("interrupt, cnt = %d", CNT(t16));
 +
-+#
-+# Bit and Bit-test Instructions
-+#
-+LSR             1001 010 rd:5 0110
-+ROR             1001 010 rd:5 0111
-+ASR             1001 010 rd:5 0101
-+SWAP            1001 010 rd:5 0010
-+SBI             1001 1010 reg:5 bit:3
-+CBI             1001 1000 reg:5 bit:3
-+BST             1111 101 rd:5 0 bit:3
-+BLD             1111 100 rd:5 0 bit:3
-+BSET            1001 0100 0 bit:3 1000
-+BCLR            1001 0100 1 bit:3 1000
++    /* Counter overflow */
++    if (t16->next_interrupt == OVERFLOW) {
++        DB_PRINT("0xffff overflow");
++        avr_timer16_clock_reset(t16);
++        if (t16->imsk & T16_INT_TOV) {
++            t16->ifr |= T16_INT_TOV;
++            qemu_set_irq(t16->ovf_irq, 1);
++        }
++    }
++    /* Check for ocra overflow in CTC mode */
++    if (mode == T16_MODE_CTC_OCRA && t16->next_interrupt == COMPA) {
++        DB_PRINT("CTC OCRA overflow");
++        avr_timer16_clock_reset(t16);
++    }
++    /* Check for icr overflow in CTC mode */
++    if (mode == T16_MODE_CTC_ICR && t16->next_interrupt == CAPT) {
++        DB_PRINT("CTC ICR overflow");
++        avr_timer16_clock_reset(t16);
++        if (t16->imsk & T16_INT_IC) {
++            t16->ifr |= T16_INT_IC;
++            qemu_set_irq(t16->capt_irq, 1);
++        }
++    }
++    /* Check for output compare interrupts */
++    if (t16->imsk & T16_INT_OCA && t16->next_interrupt == COMPA) {
++        t16->ifr |= T16_INT_OCA;
++        qemu_set_irq(t16->compa_irq, 1);
++    }
++    if (t16->imsk & T16_INT_OCB && t16->next_interrupt == COMPB) {
++        t16->ifr |= T16_INT_OCB;
++        qemu_set_irq(t16->compb_irq, 1);
++    }
++    if (t16->imsk & T16_INT_OCC && t16->next_interrupt == COMPC) {
++        t16->ifr |= T16_INT_OCC;
++        qemu_set_irq(t16->compc_irq, 1);
++    }
++    avr_timer16_set_alarm(t16);
++}
++
++static void avr_timer16_reset(DeviceState *dev)
++{
++    AVRTimer16State *t16 = AVR_TIMER16(dev);
++
++    avr_timer16_clock_reset(t16);
++    avr_timer16_clksrc_update(t16);
++    avr_timer16_set_alarm(t16);
++
++    qemu_set_irq(t16->capt_irq, 0);
++    qemu_set_irq(t16->compa_irq, 0);
++    qemu_set_irq(t16->compb_irq, 0);
++    qemu_set_irq(t16->compc_irq, 0);
++    qemu_set_irq(t16->ovf_irq, 0);
++}
++
++static uint64_t avr_timer16_read(void *opaque, hwaddr offset, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    uint8_t retval = 0;
++
++    switch (offset) {
++    case T16_CRA:
++        retval = t16->cra;
++        break;
++    case T16_CRB:
++        retval = t16->crb;
++        break;
++    case T16_CRC:
++        retval = t16->crc;
++        break;
++    case T16_CNTL:
++        avr_timer16_update_cnt(t16);
++        t16->rtmp = t16->cnth;
++        retval = t16->cntl;
++        break;
++    case T16_CNTH:
++        retval = t16->rtmp;
++        break;
++    case T16_ICRL:
++        /*
++         * The timer copies cnt to icr when the input capture pin changes
++         * state or when the analog comparator has a match. We don't
++         * emulate this behaviour. We do support it's use for defining a
++         * TOP value in T16_MODE_CTC_ICR
++         */
++        t16->rtmp = t16->icrh;
++        retval = t16->icrl;
++        break;
++    case T16_ICRH:
++        retval = t16->rtmp;
++        break;
++    case T16_OCRAL:
++        retval = t16->ocral;
++        break;
++    case T16_OCRAH:
++        retval = t16->ocrah;
++        break;
++    case T16_OCRBL:
++        retval = t16->ocrbl;
++        break;
++    case T16_OCRBH:
++        retval = t16->ocrbh;
++        break;
++    case T16_OCRCL:
++        retval = t16->ocrcl;
++        break;
++    case T16_OCRCH:
++        retval = t16->ocrch;
++        break;
++    default:
++        break;
++    }
++    return (uint64_t)retval;
++}
++
++static void avr_timer16_write(void *opaque, hwaddr offset,
++                              uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    uint8_t val8 = (uint8_t)val64;
++    uint8_t prev_clk_src = CLKSRC(t16);
++
++    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
++
++    switch (offset) {
++    case T16_CRA:
++        t16->cra = val8;
++        if (t16->cra & T16_CRA_OC_CONF) {
++            ERROR("output compare pins unsupported");
++        }
++        break;
++    case T16_CRB:
++        t16->crb = val8;
++        if (t16->crb & T16_CRB_ICNC) {
++            ERROR("input capture noise canceller unsupported");
++        }
++        if (t16->crb & T16_CRB_ICES) {
++            ERROR("input capture unsupported");
++        }
++        if (CLKSRC(t16) != prev_clk_src) {
++            avr_timer16_clksrc_update(t16);
++            if (prev_clk_src == T16_CLKSRC_STOPPED) {
++                t16->reset_time_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++            }
++        }
++        break;
++    case T16_CRC:
++        t16->crc = val8;
++        ERROR("output compare pins unsupported");
++        break;
++    case T16_CNTL:
++        /*
++         * CNT is the 16-bit counter value, it must be read/written via
++         * a temporary register (rtmp) to make the read/write atomic.
++         */
++        /* ICR also has this behaviour, and shares rtmp */
++        /*
++         * Writing CNT blocks compare matches for one clock cycle.
++         * Writing CNT to TOP or to an OCR value (if in use) will
++         * skip the relevant interrupt
++         */
++        t16->cntl = val8;
++        t16->cnth = t16->rtmp;
++        avr_timer16_recalc_reset_time(t16);
++        break;
++    case T16_CNTH:
++        t16->rtmp = val8;
++        break;
++    case T16_ICRL:
++        /* ICR can only be written in mode T16_MODE_CTC_ICR */
++        if (MODE(t16) == T16_MODE_CTC_ICR) {
++            t16->icrl = val8;
++            t16->icrh = t16->rtmp;
++        }
++        break;
++    case T16_ICRH:
++        if (MODE(t16) == T16_MODE_CTC_ICR) {
++            t16->rtmp = val8;
++        }
++        break;
++    case T16_OCRAL:
++        /*
++         * OCRn cause the relevant output compare flag to be raised, and
++         * trigger an interrupt, when CNT is equal to the value here
++         */
++        t16->ocral = val8;
++        break;
++    case T16_OCRAH:
++        t16->ocrah = val8;
++        break;
++    case T16_OCRBL:
++        t16->ocrbl = val8;
++        break;
++    case T16_OCRBH:
++        t16->ocrbh = val8;
++        break;
++    case T16_OCRCL:
++        t16->ocrcl = val8;
++        break;
++    case T16_OCRCH:
++        t16->ocrch = val8;
++        break;
++    default:
++        break;
++    }
++    avr_timer16_set_alarm(t16);
++}
++
++static uint64_t avr_timer16_imsk_read(void *opaque,
++                                      hwaddr offset,
++                                      unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return 0;
++    }
++    return t16->imsk;
++}
++
++static void avr_timer16_imsk_write(void *opaque, hwaddr offset,
++                                   uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return;
++    }
++    t16->imsk = (uint8_t)val64;
++}
++
++static uint64_t avr_timer16_ifr_read(void *opaque,
++                                     hwaddr offset,
++                                     unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return 0;
++    }
++    return t16->ifr;
++}
++
++static void avr_timer16_ifr_write(void *opaque, hwaddr offset,
++                                  uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    AVRTimer16State *t16 = opaque;
++    if (offset != 0) {
++        return;
++    }
++    t16->ifr = (uint8_t)val64;
++}
++
++static const MemoryRegionOps avr_timer16_ops = {
++    .read = avr_timer16_read,
++    .write = avr_timer16_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static const MemoryRegionOps avr_timer16_imsk_ops = {
++    .read = avr_timer16_imsk_read,
++    .write = avr_timer16_imsk_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static const MemoryRegionOps avr_timer16_ifr_ops = {
++    .read = avr_timer16_ifr_read,
++    .write = avr_timer16_ifr_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.max_access_size = 1}
++};
++
++static Property avr_timer16_properties[] = {
++    DEFINE_PROP_UINT8("id", struct AVRTimer16State, id, 0),
++    DEFINE_PROP_UINT64("cpu-frequency-hz", struct AVRTimer16State,
++                       cpu_freq_hz, 20000000),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void avr_timer16_pr(void *opaque, int irq, int level)
++{
++    AVRTimer16State *s = AVR_TIMER16(opaque);
++
++    s->enabled = !level;
++
++    if (!s->enabled) {
++        avr_timer16_reset(DEVICE(s));
++    }
++}
++
++static void avr_timer16_init(Object *obj)
++{
++    AVRTimer16State *s = AVR_TIMER16(obj);
++
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->capt_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compa_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compb_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->compc_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->ovf_irq);
++
++    memory_region_init_io(&s->iomem, obj, &avr_timer16_ops,
++                          s, "avr-timer16", 0xe);
++    memory_region_init_io(&s->imsk_iomem, obj, &avr_timer16_imsk_ops,
++                          s, "avr-timer16-intmask", 0x1);
++    memory_region_init_io(&s->ifr_iomem, obj, &avr_timer16_ifr_ops,
++                          s, "avr-timer16-intflag", 0x1);
++
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->imsk_iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->ifr_iomem);
++    qdev_init_gpio_in(DEVICE(s), avr_timer16_pr, 1);
++
++    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, avr_timer16_interrupt, s);
++    s->enabled = true;
++}
++
++static void avr_timer16_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_timer16_reset;
++    dc->props = avr_timer16_properties;
++}
++
++static const TypeInfo avr_timer16_info = {
++    .name          = TYPE_AVR_TIMER16,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRTimer16State),
++    .instance_init = avr_timer16_init,
++    .class_init    = avr_timer16_class_init,
++};
++
++static void avr_timer16_register_types(void)
++{
++    type_register_static(&avr_timer16_info);
++}
++
++type_init(avr_timer16_register_types)
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index 59b3f44d69..cc66b60ef1 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -35,3 +35,6 @@ config CMSDK_APB_TIMER
+ config CMSDK_APB_DUALTIMER
+     bool
+     select PTIMER
++
++config ATMEL_TIMER16
++    bool
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index dece235fd7..08a8a5cee9 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -35,3 +35,5 @@ common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+ common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) += cmsdk-apb-dualtimer.o
+ common-obj-$(CONFIG_MSF2) += mss-timer.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_systmr.o
++
++obj-$(CONFIG_ATMEL_TIMER16) += atmel_timer16.o
 -- 
 2.20.1
 
