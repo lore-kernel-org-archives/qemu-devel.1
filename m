@@ -2,81 +2,83 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 207ADC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 05:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B622DC33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 05:34:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDE0B21835
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 05:33:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E41A21835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 05:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QdPVjOxM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDE0B21835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SIS9dSAx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E41A21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuV7S-00053o-P1
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 00:33:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42290)
+	id 1iuV8p-000680-KH
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 00:34:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1iuV0I-0004wY-G8
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 00:26:07 -0500
+ (envelope-from <thuth@redhat.com>) id 1iuV0x-0005zF-L8
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 00:26:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1iuV0G-0001rl-ST
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 00:26:06 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39545)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1iuV0B-0001pK-MX; Thu, 23 Jan 2020 00:25:59 -0500
-Received: by mail-pg1-x541.google.com with SMTP id 4so771213pgd.6;
- Wed, 22 Jan 2020 21:25:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=KeM+UcLJ0eZCHHeipWPmwwPiaN02ZhSI49JMqf9Y4mU=;
- b=QdPVjOxMhYXoon6u89PhZsZHpR/3WcQt09Zpc622s6LKjlcfYF4f8wOyY/ORFw4XdH
- cPjfeEtwD4msjL0lJGc2SDWESk65+UqKvK6j95RIO2KCQbWS7M6UoV622lVPKteDoG0m
- lSSff/8issKkvZcP4W49YLPytK7zrKiBKPB3M8q3AUCfaIyaqtvZ1frEzYhD0DlkmxsE
- dYiDy7u+lDyg4Nc0+5M4AjFVrT/FxxJkiZk8pPE3YvQoxBK/lySnaogcR5/Hp/tv7zqi
- FXTObFRH3T2J6jP0IqdqKDlbh7Fh3JD21oLbpGdQQbh5tlGvt8S2hrV/Zu1twWGDH7QW
- p5iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=KeM+UcLJ0eZCHHeipWPmwwPiaN02ZhSI49JMqf9Y4mU=;
- b=gNDoFNmTDNJ53We4yUNu3k3L4zzpOs5e4PApPDyqvcpBkRo7IAUv9SEO3iTSfYCCNV
- BlTE00VXUHmPetLmNVWPpaavm2GbbQvXu/8LbsDkLy5JoB5ottLfIRhh6cEVIxZ97S0I
- 2jjoTelo8+pzvWkpSxo/z/R1EiyTqfc8htNSplEw8lm/j96sNPu+I5Yyy43yEZeLvhKe
- Iyyq1TNmZ/PSGHj0FGnhkRuX3C2ngZBrZS9u/tzZEEUpZFH8XscwBDbsM/upEeDBXAic
- CxuGIa0g/OpKwJaTRAZjJHR9HQoZHuB0oVn/0m+cM8o9lT4Y/t6IU2kZjAXc8MccmoFB
- 7pJA==
-X-Gm-Message-State: APjAAAXRHrDPI1PgiitQ+amvsB3FJlEtNoeakeiMrUHhvoltG8pavo+D
- S8uYfAptP4G88qtRcSQziHU=
-X-Google-Smtp-Source: APXvYqzoIdeEopZGCNkFFwLebtJ4ETGdRWYwX2xufS5RIjnhRAbP7q4Q9sJp4wwQJcifKb5UBvYdrg==
-X-Received: by 2002:a62:83c5:: with SMTP id h188mr5963479pfe.0.1579757157542; 
- Wed, 22 Jan 2020 21:25:57 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id 17sm730160pfv.142.2020.01.22.21.25.56
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 22 Jan 2020 21:25:57 -0800 (PST)
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v3 7/8] hw/char/exynos4210_uart: Add receive DMA support
-Date: Wed, 22 Jan 2020 21:25:39 -0800
-Message-Id: <20200123052540.6132-8-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200123052540.6132-1-linux@roeck-us.net>
-References: <20200123052540.6132-1-linux@roeck-us.net>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+ (envelope-from <thuth@redhat.com>) id 1iuV0v-00029W-DS
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 00:26:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36863
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iuV0v-00028s-9F
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 00:26:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579757204;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=XtvlH/RRuYw8L9kZEG99bzVxLs3XXTKoTGpizGGVmXM=;
+ b=SIS9dSAxTNE2eiVYwBLNCvXN/XjLIhtuMWJeKb3uwlnYaTZ9pn1uwH0gdLCz+CIo6yf1jH
+ gbWS0MOzTH77wJLQpgPctbgbu94Ox3hHceuTNidfMLkqkEsPQs40ObMrUXfMD33NTQxV2b
+ Y76CJYJgP+qhH0OIyo+bChop4zzb4DE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-mozyp-P8M-e4fOGjb32PlA-1; Thu, 23 Jan 2020 00:26:42 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1AD3800D41;
+ Thu, 23 Jan 2020 05:26:40 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-64.ams2.redhat.com [10.36.116.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B1D052898E;
+ Thu, 23 Jan 2020 05:26:36 +0000 (UTC)
+Subject: Re: [PATCH] stm32f4xx_syscfg: remove redundant code to fix coverity
+ warning
+To: pannengyuan@huawei.com, alistair@alistair23.me, peter.maydell@linaro.org
+References: <20200123023845.20980-1-pannengyuan@huawei.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6aaa3f39-81bd-5333-9083-d95dd3cbe6b9@redhat.com>
+Date: Thu, 23 Jan 2020 06:26:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200123023845.20980-1-pannengyuan@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: mozyp-P8M-e4fOGjb32PlA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,118 +90,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Guenter Roeck <linux@roeck-us.net>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ zhang.zhanghailiang@huawei.com, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To support receive DMA, we need to inform the DMA controller if receive data
-is available. Otherwise the DMA controller keeps requesting data, causing
-receive errors.
+On 23/01/2020 03.38, pannengyuan@huawei.com wrote:
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+> 
+> Fixes the coverity warning:
+>     CID 91708242: (EVALUATION_ORDER)
+>     50. write_write_typo: In "config = config = irq / 16", "config" is written twice with the same value.
+>     50    uint8_t config = config = irq / 16;
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+>  hw/misc/stm32f4xx_syscfg.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/misc/stm32f4xx_syscfg.c b/hw/misc/stm32f4xx_syscfg.c
+> index dbcdca59f8..f960e4ea1e 100644
+> --- a/hw/misc/stm32f4xx_syscfg.c
+> +++ b/hw/misc/stm32f4xx_syscfg.c
+> @@ -47,7 +47,7 @@ static void stm32f4xx_syscfg_set_irq(void *opaque, int irq, int level)
+>      STM32F4xxSyscfgState *s = opaque;
+>      int icrreg = irq / 4;
+>      int startbit = (irq & 3) * 4;
+> -    uint8_t config = config = irq / 16;
+> +    uint8_t config = irq / 16;
 
-Implement this using an interrupt line. The instantiating code then needs
-to connect the interrupt with the matching DMA controller GPIO pin.
+Thanks, but Philippe already posted a patch for this :
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
-v3: No change
+https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg04823.html
 
-v2: Added Reviewed-by: tag
-
- hw/char/exynos4210_uart.c | 24 ++++++++++++++++++++++++
- hw/char/trace-events      |  2 ++
- 2 files changed, 26 insertions(+)
-
-diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-index 8d6b4a071e..bf9e586e79 100644
---- a/hw/char/exynos4210_uart.c
-+++ b/hw/char/exynos4210_uart.c
-@@ -154,6 +154,7 @@ typedef struct Exynos4210UartState {
- 
-     CharBackend       chr;
-     qemu_irq          irq;
-+    qemu_irq          dmairq;
- 
-     uint32_t channel;
- 
-@@ -261,6 +262,24 @@ exynos4210_uart_Rx_FIFO_trigger_level(const Exynos4210UartState *s)
-     return exynos4210_uart_FIFO_trigger_level(s->channel, reg);
- }
- 
-+/*
-+ * Update Rx DMA busy signal if Rx DMA is enabled. For simplicity,
-+ * mark DMA as busy if DMA is enabled and the receive buffer is empty.
-+ */
-+static void exynos4210_uart_update_dmabusy(Exynos4210UartState *s)
-+{
-+    bool rx_dma_enabled = (s->reg[I_(UCON)] & 0x03) == 0x02;
-+    uint32_t count = fifo_elements_number(&s->rx);
-+
-+    if (rx_dma_enabled && !count) {
-+        qemu_irq_raise(s->dmairq);
-+        trace_exynos_uart_dmabusy(s->channel);
-+    } else {
-+        qemu_irq_lower(s->dmairq);
-+        trace_exynos_uart_dmaready(s->channel);
-+    }
-+}
-+
- static void exynos4210_uart_update_irq(Exynos4210UartState *s)
- {
-     /*
-@@ -282,10 +301,12 @@ static void exynos4210_uart_update_irq(Exynos4210UartState *s)
-         count = fifo_elements_number(&s->rx);
-         if ((count && !(s->reg[I_(UCON)] & 0x80)) ||
-             count >= exynos4210_uart_Rx_FIFO_trigger_level(s)) {
-+            exynos4210_uart_update_dmabusy(s);
-             s->reg[I_(UINTSP)] |= UINTSP_RXD;
-             timer_del(s->fifo_timeout_timer);
-         }
-     } else if (s->reg[I_(UTRSTAT)] & UTRSTAT_Rx_BUFFER_DATA_READY) {
-+        exynos4210_uart_update_dmabusy(s);
-         s->reg[I_(UINTSP)] |= UINTSP_RXD;
-     }
- 
-@@ -311,6 +332,7 @@ static void exynos4210_uart_timeout_int(void *opaque)
-         (s->reg[I_(UCON)] & (1 << 11))) {
-         s->reg[I_(UINTSP)] |= UINTSP_RXD;
-         s->reg[I_(UTRSTAT)] |= UTRSTAT_Rx_TIMEOUT;
-+        exynos4210_uart_update_dmabusy(s);
-         exynos4210_uart_update_irq(s);
-     }
- }
-@@ -495,6 +517,7 @@ static uint64_t exynos4210_uart_read(void *opaque, hwaddr offset,
-             s->reg[I_(UTRSTAT)] &= ~UTRSTAT_Rx_BUFFER_DATA_READY;
-             res = s->reg[I_(URXH)];
-         }
-+        exynos4210_uart_update_dmabusy(s);
-         trace_exynos_uart_read(s->channel, offset,
-                                exynos4210_uart_regname(offset), res);
-         return res;
-@@ -661,6 +684,7 @@ static void exynos4210_uart_init(Object *obj)
-     sysbus_init_mmio(dev, &s->iomem);
- 
-     sysbus_init_irq(dev, &s->irq);
-+    sysbus_init_irq(dev, &s->dmairq);
- }
- 
- static void exynos4210_uart_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/char/trace-events b/hw/char/trace-events
-index cb73fee6a9..6f938301d9 100644
---- a/hw/char/trace-events
-+++ b/hw/char/trace-events
-@@ -79,6 +79,8 @@ nrf51_uart_read(uint64_t addr, uint64_t r, unsigned int size) "addr 0x%" PRIx64
- nrf51_uart_write(uint64_t addr, uint64_t value, unsigned int size) "addr 0x%" PRIx64 " value 0x%" PRIx64 " size %u"
- 
- # exynos4210_uart.c
-+exynos_uart_dmabusy(uint32_t channel) "UART%d: DMA busy (Rx buffer empty)"
-+exynos_uart_dmaready(uint32_t channel) "UART%d: DMA ready"
- exynos_uart_irq_raised(uint32_t channel, uint32_t reg) "UART%d: IRQ raised: 0x%08"PRIx32
- exynos_uart_irq_lowered(uint32_t channel) "UART%d: IRQ lowered"
- exynos_uart_update_params(uint32_t channel, int speed, uint8_t parity, int data, int stop, uint64_t wordtime) "UART%d: speed: %d, parity: %c, data bits: %d, stop bits: %d wordtime: %"PRId64"ns"
--- 
-2.17.1
+ Thomas
 
 
