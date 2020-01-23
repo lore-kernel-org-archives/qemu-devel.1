@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226BFC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C12C33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA97B24655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:51:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA97B24655
+	by mail.kernel.org (Postfix) with ESMTPS id E39A824655
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:51:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39A824655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuXHL-0007vp-OR
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:51:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46171)
+	id 1iuXHM-0007xe-Gb
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:51:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <volker.ruemelin@t-online.de>) id 1iuXFd-00061L-Lc
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:06 -0500
+ (envelope-from <volker.ruemelin@t-online.de>) id 1iuXFe-00064E-Tr
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <volker.ruemelin@t-online.de>) id 1iuXFb-0004iV-NC
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:05 -0500
-Received: from mailout07.t-online.de ([194.25.134.83]:56294)
+ (envelope-from <volker.ruemelin@t-online.de>) id 1iuXFd-0004k4-Or
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:06 -0500
+Received: from mailout11.t-online.de ([194.25.134.85]:52880)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <volker.ruemelin@t-online.de>)
- id 1iuXFb-0004hB-HP
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:03 -0500
-Received: from fwd35.aul.t-online.de (fwd35.aul.t-online.de [172.20.27.145])
- by mailout07.t-online.de (Postfix) with SMTP id 0D7E6420C3D4;
- Thu, 23 Jan 2020 08:50:02 +0100 (CET)
+ id 1iuXFd-0004iw-If
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:05 -0500
+Received: from fwd28.aul.t-online.de (fwd28.aul.t-online.de [172.20.26.133])
+ by mailout11.t-online.de (Postfix) with SMTP id AB0C7420CE02;
+ Thu, 23 Jan 2020 08:50:04 +0100 (CET)
 Received: from linpower.localnet
- (EG4kSMZfQh937Ei9W3xhVB+UPLFVHknNBDFVSK8dnWKC+wMwWpejyJtib4H-JrwQfY@[46.86.62.122])
- by fwd35.t-online.de
+ (bHQziOZJ8hihzvynLX2VZ7WNABYdTbkckmy6-wzT15PRNqmXAUFxGBvKiAAcuHcw2P@[46.86.62.122])
+ by fwd28.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1iuXFZ-32WwxE0; Thu, 23 Jan 2020 08:50:01 +0100
+ esmtp id 1iuXFb-4bEfKa0; Thu, 23 Jan 2020 08:50:03 +0100
 Received: by linpower.localnet (Postfix, from userid 1000)
- id 60EF9200F7D; Thu, 23 Jan 2020 08:49:43 +0100 (CET)
+ id 62E8420109E; Thu, 23 Jan 2020 08:49:43 +0100 (CET)
 From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH 8/9] ossaudio: disable poll mode can't be reached
-Date: Thu, 23 Jan 2020 08:49:42 +0100
-Message-Id: <20200123074943.6699-8-vr_qemu@t-online.de>
+Subject: [PATCH 9/9] audio: audio_generic_get_buffer_in should honor *size
+Date: Thu, 23 Jan 2020 08:49:43 +0100
+Message-Id: <20200123074943.6699-9-vr_qemu@t-online.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <1e29e1d3-b59b-fcd6-cdff-a680bcdbffa4@t-online.de>
 References: <1e29e1d3-b59b-fcd6-cdff-a680bcdbffa4@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-ID: EG4kSMZfQh937Ei9W3xhVB+UPLFVHknNBDFVSK8dnWKC+wMwWpejyJtib4H-JrwQfY
-X-TOI-MSGID: 98d184ff-a104-44b3-b651-0d2090ea5e6b
+X-ID: bHQziOZJ8hihzvynLX2VZ7WNABYdTbkckmy6-wzT15PRNqmXAUFxGBvKiAAcuHcw2P
+X-TOI-MSGID: 2e6beee5-9e20-489a-9183-2aa25db3e52f
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 194.25.134.83
+X-Received-From: 194.25.134.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,62 +76,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently there is no way to disable poll mode in
-oss_enable_out and oss_enable_in when it was enabled before.
-The enable code path always resets the poll mode state variable.
+The function generic_get_buffer_in currently ignores the *size
+parameter and may return a buffer larger than *size.
 
-Fixes: b027a538c6 "oss: Remove unused error handling of
-qemu_set_fd_handler"
+As a result the variable samples in function
+audio_pcm_hw_run_in may underflow. The while loop then most
+likely will never termiate.
+
+This bug was reported at http://bugs.debian.org/948658.
 
 Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
 ---
- audio/ossaudio.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ audio/audio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index 39a6fc09e5..f88d076ec2 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -579,14 +579,12 @@ static void oss_enable_out(HWVoiceOut *hw, bool ena=
-ble)
-     AudiodevOssPerDirectionOptions *opdo =3D oss->dev->u.oss.out;
-=20
-     if (enable) {
--        bool poll_mode =3D opdo->try_poll;
-+        hw->poll_mode =3D opdo->try_poll;
-=20
-         ldebug("enabling voice\n");
--        if (poll_mode) {
-+        if (hw->poll_mode) {
-             oss_poll_out(hw);
--            poll_mode =3D 0;
-         }
--        hw->poll_mode =3D poll_mode;
-=20
-         if (!oss->mmapped) {
-             return;
-@@ -708,17 +706,15 @@ static void oss_enable_in(HWVoiceIn *hw, bool enabl=
-e)
-     AudiodevOssPerDirectionOptions *opdo =3D oss->dev->u.oss.out;
-=20
-     if (enable) {
--        bool poll_mode =3D opdo->try_poll;
-+        hw->poll_mode =3D opdo->try_poll;
-=20
--        if (poll_mode) {
-+        if (hw->poll_mode) {
-             oss_poll_in(hw);
--            poll_mode =3D 0;
-         }
--        hw->poll_mode =3D poll_mode;
-     } else {
-         if (hw->poll_mode) {
--            hw->poll_mode =3D 0;
-             qemu_set_fd_handler (oss->fd, NULL, NULL, NULL);
-+            hw->poll_mode =3D 0;
-         }
+diff --git a/audio/audio.c b/audio/audio.c
+index 81822bfec9..f5fb6cbf53 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -1406,7 +1406,8 @@ void *audio_generic_get_buffer_in(HWVoiceIn *hw, si=
+ze_t *size)
      }
+     assert(start >=3D 0 && start < hw->size_emul);
+=20
+-    *size =3D MIN(hw->pending_emul, hw->size_emul - start);
++    *size =3D MIN(*size, hw->pending_emul);
++    *size =3D MIN(*size, hw->size_emul - start);
+     return hw->buf_emul + start;
  }
+=20
 --=20
 2.16.4
 
