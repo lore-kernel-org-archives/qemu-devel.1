@@ -2,78 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D633DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 295B6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:58:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6E0422464
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:58:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE65A20718
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:58:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NSEmUACb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6E0422464
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hj9FXJEH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE65A20718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iugk4-0006mO-8o
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:58:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35714)
+	id 1iugkg-0007ha-Oi
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:58:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuddx-00048V-84
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:39:38 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufdK-0004Iq-Oe
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuddv-0004Jg-HD
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:39:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32262
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iufdJ-0006Cf-Dz
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:06 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33230
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuddv-0004J3-Dm
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:39:35 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdJ-0006Bm-Ak
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579790374;
+ s=mimecast20190719; t=1579798023;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ARjGzn8oBsyoJqyF3PPQneWx7B2B2Pwm/46hhCqnWtg=;
- b=NSEmUACby7UiQw6ZM8aOA1GfwSHefLqZmmVuht1m3MnuPiOJYvaLjM6qUAygckkoc9Wznf
- wZWm2jsFgVNK5eEt7grOgaaqqFfCAN+f0EHmN4QviNmKS661WVwB909kb5mXgMQM1rjDKq
- M9JoAT7U4XO826P53w0rX1cRJh3xJw4=
+ bh=tpyzySGg83atDS+yWJ/uSWAUnEpEtPnDwxQUntkRQQY=;
+ b=hj9FXJEHJtSvXF0ybq962aBGnQ/t+Yn2GIt/OOI+oLPz1e0XDI8AwVV483GFrUCWxSOUjV
+ skcV9tr0eNEQpIqo1xu8O7tN/v1HIOdCRrjPtjP89KvCOCkM3fOuP6L39LcMp95Mf1mjcE
+ /pQ2V6kbGmUWXR0UbR0DvifMqgETTac=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-09I6mRr0Ose7D2HJMntAVQ-1; Thu, 23 Jan 2020 09:39:33 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-234-TPln2ot3PlKYJQ1VfUuu1g-1; Thu, 23 Jan 2020 11:47:01 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E914E8005B4;
- Thu, 23 Jan 2020 14:39:31 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F15E885753;
- Thu, 23 Jan 2020 14:39:30 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 20/80] arm/mps2-tz: use memdev for RAM
-Date: Thu, 23 Jan 2020 15:37:11 +0100
-Message-Id: <1579790231-26731-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579779525-20065-21-git-send-email-imammedo@redhat.com>
-References: <1579779525-20065-21-git-send-email-imammedo@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C007910509B1
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:00 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DDDBC28994;
+ Thu, 23 Jan 2020 16:46:58 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 011/108] virtiofsd: Fix fuse_daemonize ignored return values
+Date: Thu, 23 Jan 2020 16:44:53 +0000
+Message-Id: <20200123164630.91498-12-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 09I6mRr0Ose7D2HJMntAVQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: TPln2ot3PlKYJQ1VfUuu1g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,97 +87,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-PS:
- while at it add check for user supplied RAM size and error
- out if it mismatches board expected value.
+QEMU's compiler enables warnings/errors for ignored values
+and the (void) trick used in the fuse code isn't enough.
+Turn all the return values into a return value on the function.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
-v2:
-  * fix format string causing build failure on 32-bit host
-    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
-v4:
-  * move default_ram_size to mps2tz_class_init()
-    (Andrew Jones <drjones@redhat.com>)
+ tools/virtiofsd/helper.c | 33 ++++++++++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 11 deletions(-)
 
-CC: drjones@redhat.com
-CC: peter.maydell@linaro.org
-CC: qemu-arm@nongnu.org
-
-mps2-tz
----
- hw/arm/mps2-tz.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index f8b620b..a8dea7d 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -39,6 +39,7 @@
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 5e6f2051a7..d9227d7367 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -10,12 +10,10 @@
+  * See the file COPYING.LIB.
+  */
 =20
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/arm/boot.h"
-@@ -79,7 +80,6 @@ typedef struct {
-     MachineState parent;
+-#include "config.h"
+ #include "fuse_i.h"
+ #include "fuse_lowlevel.h"
+ #include "fuse_misc.h"
+ #include "fuse_opt.h"
+-#include "mount_util.h"
 =20
-     ARMSSE iotkit;
--    MemoryRegion psram;
-     MemoryRegion ssram[3];
-     MemoryRegion ssram1_m;
-     MPS2SCC scc;
-@@ -388,6 +388,13 @@ static void mps2tz_common_init(MachineState *machine)
-         exit(1);
+ #include <errno.h>
+ #include <limits.h>
+@@ -171,6 +169,7 @@ int fuse_parse_cmdline(struct fuse_args *args, struct f=
+use_cmdline_opts *opts)
+=20
+ int fuse_daemonize(int foreground)
+ {
++    int ret =3D 0, rett;
+     if (!foreground) {
+         int nullfd;
+         int waiter[2];
+@@ -192,8 +191,8 @@ int fuse_daemonize(int foreground)
+         case 0:
+             break;
+         default:
+-            (void)read(waiter[0], &completed, sizeof(completed));
+-            _exit(0);
++            _exit(read(waiter[0], &completed,
++                       sizeof(completed) !=3D sizeof(completed)));
+         }
+=20
+         if (setsid() =3D=3D -1) {
+@@ -201,13 +200,22 @@ int fuse_daemonize(int foreground)
+             return -1;
+         }
+=20
+-        (void)chdir("/");
++        ret =3D chdir("/");
+=20
+         nullfd =3D open("/dev/null", O_RDWR, 0);
+         if (nullfd !=3D -1) {
+-            (void)dup2(nullfd, 0);
+-            (void)dup2(nullfd, 1);
+-            (void)dup2(nullfd, 2);
++            rett =3D dup2(nullfd, 0);
++            if (!ret) {
++                ret =3D rett;
++            }
++            rett =3D dup2(nullfd, 1);
++            if (!ret) {
++                ret =3D rett;
++            }
++            rett =3D dup2(nullfd, 2);
++            if (!ret) {
++                ret =3D rett;
++            }
+             if (nullfd > 2) {
+                 close(nullfd);
+             }
+@@ -215,13 +223,16 @@ int fuse_daemonize(int foreground)
+=20
+         /* Propagate completion of daemon initialization */
+         completed =3D 1;
+-        (void)write(waiter[1], &completed, sizeof(completed));
++        rett =3D write(waiter[1], &completed, sizeof(completed));
++        if (!ret) {
++            ret =3D rett;
++        }
+         close(waiter[0]);
+         close(waiter[1]);
+     } else {
+-        (void)chdir("/");
++        ret =3D chdir("/");
      }
-=20
-+    if (machine->ram_size !=3D mc->default_ram_size) {
-+        char *sz =3D size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-+
-     sysbus_init_child_obj(OBJECT(machine), "iotkit", &mms->iotkit,
-                           sizeof(mms->iotkit), mmc->armsse_type);
-     iotkitdev =3D DEVICE(&mms->iotkit);
-@@ -458,9 +465,7 @@ static void mps2tz_common_init(MachineState *machine)
-      * tradeoffs. For QEMU they're all just RAM, though. We arbitrarily
-      * call the 16MB our "system memory", as it's the largest lump.
-      */
--    memory_region_allocate_system_memory(&mms->psram,
--                                         NULL, "mps.ram", 16 * MiB);
--    memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
-+    memory_region_add_subregion(system_memory, 0x80000000, machine->ram);
-=20
-     /* The overflow IRQs for all UARTs are ORed together.
-      * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
-@@ -642,6 +647,8 @@ static void mps2tz_class_init(ObjectClass *oc, void *da=
-ta)
-=20
-     mc->init =3D mps2tz_common_init;
-     iic->check =3D mps2_tz_idau_check;
-+    mc->default_ram_size =3D 16 * MiB;
-+    mc->default_ram_id =3D "mps.ram";
+-    return 0;
++    return ret;
  }
 =20
- static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
+ void fuse_apply_conn_info_opts(struct fuse_conn_info_opts *opts,
 --=20
-2.7.4
+2.24.1
 
 
