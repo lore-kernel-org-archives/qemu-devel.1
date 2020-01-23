@@ -6,102 +6,81 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC42C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 068E9C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:33:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 265AB21D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:29:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE69B21835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:33:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GhJ25hD+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 265AB21D7D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpjLuiF/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE69B21835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuj6z-0002TK-90
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:29:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51751)
+	id 1iujA3-0005g9-W3
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:33:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iuhWq-00052D-UN
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:48:34 -0500
+ (envelope-from <berrange@redhat.com>) id 1iuhjz-0004or-C5
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iuhWn-0003Jg-RJ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:48:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57059
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1iuhjw-0003zF-V4
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:02:06 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27185
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuhWn-0003Ja-O9
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:48:29 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iuhjw-0003yN-Qn
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:02:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579805309;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1579806124;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xmacIV8cWQXcXOgkO9yiGB4dHnGn1yEeINWNajQRXUA=;
- b=GhJ25hD+RUUEuB3oJLGbQ1JFZRQw8BMrt81TfaAtwRRVPmN61qrJCvTLqfMMP+19tysI+t
- lncMthJYJssIN71xWHmq1SdCP0IeIG3nBwHh1vROqLDDyTJMIM/PuOWMLTC1hNIcb+e0/L
- LsaZ7xYqLCGcFT+eIFmrIFONWm6J3P0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-B9HbO9ikO1yvmUQS-6_y0g-1; Thu, 23 Jan 2020 13:48:24 -0500
-Received: by mail-wr1-f72.google.com with SMTP id f17so2341188wrt.19
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:48:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3x/8NNjdVDDhizKbdYFldCySL8YJ0uWvbImRLGGjuGI=;
- b=SK+qr+0jkebs+CMP1P3isx1P7NtUkr+sUWNwsO2bVrTzCHAs2YThApRi5DROUAnzQ5
- F9LI5qbNuOWaaSHdW47duhK0bZ4TftE9eNiVMfM1nXl8VQ1NCR06o37RFhldhp0qndSk
- jRHc4F8ewIzIvCR4EhscjDdMEc4kvxlBnKFqYUOec63P74oojhUfdyfv+0zSEVumKMQr
- kXLAD0xvWAlAUOOtyd+5DgkUi19MztIpyw/9emKsJM3/9v+8EQyHtI6wst3+pTO3HD9u
- jaUr0BjAsrN2siI1+GxYle+HAJe0BYNiZZdaq5cdgDYZNIA4XvN/7JwVVtsBit5bJCla
- Crcw==
-X-Gm-Message-State: APjAAAUzhl7QDoUKR5nw4WDxHnyd5CyvDI+RT8Uuck9+r8DmD9qPwc1l
- YNWQtvRFQUzYg7I1U0owwNRGDyX66E8fM3PQuiHmu1xQP8P1tj2O4+jPjr/m1WEiw21RZpk57wx
- kvab+GAH/YeNc0GA=
-X-Received: by 2002:adf:f604:: with SMTP id t4mr17681877wrp.33.1579805302972; 
- Thu, 23 Jan 2020 10:48:22 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxcp6ZmdrBDSrt6gt0Lv/QXcnUupR5kKMiKdiRhwhVhvL1iswS2FMkvlsJdA40rOY4VCR2Pmg==
-X-Received: by 2002:adf:f604:: with SMTP id t4mr17681856wrp.33.1579805302722; 
- Thu, 23 Jan 2020 10:48:22 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id l17sm4139128wro.77.2020.01.23.10.48.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jan 2020 10:48:22 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] machine: Convert the valid cpu types
- to use cpu_model
-To: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov
- <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20180205224205.GA3291@localhost.localdomain>
- <20180206154320.288acdc2@redhat.com>
- <62d7649e-e85d-43a2-2df8-85e2a0953e89@redhat.com>
- <20190617170106.48d776ca@redhat.com>
- <0a31228d-4d32-2c54-649b-6aef9953fffc@redhat.com>
- <20190617173343.68e3c9ec@redhat.com> <20190617162700.GC19178@habkost.net>
- <20190618133410.18b93bcd@redhat.com> <20190618135516.GH19178@habkost.net>
- <20190620110239.6c4c092d@redhat.com> <20190620144328.GA1862@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <87908f05-f14a-c502-db0b-96f849d018d1@redhat.com>
-Date: Thu, 23 Jan 2020 19:48:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=8gqOrEcq9njh+eHq7yVHSPVkftfuEuw7ErAH94+T8Nw=;
+ b=YpjLuiF/eOUGZ7zqgn0hCuuxuxQwPjB/6fGSKvihQDf1CA30sFYGPSFnGghUQhyxgvZ4Z7
+ fZR5+r7GNvIZK+/D1LltSQF3+wwVH2gKK0lK/lmy1JmuJkSScBaTYUxVU1Pgo/F30TWmK1
+ K8eTQQaLiP9BVBEPYtWC5CquWgXiAlk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-T1-tzPGHOZGIdtDyYGSziA-1; Thu, 23 Jan 2020 14:02:01 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A1D0800D4E;
+ Thu, 23 Jan 2020 19:02:00 +0000 (UTC)
+Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53C8B5C1BB;
+ Thu, 23 Jan 2020 19:01:48 +0000 (UTC)
+Date: Thu, 23 Jan 2020 19:01:45 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200123190145.GI657556@redhat.com>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <87h81unja8.fsf@dusky.pond.sub.org>
+ <20191224134139.GD2710539@redhat.com>
+ <30664f6e-81da-a6e6-9b20-037fc91290fb@redhat.com>
+ <878slyej29.fsf@dusky.pond.sub.org>
+ <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190620144328.GA1862@habkost.net>
-Content-Language: en-US
-X-MC-Unique: B9HbO9ikO1yvmUQS-6_y0g-1
+In-Reply-To: <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: T1-tzPGHOZGIdtDyYGSziA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,118 +92,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcel@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
- alistair23@gmail.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/20/19 4:43 PM, Eduardo Habkost wrote:
-> On Thu, Jun 20, 2019 at 11:02:39AM +0200, Igor Mammedov wrote:
->> On Tue, 18 Jun 2019 10:55:16 -0300
->> Eduardo Habkost <ehabkost@redhat.com> wrote:
->>
->>> On Tue, Jun 18, 2019 at 01:34:10PM +0200, Igor Mammedov wrote:
->>>> On Mon, 17 Jun 2019 13:27:00 -0300
->>>> Eduardo Habkost <ehabkost@redhat.com> wrote:
->>>>   =20
->>>>> On Mon, Jun 17, 2019 at 05:33:43PM +0200, Igor Mammedov wrote:
->>>>>> On Mon, 17 Jun 2019 17:15:21 +0200
->>>>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->>>>> [...]
->>>>>>> Yes. Eduardo and you should write some lines to explain this, and t=
-hen
->>>>>>> we will follow :)
->>>>>> Unfortunately I don't recall details anymore. One could check out al=
-l
->>>>>> implementations of class_by_name callbacks to find out current state=
-.
->>>>>
->>>>> See this message for a summary of existing class_by_name quirks:
->>>>>
->>>>>    https://www.mail-archive.com/qemu-devel@nongnu.org/msg615503.html
->>>>>    Date: Wed, 08 May 2019 10:34:44 +0200
->>>>>    Message-ID: <877eb173a3.fsf@dusky.pond.sub.org>
->>>>>    Subject: Re: [Qemu-devel] [PATCH 0/7] Delete 16 *_cpu_class_by_nam=
-e() functions
->>>>>
->>>>> I'm unsure about Igor's suggestion to get rid of CPU model names
->>>>> and use only QOM type names in external interfaces.  In either
->>>>> case, we can still simplify the rules rules and reduce the amount
->>>>> of arch-specific code.
->>>> as far as we have cpu_class_by_name, we have to watch over that
->>>> new patches/targets won't add some custom handling/fallbac/whatnot.
->>>
->>> We can get rid of CPUClass::cpu_class_by_name() without changing
->>> the external interfaces provided by QEMU.
->> if you mean QMP, than it is possible to keep model there where
->> it already exists. Based on experiment [1](x86) I did, it's local to
->> affected target and doesn't pollute other code.
+On Thu, Jan 23, 2020 at 12:58:45PM -0500, John Snow wrote:
+> Yes, I agree: Scrap and start over.
 >=20
-> I mean both command line and QMP.
+> What SHOULD the syntax look like, though? Clearly the idea of qmp-shell
+> is that it offers a convenient way to enter the top-level keys of the
+> arguments dict. This works absolutely fine right up until you need to
+> start providing nested definitions.
 >=20
->>
->>> I don't have a strong opinion about using only QOM types at -cpu,
->>> yet.  But first we need to get rid of the arch-specific CPU model
->>> name exceptions enumerated at the URL above (which would be very
->>> welcome).
->> One way to get rid of them is to deprecate them in favor of strict
->> match (no fallback/substitutions/aliases) to typename and when we
->> drop it make switch type based naming only.
+> For the nesting, we say: "Go ahead and use JSON, but you have to take
+> all the spaces out."
 >=20
-> This is true, but is it desirable?  Aren't we just moving
-> complexity elsewhere?  Management software would still need to
-> translate CPU models from existing VM configurations to QOM type
-> names.
+> This... works, charitably, but is hardly what I would call usable.
 >=20
->>
->> 1) I've just took a quick look at how much of duplicated/confusing
->> code we could get rid off if we drop cpu_class_by_name/*_cpu_list.
->> It amounts to >800LOC of trivial removal (not counting ppc/s390
->> that depend on model naming heavily and in need of some non
->> trivial refactoring)
+> For the CLI, we offer a dot syntax notation that resembles nothing in
+> particular. It often seems the case that it isn't expressive enough to
+> map losslessly to JSON. I suspect it doesn't handle siblings very well.
 >=20
-> Removing the code might be trivial.  Coordinating with the
-> maintainers of all architectures to confirm this is really
-> something everybody wants is the difficult part.
+> A proper HMP-esque TUI would likely have need of coming up with its own
+> pet syntax for commands that avoid complicated nested JSON definitions,
+> but for effort:value ratio, having a QMP shorthand shell that works
+> arbitrarily with any command might be a better win.
 >=20
-> If you really want to do it, please make sure all the
-> architecture maintainers (and libvirt developers) are involved in
-> the discussion.
+> Do we still have a general-case problem of how to represent QAPI
+> structures in plaintext? Will this need to be solved for the CLI, too?
 
- From the previous link (summary of existing class_by_name quirks):
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg615737.html
+I don't know if you've ever looked at how Kubernetes/OpenShift exposes
+its functionality on the command line ? I think it is interesting to
+note that they largely don't try to solve this problem of flattening
+JSON for humans on the CLI using their client.
 
-   "Deprecating unwanted stuff now is likely to make a
-    later cleanup so much easier."
+Everything in their world is an object described in JSON/YAML, and
+there are a small set of generic commands that can act on any type
+of object. These commands primarily input and output JSON or YAML
+documents directly. As a user you can pick either format since it
+can do a lossless conversion in both directions server side.
 
-This was 8 months ago :/
+So when configuring objects you'll always provide a JSON/YAML doc.
+They've got some clever stuff for updating objects where you can
+provide a JSON patch for only the bits which need changing.
 
-IIUC we need to restart this topic addressing the libvirt community=20
-first, then see with the QEMU one?
+When querying/listing objects by default it displays only a small
+subset of their config information in a human friendly-ish format.
+If you want to see everything then you ask for it in JSON/YAML
+format. There's also an expression language that lets you extract
+particular pieces of information based on requested properties,
+and you can filter the list of objects based on attributes and so
+on.
 
->=20
->>
->>>
->>>>
->>>> On contrary -device works just with type names for all devices,
->>>> applying the same to -cpu which is basically translator
->>>>     model->type[,-global type.foo,...]
->>>> would be consistent with -device and less confusing for everyone
->>>> (not counting significant code reduction).
->>>> It would certainly simplify contributing new targets as contributor
->>>> won't have to care about cpu model naming and do something about it.
->>>>
->>>> This option wasn't considered before because we didn't have deprecatio=
-n
->>>> back then, but now it opens possibility to simplify qemu and consolida=
-te
->>>> naming. (we probably would be able to fold '-cpu help' into '-device h=
-elp'
->>>> as well).
->>>>   =20
->>>
->>
->=20
+I think it is fair to say the structure of kubernetes object config
+is on a par with hierarchical complexity of QEMU. The lack of a simple
+human targetted data input format does not appear to have negatively
+impacted the adoption of Kubernetes. It is worth questioning why this
+is the case, while we feel the human CLI syntax for QEMU is so
+critically important to QEMU's future ?
+
+
+
+Part of it is that the machine oriented data input format via QMP
+suffers from the fact that it came second in QEMU after HMP. As a
+result, 90% of the documentation that illustrates QEMU will use the
+human CLI syntax, varying vintages of that. Since all the docs are
+focused on the HMP/CLI syntax, whenever there's a new feature we
+feel pressured to expose it & document it in the human syntax too.
+
+All this results in a situation where JSON is functionally the best
+way to configure QEMU, but practically the worse, since very few
+people understand how to actually use it. This is a vicious circle
+holding back QMP/JSON and making the human syntax an ever greater
+burden for users & maintainers
+
+
+IOW, the difficulty with configuring QEMU via JSON is not the fault
+of JSON itself, it is the lack of knowledge amongst users and docs,
+compounded by our never ending "improvements" to the human syntax.
+There are other factors too, such as our only partial coverage of
+config using JSON - some is only possible via the CLI still.
+
+
+I guess my point is that with a scrap & startover view point, we
+should arguably completely ignore the design question of how to
+flatten JSON for humans/command line, as it is the wrong problem.
+Instead focus on the problem of making use of JSON the best way
+to deal with QEMU both functionally and practically, for humans
+and machines alike.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
