@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CADC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1780C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:29:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D73752077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B5F1214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:29:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJCDtKsQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D73752077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUx+OifF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5F1214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudTQ-0006AA-EP
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:28:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41612)
+	id 1iudTw-0006zB-73
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:29:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41689)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAc-0004Cn-5Y
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:11 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iubAj-0004EL-Lh
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAZ-0006VD-8n
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:09 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47036
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iubAh-0006ba-N8
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57996
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAZ-0006V7-59
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:07 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAf-0006Zx-RE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780866;
+ s=mimecast20190719; t=1579780872;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jpp1hU0u41hPqGsR1wZcmULbA2C0eLL4P2m5Syh+A00=;
- b=cJCDtKsQfWtyZRc8yvZOdyUtWWihiLYX5nKE3yd7YcQ5DUK+PfmDiUuOL3m46KorQ4D8GL
- lZBLumYhBglJqH9bYH/Gx0MtLj166ZdlI8rw9WH17oLhjLyoPqfyp0uKFXNy4MPAhvRkro
- J5ejJsU9Veevr9ayE839Z2bRwoEkw+o=
+ bh=aLZjkQwegSYpdgRATUG0pRrWmWYP1vk2vwHAPH7tVEg=;
+ b=XUx+OifFrc9uxWVC5cuanTp67wBieen1lgjNP/BjJgtAXkhCzvLp+QRx0NkYSHruJe2rJH
+ jaDbV+0kAjR+22oqpZcZMqo1sltLQ/EhXDmGAoyLFox2he11rFUDtMkhhF72k5KWHvQMd8
+ qcXtnAug88f0wonnqaOzLbQeLaPWEYM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-yjFUXvulM2Suymc1xLCJxw-1; Thu, 23 Jan 2020 07:01:04 -0500
+ us-mta-198-tb3UhsxrNlSNe2HNoEsGsQ-1; Thu, 23 Jan 2020 07:01:09 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78D35107ACCC
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1885A0CBF
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:08 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B996385754;
- Thu, 23 Jan 2020 12:01:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E361485750;
+ Thu, 23 Jan 2020 12:01:07 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 095/111] virtiofsd: passthrough_ll: fix refcounting on
- remove/rename
-Date: Thu, 23 Jan 2020 11:58:25 +0000
-Message-Id: <20200123115841.138849-96-dgilbert@redhat.com>
+Subject: [PULL 100/111] virtiofsd: Fix data corruption with O_APPEND write in
+ writeback mode
+Date: Thu, 23 Jan 2020 11:58:30 +0000
+Message-Id: <20200123115841.138849-101-dgilbert@redhat.com>
 In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
 References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: yjFUXvulM2Suymc1xLCJxw-1
+X-MC-Unique: tb3UhsxrNlSNe2HNoEsGsQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,132 +91,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Miklos Szeredi <mszeredi@redhat.com>
+From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
-Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+When writeback mode is enabled (-o writeback), O_APPEND handling is
+done in kernel. Therefore virtiofsd clears O_APPEND flag when open.
+Otherwise O_APPEND flag takes precedence over pwrite() and write
+data may corrupt.
+
+Currently clearing O_APPEND flag is done in lo_open(), but we also
+need the same operation in lo_create(). So, factor out the flag
+update operation in lo_open() to update_open_flags() and call it
+in both lo_open() and lo_create().
+
+This fixes the failure of xfstest generic/069 in writeback mode
+(which tests O_APPEND write data integrity).
+
+Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 50 +++++++++++++++++++++++++++++++-
- 1 file changed, 49 insertions(+), 1 deletion(-)
+ tools/virtiofsd/passthrough_ll.c | 66 ++++++++++++++++----------------
+ 1 file changed, 33 insertions(+), 33 deletions(-)
 
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
 _ll.c
-index c819b5f782..e3a6d6b611 100644
+index 948cb19c77..4c61ac5065 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1140,17 +1140,42 @@ out_err:
-     fuse_reply_err(req, saverr);
+@@ -1692,6 +1692,37 @@ static void lo_releasedir(fuse_req_t req, fuse_ino_t=
+ ino,
+     fuse_reply_err(req, 0);
  }
 =20
-+static struct lo_inode *lookup_name(fuse_req_t req, fuse_ino_t parent,
-+                                    const char *name)
++static void update_open_flags(int writeback, struct fuse_file_info *fi)
 +{
-+    int res;
-+    struct stat attr;
-+
-+    res =3D fstatat(lo_fd(req, parent), name, &attr,
-+                  AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
-+    if (res =3D=3D -1) {
-+        return NULL;
++    /*
++     * With writeback cache, kernel may send read requests even
++     * when userspace opened write-only
++     */
++    if (writeback && (fi->flags & O_ACCMODE) =3D=3D O_WRONLY) {
++        fi->flags &=3D ~O_ACCMODE;
++        fi->flags |=3D O_RDWR;
 +    }
 +
-+    return lo_find(lo_data(req), &attr);
++    /*
++     * With writeback cache, O_APPEND is handled by the kernel.
++     * This breaks atomicity (since the file may change in the
++     * underlying filesystem, so that the kernel's idea of the
++     * end of the file isn't accurate anymore). In this example,
++     * we just accept that. A more rigorous filesystem may want
++     * to return an error here
++     */
++    if (writeback && (fi->flags & O_APPEND)) {
++        fi->flags &=3D ~O_APPEND;
++    }
++
++    /*
++     * O_DIRECT in guest should not necessarily mean bypassing page
++     * cache on host as well. If somebody needs that behavior, it
++     * probably should be a configuration knob in daemon.
++     */
++    fi->flags &=3D ~O_DIRECT;
 +}
 +
- static void lo_rmdir(fuse_req_t req, fuse_ino_t parent, const char *name)
+ static void lo_create(fuse_req_t req, fuse_ino_t parent, const char *name,
+                       mode_t mode, struct fuse_file_info *fi)
  {
-     int res;
-+    struct lo_inode *inode;
-+    struct lo_data *lo =3D lo_data(req);
-+
-     if (!is_safe_path_component(name)) {
-         fuse_reply_err(req, EINVAL);
-         return;
+@@ -1721,12 +1752,7 @@ static void lo_create(fuse_req_t req, fuse_ino_t par=
+ent, const char *name,
+         goto out;
      }
 =20
-+    inode =3D lookup_name(req, parent, name);
-+    if (!inode) {
-+        fuse_reply_err(req, EIO);
-+        return;
-+    }
-+
-     res =3D unlinkat(lo_fd(req, parent), name, AT_REMOVEDIR);
+-    /*
+-     * O_DIRECT in guest should not necessarily mean bypassing page
+-     * cache on host as well. If somebody needs that behavior, it
+-     * probably should be a configuration knob in daemon.
+-     */
+-    fi->flags &=3D ~O_DIRECT;
++    update_open_flags(lo->writeback, fi);
 =20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-+    unref_inode_lolocked(lo, inode, 1);
- }
+     fd =3D openat(parent_inode->fd, name, (fi->flags | O_CREAT) & ~O_NOFOL=
+LOW,
+                 mode);
+@@ -1936,33 +1962,7 @@ static void lo_open(fuse_req_t req, fuse_ino_t ino, =
+struct fuse_file_info *fi)
+     fuse_log(FUSE_LOG_DEBUG, "lo_open(ino=3D%" PRIu64 ", flags=3D%d)\n", i=
+no,
+              fi->flags);
 =20
- static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
-@@ -1158,12 +1183,23 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-                       unsigned int flags)
- {
-     int res;
-+    struct lo_inode *oldinode;
-+    struct lo_inode *newinode;
-+    struct lo_data *lo =3D lo_data(req);
+-    /*
+-     * With writeback cache, kernel may send read requests even
+-     * when userspace opened write-only
+-     */
+-    if (lo->writeback && (fi->flags & O_ACCMODE) =3D=3D O_WRONLY) {
+-        fi->flags &=3D ~O_ACCMODE;
+-        fi->flags |=3D O_RDWR;
+-    }
+-
+-    /*
+-     * With writeback cache, O_APPEND is handled by the kernel.
+-     * This breaks atomicity (since the file may change in the
+-     * underlying filesystem, so that the kernel's idea of the
+-     * end of the file isn't accurate anymore). In this example,
+-     * we just accept that. A more rigorous filesystem may want
+-     * to return an error here
+-     */
+-    if (lo->writeback && (fi->flags & O_APPEND)) {
+-        fi->flags &=3D ~O_APPEND;
+-    }
+-
+-    /*
+-     * O_DIRECT in guest should not necessarily mean bypassing page
+-     * cache on host as well. If somebody needs that behavior, it
+-     * probably should be a configuration knob in daemon.
+-     */
+-    fi->flags &=3D ~O_DIRECT;
++    update_open_flags(lo->writeback, fi);
 =20
-     if (!is_safe_path_component(name) || !is_safe_path_component(newname))=
- {
-         fuse_reply_err(req, EINVAL);
-         return;
-     }
-=20
-+    oldinode =3D lookup_name(req, parent, name);
-+    newinode =3D lookup_name(req, newparent, newname);
-+
-+    if (!oldinode) {
-+        fuse_reply_err(req, EIO);
-+        goto out;
-+    }
-+
-     if (flags) {
- #ifndef SYS_renameat2
-         fuse_reply_err(req, EINVAL);
-@@ -1176,26 +1212,38 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-             fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-         }
- #endif
--        return;
-+        goto out;
-     }
-=20
-     res =3D renameat(lo_fd(req, parent), name, lo_fd(req, newparent), newn=
-ame);
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-+out:
-+    unref_inode_lolocked(lo, oldinode, 1);
-+    unref_inode_lolocked(lo, newinode, 1);
- }
-=20
- static void lo_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
- {
-     int res;
-+    struct lo_inode *inode;
-+    struct lo_data *lo =3D lo_data(req);
-=20
-     if (!is_safe_path_component(name)) {
-         fuse_reply_err(req, EINVAL);
-         return;
-     }
-=20
-+    inode =3D lookup_name(req, parent, name);
-+    if (!inode) {
-+        fuse_reply_err(req, EIO);
-+        return;
-+    }
-+
-     res =3D unlinkat(lo_fd(req, parent), name, 0);
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-+    unref_inode_lolocked(lo, inode, 1);
- }
-=20
- static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
-e,
+     sprintf(buf, "%i", lo_fd(req, ino));
+     fd =3D openat(lo->proc_self_fd, buf, fi->flags & ~O_NOFOLLOW);
 --=20
 2.24.1
 
