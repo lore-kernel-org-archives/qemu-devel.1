@@ -2,83 +2,58 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21113C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E7FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:26:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2BB52064C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:25:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XkCtbHku"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2BB52064C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8C98214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:26:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8C98214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iueMZ-0000Cd-Om
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:25:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51470)
+	id 1iueMy-0000se-FM
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:26:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46057)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrQ-00053K-T1
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:29 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0001Cu-F7
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrP-0003SD-Oz
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:28 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:55785)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrP-0003Ps-Ii
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:27 -0500
-Received: by mail-wm1-x332.google.com with SMTP id q9so2635473wmj.5
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=+U+IhI9S2shiMvtu75gJowqZ/s3WgewzmHW03jb/rC4=;
- b=XkCtbHkuWGN/UMK5R4mByTDuNLFXQnpP1hKyudOLDUPAlHjV3lYPfjQyFVXuyZENNr
- Wo++6EkWtjXbO5UrjRBnVVj3PwpE+AAJuj3KiQ56k3IZ1AgPIphVtzoIS1YAAhnguiV4
- Mi9XwoBZDEMIN0FkJNSMmCwI7OR/00Kd01pWVepo76XvP6/+qT0e7hhI1OM86aorNwqp
- mtSsLBqKla92VyijvS8hjFjFIZ+fB8jxV5PWJSWFn6OpepUg+fEYFi7Hf0t8kI2iX9Lv
- 5SL3+TvL1gykIqrU0fml6gBgdsJSeEN0w/4cNbt+UzV9nScJ+TiacbpbthVSsM9+MmGT
- b68w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=+U+IhI9S2shiMvtu75gJowqZ/s3WgewzmHW03jb/rC4=;
- b=l2smaxIgTbHJCYZyBrDe5nKEa00pp5OhP0rZLXgso1JxFqlNPi0CNtGz1nsZmsYTJE
- ObueWORHPabJRraSOaMWrvDgezVQ9Cri4l2NFXZfWH5WlffHb5Ho/oWFabuDtF7z7uj2
- 1F+XEWoPfIraBPB6rQksK3+K/6GsdrM2f7ocgo1CpPZn36Xrsz5+jdKFFTr9DHyvJm34
- 45YQmM3WhcGqHP6cUuWtyKYa9shGAUs5flEgJPhmA0GBL1ul1e4sXZmyCb2YRpLQ/mpT
- IFcp6dP8g1mzE7rJlVsc+PjzGZK4NS0OerUbBiGvrxt59+/Fejj9hakCd35jZaiY/spZ
- H9IA==
-X-Gm-Message-State: APjAAAW3QJVmSvUtjYS8WrSbeTyK/0lVWQT2fGTigZlVAzwLO+DjfnmZ
- 3oOUPme5Yr6AueI9O17Sttpo9XUL
-X-Google-Smtp-Source: APXvYqxvtoehS1A+AMWeedPNn6Sjr/W437HQSZVz8NYb4nDK4unxNP+7yiE01GRXOeVUtjqzB/9cmA==
-X-Received: by 2002:a05:600c:2318:: with SMTP id
- 24mr4455975wmo.48.1579787366368; 
- Thu, 23 Jan 2020 05:49:26 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.25
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:25 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUK-0000lh-J1
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:38 -0500
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:36686)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUK-0000iJ-2n
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:36 -0500
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 65B47BA920;
+ Thu, 23 Jan 2020 22:25:34 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+ (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 15CE124008F;
+ Thu, 23 Jan 2020 22:25:34 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PULL 22/59] virtio-scsi: convert to new virtio_delete_queue
-Date: Thu, 23 Jan 2020 14:48:25 +0100
-Message-Id: <1579787342-27146-23-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH v29 08/22] target/rx: Disassemble rx_index_addr into a string
+Date: Thu, 23 Jan 2020 22:25:11 +0900
+Message-Id: <20200123132525.80891-9-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+References: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 202.224.55.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,43 +65,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pan Nengyuan <pannengyuan@huawei.com>
+Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Use virtio_delete_queue to make it more clear.
+We were eliding all zero indexes.  It is only ld=3D=3D0 that does
+not have an index in the instruction.  This also allows us to
+avoid breaking the final print into multiple pieces.
 
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200117075547.60864-3-pannengyuan@huawei.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-19-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/scsi/virtio-scsi.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/rx/disas.c | 154 +++++++++++++++++-----------------------------
+ 1 file changed, 55 insertions(+), 99 deletions(-)
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 858b3aa..d3af42e 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -945,10 +945,10 @@ void virtio_scsi_common_unrealize(DeviceState *dev)
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-     int i;
- 
--    virtio_del_queue(vdev, 0);
--    virtio_del_queue(vdev, 1);
-+    virtio_delete_queue(vs->ctrl_vq);
-+    virtio_delete_queue(vs->event_vq);
-     for (i = 0; i < vs->conf.num_queues; i++) {
--        virtio_del_queue(vdev, i + 2);
-+        virtio_delete_queue(vs->cmd_vqs[i]);
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index 8cada4825d..64342537ee 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -107,49 +107,42 @@ static const char psw[] =3D {
+     'i', 'u', 0, 0, 0, 0, 0, 0,
+ };
+=20
+-static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
++static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi=
+)
+ {
+-    bfd_byte buf[2];
++    uint32_t addr =3D ctx->addr;
++    uint8_t buf[2];
++    uint16_t dsp;
++
+     switch (ld) {
+     case 0:
+-        return 0;
++        /* No index; return empty string.  */
++        out[0] =3D '\0';
++        return;
+     case 1:
+-        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
+         ctx->addr +=3D 1;
+-        return ((uint8_t)buf[0]) << size;
++        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
++        dsp =3D buf[0];
++        break;
+     case 2:
+-        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
+         ctx->addr +=3D 2;
+-        return lduw_le_p(buf) << size;
++        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
++        dsp =3D lduw_le_p(buf);
++        break;
++    default:
++        g_assert_not_reached();
      }
-     g_free(vs->cmd_vqs);
-     virtio_cleanup(vdev);
--- 
-1.8.3.1
-
+-    g_assert_not_reached();
++
++    sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
+ }
+=20
+ static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
+ {
+-    int dsp;
+     static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
++    char dsp[8];
++
+     if (ld < 3) {
+-        switch (mi) {
+-        case 4:
+-            /* dsp[rs].ub */
+-            dsp =3D rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
+-            break;
+-        case 3:
+-            /* dsp[rs].uw */
+-            dsp =3D rx_index_addr(ld, RX_MEMORY_WORD, ctx);
+-            break;
+-        default:
+-            /* dsp[rs].b */
+-            /* dsp[rs].w */
+-            /* dsp[rs].l */
+-            dsp =3D rx_index_addr(ld, mi, ctx);
+-            break;
+-        }
+-        if (dsp > 0) {
+-            prt("%d", dsp);
+-        }
+-        prt("[r%d]%s", rs, sizes[mi]);
++        rx_index_addr(ctx, dsp, ld, mi);
++        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
+     } else {
+         prt("r%d", rs);
+     }
+@@ -235,7 +228,7 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_r=
+a *a)
+ /* mov.[bwl] rs,rd */
+ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
+ {
+-    int dsp;
++    char dspd[8], dsps[8];
+=20
+     prt("mov.%c\t", size[a->sz]);
+     if (a->lds =3D=3D 3 && a->ldd =3D=3D 3) {
+@@ -244,29 +237,15 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV=
+_mm *a)
+         return true;
+     }
+     if (a->lds =3D=3D 3) {
+-        prt("r%d, ", a->rd);
+-        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
+-        if (dsp > 0) {
+-            prt("%d", dsp);
+-        }
+-        prt("[r%d]", a->rs);
++        rx_index_addr(ctx, dspd, a->ldd, a->sz);
++        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
+     } else if (a->ldd =3D=3D 3) {
+-        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
+-        if (dsp > 0) {
+-            prt("%d", dsp);
+-        }
+-        prt("[r%d], r%d", a->rs, a->rd);
++        rx_index_addr(ctx, dsps, a->lds, a->sz);
++        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
+     } else {
+-        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
+-        if (dsp > 0) {
+-            prt("%d", dsp);
+-        }
+-        prt("[r%d], ", a->rs);
+-        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
+-        if (dsp > 0) {
+-            prt("%d", dsp);
+-        }
+-        prt("[r%d]", a->rd);
++        rx_index_addr(ctx, dsps, a->lds, a->sz);
++        rx_index_addr(ctx, dspd, a->ldd, a->sz);
++        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
+     }
+     return true;
+ }
+@@ -357,12 +336,10 @@ static bool trans_PUSH_r(DisasContext *ctx, arg_PUS=
+H_r *a)
+ /* push dsp[rs] */
+ static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
+ {
+-    prt("push\t");
+-    int dsp =3D rx_index_addr(a->ld, a->sz, ctx);
+-    if (dsp > 0) {
+-        prt("%d", dsp);
+-    }
+-    prt("[r%d]", a->rs);
++    char dsp[8];
++
++    rx_index_addr(ctx, dsp, a->ld, a->sz);
++    prt("push\t%s[r%d]", dsp, a->rs);
+     return true;
+ }
+=20
+@@ -389,17 +366,13 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XC=
+HG_rr *a)
+ /* xchg dsp[rs].<mi>,rd */
+ static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
+ {
+-    int dsp;
+     static const char msize[][4] =3D {
+         "b", "w", "l", "ub", "uw",
+     };
++    char dsp[8];
+=20
+-    prt("xchg\t");
+-    dsp =3D rx_index_addr(a->ld, a->mi, ctx);
+-    if (dsp > 0) {
+-        prt("%d", dsp);
+-    }
+-    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
++    rx_index_addr(ctx, dsp, a->ld, a->mi);
++    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
+     return true;
+ }
+=20
+@@ -552,13 +525,10 @@ static bool trans_ADC_rr(DisasContext *ctx, arg_ADC=
+_rr *a)
+ /* adc dsp[rs], rd */
+ static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
+ {
+-    int dsp;
+-    prt("adc\t");
+-    dsp =3D rx_index_addr(a->ld, 2, ctx);
+-    if (dsp > 0) {
+-        prt("%d", dsp);
+-    }
+-    prt("[r%d], r%d", a->rs, a->rd);
++    char dsp[8];
++
++    rx_index_addr(ctx, dsp, a->ld, 2);
++    prt("adc\t%s[r%d], r%d", dsp, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1217,25 +1187,17 @@ static bool trans_ITOF(DisasContext *ctx, arg_ITO=
+F *a)
+=20
+ #define BOP_IM(name, reg)                                       \
+     do {                                                        \
+-        int dsp;                                                \
+-        prt("b%s\t#%d, ", #name, a->imm);                       \
+-        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
+-        if (dsp > 0) {                                          \
+-            prt("%d", dsp);                                     \
+-        }                                                       \
+-        prt("[r%d]", reg);                                      \
++        char dsp[8];                                            \
++        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
++        prt("b%s\t#%d, %s[r%d]", #name, a->imm, dsp, reg);      \
+         return true;                                            \
+     } while (0)
+=20
+ #define BOP_RM(name)                                            \
+     do {                                                        \
+-        int dsp;                                                \
+-        prt("b%s\tr%d, ", #name, a->rd);                        \
+-        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
+-        if (dsp > 0) {                                          \
+-            prt("%d", dsp);                                     \
+-        }                                                       \
+-        prt("[r%d]", a->rs);                                    \
++        char dsp[8];                                            \
++        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
++        prt("b%s\tr%d, %s[r%d]", #name, a->rd, dsp, a->rs);     \
+         return true;                                            \
+     } while (0)
+=20
+@@ -1346,12 +1308,10 @@ static bool trans_BNOT_ir(DisasContext *ctx, arg_=
+BNOT_ir *a)
+ /* bmcond #imm, dsp[rd] */
+ static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
+ {
+-    int dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
+-    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
+-    if (dsp > 0) {
+-        prt("%d", dsp);
+-    }
+-    prt("[%d]", a->rd);
++    char dsp[8];
++
++    rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);
++    prt("bm%s\t#%d, %s[r%d]", cond[a->cd], a->imm, dsp, a->rd);
+     return true;
+ }
+=20
+@@ -1443,16 +1403,12 @@ static bool trans_WAIT(DisasContext *ctx, arg_WAI=
+T *a)
+ /* sccnd.[bwl] dsp:[rd] */
+ static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
+ {
+-    int dsp;
+-    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
+     if (a->ld < 3) {
+-        dsp =3D rx_index_addr(a->sz, a->ld, ctx);
+-        if (dsp > 0) {
+-            prt("%d", dsp);
+-        }
+-        prt("[r%d]", a->rd);
++        char dsp[8];
++        rx_index_addr(ctx, dsp, a->sz, a->ld);
++        prt("sc%s.%c\t%s[r%d]", cond[a->cd], size[a->sz], dsp, a->rd);
+     } else {
+-        prt("r%d", a->rd);
++        prt("sc%s.%c\tr%d", cond[a->cd], size[a->sz], a->rd);
+     }
+     return true;
+ }
+--=20
+2.20.1
 
 
