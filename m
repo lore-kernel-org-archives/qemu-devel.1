@@ -2,86 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E9EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF7DFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:55:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22A70214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC098214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:55:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIySqjIG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22A70214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2jwf1BM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC098214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59841 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuep5-00071g-Qb
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:55:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51897)
+	id 1iuepK-0007SO-2S
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:55:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrm-0005ad-TQ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:51 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iuctd-00008P-TE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrl-0004VT-Qg
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:50 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:35787)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrl-0004Si-Jz
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:49 -0500
-Received: by mail-wm1-x331.google.com with SMTP id p17so2627119wmb.0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=MIVPt6AfB7Si2oRFoeO2RPXJ/HSxWbOijJs6IvacXC4=;
- b=lIySqjIGpijZ4dJsytu6VCMwAxKpQ5v2GVAVUZbn+bW3fkWMrtSfx9kuRu3XMDaZ92
- s5NfXcJX9lMjUcmKEj4DRN/V29TD8Ttn3nQUs/o7SlIeeRDxdKNjdgydOmIhyX7jOeVw
- i3G0VFA6rMjtBa50l7OxsjT0Ct3yMUau3Lkpvx0sRfEo8eb07gtjMfXXc+BW8n5DnX+3
- 5PQ9xzbEN8oDGTs8iKUmmAHaQW3ZH6OCOnQ0k9TxH1kuKXfEv+YZvWPIOJAWNY9QwAFU
- WBgZqL4c1e+dvwj41SkHFg49Jd/1G8W1d3q5KI9Pr/7gGn1UjzR30xrE18sq0//fEOzT
- uthQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=MIVPt6AfB7Si2oRFoeO2RPXJ/HSxWbOijJs6IvacXC4=;
- b=V3y5EFQ0WB4mqpuf8TmuNizxFcjYx/qD6sj7X7UfXnml8aKZU1JADoYLFPt0BKIxJg
- /p2bM8ftJ3eI9b0lVfld1ue/tO3h2SwZybwG7r2cwsjy/Cxzr0UFgdsY/pgJj51ah72p
- Pavi3uVZwoNFE9WcoiP/9erHMgr+ISH0XkC2gras5cnuK985HjM1QILy0qt4Muqd4m3W
- hI9rlYJPSafqcMOXzaLBzW6NLbSlfTmMyE5poEbOPiKRvnR9XgmrXrnBxr3AjliMtAjC
- BXSiwxosOEWhHyUgrClcYTtYqMrYbV8KsS6ydig8dJ736AH/WM0cRNF3lKx07LKxasV4
- gC/Q==
-X-Gm-Message-State: APjAAAVHmMkS8mh4hAZ3EBTLHK3J92x9mDVzQ/tTshhsht19c4TC8Pes
- WEOZVil4RRw6M1edloHEzXBE5NY8
-X-Google-Smtp-Source: APXvYqze5kc9ykXYM8BnoZ3clWESdXoRjAOe6WhscklrehcuAJ78m2JToo+E0pbKDefkz1n+urrw/w==
-X-Received: by 2002:a7b:cc98:: with SMTP id p24mr4384055wma.139.1579787388489; 
- Thu, 23 Jan 2020 05:49:48 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.47
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:47 -0800 (PST)
+ (envelope-from <pbonzini@redhat.com>) id 1iuctc-0008Lo-UJ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40808
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuctc-0008L4-RT
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579787504;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7ZAKcaYK/1ruN2bloXbMQjJI12mYPfN7fiiBhG4qly8=;
+ b=Z2jwf1BMjnEvJmCzXJ+dF9LHr5OHJwQxyXtHiUW2vVU3YEm+3EbFq6WdgZ/hKrgx3jxsJL
+ zpnFE5ZBsPo1OCI2QfN1iClBnStfpiGjkYJV6rDnlliahAQTjKIZUCm8p9l5HF4moY5h8u
+ Py0sNvtraMwd/DbQtCbLB02w+VImNQk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-Kanf8ig4PnKlizzvcjDxTw-1; Thu, 23 Jan 2020 08:51:42 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2979818CA25B
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:51:42 +0000 (UTC)
+Received: from 640k.localdomain.com (unknown [10.36.112.13])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 775BD85785;
+ Thu, 23 Jan 2020 13:51:36 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 48/59] object: return self in object_ref()
-Date: Thu, 23 Jan 2020 14:48:51 +0100
-Message-Id: <1579787342-27146-49-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 24/59] hw/ppc/spapr_rtas: Access MachineState via
+ SpaprMachineState argument
+Date: Thu, 23 Jan 2020 14:50:14 +0100
+Message-Id: <1579787449-27599-25-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
+References: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Kanf8ig4PnKlizzvcjDxTw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::331
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,60 +86,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-This allow for simpler assignment with ref: foo = object_ref(bar)
+We received a SpaprMachineState argument. Since SpaprMachineState
+inherits of MachineState, use it instead of calling qdev_get_machine.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200110153039.1379601-19-marcandre.lureau@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20200121110349.25842-3-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h | 3 ++-
- qom/object.c         | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_rtas.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index ead9129..933e5c6 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1013,8 +1013,9 @@ GSList *object_class_get_list_sorted(const char *implements_type,
-  *
-  * Increase the reference count of a object.  A object cannot be freed as long
-  * as its reference count is greater than zero.
-+ * Returns: @obj
-  */
--void object_ref(Object *obj);
-+Object *object_ref(Object *obj);
- 
- /**
-  * object_unref:
-diff --git a/qom/object.c b/qom/object.c
-index 84d234d..b774507 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1107,12 +1107,13 @@ GSList *object_class_get_list_sorted(const char *implements_type,
-                         object_class_cmp);
- }
- 
--void object_ref(Object *obj)
-+Object *object_ref(Object *obj)
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index e88bb19..6f06e9d 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -267,7 +267,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *c=
+pu,
+                                           uint32_t nret, target_ulong rets=
+)
  {
-     if (!obj) {
--        return;
-+        return NULL;
-     }
-     atomic_inc(&obj->ref);
-+    return obj;
- }
- 
- void object_unref(Object *obj)
--- 
+     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+-    MachineState *ms =3D MACHINE(qdev_get_machine());
++    MachineState *ms =3D MACHINE(spapr);
+     unsigned int max_cpus =3D ms->smp.max_cpus;
+     target_ulong parameter =3D rtas_ld(args, 0);
+     target_ulong buffer =3D rtas_ld(args, 1);
+--=20
 1.8.3.1
 
 
