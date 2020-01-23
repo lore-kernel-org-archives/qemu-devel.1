@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 115E9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E1BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA43321D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10EDE21D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:02:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IOC8wta3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA43321D7D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTV8Hic6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10EDE21D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhkC-0004De-0m
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:02:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41585)
+	id 1iuhki-0004XC-HK
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:02:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufeH-0005No-Rn
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:07 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufe9-0005DA-Cu
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufeG-0006pa-9I
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30618
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iufe8-0006eu-49
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:57 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58943
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufeG-0006oG-6L
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:04 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufe8-0006eS-0z
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798082;
+ s=mimecast20190719; t=1579798075;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TTHm9Jt/ZwkRilrjifGOycxUrgPWy6KWn81baKXTvRA=;
- b=IOC8wta3baVAK0QZcd6vQYTFnWmbacqNbfhefZo2DAWAL8lBFksVko6ZX6XEBxjiybu/aH
- GRfzpcze9qKrHEV9CK4PQ3yoGhQZnFN8ihEiVvQ8vLMAm0CWtaqJTFRqC+oDV7woDpp0IM
- +OUffwO0gC09BdMN1X+xa2WwhhV29Oo=
+ bh=A2OLDzwvIkswhQnYmC967hKOHC8UuZ0BirW2egCo2xI=;
+ b=KTV8Hic6mjjNRgBFl040CfB2JC3UcXd2EzNHe97dwYNf+tZ8j+RenOLNvHvtiTrz4lyBB+
+ jzYct+4S4XbawgZWG6Ex1NLXohnGgSZbqGEkcHLOdlYYwx55bfkGBk5e7G5ehOwPArqLGL
+ crZ0phnDAQAeGmP/uoGyEYL1HasmB8g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-sPPPSBgJNr-ANHh_rmX7KQ-1; Thu, 23 Jan 2020 11:48:00 -0500
+ us-mta-286-uiYjjXtFNzW0xJdapgElZw-1; Thu, 23 Jan 2020 11:47:53 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A448A8026B7
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9DD67A0A7
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:52 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
  [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F40BF19C69;
- Thu, 23 Jan 2020 16:47:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD59319C69;
+ Thu, 23 Jan 2020 16:47:49 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 060/108] virtiofsd: Add ID to the log with FUSE_LOG_DEBUG level
-Date: Thu, 23 Jan 2020 16:45:42 +0000
-Message-Id: <20200123164630.91498-61-dgilbert@redhat.com>
+Subject: [PULL 053/108] virtiofsd: Parse flag FUSE_WRITE_KILL_PRIV
+Date: Thu, 23 Jan 2020 16:45:35 +0000
+Message-Id: <20200123164630.91498-54-dgilbert@redhat.com>
 In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
 References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: sPPPSBgJNr-ANHh_rmX7KQ-1
+X-MC-Unique: uiYjjXtFNzW0xJdapgElZw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,75 +91,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+From: Vivek Goyal <vgoyal@redhat.com>
 
-virtiofsd has some threads, so we see a lot of logs with debug option.
-It would be useful for debugging if we can identify the specific thread
-from the log.
+Caller can set FUSE_WRITE_KILL_PRIV in write_flags. Parse it and pass it
+to the filesystem.
 
-Add ID, which is got by gettid(), to the log with FUSE_LOG_DEBUG level
-so that we can grep the specific thread.
-
-The log is like as:
-
-  ]# ./virtiofsd -d -o vhost_user_socket=3D/tmp/vhostqemu0 -o source=3D/tmp=
-/share0 -o cache=3Dauto
-  ...
-  [ID: 00000097]    unique: 12696, success, outsize: 120
-  [ID: 00000097] virtio_send_msg: elem 18: with 2 in desc of length 120
-  [ID: 00000003] fv_queue_thread: Got queue event on Queue 1
-  [ID: 00000003] fv_queue_thread: Queue 1 gave evalue: 1 available: in: 655=
-52 out: 80
-  [ID: 00000003] fv_queue_thread: Waiting for Queue 1 event
-  [ID: 00000071] fv_queue_worker: elem 33: with 2 out desc of length 80 bad=
-_in_num=3D0 bad_out_num=3D0
-  [ID: 00000071] unique: 12694, opcode: READ (15), nodeid: 2, insize: 80, p=
-id: 2014
-  [ID: 00000071] lo_read(ino=3D2, size=3D65536, off=3D131072)
-
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  added rework as suggested by Daniel P. Berrang=C3=A9 during review
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/virtiofsd/fuse_common.h   | 6 +++++-
+ tools/virtiofsd/fuse_lowlevel.c | 4 +++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index ff6910fd73..f08324f000 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -43,6 +43,7 @@
- #include <cap-ng.h>
- #include <dirent.h>
- #include <errno.h>
-+#include <glib.h>
- #include <inttypes.h>
- #include <limits.h>
- #include <pthread.h>
-@@ -2268,10 +2269,17 @@ static void setup_nofile_rlimit(void)
+diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
+index f8f6433743..686c42c0a5 100644
+--- a/tools/virtiofsd/fuse_common.h
++++ b/tools/virtiofsd/fuse_common.h
+@@ -93,8 +93,12 @@ struct fuse_file_info {
+      */
+     unsigned int cache_readdir:1;
 =20
- static void log_func(enum fuse_log_level level, const char *fmt, va_list a=
-p)
- {
-+    g_autofree char *localfmt =3D NULL;
++    /* Indicates that suid/sgid bits should be removed upon write */
++    unsigned int kill_priv:1;
 +
-     if (current_log_level < level) {
-         return;
-     }
++
+     /** Padding.  Reserved for future use*/
+-    unsigned int padding:25;
++    unsigned int padding:24;
+     unsigned int padding2:32;
 =20
-+    if (current_log_level =3D=3D FUSE_LOG_DEBUG) {
-+        localfmt =3D g_strdup_printf("[ID: %08ld] %s", syscall(__NR_gettid=
-), fmt);
-+        fmt =3D localfmt;
-+    }
-+
-     if (use_syslog) {
-         int priority =3D LOG_ERR;
-         switch (level) {
+     /*
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 02e1d83038..2d6dc5a680 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -1142,6 +1142,7 @@ static void do_write(fuse_req_t req, fuse_ino_t nodei=
+d,
+     memset(&fi, 0, sizeof(fi));
+     fi.fh =3D arg->fh;
+     fi.writepage =3D (arg->write_flags & FUSE_WRITE_CACHE) !=3D 0;
++    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
+=20
+     fi.lock_owner =3D arg->lock_owner;
+     fi.flags =3D arg->flags;
+@@ -1177,7 +1178,8 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t n=
+odeid,
+     fi.lock_owner =3D arg->lock_owner;
+     fi.flags =3D arg->flags;
+     fi.fh =3D arg->fh;
+-    fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
++    fi.writepage =3D !!(arg->write_flags & FUSE_WRITE_CACHE);
++    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
+=20
+     if (ibufv->count =3D=3D 1) {
+         assert(!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD));
 --=20
 2.24.1
 
