@@ -2,85 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6A5C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BDCC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F15321D7E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:49:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38AC722464
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:50:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c2z0Pa+j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F15321D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ieOkSR7q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38AC722464
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhY4-0005e8-41
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:49:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35901)
+	id 1iuhYw-0006cn-8J
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:50:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iufNI-0000kS-Cn
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:30:38 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufea-0005kI-MK
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iufNG-0002wr-4S
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:30:31 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:52008)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iufNF-0002vo-F6
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:30:30 -0500
-Received: by mail-wm1-x334.google.com with SMTP id t23so3224569wmi.1
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 08:30:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=XUTxum3ZRedfDC64SIxS1PRGjZaWuC3xkwEwjz6rlJ4=;
- b=c2z0Pa+jm/HXMk1fAODn7Fwx54pn85uPyqiQFmB+eGOl9oL7eCjsZVFAjhFG9jZVwv
- Qy4ZpUCw0F8LQCYH0yCHS8DIusN803wjt5llKqSS17mmiBfxGgqiD+8IOaUQ1PVCzB93
- Mh1BUM8OU0+/NZZnCFZagUReqIZCYMI7Ducoy3D2RioOm1GNL/P1DsNyC+WQIWMGrM7T
- hsAk8bYE1C9FKX1A25HD373pX9I5nWo+76GfXkZWnbEoiY66W2A4KytnY1EVE5CitsYl
- WBYQjaQO+UC8W3PbBiYfi2gGvBrTH+SiYbptLL45TpVdBJI0E2LoJhpk1p/9McOoQYcX
- 98Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=XUTxum3ZRedfDC64SIxS1PRGjZaWuC3xkwEwjz6rlJ4=;
- b=pFzDx3SIklaeFYOjylqaNIkzuiF292eTAScQ4hn3RA0/LqbGhvPh/gE6qNxDALZgFM
- Q3PPOLBsODB2J0VIgiTgNoRxTRTwgQpxgvpWP1jEdryrSzShdw9U6Ehpz3vFHsFyr7++
- F+BxM7nJrzoLPE/Wu5f1xXPpRnsDkE188AlOvHpp89W5W3XyGN0kIMcmKT8jHkP2Aowl
- j7/tZvZuDHTg335fNd9Lsibzmgt70/evmLQAdxHl1yMrIjeUYB7q76iatxqQzKssb8iy
- F9JvbqMILnsxJlrczdfgxnm44AFSFKQxP94e8Td9WWg6wds+3VVL9mB3xhowMLXM75wL
- HnfA==
-X-Gm-Message-State: APjAAAXsmmf6lx4isoOm2Vn6goXGt6zHRF+JolbKfrpXaexO9l8/g1UU
- BR49gs09hDlsudTlddEqkK6edD9AoHxyXA==
-X-Google-Smtp-Source: APXvYqxPG43FTFi9zX8muBaw05HwK+W+uJZSlni+FdJnoTDnxlwZuXDJTgQG22KTuXZD5VR/t2SgQg==
-X-Received: by 2002:a1c:6605:: with SMTP id a5mr4796990wmc.112.1579797027992; 
- Thu, 23 Jan 2020 08:30:27 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 60sm3801808wrn.86.2020.01.23.08.30.27
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Jan 2020 08:30:27 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL v3 00/20] target-arm queue
-Date: Thu, 23 Jan 2020 16:30:25 +0000
-Message-Id: <20200123163025.16896-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <dgilbert@redhat.com>) id 1iufeZ-0007j0-Iz
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53621
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufeZ-0007iN-G3
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579798103;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qHRBtI8mqc/+h6vY0sDSH8KnWBJyk6xG64HuaxZqdiY=;
+ b=ieOkSR7qli3dmivWRIz9zuXsm3jp9JMYrFU2o6KSgCLtGWhb5QuxrJYk9uJF5h9UvBuCnv
+ 3dDMGEfXqsBNWJJrmlHSvgyZqwQoFq+uYF5nnZt1hT22khzuZO+O2CK/3RbAO20Ugb9h8Y
+ Zsaebvh0t9a8w6X1EksE2ERfvzBsE58=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-wuhlraj7No21MxkWntpDiQ-1; Thu, 23 Jan 2020 11:48:21 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDE8C10883AD
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:20 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 330E728991;
+ Thu, 23 Jan 2020 16:48:20 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 079/108] virtiofsd: fix memory leak on lo.source
+Date: Thu, 23 Jan 2020 16:46:01 +0000
+Message-Id: <20200123164630.91498-80-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: wuhlraj7No21MxkWntpDiQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,113 +91,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v1->v2: add system/index to docs/index.rst
-v2->v3: fix format string issues for OSX
+From: Liu Bo <bo.liu@linux.alibaba.com>
 
-The following changes since commit b7c359c748a2e3ccb97a184b9739feb2cd48de2f:
+valgrind reported that lo.source is leaked on quiting, but it was defined
+as (const char*) as it may point to a const string "/".
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0-pull-request' into staging (2020-01-23 14:38:43 +0000)
+Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-are available in the Git repository at:
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index af050c6d97..056ebe8556 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -115,7 +115,7 @@ struct lo_data {
+     int writeback;
+     int flock;
+     int xattr;
+-    const char *source;
++    char *source;
+     double timeout;
+     int cache;
+     int timeout_set;
+@@ -2497,9 +2497,8 @@ int main(int argc, char *argv[])
+             fuse_log(FUSE_LOG_ERR, "source is not a directory\n");
+             exit(1);
+         }
+-
+     } else {
+-        lo.source =3D "/";
++        lo.source =3D strdup("/");
+     }
+     if (!lo.timeout_set) {
+         switch (lo.cache) {
+@@ -2570,5 +2569,7 @@ err_out1:
+         close(lo.root.fd);
+     }
+=20
++    free(lo.source);
++
+     return ret ? 1 : 0;
+ }
+--=20
+2.24.1
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200123-3
-
-for you to fetch changes up to 9805a6b7d03a23e16d6499d16882094db490683a:
-
-  hw/arm/exynos4210: Connect serial port DMA busy signals with pl330 (2020-01-23 15:52:34 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * fix bug in PAuth emulation
- * add PMU to Cortex-R5, Cortex-R5F
- * qemu-nbd: Convert documentation to rST
- * qemu-block-drivers: Convert documentation to rST
- * Fix Exynos4210 UART DMA support
- * Various minor code cleanups
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      target/arm/arch_dump: Add SVE notes
-
-Clement Deschamps (1):
-      target/arm: add PMU feature to cortex-r5 and cortex-r5f
-
-Guenter Roeck (8):
-      dma/pl330: Convert to support tracing
-      hw/core/or-irq: Increase limit of or-lines to 48
-      hw/arm/exynos4210: Fix DMA initialization
-      hw/char/exynos4210_uart: Convert to support tracing
-      hw/char/exynos4210_uart: Implement post_load function
-      hw/char/exynos4210_uart: Implement Rx FIFO level triggers and timeouts
-      hw/char/exynos4210_uart: Add receive DMA support
-      hw/arm/exynos4210: Connect serial port DMA busy signals with pl330
-
-Keqian Zhu (2):
-      hw/acpi: Remove extra indent in ACPI GED hotplug cb
-      hw/arm: Use helper function to trigger hotplug handler plug
-
-Peter Maydell (3):
-      qemu-nbd: Convert invocation documentation to rST
-      docs: Create stub system manual
-      qemu-block-drivers: Convert to rST
-
-Philippe Mathieu-Daudé (1):
-      hw/misc/stm32f4xx_syscfg: Fix copy/paste error
-
-Richard Henderson (3):
-      tests/tcg/aarch64: Fix compilation parameters for pauth-%
-      tests/tcg/aarch64: Add pauth-3
-      tests/tcg/aarch64: Add pauth-4
-
-Vincent Dehors (1):
-      target/arm: Fix PAuth sbox functions
-
- Makefile                                  |  37 +-
- tests/tcg/aarch64/Makefile.softmmu-target |   5 +-
- tests/tcg/aarch64/Makefile.target         |   3 +-
- include/elf.h                             |   1 +
- include/hw/arm/exynos4210.h               |   4 +
- include/hw/or-irq.h                       |   2 +-
- target/arm/cpu.h                          |  25 +
- hw/acpi/generic_event_device.c            |   2 +-
- hw/arm/exynos4210.c                       |  77 ++-
- hw/arm/virt.c                             |   6 +-
- hw/char/exynos4210_uart.c                 | 245 +++++---
- hw/dma/pl330.c                            |  88 +--
- hw/misc/stm32f4xx_syscfg.c                |   2 +-
- target/arm/arch_dump.c                    | 124 +++-
- target/arm/cpu.c                          |   1 +
- target/arm/kvm64.c                        |  24 -
- target/arm/pauth_helper.c                 |   4 +-
- tests/tcg/aarch64/pauth-1.c               |   2 -
- tests/tcg/aarch64/pauth-2.c               |   2 -
- tests/tcg/aarch64/pauth-4.c               |  25 +
- tests/tcg/aarch64/system/pauth-3.c        |  40 ++
- MAINTAINERS                               |   1 +
- docs/index.html.in                        |   1 +
- docs/index.rst                            |   2 +-
- docs/interop/conf.py                      |   4 +-
- docs/interop/index.rst                    |   1 +
- docs/interop/qemu-nbd.rst                 | 263 ++++++++
- docs/interop/qemu-option-trace.rst.inc    |  30 +
- docs/qemu-block-drivers.texi              | 889 ---------------------------
- docs/system/conf.py                       |  22 +
- docs/system/index.rst                     |  17 +
- docs/system/qemu-block-drivers.rst        | 985 ++++++++++++++++++++++++++++++
- hw/char/trace-events                      |  20 +
- hw/dma/trace-events                       |  24 +
- qemu-doc.texi                             |  18 -
- qemu-nbd.texi                             | 214 -------
- qemu-option-trace.texi                    |   4 +
- qemu-options.hx                           |   2 +-
- 38 files changed, 1898 insertions(+), 1318 deletions(-)
- create mode 100644 tests/tcg/aarch64/pauth-4.c
- create mode 100644 tests/tcg/aarch64/system/pauth-3.c
- create mode 100644 docs/interop/qemu-nbd.rst
- create mode 100644 docs/interop/qemu-option-trace.rst.inc
- delete mode 100644 docs/qemu-block-drivers.texi
- create mode 100644 docs/system/conf.py
- create mode 100644 docs/system/index.rst
- create mode 100644 docs/system/qemu-block-drivers.rst
- delete mode 100644 qemu-nbd.texi
 
