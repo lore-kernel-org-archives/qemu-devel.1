@@ -2,89 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D59CC33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C3FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:31:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38E9524125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:30:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0042224125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:31:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fkUaQvva"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E9524125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRvmD3jQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0042224125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuagW-0006U6-6k
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:30:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60323)
+	id 1iuahx-0008JT-5z
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:31:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60371)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iuafR-0005U1-PI
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:28:58 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iuafZ-0005cb-4u
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:29:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iuafQ-0006U1-IX
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:28:57 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50448)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iuafQ-0006TQ-AZ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:28:56 -0500
-Received: by mail-wm1-x341.google.com with SMTP id a5so2185901wmb.0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 03:28:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=JT0vRtzsfSszG2BZGI3MYVv47jIAKzN+WgSV9JREyRA=;
- b=fkUaQvvaAY7oZ7SDFpItQ+JmgHO24HO4HBwcdI5Glm4OJVYc1lx3FdmA8xuscw95x5
- qg9LAAPHJkQ+5NMBjqcfR76VSxrWtaQTlOywepbOAVo0eqfA3COopXR7u50YDDsrotvW
- wcxUEQEaoTcNiQYaqPBPfH9oEEENPMQLHbKDDEkaGjQDJqGC5Yhgaski3Q91ZhH1tLtO
- 4qs0m2xxq/Byj2G0fFPONxTG6BlAIW4kr0eN34a8UcP0+tlH+0Se4NKP88/PXYYbLI3x
- J3gI05xZGUmpdPVy527hwqs1q84UhNX+ouFcrJkwPYI9FEoD0NnDnZMek3EW7OV7r9mB
- Ksfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=JT0vRtzsfSszG2BZGI3MYVv47jIAKzN+WgSV9JREyRA=;
- b=liwEpmAFAGqmIFP+uyXZPKKED9Ddl2/HZJ3afDLkVtHRs0cAU5rGY7NFo7VK9M5n3E
- dpEmzr3appRKLsdl0/Hr0Ie1u965kpKLGy04ve1VK4sjLFAgKR5WEvfk7hg5qGNyCGoQ
- 0g9AeNuLbgmA2lFwzquUjnTJLqyHkdSauVzB0SY2wFi/q7bh3DpaP9XBrm72su4EVWU0
- yQLzlpxN1pdfUUEU+fa6zvyhMm+sTm5yD5W/KHo4j4AcKEw62QCe9tYOfW9GYhM2ljVM
- Q9d/HzHbCF9sU5BQoM3+6GkackJpCA4vVTcwvucpGF4/iCPjAOOoMxshTMAdAlDYW3cL
- yLiQ==
-X-Gm-Message-State: APjAAAXI/rLoWxHbxcalHBFvyxhRsYHqkDd0GkMKiHVuLOc9wyrdfins
- XwEdw14KqVuyqZ+udf3VHQucJg==
-X-Google-Smtp-Source: APXvYqzBfyOaCavQLsNNPp3o3Yeh1KcX20P8tpeJ/t856wf8osmzxGnXuf8g7YzU3mJgXDjTwcRqrA==
-X-Received: by 2002:a1c:7e0b:: with SMTP id z11mr3780971wmc.88.1579778935127; 
- Thu, 23 Jan 2020 03:28:55 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i10sm2661243wru.16.2020.01.23.03.28.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Jan 2020 03:28:53 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E8EAF1FF87;
- Thu, 23 Jan 2020 11:28:52 +0000 (GMT)
-References: <20191217173252.4672-1-philmd@redhat.com>
- <6a8266c6-7c6d-3139-249f-2dd46c98e02f@redhat.com>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 0/6] Fix more GCC9 -O3 warnings
-In-reply-to: <6a8266c6-7c6d-3139-249f-2dd46c98e02f@redhat.com>
-Date: Thu, 23 Jan 2020 11:28:52 +0000
-Message-ID: <87blquza17.fsf@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1iuafY-0006Xd-0v
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:29:05 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25652
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iuafX-0006XW-Tq
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:29:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579778943;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=w/1YV3+RoCAt4xVVVjcQqTcd3vYv28dBfy+uc5bOw54=;
+ b=dRvmD3jQL6RtodZp6YyaY3z2ET5Dehnb78ucvUVtxaQ/iKlPJXuylem69av7uwsvCtY5yH
+ 2+crMftSlC0C/AMfd+yELwXNX/uUZkqlcmeBM+GeU3QQhe1apsxsACJ/cXYkYoRDs9rAib
+ d4IAyFpDxBVuWM5VuCBMpEXcvjWxliQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-uZbjrhAOPEyA-zU1Sgm9QQ-1; Thu, 23 Jan 2020 06:29:01 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80127DB62;
+ Thu, 23 Jan 2020 11:29:00 +0000 (UTC)
+Received: from gondolin (ovpn-116-120.ams2.redhat.com [10.36.116.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CA5347C42C;
+ Thu, 23 Jan 2020 11:28:51 +0000 (UTC)
+Date: Thu, 23 Jan 2020 12:28:48 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH 4/6] tests/acceptance/virtio_seg_max_adjust: Only test
+ Xen as superuser
+Message-ID: <20200123122848.6a74c2ce.cohuck@redhat.com>
+In-Reply-To: <20200122223247.30419-5-philmd@redhat.com>
+References: <20200122223247.30419-1-philmd@redhat.com>
+ <20200122223247.30419-5-philmd@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: uZbjrhAOPEyA-zU1Sgm9QQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,55 +87,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Hannes Reinecke <hare@suse.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Joel Stanley <joel@jms.id.au>,
- Andrew Jeffery <andrew@aj.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-arm@nongnu.org,
- =?utf-8?B?S8WR?= =?utf-8?B?dsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 22 Jan 2020 23:32:45 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+$SUBJECT: s/Only test Xen as superuser/Test Xen only as superuser/ ?
 
-> On 12/17/19 6:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Fix some trivial warnings when building with -O3.
->> Philippe Mathieu-Daud=C3=A9 (6):
->>    audio/audio: Add missing fall through comment
->>    hw/display/tcx: Add missing fall through comments
->>    hw/net/imx_fec: Rewrite fall through comments
->>    hw/timer/aspeed_timer: Add a fall through comment
->>    hw/scsi/megasas: Silent GCC9 duplicated-cond warning
->>    qemu-io-cmds: Silent GCC9 format-overflow warning
->
-> Sorry, this series failed because I used this tag in the first patch:
->
-> Cc: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
->
-> Then git-send-email was happy with --dry-run, but then failed:
-> (body) Adding cc: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.=
-com> from line
-> 'Cc: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>'
-> 5.1.1 <K  v  g  >: Recipient address rejected: User unknown in local
-> recipient table
->
-> Note to self, enclose utf-8 names, as:
-> Cc: "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com>
+> When running the test unprivileged, we get:
+>=20
+>   $ avocado --show=3Dapp,machine run tests/acceptance/virtio_seg_max_adju=
+st.py
+>   JOB ID     : b631d5d692e49b791b211d33b80730315d561d45
+>   JOB LOG    : job-results/job-2020-01-22T17.56-b631d5d/job.log
+>    (1/1) tests/acceptance/virtio_seg_max_adjust.py:VirtioMaxSegSettingsCh=
+eck.test_machine_types:
+>   machine: {'name': 'pc-i440fx-2.12', 'seg_max_adjust': 'false', 'device'=
+: 'virtio-scsi-pci'}
+>   machine: {'name': 'pc-i440fx-2.0', 'seg_max_adjust': 'false', 'device':=
+ 'virtio-scsi-pci'}
+>   machine: {'name': 'xenpv', 'seg_max_adjust': 'false', 'device': 'virtio=
+-scsi-pci'}
+>   FAIL: machine type xenpv: <class 'qemu.qmp.QMPConnectError'> (0.40 s)
+>=20
+> Looking at the job.log file we find:
+>=20
+>   xencall: error: Could not obtain handle on privileged command interface=
+: No such file or directory
+>   xen be core: xen be core: can't open xen interface
+>=20
+> Do not run this test on Xen machines if not superuser.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/acceptance/virtio_seg_max_adjust.py | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance=
+/virtio_seg_max_adjust.py
+> index f679b0eec7..ad736bcda3 100755
+> --- a/tests/acceptance/virtio_seg_max_adjust.py
+> +++ b/tests/acceptance/virtio_seg_max_adjust.py
+> @@ -118,6 +118,8 @@ class VirtioMaxSegSettingsCheck(Test):
+> =20
+>      def test_machine_types(self):
+>          EXCLUDED_MACHINES =3D ['none', 'isapc', 'microvm']
+> +        if os.geteuid() !=3D 0:
+> +            EXCLUDED_MACHINES +=3D ['xenfv', 'xenpv']
+>          # collect all machine types except the ones in EXCLUDED_MACHINES
+>          with QEMUMachine(self.qemu_bin) as vm:
+>              vm.launch()
 
-I never have to with my tags:
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-Is it possible to be more even utf-8? Sounds like a bug in the git tools
-to me.
-
---=20
-Alex Benn=C3=A9e
 
