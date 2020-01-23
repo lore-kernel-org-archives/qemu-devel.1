@@ -2,58 +2,68 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01FDFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759A4C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8A7A2073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A7A2073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 42AB02073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="uDbKRPXU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42AB02073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudmk-0007fP-4W
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:48:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46203)
+	id 1iudmn-0007eA-L5
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:48:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36279)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUQ-0001IV-MS
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:44 -0500
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iuc35-0007se-Uy
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000sK-VL
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:42 -0500
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:52548)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000qq-Kh
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:38 -0500
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id CD5C643AE6;
- Thu, 23 Jan 2020 22:25:37 +0900 (JST)
-Received: from yo-satoh-debian.localdomain
- (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 8A411240091;
- Thu, 23 Jan 2020 22:25:37 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iuc34-0001Uh-L8
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:57:27 -0500
+Received: from kylie.crudebyte.com ([5.189.157.229]:37365)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1iuc34-0001Ko-8K
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:57:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=V5oqMEoflPhykTavsM38Rv40v7UC+z7FceKe2WoAKgg=; b=uDbKRPXUVMbkdTUTksCAoRsF6b
+ wBUITNoDM1fMxOzunvkROrDS4tmAx3UlMwvH2+d44fJi5VXiOu6PaY8nFWu/f95TTW3c7Z3EcF26O
+ lc1A1E/zlBNl30OrFT9YxAdbq2KkzEeWRdjhmGgtU4end94Ln3/ui0QEyL+AF0RAUhWvienATHVSk
+ roThtK0rB7x6ch7jbgKv4xwI9pv5F+kzKe7iwvuGAykbKNU/Lj9h01EheqgckLx6Kq1yl3SkwWG31
+ G6p2HN8065sctxWMslQdHlJLuWradY/W+oiFIHoS0DWlWcnTwMKvhMSdyPf89ztjET9eB01j5OHjN
+ vrMSfPBacfvI0isr6IN356DE5SQj6pUYBMsIFKLpeCaVGJguvydP5U7Rge8Gkx2KLsKh1A8z5qUYM
+ hfKWyMDSL/xXM50Z68o6WfUXU7DwEuKT9pzM9PS3FOaFbzxjvPVohqFkM0evqWMigzk7AIJM4QWqk
+ wW3QrtFWf3XauSZ6M1HHgCFcoXPmYPRfHZgUfPhTh2HMo7s7uOn8og7T46uqf4z8BnWwslwHL8npr
+ s/RX4VBulUBl2hLWJzz357BaDvp9Y5V7hHDc0CaMtHo+LF5FutCuaEdc/iWsQ6e1sr5VA0Gj7g6vd
+ wwaM1n9SOeOQhYPSEB9eaFxV695tb/N9oj5hcGTUY=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v29 20/22] Add rx-softmmu
-Date: Thu, 23 Jan 2020 22:25:23 +0900
-Message-Id: <20200123132525.80891-21-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200123132525.80891-1-ysato@users.sourceforge.jp>
-References: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v4 10/11] 9pfs: T_readdir latency optimization
+Date: Thu, 23 Jan 2020 13:57:23 +0100
+Message-ID: <2409946.W8UoNLAh9x@silver>
+In-Reply-To: <20200123123342.0b69008b@bahia.lan>
+References: <cover.1579567019.git.qemu_oss@crudebyte.com>
+ <cbd48794ab09613589719b37b147589cda5af6dd.1579567020.git.qemu_oss@crudebyte.com>
+ <20200123123342.0b69008b@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.13
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,155 +75,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, philmd@redhat.com,
- Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-17-ysato@users.sourceforge.jp>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-pick ed65c02993 target/rx: Add RX to SysEmuTarget
-pick 01372568ae tests: Add rx to machine-none-test.c
-[PMD: Squashed patches from Richard Henderson modifying
-      qapi/common.json and tests/machine-none-test.c]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- configure                       | 8 ++++++++
- default-configs/rx-softmmu.mak  | 3 +++
- qapi/machine.json               | 3 ++-
- include/exec/poison.h           | 1 +
- include/sysemu/arch_init.h      | 1 +
- arch_init.c                     | 2 ++
- tests/qtest/machine-none-test.c | 1 +
- hw/Kconfig                      | 1 +
- 8 files changed, 19 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/rx-softmmu.mak
+On Donnerstag, 23. Januar 2020 12:33:42 CET Greg Kurz wrote:
+> On Tue, 21 Jan 2020 01:30:10 +0100
+> 
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > Make top half really top half and bottom half really bottom half:
+> > 
+> > Each T_readdir request handling is hopping between threads (main
+> > I/O thread and background I/O driver threads) several times for
+> > every individual directory entry, which sums up to huge latencies
+> > for handling just a single T_readdir request.
+> > 
+> > Instead of doing that, collect now all required directory entries
+> > (including all potentially required stat buffers for each entry) in
+> > one rush on a background I/O thread from fs driver, then assemble
+> > the entire resulting network response message for the readdir
+> > request on main I/O thread. The fs driver is still aborting the
+> > directory entry retrieval loop (on the background I/O thread) as
+> > soon as it would exceed the client's requested maximum R_readdir
+> > response size. So we should not have any performance penalty by
+> > doing this.
+> > 
+> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > ---
+> 
+> Ok so this is it. Not reviewed this huge patch yet but I could at
+> least give a try. The gain is impressive indeed:
 
-diff --git a/configure b/configure
-index 557e4382ea..485f7818d8 100755
---- a/configure
-+++ b/configure
-@@ -7689,6 +7689,11 @@ case "$target_name" in
-     mttcg=3Dyes
-     gdb_xml_files=3D"riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit=
--csr.xml riscv-64bit-virtual.xml"
-   ;;
-+  rx)
-+    TARGET_ARCH=3Drx
-+    bflt=3D"yes"
-+    target_compiler=3D$cross_cc_rx
-+  ;;
-   sh4|sh4eb)
-     TARGET_ARCH=3Dsh4
-     bflt=3D"yes"
-@@ -7870,6 +7875,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   riscv*)
-     disas_config "RISCV"
-   ;;
-+  rx)
-+    disas_config "RX"
-+  ;;
-   s390*)
-     disas_config "S390"
-   ;;
-diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.=
-mak
-new file mode 100644
-index 0000000000..a3eecefb11
---- /dev/null
-+++ b/default-configs/rx-softmmu.mak
-@@ -0,0 +1,3 @@
-+# Default configuration for rx-softmmu
-+
-+CONFIG_RX_VIRT=3Dy
-diff --git a/qapi/machine.json b/qapi/machine.json
-index b3d30bc816..57703c9696 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -21,6 +21,7 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# rx: added in 5.0
- #
- # Since: 3.0
- ##
-@@ -28,7 +29,7 @@
-   'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
--             'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-+             'ppc64', 'riscv32', 'riscv64', 'rx', 's390x', 'sh4',
-              'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
-              'x86_64', 'xtensa', 'xtensaeb' ] }
-=20
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index 955eb863ab..7b9ac361dc 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -26,6 +26,7 @@
- #pragma GCC poison TARGET_PPC
- #pragma GCC poison TARGET_PPC64
- #pragma GCC poison TARGET_ABI32
-+#pragma GCC poison TARGET_RX
- #pragma GCC poison TARGET_S390X
- #pragma GCC poison TARGET_SH4
- #pragma GCC poison TARGET_SPARC
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 62c6fe4cf1..6c011acc52 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -24,6 +24,7 @@ enum {
-     QEMU_ARCH_NIOS2 =3D (1 << 17),
-     QEMU_ARCH_HPPA =3D (1 << 18),
-     QEMU_ARCH_RISCV =3D (1 << 19),
-+    QEMU_ARCH_RX =3D (1 << 20),
- };
-=20
- extern const uint32_t arch_type;
-diff --git a/arch_init.c b/arch_init.c
-index 705d0b94ad..d9eb0ec1dd 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -77,6 +77,8 @@ int graphic_depth =3D 32;
- #define QEMU_ARCH QEMU_ARCH_PPC
- #elif defined(TARGET_RISCV)
- #define QEMU_ARCH QEMU_ARCH_RISCV
-+#elif defined(TARGET_RX)
-+#define QEMU_ARCH QEMU_ARCH_RX
- #elif defined(TARGET_S390X)
- #define QEMU_ARCH QEMU_ARCH_S390X
- #elif defined(TARGET_SH4)
-diff --git a/tests/qtest/machine-none-test.c b/tests/qtest/machine-none-t=
-est.c
-index 5953d31755..8bb54a6360 100644
---- a/tests/qtest/machine-none-test.c
-+++ b/tests/qtest/machine-none-test.c
-@@ -56,6 +56,7 @@ static struct arch2cpu cpus_map[] =3D {
-     { "hppa", "hppa" },
-     { "riscv64", "rv64gcsu-v1.10.0" },
-     { "riscv32", "rv32gcsu-v1.9.1" },
-+    { "rx", "rx62n" },
- };
-=20
- static const char *get_cpu_model_by_arch(const char *arch)
-diff --git a/hw/Kconfig b/hw/Kconfig
-index ecf491bf04..62f9ebdc22 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -55,6 +55,7 @@ source nios2/Kconfig
- source openrisc/Kconfig
- source ppc/Kconfig
- source riscv/Kconfig
-+source rx/Kconfig
- source s390x/Kconfig
- source sh4/Kconfig
- source sparc/Kconfig
---=20
-2.20.1
+Tseses, so much scepticism. :)
+
+> [greg@bahia qemu-9p]$ (cd .mbuild-$(stg branch)/obj ; export
+> QTEST_QEMU_BINARY='x86_64-softmmu/qemu-system-x86_64'; make all
+> tests/qtest/qos-test && for i in {1..100}; do tests/qtest/qos-test -p
+> $(tests/qtest/qos-test -l | grep readdir/basic); done) |& awk '/IMPORTANT/
+> { print $10 }' | sed -e 's/s//' -e 's/^/n+=1;x+=/;$ascale=6;x/n' | bc
+> .009806
+> 
+> instead of .055654, i.e. nearly 6 times faster ! This sounds promising :)
+
+Like mentioned in the other email, performance improvement by this patch is 
+actually far more than factor 6 since you probably just dropped the n-square 
+driver hack in your benchmarks (which tainted your benchmark results):
+
+Unoptimized readdir, with n-square correction hack:
+Time client spent for waiting for reply from server: 0.082539s [MOST 
+IMPORTANT]
+
+Optimized readdir, with n-square correction hack:
+Time 9p server spent on synth_readdir() I/O only (synth driver): 0.001576s
+Time 9p server spent on entire T_readdir request: 0.002244s [IMPORTANT]
+Time client spent for waiting for reply from server: 0.002566s [MOST 
+IMPORTANT]
+
+So in this particular test run performance improvement by around factor 32, 
+but I also observed factors around 40 before in my tests.
+
+> Now I need to find time to do a decent review... :-\
+
+Sure, take your time! But as you can see, it is really worth it.
+
+And it's not just the performance improvement. This patch also reduces program 
+flow complexity significantly, e.g. there is just one lock and one unlock; 
+entry name allocation is immediately freed without any potential branch in 
+between, and much more. In other words: it adds safety.
+
+Best regards,
+Christian Schoenebeck
+
 
 
