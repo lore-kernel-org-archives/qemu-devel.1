@@ -2,75 +2,75 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E14EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8952BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:41:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E12621835
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F8CB24655
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:41:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GAF4RVPK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E12621835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BeT+DSfP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F8CB24655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubnU-0003vc-6q
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:41:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36575)
+	id 1iubnu-0004Dh-MJ
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:41:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuatz-0000I6-Ex
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:44:00 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuati-0008M0-7k
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuaty-0005MI-76
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41961
+ (envelope-from <imammedo@redhat.com>) id 1iuatg-0005Aa-Be
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25537
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuaty-0005M0-2s
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:58 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuatg-0005AI-6U
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779837;
+ s=mimecast20190719; t=1579779819;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=J8nV1/0Rc/Xq+Tk70JknarbOIyTay9X4uuQGtu4R0e0=;
- b=GAF4RVPKhXAeZhLO9dZly0mlqtXFEi7Ujkidemno3ecJ3CujuS/0kj+jJRRpw2jIpzZsCm
- RFQwMs1wLP2rSh30cFwASr1U8VfnqhAsOXbNibfEer0ffWqRfI4Icx4DnQRdKZtbkWfG5e
- gMjRlH828nvlt6ccxhopKGI3ut1h5Co=
+ bh=hyuYiAbao9MpsJV0ffmt+3w7RbAKi4QNjBtbeh2nu1Y=;
+ b=BeT+DSfPSs7J+ljsNFvjprKRBIi0tCpuQlY8mBVU5FGVcIy838xCZIHPBAk87rYBZRnah9
+ 8F2YX2Um6K5PabMYDPqcSLjvUbqNy/c0gw2Yc4lLBbpZpyspeYrjwHduIUp8cqT9wfscMU
+ 1Cb1IkahrP6sbx3nLCTIXctASE8gkiI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-i3SqZ2HbPPy92iKe26fUNg-1; Thu, 23 Jan 2020 06:43:55 -0500
+ us-mta-116-U2Atju1rOYal11espi6rXw-1; Thu, 23 Jan 2020 06:43:38 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E15A7DB62
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:43:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C2B910120AA;
+ Thu, 23 Jan 2020 11:43:37 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8843710016E8;
- Thu, 23 Jan 2020 11:43:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0FFF7100164D;
+ Thu, 23 Jan 2020 11:43:35 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 76/80] make mem_path local variable
-Date: Thu, 23 Jan 2020 12:38:41 +0100
-Message-Id: <1579779525-20065-77-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 68/80] ppc/virtex_ml507: remove unused arguments
+Date: Thu, 23 Jan 2020 12:38:33 +0100
+Message-Id: <1579779525-20065-69-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: i3SqZ2HbPPy92iKe26fUNg-1
+X-MC-Unique: U2Atju1rOYal11espi6rXw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -85,62 +85,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com
+Cc: edgar.iglesias@gmail.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's no longer used anywhere beside main(),
-so make it local variable that is used for CLI compat
-purposes to keep -mem-path option working.
-
-Under hood QEMU will use it to create
-  memory-backend-file,mem-path=3D...
-backend and use its MemoryRegion as main RAM.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-CC: pbonzini@redhat.com
+CC: david@gibson.dropbear.id.au
+CC: qemu-ppc@nongnu.org
+CC: edgar.iglesias@gmail.com
 ---
- include/sysemu/sysemu.h | 1 -
- vl.c                    | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ hw/ppc/virtex_ml507.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 80c57fd..8de9065 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -53,7 +53,6 @@ extern uint8_t *boot_splash_filedata;
- extern bool enable_mlock;
- extern bool enable_cpu_pm;
- extern QEMUClockType rtc_clock;
--extern const char *mem_path;
- extern int mem_prealloc;
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 6862552..651d8db 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -89,10 +89,7 @@ static void mmubooke_create_initial_mapping(CPUPPCState =
+*env,
+     tlb->PID =3D 0;
+ }
 =20
- #define MAX_OPTION_ROMS 16
-diff --git a/vl.c b/vl.c
-index 3536451..d825a34 100644
---- a/vl.c
-+++ b/vl.c
-@@ -140,7 +140,6 @@ enum vga_retrace_method vga_retrace_method =3D VGA_RETR=
-ACE_DUMB;
- int display_opengl;
- const char* keyboard_layout =3D NULL;
- ram_addr_t ram_size;
--const char *mem_path =3D NULL;
- int mem_prealloc =3D 0; /* force preallocation of physical target memory *=
-/
- bool enable_mlock =3D false;
- bool enable_cpu_pm =3D false;
-@@ -2876,6 +2875,7 @@ int main(int argc, char **argv, char **envp)
-     Error *err =3D NULL;
-     bool list_data_dirs =3D false;
-     char *dir, **dirs;
-+    const char *mem_path =3D NULL;
-     BlockdevOptionsQueue bdo_queue =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue=
-);
-     QemuPluginList plugin_list =3D QTAILQ_HEAD_INITIALIZER(plugin_list);
+-static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_size,
+-                                      int do_init,
+-                                      const char *cpu_type,
+-                                      uint32_t sysclk)
++static PowerPCCPU *ppc440_init_xilinx(const char *cpu_type, uint32_t syscl=
+k)
+ {
+     PowerPCCPU *cpu;
+     CPUPPCState *env;
+@@ -213,7 +210,7 @@ static void virtex_init(MachineState *machine)
+     int i;
 =20
+     /* init CPUs */
+-    cpu =3D ppc440_init_xilinx(&ram_size, 1, machine->cpu_type, 400000000)=
+;
++    cpu =3D ppc440_init_xilinx(machine->cpu_type, 400000000);
+     env =3D &cpu->env;
+=20
+     if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
 --=20
 2.7.4
 
