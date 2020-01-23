@@ -6,64 +6,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29DCC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31707C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 804E224125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:26:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 804E224125
+	by mail.kernel.org (Postfix) with ESMTPS id 086F124125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086F124125
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuXpF-0006L1-1n
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:26:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56040)
+	id 1iuXpI-0006Nc-P6
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:26:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55916)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iuXlP-0001Ay-DS
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:56 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iuXlI-00011S-2G
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iuXlO-000348-0f
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:55 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:60511)
+ (envelope-from <laurent@vivier.eu>) id 1iuXlG-0002t7-HG
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:47 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:43277)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuXlN-00033n-NN
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:53 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuXlG-0002oZ-7v
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:46 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MlNcr-1jJk2n4577-00lo5U; Thu, 23 Jan 2020 09:22:41 +0100
+ id 1MQdpG-1jI6E008HO-00NgMR; Thu, 23 Jan 2020 09:22:34 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/17] linux-user: Add support for getting/setting RTC periodic
- interrupt and epoch using ioctls
-Date: Thu, 23 Jan 2020 09:22:24 +0100
-Message-Id: <20200123082227.2037994-15-laurent@vivier.eu>
+Subject: [PULL 01/17] linux-user:Fix align mistake when mmap guest space
+Date: Thu, 23 Jan 2020 09:22:11 +0100
+Message-Id: <20200123082227.2037994-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200123082227.2037994-1-laurent@vivier.eu>
 References: <20200123082227.2037994-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:YZFoyKaAcNQl8z8+8Riz+v/ZSkh1cjwJxiVip/6CFHXtkDTTZQC
- N260pAY+36A3AoOpI71j59jpwdkZezVAfWpqlOERE7l1oLMEYhyDr+A3OBxLHxtut36l+/U
- bVJxBoEa9gnR4FLNvUrRax+ipz1Aqm0Vu6w0D3xH9UkJDVoRdODuXVnvoip7zQjIsjuccDt
- V6rRlmMtmsQL3AEVKn4VA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:RslzKrMcYFo=:6+jsLUaUEUptEZVU9oyXHK
- Ukg6s4GSlpp/7D5UDM6SetD0TPsL0ocRRX53IelD0CXlcFsTFGlJYyZTND92+lIDQNomkkGDo
- 2TDoT1lFPMuVwJpunY7Rxw3NjMwgCmotjBraFPMSLbFFjJBn6KYDj87+0Gx0zzYAB2BrkIqCk
- W/LEthJZxm/3vJNbIIzaXwDLFqgVz2aGptFEeQ7MtkkQqWt10nrRdELVZgPoZIpkezgkmKJY/
- 5gvBOAqCpH4nby9ct5pzeKjgolT3FjPo1HqowLka/GB/aFgwjbor87p/J1X+xeA/kMtXQKIGu
- Xi3+zztpdwSodLi3u/CP7rOXiHRNb2FR5H6JDRch32SQjN/tH7szr790pktjHitZTVlt6yEXu
- y6YrlNGkP4U0X5pdkAkmrsk4I1mGSeAb5rkVZktTGwkWlegzVlLVgsexL29m6N8UbvqoHQSmN
- gDhIjtKMLn0HQbFSJrGJE3/BVQpOa8RdBAi3IByIg01uAolOX5j3i3BtYP6Hqxsy4TtZ3SAyD
- iOLOmB7EzmujW2nEbXg4Zc9nhbUPo9Xs/NNk9xFse0mx8t3FIbNyEy+khHId9s6DaLqhqgR2u
- fYT4gBRo05smkGt/yPLccUEnZ52DOjmkWeOysSD09Lduy97BNBgXuEAt6ihqLyBrnA9FDKWRq
- UoICJzPSudFLBkMNrx6efPM9kkfsULKy+JtUa0ViO49H9tB/MBnsLVnqrcg10/3Wa3/ROSyTk
- 1rCVn0XVJyeXbo//9o9DrCZjE57iXbVVe9HtqvuHBh7la0umSKBZrmqe55WEYpsyxYtEMb2Ln
- WEPd/mDr61VE64NZHe9fYzogTP6ugl2yW33LoHsSToqI1T8E78=
+X-Provags-ID: V03:K1:qn6JMmYNdNfmHxOlpWiAP26Rna0EFvuX7k+7mR0zyHjLMOqIqmj
+ x5rG3dVEp5JExxAcqTw9oOMaTchKpDUWX8gECl7qqtg2uH1Jp8NmxMyUG9XYf0/QqI8tBfc
+ FdML4G1/VpDuqGhWqCUgdEIzFvgic0c1UhF2tSuo7fz6IPYmefvaxieUyWllBgXxeixIlT4
+ TyKtmyY7xhQV8nt2s9x1Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Z6bhkNrDhUw=:ked2FmQBb06bKKCDfROfk5
+ uFUBR9SFI5GAzwpA+eNP4b59ahjuwkJ8o+7p88GDLTGLooJENDymIkfq2anMZQWFEh4RuuKHF
+ kupz/WqgQYYZGzGSTa+ZyTZU9S4zM0vKvXgM0OaaSov7fRdp5TGy4ufxPW3MwsVwivmlzFJOW
+ 8mTecrcN4ex23q/TN/QXnuiFwdvUbRq+LnKG2it1CoxpQgzhci06ceeyCbu9NhiPxY+5exDgW
+ rEPgSfRR4H4o/XVfUbIxibQ1BaCM+wVRQlDWg/HkckmkcIA9Y96qb+kjtn/iHn8FKlhUE1yQS
+ NPjylT9QNH9M2QQlW5yAfqb2zt9O0jGSvEW0wMgCQPujfVWxoXAjk5ioofF6HBqw2/Td8mf6P
+ gzF7a6xCiOgv9sdDV07P69pJDypP1bDEVuVg8/4PNoAywPcXiOjczQA7ru0cLBOfZBt1PSE64
+ EjVA2udj8WdCU6E6irZC7NVnXKrNUqjNy/Y1AZoHNPcCb4m1t95SmQ0rgaIZ5K84IsGHOlW+Z
+ YVuncRzC41kend++UoHxTtEd2VyefMjL6vhp0McI8gV2ZBfd6+RqPpBt1DwuulcT01I75mwwM
+ 0cQp+SryIzV6GgegB6UI/6s4SJ6ZuEBrohOgxf7byd/0u4Pzv039kVTsC6IPiAKfKiK/NGRxd
+ TAqzpXoNkOFmHVKH+bI2i1y25p2WjSMMr9yxHHzka8A32PqhT/e7BflsNeuyM55B58+weSMSW
+ nibrXqnSgLd9z1BMrqltdUYaSw/YgWQF1eXekNrLR9coUrDO+SIrlO/5AE9MA4n0iLM0kq1g3
+ fIrO6FMDgXxu69j1huTxjXLmCleBk0ktoQza+IsCLX6q1z+6+U=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,94 +75,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Filip Bozuta <Filip.Bozuta@rt-rk.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Xinyu Li <precinct@mail.ustc.edu.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+From: Xinyu Li <precinct@mail.ustc.edu.cn>
 
-This patch implements functionalities of following ioctls:
+In init_guest_space, we need to mmap guest space. If the return address
+of first mmap is not aligned with align, which was set to MAX(SHMLBA,
+qemu_host_page_size), we need unmap and a new mmap(space is larger than
+first size). The new size is named real_size, which is aligned_size +
+qemu_host_page_size. alugned_size is the guest space size. And add a
+qemu_host_page_size to avoid memory error when we align real_start
+manually (ROUND_UP(real_start, align)). But when SHMLBA >
+qemu_host_page_size, the added size will smaller than the size to align,
+which can make a mistake(in a mips machine, it appears). So change
+real_size from aligned_size +qemu_host_page_size
+to aligned_size + align will solve it.
 
-RTC_IRQP_READ, RTC_IRQP_SET - Getting/Setting IRQ rate
-
-    Read and set the frequency for periodic interrupts, for RTCs
-    that support periodic interrupts. The periodic interrupt must
-    be separately enabled or disabled using the RTC_PIE_ON,
-    RTC_PIE_OFF requests. The third ioctl's argument is an
-    unsigned long * or an unsigned long, respectively. The value
-    is the frequency in interrupts per second. The set of allow‐
-    able frequencies is the multiples of two in the range 2 to
-    8192. Only a privileged process (i.e., one having the
-    CAP_SYS_RESOURCE capability) can set frequencies above the
-    value specified in /proc/sys/dev/rtc/max-user-freq. (This
-    file contains the value 64 by default.)
-
-RTC_EPOCH_READ, RTC_EPOCH_SET - Getting/Setting epoch
-
-    Many RTCs encode the year in an 8-bit register which is either
-    interpreted as an 8-bit binary number or as a BCD number. In
-    both cases, the number is interpreted relative to this RTC's
-    Epoch. The RTC's Epoch is initialized to 1900 on most systems
-    but on Alpha and MIPS it might also be initialized to 1952,
-    1980, or 2000, depending on the value of an RTC register for
-    the year. With some RTCs, these operations can be used to
-    read or to set the RTC's Epoch, respectively. The third
-    ioctl's argument is an unsigned long * or an unsigned long,
-    respectively, and the value returned (or assigned) is the
-    Epoch. To set the RTC's Epoch the process must be privileged
-    (i.e., have the CAP_SYS_TIME capability).
-
-Implementation notes:
-
-    All ioctls in this patch have a pointer to 'ulong' as their
-    third argument. That is the reason why corresponding parts
-    of added code in linux-user/syscall_defs.h contain special
-    handling related to 'ulong' type: they use 'abi_ulong' type
-    to make sure that ioctl's code is calculated correctly for
-    both 32-bit and 64-bit targets. Also, 'MK_PTR(TYPE_ULONG)'
-    is used for the similar reason in linux-user/ioctls.h.
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-Message-Id: <1579117007-7565-4-git-send-email-Filip.Bozuta@rt-rk.com>
+Signed-off-by: Xinyu Li <precinct@mail.ustc.edu.cn>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h       | 4 ++++
- linux-user/syscall_defs.h | 4 ++++
- 2 files changed, 8 insertions(+)
+ linux-user/elfload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index c39dd0128a60..9e91eaae7705 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -81,6 +81,10 @@
-      IOCTL(RTC_ALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-      IOCTL(RTC_RD_TIME, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-      IOCTL(RTC_SET_TIME, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-+     IOCTL(RTC_IRQP_READ, IOC_R, MK_PTR(TYPE_ULONG))
-+     IOCTL(RTC_IRQP_SET, IOC_W, TYPE_ULONG)
-+     IOCTL(RTC_EPOCH_READ, IOC_R, MK_PTR(TYPE_ULONG))
-+     IOCTL(RTC_EPOCH_SET, IOC_W, TYPE_ULONG)
- 
-      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index dc36dd475112..fcbb2ee9a387 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -776,6 +776,10 @@ struct target_pollfd {
- #define TARGET_RTC_ALM_SET          TARGET_IOW('p', 0x07, struct rtc_time)
- #define TARGET_RTC_RD_TIME          TARGET_IOR('p', 0x09, struct rtc_time)
- #define TARGET_RTC_SET_TIME         TARGET_IOW('p', 0x0a, struct rtc_time)
-+#define TARGET_RTC_IRQP_READ        TARGET_IOR('p', 0x0b, abi_ulong)
-+#define TARGET_RTC_IRQP_SET         TARGET_IOW('p', 0x0c, abi_ulong)
-+#define TARGET_RTC_EPOCH_READ       TARGET_IOR('p', 0x0d, abi_ulong)
-+#define TARGET_RTC_EPOCH_SET        TARGET_IOW('p', 0x0e, abi_ulong)
- 
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 07b16cc0f470..511e4500788b 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2191,7 +2191,7 @@ unsigned long init_guest_space(unsigned long host_start,
+              * to where we need to put the commpage.
+              */
+             munmap((void *)real_start, host_size);
+-            real_size = aligned_size + qemu_host_page_size;
++            real_size = aligned_size + align;
+             real_start = (unsigned long)
+                 mmap((void *)real_start, real_size, PROT_NONE, flags, -1, 0);
+             if (real_start == (unsigned long)-1) {
 -- 
 2.24.1
 
