@@ -6,88 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBB7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CAAC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:28:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 378F721569
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1369021569
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:28:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cc7b+koi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 378F721569
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/EqqGoc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1369021569
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iugGb-0001en-AL
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:27:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53273)
+	id 1iugHe-0002iU-GZ
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:28:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsuvorov@redhat.com>) id 1iuegq-0003jC-5u
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:46:41 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iueEM-0005eF-J1
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:17:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsuvorov@redhat.com>) id 1iuego-0006N6-D4
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:46:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33375
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1iueEL-0002iH-8R
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:17:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27943
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsuvorov@redhat.com>) id 1iuego-0006Lh-5O
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:46:38 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iueEL-0002i0-5F
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:17:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579794397;
+ s=mimecast20190719; t=1579792632;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kmriD2mM+e6KKghvVi1/3WUOd5aOJYaN9QqpTvLOSNQ=;
- b=cc7b+koib52ZOPzpSPrG2AFveriPXT6SvclB80dodvIr3aBNkWmtv5zXHLY2u63pHkc8Ci
- QAYv+R3ZGcFBOhcfJ8Fp3kK5TbbG3fPz3U8guyrXqbVpBl6sf1ZmDUVt5zIlHXkrolP63q
- a4LQtjZrLj4hFe/KRFr7P9iNSfEBbi0=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-gtmRDd-FPgmwxao0mpUV8A-1; Thu, 23 Jan 2020 10:46:30 -0500
-Received: by mail-lf1-f71.google.com with SMTP id y73so535931lff.0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:46:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=b6ei9jQV2lpe+I5Ke04IpporlTiD4ohdw7YEXDw5Wes=;
- b=QiSw72AGQxApTq4uaoCVSKfbXcPUpySJ7zpIFu/K155GCBECM98LqNyPW6Qe5UOKyk
- x1P+I0NmF74O8W449ldMUMHlZvlxdxvICqvH5ytTq+Sk+KrXQsMMld0y0mc4Tnefj2Bn
- XqvnCSGd22FbxVYui6M8fHN3c2be9v7eaxNmfftO01bgSU1iUL5p6WyyDju68RQQwiip
- +zjtZNL8lfXkKHlCMIBSC/opTCgAK0ru8OfBYGSJOiGw3XavVEc5bCsb86V6ureOGhAI
- aVv7JdCf5vMNe5faU4ErzJxWLNcn5AuPZksbayslpcTnDI7ZIhvn1dHq8khUYuJupKTw
- nzoA==
-X-Gm-Message-State: APjAAAV2/k95JkfgefJCD0WFXupyWA4hnbGkRJ6ugoAW19lArK0u2N3M
- aEXp08ATmotsf27vI1r0Z9FdpMN2GPyDyndHJEpyyt6c7Q+7z+2y/eaPWgfS3ePKHLRNaLSpIBc
- T8E9030emUYtu8vf8J/bTxRNwPSfrKYE=
-X-Received: by 2002:a2e:8316:: with SMTP id a22mr22991100ljh.141.1579794389117; 
- Thu, 23 Jan 2020 07:46:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwpDZ56sIxNz3macYW7AlsOpO5MWuTd70xsrOqdq53F/W+D22P34TBWAGcXHDFzO9VCnb0ZMykS0Q4PO4Df5oE=
-X-Received: by 2002:a2e:8316:: with SMTP id a22mr22991084ljh.141.1579794388837; 
- Thu, 23 Jan 2020 07:46:28 -0800 (PST)
+ bh=6tLMZZuLaHZ7+9S5a5Q4dO5dyShTG2/4H+EPaxCb43s=;
+ b=R/EqqGocI37H/V32OASl9/RlETDeLFI5cLptqtdy5rikpoNkmgVfRRjAVC6Exe0Z6a6qtI
+ sHq8QxvJ/N1L1SCRZgQfPuzUIQ6lIAnf2hQxGSMS48cWGqmIJpTXyCSj9x8hGtg3CEiu8/
+ Q07KyCr/Yt9vSxXfjGAClvtpW0rCXz4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-BpVsLgrlMyeEa2jOq8f8OA-1; Thu, 23 Jan 2020 10:17:09 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A5F2106BC2A;
+ Thu, 23 Jan 2020 15:17:08 +0000 (UTC)
+Received: from thinkpad.redhat.com (ovpn-204-119.brq.redhat.com
+ [10.40.204.119])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 661F15DAA4;
+ Thu, 23 Jan 2020 15:17:06 +0000 (UTC)
+From: Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC 1/2] virtio-rng: prepare the introduction of a control queue
+Date: Thu, 23 Jan 2020 16:16:59 +0100
+Message-Id: <20200123151700.1367857-2-lvivier@redhat.com>
+In-Reply-To: <20200123151700.1367857-1-lvivier@redhat.com>
+References: <20200123151700.1367857-1-lvivier@redhat.com>
 MIME-Version: 1.0
-References: <20200115224025.538368-1-jusual@redhat.com>
- <20200115224025.538368-3-jusual@redhat.com>
- <38fdd88d-1399-effb-b74b-e02b7343f044@redhat.com>
- <CAMDeoFX1eFToYOWmBaVOYHTnNka8Fwruq6PtX7GsAGTuS++u8w@mail.gmail.com>
- <095236a0-ba8c-55c6-f9fc-e2a4a809b274@redhat.com>
-In-Reply-To: <095236a0-ba8c-55c6-f9fc-e2a4a809b274@redhat.com>
-From: Julia Suvorova <jusual@redhat.com>
-Date: Thu, 23 Jan 2020 16:46:18 +0100
-Message-ID: <CAMDeoFWJJbLs_Dtkb2rqXYW-PMA=9Qwy83SnkqS2_-EOaNtiSg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] virtio-balloon: Reject qmp_balloon during hot-unplug
-To: David Hildenbrand <david@redhat.com>
-X-MC-Unique: gtmRDd-FPgmwxao0mpUV8A-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: BpVsLgrlMyeEa2jOq8f8OA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,87 +85,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Amit Shah <amit@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 23, 2020 at 3:17 PM David Hildenbrand <david@redhat.com> wrote:
->
-> On 23.01.20 15:08, Julia Suvorova wrote:
-> > On Thu, Jan 16, 2020 at 1:36 PM David Hildenbrand <david@redhat.com> wr=
-ote:
-> >>
-> >> On 15.01.20 23:40, Julia Suvorova wrote:
-> >>> Hot-unplug takes some time due to communication with the guest.
-> >>> Do not change the device while freeing up resources.
-> >>>
-> >>> Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> >>> ---
-> >>>  balloon.c                  | 2 +-
-> >>>  hw/virtio/virtio-balloon.c | 9 ++++++++-
-> >>>  include/sysemu/balloon.h   | 2 +-
-> >>>  3 files changed, 10 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/balloon.c b/balloon.c
-> >>> index f104b42961..998ec53a0f 100644
-> >>> --- a/balloon.c
-> >>> +++ b/balloon.c
-> >>> @@ -119,5 +119,5 @@ void qmp_balloon(int64_t target, Error **errp)
-> >>>      }
-> >>>
-> >>>      trace_balloon_event(balloon_opaque, target);
-> >>> -    balloon_event_fn(balloon_opaque, target);
-> >>> +    balloon_event_fn(balloon_opaque, target, errp);
-> >>>  }
-> >>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> >>> index 57f3b9f22d..0fa4e4454b 100644
-> >>> --- a/hw/virtio/virtio-balloon.c
-> >>> +++ b/hw/virtio/virtio-balloon.c
-> >>> @@ -717,12 +717,19 @@ static void virtio_balloon_stat(void *opaque, B=
-alloonInfo *info)
-> >>>                                               VIRTIO_BALLOON_PFN_SHIF=
-T);
-> >>>  }
-> >>>
-> >>> -static void virtio_balloon_to_target(void *opaque, ram_addr_t target=
-)
-> >>> +static void virtio_balloon_to_target(void *opaque, ram_addr_t target=
-,
-> >>> +                                     Error **errp)
-> >>>  {
-> >>> +    DeviceState *bus_dev =3D qdev_get_bus_device(DEVICE(opaque));
-> >>>      VirtIOBalloon *dev =3D VIRTIO_BALLOON(opaque);
-> >>>      VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> >>>      ram_addr_t vm_ram_size =3D get_current_ram_size();
-> >>>
-> >>> +    if (bus_dev && bus_dev->pending_deleted_event) {
-> >>> +        error_setg(errp, "Hot-unplug of %s is in progress", vdev->na=
-me);
-> >>> +        return;
-> >>> +    }
-> >>> +
-> >>
-> >> How exactly does this help? The guest is free to inflate/deflate
-> >> whenever it wants.
-> >
-> > Guest is aware of hot-unplug start, and virtio driver should not
-> > initiate any operations. This patch just restricts issuing commands
-> > from qmp monitor.
->
-> Why shouldn't the guest driver inflate/deflate while memory hotplug is
-> going on?
->
-> Simple balloon compaction in a Linux guest -> deflate/inflate triggered
-> in the hypervisor.
+Rename the existing vq to input_vq and use virtio_delete_queue()
+rather than virtio_del_queue().
 
-QEMU crashes if inflate happens after powering-off PCI slot. Guest is
-unable to interact with virtio-balloon device then, driver is
-unloaded. But inflate can still happen if initiated from qmp.
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ hw/virtio/virtio-rng.c         | 18 +++++++++---------
+ include/hw/virtio/virtio-rng.h |  2 +-
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-Best regards, Julia Suvorova.
+diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+index b498a2033263..a0bca55bef55 100644
+--- a/hw/virtio/virtio-rng.c
++++ b/hw/virtio/virtio-rng.c
+@@ -25,7 +25,7 @@
+ static bool is_guest_ready(VirtIORNG *vrng)
+ {
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(vrng);
+-    if (virtio_queue_ready(vrng->vq)
++    if (virtio_queue_ready(vrng->input_vq)
+         && (vdev->status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+         return true;
+     }
+@@ -69,7 +69,7 @@ static void chr_read(void *opaque, const void *buf, size_=
+t size)
+=20
+     offset =3D 0;
+     while (offset < size) {
+-        elem =3D virtqueue_pop(vrng->vq, sizeof(VirtQueueElement));
++        elem =3D virtqueue_pop(vrng->input_vq, sizeof(VirtQueueElement));
+         if (!elem) {
+             break;
+         }
+@@ -78,13 +78,13 @@ static void chr_read(void *opaque, const void *buf, siz=
+e_t size)
+                            0, buf + offset, size - offset);
+         offset +=3D len;
+=20
+-        virtqueue_push(vrng->vq, elem, len);
++        virtqueue_push(vrng->input_vq, elem, len);
+         trace_virtio_rng_pushed(vrng, len);
+         g_free(elem);
+     }
+-    virtio_notify(vdev, vrng->vq);
++    virtio_notify(vdev, vrng->input_vq);
+=20
+-    if (!virtio_queue_empty(vrng->vq)) {
++    if (!virtio_queue_empty(vrng->input_vq)) {
+         /* If we didn't drain the queue, call virtio_rng_process
+          * to take care of asking for more data as appropriate.
+          */
+@@ -112,7 +112,7 @@ static void virtio_rng_process(VirtIORNG *vrng)
+     } else {
+         quota =3D MIN((uint64_t)vrng->quota_remaining, (uint64_t)UINT32_MA=
+X);
+     }
+-    size =3D get_request_size(vrng->vq, quota);
++    size =3D get_request_size(vrng->input_vq, quota);
+=20
+     trace_virtio_rng_request(vrng, size, quota);
+=20
+@@ -122,7 +122,7 @@ static void virtio_rng_process(VirtIORNG *vrng)
+     }
+ }
+=20
+-static void handle_input(VirtIODevice *vdev, VirtQueue *vq)
++static void virtio_rng_handle_input(VirtIODevice *vdev, VirtQueue *vq)
+ {
+     VirtIORNG *vrng =3D VIRTIO_RNG(vdev);
+     virtio_rng_process(vrng);
+@@ -220,7 +220,7 @@ static void virtio_rng_device_realize(DeviceState *dev,=
+ Error **errp)
+=20
+     virtio_init(vdev, "virtio-rng", VIRTIO_ID_RNG, 0);
+=20
+-    vrng->vq =3D virtio_add_queue(vdev, 8, handle_input);
++    vrng->input_vq =3D virtio_add_queue(vdev, 8, virtio_rng_handle_input);
+     vrng->quota_remaining =3D vrng->conf.max_bytes;
+     vrng->rate_limit_timer =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
+                                                check_rate_limit, vrng);
+@@ -238,7 +238,7 @@ static void virtio_rng_device_unrealize(DeviceState *de=
+v, Error **errp)
+     qemu_del_vm_change_state_handler(vrng->vmstate);
+     timer_del(vrng->rate_limit_timer);
+     timer_free(vrng->rate_limit_timer);
+-    virtio_del_queue(vdev, 0);
++    virtio_delete_queue(vrng->input_vq);
+     virtio_cleanup(vdev);
+ }
+=20
+diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rng.=
+h
+index bd05d734b87d..d77daf126828 100644
+--- a/include/hw/virtio/virtio-rng.h
++++ b/include/hw/virtio/virtio-rng.h
+@@ -32,7 +32,7 @@ typedef struct VirtIORNG {
+     VirtIODevice parent_obj;
+=20
+     /* Only one vq - guest puts buffer(s) on it when it needs entropy */
+-    VirtQueue *vq;
++    VirtQueue *input_vq;
+=20
+     VirtIORNGConf conf;
+=20
+--=20
+2.23.0
 
 
