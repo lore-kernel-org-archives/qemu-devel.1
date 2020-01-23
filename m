@@ -6,97 +6,83 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1054CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E886FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:25:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7D0A21D7E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7A7722522
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:25:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRIuWjRW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D0A21D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FNIIwcC3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7A7722522
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iui4l-0003oj-Cj
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:23:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56394)
+	id 1iui6L-0006Ae-6b
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:25:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iugNS-0001YQ-BV
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:34:48 -0500
+ (envelope-from <groeck7@gmail.com>) id 1iufnP-0006XP-E9
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iugNR-0001Om-1S
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:34:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55287
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iugNQ-0001O9-Sl
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:34:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579800883;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4QxrHYZ/+CqyAi2ffTFV1RS5A+0hVDD6X49C+Qi7UrM=;
- b=VRIuWjRWFg/gD5J7s4yMIDh6MWwXNGI7HjiMhMZ5a9V9sLkk0a+HCbo2uqLghUoa8+arag
- dPL4pxARDPWsppqBlBj4Ngt43rz9X+U/S50YEbvDF6ygKAO7MpQsWgMpLPGMQ7ETCtCKJx
- 2haCrPvZxEuQ/8F7UPzLbKiJMnsEFck=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-y2O9rKKCO-WWbjOXJ-xHLA-1; Thu, 23 Jan 2020 12:29:46 -0500
-Received: by mail-wm1-f72.google.com with SMTP id q26so968945wmq.8
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 09:29:45 -0800 (PST)
+ (envelope-from <groeck7@gmail.com>) id 1iufnO-0006gH-CE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:57:31 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43257)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1iufnJ-0006Za-7i; Thu, 23 Jan 2020 11:57:25 -0500
+Received: by mail-pg1-x543.google.com with SMTP id u131so1652509pgc.10;
+ Thu, 23 Jan 2020 08:57:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=DX9XPLUMx26HScqd/BBt+1dKos1BhNzRsteN/4RmO2g=;
+ b=FNIIwcC37Uv5CUhA8kKyYV+ee7VZXuIPixuIFl7WWel/TvADRoQtojyOccW1bllX3N
+ c5NXOnlm4NOq+0+ytxL/oRtomMh3LTbFuwikiv9sDUUT2OaT4j8ALPQVV8jh/kj8YvDN
+ m3QdetRNsz31lgCzLhZu71t06UTLww2msQ/N7nQYRmvcz15ewZF990Zc9NJf/quDwqjJ
+ kYiLdAq60tqtus3h73VyOBhLAcGfCyT3tGI2ixIhBEqLEvr5ltlu3bB8bn8wxXCUCCcd
+ BXmlBv0oyxt3j+JA6HJd/T/mIoiRBs89ekcP9CbsLbuRT2kboA+7WX9VIRq8xjHdiZhU
+ qDLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Yl51thC8M2gtd7bpZZXNCdwoWwXv9aSNev/0fGCwafU=;
- b=d5Q0Fh2hssvpnWNjbg6+aFI1d4WrymgkM6bIX8OFZlOU3QYzBiu2iDMHpL+z+3e0py
- 4OTHcB6VaJAmQdvtRL4sfL++N8wPxnAlToPGbl5shNGevpKXBXTbG4tG0rV9KNL2d/5W
- D4pLNj7b6Y1E8XIgNExHQRAh9PTIvMK1SY42Se7qgAb+w4jjKCFigsdCaacLn6v++gHl
- wjhPLYhNdCaDnXMqkB+rf/hmZqNX1vHUm0nDMkJ9EX49O8p224Dd6pxZWcUgGElyudTm
- Q1BvlbJ35vfkI0Uzgf09ILZWrSwPAUQIhl2eb3KIMYuWnNUs4p14RWU9AbYaRPtznGK8
- jTgg==
-X-Gm-Message-State: APjAAAVvph58IQR1qMeoOhtvkQc2Gj5znWVn5si9MgnXyj7WHqmZKB4s
- X4vf8QydML2kKZTt0wkQ34i2v2f1MZsHtkwTlDMvyAMeefzTBhcfNYZ/mh2GKuD9ugvnC2sNgK7
- fKIVmx0WmVW0MuWc=
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr4290766wmi.116.1579800584880; 
- Thu, 23 Jan 2020 09:29:44 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwfdmtO2JHaf9GEjtzMfnGKoCi4hbVnJHE7ccBXna8fgQW3l6nzYa+N+3jTPv2sudN421Zobg==
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr4290743wmi.116.1579800584649; 
- Thu, 23 Jan 2020 09:29:44 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id i5sm3461916wml.31.2020.01.23.09.29.43
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jan 2020 09:29:44 -0800 (PST)
-Subject: Re: [PATCH rc1 12/24] hw/timer: Add limited support for Atmel 16 bit
- timer peripheral
-To: Thomas Huth <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200123000307.11541-1-richard.henderson@linaro.org>
- <20200123000307.11541-13-richard.henderson@linaro.org>
- <13770068-790a-5317-a0fa-5a672bae7253@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <acdd7512-239f-e23a-b541-dd638dd32f59@redhat.com>
-Date: Thu, 23 Jan 2020 18:29:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=DX9XPLUMx26HScqd/BBt+1dKos1BhNzRsteN/4RmO2g=;
+ b=Pxo7uU4DaKBkavY6IxgN9mBPN5mIT6KZIgM2XORq85h2RRoIWWx+oCw9gY4wCt+4lG
+ hGsEImn6YkarndmJ+HoCRcqpp7Qvep4+69tmXxwbSTKg632GroMOVQRbEbVLBsNflDAv
+ CbDMaXQ/vxsNLVb1r7FcS2d3WJTJemEeFgTdXaCvzttd+EuR67vR22JdreEUuw2xCTVP
+ OJAB7Aq9TAdk6g3saUxJwkh2U3oLLE1+Pp5Z5pQ4gWxU57oo0A1Vd1XKnvJez2NBbPtq
+ cF7pvv+dz56RQ1vCe+SJ1EtA2ta9lsUmK6bPFFWnpBiQS7TDP9vVI9SsubY0qg2O801k
+ Vxog==
+X-Gm-Message-State: APjAAAUGtU8yrSqXPtshh5cULzqdXwE0D3HDpAC0ryNVuHZcYI5k5mTa
+ OCiyPHoQw+X8wVPo/rXit3I=
+X-Google-Smtp-Source: APXvYqxPL67w4/GCDC05r5iBuRpYTzMGui3BJeOn6/7yOLD5+/k5Ygxn/Jt3U1HLFAexiuk2QXO1AA==
+X-Received: by 2002:a65:4047:: with SMTP id h7mr4970926pgp.60.1579798644055;
+ Thu, 23 Jan 2020 08:57:24 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id p17sm3212163pfn.31.2020.01.23.08.57.20
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 23 Jan 2020 08:57:21 -0800 (PST)
+Date: Thu, 23 Jan 2020 08:57:20 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 1/8] dma/pl330: Convert to support tracing
+Message-ID: <20200123165720.GA4805@roeck-us.net>
+References: <20200123052540.6132-1-linux@roeck-us.net>
+ <20200123052540.6132-2-linux@roeck-us.net>
+ <CAFEAcA-SPUPEcV4Uw9=8-5EJmLztVorV++ypFp=vYxasncBrZw@mail.gmail.com>
+ <CAFEAcA9p7Foko17jTB_GSGLnaQwpJTcf0-qTrJkVWje1jOpq-g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <13770068-790a-5317-a0fa-5a672bae7253@redhat.com>
-Content-Language: en-US
-X-MC-Unique: y2O9rKKCO-WWbjOXJ-xHLA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9p7Foko17jTB_GSGLnaQwpJTcf0-qTrJkVWje1jOpq-g@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,158 +94,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: S.E.Harris@kent.ac.uk, dovgaluk@ispras.ru, me@xcancerberox.com.ar,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, mrolnik@gmail.com,
- imammedo@redhat.com, aleksandar.m.mail@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/23/20 5:49 AM, Thomas Huth wrote:
-> On 23/01/2020 01.02, Richard Henderson wrote:
->> From: Michael Rolnik <mrolnik@gmail.com>
->>
->> These were designed to facilitate testing but should provide enough
->> function to be useful in other contexts.  Only a subset of the functions
->> of each peripheral is implemented, mainly due to the lack of a standard
->> way to handle electrical connections (like GPIO pins).
->>
->> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
->> Message-Id: <20200118191416.19934-13-mrolnik@gmail.com>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> [rth: Squash info mtree fixes and a file rename from f4bug, which was:]
->> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
-> [...]
->> +static void avr_timer16_clksrc_update(AVRTimer16State *t16)
->> +{
->> +    uint16_t divider =3D 0;
->> +    switch (CLKSRC(t16)) {
->> +    case T16_CLKSRC_EXT_FALLING:
->> +    case T16_CLKSRC_EXT_RISING:
->> +        ERROR("external clock source unsupported");
->=20
-> Maybe this should rather be qemu_log_mask(LOG_UNIMP, ...) instead?
+On Thu, Jan 23, 2020 at 04:23:59PM +0000, Peter Maydell wrote:
+> On Thu, 23 Jan 2020 at 15:51, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Thu, 23 Jan 2020 at 05:25, Guenter Roeck <linux@roeck-us.net> wrote:
+> > >
+> > > Replace debug logging code with tracing.
+> > >
+> > > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> > > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> >
+> > This turns out not to compile on OSX, which is a bit
+> > stricter about format strings:
+> >
+> > These two:
+> >
+> > > +pl330_dmald(uint32_t chan, uint32_t addr, uint32_t size, uint32_t num, uint32_t ch) "channel:%"PRId8" address:0x%08"PRIx32" size:0x%"PRIx32" num:%"PRId32"%c"
+> >
+> > > +pl330_dmast(uint32_t chn, uint32_t addr, uint32_t sz, uint32_t num, uint32_t c) "channel:%"PRId8" address:0x%08"PRIx32" size:0x%"PRIx32" num:%"PRId32" %c"
+> >
+> > both provoke
+> >  error: format specifies type 'char' but the argument has type
+> > 'uint32_t' (aka 'unsigned int') [-Werror,-Wformat]
+> >
+> > because of the last argument.
+> >
+> > Easy fix would seem to be to change 'uint32_t ch' to 'char ch'
+> > (the argument is always a literal constant 'Y' or 'N').
+> 
+> The 'chan'/'chn' argument is wrong too -- should be uint8_t
+> to match the format string and the type of PL330Chan::tag.
+> I'll just fix up the pullreq rather than forcing a respin.
 
-Yes.
+Thanks, and sorry for the trouble.
 
->> +        goto end;
->> +    case T16_CLKSRC_STOPPED:
->> +        goto end;
->> +    case T16_CLKSRC_DIV1:
->> +        divider =3D 1;
->> +        break;
->> +    case T16_CLKSRC_DIV8:
->> +        divider =3D 8;
->> +        break;
->> +    case T16_CLKSRC_DIV64:
->> +        divider =3D 64;
->> +        break;
->> +    case T16_CLKSRC_DIV256:
->> +        divider =3D 256;
->> +        break;
->> +    case T16_CLKSRC_DIV1024:
->> +        divider =3D 1024;
->> +        break;
->> +    default:
->> +        goto end;
->> +    }
->> +    t16->freq_hz =3D t16->cpu_freq_hz / divider;
->> +    t16->period_ns =3D NANOSECONDS_PER_SECOND / t16->freq_hz;
->> +    DB_PRINT("Timer frequency %" PRIu64 " hz, period %" PRIu64 " ns (%f=
- s)",
->> +             t16->freq_hz, t16->period_ns, 1 / (double)t16->freq_hz);
->> +end:
->> +    return;
->> +}
->=20
-> Nit: You could use an early "return" instead of "goto end" and the
-> superfluous return statement at the end of the function.
-
-I'd prefer use a 'break' statement, and check if divider !=3D then { set=20
-values and log trace event}.
-
->> +static void avr_timer16_set_alarm(AVRTimer16State *t16)
->> +{
->> +    if (CLKSRC(t16) =3D=3D T16_CLKSRC_EXT_FALLING ||
->> +        CLKSRC(t16) =3D=3D T16_CLKSRC_EXT_RISING ||
->> +        CLKSRC(t16) =3D=3D T16_CLKSRC_STOPPED) {
->> +        /* Timer is disabled or set to external clock source (unsupport=
-ed) */
->> +        goto end;
->> +    }
->> +
->> +    uint64_t alarm_offset =3D 0xffff;
->> +    enum NextInterrupt next_interrupt =3D OVERFLOW;
->> +
->> +    switch (MODE(t16)) {
->> +    case T16_MODE_NORMAL:
->> +        /* Normal mode */
->> +        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
->> +            (t16->imsk & T16_INT_OCA)) {
->> +            alarm_offset =3D OCRA(t16);
->> +            next_interrupt =3D COMPA;
->> +        }
->> +        break;
->> +    case T16_MODE_CTC_OCRA:
->> +        /* CTC mode, top =3D ocra */
->> +        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16)) {
->> +            alarm_offset =3D OCRA(t16);
->> +            next_interrupt =3D COMPA;
->> +        }
->> +       break;
->> +    case T16_MODE_CTC_ICR:
->> +        /* CTC mode, top =3D icr */
->> +        if (ICR(t16) < alarm_offset && ICR(t16) > CNT(t16)) {
->> +            alarm_offset =3D ICR(t16);
->> +            next_interrupt =3D CAPT;
->> +        }
->> +        if (OCRA(t16) < alarm_offset && OCRA(t16) > CNT(t16) &&
->> +            (t16->imsk & T16_INT_OCA)) {
->> +            alarm_offset =3D OCRA(t16);
->> +            next_interrupt =3D COMPA;
->> +        }
->> +        break;
->> +    default:
->> +        ERROR("pwm modes are unsupported");
->=20
-> qemu_log_mask(LOG_UNIMP, ...) ?
->=20
->> +        goto end;
->> +    }
->> +    if (OCRB(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
->> +        (t16->imsk & T16_INT_OCB)) {
->> +        alarm_offset =3D OCRB(t16);
->> +        next_interrupt =3D COMPB;
->> +    }
->> +    if (OCRC(t16) < alarm_offset && OCRB(t16) > CNT(t16) &&
->> +        (t16->imsk & T16_INT_OCC)) {
->> +        alarm_offset =3D OCRB(t16);
->> +        next_interrupt =3D COMPC;
->> +    }
->> +    alarm_offset -=3D CNT(t16);
->> +
->> +    t16->next_interrupt =3D next_interrupt;
->> +    uint64_t alarm_ns =3D
->> +        t16->reset_time_ns + ((CNT(t16) + alarm_offset) * t16->period_n=
-s);
->> +    timer_mod(t16->timer, alarm_ns);
->> +
->> +    DB_PRINT("next alarm %" PRIu64 " ns from now",
->> +        alarm_offset * t16->period_ns);
->> +
->> +end:
->> +    return;
->> +}
->=20
-> This function could also use early returns instead of "goto end".
->=20
-> (no need to respin just because of these nits ... but maybe something to
-> consider if you respin anyway)
->=20
->   Thomas
->=20
->=20
-
+Guenter
 
