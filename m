@@ -2,128 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A53C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA87C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:57:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3620B2253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:53:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3620B2253D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
+	by mail.kernel.org (Postfix) with ESMTPS id 78A732253D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:57:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tl8OBdvI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A732253D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54497 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iua6z-0000VU-CH
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:53:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52987)
+	id 1iuaAq-0002GB-EB
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:57:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54318)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1iua6M-0008NT-T2
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:52:44 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuaA4-0001Q2-3n
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:56:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1iua6K-0005OQ-Pz
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:52:42 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:45825)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
- id 1iua6I-0005Iq-6l; Thu, 23 Jan 2020 05:52:38 -0500
-Received: by mail-lf1-f65.google.com with SMTP id 203so1909882lfa.12;
- Thu, 23 Jan 2020 02:52:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:reply-to:subject:to:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=aOtv4fL68InaKY4oVVV2poS3rOAPJn1sMawl2olOFy0=;
- b=BLutMHP0yjO5z/9ena/55NnH6engxipy4s6Z6aT1W45wVUF8Vu/pJRgLEEF2oofIUX
- g1AoB2e4p70eXU7r0BKad223H4KKFOmjER0nf6AXDKbNA4h/f35Xxqa4pQR2e9n0COL3
- yQyljigEuZxNJRu9WxD7dg3gXrWMcPwRfhuxKfsOGfnzTLm32CAepUkneP1KsxRBvK4J
- MrlBdaFlSJOsjSDTEc8FSfgEjC8r4WwLYZK6uZZhmjtvt4QPBrHj/UEaPQlnHgkKY2AG
- TXg1YhorpgioIi/oD+KYXZcKN5ODh7Thn+cAzPWfVFJhRNNZYl9vMDHidXfvGxn5aMRQ
- umqQ==
-X-Gm-Message-State: APjAAAWZ+ABl3AoWBwRXsKlkLYGjUFpMcMpRpLfXzDNeNp1m4go5CtkL
- TvI9cWVedYLouY+XtGR34I9gPAhRkqA=
-X-Google-Smtp-Source: APXvYqz4J5PFJWosIDVThpSSWb7c5QzBUaPCe+6bWa/OSBn45jw/a4823s9crcA60wC3/6BixJMeGw==
-X-Received: by 2002:a19:f514:: with SMTP id j20mr4412188lfb.31.1579776756961; 
- Thu, 23 Jan 2020 02:52:36 -0800 (PST)
-Received: from [192.168.42.234] ([213.87.157.243])
- by smtp.gmail.com with ESMTPSA id u3sm856699lfm.37.2020.01.23.02.52.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jan 2020 02:52:35 -0800 (PST)
-Subject: Re: [PATCH v3 0/2] ide: Fix incorrect handling of some PRDTs and add
- the corresponding unit-test
-To: John Snow <jsnow@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org,
- pmatouse@redhat.com, sstabellini@kernel.org, mdroth@linux.vnet.ibm.com,
- pjp@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- Andrea Arcangeli <aarcange@redhat.com>,
- Kashyap Chamarthy <kashyap.cv@gmail.com>,
- Darren Kenny <darren.kenny@oracle.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
-References: <20191223175117.508990-1-alex.popov@linux.com>
- <65254fe8-7865-f045-9e0c-1d56dd9fe8eb@redhat.com>
-From: Alexander Popov <alex.popov@linux.com>
-Autocrypt: addr=alex.popov@linux.com; prefer-encrypt=mutual; keydata=
- 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
- j3lCqPk=
-Message-ID: <87bcb2e6-227a-af3d-5617-91aad1fef4e3@linux.com>
-Date: Thu, 23 Jan 2020 13:52:33 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <65254fe8-7865-f045-9e0c-1d56dd9fe8eb@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+ (envelope-from <imammedo@redhat.com>) id 1iuaA1-0002VA-Vh
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:56:31 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44743
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuaA1-0002Uv-S9
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:56:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579776989;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=J/xHqG5aDvxlK3LgnSR+6VrUTOuP0qIe/I40iPzyD8I=;
+ b=Tl8OBdvIw06MPwRD7cDP9HT0SYtPCwJfIKF9Bm8h9pT5/gFmuf8nY8q4ZbPb6cJic8PZuh
+ go+ahG2PK+U2mygri/Fk0w3U8jd4cr/yIRFoPo/DpIeZXGDrG1/h+IIzVKkKzICo7rKU0S
+ HazAy1UuxtK+XrO86DTBP9ZOPSNH5no=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-ZP0phT_INPab7cmP8-l1jQ-1; Thu, 23 Jan 2020 05:56:27 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A53D100550E
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:56:26 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C8381001B11;
+ Thu, 23 Jan 2020 10:56:25 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 01/80] numa: remove deprecated -mem-path fallback to
+ anonymous RAM
+Date: Thu, 23 Jan 2020 11:52:45 +0100
+Message-Id: <1579776844-163759-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1579776844-163759-1-git-send-email-imammedo@redhat.com>
+References: <1579776844-163759-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: ZP0phT_INPab7cmP8-l1jQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.167.65
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,44 +86,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: alex.popov@linux.com
+Cc: ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.01.2020 02:14, John Snow wrote:
-> On 12/23/19 12:51 PM, Alexander Popov wrote:
->> Fuzzing the Linux kernel with syzkaller allowed to find how to crash qemu
->> using a special SCSI_IOCTL_SEND_COMMAND. It hits the assertion in
->> ide_dma_cb() introduced in the commit a718978ed58a in July 2015.
->>
->> This patch series fixes incorrect handling of some PRDTs in ide_dma_cb()
->> and improves the ide-test to cover more PRDT cases (including one
->> that causes that particular qemu crash).
->>
->> Changes from v2 (thanks to Kevin Wolf for the feedback):
->>  - the assertion about prepare_buf() return value is improved;
->>  - the patch order is reversed to keep the tree bisectable;
->>  - the unit-test performance is improved -- now it runs 8 seconds
->>    instead of 3 minutes on my laptop.
->>
->> Alexander Popov (2):
->>   ide: Fix incorrect handling of some PRDTs in ide_dma_cb()
->>   tests/ide-test: Create a single unit-test covering more PRDT cases
->>
->>  hw/ide/core.c    |  30 +++++---
->>  tests/ide-test.c | 174 ++++++++++++++++++++---------------------------
->>  2 files changed, 96 insertions(+), 108 deletions(-)
->>
-> 
-> Thanks, applied to my IDE tree:
-> 
-> https://github.com/jnsnow/qemu/commits/ide
-> https://github.com/jnsnow/qemu.git
+it has been deprecated since 4.0 by commit
+ cb79224b7 (deprecate -mem-path fallback to anonymous RAM)
+Deprecation period ran out and it's time to remove it
+so it won't get in a way of switching to using hostmem
+backend for RAM.
 
-Happy end!
-Thanks a lot!
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+CC:libvir-list@redhat.com
+CC: ehabkost@redhat.com
+---
+ hw/core/numa.c       | 18 +-----------------
+ qemu-deprecated.texi |  9 ---------
+ 2 files changed, 1 insertion(+), 26 deletions(-)
 
-Best regards,
-Alexander
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 0d1b4be..840e685 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -784,24 +784,8 @@ static void allocate_system_memory_nonnuma(MemoryRegio=
+n *mr, Object *owner,
+ {
+     if (mem_path) {
+ #ifdef __linux__
+-        Error *err =3D NULL;
+         memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, 0,
+-                                         mem_path, &err);
+-        if (err) {
+-            error_report_err(err);
+-            if (mem_prealloc) {
+-                exit(1);
+-            }
+-            warn_report("falling back to regular RAM allocation");
+-            error_printf("This is deprecated. Make sure that -mem-path "
+-                         " specified path has sufficient resources to allo=
+cate"
+-                         " -m specified RAM amount\n");
+-            /* Legacy behavior: if allocation failed, fall back to
+-             * regular RAM allocation.
+-             */
+-            mem_path =3D NULL;
+-            memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &e=
+rror_fatal);
+-        }
++                                         mem_path, &error_fatal);
+ #else
+         fprintf(stderr, "-mem-path not supported on this host\n");
+         exit(1);
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 0968d37..982af95 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -113,15 +113,6 @@ QEMU using implicit generic or board specific splittin=
+g rule.
+ Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} =
+(if
+ it's supported by used machine type) to define mapping explictly instead.
+=20
+-@subsection -mem-path fallback to RAM (since 4.1)
+-Currently if guest RAM allocation from file pointed by @option{mem-path}
+-fails, QEMU falls back to allocating from RAM, which might result
+-in unpredictable behavior since the backing file specified by the user
+-is ignored. In the future, users will be responsible for making sure
+-the backing storage specified with @option{-mem-path} can actually provide
+-the guest RAM configured with @option{-m} and QEMU will fail to start up i=
+f
+-RAM allocation is unsuccessful.
+-
+ @subsection RISC-V -bios (since 4.1)
+=20
+ QEMU 4.1 introduced support for the -bios option in QEMU for RISC-V for th=
+e
+--=20
+2.7.4
+
 
