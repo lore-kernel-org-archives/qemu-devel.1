@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 989EAC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02181C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6982621D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:44:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C57DC21D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:44:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZYNNI33"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6982621D7D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OEJylLAr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C57DC21D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiP6-0007hs-Ie
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:44:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42705)
+	id 1iuiPB-0007xP-To
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:44:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41264)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iuff6-0006KA-Lg
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:57 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufdv-0004w2-4j
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iuff5-0000K1-Bo
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57096
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iufdt-0006WX-R0
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:42 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52220
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuff5-0000JX-9N
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:55 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdt-0006WF-O0
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798135;
+ s=mimecast20190719; t=1579798061;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8BaKkhOPYBmQm13qrx27mas1rTlYoHzoKc+rGhVsrGg=;
- b=cZYNNI33bBGNcxBnEDlwDRKkrKgdiy1ulI/ggJawsVDpgsB793u19PBGE5wfbDIX63pWoz
- DWTCeNqLT9j6dlqK/e7nwGGU2+st/Aa3AMb5F3Y9san5naw1qkNK69LZme+A31D1VFEfSM
- /41Bt0hJhdoM8mdPsz5T6R4dQ7hQ4T0=
+ bh=ql3iZhOCDYYWCFp4jJc0tlyutsrGTcwOVUXiZ06+mF4=;
+ b=OEJylLArAAyARZWQjTG7Mw2P0zyEsMLc1W5CNwCNTi/sMm+AVtqJVAlRZtswwSm3yS+VVX
+ xnkdlsYWMvwuMzUvBv4sp4APQe2LNQbLvy37L66zgCTLHc3T9YvcIqrjvmr7bwlf4f5qU0
+ F9HhrKM7qEYMloqHt7RW1Y5RTD+EMA8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-JDbZvjBGOPyUu-oNUmiXrg-1; Thu, 23 Jan 2020 11:48:51 -0500
+ us-mta-380-4n2jWFx6PAKY29oxGfpgDQ-1; Thu, 23 Jan 2020 11:47:38 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DBDB107ACC7
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ACB519057CF
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:37 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
  [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7767D28993;
- Thu, 23 Jan 2020 16:48:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C976E28998;
+ Thu, 23 Jan 2020 16:47:36 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 102/108] virtiofsd: prevent FUSE_INIT/FUSE_DESTROY races
-Date: Thu, 23 Jan 2020 16:46:24 +0000
-Message-Id: <20200123164630.91498-103-dgilbert@redhat.com>
+Subject: [PULL 040/108] virtiofsd: validate path components
+Date: Thu, 23 Jan 2020 16:45:22 +0000
+Message-Id: <20200123164630.91498-41-dgilbert@redhat.com>
 In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
 References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: JDbZvjBGOPyUu-oNUmiXrg-1
+X-MC-Unique: 4n2jWFx6PAKY29oxGfpgDQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,90 +93,159 @@ Sender: "Qemu-devel"
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-When running with multiple threads it can be tricky to handle
-FUSE_INIT/FUSE_DESTROY in parallel with other request types or in
-parallel with themselves.  Serialize FUSE_INIT and FUSE_DESTROY so that
-malicious clients cannot trigger race conditions.
+Several FUSE requests contain single path components.  A correct FUSE
+client sends well-formed path components but there is currently no input
+validation in case something went wrong or the client is malicious.
+
+Refuse ".", "..", and paths containing '/' when we expect a path
+component.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/fuse_i.h        |  1 +
- tools/virtiofsd/fuse_lowlevel.c | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+)
+ tools/virtiofsd/passthrough_ll.c | 59 ++++++++++++++++++++++++++++----
+ 1 file changed, 53 insertions(+), 6 deletions(-)
 
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index a20854f1c4..1447d86866 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -61,6 +61,7 @@ struct fuse_session {
-     struct fuse_req list;
-     struct fuse_req interrupts;
-     pthread_mutex_t lock;
-+    pthread_rwlock_t init_rwlock;
-     int got_destroy;
-     int broken_splice_nonblock;
-     uint64_t notify_ctr;
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index dab6a31e08..79a4031266 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -2428,6 +2428,19 @@ void fuse_session_process_buf_int(struct fuse_sessio=
-n *se,
-     req->ctx.pid =3D in->pid;
-     req->ch =3D ch;
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index ac380efcb1..e375406160 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -133,6 +133,21 @@ static void unref_inode(struct lo_data *lo, struct lo_=
+inode *inode, uint64_t n);
 =20
-+    /*
-+     * INIT and DESTROY requests are serialized, all other request types
-+     * run in parallel.  This prevents races between FUSE_INIT and ordinar=
-y
-+     * requests, FUSE_INIT and FUSE_INIT, FUSE_INIT and FUSE_DESTROY, and
-+     * FUSE_DESTROY and FUSE_DESTROY.
-+     */
-+    if (in->opcode =3D=3D FUSE_INIT || in->opcode =3D=3D CUSE_INIT ||
-+        in->opcode =3D=3D FUSE_DESTROY) {
-+        pthread_rwlock_wrlock(&se->init_rwlock);
-+    } else {
-+        pthread_rwlock_rdlock(&se->init_rwlock);
+ static struct lo_inode *lo_find(struct lo_data *lo, struct stat *st);
+=20
++static int is_dot_or_dotdot(const char *name)
++{
++    return name[0] =3D=3D '.' &&
++           (name[1] =3D=3D '\0' || (name[1] =3D=3D '.' && name[2] =3D=3D '=
+\0'));
++}
++
++/* Is `path` a single path component that is not "." or ".."? */
++static int is_safe_path_component(const char *path)
++{
++    if (strchr(path, '/')) {
++        return 0;
 +    }
 +
-     err =3D EIO;
-     if (!se->got_init) {
-         enum fuse_opcode expected;
-@@ -2485,10 +2498,13 @@ void fuse_session_process_buf_int(struct fuse_sessi=
-on *se,
-     } else {
-         fuse_ll_ops[in->opcode].func(req, in->nodeid, &iter);
-     }
-+
-+    pthread_rwlock_unlock(&se->init_rwlock);
-     return;
++    return !is_dot_or_dotdot(path);
++}
 =20
- reply_err:
-     fuse_reply_err(req, err);
-+    pthread_rwlock_unlock(&se->init_rwlock);
+ static struct lo_data *lo_data(fuse_req_t req)
+ {
+@@ -681,6 +696,15 @@ static void lo_lookup(fuse_req_t req, fuse_ino_t paren=
+t, const char *name)
+                  parent, name);
+     }
+=20
++    /*
++     * Don't use is_safe_path_component(), allow "." and ".." for NFS expo=
+rt
++     * support.
++     */
++    if (strchr(name, '/')) {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
++
+     err =3D lo_do_lookup(req, parent, name, &e);
+     if (err) {
+         fuse_reply_err(req, err);
+@@ -762,6 +786,11 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_ino_=
+t parent,
+     struct fuse_entry_param e;
+     struct lo_cred old =3D {};
+=20
++    if (!is_safe_path_component(name)) {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
++
+     dir =3D lo_inode(req, parent);
+     if (!dir) {
+         fuse_reply_err(req, EBADF);
+@@ -863,6 +892,11 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fu=
+se_ino_t parent,
+     struct fuse_entry_param e;
+     int saverr;
+=20
++    if (!is_safe_path_component(name)) {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
++
+     inode =3D lo_inode(req, ino);
+     if (!inode) {
+         fuse_reply_err(req, EBADF);
+@@ -904,6 +938,10 @@ out_err:
+ static void lo_rmdir(fuse_req_t req, fuse_ino_t parent, const char *name)
+ {
+     int res;
++    if (!is_safe_path_component(name)) {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
+=20
+     res =3D unlinkat(lo_fd(req, parent), name, AT_REMOVEDIR);
+=20
+@@ -916,6 +954,11 @@ static void lo_rename(fuse_req_t req, fuse_ino_t paren=
+t, const char *name,
+ {
+     int res;
+=20
++    if (!is_safe_path_component(name) || !is_safe_path_component(newname))=
+ {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
++
+     if (flags) {
+         fuse_reply_err(req, EINVAL);
+         return;
+@@ -930,6 +973,11 @@ static void lo_unlink(fuse_req_t req, fuse_ino_t paren=
+t, const char *name)
+ {
+     int res;
+=20
++    if (!is_safe_path_component(name)) {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
++
+     res =3D unlinkat(lo_fd(req, parent), name, 0);
+=20
+     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+@@ -1093,12 +1141,6 @@ out_err:
+     fuse_reply_err(req, error);
  }
 =20
- #define LL_OPTION(n, o, v)                     \
-@@ -2531,6 +2547,7 @@ void fuse_session_destroy(struct fuse_session *se)
-             se->op.destroy(se->userdata);
-         }
+-static int is_dot_or_dotdot(const char *name)
+-{
+-    return name[0] =3D=3D '.' &&
+-           (name[1] =3D=3D '\0' || (name[1] =3D=3D '.' && name[2] =3D=3D '=
+\0'));
+-}
+-
+ static void lo_do_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
+                           off_t offset, struct fuse_file_info *fi, int plu=
+s)
+ {
+@@ -1248,6 +1290,11 @@ static void lo_create(fuse_req_t req, fuse_ino_t par=
+ent, const char *name,
+                  parent, name);
      }
-+    pthread_rwlock_destroy(&se->init_rwlock);
-     pthread_mutex_destroy(&se->lock);
-     free(se->cuse_data);
-     if (se->fd !=3D -1) {
-@@ -2610,6 +2627,7 @@ struct fuse_session *fuse_session_new(struct fuse_arg=
-s *args,
-     list_init_req(&se->list);
-     list_init_req(&se->interrupts);
-     fuse_mutex_init(&se->lock);
-+    pthread_rwlock_init(&se->init_rwlock, NULL);
 =20
-     memcpy(&se->op, op, op_size);
-     se->owner =3D getuid();
++    if (!is_safe_path_component(name)) {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
++
+     err =3D lo_change_cred(req, &old);
+     if (err) {
+         goto out;
 --=20
 2.24.1
 
