@@ -2,78 +2,86 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A65EFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A176C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:18:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7151D20704
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:16:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C59EB20704
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cWZ9XkAq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7151D20704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GD1rVnsb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C59EB20704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iug5x-00046W-1o
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:16:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52691)
+	id 1iug7I-0005AF-2s
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:18:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iuctp-0000Si-4d
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:58 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRi-0000Sp-2C
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iucto-0000NK-1P
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32663
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuctn-0000M3-UN
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579787515;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fhWeL2ADPT5bDg7/jmj0T6OuctAf6BKtCLK+BXLaiNI=;
- b=cWZ9XkAq9ImSW/nN6EmOdBjIRMAqJWGasQqsv1vxDrVbuEaJcI5EwYcHE/UnV6ycMj4AJu
- 3+7onYjrcsrxXiUjXw8m+ditbKKh1cq4ja1oqPb1SGHxycyAcGCIrTJjHs6FiHzR06dDRh
- Uu4W0LhFqJzqOTgqI56+a/n/IXXhiZM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-x_LqWXKjOuuAZoip8sIFhw-1; Thu, 23 Jan 2020 08:51:54 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 463F46C199
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:51:53 +0000 (UTC)
-Received: from 640k.localdomain.com (unknown [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DBDE6857A5;
- Thu, 23 Jan 2020 13:51:50 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRf-0003ru-Vh
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:01 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40744)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iueRf-0003pz-Ln
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:59 -0500
+Received: by mail-wm1-x331.google.com with SMTP id t14so2967201wmi.5
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:30:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=TNju8K/yY0mIPA9rZ4WT+1GVvRX99QV39SbRPGh2iCg=;
+ b=GD1rVnsbRyIOZi0HqoCML49dPwoQnKcV4zlem9zySe8bqOuQo6e2boRwmZu/7Bvt7i
+ aXQaas2Of2EJ2GHL9pMiFscFOFGaKVJkRC1I2IP+qnWjAsaOAcEyy3/C154icX/0aHRR
+ 14sSwaFilnxBNpIWelG5sAebw54kKgS57/oXXyy5qrfuuCEe1Nmbhhs5eZ+e/PryUV2d
+ WeZHULDahxp0j4fc9B99Z3xlhKL19sFjSVbSUeN9YfBwAzXN7NFu+E1DlrR5/7I0ywww
+ CUIRpXAIghaFFmCvi3brOdwYB0bK4rbsVzT7U3HleEQ9XE+0ccvArLwZvGX9eQ4oH+H7
+ uYqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=TNju8K/yY0mIPA9rZ4WT+1GVvRX99QV39SbRPGh2iCg=;
+ b=sDvKJ48Q/HKnzKnjUpaVeQQBy6qz2pEHtZdIcYs/YY3I1Nmt6HoTyrzQxjmfSMvf70
+ vxs4UoDZfgh5Mkpc8y31SFoIIX6larf+dGQdLFVGust6MVKFimT/YryGB/Rx8AiAFxGN
+ KgsysCSUeWxtMXz94CBaX+2sAsm9EIKaoXWNr+La3JVRNwushPsdfOADMZSirTSZvM1H
+ Ycpf3iSKLXTf4Tq38B67YJREXQlwikGyFvvGWsI3LLDHz1VkPbseoKbHuDtDmoFZZNJS
+ oGHudBHcVNDIjNA3dGLCNwwddiCgjrK2zrUyb+1BFgdXS9CM033VEhhmvf6HYbW3xgAO
+ zfXw==
+X-Gm-Message-State: APjAAAUHv+tGSvJ7HOMEXFx1plX6PflZkaSyQAFj8977IwWf6wLqhKok
+ MQNgqz9VU2vFauhUY3FpbrO3L+GOnmM2lA==
+X-Google-Smtp-Source: APXvYqyFRUe78zxuF+swfVJ10V44YwQRe6j/FnsPv8AT+UCZATYaIskXFxC2Vnxu7GW/26t4jsaGBQ==
+X-Received: by 2002:a7b:c1c7:: with SMTP id a7mr4719422wmj.168.1579793458447; 
+ Thu, 23 Jan 2020 07:30:58 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s139sm2903592wme.35.2020.01.23.07.30.57
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 07:30:57 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 28/59] accel: Introduce the current_accel() wrapper
-Date: Thu, 23 Jan 2020 14:50:18 +0100
-Message-Id: <1579787449-27599-29-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
-References: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 14/20] hw/core/or-irq: Increase limit of or-lines to 48
+Date: Thu, 23 Jan 2020 15:30:35 +0000
+Message-Id: <20200123153041.4248-15-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123153041.4248-1-peter.maydell@linaro.org>
+References: <20200123153041.4248-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: x_LqWXKjOuuAZoip8sIFhw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,59 +93,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Guenter Roeck <linux@roeck-us.net>
 
-The accel/ code only accesses the MachineState::accel field.
-As we simply want to access the accelerator, not the machine,
-add a current_accel() wrapper.
+Exynos DMA requires up to 33 interrupt lines (32 event interrupts
+plus abort interrupt), which all need to be wired together. Increase
+the maximum number of or-irq lines to 48 to support this configuration.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20200121110349.25842-9-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Message-id: 20200123052540.6132-3-linux@roeck-us.net
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- accel/accel.c          | 5 +++++
- include/sysemu/accel.h | 2 ++
- 2 files changed, 7 insertions(+)
+ include/hw/or-irq.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/accel/accel.c b/accel/accel.c
-index 1c5c3a6..cb555e3 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -63,6 +63,11 @@ int accel_init_machine(AccelState *accel, MachineState *=
-ms)
-     return ret;
- }
-=20
-+AccelState *current_accel(void)
-+{
-+    return current_machine->accelerator;
-+}
-+
- void accel_setup_post(MachineState *ms)
- {
-     AccelState *accel =3D ms->accelerator;
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index d4c1429..47e5788 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -70,4 +70,6 @@ int accel_init_machine(AccelState *accel, MachineState *m=
-s);
- /* Called just before os_setup_post (ie just before drop OS privs) */
- void accel_setup_post(MachineState *ms);
-=20
-+AccelState *current_accel(void);
-+
- #endif
---=20
-1.8.3.1
-
+diff --git a/include/hw/or-irq.h b/include/hw/or-irq.h
+index 3a3230dd844..0038bfbe3d6 100644
+--- a/include/hw/or-irq.h
++++ b/include/hw/or-irq.h
+@@ -33,7 +33,7 @@
+ /* This can safely be increased if necessary without breaking
+  * migration compatibility (as long as it remains greater than 15).
+  */
+-#define MAX_OR_LINES      32
++#define MAX_OR_LINES      48
+ 
+ typedef struct OrIRQState qemu_or_irq;
+ 
+-- 
+2.20.1
 
 
