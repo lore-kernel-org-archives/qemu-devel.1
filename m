@@ -2,55 +2,95 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE51C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34117C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CCD624125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:46:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CCD624125
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id ECFC724125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:48:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MH7u+Q1t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECFC724125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuXCA-00046z-Lo
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:46:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45025)
+	id 1iuXEN-0005Cn-5N
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:48:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45419)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iuXBV-0003c2-O9
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:45:51 -0500
+ (envelope-from <mst@redhat.com>) id 1iuXDD-0004kk-Ma
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:47:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iuXBT-0000iH-Tc
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:45:49 -0500
-Resent-Date: Thu, 23 Jan 2020 02:45:49 -0500
-Resent-Message-Id: <E1iuXBT-0000iH-Tc@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21193)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iuXBT-0000hJ-Lc
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:45:47 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1579765533528413.4821897534248;
- Wed, 22 Jan 2020 23:45:33 -0800 (PST)
-In-Reply-To: <20200123070913.626488-1-mst@redhat.com>
+ (envelope-from <mst@redhat.com>) id 1iuXDB-0002Jo-Ub
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:47:35 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50073
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iuXDB-0002J3-Eq
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:47:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579765652;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bHlkv35AeN8GtQN2RAEYkWnO5WFBFl05Nb9komQSiu0=;
+ b=MH7u+Q1t1rwsyaXixLUc52KtJgUBoPzoUcc2IG4kaZTSbO+dKF8MP1wYJvlSRxpPI84Hqw
+ VYMYO09/RAOmYkLXgY1n9Dd0n1xf1+Qj5IhEHowyu6p+tJfq1/ED0wvfCgxpj6+MKN1oKR
+ uiMcEDcQNT8hAd5VDpmBempFgWgdw0c=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-ylV_X1wwPEW4iWTd6z1fvA-1; Thu, 23 Jan 2020 02:47:30 -0500
+Received: by mail-wm1-f69.google.com with SMTP id e12so339766wma.7
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 23:47:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=cawcREq5RwTcoSWnPCo0c5ae9EhqWgrfO15v8URR0jo=;
+ b=feQOcrmqvluiWFarh9piEc3D4Q5c60UdISiEXML866scfZ/O5o+kqW64NSz/aEVmAc
+ 3iDiNQAVo+yx1+/ad4cNwW3Zp7/4H0yzu4Ol9I+VzTDBkA8ybn2yd5BngMLXhbj19siq
+ mf7PPOZSFkglQLt9SKtOdjTZUkl+18lyXAoUf9AtpcN0XwKZtE8EZnDOt2YDALYp9eSx
+ WaOsbXqceEoWAyi1Bg8piSWP3RhsVjtUaDbYsn6vHb66M8hpeS+Cm0Zo3zdkSIGbfNcT
+ dVQ7+uCD6Wh7cuVLXoN0TTUpc29lvETfRoKcPDbKOs6VnhyVxgHlY00TgqGitF62RZbx
+ eD9w==
+X-Gm-Message-State: APjAAAXIfBmOY4Et2LiXGgcql5wwMDBEwAyiCT1AfqWuIqdRfjCqkuJV
+ k7dEwAuYk31tKk9NA7q/FGOf13RCetPC+o7T4A7mWakahe8goeDHz+IHhMTXyATCjwEAE8ReuCe
+ I2vkhzan/3usQ/L0=
+X-Received: by 2002:adf:a746:: with SMTP id e6mr15928262wrd.329.1579765648749; 
+ Wed, 22 Jan 2020 23:47:28 -0800 (PST)
+X-Google-Smtp-Source: APXvYqywwrbzyxvJMk4XZOiNVFH0k6dHyVEmpG1cWxqqff34vOTjYQHSY3Zp7lFBQdho7JU2wM8Aaw==
+X-Received: by 2002:adf:a746:: with SMTP id e6mr15928222wrd.329.1579765648402; 
+ Wed, 22 Jan 2020 23:47:28 -0800 (PST)
+Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
+ by smtp.gmail.com with ESMTPSA id
+ q11sm1963325wrp.24.2020.01.22.23.47.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Jan 2020 23:47:27 -0800 (PST)
+Date: Thu, 23 Jan 2020 02:47:25 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 Subject: Re: [PULL v3 00/18] virtio, pc: fixes, features
-Message-ID: <157976553234.12545.16551531339287540211@f6d1ed32ca6b>
+Message-ID: <20200123024708-mutt-send-email-mst@kernel.org>
+References: <20200123070913.626488-1-mst@redhat.com>
+ <157976553234.12545.16551531339287540211@f6d1ed32ca6b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mst@redhat.com
-Date: Wed, 22 Jan 2020 23:45:33 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <157976553234.12545.16551531339287540211@f6d1ed32ca6b>
+X-MC-Unique: ylV_X1wwPEW4iWTd6z1fvA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,89 +102,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyMzA3MDkxMy42MjY0
-ODgtMS1tc3RAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwMTIzMDcwOTEzLjYyNjQ4OC0x
-LW1zdEByZWRoYXQuY29tClN1YmplY3Q6IFtQVUxMIHYzIDAwLzE4XSB2aXJ0aW8sIHBjOiBmaXhl
-cywgZmVhdHVyZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
-di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJiODE5MWMgdmhvc3Q6IGNvZGluZyBzdHlsZSBmaXgK
-N2JiMWY3NCBpMzg2OmFjcGk6IFJlbW92ZSBfSElEIGZyb20gdGhlIFNNQnVzIEFDUEkgZW50cnkK
-NWQ1YWUwYiB2aG9zdDogT25seSBhbGlnbiBzZWN0aW9ucyBmb3Igdmhvc3QtdXNlcgoyZmU2OTBk
-IHZob3N0OiBBZGQgbmFtZXMgdG8gc2VjdGlvbiByb3VuZGVkIHdhcm5pbmcKODVmMmFhOSB2aG9z
-dC12c29jazogZGVsZXRlIHZxcyBpbiB2aG9zdF92c29ja191bnJlYWxpemUgdG8gYXZvaWQgbWVt
-bGVha3MKYWU3MjRkNyB2aXJ0aW8tc2NzaTogY29udmVydCB0byBuZXcgdmlydGlvX2RlbGV0ZV9x
-dWV1ZQozMmE4ZDdhIHZpcnRpby1zY3NpOiBkZWxldGUgdnFzIGluIHVucmVhbGl6ZSB0byBhdm9p
-ZCBtZW1sZWFrcwpjZTE1YWQ0IHZpcnRpby05cC1kZXZpY2U6IGNvbnZlcnQgdG8gbmV3IHZpcnRp
-b19kZWxldGVfcXVldWUKM2JkZjA3NiB2aXJ0aW8tOXAtZGV2aWNlOiBmaXggbWVtbGVhayBpbiB2
-aXJ0aW9fOXBfZGV2aWNlX3VucmVhbGl6ZQowMWZiM2JjIGJpb3MtdGFibGVzLXRlc3Q6IGRvY3Vt
-ZW50IGV4cGVjdGVkIGZpbGUgdXBkYXRlCjAyMTQ5N2MgYWNwaTogY3B1aHA6IGFkZCBDUEhQX0dF
-VF9DUFVfSURfQ01EIGNvbW1hbmQKOGRmNzQ2MSBhY3BpOiBjcHVocDogc3BlYzogYWRkIHR5cGlj
-YWwgdXNlY2FzZXMKZjM3ZmY2YiBhY3BpOiBjcHVocDogaW50cm9kdWNlICdDb21tYW5kIGRhdGEg
-MicgZmllbGQKOWMyZTJhMyBhY3BpOiBjcHVocDogc3BlYzogY2xhcmlmeSBzdG9yZSBpbnRvICdD
-b21tYW5kIGRhdGEnIHdoZW4gJ0NvbW1hbmQgZmllbGQnID09IDAKMzE2MzJmYiBhY3BpOiBjcHVo
-cDogc3BlYzogZml4ICdDb21tYW5kIGRhdGEnIGRlc2NyaXB0aW9uCjg4MzNiNzAgYWNwaTogY3B1
-aHA6IHNwZWM6IGNsYXJpZnkgJ0NQVSBzZWxlY3RvcicgcmVnaXN0ZXIgdXNhZ2UgYW5kIGVuZGlh
-bm5lc3MKNTk1MjljMiB0ZXN0czogcTM1OiBNQ0g6IGFkZCBkZWZhdWx0IFNNQkFTRSBTTVJBTSBs
-b2NrIHRlc3QKYWI0YWI4ZiBxMzU6IGltcGxlbWVudCAxMjhLIFNNUkFNIGF0IGRlZmF1bHQgU01C
-QVNFIGFkZHJlc3MKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTggQ2hlY2tpbmcgY29tbWl0IGFi
-NGFiOGZlZDhjMiAocTM1OiBpbXBsZW1lbnQgMTI4SyBTTVJBTSBhdCBkZWZhdWx0IFNNQkFTRSBh
-ZGRyZXNzKQoyLzE4IENoZWNraW5nIGNvbW1pdCA1OTUyOWMyMWRjMjAgKHRlc3RzOiBxMzU6IE1D
-SDogYWRkIGRlZmF1bHQgU01CQVNFIFNNUkFNIGxvY2sgdGVzdCkKMy8xOCBDaGVja2luZyBjb21t
-aXQgODgzM2I3MGYzOGEzIChhY3BpOiBjcHVocDogc3BlYzogY2xhcmlmeSAnQ1BVIHNlbGVjdG9y
-JyByZWdpc3RlciB1c2FnZSBhbmQgZW5kaWFubmVzcykKNC8xOCBDaGVja2luZyBjb21taXQgMzE2
-MzJmYjA0OTc2IChhY3BpOiBjcHVocDogc3BlYzogZml4ICdDb21tYW5kIGRhdGEnIGRlc2NyaXB0
-aW9uKQo1LzE4IENoZWNraW5nIGNvbW1pdCA5YzJlMmEzYzU1Y2YgKGFjcGk6IGNwdWhwOiBzcGVj
-OiBjbGFyaWZ5IHN0b3JlIGludG8gJ0NvbW1hbmQgZGF0YScgd2hlbiAnQ29tbWFuZCBmaWVsZCcg
-PT0gMCkKNi8xOCBDaGVja2luZyBjb21taXQgZjM3ZmY2YjAzMjhmIChhY3BpOiBjcHVocDogaW50
-cm9kdWNlICdDb21tYW5kIGRhdGEgMicgZmllbGQpCjcvMTggQ2hlY2tpbmcgY29tbWl0IDhkZjc0
-NjFmOGU5YyAoYWNwaTogY3B1aHA6IHNwZWM6IGFkZCB0eXBpY2FsIHVzZWNhc2VzKQo4LzE4IENo
-ZWNraW5nIGNvbW1pdCAwMjE0OTdjZmFlODEgKGFjcGk6IGNwdWhwOiBhZGQgQ1BIUF9HRVRfQ1BV
-X0lEX0NNRCBjb21tYW5kKQo5LzE4IENoZWNraW5nIGNvbW1pdCAwMWZiM2JjNDBhNDQgKGJpb3Mt
-dGFibGVzLXRlc3Q6IGRvY3VtZW50IGV4cGVjdGVkIGZpbGUgdXBkYXRlKQpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojMjM6IEZJTEU6IHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRl
-c3QuYzoyMDoKKyAqIENvbnRyaWJ1dG9yIG9yIEFDUEkgTWFpbnRhaW5lciAoc3RlcHMgNC03IG5l
-ZWQgdG8gYmUgcmVkb25lIHRvIHJlc29sdmUgY29uZmxpY3RzCgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KMTAvMTggQ2hlY2tpbmcgY29tbWl0IDNiZGYwNzZjNmRhMSAodmlydGlvLTlwLWRl
-dmljZTogZml4IG1lbWxlYWsgaW4gdmlydGlvXzlwX2RldmljZV91bnJlYWxpemUpCjExLzE4IENo
-ZWNraW5nIGNvbW1pdCBjZTE1YWQ0MjhjZGUgKHZpcnRpby05cC1kZXZpY2U6IGNvbnZlcnQgdG8g
-bmV3IHZpcnRpb19kZWxldGVfcXVldWUpCjEyLzE4IENoZWNraW5nIGNvbW1pdCAzMmE4ZDdhMGI1
-NTMgKHZpcnRpby1zY3NpOiBkZWxldGUgdnFzIGluIHVucmVhbGl6ZSB0byBhdm9pZCBtZW1sZWFr
-cykKMTMvMTggQ2hlY2tpbmcgY29tbWl0IGFlNzI0ZDc2YjhlZCAodmlydGlvLXNjc2k6IGNvbnZl
-cnQgdG8gbmV3IHZpcnRpb19kZWxldGVfcXVldWUpCjE0LzE4IENoZWNraW5nIGNvbW1pdCA4NWYy
-YWE5ZjhhYTAgKHZob3N0LXZzb2NrOiBkZWxldGUgdnFzIGluIHZob3N0X3Zzb2NrX3VucmVhbGl6
-ZSB0byBhdm9pZCBtZW1sZWFrcykKMTUvMTggQ2hlY2tpbmcgY29tbWl0IDJmZTY5MGRhMzljNyAo
-dmhvc3Q6IEFkZCBuYW1lcyB0byBzZWN0aW9uIHJvdW5kZWQgd2FybmluZykKMTYvMTggQ2hlY2tp
-bmcgY29tbWl0IDVkNWFlMGI5ZTA2MSAodmhvc3Q6IE9ubHkgYWxpZ24gc2VjdGlvbnMgZm9yIHZo
-b3N0LXVzZXIpCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0OTogRklMRTogaHcvdmlydGlv
-L3Zob3N0LmM6NTU0OgorICAgIGlmIChkZXYtPnZob3N0X29wcy0+YmFja2VuZF90eXBlID09IFZI
-T1NUX0JBQ0tFTkRfVFlQRV9VU0VSKSB7ICAgJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzY0OiBGSUxFOiBody92aXJ0aW8vdmhvc3QuYzo1Njk6CisgICAgICAgIHRyYWNlX3Zo
-b3N0X3JlZ2lvbl9hZGRfc2VjdGlvbl9hbGlnbmVkKHNlY3Rpb24tPm1yLT5uYW1lLCBtcnNfZ3Bh
-LCBtcnNfc2l6ZSwKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNDMgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMTYvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE3LzE4IENoZWNraW5n
-IGNvbW1pdCA3YmIxZjc0YjQwZTkgKGkzODY6YWNwaTogUmVtb3ZlIF9ISUQgZnJvbSB0aGUgU01C
-dXMgQUNQSSBlbnRyeSkKMTgvMTggQ2hlY2tpbmcgY29tbWl0IDJiODE5MWM0OTBhNiAodmhvc3Q6
-IGNvZGluZyBzdHlsZSBmaXgpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
-aGV3Lm9yZy9sb2dzLzIwMjAwMTIzMDcwOTEzLjYyNjQ4OC0xLW1zdEByZWRoYXQuY29tL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, Jan 22, 2020 at 11:45:33PM -0800, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200123070913.626488-1-mst@redhat.=
+com/
+>=20
+>=20
+>=20
+> Hi,
+>=20
+> This series seems to have some coding style problems.
+
+yes but they are fixed by a follow up patch :)
+
+> See output below for
+> more information:
+>=20
+> Type: series
+> Message-id: 20200123070913.626488-1-mst@redhat.com
+> Subject: [PULL v3 00/18] virtio, pc: fixes, features
+>=20
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>=20
+> Switched to a new branch 'test'
+> 2b8191c vhost: coding style fix
+> 7bb1f74 i386:acpi: Remove _HID from the SMBus ACPI entry
+> 5d5ae0b vhost: Only align sections for vhost-user
+> 2fe690d vhost: Add names to section rounded warning
+> 85f2aa9 vhost-vsock: delete vqs in vhost_vsock_unrealize to avoid memleak=
+s
+> ae724d7 virtio-scsi: convert to new virtio_delete_queue
+> 32a8d7a virtio-scsi: delete vqs in unrealize to avoid memleaks
+> ce15ad4 virtio-9p-device: convert to new virtio_delete_queue
+> 3bdf076 virtio-9p-device: fix memleak in virtio_9p_device_unrealize
+> 01fb3bc bios-tables-test: document expected file update
+> 021497c acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command
+> 8df7461 acpi: cpuhp: spec: add typical usecases
+> f37ff6b acpi: cpuhp: introduce 'Command data 2' field
+> 9c2e2a3 acpi: cpuhp: spec: clarify store into 'Command data' when 'Comman=
+d field' =3D=3D 0
+> 31632fb acpi: cpuhp: spec: fix 'Command data' description
+> 8833b70 acpi: cpuhp: spec: clarify 'CPU selector' register usage and endi=
+anness
+> 59529c2 tests: q35: MCH: add default SMBASE SMRAM lock test
+> ab4ab8f q35: implement 128K SMRAM at default SMBASE address
+>=20
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> 1/18 Checking commit ab4ab8fed8c2 (q35: implement 128K SMRAM at default S=
+MBASE address)
+> 2/18 Checking commit 59529c21dc20 (tests: q35: MCH: add default SMBASE SM=
+RAM lock test)
+> 3/18 Checking commit 8833b70f38a3 (acpi: cpuhp: spec: clarify 'CPU select=
+or' register usage and endianness)
+> 4/18 Checking commit 31632fb04976 (acpi: cpuhp: spec: fix 'Command data' =
+description)
+> 5/18 Checking commit 9c2e2a3c55cf (acpi: cpuhp: spec: clarify store into =
+'Command data' when 'Command field' =3D=3D 0)
+> 6/18 Checking commit f37ff6b0328f (acpi: cpuhp: introduce 'Command data 2=
+' field)
+> 7/18 Checking commit 8df7461f8e9c (acpi: cpuhp: spec: add typical usecase=
+s)
+> 8/18 Checking commit 021497cfae81 (acpi: cpuhp: add CPHP_GET_CPU_ID_CMD c=
+ommand)
+> 9/18 Checking commit 01fb3bc40a44 (bios-tables-test: document expected fi=
+le update)
+> WARNING: line over 80 characters
+> #23: FILE: tests/qtest/bios-tables-test.c:20:
+> + * Contributor or ACPI Maintainer (steps 4-7 need to be redone to resolv=
+e conflicts
+>=20
+> total: 0 errors, 1 warnings, 38 lines checked
+>=20
+> Patch 9/18 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 10/18 Checking commit 3bdf076c6da1 (virtio-9p-device: fix memleak in virt=
+io_9p_device_unrealize)
+> 11/18 Checking commit ce15ad428cde (virtio-9p-device: convert to new virt=
+io_delete_queue)
+> 12/18 Checking commit 32a8d7a0b553 (virtio-scsi: delete vqs in unrealize =
+to avoid memleaks)
+> 13/18 Checking commit ae724d76b8ed (virtio-scsi: convert to new virtio_de=
+lete_queue)
+> 14/18 Checking commit 85f2aa9f8aa0 (vhost-vsock: delete vqs in vhost_vsoc=
+k_unrealize to avoid memleaks)
+> 15/18 Checking commit 2fe690da39c7 (vhost: Add names to section rounded w=
+arning)
+> 16/18 Checking commit 5d5ae0b9e061 (vhost: Only align sections for vhost-=
+user)
+> ERROR: trailing whitespace
+> #49: FILE: hw/virtio/vhost.c:554:
+> +    if (dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER) {  =
+ $
+>=20
+> WARNING: line over 80 characters
+> #64: FILE: hw/virtio/vhost.c:569:
+> +        trace_vhost_region_add_section_aligned(section->mr->name, mrs_gp=
+a, mrs_size,
+>=20
+> total: 1 errors, 1 warnings, 43 lines checked
+>=20
+> Patch 16/18 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 17/18 Checking commit 7bb1f74b40e9 (i386:acpi: Remove _HID from the SMBus=
+ ACPI entry)
+> 18/18 Checking commit 2b8191c490a6 (vhost: coding style fix)
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 1
+>=20
+>=20
+> The full log is available at
+> http://patchew.org/logs/20200123070913.626488-1-mst@redhat.com/testing.ch=
+eckpatch/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
 
