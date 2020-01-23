@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 799D2C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE5AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4105F21835
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0674821835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:48:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WXsxUZ6X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4105F21835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B+iwZy8m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0674821835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubtH-0002hL-5s
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:47:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36705)
+	id 1iubu1-0003IX-JL
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:48:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuauO-0000yA-Qm
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:44:26 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuatl-0008Oo-RH
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuauN-0005Wi-EN
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:44:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40649
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iuati-0005C1-9m
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:45 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58293
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuauN-0005We-Al
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:44:23 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuati-0005AU-4J
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779863;
+ s=mimecast20190719; t=1579779820;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ONGRb2H7xwKxLjc0yEDl8AhQd6ixqikOmhtSaklR8po=;
- b=WXsxUZ6XY6oitfy6Y3vcQhC+zQVI4lgGYzpvLcebukZQzl98NTdri4KkwIUKfu9HuTSMdL
- V1YnCEbsjZ8VpZVOLqKdI26ZChiTQp1+9JEyl3VbAlHqeHnLVhDgdS3nJCZKfDulIbbwGc
- 7a3450JWmI0/yW9TivaOzfgit8pfo+I=
+ bh=tDKbBbAWWOkkiIWFBWLIbRth9yEyr7d7mcqC9bU3rvU=;
+ b=B+iwZy8mYYSQtN5GMBChndKDnGS2AvgGlKuTUwCniTsvXKLYTBFiv4OFn5gSFBmI3iQQ8i
+ 3Rlm5TaiONAAX11hbNdaJgHdjzym9pPg8HMGoKL0gsljz6K6Z4br2tZlo38b6pYbqnvghJ
+ 5ED0gMooPUEIfvjXrDO0URWsmJlWI/w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-uHmyv-KSMHW6pZ7PrhKrLw-1; Thu, 23 Jan 2020 06:44:20 -0500
+ us-mta-203-KHCuqhxHMvWFG2SYUCBk5Q-1; Thu, 23 Jan 2020 06:43:36 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3E648010E0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:44:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC434801E7A;
+ Thu, 23 Jan 2020 11:43:35 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BF82710372F9;
- Thu, 23 Jan 2020 11:44:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E82DF100164D;
+ Thu, 23 Jan 2020 11:43:34 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 80/80] tests:numa-test: use explicit memdev to
- specify node RAM
-Date: Thu, 23 Jan 2020 12:38:45 +0100
-Message-Id: <1579779525-20065-81-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 67/80] ppc/spapr: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:32 +0100
+Message-Id: <1579779525-20065-68-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: uHmyv-KSMHW6pZ7PrhKrLw-1
+X-MC-Unique: KHCuqhxHMvWFG2SYUCBk5Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,153 +84,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Follow up patches will remove automatic RAM distribution
-between nodes and will make default machine types require
-"memdev" option instead of legacy "mem" option.
-
-Make tests to follow new rules and add an additional test
-for legacy "mem" option on old machine type, to make sure
-it won't regress in the future.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
-v3:
-   * s/strcmp/g_str_equal/
-   * put -object lines before -m
-     (Thomas Huth <thuth@redhat.com>)
-   * drop new test_pc_legacy_mem(), due to dropping
-      "numa: forbid '-numa node,mem' for 5.0 and newer machine types"
-     it will be posted later, when libvirt side is prepared for
-     disabled '-numa node,mem' (hopefully 5.1)
-
-CC: thuth@redhat.com
-CC: lvivier@redhat.com
+CC: david@gibson.dropbear.id.au
+CC: qemu-ppc@nongnu.org
 ---
- tests/qtest/numa-test.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ hw/ppc/spapr.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
-index 0bb4897..bc9c6be 100644
---- a/tests/qtest/numa-test.c
-+++ b/tests/qtest/numa-test.c
-@@ -25,9 +25,8 @@ static void test_mon_explicit(const void *data)
-     g_autofree char *s =3D NULL;
-     g_autofree char *cli =3D NULL;
-=20
--    cli =3D make_cli(data, "-smp 8 "
--                   "-numa node,nodeid=3D0,cpus=3D0-3 "
--                   "-numa node,nodeid=3D1,cpus=3D4-7 ");
-+    cli =3D make_cli(data, "-smp 8 -numa node,nodeid=3D0,memdev=3Dram,cpus=
-=3D0-3 "
-+                         "-numa node,nodeid=3D1,cpus=3D4-7");
-     qts =3D qtest_init(cli);
-=20
-     s =3D qtest_hmp(qts, "info numa");
-@@ -37,13 +36,13 @@ static void test_mon_explicit(const void *data)
-     qtest_quit(qts);
- }
-=20
--static void test_mon_default(const void *data)
-+static void test_def_cpu_split(const void *data)
- {
-     QTestState *qts;
-     g_autofree char *s =3D NULL;
-     g_autofree char *cli =3D NULL;
-=20
--    cli =3D make_cli(data, "-smp 8 -numa node -numa node");
-+    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram -numa node");
-     qts =3D qtest_init(cli);
-=20
-     s =3D qtest_hmp(qts, "info numa");
-@@ -60,7 +59,7 @@ static void test_mon_partial(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 "
--                   "-numa node,nodeid=3D0,cpus=3D0-1 "
-+                   "-numa node,nodeid=3D0,memdev=3Dram,cpus=3D0-1 "
-                    "-numa node,nodeid=3D1,cpus=3D4-5 ");
-     qts =3D qtest_init(cli);
-=20
-@@ -87,7 +86,8 @@ static void test_query_cpus(const void *data)
-     QTestState *qts;
-     g_autofree char *cli =3D NULL;
-=20
--    cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
-=3D4-7");
-+    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram,cpus=3D0-3 "
-+                         "-numa node,cpus=3D4-7");
-     qts =3D qtest_init(cli);
-     cpus =3D get_cpus(qts, &resp);
-     g_assert(cpus);
-@@ -125,7 +125,7 @@ static void pc_numa_cpu(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,thre=
-ads=3D2 "
--        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-+        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
-         "-numa cpu,node-id=3D1,socket-id=3D0 "
-         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
-         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
-@@ -178,7 +178,7 @@ static void spapr_numa_cpu(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 4,cores=3D4 "
--        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-+        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
-         "-numa cpu,node-id=3D0,core-id=3D0 "
-         "-numa cpu,node-id=3D0,core-id=3D1 "
-         "-numa cpu,node-id=3D0,core-id=3D2 "
-@@ -223,7 +223,7 @@ static void aarch64_numa_cpu(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 2 "
--        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-+        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
-         "-numa cpu,node-id=3D1,thread-id=3D0 "
-         "-numa cpu,node-id=3D0,thread-id=3D1");
-     qts =3D qtest_init(cli);
-@@ -270,7 +270,7 @@ static void pc_dynamic_cpu_cfg(const void *data)
-=20
-     /* create 2 numa nodes */
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
--        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
-+        " 'arguments': { 'type': 'node', 'nodeid': 0, 'memdev': 'ram' } }"=
-)));
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-         " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
-=20
-@@ -542,13 +542,19 @@ int main(int argc, char **argv)
-     g_autoptr(GString) args =3D g_string_new("");
-     const char *arch =3D qtest_get_arch();
-=20
-+    if (g_str_equal(arch, "ppc64")) {
-+        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
-=3D512M");
-+    } else {
-+        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
-=3D128M");
-+    }
-+
-     if (g_str_equal(arch, "aarch64")) {
-         g_string_append(args, " -machine virt");
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 02cf53f..ff0343b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2587,7 +2587,6 @@ static void spapr_machine_init(MachineState *machine)
+     PCIHostState *phb;
+     int i;
+     MemoryRegion *sysmem =3D get_system_memory();
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     hwaddr node0_size =3D spapr_node0_size(machine);
+     long load_limit, fw_size;
+     char *filename;
+@@ -2766,10 +2765,8 @@ static void spapr_machine_init(MachineState *machine=
+)
+         kvmppc_enable_h_page_init();
      }
 =20
-     g_test_init(&argc, &argv, NULL);
+-    /* allocate RAM */
+-    memory_region_allocate_system_memory(ram, NULL, "ppc_spapr.ram",
+-                                         machine->ram_size);
+-    memory_region_add_subregion(sysmem, 0, ram);
++    /* map RAM */
++    memory_region_add_subregion(sysmem, 0, machine->ram);
 =20
--    qtest_add_data_func("/numa/mon/default", args, test_mon_default);
-+    qtest_add_data_func("/numa/mon/cpus/default", args, test_def_cpu_split=
-);
-     qtest_add_data_func("/numa/mon/cpus/explicit", args, test_mon_explicit=
-);
-     qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
-     qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cpus=
-);
+     /* always allocate the device memory information */
+     machine->device_memory =3D g_malloc0(sizeof(*machine->device_memory));
+@@ -4344,6 +4341,7 @@ static void spapr_machine_class_init(ObjectClass *oc,=
+ void *data)
+     mc->no_parallel =3D 1;
+     mc->default_boot_order =3D "";
+     mc->default_ram_size =3D 512 * MiB;
++    mc->default_ram_id =3D "ppc_spapr.ram";
+     mc->default_display =3D "std";
+     mc->kvm_type =3D spapr_kvm_type;
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SPAPR_PCI_HOST_BRIDGE)=
+;
 --=20
 2.7.4
 
