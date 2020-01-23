@@ -2,72 +2,74 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CAAC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A89C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1369021569
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:28:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A6C721569
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:29:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/EqqGoc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1369021569
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKUfadoM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6C721569
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iugHe-0002iU-GZ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:28:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45741)
+	id 1iugII-0003b9-M6
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:29:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59516)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iueEM-0005eF-J1
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:17:15 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iudMQ-0004sa-SW
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iueEL-0002iH-8R
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:17:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27943
+ (envelope-from <kraxel@redhat.com>) id 1iudMP-0003JS-K3
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:21:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40359
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iueEL-0002i0-5F
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:17:13 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iudMP-0003JL-H3
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:21:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579792632;
+ s=mimecast20190719; t=1579789289;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6tLMZZuLaHZ7+9S5a5Q4dO5dyShTG2/4H+EPaxCb43s=;
- b=R/EqqGocI37H/V32OASl9/RlETDeLFI5cLptqtdy5rikpoNkmgVfRRjAVC6Exe0Z6a6qtI
- sHq8QxvJ/N1L1SCRZgQfPuzUIQ6lIAnf2hQxGSMS48cWGqmIJpTXyCSj9x8hGtg3CEiu8/
- Q07KyCr/Yt9vSxXfjGAClvtpW0rCXz4=
+ bh=8bVKJ77zZUyNg7pPmcSu/Ffhx0VlXpEBLLjM081mYSI=;
+ b=aKUfadoMKJGr95o2GE2jzax91PhD0oxybegP2xkyQ8AjZE4cswrWvuyy2HcaDEPqq94BU7
+ ddlHXC62wW3ArDFBjrxxIjPgqOhFelknXRXPjbuM+S9Totm9oYBqfTg/zpDj/6z0KPhHMl
+ XM+uIm/vjRksm3zemZDAImgS9orNIME=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-BpVsLgrlMyeEa2jOq8f8OA-1; Thu, 23 Jan 2020 10:17:09 -0500
+ us-mta-361-_TiYi6LnPwaSdphb7iJKCA-1; Thu, 23 Jan 2020 09:21:27 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A5F2106BC2A;
- Thu, 23 Jan 2020 15:17:08 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-204-119.brq.redhat.com
- [10.40.204.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 661F15DAA4;
- Thu, 23 Jan 2020 15:17:06 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01D851800D78;
+ Thu, 23 Jan 2020 14:21:26 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-106.ams2.redhat.com
+ [10.36.116.106])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 389E45DA2C;
+ Thu, 23 Jan 2020 14:21:23 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 6DE649C74; Thu, 23 Jan 2020 15:21:22 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC 1/2] virtio-rng: prepare the introduction of a control queue
-Date: Thu, 23 Jan 2020 16:16:59 +0100
-Message-Id: <20200123151700.1367857-2-lvivier@redhat.com>
-In-Reply-To: <20200123151700.1367857-1-lvivier@redhat.com>
-References: <20200123151700.1367857-1-lvivier@redhat.com>
-MIME-Version: 1.0
+Subject: [PULL 1/3] Revert "vnc: allow fall back to RAW encoding"
+Date: Thu, 23 Jan 2020 15:21:20 +0100
+Message-Id: <20200123142122.13839-2-kraxel@redhat.com>
+In-Reply-To: <20200123142122.13839-1-kraxel@redhat.com>
+References: <20200123142122.13839-1-kraxel@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: BpVsLgrlMyeEa2jOq8f8OA-1
+X-MC-Unique: _TiYi6LnPwaSdphb7iJKCA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -85,116 +87,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Amit Shah <amit@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename the existing vq to input_vq and use virtio_delete_queue()
-rather than virtio_del_queue().
+This reverts commit de3f7de7f4e257ce44cdabb90f5f17ee99624557.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Remove VNC optimization to reencode framebuffer update as raw if it's
+smaller than the default encoding.
+
+QEMU's implementation was naive and didn't account for the ZLIB z_stream
+mutating with each compression.  Because of the mutation, simply
+resetting the output buffer's offset wasn't sufficient to "rewind" the
+operation.  The mutated z_stream would generate future zlib blocks which
+referred to symbols in past blocks which weren't sent.  This would lead
+to artifacting.
+
+Considering that ZRLE is never larger than raw and even though ZLIB can
+occasionally be fractionally larger than raw, the overhead of
+implementing this optimization correctly isn't worth it.
+
+Signed-off-by: Cameron Esfahani <dirty@apple.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/virtio/virtio-rng.c         | 18 +++++++++---------
- include/hw/virtio/virtio-rng.h |  2 +-
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ ui/vnc.c | 20 ++------------------
+ 1 file changed, 2 insertions(+), 18 deletions(-)
 
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index b498a2033263..a0bca55bef55 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -25,7 +25,7 @@
- static bool is_guest_ready(VirtIORNG *vrng)
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 4100d6e4048c..3e8d1f120710 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -898,8 +898,6 @@ int vnc_raw_send_framebuffer_update(VncState *vs, int x=
+, int y, int w, int h)
+ int vnc_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
  {
-     VirtIODevice *vdev =3D VIRTIO_DEVICE(vrng);
--    if (virtio_queue_ready(vrng->vq)
-+    if (virtio_queue_ready(vrng->input_vq)
-         && (vdev->status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-         return true;
-     }
-@@ -69,7 +69,7 @@ static void chr_read(void *opaque, const void *buf, size_=
-t size)
+     int n =3D 0;
+-    bool encode_raw =3D false;
+-    size_t saved_offs =3D vs->output.offset;
 =20
-     offset =3D 0;
-     while (offset < size) {
--        elem =3D virtqueue_pop(vrng->vq, sizeof(VirtQueueElement));
-+        elem =3D virtqueue_pop(vrng->input_vq, sizeof(VirtQueueElement));
-         if (!elem) {
+     switch(vs->vnc_encoding) {
+         case VNC_ENCODING_ZLIB:
+@@ -922,24 +920,10 @@ int vnc_send_framebuffer_update(VncState *vs, int x, =
+int y, int w, int h)
+             n =3D vnc_zywrle_send_framebuffer_update(vs, x, y, w, h);
              break;
-         }
-@@ -78,13 +78,13 @@ static void chr_read(void *opaque, const void *buf, siz=
-e_t size)
-                            0, buf + offset, size - offset);
-         offset +=3D len;
-=20
--        virtqueue_push(vrng->vq, elem, len);
-+        virtqueue_push(vrng->input_vq, elem, len);
-         trace_virtio_rng_pushed(vrng, len);
-         g_free(elem);
+         default:
+-            encode_raw =3D true;
++            vnc_framebuffer_update(vs, x, y, w, h, VNC_ENCODING_RAW);
++            n =3D vnc_raw_send_framebuffer_update(vs, x, y, w, h);
+             break;
      }
--    virtio_notify(vdev, vrng->vq);
-+    virtio_notify(vdev, vrng->input_vq);
-=20
--    if (!virtio_queue_empty(vrng->vq)) {
-+    if (!virtio_queue_empty(vrng->input_vq)) {
-         /* If we didn't drain the queue, call virtio_rng_process
-          * to take care of asking for more data as appropriate.
-          */
-@@ -112,7 +112,7 @@ static void virtio_rng_process(VirtIORNG *vrng)
-     } else {
-         quota =3D MIN((uint64_t)vrng->quota_remaining, (uint64_t)UINT32_MA=
-X);
-     }
--    size =3D get_request_size(vrng->vq, quota);
-+    size =3D get_request_size(vrng->input_vq, quota);
-=20
-     trace_virtio_rng_request(vrng, size, quota);
-=20
-@@ -122,7 +122,7 @@ static void virtio_rng_process(VirtIORNG *vrng)
-     }
+-
+-    /* If the client has the same pixel format as our internal buffer and
+-     * a RAW encoding would need less space fall back to RAW encoding to
+-     * save bandwidth and processing power in the client. */
+-    if (!encode_raw && vs->write_pixels =3D=3D vnc_write_pixels_copy &&
+-        12 + h * w * VNC_SERVER_FB_BYTES <=3D (vs->output.offset - saved_o=
+ffs)) {
+-        vs->output.offset =3D saved_offs;
+-        encode_raw =3D true;
+-    }
+-
+-    if (encode_raw) {
+-        vnc_framebuffer_update(vs, x, y, w, h, VNC_ENCODING_RAW);
+-        n =3D vnc_raw_send_framebuffer_update(vs, x, y, w, h);
+-    }
+-
+     return n;
  }
-=20
--static void handle_input(VirtIODevice *vdev, VirtQueue *vq)
-+static void virtio_rng_handle_input(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIORNG *vrng =3D VIRTIO_RNG(vdev);
-     virtio_rng_process(vrng);
-@@ -220,7 +220,7 @@ static void virtio_rng_device_realize(DeviceState *dev,=
- Error **errp)
-=20
-     virtio_init(vdev, "virtio-rng", VIRTIO_ID_RNG, 0);
-=20
--    vrng->vq =3D virtio_add_queue(vdev, 8, handle_input);
-+    vrng->input_vq =3D virtio_add_queue(vdev, 8, virtio_rng_handle_input);
-     vrng->quota_remaining =3D vrng->conf.max_bytes;
-     vrng->rate_limit_timer =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
-                                                check_rate_limit, vrng);
-@@ -238,7 +238,7 @@ static void virtio_rng_device_unrealize(DeviceState *de=
-v, Error **errp)
-     qemu_del_vm_change_state_handler(vrng->vmstate);
-     timer_del(vrng->rate_limit_timer);
-     timer_free(vrng->rate_limit_timer);
--    virtio_del_queue(vdev, 0);
-+    virtio_delete_queue(vrng->input_vq);
-     virtio_cleanup(vdev);
- }
-=20
-diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rng.=
-h
-index bd05d734b87d..d77daf126828 100644
---- a/include/hw/virtio/virtio-rng.h
-+++ b/include/hw/virtio/virtio-rng.h
-@@ -32,7 +32,7 @@ typedef struct VirtIORNG {
-     VirtIODevice parent_obj;
-=20
-     /* Only one vq - guest puts buffer(s) on it when it needs entropy */
--    VirtQueue *vq;
-+    VirtQueue *input_vq;
-=20
-     VirtIORNGConf conf;
 =20
 --=20
-2.23.0
+2.18.1
 
 
