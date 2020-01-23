@@ -2,78 +2,84 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83610C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 23:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4197C35240
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 23:23:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B26720718
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 23:00:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB82C207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 23:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyO5tEqH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B26720718
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UaC3VJhL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB82C207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iulSl-0003hX-Eh
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 18:00:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48521)
+	id 1iulpC-0001CW-Rp
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 18:23:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52320)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iulRW-0002Dm-DN
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:59:21 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iuloM-0008HP-NO
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 18:22:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iulRV-0007A3-12
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:59:18 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36771
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iulRU-00079a-T3
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:59:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579820356;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=exSsg2ppyWzgOBiZqKPLtdvTCcI9dBO5WZbvBIHjWF8=;
- b=iyO5tEqH1w9LNs1jAaiXLj2FwiqOKyOI2ykT3+NxTTi+2bSuKbQQV5QS0Y8XnZ/dt2L/Bo
- POGfkZhMabGvWsh8fdsu1IPm63KPkEBvZnIxZSI4/ACK9jiiwh8GS+bzwN60N93OLtNaHF
- l9fbyMcDpz17/022KN3jRWFhNCugjf4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-FLp6PmUsO7GlQtho8LU-8g-1; Thu, 23 Jan 2020 17:59:13 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20D16100550E;
- Thu, 23 Jan 2020 22:59:12 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF94719C69;
- Thu, 23 Jan 2020 22:59:10 +0000 (UTC)
-Message-ID: <13cdd5d93c9bf3be15bceea412b3b66cc1f38fda.camel@redhat.com>
-Subject: Re: [PATCH v2 5/5] iotests: Add test for image creation fallback
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Fri, 24 Jan 2020 00:59:09 +0200
-In-Reply-To: <20200122164532.178040-6-mreitz@redhat.com>
-References: <20200122164532.178040-1-mreitz@redhat.com>
- <20200122164532.178040-6-mreitz@redhat.com>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: FLp6PmUsO7GlQtho8LU-8g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ (envelope-from <richard.henderson@linaro.org>) id 1iuloL-0007Zk-Fu
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 18:22:54 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51161)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iuloL-0007ZB-8N
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 18:22:53 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id r67so183367pjb.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 15:22:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=RoircKAFBAZMrOvjlCVOAiabpxz9R5dJatJCo0/3s5s=;
+ b=UaC3VJhLc1HcJ3v95FJ1NCe2Pra4der/WngdAWngUEa9C9TTI0IqyI1BsVfpAWZwLM
+ GAL7ZAlTnclSJYsoc/YTlxIo0WF8GWT4Iy9/773IRZhO5dW502rrWBuYdlubUw2OB60m
+ LP9EfbE9C+FwFm9r0MiXIs9FvG5qkicu8rnYkLjtFEp9kTEjcUoO/XgzSgzQaS2mgwiR
+ sdnqLZiDFIV9niYOmUV6XzqsNWls7uRgFauP++DIivGDU2HXV4iACa/R9k79ym4ceQau
+ xVv/66uQ/4c6DXscxYbOoRATpNG/8GSP0nfJfCSYCiiZFX4NVng1lfequRWVTFq04dwX
+ ZoTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=RoircKAFBAZMrOvjlCVOAiabpxz9R5dJatJCo0/3s5s=;
+ b=s+GVyEBZAzt4VygEJyOKZdFBicN0cd2HwyU+SsNdND+R+NUGG9HEJ6vXgMMnwOZihD
+ L+3V/OSFIvl30q7r8+nyqZAtmFnVLTT6aHpg/OPrHx2o4KZmwKdNdzmmC+BQckPF5iQw
+ THuqcdWRPAk25M7s6IWUBKLezh/eyBGrs2yfZsUgtuNP6RGQDlHu377zLqrkUgguy08D
+ TbMY7lfMcJzfhXk1egPYi7Azk2qDCHvrbCRWrRcAki/+4SRyuyliXocXvlWD26aCKkF0
+ zZaPBu/aWDif74U1MfXs1SJEZztIemt1U+GIs4WEiZruZBHxikx/ERXf0EGlnGBcIlrm
+ fjJg==
+X-Gm-Message-State: APjAAAUTrY1iHvm2J6iV4YVdYYpHCfhlu2YvJ/wpJ/oXHfEYNj/yzpgx
+ MnDfZyCDBTFJjp8sdEFCBnRvSWGYjQQ=
+X-Google-Smtp-Source: APXvYqxCLfZc1EHOLu2Tf9M9G8f1lG7JZKnNZl+VTytmFVi+V+lgVNIQCJwRxzDsBRve177CENLlDw==
+X-Received: by 2002:a17:902:a5c3:: with SMTP id
+ t3mr558010plq.145.1579821771450; 
+ Thu, 23 Jan 2020 15:22:51 -0800 (PST)
+Received: from localhost.localdomain (rrcs-173-198-77-92.west.biz.rr.com.
+ [173.198.77.92])
+ by smtp.gmail.com with ESMTPSA id z5sm4136008pfq.3.2020.01.23.15.22.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 15:22:50 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/5] target/s390x: Do not leak stack address in translate_one
+Date: Thu, 23 Jan 2020 13:22:43 -1000
+Message-Id: <20200123232248.1800-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,131 +91,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2020-01-22 at 17:45 +0100, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/259     | 61 ++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/259.out | 14 +++++++++
->  tests/qemu-iotests/group   |  1 +
->  3 files changed, 76 insertions(+)
->  create mode 100755 tests/qemu-iotests/259
->  create mode 100644 tests/qemu-iotests/259.out
-> 
-> diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
-> new file mode 100755
-> index 0000000000..22b4c10241
-> --- /dev/null
-> +++ b/tests/qemu-iotests/259
-> @@ -0,0 +1,61 @@
-> +#!/usr/bin/env bash
-> +#
-> +# Test generic image creation fallback (by using NBD)
-> +#
-> +# Copyright (C) 2019 Red Hat, Inc.
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +# creator
-> +owner=mreitz@redhat.com
-> +
-> +seq=$(basename $0)
-> +echo "QA output created by $seq"
-> +
-> +status=1	# failure is the default!
-> +
-> +_cleanup()
-> +{
-> +    _cleanup_test_img
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +# get standard environment, filters and checks
-> +. ./common.rc
-> +. ./common.filter
-> +
-> +_supported_fmt raw
-> +_supported_proto nbd
-> +_supported_os Linux
-> +
-> +
-> +_make_test_img 64M
-> +
-> +echo
-> +echo '--- Testing creation ---'
-> +
-> +$QEMU_IMG create -f qcow2 "$TEST_IMG" 64M | _filter_img_create
-> +$QEMU_IMG info "$TEST_IMG" | _filter_img_info
-> +
-> +echo
-> +echo '--- Testing creation for which the node would need to grow ---'
-> +
-> +$QEMU_IMG create -f qcow2 -o preallocation=metadata "$TEST_IMG" 64M 2>&1 \
-> +    | _filter_img_create
-> +
-> +# success, all done
-> +echo "*** done"
-> +rm -f $seq.full
-> +status=0
-> diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
-> new file mode 100644
-> index 0000000000..ffed19c2a0
-> --- /dev/null
-> +++ b/tests/qemu-iotests/259.out
-> @@ -0,0 +1,14 @@
-> +QA output created by 259
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +
-> +--- Testing creation ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=qcow2 size=67108864
-> +image: TEST_DIR/t.IMGFMT
-> +file format: qcow2
-> +virtual size: 64 MiB (67108864 bytes)
-> +disk size: unavailable
-> +
-> +--- Testing creation for which the node would need to grow ---
-> +qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Image format driver does not support resize
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=qcow2 size=67108864 preallocation=metadata
-> +*** done
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 1904223020..ec47c2216a 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -273,6 +273,7 @@
->  256 rw auto quick
->  257 rw
->  258 rw quick
-> +259 rw auto quick
->  260 rw quick
->  261 rw
->  262 rw quick migration
-
-Very minor nitpick: maybe add a note that nbd doesn't support resize / truncate.
-It might start supporting it one day.
-I didn't notice it first.
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
+Thomas' patch avoids the leak, but I think we can do a bit more to
+cleaning in this area, and move the structure inline to DisasContext.
 
 
+r~
 
+
+Richard Henderson (5):
+  target/s390x: Move struct DisasFields definition earlier
+  target/s390x: Remove DisasFields argument from callbacks
+  target/s390x: Pass DisasContext to get_field and have_field
+  target/s390x: Move DisasFields into DisasContext
+  target/s390x: Remove DisasFields argument from extract_insn
+
+ target/s390x/translate.c        | 982 ++++++++++++++++----------------
+ target/s390x/translate_vx.inc.c | 649 +++++++++++----------
+ 2 files changed, 813 insertions(+), 818 deletions(-)
+
+-- 
+2.20.1
 
 
