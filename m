@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E723CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4586FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:38:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B092921734
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:38:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14CD521734
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:38:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PcD1MV1f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B092921734
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pJxdwXLc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14CD521734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iueYq-0000J7-8v
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:38:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51222)
+	id 1iueZI-0000hz-TU
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:38:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrC-0004k3-Lh
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:15 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrf-0005PJ-BM
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrA-00032j-L4
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:14 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:52975)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucre-0004DU-7e
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:43 -0500
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39172)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrA-00031K-EV
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:12 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id p9so2644038wmc.2
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:12 -0800 (PST)
+ id 1iucre-0004C9-1Q
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:42 -0500
+Received: by mail-wm1-x32d.google.com with SMTP id 20so2591772wmj.4
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gl7eWmA7CA9XKm3RFgregvJlE8LU8fI3r6RyQ6MZ0c0=;
- b=PcD1MV1fsFXokrsvY7vAKB2jiAGEru343pJDBzGqPZLOpuKsYuYbBf4V8oze8KzU9P
- owaXjKVf9sEX1ap/k/DLD+FTfhLbLVgxfZeiE1xGOs5Va3j2oE8bNJ55CatZL8MJD2yG
- VexI0WFmT260AtxLcoK+u/10rADHiS4XVUpREsc9psUQuSJn2NfJrJKRHnEDvUeiqegQ
- 7c4LTmg1cwUv7Rq0nsVKEybAigs1wgeEzWOusSfvH/Tv9rwHhjQntn8yUfK9R96dx6Kt
- NoXoExhXzjAL/7Vr+AVAf2pwTjOS0WJVZqngW/tE3U2yZdkXaxLl5q8z0Qw8DssqACEA
- ErNA==
+ bh=NRtpysghTnIJUNFyZSG4PEwiYVfrrLID8LkUoY/p4CA=;
+ b=pJxdwXLcMYwvGwGK+WZ4Luv2M8+omtuPsN5RomK2ZvK4SPXCJJvuPeqgGoepbB+r7D
+ 3k7xbIhqKVZfI/UPP5NvhDDI54pdrCpgl6m+2LSCLjdX9+hPwE1AbBdAzxQrurb3D/od
+ CjrUWDcASkp3zlNDyU7c2q+oxJ0oB8fxDlV1ySyMtovqsz5ncVY90ud5nQEVNIKCTl9O
+ WIExG6iRe0gP2XHWVRuh4KFB8/fNnLn6PTlMCe1fsKm37JJMwwvGonktI6Oxe7L2FAIu
+ XGHrYWYFU/CImovOMrMaiyi9padEVAYqypbhGp8F0HxVZy/NPbfNNWh5O3dgbMiKDbVo
+ dUcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gl7eWmA7CA9XKm3RFgregvJlE8LU8fI3r6RyQ6MZ0c0=;
- b=nLatFqlRHQxym8i1uWLWcZ1MDdpx0/UECuU/RbNuEi+XPZc4vBLcZUnxbAs73nsJVj
- lwaMjPlF58P0oRjvDjK58l3bW4rqq9ZL3At8siPrj8AmtQXOT4Z1E1jsXeZu7YtCakUI
- j4b3w6QGKZ3w4lGN+I70oI47PNqBFtbbFSbPa+nVGL2mWAhRwfEVwPzErWZc10ky95Ab
- EbCpyLpM4+dKplU6v+ztlbXebZkqQTKxzcH7ojMi3CaLTmssV1V+y29dalx5/FeD3IAX
- DSyWT4oUxiXCZ1hDCPP68xiHEMHxsOidm8fcekinpPfz2f4uwqn/4kYTwe9I4pQVUFDT
- kR+w==
-X-Gm-Message-State: APjAAAUiZNW7WQC+uqBxEQMlcEbeNKzjwyXuoILYtN5YixNRLKrmHJ0v
- +YCieQHyOGRKBqMsiOhnqoyfTLy+
-X-Google-Smtp-Source: APXvYqwvLR8zAiuT8HwiV6xD2SjZCQBDBntTtI6MMzovI074bivLArp1PA/Ru6JICV4EX7cIoVvC3w==
-X-Received: by 2002:a7b:c3d8:: with SMTP id t24mr4312838wmj.175.1579787351077; 
- Thu, 23 Jan 2020 05:49:11 -0800 (PST)
+ bh=NRtpysghTnIJUNFyZSG4PEwiYVfrrLID8LkUoY/p4CA=;
+ b=pgQWnrDUwOXqx8kzBYaprHIQlhGfx7FyMurQF6u+S8BMieDMN62VebREzW5aVEfYBt
+ iRCzto5Ul6gbkzLlFfkI57yYKMyMO6FeAt5xjdzavd/rXgpPn15vLMN12iGzr4RXfP7x
+ DWDyp6WlCB31xw5t32l8PWVrorlPYGd1atMjVfMQdK0OIE7Jknn31UnZSl7sDPYuQ1dS
+ cn73e+ushcswBZdWFCvB13neU5rmrGjfb1/6MOufpPQSj+BSxkHVKCkYLllrH3g69JQu
+ Xvq/W4cNl6bVJSVYbGuHdsjcke3lMtesGR/C0WS/J88bCABvYyK+hzmbOD2u+ydrEgkE
+ WQUw==
+X-Gm-Message-State: APjAAAUQkFpKzLuZagrqh2rUTvtWxVGaeXneoSlMAJkNiFOyPyY9Keta
+ 67jIvTfXHPzMwD/QH/pmNaS2RnxX
+X-Google-Smtp-Source: APXvYqzGjKTURVyJHKhzzMNMurSQlSFHTXb6qeCiQEl5C/GBOAVSxYwm78XEsOAIEAZhWHW8s37cRQ==
+X-Received: by 2002:a7b:cf01:: with SMTP id l1mr4314489wmg.86.1579787380985;
+ Thu, 23 Jan 2020 05:49:40 -0800 (PST)
 Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.10
+ by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.40
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:10 -0800 (PST)
+ Thu, 23 Jan 2020 05:49:40 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/59] audio/audio: Add missing fall through comment
-Date: Thu, 23 Jan 2020 14:48:09 +0100
-Message-Id: <1579787342-27146-7-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 39/59] qstring: add qstring_free()
+Date: Thu, 23 Jan 2020 14:48:42 +0100
+Message-Id: <1579787342-27146-40-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
 References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32a
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,50 +93,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-When building with GCC9 using CFLAG -Wimplicit-fallthrough=2 we get:
+Similar to g_string_free(), optionally return the underlying char*.
 
-  audio/audio.c: In function ‘audio_pcm_init_info’:
-  audio/audio.c:306:14: error: this statement may fall through [-Werror=implicit-fallthrough=]
-    306 |         sign = 1;
-        |         ~~~~~^~~
-  audio/audio.c:307:5: note: here
-    307 |     case AUDIO_FORMAT_U8:
-        |     ^~~~
-  cc1: all warnings being treated as errors
-
-Similarly to e46349414, add the missing fall through comment to
-hint GCC.
-
-Fixes: 2b9cce8c8c
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-Id: <20191218192526.13845-2-philmd@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200110153039.1379601-10-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- audio/audio.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/qapi/qmp/qstring.h |  1 +
+ qobject/qstring.c          | 27 ++++++++++++++++++++++-----
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/audio/audio.c b/audio/audio.c
-index abea027..f63f397 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -304,6 +304,7 @@ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as)
-     switch (as->fmt) {
-     case AUDIO_FORMAT_S8:
-         sign = 1;
-+        /* fall through */
-     case AUDIO_FORMAT_U8:
-         mul = 1;
-         break;
+diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+index 3e83e3a..e2e356e 100644
+--- a/include/qapi/qmp/qstring.h
++++ b/include/qapi/qmp/qstring.h
+@@ -33,6 +33,7 @@ void qstring_append_int(QString *qstring, int64_t value);
+ void qstring_append(QString *qstring, const char *str);
+ void qstring_append_chr(QString *qstring, int c);
+ bool qstring_is_equal(const QObject *x, const QObject *y);
++char *qstring_free(QString *qstring, bool return_str);
+ void qstring_destroy_obj(QObject *obj);
+ 
+ #endif /* QSTRING_H */
+diff --git a/qobject/qstring.c b/qobject/qstring.c
+index 1c6897d..b66a2c3 100644
+--- a/qobject/qstring.c
++++ b/qobject/qstring.c
+@@ -150,15 +150,32 @@ bool qstring_is_equal(const QObject *x, const QObject *y)
+ }
+ 
+ /**
++ * qstring_free(): Free the memory allocated by a QString object
++ *
++ * Return: if @return_str, return the underlying string, to be
++ * g_free(), otherwise NULL is returned.
++ */
++char *qstring_free(QString *qstring, bool return_str)
++{
++    char *rv = NULL;
++
++    if (return_str) {
++        rv = qstring->string;
++    } else {
++        g_free(qstring->string);
++    }
++
++    g_free(qstring);
++
++    return rv;
++}
++
++/**
+  * qstring_destroy_obj(): Free all memory allocated by a QString
+  * object
+  */
+ void qstring_destroy_obj(QObject *obj)
+ {
+-    QString *qs;
+-
+     assert(obj != NULL);
+-    qs = qobject_to(QString, obj);
+-    g_free(qs->string);
+-    g_free(qs);
++    qstring_free(qobject_to(QString, obj), FALSE);
+ }
 -- 
 1.8.3.1
 
