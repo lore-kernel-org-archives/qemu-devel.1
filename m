@@ -2,79 +2,58 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D6FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01FDFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2B1A214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:46:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/Nah05z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B1A214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C8A7A2073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A7A2073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudkT-0004iT-35
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:46:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41874)
+	id 1iudmk-0007fP-4W
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:48:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAs-0004ML-8H
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:27 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUQ-0001IV-MS
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAr-0006mu-2c
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:26 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37912
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAq-0006mi-VJ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780884;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DxAJgeP+0hPstRiShwv7lrQwRfRqOxM1T7uh9S2eayU=;
- b=c/Nah05zO82E51FISIc5bkFJ+5oC5qVkPFxvqF1wzBrtqH0fKdmXrlf7QtCow9kBFvIUY3
- 5hwg2FCAE6DnDEIuThVVpiulom+/03/w8Wj+bwm5dKF3bTEbl00fYeKzeG1ZHVIe/lHGfh
- /Et4bXgtU243xKa2lekZylGYKwiozOY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-NNfni3rROTmtLJgqqeASbw-1; Thu, 23 Jan 2020 07:01:23 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D8A8477
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:22 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 767871CB;
- Thu, 23 Jan 2020 12:01:21 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 111/111] virtiofsd: add some options to the help message
-Date: Thu, 23 Jan 2020 11:58:41 +0000
-Message-Id: <20200123115841.138849-112-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-References: <20200123115841.138849-1-dgilbert@redhat.com>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000sK-VL
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:42 -0500
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:52548)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000qq-Kh
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:38 -0500
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id CD5C643AE6;
+ Thu, 23 Jan 2020 22:25:37 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+ (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 8A411240091;
+ Thu, 23 Jan 2020 22:25:37 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v29 20/22] Add rx-softmmu
+Date: Thu, 23 Jan 2020 22:25:23 +0900
+Message-Id: <20200123132525.80891-21-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+References: <20200123132525.80891-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: NNfni3rROTmtLJgqqeASbw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,69 +65,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: richard.henderson@linaro.org, philmd@redhat.com,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-
-Add following options to the help message:
-- cache
-- flock|no_flock
-- norace
-- posix_lock|no_posix_lock
-- readdirplus|no_readdirplus
-- timeout
-- writeback|no_writeback
-- xattr|no_xattr
-
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-
-dgilbert: Split cache, norace, posix_lock, readdirplus off
-  into our own earlier patches that added the options
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-17-ysato@users.sourceforge.jp>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+pick ed65c02993 target/rx: Add RX to SysEmuTarget
+pick 01372568ae tests: Add rx to machine-none-test.c
+[PMD: Squashed patches from Richard Henderson modifying
+      qapi/common.json and tests/machine-none-test.c]
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tools/virtiofsd/helper.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ configure                       | 8 ++++++++
+ default-configs/rx-softmmu.mak  | 3 +++
+ qapi/machine.json               | 3 ++-
+ include/exec/poison.h           | 1 +
+ include/sysemu/arch_init.h      | 1 +
+ arch_init.c                     | 2 ++
+ tests/qtest/machine-none-test.c | 1 +
+ hw/Kconfig                      | 1 +
+ 8 files changed, 19 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/rx-softmmu.mak
 
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index f98d8f2eb2..0801cf752c 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -148,6 +148,8 @@ void fuse_cmdline_help(void)
-            "    -o cache=3D<mode>            cache mode. could be one of \=
-"auto, "
-            "always, none\"\n"
-            "                               default: auto\n"
-+           "    -o flock|no_flock          enable/disable flock\n"
-+           "                               default: no_flock\n"
-            "    -o log_level=3D<level>       log level, default to \"info\=
-"\n"
-            "                               level could be one of \"debug, =
-"
-            "info, warn, err\"\n"
-@@ -163,7 +165,13 @@ void fuse_cmdline_help(void)
-            "                               enable/disable readirplus\n"
-            "                               default: readdirplus except wit=
-h "
-            "cache=3Dnone\n"
--          );
-+           "    -o timeout=3D<number>        I/O timeout (second)\n"
-+           "                               default: depends on cache=3D op=
-tion.\n"
-+           "    -o writeback|no_writeback  enable/disable writeback cache\=
-n"
-+           "                               default: no_writeback\n"
-+           "    -o xattr|no_xattr          enable/disable xattr\n"
-+           "                               default: no_xattr\n"
-+           );
- }
+diff --git a/configure b/configure
+index 557e4382ea..485f7818d8 100755
+--- a/configure
++++ b/configure
+@@ -7689,6 +7689,11 @@ case "$target_name" in
+     mttcg=3Dyes
+     gdb_xml_files=3D"riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit=
+-csr.xml riscv-64bit-virtual.xml"
+   ;;
++  rx)
++    TARGET_ARCH=3Drx
++    bflt=3D"yes"
++    target_compiler=3D$cross_cc_rx
++  ;;
+   sh4|sh4eb)
+     TARGET_ARCH=3Dsh4
+     bflt=3D"yes"
+@@ -7870,6 +7875,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   riscv*)
+     disas_config "RISCV"
+   ;;
++  rx)
++    disas_config "RX"
++  ;;
+   s390*)
+     disas_config "S390"
+   ;;
+diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.=
+mak
+new file mode 100644
+index 0000000000..a3eecefb11
+--- /dev/null
++++ b/default-configs/rx-softmmu.mak
+@@ -0,0 +1,3 @@
++# Default configuration for rx-softmmu
++
++CONFIG_RX_VIRT=3Dy
+diff --git a/qapi/machine.json b/qapi/machine.json
+index b3d30bc816..57703c9696 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -21,6 +21,7 @@
+ #        is true even for "qemu-system-x86_64".
+ #
+ # ppcemb: dropped in 3.1
++# rx: added in 5.0
+ #
+ # Since: 3.0
+ ##
+@@ -28,7 +29,7 @@
+   'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
+              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
+              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
+-             'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
++             'ppc64', 'riscv32', 'riscv64', 'rx', 's390x', 'sh4',
+              'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
+              'x86_64', 'xtensa', 'xtensaeb' ] }
 =20
- static int fuse_helper_opt_proc(void *data, const char *arg, int key,
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index 955eb863ab..7b9ac361dc 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -26,6 +26,7 @@
+ #pragma GCC poison TARGET_PPC
+ #pragma GCC poison TARGET_PPC64
+ #pragma GCC poison TARGET_ABI32
++#pragma GCC poison TARGET_RX
+ #pragma GCC poison TARGET_S390X
+ #pragma GCC poison TARGET_SH4
+ #pragma GCC poison TARGET_SPARC
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 62c6fe4cf1..6c011acc52 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -24,6 +24,7 @@ enum {
+     QEMU_ARCH_NIOS2 =3D (1 << 17),
+     QEMU_ARCH_HPPA =3D (1 << 18),
+     QEMU_ARCH_RISCV =3D (1 << 19),
++    QEMU_ARCH_RX =3D (1 << 20),
+ };
+=20
+ extern const uint32_t arch_type;
+diff --git a/arch_init.c b/arch_init.c
+index 705d0b94ad..d9eb0ec1dd 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -77,6 +77,8 @@ int graphic_depth =3D 32;
+ #define QEMU_ARCH QEMU_ARCH_PPC
+ #elif defined(TARGET_RISCV)
+ #define QEMU_ARCH QEMU_ARCH_RISCV
++#elif defined(TARGET_RX)
++#define QEMU_ARCH QEMU_ARCH_RX
+ #elif defined(TARGET_S390X)
+ #define QEMU_ARCH QEMU_ARCH_S390X
+ #elif defined(TARGET_SH4)
+diff --git a/tests/qtest/machine-none-test.c b/tests/qtest/machine-none-t=
+est.c
+index 5953d31755..8bb54a6360 100644
+--- a/tests/qtest/machine-none-test.c
++++ b/tests/qtest/machine-none-test.c
+@@ -56,6 +56,7 @@ static struct arch2cpu cpus_map[] =3D {
+     { "hppa", "hppa" },
+     { "riscv64", "rv64gcsu-v1.10.0" },
+     { "riscv32", "rv32gcsu-v1.9.1" },
++    { "rx", "rx62n" },
+ };
+=20
+ static const char *get_cpu_model_by_arch(const char *arch)
+diff --git a/hw/Kconfig b/hw/Kconfig
+index ecf491bf04..62f9ebdc22 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -55,6 +55,7 @@ source nios2/Kconfig
+ source openrisc/Kconfig
+ source ppc/Kconfig
+ source riscv/Kconfig
++source rx/Kconfig
+ source s390x/Kconfig
+ source sh4/Kconfig
+ source sparc/Kconfig
 --=20
-2.24.1
+2.20.1
 
 
