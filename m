@@ -2,103 +2,89 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2271C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D59CC33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:30:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6483524125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38E9524125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:30:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E1MJrCeP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6483524125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fkUaQvva"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E9524125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuagV-0006Su-EJ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:30:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60311)
+	id 1iuagW-0006U6-6k
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:30:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iuafR-0005Ty-Ug
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:28:59 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iuafR-0005U1-PI
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:28:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iuafQ-0006Tg-1r
+ (envelope-from <alex.bennee@linaro.org>) id 1iuafQ-0006U1-IX
  for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:28:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50974
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuafP-0006TK-UP
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50448)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iuafQ-0006TQ-AZ
  for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:28:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579778935;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uTjVUYt4wAd20VubywjRYV1osOiBguqJpqhqZYd0Zlg=;
- b=E1MJrCeP3DC/kA7DRGZ8ULmBPcAJIrsi3E/siUATx8r0zyX3l2NT9oZ2Af6Pwz2YEqHpDt
- haGNqwC+LbE5Vl1jNc4iPk/gueAbLbOa9mfGbScJInZlMH9zQhdyAOWW97GWmi//BhRlfF
- 4NLMgQC4js9+k+ggu5rtTocOglbootw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-HeyjdDcYP2ipqOzn_Us7wg-1; Thu, 23 Jan 2020 06:28:53 -0500
-Received: by mail-wm1-f69.google.com with SMTP id m21so279926wmg.6
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 03:28:53 -0800 (PST)
+Received: by mail-wm1-x341.google.com with SMTP id a5so2185901wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 03:28:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=JT0vRtzsfSszG2BZGI3MYVv47jIAKzN+WgSV9JREyRA=;
+ b=fkUaQvvaAY7oZ7SDFpItQ+JmgHO24HO4HBwcdI5Glm4OJVYc1lx3FdmA8xuscw95x5
+ qg9LAAPHJkQ+5NMBjqcfR76VSxrWtaQTlOywepbOAVo0eqfA3COopXR7u50YDDsrotvW
+ wcxUEQEaoTcNiQYaqPBPfH9oEEENPMQLHbKDDEkaGjQDJqGC5Yhgaski3Q91ZhH1tLtO
+ 4qs0m2xxq/Byj2G0fFPONxTG6BlAIW4kr0eN34a8UcP0+tlH+0Se4NKP88/PXYYbLI3x
+ J3gI05xZGUmpdPVy527hwqs1q84UhNX+ouFcrJkwPYI9FEoD0NnDnZMek3EW7OV7r9mB
+ Ksfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=uTjVUYt4wAd20VubywjRYV1osOiBguqJpqhqZYd0Zlg=;
- b=QjHlBb8ZZ/nmx1Cg+GOUvY2eCRaPub7wAlFZsEbrbWueKABdZWECKVmVi/gEDvKpuX
- IL9ng1XVU/qmBzxwJRPtSC86QJjNZLCXDrL1UbG+S9xr4peEYV4sEDJRkgTjXJkduSj5
- 3VhnboScT/scFgoumdQAZ6Jj3Kuw25fPECSvW/vLUGdqDDsE+BV5KlsARjPgO9zrWpgS
- sZgdEY34k96CygYe0ozi2cUU/QQfRDkdWOAcLnRqbcHGwa2UA5Aw2bPhpWRSKCWxIaMo
- fkcLISmJsXq7pG13v7h66OjsmzZrSUVLo5f2vGPiLGQ83KvuQo9ZSpRTcuqzqbS5kqAQ
- l02w==
-X-Gm-Message-State: APjAAAVOhuTAw+cKmuDZGXwyy1WcySY5R3H0Fz7BwmP3tveUvXlcnovP
- IzaiixgL2mOFXmtOAfpCnenhwF/1OjrL4Imcz6i06lg05mJgPg1dcZAD8HindJ3JDYRM9zc5SQq
- C9sqzSTcJzpBuvZk=
-X-Received: by 2002:a05:6000:118e:: with SMTP id
- g14mr18069361wrx.39.1579778932146; 
- Thu, 23 Jan 2020 03:28:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqySJsWPvAkgplHWRYGeVT6996JqJTIQw02ei2yOcuTK/8lymrdDRl9Is2dW2AZ/fvUtpXvosQ==
-X-Received: by 2002:a05:6000:118e:: with SMTP id
- g14mr18069341wrx.39.1579778931870; 
- Thu, 23 Jan 2020 03:28:51 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b8fe:679e:87eb:c059?
- ([2001:b07:6468:f312:b8fe:679e:87eb:c059])
- by smtp.gmail.com with ESMTPSA id r62sm2638124wma.32.2020.01.23.03.28.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jan 2020 03:28:51 -0800 (PST)
-Subject: Re: [PATCH 10/26] object: add object_property_set_defaut_{bool, str, 
- int, uint}()
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
-References: <20200110153039.1379601-1-marcandre.lureau@redhat.com>
- <20200110153039.1379601-11-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a3b0024-fb80-c34d-16fd-78f8bc722807@redhat.com>
-Date: Thu, 23 Jan 2020 12:28:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=JT0vRtzsfSszG2BZGI3MYVv47jIAKzN+WgSV9JREyRA=;
+ b=liwEpmAFAGqmIFP+uyXZPKKED9Ddl2/HZJ3afDLkVtHRs0cAU5rGY7NFo7VK9M5n3E
+ dpEmzr3appRKLsdl0/Hr0Ie1u965kpKLGy04ve1VK4sjLFAgKR5WEvfk7hg5qGNyCGoQ
+ 0g9AeNuLbgmA2lFwzquUjnTJLqyHkdSauVzB0SY2wFi/q7bh3DpaP9XBrm72su4EVWU0
+ yQLzlpxN1pdfUUEU+fa6zvyhMm+sTm5yD5W/KHo4j4AcKEw62QCe9tYOfW9GYhM2ljVM
+ Q9d/HzHbCF9sU5BQoM3+6GkackJpCA4vVTcwvucpGF4/iCPjAOOoMxshTMAdAlDYW3cL
+ yLiQ==
+X-Gm-Message-State: APjAAAXI/rLoWxHbxcalHBFvyxhRsYHqkDd0GkMKiHVuLOc9wyrdfins
+ XwEdw14KqVuyqZ+udf3VHQucJg==
+X-Google-Smtp-Source: APXvYqzBfyOaCavQLsNNPp3o3Yeh1KcX20P8tpeJ/t856wf8osmzxGnXuf8g7YzU3mJgXDjTwcRqrA==
+X-Received: by 2002:a1c:7e0b:: with SMTP id z11mr3780971wmc.88.1579778935127; 
+ Thu, 23 Jan 2020 03:28:55 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i10sm2661243wru.16.2020.01.23.03.28.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 03:28:53 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E8EAF1FF87;
+ Thu, 23 Jan 2020 11:28:52 +0000 (GMT)
+References: <20191217173252.4672-1-philmd@redhat.com>
+ <6a8266c6-7c6d-3139-249f-2dd46c98e02f@redhat.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 0/6] Fix more GCC9 -O3 warnings
+In-reply-to: <6a8266c6-7c6d-3139-249f-2dd46c98e02f@redhat.com>
+Date: Thu, 23 Jan 2020 11:28:52 +0000
+Message-ID: <87blquza17.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200110153039.1379601-11-marcandre.lureau@redhat.com>
-Content-Language: en-US
-X-MC-Unique: HeyjdDcYP2ipqOzn_Us7wg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,101 +96,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Hannes Reinecke <hare@suse.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Joel Stanley <joel@jms.id.au>,
+ Andrew Jeffery <andrew@aj.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-arm@nongnu.org,
+ =?utf-8?B?S8WR?= =?utf-8?B?dsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch caught my attention because of the typo in the function, but 
-I also noticed that get_default is never set to anything but 
-object_property_get_defval.
 
-What do you think about removing the method and just relying on defval?
-In practice there would be a new patch that squashes 7, 10 and the thing
-after my signature.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Paolo
+> On 12/17/19 6:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Fix some trivial warnings when building with -O3.
+>> Philippe Mathieu-Daud=C3=A9 (6):
+>>    audio/audio: Add missing fall through comment
+>>    hw/display/tcx: Add missing fall through comments
+>>    hw/net/imx_fec: Rewrite fall through comments
+>>    hw/timer/aspeed_timer: Add a fall through comment
+>>    hw/scsi/megasas: Silent GCC9 duplicated-cond warning
+>>    qemu-io-cmds: Silent GCC9 format-overflow warning
+>
+> Sorry, this series failed because I used this tag in the first patch:
+>
+> Cc: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
+>
+> Then git-send-email was happy with --dry-run, but then failed:
+> (body) Adding cc: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.=
+com> from line
+> 'Cc: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>'
+> 5.1.1 <K  v  g  >: Recipient address rejected: User unknown in local
+> recipient table
+>
+> Note to self, enclose utf-8 names, as:
+> Cc: "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com>
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 1ea5c8c..035e41c 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -367,13 +367,6 @@ typedef void (ObjectPropertyRelease)(Object *obj,
-  */
- typedef void (ObjectPropertyInit)(Object *obj, ObjectProperty *prop);
- 
--/**
-- * ObjectPropertyGetDefault:
-- *
-- * Get an allocated string representation of the default value.
-- */
--typedef char *(ObjectPropertyGetDefault)(ObjectProperty *prop);
--
- struct ObjectProperty
- {
-     gchar *name;
-@@ -384,7 +377,6 @@ struct ObjectProperty
-     ObjectPropertyResolve *resolve;
-     ObjectPropertyRelease *release;
-     ObjectPropertyInit *init;
--    ObjectPropertyGetDefault *get_default;
-     void *opaque;
-     QObject *defval;
- };
-diff --git a/qom/object.c b/qom/object.c
-index 2464a9f..aa6cf19 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1444,15 +1444,6 @@ int64_t object_property_get_int(Object *obj, const char *name,
-     return retval;
- }
- 
--char *object_property_get_default(ObjectProperty *prop)
--{
--    if (!prop->get_default) {
--        return NULL;
--    }
--
--    return prop->get_default(prop);
--}
--
- static void object_property_init_defval(Object *obj, ObjectProperty *prop)
- {
-     Visitor *v = qobject_input_visitor_new(prop->defval);
-@@ -1463,8 +1454,12 @@ static void object_property_init_defval(Object *obj, ObjectProperty *prop)
-     visit_free(v);
- }
- 
--static char *object_property_get_defval(ObjectProperty *prop)
-+char *object_property_get_default(ObjectProperty *prop)
- {
-+    if (!prop->defval) {
-+        return NULL;
-+    }
-+
-     return qstring_free(qobject_to_json(prop->defval), TRUE);
- }
- 
-@@ -1472,11 +1467,9 @@ static void object_property_set_default(ObjectProperty *prop, QObject *defval)
- {
-     assert(!prop->defval);
-     assert(!prop->init);
--    assert(!prop->get_default);
- 
-     prop->defval = defval;
-     prop->init = object_property_init_defval;
--    prop->get_default = object_property_get_defval;
- }
- 
- void object_property_set_default_bool(ObjectProperty *prop, bool value)
-@@ -2610,8 +2603,7 @@ void object_property_add_alias(Object *obj, const char *name,
-         goto out;
-     }
-     op->resolve = property_resolve_alias;
--    if (target_prop->get_default) {
--        op->get_default = target_prop->get_default;
-+    if (target_prop->defval) {
-         op->defval = qobject_ref(target_prop->defval);
-     }
- 
+I never have to with my tags:
 
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+Is it possible to be more even utf-8? Sounds like a bug in the git tools
+to me.
+
+--=20
+Alex Benn=C3=A9e
 
