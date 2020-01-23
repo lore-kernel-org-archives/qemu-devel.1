@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CE6C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A9FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:03:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF04B2253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF04B2253D
+	by mail.kernel.org (Postfix) with ESMTPS id 32F8424655
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:03:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32F8424655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuZJE-0003QT-Uy
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:01:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34362)
+	id 1iuZKT-0004MU-AU
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:03:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iuZIM-0002zO-Cr
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:01:03 -0500
+ (envelope-from <bounces@canonical.com>) id 1iuZIM-0002zP-Dp
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iuZIK-0006pP-Si
+ (envelope-from <bounces@canonical.com>) id 1iuZIK-0006pK-SZ
  for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:01:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49232)
+Received: from indium.canonical.com ([91.189.90.7]:49150)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iuZIJ-0006mB-23
+ id 1iuZIJ-0006k0-1t
  for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:01:00 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iuZII-0002Q3-2W
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:00:58 +0000
+ id 1iuZIG-0002RD-F3
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:00:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 120C72E80C3
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:00:58 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 626A72E80CB
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:00:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jan 2020 09:55:46 -0000
+Date: Thu, 23 Jan 2020 09:52:55 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1859656@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -62,7 +62,7 @@ X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <157977334610.4938.18367270706746003803.malone@wampee.canonical.com>
+Message-Id: <157977317542.4803.2138107860071652172.malone@soybean.canonical.com>
 Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
  initial deploy
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -71,7 +71,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4101ee24bb8d8b62a1439346492927c2c163a394
+X-Launchpad-Hash: 27612ffc88ca3e44d6d35394912d75315d9a80e2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,17 +89,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TBH I'd really want to see how this worked as we didn't push anything to
-Bionic that would have changed this recently.
-
-I checked and the only change in that regard is really old.
-It was for bug 1790901 which was a prereq for real IPXE on s390x.
-So I doubt that MAAS could have worked before that.
-Never the less to be sure I was trying the old verson (which needed an odd =
-bundle of kernel+initrd to build into what you reply on netboot).
-
-But even that - if netboot is failing - it does not fall through (as I'd
-expected, but I wanted to be sure).
+First check - as assumed - the old style config always failed.
+It went into netboot, netboot fails and then it bails out.
 
 root@testkvm-bionic-from:~# virsh start netboot --console
 Domain netboot started
@@ -107,9 +98,66 @@ Connected to domain netboot
 Escape character is ^]
 done
   Using IPv4 address: 192.168.122.33
-  Requesting file "" via TFTP from 192.168.122.1
-  Receiving data:  0 KBytesICMP ERROR "port unreachable"
+  Using TFTP server: 192.168.122.1
+Trying pxelinux.cfg files...
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  Receiving data:  0 KBytes
+Repeating TFTP read request...
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  Receiving data:  0 KBytes
+Repeating TFTP read request...
+  TFTP error: ICMP ERROR "port unreachable"
 Failed to load OS from network
+
+root@testkvm-bionic-from:~# =
+
+root@testkvm-bionic-from:~# virsh list --all
+ Id    Name                           State
+----------------------------------------------------
+ -     netboot                        shut off
+
+
+-- -- -- --
+
+The suggested config with bootindex (lets see if that would work on
+s390x)
+
+root@testkvm-bionic-from:~# virsh start netboot --console
+Domain netboot started
+Connected to domain netboot
+Escape character is ^]
+done
+  Using IPv4 address: 192.168.122.33
+  Using TFTP server: 192.168.122.1
+Trying pxelinux.cfg files...
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  Receiving data:  0 KBytes
+Repeating TFTP read request...
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  TFTP error: ICMP ERROR "port unreachable"
+  Receiving data:  0 KBytes
+Repeating TFTP read request...
+  TFTP error: ICMP ERROR "port unreachable"
+Failed to load OS from network
+
+by that confirming SFeole again (comment #9 this time).
+
+So no easy workarounds present.
 
 -- =
 
