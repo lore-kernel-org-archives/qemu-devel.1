@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85555C33CB8
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6EC0C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:02:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D5AC20684
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:01:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80E8E20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:02:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jxdq4JuY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5AC20684
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fp50R68w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E8E20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iud31-0003nl-2y
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:01:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40995)
+	id 1iud3h-0004Kz-7R
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:02:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iub9e-0003AN-9N
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:11 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iubAr-0004MH-LI
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iub9Z-0005aD-9b
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:10 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39187
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iubAq-0006mJ-Fq
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25767
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub9Z-0005a7-6F
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:05 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAq-0006ll-Bn
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780805;
+ s=mimecast20190719; t=1579780884;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TTHm9Jt/ZwkRilrjifGOycxUrgPWy6KWn81baKXTvRA=;
- b=Jxdq4JuYYoymANkfUSb5i3hsMY7yzBRhrU0CYN+4xygdjQK2js5NoqY3+X8rxZ+Fzf/MbQ
- gnTx9QDRMN6OJKnjdRqdHeNtWnv7/naspYQQctiZaCbVXkz5uTStd0BRcRUg++oxxWkzaL
- WjjeL9wn7ihRFJKL01jhD6pgADFrJIg=
+ bh=AsLIGnsc4Kc2PIcdInCoGUfJ3yiSTnFajKGCNhtMMv0=;
+ b=Fp50R68w9+0k77d8o3EngYHiivBhLnTznZ7BhiF3cISvm5GLbknDr0hYFxYjknW/9wKzqN
+ tmKc/arW0fXM3hoM22GkM1aIjYCbtYIHbIGlKOOy2bxTSCmyais4kfXXgO0hq0zelCBqlk
+ FsQFhWedNC7sITiRazqlxNUmqGKSy7w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-4I3zU2K4NsaqJMbSkcLeRQ-1; Thu, 23 Jan 2020 07:00:03 -0500
+ us-mta-376-N0j0b-ElONKbHn6Jb4eQzg-1; Thu, 23 Jan 2020 07:01:22 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1C878017CC
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:00:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A49818A6EC0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:21 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF66F1CB;
- Thu, 23 Jan 2020 12:00:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7576485754;
+ Thu, 23 Jan 2020 12:01:20 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 062/111] virtiofsd: Add ID to the log with FUSE_LOG_DEBUG level
-Date: Thu, 23 Jan 2020 11:57:52 +0000
-Message-Id: <20200123115841.138849-63-dgilbert@redhat.com>
+Subject: [PULL 110/111] virtiofsd: stop all queue threads on exit in
+ virtio_loop()
+Date: Thu, 23 Jan 2020 11:58:40 +0000
+Message-Id: <20200123115841.138849-111-dgilbert@redhat.com>
 In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
 References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 4I3zU2K4NsaqJMbSkcLeRQ-1
+X-MC-Unique: N0j0b-ElONKbHn6Jb4eQzg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,75 +91,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+From: Eryu Guan <eguan@linux.alibaba.com>
 
-virtiofsd has some threads, so we see a lot of logs with debug option.
-It would be useful for debugging if we can identify the specific thread
-from the log.
+On guest graceful shutdown, virtiofsd receives VHOST_USER_GET_VRING_BASE
+request from VMM and shuts down virtqueues by calling fv_set_started(),
+which joins fv_queue_thread() threads. So when virtio_loop() returns,
+there should be no thread is still accessing data in fuse session and/or
+virtio dev.
 
-Add ID, which is got by gettid(), to the log with FUSE_LOG_DEBUG level
-so that we can grep the specific thread.
+But on abnormal exit, e.g. guest got killed for whatever reason,
+vhost-user socket is closed and virtio_loop() breaks out the main loop
+and returns to main(). But it's possible fv_queue_worker()s are still
+working and accessing fuse session and virtio dev, which results in
+crash or use-after-free.
 
-The log is like as:
+Fix it by stopping fv_queue_thread()s before virtio_loop() returns,
+to make sure there's no-one could access fuse session and virtio dev.
 
-  ]# ./virtiofsd -d -o vhost_user_socket=3D/tmp/vhostqemu0 -o source=3D/tmp=
-/share0 -o cache=3Dauto
-  ...
-  [ID: 00000097]    unique: 12696, success, outsize: 120
-  [ID: 00000097] virtio_send_msg: elem 18: with 2 in desc of length 120
-  [ID: 00000003] fv_queue_thread: Got queue event on Queue 1
-  [ID: 00000003] fv_queue_thread: Queue 1 gave evalue: 1 available: in: 655=
-52 out: 80
-  [ID: 00000003] fv_queue_thread: Waiting for Queue 1 event
-  [ID: 00000071] fv_queue_worker: elem 33: with 2 out desc of length 80 bad=
-_in_num=3D0 bad_out_num=3D0
-  [ID: 00000071] unique: 12694, opcode: READ (15), nodeid: 2, insize: 80, p=
-id: 2014
-  [ID: 00000071] lo_read(ino=3D2, size=3D65536, off=3D131072)
-
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  added rework as suggested by Daniel P. Berrang=C3=A9 during review
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reported-by: Qingming Su <qingming.su@linux.alibaba.com>
+Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/virtiofsd/fuse_virtio.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index ff6910fd73..f08324f000 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -43,6 +43,7 @@
- #include <cap-ng.h>
- #include <dirent.h>
- #include <errno.h>
-+#include <glib.h>
- #include <inttypes.h>
- #include <limits.h>
- #include <pthread.h>
-@@ -2268,10 +2269,17 @@ static void setup_nofile_rlimit(void)
-=20
- static void log_func(enum fuse_log_level level, const char *fmt, va_list a=
-p)
- {
-+    g_autofree char *localfmt =3D NULL;
-+
-     if (current_log_level < level) {
-         return;
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 9f6582343c..80a6e929df 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -815,6 +815,19 @@ int virtio_loop(struct fuse_session *se)
+         }
      }
 =20
-+    if (current_log_level =3D=3D FUSE_LOG_DEBUG) {
-+        localfmt =3D g_strdup_printf("[ID: %08ld] %s", syscall(__NR_gettid=
-), fmt);
-+        fmt =3D localfmt;
++    /*
++     * Make sure all fv_queue_thread()s quit on exit, as we're about to
++     * free virtio dev and fuse session, no one should access them anymore=
+.
++     */
++    for (int i =3D 0; i < se->virtio_dev->nqueues; i++) {
++        if (!se->virtio_dev->qi[i]) {
++            continue;
++        }
++
++        fuse_log(FUSE_LOG_INFO, "%s: Stopping queue %d thread\n", __func__=
+, i);
++        fv_queue_cleanup_thread(se->virtio_dev, i);
 +    }
 +
-     if (use_syslog) {
-         int priority =3D LOG_ERR;
-         switch (level) {
+     fuse_log(FUSE_LOG_INFO, "%s: Exit\n", __func__);
+=20
+     return 0;
 --=20
 2.24.1
 
