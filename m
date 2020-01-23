@@ -2,54 +2,78 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA85C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 22:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83610C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 23:00:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DD1D20718
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 22:59:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD1D20718
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
+	by mail.kernel.org (Postfix) with ESMTPS id 4B26720718
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 23:00:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyO5tEqH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B26720718
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iulS4-0002Xy-9j
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 17:59:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48351)
+	id 1iulSl-0003hX-Eh
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 18:00:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pl@kamp.de>) id 1iulR2-0001EF-T9
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:58:50 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iulRW-0002Dm-DN
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:59:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pl@kamp.de>) id 1iulR1-0006Ow-JR
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:58:48 -0500
-Received: from kerio.kamp.de ([195.62.97.192]:58425)
+ (envelope-from <mlevitsk@redhat.com>) id 1iulRV-0007A3-12
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:59:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36771
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pl@kamp.de>)
- id 1iulQw-0006Ds-89; Thu, 23 Jan 2020 17:58:42 -0500
-X-Footer: a2FtcC5kZQ==
-Received: from [82.141.7.52] ([79.200.90.31]) (authenticated user pl@kamp.de)
- by kerio.kamp.de with ESMTPSA
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
- Thu, 23 Jan 2020 23:58:35 +0100
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Peter Lieven <pl@kamp.de>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH] iscsi: Cap block count from GET LBA STATUS (CVE-2020-1711)
-Date: Thu, 23 Jan 2020 23:58:35 +0100
-Message-Id: <9F93582E-139B-45B2-8630-FDD331F09DEF@kamp.de>
-References: <B07CB62A-7860-4385-A6A4-4ECA211DBE42@nutanix.com>
-In-Reply-To: <B07CB62A-7860-4385-A6A4-4ECA211DBE42@nutanix.com>
-To: Felipe Franciosi <felipe@nutanix.com>
-X-Mailer: iPhone Mail (17C54)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iulRU-00079a-T3
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 17:59:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579820356;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=exSsg2ppyWzgOBiZqKPLtdvTCcI9dBO5WZbvBIHjWF8=;
+ b=iyO5tEqH1w9LNs1jAaiXLj2FwiqOKyOI2ykT3+NxTTi+2bSuKbQQV5QS0Y8XnZ/dt2L/Bo
+ POGfkZhMabGvWsh8fdsu1IPm63KPkEBvZnIxZSI4/ACK9jiiwh8GS+bzwN60N93OLtNaHF
+ l9fbyMcDpz17/022KN3jRWFhNCugjf4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-FLp6PmUsO7GlQtho8LU-8g-1; Thu, 23 Jan 2020 17:59:13 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20D16100550E;
+ Thu, 23 Jan 2020 22:59:12 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF94719C69;
+ Thu, 23 Jan 2020 22:59:10 +0000 (UTC)
+Message-ID: <13cdd5d93c9bf3be15bceea412b3b66cc1f38fda.camel@redhat.com>
+Subject: Re: [PATCH v2 5/5] iotests: Add test for image creation fallback
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Date: Fri, 24 Jan 2020 00:59:09 +0200
+In-Reply-To: <20200122164532.178040-6-mreitz@redhat.com>
+References: <20200122164532.178040-1-mreitz@redhat.com>
+ <20200122164532.178040-6-mreitz@redhat.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: FLp6PmUsO7GlQtho8LU-8g-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 195.62.97.192
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,128 +85,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Turschmid <peter.turschm@nutanix.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, P J P <ppandit@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 2020-01-22 at 17:45 +0100, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/259     | 61 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/259.out | 14 +++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 76 insertions(+)
+>  create mode 100755 tests/qemu-iotests/259
+>  create mode 100644 tests/qemu-iotests/259.out
+> 
+> diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
+> new file mode 100755
+> index 0000000000..22b4c10241
+> --- /dev/null
+> +++ b/tests/qemu-iotests/259
+> @@ -0,0 +1,61 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test generic image creation fallback (by using NBD)
+> +#
+> +# Copyright (C) 2019 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +# creator
+> +owner=mreitz@redhat.com
+> +
+> +seq=$(basename $0)
+> +echo "QA output created by $seq"
+> +
+> +status=1	# failure is the default!
+> +
+> +_cleanup()
+> +{
+> +    _cleanup_test_img
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +_supported_fmt raw
+> +_supported_proto nbd
+> +_supported_os Linux
+> +
+> +
+> +_make_test_img 64M
+> +
+> +echo
+> +echo '--- Testing creation ---'
+> +
+> +$QEMU_IMG create -f qcow2 "$TEST_IMG" 64M | _filter_img_create
+> +$QEMU_IMG info "$TEST_IMG" | _filter_img_info
+> +
+> +echo
+> +echo '--- Testing creation for which the node would need to grow ---'
+> +
+> +$QEMU_IMG create -f qcow2 -o preallocation=metadata "$TEST_IMG" 64M 2>&1 \
+> +    | _filter_img_create
+> +
+> +# success, all done
+> +echo "*** done"
+> +rm -f $seq.full
+> +status=0
+> diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
+> new file mode 100644
+> index 0000000000..ffed19c2a0
+> --- /dev/null
+> +++ b/tests/qemu-iotests/259.out
+> @@ -0,0 +1,14 @@
+> +QA output created by 259
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> +
+> +--- Testing creation ---
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=qcow2 size=67108864
+> +image: TEST_DIR/t.IMGFMT
+> +file format: qcow2
+> +virtual size: 64 MiB (67108864 bytes)
+> +disk size: unavailable
+> +
+> +--- Testing creation for which the node would need to grow ---
+> +qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Image format driver does not support resize
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=qcow2 size=67108864 preallocation=metadata
+> +*** done
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 1904223020..ec47c2216a 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -273,6 +273,7 @@
+>  256 rw auto quick
+>  257 rw
+>  258 rw quick
+> +259 rw auto quick
+>  260 rw quick
+>  261 rw
+>  262 rw quick migration
+
+Very minor nitpick: maybe add a note that nbd doesn't support resize / truncate.
+It might start supporting it one day.
+I didn't notice it first.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
 
-> Am 23.01.2020 um 22:29 schrieb Felipe Franciosi <felipe@nutanix.com>:
->=20
-> =EF=BB=BFHi,
->=20
->> On Jan 23, 2020, at 5:46 PM, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->>=20
->>> On 1/23/20 1:44 PM, Felipe Franciosi wrote:
->>> When querying an iSCSI server for the provisioning status of blocks (via=
-
->>> GET LBA STATUS), Qemu only validates that the response descriptor zero's=
-
->>> LBA matches the one requested. Given the SCSI spec allows servers to
->>> respond with the status of blocks beyond the end of the LUN, Qemu may
->>> have its heap corrupted by clearing/setting too many bits at the end of
->>> its allocmap for the LUN.
->>> A malicious guest in control of the iSCSI server could carefully program=
-
->>> Qemu's heap (by selectively setting the bitmap) and then smash it.
->>> This limits the number of bits that iscsi_co_block_status() will try to
->>> update in the allocmap so it can't overflow the bitmap.
->>=20
->> Please add:
->>=20
->> Fixes: CVE-2020-1711 (title of CVE if possible)
->=20
-> I wasn't sure we had one yet. Kevin: can you do the needful in your branch=
-?
->=20
->> Cc: qemu-stable@nongnu.org
->=20
-> Yeah, that's there.
->=20
->>=20
->>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
->>> Signed-off-by: Peter Turschmid <peter.turschm@nutanix.com>
->>> Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
->>> ---
->>> block/iscsi.c | 5 +++--
->>> 1 file changed, 3 insertions(+), 2 deletions(-)
->>> diff --git a/block/iscsi.c b/block/iscsi.c
->>> index 2aea7e3f13..cbd57294ab 100644
->>> --- a/block/iscsi.c
->>> +++ b/block/iscsi.c
->>> @@ -701,7 +701,7 @@ static int coroutine_fn iscsi_co_block_status(BlockD=
-riverState *bs,
->>>     struct scsi_get_lba_status *lbas =3D NULL;
->>>     struct scsi_lba_status_descriptor *lbasd =3D NULL;
->>>     struct IscsiTask iTask;
->>> -    uint64_t lba;
->>> +    uint64_t lba, max_bytes;
->>>     int ret;
->>>       iscsi_co_init_iscsitask(iscsilun, &iTask);
->>> @@ -721,6 +721,7 @@ static int coroutine_fn iscsi_co_block_status(BlockD=
-riverState *bs,
->>>     }
->>>       lba =3D offset / iscsilun->block_size;
->>> +    max_bytes =3D (iscsilun->num_blocks - lba) * iscsilun->block_size;
->>>       qemu_mutex_lock(&iscsilun->mutex);
->>> retry:
->>> @@ -764,7 +765,7 @@ retry:
->>>         goto out_unlock;
->>>     }
->>> -    *pnum =3D (int64_t) lbasd->num_blocks * iscsilun->block_size;
->>> +    *pnum =3D MIN((int64_t) lbasd->num_blocks * iscsilun->block_size, m=
-ax_bytes);
->>>       if (lbasd->provisioning =3D=3D SCSI_PROVISIONING_TYPE_DEALLOCATED |=
-|
->>>         lbasd->provisioning =3D=3D SCSI_PROVISIONING_TYPE_ANCHORED) {
->>=20
->> What about this?
->>=20
->> -- >8 --
->> diff --git a/block/iscsi.c b/block/iscsi.c
->> index 2aea7e3f13..25598accbb 100644
->> --- a/block/iscsi.c
->> +++ b/block/iscsi.c
->> @@ -506,6 +506,11 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t of=
-fset,
->>    /* shrink to touch only completely contained clusters */
->>    cl_num_shrunk =3D DIV_ROUND_UP(offset, iscsilun->cluster_size);
->>    nb_cls_shrunk =3D (offset + bytes) / iscsilun->cluster_size - cl_num_s=
-hrunk;
->> +    if (nb_cls_expanded >=3D iscsilun->allocmap_size
->> +        || nb_cls_shrunk >=3D iscsilun->allocmap_size) {
->> +        error_report("iSCSI invalid request: ..." /* TODO */);
->> +        return;
->> +    }
->>    if (allocated) {
->>        bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
->>    } else {
->> ---
->=20
-> I'm not sure the above is correct because (if I read this right)
-> nb_cls_* represents the number of clusters, not the last cluster.
->=20
-> Personally, I would have the checks (or "trim"s) closer to where they
-> were issued (to fail sooner) and assert()s closer to bitmap (as no oob
-> accesses should be happening at this point). There were also
-> discussions about using safer (higher level) bitmaps for this. I'm
-> always in favour of adding all reasonable checks. :)
-
-I would add assertions that cl_num + nb_cls <=3D allocmap_size before every s=
-et and clear.
-
-Peter
 
 
 
