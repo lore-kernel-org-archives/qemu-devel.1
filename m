@@ -2,79 +2,84 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF59DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 222D7C33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE92F21D7D
+	by mail.kernel.org (Postfix) with ESMTPS id EB8A824125
 	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:38:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE92F21D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSdybYzL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB8A824125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiJ4-000159-1W
+	id 1iuiJ4-00011L-44
 	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:38:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50267)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iug56-0003a3-L0
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:15:50 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufdl-0004lc-2m
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iug54-0003Hj-LA
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:15:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54542)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iug54-0003FA-1w
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:15:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iug51-0003QN-Us
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 17:15:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E7E312E80CB
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 17:15:43 +0000 (UTC)
+ (envelope-from <dgilbert@redhat.com>) id 1iufdj-0006Rt-QJ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:33 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33705
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdj-0006Rl-No
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579798051;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pRi6vYFNhs/j1llGXVOGVhSwK/ObAljmvQ/qv9tM0tY=;
+ b=JSdybYzLKUn81jsl9DNBhNgjfQU/y4A8jhael0Y5oJ9WtJsuwkvAho4LBs/B2MBSb5vuzS
+ Cd919+s9TRtxCNHySfW4+kukQF+WBg53ZrljjWopnXFpvLSunFWPs42s8sIcTvhDxpgjy9
+ Sz4JE1A6OWwxrOF/ezpSeExj8cGEczQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-K0JJm_mFNjiBGk8LgEePBg-1; Thu, 23 Jan 2020 11:47:30 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13309107ACC4
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:29 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5EB3A19C69;
+ Thu, 23 Jan 2020 16:47:28 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 034/108] virtiofsd: passthrough_ll: create new files in
+ caller's context
+Date: Thu, 23 Jan 2020 16:45:16 +0000
+Message-Id: <20200123164630.91498-35-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: K0JJm_mFNjiBGk8LgEePBg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jan 2020 17:02:03 -0000
-From: Lee Trager <lee.trager@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=maas; status=New; importance=Undecided;
- assignee=lee.trager@canonical.com; 
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
- assignee=maas; 
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fheimes ltrager paelzer sfeole
-X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
-X-Launchpad-Bug-Modifier: Lee Trager (ltrager)
-References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <157979892351.5598.15509680617209942702.malone@chaenomeles.canonical.com>
-Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
- initial deploy
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 35a78bb26f9a5597de362008180d835c0185589a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,91 +88,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The S390X KVM boot driver in MAAS really hasn't changed since it was
-committed in 2018[1]. I doubt changing the version of MAAS will show it
-working. I would try using older versions of qemu.
+From: Vivek Goyal <vgoyal@redhat.com>
 
-[1]
-https://git.launchpad.net/maas/log/src/provisioningserver/boot/s390x.py
+We need to create files in the caller's context. Otherwise after
+creating a file, the caller might not be able to do file operations on
+that file.
 
--- =
+Changed effective uid/gid to caller's uid/gid, create file and then
+switch back to uid/gid 0.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859656
+Use syscall(setresuid, ...) otherwise glibc does some magic to change EUID
+in all threads, which is not what we want.
 
-Title:
-  [2.6] Unable to reboot s390x KVM machine after initial deploy
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 96 ++++++++++++++++++++++++++++++--
+ 1 file changed, 91 insertions(+), 5 deletions(-)
 
-Status in MAAS:
-  New
-Status in QEMU:
-  Incomplete
-Status in Ubuntu on IBM z Systems:
-  Triaged
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index cd27c09f59..5e061797d4 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -50,6 +50,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/file.h>
++#include <sys/syscall.h>
+ #include <sys/xattr.h>
+ #include <unistd.h>
+=20
+@@ -83,6 +84,11 @@ struct lo_inode {
+     uint64_t refcount; /* protected by lo->mutex */
+ };
+=20
++struct lo_cred {
++    uid_t euid;
++    gid_t egid;
++};
++
+ enum {
+     CACHE_NEVER,
+     CACHE_NORMAL,
+@@ -383,6 +389,69 @@ static void lo_lookup(fuse_req_t req, fuse_ino_t paren=
+t, const char *name)
+     }
+ }
+=20
++/*
++ * On some archs, setres*id is limited to 2^16 but they
++ * provide setres*id32 variants that allow 2^32.
++ * Others just let setres*id do 2^32 anyway.
++ */
++#ifdef SYS_setresgid32
++#define OURSYS_setresgid SYS_setresgid32
++#else
++#define OURSYS_setresgid SYS_setresgid
++#endif
++
++#ifdef SYS_setresuid32
++#define OURSYS_setresuid SYS_setresuid32
++#else
++#define OURSYS_setresuid SYS_setresuid
++#endif
++
++/*
++ * Change to uid/gid of caller so that file is created with
++ * ownership of caller.
++ * TODO: What about selinux context?
++ */
++static int lo_change_cred(fuse_req_t req, struct lo_cred *old)
++{
++    int res;
++
++    old->euid =3D geteuid();
++    old->egid =3D getegid();
++
++    res =3D syscall(OURSYS_setresgid, -1, fuse_req_ctx(req)->gid, -1);
++    if (res =3D=3D -1) {
++        return errno;
++    }
++
++    res =3D syscall(OURSYS_setresuid, -1, fuse_req_ctx(req)->uid, -1);
++    if (res =3D=3D -1) {
++        int errno_save =3D errno;
++
++        syscall(OURSYS_setresgid, -1, old->egid, -1);
++        return errno_save;
++    }
++
++    return 0;
++}
++
++/* Regain Privileges */
++static void lo_restore_cred(struct lo_cred *old)
++{
++    int res;
++
++    res =3D syscall(OURSYS_setresuid, -1, old->euid, -1);
++    if (res =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "seteuid(%u): %m\n", old->euid);
++        exit(1);
++    }
++
++    res =3D syscall(OURSYS_setresgid, -1, old->egid, -1);
++    if (res =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "setegid(%u): %m\n", old->egid);
++        exit(1);
++    }
++}
++
+ static void lo_mknod_symlink(fuse_req_t req, fuse_ino_t parent,
+                              const char *name, mode_t mode, dev_t rdev,
+                              const char *link)
+@@ -391,12 +460,21 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_ino=
+_t parent,
+     int saverr;
+     struct lo_inode *dir =3D lo_inode(req, parent);
+     struct fuse_entry_param e;
++    struct lo_cred old =3D {};
+=20
+     saverr =3D ENOMEM;
+=20
++    saverr =3D lo_change_cred(req, &old);
++    if (saverr) {
++        goto out;
++    }
++
+     res =3D mknod_wrapper(dir->fd, name, link, mode, rdev);
+=20
+     saverr =3D errno;
++
++    lo_restore_cred(&old);
++
+     if (res =3D=3D -1) {
+         goto out;
+     }
+@@ -794,26 +872,34 @@ static void lo_create(fuse_req_t req, fuse_ino_t pare=
+nt, const char *name,
+     struct lo_data *lo =3D lo_data(req);
+     struct fuse_entry_param e;
+     int err;
++    struct lo_cred old =3D {};
+=20
+     if (lo_debug(req)) {
+         fuse_log(FUSE_LOG_DEBUG, "lo_create(parent=3D%" PRIu64 ", name=3D%=
+s)\n",
+                  parent, name);
+     }
+=20
++    err =3D lo_change_cred(req, &old);
++    if (err) {
++        goto out;
++    }
++
+     fd =3D openat(lo_fd(req, parent), name, (fi->flags | O_CREAT) & ~O_NOF=
+OLLOW,
+                 mode);
+-    if (fd =3D=3D -1) {
+-        return (void)fuse_reply_err(req, errno);
+-    }
++    err =3D fd =3D=3D -1 ? errno : 0;
++    lo_restore_cred(&old);
+=20
+-    fi->fh =3D fd;
++    if (!err) {
++        fi->fh =3D fd;
++        err =3D lo_do_lookup(req, parent, name, &e);
++    }
+     if (lo->cache =3D=3D CACHE_NEVER) {
+         fi->direct_io =3D 1;
+     } else if (lo->cache =3D=3D CACHE_ALWAYS) {
+         fi->keep_cache =3D 1;
+     }
+=20
+-    err =3D lo_do_lookup(req, parent, name, &e);
++out:
+     if (err) {
+         fuse_reply_err(req, err);
+     } else {
+--=20
+2.24.1
 
-Bug description:
-  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
-  Arch: S390x
-
-  Appears that MAAS can not find the s390x bootloader to boot from the
-  disk, not sure how maas determines this.  However this was working in
-  the past. I had originally thought that if the maas machine was
-  deployed then it defaulted to boot from disk.
-
-  If I force the VM to book from disk, the VM starts up as expected.
-
-  Reproduce:
-
-  - Deploy Disco on S390x KVM instance
-  - Reboot it
-
-  on the KVM console...
-
-  Connected to domain s2lp6g001
-  Escape character is ^]
-  done
-  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
-  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
-  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
-  Trying pxelinux.cfg files...
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  Failed to load OS from network
-
-  =3D=3D> /var/log/maas/rackd.log <=3D=3D
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
-0x.bin requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
-5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-1-52-54-00-e5-d7-bb requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA0 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64B requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF6 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-A requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
- requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
-efault requested by 10.246.75.160
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
 
