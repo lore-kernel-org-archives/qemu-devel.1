@@ -2,86 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF9FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7BCC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:24:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20EB621734
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:24:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0B4321734
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:24:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tLqbYJqQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20EB621734
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OEGv9Wpv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B4321734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iufH4-00080z-Sg
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:24:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51695)
+	id 1iufHa-0000cD-BP
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:24:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59809)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrd-0005NH-Tf
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:42 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iudNs-00074l-38
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:23:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrc-00049C-Nj
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:41 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:40244)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrc-000487-Hk
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:40 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id c14so3133361wrn.7
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=hUG/7q5hSf5ymYtbRPJKidNIIUCm54xUUBFlpg5zKq0=;
- b=tLqbYJqQtBfyse6rQp3S6/Ma/yd4bd+4qTqBWqo0D81u826aElxbkeXHi6vh7hrw01
- 0hvLqzNVqE2BR14Y0D2OvLTrFrnY/jlt3BZq251MwiyJMfTll/aFBryoaTN7TAH8yFN/
- eft7v8yfhwRZdlqkTETTB4/Ay3msdDucLl8yaGefup37DSTYQmeA+UWaklfQYZR01nas
- 8qqmRzO60rzaBWMtdcVRpEVipZCWJpMk8iFxeBuBhOKtpOuXY9xscuEYtHEvUGHONFch
- PlucL6q/mh7XZiH15DQb0xNBy+JkPR73oLqvUBTbfVrrHeV4z6JwJ5TkrN5ttphWI4Lz
- G61A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=hUG/7q5hSf5ymYtbRPJKidNIIUCm54xUUBFlpg5zKq0=;
- b=R/oSMGWGTs7AJ6dZhgY1kBXiAAdDiTaKia2Sms1d44i6NkgqW6VVUl83Q4gtU5Jaim
- e6/GYehDNK9WcDhZgjjjDlInHZkJ5WsQ/PAs6Fts2dudcK9H7PB252BKa2coBOc+gV6/
- /16VvBgMX0XsgMVw/qF9fRI6XWvCkig40iRF0jyC2uBb2yHLlkeOGECVlOz8SSsvubKB
- iYB5Yh54QqG82b7J6Nfeb75WKxE+GwCddeWVFkHbJi64bXsN/rTb0pjErivSSJXxJ80K
- VGtKKOPTrf+1pCh7vF0Kb8AmAn8fDIoDYv+2lPsKbdekoAgfYQTeYx9NsGWE39rA0jHJ
- laHQ==
-X-Gm-Message-State: APjAAAUTOF4943Sdw0B9pRVHPEAAzcaVjTSU4fkg57fzDMs5+NqvBGoi
- +I3xHTaYvUuXq5WjwCd3hb3HmAdh
-X-Google-Smtp-Source: APXvYqzLfOi2acp6yMec3AsL88IYDnNi7F7etX7r7FHDZeWzaZHC1thqmyrP08UAtkwpvDKyxNCiEw==
-X-Received: by 2002:adf:eb48:: with SMTP id u8mr17453068wrn.283.1579787379310; 
- Thu, 23 Jan 2020 05:49:39 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.38
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:38 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <kraxel@redhat.com>) id 1iudNq-0004eh-Sd
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:22:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57788
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iudNq-0004dY-Op
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:22:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579789378;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uWPWSWfYKvtz3ECYoPIg8PimFhSZqtJF8y3utyXfJ80=;
+ b=OEGv9WpvYGSqfQ+awiG6sH5eP9IO0c85lM0xt+n0ew0FVcoFHExqGxa7fS5vmxzgI5I08v
+ upE3+eLHfEoAO+dwD2Sbk1HyQpR4ydu/i/1orVzkW0PhaaQO0NZbk/XxqnYfOhzGod/B/Z
+ mHpPm5ObVrTqFR5zYPffqkTiXzf4nqY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-sev2OAqlNIOOVoMOIDcMCQ-1; Thu, 23 Jan 2020 09:21:26 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4D9F8017CC;
+ Thu, 23 Jan 2020 14:21:25 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-106.ams2.redhat.com
+ [10.36.116.106])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 39A7A80896;
+ Thu, 23 Jan 2020 14:21:23 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 779A49C7F; Thu, 23 Jan 2020 15:21:22 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 37/59] object: add object_property_get_defaut()
-Date: Thu, 23 Jan 2020 14:48:40 +0100
-Message-Id: <1579787342-27146-38-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+Subject: [PULL 2/3] vnc: prioritize ZRLE compression over ZLIB
+Date: Thu, 23 Jan 2020 15:21:21 +0100
+Message-Id: <20200123142122.13839-3-kraxel@redhat.com>
+In-Reply-To: <20200123142122.13839-1-kraxel@redhat.com>
+References: <20200123142122.13839-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: sev2OAqlNIOOVoMOIDcMCQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,89 +87,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Cameron Esfahani <dirty@apple.com>
 
-The new callback will be used in following "object: add
-object_property_set_defaut_{bool,str,int,uint}()" and "vl: print
-default value in object help" patches.
+In my investigation, ZRLE always compresses better than ZLIB so
+prioritize ZRLE over ZLIB, even if the client hints that ZLIB is
+preferred.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200110153039.1379601-8-marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+zlib buffer is always reset in zrle_compress_data(), so using offset to
+calculate next_out and avail_out is useless.
+
+Signed-off-by: Cameron Esfahani <dirty@apple.com>
+Message-Id: <b5d129895d08a90d0a2a6183b95875bacfa998b8.1579582674.git.dirty@=
+apple.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/qom/object.h | 17 +++++++++++++++++
- qom/object.c         |  9 +++++++++
- 2 files changed, 26 insertions(+)
+ ui/vnc-enc-zrle.c |  4 ++--
+ ui/vnc.c          | 11 +++++++++--
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 29f47d3..ca47308 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -367,6 +367,13 @@ typedef void (ObjectPropertyRelease)(Object *obj,
-  */
- typedef void (ObjectPropertyInit)(Object *obj, ObjectProperty *prop);
- 
-+/**
-+ * ObjectPropertyGetDefault:
-+ *
-+ * Get an allocated string representation of the default value.
-+ */
-+typedef char *(ObjectPropertyGetDefault)(ObjectProperty *prop);
-+
- struct ObjectProperty
- {
-     gchar *name;
-@@ -377,6 +384,7 @@ struct ObjectProperty
-     ObjectPropertyResolve *resolve;
-     ObjectPropertyRelease *release;
-     ObjectPropertyInit *init;
-+    ObjectPropertyGetDefault *get_default;
-     void *opaque;
- };
- 
-@@ -1234,6 +1242,15 @@ void object_property_set_int(Object *obj, int64_t value,
-                              const char *name, Error **errp);
- 
- /**
-+ * object_property_get_defaut:
-+ * @prop: the property to get default value
-+ *
-+ * Return an allocated string that represents the default property
-+ * value or NULL.
-+ */
-+char *object_property_get_default(ObjectProperty *prop);
-+
-+/**
-  * object_property_get_int:
-  * @obj: the object
-  * @name: the name of the property
-diff --git a/qom/object.c b/qom/object.c
-index cd7ce81..49c2429 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1438,6 +1438,15 @@ int64_t object_property_get_int(Object *obj, const char *name,
-     return retval;
- }
- 
-+char *object_property_get_default(ObjectProperty *prop)
-+{
-+    if (!prop->get_default) {
-+        return NULL;
-+    }
-+
-+    return prop->get_default(prop);
-+}
-+
- void object_property_set_uint(Object *obj, uint64_t value,
-                               const char *name, Error **errp)
- {
--- 
-1.8.3.1
-
+diff --git a/ui/vnc-enc-zrle.c b/ui/vnc-enc-zrle.c
+index 17fd28a2e2b0..b4f71e32cfe8 100644
+--- a/ui/vnc-enc-zrle.c
++++ b/ui/vnc-enc-zrle.c
+@@ -98,8 +98,8 @@ static int zrle_compress_data(VncState *vs, int level)
+     /* set pointers */
+     zstream->next_in =3D vs->zrle->zrle.buffer;
+     zstream->avail_in =3D vs->zrle->zrle.offset;
+-    zstream->next_out =3D vs->zrle->zlib.buffer + vs->zrle->zlib.offset;
+-    zstream->avail_out =3D vs->zrle->zlib.capacity - vs->zrle->zlib.offset=
+;
++    zstream->next_out =3D vs->zrle->zlib.buffer;
++    zstream->avail_out =3D vs->zrle->zlib.capacity;
+     zstream->data_type =3D Z_BINARY;
+=20
+     /* start encoding */
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 3e8d1f120710..1d7138a3a073 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -2071,8 +2071,15 @@ static void set_encodings(VncState *vs, int32_t *enc=
+odings, size_t n_encodings)
+             break;
+ #endif
+         case VNC_ENCODING_ZLIB:
+-            vs->features |=3D VNC_FEATURE_ZLIB_MASK;
+-            vs->vnc_encoding =3D enc;
++            /*
++             * VNC_ENCODING_ZRLE compresses better than VNC_ENCODING_ZLIB.
++             * So prioritize ZRLE, even if the client hints that it prefer=
+s
++             * ZLIB.
++             */
++            if ((vs->features & VNC_FEATURE_ZRLE_MASK) =3D=3D 0) {
++                vs->features |=3D VNC_FEATURE_ZLIB_MASK;
++                vs->vnc_encoding =3D enc;
++            }
+             break;
+         case VNC_ENCODING_ZRLE:
+             vs->features |=3D VNC_FEATURE_ZRLE_MASK;
+--=20
+2.18.1
 
 
