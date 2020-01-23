@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A8DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 754EEC33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E491321D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A59021D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SEc6mkjA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E491321D7D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ac60EBko"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A59021D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiHQ-0005hz-0u
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:36:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42216)
+	id 1iuiHT-0005tR-Dj
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:36:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufeY-0005hu-N2
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:23 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufdh-0004j0-Po
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufeX-0007cv-Kz
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20745
+ (envelope-from <dgilbert@redhat.com>) id 1iufdf-0006PH-W2
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43104
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufeX-0007c7-IM
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:21 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdf-0006Oy-Tm
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798101;
+ s=mimecast20190719; t=1579798046;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=imqdhMqGGCbqFjXzn1OvJMNkpWKq8bLqQVnL1jcujuQ=;
- b=SEc6mkjAl+UiRw5VIapkUza5y9u+Ge7epKgXEA37N9mJNl02aiSE4dpI+kuLgYmC5gGUe0
- NEFrskhqmXa8AFYwGuC7SMhpZOCt314k7mIwpd1nPwGd6eaLZ64lrfobBfUumsktweBqM9
- ZurTSK41rsKLXZ8JBaa/otvFTODDHdQ=
+ bh=9Wsvi6ylmggzuEttsW+S6YDpnrJ0gXoKZtapOr0FXpA=;
+ b=ac60EBkoCUmOO0aGa5y0tiBgbduPRFBP54M6rTGXdUAKemS+oaFpLyFeSR6C4vuqw8Lxeo
+ FoSBXm9jSX08VajypKrmXVspY/AuR9mP3Z+UnISshqCey+Hgca3HwyEEzUU2f6R2q4O7z7
+ vuqUJJXEWsxtakU0C7rQXVYaJ3oYugk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-c1crK3mqMGqQZ2drjuon0w-1; Thu, 23 Jan 2020 11:48:19 -0500
+ us-mta-153-_eR23ePCPku5RuTE4ZuFbA-1; Thu, 23 Jan 2020 11:47:25 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1E0A9276E
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13D5418FE89A
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:24 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
  [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3C3DF28993;
- Thu, 23 Jan 2020 16:48:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 61AEA28991;
+ Thu, 23 Jan 2020 16:47:23 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 077/108] virtiofsd: fix error handling in main()
-Date: Thu, 23 Jan 2020 16:45:59 +0000
-Message-Id: <20200123164630.91498-78-dgilbert@redhat.com>
+Subject: [PULL 029/108] virtiofsd: add --fd=FDNUM fd passing option
+Date: Thu, 23 Jan 2020 16:45:11 +0000
+Message-Id: <20200123164630.91498-30-dgilbert@redhat.com>
 In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
 References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: c1crK3mqMGqQZ2drjuon0w-1
+X-MC-Unique: _eR23ePCPku5RuTE4ZuFbA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -91,48 +91,163 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Bo <bo.liu@linux.alibaba.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Neither fuse_parse_cmdline() nor fuse_opt_parse() goes to the right place
-to do cleanup.
+Although --socket-path=3DPATH is useful for manual invocations, management
+tools typically create the UNIX domain socket themselves and pass it to
+the vhost-user device backend.  This way QEMU can be launched
+immediately with a valid socket.  No waiting for the vhost-user device
+backend is required when fd passing is used.
 
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ tools/virtiofsd/fuse_i.h        |  1 +
+ tools/virtiofsd/fuse_lowlevel.c | 16 ++++++++++++----
+ tools/virtiofsd/fuse_virtio.c   | 31 +++++++++++++++++++++++++------
+ 3 files changed, 38 insertions(+), 10 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 9ed77a17fd..af050c6d97 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2443,13 +2443,14 @@ int main(int argc, char *argv[])
-     lo_map_init(&lo.fd_map);
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index 1126723d18..45995f3246 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -68,6 +68,7 @@ struct fuse_session {
+     size_t bufsize;
+     int error;
+     char *vu_socket_path;
++    int   vu_listen_fd;
+     int   vu_socketfd;
+     struct fv_VuDev *virtio_dev;
+ };
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 4f4684d942..95f4db8fcf 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -2130,6 +2130,7 @@ static const struct fuse_opt fuse_ll_opts[] =3D {
+     LL_OPTION("--debug", debug, 1),
+     LL_OPTION("allow_root", deny_others, 1),
+     LL_OPTION("--socket-path=3D%s", vu_socket_path, 0),
++    LL_OPTION("--fd=3D%d", vu_listen_fd, 0),
+     FUSE_OPT_END
+ };
 =20
-     if (fuse_parse_cmdline(&args, &opts) !=3D 0) {
--        return 1;
-+        goto err_out1;
+@@ -2147,7 +2148,8 @@ void fuse_lowlevel_help(void)
+      */
+     printf(
+         "    -o allow_root              allow access by root\n"
+-        "    --socket-path=3DPATH         path for the vhost-user socket\n=
+");
++        "    --socket-path=3DPATH         path for the vhost-user socket\n=
+"
++        "    --fd=3DFDNUM                 fd number of vhost-user socket\n=
+");
+ }
+=20
+ void fuse_session_destroy(struct fuse_session *se)
+@@ -2191,6 +2193,7 @@ struct fuse_session *fuse_session_new(struct fuse_arg=
+s *args,
+         goto out1;
      }
-     fuse_set_log_func(log_func);
-     use_syslog =3D opts.syslog;
-     if (use_syslog) {
-         openlog("virtiofsd", LOG_PID, LOG_DAEMON);
+     se->fd =3D -1;
++    se->vu_listen_fd =3D -1;
+     se->conn.max_write =3D UINT_MAX;
+     se->conn.max_readahead =3D UINT_MAX;
+=20
+@@ -2212,8 +2215,13 @@ struct fuse_session *fuse_session_new(struct fuse_ar=
+gs *args,
+         goto out4;
      }
+=20
+-    if (!se->vu_socket_path) {
+-        fprintf(stderr, "fuse: missing -o vhost_user_socket option\n");
++    if (!se->vu_socket_path && se->vu_listen_fd < 0) {
++        fuse_log(FUSE_LOG_ERR, "fuse: missing --socket-path or --fd option=
+\n");
++        goto out4;
++    }
++    if (se->vu_socket_path && se->vu_listen_fd >=3D 0) {
++        fuse_log(FUSE_LOG_ERR,
++                 "fuse: --socket-path and --fd cannot be given together\n"=
+);
+         goto out4;
+     }
+=20
+@@ -2253,7 +2261,7 @@ void fuse_session_unmount(struct fuse_session *se)
+=20
+ int fuse_lowlevel_is_virtio(struct fuse_session *se)
+ {
+-    return se->vu_socket_path !=3D NULL;
++    return !!se->virtio_dev;
+ }
+=20
+ #ifdef linux
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 7e2711b504..635f87756a 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -638,18 +638,21 @@ int virtio_loop(struct fuse_session *se)
+     return 0;
+ }
+=20
+-int virtio_session_mount(struct fuse_session *se)
++static int fv_create_listen_socket(struct fuse_session *se)
+ {
+     struct sockaddr_un un;
+     mode_t old_umask;
+=20
++    /* Nothing to do if fd is already initialized */
++    if (se->vu_listen_fd >=3D 0) {
++        return 0;
++    }
 +
-     if (opts.show_help) {
-         printf("usage: %s [options]\n\n", argv[0]);
-         fuse_cmdline_help();
-@@ -2468,7 +2469,7 @@ int main(int argc, char *argv[])
+     if (strlen(se->vu_socket_path) >=3D sizeof(un.sun_path)) {
+         fuse_log(FUSE_LOG_ERR, "Socket path too long\n");
+         return -1;
      }
 =20
-     if (fuse_opt_parse(&args, &lo, lo_opts, NULL) =3D=3D -1) {
--        return 1;
-+        goto err_out1;
-     }
-=20
+-    se->fd =3D -1;
+-
      /*
+      * Create the Unix socket to communicate with qemu
+      * based on QEMU's vhost-user-bridge
+@@ -682,15 +685,31 @@ int virtio_session_mount(struct fuse_session *se)
+         return -1;
+     }
+=20
++    se->vu_listen_fd =3D listen_sock;
++    return 0;
++}
++
++int virtio_session_mount(struct fuse_session *se)
++{
++    int ret;
++
++    ret =3D fv_create_listen_socket(se);
++    if (ret < 0) {
++        return ret;
++    }
++
++    se->fd =3D -1;
++
+     fuse_log(FUSE_LOG_INFO, "%s: Waiting for vhost-user socket connection.=
+..\n",
+              __func__);
+-    int data_sock =3D accept(listen_sock, NULL, NULL);
++    int data_sock =3D accept(se->vu_listen_fd, NULL, NULL);
+     if (data_sock =3D=3D -1) {
+         fuse_log(FUSE_LOG_ERR, "vhost socket accept: %m\n");
+-        close(listen_sock);
++        close(se->vu_listen_fd);
+         return -1;
+     }
+-    close(listen_sock);
++    close(se->vu_listen_fd);
++    se->vu_listen_fd =3D -1;
+     fuse_log(FUSE_LOG_INFO, "%s: Received vhost-user socket connection\n",
+              __func__);
+=20
 --=20
 2.24.1
 
