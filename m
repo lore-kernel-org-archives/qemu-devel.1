@@ -2,79 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C95DBC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30885C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:18:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 900C92467B
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC6F92467B
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:18:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkbBoutq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900C92467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7c6EqVn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC6F92467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iucMl-0008Q6-2C
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:17:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39552)
+	id 1iucNh-0000bZ-6a
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:18:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iub75-00080d-C8
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:57:32 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub94-0002Oq-PR
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iub74-0003Ut-9Q
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:57:31 -0500
-Received: from mail-qv1-xf36.google.com ([2607:f8b0:4864:20::f36]:42168)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iub74-0003Tr-4g
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:57:30 -0500
-Received: by mail-qv1-xf36.google.com with SMTP id dc14so1312471qvb.9
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 03:57:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Zs3C0moVFYQrAeeeVDEJyevqfF+VQBDa1YIUJ6XWpyk=;
- b=JkbBoutqNzP+qwZ4Jkkb8VESP6Wd1cu5kO/WN0R8RJYWworILJcjOwQdpBkX+fPWKJ
- c5Cpk1F4xSh03ayphRf2NImy1eUitXt1/oUQaPSglGwk3mQQqjO6XEQfW6ZfxhQ34EZv
- fmhe4NBPNFduai4kkZnifBSUdUX6Iv4H1fdYfvZ/OKz9W+sK5kfKzsj/w481uE1wieNG
- ZhsqhAq+mSyMQWQJgiH298hQbtBO5HNrX5+72Sbjaqbhno5ubn3RnIenZaE5CJUbu7wh
- 1B7sbGaDQuxmtQR3/clwtOyQfvDxQa45D1PGbtl7DCwe/C9W7ux0admNYpNoi/kFuaWj
- GYzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Zs3C0moVFYQrAeeeVDEJyevqfF+VQBDa1YIUJ6XWpyk=;
- b=o7duvPodtX8Y2sTzVHlwt6sZoSfvy8+oNdK3YRhjQrkdf0iaCd7GHZ300PnXNrr/2Q
- /TrFMWSXt+bvS0A5LzQ79wdKzXE2FJRwBEgYDHiZvCmc0a/tIVPA8Nggwb5CuX/mxUce
- y006Oo/Q4yD3QnllR7rMrGD6SBMOa+UHA+1Db43fuLnuYkCFKXn0iZrHODQw+f3USn1i
- 1RVw9X27bE+3u/Pw8SmFJ2XlYjAuaJdoC18poG1hzGXBQ6sC/GhK2WnPoLcMx9rRVaBa
- Db0ivrumVOBGO4f9u5YOuwJ/n/qgs9baos/5KRat/mbBgDKlfLmFBggw5JHZ8BapBTBA
- XtCA==
-X-Gm-Message-State: APjAAAXhANuXvf/hzskXeh19WaakDPAC7yaKMgZPhNHegxrrclCs/KjO
- bW6uku3wx7+Y9lLBnvrzAJLtPRhKDrQDZ7TW+fo=
-X-Google-Smtp-Source: APXvYqxaJzv6wEDw2fzZkzw5riEVEGsYOJQnFR5UFAvtkHjLf5lej8d4BuFTm9DWDkH1i6lSYDzpkxqCINBnu0Xp3ww=
-X-Received: by 2002:a0c:f68f:: with SMTP id p15mr15016701qvn.79.1579780647027; 
- Thu, 23 Jan 2020 03:57:27 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1iub93-0005AY-7z
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:34 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35506
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub93-0005AA-46
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579780772;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MdrT4LOkC8ZKML3gWoy6Ii/nK7cw9vlWojUEEc01X4s=;
+ b=A7c6EqVnuainZbOFRniVjgFC+vPJEsTD3MwhcBwAk7MQBoUAKAo/qCGVeMxaufLf8o+98i
+ ykqlEIrZqBH/ZllT/J/4kAxJVTWu3p27aEQNCHsxkAOy3AniiEbBU1xImuboZny+huev+0
+ LX/LYC8gVdRedjXgp49arbUj2oFOMTU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-gcHYy5m2PAeF9i946Yp66A-1; Thu, 23 Jan 2020 06:59:31 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5866CDB6A
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:29 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A627385754;
+ Thu, 23 Jan 2020 11:59:28 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 035/111] virtiofsd: passthrough_ll: add lo_map for ino/fh
+ indirection
+Date: Thu, 23 Jan 2020 11:57:25 +0000
+Message-Id: <20200123115841.138849-36-dgilbert@redhat.com>
+In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-References: <20200123000307.11541-1-richard.henderson@linaro.org>
- <bdcf69f2-a88a-6484-8321-f8b6a9977763@redhat.com>
-In-Reply-To: <bdcf69f2-a88a-6484-8321-f8b6a9977763@redhat.com>
-From: Michael Rolnik <mrolnik@gmail.com>
-Date: Thu, 23 Jan 2020 13:56:47 +0200
-Message-ID: <CAK4993j5xy6uJhi4e-denFjPt3BX+2yLnLcHKSg9hEYHj7QpKw@mail.gmail.com>
-Subject: Re: [PATCH rc1 00/24] target/avr merger
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000004a07da059ccd5831"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f36
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: gcHYy5m2PAeF9i946Yp66A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,69 +87,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Igor Mammedov <imammedo@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004a07da059ccd5831
-Content-Type: text/plain; charset="UTF-8"
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-How do I get it? from where?
+A layer of indirection is needed because passthrough_ll cannot expose
+pointers or file descriptor numbers to untrusted clients.  Malicious
+clients could send invalid pointers or file descriptors in order to
+crash or exploit the file system daemon.
 
-On Thu, Jan 23, 2020 at 7:12 AM Thomas Huth <thuth@redhat.com> wrote:
+lo_map provides an integer key->value mapping.  This will be used for
+ino and fh fields in the patches that follow.
 
-> On 23/01/2020 01.02, Richard Henderson wrote:
-> > This is a merger of Michael's v41 of the base avr architecture,
-> > and v4 of Phil's arduino target boards.  Call this release, or
-> > merge, candidate 1.
-> >
-> > Has all commentary been addressed?  How much more, if anything,
-> > does anyone require before allowing normal development in tree?
->
-> I just had a quick look at the series. Apart from some few nits, it
-> looks fine to me, so I think it's fine to merge it now.
->
->  Thomas
->
->
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 124 +++++++++++++++++++++++++++++++
+ 1 file changed, 124 insertions(+)
 
--- 
-Best Regards,
-Michael Rolnik
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 5e061797d4..e83a976587 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -74,6 +74,21 @@ struct _uintptr_to_must_hold_fuse_ino_t_dummy_struct {
+ };
+ #endif
+=20
++struct lo_map_elem {
++    union {
++        /* Element values will go here... */
++        ssize_t freelist;
++    };
++    bool in_use;
++};
++
++/* Maps FUSE fh or ino values to internal objects */
++struct lo_map {
++    struct lo_map_elem *elems;
++    size_t nelems;
++    ssize_t freelist;
++};
++
+ struct lo_inode {
+     struct lo_inode *next; /* protected by lo->mutex */
+     struct lo_inode *prev; /* protected by lo->mutex */
+@@ -130,6 +145,115 @@ static struct lo_data *lo_data(fuse_req_t req)
+     return (struct lo_data *)fuse_req_userdata(req);
+ }
+=20
++__attribute__((unused)) static void lo_map_init(struct lo_map *map)
++{
++    map->elems =3D NULL;
++    map->nelems =3D 0;
++    map->freelist =3D -1;
++}
++
++__attribute__((unused)) static void lo_map_destroy(struct lo_map *map)
++{
++    free(map->elems);
++}
++
++static int lo_map_grow(struct lo_map *map, size_t new_nelems)
++{
++    struct lo_map_elem *new_elems;
++    size_t i;
++
++    if (new_nelems <=3D map->nelems) {
++        return 1;
++    }
++
++    new_elems =3D realloc(map->elems, sizeof(map->elems[0]) * new_nelems);
++    if (!new_elems) {
++        return 0;
++    }
++
++    for (i =3D map->nelems; i < new_nelems; i++) {
++        new_elems[i].freelist =3D i + 1;
++        new_elems[i].in_use =3D false;
++    }
++    new_elems[new_nelems - 1].freelist =3D -1;
++
++    map->elems =3D new_elems;
++    map->freelist =3D map->nelems;
++    map->nelems =3D new_nelems;
++    return 1;
++}
++
++__attribute__((unused)) static struct lo_map_elem *
++lo_map_alloc_elem(struct lo_map *map)
++{
++    struct lo_map_elem *elem;
++
++    if (map->freelist =3D=3D -1 && !lo_map_grow(map, map->nelems + 256)) {
++        return NULL;
++    }
++
++    elem =3D &map->elems[map->freelist];
++    map->freelist =3D elem->freelist;
++
++    elem->in_use =3D true;
++
++    return elem;
++}
++
++__attribute__((unused)) static struct lo_map_elem *
++lo_map_reserve(struct lo_map *map, size_t key)
++{
++    ssize_t *prev;
++
++    if (!lo_map_grow(map, key + 1)) {
++        return NULL;
++    }
++
++    for (prev =3D &map->freelist; *prev !=3D -1;
++         prev =3D &map->elems[*prev].freelist) {
++        if (*prev =3D=3D key) {
++            struct lo_map_elem *elem =3D &map->elems[key];
++
++            *prev =3D elem->freelist;
++            elem->in_use =3D true;
++            return elem;
++        }
++    }
++    return NULL;
++}
++
++__attribute__((unused)) static struct lo_map_elem *
++lo_map_get(struct lo_map *map, size_t key)
++{
++    if (key >=3D map->nelems) {
++        return NULL;
++    }
++    if (!map->elems[key].in_use) {
++        return NULL;
++    }
++    return &map->elems[key];
++}
++
++__attribute__((unused)) static void lo_map_remove(struct lo_map *map,
++                                                  size_t key)
++{
++    struct lo_map_elem *elem;
++
++    if (key >=3D map->nelems) {
++        return;
++    }
++
++    elem =3D &map->elems[key];
++    if (!elem->in_use) {
++        return;
++    }
++
++    elem->in_use =3D false;
++
++    elem->freelist =3D map->freelist;
++    map->freelist =3D key;
++}
++
+ static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
+ {
+     if (ino =3D=3D FUSE_ROOT_ID) {
+--=20
+2.24.1
 
---0000000000004a07da059ccd5831
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">How do I get it? from where?</div><br><div class=3D"gmail_=
-quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jan 23, 2020 at 7:12 A=
-M Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&=
-gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 23=
-/01/2020 01.02, Richard Henderson wrote:<br>
-&gt; This is a merger of Michael&#39;s v41 of the base avr architecture,<br=
->
-&gt; and v4 of Phil&#39;s arduino target boards.=C2=A0 Call this release, o=
-r<br>
-&gt; merge, candidate 1.<br>
-&gt; <br>
-&gt; Has all commentary been addressed?=C2=A0 How much more, if anything,<b=
-r>
-&gt; does anyone require before allowing normal development in tree?<br>
-<br>
-I just had a quick look at the series. Apart from some few nits, it<br>
-looks fine to me, so I think it&#39;s fine to merge it now.<br>
-<br>
-=C2=A0Thomas<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
-
---0000000000004a07da059ccd5831--
 
