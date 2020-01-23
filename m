@@ -2,85 +2,126 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 068E9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4827C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:37:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE69B21835
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:33:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6728421734
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:37:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpjLuiF/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE69B21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="DN8ZN+n4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6728421734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iujA3-0005g9-W3
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:33:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54134)
+	id 1iujEP-0001r2-I6
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:37:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48517)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iuhjz-0004or-C5
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:02:09 -0500
+ (envelope-from <felipe@nutanix.com>) id 1iujDl-0001Ii-7S
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 15:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iuhjw-0003zF-V4
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:02:06 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27185
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iuhjw-0003yN-Qn
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:02:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579806124;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8gqOrEcq9njh+eHq7yVHSPVkftfuEuw7ErAH94+T8Nw=;
- b=YpjLuiF/eOUGZ7zqgn0hCuuxuxQwPjB/6fGSKvihQDf1CA30sFYGPSFnGghUQhyxgvZ4Z7
- fZR5+r7GNvIZK+/D1LltSQF3+wwVH2gKK0lK/lmy1JmuJkSScBaTYUxVU1Pgo/F30TWmK1
- K8eTQQaLiP9BVBEPYtWC5CquWgXiAlk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-T1-tzPGHOZGIdtDyYGSziA-1; Thu, 23 Jan 2020 14:02:01 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A1D0800D4E;
- Thu, 23 Jan 2020 19:02:00 +0000 (UTC)
-Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 53C8B5C1BB;
- Thu, 23 Jan 2020 19:01:48 +0000 (UTC)
-Date: Thu, 23 Jan 2020 19:01:45 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: Making QEMU easier for management tools and applications
-Message-ID: <20200123190145.GI657556@redhat.com>
-References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
- <87h81unja8.fsf@dusky.pond.sub.org>
- <20191224134139.GD2710539@redhat.com>
- <30664f6e-81da-a6e6-9b20-037fc91290fb@redhat.com>
- <878slyej29.fsf@dusky.pond.sub.org>
- <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: T1-tzPGHOZGIdtDyYGSziA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <felipe@nutanix.com>) id 1iujDj-0005Go-N4
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 15:36:56 -0500
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:44000)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>)
+ id 1iujDj-0005G1-Ba; Thu, 23 Jan 2020 15:36:55 -0500
+Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
+ by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00NKWUYZ022140; Thu, 23 Jan 2020 12:36:45 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=Tuv5jqw5QmhmQpvZ8GFUn2eYQCCsKE1BtAU0GDnO2B4=;
+ b=DN8ZN+n4KuBH0AoKShICLIDwqd2bWHopjS6NKztip1WYrd6OUQdtYSPZSvnt6i5kgt0b
+ uNcnYspFP3HS/MCEUT+8NuKiEKERPe1nvdmvSCuVUsR7joFTkEVILu/vsgCJNP+zXJ7p
+ 8zDlcC/G5gNJ+kh7ATKZ49mfJ+KXwbWFzp2lDwVg6bgpBfRJXUVnKy+CGnp0N+neEes0
+ xI6DgD6CSViuVOxjsjg3Y6ZemJRYzs4e61WkwRWfX1RsgblggcM+MnoRlMdeReXGO4pC
+ 8uGKOXDiGUVqIp/WEziz+fq+dy+TLQbhpq3wXqbusxk0MmNoykmasAJ9HrxKfvKvMMh0 9w== 
+Received: from nam10-dm6-obe.outbound.protection.outlook.com
+ (mail-dm6nam10lp2103.outbound.protection.outlook.com [104.47.58.103])
+ by mx0a-002c1b01.pphosted.com with ESMTP id 2xp2jm6ar0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 23 Jan 2020 12:36:45 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ToG1I9GiZCzfdDMXttTWQSF3GrQiY45kZQECZN5Q0xmAyaRImM5erH22VhGA8BjEty2Bvr+IcnnRyRe0L2AztxnNzjtEjZRlQxN6cpjcddc3zTUdJMDe3yEa6b2fcwP+XuV3n9sDusPgTOeantx4ljw2ga9mtwOrhkYrdVW8eYjh5ibXb/oFvDpPcucquIKHtCddODWyzBlivNqTtvmvY4m00ISlFFyoT2WFo2c48k4sNX1iSySxIhha1qAff6gfB2hoykvNkWJC7uN7W34RE281w/OwhNv960gYhq2klC3YWk/0gJhaJYHXqIjSOh7hZ7IGQI6fPyhfRxRoptETaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tuv5jqw5QmhmQpvZ8GFUn2eYQCCsKE1BtAU0GDnO2B4=;
+ b=m9Clzz0OTAF74+WdScwM1moe0PJGKJ9gu/S2tQeJA+W7W/9MDTeUkZA5NEWn9pzGjM27rb3olpOjmwLvU8liAi+C4p35/vQBUSAMWXN1gWOUPQ3IHaH543kCRptPLvxPZqOFFRGAfAf5kdv2jmdLZ3w7s4HMod7pmIHFRNeIa3QpZuLFcQoLleklHzafJUDiyhVouioOBjcp21+gNcfKDMjkFxh7i1Hv9QXEt4xwATJna9Zgqvu7TmfKseU3xFD211oi4b1NgTsDK6g4RRMre/vpTvo4ndlHu4PAJ6g5lzR0xzDhFOX5rHgboOiMINQ+SGgGlog3b0MQf/n9rsrgVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
+ MWHPR02MB3311.namprd02.prod.outlook.com (10.164.192.36) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.23; Thu, 23 Jan 2020 20:36:42 +0000
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c8f8:4820:a24c:3029]) by MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c8f8:4820:a24c:3029%10]) with mapi id 15.20.2644.028; Thu, 23 Jan
+ 2020 20:36:41 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH] iscsi: Don't access non-existent
+ scsi_lba_status_descriptor
+Thread-Topic: [PATCH] iscsi: Don't access non-existent
+ scsi_lba_status_descriptor
+Thread-Index: AQHV0hW67ghj9TBwskeYoa3E4EVIUKf4tXeA
+Date: Thu, 23 Jan 2020 20:36:41 +0000
+Message-ID: <C0FB7A0D-AB62-4B99-A56D-F51A1F267793@nutanix.com>
+References: <20200123170544.30117-1-kwolf@redhat.com>
+In-Reply-To: <20200123170544.30117-1-kwolf@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [82.9.225.166]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b2133d09-9018-4283-6acb-08d7a043f457
+x-ms-traffictypediagnostic: MWHPR02MB3311:
+x-microsoft-antispam-prvs: <MWHPR02MB331147C9BF5D1B169347B38DD70F0@MWHPR02MB3311.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:2150;
+x-forefront-prvs: 029174C036
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(199004)(189003)(53546011)(498600001)(186003)(86362001)(8676002)(8936002)(33656002)(81166006)(26005)(81156014)(6506007)(2906002)(54906003)(4326008)(6512007)(6486002)(71200400001)(2616005)(4744005)(66556008)(76116006)(66946007)(6916009)(5660300002)(36756003)(91956017)(66476007)(66446008)(64756008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB3311;
+ H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IQnJN57INRetwc8yIpDCNOfzSMPSpRDruY1j7B/amuhw1Xe4L8zZFUKOUW6fnA/RfqnxdpsmMo5zr+lvBbnnso3ep3vfmX1I7JWNz63CTl1Wb8Hicg1vVKLuQBIkUiK8CcX6voVEGl5b3li1Hz2rVeWQUE12922TYI9AZ848PTURoTRaDl7G3Gd0wVZLOD+uzPil9mLhPvkvoe01r167jHbcBiTFrbUKonnosKqvl+Z2G8wL7kN1v9BQJmTy7giJVZizXBGRMxviTPwZdUFMI87KVS28DcmGzAaD+CyRS+md1fpf4oSLbbiaBlB6ZHo5n6q0YhKz3oRRgm6l+u6ZDb8KQTgsf0r7CaK0VuzCyapl43IeK3PNAaecrtjx10qoE3NYsX7zxpT+08HireDB8q8+JQMR5A1gndDy/EHSS3rfYjv4dQ7jMvDkcIM1xRCX
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2BE031113056B54692D77331D7628DCC@namprd02.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2133d09-9018-4283-6acb-08d7a043f457
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2020 20:36:41.8577 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lay5sD8fqGZLQq3T5GSwVPa1QimW/mcvo2ARgpy1ewCyJobRn8iVhs1pN2UDSVireIxcFrd91lnt/H2PRq8JOs14KP/4Or86qLdEVf594e0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB3311
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-23_12:2020-01-23,
+ 2020-01-23 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.151.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,112 +133,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "pl@kamp.de" <pl@kamp.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "ronniesahlberg@gmail.com" <ronniesahlberg@gmail.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 23, 2020 at 12:58:45PM -0500, John Snow wrote:
-> Yes, I agree: Scrap and start over.
+
+
+> On Jan 23, 2020, at 5:05 PM, Kevin Wolf <kwolf@redhat.com> wrote:
 >=20
-> What SHOULD the syntax look like, though? Clearly the idea of qmp-shell
-> is that it offers a convenient way to enter the top-level keys of the
-> arguments dict. This works absolutely fine right up until you need to
-> start providing nested definitions.
+> In iscsi_co_block_status(), we may have received num_descriptors =3D=3D 0
+> from the iscsi server. Therefore, we can't unconditionally access
+> lbas->descriptors[0]. Add the missing check.
 >=20
-> For the nesting, we say: "Go ahead and use JSON, but you have to take
-> all the spaces out."
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+> block/iscsi.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> This... works, charitably, but is hardly what I would call usable.
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index cbd57294ab..c8feaa2f0e 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -753,7 +753,7 @@ retry:
+>     }
 >=20
-> For the CLI, we offer a dot syntax notation that resembles nothing in
-> particular. It often seems the case that it isn't expressive enough to
-> map losslessly to JSON. I suspect it doesn't handle siblings very well.
+>     lbas =3D scsi_datain_unmarshall(iTask.task);
+> -    if (lbas =3D=3D NULL) {
+> +    if (lbas =3D=3D NULL || lbas->num_descriptors =3D=3D 0) {
+>         ret =3D -EIO;
+>         goto out_unlock;
+>     }
+> --=20
+> 2.20.1
 >=20
-> A proper HMP-esque TUI would likely have need of coming up with its own
-> pet syntax for commands that avoid complicated nested JSON definitions,
-> but for effort:value ratio, having a QMP shorthand shell that works
-> arbitrarily with any command might be a better win.
->=20
-> Do we still have a general-case problem of how to represent QAPI
-> structures in plaintext? Will this need to be solved for the CLI, too?
 
-I don't know if you've ever looked at how Kubernetes/OpenShift exposes
-its functionality on the command line ? I think it is interesting to
-note that they largely don't try to solve this problem of flattening
-JSON for humans on the CLI using their client.
-
-Everything in their world is an object described in JSON/YAML, and
-there are a small set of generic commands that can act on any type
-of object. These commands primarily input and output JSON or YAML
-documents directly. As a user you can pick either format since it
-can do a lossless conversion in both directions server side.
-
-So when configuring objects you'll always provide a JSON/YAML doc.
-They've got some clever stuff for updating objects where you can
-provide a JSON patch for only the bits which need changing.
-
-When querying/listing objects by default it displays only a small
-subset of their config information in a human friendly-ish format.
-If you want to see everything then you ask for it in JSON/YAML
-format. There's also an expression language that lets you extract
-particular pieces of information based on requested properties,
-and you can filter the list of objects based on attributes and so
-on.
-
-I think it is fair to say the structure of kubernetes object config
-is on a par with hierarchical complexity of QEMU. The lack of a simple
-human targetted data input format does not appear to have negatively
-impacted the adoption of Kubernetes. It is worth questioning why this
-is the case, while we feel the human CLI syntax for QEMU is so
-critically important to QEMU's future ?
-
-
-
-Part of it is that the machine oriented data input format via QMP
-suffers from the fact that it came second in QEMU after HMP. As a
-result, 90% of the documentation that illustrates QEMU will use the
-human CLI syntax, varying vintages of that. Since all the docs are
-focused on the HMP/CLI syntax, whenever there's a new feature we
-feel pressured to expose it & document it in the human syntax too.
-
-All this results in a situation where JSON is functionally the best
-way to configure QEMU, but practically the worse, since very few
-people understand how to actually use it. This is a vicious circle
-holding back QMP/JSON and making the human syntax an ever greater
-burden for users & maintainers
-
-
-IOW, the difficulty with configuring QEMU via JSON is not the fault
-of JSON itself, it is the lack of knowledge amongst users and docs,
-compounded by our never ending "improvements" to the human syntax.
-There are other factors too, such as our only partial coverage of
-config using JSON - some is only possible via the CLI still.
-
-
-I guess my point is that with a scrap & startover view point, we
-should arguably completely ignore the design question of how to
-flatten JSON for humans/command line, as it is the wrong problem.
-Instead focus on the problem of making use of JSON the best way
-to deal with QEMU both functionally and practically, for humans
-and machines alike.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Reviewed-by: Felipe Franciosi <felipe@nutanix.com>
 
