@@ -2,77 +2,87 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33263C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373F8C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFC6C20704
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 034FF20704
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:11:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QhIxhHfK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC6C20704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kN0r8jOn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 034FF20704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iug0D-0004ou-CJ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:10:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52510)
+	id 1iug14-0006VL-Mp
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:11:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iuctT-0008IR-7x
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:36 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRY-0000Dt-ND
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iuctR-0007wa-1P
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:34 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52685
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuctQ-0007wM-Ux
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:51:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579787492;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tN1ejZZNNDpwR2f7hBVHJMLYu8kEqjTbMs1ArQbeLlc=;
- b=QhIxhHfKex44neOcvhjcqoU6fJoNPAMZBxucVmCo+8a/vwFeA/hVODDr1rMQPbIdB51I6h
- KlrkrCyorZITJBebCR6I+e4+c3nZGOIR489A3mN/+2YeacjVRMJ1+lY8ZEG7vamASZrrT1
- 8JJUEL0zASXC0hkFR4yKMUODOVDyPFA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-jIf9gV7IPEqPV03uNt2n1Q-1; Thu, 23 Jan 2020 08:51:30 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2D52100550E
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:51:29 +0000 (UTC)
-Received: from 640k.localdomain.com (unknown [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 26AC785785
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:51:28 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRX-0003gl-IA
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:52 -0500
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:50264)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iueRX-0003fb-CK
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:51 -0500
+Received: by mail-wm1-x32d.google.com with SMTP id a5so3022190wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:30:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=YHdtbMY45khjtvmWy6PilEpBxwmOSqr/+Trm1VbjU/k=;
+ b=kN0r8jOn2k2EbBnuHC37FLkc0sGqBGWaedKaBBKcC9T/M8F8YpA71HbPQ3pblRiGHG
+ yYLMUCxOhqC+VuTp8RYszQnI31LTpZkKQZ5TIzvLv2E3ncRYJJ9uUjJdxjLaa1ZoRrVk
+ QfvzPag7Tlnyjxc50pddeVh0bFzwQFzqf4j8NWkYMb/Ndfs57iNzMVIfvgiRhlhV70Rh
+ rzFO0Xd9FxB5zwoQLQC1tVP0j/XQgyQT70qajV24B53BSZ4noAsWc45FnhZGUaK4V7kS
+ nE1JlAMeqGzRRNh0TPQWPyvpFV/B8niEjWUkYcuB0z4+eVMupy+sBd/BJ/RYWZEfRwvm
+ 3KQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=YHdtbMY45khjtvmWy6PilEpBxwmOSqr/+Trm1VbjU/k=;
+ b=VYtN/QU0YrRNLDPGR+msWwiXesm+OxA7E21Chz28ejNIhDUlXIFh9VxRfmRKnhwLNw
+ i1MyGNh6f8YUKskNb7veBwo4WPxvFA4HOVHHO8qGLDhmJkocnUcQrWBM7pw+zT8Lejc6
+ CqfPTEvS1jase2y25wk1JWvAe3dw9QfxlKjzw/gjzvKf7LQW9F5tsgLHf2IGN8gn3hhV
+ LeXeOm7g51UGLTzVc0pW/KaO1dJprlSTYTSCTcPNSNWvz8g3QJx+jr57APoWwryerwWW
+ 94do4vACdAO8oKVZraNcD7Izwf+pAReYSv/fjin/fTodohA8sZ6jPskv8/Evx9LeWuV9
+ 8ljg==
+X-Gm-Message-State: APjAAAU2IUDNd9XKgcKT2cUi50WQvSzASjsWLOUqFbJk1MqSsXaz/PC3
+ FmAXNQIBDk36tqmrnXP1r2kGy5W+XE1UUA==
+X-Google-Smtp-Source: APXvYqwjxwQkroBTOvCaAEqq0yXBQRrszMHDMElE81oTp4+W7XakNG9LWroo/KzKdZVP37kfEC+yqg==
+X-Received: by 2002:a1c:a406:: with SMTP id n6mr4673956wme.40.1579793450178;
+ Thu, 23 Jan 2020 07:30:50 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s139sm2903592wme.35.2020.01.23.07.30.49
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 07:30:49 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 20/59] target/i386: kvm: initialize microcode revision from KVM
-Date: Thu, 23 Jan 2020 14:50:10 +0100
-Message-Id: <1579787449-27599-21-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
-References: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: jIf9gV7IPEqPV03uNt2n1Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+Subject: [PULL 07/20] hw/arm: Use helper function to trigger hotplug handler
+ plug
+Date: Thu, 23 Jan 2020 15:30:28 +0000
+Message-Id: <20200123153041.4248-8-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123153041.4248-1-peter.maydell@linaro.org>
+References: <20200123153041.4248-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,54 +98,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-KVM can return the host microcode revision as a feature MSR.
-Use it as the default value for -cpu host.
+From: Keqian Zhu <zhukeqian1@huawei.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1579544504-3616-4-git-send-email-pbonzini@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+We can use existing helper function to trigger hotplug handler
+plug, which makes code clearer.
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Message-id: 20200120012755.44581-3-zhukeqian1@huawei.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/i386/cpu.c | 4 ++++
- target/i386/kvm.c | 5 +++++
- 2 files changed, 9 insertions(+)
+ hw/arm/virt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 790254e..ffe5de0 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6416,6 +6416,10 @@ static void x86_cpu_realizefn(DeviceState *dev, Erro=
-r **errp)
-                        &cpu->mwait.ecx, &cpu->mwait.edx);
-             env->features[FEAT_1_ECX] |=3D CPUID_EXT_MONITOR;
-         }
-+        if (kvm_enabled() && cpu->ucode_rev =3D=3D 0) {
-+            cpu->ucode_rev =3D kvm_arch_get_supported_msr_feature(kvm_stat=
-e,
-+                                                                MSR_IA32_U=
-CODE_REV);
-+        }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 39ab5f47e0b..656b0081c2c 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1934,7 +1934,6 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+                              DeviceState *dev, Error **errp)
+ {
+-    HotplugHandlerClass *hhc;
+     VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+     Error *local_err = NULL;
+ 
+@@ -1943,8 +1942,9 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+         goto out;
      }
-=20
-     if (cpu->ucode_rev =3D=3D 0) {
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f6dd6b7..1b67090 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2696,6 +2696,11 @@ static void kvm_init_msrs(X86CPU *cpu)
-                           env->features[FEAT_CORE_CAPABILITY]);
-     }
-=20
-+    if (kvm_arch_get_supported_msr_feature(kvm_state,
-+                                           MSR_IA32_UCODE_REV)) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UCODE_REV, cpu->ucode_rev);
-+    }
+ 
+-    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
+-    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &error_abort);
++    hotplug_handler_plug(HOTPLUG_HANDLER(vms->acpi_dev),
++                         dev, &error_abort);
 +
-     /*
-      * Older kernels do not include VMX MSRs in KVM_GET_MSR_INDEX_LIST, bu=
-t
-      * all kernels with MSR features should have them.
---=20
-1.8.3.1
-
+ out:
+     error_propagate(errp, local_err);
+ }
+-- 
+2.20.1
 
 
