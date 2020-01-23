@@ -7,73 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC027C32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06253C32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:27:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96E6E24673
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC39F20665
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 00:27:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dNPTnF9z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96E6E24673
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h8rp30lb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC39F20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49101 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuQJq-0001GI-Mw
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:25:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54846)
+	id 1iuQLA-00038M-Ng
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 19:27:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54877)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPzg-0002Hi-KX
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:17 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzk-0002J5-PB
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iuPzX-0002KK-OO
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:07 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36974)
+ (envelope-from <richard.henderson@linaro.org>) id 1iuPzc-0002Lr-64
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:11 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:34087)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iuPzX-0002Jw-Ha
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:04:59 -0500
-Received: by mail-pf1-f194.google.com with SMTP id p14so617442pfn.4
- for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:04:59 -0800 (PST)
+ id 1iuPzc-0002Li-09
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 19:05:04 -0500
+Received: by mail-pl1-f193.google.com with SMTP id c9so533315plo.1
+ for <qemu-devel@nongnu.org>; Wed, 22 Jan 2020 16:05:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+Yoj9Ef3PvobNNzt7Mf8CoMZH4vxGIaCLIOj2GwlEFM=;
- b=dNPTnF9zEaYZbnlx9Ct88GAB0is7fVBD5d+DOy9ktdvYkKh/ANHlbv+5zKsnQpxLtw
- QFf8bksfs1OLqzgACS0faP8BpoAmZT/vhiGpcoQzzKyJXzXXbmupyx+cE8KWOZijYtsp
- QtbSg2NBIL7FT6ixSAiB4ruzubGYvm3T5e2i71bJWm3i/qByLY6yceZd6uVYjFMQs5aW
- 1swWSszHg7RTGnMS23KavHKywNy08DrdSMNxfOSRmB9N2sOLPTxP60Zz8mkngc9G3yI7
- ky3c3KZMkZqZgtanMP3fGeNhn8/khpspQJMnrMPgypB6T44/7H0gSDK5VIoMIkDmKtdW
- 7EtQ==
+ bh=SlxqTjIPt9dUcMT1pJil25PNJ90pZv9wieksrOmXI1I=;
+ b=h8rp30lbJdpfgYnjsyMAMp5x6JqBU8zicnAT4wmSxAAxQzK6WwgkOLlNEdyWPDHoNf
+ zFzXSUXDYDrqkIxnLbYEK2hCOB1q1JVjPaEP9Qm3NjdGf/irsu5pO8adARCpj3sHzA8+
+ WdGdsUi+Z3kTq6Cj25rwtsWdx2eSR0FUvsm7dIFZBvNfyDqqIY4OArz8ZGNoyf8Voha2
+ PtmGiohcfAD70MvVvyzF5kBUfmgMKH0YVzVlXJkpymuyqLjpygOeY4kZ7/qW1Eb6jjXl
+ cJc1TNakVRuX+QQsMftePY4wItQ28oI0z+DPSmw7Jqxosch9lMAGFwkTcsRLm7sbmaVE
+ DBqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+Yoj9Ef3PvobNNzt7Mf8CoMZH4vxGIaCLIOj2GwlEFM=;
- b=G9R51LMRKaNyJotbw+V9tg/3TY9FEt24fIBqUfbfSOoIYNdxFFTH/qq7p8aICC34rm
- FKzbRF7dGy81NBGWZtDPFU307j8tUDZ2WPgcZIUN3cyqY4GYL0Hsoc3flk91D8lLjS5o
- J41B8+7QJtIzYpQ1UpiYC+K3wDpahKyMFYLzys5hRiBrvWuKtV/0Evo6T9l7AaEvo0Yn
- d93voD3WxIc9LwDi433jSquxHBUzyQDho7RQceo6zp2ZSjcsckOAZqVrfK0SwnR1iNnb
- 4FGLWf1bdIcAhTp5A/hitPRpoYUqUehMbGN1LJWhyB1uef8hLqiTHsya4RIg8f/z4XBd
- znOQ==
-X-Gm-Message-State: APjAAAV4bEa65MKelPVhquQfNuzOBD2UYaSAhOynQo7rEKSu3MWw/Y/I
- AFQ6w/oiHR9LHabiFa9TLNzXC/UWO0I=
-X-Google-Smtp-Source: APXvYqyYk9tpvrdPO+53VNYEZyKMKzqC6lTZQ13jPnRVALpacDI5ZD1EHsQfmyiYXCA0kee7nbof8A==
-X-Received: by 2002:a65:68ca:: with SMTP id k10mr932404pgt.222.1579737838231; 
- Wed, 22 Jan 2020 16:03:58 -0800 (PST)
+ bh=SlxqTjIPt9dUcMT1pJil25PNJ90pZv9wieksrOmXI1I=;
+ b=tWyOGU7H4eC5MR/vyqiBoUTa025PJwmYvLmMz+NK81ji/2TX256mbfXiwwz95Fut/b
+ QhQKzmGedhqrSUs56e+NqGEtsHxPD3b7yPnry9XVLA3kx+8gPFwhybiQEg7bWcz7VJzF
+ dkQyb7wLUIb8zw8dTX6w8MbalMaATgNbggCR3icAIf2d7ucGK9PDl204aBFSrlAbyWDj
+ U86QKjjT8Q/QhzbEVGlIULSH1JfeaPgP71I36dnowQldmeNa71dkRGiwU3jfU6g/EbHs
+ WyaYwPCsP/etH/MTiZFYhU/WhA2nKiPgVkZm4mDHnsGXUMPwd4vzEJV9Nf6z46un/h74
+ idQw==
+X-Gm-Message-State: APjAAAXmwaoSC9OU+K4gzTkVb/iMfPZZM9GfhxweWelRaifhTc6OmLpl
+ wRpSJMCq5zJS3Hmn/vOAT+apC1uKoVU=
+X-Google-Smtp-Source: APXvYqys8wejwqNMR56wA7oJjcWq+MHiCyeb2wU9J5Tw8rG8grQuOOo7pJtBa8/wCRKisHmvC3pTow==
+X-Received: by 2002:a17:902:9a8e:: with SMTP id
+ w14mr13332545plp.315.1579737842846; 
+ Wed, 22 Jan 2020 16:04:02 -0800 (PST)
 Received: from localhost.localdomain (rrcs-173-198-77-92.west.biz.rr.com.
  [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.03.56
+ by smtp.gmail.com with ESMTPSA id b21sm84521pfp.0.2020.01.22.16.04.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jan 2020 16:03:57 -0800 (PST)
+ Wed, 22 Jan 2020 16:04:02 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc1 20/24] hw/avr: Add some Arduino boards
-Date: Wed, 22 Jan 2020 14:03:03 -1000
-Message-Id: <20200123000307.11541-21-richard.henderson@linaro.org>
+Subject: [PATCH rc1 22/24] tests/boot-serial-test: Test some Arduino boards
+ (AVR based)
+Date: Wed, 22 Jan 2020 14:03:05 -1000
+Message-Id: <20200123000307.11541-23-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200123000307.11541-1-richard.henderson@linaro.org>
 References: <20200123000307.11541-1-richard.henderson@linaro.org>
@@ -82,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.194
+X-Received-From: 209.85.214.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,235 +99,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: thuth@redhat.com, me@xcancerberox.com.ar, S.E.Harris@kent.ac.uk,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  dovgaluk@ispras.ru, imammedo@redhat.com, mrolnik@gmail.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Michael Rolnik <mrolnik@gmail.com>
 
-Arduino boards are build with AVR chipsets.
-Add some of the popular boards:
+Print out 'T' through serial port
 
-- Arduino Duemilanove
-- Arduino Uno
-- Arduino Mega
+The Arduino Duemilanove is based on a AVR5 CPU, while the
+Arduino MEGA2560 on a AVR6 CPU.
 
-For more information:
-  https://www.arduino.cc/en/Main/Products
-  https://store.arduino.cc/arduino-genuino/most-popular
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200120220107.17825-15-f4bug@amsat.org>
+[rth: Squash Arduino adjustments from f4bug]
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/avr/arduino.c     | 175 +++++++++++++++++++++++++++++++++++++++++++
- hw/avr/Kconfig       |   4 +
- hw/avr/Makefile.objs |   1 +
- 3 files changed, 180 insertions(+)
- create mode 100644 hw/avr/arduino.c
+ tests/qtest/boot-serial-test.c | 11 +++++++++++
+ tests/qtest/Makefile.include   |  2 ++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/hw/avr/arduino.c b/hw/avr/arduino.c
-new file mode 100644
-index 0000000000..784246baba
---- /dev/null
-+++ b/hw/avr/arduino.c
-@@ -0,0 +1,175 @@
-+/*
-+ * QEMU Arduino boards
-+ *
-+ * Copyright (c) 2019 Philippe Mathieu-Daudé
-+ *
-+ * This work is licensed under the terms of the GNU GPLv2 or later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+/* TODO: Implement the use of EXTRAM */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
-+#include "elf.h"
-+#include "atmel_atmega.h"
-+
-+typedef struct ArduinoMachineState {
-+    /*< private >*/
-+    MachineState parent_obj;
-+    /*< public >*/
-+    AtmegaMcuState mcu;
-+} ArduinoMachineState;
-+
-+typedef struct ArduinoMachineClass {
-+    /*< private >*/
-+    MachineClass parent_class;
-+    /*< public >*/
-+    const char *mcu_type;
-+    uint64_t xtal_hz;
-+} ArduinoMachineClass;
-+
-+#define TYPE_ARDUINO_MACHINE \
-+        MACHINE_TYPE_NAME("arduino")
-+#define ARDUINO_MACHINE(obj) \
-+        OBJECT_CHECK(ArduinoMachineState, (obj), TYPE_ARDUINO_MACHINE)
-+#define ARDUINO_MACHINE_CLASS(klass) \
-+        OBJECT_CLASS_CHECK(ArduinoMachineClass, (klass), TYPE_ARDUINO_MACHINE)
-+#define ARDUINO_MACHINE_GET_CLASS(obj) \
-+        OBJECT_GET_CLASS(ArduinoMachineClass, (obj), TYPE_ARDUINO_MACHINE)
-+
-+static void load_firmware(const char *firmware, uint64_t flash_size)
-+{
-+    const char *filename;
-+    int bytes_loaded;
-+
-+    /* Load firmware (contents of flash) trying to auto-detect format */
-+    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-+    if (filename == NULL) {
-+        error_report("Unable to find %s", firmware);
-+        exit(1);
-+    }
-+
-+    bytes_loaded = load_elf(filename, NULL, NULL, NULL, NULL, NULL, NULL,
-+                            0, EM_NONE, 0, 0);
-+    if (bytes_loaded < 0) {
-+        bytes_loaded = load_image_targphys(filename, OFFSET_CODE, flash_size);
-+    }
-+    if (bytes_loaded < 0) {
-+        error_report("Unable to load firmware image %s as ELF or raw binary",
-+                     firmware);
-+        exit(1);
-+    }
-+}
-+
-+static void arduino_machine_init(MachineState *machine)
-+{
-+    ArduinoMachineClass *amc = ARDUINO_MACHINE_GET_CLASS(machine);
-+    ArduinoMachineState *ams = ARDUINO_MACHINE(machine);
-+
-+    sysbus_init_child_obj(OBJECT(machine), "mcu", &ams->mcu, sizeof(ams->mcu),
-+                          amc->mcu_type);
-+    object_property_set_uint(OBJECT(&ams->mcu), amc->xtal_hz,
-+                             "xtal-frequency-hz", &error_abort);
-+    object_property_set_bool(OBJECT(&ams->mcu), true, "realized",
-+                             &error_abort);
-+
-+    if (machine->firmware) {
-+        load_firmware(machine->firmware, memory_region_size(&ams->mcu.flash));
-+    }
-+}
-+
-+static void arduino_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->init = arduino_machine_init;
-+    mc->default_cpus = 1;
-+    mc->min_cpus = mc->default_cpus;
-+    mc->max_cpus = mc->default_cpus;
-+    mc->no_floppy = 1;
-+    mc->no_cdrom = 1;
-+    mc->no_parallel = 1;
-+}
-+
-+static void arduino_duemilanove_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    ArduinoMachineClass *amc = ARDUINO_MACHINE_CLASS(oc);
-+
-+    /* https://www.arduino.cc/en/Main/ArduinoBoardDuemilanove */
-+    mc->desc        = "Arduino Duemilanove (ATmega168)",
-+    mc->alias       = "2009";
-+    amc->mcu_type   = TYPE_ATMEGA168_MCU;
-+    amc->xtal_hz    = 16 * 1000 * 1000;
+diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-test.c
+index 05c7f44457..07067b76a2 100644
+--- a/tests/qtest/boot-serial-test.c
++++ b/tests/qtest/boot-serial-test.c
+@@ -16,6 +16,15 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+ 
++static const uint8_t bios_avr[] = {
++    0x88, 0xe0,             /* ldi r24, 0x08   */
++    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
++    0x86, 0xe0,             /* ldi r24, 0x06   */
++    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 */
++    0x84, 0xe5,             /* ldi r24, 0x54   */
++    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
 +};
 +
-+static void arduino_uno_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    ArduinoMachineClass *amc = ARDUINO_MACHINE_CLASS(oc);
+ static const uint8_t kernel_mcf5208[] = {
+     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+@@ -103,6 +112,8 @@ typedef struct testdef {
+ 
+ static testdef_t tests[] = {
+     { "alpha", "clipper", "", "PCI:" },
++    { "avr", "arduino-duemilanove", "", "T", sizeof(bios_avr), NULL, bios_avr },
++    { "avr", "arduino-mega-2560-v3", "", "T", sizeof(bios_avr), NULL, bios_avr},
+     { "ppc", "ppce500", "", "U-Boot" },
+     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index e6bb4ab28c..4817b6320f 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -65,6 +65,8 @@ check-qtest-i386-y += numa-test
+ 
+ check-qtest-x86_64-y += $(check-qtest-i386-y)
+ 
++check-qtest-avr-y += boot-serial-test
 +
-+    /* https://store.arduino.cc/arduino-uno-rev3 */
-+    mc->desc        = "Arduino UNO (ATmega328P)";
-+    mc->alias       = "uno";
-+    amc->mcu_type   = TYPE_ATMEGA328_MCU;
-+    amc->xtal_hz    = 16 * 1000 * 1000;
-+};
-+
-+static void arduino_mega_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    ArduinoMachineClass *amc = ARDUINO_MACHINE_CLASS(oc);
-+
-+    /* https://www.arduino.cc/en/Main/ArduinoBoardMega */
-+    mc->desc        = "Arduino Mega (ATmega1280)";
-+    mc->alias       = "mega";
-+    amc->mcu_type   = TYPE_ATMEGA1280_MCU;
-+    amc->xtal_hz    = 16 * 1000 * 1000;
-+};
-+
-+static void arduino_mega2560_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    ArduinoMachineClass *amc = ARDUINO_MACHINE_CLASS(oc);
-+
-+    /* https://store.arduino.cc/arduino-mega-2560-rev3 */
-+    mc->desc        = "Arduino Mega 2560 (ATmega2560)";
-+    mc->alias       = "mega2560";
-+    mc->is_default  = true;
-+    amc->mcu_type   = TYPE_ATMEGA2560_MCU;
-+    amc->xtal_hz    = 16 * 1000 * 1000; /* CSTCE16M0V53-R0 */
-+};
-+
-+static const TypeInfo arduino_machine_types[] = {
-+    {
-+        .name          = MACHINE_TYPE_NAME("arduino-duemilanove"),
-+        .parent        = TYPE_ARDUINO_MACHINE,
-+        .class_init    = arduino_duemilanove_class_init,
-+    }, {
-+        .name          = MACHINE_TYPE_NAME("arduino-uno"),
-+        .parent        = TYPE_ARDUINO_MACHINE,
-+        .class_init    = arduino_uno_class_init,
-+    }, {
-+        .name          = MACHINE_TYPE_NAME("arduino-mega"),
-+        .parent        = TYPE_ARDUINO_MACHINE,
-+        .class_init    = arduino_mega_class_init,
-+    }, {
-+        .name          = MACHINE_TYPE_NAME("arduino-mega-2560-v3"),
-+        .parent        = TYPE_ARDUINO_MACHINE,
-+        .class_init    = arduino_mega2560_class_init,
-+    }, {
-+        .name           = TYPE_ARDUINO_MACHINE,
-+        .parent         = TYPE_MACHINE,
-+        .instance_size  = sizeof(ArduinoMachineState),
-+        .class_size     = sizeof(ArduinoMachineClass),
-+        .class_init     = arduino_machine_class_init,
-+        .abstract       = true,
-+    }
-+};
-+
-+DEFINE_TYPES(arduino_machine_types)
-diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
-index da3b10afec..59d9649d27 100644
---- a/hw/avr/Kconfig
-+++ b/hw/avr/Kconfig
-@@ -3,3 +3,7 @@ config ATMEL_ATMEGA_MCU
-     select ATMEL_TIMER16
-     select ATMEL_USART
-     select ATMEL_POWER
-+
-+config ARDUINO
-+    select ATMEL_ATMEGA_MCU
-+    select UNIMP
-diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
-index 7c7a4c3f67..f6aab1438d 100644
---- a/hw/avr/Makefile.objs
-+++ b/hw/avr/Makefile.objs
-@@ -1 +1,2 @@
- obj-$(CONFIG_ATMEL_ATMEGA_MCU) += atmel_atmega.o
-+obj-$(CONFIG_ARDUINO) += arduino.o
+ check-qtest-alpha-y += boot-serial-test
+ check-qtest-alpha-$(CONFIG_VGA) += display-vga-test
+ 
 -- 
 2.20.1
 
