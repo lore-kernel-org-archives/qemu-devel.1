@@ -2,79 +2,83 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30727C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92252C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB95324655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5952524655
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:08:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d5iu16SV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB95324655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q7F/kV+D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5952524655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iucCr-0002Ql-LD
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:07:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40305)
+	id 1iucDi-0003ql-4o
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:08:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iub8q-00022m-0Q
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:21 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iub1X-0000NK-Ah
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:51:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iub8o-00050G-2y
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25933
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub8n-0004zl-VS
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780757;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Vfmv0A1J+pz8C/UBWFllqkma5QpMSj/FQ+Xvw46UZ1s=;
- b=d5iu16SVByfJVpLMVif85RHbZb8mOvaHjK8lqQF/f8QZiQLmwKWhdhSjk6FruxCZR6bFlS
- 1uS5P9zqJF7RQ/FOPhYrhQLMkp7B7QELA0E7B/PRwprs1jPpdGTw2/6R2LAN7mfy9rgHDb
- ZnhNCnfZ+k6+csDDeinTMFtLvHuU060=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-TKAHbuaNNS-2XfYaQTk1vA-1; Thu, 23 Jan 2020 06:59:15 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 994EDDB6A
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:14 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E265D1CB;
- Thu, 23 Jan 2020 11:59:13 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 023/111] virtiofsd: Poll kick_fd for queue
-Date: Thu, 23 Jan 2020 11:57:13 +0000
-Message-Id: <20200123115841.138849-24-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-References: <20200123115841.138849-1-dgilbert@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iub1W-0000hb-7a
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:51:47 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43610)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iub1W-0000h4-2E
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:51:46 -0500
+Received: by mail-oi1-x243.google.com with SMTP id p125so2590190oif.10
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 03:51:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=bFml8qLCtmp1P0vb5uVGW4L9+hW902mtdxUueUM/0nA=;
+ b=q7F/kV+Dfh+sJ+nI37Gzpj3gGuHJXFnUcwe+dPvRVWh5dqGGNeW51I4fTNX1d8zM5a
+ o8wwN+EoUNKLSE7fSHFVnZrEHXHJE/VwFMM66Ojxn1sW9byTEDQksDFb2WD24v9QVdUI
+ 5n9nnep26dbrZv6q2PgvsqayCvQtkhPrN3L7Y7CsrB5w4YfvW22fUZUAQc79Z0+Jf1Fr
+ iQLRCPDKlb3AxlvP6dkFkaBOt8O+pNzpH5PqHdOa4ZNN50I88DcRLYsHtdHV3xKvC0uA
+ 6Zz74FJN/TAtwwG8rqYyLSrS60852DH+zYxhDnv8o9qkBI+1JMxajDHYRXvUpw1j9NBP
+ V6vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=bFml8qLCtmp1P0vb5uVGW4L9+hW902mtdxUueUM/0nA=;
+ b=UJ/I0uJP2QtOgIdKT+c5Q4nEDu6iQADpSFXsIjey0E3rkD1b/bfBZLZyTWLwVJLqUj
+ mt8l3N4CpJX7127TP7eu/pKEgmF9VhSvfM5xT4t649HCryIC9OPiXp3nCmictAATqNRD
+ Mm0zyc9zpGZykpT9XqwBGNZQ8Of3lva4GYy8iP9R4MNJyslFHo4vCDnq2fzzBiq3B0g9
+ m9T2rqGfTCc+l3Zcp3iyk83qQ+BnJ9qehBWa1g1waisxf7Rc9+0h2DXDJM9DgZoLB6DD
+ FtsEuICv63Wl/UxXj3iwOkFtpfb6nU5FREvK2vu/59IdWy73vREmSpnq+Hf6B9Rd6wsi
+ 63Fw==
+X-Gm-Message-State: APjAAAV3wu20/bvlTs557ebBppXEszos05WuAI8euk7iSDidesDQfp/c
+ wjxoQAdXUyf6qWoWwR1Tb3oXKhthr+JfcVpx59zqBg==
+X-Google-Smtp-Source: APXvYqxPTL/97ECH1J4qMtpZIPP0gROYbsp3ND4AYDartm+CUX8hMMBiaype5o7pIR5kCnkwWoWakQyN0pHtPOn5egs=
+X-Received: by 2002:aca:570d:: with SMTP id l13mr10000574oib.146.1579780304900; 
+ Thu, 23 Jan 2020 03:51:44 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: TKAHbuaNNS-2XfYaQTk1vA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+References: <20200116141511.16849-1-peter.maydell@linaro.org>
+ <20200116141511.16849-3-peter.maydell@linaro.org>
+ <CAFEAcA80NezC=oXMWNmbKTGWp2_xJVS1MFeOe58d3wMrH1mQug@mail.gmail.com>
+ <87h80nz5c8.fsf@linaro.org>
+In-Reply-To: <87h80nz5c8.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Jan 2020 11:51:33 +0000
+Message-ID: <CAFEAcA84RUT=eZnnjZET9f=fsVuy1gYhtQkrQBCjbrmysqnG4g@mail.gmail.com>
+Subject: Re: [PATCH 2/3] docs: Create stub system manual
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,92 +90,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Wed, 22 Jan 2020 at 18:58, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> > diff --git a/docs/index.html.in b/docs/index.html.in
+> > index 94eb782cf7e..573c543c02b 100644
+> > --- a/docs/index.html.in
+> > +++ b/docs/index.html.in
+> > @@ -11,6 +11,7 @@
+> >              <li><a href=3D"qemu-qmp-ref.html">QMP Reference Manual</a>=
+</li>
+> >              <li><a href=3D"qemu-ga-ref.html">Guest Agent Protocol
+> > Reference</a></li>
+> >              <li><a href=3D"interop/index.html">System Emulation
+> > Management and Interoperability Guide</a></li>
+> > +            <li><a href=3D"system/index.html">System Emulation User's
+> > Guide</a></li>
+> >              <li><a href=3D"specs/index.html">System Emulation Guest
+> > Hardware Specifications</a></li>
+> >          </ul>
+> >      </body>
+>
+>
+> This didn't seem to make a difference on readthedocs so I assume this is
+> for different tooling?
 
-In the queue thread poll the kick_fd we're passed.
+It's for when you build manuals via the makefile, in which
+case you get multiple separate Sphinx manuals and want a
+top level index that links to those and also to our legacy
+non-Sphinx docs. So it's what you'll see in the installed
+version of the docs if you do a 'make install'.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/fuse_virtio.c | 40 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
-
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 2a94bb3cca..05e7258712 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -24,6 +24,7 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/eventfd.h>
- #include <sys/socket.h>
- #include <sys/types.h>
- #include <sys/un.h>
-@@ -100,13 +101,50 @@ static void fv_panic(VuDev *dev, const char *err)
-     exit(EXIT_FAILURE);
- }
-=20
-+/* Thread function for individual queues, created when a queue is 'started=
-' */
- static void *fv_queue_thread(void *opaque)
- {
-     struct fv_QueueInfo *qi =3D opaque;
-     fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __func_=
-_,
-              qi->qidx, qi->kick_fd);
-     while (1) {
--        /* TODO */
-+        struct pollfd pf[1];
-+        pf[0].fd =3D qi->kick_fd;
-+        pf[0].events =3D POLLIN;
-+        pf[0].revents =3D 0;
-+
-+        fuse_log(FUSE_LOG_DEBUG, "%s: Waiting for Queue %d event\n", __fun=
-c__,
-+                 qi->qidx);
-+        int poll_res =3D ppoll(pf, 1, NULL, NULL);
-+
-+        if (poll_res =3D=3D -1) {
-+            if (errno =3D=3D EINTR) {
-+                fuse_log(FUSE_LOG_INFO, "%s: ppoll interrupted, going arou=
-nd\n",
-+                         __func__);
-+                continue;
-+            }
-+            fuse_log(FUSE_LOG_ERR, "fv_queue_thread ppoll: %m\n");
-+            break;
-+        }
-+        assert(poll_res =3D=3D 1);
-+        if (pf[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-+            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x Queue %=
-d\n",
-+                     __func__, pf[0].revents, qi->qidx);
-+            break;
-+        }
-+        assert(pf[0].revents & POLLIN);
-+        fuse_log(FUSE_LOG_DEBUG, "%s: Got queue event on Queue %d\n", __fu=
-nc__,
-+                 qi->qidx);
-+
-+        eventfd_t evalue;
-+        if (eventfd_read(qi->kick_fd, &evalue)) {
-+            fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
-+            break;
-+        }
-+        if (qi->virtio_dev->se->debug) {
-+            fprintf(stderr, "%s: Queue %d gave evalue: %zx\n", __func__,
-+                    qi->qidx, (size_t)evalue);
-+        }
-     }
-=20
-     return NULL;
---=20
-2.24.1
-
+thanks
+-- PMM
 
