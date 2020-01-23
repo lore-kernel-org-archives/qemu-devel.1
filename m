@@ -2,79 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F24C2D0DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B25C33CB6
 	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:39:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA97921D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:39:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08FF624125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:39:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qHVlYaba"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA97921D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5NekAtB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08FF624125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiKJ-0004Om-4e
+	id 1iuiKJ-0004RC-4r
 	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:39:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50701)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41211)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iug5I-0003qs-UX
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:16:01 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufdp-0004oa-C2
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iug5H-0003ck-HJ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:16:00 -0500
-Received: from mail-il1-x131.google.com ([2607:f8b0:4864:20::131]:36947)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iug5H-0003bN-BC
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:15:59 -0500
-Received: by mail-il1-x131.google.com with SMTP id u14so91051ilj.4
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 09:15:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=PGuXk7eNvrl6hMLchdM6URLXUGs/pNlqs13qQqDvC+o=;
- b=qHVlYabaNHETB/RZkeiOkVivJPUIpOkBZU1nr8aD1ALgee1k5ZPdWh6JqJpaZlr208
- +NofE/mNkW6YciWQ2XEqHOJ7OZxTF6Otthg4peYAU6iV94RWanCgHeuvfx9d75JitA8E
- J/WCXo3wrsvvLoeEyGoHgse3aLUBtAdKbyP0D6yQf7QXmD3ocZt5FtWJotUQOh4si+zI
- E2zL/Gl8JOI5CaDCVfxTZ0dvSeTnsUcLbyyLYVZMmmtrMjeIk9W8e1A5QxieKlituKxr
- WpoikwRwoUoALNdDwdK9JfO3/mXJr0ZRtGM0XKKP8jrd+tdw834dDBzCVwOHDAFW8BTb
- ii5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=PGuXk7eNvrl6hMLchdM6URLXUGs/pNlqs13qQqDvC+o=;
- b=LjBQGo9FRQepl6b/7lrT46Io9yLQcSE4P6qm6HvAuFNotrglzTvckd512wqZ6sh29d
- A23J0PwSGm9QqZvCOVozbYKeeZpjl1JIqe1vUKEMQbjJYIlLyS4rY3tXi++27aVjPZRb
- ErrcMvULF+YC8l97swf6NKoaQ29VMuwcVxH+qwgHRcQm+OSqR2n69ag53GuKhdt8/S07
- r2I6gVwbpC+BcsURAGbpehsAEuBcr0c8qbZl3wZ/c+c121giiy3jLzoFvhkxPfqaiYWL
- yVrI6nribT2dkGjhRQUZH747H+tn9SftCo3n/SCBvtsO1zobTUMC1VILxlk0qqq3glof
- nEmw==
-X-Gm-Message-State: APjAAAWU2jJJST4Bt2QG3MpUuw1osTqMcMkGESdvN4eOPgUPLg601h3c
- RbRfXvnrHND7sxD9yuKdRT5dRIFefcchdkCynLNJUKTwaZs=
-X-Google-Smtp-Source: APXvYqz8iodsc6FBHmk52rFE/7vke6vGsHhiy9tScCibO5q/rxrKZfAlJPIl56WBNk6YlyLsd8ifbJizNuMsRi/JDb4=
-X-Received: by 2002:a92:84ce:: with SMTP id y75mr13069650ilk.93.1579799757900; 
- Thu, 23 Jan 2020 09:15:57 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1iufdo-0006Tf-4v
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20658
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdn-0006TP-WA
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579798055;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Nf43hP0IRcmDWjQcwTYkWCN3u56GRcr1BZ/k+vIuitE=;
+ b=Y5NekAtBVnHFZT7xoC/HG1AxVeYzr5FF+KVAE+m2+oRRPP89rkps5qTuO61+FMbnDeSg0S
+ UgOhe5wKyCuz7vBprMPNwKluuqCegnuGtNUZYzOdW14Ck7LnJeFVyinEmJ6VfxCukazYqx
+ TimJVNa+chRiUa68fcH/RZtkpfGtIYU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-s2vQWiT0MCGHdKNA8YFXJw-1; Thu, 23 Jan 2020 11:47:28 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 121701872C1B
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:28 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F37A19C69;
+ Thu, 23 Jan 2020 16:47:27 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 033/108] virtiofs: Add maintainers entry
+Date: Thu, 23 Jan 2020 16:45:15 +0000
+Message-Id: <20200123164630.91498-34-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-References: <20200123163637.18230-1-peter.maydell@linaro.org>
-In-Reply-To: <20200123163637.18230-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Jan 2020 17:15:23 +0000
-Message-ID: <CAFEAcA9+UWAmQgqP73gLonmQX1RTOsDC9yF3czNSjb3WF06JSQ@mail.gmail.com>
-Subject: Re: [PULL v4 00/20] target-arm queue
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::131
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: s2vQWiT0MCGHdKNA8YFXJw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,39 +91,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 at 16:36, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> v1->v2: add system/index to docs/index.rst
-> v2->v3: fix format string issues for OSX
-> v3->v4: actually fix format string issues, somehow
->  I failed to actually put the change into git :-(
->
-> The following changes since commit b7c359c748a2e3ccb97a184b9739feb2cd48de2f:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0-pull-request' into staging (2020-01-23 14:38:43 +0000)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200123-4
->
-> for you to fetch changes up to e9d20b55b2e4c8400143554f0e83e4e1fcb9bd0f:
->
->   hw/arm/exynos4210: Connect serial port DMA busy signals with pl330 (2020-01-23 16:34:15 +0000)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * fix bug in PAuth emulation
->  * add PMU to Cortex-R5, Cortex-R5F
->  * qemu-nbd: Convert documentation to rST
->  * qemu-block-drivers: Convert documentation to rST
->  * Fix Exynos4210 UART DMA support
->  * Various minor code cleanups
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Applied, thanks.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2c768ed3d8..075fdab372 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1595,6 +1595,14 @@ T: git https://github.com/cohuck/qemu.git s390-next
+ T: git https://github.com/borntraeger/qemu.git s390-next
+ L: qemu-s390x@nongnu.org
+=20
++virtiofs
++M: Dr. David Alan Gilbert <dgilbert@redhat.com>
++M: Stefan Hajnoczi <stefanha@redhat.com>
++S: Supported
++F: tools/virtiofsd/*
++F: hw/virtio/vhost-user-fs*
++F: include/hw/virtio/vhost-user-fs.h
++
+ virtio-input
+ M: Gerd Hoffmann <kraxel@redhat.com>
+ S: Maintained
+--=20
+2.24.1
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
