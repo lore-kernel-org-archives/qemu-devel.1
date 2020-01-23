@@ -2,126 +2,101 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 213ADC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 21:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE05C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 21:38:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA71521D7E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 21:30:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C82D320665
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 21:38:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="DP0g7ekS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA71521D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MyiaOXIc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C82D320665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuk3R-0006RA-Vj
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 16:30:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56879)
+	id 1iukAy-00008S-SP
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 16:38:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58353)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <felipe@nutanix.com>) id 1iuk2V-00059C-4x
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:29:24 -0500
+ (envelope-from <philmd@redhat.com>) id 1iukAG-00083m-Ao
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:37:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <felipe@nutanix.com>) id 1iuk2T-0000t8-Sa
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:29:23 -0500
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:26472)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <felipe@nutanix.com>)
- id 1iuk2O-0000pe-53; Thu, 23 Jan 2020 16:29:16 -0500
-Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00NLSiLd010967; Thu, 23 Jan 2020 13:29:08 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=OfsJ6rELW0G6HeD9kEOlHZEFQPDvI0rH8FjS/EZ3ki8=;
- b=DP0g7ekST1LlQwquTiHu8QqcL9xSPOVDsU6LgGQU5CsGgMNjeWJWyt1hkb7wv71hB0QM
- WN2CKOc0rf/ShWrzlGueXKDby3tmkdj5A/jj7oaJ2HGxQaAeiU20lOKLOxkaWVBJPiwl
- eVtmgZbS8dAi4tkWnBRz16hwTv8xkDg85ImSRpt77Jj8tHGI1Y1JZS4ciwUnyi2nxM6x
- xUP8+3atHNFk7GA1c5y9tMQw7ckLqAPtYAndi/QlQck1tDiq3sDyqjKH9VCKty92LWDg
- CGdHbg5cIIypopsjfTzW+q1mSdDizzDrS5Y/TY8F1DOuVkoZqFdzpDTw6Uo5cqszLo0A 1g== 
-Received: from nam10-dm6-obe.outbound.protection.outlook.com
- (mail-dm6nam10lp2109.outbound.protection.outlook.com [104.47.58.109])
- by mx0b-002c1b01.pphosted.com with ESMTP id 2xm27n3pw8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 23 Jan 2020 13:29:08 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b+QZ/vyK2uh4HFANhn53OASnlo3aKwof2pEr0g6zo890jsQKgLx/93PuHBDVogN65AILq64Nn5eF83D9KVcN7rdG0mmWS/74+vVfp68h7a5A+Qu1xBwIGFDphhwj5ur1nTihCiQblR0t1YyWLM1ddNZ3ezpZFTbODqhsauWTVaEHZEj7+ElUYVymaD28RgZaKnr5ilxbABc9y18JVy4LyJ3dL/KQhoiNHnoVZaW+V10i/3HRlGrflLM18r5PTTIrolDyadIZMth0P3HLK8vM4McBHvGdcR1f/GCrBJcq+VLPn/f5iwYhZ75qq6BamqzArH7LFHoPJntk+rBD9/mjNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OfsJ6rELW0G6HeD9kEOlHZEFQPDvI0rH8FjS/EZ3ki8=;
- b=h/p5Lkl9OjorsszNIgXAoT3DRt7zdyy58+txKECYbCSGNAx6nv+IMG95brs5yCjHEJ2jAJkJMmB5nVmWtxgtPdjqjnG0TUDm0r+wBHg9Ds+6/bTmcIAsT3lgVYXDBFP+j5s4NHCLW/J7hvW+Bxa8DCMuypcgJJ//EA3PIsrllv5hO41T4twfolYuY1Ivdldde22MRf5+s7yB/koMX1AurPssVJGZ/I0zJSELyE9BqLQ4JtU71185HMNsOOh67/PNFZybJQ32GfyAL9W7es1qanwUDGNF51eaTUcb9X/ohP5UwaonntA47EE3yKyHfxff9SVz1IXRsXCpboIEstHNdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
- MWHPR02MB2608.namprd02.prod.outlook.com (10.168.205.150) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20; Thu, 23 Jan 2020 21:29:05 +0000
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029]) by MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029%10]) with mapi id 15.20.2644.028; Thu, 23 Jan
- 2020 21:29:05 +0000
-From: Felipe Franciosi <felipe@nutanix.com>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH] iscsi: Cap block count from GET LBA STATUS (CVE-2020-1711)
-Thread-Topic: [PATCH] iscsi: Cap block count from GET LBA STATUS
- (CVE-2020-1711)
-Thread-Index: AQHV0ersGiQprkLuikaxEpLUh3Oweaf4hjqAgAA+NQA=
-Date: Thu, 23 Jan 2020 21:29:05 +0000
-Message-ID: <B07CB62A-7860-4385-A6A4-4ECA211DBE42@nutanix.com>
-References: <20200123124357.124019-1-felipe@nutanix.com>
- <3cb32404-e8ee-ba8c-3684-bfa6d0827d39@redhat.com>
-In-Reply-To: <3cb32404-e8ee-ba8c-3684-bfa6d0827d39@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [82.9.225.166]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9d6ce09a-2081-4cec-026e-08d7a04b4635
-x-ms-traffictypediagnostic: MWHPR02MB2608:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR02MB26089F4A5477B055E155EA55D70F0@MWHPR02MB2608.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:2657;
-x-forefront-prvs: 029174C036
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(346002)(39860400002)(376002)(136003)(396003)(199004)(189003)(71200400001)(36756003)(6512007)(6486002)(7416002)(86362001)(8936002)(81156014)(81166006)(33656002)(8676002)(478600001)(6916009)(2906002)(66946007)(76116006)(2616005)(91956017)(5660300002)(66556008)(26005)(6506007)(53546011)(66446008)(64756008)(66476007)(186003)(4326008)(316002)(54906003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2608;
- H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: t84kaYtegifCZkq3PhJV4EaLxWxjuDmUY0wIQwhSwcG6fELK/SnZAaW0/Dzk3KLNXjYSaBqv2Um3723968CmQnRlQiuh0VvUW4LOYtMuPoXwgewqObErq2PnemLgvcxGz4W2VHZfxI1PdVTfbMc7HptNivAmuEJMp6HmaRgTrZYLmYzQLehkf1hJXo6EAwDp4C1ctZTGyMxMRSu/36sS8/dM9dmgmtYRTcaqLEqet49XM9nJcMPjDM1bctwGjpBBviIyFmFlXW4nyrpt6LxzvWgbweiBR94yN1Kaw4Xa280ZWjrcjtauYklNpxdZqscI9+8RwBVmMPWACfO6j1FCtMDcST7X+OlAYI8BvMfChFtBLbpi1Naf2JNsrSj6YuOmjL402stWSJZ4pwvh1kQFyb/3Tn4Z0KGokLLIczaJe4MViU5E2sWWw0UomfAUmES1
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6A4FA6A0B418E3409E952D5615C55AF8@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <philmd@redhat.com>) id 1iukAD-0006YS-L3
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:37:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53064
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iukAD-0006Y2-CB
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 16:37:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579815440;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XlTHO8WHEE9t25LoVisuvVHpQQp/TKWQFsQQ9VLBGDY=;
+ b=MyiaOXIcY3axMQs5r1pSsKkawalScuLiDG3+MJUTg3SL1ScFprSSACWJXJfwdON8t071t5
+ ykElGYYOubi5OS1NcC0e+tVnDH396jZu3tb2DmH9yGKW20+08F/HynUBNU0ieyXMdq5RZg
+ KQaNnd2jlRTU/0iAj3TFkC8jXHBFRL8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-1DdYxr2aO5y9dp-6RPo8-A-1; Thu, 23 Jan 2020 16:37:16 -0500
+Received: by mail-wr1-f69.google.com with SMTP id j4so50728wrs.13
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:37:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Y7gax/A5KiNx88GJ4wsoGpzUNZ8rjuZRuMpi4a97L6M=;
+ b=p352DBDue7ABRkTiUKrS6dKFBtWbg4F867WGJBp4ZN4NC28LPT0cMFtF2AHARQgh45
+ 6Wl1yyg7HOrN/THTGi+ze+jrYcfvtPqgK9C6C1DAWXuR7URq0ypBUU7W/wMMDBub4bjr
+ pGc8mOEOE7bWhmO7wRpeqAeWaFopkKwXOQJ1zDopgyWTaCD7BaNnXa7piphPlcFTpGWq
+ 1PG7rmaaRKiV8uWsx13UVucoWyisJvbmkIRtHmSn2TiQ+HVzE5kmlNABLu4aApc2x5Ih
+ dhg2kiTgLmttlPj88bZaUUlbcdC4pmiXm4tSy5N3LairQVwvmXUdWYXbfUZwuuXOTPmD
+ bHpQ==
+X-Gm-Message-State: APjAAAXFdRgv+5jyqkvkg6tL1xxn1frsPLzs4o0bqzUO5EqsR1ZbdSde
+ 5arJ0qbXM8CKmrDcgEqjgwkPrqPHdBgInArYMI23xyJ6dQXhpZlgTjE6uGBbaMupUL7wZ7jLKgI
+ wpZgSz4L0mw9SKno=
+X-Received: by 2002:a5d:65cf:: with SMTP id e15mr118018wrw.126.1579815435001; 
+ Thu, 23 Jan 2020 13:37:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyspX+3PpoYTXzRA/pvR4bqiz7xrSdrRAoRB/gwCNs10BtjPoSd9495PH9Upqw9Jft3Iigu7g==
+X-Received: by 2002:a5d:65cf:: with SMTP id e15mr117995wrw.126.1579815434758; 
+ Thu, 23 Jan 2020 13:37:14 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id 4sm4056759wmg.22.2020.01.23.13.37.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Jan 2020 13:37:14 -0800 (PST)
+Subject: Re: [PATCH] tests/boot-serial-test: Allow the HPPA machine to shudown
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+References: <20200123003603.11610-1-f4bug@amsat.org>
+ <a71b6c89-b36c-ebb6-3ff4-c3866309125c@redhat.com>
+ <0deda7d0-78a1-6618-e2b5-9b92b301557a@redhat.com>
+Message-ID: <1c474db4-a9b6-1103-b34d-c37a5338a91e@redhat.com>
+Date: Thu, 23 Jan 2020 22:37:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d6ce09a-2081-4cec-026e-08d7a04b4635
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2020 21:29:05.4036 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Ekux7EeatFBLGSpvIrbhhtWb7l2dsQ0krjSUOFKN+/eUojrqhhPZN48jO7gqI6qCmWChKXnUgXh3w632v+y2WGy/sdOx7VnNiwxtkfrXO0I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2608
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-01-23_13:2020-01-23,
- 2020-01-23 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.155.12
+In-Reply-To: <0deda7d0-78a1-6618-e2b5-9b92b301557a@redhat.com>
+Content-Language: en-US
+X-MC-Unique: 1DdYxr2aO5y9dp-6RPo8-A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,83 +108,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Turschmid <peter.turschm@nutanix.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Peter Lieven <pl@kamp.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, P J P <ppandit@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGksDQoNCj4gT24gSmFuIDIzLCAyMDIwLCBhdCA1OjQ2IFBNLCBQaGlsaXBwZSBNYXRoaWV1LURh
-dWTDqSA8cGhpbG1kQHJlZGhhdC5jb20+IHdyb3RlOg0KPiANCj4gT24gMS8yMy8yMCAxOjQ0IFBN
-LCBGZWxpcGUgRnJhbmNpb3NpIHdyb3RlOg0KPj4gV2hlbiBxdWVyeWluZyBhbiBpU0NTSSBzZXJ2
-ZXIgZm9yIHRoZSBwcm92aXNpb25pbmcgc3RhdHVzIG9mIGJsb2NrcyAodmlhDQo+PiBHRVQgTEJB
-IFNUQVRVUyksIFFlbXUgb25seSB2YWxpZGF0ZXMgdGhhdCB0aGUgcmVzcG9uc2UgZGVzY3JpcHRv
-ciB6ZXJvJ3MNCj4+IExCQSBtYXRjaGVzIHRoZSBvbmUgcmVxdWVzdGVkLiBHaXZlbiB0aGUgU0NT
-SSBzcGVjIGFsbG93cyBzZXJ2ZXJzIHRvDQo+PiByZXNwb25kIHdpdGggdGhlIHN0YXR1cyBvZiBi
-bG9ja3MgYmV5b25kIHRoZSBlbmQgb2YgdGhlIExVTiwgUWVtdSBtYXkNCj4+IGhhdmUgaXRzIGhl
-YXAgY29ycnVwdGVkIGJ5IGNsZWFyaW5nL3NldHRpbmcgdG9vIG1hbnkgYml0cyBhdCB0aGUgZW5k
-IG9mDQo+PiBpdHMgYWxsb2NtYXAgZm9yIHRoZSBMVU4uDQo+PiBBIG1hbGljaW91cyBndWVzdCBp
-biBjb250cm9sIG9mIHRoZSBpU0NTSSBzZXJ2ZXIgY291bGQgY2FyZWZ1bGx5IHByb2dyYW0NCj4+
-IFFlbXUncyBoZWFwIChieSBzZWxlY3RpdmVseSBzZXR0aW5nIHRoZSBiaXRtYXApIGFuZCB0aGVu
-IHNtYXNoIGl0Lg0KPj4gVGhpcyBsaW1pdHMgdGhlIG51bWJlciBvZiBiaXRzIHRoYXQgaXNjc2lf
-Y29fYmxvY2tfc3RhdHVzKCkgd2lsbCB0cnkgdG8NCj4+IHVwZGF0ZSBpbiB0aGUgYWxsb2NtYXAg
-c28gaXQgY2FuJ3Qgb3ZlcmZsb3cgdGhlIGJpdG1hcC4NCj4gDQo+IFBsZWFzZSBhZGQ6DQo+IA0K
-PiBGaXhlczogQ1ZFLTIwMjAtMTcxMSAodGl0bGUgb2YgQ1ZFIGlmIHBvc3NpYmxlKQ0KDQpJIHdh
-c24ndCBzdXJlIHdlIGhhZCBvbmUgeWV0LiBLZXZpbjogY2FuIHlvdSBkbyB0aGUgbmVlZGZ1bCBp
-biB5b3VyIGJyYW5jaD8NCg0KPiBDYzogcWVtdS1zdGFibGVAbm9uZ251Lm9yZw0KDQpZZWFoLCB0
-aGF0J3MgdGhlcmUuDQoNCj4gDQo+PiBTaWduZWQtb2ZmLWJ5OiBGZWxpcGUgRnJhbmNpb3NpIDxm
-ZWxpcGVAbnV0YW5peC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBQZXRlciBUdXJzY2htaWQgPHBl
-dGVyLnR1cnNjaG1AbnV0YW5peC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBSYXBoYWVsIE5vcndp
-dHogPHJhcGhhZWwubm9yd2l0ekBudXRhbml4LmNvbT4NCj4+IC0tLQ0KPj4gIGJsb2NrL2lzY3Np
-LmMgfCA1ICsrKy0tDQo+PiAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMiBkZWxl
-dGlvbnMoLSkNCj4+IGRpZmYgLS1naXQgYS9ibG9jay9pc2NzaS5jIGIvYmxvY2svaXNjc2kuYw0K
-Pj4gaW5kZXggMmFlYTdlM2YxMy4uY2JkNTcyOTRhYiAxMDA2NDQNCj4+IC0tLSBhL2Jsb2NrL2lz
-Y3NpLmMNCj4+ICsrKyBiL2Jsb2NrL2lzY3NpLmMNCj4+IEBAIC03MDEsNyArNzAxLDcgQEAgc3Rh
-dGljIGludCBjb3JvdXRpbmVfZm4gaXNjc2lfY29fYmxvY2tfc3RhdHVzKEJsb2NrRHJpdmVyU3Rh
-dGUgKmJzLA0KPj4gICAgICBzdHJ1Y3Qgc2NzaV9nZXRfbGJhX3N0YXR1cyAqbGJhcyA9IE5VTEw7
-DQo+PiAgICAgIHN0cnVjdCBzY3NpX2xiYV9zdGF0dXNfZGVzY3JpcHRvciAqbGJhc2QgPSBOVUxM
-Ow0KPj4gICAgICBzdHJ1Y3QgSXNjc2lUYXNrIGlUYXNrOw0KPj4gLSAgICB1aW50NjRfdCBsYmE7
-DQo+PiArICAgIHVpbnQ2NF90IGxiYSwgbWF4X2J5dGVzOw0KPj4gICAgICBpbnQgcmV0Ow0KPj4g
-ICAgICAgIGlzY3NpX2NvX2luaXRfaXNjc2l0YXNrKGlzY3NpbHVuLCAmaVRhc2spOw0KPj4gQEAg
-LTcyMSw2ICs3MjEsNyBAQCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBpc2NzaV9jb19ibG9ja19z
-dGF0dXMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiAgICAgIH0NCj4+ICAgICAgICBsYmEgPSBv
-ZmZzZXQgLyBpc2NzaWx1bi0+YmxvY2tfc2l6ZTsNCj4+ICsgICAgbWF4X2J5dGVzID0gKGlzY3Np
-bHVuLT5udW1fYmxvY2tzIC0gbGJhKSAqIGlzY3NpbHVuLT5ibG9ja19zaXplOw0KPj4gICAgICAg
-IHFlbXVfbXV0ZXhfbG9jaygmaXNjc2lsdW4tPm11dGV4KTsNCj4+ICByZXRyeToNCj4+IEBAIC03
-NjQsNyArNzY1LDcgQEAgcmV0cnk6DQo+PiAgICAgICAgICBnb3RvIG91dF91bmxvY2s7DQo+PiAg
-ICAgIH0NCj4+ICAtICAgICpwbnVtID0gKGludDY0X3QpIGxiYXNkLT5udW1fYmxvY2tzICogaXNj
-c2lsdW4tPmJsb2NrX3NpemU7DQo+PiArICAgICpwbnVtID0gTUlOKChpbnQ2NF90KSBsYmFzZC0+
-bnVtX2Jsb2NrcyAqIGlzY3NpbHVuLT5ibG9ja19zaXplLCBtYXhfYnl0ZXMpOw0KPj4gICAgICAg
-IGlmIChsYmFzZC0+cHJvdmlzaW9uaW5nID09IFNDU0lfUFJPVklTSU9OSU5HX1RZUEVfREVBTExP
-Q0FURUQgfHwNCj4+ICAgICAgICAgIGxiYXNkLT5wcm92aXNpb25pbmcgPT0gU0NTSV9QUk9WSVNJ
-T05JTkdfVFlQRV9BTkNIT1JFRCkgew0KPiANCj4gV2hhdCBhYm91dCB0aGlzPw0KPiANCj4gLS0g
-PjggLS0NCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2lzY3NpLmMgYi9ibG9jay9pc2NzaS5jDQo+IGlu
-ZGV4IDJhZWE3ZTNmMTMuLjI1NTk4YWNjYmIgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2lzY3NpLmMN
-Cj4gKysrIGIvYmxvY2svaXNjc2kuYw0KPiBAQCAtNTA2LDYgKzUwNiwxMSBAQCBpc2NzaV9hbGxv
-Y21hcF91cGRhdGUoSXNjc2lMdW4gKmlzY3NpbHVuLCBpbnQ2NF90IG9mZnNldCwNCj4gICAgIC8q
-IHNocmluayB0byB0b3VjaCBvbmx5IGNvbXBsZXRlbHkgY29udGFpbmVkIGNsdXN0ZXJzICovDQo+
-ICAgICBjbF9udW1fc2hydW5rID0gRElWX1JPVU5EX1VQKG9mZnNldCwgaXNjc2lsdW4tPmNsdXN0
-ZXJfc2l6ZSk7DQo+ICAgICBuYl9jbHNfc2hydW5rID0gKG9mZnNldCArIGJ5dGVzKSAvIGlzY3Np
-bHVuLT5jbHVzdGVyX3NpemUgLSBjbF9udW1fc2hydW5rOw0KPiArICAgIGlmIChuYl9jbHNfZXhw
-YW5kZWQgPj0gaXNjc2lsdW4tPmFsbG9jbWFwX3NpemUNCj4gKyAgICAgICAgfHwgbmJfY2xzX3No
-cnVuayA+PSBpc2NzaWx1bi0+YWxsb2NtYXBfc2l6ZSkgew0KPiArICAgICAgICBlcnJvcl9yZXBv
-cnQoImlTQ1NJIGludmFsaWQgcmVxdWVzdDogLi4uIiAvKiBUT0RPICovKTsNCj4gKyAgICAgICAg
-cmV0dXJuOw0KPiArICAgIH0NCj4gICAgIGlmIChhbGxvY2F0ZWQpIHsNCj4gICAgICAgICBiaXRt
-YXBfc2V0KGlzY3NpbHVuLT5hbGxvY21hcCwgY2xfbnVtX2V4cGFuZGVkLCBuYl9jbHNfZXhwYW5k
-ZWQpOw0KPiAgICAgfSBlbHNlIHsNCj4gLS0tDQoNCkknbSBub3Qgc3VyZSB0aGUgYWJvdmUgaXMg
-Y29ycmVjdCBiZWNhdXNlIChpZiBJIHJlYWQgdGhpcyByaWdodCkNCm5iX2Nsc18qIHJlcHJlc2Vu
-dHMgdGhlIG51bWJlciBvZiBjbHVzdGVycywgbm90IHRoZSBsYXN0IGNsdXN0ZXIuDQoNClBlcnNv
-bmFsbHksIEkgd291bGQgaGF2ZSB0aGUgY2hlY2tzIChvciAidHJpbSJzKSBjbG9zZXIgdG8gd2hl
-cmUgdGhleQ0Kd2VyZSBpc3N1ZWQgKHRvIGZhaWwgc29vbmVyKSBhbmQgYXNzZXJ0KClzIGNsb3Nl
-ciB0byBiaXRtYXAgKGFzIG5vIG9vYg0KYWNjZXNzZXMgc2hvdWxkIGJlIGhhcHBlbmluZyBhdCB0
-aGlzIHBvaW50KS4gVGhlcmUgd2VyZSBhbHNvDQpkaXNjdXNzaW9ucyBhYm91dCB1c2luZyBzYWZl
-ciAoaGlnaGVyIGxldmVsKSBiaXRtYXBzIGZvciB0aGlzLiBJJ20NCmFsd2F5cyBpbiBmYXZvdXIg
-b2YgYWRkaW5nIGFsbCByZWFzb25hYmxlIGNoZWNrcy4gOikNCg0KQ2hlZXJzLA0KRmVsaXBl
+On 1/23/20 7:29 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/23/20 5:39 AM, Thomas Huth wrote:
+>> On 23/01/2020 01.36, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> The boot-serial test uses SeaBIOS on HPPA, and expects to read the
+>>> "SeaBIOS wants SYSTEM HALT" string, see [*]:
+>>>
+>>> =C2=A0 122 void __VISIBLE __noreturn hlt(void)
+>>> =C2=A0 123 {
+>>> =C2=A0 124=C2=A0=C2=A0=C2=A0=C2=A0 if (pdc_debug)
+>>> =C2=A0 125=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 printf("HALT=
+ initiated from %p\n", =20
+>>> __builtin_return_address(0));
+>>> =C2=A0 126=C2=A0=C2=A0=C2=A0=C2=A0 printf("SeaBIOS wants SYSTEM HALT.\n=
+\n");
+>>> =C2=A0 127=C2=A0=C2=A0=C2=A0=C2=A0 asm volatile("\t.word 0xfffdead0": :=
+ :"memory");
+>>> =C2=A0 128=C2=A0=C2=A0=C2=A0=C2=A0 while (1);
+>>> =C2=A0 129 }
+>>>
+>>> A 'SYSTEM HALT' would really halts the CPU, but SeaBIOS implements
+>>> it as an infinite loop.
+>>>
+>>> If SeaBIOS does not use the expected serial port but another device,
+>>> we might poll the console indefinitely while the machine is halted.
+>>>
+>>> Allow the HPPA machine to 'shutdown'. When it does, we'll get
+>>> a qtest error:
+>>>
+>>> =C2=A0=C2=A0 $ make check-qtest-hppa
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-hppa: tests=
+/qtest/boot-serial-test
+>>> =C2=A0=C2=A0 ** (tests/qtest/boot-serial-test:31924): ERROR **: 01:12:3=
+7.604:=20
+>>> Failed to find expected string. Please check=20
+>>> '/tmp/qtest-boot-serial-sjxoM6Q'
+>>> =C2=A0=C2=A0 ERROR - Bail out! FATAL-ERROR: Failed to find expected str=
+ing.=20
+>>> Please check '/tmp/qtest-boot-serial-sjxoM6Q'
+>>> =C2=A0=C2=A0 make: *** [tests/Makefile.include:628: check-qtest-hppa] E=
+rror 1
+>>
+>> The tests are run with -no-shutdown. Why does qemu exit in that case?
+>=20
+> Because the HPPA firmware called HALT.
+>=20
+>> Sounds like a bug in another place, and not in the boot-serial-test.
+>=20
+> Yes, the bug is elsewhere, but with the bug the boot-serial-test hangs=20
+> forever.... No output on the console, qtest waiting indefinitely.
+
+Richard explained me on IRC what you probably meant, which was not=20
+obvious to me at first.
+
+Now I found in check_guest_output():
+
+     /* Poll serial output... */
+     while (1) {
+         ...
+         /* Wait at most 360 seconds.  */
+         now =3D time(NULL);
+         if (now - start >=3D 360) {
+             break;
+         }
+         g_usleep(10000);
+     }
+
+$ QTEST_QEMU_BINARY=3Dhppa-softmmu/qemu-system-hppa \
+   time tests/qtest/boot-serial-test -k
+/hppa/boot-serial/hppa:
+** (tests/qtest/boot-serial-test:18604): ERROR **: 22:33:25.010: Failed=20
+to find expected string. Please check '/tmp/qtest-boot-serial-sZq7ljM'
+Command terminated by signal 5
+0.31user 0.66system 6:00.07elapsed 0%CPU
+
+Indeed the test fails after 6min, I guess I didn't expect that much=20
+while testing interactively.
+
+So please disregard this patch.
+
+Thanks,
+
+Phil.
+
 
