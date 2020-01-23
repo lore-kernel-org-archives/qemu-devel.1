@@ -2,80 +2,86 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F95C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33148C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7745121569
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0585F21569
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkOJ+U1n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7745121569
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aTSpFQt/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0585F21569
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhCD-0003Gm-92
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:27:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41420)
+	id 1iuhCT-0003ed-4i
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:27:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48478)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufe7-00058g-GE
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:57 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRl-0000Uy-KF
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufe5-0006dY-Ov
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59254
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufe5-0006dE-Lt
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798073;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HcX+rlmsOnPkAnqht3vH74Z9QoTWqy14xncBYAwsD2g=;
- b=IkOJ+U1njT8EDbOvlESZ/+8jSv7UnsSy1wUIuO7/lulUf2cCn6fDvsIowZ9ewUaxE0+GlX
- rxq+OPrP+mjVWQ36cymj/zkzBlXN33nL1hn5k3CbiaDfg1uN8MxbBpYLqN2NBvBbSW0VeH
- GBqZ/Qa5e7q1lIXHEMQT9tBLCnXm21M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-wnCb0o13OiGh2UFFXY9jhQ-1; Thu, 23 Jan 2020 11:47:49 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67D971085942
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:48 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
- [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B55B628993;
- Thu, 23 Jan 2020 16:47:47 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 051/108] virtiofsd: move to a new pid namespace
-Date: Thu, 23 Jan 2020 16:45:33 +0000
-Message-Id: <20200123164630.91498-52-dgilbert@redhat.com>
-In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
-References: <20200123164630.91498-1-dgilbert@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRj-0003xP-QE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:05 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:50270)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iueRh-0003s1-VG
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:02 -0500
+Received: by mail-wm1-x332.google.com with SMTP id a5so3022696wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:31:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=A4I+VF355k3jsisxBlTLttI/lpdyrdQbQaCIU3RplcU=;
+ b=aTSpFQt//TWlyU8KeQC3749oyZfVDTA2S5ScqKqENlPeKu+0cxq+j/js/radwKcAW1
+ qs/oBaM5sDd/NGDQ6Gns2YGr2ZsL66LclYgTAGT6PfFFJI5RgdNP5bEkF2q+xKrpu+jx
+ iPmtcqaXOSDzJRnvXrJF4L9mpgt8nW3bvRYv2xmFyU/aBWqd6guq3D9/Nc6sB9XpD2dl
+ P/MLFttz5bfLvX0O6bI9aaXMx3qNZmHLYObCba2B/Ebqd9zbcMCHk2DL78ExeCipiQF9
+ FJkPnPG3PFYbsjEtkmkhY8ONyIpkVwAi5AtzVCjtc7XLx4ByH51bmbykIFpUz71zh+ei
+ tVzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=A4I+VF355k3jsisxBlTLttI/lpdyrdQbQaCIU3RplcU=;
+ b=mDk+R4T86tPMqxn66SypViUaPUEpUpJL2++0CvRU32F/m+UyqmWdTDN8TTbIeF0BcV
+ Vojfi6XFsMLFwXsm/SZua6qZhadS7IXQVYL29+a8lNSSUkF4JAWzgcUa0oO78NSd+lKj
+ V6P/tac66QfT+Mj7GVOOoSYi55JOlyzxF48xgQVKxvFM/OARrArj3YjunCH0zk7fUnCK
+ 7uXShbgbWGAhO1+RiKLMZVxIapCATBS07BmM+GA5Nn/SnqjTzgNCs8RjRpIIb+Ec8D47
+ NcgSOzBvLMa+kxPSG+drwJVUTmiCISKVzJ+MoKT5HdUPAxqymj2pjb2tgda1ILqTuhOi
+ 1cYA==
+X-Gm-Message-State: APjAAAXFfE6JdsSHbVNqmQyjDc2hYktnCQZfyr4V9dGz5pkK7SwUA6yI
+ SbngBfPE3tGaqJ4SNPV0qTy9QXxHGMqLuA==
+X-Google-Smtp-Source: APXvYqyNgbM8e289MTVorCCIZhxXEfTlHiKlL4znNHSANU1FfnC1rVzc1GB1OLVYGWfVt2xo+FIc0w==
+X-Received: by 2002:a1c:3d8b:: with SMTP id k133mr4720186wma.161.1579793459370; 
+ Thu, 23 Jan 2020 07:30:59 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s139sm2903592wme.35.2020.01.23.07.30.58
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 07:30:58 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 15/20] hw/arm/exynos4210: Fix DMA initialization
+Date: Thu, 23 Jan 2020 15:30:36 +0000
+Message-Id: <20200123153041.4248-16-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123153041.4248-1-peter.maydell@linaro.org>
+References: <20200123153041.4248-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: wnCb0o13OiGh2UFFXY9jhQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,220 +97,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Guenter Roeck <linux@roeck-us.net>
 
-virtiofsd needs access to /proc/self/fd.  Let's move to a new pid
-namespace so that a compromised process cannot see another other
-processes running on the system.
+First parameter to exynos4210_get_irq() is not the SPI port number,
+but the interrupt group number. Interrupt groups are 20 for mdma
+and 21 for pdma. Interrupts are not inverted. Controllers support 32
+events (pdma) or 31 events (mdma). Events must all be routed to a single
+interrupt line. Set other parameters as documented in Exynos4210 datasheet,
+section 8 (DMA controller).
 
-One wrinkle in this approach: unshare(CLONE_NEWPID) affects *child*
-processes and not the current process.  Therefore we need to fork the
-pid 1 process that will actually run virtiofsd and leave a parent in
-waitpid(2).  This is not the same thing as daemonization and parent
-processes should not notice a difference.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Fixes: 59520dc65e ("hw/arm/exynos4210: Add DMA support for the Exynos4210")
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Message-id: 20200123052540.6132-4-linux@roeck-us.net
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- tools/virtiofsd/passthrough_ll.c | 134 ++++++++++++++++++++-----------
- 1 file changed, 86 insertions(+), 48 deletions(-)
+ include/hw/arm/exynos4210.h |  4 +++
+ hw/arm/exynos4210.c         | 51 +++++++++++++++++++++++++++++++------
+ 2 files changed, 47 insertions(+), 8 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 27ab328722..0947d14e5b 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -51,7 +51,10 @@
- #include <string.h>
- #include <sys/file.h>
- #include <sys/mount.h>
-+#include <sys/prctl.h>
- #include <sys/syscall.h>
-+#include <sys/types.h>
-+#include <sys/wait.h>
- #include <sys/xattr.h>
- #include <unistd.h>
-=20
-@@ -1945,24 +1948,95 @@ static void print_capabilities(void)
+diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
+index f0f23b0e9b2..55260394af6 100644
+--- a/include/hw/arm/exynos4210.h
++++ b/include/hw/arm/exynos4210.h
+@@ -24,6 +24,7 @@
+ #ifndef EXYNOS4210_H
+ #define EXYNOS4210_H
+ 
++#include "hw/or-irq.h"
+ #include "hw/sysbus.h"
+ #include "target/arm/cpu-qom.h"
+ 
+@@ -74,6 +75,8 @@
+ 
+ #define EXYNOS4210_I2C_NUMBER               9
+ 
++#define EXYNOS4210_NUM_DMA      3
++
+ typedef struct Exynos4210Irq {
+     qemu_irq int_combiner_irq[EXYNOS4210_MAX_INT_COMBINER_IN_IRQ];
+     qemu_irq ext_combiner_irq[EXYNOS4210_MAX_EXT_COMBINER_IN_IRQ];
+@@ -97,6 +100,7 @@ typedef struct Exynos4210State {
+     MemoryRegion boot_secondary;
+     MemoryRegion bootreg_mem;
+     I2CBus *i2c_if[EXYNOS4210_I2C_NUMBER];
++    qemu_or_irq pl330_irq_orgate[EXYNOS4210_NUM_DMA];
+ } Exynos4210State;
+ 
+ #define TYPE_EXYNOS4210_SOC "exynos4210"
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index 77fbe1baabc..7701a3fa8bd 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -166,17 +166,36 @@ static uint64_t exynos4210_calc_affinity(int cpu)
+     return (0x9 << ARM_AFF1_SHIFT) | cpu;
  }
-=20
- /*
-- * Called after our UNIX domain sockets have been created, now we can move=
- to
-- * an empty network namespace to prevent TCP/IP and other network activity=
- in
-- * case this process is compromised.
-+ * Move to a new mount, net, and pid namespaces to isolate this process.
-  */
--static void setup_net_namespace(void)
-+static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
+ 
+-static void pl330_create(uint32_t base, qemu_irq irq, int nreq)
++static void pl330_create(uint32_t base, qemu_or_irq *orgate, qemu_irq irq,
++                         int nreq, int nevents, int width)
  {
--    if (unshare(CLONE_NEWNET) !=3D 0) {
--        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNET): %m\n");
-+    pid_t child;
+     SysBusDevice *busdev;
+     DeviceState *dev;
++    int i;
+ 
+     dev = qdev_create(NULL, "pl330");
++    qdev_prop_set_uint8(dev, "num_events", nevents);
++    qdev_prop_set_uint8(dev, "num_chnls",  8);
+     qdev_prop_set_uint8(dev, "num_periph_req",  nreq);
 +
-+    /*
-+     * Create a new pid namespace for *child* processes.  We'll have to
-+     * fork in order to enter the new pid namespace.  A new mount namespac=
-e
-+     * is also needed so that we can remount /proc for the new pid
-+     * namespace.
-+     *
-+     * Our UNIX domain sockets have been created.  Now we can move to
-+     * an empty network namespace to prevent TCP/IP and other network
-+     * activity in case this process is compromised.
-+     */
-+    if (unshare(CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWNET) !=3D 0) {
-+        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWPID | CLONE_NEWNS): %m\n"=
-);
-+        exit(1);
++    qdev_prop_set_uint8(dev, "wr_cap", 4);
++    qdev_prop_set_uint8(dev, "wr_q_dep", 8);
++    qdev_prop_set_uint8(dev, "rd_cap", 4);
++    qdev_prop_set_uint8(dev, "rd_q_dep", 8);
++    qdev_prop_set_uint8(dev, "data_width", width);
++    qdev_prop_set_uint16(dev, "data_buffer_dep", width);
+     qdev_init_nofail(dev);
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, base);
+-    sysbus_connect_irq(busdev, 0, irq);
++
++    object_property_set_int(OBJECT(orgate), nevents + 1, "num-lines",
++                            &error_abort);
++    object_property_set_bool(OBJECT(orgate), true, "realized", &error_abort);
++
++    for (i = 0; i < nevents + 1; i++) {
++        sysbus_connect_irq(busdev, i, qdev_get_gpio_in(DEVICE(orgate), i));
 +    }
-+
-+    child =3D fork();
-+    if (child < 0) {
-+        fuse_log(FUSE_LOG_ERR, "fork() failed: %m\n");
-+        exit(1);
-+    }
-+    if (child > 0) {
-+        pid_t waited;
-+        int wstatus;
-+
-+        /* The parent waits for the child */
-+        do {
-+            waited =3D waitpid(child, &wstatus, 0);
-+        } while (waited < 0 && errno =3D=3D EINTR && !se->exited);
-+
-+        /* We were terminated by a signal, see fuse_signals.c */
-+        if (se->exited) {
-+            exit(0);
-+        }
-+
-+        if (WIFEXITED(wstatus)) {
-+            exit(WEXITSTATUS(wstatus));
-+        }
-+
-+        exit(1);
-+    }
-+
-+    /* Send us SIGTERM when the parent thread terminates, see prctl(2) */
-+    prctl(PR_SET_PDEATHSIG, SIGTERM);
-+
-+    /*
-+     * If the mounts have shared propagation then we want to opt out so ou=
-r
-+     * mount changes don't affect the parent mount namespace.
-+     */
-+    if (mount(NULL, "/", NULL, MS_REC | MS_SLAVE, NULL) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_SLAVE): %m\n");
-+        exit(1);
-+    }
-+
-+    /* The child must remount /proc to use the new pid namespace */
-+    if (mount("proc", "/proc", "proc",
-+              MS_NODEV | MS_NOEXEC | MS_NOSUID | MS_RELATIME, NULL) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "mount(/proc): %m\n");
-+        exit(1);
-+    }
-+
-+    /* Now we can get our /proc/self/fd directory file descriptor */
-+    lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
-+    if (lo->proc_self_fd =3D=3D -1) {
-+        fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
-         exit(1);
-     }
++    qdev_connect_gpio_out(DEVICE(orgate), 0, irq);
  }
-=20
--/* This magic is based on lxc's lxc_pivot_root() */
--static void setup_pivot_root(const char *source)
-+/*
-+ * Make the source directory our root so symlinks cannot escape and no oth=
-er
-+ * files are accessible.  Assumes unshare(CLONE_NEWNS) was already called.
-+ */
-+static void setup_mounts(const char *source)
- {
-     int oldroot;
-     int newroot;
-=20
-+    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, sou=
-rce);
-+        exit(1);
-+    }
+ 
+ static void exynos4210_realize(DeviceState *socdev, Error **errp)
+@@ -431,12 +450,27 @@ static void exynos4210_realize(DeviceState *socdev, Error **errp)
+             s->irq_table[exynos4210_get_irq(28, 3)]);
+ 
+     /*** DMA controllers ***/
+-    pl330_create(EXYNOS4210_PL330_BASE0_ADDR,
+-                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(35, 1)]), 32);
+-    pl330_create(EXYNOS4210_PL330_BASE1_ADDR,
+-                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(36, 1)]), 32);
+-    pl330_create(EXYNOS4210_PL330_BASE2_ADDR,
+-                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(34, 1)]), 1);
++    pl330_create(EXYNOS4210_PL330_BASE0_ADDR, &s->pl330_irq_orgate[0],
++                 s->irq_table[exynos4210_get_irq(21, 0)], 32, 32, 32);
++    pl330_create(EXYNOS4210_PL330_BASE1_ADDR, &s->pl330_irq_orgate[1],
++                 s->irq_table[exynos4210_get_irq(21, 1)], 32, 32, 32);
++    pl330_create(EXYNOS4210_PL330_BASE2_ADDR, &s->pl330_irq_orgate[2],
++                 s->irq_table[exynos4210_get_irq(20, 1)], 1, 31, 64);
++}
 +
-+    /* This magic is based on lxc's lxc_pivot_root() */
-     oldroot =3D open("/", O_DIRECTORY | O_RDONLY | O_CLOEXEC);
-     if (oldroot < 0) {
-         fuse_log(FUSE_LOG_ERR, "open(/): %m\n");
-@@ -2009,47 +2083,14 @@ static void setup_pivot_root(const char *source)
-     close(oldroot);
++static void exynos4210_init(Object *obj)
++{
++    Exynos4210State *s = EXYNOS4210_SOC(obj);
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->pl330_irq_orgate); i++) {
++        char *name = g_strdup_printf("pl330-irq-orgate%d", i);
++        qemu_or_irq *orgate = &s->pl330_irq_orgate[i];
++
++        object_initialize_child(obj, name, orgate, sizeof(*orgate),
++                                TYPE_OR_IRQ, &error_abort, NULL);
++        g_free(name);
++    }
  }
-=20
--static void setup_proc_self_fd(struct lo_data *lo)
--{
--    lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
--    if (lo->proc_self_fd =3D=3D -1) {
--        fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
--        exit(1);
--    }
--}
--
--/*
-- * Make the source directory our root so symlinks cannot escape and no oth=
-er
-- * files are accessible.
-- */
--static void setup_mount_namespace(const char *source)
--{
--    if (unshare(CLONE_NEWNS) !=3D 0) {
--        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNS): %m\n");
--        exit(1);
--    }
--
--    if (mount(NULL, "/", NULL, MS_REC | MS_SLAVE, NULL) < 0) {
--        fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_PRIVATE): %m\n");
--        exit(1);
--    }
--
--    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
--        fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, sou=
-rce);
--        exit(1);
--    }
--
--    setup_pivot_root(source);
--}
--
- /*
-  * Lock down this process to prevent access to other processes or files ou=
-tside
-  * source directory.  This reduces the impact of arbitrary code execution =
-bugs.
-  */
--static void setup_sandbox(struct lo_data *lo)
-+static void setup_sandbox(struct lo_data *lo, struct fuse_session *se)
- {
--    setup_net_namespace();
--    setup_mount_namespace(lo->source);
-+    setup_namespaces(lo, se);
-+    setup_mounts(lo->source);
- }
-=20
- int main(int argc, char *argv[])
-@@ -2173,10 +2214,7 @@ int main(int argc, char *argv[])
-=20
-     fuse_daemonize(opts.foreground);
-=20
--    /* Must be after daemonize to get the right /proc/self/fd */
--    setup_proc_self_fd(&lo);
--
--    setup_sandbox(&lo);
-+    setup_sandbox(&lo, se);
-=20
-     /* Block until ctrl+c or fusermount -u */
-     ret =3D virtio_loop(se);
---=20
-2.24.1
+ 
+ static void exynos4210_class_init(ObjectClass *klass, void *data)
+@@ -450,6 +484,7 @@ static const TypeInfo exynos4210_info = {
+     .name = TYPE_EXYNOS4210_SOC,
+     .parent = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(Exynos4210State),
++    .instance_init = exynos4210_init,
+     .class_init = exynos4210_class_init,
+ };
+ 
+-- 
+2.20.1
 
 
