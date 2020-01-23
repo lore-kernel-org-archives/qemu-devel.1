@@ -2,76 +2,157 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E631C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D840C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1315E21D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EBA421D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iME2lMB/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1315E21D7D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDvcSXYK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EBA421D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiHT-0005pd-4t
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:36:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49338)
+	id 1iuiHa-0006Bu-CM
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:36:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43342)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iug4R-0002wZ-28
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:15:09 -0500
+ (envelope-from <jsnow@redhat.com>) id 1iugzD-0001PV-9r
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:13:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iug4O-0002Rl-0A
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:15:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23457
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1iugzA-0004Gd-Ay
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:13:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21771
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iug4N-0002P8-Rg
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:15:03 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iugzA-0004Cf-69
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:13:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579799702;
+ s=mimecast20190719; t=1579803222;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=lXQiMnh+8nnMY8LfQp0somzgzARDqxmhTIrLeyB5+SQ=;
- b=iME2lMB/PBYcXYc1yJ/sYXEiHswHIY0hw5KLU75t2XPvCOmRRFtHYGynJsp3Y8fyoClFKN
- gy1YPUZy4py/preigxMhslr5pqcPFjSDhX6UIJ/8VQt+OUOU8NA/sD9XEuZpwVVUgK8IQ7
- 8ZWRmU4kVb7q09PmqRVDYYf2tKNVkCI=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=47Zx6Be1/CXJq0HEZ5xXpdo8looUyl5x3WQwmQ5V4uM=;
+ b=iDvcSXYKXezcaw9V0LVT5oiE3MlgxnSRvm4vfZxeGJ5X+M8nYpAzaraq94n9Y/ml4dcSgc
+ gnezonk+FeSGqMJjSMOMww/GG861p6pDUZVV2yJO4cVsNGVCzu1Iwj+3w0ZpEBPvQMx76f
+ 2fYQdBp8ifFG2fBSPMj/+Dzy0IYLnII=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-6P45-92lNm2_8CCoJmyoiw-1; Thu, 23 Jan 2020 12:12:02 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-354-eA2wD17JMX639sTz2RlMfw-1; Thu, 23 Jan 2020 13:13:40 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 494D7100551B;
- Thu, 23 Jan 2020 17:12:00 +0000 (UTC)
-Received: from thuth.com (ovpn-116-64.ams2.redhat.com [10.36.116.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 45C1C85784;
- Thu, 23 Jan 2020 17:11:52 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [qemu-web PATCH v2] Add "Security Process" information to the main
- website
-Date: Thu, 23 Jan 2020 18:11:50 +0100
-Message-Id: <20200123171150.12782-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 6P45-92lNm2_8CCoJmyoiw-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 070748017CC;
+ Thu, 23 Jan 2020 18:13:39 +0000 (UTC)
+Received: from [10.10.125.4] (ovpn-125-4.rdu2.redhat.com [10.10.125.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F23E5DA87;
+ Thu, 23 Jan 2020 18:13:34 +0000 (UTC)
+Subject: Re: Making QEMU easier for management tools and applications
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <20191224130035.GC2710539@redhat.com>
+ <a95b7572-d863-bc88-66aa-3beed679cefe@redhat.com>
+ <20200123102705.GC657556@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <0ba8f074-fde8-a0f6-5880-d2f5eabeca98@redhat.com>
+Date: Thu, 23 Jan 2020 13:13:33 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
+MIME-Version: 1.0
+In-Reply-To: <20200123102705.GC657556@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: eA2wD17JMX639sTz2RlMfw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,265 +164,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pjp@redhat.com, sstabellini@kernel.org, pmatouse@redhat.com,
- mdroth@linux.vnet.ibm.com, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-One reporter of a security issue recently complained that it might not
-be the best idea to store our "Security Process" in the Wiki. Well, while
-the page in the Wiki is protected (so that only some few people can edit
-it), it is still possible that someone might find a bug in the Wiki
-software to alter the page contents...
-Anyway, it looks more trustworthy if we present the "Security Process"
-information in the static website instead. Thus this patch adds the
-information from the wiki to the Jekyll-based website now.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Improved some sentences as suggested by Paolo
 
- contribute.md                  |   3 +-
- contribute/report-a-bug.md     |   7 +-
- contribute/security-process.md | 129 +++++++++++++++++++++++++++++++++
- 3 files changed, 134 insertions(+), 5 deletions(-)
- create mode 100644 contribute/security-process.md
+On 1/23/20 5:27 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Jan 22, 2020 at 05:42:10PM -0500, John Snow wrote:
+>>
+>>
+>> On 12/24/19 8:00 AM, Daniel P. Berrang=C3=A9 wrote:
+>>> Based on experiance in libvirt, this is an even larger job than (4),
+>>> as the feature set here is huge.  Much of it directly ties into the
+>>> config problem, as to deal with SELinux / namespace setup the code
+>>> needs to understand what resources to provide access to. This
+>>> requires a way to express 100% coverage of all QEMU configuration
+>>> in use & analyse it to determine what resources it implies. So this
+>>> ties strongly into QAPI-ification completion.
+>>
+>> Is it totally bonkers to suggest that QEMU provide a method of digesting
+>> a given configuration and returning a configuration object that a
+>> standalone jailer can use?
+>>
+>> So we have a QEMU manager, the generic jailer, and QEMU. QEMU and the
+>> manager cooperate to produce the jailing configuration, and the jailer
+>> does what we ask it to.
+>=20
+> It isn't clear what you mean by "QEMU" here. If this QEMU, the system
+> emulator process, then this is the untrustworthy part of the stack,
+> so the jailer must not use any data that QEMU is providing. In fact
+> during startup the jailer does its work before QEMU even exists.
+>=20
 
-diff --git a/contribute.md b/contribute.md
-index 56306e0..96901b5 100644
---- a/contribute.md
-+++ b/contribute.md
-@@ -3,7 +3,8 @@ title: Contribute to QEMU!
- permalink: /contribute/
- ---
-=20
--* Report a bug: [https://bugs.launchpad.net/qemu/](https://bugs.launchpad.=
-net/qemu/)<br>[How to report a bug](report-a-bug/)
-+* Report a bug in our bugtracker: [https://bugs.launchpad.net/qemu/](https=
-://bugs.launchpad.net/qemu/)<br>
-+  See also [How to report a bug](report-a-bug/) or [How to report a securi=
-ty bug](security-process/)
-=20
- * Clone ([or browse](https://git.qemu.org/?p=3Dqemu.git)) the git reposito=
-ry: <br>`git clone https://git.qemu.org/git/qemu.git`
-=20
-diff --git a/contribute/report-a-bug.md b/contribute/report-a-bug.md
-index 441c61b..1cc42e7 100644
---- a/contribute/report-a-bug.md
-+++ b/contribute/report-a-bug.md
-@@ -17,10 +17,9 @@ When submitting a bug report, please try to do the follo=
-wing:
-=20
- * Do not contribute patches on the bug tracker; send patches to the mailin=
-g list. Follow QEMU's [guidelines about submitting patches](https://wiki.qe=
-mu.org/Contribute/SubmitAPatch).
-=20
--Do NOT report security issues (or other bugs, too) as
--"private" bugs in the bug tracker.  QEMU has a [security
--process](https://wiki.qemu.org/SecurityProcess) for issues that should
--be reported in a non-public way instead.
-+Do NOT report security issues (or other bugs, too) as "private" bugs in th=
-e
-+bug tracker.  QEMU has a [security process](../security-process) for issue=
-s
-+that should be reported in a non-public way instead.
-=20
- For problems with KVM in the kernel, use the kernel bug tracker instead;
- the [KVM wiki](https://www.linux-kvm.org/page/Bugs) has the details.
-diff --git a/contribute/security-process.md b/contribute/security-process.m=
-d
-new file mode 100644
-index 0000000..ad10627
---- /dev/null
-+++ b/contribute/security-process.md
-@@ -0,0 +1,129 @@
-+---
-+title: Security Process
-+permalink: /contribute/security-process/
-+---
-+
-+QEMU takes security very seriously, and we aim to take immediate action to
-+address serious security-related problems that involve our product.
-+
-+Please report any suspected security vulnerability in QEMU to the followin=
-g
-+addresses. You can use GPG keys for respective receipients to communicate =
-with
-+us securely. If you do, please upload your GPG public key or supply it to =
-us
-+in some other way, so that we can communicate to you in a secure way, too!
-+Please include the tag **\[QEMU-SECURITY\]** on the subject line to help u=
-s
-+identify your message as security-related.=20
-+
-+## QEMU Security Contact List
-+
-+Please copy everyone on this list:
-+
-+ Contact Person(s)=09| Contact Address=09=09| Company=09|  GPG Key  | GPG =
-key fingerprint
-+:-----------------------|:------------------------------|:--------------|:=
----------:|:--------------------
-+ Michael S. Tsirkin=09| mst@redhat.com=09=09| Red Hat Inc.=09| [&#x1f511;]=
-(https://pgp.mit.edu/pks/lookup?op=3Dvindex&search=3D0xC3503912AFBE8E67) | =
-0270 606B 6F3C DF3D 0B17 0970 C350 3912 AFBE 8E67
-+ Petr Matousek=09=09| pmatouse@redhat.com=09=09| Red Hat Inc.=09| [&#x1f51=
-1;](https://pgp.mit.edu/pks/lookup?op=3Dvindex&search=3D0x3E786F42C44977CA)=
- | 8107 AF16 A416 F9AF 18F3 D874 3E78 6F42 C449 77CA
-+ Stefano Stabellini=09| sstabellini@kernel.org =09| Independent=09| [&#x1f=
-511;](https://pgp.mit.edu/pks/lookup?op=3Dvindex&search=3D0x894F8F4870E1AE9=
-0) | D04E 33AB A51F 67BA 07D3 0AEA 894F 8F48 70E1 AE90
-+ Security Response Team | secalert@redhat.com=09=09| Red Hat Inc.=09| [&#x=
-1f511;](https://access.redhat.com/site/security/team/contact/#contact) |
-+ Michael Roth=09=09| mdroth@linux.vnet.ibm.com=09| IBM=09=09| [&#x1f511;](=
-https://pgp.mit.edu/pks/lookup?op=3Dvindex&search=3D0x3353C9CEF108B584) | C=
-EAC C9E1 5534 EBAB B82D 3FA0 3353 C9CE F108 B584
-+ Prasad J Pandit =09| pjp@redhat.com=09=09| Red Hat Inc.=09| [&#x1f511;](h=
-ttp://pool.sks-keyservers.net/pks/lookup?op=3Dvindex&search=3D0xE2858B5AF05=
-0DE8D) | 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D=20
-+
-+## How to Contact Us Securely
-+
-+We use GNU Privacy Guard (GnuPG or GPG) keys to secure communications. Mai=
-l
-+sent to members of the list can be encrypted with public keys of all membe=
-rs
-+of the list. We expect to change some of the keys we use from time to time=
-.
-+Should a key change, the previous one will be revoked.
-+
-+## How we respond
-+
-+Maintainers listed on the security reporting list operate a policy of
-+responsible disclosure. As such they agree that any information you share =
-with
-+them about security issues that are not public knowledge is kept confident=
-ial
-+within respective affiliated companies. It is not passed on to any third-p=
-arty,
-+including Xen Security Project, without your permission.
-+
-+Email sent to us is read and acknowledged with a non-automated response. F=
-or
-+issues that are complicated and require significant attention, we will ope=
-n an
-+investigation and keep you informed of our progress. We might take one or =
-more
-+of the following steps:
-+
-+### Publication embargo
-+
-+As a security issue reported, that is not already publically disclosed
-+elsewhere, has an embargo date assigned and communicated to reporter. Emba=
-rgo
-+periods will be negotiated by mutual agreement between members of the secu=
-rity
-+team and other relevant parties to the problem. Members of the security co=
-ntact
-+list agree not to publically disclose any details of the security issue un=
-til
-+the embargo date expires.
-+
-+### CVE allocation
-+
-+An security issue is assigned with a CVE number. The CVE numbers will usua=
-lly
-+be allocated by one of the vendor security engineers on the security conta=
-ct
-+list.
-+
-+## When to contact the QEMU Security Contact List
-+
-+You should contact the Security Contact List if:
-+* You think there may be a security vulnerability in QEMU.
-+* You are unsure about how a known vulnerability affects QEMU.
-+* You can contact us in English. We are unable to respond in other languag=
-es.
-+
-+## When *not* to contact the QEMU Security Contact List
-+* You need assistance in a language other than English.
-+* You require technical assistance (for example, "how do I configure QEMU?=
-").
-+* You need help upgrading QEMU due to security alerts.
-+* Your issue is not security related.
-+
-+## How impact and severity of a bug is decided
-+
-+All security issues in QEMU are not equal. Based on the parts of the QEMU
-+sources wherein the bug is found, its impact and severity could vary.
-+
-+In particular, QEMU is used in many different scenarios; some of them assu=
-me
-+that the guest is trusted, some of them don't. General considerations to t=
-riage
-+QEMU issues and decide whether a configuration is security sensitive inclu=
-de:
-+
-+* Is there any feasible way for a malicious party to exploit this flaw and
-+  cause real damage? (e.g. from a guest or via downloadable images)
-+* Does the flaw require access to the management interface? Would the
-+  management interface be accessible in the scenario where the flaw could =
-cause
-+  real damage?
-+* Is QEMU used in conjunction with a hypervisor (as opposed to TCG binary
-+  translation)?
-+* Is QEMU used to offer virtualised production services, as opposed to usa=
-ge
-+  as a development platform?
-+
-+Whenever some or all of these questions have negative answers, what appear=
-s to
-+be a major security flaw might be considered of low severity because it co=
-uld
-+only be exercised in use cases where QEMU and everything interacting with =
-it is
-+trusted.
-+
-+For  example, consider upstream commit [9201bb9 "sdhci.c: Limit the maximu=
-m
-+block size"](http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D9201bb9), an=
- of out of
-+bounds (OOB) memory access (ie. buffer overflow) issue that was found and =
-fixed
-+in the SD Host  Controller emulation (hw/sd/sdhci.c).
-+
-+On the surface, this bug appears to be a genuine security flaw, with poten=
-tially
-+severe implications. But digging further down, there are only two ways to =
-use
-+SD Host Controller emulation, one is via 'sdhci-pci' interface and the oth=
-er
-+is via 'generic-sdhci' interface.
-+
-+Of these two, the 'sdhci-pci' interface had actually been disabled by defa=
-ult
-+in the upstream QEMU releases (commit [1910913 "sdhci: Make device "sdhci-=
-pci"
-+unavailable with -device"](http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=
-=3D1910913)
-+at the time the flaw was reported; therefore, guests could not possibly us=
-e
-+'sdhci-pci' for any  purpose.
-+
-+The 'generic-sdhci' interface, instead, had only one user in 'Xilinx Zynq
-+Baseboard emulation' (hw/arm/xilinx_zynq.c). Xilinx Zynq is a programmable
-+systems on chip (SoC) device. While QEMU does emulate this device, in prac=
-tice
-+it is used to facilitate cross-platform developmental efforts, i.e. QEMU i=
-s
-+used to write programs for the SoC device. In such developer environments,=
- it
-+is generally assumed that the guest is trusted.
-+
-+And thus, this buffer overflow turned out to be a security non-issue.
-+
-+## What to Send to the QEMU Security Contact List
-+
-+Please provide as much information about your system and the issue as poss=
-ible
-+when contacting the list.
+I worried about this. Hence the "Nuts?" ask. It sounds like the ultimate
+problem is nobody can know -- except QEMU -- what permissions are truly
+needed for a given configuration. Even if we had an immaculate API, how
+would anyone except QEMU developers know?
+
+Trial and error, perhaps, on behalf of the jailer developers. Trial and
+error is not the greatest feature of a security mechanism. Clearly, a
+lot of effort has been spent to get libvirt's implementation correct,
+but Stefan raises the idea that other projects have need of
+understanding how to map QEMU configurations to appropriate jails.
+
+Worse, it could still change on a whim. We (QEMU developers) probably
+are not used to thinking of permitted syscall lists as ABI that we
+strive to maintain. It can change.
+
+How do we make this easier in a way that doesn't trust QEMU? I feel like
+QEMU needs to provide *some* kind of information that can be used to
+build better jailing configurations...
+
+> There are aspects to the confinement that use / rely on knowledge that
+> QEMU doesn't normally have, or are expressed in a different way that
+> which QEMU uses, or needs to take a different imlpementation approach to
+> that which QEMU normally has.
+>=20
+> For networking, for example, from QEMU's config POV, there's just a
+> TAP file descriptor. There are then a huge number of ways in which
+> that TAP FD has been connected to the network in the host that are
+> invisible to QEMU. Plain bridge, openvswitch bridge, macvtap device
+> all with varying configs. Knowledge of this is relevant to the manager
+> process and the jailer but irrelevant to QEMU.
+>=20
+> When configuring disks we have technical issues. For example we need
+> to identify the full backing chain and grant the appropriate permissions
+> on this. Even if there was a libqemublock.so, libvirt would not use this
+> because the QEMU storage code design is not reliable & minimal enough.
+> For example to just query the backing file, QEMU opens the qcow2 and
+> parses all the data about it, building up L1/L2 tables, and other
+> data structures involved. It is trivial to create qcow2 files which
+> result in both memory and CPU denial of service merely from opening
+> the file.  Libvirt's approach to this is minimalist just having a
+> data table of offsets to the key fields in each file format. So we
+> can extract the backing file & its format without reading anything
+> else from the disk.
+>=20
+> When configuring chardevs there is a choice of how to do it - we
+> could just pass the UNIX socket path in, or we could create the
+> UNIX socket ourselves & pass in the pre-opened FD. Both are equally
+> functional from QEMU's POV and the end user's POV, but passing a
+> pre-opened FD is more convenient for libvirt's needs as it allowed
+> for race-free startups sychronization between libvirt & QEMU, or
+> rather QMP.  The different options here though, have different
+> needs on the jailer, because extra steps are needed when passing
+> pre-opened FD to get the SELinux labelling right. QEMU doesn't
+> know which approach the mgmt app will want to take, so we can't
+> ask QEMU how the jailer should be configured - the mgmt app needs
+> to make that decision.
+>=20
+> Essentially we have 2 configuration formats - the high level one
+> that the mgmt app layer uses & the low level one that QEMU uses.
+> The component in the stack which maps between the two config
+> formats, is that one that has the knowledge to configure the
+> jailer. This isn't QEMU. It is whatever is immediately above QEMU,
+> currently libvirt, but something conceptually equivalent to the
+> role libvirt's QEMU driver impl fills.
+>=20
+> Regards,
+> Daniel
+>=20
+
 --=20
-2.18.1
+=E2=80=94js
 
 
