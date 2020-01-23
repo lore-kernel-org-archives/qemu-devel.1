@@ -2,86 +2,81 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33148C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD75C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0585F21569
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82E2421569
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:27:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aTSpFQt/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0585F21569
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmsIrCeQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82E2421569
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhCT-0003ed-4i
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:27:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48478)
+	id 1iuhCW-0003lA-8d
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:27:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iueRl-0000Uy-KF
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:07 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufTq-0007mx-Hs
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:37:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iueRj-0003xP-QE
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:05 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:50270)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iueRh-0003s1-VG
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:02 -0500
-Received: by mail-wm1-x332.google.com with SMTP id a5so3022696wmb.0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:31:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=A4I+VF355k3jsisxBlTLttI/lpdyrdQbQaCIU3RplcU=;
- b=aTSpFQt//TWlyU8KeQC3749oyZfVDTA2S5ScqKqENlPeKu+0cxq+j/js/radwKcAW1
- qs/oBaM5sDd/NGDQ6Gns2YGr2ZsL66LclYgTAGT6PfFFJI5RgdNP5bEkF2q+xKrpu+jx
- iPmtcqaXOSDzJRnvXrJF4L9mpgt8nW3bvRYv2xmFyU/aBWqd6guq3D9/Nc6sB9XpD2dl
- P/MLFttz5bfLvX0O6bI9aaXMx3qNZmHLYObCba2B/Ebqd9zbcMCHk2DL78ExeCipiQF9
- FJkPnPG3PFYbsjEtkmkhY8ONyIpkVwAi5AtzVCjtc7XLx4ByH51bmbykIFpUz71zh+ei
- tVzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=A4I+VF355k3jsisxBlTLttI/lpdyrdQbQaCIU3RplcU=;
- b=mDk+R4T86tPMqxn66SypViUaPUEpUpJL2++0CvRU32F/m+UyqmWdTDN8TTbIeF0BcV
- Vojfi6XFsMLFwXsm/SZua6qZhadS7IXQVYL29+a8lNSSUkF4JAWzgcUa0oO78NSd+lKj
- V6P/tac66QfT+Mj7GVOOoSYi55JOlyzxF48xgQVKxvFM/OARrArj3YjunCH0zk7fUnCK
- 7uXShbgbWGAhO1+RiKLMZVxIapCATBS07BmM+GA5Nn/SnqjTzgNCs8RjRpIIb+Ec8D47
- NcgSOzBvLMa+kxPSG+drwJVUTmiCISKVzJ+MoKT5HdUPAxqymj2pjb2tgda1ILqTuhOi
- 1cYA==
-X-Gm-Message-State: APjAAAXFfE6JdsSHbVNqmQyjDc2hYktnCQZfyr4V9dGz5pkK7SwUA6yI
- SbngBfPE3tGaqJ4SNPV0qTy9QXxHGMqLuA==
-X-Google-Smtp-Source: APXvYqyNgbM8e289MTVorCCIZhxXEfTlHiKlL4znNHSANU1FfnC1rVzc1GB1OLVYGWfVt2xo+FIc0w==
-X-Received: by 2002:a1c:3d8b:: with SMTP id k133mr4720186wma.161.1579793459370; 
- Thu, 23 Jan 2020 07:30:59 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s139sm2903592wme.35.2020.01.23.07.30.58
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Jan 2020 07:30:58 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 15/20] hw/arm/exynos4210: Fix DMA initialization
-Date: Thu, 23 Jan 2020 15:30:36 +0000
-Message-Id: <20200123153041.4248-16-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200123153041.4248-1-peter.maydell@linaro.org>
-References: <20200123153041.4248-1-peter.maydell@linaro.org>
+ (envelope-from <dgilbert@redhat.com>) id 1iufTp-00077R-5S
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:37:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29254
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufTm-00075r-Db
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:37:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579797433;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/aGmG4rgywoJ0OD4dB10i0OAE/DqMGnKEaXy9fgOkok=;
+ b=dmsIrCeQ+PRDLuFxBM/u3EOFA1Un63LwiOS1+PUsXQHzZmdBQ9fzsJD8apey9v7dYV8gFy
+ 6prMKiLeYzMtdLFRALa3IfDx0Dz0JMJSQ485l3tzEB4cX7NBlIoyM0x9CwfOzaPZVEzcjz
+ pMEIfSC9QJ/n85YJ748pBIx50qAr8QM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-jmvWSGyGPaqaKop1suG_eg-1; Thu, 23 Jan 2020 11:37:11 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41DE66C413
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:37:10 +0000 (UTC)
+Received: from work-vm (ovpn-116-110.ams2.redhat.com [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 12B1C28991;
+ Thu, 23 Jan 2020 16:37:08 +0000 (UTC)
+Date: Thu, 23 Jan 2020 16:37:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v4 5/6] migration: Create migration_is_running()
+Message-ID: <20200123163706.GD2732@work-vm>
+References: <20200122111517.33223-1-quintela@redhat.com>
+ <20200122111517.33223-6-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::332
+In-Reply-To: <20200122111517.33223-6-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: jmvWSGyGPaqaKop1suG_eg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,144 +88,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Guenter Roeck <linux@roeck-us.net>
+* Juan Quintela (quintela@redhat.com) wrote:
+> This function returns if we are in the middle of a migration.
+> It is like migration_is_setup_or_active() with CANCELLING and COLO.
+> Adapt all calers that are needed.
+>=20
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-First parameter to exynos4210_get_irq() is not the SPI port number,
-but the interrupt group number. Interrupt groups are 20 for mdma
-and 21 for pdma. Interrupts are not inverted. Controllers support 32
-events (pdma) or 31 events (mdma). Events must all be routed to a single
-interrupt line. Set other parameters as documented in Exynos4210 datasheet,
-section 8 (DMA controller).
+Yeh the changes do change behaviour, but they're probably more correct.
 
-Fixes: 59520dc65e ("hw/arm/exynos4210: Add DMA support for the Exynos4210")
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Message-id: 20200123052540.6132-4-linux@roeck-us.net
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/arm/exynos4210.h |  4 +++
- hw/arm/exynos4210.c         | 51 +++++++++++++++++++++++++++++++------
- 2 files changed, 47 insertions(+), 8 deletions(-)
 
-diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
-index f0f23b0e9b2..55260394af6 100644
---- a/include/hw/arm/exynos4210.h
-+++ b/include/hw/arm/exynos4210.h
-@@ -24,6 +24,7 @@
- #ifndef EXYNOS4210_H
- #define EXYNOS4210_H
- 
-+#include "hw/or-irq.h"
- #include "hw/sysbus.h"
- #include "target/arm/cpu-qom.h"
- 
-@@ -74,6 +75,8 @@
- 
- #define EXYNOS4210_I2C_NUMBER               9
- 
-+#define EXYNOS4210_NUM_DMA      3
-+
- typedef struct Exynos4210Irq {
-     qemu_irq int_combiner_irq[EXYNOS4210_MAX_INT_COMBINER_IN_IRQ];
-     qemu_irq ext_combiner_irq[EXYNOS4210_MAX_EXT_COMBINER_IN_IRQ];
-@@ -97,6 +100,7 @@ typedef struct Exynos4210State {
-     MemoryRegion boot_secondary;
-     MemoryRegion bootreg_mem;
-     I2CBus *i2c_if[EXYNOS4210_I2C_NUMBER];
-+    qemu_or_irq pl330_irq_orgate[EXYNOS4210_NUM_DMA];
- } Exynos4210State;
- 
- #define TYPE_EXYNOS4210_SOC "exynos4210"
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 77fbe1baabc..7701a3fa8bd 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -166,17 +166,36 @@ static uint64_t exynos4210_calc_affinity(int cpu)
-     return (0x9 << ARM_AFF1_SHIFT) | cpu;
- }
- 
--static void pl330_create(uint32_t base, qemu_irq irq, int nreq)
-+static void pl330_create(uint32_t base, qemu_or_irq *orgate, qemu_irq irq,
-+                         int nreq, int nevents, int width)
- {
-     SysBusDevice *busdev;
-     DeviceState *dev;
-+    int i;
- 
-     dev = qdev_create(NULL, "pl330");
-+    qdev_prop_set_uint8(dev, "num_events", nevents);
-+    qdev_prop_set_uint8(dev, "num_chnls",  8);
-     qdev_prop_set_uint8(dev, "num_periph_req",  nreq);
-+
-+    qdev_prop_set_uint8(dev, "wr_cap", 4);
-+    qdev_prop_set_uint8(dev, "wr_q_dep", 8);
-+    qdev_prop_set_uint8(dev, "rd_cap", 4);
-+    qdev_prop_set_uint8(dev, "rd_q_dep", 8);
-+    qdev_prop_set_uint8(dev, "data_width", width);
-+    qdev_prop_set_uint16(dev, "data_buffer_dep", width);
-     qdev_init_nofail(dev);
-     busdev = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(busdev, 0, base);
--    sysbus_connect_irq(busdev, 0, irq);
-+
-+    object_property_set_int(OBJECT(orgate), nevents + 1, "num-lines",
-+                            &error_abort);
-+    object_property_set_bool(OBJECT(orgate), true, "realized", &error_abort);
-+
-+    for (i = 0; i < nevents + 1; i++) {
-+        sysbus_connect_irq(busdev, i, qdev_get_gpio_in(DEVICE(orgate), i));
-+    }
-+    qdev_connect_gpio_out(DEVICE(orgate), 0, irq);
- }
- 
- static void exynos4210_realize(DeviceState *socdev, Error **errp)
-@@ -431,12 +450,27 @@ static void exynos4210_realize(DeviceState *socdev, Error **errp)
-             s->irq_table[exynos4210_get_irq(28, 3)]);
- 
-     /*** DMA controllers ***/
--    pl330_create(EXYNOS4210_PL330_BASE0_ADDR,
--                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(35, 1)]), 32);
--    pl330_create(EXYNOS4210_PL330_BASE1_ADDR,
--                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(36, 1)]), 32);
--    pl330_create(EXYNOS4210_PL330_BASE2_ADDR,
--                 qemu_irq_invert(s->irq_table[exynos4210_get_irq(34, 1)]), 1);
-+    pl330_create(EXYNOS4210_PL330_BASE0_ADDR, &s->pl330_irq_orgate[0],
-+                 s->irq_table[exynos4210_get_irq(21, 0)], 32, 32, 32);
-+    pl330_create(EXYNOS4210_PL330_BASE1_ADDR, &s->pl330_irq_orgate[1],
-+                 s->irq_table[exynos4210_get_irq(21, 1)], 32, 32, 32);
-+    pl330_create(EXYNOS4210_PL330_BASE2_ADDR, &s->pl330_irq_orgate[2],
-+                 s->irq_table[exynos4210_get_irq(20, 1)], 1, 31, 64);
-+}
-+
-+static void exynos4210_init(Object *obj)
-+{
-+    Exynos4210State *s = EXYNOS4210_SOC(obj);
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(s->pl330_irq_orgate); i++) {
-+        char *name = g_strdup_printf("pl330-irq-orgate%d", i);
-+        qemu_or_irq *orgate = &s->pl330_irq_orgate[i];
-+
-+        object_initialize_child(obj, name, orgate, sizeof(*orgate),
-+                                TYPE_OR_IRQ, &error_abort, NULL);
-+        g_free(name);
-+    }
- }
- 
- static void exynos4210_class_init(ObjectClass *klass, void *data)
-@@ -450,6 +484,7 @@ static const TypeInfo exynos4210_info = {
-     .name = TYPE_EXYNOS4210_SOC,
-     .parent = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(Exynos4210State),
-+    .instance_init = exynos4210_init,
-     .class_init = exynos4210_class_init,
- };
- 
--- 
-2.20.1
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  migration/migration.c | 29 ++++++++++++++++++++++++-----
+>  migration/migration.h |  1 +
+>  migration/savevm.c    |  4 +---
+>  3 files changed, 26 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 990bff00c0..1fb0aab44d 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -829,6 +829,27 @@ bool migration_is_setup_or_active(int state)
+>      }
+>  }
+> =20
+> +bool migration_is_running(int state)
+> +{
+> +    switch (state) {
+> +    case MIGRATION_STATUS_ACTIVE:
+> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+> +    case MIGRATION_STATUS_POSTCOPY_PAUSED:
+> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
+> +    case MIGRATION_STATUS_SETUP:
+> +    case MIGRATION_STATUS_PRE_SWITCHOVER:
+> +    case MIGRATION_STATUS_DEVICE:
+> +    case MIGRATION_STATUS_WAIT_UNPLUG:
+> +    case MIGRATION_STATUS_CANCELLING:
+> +    case MIGRATION_STATUS_COLO:
+> +        return true;
+> +
+> +    default:
+> +        return false;
+> +
+> +    }
+> +}
+> +
+>  static void populate_time_info(MigrationInfo *info, MigrationState *s)
+>  {
+>      info->has_status =3D true;
+> @@ -1077,7 +1098,7 @@ void qmp_migrate_set_capabilities(MigrationCapabili=
+tyStatusList *params,
+>      MigrationCapabilityStatusList *cap;
+>      bool cap_list[MIGRATION_CAPABILITY__MAX];
+> =20
+> -    if (migration_is_setup_or_active(s->state)) {
+> +    if (migration_is_running(s->state)) {
+>          error_setg(errp, QERR_MIGRATION_ACTIVE);
+>          return;
+>      }
+> @@ -1590,7 +1611,7 @@ static void migrate_fd_cancel(MigrationState *s)
+> =20
+>      do {
+>          old_state =3D s->state;
+> -        if (!migration_is_setup_or_active(old_state)) {
+> +        if (!migration_is_running(old_state)) {
+>              break;
+>          }
+>          /* If the migration is paused, kick it out of the pause */
+> @@ -1888,9 +1909,7 @@ static bool migrate_prepare(MigrationState *s, bool=
+ blk, bool blk_inc,
+>          return true;
+>      }
+> =20
+> -    if (migration_is_setup_or_active(s->state) ||
+> -        s->state =3D=3D MIGRATION_STATUS_CANCELLING ||
+> -        s->state =3D=3D MIGRATION_STATUS_COLO) {
+> +    if (migration_is_running(s->state)) {
+>          error_setg(errp, QERR_MIGRATION_ACTIVE);
+>          return false;
+>      }
+> diff --git a/migration/migration.h b/migration/migration.h
+> index aa9ff6f27b..44b1d56929 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -279,6 +279,7 @@ void migrate_fd_error(MigrationState *s, const Error =
+*error);
+>  void migrate_fd_connect(MigrationState *s, Error *error_in);
+> =20
+>  bool migration_is_setup_or_active(int state);
+> +bool migration_is_running(int state);
+> =20
+>  void migrate_init(MigrationState *s);
+>  bool migration_is_blocked(Error **errp);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index adfdca26ac..f19cb9ec7a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1531,9 +1531,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **e=
+rrp)
+>      MigrationState *ms =3D migrate_get_current();
+>      MigrationStatus status;
+> =20
+> -    if (migration_is_setup_or_active(ms->state) ||
+> -        ms->state =3D=3D MIGRATION_STATUS_CANCELLING ||
+> -        ms->state =3D=3D MIGRATION_STATUS_COLO) {
+> +    if (migration_is_running(ms->state)) {
+>          error_setg(errp, QERR_MIGRATION_ACTIVE);
+>          return -EINVAL;
+>      }
+> --=20
+> 2.24.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
