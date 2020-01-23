@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C95CAC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25284C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:01:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9424624655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E33BA21569
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:01:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X8zkOnpy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9424624655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sjhr0hkw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E33BA21569
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iub94-0001cZ-6P
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:59:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35416)
+	id 1iubAx-0003eC-W2
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:01:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuas4-0005v7-Qo
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:01 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuart-0005ZC-5b
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuas3-0004OQ-Hy
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:00 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34752
+ (envelope-from <imammedo@redhat.com>) id 1iuarr-0004GY-Uc
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:49 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22256
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuas3-0004OD-F8
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:59 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuarr-0004GP-Ru
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779719;
+ s=mimecast20190719; t=1579779707;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LgCZ/pGkOf/xbrfC8klHSdk5ZNKIH9vXEKSiOqSFROE=;
- b=X8zkOnpyLFjPxI4iyUnk4HfX2T0bpbggclP9BAHcEEFqVkJ2E1mQ5eBt4PvhWMcru9ai8W
- CvMx8MFb2n5/hDLWuEDeZ+g2Lpy/X0T+LbWfDLkQ0ODFSsIjViUuk5/neyAXPJQM7yXiOf
- aitt7nDjpepjwkUUpGe4FCxNV5WwzYM=
+ bh=MrbAHNDp1Kp3NvQXCAH+L04X9w/Fm09aqfx5l9uGx3s=;
+ b=Sjhr0hkwf0f7GbaixOg0pFMO6O3Za5oiMfKwIUP/2kG6q2UQ2Yi5QZ8VPFwx1Yf/oQmIrh
+ agOSJ4BgkHbngjK36mQIJMLUneiY72dzTyrs25FBk9MdWDg+sxZ7cvewOukT2qrx2YPb3D
+ iRCix8Oxh04QU8yZyrJLp+LvVeaJKF4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-0EoVcCViNmi4lvvHZzTmPA-1; Thu, 23 Jan 2020 06:41:55 -0500
+ us-mta-297-lYYUeoV5OdiVVSM47WW9jg-1; Thu, 23 Jan 2020 06:41:43 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D2E618C8C06;
- Thu, 23 Jan 2020 11:41:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBCAC107ACC9;
+ Thu, 23 Jan 2020 11:41:42 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 39DBF1001DD7;
- Thu, 23 Jan 2020 11:41:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C7B4B10016EB;
+ Thu, 23 Jan 2020 11:41:41 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 25/80] arm/palm: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:37:50 +0100
-Message-Id: <1579779525-20065-26-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 20/80] arm/mps2-tz: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:37:45 +0100
+Message-Id: <1579779525-20065-21-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 0EoVcCViNmi4lvvHZzTmPA-1
+X-MC-Unique: lYYUeoV5OdiVVSM47WW9jg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -109,46 +109,36 @@ v2:
     (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 
 CC: drjones@redhat.com
-CC: balrogg@gmail.com
 CC: peter.maydell@linaro.org
 CC: qemu-arm@nongnu.org
 ---
- hw/arm/palm.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ hw/arm/mps2-tz.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-index 72eca8c..388b262 100644
---- a/hw/arm/palm.c
-+++ b/hw/arm/palm.c
-@@ -31,6 +31,7 @@
- #include "hw/loader.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index f8b620b..06dacf6 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -39,6 +39,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
 +#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/arm/boot.h"
+@@ -79,7 +80,6 @@ typedef struct {
+     MachineState parent;
 =20
- static uint64_t static_read(void *opaque, hwaddr offset, unsigned size)
- {
-@@ -181,7 +182,6 @@ static void palmte_gpio_setup(struct omap_mpu_state_s *=
-cpu)
+     ARMSSE iotkit;
+-    MemoryRegion psram;
+     MemoryRegion ssram[3];
+     MemoryRegion ssram1_m;
+     MPS2SCC scc;
+@@ -388,6 +388,13 @@ static void mps2tz_common_init(MachineState *machine)
+         exit(1);
+     }
 =20
- static struct arm_boot_info palmte_binfo =3D {
-     .loader_start =3D OMAP_EMIFF_BASE,
--    .ram_size =3D 0x02000000,
-     .board_id =3D 0x331,
- };
-=20
-@@ -195,15 +195,21 @@ static void palmte_init(MachineState *machine)
-     static uint32_t cs2val =3D 0x0000e1a0;
-     static uint32_t cs3val =3D 0xe1a0e1a0;
-     int rom_size, rom_loaded =3D 0;
--    MemoryRegion *dram =3D g_new(MemoryRegion, 1);
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     MemoryRegion *flash =3D g_new(MemoryRegion, 1);
-     MemoryRegion *cs =3D g_new(MemoryRegion, 4);
-=20
--    memory_region_allocate_system_memory(dram, NULL, "omap1.dram",
--                                         palmte_binfo.ram_size);
--    memory_region_add_subregion(address_space_mem, OMAP_EMIFF_BASE, dram);
 +    if (machine->ram_size !=3D mc->default_ram_size) {
 +        char *sz =3D size_to_str(mc->default_ram_size);
 +        error_report("Invalid RAM size, should be %s", sz);
@@ -156,23 +146,38 @@ cpu)
 +        exit(EXIT_FAILURE);
 +    }
 +
-+    memory_region_add_subregion(address_space_mem, OMAP_EMIFF_BASE,
-+                                machine->ram);
+     sysbus_init_child_obj(OBJECT(machine), "iotkit", &mms->iotkit,
+                           sizeof(mms->iotkit), mmc->armsse_type);
+     iotkitdev =3D DEVICE(&mms->iotkit);
+@@ -458,9 +465,7 @@ static void mps2tz_common_init(MachineState *machine)
+      * tradeoffs. For QEMU they're all just RAM, though. We arbitrarily
+      * call the 16MB our "system memory", as it's the largest lump.
+      */
+-    memory_region_allocate_system_memory(&mms->psram,
+-                                         NULL, "mps.ram", 16 * MiB);
+-    memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
++    memory_region_add_subregion(system_memory, 0x80000000, machine->ram);
 =20
--    mpu =3D omap310_mpu_init(dram, machine->cpu_type);
-+    mpu =3D omap310_mpu_init(machine->ram, machine->cpu_type);
+     /* The overflow IRQs for all UARTs are ORed together.
+      * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
+@@ -642,6 +647,7 @@ static void mps2tz_class_init(ObjectClass *oc, void *da=
+ta)
 =20
-     /* External Flash (EMIFS) */
-     memory_region_init_ram(flash, NULL, "palmte.flash", flash_size,
-@@ -265,6 +271,8 @@ static void palmte_machine_init(MachineClass *mc)
-     mc->init =3D palmte_init;
-     mc->ignore_memory_transaction_failures =3D true;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("ti925t");
-+    mc->default_ram_size =3D 0x02000000;
-+    mc->default_ram_id =3D "omap1.dram";
+     mc->init =3D mps2tz_common_init;
+     iic->check =3D mps2_tz_idau_check;
++    mc->default_ram_id =3D "mps.ram";
  }
 =20
- DEFINE_MACHINE("cheetah", palmte_machine_init)
+ static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
+@@ -657,6 +663,7 @@ static void mps2tz_an505_class_init(ObjectClass *oc, vo=
+id *data)
+     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-m33");
+     mmc->scc_id =3D 0x41045050;
+     mmc->armsse_type =3D TYPE_IOTKIT;
++    mc->default_ram_size =3D 16 * MiB;
+ }
+=20
+ static void mps2tz_an521_class_init(ObjectClass *oc, void *data)
 --=20
 2.7.4
 
