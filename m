@@ -2,76 +2,74 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 153B9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E32C0C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:08:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9E552077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:07:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B28BD2077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:08:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6Px9ySc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E552077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dR31K7Sp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B28BD2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iugtI-00014l-Ph
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:07:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56495)
+	id 1iugtr-0001mb-Cj
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:08:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iueul-0007Q0-Kc
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:01:06 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufdX-0004Zq-Nn
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iueuj-0002sS-1M
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:01:02 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44434
+ (envelope-from <dgilbert@redhat.com>) id 1iufdW-0006KS-6B
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:19 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27482
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iueui-0002rR-R8
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:01:00 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdW-0006K6-37
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579795260;
+ s=mimecast20190719; t=1579798037;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YFTDM+x0VAdB0nagmEK2b9vblxyqjSTWW94FriwaigY=;
- b=P6Px9yScsEeHrqqJ1t5IAtHjm/PIf0Fi362IE01KN9IKXMWrNiDX/iX/h3BMQaX7vdXnEo
- sC8NrCm6LPAZh3tW6xm4u0txVTryxbGpMgaoIb/trhLiqf9kXv9MzV1xgRoyy/Sn2xTue5
- rGGRl8ou7D1zi6XgHVsFt1FKXa2USx8=
+ bh=zlNzNyYoxj2lnoNzzGg5/pOhg/YhgfpT3IBucMikk1o=;
+ b=dR31K7SpwgddUj+Wd8XFpb4PbQELKVISC2SPvsn9dN/I+PJ9eZy+jYKmto8q8BMxGf8dfF
+ jotvgUJklC4R2uV6EYv+6MOj+bFPS1U2fcBd5c10dEpgzVYzWumWiSvJzZeWAnmtEcE+58
+ YNLUDlDyA+IKCJElxkKrpFyLDk25wl8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-ipf40sDDONahXRoxuxyxgA-1; Thu, 23 Jan 2020 11:00:58 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-338-lcXgzszNMGqy-wrLR1vJ5Q-1; Thu, 23 Jan 2020 11:47:10 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2162210054E3;
- Thu, 23 Jan 2020 16:00:57 +0000 (UTC)
-Received: from gondolin (ovpn-116-120.ams2.redhat.com [10.36.116.120])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 997E010016EB;
- Thu, 23 Jan 2020 16:00:43 +0000 (UTC)
-Date: Thu, 23 Jan 2020 17:00:40 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Subject: Re: [PATCH 5/6] tests/acceptance/virtio_seg_max_adjust: Restrict to
- X86 architecture
-Message-ID: <20200123170040.2ffdd0d8.cohuck@redhat.com>
-In-Reply-To: <814cb9da-696c-0716-c1fe-247fd4e6cb05@redhat.com>
-References: <20200122223247.30419-1-philmd@redhat.com>
- <20200122223247.30419-6-philmd@redhat.com>
- <20200123124844.32e2aa09.cohuck@redhat.com>
- <814cb9da-696c-0716-c1fe-247fd4e6cb05@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D63A18AB96D
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:09 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2303028990;
+ Thu, 23 Jan 2020 16:47:08 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 018/108] virtiofsd: Open vhost connection instead of mounting
+Date: Thu, 23 Jan 2020 16:45:00 +0000
+Message-Id: <20200123164630.91498-19-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: ipf40sDDONahXRoxuxyxgA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: lcXgzszNMGqy-wrLR1vJ5Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -89,104 +87,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 11:36:55 -0200
-Wainer dos Santos Moschetta <wainersm@redhat.com> wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> On 1/23/20 9:48 AM, Cornelia Huck wrote:
-> > On Wed, 22 Jan 2020 23:32:46 +0100
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> > =20
-> >> Running on mainstream KVM architectures, we get:
-> >>
-> >> - Aarch64
-> >>
-> >>    Timeout.
-> >>
-> >>    job.log:
-> >>    -------
-> >>    No machine specified, and there is no default
-> >>    Use -machine help to list supported machines =20
-> > The code probably needs to be made more clever to find the machines to
-> > run?
-> > =20
-> >> - MIPS:
-> >>
-> >>     (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: argumen=
-t of type 'NoneType' is not iterable (0.14 s)
-> >>
-> >>    job.log:
-> >>    -------
-> >>    Could not load MIPS bios 'mipsel_bios.bin', and no -kernel argument=
- was specified =20
-> > Probably needs some hint from mips folks how this can be set up.
-> > =20
-> >> - PowerPC
-> >>
-> >>     (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: invalid=
- literal for int() with base 10: 'sxxm' (0.16 s)
-> >>
-> >>    job.log:
-> >>    ------- =20
-> >>    >>> {'execute': 'query-machines'} =20
-> >>    <<< {'return': [{'hotpluggable-cpus': True, 'name': 'pseries-2.12-s=
-xxm', 'numa-mem-supported': True, 'default-cpu-type': 'power8_v2.0-powerpc6=
-4-cpu', 'cpu-max': 1024, 'deprecated': False}, ... =20
-> > This seems to be because the machine type parsing code cannot deal with
-> > the format used here. =20
->=20
->=20
-> Indeed, looking at the comments in code the parser was meant for PC types=
-.
->=20
-> Is there a way to obtain the machine type version other than parsing its=
+When run with vhost-user options we conect to the QEMU instead
+via a socket.  Start this off by creating the socket.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/fuse_i.h        |  7 ++-
+ tools/virtiofsd/fuse_lowlevel.c | 55 +++--------------------
+ tools/virtiofsd/fuse_virtio.c   | 79 +++++++++++++++++++++++++++++++++
+ tools/virtiofsd/fuse_virtio.h   | 23 ++++++++++
+ 4 files changed, 114 insertions(+), 50 deletions(-)
+ create mode 100644 tools/virtiofsd/fuse_virtio.c
+ create mode 100644 tools/virtiofsd/fuse_virtio.h
+
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index 26b1a7da88..82d6ac7115 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -6,9 +6,10 @@
+  * See the file COPYING.LIB
+  */
 =20
-> name? If not, wouldn't be useful for management apps have that=20
-> information returned with 'query-machines'?
-
-The question would be "What version?". The pseries machine type the
-code chokes upon above has an additional suffix. Not all machine types
-are versioned, obviously, and we don't have an uniform way to build
-machine type names, either.
-
-If I understand this test correctly, the idea is to distinguish between
-"version that defaults the feature to off" and "version that defaults
-the feature to on". So, the pseries machine with the extra suffix from
-above and the one without would basically be the same 2.12 compatible
-machine (both in the first bucket). For other tests, those two machines
-might be very different, though.
-
-tl;dr "version" might not be well-defined enough.
-
->=20
-> - Wainer
->=20
-> >> - S390X:
-> >>
-> >>     (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: invalid=
- literal for int() with base 10: 'virtio' (0.14 s)
-> >>
-> >>    job.log:
-> >>    -------
-> >>    Traceback (most recent call last):
-> >>      File "virtio_seg_max_adjust.py", line 139, in test_machine_types
-> >>        if self.seg_max_adjust_enabled(m):
-> >>      File "virtio_seg_max_adjust.py", line 113, in seg_max_adjust_enab=
-led
-> >>        major =3D int(ver[0])
-> >>    ValueError: invalid literal for int() with base 10: 'virtio' =20
-> >>    >>> {'execute': 'query-machines'} =20
-> >>    <<< {'return': [{'hotpluggable-cpus': True, 'name': 's390-ccw-virti=
-o-4.0', 'numa-mem-supported': False, 'default-cpu-type': 'qemu-s390x-cpu', =
-'cpu-max': 248, 'deprecated': False}, ... =20
-> > Same here.
+-#define FUSE_USE_VERSION 31
+-
++#ifndef FUSE_I_H
++#define FUSE_I_H
+=20
++#define FUSE_USE_VERSION 31
+ #include "fuse.h"
+ #include "fuse_lowlevel.h"
+=20
+@@ -101,3 +102,5 @@ void fuse_session_process_buf_int(struct fuse_session *=
+se,
+=20
+ /* room needed in buffer to accommodate header */
+ #define FUSE_BUFFER_HEADER_SIZE 0x1000
++
++#endif
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 17e8718283..5df124e64b 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -14,6 +14,7 @@
+ #include "standard-headers/linux/fuse.h"
+ #include "fuse_misc.h"
+ #include "fuse_opt.h"
++#include "fuse_virtio.h"
+=20
+ #include <assert.h>
+ #include <errno.h>
+@@ -2202,6 +2203,11 @@ struct fuse_session *fuse_session_new(struct fuse_ar=
+gs *args,
+         goto out4;
+     }
+=20
++    if (!se->vu_socket_path) {
++        fprintf(stderr, "fuse: missing -o vhost_user_socket option\n");
++        goto out4;
++    }
++
+     se->bufsize =3D FUSE_MAX_MAX_PAGES * getpagesize() + FUSE_BUFFER_HEADE=
+R_SIZE;
+=20
+     list_init_req(&se->list);
+@@ -2224,54 +2230,7 @@ out1:
+=20
+ int fuse_session_mount(struct fuse_session *se)
+ {
+-    int fd;
+-
+-    /*
+-     * Make sure file descriptors 0, 1 and 2 are open, otherwise chaos
+-     * would ensue.
+-     */
+-    do {
+-        fd =3D open("/dev/null", O_RDWR);
+-        if (fd > 2) {
+-            close(fd);
+-        }
+-    } while (fd >=3D 0 && fd <=3D 2);
+-
+-    /*
+-     * To allow FUSE daemons to run without privileges, the caller may ope=
+n
+-     * /dev/fuse before launching the file system and pass on the file
+-     * descriptor by specifying /dev/fd/N as the mount point. Note that th=
+e
+-     * parent process takes care of performing the mount in this case.
+-     */
+-    fd =3D fuse_mnt_parse_fuse_fd(mountpoint);
+-    if (fd !=3D -1) {
+-        if (fcntl(fd, F_GETFD) =3D=3D -1) {
+-            fuse_log(FUSE_LOG_ERR, "fuse: Invalid file descriptor /dev/fd/=
+%u\n",
+-                     fd);
+-            return -1;
+-        }
+-        se->fd =3D fd;
+-        return 0;
+-    }
+-
+-    /* Open channel */
+-    fd =3D fuse_kern_mount(mountpoint, se->mo);
+-    if (fd =3D=3D -1) {
+-        return -1;
+-    }
+-    se->fd =3D fd;
+-
+-    /* Save mountpoint */
+-    se->mountpoint =3D strdup(mountpoint);
+-    if (se->mountpoint =3D=3D NULL) {
+-        goto error_out;
+-    }
+-
+-    return 0;
+-
+-error_out:
+-    fuse_kern_unmount(mountpoint, fd);
+-    return -1;
++    return virtio_session_mount(se);
+ }
+=20
+ int fuse_session_fd(struct fuse_session *se)
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+new file mode 100644
+index 0000000000..cbef6ffdda
+--- /dev/null
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -0,0 +1,79 @@
++/*
++ * virtio-fs glue for FUSE
++ * Copyright (C) 2018 Red Hat, Inc. and/or its affiliates
++ *
++ * Authors:
++ *   Dave Gilbert  <dgilbert@redhat.com>
++ *
++ * Implements the glue between libfuse and libvhost-user
++ *
++ * This program can be distributed under the terms of the GNU LGPLv2.
++ * See the file COPYING.LIB
++ */
++
++#include "fuse_i.h"
++#include "standard-headers/linux/fuse.h"
++#include "fuse_misc.h"
++#include "fuse_opt.h"
++#include "fuse_virtio.h"
++
++#include <stdint.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <sys/un.h>
++#include <unistd.h>
++
++/* From spec */
++struct virtio_fs_config {
++    char tag[36];
++    uint32_t num_queues;
++};
++
++int virtio_session_mount(struct fuse_session *se)
++{
++    struct sockaddr_un un;
++    mode_t old_umask;
++
++    if (strlen(se->vu_socket_path) >=3D sizeof(un.sun_path)) {
++        fuse_log(FUSE_LOG_ERR, "Socket path too long\n");
++        return -1;
++    }
++
++    se->fd =3D -1;
++
++    /*
++     * Create the Unix socket to communicate with qemu
++     * based on QEMU's vhost-user-bridge
++     */
++    unlink(se->vu_socket_path);
++    strcpy(un.sun_path, se->vu_socket_path);
++    size_t addr_len =3D sizeof(un);
++
++    int listen_sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
++    if (listen_sock =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "vhost socket creation: %m\n");
++        return -1;
++    }
++    un.sun_family =3D AF_UNIX;
++
++    /*
++     * Unfortunately bind doesn't let you set the mask on the socket,
++     * so set umask to 077 and restore it later.
++     */
++    old_umask =3D umask(0077);
++    if (bind(listen_sock, (struct sockaddr *)&un, addr_len) =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "vhost socket bind: %m\n");
++        umask(old_umask);
++        return -1;
++    }
++    umask(old_umask);
++
++    if (listen(listen_sock, 1) =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "vhost socket listen: %m\n");
++        return -1;
++    }
++
++    return -1;
++}
+diff --git a/tools/virtiofsd/fuse_virtio.h b/tools/virtiofsd/fuse_virtio.h
+new file mode 100644
+index 0000000000..8f2edb69ca
+--- /dev/null
++++ b/tools/virtiofsd/fuse_virtio.h
+@@ -0,0 +1,23 @@
++/*
++ * virtio-fs glue for FUSE
++ * Copyright (C) 2018 Red Hat, Inc. and/or its affiliates
++ *
++ * Authors:
++ *   Dave Gilbert  <dgilbert@redhat.com>
++ *
++ * Implements the glue between libfuse and libvhost-user
++ *
++ * This program can be distributed under the terms of the GNU LGPLv2.
++ *  See the file COPYING.LIB
++ */
++
++#ifndef FUSE_VIRTIO_H
++#define FUSE_VIRTIO_H
++
++#include "fuse_i.h"
++
++struct fuse_session;
++
++int virtio_session_mount(struct fuse_session *se);
++
++#endif
+--=20
+2.24.1
 
 
