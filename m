@@ -6,64 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31707C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA09EC33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 086F124125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:26:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086F124125
+	by mail.kernel.org (Postfix) with ESMTPS id AEC8124125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:27:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC8124125
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuXpI-0006Nc-P6
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:26:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55916)
+	id 1iuXpc-0006qu-4P
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:27:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iuXlI-00011S-2G
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:49 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iuXlM-00014t-3i
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iuXlG-0002t7-HG
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:47 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:43277)
+ (envelope-from <laurent@vivier.eu>) id 1iuXlK-00032G-KT
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:51 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:39505)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuXlG-0002oZ-7v
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:46 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuXlK-00030m-Al
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:50 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MQdpG-1jI6E008HO-00NgMR; Thu, 23 Jan 2020 09:22:34 +0100
+ id 1N6bPS-1jgTgr0XQk-017zXj; Thu, 23 Jan 2020 09:22:35 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/17] linux-user:Fix align mistake when mmap guest space
-Date: Thu, 23 Jan 2020 09:22:11 +0100
-Message-Id: <20200123082227.2037994-2-laurent@vivier.eu>
+Subject: [PULL 03/17] linux-user: Add support for FS_IOC_<GET|SET>VERSION
+ ioctls
+Date: Thu, 23 Jan 2020 09:22:13 +0100
+Message-Id: <20200123082227.2037994-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200123082227.2037994-1-laurent@vivier.eu>
 References: <20200123082227.2037994-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:qn6JMmYNdNfmHxOlpWiAP26Rna0EFvuX7k+7mR0zyHjLMOqIqmj
- x5rG3dVEp5JExxAcqTw9oOMaTchKpDUWX8gECl7qqtg2uH1Jp8NmxMyUG9XYf0/QqI8tBfc
- FdML4G1/VpDuqGhWqCUgdEIzFvgic0c1UhF2tSuo7fz6IPYmefvaxieUyWllBgXxeixIlT4
- TyKtmyY7xhQV8nt2s9x1Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Z6bhkNrDhUw=:ked2FmQBb06bKKCDfROfk5
- uFUBR9SFI5GAzwpA+eNP4b59ahjuwkJ8o+7p88GDLTGLooJENDymIkfq2anMZQWFEh4RuuKHF
- kupz/WqgQYYZGzGSTa+ZyTZU9S4zM0vKvXgM0OaaSov7fRdp5TGy4ufxPW3MwsVwivmlzFJOW
- 8mTecrcN4ex23q/TN/QXnuiFwdvUbRq+LnKG2it1CoxpQgzhci06ceeyCbu9NhiPxY+5exDgW
- rEPgSfRR4H4o/XVfUbIxibQ1BaCM+wVRQlDWg/HkckmkcIA9Y96qb+kjtn/iHn8FKlhUE1yQS
- NPjylT9QNH9M2QQlW5yAfqb2zt9O0jGSvEW0wMgCQPujfVWxoXAjk5ioofF6HBqw2/Td8mf6P
- gzF7a6xCiOgv9sdDV07P69pJDypP1bDEVuVg8/4PNoAywPcXiOjczQA7ru0cLBOfZBt1PSE64
- EjVA2udj8WdCU6E6irZC7NVnXKrNUqjNy/Y1AZoHNPcCb4m1t95SmQ0rgaIZ5K84IsGHOlW+Z
- YVuncRzC41kend++UoHxTtEd2VyefMjL6vhp0McI8gV2ZBfd6+RqPpBt1DwuulcT01I75mwwM
- 0cQp+SryIzV6GgegB6UI/6s4SJ6ZuEBrohOgxf7byd/0u4Pzv039kVTsC6IPiAKfKiK/NGRxd
- TAqzpXoNkOFmHVKH+bI2i1y25p2WjSMMr9yxHHzka8A32PqhT/e7BflsNeuyM55B58+weSMSW
- nibrXqnSgLd9z1BMrqltdUYaSw/YgWQF1eXekNrLR9coUrDO+SIrlO/5AE9MA4n0iLM0kq1g3
- fIrO6FMDgXxu69j1huTxjXLmCleBk0ktoQza+IsCLX6q1z+6+U=
+X-Provags-ID: V03:K1:5+e8ly+M64AP+Fd9RcIlIR0MmRTynLhSFtzn9DW9MCwhG6dhmn6
+ I17Lmp0tzxas//xawK8xcJ2OLzZe62iDbN863PfFuKIJbZcvKzb3QY5vGhxQDBWRabmfnfH
+ O4aIRxAZwApOXikf56dc47MHGcYHxLeAaUEdLG7Av2c+WcDDb6sPfgyYCVR44Yi8mTpop9C
+ Mr7DtaDCC4J9ykSrWWsZQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zGKMKVesmio=:RfR4q6OYN579CSUuJI9+1W
+ agBD2kYKoeZ9NAEtq9sfB/6OeSVPY3urhw9YYxpcuxNv9I0CJ5gYoxDej3/WolAh610gvUSjD
+ ADXHZQNRDlyefen3Xv6XYOuZGhEy+VC/iI9C1BEtSaeWz2MJ3YOgWWc2gqj7ShqheYmuraGXX
+ Mphu6eWzna6XZnUh5Qd4y/RhoPRVO+f+niB0YeN4/aPe0dk3v8RH9l2MVllR4H4Yii43HOxUT
+ 7I32kcLHDh9b264bUUTGJRrt6at4knC/jrDDm6E+rRy2vYypTQbl9cEQeAZxen4g6P79lWj2D
+ 5TAibfnpDv3nR/RZGqJs3MJuKQv936WYEJEZarYR2OfFmDJmqB+zzwoA/TLLj8cBJs1sNV7gS
+ tYBfBlV8kSPhPViHl6O2w48pQz2dM1iCxeqeW6UXT0WdO7su8OHmbYHE3q8DMP+PE/FeA3EOq
+ m77oy8BwwqeT0tZPORp6G64Q8ymo8bl3rzv1/IO3FqQXKnfcIBRc/9bKC26FvWzG1tYSYkh4b
+ AjbcBam6Qt5t1kmus6lLbGDSCes/5EyhH5uZwsE36PZWLreRvGJJezwd85Zr3EXbtJkTzWZ6t
+ PB9VUOHjA7Bpdeb41Jk/eVM/F2gwCjO94S7nZir0cc4ssEckCzlX/V5UmLf123Hs2DSRr/kPF
+ rB3LUVC9R0g08nmLnQQfJMjedxiwi6VWYxHWdBzjp5uku+OG8nbNSohmZ3gJVIUHsG8y77Y6r
+ 8Bht39nWsyK0rYogCRAhEjL4+qOw2Wk0yE9mqGag3AbP9AZuDH1j0NJD2QLevOeZjw5BQB3Dw
+ yxIDVFsOatbXc2cSwLTBZ2JG2Y5QLKiud64OsVytiYp3wjH1Jk=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,48 +76,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Xinyu Li <precinct@mail.ustc.edu.cn>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xinyu Li <precinct@mail.ustc.edu.cn>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-In init_guest_space, we need to mmap guest space. If the return address
-of first mmap is not aligned with align, which was set to MAX(SHMLBA,
-qemu_host_page_size), we need unmap and a new mmap(space is larger than
-first size). The new size is named real_size, which is aligned_size +
-qemu_host_page_size. alugned_size is the guest space size. And add a
-qemu_host_page_size to avoid memory error when we align real_start
-manually (ROUND_UP(real_start, align)). But when SHMLBA >
-qemu_host_page_size, the added size will smaller than the size to align,
-which can make a mistake(in a mips machine, it appears). So change
-real_size from aligned_size +qemu_host_page_size
-to aligned_size + align will solve it.
+A very specific thing for these two ioctls is that their code
+implies that their third argument is of type 'long', but the
+kernel uses that argument as if it is of type 'int'. This anomaly
+is recognized also in commit 6080723 (linux-user: Implement
+FS_IOC_GETFLAGS and FS_IOC_SETFLAGS ioctls).
 
-Signed-off-by: Xinyu Li <precinct@mail.ustc.edu.cn>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <1579214991-19602-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/elfload.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall_defs.h | 8 +++++---
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 07b16cc0f470..511e4500788b 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2191,7 +2191,7 @@ unsigned long init_guest_space(unsigned long host_start,
-              * to where we need to put the commpage.
-              */
-             munmap((void *)real_start, host_size);
--            real_size = aligned_size + qemu_host_page_size;
-+            real_size = aligned_size + align;
-             real_start = (unsigned long)
-                 mmap((void *)real_start, real_size, PROT_NONE, flags, -1, 0);
-             if (real_start == (unsigned long)-1) {
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index c6b9d6ad6653..c44f42eaf4e7 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -138,6 +138,8 @@
+ 
+      IOCTL(FS_IOC_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
+ 
+ #ifdef CONFIG_USBFS
+   /* USB ioctls */
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 98c2119de9c1..f68a8b6e8e18 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -911,12 +911,14 @@ struct target_pollfd {
+ #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
+ #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
+ 
+-/* Note that the ioctl numbers claim type "long" but the actual type
+- * used by the kernel is "int".
++/*
++ * Note that the ioctl numbers for FS_IOC_<GET|SET><FLAGS|VERSION>
++ * claim type "long" but the actual type used by the kernel is "int".
+  */
+ #define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
+ #define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
+-
++#define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
++#define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+ #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
+ 
+ /* usb ioctls */
 -- 
 2.24.1
 
