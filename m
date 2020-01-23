@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6EC0C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C9E6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:02:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80E8E20684
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5495D20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:02:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fp50R68w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E8E20684
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DGHO7PAc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5495D20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iud3h-0004Kz-7R
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:02:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41862)
+	id 1iud4L-0005GJ-1z
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:02:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAr-0004MH-LI
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:27 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub9U-0002y1-FS
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAq-0006mJ-Fq
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25767
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iub9T-0005U8-45
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:00 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38704
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAq-0006ll-Bn
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:24 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub9T-0005Tn-0U
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780884;
+ s=mimecast20190719; t=1579780798;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AsLIGnsc4Kc2PIcdInCoGUfJ3yiSTnFajKGCNhtMMv0=;
- b=Fp50R68w9+0k77d8o3EngYHiivBhLnTznZ7BhiF3cISvm5GLbknDr0hYFxYjknW/9wKzqN
- tmKc/arW0fXM3hoM22GkM1aIjYCbtYIHbIGlKOOy2bxTSCmyais4kfXXgO0hq0zelCBqlk
- FsQFhWedNC7sITiRazqlxNUmqGKSy7w=
+ bh=lxR2CPoTBdsqUlKhDMI0yaffCU2qFxmoxCDzO85rOPA=;
+ b=DGHO7PAcN+4Fp5tm39R3VW8Ix0m4UqpLTE2BRncMMgH+oQP7dpxR9jCf2lt4kFqvuYewZM
+ 6AD4eYqwGckFBQjA98ENcdmHD1ZW7R3aQ5f1CKPVr2xkfHGBEWfLRluawMrXeAlhVaYtxl
+ LYw28C98mR7lzkD4aUxt5APDO1GM90w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-N0j0b-ElONKbHn6Jb4eQzg-1; Thu, 23 Jan 2020 07:01:22 -0500
+ us-mta-267-zo4JF0osN3uJ8StNm7YaOA-1; Thu, 23 Jan 2020 06:59:55 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A49818A6EC0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E438A18A6EC1
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:54 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7576485754;
- Thu, 23 Jan 2020 12:01:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C54285782;
+ Thu, 23 Jan 2020 11:59:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 110/111] virtiofsd: stop all queue threads on exit in
- virtio_loop()
-Date: Thu, 23 Jan 2020 11:58:40 +0000
-Message-Id: <20200123115841.138849-111-dgilbert@redhat.com>
+Subject: [PULL 058/111] docs:  Add docs/tools
+Date: Thu, 23 Jan 2020 11:57:48 +0000
+Message-Id: <20200123115841.138849-59-dgilbert@redhat.com>
 In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
 References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: N0j0b-ElONKbHn6Jb4eQzg-1
+X-MC-Unique: zo4JF0osN3uJ8StNm7YaOA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,57 +90,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eryu Guan <eguan@linux.alibaba.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On guest graceful shutdown, virtiofsd receives VHOST_USER_GET_VRING_BASE
-request from VMM and shuts down virtqueues by calling fv_set_started(),
-which joins fv_queue_thread() threads. So when virtio_loop() returns,
-there should be no thread is still accessing data in fuse session and/or
-virtio dev.
+Create docs/tools based on docs/dev based on docs/devel.
 
-But on abnormal exit, e.g. guest got killed for whatever reason,
-vhost-user socket is closed and virtio_loop() breaks out the main loop
-and returns to main(). But it's possible fv_queue_worker()s are still
-working and accessing fuse session and virtio dev, which results in
-crash or use-after-free.
-
-Fix it by stopping fv_queue_thread()s before virtio_loop() returns,
-to make sure there's no-one could access fuse session and virtio dev.
-
-Reported-by: Qingming Su <qingming.su@linux.alibaba.com>
-Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/fuse_virtio.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ Makefile             |  9 ++++++++-
+ docs/index.rst       |  1 +
+ docs/tools/conf.py   | 16 ++++++++++++++++
+ docs/tools/index.rst | 12 ++++++++++++
+ 4 files changed, 37 insertions(+), 1 deletion(-)
+ create mode 100644 docs/tools/conf.py
+ create mode 100644 docs/tools/index.rst
 
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 9f6582343c..80a6e929df 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -815,6 +815,19 @@ int virtio_loop(struct fuse_session *se)
-         }
-     }
+diff --git a/Makefile b/Makefile
+index 6b4b075a92..60c35a9dd3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -823,6 +823,7 @@ endef
+ install-sphinxdocs: sphinxdocs
+ =09$(call install-manual,interop)
+ =09$(call install-manual,specs)
++=09$(call install-manual,tools)
 =20
-+    /*
-+     * Make sure all fv_queue_thread()s quit on exit, as we're about to
-+     * free virtio dev and fuse session, no one should access them anymore=
-.
-+     */
-+    for (int i =3D 0; i < se->virtio_dev->nqueues; i++) {
-+        if (!se->virtio_dev->qi[i]) {
-+            continue;
-+        }
-+
-+        fuse_log(FUSE_LOG_INFO, "%s: Stopping queue %d thread\n", __func__=
-, i);
-+        fv_queue_cleanup_thread(se->virtio_dev, i);
-+    }
-+
-     fuse_log(FUSE_LOG_INFO, "%s: Exit\n", __func__);
+ install-doc: $(DOCS) install-sphinxdocs
+ =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+@@ -1010,7 +1011,10 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.m=
+ak
+ # and handles "don't rebuild things unless necessary" itself.
+ # The '.doctrees' files are cached information to speed this up.
+ .PHONY: sphinxdocs
+-sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/interop=
+/index.html $(MANUAL_BUILDDIR)/specs/index.html
++sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
++            $(MANUAL_BUILDDIR)/interop/index.html \
++            $(MANUAL_BUILDDIR)/specs/index.html \
++            $(MANUAL_BUILDDIR)/tools/index.html
 =20
-     return 0;
+ # Canned command to build a single manual
+ # Arguments: $1 =3D manual name, $2 =3D Sphinx builder ('html' or 'man')
+@@ -1030,6 +1034,9 @@ $(MANUAL_BUILDDIR)/interop/index.html: $(call manual-=
+deps,interop)
+ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+ =09$(call build-manual,specs,html)
+=20
++$(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools)
++=09$(call build-manual,tools,html)
++
+ $(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
+ =09$(call build-manual,interop,man)
+=20
+diff --git a/docs/index.rst b/docs/index.rst
+index baa5791c17..f15ca17bf4 100644
+--- a/docs/index.rst
++++ b/docs/index.rst
+@@ -13,4 +13,5 @@ Welcome to QEMU's documentation!
+    interop/index
+    devel/index
+    specs/index
++   tools/index
+=20
+diff --git a/docs/tools/conf.py b/docs/tools/conf.py
+new file mode 100644
+index 0000000000..f9f76ff597
+--- /dev/null
++++ b/docs/tools/conf.py
+@@ -0,0 +1,16 @@
++# -*- coding: utf-8 -*-
++#
++# QEMU documentation build configuration file for the 'tools' manual.
++#
++# This includes the top level conf file and then makes any necessary tweak=
+s.
++import sys
++import os
++
++qemu_docdir =3D os.path.abspath("..")
++parent_config =3D os.path.join(qemu_docdir, "conf.py")
++exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
++
++# This slightly misuses the 'description', but is the best way to get
++# the manual title to appear in the sidebar.
++html_theme_options['description'] =3D u'Tools'
++
+diff --git a/docs/tools/index.rst b/docs/tools/index.rst
+new file mode 100644
+index 0000000000..adbcd3bc72
+--- /dev/null
++++ b/docs/tools/index.rst
+@@ -0,0 +1,12 @@
++.. This is the top level page for the 'tools' manual.
++
++
++QEMU tools
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++This manual documents various tools included with QEMU.
++
++Contents:
++
++.. toctree::
++   :maxdepth: 2
 --=20
 2.24.1
 
