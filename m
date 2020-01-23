@@ -2,80 +2,81 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB9DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0E6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:43:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0E2421D7E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E98B21D7E
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:43:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="khKZO9LB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0E2421D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KKZuGJFS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E98B21D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhRl-0006x0-9V
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:43:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33715)
+	id 1iuhSB-0007XV-5b
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:43:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iufHA-0000OC-L0
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:24:13 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufeR-0005Zj-O7
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iufH9-0006vB-DV
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:24:12 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42319)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iufH9-0006uf-7N
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:24:11 -0500
-Received: by mail-oi1-x242.google.com with SMTP id 18so3408667oin.9
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 08:24:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MTG316SXjD3XRVIEALV11CJVcTGvbR40Hq6l/pimWy0=;
- b=khKZO9LB6LdTDy/WqES8LmyJgLTBwchTqpoiqfc/AUUqyeIw57+fGi4schXSlYf636
- +P2+cUb6xPqcj+3dwifcEcegT2Igv7YVQlD6FsVPgSmbb36aHTBSBTwbRUHZ5H0kSiUu
- xGFWYvxD6ggp0PKgvZGiR8f7IJSRRvrRtAgkNFZxKEt7Vg5QgecL/VjfJeCtqpxQSTXK
- 0HiyYpl9/fLhj3urdxFmdkTgVUT+BDLYGTTSUhjoyA36oKGRaGvIT2bDog6rko/Z5WGm
- lz5Qzf42+BmTEOxbl5Np1wDJia63nE0m8dykHRXV4g3WItUTMLkzDrwpuhPeUfuBOjNB
- MAMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=MTG316SXjD3XRVIEALV11CJVcTGvbR40Hq6l/pimWy0=;
- b=Lngjp3sCB43x6dDjOCT6x9CT4/JrkZJ/8iQaK+mY8ezCdDdQuZbyqFRFclgFfYbL5E
- PSidtGSBIDnmtdL9VFgWVPJM0TQBHwTh5q8KDxL78SWWLJXrbx1iMB+jEGOP5OTTtEHN
- HO1KgOnnJ1MPhZa+Mb8HB4H1omVBaANjg5Y8hYDM0W0tru4dw0V0k6wOiJIUUr4+5qmt
- 5rS0N7UeVGn9fZKMS1waEGCAGBMrzSBDHtigQuxepixJQXfBuqB5BqoCv/c9dsIT3hDU
- sdCmogBRk14W0PsHLxq9pcqNyLDbty1QZM7fX1qU/rmZ9Q0xE8S0vPDL48x4TvfEes2+
- 30SA==
-X-Gm-Message-State: APjAAAV8kYCoZXlJyTdk5T0T7LT+oeoAIBvQj40JvbGNK58h6q6qFRGX
- YHVq3ORdlKZtBoS+j5qcmc8yGCzt74icJ4DCMPvyQHWr5fo=
-X-Google-Smtp-Source: APXvYqweX/gThbfr++qFFF04JSkqOWHgRH72nk720loynaeAY7CSqIXArIoJNCsgfPGDjqW+oDbvkay3EzLIEnyjYvA=
-X-Received: by 2002:aca:570d:: with SMTP id l13mr10851072oib.146.1579796650373; 
- Thu, 23 Jan 2020 08:24:10 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1iufeQ-0007Ea-IS
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25436
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufeQ-0007CP-FP
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579798094;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qPJvaYYTro8fIP26k9jZvtAbABFrmMApduG+kmA4D1c=;
+ b=KKZuGJFS9luCoJgvriFobgzBqOLPFjtZUdUoxNB8ua13IaMUx8+m927DL7CdigXhv77DtC
+ wn//MJKqBm+iV/mFiyfRxrH91vZsC2a1eG8z64HEQzjeFHvK7MnN0WGgZ7Tlz81ZAESmtv
+ ug8omzB86QLLAPzFLR+8l3YN1DsLbnI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-QBqiw0hzOsC3pksk0Psstw-1; Thu, 23 Jan 2020 11:48:12 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E36D3800D55
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:11 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3950A38F;
+ Thu, 23 Jan 2020 16:48:11 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 070/108] virtiofsd: rename unref_inode() to
+ unref_inode_lolocked()
+Date: Thu, 23 Jan 2020 16:45:52 +0000
+Message-Id: <20200123164630.91498-71-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-References: <20200123052540.6132-1-linux@roeck-us.net>
- <20200123052540.6132-2-linux@roeck-us.net>
- <CAFEAcA-SPUPEcV4Uw9=8-5EJmLztVorV++ypFp=vYxasncBrZw@mail.gmail.com>
-In-Reply-To: <CAFEAcA-SPUPEcV4Uw9=8-5EJmLztVorV++ypFp=vYxasncBrZw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Jan 2020 16:23:59 +0000
-Message-ID: <CAFEAcA9p7Foko17jTB_GSGLnaQwpJTcf0-qTrJkVWje1jOpq-g@mail.gmail.com>
-Subject: Re: [PATCH v3 1/8] dma/pl330: Convert to support tracing
-To: Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: QBqiw0hzOsC3pksk0Psstw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,42 +88,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 at 15:51, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Thu, 23 Jan 2020 at 05:25, Guenter Roeck <linux@roeck-us.net> wrote:
-> >
-> > Replace debug logging code with tracing.
-> >
-> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->
-> This turns out not to compile on OSX, which is a bit
-> stricter about format strings:
->
-> These two:
->
-> > +pl330_dmald(uint32_t chan, uint32_t addr, uint32_t size, uint32_t num, uint32_t ch) "channel:%"PRId8" address:0x%08"PRIx32" size:0x%"PRIx32" num:%"PRId32"%c"
->
-> > +pl330_dmast(uint32_t chn, uint32_t addr, uint32_t sz, uint32_t num, uint32_t c) "channel:%"PRId8" address:0x%08"PRIx32" size:0x%"PRIx32" num:%"PRId32" %c"
->
-> both provoke
->  error: format specifies type 'char' but the argument has type
-> 'uint32_t' (aka 'unsigned int') [-Werror,-Wformat]
->
-> because of the last argument.
->
-> Easy fix would seem to be to change 'uint32_t ch' to 'char ch'
-> (the argument is always a literal constant 'Y' or 'N').
+From: Miklos Szeredi <mszeredi@redhat.com>
 
-The 'chan'/'chn' argument is wrong too -- should be uint8_t
-to match the format string and the type of PL330Chan::tag.
-I'll just fix up the pullreq rather than forcing a respin.
+Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
--- PMM
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 8b1784ff7b..de12e75a9e 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -148,8 +148,8 @@ static const struct fuse_opt lo_opts[] =3D {
+ };
+ static bool use_syslog =3D false;
+ static int current_log_level;
+-
+-static void unref_inode(struct lo_data *lo, struct lo_inode *inode, uint64=
+_t n);
++static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
+e,
++                                 uint64_t n);
+=20
+ static struct {
+     pthread_mutex_t mutex;
+@@ -586,7 +586,7 @@ retry:
+     return 0;
+=20
+ fail_unref:
+-    unref_inode(lo, p, 1);
++    unref_inode_lolocked(lo, p, 1);
+ fail:
+     if (retries) {
+         retries--;
+@@ -624,7 +624,7 @@ fallback:
+     res =3D lo_parent_and_name(lo, inode, path, &parent);
+     if (res !=3D -1) {
+         res =3D utimensat(parent->fd, path, tv, AT_SYMLINK_NOFOLLOW);
+-        unref_inode(lo, parent, 1);
++        unref_inode_lolocked(lo, parent, 1);
+     }
+=20
+     return res;
+@@ -1027,7 +1027,7 @@ fallback:
+     res =3D lo_parent_and_name(lo, inode, path, &parent);
+     if (res !=3D -1) {
+         res =3D linkat(parent->fd, path, dfd, name, 0);
+-        unref_inode(lo, parent, 1);
++        unref_inode_lolocked(lo, parent, 1);
+     }
+=20
+     return res;
+@@ -1141,7 +1141,8 @@ static void lo_unlink(fuse_req_t req, fuse_ino_t pare=
+nt, const char *name)
+     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+ }
+=20
+-static void unref_inode(struct lo_data *lo, struct lo_inode *inode, uint64=
+_t n)
++static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
+e,
++                                 uint64_t n)
+ {
+     if (!inode) {
+         return;
+@@ -1181,7 +1182,7 @@ static void lo_forget_one(fuse_req_t req, fuse_ino_t =
+ino, uint64_t nlookup)
+              (unsigned long long)ino, (unsigned long long)inode->refcount,
+              (unsigned long long)nlookup);
+=20
+-    unref_inode(lo, inode, nlookup);
++    unref_inode_lolocked(lo, inode, nlookup);
+ }
+=20
+ static void lo_forget(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup)
+--=20
+2.24.1
+
 
