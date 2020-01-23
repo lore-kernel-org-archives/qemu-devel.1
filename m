@@ -6,65 +6,71 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3977DC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70763C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:26:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F98224655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:21:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F98224655
+	by mail.kernel.org (Postfix) with ESMTPS id 4556C24673
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:26:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4556C24673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuVrp-0001NK-3H
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 01:21:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34280)
+	id 1iuVwr-0002e6-Dd
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 01:26:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iuVrC-0000vj-JS
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:20:47 -0500
+ (envelope-from <bounces@canonical.com>) id 1iuVw5-00029K-Rl
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:25:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iuVrB-0006ue-EM
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:20:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54230)
+ (envelope-from <bounces@canonical.com>) id 1iuVw4-0006vc-21
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:25:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54428)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iuVrB-0006tg-8z
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:20:45 -0500
+ id 1iuVw3-0006ti-SF
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:25:47 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iuVrA-00020V-IK
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:20:44 +0000
+ id 1iuVw2-0002Pv-P9
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:25:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 86CCF2E80C0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:20:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id BC83F2E80C7
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:25:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jan 2020 06:12:23 -0000
-From: Thomas Huth <1639394@bugs.launchpad.net>
+Date: Thu, 23 Jan 2020 06:17:52 -0000
+From: Frank Heimes <1859656@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=maas; status=New; importance=Undecided;
+ assignee=lee.trager@canonical.com; 
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
  assignee=None; 
+X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
+ assignee=maas; 
+X-Launchpad-Bug-Tags: s390x
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow xtrondo
-X-Launchpad-Bug-Reporter: xtrondo (xtrondo)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20161105021624.30133.98019.malonedeb@wampee.canonical.com>
-Message-Id: <157975994405.5350.526382048528793519.launchpad@soybean.canonical.com>
-Subject: [Bug 1639394] Re: Unable to boot Solaris 8/9 x86 under Fedora 24
+X-Launchpad-Bug-Commenters: ltrager paelzer sfeole
+X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
+X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
+References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
+Message-Id: <157976027304.5723.8658664375212273651.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
+ initial deploy
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b20812a4a44f12128391a087d66a761463184d52
+X-Launchpad-Hash: f00630c8865a3e3e0cc49d2c3324ca501176d1bb
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,56 +83,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1639394 <1639394@bugs.launchpad.net>
+Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+** Tags added: s390x
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1639394
+https://bugs.launchpad.net/bugs/1859656
 
 Title:
-  Unable to boot Solaris 8/9 x86 under Fedora 24
+  [2.6] Unable to reboot s390x KVM machine after initial deploy
 
+Status in MAAS:
+  New
 Status in QEMU:
   Incomplete
+Status in Ubuntu on IBM z Systems:
+  Triaged
 
 Bug description:
-  qemu-system-x86_64 -version
-  QEMU emulator version 2.6.2 (qemu-2.6.2-4.fc24), Copyright (c) 2003-2008 =
-Fabrice Bellard
+  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
+  Arch: S390x
 
-  Try several ways without success, I think it was a regression because pro=
-blem seems to be related with ide fixed on 0.6.0:
-  - int13 CDROM BIOS fix (aka Solaris x86 install CD fix)
-  - int15, ah=3D86 BIOS fix (aka Solaris x86 hardware probe hang up fix)
+  Appears that MAAS can not find the s390x bootloader to boot from the
+  disk, not sure how maas determines this.  However this was working in
+  the past. I had originally thought that if the maas machine was
+  deployed then it defaulted to boot from disk.
 
-  Solaris 10/11 works without a problem, also booting with "scsi" will
-  circumvent initial problem, but later found problems related with
-  "scsi" cdrom boot and also will not found the "ide" disk device.
+  If I force the VM to book from disk, the VM starts up as expected.
 
-  =
+  Reproduce:
 
-  qemu-system-i386 -m 712 -drive file=3D/dev/Virtual_hdd/beryllium0,format=
-=3Draw -cdrom /repo/Isos/sol-9_905_x86.iso
+  - Deploy Disco on S390x KVM instance
+  - Reboot it
 
-  SunOS Secondary Boot version 3.00
+  on the KVM console...
 
-  prom_panic: Could not mount filesystem.
-  Entering boot debugger:
-  [136419]
+  Connected to domain s2lp6g001
+  Escape character is ^]
+  done
+  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
+  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
+  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
+  Trying pxelinux.cfg files...
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  Failed to load OS from network
 
-  =
-
-  Regards,
-  \\CA,
+  =3D=3D> /var/log/maas/rackd.log <=3D=3D
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
+0x.bin requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
+5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+1-52-54-00-e5-d7-bb requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA0 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64B requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF6 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+A requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+ requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
+efault requested by 10.246.75.160
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1639394/+subscriptions
+https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
 
