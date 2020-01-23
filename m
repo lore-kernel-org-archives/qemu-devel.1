@@ -2,78 +2,86 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C58C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:28:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A8CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:29:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8430722522
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:28:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CDED21734
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:29:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bGVBBobi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8430722522
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Md/tOE2Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CDED21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iufLP-000693-1M
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:28:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53049)
+	id 1iufLu-0006mo-7X
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:29:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51847)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iucuO-0001NT-7d
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:33 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrj-0005W9-UO
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iucuN-0001He-6c
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24629
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iucuN-0001HR-37
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:52:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579787550;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ppgAxw9SO7HGyY8uV4plx7AC+/cE4ShpaHOxwMrlAfY=;
- b=bGVBBobi/xJnBBiPz88SMlnLJ3ZASPbeiXB4f3BNa+9t7/Fi3WiMfMhO6GayAPNZ54nJMO
- O0IEjEiWVEkoZlstlnxsI9MpHdl6YQDLMuIzKLbyg/SPXdnFEyFuidZIIi77VnAQ980hrU
- SbbhSJl1dPcLTiyHmtMwITa7eai4Ax4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-RLXnwoC4OS-_QTbOQFWwAg-1; Thu, 23 Jan 2020 08:52:29 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84CEF8024D3
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 13:52:28 +0000 (UTC)
-Received: from 640k.localdomain.com (unknown [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 82F118575C;
- Thu, 23 Jan 2020 13:52:27 +0000 (UTC)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucri-0004NM-OG
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:47 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:33988)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iucri-0004LP-HF
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:46 -0500
+Received: by mail-wr1-x436.google.com with SMTP id t2so3186079wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NKQefvh4U78BlEUri4dbdA4PBZUpYRKEAzo+PNIiyOU=;
+ b=Md/tOE2YZwQVkSXXYiFxlNyLgzOaGdqxmNMXqPSwP9HdoPEODuHnolNbIutFLGmDQh
+ IyeSIUVHEeGUOiy1GVmfEU5cdztZtPSmGFs4+pE50ybum3q54Cd7zKF4ROkFqS4ia5/l
+ YaQqyD6XweqP7TJTor63jOc/iI9J3XqA2bJEhkfdVWk6iaZItBxuXeqqCXdw9ttR5cbn
+ 6qY6ypxw6HpVYGNScu+xTK5lxGxoPm2MSlbpRIdsDrd55QfMj6Bs57NoZuoN4czMaqER
+ 77+JC5ODZdSYfV9w7wNXN6t/018rPfO/9CpbQDKumjbFabt7mGoU4uAFCgIItQay/Zzi
+ hoUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=NKQefvh4U78BlEUri4dbdA4PBZUpYRKEAzo+PNIiyOU=;
+ b=uMwH2j7z64LI9t10QbRXuHO4ugjCWX75sKrT1nAhmmuVyjU3gjuvPvi+Bg21lMiwVd
+ PYHQuoBpRfM9+GFxFB8Q9R8tmQMV70czoIOEsat1bFL5LrK2MNI4bhlrzLPlzjNxuKxN
+ AGu4q6+j5hSU1LfY6I1uy12vw2ezEmwQVKxjuovGbD0dqd3wzSkspNxiRlYScj5CB0oA
+ B0wno2jsP6+hAQwwwEuttjvyL5OrU2ssnm8KuQYba2rJq8W0CyFmrPc40+TcrR4m4ThX
+ LKv0tqJHHUPCtPop/CF7UIGsYS/MN1gadr9Ef+hTblYRT0HbDfOXXnWlHPKwFyOznnoL
+ jBEg==
+X-Gm-Message-State: APjAAAXiCjgjN3iOsZeZJmqQq1mjZ6HluS6DQhEKWaYQd0msGzRocpbB
+ eArk/HxuUXF6+snCw9MGeR6MZh2d
+X-Google-Smtp-Source: APXvYqzk3N9W9Mna8U59ycNM+RLUi6njsjsa84+7ywowBwA3I49csIISfYGZ+wCvb2PkWaUCEHhNyQ==
+X-Received: by 2002:adf:e692:: with SMTP id r18mr17886336wrm.413.1579787385277; 
+ Thu, 23 Jan 2020 05:49:45 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.44
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 23 Jan 2020 05:49:44 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 47/59] object: return self in object_ref()
-Date: Thu, 23 Jan 2020 14:50:37 +0100
-Message-Id: <1579787449-27599-48-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
-References: <1579787449-27599-1-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 44/59] object: add direct link flag
+Date: Thu, 23 Jan 2020 14:48:47 +0100
+Message-Id: <1579787342-27146-45-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: RLXnwoC4OS-_QTbOQFWwAg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,58 +98,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-This allow for simpler assignment with ref: foo =3D object_ref(bar)
+Allow the link property to hold the pointer to the target, instead of
+indirectly through another variable.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20200110153039.1379601-19-marcandre.lureau@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200110153039.1379601-15-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h | 3 ++-
- qom/object.c         | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ include/qom/object.h |  3 +++
+ qom/object.c         | 26 ++++++++++++++++++++------
+ 2 files changed, 23 insertions(+), 6 deletions(-)
 
 diff --git a/include/qom/object.h b/include/qom/object.h
-index 5e2f60d..18660fd 100644
+index 7e66bc7..5b02be6 100644
 --- a/include/qom/object.h
 +++ b/include/qom/object.h
-@@ -1005,8 +1005,9 @@ GSList *object_class_get_list_sorted(const char *impl=
-ements_type,
-  *
-  * Increase the reference count of a object.  A object cannot be freed as =
-long
-  * as its reference count is greater than zero.
-+ * Returns: @obj
-  */
--void object_ref(Object *obj);
-+Object *object_ref(Object *obj);
-=20
+@@ -1528,6 +1528,9 @@ void object_property_add_child(Object *obj, const char *name,
+ typedef enum {
+     /* Unref the link pointer when the property is deleted */
+     OBJ_PROP_LINK_STRONG = 0x1,
++
++    /* private */
++    OBJ_PROP_LINK_DIRECT = 0x2,
+ } ObjectPropertyLinkFlags;
+ 
  /**
-  * object_unref:
 diff --git a/qom/object.c b/qom/object.c
-index 66c4a5f..555c8b9 100644
+index ced5e0b..dff16da 100644
 --- a/qom/object.c
 +++ b/qom/object.c
-@@ -1107,12 +1107,13 @@ GSList *object_class_get_list_sorted(const char *im=
-plements_type,
-                         object_class_cmp);
+@@ -1729,17 +1729,30 @@ void object_property_allow_set_link(const Object *obj, const char *name,
  }
-=20
--void object_ref(Object *obj)
-+Object *object_ref(Object *obj)
+ 
+ typedef struct {
+-    Object **targetp;
++    union {
++        Object **targetp;
++        Object *target; /* if OBJ_PROP_LINK_DIRECT, when holding the pointer  */
++    };
+     void (*check)(const Object *, const char *, Object *, Error **);
+     ObjectPropertyLinkFlags flags;
+ } LinkProperty;
+ 
++static Object **
++object_link_get_targetp(Object *obj, LinkProperty *lprop)
++{
++    if (lprop->flags & OBJ_PROP_LINK_DIRECT) {
++        return &lprop->target;
++    } else {
++        return lprop->targetp;
++    }
++}
++
+ static void object_get_link_property(Object *obj, Visitor *v,
+                                      const char *name, void *opaque,
+                                      Error **errp)
  {
-     if (!obj) {
--        return;
-+        return NULL;
-     }
-     atomic_inc(&obj->ref);
-+    return obj;
+     LinkProperty *lprop = opaque;
+-    Object **targetp = lprop->targetp;
++    Object **targetp = object_link_get_targetp(obj, lprop);
+     gchar *path;
+ 
+     if (*targetp) {
+@@ -1798,7 +1811,7 @@ static void object_set_link_property(Object *obj, Visitor *v,
+ {
+     Error *local_err = NULL;
+     LinkProperty *prop = opaque;
+-    Object **targetp = prop->targetp;
++    Object **targetp = object_link_get_targetp(obj, prop);
+     Object *old_target = *targetp;
+     Object *new_target = NULL;
+     char *path = NULL;
+@@ -1832,16 +1845,17 @@ static Object *object_resolve_link_property(Object *parent, void *opaque, const
+ {
+     LinkProperty *lprop = opaque;
+ 
+-    return *lprop->targetp;
++    return *object_link_get_targetp(parent, lprop);
  }
-=20
- void object_unref(Object *obj)
---=20
+ 
+ static void object_release_link_property(Object *obj, const char *name,
+                                          void *opaque)
+ {
+     LinkProperty *prop = opaque;
++    Object **targetp = object_link_get_targetp(obj, prop);
+ 
+-    if ((prop->flags & OBJ_PROP_LINK_STRONG) && *prop->targetp) {
+-        object_unref(*prop->targetp);
++    if ((prop->flags & OBJ_PROP_LINK_STRONG) && *targetp) {
++        object_unref(*targetp);
+     }
+     g_free(prop);
+ }
+-- 
 1.8.3.1
 
 
