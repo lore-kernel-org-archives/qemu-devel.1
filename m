@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B1DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D73EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:16:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CA1C22522
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:14:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 258FD22522
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 20:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PJjrDngJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CA1C22522
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtFxbesx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 258FD22522
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuis9-0004Nk-Eo
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:14:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42608)
+	id 1iuitT-0005YB-7g
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 15:15:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufey-00069q-Mu
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:51 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuff5-0006H8-UI
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufew-00007z-35
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23512
+ (envelope-from <dgilbert@redhat.com>) id 1iuff3-0000Fe-6M
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31385
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufev-00007Y-WD
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:46 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuff2-0000EH-32
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798125;
+ s=mimecast20190719; t=1579798131;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pfYejLp3p2IfBeM0FrCsJccHwHgdomwifKJrQcOxA08=;
- b=PJjrDngJq3yKRLPDkrQyIhA42ZtxOQf7h5PlS+nRDwi5lIe6hPsDZRs5dxKbefcyJMZoj8
- ewq97TlZc/P1F0kdT49mf61s0yJuxY0V9Fvq8YrP6HegD/TZ8HJIPX9rcb67PuEyexiKK6
- GK2jUvHvoVejXjssKPQUiJhmmgoZmRE=
+ bh=QI0z+SHu3+O7I/SzHjc7y9nEf+OUeQPwBPC7ev0Fn/k=;
+ b=JtFxbesx6f3ODyZOD0pY2kx2SvYVNRg9aifvGY5Elb86eD1a6mhMWTkCD15P7I7P3LUFLz
+ 40fZnmSR007Uub/tv9karxPOvOYr8Qq+dGy4uhZ6pND3kJ5mLS3mNi9H5XkWUlGLh4ecWb
+ LUbmJQAfp39GoVKlQD19QuKJ438IdqM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-OZFG5ZpcMcuFABXJgNhQWw-1; Thu, 23 Jan 2020 11:48:39 -0500
+ us-mta-391-HS_nOYioON6zu01NN5zS_w-1; Thu, 23 Jan 2020 11:48:50 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA0CC802C82
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D1FB1005513
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:49 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
  [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 422D528991;
- Thu, 23 Jan 2020 16:48:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 78FFC19C69;
+ Thu, 23 Jan 2020 16:48:48 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 093/108] virtiofsd: introduce inode refcount to prevent
- use-after-free
-Date: Thu, 23 Jan 2020 16:46:15 +0000
-Message-Id: <20200123164630.91498-94-dgilbert@redhat.com>
+Subject: [PULL 101/108] virtiofsd: process requests in a thread pool
+Date: Thu, 23 Jan 2020 16:46:23 +0000
+Message-Id: <20200123164630.91498-102-dgilbert@redhat.com>
 In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
 References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: OZFG5ZpcMcuFABXJgNhQWw-1
+X-MC-Unique: HS_nOYioON6zu01NN5zS_w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -94,617 +93,545 @@ Sender: "Qemu-devel"
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-If thread A is using an inode it must not be deleted by thread B when
-processing a FUSE_FORGET request.
+Introduce a thread pool so that fv_queue_thread() just pops
+VuVirtqElements and hands them to the thread pool.  For the time being
+only one worker thread is allowed since passthrough_ll.c is not
+thread-safe yet.  Future patches will lift this restriction so that
+multiple FUSE requests can be processed in parallel.
 
-The FUSE protocol itself already has a counter called nlookup that is
-used in FUSE_FORGET messages.  We cannot trust this counter since the
-untrusted client can manipulate it via FUSE_FORGET messages.
+The main new concept is struct FVRequest, which contains both
+VuVirtqElement and struct fuse_chan.  We now have fv_VuDev for a device,
+fv_QueueInfo for a virtqueue, and FVRequest for a request.  Some of
+fv_QueueInfo's fields are moved into FVRequest because they are
+per-request.  The name FVRequest conforms to QEMU coding style and I
+expect the struct fv_* types will be renamed in a future refactoring.
 
-Introduce a new refcount to keep inodes alive for the required lifespan.
-lo_inode_put() must be called to release a reference.  FUSE's nlookup
-counter holds exactly one reference so that the inode stays alive as
-long as the client still wants to remember it.
+This patch series is not optimal.  fbuf reuse is dropped so each request
+does malloc(se->bufsize), but there is no clean and cheap way to keep
+this with a thread pool.  The vq_lock mutex is held for longer than
+necessary, especially during the eventfd_write() syscall.  Performance
+can be improved in the future.
 
-Note that the lo_inode->is_symlink field is moved to avoid creating a
-hole in the struct due to struct field alignment.
+prctl(2) had to be added to the seccomp whitelist because glib invokes
+it.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Reviewed-by: Sergio Lopez <slp@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 169 ++++++++++++++++++++++++++-----
- 1 file changed, 146 insertions(+), 23 deletions(-)
+ tools/virtiofsd/fuse_virtio.c | 359 +++++++++++++++++++---------------
+ 1 file changed, 201 insertions(+), 158 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index e3a6d6b611..ab1613586e 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -97,7 +97,13 @@ struct lo_key {
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index f6242f9338..0dcf2ef57a 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -22,6 +22,7 @@
 =20
- struct lo_inode {
-     int fd;
--    bool is_symlink;
+ #include <assert.h>
+ #include <errno.h>
++#include <glib.h>
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -37,17 +38,28 @@
+ struct fv_VuDev;
+ struct fv_QueueInfo {
+     pthread_t thread;
++    /*
++     * This lock protects the VuVirtq preventing races between
++     * fv_queue_thread() and fv_queue_worker().
++     */
++    pthread_mutex_t vq_lock;
++
+     struct fv_VuDev *virtio_dev;
+=20
+     /* Our queue index, corresponds to array position */
+     int qidx;
+     int kick_fd;
+     int kill_fd; /* For killing the thread */
++};
+=20
+-    /* The element for the command currently being processed */
+-    VuVirtqElement *qe;
++/* A FUSE request */
++typedef struct {
++    VuVirtqElement elem;
++    struct fuse_chan ch;
++
++    /* Used to complete requests that involve no reply */
+     bool reply_sent;
+-};
++} FVRequest;
+=20
+ /*
+  * We pass the dev element into libvhost-user
+@@ -191,8 +203,11 @@ static void copy_iov(struct iovec *src_iov, int src_co=
+unt,
+ int virtio_send_msg(struct fuse_session *se, struct fuse_chan *ch,
+                     struct iovec *iov, int count)
+ {
+-    VuVirtqElement *elem;
+-    VuVirtq *q;
++    FVRequest *req =3D container_of(ch, FVRequest, ch);
++    struct fv_QueueInfo *qi =3D ch->qi;
++    VuDev *dev =3D &se->virtio_dev->dev;
++    VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
++    VuVirtqElement *elem =3D &req->elem;
+     int ret =3D 0;
+=20
+     assert(count >=3D 1);
+@@ -205,11 +220,7 @@ int virtio_send_msg(struct fuse_session *se, struct fu=
+se_chan *ch,
+=20
+     /* unique =3D=3D 0 is notification, which we don't support */
+     assert(out->unique);
+-    /* For virtio we always have ch */
+-    assert(ch);
+-    assert(!ch->qi->reply_sent);
+-    elem =3D ch->qi->qe;
+-    q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
++    assert(!req->reply_sent);
+=20
+     /* The 'in' part of the elem is to qemu */
+     unsigned int in_num =3D elem->in_num;
+@@ -236,9 +247,15 @@ int virtio_send_msg(struct fuse_session *se, struct fu=
+se_chan *ch,
+     }
+=20
+     copy_iov(iov, count, in_sg, in_num, tosend_len);
+-    vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
+-    vu_queue_notify(&se->virtio_dev->dev, q);
+-    ch->qi->reply_sent =3D true;
++
++    pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock);
++    pthread_mutex_lock(&qi->vq_lock);
++    vu_queue_push(dev, q, elem, tosend_len);
++    vu_queue_notify(dev, q);
++    pthread_mutex_unlock(&qi->vq_lock);
++    pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
++
++    req->reply_sent =3D true;
+=20
+ err:
+     return ret;
+@@ -254,9 +271,12 @@ int virtio_send_data_iov(struct fuse_session *se, stru=
+ct fuse_chan *ch,
+                          struct iovec *iov, int count, struct fuse_bufvec =
+*buf,
+                          size_t len)
+ {
++    FVRequest *req =3D container_of(ch, FVRequest, ch);
++    struct fv_QueueInfo *qi =3D ch->qi;
++    VuDev *dev =3D &se->virtio_dev->dev;
++    VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
++    VuVirtqElement *elem =3D &req->elem;
+     int ret =3D 0;
+-    VuVirtqElement *elem;
+-    VuVirtq *q;
+=20
+     assert(count >=3D 1);
+     assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
+@@ -275,11 +295,7 @@ int virtio_send_data_iov(struct fuse_session *se, stru=
+ct fuse_chan *ch,
+     /* unique =3D=3D 0 is notification which we don't support */
+     assert(out->unique);
+=20
+-    /* For virtio we always have ch */
+-    assert(ch);
+-    assert(!ch->qi->reply_sent);
+-    elem =3D ch->qi->qe;
+-    q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
++    assert(!req->reply_sent);
+=20
+     /* The 'in' part of the elem is to qemu */
+     unsigned int in_num =3D elem->in_num;
+@@ -395,33 +411,175 @@ int virtio_send_data_iov(struct fuse_session *se, st=
+ruct fuse_chan *ch,
+=20
+     ret =3D 0;
+=20
+-    vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
+-    vu_queue_notify(&se->virtio_dev->dev, q);
++    pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock);
++    pthread_mutex_lock(&qi->vq_lock);
++    vu_queue_push(dev, q, elem, tosend_len);
++    vu_queue_notify(dev, q);
++    pthread_mutex_unlock(&qi->vq_lock);
++    pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
+=20
+ err:
+     if (ret =3D=3D 0) {
+-        ch->qi->reply_sent =3D true;
++        req->reply_sent =3D true;
+     }
+=20
+     return ret;
+ }
+=20
++/* Process one FVRequest in a thread pool */
++static void fv_queue_worker(gpointer data, gpointer user_data)
++{
++    struct fv_QueueInfo *qi =3D user_data;
++    struct fuse_session *se =3D qi->virtio_dev->se;
++    struct VuDev *dev =3D &qi->virtio_dev->dev;
++    FVRequest *req =3D data;
++    VuVirtqElement *elem =3D &req->elem;
++    struct fuse_buf fbuf =3D {};
++    bool allocated_bufv =3D false;
++    struct fuse_bufvec bufv;
++    struct fuse_bufvec *pbufv;
++
++    assert(se->bufsize > sizeof(struct fuse_in_header));
 +
 +    /*
-+     * Atomic reference count for this object.  The nlookup field holds a
-+     * reference and release it when nlookup reaches 0.
++     * An element contains one request and the space to send our response
++     * They're spread over multiple descriptors in a scatter/gather set
++     * and we can't trust the guest to keep them still; so copy in/out.
 +     */
-+    gint refcount;
++    fbuf.mem =3D malloc(se->bufsize);
++    assert(fbuf.mem);
 +
-     struct lo_key key;
-=20
-     /*
-@@ -116,6 +122,8 @@ struct lo_inode {
-     fuse_ino_t fuse_ino;
-     pthread_mutex_t plock_mutex;
-     GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
++    fuse_mutex_init(&req->ch.lock);
++    req->ch.fd =3D -1;
++    req->ch.qi =3D qi;
 +
-+    bool is_symlink;
- };
-=20
- struct lo_cred {
-@@ -471,6 +479,23 @@ static ssize_t lo_add_inode_mapping(fuse_req_t req, st=
-ruct lo_inode *inode)
-     return elem - lo_data(req)->ino_map.elems;
- }
-=20
-+static void lo_inode_put(struct lo_data *lo, struct lo_inode **inodep)
-+{
-+    struct lo_inode *inode =3D *inodep;
++    /* The 'out' part of the elem is from qemu */
++    unsigned int out_num =3D elem->out_num;
++    struct iovec *out_sg =3D elem->out_sg;
++    size_t out_len =3D iov_size(out_sg, out_num);
++    fuse_log(FUSE_LOG_DEBUG,
++             "%s: elem %d: with %d out desc of length %zd\n",
++             __func__, elem->index, out_num, out_len);
 +
-+    if (!inode) {
-+        return;
++    /*
++     * The elem should contain a 'fuse_in_header' (in to fuse)
++     * plus the data based on the len in the header.
++     */
++    if (out_len < sizeof(struct fuse_in_header)) {
++        fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for in_header\n",
++                 __func__, elem->index);
++        assert(0); /* TODO */
++    }
++    if (out_len > se->bufsize) {
++        fuse_log(FUSE_LOG_ERR, "%s: elem %d too large for buffer\n", __fun=
+c__,
++                 elem->index);
++        assert(0); /* TODO */
++    }
++    /* Copy just the first element and look at it */
++    copy_from_iov(&fbuf, 1, out_sg);
++
++    pbufv =3D NULL; /* Compiler thinks an unitialised path */
++    if (out_num > 2 &&
++        out_sg[0].iov_len =3D=3D sizeof(struct fuse_in_header) &&
++        ((struct fuse_in_header *)fbuf.mem)->opcode =3D=3D FUSE_WRITE &&
++        out_sg[1].iov_len =3D=3D sizeof(struct fuse_write_in)) {
++        /*
++         * For a write we don't actually need to copy the
++         * data, we can just do it straight out of guest memory
++         * but we must still copy the headers in case the guest
++         * was nasty and changed them while we were using them.
++         */
++        fuse_log(FUSE_LOG_DEBUG, "%s: Write special case\n", __func__);
++
++        /* copy the fuse_write_in header afte rthe fuse_in_header */
++        fbuf.mem +=3D out_sg->iov_len;
++        copy_from_iov(&fbuf, 1, out_sg + 1);
++        fbuf.mem -=3D out_sg->iov_len;
++        fbuf.size =3D out_sg[0].iov_len + out_sg[1].iov_len;
++
++        /* Allocate the bufv, with space for the rest of the iov */
++        pbufv =3D malloc(sizeof(struct fuse_bufvec) +
++                       sizeof(struct fuse_buf) * (out_num - 2));
++        if (!pbufv) {
++            fuse_log(FUSE_LOG_ERR, "%s: pbufv malloc failed\n",
++                    __func__);
++            goto out;
++        }
++
++        allocated_bufv =3D true;
++        pbufv->count =3D 1;
++        pbufv->buf[0] =3D fbuf;
++
++        size_t iovindex, pbufvindex;
++        iovindex =3D 2; /* 2 headers, separate iovs */
++        pbufvindex =3D 1; /* 2 headers, 1 fusebuf */
++
++        for (; iovindex < out_num; iovindex++, pbufvindex++) {
++            pbufv->count++;
++            pbufv->buf[pbufvindex].pos =3D ~0; /* Dummy */
++            pbufv->buf[pbufvindex].flags =3D 0;
++            pbufv->buf[pbufvindex].mem =3D out_sg[iovindex].iov_base;
++            pbufv->buf[pbufvindex].size =3D out_sg[iovindex].iov_len;
++        }
++    } else {
++        /* Normal (non fast write) path */
++
++        /* Copy the rest of the buffer */
++        fbuf.mem +=3D out_sg->iov_len;
++        copy_from_iov(&fbuf, out_num - 1, out_sg + 1);
++        fbuf.mem -=3D out_sg->iov_len;
++        fbuf.size =3D out_len;
++
++        /* TODO! Endianness of header */
++
++        /* TODO: Add checks for fuse_session_exited */
++        bufv.buf[0] =3D fbuf;
++        bufv.count =3D 1;
++        pbufv =3D &bufv;
++    }
++    pbufv->idx =3D 0;
++    pbufv->off =3D 0;
++    fuse_session_process_buf_int(se, pbufv, &req->ch);
++
++out:
++    if (allocated_bufv) {
++        free(pbufv);
 +    }
 +
-+    *inodep =3D NULL;
++    /* If the request has no reply, still recycle the virtqueue element */
++    if (!req->reply_sent) {
++        struct VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
 +
-+    if (g_atomic_int_dec_and_test(&inode->refcount)) {
-+        close(inode->fd);
-+        free(inode);
++        fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n", __func__,
++                 elem->index);
++
++        pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock);
++        pthread_mutex_lock(&qi->vq_lock);
++        vu_queue_push(dev, q, elem, 0);
++        vu_queue_notify(dev, q);
++        pthread_mutex_unlock(&qi->vq_lock);
++        pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
 +    }
++
++    pthread_mutex_destroy(&req->ch.lock);
++    free(fbuf.mem);
++    free(req);
 +}
 +
-+/* Caller must release refcount using lo_inode_put() */
- static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
+ /* Thread function for individual queues, created when a queue is 'started=
+' */
+ static void *fv_queue_thread(void *opaque)
  {
-     struct lo_data *lo =3D lo_data(req);
-@@ -478,6 +503,9 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse_i=
-no_t ino)
+     struct fv_QueueInfo *qi =3D opaque;
+     struct VuDev *dev =3D &qi->virtio_dev->dev;
+     struct VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
+-    struct fuse_session *se =3D qi->virtio_dev->se;
+-    struct fuse_chan ch;
+-    struct fuse_buf fbuf;
++    GThreadPool *pool;
 =20
-     pthread_mutex_lock(&lo->mutex);
-     elem =3D lo_map_get(&lo->ino_map, ino);
-+    if (elem) {
-+        g_atomic_int_inc(&elem->inode->refcount);
-+    }
-     pthread_mutex_unlock(&lo->mutex);
-=20
-     if (!elem) {
-@@ -487,10 +515,23 @@ static struct lo_inode *lo_inode(fuse_req_t req, fuse=
-_ino_t ino)
-     return elem->inode;
- }
-=20
-+/*
-+ * TODO Remove this helper and force callers to hold an inode refcount unt=
-il
-+ * they are done with the fd.  This will be done in a later patch to make
-+ * review easier.
-+ */
- static int lo_fd(fuse_req_t req, fuse_ino_t ino)
- {
-     struct lo_inode *inode =3D lo_inode(req, ino);
--    return inode ? inode->fd : -1;
-+    int fd;
-+
-+    if (!inode) {
-+        return -1;
-+    }
-+
-+    fd =3D inode->fd;
-+    lo_inode_put(lo_data(req), &inode);
-+    return fd;
- }
-=20
- static void lo_init(void *userdata, struct fuse_conn_info *conn)
-@@ -545,6 +586,10 @@ static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
-     fuse_reply_attr(req, &buf, lo->timeout);
- }
-=20
-+/*
-+ * Increments parent->nlookup and caller must release refcount using
-+ * lo_inode_put(&parent).
-+ */
- static int lo_parent_and_name(struct lo_data *lo, struct lo_inode *inode,
-                               char path[PATH_MAX], struct lo_inode **paren=
-t)
- {
-@@ -582,6 +627,7 @@ retry:
-         p =3D &lo->root;
-         pthread_mutex_lock(&lo->mutex);
-         p->nlookup++;
-+        g_atomic_int_inc(&p->refcount);
-         pthread_mutex_unlock(&lo->mutex);
-     } else {
-         *last =3D '\0';
-@@ -625,6 +671,7 @@ retry:
-=20
- fail_unref:
-     unref_inode_lolocked(lo, p, 1);
-+    lo_inode_put(lo, &p);
- fail:
-     if (retries) {
-         retries--;
-@@ -663,6 +710,7 @@ fallback:
-     if (res !=3D -1) {
-         res =3D utimensat(parent->fd, path, tv, AT_SYMLINK_NOFOLLOW);
-         unref_inode_lolocked(lo, parent, 1);
-+        lo_inode_put(lo, &parent);
-     }
-=20
-     return res;
-@@ -780,11 +828,13 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino=
-, struct stat *attr,
-             goto out_err;
-         }
-     }
-+    lo_inode_put(lo, &inode);
-=20
-     return lo_getattr(req, ino, fi);
-=20
- out_err:
-     saverr =3D errno;
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
- }
-=20
-@@ -801,6 +851,7 @@ static struct lo_inode *lo_find(struct lo_data *lo, str=
-uct stat *st)
-     if (p) {
-         assert(p->nlookup > 0);
-         p->nlookup++;
-+        g_atomic_int_inc(&p->refcount);
-     }
-     pthread_mutex_unlock(&lo->mutex);
-=20
-@@ -820,6 +871,10 @@ static void posix_locks_value_destroy(gpointer data)
-     free(plock);
- }
-=20
-+/*
-+ * Increments nlookup and caller must release refcount using
-+ * lo_inode_put(&parent).
-+ */
- static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *nam=
-e,
-                         struct fuse_entry_param *e)
- {
-@@ -827,7 +882,8 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-     int res;
-     int saverr;
-     struct lo_data *lo =3D lo_data(req);
--    struct lo_inode *inode, *dir =3D lo_inode(req, parent);
-+    struct lo_inode *inode =3D NULL;
-+    struct lo_inode *dir =3D lo_inode(req, parent);
-=20
-     /*
-      * name_to_handle_at() and open_by_handle_at() can reach here with fus=
-e
-@@ -868,6 +924,13 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t par=
-ent, const char *name,
-         }
-=20
-         inode->is_symlink =3D S_ISLNK(e->attr.st_mode);
-+
-+        /*
-+         * One for the caller and one for nlookup (released in
-+         * unref_inode_lolocked())
-+         */
-+        g_atomic_int_set(&inode->refcount, 2);
-+
-         inode->nlookup =3D 1;
-         inode->fd =3D newfd;
-         newfd =3D -1;
-@@ -883,6 +946,8 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-         pthread_mutex_unlock(&lo->mutex);
-     }
-     e->ino =3D inode->fuse_ino;
-+    lo_inode_put(lo, &inode);
-+    lo_inode_put(lo, &dir);
-=20
-     fuse_log(FUSE_LOG_DEBUG, "  %lli/%s -> %lli\n", (unsigned long long)pa=
-rent,
-              name, (unsigned long long)e->ino);
-@@ -894,6 +959,8 @@ out_err:
-     if (newfd !=3D -1) {
-         close(newfd);
-     }
-+    lo_inode_put(lo, &inode);
-+    lo_inode_put(lo, &dir);
-     return saverr;
- }
-=20
-@@ -991,6 +1058,7 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_ino_=
-t parent,
- {
-     int res;
-     int saverr;
-+    struct lo_data *lo =3D lo_data(req);
-     struct lo_inode *dir;
-     struct fuse_entry_param e;
-     struct lo_cred old =3D {};
-@@ -1032,9 +1100,11 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_in=
-o_t parent,
-              name, (unsigned long long)e.ino);
-=20
-     fuse_reply_entry(req, &e);
-+    lo_inode_put(lo, &dir);
-     return;
-=20
- out:
-+    lo_inode_put(lo, &dir);
-     fuse_reply_err(req, saverr);
- }
-=20
-@@ -1085,6 +1155,7 @@ fallback:
-     if (res !=3D -1) {
-         res =3D linkat(parent->fd, path, dfd, name, 0);
-         unref_inode_lolocked(lo, parent, 1);
-+        lo_inode_put(lo, &parent);
-     }
-=20
-     return res;
-@@ -1095,6 +1166,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, f=
-use_ino_t parent,
- {
-     int res;
-     struct lo_data *lo =3D lo_data(req);
-+    struct lo_inode *parent_inode;
-     struct lo_inode *inode;
-     struct fuse_entry_param e;
-     int saverr;
-@@ -1104,17 +1176,18 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino,=
- fuse_ino_t parent,
-         return;
-     }
-=20
-+    parent_inode =3D lo_inode(req, parent);
-     inode =3D lo_inode(req, ino);
--    if (!inode) {
--        fuse_reply_err(req, EBADF);
--        return;
-+    if (!parent_inode || !inode) {
-+        errno =3D EBADF;
-+        goto out_err;
-     }
-=20
-     memset(&e, 0, sizeof(struct fuse_entry_param));
-     e.attr_timeout =3D lo->timeout;
-     e.entry_timeout =3D lo->timeout;
-=20
--    res =3D linkat_empty_nofollow(lo, inode, lo_fd(req, parent), name);
-+    res =3D linkat_empty_nofollow(lo, inode, parent_inode->fd, name);
-     if (res =3D=3D -1) {
-         goto out_err;
-     }
-@@ -1133,13 +1206,18 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino,=
- fuse_ino_t parent,
-              name, (unsigned long long)e.ino);
-=20
-     fuse_reply_entry(req, &e);
-+    lo_inode_put(lo, &parent_inode);
-+    lo_inode_put(lo, &inode);
-     return;
-=20
- out_err:
-     saverr =3D errno;
-+    lo_inode_put(lo, &parent_inode);
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
- }
-=20
-+/* Increments nlookup and caller must release refcount using lo_inode_put(=
-) */
- static struct lo_inode *lookup_name(fuse_req_t req, fuse_ino_t parent,
-                                     const char *name)
- {
-@@ -1176,6 +1254,7 @@ static void lo_rmdir(fuse_req_t req, fuse_ino_t paren=
-t, const char *name)
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-     unref_inode_lolocked(lo, inode, 1);
-+    lo_inode_put(lo, &inode);
- }
-=20
- static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
-@@ -1183,8 +1262,10 @@ static void lo_rename(fuse_req_t req, fuse_ino_t par=
-ent, const char *name,
-                       unsigned int flags)
- {
-     int res;
--    struct lo_inode *oldinode;
--    struct lo_inode *newinode;
-+    struct lo_inode *parent_inode;
-+    struct lo_inode *newparent_inode;
-+    struct lo_inode *oldinode =3D NULL;
-+    struct lo_inode *newinode =3D NULL;
-     struct lo_data *lo =3D lo_data(req);
-=20
-     if (!is_safe_path_component(name) || !is_safe_path_component(newname))=
- {
-@@ -1192,6 +1273,13 @@ static void lo_rename(fuse_req_t req, fuse_ino_t par=
-ent, const char *name,
-         return;
-     }
-=20
-+    parent_inode =3D lo_inode(req, parent);
-+    newparent_inode =3D lo_inode(req, newparent);
-+    if (!parent_inode || !newparent_inode) {
-+        fuse_reply_err(req, EBADF);
-+        goto out;
-+    }
-+
-     oldinode =3D lookup_name(req, parent, name);
-     newinode =3D lookup_name(req, newparent, newname);
-=20
-@@ -1204,8 +1292,8 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
- #ifndef SYS_renameat2
-         fuse_reply_err(req, EINVAL);
- #else
--        res =3D syscall(SYS_renameat2, lo_fd(req, parent), name,
--                       lo_fd(req, newparent), newname, flags);
-+        res =3D syscall(SYS_renameat2, parent_inode->fd, name,
-+                        newparent_inode->fd, newname, flags);
-         if (res =3D=3D -1 && errno =3D=3D ENOSYS) {
-             fuse_reply_err(req, EINVAL);
-         } else {
-@@ -1215,12 +1303,16 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-         goto out;
-     }
-=20
--    res =3D renameat(lo_fd(req, parent), name, lo_fd(req, newparent), newn=
-ame);
-+    res =3D renameat(parent_inode->fd, name, newparent_inode->fd, newname)=
+-    fbuf.mem =3D NULL;
+-    fbuf.flags =3D 0;
+-
+-    fuse_mutex_init(&ch.lock);
+-    ch.fd =3D (int)0xdaff0d111;
+-    ch.qi =3D qi;
++    pool =3D g_thread_pool_new(fv_queue_worker, qi, 1 /* TODO max_threads =
+*/,
++                             TRUE, NULL);
++    if (!pool) {
++        fuse_log(FUSE_LOG_ERR, "%s: g_thread_pool_new failed\n", __func__)=
 ;
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
- out:
-     unref_inode_lolocked(lo, oldinode, 1);
-     unref_inode_lolocked(lo, newinode, 1);
-+    lo_inode_put(lo, &oldinode);
-+    lo_inode_put(lo, &newinode);
-+    lo_inode_put(lo, &parent_inode);
-+    lo_inode_put(lo, &newparent_inode);
- }
-=20
- static void lo_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
-@@ -1244,6 +1336,7 @@ static void lo_unlink(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name)
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-     unref_inode_lolocked(lo, inode, 1);
-+    lo_inode_put(lo, &inode);
- }
-=20
- static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
-e,
-@@ -1265,8 +1358,9 @@ static void unref_inode_lolocked(struct lo_data *lo, =
-struct lo_inode *inode,
-         g_hash_table_destroy(inode->posix_locks);
-         pthread_mutex_destroy(&inode->plock_mutex);
-         pthread_mutex_unlock(&lo->mutex);
--        close(inode->fd);
--        free(inode);
-+
-+        /* Drop our refcount from lo_do_lookup() */
-+        lo_inode_put(lo, &inode);
-     } else {
-         pthread_mutex_unlock(&lo->mutex);
-     }
-@@ -1280,6 +1374,7 @@ static int unref_all_inodes_cb(gpointer key, gpointer=
- value, gpointer user_data)
-     inode->nlookup =3D 0;
-     lo_map_remove(&lo->ino_map, inode->fuse_ino);
-     close(inode->fd);
-+    lo_inode_put(lo, &inode); /* Drop our refcount from lo_do_lookup() */
-=20
-     return TRUE;
- }
-@@ -1306,6 +1401,7 @@ static void lo_forget_one(fuse_req_t req, fuse_ino_t =
-ino, uint64_t nlookup)
-              (unsigned long long)nlookup);
-=20
-     unref_inode_lolocked(lo, inode, nlookup);
-+    lo_inode_put(lo, &inode);
- }
-=20
- static void lo_forget(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup)
-@@ -1537,6 +1633,7 @@ static void lo_do_readdir(fuse_req_t req, fuse_ino_t =
-ino, size_t size,
-     err =3D 0;
- error:
-     lo_dirp_put(&d);
-+    lo_inode_put(lo, &dinode);
-=20
-     /*
-      * If there's an error, we can only signal it if we haven't stored
-@@ -1595,6 +1692,7 @@ static void lo_create(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
- {
-     int fd;
-     struct lo_data *lo =3D lo_data(req);
-+    struct lo_inode *parent_inode;
-     struct fuse_entry_param e;
-     int err;
-     struct lo_cred old =3D {};
-@@ -1607,12 +1705,18 @@ static void lo_create(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-         return;
-     }
-=20
-+    parent_inode =3D lo_inode(req, parent);
-+    if (!parent_inode) {
-+        fuse_reply_err(req, EBADF);
-+        return;
++        return NULL;
 +    }
-+
-     err =3D lo_change_cred(req, &old);
-     if (err) {
-         goto out;
-     }
 =20
--    fd =3D openat(lo_fd(req, parent), name, (fi->flags | O_CREAT) & ~O_NOF=
-OLLOW,
-+    fd =3D openat(parent_inode->fd, name, (fi->flags | O_CREAT) & ~O_NOFOL=
-LOW,
-                 mode);
-     err =3D fd =3D=3D -1 ? errno : 0;
-     lo_restore_cred(&old);
-@@ -1625,8 +1729,8 @@ static void lo_create(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-         pthread_mutex_unlock(&lo->mutex);
-         if (fh =3D=3D -1) {
-             close(fd);
--            fuse_reply_err(req, ENOMEM);
--            return;
-+            err =3D ENOMEM;
-+            goto out;
+     fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __func_=
+_,
+              qi->qidx, qi->kick_fd);
+@@ -478,6 +636,7 @@ static void *fv_queue_thread(void *opaque)
+         /* Mutual exclusion with virtio_loop() */
+         ret =3D pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock)=
+;
+         assert(ret =3D=3D 0); /* there is no possible error case */
++        pthread_mutex_lock(&qi->vq_lock);
+         /* out is from guest, in is too guest */
+         unsigned int in_bytes, out_bytes;
+         vu_queue_get_avail_bytes(dev, q, &in_bytes, &out_bytes, ~0, ~0);
+@@ -486,141 +645,22 @@ static void *fv_queue_thread(void *opaque)
+                  "%s: Queue %d gave evalue: %zx available: in: %u out: %u\=
+n",
+                  __func__, qi->qidx, (size_t)evalue, in_bytes, out_bytes);
+=20
+-
+         while (1) {
+-            bool allocated_bufv =3D false;
+-            struct fuse_bufvec bufv;
+-            struct fuse_bufvec *pbufv;
+-
+-            /*
+-             * An element contains one request and the space to send our
+-             * response They're spread over multiple descriptors in a
+-             * scatter/gather set and we can't trust the guest to keep the=
+m
+-             * still; so copy in/out.
+-             */
+-            VuVirtqElement *elem =3D vu_queue_pop(dev, q, sizeof(VuVirtqEl=
+ement));
+-            if (!elem) {
++            FVRequest *req =3D vu_queue_pop(dev, q, sizeof(FVRequest));
++            if (!req) {
+                 break;
+             }
+=20
+-            qi->qe =3D elem;
+-            qi->reply_sent =3D false;
++            req->reply_sent =3D false;
+=20
+-            if (!fbuf.mem) {
+-                fbuf.mem =3D malloc(se->bufsize);
+-                assert(fbuf.mem);
+-                assert(se->bufsize > sizeof(struct fuse_in_header));
+-            }
+-            /* The 'out' part of the elem is from qemu */
+-            unsigned int out_num =3D elem->out_num;
+-            struct iovec *out_sg =3D elem->out_sg;
+-            size_t out_len =3D iov_size(out_sg, out_num);
+-            fuse_log(FUSE_LOG_DEBUG,
+-                     "%s: elem %d: with %d out desc of length %zd\n", __fu=
+nc__,
+-                     elem->index, out_num, out_len);
+-
+-            /*
+-             * The elem should contain a 'fuse_in_header' (in to fuse)
+-             * plus the data based on the len in the header.
+-             */
+-            if (out_len < sizeof(struct fuse_in_header)) {
+-                fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for in_heade=
+r\n",
+-                         __func__, elem->index);
+-                assert(0); /* TODO */
+-            }
+-            if (out_len > se->bufsize) {
+-                fuse_log(FUSE_LOG_ERR, "%s: elem %d too large for buffer\n=
+",
+-                         __func__, elem->index);
+-                assert(0); /* TODO */
+-            }
+-            /* Copy just the first element and look at it */
+-            copy_from_iov(&fbuf, 1, out_sg);
+-
+-            if (out_num > 2 &&
+-                out_sg[0].iov_len =3D=3D sizeof(struct fuse_in_header) &&
+-                ((struct fuse_in_header *)fbuf.mem)->opcode =3D=3D FUSE_WR=
+ITE &&
+-                out_sg[1].iov_len =3D=3D sizeof(struct fuse_write_in)) {
+-                /*
+-                 * For a write we don't actually need to copy the
+-                 * data, we can just do it straight out of guest memory
+-                 * but we must still copy the headers in case the guest
+-                 * was nasty and changed them while we were using them.
+-                 */
+-                fuse_log(FUSE_LOG_DEBUG, "%s: Write special case\n", __fun=
+c__);
+-
+-                /* copy the fuse_write_in header after the fuse_in_header =
+*/
+-                fbuf.mem +=3D out_sg->iov_len;
+-                copy_from_iov(&fbuf, 1, out_sg + 1);
+-                fbuf.mem -=3D out_sg->iov_len;
+-                fbuf.size =3D out_sg[0].iov_len + out_sg[1].iov_len;
+-
+-                /* Allocate the bufv, with space for the rest of the iov *=
+/
+-                allocated_bufv =3D true;
+-                pbufv =3D malloc(sizeof(struct fuse_bufvec) +
+-                               sizeof(struct fuse_buf) * (out_num - 2));
+-                if (!pbufv) {
+-                    vu_queue_unpop(dev, q, elem, 0);
+-                    free(elem);
+-                    fuse_log(FUSE_LOG_ERR, "%s: pbufv malloc failed\n",
+-                             __func__);
+-                    goto out;
+-                }
+-
+-                pbufv->count =3D 1;
+-                pbufv->buf[0] =3D fbuf;
+-
+-                size_t iovindex, pbufvindex;
+-                iovindex =3D 2; /* 2 headers, separate iovs */
+-                pbufvindex =3D 1; /* 2 headers, 1 fusebuf */
+-
+-                for (; iovindex < out_num; iovindex++, pbufvindex++) {
+-                    pbufv->count++;
+-                    pbufv->buf[pbufvindex].pos =3D ~0; /* Dummy */
+-                    pbufv->buf[pbufvindex].flags =3D 0;
+-                    pbufv->buf[pbufvindex].mem =3D out_sg[iovindex].iov_ba=
+se;
+-                    pbufv->buf[pbufvindex].size =3D out_sg[iovindex].iov_l=
+en;
+-                }
+-            } else {
+-                /* Normal (non fast write) path */
+-
+-                /* Copy the rest of the buffer */
+-                fbuf.mem +=3D out_sg->iov_len;
+-                copy_from_iov(&fbuf, out_num - 1, out_sg + 1);
+-                fbuf.mem -=3D out_sg->iov_len;
+-                fbuf.size =3D out_len;
+-
+-                /* TODO! Endianness of header */
+-
+-                /* TODO: Add checks for fuse_session_exited */
+-                bufv.buf[0] =3D fbuf;
+-                bufv.count =3D 1;
+-                pbufv =3D &bufv;
+-            }
+-            pbufv->idx =3D 0;
+-            pbufv->off =3D 0;
+-            fuse_session_process_buf_int(se, pbufv, &ch);
+-
+-            if (allocated_bufv) {
+-                free(pbufv);
+-            }
+-
+-            if (!qi->reply_sent) {
+-                fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
+-                         __func__, elem->index);
+-                /* I think we've still got to recycle the element */
+-                vu_queue_push(dev, q, elem, 0);
+-                vu_queue_notify(dev, q);
+-            }
+-            qi->qe =3D NULL;
+-            free(elem);
+-            elem =3D NULL;
++            g_thread_pool_push(pool, req, NULL);
          }
 =20
-         fi->fh =3D fh;
-@@ -1639,6 +1743,8 @@ static void lo_create(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
++        pthread_mutex_unlock(&qi->vq_lock);
+         pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
      }
-=20
- out:
-+    lo_inode_put(lo, &parent_inode);
+-out:
+-    pthread_mutex_destroy(&ch.lock);
+-    free(fbuf.mem);
 +
-     if (err) {
-         fuse_reply_err(req, err);
-     } else {
-@@ -1712,16 +1818,18 @@ static void lo_getlk(fuse_req_t req, fuse_ino_t ino=
-, struct fuse_file_info *fi,
-     plock =3D
-         lookup_create_plock_ctx(lo, inode, fi->lock_owner, lock->l_pid, &r=
-et);
-     if (!plock) {
--        pthread_mutex_unlock(&inode->plock_mutex);
--        fuse_reply_err(req, ret);
--        return;
-+        saverr =3D ret;
-+        goto out;
-     }
++    g_thread_pool_free(pool, FALSE, TRUE);
 =20
-     ret =3D fcntl(plock->fd, F_OFD_GETLK, lock);
-     if (ret =3D=3D -1) {
-         saverr =3D errno;
-     }
-+
-+out:
-     pthread_mutex_unlock(&inode->plock_mutex);
-+    lo_inode_put(lo, &inode);
-=20
-     if (saverr) {
-         fuse_reply_err(req, saverr);
-@@ -1761,9 +1869,8 @@ static void lo_setlk(fuse_req_t req, fuse_ino_t ino, =
-struct fuse_file_info *fi,
-         lookup_create_plock_ctx(lo, inode, fi->lock_owner, lock->l_pid, &r=
-et);
-=20
-     if (!plock) {
--        pthread_mutex_unlock(&inode->plock_mutex);
--        fuse_reply_err(req, ret);
--        return;
-+        saverr =3D ret;
-+        goto out;
-     }
-=20
-     /* TODO: Is it alright to modify flock? */
-@@ -1772,7 +1879,11 @@ static void lo_setlk(fuse_req_t req, fuse_ino_t ino,=
- struct fuse_file_info *fi,
-     if (ret =3D=3D -1) {
-         saverr =3D errno;
-     }
-+
-+out:
-     pthread_mutex_unlock(&inode->plock_mutex);
-+    lo_inode_put(lo, &inode);
-+
-     fuse_reply_err(req, saverr);
+     return NULL;
  }
-=20
-@@ -1898,6 +2009,7 @@ static void lo_flush(fuse_req_t req, fuse_ino_t ino, =
-struct fuse_file_info *fi)
-     pthread_mutex_unlock(&inode->plock_mutex);
-=20
-     res =3D close(dup(lo_fi_fd(req, fi)));
-+    lo_inode_put(lo_data(req), &inode);
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
- }
-=20
-@@ -2115,11 +2227,14 @@ out_free:
-     if (fd >=3D 0) {
-         close(fd);
+@@ -643,6 +683,7 @@ static void fv_queue_cleanup_thread(struct fv_VuDev *vu=
+d, int qidx)
+         fuse_log(FUSE_LOG_ERR, "%s: Failed to join thread idx %d err %d\n"=
+,
+                  __func__, qidx, ret);
      }
++    pthread_mutex_destroy(&ourqi->vq_lock);
+     close(ourqi->kill_fd);
+     ourqi->kick_fd =3D -1;
+     free(vud->qi[qidx]);
+@@ -696,6 +737,8 @@ static void fv_queue_set_started(VuDev *dev, int qidx, =
+bool started)
+=20
+         ourqi->kill_fd =3D eventfd(0, EFD_CLOEXEC | EFD_SEMAPHORE);
+         assert(ourqi->kill_fd !=3D -1);
++        pthread_mutex_init(&ourqi->vq_lock, NULL);
 +
-+    lo_inode_put(lo, &inode);
-     return;
-=20
- out_err:
-     saverr =3D errno;
- out:
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
-     goto out_free;
- }
-@@ -2190,11 +2305,14 @@ out_free:
-     if (fd >=3D 0) {
-         close(fd);
-     }
-+
-+    lo_inode_put(lo, &inode);
-     return;
-=20
- out_err:
-     saverr =3D errno;
- out:
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
-     goto out_free;
- }
-@@ -2243,6 +2361,8 @@ out:
-     if (fd >=3D 0) {
-         close(fd);
-     }
-+
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
- }
-=20
-@@ -2289,6 +2409,8 @@ out:
-     if (fd >=3D 0) {
-         close(fd);
-     }
-+
-+    lo_inode_put(lo, &inode);
-     fuse_reply_err(req, saverr);
- }
-=20
-@@ -2671,6 +2793,7 @@ static void setup_root(struct lo_data *lo, struct lo_=
-inode *root)
-     root->key.ino =3D stat.st_ino;
-     root->key.dev =3D stat.st_dev;
-     root->nlookup =3D 2;
-+    g_atomic_int_set(&root->refcount, 2);
- }
-=20
- static guint lo_key_hash(gconstpointer key)
+         if (pthread_create(&ourqi->thread, NULL, fv_queue_thread, ourqi)) =
+{
+             fuse_log(FUSE_LOG_ERR, "%s: Failed to create thread for queue =
+%d\n",
+                      __func__, qidx);
 --=20
 2.24.1
 
