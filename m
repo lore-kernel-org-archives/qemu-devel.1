@@ -2,71 +2,72 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6EFBC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E451C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:22:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D3B820678
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBE5020678
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:22:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hB0GJo8E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D3B820678
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cLgwIMxt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBE5020678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubUr-000420-Nw
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:22:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35873)
+	id 1iubVa-00057n-JL
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:22:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35918)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuat5-0007Kl-Vb
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:05 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuatE-0007Y3-3b
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuat4-0004r8-RW
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37238
+ (envelope-from <imammedo@redhat.com>) id 1iuatC-0004uM-Tt
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53842
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuat4-0004r0-Nz
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:02 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuatC-0004u8-QE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779782;
+ s=mimecast20190719; t=1579779790;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LmbT4utHw3jVlrOr00QmnnfO7V5reIzeADeYrdgAyuw=;
- b=hB0GJo8E0Cth9vNIRGYf+9ZYKA8g//F+q0BuC6FR5T5ynSMNObvYCo8OZibV5p/rWYklWX
- 29HXaO1/P8IdKC0bwIIygt/i7MmN+wbrEZv11owLH+VKRH2HBlJHPQ6+AYOPXXBRzq+BtI
- SBRvsjzu9zXEFPjMhL/jxFfVhrgYGJU=
+ bh=FQGphAKYlFne4I+9P4+J325qf+HsV/nJrS3YY9oV5Ik=;
+ b=cLgwIMxtPjcm/KLcGxQa7El/aKGqvhGE0q2E9FJvIFNCz3N+Q7h1EGM5hny+Jbs7m5CK4/
+ qqlgo8601oCWwoU+rhsqcJlti3EyK04TisZ0BqqRBMUhQ5UxTIV5gIiGkdX2+THr1fWyxi
+ owEbHMYeoA3V7y8i8iproHnhnBpoElQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-BARCobzpM9qjwGW3nthjBA-1; Thu, 23 Jan 2020 06:42:59 -0500
+ us-mta-386-BKZcemA8NcKjl9ZucX1geg-1; Thu, 23 Jan 2020 06:43:08 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40763108BC53;
- Thu, 23 Jan 2020 11:42:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15212190B2BB
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:43:08 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E2D02100032E;
- Thu, 23 Jan 2020 11:42:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 86707100164D
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:43:07 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 43/80] x86/microvm: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:38:08 +0100
-Message-Id: <1579779525-20065-44-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 47/80] m68k/an5206: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:12 +0100
+Message-Id: <1579779525-20065-48-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: BARCobzpM9qjwGW3nthjBA-1
+X-MC-Unique: BKZcemA8NcKjl9ZucX1geg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -84,8 +85,6 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, slp@redhat.com,
- mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,66 +98,42 @@ and using MachineState::ram instead of manually initializing
 RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
-CC: slp@redhat.com
-CC: pbonzini@redhat.com
-CC: mst@redhat.com
-CC: rth@twiddle.net
-CC: ehabkost@redhat.com
----
- hw/i386/microvm.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/m68k/an5206.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index 827ce29..7d78b99 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -167,7 +167,7 @@ static void microvm_memory_init(MicrovmMachineState *mm=
-s)
- {
-     MachineState *machine =3D MACHINE(mms);
-     X86MachineState *x86ms =3D X86_MACHINE(mms);
--    MemoryRegion *ram, *ram_below_4g, *ram_above_4g;
-+    MemoryRegion *ram_below_4g, *ram_above_4g;
-     MemoryRegion *system_memory =3D get_system_memory();
-     FWCfgState *fw_cfg;
-     ram_addr_t lowmem;
-@@ -214,12 +214,8 @@ static void microvm_memory_init(MicrovmMachineState *m=
-ms)
-         x86ms->below_4g_mem_size =3D machine->ram_size;
-     }
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index 54ccbe1..69a8ffa 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -33,7 +33,6 @@ static void an5206_init(MachineState *machine)
+     uint64_t elf_entry;
+     hwaddr entry;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *sram =3D g_new(MemoryRegion, 1);
 =20
--    ram =3D g_malloc(sizeof(*ram));
--    memory_region_allocate_system_memory(ram, NULL, "microvm.ram",
--                                         machine->ram_size);
--
-     ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
--    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
-+    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", machine->=
-ram,
-                              0, x86ms->below_4g_mem_size);
-     memory_region_add_subregion(system_memory, 0, ram_below_4g);
+     cpu =3D M68K_CPU(cpu_create(machine->cpu_type));
+@@ -46,8 +45,7 @@ static void an5206_init(MachineState *machine)
+     env->rambar0 =3D AN5206_RAMBAR_ADDR | 1;
 =20
-@@ -227,7 +223,8 @@ static void microvm_memory_init(MicrovmMachineState *mm=
-s)
+     /* DRAM at address zero */
+-    memory_region_allocate_system_memory(ram, NULL, "an5206.ram", ram_size=
+);
+-    memory_region_add_subregion(address_space_mem, 0, ram);
++    memory_region_add_subregion(address_space_mem, 0, machine->ram);
 =20
-     if (x86ms->above_4g_mem_size > 0) {
-         ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
--        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
-+        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g",
-+                                 machine->ram,
-                                  x86ms->below_4g_mem_size,
-                                  x86ms->above_4g_mem_size);
-         memory_region_add_subregion(system_memory, 0x100000000ULL,
-@@ -502,6 +499,7 @@ static void microvm_class_init(ObjectClass *oc, void *d=
-ata)
-     mc->auto_enable_numa_with_memhp =3D false;
-     mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
-     mc->nvdimm_supported =3D false;
-+    mc->default_ram_id =3D "microvm.ram";
+     /* Internal SRAM.  */
+     memory_region_init_ram(sram, NULL, "an5206.sram", 512, &error_fatal);
+@@ -89,6 +87,7 @@ static void an5206_machine_init(MachineClass *mc)
+     mc->desc =3D "Arnewsh 5206";
+     mc->init =3D an5206_init;
+     mc->default_cpu_type =3D M68K_CPU_TYPE_NAME("m5206");
++    mc->default_ram_id =3D "an5206.ram";
+ }
 =20
-     /* Avoid relying too much on kernel components */
-     mc->default_kernel_irqchip_split =3D true;
+ DEFINE_MACHINE("an5206", an5206_machine_init)
 --=20
 2.7.4
 
