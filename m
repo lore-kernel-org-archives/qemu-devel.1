@@ -2,73 +2,72 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA4AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:11:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B795DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:12:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3640E206A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:11:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8210E206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:12:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a8cEk9dw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3640E206A2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwTd8HrR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8210E206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubKQ-0007gM-TZ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:11:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35933)
+	id 1iubLr-0001I7-3w
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:12:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35627)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuatF-0007Zi-1g
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:14 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuasP-0006FS-NM
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuatD-0004uW-HV
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:12 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42619
+ (envelope-from <imammedo@redhat.com>) id 1iuasO-0004Wm-Lv
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20894
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuatD-0004uQ-DS
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:11 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuasO-0004WX-J3
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779791;
+ s=mimecast20190719; t=1579779740;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9CK5qPoMcDq51uWEiTrxAVweeSx31rzpIOXSXlmZViQ=;
- b=a8cEk9dwou9Yqq7mEWy+EjuJ5BQ8ZAtmWEH+vAmQFwaN+PkUIOM1HPu70ywEZqtDzYoN6i
- /7/W59fCLpzK+SaeoG4VSlRq37WXdMbS/ypjiEGLdXIUIds+q+LAtarzo5MAYvASuSDrO7
- 8ne19Op5Lz6jxeGh7MZeg/Kryf6ivpc=
+ bh=CgDkMDU9I/V0rpGXWiH372N5eIehhdVauWqhAVRQ1p4=;
+ b=fwTd8HrRE6SJrINlbFIqxC3A+gmigQ1cqTOZpreBk+NdXP02Bkr3TO4+Yb7P4Vn+rk55gh
+ 7aAd0j876LkQ2L3lvVGORCqCtPxcUSAu+2nTqDsSizvEDOETrZLT3LMW0llL9LRelqT0Pr
+ 9c5IS0B0xtzm12UsNBGU0W0ulslPGVU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-8e76ps0wNamPT0XvZsB4Ng-1; Thu, 23 Jan 2020 06:43:07 -0500
+ us-mta-374-M56JsD3qO_-XZl4QY27M3g-1; Thu, 23 Jan 2020 06:42:16 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41D7D8026B6;
- Thu, 23 Jan 2020 11:43:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F34BDBAB;
+ Thu, 23 Jan 2020 11:42:15 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 31D1110843E9;
- Thu, 23 Jan 2020 11:43:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1C0C510016E8;
+ Thu, 23 Jan 2020 11:42:13 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 45/80] lm32/lm32_boards: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:38:10 +0100
-Message-Id: <1579779525-20065-46-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 35/80] arm/xlnx-zcu102: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:00 +0100
+Message-Id: <1579779525-20065-36-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 8e76ps0wNamPT0XvZsB4Ng-1
+X-MC-Unique: M56JsD3qO_-XZl4QY27M3g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -86,7 +85,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: michael@walle.cc
+Cc: edgar.iglesias@gmail.com, alistair@alistair23.me, qemu-arm@nongnu.org,
+ peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,169 +99,55 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-PS:
- while at it add check for user supplied RAM size and error
- out if it mismatches board expected value.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
-v2:
-  * fix format string causing build failure on 32-bit host
-    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
-
-CC: michael@walle.cc
+CC: alistair@alistair23.me
+CC: edgar.iglesias@gmail.com
+CC: peter.maydell@linaro.org
+CC: qemu-arm@nongnu.org
 ---
- hw/lm32/lm32_boards.c | 39 ++++++++++++++++++++++++++-------------
- 1 file changed, 26 insertions(+), 13 deletions(-)
+ hw/arm/xlnx-zcu102.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index 5ae308b..cffb777 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -19,6 +19,7 @@
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 53cfe7c..bd645ad 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -28,7 +28,6 @@ typedef struct XlnxZCU102 {
+     MachineState parent_obj;
 =20
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "qemu/cutils.h"
- #include "qemu/error-report.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
-@@ -75,22 +76,28 @@ static void main_cpu_reset(void *opaque)
+     XlnxZynqMPState soc;
+-    MemoryRegion ddr_ram;
 =20
- static void lm32_evr_init(MachineState *machine)
- {
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     const char *kernel_filename =3D machine->kernel_filename;
-     LM32CPU *cpu;
-     CPULM32State *env;
-     DriveInfo *dinfo;
-     MemoryRegion *address_space_mem =3D  get_system_memory();
--    MemoryRegion *phys_ram =3D g_new(MemoryRegion, 1);
-     qemu_irq irq[32];
-     ResetInfo *reset_info;
-     int i;
+     bool secure;
+     bool virt;
+@@ -87,13 +86,10 @@ static void xlnx_zcu102_init(MachineState *machine)
+                  ram_size);
+     }
 =20
-+    if (machine->ram_size !=3D mc->default_ram_size) {
-+        char *sz =3D size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-+
-     /* memory map */
-     hwaddr flash_base  =3D 0x04000000;
-     size_t flash_sector_size       =3D 256 * KiB;
-     size_t flash_size              =3D 32 * MiB;
-     hwaddr ram_base    =3D 0x08000000;
--    size_t ram_size                =3D 64 * MiB;
-     hwaddr timer0_base =3D 0x80002000;
-     hwaddr uart0_base  =3D 0x80006000;
-     hwaddr timer1_base =3D 0x8000a000;
-@@ -107,9 +114,7 @@ static void lm32_evr_init(MachineState *machine)
-=20
-     reset_info->flash_base =3D flash_base;
-=20
--    memory_region_allocate_system_memory(phys_ram, NULL, "lm32_evr.sdram",
+-    memory_region_allocate_system_memory(&s->ddr_ram, NULL, "ddr-ram",
 -                                         ram_size);
--    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
-+    memory_region_add_subregion(address_space_mem, ram_base, machine->ram)=
-;
+-
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc=
+),
+                             TYPE_XLNX_ZYNQMP, &error_abort, NULL);
 =20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     /* Spansion S29NS128P */
-@@ -144,7 +149,7 @@ static void lm32_evr_init(MachineState *machine)
-=20
-         if (kernel_size < 0) {
-             kernel_size =3D load_image_targphys(kernel_filename, ram_base,
--                                              ram_size);
-+                                              machine->ram_size);
-             reset_info->bootstrap_pc =3D ram_base;
-         }
-=20
-@@ -159,6 +164,7 @@ static void lm32_evr_init(MachineState *machine)
-=20
- static void lm32_uclinux_init(MachineState *machine)
- {
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     const char *initrd_filename =3D machine->initrd_filename;
-@@ -166,18 +172,23 @@ static void lm32_uclinux_init(MachineState *machine)
-     CPULM32State *env;
-     DriveInfo *dinfo;
-     MemoryRegion *address_space_mem =3D  get_system_memory();
--    MemoryRegion *phys_ram =3D g_new(MemoryRegion, 1);
-     qemu_irq irq[32];
-     HWSetup *hw;
-     ResetInfo *reset_info;
-     int i;
-=20
-+    if (machine->ram_size !=3D mc->default_ram_size) {
-+        char *sz =3D size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-+
-     /* memory map */
-     hwaddr flash_base   =3D 0x04000000;
-     size_t flash_sector_size        =3D 256 * KiB;
-     size_t flash_size               =3D 32 * MiB;
-     hwaddr ram_base     =3D 0x08000000;
--    size_t ram_size                 =3D 64 * MiB;
-     hwaddr uart0_base   =3D 0x80000000;
-     hwaddr timer0_base  =3D 0x80002000;
-     hwaddr timer1_base  =3D 0x80010000;
-@@ -200,9 +211,7 @@ static void lm32_uclinux_init(MachineState *machine)
-=20
-     reset_info->flash_base =3D flash_base;
-=20
--    memory_region_allocate_system_memory(phys_ram, NULL,
--                                         "lm32_uclinux.sdram", ram_size);
--    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
-+    memory_region_add_subregion(address_space_mem, ram_base, machine->ram)=
-;
-=20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     /* Spansion S29NS128P */
-@@ -238,7 +247,7 @@ static void lm32_uclinux_init(MachineState *machine)
-=20
-         if (kernel_size < 0) {
-             kernel_size =3D load_image_targphys(kernel_filename, ram_base,
--                                              ram_size);
-+                                              machine->ram_size);
-             reset_info->bootstrap_pc =3D ram_base;
-         }
-=20
-@@ -252,7 +261,7 @@ static void lm32_uclinux_init(MachineState *machine)
-     hw =3D hwsetup_init();
-     hwsetup_add_cpu(hw, "LM32", 75000000);
-     hwsetup_add_flash(hw, "flash", flash_base, flash_size);
--    hwsetup_add_ddr_sdram(hw, "ddr_sdram", ram_base, ram_size);
-+    hwsetup_add_ddr_sdram(hw, "ddr_sdram", ram_base, machine->ram_size);
-     hwsetup_add_timer(hw, "timer0", timer0_base, timer0_irq);
-     hwsetup_add_timer(hw, "timer1_dev_only", timer1_base, timer1_irq);
-     hwsetup_add_timer(hw, "timer2_dev_only", timer2_base, timer2_irq);
-@@ -288,6 +297,8 @@ static void lm32_evr_class_init(ObjectClass *oc, void *=
-data)
-     mc->init =3D lm32_evr_init;
-     mc->is_default =3D 1;
-     mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
-+    mc->default_ram_size =3D 64 * MiB;
-+    mc->default_ram_id =3D "lm32_evr.sdram";
+-    object_property_set_link(OBJECT(&s->soc), OBJECT(&s->ddr_ram),
++    object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
+                          "ddr-ram", &error_abort);
+     object_property_set_bool(OBJECT(&s->soc), s->secure, "secure",
+                              &error_fatal);
+@@ -211,6 +207,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass =
+*oc, void *data)
+     mc->ignore_memory_transaction_failures =3D true;
+     mc->max_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+     mc->default_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS;
++    mc->default_ram_id =3D "ddr-ram";
  }
 =20
- static const TypeInfo lm32_evr_type =3D {
-@@ -304,6 +315,8 @@ static void lm32_uclinux_class_init(ObjectClass *oc, vo=
-id *data)
-     mc->init =3D lm32_uclinux_init;
-     mc->is_default =3D 0;
-     mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
-+    mc->default_ram_size =3D 64 * MiB;
-+    mc->default_ram_id =3D "lm32_uclinux.sdram";
- }
-=20
- static const TypeInfo lm32_uclinux_type =3D {
+ static const TypeInfo xlnx_zcu102_machine_init_typeinfo =3D {
 --=20
 2.7.4
 
