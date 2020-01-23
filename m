@@ -2,79 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF58C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 726DDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52E5A2253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:42:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E5A2253D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3DF8B2253D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:43:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQ9qIC/Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DF8B2253D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuasg-00068I-2C
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:42:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34691)
+	id 1iuatE-0006ym-S4
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:43:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iuar4-0004mY-Id
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:00 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuarH-0004wK-Ol
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iuar3-0003fm-29
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:40:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34802)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iuar2-0003fN-Sp
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:40:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iuar1-0003dO-F1
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:40:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6FD262E80CE
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:40:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jan 2020 11:34:30 -0000
-From: Frank Heimes <1859656@bugs.launchpad.net>
+ (envelope-from <imammedo@redhat.com>) id 1iuarG-0003om-L6
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54032
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuarG-0003oY-Ig
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579779670;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FaOaicH6bRk3FSp2iZu1SQpC36iDD1sE8fB/0bIEj+k=;
+ b=MQ9qIC/ZOHdKOJqZUOcbxZds5SCHSy2rzcskyOiqJ0hd4zeWN64D5tu0KdIcAEYbWhje9y
+ Hcqm7xteipk7JQ+m97WRlfkRX/E5Edd6lR9LK9PyyJ5QFTM+eNmJrC7eXFnSHkyheIiQN/
+ bh/zG9GnTmEnjT1g9HzQEerIgJcZAZ0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-P8KuJChRNuuZgfhL-RHpvA-1; Thu, 23 Jan 2020 06:41:08 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFEB18010E0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:41:07 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D844F10016E8;
+ Thu, 23 Jan 2020 11:41:06 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=maas; status=New; importance=Undecided;
- assignee=lee.trager@canonical.com; 
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
- assignee=maas; 
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fheimes ltrager paelzer sfeole
-X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
-X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
-References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <157977927077.4717.3663394926831163556.malone@soybean.canonical.com>
-Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
- initial deploy
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 319e728340cd7dfbf493add17a2166db36a52377
+Subject: [PATCH REPOST v3 02/80] machine: introduce memory-backend property
+Date: Thu, 23 Jan 2020 12:37:27 +0100
+Message-Id: <1579779525-20065-3-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: P8KuJChRNuuZgfhL-RHpvA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,155 +84,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
+Cc: pbonzini@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I took the time and recreated a MAAS setup (latest stable 2.2) on s390x and=
- it looks like this:
-- I could start a deployment and ran through the states:
-   - Power On, Commissioning (Performing PXE boot)
-   - Power On, Commissioning (Gathering Information)
-   - Power On, Ready
-   - Power Off, Ready
-  (I may have have missed some states in between.)
-- Power Off, Ready is the final state at that point
-  and on the console it's:
-$ virsh list --all
- Id    Name                           State
-----------------------------------------------------
- -     vm1                            shut off
-- xml VM definition is:
-$ virsh dumpxml vm1
-<domain type=3D'kvm'>
-  <name>vm1</name>
-  <uuid>0f7d1d61-9368-4bfe-8c65-c709e90e8780</uuid>
-  <memory unit=3D'KiB'>1048576</memory>
-  <currentMemory unit=3D'KiB'>1048576</currentMemory>
-  <vcpu placement=3D'static'>1</vcpu>
-  <os>
-    <type arch=3D's390x' machine=3D's390-ccw-virtio-bionic'>hvm</type>
-    <boot dev=3D'network'/>
-    <boot dev=3D'hd'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-  </features>
-  <clock offset=3D'utc'/>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>destroy</on_crash>
-  <devices>
-    <emulator>/usr/bin/kvm</emulator>
-    <disk type=3D'file' device=3D'disk'>
-      <driver name=3D'qemu' type=3D'raw'/>
-      <source file=3D'/var/lib/libvirt/maas-images/6addbfeb-ff2c-4350-b34d-=
-11a56ea34f1d'/>
-      <target dev=3D'vda' bus=3D'virtio'/>
-      <serial>6addbfeb-ff2c-4350-b34d-11a56ea34f1d</serial>
-      <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0002'/>
-    </disk>
-    <interface type=3D'network'>
-      <mac address=3D'52:54:00:ea:11:5f'/>
-      <source network=3D'default'/>
-      <model type=3D'virtio'/>
-      <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0001'/>
-    </interface>
-    <console type=3D'pty'>
-      <log file=3D'/var/log/libvirt/qemu/vm1-serial0.log' append=3D'off'/>
-      <target type=3D'sclp' port=3D'0'/>
-    </console>
-    <memballoon model=3D'virtio'>
-      <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0000'/>
-    </memballoon>
-    <panic model=3D's390'/>
-  </devices>
-</domain>
+Property will contain link to memory backend that will be
+used for backing initial RAM.
+Follow up commit will alias -mem-path and -mem-prealloc
+CLI options into memory backend options to make memory
+handling consistent (using only hostmem backend family
+for guest RAM allocation).
 
-So it largely looks like assumed (after initially reading the bug),
-PXE itself seems to work, but the boot issue it due to:
-    <boot dev=3D'network'/>
-    <boot dev=3D'hd'/>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v3:
+ * rename property name from ram-memdev to memory-backend
+   (Paolo Bonzini <pbonzini@redhat.com>)
 
-That confirms the situation (on s390x and MAAS 2.6.2)m but it still
-raises the question why it seem to have worked with 2.6.0?
+CC: ehabkost@redhat.com
+CC: pbonzini@redhat.com
+---
+ include/hw/boards.h | 2 ++
+ hw/core/machine.c   | 9 +++++++++
+ 2 files changed, 11 insertions(+)
 
--- =
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index fb1b43d..6aa01b8 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -4,6 +4,7 @@
+ #define HW_BOARDS_H
+=20
+ #include "exec/memory.h"
++#include "sysemu/hostmem.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/accel.h"
+ #include "qapi/qapi-types-machine.h"
+@@ -285,6 +286,7 @@ struct MachineState {
+     bool enforce_config_section;
+     bool enable_graphics;
+     char *memory_encryption;
++    HostMemoryBackend *ram_memdev;
+     DeviceMemoryState *device_memory;
+=20
+     ram_addr_t ram_size;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 3e288bf..bf30183 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -886,6 +886,15 @@ static void machine_initfn(Object *obj)
+                                         "Table (HMAT)", NULL);
+     }
+=20
++    object_property_add_link(obj, "memory-backend", TYPE_MEMORY_BACKEND,
++                             (Object **)&ms->ram_memdev,
++                             object_property_allow_set_link,
++                             OBJ_PROP_LINK_STRONG, &error_abort);
++    object_property_set_description(obj, "memory-backend",
++                                    "Set RAM backend"
++                                    "Valid value is ID of hostmem based ba=
+ckend",
++                                     &error_abort);
++
+     /* Register notifier when init is done for sysbus sanity checks */
+     ms->sysbus_notifier.notify =3D machine_init_notify;
+     qemu_add_machine_init_done_notifier(&ms->sysbus_notifier);
+--=20
+2.7.4
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859656
-
-Title:
-  [2.6] Unable to reboot s390x KVM machine after initial deploy
-
-Status in MAAS:
-  New
-Status in QEMU:
-  Incomplete
-Status in Ubuntu on IBM z Systems:
-  Triaged
-
-Bug description:
-  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
-  Arch: S390x
-
-  Appears that MAAS can not find the s390x bootloader to boot from the
-  disk, not sure how maas determines this.  However this was working in
-  the past. I had originally thought that if the maas machine was
-  deployed then it defaulted to boot from disk.
-
-  If I force the VM to book from disk, the VM starts up as expected.
-
-  Reproduce:
-
-  - Deploy Disco on S390x KVM instance
-  - Reboot it
-
-  on the KVM console...
-
-  Connected to domain s2lp6g001
-  Escape character is ^]
-  done
-  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
-  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
-  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
-  Trying pxelinux.cfg files...
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  Failed to load OS from network
-
-  =3D=3D> /var/log/maas/rackd.log <=3D=3D
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
-0x.bin requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
-5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-1-52-54-00-e5-d7-bb requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA0 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64B requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF6 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-A requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
- requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
-efault requested by 10.246.75.160
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
 
