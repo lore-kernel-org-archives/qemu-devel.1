@@ -2,81 +2,86 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2ACC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0352AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:53:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E233D20718
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:52:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C707920718
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 17:53:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bxe0gm8m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E233D20718
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ywwETYnz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C707920718
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iugeV-0007Hr-DI
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:52:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35202)
+	id 1iugfl-0000hV-H7
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 12:53:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48477)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iudcR-0001jq-D2
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:38:04 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRl-0000Ux-KW
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iudcQ-0002R2-3j
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:38:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22190
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iudcQ-0002QS-01
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:38:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579790281;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZEOJ4hHDlpjG53G0NmYTegfHo15aL+AiedS0R0mF8Fw=;
- b=Bxe0gm8mjkIKV3ZNOu/ss840mDvGrYOASAG1+ONtuZ2jB2kST21dpCbkdH/yZO31rF9P+D
- UFErHbllAzPwriQRbOKuBrIWz+cDoK3Vv9xZiOuXYx6HD118+Q2pngMitD+aaMrXU3YCKq
- kLbB7I9C/e+sK5mjAcAaiuse+cGGzMM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-6OfRk62_Nb-FACkmJUQTyw-1; Thu, 23 Jan 2020 09:37:58 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01098107ACC4;
- Thu, 23 Jan 2020 14:37:57 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 032FE86810;
- Thu, 23 Jan 2020 14:37:55 +0000 (UTC)
-Date: Thu, 23 Jan 2020 15:37:53 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH REPOST v3 20/80] arm/mps2-tz: use memdev for RAM
-Message-ID: <20200123143753.5thh23czkypa76sh@kamzik.brq.redhat.com>
-References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
- <1579779525-20065-21-git-send-email-imammedo@redhat.com>
- <20200123125909.p2aq3ad2x5l24zq5@kamzik.brq.redhat.com>
- <20200123143948.4ef7b702@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRj-0003xr-Vr
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:05 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34328)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iueRj-0003vc-PL
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:31:03 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t2so3586228wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:31:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=o4xSgx2m35zUuP+7sJH7VCULByapC4KhuLB9uUeF7Ow=;
+ b=ywwETYnzr/RN6Ud+RLG8i4NbvraIIeDSjbmLN82lnjEGCyiF0ouZRfZfIel84lE/1q
+ L1csCvZ1QbZYdcZ7EIk6GHY0eAFwbgLyvxXK9hcec94tcTCForEHIOpU3ZcCb6Dhk4tz
+ q/JklHRObWqFCIDGA+fUckMPhiBUg2/xxY6Vf2omO7ZBhJQvDr2pufkZ4FV1pPajfMZj
+ FMXDWaNDiULAuqtKmYHoOyMhtV8cBrXE6kaxJOksXuTtuHzQ5E80K+mJDy80Hqk5+5Zq
+ jzMBVW2p5NGe1JpCRB4OXnR7u5SvFRJYnwZGPu+stIvHvymP1pQEHqISJtwqhhwghMs5
+ QW/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=o4xSgx2m35zUuP+7sJH7VCULByapC4KhuLB9uUeF7Ow=;
+ b=uL98+DLAwhmh0dsmagS+OJl3ftVDp622rVkCK4Gd8Lm1+fqlEwQrQ31bD9N1c2K2qA
+ FSWNvTc8y7a4Myr4ms7zg81arkRjw6uGu0N1H2VwMjITmyYuCEeT99OgMqLsMtsBB+qj
+ L3HSJyP9P5/62kPO2rQvDIwlef1GoOtvTYzSaod86O4xKe6hOH604bAiQrA4mBBYl2Ju
+ E/gOcCisj4KT5Qgn5wlysnSZGp+xF239Bdc+YWqypyNXMUjMuDLCHvXex0o04E+6Zh1+
+ 5NXuPHwq8dzhLpRYX1BGGlYWmyOsrEoJBD/LsCHQECD/2RRp2FpnwD84GJ4Njk+H8Zid
+ OJBA==
+X-Gm-Message-State: APjAAAXBtcnFbo9VIXev5RkOH4XbMIjdPRkj7WKr45riQIoIHp2M/tMD
+ 9tT6hCJreENmR7CqXIF8FkxIF2KxXIUFNg==
+X-Google-Smtp-Source: APXvYqy9pOmxSNxVk36Bh76kznSZXaDbRyt0tJzhOPt+BfKnZYEwiMsLYC7y2TWOYlqk18MeZbrU9w==
+X-Received: by 2002:adf:b648:: with SMTP id i8mr18076969wre.91.1579793461680; 
+ Thu, 23 Jan 2020 07:31:01 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s139sm2903592wme.35.2020.01.23.07.31.00
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 07:31:01 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 17/20] hw/char/exynos4210_uart: Implement post_load function
+Date: Thu, 23 Jan 2020 15:30:38 +0000
+Message-Id: <20200123153041.4248-18-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123153041.4248-1-peter.maydell@linaro.org>
+References: <20200123153041.4248-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200123143948.4ef7b702@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 6OfRk62_Nb-FACkmJUQTyw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,114 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 23, 2020 at 02:39:48PM +0100, Igor Mammedov wrote:
-> On Thu, 23 Jan 2020 13:59:09 +0100
-> Andrew Jones <drjones@redhat.com> wrote:
->=20
-> > On Thu, Jan 23, 2020 at 12:37:45PM +0100, Igor Mammedov wrote:
-> > > memory_region_allocate_system_memory() API is going away, so
-> > > replace it with memdev allocated MemoryRegion. The later is
-> > > initialized by generic code, so board only needs to opt in
-> > > to memdev scheme by providing
-> > >   MachineClass::default_ram_id
-> > > and using MachineState::ram instead of manually initializing
-> > > RAM memory region.
-> > >=20
-> > > PS:
-> > >  while at it add check for user supplied RAM size and error
-> > >  out if it mismatches board expected value.
-> > >=20
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > > v2:
-> > >   * fix format string causing build failure on 32-bit host
-> > >     (Philippe Mathieu-Daud=E9 <philmd@redhat.com>)
-> > >=20
-> > > CC: drjones@redhat.com
-> > > CC: peter.maydell@linaro.org
-> > > CC: qemu-arm@nongnu.org
-> > > ---
-> > >  hw/arm/mps2-tz.c | 15 +++++++++++----
-> > >  1 file changed, 11 insertions(+), 4 deletions(-)
-> > >=20
-> > > diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-> > > index f8b620b..06dacf6 100644
-> > > --- a/hw/arm/mps2-tz.c
-> > > +++ b/hw/arm/mps2-tz.c
-> > > @@ -39,6 +39,7 @@
-> > > =20
-> > >  #include "qemu/osdep.h"
-> > >  #include "qemu/units.h"
-> > > +#include "qemu/cutils.h"
-> > >  #include "qapi/error.h"
-> > >  #include "qemu/error-report.h"
-> > >  #include "hw/arm/boot.h"
-> > > @@ -79,7 +80,6 @@ typedef struct {
-> > >      MachineState parent;
-> > > =20
-> > >      ARMSSE iotkit;
-> > > -    MemoryRegion psram;
-> > >      MemoryRegion ssram[3];
-> > >      MemoryRegion ssram1_m;
-> > >      MPS2SCC scc;
-> > > @@ -388,6 +388,13 @@ static void mps2tz_common_init(MachineState *mac=
-hine)
-> > >          exit(1);
-> > >      }
-> > > =20
-> > > +    if (machine->ram_size !=3D mc->default_ram_size) {
-> > > +        char *sz =3D size_to_str(mc->default_ram_size);
-> > > +        error_report("Invalid RAM size, should be %s", sz);
-> > > +        g_free(sz);
-> > > +        exit(EXIT_FAILURE);
-> > > +    }
-> > > +
-> > >      sysbus_init_child_obj(OBJECT(machine), "iotkit", &mms->iotkit,
-> > >                            sizeof(mms->iotkit), mmc->armsse_type);
-> > >      iotkitdev =3D DEVICE(&mms->iotkit);
-> > > @@ -458,9 +465,7 @@ static void mps2tz_common_init(MachineState *mach=
-ine)
-> > >       * tradeoffs. For QEMU they're all just RAM, though. We arbitrar=
-ily
-> > >       * call the 16MB our "system memory", as it's the largest lump.
-> > >       */
-> > > -    memory_region_allocate_system_memory(&mms->psram,
-> > > -                                         NULL, "mps.ram", 16 * MiB);
-> > > -    memory_region_add_subregion(system_memory, 0x80000000, &mms->psr=
-am);
-> > > +    memory_region_add_subregion(system_memory, 0x80000000, machine->=
-ram);
-> > > =20
-> > >      /* The overflow IRQs for all UARTs are ORed together.
-> > >       * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
-> > > @@ -642,6 +647,7 @@ static void mps2tz_class_init(ObjectClass *oc, vo=
-id *data)
-> > > =20
-> > >      mc->init =3D mps2tz_common_init;
-> > >      iic->check =3D mps2_tz_idau_check;
-> > > +    mc->default_ram_id =3D "mps.ram";
-> > >  }
-> > > =20
-> > >  static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
-> > > @@ -657,6 +663,7 @@ static void mps2tz_an505_class_init(ObjectClass *=
-oc, void *data)
-> > >      mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-m33");
-> > >      mmc->scc_id =3D 0x41045050;
-> > >      mmc->armsse_type =3D TYPE_IOTKIT;
-> > > +    mc->default_ram_size =3D 16 * MiB; =20
-> >=20
-> > Shouldn't this line be added to mps2tz_class_init ?
->=20
-> Yep, it should be there
+From: Guenter Roeck <linux@roeck-us.net>
 
-With that change you can add my r-b.
+After restoring a VM, serial parameters need to be updated to reflect
+restored register values. Implement a post_load function to handle this
+situation.
 
-Thanks,
-drew
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Message-id: 20200123052540.6132-6-linux@roeck-us.net
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/char/exynos4210_uart.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
+index b3199df865e..6ffbaddfff1 100644
+--- a/hw/char/exynos4210_uart.c
++++ b/hw/char/exynos4210_uart.c
+@@ -522,10 +522,20 @@ static void exynos4210_uart_reset(DeviceState *dev)
+     trace_exynos_uart_rxsize(s->channel, s->rx.size);
+ }
+ 
++static int exynos4210_uart_post_load(void *opaque, int version_id)
++{
++    Exynos4210UartState *s = (Exynos4210UartState *)opaque;
++
++    exynos4210_uart_update_parameters(s);
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_exynos4210_uart_fifo = {
+     .name = "exynos4210.uart.fifo",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .post_load = exynos4210_uart_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(sp, Exynos4210UartFIFO),
+         VMSTATE_UINT32(rp, Exynos4210UartFIFO),
+-- 
+2.20.1
 
 
