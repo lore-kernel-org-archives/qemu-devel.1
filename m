@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB6CC33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A156AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BD372087E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:26:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A6892077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:26:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcRX10YG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD372087E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LnEfY2DL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6892077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudQr-0002Sh-7H
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:26:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41512)
+	id 1iudRV-0003BT-9i
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:26:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAW-000471-Jl
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:05 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iubAf-0004EE-QI
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAR-0006K6-8F
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:04 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51206
+ (envelope-from <dgilbert@redhat.com>) id 1iubAd-0006Z2-O0
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:13 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60561
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAR-0006Fa-1R
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:59 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAb-0006Wq-Uu
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780855;
+ s=mimecast20190719; t=1579780869;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xr5sJDBg9ZhH2lRGDj6MS3ljeG8AkiArnkJCqI0i0Aw=;
- b=gcRX10YGwowBfwxUcB1mqESpZQIvbrRo+zo6pRQ9GfsS6gHcdjJlpBM9+L5/8+CgNTJpCq
- SOxrolI3cfL6+vPVL41ksKitWQW6oSKm1YWHjhEPL7BoJhrlKDCHZ16cu3gQMykYZRNp8M
- KHFvKEZtZduRb7uenKDq9Aadlol0RXk=
+ bh=R2MWWHSa3gJDszL7gAVY1SstmCYyEN2FqLUtV3/R3cc=;
+ b=LnEfY2DLkyvcgPEpauLaUso5rDEwYGTlNAXYFfPL3OWUxPglg0XdDfFHyxGtUVvpTrNM6Q
+ JXqOmX1/H/5WRxc8KgGJT9WvPH4lLyiDtMurYz3PRNMiTikh9KO90pmSCxMsBNEqLQDfMm
+ a0wBblqJ86cp7nmvz5WX6Cyf2HZVQzQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-SKHJeMJoO8W-vydXHtBJNg-1; Thu, 23 Jan 2020 07:00:50 -0500
+ us-mta-131-x7_OP1YbOiSokjvwNwDXvA-1; Thu, 23 Jan 2020 07:01:07 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11626800D4C
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:00:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98A9B1005510
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:06 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5400F85754;
- Thu, 23 Jan 2020 12:00:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D473A85754;
+ Thu, 23 Jan 2020 12:01:05 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 083/111] virtiofsd: Prevent multiply running with same
- vhost_user_socket
-Date: Thu, 23 Jan 2020 11:58:13 +0000
-Message-Id: <20200123115841.138849-84-dgilbert@redhat.com>
+Subject: [PULL 098/111] virtiofsd: convert more fprintf and perror to use fuse
+ log infra
+Date: Thu, 23 Jan 2020 11:58:28 +0000
+Message-Id: <20200123115841.138849-99-dgilbert@redhat.com>
 In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
 References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: SKHJeMJoO8W-vydXHtBJNg-1
+X-MC-Unique: x7_OP1YbOiSokjvwNwDXvA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -91,130 +91,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+From: Eryu Guan <eguan@linux.alibaba.com>
 
-virtiofsd can run multiply even if the vhost_user_socket is same path.
-
-  ]# ./virtiofsd -o vhost_user_socket=3D/tmp/vhostqemu -o source=3D/tmp/sha=
-re &
-  [1] 244965
-  virtio_session_mount: Waiting for vhost-user socket connection...
-  ]# ./virtiofsd -o vhost_user_socket=3D/tmp/vhostqemu -o source=3D/tmp/sha=
-re &
-  [2] 244966
-  virtio_session_mount: Waiting for vhost-user socket connection...
-  ]#
-
-The user will get confused about the situation and maybe the cause of the
-unexpected problem. So it's better to prevent the multiple running.
-
-Create a regular file under localstatedir directory to exclude the
-vhost_user_socket. To create and lock the file, use qemu_write_pidfile()
-because the API has some sanity checks and file lock.
-
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  Applied fixes from Stefan's review and moved osdep include
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/fuse_lowlevel.c |  1 +
- tools/virtiofsd/fuse_virtio.c   | 49 ++++++++++++++++++++++++++++++++-
- 2 files changed, 49 insertions(+), 1 deletion(-)
+ tools/virtiofsd/fuse_signals.c | 7 +++++--
+ tools/virtiofsd/helper.c       | 9 ++++++---
+ 2 files changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index 440508a6ec..aac282f278 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -18,6 +18,7 @@
-=20
- #include <assert.h>
- #include <errno.h>
-+#include <glib.h>
- #include <limits.h>
- #include <stdbool.h>
- #include <stddef.h>
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index e7bd772805..b7948def27 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -13,11 +13,12 @@
-=20
- #include "qemu/osdep.h"
- #include "qemu/iov.h"
--#include "fuse_virtio.h"
-+#include "qapi/error.h"
+diff --git a/tools/virtiofsd/fuse_signals.c b/tools/virtiofsd/fuse_signals.=
+c
+index dc7c8ac025..f18625b6e2 100644
+--- a/tools/virtiofsd/fuse_signals.c
++++ b/tools/virtiofsd/fuse_signals.c
+@@ -12,6 +12,7 @@
  #include "fuse_i.h"
- #include "standard-headers/linux/fuse.h"
- #include "fuse_misc.h"
- #include "fuse_opt.h"
-+#include "fuse_virtio.h"
+ #include "fuse_lowlevel.h"
 =20
- #include <assert.h>
- #include <errno.h>
-@@ -743,6 +744,42 @@ int virtio_loop(struct fuse_session *se)
-     return 0;
- }
++#include <errno.h>
+ #include <signal.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -47,13 +48,15 @@ static int set_one_signal_handler(int sig, void (*handl=
+er)(int), int remove)
+     sa.sa_flags =3D 0;
 =20
-+static void strreplace(char *s, char old, char new)
-+{
-+    for (; *s; ++s) {
-+        if (*s =3D=3D old) {
-+            *s =3D new;
-+        }
-+    }
-+}
-+
-+static bool fv_socket_lock(struct fuse_session *se)
-+{
-+    g_autofree gchar *sk_name =3D NULL;
-+    g_autofree gchar *pidfile =3D NULL;
-+    g_autofree gchar *dir =3D NULL;
-+    Error *local_err =3D NULL;
-+
-+    dir =3D qemu_get_local_state_pathname("run/virtiofsd");
-+
-+    if (g_mkdir_with_parents(dir, S_IRWXU) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "%s: Failed to create directory %s: %s",
-+                 __func__, dir, strerror(errno));
-+        return false;
-+    }
-+
-+    sk_name =3D g_strdup(se->vu_socket_path);
-+    strreplace(sk_name, '/', '.');
-+    pidfile =3D g_strdup_printf("%s/%s.pid", dir, sk_name);
-+
-+    if (!qemu_write_pidfile(pidfile, &local_err)) {
-+        error_report_err(local_err);
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- static int fv_create_listen_socket(struct fuse_session *se)
- {
-     struct sockaddr_un un;
-@@ -758,6 +795,16 @@ static int fv_create_listen_socket(struct fuse_session=
- *se)
+     if (sigaction(sig, NULL, &old_sa) =3D=3D -1) {
+-        perror("fuse: cannot get old signal handler");
++        fuse_log(FUSE_LOG_ERR, "fuse: cannot get old signal handler: %s\n"=
+,
++                 strerror(errno));
          return -1;
      }
 =20
-+    if (!strlen(se->vu_socket_path)) {
-+        fuse_log(FUSE_LOG_ERR, "Socket path is empty\n");
-+        return -1;
-+    }
-+
-+    /* Check the vu_socket_path is already used */
-+    if (!fv_socket_lock(se)) {
-+        return -1;
-+    }
-+
-     /*
-      * Create the Unix socket to communicate with qemu
-      * based on QEMU's vhost-user-bridge
+     if (old_sa.sa_handler =3D=3D (remove ? handler : SIG_DFL) &&
+         sigaction(sig, &sa, NULL) =3D=3D -1) {
+-        perror("fuse: cannot set signal handler");
++        fuse_log(FUSE_LOG_ERR, "fuse: cannot set signal handler: %s\n",
++                 strerror(errno));
+         return -1;
+     }
+     return 0;
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 33749bfcb7..f98d8f2eb2 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -208,7 +208,8 @@ int fuse_daemonize(int foreground)
+         char completed;
+=20
+         if (pipe(waiter)) {
+-            perror("fuse_daemonize: pipe");
++            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: pipe: %s\n",
++                     strerror(errno));
+             return -1;
+         }
+=20
+@@ -218,7 +219,8 @@ int fuse_daemonize(int foreground)
+          */
+         switch (fork()) {
+         case -1:
+-            perror("fuse_daemonize: fork");
++            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: fork: %s\n",
++                     strerror(errno));
+             return -1;
+         case 0:
+             break;
+@@ -228,7 +230,8 @@ int fuse_daemonize(int foreground)
+         }
+=20
+         if (setsid() =3D=3D -1) {
+-            perror("fuse_daemonize: setsid");
++            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: setsid: %s\n",
++                     strerror(errno));
+             return -1;
+         }
+=20
 --=20
 2.24.1
 
