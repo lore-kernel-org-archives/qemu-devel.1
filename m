@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8426FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:40:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C33C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:40:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 504F320661
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:40:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3E8F20661
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:40:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fkXNfb8H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504F320661
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAPZf1hc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E8F20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuciX-0001a4-Nk
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:40:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40475)
+	id 1iucit-00028e-JG
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:40:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iub90-0002IC-P2
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:31 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub9D-0002Ye-0u
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iub8z-00057p-BA
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47023
+ (envelope-from <dgilbert@redhat.com>) id 1iub9B-0005Gh-KZ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32381
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub8z-00057R-7V
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:29 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub9B-0005Ga-GN
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780768;
+ s=mimecast20190719; t=1579780781;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lj9ybDQyvN3fBqhUPDkPLVFN9fpotOGLEAZ1wOYsfuk=;
- b=fkXNfb8H9tN+U0l/GtMTlGNqnY4xBt3Hjxe/T5947LbgOHSij3IPu7fEKFtXMg63Ken4Os
- hwoI+MKwwUfRtgBUEz5GNJq7/62FtHVXT2Elny9Qv5qs9LqDvMCVZlqhgcdMQ+AIaWUazn
- 2Iq7EM4vOf01q4860Ulpiat1aT2SchE=
+ bh=a7J2d+/qEC/4s8KwV2sf+Fq1jzRcegakEDeWcp+uogY=;
+ b=cAPZf1hcn3FHW89NW3xvymo8hP3bdNtTXDJTVaKKuX1lF9TdT8TWthG5aGivXA2iq60/Zq
+ +ell7VjxB5lkVWfUdTYVRhgfg1RXgfA/CVtNjGc2WcxsgLtgvl2Cw2n4ShhDsM7LShhb1h
+ M7yL64D/WChvTsf5eTOwpM97PNdBG0U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-2kWfQZWEMPmG7r4UG4AMOg-1; Thu, 23 Jan 2020 06:59:27 -0500
+ us-mta-165-hyByOBv5NdS99EEuVWn79g-1; Thu, 23 Jan 2020 06:59:39 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CA8B8010C9
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F0BA477
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:38 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A45841CB;
- Thu, 23 Jan 2020 11:59:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AF84A1CB;
+ Thu, 23 Jan 2020 11:59:37 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 032/111] virtiofsd: add --print-capabilities option
-Date: Thu, 23 Jan 2020 11:57:22 +0000
-Message-Id: <20200123115841.138849-33-dgilbert@redhat.com>
+Subject: [PULL 044/111] virtiofsd: validate input buffer sizes in
+ do_write_buf()
+Date: Thu, 23 Jan 2020 11:57:34 +0000
+Message-Id: <20200123115841.138849-45-dgilbert@redhat.com>
 In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
 References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 2kWfQZWEMPmG7r4UG4AMOg-1
+X-MC-Unique: hyByOBv5NdS99EEuVWn79g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,106 +93,127 @@ Sender: "Qemu-devel"
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Add the --print-capabilities option as per vhost-user.rst "Backend
-programs conventions".  Currently there are no advertised features.
+There is a small change in behavior: if fuse_write_in->size doesn't
+match the input buffer size then the request is failed.  Previously
+write requests with 1 fuse_buf element would truncate to
+fuse_write_in->size.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- docs/interop/vhost-user.json     |  4 +++-
- tools/virtiofsd/fuse_lowlevel.h  |  1 +
- tools/virtiofsd/helper.c         |  2 ++
- tools/virtiofsd/passthrough_ll.c | 12 ++++++++++++
- 4 files changed, 18 insertions(+), 1 deletion(-)
+ tools/virtiofsd/fuse_lowlevel.c | 49 ++++++++++++++++++++-------------
+ 1 file changed, 30 insertions(+), 19 deletions(-)
 
-diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-index ce0ef74db5..ef8ac5941f 100644
---- a/docs/interop/vhost-user.json
-+++ b/docs/interop/vhost-user.json
-@@ -31,6 +31,7 @@
- # @rproc-serial: virtio remoteproc serial link
- # @scsi: virtio scsi
- # @vsock: virtio vsock transport
-+# @fs: virtio fs (since 4.2)
- #
- # Since: 4.0
- ##
-@@ -50,7 +51,8 @@
-       'rpmsg',
-       'rproc-serial',
-       'scsi',
--      'vsock'
-+      'vsock',
-+      'fs'
-   ]
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 7e10995adc..611e8b0354 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -1003,8 +1003,8 @@ static void do_write(fuse_req_t req, fuse_ino_t nodei=
+d, const void *inarg)
+     }
  }
 =20
-diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowleve=
-l.h
-index f6b34700af..0d61df8110 100644
---- a/tools/virtiofsd/fuse_lowlevel.h
-+++ b/tools/virtiofsd/fuse_lowlevel.h
-@@ -1794,6 +1794,7 @@ struct fuse_cmdline_opts {
-     int nodefault_subtype;
-     int show_version;
-     int show_help;
-+    int print_capabilities;
-     unsigned int max_idle_threads;
- };
-=20
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index a3645fc807..b8ec5ac8dc 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -40,6 +40,7 @@ static const struct fuse_opt fuse_helper_opts[] =3D {
-     FUSE_HELPER_OPT("--help", show_help),
-     FUSE_HELPER_OPT("-V", show_version),
-     FUSE_HELPER_OPT("--version", show_version),
-+    FUSE_HELPER_OPT("--print-capabilities", print_capabilities),
-     FUSE_HELPER_OPT("-d", debug),
-     FUSE_HELPER_OPT("debug", debug),
-     FUSE_HELPER_OPT("-d", foreground),
-@@ -135,6 +136,7 @@ void fuse_cmdline_help(void)
+-static void do_write_buf(fuse_req_t req, fuse_ino_t nodeid, const void *in=
+arg,
+-                         struct fuse_bufvec *ibufv)
++static void do_write_buf(fuse_req_t req, fuse_ino_t nodeid,
++                         struct fuse_mbuf_iter *iter, struct fuse_bufvec *=
+ibufv)
  {
-     printf("    -h   --help                print help\n"
-            "    -V   --version             print version\n"
-+           "    --print-capabilities       print vhost-user.json\n"
-            "    -d   -o debug              enable debug output (implies -f=
-)\n"
-            "    -f                         foreground operation\n"
-            "    --daemonize                run in background\n"
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 037c5d7b26..cd27c09f59 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1298,6 +1298,14 @@ static struct fuse_lowlevel_ops lo_oper =3D {
-     .lseek =3D lo_lseek,
- };
+     struct fuse_session *se =3D req->se;
+     struct fuse_bufvec *pbufv =3D ibufv;
+@@ -1012,28 +1012,27 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t=
+ nodeid, const void *inarg,
+         .buf[0] =3D ibufv->buf[0],
+         .count =3D 1,
+     };
+-    struct fuse_write_in *arg =3D (struct fuse_write_in *)inarg;
++    struct fuse_write_in *arg;
++    size_t arg_size =3D sizeof(*arg);
+     struct fuse_file_info fi;
 =20
-+/* Print vhost-user.json backend program capabilities */
-+static void print_capabilities(void)
-+{
-+    printf("{\n");
-+    printf("  \"type\": \"fs\"\n");
-+    printf("}\n");
-+}
+     memset(&fi, 0, sizeof(fi));
 +
- int main(int argc, char *argv[])
- {
-     struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
-@@ -1328,6 +1336,10 @@ int main(int argc, char *argv[])
-         fuse_lowlevel_version();
-         ret =3D 0;
-         goto err_out1;
-+    } else if (opts.print_capabilities) {
-+        print_capabilities();
-+        ret =3D 0;
-+        goto err_out1;
++    arg =3D fuse_mbuf_iter_advance(iter, arg_size);
++    if (!arg) {
++        fuse_reply_err(req, EINVAL);
++        return;
++    }
++
++    fi.lock_owner =3D arg->lock_owner;
++    fi.flags =3D arg->flags;
+     fi.fh =3D arg->fh;
+     fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
+=20
+     if (ibufv->count =3D=3D 1) {
+-        fi.lock_owner =3D arg->lock_owner;
+-        fi.flags =3D arg->flags;
+-        if (!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD)) {
+-            tmpbufv.buf[0].mem =3D PARAM(arg);
+-        }
+-        tmpbufv.buf[0].size -=3D
+-            sizeof(struct fuse_in_header) + sizeof(struct fuse_write_in);
+-        if (tmpbufv.buf[0].size < arg->size) {
+-            fuse_log(FUSE_LOG_ERR,
+-                     "fuse: do_write_buf: buffer size too small\n");
+-            fuse_reply_err(req, EIO);
+-            return;
+-        }
+-        tmpbufv.buf[0].size =3D arg->size;
++        assert(!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD));
++        tmpbufv.buf[0].mem =3D ((char *)arg) + arg_size;
++        tmpbufv.buf[0].size -=3D sizeof(struct fuse_in_header) + arg_size;
+         pbufv =3D &tmpbufv;
+     } else {
+         /*
+@@ -1043,6 +1042,13 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t =
+nodeid, const void *inarg,
+         ibufv->buf[0].size =3D 0;
      }
 =20
-     if (fuse_opt_parse(&args, &lo, lo_opts, NULL) =3D=3D -1) {
++    if (fuse_buf_size(pbufv) !=3D arg->size) {
++        fuse_log(FUSE_LOG_ERR,
++                 "fuse: do_write_buf: buffer size doesn't match arg->size\=
+n");
++        fuse_reply_err(req, EIO);
++        return;
++    }
++
+     se->op.write_buf(req, nodeid, pbufv, arg->offset, &fi);
+ }
+=20
+@@ -2052,12 +2058,17 @@ void fuse_session_process_buf_int(struct fuse_sessi=
+on *se,
+                                   struct fuse_chan *ch)
+ {
+     const struct fuse_buf *buf =3D bufv->buf;
++    struct fuse_mbuf_iter iter =3D FUSE_MBUF_ITER_INIT(buf);
+     struct fuse_in_header *in;
+     const void *inarg;
+     struct fuse_req *req;
+     int err;
+=20
+-    in =3D buf->mem;
++    /* The first buffer must be a memory buffer */
++    assert(!(buf->flags & FUSE_BUF_IS_FD));
++
++    in =3D fuse_mbuf_iter_advance(&iter, sizeof(*in));
++    assert(in); /* caller guarantees the input buffer is large enough */
+=20
+     if (se->debug) {
+         fuse_log(FUSE_LOG_DEBUG,
+@@ -2129,7 +2140,7 @@ void fuse_session_process_buf_int(struct fuse_session=
+ *se,
+=20
+     inarg =3D (void *)&in[1];
+     if (in->opcode =3D=3D FUSE_WRITE && se->op.write_buf) {
+-        do_write_buf(req, in->nodeid, inarg, bufv);
++        do_write_buf(req, in->nodeid, &iter, bufv);
+     } else {
+         fuse_ll_ops[in->opcode].func(req, in->nodeid, inarg);
+     }
 --=20
 2.24.1
 
