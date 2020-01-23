@@ -2,86 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 350ADC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57786C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDBDD21D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21CE121835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rv7YyKkV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDBDD21D7D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqyiUlqv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21CE121835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iueC2-0002GD-IZ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:14:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51322)
+	id 1iueC9-0002Qu-P4
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:14:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrI-0004rf-Ju
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:21 -0500
+ (envelope-from <drjones@redhat.com>) id 1iuc6K-0003st-SR
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:00:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrH-0003GH-IN
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:20 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33236)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrH-0003Eu-AV
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:19 -0500
-Received: by mail-wr1-x444.google.com with SMTP id b6so3192938wrq.0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=eTr7REOAleaAyfl/HuxFmf5p5T5F7PayCyv/OCMj0WQ=;
- b=rv7YyKkVDjJpDA6wkmE/VA+FMWclXUowiWMkryXzuRero5HwlTUvNHMPY24MEjuVXl
- XXMhOhxHB4pWSpMpCSnOv4dVA00Dd3B1lofx8ei5R1S+SrUX5fjLvAx9uyDHivlGy3N1
- TAjpYyXjWSuR5gJ3ejNJxU/qbzPf4bgHfOt1zpKyGqg37Xrw+Ggt0WzAXhMaSYA0YhAY
- m0E5ZNJnBEHd2BX8LPCHybdfnOSPlpldFgz5OZzG7yUZ38GqlwJjOuLtomwCHeS9RxeF
- MVMwNSvXBh4jg6Z3Tyig/F59dB9h3h/7xJh9UX4IvXIO5di2Hc1L2SRySsZpI/pf6EyV
- yDIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=eTr7REOAleaAyfl/HuxFmf5p5T5F7PayCyv/OCMj0WQ=;
- b=cLIlcreyS/J9/bFliDKqEdO6gNvqzajHShnen27utUrmM+shb4wYTYA4wh+QvmdF2p
- oE4hdjxN5tGrSZDRbZwLR8DfHDJXs6IBB1mYorRRb4WlPvvpJ8wGSr+sNCqgmYfh1rSU
- 5PPYFME9EpEqUG3CFJqAKAiC0JjLhV9vJ0OO6PVehdRRY1GBgy/b+/JcTTM+8iRj+QLM
- XYL14nzusuGNfuAwVfgGM2IX9H2dNzad9/XGD1RjSdBPA0jL+A6m6sgzGqjm/FXZ34Ep
- PGJ9sJOnfR97+ZNnGEwEEw7vXP3bwW3hfmtntvgtgpuB3/oAHjLX4Ng554lXFekCVqMb
- BK7A==
-X-Gm-Message-State: APjAAAW7ki9U0h5hVCfbytdvhT7nJ3cZ1PZWyt/L48nZ0RDHJ5DFEnQc
- QVE934495bYRLp/YV5Gt39ET9mcK
-X-Google-Smtp-Source: APXvYqwfqD1KgnmTr1Cnzw25AFVZMF0V8tdquqWZbYWFga/U9aIg4PtVJGqKsEUXyIe46jkhRhK7tw==
-X-Received: by 2002:adf:f581:: with SMTP id f1mr17815471wro.264.1579787358106; 
- Thu, 23 Jan 2020 05:49:18 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.16
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:17 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 13/59] Makefile: Clarify all the codebase requires qom/ objects
-Date: Thu, 23 Jan 2020 14:48:16 +0100
-Message-Id: <1579787342-27146-14-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+ (envelope-from <drjones@redhat.com>) id 1iuc6J-0006zQ-Nr
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:00:48 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40496
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iuc6J-0006x0-GY
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:00:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579784447;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=m9UPhOnRabdsdLcNcK3PP/8xogz+cYcmH6Xcd3AlmBc=;
+ b=MqyiUlqv8xeOciuTZxMBFLaa6XiH3zpjhmm34jDJ+f7AW99rJWZCQpdRYlqMmLMahGbZzw
+ 2PP0abJ/NgTonUPlEh9Ys/9/sdve0IufYLN0qRVmzkoZhMLjz9esWGV+NhesZw1RH88j+M
+ lvRHlm32FdjkmBUzAjBwko1SP4axkeo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-5oOSJUz-PGuKv4lhWUb0lw-1; Thu, 23 Jan 2020 08:00:45 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09C9A800D4E;
+ Thu, 23 Jan 2020 13:00:44 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 113AF60E3E;
+ Thu, 23 Jan 2020 13:00:42 +0000 (UTC)
+Date: Thu, 23 Jan 2020 14:00:40 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH REPOST v3 21/80] arm/mps2: use memdev for RAM
+Message-ID: <20200123130040.fa5pjoplcmz6nus6@kamzik.brq.redhat.com>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+ <1579779525-20065-22-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <1579779525-20065-22-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 5oOSJUz-PGuKv4lhWUb0lw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,53 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Thu, Jan 23, 2020 at 12:37:46PM +0100, Igor Mammedov wrote:
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>   MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
+>=20
+> PS:
+>  while at it add check for user supplied RAM size and error
+>  out if it mismatches board expected value.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>   * fix format string causing build failure on 32-bit host
+>     (Philippe Mathieu-Daud=E9 <philmd@redhat.com>)
+>=20
+> CC: drjones@redhat.com
+> CC: peter.maydell@linaro.org
+> CC: qemu-arm@nongnu.org
+> ---
+>  hw/arm/mps2.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
 
-QEMU user-mode also requires the qom/ objects, it is not only
-used by "system emulation and qemu-img". As we will use a big
-if() block, move it upper in the "Common libraries for tools
-and emulators" section.
+I don't know anything about mps2, but I promised Igor to put
+another pair of eyes on his changes. Looks fine to me.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200118140619.26333-3-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile.objs | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/Makefile.objs b/Makefile.objs
-index 7c1e50f..5aae561 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -2,6 +2,7 @@
- # Common libraries for tools and emulators
- stub-obj-y = stubs/
- util-obj-y = crypto/ util/ qobject/ qapi/
-+qom-obj-y = qom/
- 
- chardev-obj-y = chardev/
- 
-@@ -27,11 +28,6 @@ block-obj-m = block/
- crypto-obj-y = crypto/
- 
- #######################################################################
--# qom-obj-y is code used by both qemu system emulation and qemu-img
--
--qom-obj-y = qom/
--
--#######################################################################
- # io-obj-y is code used by both qemu system emulation and qemu-img
- 
- io-obj-y = io/
--- 
-1.8.3.1
-
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 
