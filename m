@@ -2,79 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE78C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40EBCC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:13:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B74CD2051A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:12:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09C6E2087E
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:13:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IwVI6n+x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B74CD2051A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EW7trAUz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C6E2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudE1-0001zk-97
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:12:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41354)
+	id 1iudER-0002bH-Ld
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:13:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAS-00041u-C1
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:01 -0500
+ (envelope-from <drjones@redhat.com>) id 1iubn0-0003ou-6C
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAR-0006JE-17
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:00 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59310
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <drjones@redhat.com>) id 1iubmy-0002GJ-Ot
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:40:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45354
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAP-0006B3-E6
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:58 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iubmy-0002Ev-Kd
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:40:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780849;
+ s=mimecast20190719; t=1579783248;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wUAG2fbKAm1QXX7BuOCGgK1HShg22nIR5T+Nv/E/82U=;
- b=IwVI6n+xoxqV/lekfeiApCEV37gDciYjHJrExyj0TKfuckLryxFM7QlP+LQJmYpweDSgH8
- duP0wn0jPj47WMYEO8wgboto5kAmUhGpQopVR7kKCeeDyfX0U7p2pna0EJuwynSA6+Qgu7
- rsxIm5c2xhGRSNzG/TLxRd1szwXXAp8=
+ bh=CeuFK25U9RHqFoRab+T9Ogkit/2+wkjDCN/atYUZSmM=;
+ b=EW7trAUzHUJVIpXuU4IAAf7X8S6Ct/hTVkeSOyC4UrEWiJ1X/GULgSz5I3c8qQrONGNswL
+ Iy8SGXsLVuQffHPkQ0HNpFFDtzJBHghU1PL4+BmP1oXMOEUZY5HsYF8G2H37NkiZ8Sog3h
+ mepdU6XkHYUwQcXbIrgGwA8w5leu770=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-XBp-RtxXNGeqPZqQDm-UkQ-1; Thu, 23 Jan 2020 07:00:47 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-257-gOUWXMsZM1iSXuVPe9pGBQ-1; Thu, 23 Jan 2020 07:40:44 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09D708018A9
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:00:46 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 555A585797;
- Thu, 23 Jan 2020 12:00:45 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 080/111] virtiofsd: cleanup allocated resource in se
-Date: Thu, 23 Jan 2020 11:58:10 +0000
-Message-Id: <20200123115841.138849-81-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-References: <20200123115841.138849-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3A03DB2D;
+ Thu, 23 Jan 2020 12:40:42 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90A4B5C290;
+ Thu, 23 Jan 2020 12:40:41 +0000 (UTC)
+Date: Thu, 23 Jan 2020 13:40:39 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH REPOST v3 15/80] arm/integratorcp: use memdev for RAM
+Message-ID: <20200123124039.iz3pkwh6lm4mnatw@kamzik.brq.redhat.com>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+ <1579779525-20065-16-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: XBp-RtxXNGeqPZqQDm-UkQ-1
+In-Reply-To: <1579779525-20065-16-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: gOUWXMsZM1iSXuVPe9pGBQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,72 +86,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, peter.chubb@nicta.com.au,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Bo <bo.liu@linux.alibaba.com>
+On Thu, Jan 23, 2020 at 12:37:40PM +0100, Igor Mammedov wrote:
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>   MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: drjones@redhat.com
+> CC: peter.chubb@nicta.com.au
+> CC: peter.maydell@linaro.org
+> CC: qemu-arm@nongnu.org
+> ---
+>  hw/arm/integratorcp.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>
 
-This cleans up unfreed resources in se on quiting, including
-se->virtio_dev, se->vu_socket_path, se->vu_socketfd.
+I don't know anything about integratorcp, but I promised Igor to put
+another pair of eyes on his changes. Looks fine to me.
 
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/fuse_lowlevel.c | 7 +++++++
- tools/virtiofsd/fuse_virtio.c   | 7 +++++++
- tools/virtiofsd/fuse_virtio.h   | 2 +-
- 3 files changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index 65f91dabae..440508a6ec 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -2532,6 +2532,13 @@ void fuse_session_destroy(struct fuse_session *se)
-     if (se->fd !=3D -1) {
-         close(se->fd);
-     }
-+
-+    if (se->vu_socket_path) {
-+        virtio_session_close(se);
-+        free(se->vu_socket_path);
-+        se->vu_socket_path =3D NULL;
-+    }
-+
-     free(se);
- }
-=20
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 7a8774a3ee..e7bd772805 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -833,3 +833,10 @@ int virtio_session_mount(struct fuse_session *se)
-=20
-     return 0;
- }
-+
-+void virtio_session_close(struct fuse_session *se)
-+{
-+    close(se->vu_socketfd);
-+    free(se->virtio_dev);
-+    se->virtio_dev =3D NULL;
-+}
-diff --git a/tools/virtiofsd/fuse_virtio.h b/tools/virtiofsd/fuse_virtio.h
-index cc676b9193..111684032c 100644
---- a/tools/virtiofsd/fuse_virtio.h
-+++ b/tools/virtiofsd/fuse_virtio.h
-@@ -19,7 +19,7 @@
- struct fuse_session;
-=20
- int virtio_session_mount(struct fuse_session *se);
--
-+void virtio_session_close(struct fuse_session *se);
- int virtio_loop(struct fuse_session *se);
-=20
-=20
---=20
-2.24.1
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 
