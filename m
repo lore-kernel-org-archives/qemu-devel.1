@@ -2,62 +2,86 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21135C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:16:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 344E3C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:18:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9858206D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:16:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9858206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 02A11206D4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:18:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JEYLxrOD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02A11206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuaSy-0000QM-Qp
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:16:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57600)
+	id 1iuaVH-0001t7-4G
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:18:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58166)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iuaRv-0007nR-8o
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:15:00 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iuaUZ-0001K2-Te
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:17:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iuaRu-0006wf-0P
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:14:59 -0500
-Received: from 17.mo7.mail-out.ovh.net ([188.165.35.227]:43467)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuaRt-0006sO-Q1
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:14:57 -0500
-Received: from player771.ha.ovh.net (unknown [10.108.35.215])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id B97F614C40D
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:13:57 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player771.ha.ovh.net (Postfix) with ESMTPSA id 41727EA0531D;
- Thu, 23 Jan 2020 11:13:53 +0000 (UTC)
-Date: Thu, 23 Jan 2020 12:13:51 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v4 09/11] hw/9pfs/9p-synth: avoid n-square issue in
- synth_readdir()
-Message-ID: <20200123121351.5a0e9516@bahia.lan>
-In-Reply-To: <d385726be4d8146a86561703bc6d77edd39fb654.1579567020.git.qemu_oss@crudebyte.com>
-References: <cover.1579567019.git.qemu_oss@crudebyte.com>
- <d385726be4d8146a86561703bc6d77edd39fb654.1579567020.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <stefanha@gmail.com>) id 1iuaUY-0000Pb-T8
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:17:43 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37892)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iuaUY-0000Oy-NA
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:17:42 -0500
+Received: by mail-wr1-x444.google.com with SMTP id y17so2635900wrh.5
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 03:17:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=sosvvXUpTobKiyKOH6Gi6H3mGnU/RzjOKH5eNYmBrWc=;
+ b=JEYLxrODzolG2OvzuvvLYKzlfo99sN39GT+plgjiU89o+eAx/EfmKJJTNshZbs6uoW
+ Oep0DfGHnLNlnq0xN5e9TueMLTPg4gPFw4wTyyiR8wlQNE30xorKGbTy9GCsFYjziFse
+ YGjGo+9z0HgYz2+ymW1hiw8fdHLZRcrHb5FCnCUY2uwrbq0ptf/XVEWU8GbnjOWvzTmc
+ l7bB9xPmETCz0k2FJIjEUS9qCpFJqbIBZoEAOmXvUG47M4MLwyVhX/8oUQMjacstDi8v
+ cI1eBrfd6hnCTVo0BvS5QUothWPG7fy6ERnAI9YWLfRqV6FPe0MPhIR9v0qwt7ZgO/3o
+ w7Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=sosvvXUpTobKiyKOH6Gi6H3mGnU/RzjOKH5eNYmBrWc=;
+ b=CJe+jGa08v6vBGpeYp/MyyYMaXaJeOIRIuNRHO8hfJDn/fH9SVuWn5GMRx1NIPe1Qb
+ Aaglbjyx2NCoWcReIaS3+BsSvBpKte+i8xsOLt/6ZuvYAC2MskJYPMU3J9lPdqd4kPSg
+ DWaDlluzv78CsP9ebtZ7ODPx9jCkyyoZ48VyiHhqXiLgDSu7ElhDRdR6jRnobN47Jaf0
+ ViNcxawSUFgczTG8YTIaGxpLDvsnjc9mAWfvoMn0geXDnQcGLtj4tIh3iOLUs7XntCh/
+ +3/bG1o2Akn4kLuqRtU7SIzJgq69w+k5zWSi6oaBuE5sczBeyUNx8m7w2zWIlNV8ZrlY
+ 0gow==
+X-Gm-Message-State: APjAAAWXz9ROw5m1aNW2PnZdXxgnVF5vQa45xchDW9v+x/7PCPqwMfa4
+ V19L6L9DtvuRMnpEvN5YbtY=
+X-Google-Smtp-Source: APXvYqzL+8KM3bQuuwKx6QTXWE/8WnjLV2MlsjeLCtQ9aZKVqEq5DSLBaW9bczK9Drs5Zw6nFPaYvQ==
+X-Received: by 2002:adf:fa12:: with SMTP id m18mr16758396wrr.309.1579778261147; 
+ Thu, 23 Jan 2020 03:17:41 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id c4sm2274654wml.7.2020.01.23.03.17.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 03:17:40 -0800 (PST)
+Date: Thu, 23 Jan 2020 11:17:38 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Maintainers, please add Message-Id: when merging patches
+Message-ID: <20200123111738.GA691377@stefanha-x1.localdomain>
+References: <CAJSP0QX22cYJvnpb+zDDXLaYg0yY4CV3Jn5QY+ExxJyFcmQ3Gw@mail.gmail.com>
+ <87v9p3znas.fsf@linaro.org> <871rrqbmr9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9219431389831141696
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddvgddvhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.35.227
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
+Content-Disposition: inline
+In-Reply-To: <871rrqbmr9.fsf@dusky.pond.sub.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,102 +93,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jan 2020 01:26:15 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-> This patch is just a temporary benchmark hack, not intended
-> to be merged!
-> 
-> 9pfs synth driver's readdir() implementation has a severe
-> n-square performance problem. This patch is a quick and dirty
-> hack to prevent that performance problem from tainting the
-> readdir() benchmark results. In its current form, this patch
-> is not useful for anything else than for an isolated readdir
-> benchmark.
-> 
-> NOTE: This patch would break the new readdir/split test,
-> because it would alter the behaviour of seekdir() required
-> for retrieving directory entries splitted over several
-> requests.
-> 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
+--AhhlLboLdkugWU4S
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Honestly it doesn't seem to change anything significant for me.
-Mean time calculated over 100 runs:
+On Thu, Jan 23, 2020 at 09:27:54AM +0100, Markus Armbruster wrote:
+> Alex Benn=E9e <alex.bennee@linaro.org> writes:
+>=20
+> > Stefan Hajnoczi <stefanha@gmail.com> writes:
+> >
+> >> Around 66% of qemu.git commits since v4.1.0 include a Message-Id: tag.=
+  Hooray!
+> >>
+> >> Message-Id: references the patch email that a commit was merged from.
+> >> This information is helpful to anyone wishing to refer back to email
+> >> discussions and patch series.
+> >
+> > So I guess the ones that don't are maintainer originated patches unless
+> > you actively rebuild your trees from a posted series?
+>=20
+> I recommend using the exact same workflow for constructing pull requests
+> whether you wrote the patches yourself or not.
 
-Without this patch:
+Yes, that's the approach I follow too.  I use the 'patches' tool to
+apply patch series, including my own.
 
-[greg@bahia qemu-9p]$ (cd .mbuild-$(stg branch)/obj ; export QTEST_QEMU_BINARY='x86_64-softmmu/qemu-system-x86_64'; make all tests/qtest/qos-test && for i in {1..100}; do tests/qtest/qos-test -p $(tests/qtest/qos-test -l | grep readdir/basic); done) |& awk '/IMPORTANT/ { print $10 }' | sed -e 's/s//' -e 's/^/n+=1;x+=/;$ascale=6;x/n' | bc
-.055654
+It's necessary to get the Revewied-by:, Tested-by:, etc tags squashed in
+automatically anyway.
 
-With this patch:
+Stefan
 
-[greg@bahia qemu-9p]$ (cd .mbuild-$(stg branch)/obj ; export QTEST_QEMU_BINARY='x86_64-softmmu/qemu-system-x86_64'; make all tests/qtest/qos-test && for i in {1..100}; do tests/qtest/qos-test -p $(tests/qtest/qos-test -l | grep readdir/basic); done) |& awk '/IMPORTANT/ { print $10 }' | sed -e 's/s//' -e 's/^/n+=1;x+=/;$ascale=6;x/n' | bc
-.058786
+--AhhlLboLdkugWU4S
+Content-Type: application/pgp-signature; name="signature.asc"
 
->  hw/9pfs/9p-synth.c | 29 ++++++++++++++++++++++++++---
->  1 file changed, 26 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
-> index 7eb210ffa8..54dc30f37b 100644
-> --- a/hw/9pfs/9p-synth.c
-> +++ b/hw/9pfs/9p-synth.c
-> @@ -225,7 +225,8 @@ static void synth_direntry(V9fsSynthNode *node,
->  }
->  
->  static struct dirent *synth_get_dentry(V9fsSynthNode *dir,
-> -                                            struct dirent *entry, off_t off)
-> +                                       struct dirent *entry, off_t off,
-> +                                       V9fsSynthNode **hack)
->  {
->      int i = 0;
->      V9fsSynthNode *node;
-> @@ -243,16 +244,38 @@ static struct dirent *synth_get_dentry(V9fsSynthNode *dir,
->          /* end of directory */
->          return NULL;
->      }
-> +    *hack = node;
->      synth_direntry(node, entry, off);
->      return entry;
->  }
->  
->  static struct dirent *synth_readdir(FsContext *ctx, V9fsFidOpenState *fs)
->  {
-> -    struct dirent *entry;
-> +    struct dirent *entry = NULL;
->      V9fsSynthOpenState *synth_open = fs->private;
->      V9fsSynthNode *node = synth_open->node;
-> -    entry = synth_get_dentry(node, &synth_open->dent, synth_open->offset);
-> +
-> +    /*
-> +     * HACK: This is just intended for benchmark, to avoid severe n-square
-> +     * performance problem of synth driver's readdir implementation here which
-> +     * would otherwise unncessarily taint the benchmark results. By simply
-> +     * caching (globally) the previous node (of the previous synth_readdir()
-> +     * call) we can simply proceed to next node in chained list efficiently.
-> +     *
-> +     * not a good idea for any production code ;-)
-> +     */
-> +    static struct V9fsSynthNode *cachedNode;
-> +
-> +    if (!cachedNode) {
-> +        entry = synth_get_dentry(node, &synth_open->dent, synth_open->offset,
-> +                                 &cachedNode);
-> +    } else {
-> +        cachedNode = cachedNode->sibling.le_next;
-> +        if (cachedNode) {
-> +            entry = &synth_open->dent;
-> +            synth_direntry(cachedNode, entry, synth_open->offset + 1);
-> +        }
-> +    }
->      if (entry) {
->          synth_open->offset++;
->      }
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4pgNIACgkQnKSrs4Gr
+c8jODwf+J+IwEMuRc6V7x/Y8h9JestAAiILBbLPYMBHkKVFu60QgU6vaoGwVJR+Q
+zjf+CcNvi2IjgrtDTfRySeyZgPGYEiw1e8gJy17ateZw6eQMOq2LHhDdybA/YMVW
+rkaeah0onoU7KKL4vVvl2i9A4FC5IkrLXfnRHo4FJCodjC45Kpyut60CHgEHRDow
+EayP5JR6lelaxQQcayGDoNeyojludLH06Mtbueofw5xruAxDcgQKXwBkRcZfuogs
+idslkrh0jyS0YBOHk2uXPt/tp+l/zAT8IYBkYM9//PHJBJHTnt4DxEkC3yCqEqEz
+RfT0XAGq/6BNNxOhtWeq7cUhl3kvqQ==
+=vAQF
+-----END PGP SIGNATURE-----
+
+--AhhlLboLdkugWU4S--
 
