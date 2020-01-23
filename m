@@ -2,57 +2,56 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A688AC32771
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 01:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23140C32771
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 02:39:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D67D21569
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 01:29:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D67D21569
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=qindel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EFC1524673
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 02:39:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFC1524673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuRJQ-00029A-UK
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 20:29:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59607)
+	id 1iuSPI-0007FJ-4B
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jan 2020 21:39:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49739)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <salva@freeso>) id 1iuNKM-0001dA-Hx
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:19 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1iuSOf-0006jK-SP
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 21:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <salva@freeso>) id 1iuNKL-0004Nu-2d
- for qemu-devel@nongnu.org; Wed, 22 Jan 2020 16:14:18 -0500
-Received: from static.96.225.213.82.ibercom.com ([82.213.225.96]:52942
- helo=freeso)
+ (envelope-from <pannengyuan@huawei.com>) id 1iuSOd-0001Zm-98
+ for qemu-devel@nongnu.org; Wed, 22 Jan 2020 21:39:05 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2689 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <salva@freeso>)
- id 1iuNKK-0004Jq-RS; Wed, 22 Jan 2020 16:14:17 -0500
-Received: from freeso (localhost [127.0.0.1])
- by freeso (8.15.2/8.15.2) with ESMTPS id 00MKLQVO017038
- (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
- Wed, 22 Jan 2020 21:21:26 +0100 (CET) (envelope-from salva@freeso)
-Received: (from salva@localhost)
- by freeso (8.15.2/8.15.2/Submit) id 00MKLQWU017037;
- Wed, 22 Jan 2020 21:21:26 +0100 (CET) (envelope-from salva)
-From: salvador@qindel.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH] qemu_set_log_filename: filename argument may be NULL
-Date: Wed, 22 Jan 2020 21:21:25 +0100
-Message-Id: <20200122202125.16993-1-salvador@qindel.com>
-X-Mailer: git-send-email 2.24.1
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1iuSOc-0001W4-Ud; Wed, 22 Jan 2020 21:39:03 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 1D690621789EB8202781;
+ Thu, 23 Jan 2020 10:38:55 +0800 (CST)
+Received: from DESKTOP-9NTIQGG.china.huawei.com (10.173.221.136) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 23 Jan 2020 10:38:48 +0800
+From: <pannengyuan@huawei.com>
+To: <alistair@alistair23.me>, <peter.maydell@linaro.org>
+Subject: [PATCH] stm32f4xx_syscfg: remove redundant code to fix coverity
+ warning
+Date: Thu, 23 Jan 2020 10:38:45 +0800
+Message-ID: <20200123023845.20980-1-pannengyuan@huawei.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.173.221.136]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 82.213.225.96
-X-Mailman-Approved-At: Wed, 22 Jan 2020 20:28:29 -0500
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,66 +63,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, sfandino@yahoo.com,
- Salvador Fandino <salvador@qindel.com>
+Cc: qemu-trivial@nongnu.org, Euler Robot <euler.robot@huawei.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>, zhang.zhanghailiang@huawei.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Salvador Fandino <salvador@qindel.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-NULL is a valid log filename used to indicate we want to use stderr
-but qemu_set_log_filename (which is called by bsd-user/main.c) was not
-handling it correctly.
+Fixes the coverity warning:
+    CID 91708242: (EVALUATION_ORDER)
+    50. write_write_typo: In "config =3D config =3D irq / 16", "config" i=
+s written twice with the same value.
+    50    uint8_t config =3D config =3D irq / 16;
 
-Signed-off-by: Salvador Fandino <salvador@qindel.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 ---
- util/log.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ hw/misc/stm32f4xx_syscfg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/util/log.c b/util/log.c
-index 867264da8d..3cd2ebfdf4 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -151,22 +151,25 @@ void qemu_log_needs_buffers(void)
-  */
- void qemu_set_log_filename(const char *filename, Error **errp)
- {
--    char *pidstr;
-     g_free(logfilename);
-     logfilename = NULL;
- 
--    pidstr = strstr(filename, "%");
--    if (pidstr) {
--        /* We only accept one %d, no other format strings */
--        if (pidstr[1] != 'd' || strchr(pidstr + 2, '%')) {
--            error_setg(errp, "Bad logfile format: %s", filename);
--            return;
--        } else {
--            logfilename = g_strdup_printf(filename, getpid());
--        }
--    } else {
--        logfilename = g_strdup(filename);
-+    if (filename) {
-+            char *pidstr = strstr(filename, "%");
-+            if (pidstr) {
-+                /* We only accept one %d, no other format strings */
-+                if (pidstr[1] != 'd' || strchr(pidstr + 2, '%')) {
-+                    error_setg(errp, "Bad logfile format: %s", filename);
-+                    return;
-+                } else {
-+                    logfilename = g_strdup_printf(filename, getpid());
-+                }
-+            } else {
-+                logfilename = g_strdup(filename);
-+            }
-     }
-+    /* else, let logfilename be NULL indicating we want to use stderr */
-+
-     qemu_log_close();
-     qemu_set_log(qemu_loglevel);
- }
--- 
-2.24.1
+diff --git a/hw/misc/stm32f4xx_syscfg.c b/hw/misc/stm32f4xx_syscfg.c
+index dbcdca59f8..f960e4ea1e 100644
+--- a/hw/misc/stm32f4xx_syscfg.c
++++ b/hw/misc/stm32f4xx_syscfg.c
+@@ -47,7 +47,7 @@ static void stm32f4xx_syscfg_set_irq(void *opaque, int =
+irq, int level)
+     STM32F4xxSyscfgState *s =3D opaque;
+     int icrreg =3D irq / 4;
+     int startbit =3D (irq & 3) * 4;
+-    uint8_t config =3D config =3D irq / 16;
++    uint8_t config =3D irq / 16;
+=20
+     trace_stm32f4xx_syscfg_set_irq(irq / 16, irq % 16, level);
+=20
+--=20
+2.21.0.windows.1
+
 
 
