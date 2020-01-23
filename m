@@ -2,79 +2,59 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967CCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD8BC33CB6
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:43:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64FEB20704
+	by mail.kernel.org (Postfix) with ESMTPS id E5E7E20704
 	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:43:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfBRTvcB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64FEB20704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E7E20704
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudhO-0000fd-Sm
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:43:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41582)
+	id 1iudhP-0000iW-GQ
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:43:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAY-0004A1-J0
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:07 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUO-0001Fo-Kq
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAX-0006TI-4t
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57295
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAX-0006Sv-0r
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780864;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xFiJzCmw9nQ6WRZGQBVDeKp8kTLzMnMMVpVQq0q8ohM=;
- b=dfBRTvcBPJ3SWBRMhWSE5HOyQyU4hQEzyEWaaPczk7zpGDEw47mSQA6SH3el/jwY8NwNCH
- 5qHduEb/bNjenW6EMDzjYTfUOTbxxWVkD4qCmZp4qm+1zPHPxGGmz9ufuUPckJQY3yVvDA
- rxDQd/4pph9z5s8XcIWbLWd24Gq2mTA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-tLkrQp-LPweE3eMeWBv--w-1; Thu, 23 Jan 2020 07:01:02 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6005118A6EC6
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:00 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AC7F385750;
- Thu, 23 Jan 2020 12:00:59 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 092/111] virtiofsd: rename inode->refcount to inode->nlookup
-Date: Thu, 23 Jan 2020 11:58:22 +0000
-Message-Id: <20200123115841.138849-93-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-References: <20200123115841.138849-1-dgilbert@redhat.com>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000rf-MO
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:40 -0500
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:52544)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0000pl-C3
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:38 -0500
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 8037543AD7;
+ Thu, 23 Jan 2020 22:25:37 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+ (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 50FC3240090;
+ Thu, 23 Jan 2020 22:25:37 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v29 19/22] hw/rx: Restrict the RX62N microcontroller to the
+ RX62N CPU core
+Date: Thu, 23 Jan 2020 22:25:22 +0900
+Message-Id: <20200123132525.80891-20-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+References: <20200123132525.80891-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: tLkrQp-LPweE3eMeWBv--w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,137 +66,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: richard.henderson@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-This reference counter plays a specific role in the FUSE protocol.  It's
-not a generic object reference counter and the FUSE kernel code calls it
-"nlookup".
+While the VIRT machine can use different microcontrollers,
+the RX62N microcontroller is tied to the RX62N CPU core.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- tools/virtiofsd/passthrough_ll.c | 37 +++++++++++++++++++++-----------
- 1 file changed, 25 insertions(+), 12 deletions(-)
+ hw/rx/rx-virt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 2d703b57e5..c819b5f782 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -99,7 +99,20 @@ struct lo_inode {
-     int fd;
-     bool is_symlink;
-     struct lo_key key;
--    uint64_t refcount; /* protected by lo->mutex */
-+
-+    /*
-+     * This counter keeps the inode alive during the FUSE session.
-+     * Incremented when the FUSE inode number is sent in a reply
-+     * (FUSE_LOOKUP, FUSE_READDIRPLUS, etc).  Decremented when an inode is
-+     * released by requests like FUSE_FORGET, FUSE_RMDIR, FUSE_RENAME, etc=
-.
-+     *
-+     * Note that this value is untrusted because the client can manipulate
-+     * it arbitrarily using FUSE_FORGET requests.
-+     *
-+     * Protected by lo->mutex.
-+     */
-+    uint64_t nlookup;
-+
-     fuse_ino_t fuse_ino;
-     pthread_mutex_t plock_mutex;
-     GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
-@@ -568,7 +581,7 @@ retry:
-     if (last =3D=3D path) {
-         p =3D &lo->root;
-         pthread_mutex_lock(&lo->mutex);
--        p->refcount++;
-+        p->nlookup++;
-         pthread_mutex_unlock(&lo->mutex);
-     } else {
-         *last =3D '\0';
-@@ -786,8 +799,8 @@ static struct lo_inode *lo_find(struct lo_data *lo, str=
-uct stat *st)
-     pthread_mutex_lock(&lo->mutex);
-     p =3D g_hash_table_lookup(lo->inodes, &key);
-     if (p) {
--        assert(p->refcount > 0);
--        p->refcount++;
-+        assert(p->nlookup > 0);
-+        p->nlookup++;
-     }
-     pthread_mutex_unlock(&lo->mutex);
+diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+index 017941b996..f58fa3e5a8 100644
+--- a/hw/rx/rx-virt.c
++++ b/hw/rx/rx-virt.c
+@@ -17,6 +17,7 @@
+  */
 =20
-@@ -855,7 +868,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
-nt, const char *name,
-         }
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -56,6 +57,7 @@ static void rx_load_image(RXCPU *cpu, const char *filen=
+ame,
 =20
-         inode->is_symlink =3D S_ISLNK(e->attr.st_mode);
--        inode->refcount =3D 1;
-+        inode->nlookup =3D 1;
-         inode->fd =3D newfd;
-         newfd =3D -1;
-         inode->key.ino =3D e->attr.st_ino;
-@@ -1112,7 +1125,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, f=
-use_ino_t parent,
-     }
-=20
-     pthread_mutex_lock(&lo->mutex);
--    inode->refcount++;
-+    inode->nlookup++;
-     pthread_mutex_unlock(&lo->mutex);
-     e.ino =3D inode->fuse_ino;
-=20
-@@ -1193,9 +1206,9 @@ static void unref_inode_lolocked(struct lo_data *lo, =
-struct lo_inode *inode,
-     }
-=20
-     pthread_mutex_lock(&lo->mutex);
--    assert(inode->refcount >=3D n);
--    inode->refcount -=3D n;
--    if (!inode->refcount) {
-+    assert(inode->nlookup >=3D n);
-+    inode->nlookup -=3D n;
-+    if (!inode->nlookup) {
-         lo_map_remove(&lo->ino_map, inode->fuse_ino);
-         g_hash_table_remove(lo->inodes, &inode->key);
-         if (g_hash_table_size(inode->posix_locks)) {
-@@ -1216,7 +1229,7 @@ static int unref_all_inodes_cb(gpointer key, gpointer=
- value, gpointer user_data)
-     struct lo_inode *inode =3D value;
-     struct lo_data *lo =3D user_data;
-=20
--    inode->refcount =3D 0;
-+    inode->nlookup =3D 0;
-     lo_map_remove(&lo->ino_map, inode->fuse_ino);
-     close(inode->fd);
-=20
-@@ -1241,7 +1254,7 @@ static void lo_forget_one(fuse_req_t req, fuse_ino_t =
-ino, uint64_t nlookup)
-     }
-=20
-     fuse_log(FUSE_LOG_DEBUG, "  forget %lli %lli -%lli\n",
--             (unsigned long long)ino, (unsigned long long)inode->refcount,
-+             (unsigned long long)ino, (unsigned long long)inode->nlookup,
-              (unsigned long long)nlookup);
-=20
-     unref_inode_lolocked(lo, inode, nlookup);
-@@ -2609,7 +2622,7 @@ static void setup_root(struct lo_data *lo, struct lo_=
-inode *root)
-     root->fd =3D fd;
-     root->key.ino =3D stat.st_ino;
-     root->key.dev =3D stat.st_dev;
--    root->refcount =3D 2;
-+    root->nlookup =3D 2;
- }
-=20
- static guint lo_key_hash(gconstpointer key)
+ static void rxvirt_init(MachineState *machine)
+ {
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     RX62NState *s =3D g_new(RX62NState, 1);
+     MemoryRegion *sysmem =3D get_system_memory();
+     MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
 --=20
-2.24.1
+2.20.1
 
 
