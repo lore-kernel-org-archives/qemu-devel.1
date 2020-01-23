@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C648C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04103C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EADB24125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:32:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EADB24125
+	by mail.kernel.org (Postfix) with ESMTPS id CCAA524125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 10:35:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCAA524125
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuZmL-0003iT-82
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:32:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42660)
+	id 1iuZpG-0004qj-RE
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 05:35:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iuZlg-0003JA-OE
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:31:22 -0500
+ (envelope-from <groug@kaod.org>) id 1iuZoe-0004RW-Mq
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:34:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iuZlf-0000Xq-8l
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:31:20 -0500
-Received: from 19.mo4.mail-out.ovh.net ([87.98.179.66]:60390)
+ (envelope-from <groug@kaod.org>) id 1iuZod-0003pA-2R
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:34:24 -0500
+Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:50480)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuZle-0000KS-TL
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:31:19 -0500
-Received: from player763.ha.ovh.net (unknown [10.108.16.182])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3D97C214FB9
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:31:07 +0100 (CET)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iuZoc-0003mi-SQ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 05:34:23 -0500
+Received: from player760.ha.ovh.net (unknown [10.108.42.83])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 2024B1FB68E
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:34:19 +0100 (CET)
 Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
  [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player763.ha.ovh.net (Postfix) with ESMTPSA id 2CE83E88957E;
- Thu, 23 Jan 2020 10:31:04 +0000 (UTC)
-Date: Thu, 23 Jan 2020 11:30:58 +0100
+ by player760.ha.ovh.net (Postfix) with ESMTPSA id 5E632E8CCEA0;
+ Thu, 23 Jan 2020 10:34:18 +0000 (UTC)
+Date: Thu, 23 Jan 2020 11:34:15 +0100
 From: Greg Kurz <groug@kaod.org>
 To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v4 06/11] tests/virtio-9p: added splitted readdir test
-Message-ID: <20200123113058.17e2c88d@bahia.lan>
-In-Reply-To: <17952898.t909x8hp7r@silver>
+Subject: Re: [PATCH v4 08/11] 9pfs: readdir benchmark
+Message-ID: <20200123113415.33ba5b2a@bahia.lan>
+In-Reply-To: <b1eae734604cdbda0cecf1fbb7d103dd249642ee.1579567020.git.qemu_oss@crudebyte.com>
 References: <cover.1579567019.git.qemu_oss@crudebyte.com>
- <f6394833fa66bf6a73d204db34302732a5f6b98a.1579567020.git.qemu_oss@crudebyte.com>
- <20200122221905.055f9f93@bahia.lan> <17952898.t909x8hp7r@silver>
+ <b1eae734604cdbda0cecf1fbb7d103dd249642ee.1579567020.git.qemu_oss@crudebyte.com>
 X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 8496322174974335296
+X-Ovh-Tracer-Id: 8550928320850270528
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddvgddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejieefrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvddvgdduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.179.66
+X-Received-From: 178.32.124.17
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,115 +73,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 Jan 2020 23:36:22 +0100
+On Tue, 21 Jan 2020 01:23:55 +0100
 Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-> On Mittwoch, 22. Januar 2020 22:19:05 CET Greg Kurz wrote:
-> > On Tue, 21 Jan 2020 01:16:21 +0100
-> > 
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > The previous, already existing readdir test simply used a 'count'
-> > > parameter big enough to retrieve all directory entries with a
-> > > single Treaddir request.
-> > > 
-> > > In this new 'splitted' readdir test, directory entries are
-> > > retrieved, splitted over several Treaddir requests by picking small
-> > > 'count' parameters which force the server to truncate the response.
-> > > So the test client sends as many Treaddir requests as necessary to
-> > > get all directory entries. Currently this test covers actually two
-> > > tests: a sequence of Treaddir requests with count=512 and then a
-> > > subsequent test with a sequence of Treaddir requests with count=256.
-> > > 
-> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > ---
-> > 
-> > Not sure it is really needed to check with multiple values for 'count',
-> > but it doesn't eat too many cycles so I guess it doesn't hurt.
+> This patch is not intended to be merged. It just provides a
+
+Well I like the idea of having such a benchmark available.
+It could probably be merged after a few changes...
+
+> temporary benchmark foundation for coneniently A/B comparison
+> of the subsequent 9p readdir optimization patches:
 > 
-> Yes, it is a cheap test, nobody will feel the difference. One could argue 
-> about the precise 'count' values being used ...
-> 
-> > 
-> > Applied as well.
-> > 
-> > >  tests/qtest/virtio-9p-test.c | 91 ++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 91 insertions(+)
-> > > 
-> > > diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-> > > index 2167322985..8b0d94546e 100644
-> > > --- a/tests/qtest/virtio-9p-test.c
-> > > +++ b/tests/qtest/virtio-9p-test.c
-> > > @@ -578,6 +578,7 @@ static bool fs_dirents_contain_name(struct V9fsDirent
-> > > *e, const char* name)> 
-> > >      return false;
-> > >  
-> > >  }
-> > > 
-> > > +/* basic readdir test where reply fits into a single response message */
-> > > 
-> > >  static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-> > >  {
-> > >  
-> > >      QVirtio9P *v9p = obj;
-> > > 
-> > > @@ -631,6 +632,95 @@ static void fs_readdir(void *obj, void *data,
-> > > QGuestAllocator *t_alloc)> 
-> > >      g_free(wnames[0]);
-> > >  
-> > >  }
-> > > 
-> > > +/* readdir test where overall request is splitted over several messages
-> > > */
-> > > +static void fs_readdir_split(void *obj, void *data, QGuestAllocator
-> > > *t_alloc) +{
-> > > +    QVirtio9P *v9p = obj;
-> > > +    alloc = t_alloc;
-> > > +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-> > > +    uint16_t nqid;
-> > > +    v9fs_qid qid;
-> > > +    uint32_t count, nentries, npartialentries;
-> > > +    struct V9fsDirent *entries, *tail, *partialentries;
-> > > +    P9Req *req;
-> > > +    int subtest;
-> > > +    int fid;
-> > > +    uint64_t offset;
-> > > +    /* the Treaddir 'count' parameter values to be tested */
-> > > +    const uint32_t vcount[] = { 512, 256 };
-> 
-> ... here. But IMO it does make sense preserving the function's overall 
-> structure to allow testing with different 'count' values if necessary. Because 
-> that way this test could e.g. guard potential bugs when server's Treaddir 
-> handler is rolling back (or not) the dir offset for instance, which server has 
-> to do (or not) according to this 'count' value and the precise file name 
-> length of the individual directory entries.
+> * hw/9pfs/9p-synth: increase amount of simulated files for
+>   readdir test to 2000 files.
 > 
 
-I still agree it is useful to be able to check different values but I
-now realize that it shouldn't be done like this because adding new
-values to vcount[] doesn't scale well with the MAX_REQ limitation I
-mentioned in another mail. More values, especially small ones, are
-likely to trigger "Failed to decode VirtFS request type 40" at some
-point. 
+... the 9p-synth backend could maybe always create this number
+of files ?
 
-I now think that fs_readdir_split() should rather get count as
-an argument and only do one run. By default we would only call
-this with an appropriate value, ideally derived from the test
-environment (number of files, size of filenames... etc...).
-If someone needs to test a specific value, it is easy as adding
-a new qos_add_test() line.
-
-This would ensure at least that each run starts with the same
-fixed number of possible requests, ie. MAX_REQ minus the cost of
-fs_attach().
-
-So I'll revert this patch for now.
-
-> Whatever precise 'count' tests are desired, it would only mean a one line 
-> change here.
+> * tests/virtio-9p: measure wall time that elapsed between
+>   sending T_readdir request and arrival of R_readdir response
+>   and print out that measured duration, as well as amount of
+>   directory entries received, and the amount of bytes of the
+>   response message.
 > 
-> Best regards,
-> Christian Schoenebeck
+
+... maybe we should make the printing optional and off by
+default so that it doesn't pollute CI logs.
+
+> * tests/virtio-9p: increased msize to 256kiB to allow
+>   retrieving all 2000 files (simulated by 9pfs synth driver)
+>   with only one T_readdir request.
 > 
+
+... always use 256k for both the basic test and a revisited
+split test ?
+
+> Running this benchmark is fairly quick & simple and does not
+> require any guest OS installation or other prerequisites:
 > 
+> cd build
+> make && make tests/qtest/qos-test
+> export QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
+> tests/qtest/qos-test -p $(tests/qtest/qos-test -l | grep readdir/basic)
+> 
+> Since this benchmark uses the 9pfs synth driver, the host
+> machine's I/O hardware (SSDs/HDDs) is not relevant for the
+> benchmark result, because the synth backend's readdir
+> implementation returns immediately (without any blocking I/O
+> that would incur with a real-life fs driver) and just returns
+> already prepared, simulated directory entries directly from RAM.
+> So this benchmark focuses on the efficiency of the 9pfs
+> controller code (or top half) for readdir request handling.
+> 
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> ---
+>  hw/9pfs/9p-synth.h           |  2 +-
+>  tests/qtest/virtio-9p-test.c | 37 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 37 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-synth.h b/hw/9pfs/9p-synth.h
+> index 036d7e4a5b..7d6cedcdac 100644
+> --- a/hw/9pfs/9p-synth.h
+> +++ b/hw/9pfs/9p-synth.h
+> @@ -58,7 +58,7 @@ int qemu_v9fs_synth_add_file(V9fsSynthNode *parent, int mode,
+>  /* for READDIR test */
+>  #define QTEST_V9FS_SYNTH_READDIR_DIR "ReadDirDir"
+>  #define QTEST_V9FS_SYNTH_READDIR_FILE "ReadDirFile%d"
+> -#define QTEST_V9FS_SYNTH_READDIR_NFILES 100
+> +#define QTEST_V9FS_SYNTH_READDIR_NFILES 2000
+>  
+>  /* Any write to the "FLUSH" file is handled one byte at a time by the
+>   * backend. If the byte is zero, the backend returns success (ie, 1),
+> diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> index e47b286340..d71b37aa6c 100644
+> --- a/tests/qtest/virtio-9p-test.c
+> +++ b/tests/qtest/virtio-9p-test.c
+> @@ -15,6 +15,18 @@
+>  #include "libqos/virtio-9p.h"
+>  #include "libqos/qgraph.h"
+>  
+> +/*
+> + * to benchmark the real time (not CPU time) that elapsed between start of
+> + * a request and arrival of its response
+> + */
+> +static double wall_time(void)
+> +{
+> +    struct timeval t;
+> +    struct timezone tz;
+> +    gettimeofday(&t, &tz);
+> +    return t.tv_sec + t.tv_usec * 0.000001;
+> +}
+> +
+>  #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
+>  static QGuestAllocator *alloc;
+>  
+> @@ -36,7 +48,7 @@ static void pci_config(void *obj, void *data, QGuestAllocator *t_alloc)
+>      g_free(tag);
+>  }
+>  
+> -#define P9_MAX_SIZE 4096 /* Max size of a T-message or R-message */
+> +#define P9_MAX_SIZE (256 * 1024) /* Max size of a T-message or R-message */
+>  
+>  typedef struct {
+>      QTestState *qts;
+> @@ -600,12 +612,35 @@ static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
+>      v9fs_req_wait_for_reply(req, NULL);
+>      v9fs_rlopen(req, &qid, NULL);
+>  
+> +    const double start = wall_time();
+> +
+>      /*
+>       * submit count = msize - 11, because 11 is the header size of Rreaddir
+>       */
+>      req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - 11, 0);
+> +    const double treaddir = wall_time();
+>      v9fs_req_wait_for_reply(req, NULL);
+> +    const double waitforreply = wall_time();
+>      v9fs_rreaddir(req, &count, &nentries, &entries);
+> +    const double end = wall_time();
+> +
+> +    printf("\nTime client spent on sending T_readdir: %fs\n\n",
+> +           treaddir - start);
+> +
+> +    printf("Time client spent for waiting for reply from server: %fs "
+> +           "[MOST IMPORTANT]\n", waitforreply - start);
+> +    printf("(This is the most important value, because it reflects the time\n"
+> +           "the 9p server required to process and return the result of the\n"
+> +           "T_readdir request.)\n\n");
+> +
+> +    printf("Total client time: %fs\n", end - start);
+> +    printf("(NOTE: this time is not relevant; this huge time comes from\n"
+> +           "inefficient qtest_memread() calls. So you can discard this\n"
+> +           "value as a problem of this test client implementation while\n"
+> +           "processing the received server T_readdir reply.)\n\n");
+> +
+> +    printf("Details of response message data: R_readddir nentries=%d "
+> +           "rbytes=%d\n", nentries, count);
+>  
+>      /*
+>       * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
 
 
