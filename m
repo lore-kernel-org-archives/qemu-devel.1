@@ -2,87 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA78C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF58C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B21C92253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:40:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A/rpVbN7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B21C92253D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 52E5A2253D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:42:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E5A2253D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuaqZ-00049T-U6
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:40:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34305)
+	id 1iuasg-00068I-2C
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:42:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34691)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuapp-0003iG-KW
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:39:42 -0500
+ (envelope-from <bounces@canonical.com>) id 1iuar4-0004mY-Id
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuapo-0002te-Id
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:39:41 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55035)
+ (envelope-from <bounces@canonical.com>) id 1iuar3-0003fm-29
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:40:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34802)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iuapo-0002t5-CF
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:39:40 -0500
-Received: by mail-wm1-x341.google.com with SMTP id b19so2201771wmj.4
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 03:39:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=n0tMWs3StmJUjvh7UqoyhGYJQxb3xLIGGA3i9fUY/xQ=;
- b=A/rpVbN7ci9y/rAwYBdiM3xQfRP+5lmzG5O5/YG5ac1QbalrnhmwpBVMaNGePxn81H
- nlVRvX/kuKrb8Tdp8ZA5B70GTGl9RFjeO08IvF5wO8A+Prg5W8jhJ9dtP4ptgnXMWfvo
- 9WPYHtYPwB4u4LhpK4ePgECSVpLCzDXlHactZQY0wzZXfZhgcHpxpokO/4YKDjxU5JnJ
- tLJIIao6zoSjqwi2AAJv3Au5fy8aupiKoomBWs/PrxfdfzpqYRBbMILtb7tHV1BJ/7KZ
- kwU0vnSENElNCwgaVoLaRXxbUNTp/ttLzerH8xNfYLbjCD7hldw2/xIUz7q1VzXSfdRS
- /SYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=n0tMWs3StmJUjvh7UqoyhGYJQxb3xLIGGA3i9fUY/xQ=;
- b=hsXwdiN20lTVf8SfQyWcQltnpfgSr3NYG5R3HZOqUBY6ID/LhtZQs17Xyw2Zx31TL1
- K5vBw6qdKB78n1QvKhClKr/FfAntZlVBTLg43Av1OCcklKji1ZSAuksz1pQ3qeHbnDVd
- uw28rsIgQYkKXGXmvwlRX7p6OBuQYNgbUTlWWJgPmy5QILXtFRE/kbGbBORQniPbCBvn
- H8QAxZLw3kguoU41bp89SeKrELMW4NHj6raqMtSgUfNaPcb4z8ZmjFSJxuJFm50K1utj
- YRdTKlw8bqW05OT9TpR3TgnO8z+arT/PCQHqU/ZKE4bCISTeO9o7ZkdceRSRChLvdSCH
- LQ0A==
-X-Gm-Message-State: APjAAAW5Dv6wh6tC6IHsSZq4+ial9BtZN62fVREy+2KvtL+pAfXknJvp
- Th6269d97bwRLHCt2uPTRqpxDbwuy2XF3sfxQPA=
-X-Google-Smtp-Source: APXvYqzkiHUhXXwgz19jq0VXJs8bScrM2f/VU721+VulEkF+BybtSOtCQ9t2Qh56FqGo0zOYYq/2uphn4KoU045Ce68=
-X-Received: by 2002:a1c:9c87:: with SMTP id f129mr3950059wme.26.1579779579260; 
- Thu, 23 Jan 2020 03:39:39 -0800 (PST)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iuar2-0003fN-Sp
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:40:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iuar1-0003dO-F1
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:40:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6FD262E80CE
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:40:55 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200110153039.1379601-1-marcandre.lureau@redhat.com>
- <20200110153039.1379601-11-marcandre.lureau@redhat.com>
- <2a3b0024-fb80-c34d-16fd-78f8bc722807@redhat.com>
-In-Reply-To: <2a3b0024-fb80-c34d-16fd-78f8bc722807@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 23 Jan 2020 15:39:27 +0400
-Message-ID: <CAJ+F1CJBFT7j6qenmD-C053dN4p3YgXFzi3ed=e9vXzr4Hr_ng@mail.gmail.com>
-Subject: Re: [PATCH 10/26] object: add object_property_set_defaut_{bool, str, 
- int, uint}()
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Date: Thu, 23 Jan 2020 11:34:30 -0000
+From: Frank Heimes <1859656@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=maas; status=New; importance=Undecided;
+ assignee=lee.trager@canonical.com; 
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
+ assignee=maas; 
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fheimes ltrager paelzer sfeole
+X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
+X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
+References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
+Message-Id: <157977927077.4717.3663394926831163556.malone@soybean.canonical.com>
+Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
+ initial deploy
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 319e728340cd7dfbf493add17a2166db36a52377
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,125 +83,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+I took the time and recreated a MAAS setup (latest stable 2.2) on s390x and=
+ it looks like this:
+- I could start a deployment and ran through the states:
+   - Power On, Commissioning (Performing PXE boot)
+   - Power On, Commissioning (Gathering Information)
+   - Power On, Ready
+   - Power Off, Ready
+  (I may have have missed some states in between.)
+- Power Off, Ready is the final state at that point
+  and on the console it's:
+$ virsh list --all
+ Id    Name                           State
+----------------------------------------------------
+ -     vm1                            shut off
+- xml VM definition is:
+$ virsh dumpxml vm1
+<domain type=3D'kvm'>
+  <name>vm1</name>
+  <uuid>0f7d1d61-9368-4bfe-8c65-c709e90e8780</uuid>
+  <memory unit=3D'KiB'>1048576</memory>
+  <currentMemory unit=3D'KiB'>1048576</currentMemory>
+  <vcpu placement=3D'static'>1</vcpu>
+  <os>
+    <type arch=3D's390x' machine=3D's390-ccw-virtio-bionic'>hvm</type>
+    <boot dev=3D'network'/>
+    <boot dev=3D'hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <clock offset=3D'utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+    <disk type=3D'file' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'raw'/>
+      <source file=3D'/var/lib/libvirt/maas-images/6addbfeb-ff2c-4350-b34d-=
+11a56ea34f1d'/>
+      <target dev=3D'vda' bus=3D'virtio'/>
+      <serial>6addbfeb-ff2c-4350-b34d-11a56ea34f1d</serial>
+      <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0002'/>
+    </disk>
+    <interface type=3D'network'>
+      <mac address=3D'52:54:00:ea:11:5f'/>
+      <source network=3D'default'/>
+      <model type=3D'virtio'/>
+      <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0001'/>
+    </interface>
+    <console type=3D'pty'>
+      <log file=3D'/var/log/libvirt/qemu/vm1-serial0.log' append=3D'off'/>
+      <target type=3D'sclp' port=3D'0'/>
+    </console>
+    <memballoon model=3D'virtio'>
+      <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0000'/>
+    </memballoon>
+    <panic model=3D's390'/>
+  </devices>
+</domain>
 
-On Thu, Jan 23, 2020 at 3:29 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> This patch caught my attention because of the typo in the function, but
+So it largely looks like assumed (after initially reading the bug),
+PXE itself seems to work, but the boot issue it due to:
+    <boot dev=3D'network'/>
+    <boot dev=3D'hd'/>
 
-Ah! a french "d=C3=A9faut".
+That confirms the situation (on s390x and MAAS 2.6.2)m but it still
+raises the question why it seem to have worked with 2.6.0?
 
-> I also noticed that get_default is never set to anything but
-> object_property_get_defval.
->
-> What do you think about removing the method and just relying on defval?
-> In practice there would be a new patch that squashes 7, 10 and the thing
-> after my signature.
+-- =
 
-Indeed, we could remove the get_default callback. I can't find the
-reason I added it now.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859656
 
-Are you resending the series then?
+Title:
+  [2.6] Unable to reboot s390x KVM machine after initial deploy
 
->
-> Paolo
->
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index 1ea5c8c..035e41c 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -367,13 +367,6 @@ typedef void (ObjectPropertyRelease)(Object *obj,
->   */
->  typedef void (ObjectPropertyInit)(Object *obj, ObjectProperty *prop);
->
-> -/**
-> - * ObjectPropertyGetDefault:
-> - *
-> - * Get an allocated string representation of the default value.
-> - */
-> -typedef char *(ObjectPropertyGetDefault)(ObjectProperty *prop);
-> -
->  struct ObjectProperty
->  {
->      gchar *name;
-> @@ -384,7 +377,6 @@ struct ObjectProperty
->      ObjectPropertyResolve *resolve;
->      ObjectPropertyRelease *release;
->      ObjectPropertyInit *init;
-> -    ObjectPropertyGetDefault *get_default;
->      void *opaque;
->      QObject *defval;
->  };
-> diff --git a/qom/object.c b/qom/object.c
-> index 2464a9f..aa6cf19 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -1444,15 +1444,6 @@ int64_t object_property_get_int(Object *obj, const=
- char *name,
->      return retval;
->  }
->
-> -char *object_property_get_default(ObjectProperty *prop)
-> -{
-> -    if (!prop->get_default) {
-> -        return NULL;
-> -    }
-> -
-> -    return prop->get_default(prop);
-> -}
-> -
->  static void object_property_init_defval(Object *obj, ObjectProperty *pro=
-p)
->  {
->      Visitor *v =3D qobject_input_visitor_new(prop->defval);
-> @@ -1463,8 +1454,12 @@ static void object_property_init_defval(Object *ob=
-j, ObjectProperty *prop)
->      visit_free(v);
->  }
->
-> -static char *object_property_get_defval(ObjectProperty *prop)
-> +char *object_property_get_default(ObjectProperty *prop)
->  {
-> +    if (!prop->defval) {
-> +        return NULL;
-> +    }
-> +
->      return qstring_free(qobject_to_json(prop->defval), TRUE);
->  }
->
-> @@ -1472,11 +1467,9 @@ static void object_property_set_default(ObjectProp=
-erty *prop, QObject *defval)
->  {
->      assert(!prop->defval);
->      assert(!prop->init);
-> -    assert(!prop->get_default);
->
->      prop->defval =3D defval;
->      prop->init =3D object_property_init_defval;
-> -    prop->get_default =3D object_property_get_defval;
->  }
->
->  void object_property_set_default_bool(ObjectProperty *prop, bool value)
-> @@ -2610,8 +2603,7 @@ void object_property_add_alias(Object *obj, const c=
-har *name,
->          goto out;
->      }
->      op->resolve =3D property_resolve_alias;
-> -    if (target_prop->get_default) {
-> -        op->get_default =3D target_prop->get_default;
-> +    if (target_prop->defval) {
->          op->defval =3D qobject_ref(target_prop->defval);
->      }
->
->
->
+Status in MAAS:
+  New
+Status in QEMU:
+  Incomplete
+Status in Ubuntu on IBM z Systems:
+  Triaged
 
+Bug description:
+  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
+  Arch: S390x
 
---=20
-Marc-Andr=C3=A9 Lureau
+  Appears that MAAS can not find the s390x bootloader to boot from the
+  disk, not sure how maas determines this.  However this was working in
+  the past. I had originally thought that if the maas machine was
+  deployed then it defaulted to boot from disk.
+
+  If I force the VM to book from disk, the VM starts up as expected.
+
+  Reproduce:
+
+  - Deploy Disco on S390x KVM instance
+  - Reboot it
+
+  on the KVM console...
+
+  Connected to domain s2lp6g001
+  Escape character is ^]
+  done
+  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
+  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
+  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
+  Trying pxelinux.cfg files...
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  Failed to load OS from network
+
+  =3D=3D> /var/log/maas/rackd.log <=3D=3D
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
+0x.bin requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
+5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+1-52-54-00-e5-d7-bb requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA0 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64B requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF6 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+A requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+ requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
+efault requested by 10.246.75.160
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
 
