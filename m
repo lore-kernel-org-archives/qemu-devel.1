@@ -2,78 +2,78 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D4BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 921E0C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:37:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F98E24655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 573C721835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:37:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GZr+yCwk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F98E24655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K1tokhBW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573C721835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubiR-00056p-Eo
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:36:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36612)
+	id 1iubjn-0006uQ-7W
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:37:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuau6-0000Tc-OJ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:44:08 -0500
+ (envelope-from <quintela@redhat.com>) id 1iub8M-0001PE-8P
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuau5-0005Pr-86
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:44:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23986
+ (envelope-from <quintela@redhat.com>) id 1iub8K-0004fW-Vi
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28456
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuau5-0005Pl-4C
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:44:05 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iub8K-0004fN-SF
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779844;
+ s=mimecast20190719; t=1579780728;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=m3LwEwVFR5xt1xmQsmgrjqhevxaKzXSpyb+1GvG9meg=;
- b=GZr+yCwkgWHXtWfLx9DjXJxRdgz2oO5KKRn/O0CoJuVAm0uL+gXc9+bBPvTQ2loWAOX0CN
- 55wNQZEkuM59BGvs83NZD8ZmDfvVeTbBic+hAak9kk1Ab+llzrfotfxatEIXYd3ZdLf/tz
- XUYlO8BQmI8BWUNkPhEZIor1PDdSEBs=
+ bh=iwZEYBBew8lo3lmUNJWPGzVep9D+rbOYQ2y34LZoLwU=;
+ b=K1tokhBWxs+Tn8YYxN+4fb9QVFPRYi3yZY5MFHGz7cJ3RCeHBD7av9SzwhVH/ggZ0jfUIt
+ muNK/CuctMj+8J9Tg30XbPc4YcDh3GHeAVT7DiTXUvLdHGM5/AOM4W/thbr0eanfLsNZXs
+ cHg/GOhC5/pPdM1Asw0td1muMffv7aw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-UIe5sK_VMN2vC5YXd7QfYw-1; Thu, 23 Jan 2020 06:44:03 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-402-DkoFpFiLPVS2z_mbH79HAw-1; Thu, 23 Jan 2020 06:58:46 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 648BB190D350
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:44:00 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 362761036D1A;
- Thu, 23 Jan 2020 11:43:55 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66941477
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:58:45 +0000 (UTC)
+Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A20219C69;
+ Thu, 23 Jan 2020 11:58:42 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 77/80] hostmem: introduce "prealloc-threads" property
-Date: Thu, 23 Jan 2020 12:38:42 +0100
-Message-Id: <1579779525-20065-78-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
-References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: UIe5sK_VMN2vC5YXd7QfYw-1
+Subject: [PATCH v3 04/21] migration-test: Make sure that multifd and cancel
+ works
+Date: Thu, 23 Jan 2020 12:58:14 +0100
+Message-Id: <20200123115831.36842-5-quintela@redhat.com>
+In-Reply-To: <20200123115831.36842-1-quintela@redhat.com>
+References: <20200123115831.36842-1-quintela@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: DkoFpFiLPVS2z_mbH79HAw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,212 +85,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, ehabkost@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-the property will allow user to specify number of threads to use
-in pre-allocation stage. It also will allow to reduce implicit
-hostmem dependency on current_machine.
-On object creation it will default to 1, but via machine
-compat property it will be updated to MachineState::smp::cpus
-to keep current behavior for hostmem and main RAM (which is
-now also hostmem based).
+Test that this sequerce works:
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+- launch source
+- launch target
+- start migration
+- cancel migration
+- relaunch target
+- do migration again
+
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+
 ---
-v3:
-  - use object_register_sugar_prop() instead of directly hacking
-    compat_props (Paolo Bonzini <pbonzini@redhat.com>)
-  - fix TODO description
 
-CC: pbonzini@redhat.com
-CC: ehabkost@redhat.com
+- Wait for 1st trhead to move to cancelled before launching second
+  migration
+- Add 'to2' parameter to diferentiate 1st and second target.
+- Use g_free() instead of free()
 ---
- include/sysemu/hostmem.h |  2 ++
- backends/hostmem.c       | 43 +++++++++++++++++++++++++++++++++++++++----
- vl.c                     | 14 ++++++++++----
- 3 files changed, 51 insertions(+), 8 deletions(-)
+ tests/qtest/migration-test.c | 112 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 111 insertions(+), 1 deletion(-)
 
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 5db0d66..bdf8666 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -61,6 +61,7 @@ struct HostMemoryBackendClass {
-  * @parent: opaque parent object container
-  * @size: amount of memory backend provides
-  * @mr: MemoryRegion representing host memory belonging to backend
-+ * @prealloc_threads: number of threads to be used for preallocatining RAM
-  */
- struct HostMemoryBackend {
-     /* private */
-@@ -70,6 +71,7 @@ struct HostMemoryBackend {
-     uint64_t size;
-     bool merge, dump, use_canonical_path;
-     bool prealloc, force_prealloc, is_mapped, share;
-+    uint32_t prealloc_threads;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-     HostMemPolicy policy;
+diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+index b6a74a05ce..cf27ebbc9d 100644
+--- a/tests/qtest/migration-test.c
++++ b/tests/qtest/migration-test.c
+@@ -424,6 +424,14 @@ static void migrate_recover(QTestState *who, const cha=
+r *uri)
+     qobject_unref(rsp);
+ }
 =20
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index e773bdf..0988986 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -223,7 +223,6 @@ static void host_memory_backend_set_prealloc(Object *ob=
-j, bool value,
++static void migrate_cancel(QTestState *who)
++{
++    QDict *rsp;
++
++    rsp =3D wait_command(who, "{ 'execute': 'migrate_cancel' }");
++    qobject_unref(rsp);
++}
++
+ static void migrate_set_capability(QTestState *who, const char *capability=
+,
+                                    bool value)
  {
-     Error *local_err =3D NULL;
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
--    MachineState *ms =3D MACHINE(qdev_get_machine());
+@@ -456,6 +464,8 @@ static void migrate_postcopy_start(QTestState *from, QT=
+estState *to)
+ typedef struct {
+     bool hide_stderr;
+     bool use_shmem;
++    /* only launch the target process */
++    bool only_target;
+     char *opts_source;
+     char *opts_target;
+ } MigrateStart;
+@@ -571,7 +581,9 @@ static int test_migrate_start(QTestState **from, QTestS=
+tate **to,
+                                  arch_source, shmem_opts, args->opts_sourc=
+e,
+                                  ignore_stderr);
+     g_free(arch_source);
+-    *from =3D qtest_init(cmd_source);
++    if (!args->only_target) {
++        *from =3D qtest_init(cmd_source);
++    }
+     g_free(cmd_source);
 =20
-     if (backend->force_prealloc) {
-         if (value) {
-@@ -243,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *ob=
-j, bool value,
-         void *ptr =3D memory_region_get_ram_ptr(&backend->mr);
-         uint64_t sz =3D memory_region_size(&backend->mr);
+     cmd_target =3D g_strdup_printf("-accel kvm -accel tcg%s%s "
+@@ -1294,6 +1306,103 @@ static void test_multifd_tcp(void)
+     g_free(uri);
+ }
 =20
--        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
-+        os_mem_prealloc(fd, ptr, sz, backend->prealloc_threads, &local_err=
++/*
++ * This test does:
++ *  source               target
++ *                       migrate_incoming
++ *     migrate
++ *     migrate_cancel
++ *                       launch another target
++ *     migrate
++ *
++ *  And see that it works
++ */
++
++static void test_multifd_tcp_cancel(void)
++{
++    MigrateStart *args =3D migrate_start_new();
++    QTestState *from, *to, *to2;
++    QDict *rsp;
++    char *uri;
++
++    args->hide_stderr =3D true;
++
++    if (test_migrate_start(&from, &to, "defer", args)) {
++        return;
++    }
++
++    /*
++     * We want to pick a speed slow enough that the test completes
++     * quickly, but that it doesn't complete precopy even on a slow
++     * machine, so also set the downtime.
++     */
++    /* 1 ms should make it not converge*/
++    migrate_set_parameter_int(from, "downtime-limit", 1);
++    /* 300MB/s */
++    migrate_set_parameter_int(from, "max-bandwidth", 30000000);
++
++    migrate_set_parameter_int(from, "multifd-channels", 16);
++    migrate_set_parameter_int(to, "multifd-channels", 16);
++
++    migrate_set_capability(from, "multifd", "true");
++    migrate_set_capability(to, "multifd", "true");
++
++    /* Start incoming migration from the 1st socket */
++    rsp =3D wait_command(to, "{ 'execute': 'migrate-incoming',"
++                           "  'arguments': { 'uri': 'tcp:127.0.0.1:0' }}")=
+;
++    qobject_unref(rsp);
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    uri =3D migrate_get_socket_address(to, "socket-address");
++
++    migrate_qmp(from, uri, "{}");
++
++    wait_for_migration_pass(from);
++
++    migrate_cancel(from);
++
++    args =3D migrate_start_new();
++    args->only_target =3D true;
++
++    if (test_migrate_start(&from, &to2, "defer", args)) {
++        return;
++    }
++
++    migrate_set_parameter_int(to2, "multifd-channels", 16);
++
++    migrate_set_capability(to2, "multifd", "true");
++
++    /* Start incoming migration from the 1st socket */
++    rsp =3D wait_command(to2, "{ 'execute': 'migrate-incoming',"
++                            "  'arguments': { 'uri': 'tcp:127.0.0.1:0' }}"=
 );
-         if (local_err) {
-             error_propagate(errp, local_err);
-             return;
-@@ -252,14 +251,45 @@ static void host_memory_backend_set_prealloc(Object *=
-obj, bool value,
-     }
- }
-=20
-+static void host_memory_backend_get_prealloc_threads(Object *obj, Visitor =
-*v,
-+    const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+    visit_type_uint32(v, name, &backend->prealloc_threads, errp);
++    qobject_unref(rsp);
++
++    uri =3D migrate_get_socket_address(to2, "socket-address");
++
++    wait_for_migration_status(from, "cancelled", NULL);
++
++    /* 300ms it should converge */
++    migrate_set_parameter_int(from, "downtime-limit", 300);
++    /* 1GB/s */
++    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
++
++    migrate_qmp(from, uri, "{}");
++
++    wait_for_migration_pass(from);
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++    qtest_qmp_eventwait(to2, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++    test_migrate_end(from, to2, true);
++    g_free(uri);
 +}
 +
-+static void host_memory_backend_set_prealloc_threads(Object *obj, Visitor =
-*v,
-+    const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+    Error *local_err =3D NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    if (value <=3D 0) {
-+        error_setg(&local_err,
-+                   "property '%s' of %s doesn't take value '%d'",
-+                   name, object_get_typename(obj), value);
-+        goto out;
-+    }
-+    backend->prealloc_threads =3D value;
-+out:
-+    error_propagate(errp, local_err);
-+}
-+
- static void host_memory_backend_init(Object *obj)
+ int main(int argc, char **argv)
  {
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-     MachineState *machine =3D MACHINE(qdev_get_machine());
+     char template[] =3D "/tmp/migration-test-XXXXXX";
+@@ -1359,6 +1468,7 @@ int main(int argc, char **argv)
 =20
-+    /* TODO: convert access to globals to compat properties */
-     backend->merge =3D machine_mem_merge(machine);
-     backend->dump =3D machine_dump_guest_core(machine);
-     backend->prealloc =3D mem_prealloc;
-+    backend->prealloc_threads =3D 1;
- }
+     qtest_add_func("/migration/auto_converge", test_migrate_auto_converge)=
+;
+     qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
++    qtest_add_func("/migration/multifd/tcp/cancel", test_multifd_tcp_cance=
+l);
 =20
- static void host_memory_backend_post_init(Object *obj)
-@@ -313,7 +343,6 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
-Error **errp)
- {
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(uc);
-     HostMemoryBackendClass *bc =3D MEMORY_BACKEND_GET_CLASS(uc);
--    MachineState *ms =3D MACHINE(qdev_get_machine());
-     Error *local_err =3D NULL;
-     void *ptr;
-     uint64_t sz;
-@@ -378,7 +407,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
-Error **errp)
-          */
-         if (backend->prealloc) {
-             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
--                            ms->smp.cpus, &local_err);
-+                            backend->prealloc_threads, &local_err);
-             if (local_err) {
-                 goto out;
-             }
-@@ -456,6 +485,12 @@ host_memory_backend_class_init(ObjectClass *oc, void *=
-data)
-         host_memory_backend_set_prealloc, &error_abort);
-     object_class_property_set_description(oc, "prealloc",
-         "Preallocate memory", &error_abort);
-+    object_class_property_add(oc, "prealloc-threads", "int",
-+        host_memory_backend_get_prealloc_threads,
-+        host_memory_backend_set_prealloc_threads,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, "prealloc-threads",
-+        "Number of CPU threads to use for prealloc", &error_abort);
-     object_class_property_add(oc, "size", "int",
-         host_memory_backend_get_size,
-         host_memory_backend_set_size,
-diff --git a/vl.c b/vl.c
-index d825a34..21e3262 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2822,8 +2822,7 @@ static void configure_accelerators(const char *progna=
-me)
-     }
- }
+     ret =3D g_test_run();
 =20
--static void create_default_memdev(MachineState *ms, const char *path,
--                                  bool prealloc)
-+static void create_default_memdev(MachineState *ms, const char *path)
- {
-     Object *obj;
-     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-@@ -2832,7 +2831,6 @@ static void create_default_memdev(MachineState *ms, c=
-onst char *path,
-     if (path) {
-         object_property_set_str(obj, path, "mem-path", &error_fatal);
-     }
--    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
-     object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
-     object_property_add_child(object_get_objects_root(), mc->default_ram_i=
-d,
-                               obj, &error_fatal);
-@@ -3975,6 +3973,14 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
-=20
-+    if (mem_prealloc) {
-+        char *val;
-+
-+        val =3D g_strdup_printf("%d", current_machine->smp.cpus);
-+        object_register_sugar_prop("memory-backend", "prealloc-threads", v=
-al);
-+        g_free(val);
-+    }
-+
-     /*
-      * Get the default machine options from the machine if it is not alrea=
-dy
-      * specified either by the configuration file or by the command line.
-@@ -4309,7 +4315,7 @@ int main(int argc, char **argv, char **envp)
-         machine_class->default_ram_size &&
-         machine_class->default_ram_id &&
-         !current_machine->ram_memdev) {
--        create_default_memdev(current_machine, mem_path, mem_prealloc);
-+        create_default_memdev(current_machine, mem_path);
-     }
-     /* do monitor/qmp handling at preconfig state if requested */
-     main_loop();
 --=20
-2.7.4
+2.24.1
 
 
