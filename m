@@ -2,80 +2,58 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A06EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49038C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:13:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BAAA2077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:13:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KovCAUj3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BAAA2077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 285072077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:13:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 285072077C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iugyl-0000A6-5g
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:13:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41083)
+	id 1iugym-0000D0-Oe
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:13:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufdb-0004et-6c
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:24 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1iufGN-0007Nm-T5
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:23:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufdZ-0006MW-MC
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20485
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1iufGM-0006Lj-0s
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:23:23 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:48596)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdZ-0006MK-JD
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798041;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zbK2M664VeD4EebvP9HVM8XSFfKMYMH/6meiQEmwLDE=;
- b=KovCAUj3B+kcQpvgdAdx5dH7vISiFr7XLuhJxGvmBaeKUnegkBfc+XQDLiXkwxpo9IuTXb
- oHD1rd90q9Bs2Q01PFe3HKpCaaFHdoBJyopN67A/uHvXewPyYLRwpRMK+g38lu282k7oqT
- H/g3Rh0Ep9j8bTrZBleBSGTCTwkIj7A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-L0UhLyiFPZiI4mv8NYJV0A-1; Thu, 23 Jan 2020 11:47:19 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CCCC8B95B5
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:19 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
- [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6869128991;
- Thu, 23 Jan 2020 16:47:18 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 024/108] virtiofsd: Start reading commands from queue
-Date: Thu, 23 Jan 2020 16:45:06 +0000
-Message-Id: <20200123164630.91498-25-dgilbert@redhat.com>
-In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
-References: <20200123164630.91498-1-dgilbert@redhat.com>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1iufGL-0006Kj-MG; Thu, 23 Jan 2020 11:23:21 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id ED4F8748DCE;
+ Thu, 23 Jan 2020 17:23:19 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id B63A5748DCC; Thu, 23 Jan 2020 17:23:19 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id B4F49748DCD;
+ Thu, 23 Jan 2020 17:23:19 +0100 (CET)
+Date: Thu, 23 Jan 2020 17:23:19 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH REPOST v3 65/80] ppc/{ppc440_bamboo, sam460ex}: use memdev
+ for RAM
+In-Reply-To: <1579779525-20065-66-git-send-email-imammedo@redhat.com>
+Message-ID: <alpine.BSF.2.21.99999.352.2001231723100.72857@zero.eik.bme.hu>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+ <1579779525-20065-66-git-send-email-imammedo@redhat.com>
+User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: L0UhLyiFPZiI4mv8NYJV0A-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,197 +65,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Thu, 23 Jan 2020, Igor Mammedov wrote:
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>  MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Pop queue elements off queues, copy the data from them and
-pass that to fuse.
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-  Note: 'out' in a VuVirtqElement is from QEMU
-        'in' in libfuse is into the daemon
+Regards,
+BALATON Zoltan
 
-  So we read from the out iov's to get a fuse_in_header
-
-When we get a kick we've got to read all the elements until the queue
-is empty.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/fuse_i.h      |  2 +
- tools/virtiofsd/fuse_virtio.c | 99 +++++++++++++++++++++++++++++++++--
- 2 files changed, 98 insertions(+), 3 deletions(-)
-
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index ec04449069..1126723d18 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -14,6 +14,7 @@
- #include "fuse_lowlevel.h"
-=20
- struct fv_VuDev;
-+struct fv_QueueInfo;
-=20
- struct fuse_req {
-     struct fuse_session *se;
-@@ -75,6 +76,7 @@ struct fuse_chan {
-     pthread_mutex_t lock;
-     int ctr;
-     int fd;
-+    struct fv_QueueInfo *qi;
- };
-=20
- /**
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 05e7258712..3841b20129 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -12,6 +12,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/iov.h"
- #include "fuse_virtio.h"
- #include "fuse_i.h"
- #include "standard-headers/linux/fuse.h"
-@@ -32,6 +33,7 @@
-=20
- #include "contrib/libvhost-user/libvhost-user.h"
-=20
-+struct fv_VuDev;
- struct fv_QueueInfo {
-     pthread_t thread;
-     struct fv_VuDev *virtio_dev;
-@@ -101,10 +103,41 @@ static void fv_panic(VuDev *dev, const char *err)
-     exit(EXIT_FAILURE);
- }
-=20
-+/*
-+ * Copy from an iovec into a fuse_buf (memory only)
-+ * Caller must ensure there is space
-+ */
-+static void copy_from_iov(struct fuse_buf *buf, size_t out_num,
-+                          const struct iovec *out_sg)
-+{
-+    void *dest =3D buf->mem;
-+
-+    while (out_num) {
-+        size_t onelen =3D out_sg->iov_len;
-+        memcpy(dest, out_sg->iov_base, onelen);
-+        dest +=3D onelen;
-+        out_sg++;
-+        out_num--;
-+    }
-+}
-+
- /* Thread function for individual queues, created when a queue is 'started=
-' */
- static void *fv_queue_thread(void *opaque)
- {
-     struct fv_QueueInfo *qi =3D opaque;
-+    struct VuDev *dev =3D &qi->virtio_dev->dev;
-+    struct VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
-+    struct fuse_session *se =3D qi->virtio_dev->se;
-+    struct fuse_chan ch;
-+    struct fuse_buf fbuf;
-+
-+    fbuf.mem =3D NULL;
-+    fbuf.flags =3D 0;
-+
-+    fuse_mutex_init(&ch.lock);
-+    ch.fd =3D (int)0xdaff0d111;
-+    ch.qi =3D qi;
-+
-     fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __func_=
-_,
-              qi->qidx, qi->kick_fd);
-     while (1) {
-@@ -141,11 +174,71 @@ static void *fv_queue_thread(void *opaque)
-             fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
-             break;
-         }
--        if (qi->virtio_dev->se->debug) {
--            fprintf(stderr, "%s: Queue %d gave evalue: %zx\n", __func__,
--                    qi->qidx, (size_t)evalue);
-+        /* out is from guest, in is too guest */
-+        unsigned int in_bytes, out_bytes;
-+        vu_queue_get_avail_bytes(dev, q, &in_bytes, &out_bytes, ~0, ~0);
-+
-+        fuse_log(FUSE_LOG_DEBUG,
-+                 "%s: Queue %d gave evalue: %zx available: in: %u out: %u\=
-n",
-+                 __func__, qi->qidx, (size_t)evalue, in_bytes, out_bytes);
-+
-+        while (1) {
-+            /*
-+             * An element contains one request and the space to send our
-+             * response They're spread over multiple descriptors in a
-+             * scatter/gather set and we can't trust the guest to keep the=
-m
-+             * still; so copy in/out.
-+             */
-+            VuVirtqElement *elem =3D vu_queue_pop(dev, q, sizeof(VuVirtqEl=
-ement));
-+            if (!elem) {
-+                break;
-+            }
-+
-+            if (!fbuf.mem) {
-+                fbuf.mem =3D malloc(se->bufsize);
-+                assert(fbuf.mem);
-+                assert(se->bufsize > sizeof(struct fuse_in_header));
-+            }
-+            /* The 'out' part of the elem is from qemu */
-+            unsigned int out_num =3D elem->out_num;
-+            struct iovec *out_sg =3D elem->out_sg;
-+            size_t out_len =3D iov_size(out_sg, out_num);
-+            fuse_log(FUSE_LOG_DEBUG,
-+                     "%s: elem %d: with %d out desc of length %zd\n", __fu=
-nc__,
-+                     elem->index, out_num, out_len);
-+
-+            /*
-+             * The elem should contain a 'fuse_in_header' (in to fuse)
-+             * plus the data based on the len in the header.
-+             */
-+            if (out_len < sizeof(struct fuse_in_header)) {
-+                fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for in_heade=
-r\n",
-+                         __func__, elem->index);
-+                assert(0); /* TODO */
-+            }
-+            if (out_len > se->bufsize) {
-+                fuse_log(FUSE_LOG_ERR, "%s: elem %d too large for buffer\n=
-",
-+                         __func__, elem->index);
-+                assert(0); /* TODO */
-+            }
-+            copy_from_iov(&fbuf, out_num, out_sg);
-+            fbuf.size =3D out_len;
-+
-+            /* TODO! Endianness of header */
-+
-+            /* TODO: Fixup fuse_send_msg */
-+            /* TODO: Add checks for fuse_session_exited */
-+            fuse_session_process_buf_int(se, &fbuf, &ch);
-+
-+            /* TODO: vu_queue_push(dev, q, elem, qi->write_count); */
-+            vu_queue_notify(dev, q);
-+
-+            free(elem);
-+            elem =3D NULL;
-         }
-     }
-+    pthread_mutex_destroy(&ch.lock);
-+    free(fbuf.mem);
-=20
-     return NULL;
- }
---=20
-2.24.1
-
+> ---
+> v3:
+>  * drop ram_size from comment above ppc4xx_sdram_banks
+>     (BALATON Zoltan <balaton@eik.bme.hu>)
+>  * move memory alias initialization into the same loop
+>    where RAM is split on banks.
+>     (BALATON Zoltan <balaton@eik.bme.hu>)
+> v3.1
+>  * rebase on top of previous patch due to changed context
+>
+> CC: balaton@eik.bme.hu
+> CC: david@gibson.dropbear.id.au
+> CC: qemu-ppc@nongnu.org
+> ---
+> include/hw/ppc/ppc4xx.h |  2 +-
+> hw/ppc/ppc440_bamboo.c  |  3 ++-
+> hw/ppc/ppc4xx_devs.c    | 25 +++++++++----------------
+> hw/ppc/sam460ex.c       |  3 ++-
+> 4 files changed, 14 insertions(+), 19 deletions(-)
+>
+> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+> index b8c8f32..cc19c8d 100644
+> --- a/include/hw/ppc/ppc4xx.h
+> +++ b/include/hw/ppc/ppc4xx.h
+> @@ -42,7 +42,7 @@ enum {
+> qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
+>                        uint32_t dcr_base, int has_ssr, int has_vr);
+>
+> -void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
+> +void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_banks,
+>                         MemoryRegion ram_memories[],
+>                         hwaddr ram_bases[], hwaddr ram_sizes[],
+>                         const ram_addr_t sdram_bank_sizes[]);
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index 29a9642..1d4a11d 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -202,7 +202,7 @@ static void bamboo_init(MachineState *machine)
+>     /* SDRAM controller */
+>     memset(ram_bases, 0, sizeof(ram_bases));
+>     memset(ram_sizes, 0, sizeof(ram_sizes));
+> -    ppc4xx_sdram_banks(machine->ram_size, PPC440EP_SDRAM_NR_BANKS, ram_memories,
+> +    ppc4xx_sdram_banks(machine->ram, PPC440EP_SDRAM_NR_BANKS, ram_memories,
+>                        ram_bases, ram_sizes, ppc440ep_sdram_bank_sizes);
+>     /* XXX 440EP's ECC interrupts are on UIC1, but we've only created UIC0. */
+>     ppc4xx_sdram_init(env, pic[14], PPC440EP_SDRAM_NR_BANKS, ram_memories,
+> @@ -289,6 +289,7 @@ static void bamboo_machine_init(MachineClass *mc)
+>     mc->desc = "bamboo";
+>     mc->init = bamboo_init;
+>     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("440epb");
+> +    mc->default_ram_id = "ppc4xx.sdram";
+> }
+>
+> DEFINE_MACHINE("bamboo", bamboo_machine_init)
+> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+> index d89008a..0e2f81c 100644
+> --- a/hw/ppc/ppc4xx_devs.c
+> +++ b/hw/ppc/ppc4xx_devs.c
+> @@ -666,7 +666,7 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
+>         sdram_map_bcr(sdram);
+> }
+>
+> -/* Fill in consecutive SDRAM banks with 'ram_size' bytes of memory.
+> +/* Split RAM between SDRAM banks.
+>  *
+>  * sdram_bank_sizes[] must be in descending order, that is sizes[i] > sizes[i+1]
+>  * and must be 0-terminated.
+> @@ -674,16 +674,14 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
+>  * The 4xx SDRAM controller supports a small number of banks, and each bank
+>  * must be one of a small set of sizes. The number of banks and the supported
+>  * sizes varies by SoC. */
+> -void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
+> +void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_banks,
+>                         MemoryRegion ram_memories[],
+>                         hwaddr ram_bases[], hwaddr ram_sizes[],
+>                         const ram_addr_t sdram_bank_sizes[])
+> {
+> -    MemoryRegion *ram = g_malloc0(sizeof(*ram));
+> -    ram_addr_t size_left = ram_size;
+> +    ram_addr_t size_left = memory_region_size(ram);
+>     ram_addr_t base = 0;
+>     ram_addr_t bank_size;
+> -    int last_bank = 0;
+>     int i;
+>     int j;
+>
+> @@ -691,11 +689,15 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
+>         for (j = 0; sdram_bank_sizes[j] != 0; j++) {
+>             bank_size = sdram_bank_sizes[j];
+>             if (bank_size <= size_left) {
+> +                char name[32];
+> +
+>                 ram_bases[i] = base;
+>                 ram_sizes[i] = bank_size;
+>                 base += bank_size;
+>                 size_left -= bank_size;
+> -                last_bank = i;
+> +                snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
+> +                memory_region_init_alias(&ram_memories[i], NULL, name, ram,
+> +                                         ram_bases[i], ram_sizes[i]);
+>                 break;
+>             }
+>         }
+> @@ -706,7 +708,7 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
+>     }
+>
+>     if (size_left) {
+> -        ram_addr_t used_size = ram_size - size_left;
+> +        ram_addr_t used_size = memory_region_size(ram) - size_left;
+>         GString *s = g_string_new(NULL);
+>
+>         for (i = 0; sdram_bank_sizes[i]; i++) {
+> @@ -722,15 +724,6 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
+>         g_string_free(s, true);
+>         exit(EXIT_FAILURE);
+>     }
+> -
+> -    memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_size);
+> -
+> -    for (i = 0; i <= last_bank; i++) {
+> -        char name[32];
+> -        snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
+> -        memory_region_init_alias(&ram_memories[i], NULL, name, ram,
+> -                                 ram_bases[i], ram_sizes[i]);
+> -    }
+> }
+>
+> /*****************************************************************************/
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 949acba..b48aea5 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -324,7 +324,7 @@ static void sam460ex_init(MachineState *machine)
+>     /* SDRAM controller */
+>     /* put all RAM on first bank because board has one slot
+>      * and firmware only checks that */
+> -    ppc4xx_sdram_banks(machine->ram_size, 1, ram_memories, ram_bases, ram_sizes,
+> +    ppc4xx_sdram_banks(machine->ram, 1, ram_memories, ram_bases, ram_sizes,
+>                        ppc460ex_sdram_bank_sizes);
+>
+>     /* FIXME: does 460EX have ECC interrupts? */
+> @@ -483,6 +483,7 @@ static void sam460ex_machine_init(MachineClass *mc)
+>     mc->init = sam460ex_init;
+>     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("460exb");
+>     mc->default_ram_size = 512 * MiB;
+> +    mc->default_ram_id = "ppc4xx.sdram";
+> }
+>
+> DEFINE_MACHINE("sam460ex", sam460ex_machine_init)
+>
 
