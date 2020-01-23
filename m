@@ -2,69 +2,69 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA09EC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0473C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:27:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEC8124125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:27:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC8124125
+	by mail.kernel.org (Postfix) with ESMTPS id B85A524125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:27:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B85A524125
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuXpc-0006qu-4P
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:27:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56002)
+	id 1iuXpu-0007MQ-Fx
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:27:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iuXlM-00014t-3i
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:53 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iuXlI-00011l-Id
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iuXlK-00032G-KT
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:51 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:39505)
+ (envelope-from <laurent@vivier.eu>) id 1iuXlE-0002ne-Rw
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:48 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:56565)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuXlK-00030m-Al
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:50 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iuXlD-0002h1-5b
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:22:44 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N6bPS-1jgTgr0XQk-017zXj; Thu, 23 Jan 2020 09:22:35 +0100
+ id 1MVe1U-1j4P740RjI-00RW7J; Thu, 23 Jan 2020 09:22:38 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/17] linux-user: Add support for FS_IOC_<GET|SET>VERSION
- ioctls
-Date: Thu, 23 Jan 2020 09:22:13 +0100
-Message-Id: <20200123082227.2037994-4-laurent@vivier.eu>
+Subject: [PULL 09/17] linux-user: Add support for KCOV_<ENABLE|DISABLE> ioctls
+Date: Thu, 23 Jan 2020 09:22:19 +0100
+Message-Id: <20200123082227.2037994-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200123082227.2037994-1-laurent@vivier.eu>
 References: <20200123082227.2037994-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:5+e8ly+M64AP+Fd9RcIlIR0MmRTynLhSFtzn9DW9MCwhG6dhmn6
- I17Lmp0tzxas//xawK8xcJ2OLzZe62iDbN863PfFuKIJbZcvKzb3QY5vGhxQDBWRabmfnfH
- O4aIRxAZwApOXikf56dc47MHGcYHxLeAaUEdLG7Av2c+WcDDb6sPfgyYCVR44Yi8mTpop9C
- Mr7DtaDCC4J9ykSrWWsZQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zGKMKVesmio=:RfR4q6OYN579CSUuJI9+1W
- agBD2kYKoeZ9NAEtq9sfB/6OeSVPY3urhw9YYxpcuxNv9I0CJ5gYoxDej3/WolAh610gvUSjD
- ADXHZQNRDlyefen3Xv6XYOuZGhEy+VC/iI9C1BEtSaeWz2MJ3YOgWWc2gqj7ShqheYmuraGXX
- Mphu6eWzna6XZnUh5Qd4y/RhoPRVO+f+niB0YeN4/aPe0dk3v8RH9l2MVllR4H4Yii43HOxUT
- 7I32kcLHDh9b264bUUTGJRrt6at4knC/jrDDm6E+rRy2vYypTQbl9cEQeAZxen4g6P79lWj2D
- 5TAibfnpDv3nR/RZGqJs3MJuKQv936WYEJEZarYR2OfFmDJmqB+zzwoA/TLLj8cBJs1sNV7gS
- tYBfBlV8kSPhPViHl6O2w48pQz2dM1iCxeqeW6UXT0WdO7su8OHmbYHE3q8DMP+PE/FeA3EOq
- m77oy8BwwqeT0tZPORp6G64Q8ymo8bl3rzv1/IO3FqQXKnfcIBRc/9bKC26FvWzG1tYSYkh4b
- AjbcBam6Qt5t1kmus6lLbGDSCes/5EyhH5uZwsE36PZWLreRvGJJezwd85Zr3EXbtJkTzWZ6t
- PB9VUOHjA7Bpdeb41Jk/eVM/F2gwCjO94S7nZir0cc4ssEckCzlX/V5UmLf123Hs2DSRr/kPF
- rB3LUVC9R0g08nmLnQQfJMjedxiwi6VWYxHWdBzjp5uku+OG8nbNSohmZ3gJVIUHsG8y77Y6r
- 8Bht39nWsyK0rYogCRAhEjL4+qOw2Wk0yE9mqGag3AbP9AZuDH1j0NJD2QLevOeZjw5BQB3Dw
- yxIDVFsOatbXc2cSwLTBZ2JG2Y5QLKiud64OsVytiYp3wjH1Jk=
+X-Provags-ID: V03:K1:zNfPndWnTfyMu8W8Zt6FV95lB+oI0aYtu0oTtxqSMeEEo8Hymj8
+ 5v7iyn5KuJoof1XG5fipPYK4b0f+h3zXxOckDsGEFybjoRxfQWtjG9dxOXnP7SHaIIU4xAv
+ 8l+p6aSxxmWEp1dnM8UBKPJCbEm74KJnEGX0t72NKKIWli4f174SAUtB/5vFBHpxlbcu3O7
+ 7xNG0R2ocXmqsEKr1zxMg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NfN7sH84tDQ=:BAk6VId1vOw+vrviRC0Zxv
+ GO1H58GuhGT7rvlVEwTVG3ZKDHkEpraLIvwImOzNInJNfFQmkFR913hPyi4nRL82N5j1bdFCF
+ eGsAM3xvr29fQ8NXVFBvW9CF7SE88L+jH0VGBtBNntyTvkJP3KFGVF2MBy3qnIXLWA2WWsXLc
+ lJEMs03ACp1CW4HNvFZjaUW4J78IfWR9l271ett7fauDr1Pj/fxer3w1lKcsfCmxef80dhOMS
+ 6ebsPnpfmoYc/Gt+AV/ooBLbJStHv8lSTTz4OstJi0d2MKrhCZ4SxZ1EhP23thpkOBn+kN0BN
+ ArQ1JEPWogL9NL0GRFDxrVVryjewHJHahoN5NtOGYGVrNcfChwJmx5AjPxYrXboXWF6DEJ0vV
+ ai/U9X5zSLwRLc1SWEua8FfIXCnYeQVEJ2IMIafdsM+HiYP14sr3koGnQfUkqj1iMtD6zHbkE
+ xnreMK5yh72AC2kBs1WKfhdKrX7GR3cExeG5R1pkasOONmR7wJJ5KgFzU75Sn2HcsXG3inQOS
+ qVBT9pD5Dz8At4yySrAjVD04lXtLzXNmioLEeuZinoHnWmhHNUaYVVGY9GCdZaTT7EfZ/zg0A
+ PqD+uv8VgUHS6p75F88mB/nJ5KSFYFmsRN2mScbsn2vbJmeV0XW2Gr3Ich27EjhsgERWqPLPB
+ Pg01Z19Xu1FQYuqNeGHbZo+hJd4Ymj/bbGKiBof5ZrmoI2ARpQ7pDjBJ3xMTgGXeBVHGXr0t+
+ 7EPgpKfQzw6s91rNnfF9e7+9JteGBGCackXJeUKP2E0J5fCb7wdOwX/Rc8k/Uwi0n/ZZxIWLX
+ fyOg3+bGwadqF6BM4d6n2FpYKDc7jzKtICUkqn+zAIgvggN+7o=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,56 +84,62 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-A very specific thing for these two ioctls is that their code
-implies that their third argument is of type 'long', but the
-kernel uses that argument as if it is of type 'int'. This anomaly
-is recognized also in commit 6080723 (linux-user: Implement
-FS_IOC_GETFLAGS and FS_IOC_SETFLAGS ioctls).
+KCOV_ENABLE and KCOV_DISABLE play the role in kernel coverage
+tracing. These ioctls do not use the third argument of ioctl()
+system call and are straightforward to implement in QEMU.
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1579214991-19602-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Message-Id: <1579214991-19602-12-git-send-email-aleksandar.markovic@rt-rk.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 8 +++++---
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ linux-user/ioctls.h       | 5 +++++
+ linux-user/syscall.c      | 3 +++
+ linux-user/syscall_defs.h | 4 ++++
+ 3 files changed, 12 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index c6b9d6ad6653..c44f42eaf4e7 100644
+index 29969e2f2f27..6220dd8cf791 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -138,6 +138,8 @@
+@@ -534,3 +534,8 @@
+   IOCTL_IGNORE(TIOCSTART)
+   IOCTL_IGNORE(TIOCSTOP)
+ #endif
++
++#ifdef CONFIG_KCOV
++  IOCTL(KCOV_ENABLE, 0, TYPE_NULL)
++  IOCTL(KCOV_DISABLE, 0, TYPE_NULL)
++#endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 249e4b95fc9f..c5bda60b45de 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -73,6 +73,9 @@
+ #ifdef CONFIG_SENDFILE
+ #include <sys/sendfile.h>
+ #endif
++#ifdef CONFIG_KCOV
++#include <sys/kcov.h>
++#endif
  
-      IOCTL(FS_IOC_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
- 
- #ifdef CONFIG_USBFS
-   /* USB ioctls */
+ #define termios host_termios
+ #define winsize host_winsize
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 98c2119de9c1..f68a8b6e8e18 100644
+index b3acf85a6b23..7b0b60d253d9 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -911,12 +911,14 @@ struct target_pollfd {
- #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
- #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
+@@ -2434,6 +2434,10 @@ struct target_mtpos {
+ #define TARGET_MTIOCGET        TARGET_IOR('m', 2, struct target_mtget)
+ #define TARGET_MTIOCPOS        TARGET_IOR('m', 3, struct target_mtpos)
  
--/* Note that the ioctl numbers claim type "long" but the actual type
-- * used by the kernel is "int".
-+/*
-+ * Note that the ioctl numbers for FS_IOC_<GET|SET><FLAGS|VERSION>
-+ * claim type "long" but the actual type used by the kernel is "int".
-  */
- #define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
- #define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
--
-+#define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
-+#define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
- #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
- 
- /* usb ioctls */
++/* kcov ioctls */
++#define TARGET_KCOV_ENABLE     TARGET_IO('c', 100)
++#define TARGET_KCOV_DISABLE    TARGET_IO('c', 101)
++
+ struct target_sysinfo {
+     abi_long uptime;                /* Seconds since boot */
+     abi_ulong loads[3];             /* 1, 5, and 15 minute load averages */
 -- 
 2.24.1
 
