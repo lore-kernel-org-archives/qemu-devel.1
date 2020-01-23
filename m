@@ -7,81 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35BAC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E25C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AF52214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:52:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2735214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:53:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9cmQTiA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AF52214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="f/6MSOET"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2735214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuemW-00033o-Rl
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:52:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51736)
+	id 1iuen0-0002wg-IS
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:53:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrf-0005PK-Ac
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:45 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iucXQ-0005CE-2b
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:28:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrd-0004CR-JI
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:43 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:47023)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrd-00049I-Bk
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:41 -0500
-Received: by mail-wr1-x432.google.com with SMTP id z7so3098748wrl.13
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OERtFp3Q/y9ZSPI8cgyrtVoTr3IWEd9WgGvVo945KWA=;
- b=f9cmQTiA3WG4LxqkbQj6KMd0VeJ/E/HQehW2jkb1e9Ond5jwBP+2flEAntyQxTMU+S
- YMW6l2WksOkZX7lbq1sc0+lgqMtxFM9xQOQ0JOlP8hacxUVh1t21qFWJdLOuumdoIq4R
- 2lGy5sNkUDHSQpOGcuFXPICjih1RxE8qq3qCQ/NS9wgHwDLuP3JPPFNpDdrHPUZ/OslR
- h11wSAeXzqhTXYAIdBL2aRTQ/vZoWu9x2qMLzXDBJPX79UQ2UTSy47hiSzJwXHlgyWM0
- juExQt4yA2bxDJDIDR0VRUj2jn/pMpaDNizhiqiGVSVIMcJiEgcXnArKPHMU1ycmgzgb
- /0YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=OERtFp3Q/y9ZSPI8cgyrtVoTr3IWEd9WgGvVo945KWA=;
- b=GSwWolEue2jo1eWHZWlwFC7bAwPaVfhxdNQbSDJPqW6rvRpJeH4gcaw3fiSqv0RboV
- sdddqgIEZYe/BicMzPn+F/du1mLlyhlsnGkfhaDYUrJGKHVWPaG4SQkaSg2A0K7poDLh
- JoSUK0ebtHatEmV8quhj4HS/VhYQkmFO3Uqd84OeR7Qf0zQvumsq6ezgprv4Ev+oZGxV
- eZC6sfW9DJ+AJ1GmOc4zGAfgqArDxrSiZOc3i6+DG0MZXkAYiKcVXgdfYObOHTGb4Xik
- l7HtLusDbgA/v4wWqvQXEXvIdFSQFF+DRiClggEkLsZoeA78Vzu/Z827ayDc9xndBY2X
- KCPQ==
-X-Gm-Message-State: APjAAAVq0wd0A5xgGPBrS/gEC9rk/Xo+GcvYfLIcmh+Lw7HWEbHUtTEf
- 3kTWjgAoYgL03VTJ+h1cqAarimMi
-X-Google-Smtp-Source: APXvYqx1oHDukj04xWlbH8PntS9uz6GMsB5JP7T4B5BTq6freQ3b3ni//hoetmoplCdk2tBSBtebxw==
-X-Received: by 2002:adf:eb8e:: with SMTP id t14mr17514860wrn.384.1579787380137; 
- Thu, 23 Jan 2020 05:49:40 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.39
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:39 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <damien.hedde@greensocs.com>) id 1iucXM-0003kQ-At
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:28:47 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:56792)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iucXL-0003id-Ue; Thu, 23 Jan 2020 08:28:44 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 4134196F58;
+ Thu, 23 Jan 2020 13:28:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1579786122;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UABU9vf9nTWDxAMmzQJR2hWfoLnQjqdoMOxfTfB4I0M=;
+ b=f/6MSOET+crsedRZLNbswenP/ZalQecGpEZHQqqrgictgpBR4t16dGEhhu03lxheuYPtYu
+ SrFVIb79cM7+xnO8rLw+gPsM1Dujishbjb0GNuSUCOxwZsEAfnDo/Ac5soqOPRLrck077U
+ 8ixKuH7LwKCKXN6WXKjUWgu+Lrcddrc=
+From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 38/59] object: make object_class_property_add* return property
-Date: Thu, 23 Jan 2020 14:48:41 +0100
-Message-Id: <1579787342-27146-39-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH v8 09/11] docs/devel/reset.rst: add doc about Resettable
+ interface
+Date: Thu, 23 Jan 2020 14:28:21 +0100
+Message-Id: <20200123132823.1117486-10-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200123132823.1117486-1-damien.hedde@greensocs.com>
+References: <20200123132823.1117486-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::432
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1579786122;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UABU9vf9nTWDxAMmzQJR2hWfoLnQjqdoMOxfTfB4I0M=;
+ b=OiC/HAlv6nevhwrDz5QsEFGO3NotnbPBYUf4QzvNb9mYJID75uzavb66Ux/AegLIpOzYKY
+ iU472MnXsXcsKeSCjml37oOiwlNuJx2Wn+sR+bcz+kJJQy3bZoZw0uQxUK3oZqfBNpg8jh
+ yDwiUS9ggwzWOtZ8aBOkHmR1cbknAc8=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579786122; a=rsa-sha256; cv=none;
+ b=jStC6wjV99amSS9zhGFcevXTCcrJjxmfslcvK0gK+41EF5mDMP0xJAZt6gPoWXvY3B9a9r
+ ua8/Pz4y59qJe3Nkvj4SryfiWYJYVusfWLc/LMqiFz2BaawMh+5rQBKQUgHvB65KFewZTm
+ wVI+u04auukFvVXevyCNapeMYvDF+10=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,311 +90,416 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com,
+ Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
+ mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
+ pbonzini@redhat.com, philmd@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-This will help calling other ObjectProperty associated functions
-easily after.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200110153039.1379601-9-marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/qom/object.h | 24 +++++++++++++-------
- qom/object.c         | 64 ++++++++++++++++++++++++++++++++++++----------------
- 2 files changed, 60 insertions(+), 28 deletions(-)
+ docs/devel/index.rst |   1 +
+ docs/devel/reset.rst | 289 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 290 insertions(+)
+ create mode 100644 docs/devel/reset.rst
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index ca47308..9f52bc3 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1556,7 +1556,8 @@ void object_property_add_str(Object *obj, const char *name,
-                              void (*set)(Object *, const char *, Error **),
-                              Error **errp);
- 
--void object_class_property_add_str(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_str(ObjectClass *klass,
-+                                   const char *name,
-                                    char *(*get)(Object *, Error **),
-                                    void (*set)(Object *, const char *,
-                                                Error **),
-@@ -1578,7 +1579,8 @@ void object_property_add_bool(Object *obj, const char *name,
-                               void (*set)(Object *, bool, Error **),
-                               Error **errp);
- 
--void object_class_property_add_bool(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_bool(ObjectClass *klass,
-+                                    const char *name,
-                                     bool (*get)(Object *, Error **),
-                                     void (*set)(Object *, bool, Error **),
-                                     Error **errp);
-@@ -1602,7 +1604,8 @@ void object_property_add_enum(Object *obj, const char *name,
-                               void (*set)(Object *, int, Error **),
-                               Error **errp);
- 
--void object_class_property_add_enum(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_enum(ObjectClass *klass,
-+                                    const char *name,
-                                     const char *typename,
-                                     const QEnumLookup *lookup,
-                                     int (*get)(Object *, Error **),
-@@ -1623,7 +1626,8 @@ void object_property_add_tm(Object *obj, const char *name,
-                             void (*get)(Object *, struct tm *, Error **),
-                             Error **errp);
- 
--void object_class_property_add_tm(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_tm(ObjectClass *klass,
-+                                  const char *name,
-                                   void (*get)(Object *, struct tm *, Error **),
-                                   Error **errp);
- 
-@@ -1639,7 +1643,8 @@ void object_class_property_add_tm(ObjectClass *klass, const char *name,
-  */
- void object_property_add_uint8_ptr(Object *obj, const char *name,
-                                    const uint8_t *v, Error **errp);
--void object_class_property_add_uint8_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_uint8_ptr(ObjectClass *klass,
-+                                         const char *name,
-                                          const uint8_t *v, Error **errp);
- 
- /**
-@@ -1654,7 +1659,8 @@ void object_class_property_add_uint8_ptr(ObjectClass *klass, const char *name,
-  */
- void object_property_add_uint16_ptr(Object *obj, const char *name,
-                                     const uint16_t *v, Error **errp);
--void object_class_property_add_uint16_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_uint16_ptr(ObjectClass *klass,
-+                                          const char *name,
-                                           const uint16_t *v, Error **errp);
- 
- /**
-@@ -1669,7 +1675,8 @@ void object_class_property_add_uint16_ptr(ObjectClass *klass, const char *name,
-  */
- void object_property_add_uint32_ptr(Object *obj, const char *name,
-                                     const uint32_t *v, Error **errp);
--void object_class_property_add_uint32_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_uint32_ptr(ObjectClass *klass,
-+                                          const char *name,
-                                           const uint32_t *v, Error **errp);
- 
- /**
-@@ -1684,7 +1691,8 @@ void object_class_property_add_uint32_ptr(ObjectClass *klass, const char *name,
-  */
- void object_property_add_uint64_ptr(Object *obj, const char *name,
-                                     const uint64_t *v, Error **errp);
--void object_class_property_add_uint64_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_add_uint64_ptr(ObjectClass *klass,
-+                                          const char *name,
-                                           const uint64_t *v, Error **errp);
- 
- /**
-diff --git a/qom/object.c b/qom/object.c
-index 49c2429..213a796 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -2074,7 +2074,8 @@ void object_property_add_str(Object *obj, const char *name,
-     }
- }
- 
--void object_class_property_add_str(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_str(ObjectClass *klass, const char *name,
-                                    char *(*get)(Object *, Error **),
-                                    void (*set)(Object *, const char *,
-                                                Error **),
-@@ -2082,11 +2083,12 @@ void object_class_property_add_str(ObjectClass *klass, const char *name,
- {
-     Error *local_err = NULL;
-     StringProperty *prop = g_malloc0(sizeof(*prop));
-+    ObjectProperty *rv;
- 
-     prop->get = get;
-     prop->set = set;
- 
--    object_class_property_add(klass, name, "string",
-+    rv = object_class_property_add(klass, name, "string",
-                               get ? property_get_str : NULL,
-                               set ? property_set_str : NULL,
-                               property_release_str,
-@@ -2095,6 +2097,8 @@ void object_class_property_add_str(ObjectClass *klass, const char *name,
-         error_propagate(errp, local_err);
-         g_free(prop);
-     }
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index ac862152dc..4dc2ca8d71 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -24,3 +24,4 @@ Contents:
+    tcg
+    tcg-plugins
+    bitops
++   reset
+diff --git a/docs/devel/reset.rst b/docs/devel/reset.rst
+new file mode 100644
+index 0000000000..abea1102dc
+--- /dev/null
++++ b/docs/devel/reset.rst
+@@ -0,0 +1,289 @@
 +
-+    return rv;
- }
- 
- typedef struct BoolProperty
-@@ -2164,18 +2168,20 @@ void object_property_add_bool(Object *obj, const char *name,
-     }
- }
- 
--void object_class_property_add_bool(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_bool(ObjectClass *klass, const char *name,
-                                     bool (*get)(Object *, Error **),
-                                     void (*set)(Object *, bool, Error **),
-                                     Error **errp)
- {
-     Error *local_err = NULL;
-     BoolProperty *prop = g_malloc0(sizeof(*prop));
-+    ObjectProperty *rv;
- 
-     prop->get = get;
-     prop->set = set;
- 
--    object_class_property_add(klass, name, "bool",
-+    rv = object_class_property_add(klass, name, "bool",
-                               get ? property_get_bool : NULL,
-                               set ? property_set_bool : NULL,
-                               property_release_bool,
-@@ -2184,6 +2190,8 @@ void object_class_property_add_bool(ObjectClass *klass, const char *name,
-         error_propagate(errp, local_err);
-         g_free(prop);
-     }
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++Reset in QEMU: the Resettable interface
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+    return rv;
- }
- 
- static void property_get_enum(Object *obj, Visitor *v, const char *name,
-@@ -2249,7 +2257,8 @@ void object_property_add_enum(Object *obj, const char *name,
-     }
- }
- 
--void object_class_property_add_enum(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_enum(ObjectClass *klass, const char *name,
-                                     const char *typename,
-                                     const QEnumLookup *lookup,
-                                     int (*get)(Object *, Error **),
-@@ -2258,12 +2267,13 @@ void object_class_property_add_enum(ObjectClass *klass, const char *name,
- {
-     Error *local_err = NULL;
-     EnumProperty *prop = g_malloc(sizeof(*prop));
-+    ObjectProperty *rv;
- 
-     prop->lookup = lookup;
-     prop->get = get;
-     prop->set = set;
- 
--    object_class_property_add(klass, name, typename,
-+    rv = object_class_property_add(klass, name, typename,
-                               get ? property_get_enum : NULL,
-                               set ? property_set_enum : NULL,
-                               property_release_enum,
-@@ -2272,6 +2282,8 @@ void object_class_property_add_enum(ObjectClass *klass, const char *name,
-         error_propagate(errp, local_err);
-         g_free(prop);
-     }
++The reset of qemu objects is handled using the resettable interface decl=
+ared
++in ``include/hw/resettable.h``.
 +
-+    return rv;
- }
- 
- typedef struct TMProperty {
-@@ -2352,16 +2364,18 @@ void object_property_add_tm(Object *obj, const char *name,
-     }
- }
- 
--void object_class_property_add_tm(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_tm(ObjectClass *klass, const char *name,
-                                   void (*get)(Object *, struct tm *, Error **),
-                                   Error **errp)
- {
-     Error *local_err = NULL;
-     TMProperty *prop = g_malloc0(sizeof(*prop));
-+    ObjectProperty *rv;
- 
-     prop->get = get;
- 
--    object_class_property_add(klass, name, "struct tm",
-+    rv = object_class_property_add(klass, name, "struct tm",
-                               get ? property_get_tm : NULL, NULL,
-                               property_release_tm,
-                               prop, &local_err);
-@@ -2369,6 +2383,8 @@ void object_class_property_add_tm(ObjectClass *klass, const char *name,
-         error_propagate(errp, local_err);
-         g_free(prop);
-     }
++This interface allows objects to be grouped (on a tree basis); so that t=
+he
++whole group can be reset consistently. Each individual member object doe=
+s not
++have to care about others; in particular, problems of order (which objec=
+t is
++reset first) are addressed.
 +
-+    return rv;
- }
- 
- static char *qdev_get_type(Object *obj, Error **errp)
-@@ -2411,11 +2427,13 @@ void object_property_add_uint8_ptr(Object *obj, const char *name,
-                         NULL, NULL, (void *)v, errp);
- }
- 
--void object_class_property_add_uint8_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_uint8_ptr(ObjectClass *klass, const char *name,
-                                          const uint8_t *v, Error **errp)
- {
--    object_class_property_add(klass, name, "uint8", property_get_uint8_ptr,
--                              NULL, NULL, (void *)v, errp);
-+    return object_class_property_add(klass, name, "uint8",
-+                                     property_get_uint8_ptr,
-+                                     NULL, NULL, (void *)v, errp);
- }
- 
- void object_property_add_uint16_ptr(Object *obj, const char *name,
-@@ -2425,11 +2443,13 @@ void object_property_add_uint16_ptr(Object *obj, const char *name,
-                         NULL, NULL, (void *)v, errp);
- }
- 
--void object_class_property_add_uint16_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_uint16_ptr(ObjectClass *klass, const char *name,
-                                           const uint16_t *v, Error **errp)
- {
--    object_class_property_add(klass, name, "uint16", property_get_uint16_ptr,
--                              NULL, NULL, (void *)v, errp);
-+    return object_class_property_add(klass, name, "uint16",
-+                                     property_get_uint16_ptr,
-+                                     NULL, NULL, (void *)v, errp);
- }
- 
- void object_property_add_uint32_ptr(Object *obj, const char *name,
-@@ -2439,11 +2459,13 @@ void object_property_add_uint32_ptr(Object *obj, const char *name,
-                         NULL, NULL, (void *)v, errp);
- }
- 
--void object_class_property_add_uint32_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_uint32_ptr(ObjectClass *klass, const char *name,
-                                           const uint32_t *v, Error **errp)
- {
--    object_class_property_add(klass, name, "uint32", property_get_uint32_ptr,
--                              NULL, NULL, (void *)v, errp);
-+    return object_class_property_add(klass, name, "uint32",
-+                                     property_get_uint32_ptr,
-+                                     NULL, NULL, (void *)v, errp);
- }
- 
- void object_property_add_uint64_ptr(Object *obj, const char *name,
-@@ -2453,11 +2475,13 @@ void object_property_add_uint64_ptr(Object *obj, const char *name,
-                         NULL, NULL, (void *)v, errp);
- }
- 
--void object_class_property_add_uint64_ptr(ObjectClass *klass, const char *name,
-+ObjectProperty *
-+object_class_property_add_uint64_ptr(ObjectClass *klass, const char *name,
-                                           const uint64_t *v, Error **errp)
- {
--    object_class_property_add(klass, name, "uint64", property_get_uint64_ptr,
--                              NULL, NULL, (void *)v, errp);
-+    return object_class_property_add(klass, name, "uint64",
-+                                     property_get_uint64_ptr,
-+                                     NULL, NULL, (void *)v, errp);
- }
- 
- typedef struct {
--- 
-1.8.3.1
-
++As of now DeviceClass and BusClass implement this interface.
++
++
++Triggering reset
++----------------
++
++This section documents the APIs which "users" of a resettable object sho=
+uld use
++to control it. All resettable control functions must be called while hol=
+ding
++the iothread lock.
++
++You can apply a reset to an object using ``resettable_assert_reset()``. =
+You need
++to call ``resettable_release_reset()`` to release the object from reset.=
+ To
++instantly reset an object, without keeping it in reset state, just call
++``resettable_reset()``. These functions take two parameters: a pointer t=
+o the
++object to reset and a reset type.
++
++Several types of reset will be supported. For now only cold reset is def=
+ined;
++others may be added later. The Resettable interface handles reset types =
+with an
++enum:
++
++``RESET_TYPE_COLD``
++  Cold reset is supported by every resettable object. In QEMU, it means =
+we reset
++  to the initial state corresponding to the start of QEMU; this might di=
+ffer
++  from what is a real hardware cold reset. It differs from other resets =
+(like
++  warm or bus resets) which may keep certain parts untouched.
++
++Calling ``resettable_reset()`` is equivalent to calling
++``resettable_assert_reset()`` then ``resettable_release_reset()``. It is
++possible to interleave multiple calls to these three functions. There ma=
+y
++be several reset sources/controllers of a given object. The interface ha=
+ndles
++everything and the different reset controllers do not need to know anyth=
+ing
++about each others. The object will leave reset state only when each othe=
+r
++controllers end their reset operation. This point is handled internally =
+by
++maintaining a count of in-progress resets; it is crucial to call
++``resettable_release_reset()`` one time and only one time per
++``resettable_assert_reset()`` call.
++
++For now migration of a device or bus in reset is not supported. Care mus=
+t be
++taken not to delay ``resettable_release_reset()`` after its
++``resettable_assert_reset()`` counterpart.
++
++Note that, since resettable is an interface, the API takes a simple Obje=
+ct as
++parameter. Still, it is a programming error to call a resettable functio=
+n on a
++non-resettable object and it will trigger a run time assert error. Since=
+ most
++calls to resettable interface are done through base class functions, suc=
+h an
++error is not likely to happen.
++
++For Devices and Buses, the following helper functions exist:
++
++- ``device_cold_reset()``
++- ``bus_cold_reset()``
++
++These are simple wrappers around resettable_reset() function; they only =
+cast the
++Device or Bus into an Object and pass the cold reset type. When possible
++prefer to use these functions instead of ``resettable_reset()``.
++
++Device and bus functions co-exist because there can be semantic differen=
+ces
++between resetting a bus and resetting the controller bridge which owns i=
+t.
++For example, consider a SCSI controller. Resetting the controller puts a=
+ll
++its registers back to what reset state was as well as reset everything o=
+n the
++SCSI bus, whereas resetting just the SCSI bus only resets everything tha=
+t's on
++it but not the controller.
++
++
++Multi-phase mechanism
++---------------------
++
++This section documents the internals of the resettable interface.
++
++The resettable interface uses a multi-phase system to relieve objects an=
+d
++machines from reset ordering problems. To address this, the reset operat=
+ion
++of an object is split into three well defined phases.
++
++When resetting several objects (for example the whole machine at simulat=
+ion
++startup), all first phases of all objects are executed, then all second =
+phases
++and then all third phases.
++
++The three phases are:
++
++1. The **enter** phase is executed when the object enters reset. It rese=
+ts only
++   local state of the object; it must not do anything that has a side-ef=
+fect
++   on other objects, such as raising or lowering a qemu_irq line or read=
+ing or
++   writing guest memory.
++
++2. The **hold** phase is executed for entry into reset, once every objec=
+t in the
++   group which is being reset has had its *enter* phase executed. At thi=
+s point
++   devices can do actions that affect other objects.
++
++3. The **exit** phase is executed when the object leaves the reset state=
+.
++   Actions affecting other objects are permitted.
++
++As said in previous section, the interface maintains a count of reset. T=
+his
++count is used to ensure phases are executed only when required. *enter* =
+and
++*hold* phases are executed only when asserting reset for the first time
++(if an object is already in reset state when calling
++``resettable_assert_reset()`` or ``resettable_reset()``, they are not
++executed).
++The *exit* phase is executed only when the last reset operation ends. Th=
+erefore
++the object does not need to care how many of reset controllers it has an=
+d how
++many of them have started a reset.
++
++
++Handling reset in a resettable object
++-------------------------------------
++
++This section documents the APIs that an implementation of a resettable o=
+bject
++must provide and what functions it has access to. It is intended for peo=
+ple
++who want to implement or convert a class which has the resettable interf=
+ace;
++for example when specializing an existing device or bus.
++
++Methods to implement
++....................
++
++Three methods should be defined or left empty. Each method corresponds t=
+o a
++phase of the reset; they are name ``phases.enter()``, ``phases.hold()`` =
+and
++``phases.exit()``. They all take the object as parameter. The *enter* me=
+thod
++also take the reset type as second parameter.
++
++When extending an existing class, these methods may need to be extended =
+too.
++The ``resettable_class_set_parent_phases()`` class function may be used =
+to
++backup parent class methods.
++
++Here follows an example to implement reset for a Device which sets an IO=
+ while
++in reset.
++
++::
++
++    static void mydev_reset_enter(Object *obj, ResetType type)
++    {
++        MyDevClass *myclass =3D MYDEV_GET_CLASS(obj);
++        MyDevState *mydev =3D MYDEV(obj);
++        /* call parent class enter phase */
++        if (myclass->parent_phases.enter) {
++            myclass->parent_phases.enter(obj, type);
++        }
++        /* initialize local state only */
++        mydev->var =3D 0;
++    }
++
++    static void mydev_reset_hold(Object *obj)
++    {
++        MyDevClass *myclass =3D MYDEV_GET_CLASS(obj);
++        MyDevState *mydev =3D MYDEV(obj);
++        /* call parent class hold phase */
++        if (myclass->parent_phases.hold) {
++            myclass->parent_phases.hold(obj);
++        }
++        /* set an IO */
++        qemu_set_irq(mydev->irq, 1);
++    }
++
++    static void mydev_reset_exit(Object *obj)
++    {
++        MyDevClass *myclass =3D MYDEV_GET_CLASS(obj);
++        MyDevState *mydev =3D MYDEV(obj);
++        /* call parent class exit phase */
++        if (myclass->parent_phases.exit) {
++            myclass->parent_phases.exit(obj);
++        }
++        /* clear an IO */
++        qemu_set_irq(mydev->irq, 0);
++    }
++
++    typedef struct MyDevClass {
++        MyParentClass parent_class;
++        /* to store eventual parent reset methods */
++        ResettablePhases parent_phases;
++    } MyDevClass;
++
++    static void mydev_class_init(ObjectClass *class, void *data)
++    {
++        MyDevClass *myclass =3D MYDEV_CLASS(class);
++        ResettableClass *rc =3D RESETTABLE_CLASS(class);
++        resettable_class_set_parent_reset_phases(rc,
++                                                 mydev_reset_enter,
++                                                 mydev_reset_hold,
++                                                 mydev_reset_exit,
++                                                 &myclass->parent_phases=
+);
++    }
++
++In the above example, we override all three phases. It is possible to ov=
+erride
++only some of them by passing NULL instead of a function pointer to
++``resettable_class_set_parent_reset_phases()``. For example, the followi=
+ng will
++only override the *enter* phase and leave *hold* and *exit* untouched::
++
++    resettable_class_set_parent_reset_phases(rc, mydev_reset_enter,
++                                             NULL, NULL,
++                                             &myclass->parent_phases);
++
++This is equivalent to providing a trivial implementation of the hold and=
+ exit
++phases which does nothing but call the parent class's implementation of =
+the
++phase.
++
++Polling the reset state
++.......................
++
++Resettable interface provides the ``resettable_is_in_reset()`` function.
++This function returns true if the object parameter is currently under re=
+set.
++
++An object is under reset from the beginning of the *init* phase to the e=
+nd of
++the *exit* phase. During all three phases, the function will return that=
+ the
++object is in reset.
++
++This function may be used if the object behavior has to be adapted
++while in reset state. For example if a device has an irq input,
++it will probably need to ignore it while in reset; then it can for
++example check the reset state at the beginning of the irq callback.
++
++Note that until migration of the reset state is supported, an object
++should not be left in reset. So apart from being currently executing
++one of the reset phases, the only cases when this function will return
++true is if an external interaction (like changing an io) is made during
++*hold* or *exit* phase of another object in the same reset group.
++
++Helpers ``device_is_in_reset()`` and ``bus_is_in_reset()`` are also prov=
+ided
++for devices and buses and should be preferred.
++
++
++Base class handling of reset
++----------------------------
++
++This section documents parts of the reset mechanism that you only need t=
+o know
++about if you are extending it to work with a new base class other than
++DeviceClass or BusClass, or maintaining the existing code in those class=
+es. Most
++people can ignore it.
++
++Methods to implement
++....................
++
++There are two other methods that need to exist in a class implementing t=
+he
++interface: ``get_state()`` and ``child_foreach()``.
++
++``get_state()`` is simple. *resettable* is an interface and, as a conseq=
+uence,
++does not have any class state structure. But in order to factorize the c=
+ode, we
++need one. This method must return a pointer to ``ResettableState`` struc=
+ture.
++The structure must be allocated by the base class; preferably it should =
+be
++located inside the object instance structure.
++
++``child_foreach()`` is more complex. It should execute the given callbac=
+k on
++every reset child of the given resettable object. All children must be
++resettable too. Additional parameters (a reset type and an opaque pointe=
+r) must
++be passed to the callback too.
++
++In ``DeviceClass`` and ``BusClass`` the ``ResettableState`` is located
++``DeviceState`` and ``BusState`` structure. ``child_foreach()`` is imple=
+mented
++to follow the bus hierarchy; for a bus, it calls the function on every c=
+hild
++device; for a device, it calls the function on every bus child. When we =
+reset
++the main system bus, we reset the whole machine bus tree.
++
++Changing a resettable parent
++............................
++
++One thing which should be taken care of by the base class is handling re=
+set
++hierarchy changes.
++
++The reset hierarchy is supposed to be static and built during machine cr=
+eation.
++But there are actually some exceptions. To cope with this, the resettabl=
+e API
++provides ``resettable_change_parent()``. This function allows to set, up=
+date or
++remove the parent of a resettable object after machine creation is done.=
+ As
++parameters, it takes the object being moved, the old parent if any and t=
+he new
++parent if any.
++
++This function can be used at any time when not in a reset operation. Dur=
+ing
++a reset operation it must be used only in *hold* phase. Using it in *ent=
+er* or
++*exit* phase is an error.
++Also it should not be used during machine creation, although it is harml=
+ess to
++do so: the function is a no-op as long as old and new parent are NULL or=
+ not
++in reset.
++
++There is currently 2 cases where this function is used:
++
++1. *device hotplug*; it means a new device is introduced on a live bus.
++
++2. *hot bus change*; it means an existing live device is added, moved or
++   removed in the bus hierarchy. At the moment, it occurs only in the ra=
+spi
++   machines for changing the sdbus used by sd card.
+--=20
+2.24.1
 
 
