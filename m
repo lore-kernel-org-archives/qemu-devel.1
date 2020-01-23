@@ -2,78 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C373AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8B0C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CF7C2253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49C362253D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:08:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUcZEQ+0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CF7C2253D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2P3ye9M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C362253D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubHV-0003RH-4y
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:08:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35452)
+	id 1iubI2-00041H-VY
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:08:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuasA-00064C-Ux
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:08 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuasR-0006Iy-QG
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuas9-0004QV-Fh
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:06 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29309
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iuasQ-0004Xu-Rw
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53858
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuas9-0004QD-Bs
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:05 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuasQ-0004Xm-Od
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779725;
+ s=mimecast20190719; t=1579779742;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GO1VXq0VZi56Yiu7E4xYB4fx4iaWgpqlJIChDA7cNgg=;
- b=dUcZEQ+0Sk0UaCwodH9QmbdIH650TNYNZJOZTqluUNWuB7LXqqo/C3Obhjby4r5Dbun9t+
- ltNCqSQM8PERjYomxM4MNXNENVNs3ENB0Ng7P6rLQSC6flDSMIS34jBA3C/eMk8gWjMVre
- gFfWURf/B3tVqKUiD1tXteA5PW/83yA=
+ bh=xIXPLjVlQwCxTpnHTQXJxzDVBIqJT9Y1zzNQZLC8wcg=;
+ b=X2P3ye9Mqsbj9MTa35Wg3HDhURTUVbLmgH+SihEazChC2AlIWX/s1Tq7UzxKXMn0OyDzBI
+ rFn3gx4Lah5JvxKWyctdKO6KC0n78DfzfYZ+TYy8kIiaTNrV3gR0R8YqhGoSNAZNfh199x
+ mPkqBqF7Mqa6ee4HJShPRkih3DNbTKY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-tLWO2VK5N1mGiaQdM_tN3w-1; Thu, 23 Jan 2020 06:42:01 -0500
+ us-mta-157-51Kqh7CpNv6h7yAQpOTSMw-1; Thu, 23 Jan 2020 06:42:21 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 539B38010D9;
- Thu, 23 Jan 2020 11:42:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D4721800D48
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:42:20 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2CE3F10016E8;
- Thu, 23 Jan 2020 11:41:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A755310016EB
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:42:19 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 27/80] arm/sabrelite: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:37:52 +0100
-Message-Id: <1579779525-20065-28-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 37/80] null-machine: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:02 +0100
+Message-Id: <1579779525-20065-38-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: tLWO2VK5N1mGiaQdM_tN3w-1
+X-MC-Unique: 51Kqh7CpNv6h7yAQpOTSMw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,8 +86,6 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-arm@nongnu.org,
- jcd@tribudubois.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,98 +98,39 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-PS:
- remove no longer needed IMX6Sabrelite
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-CC: drjones@redhat.com
-CC: peter.maydell@linaro.org
-CC: qemu-arm@nongnu.org
-CC: jcd@tribudubois.net
----
- hw/arm/sabrelite.c | 23 ++++++++---------------
- 1 file changed, 8 insertions(+), 15 deletions(-)
+ hw/core/null-machine.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
-index 96cc455..e31694b 100644
---- a/hw/arm/sabrelite.c
-+++ b/hw/arm/sabrelite.c
-@@ -19,11 +19,6 @@
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
+diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+index 1aa0a9a..cb47d9d 100644
+--- a/hw/core/null-machine.c
++++ b/hw/core/null-machine.c
+@@ -32,11 +32,8 @@ static void machine_none_init(MachineState *mch)
+     }
 =20
--typedef struct IMX6Sabrelite {
--    FslIMX6State soc;
--    MemoryRegion ram;
--} IMX6Sabrelite;
+     /* RAM at address zero */
+-    if (mch->ram_size) {
+-        MemoryRegion *ram =3D g_new(MemoryRegion, 1);
 -
- static struct arm_boot_info sabrelite_binfo =3D {
-     /* DDR memory start */
-     .loader_start =3D FSL_IMX6_MMDC_ADDR,
-@@ -45,7 +40,7 @@ static void sabrelite_reset_secondary(ARMCPU *cpu,
-=20
- static void sabrelite_init(MachineState *machine)
- {
--    IMX6Sabrelite *s =3D g_new0(IMX6Sabrelite, 1);
-+    FslIMX6State *s;
-     Error *err =3D NULL;
-=20
-     /* Check the amount of memory is compatible with the SOC */
-@@ -55,19 +50,16 @@ static void sabrelite_init(MachineState *machine)
-         exit(1);
+-        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_si=
+ze);
+-        memory_region_add_subregion(get_system_memory(), 0, ram);
++    if (mch->ram) {
++        memory_region_add_subregion(get_system_memory(), 0, mch->ram);
      }
 =20
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc=
-),
--                            TYPE_FSL_IMX6, &error_abort, NULL);
--
--    object_property_set_bool(OBJECT(&s->soc), true, "realized", &err);
-+    s =3D FSL_IMX6(object_new(TYPE_FSL_IMX6));
-+    object_property_add_child(OBJECT(machine), "soc", OBJECT(s), &error_fa=
-tal);
-+    object_property_set_bool(OBJECT(s), true, "realized", &err);
-     if (err !=3D NULL) {
-         error_report("%s", error_get_pretty(err));
-         exit(1);
-     }
-=20
--    memory_region_allocate_system_memory(&s->ram, NULL, "sabrelite.ram",
--                                         machine->ram_size);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6_MMDC_ADDR,
--                                &s->ram);
-+                                machine->ram);
-=20
-     {
-         /*
-@@ -78,7 +70,7 @@ static void sabrelite_init(MachineState *machine)
-         /* Add the sst25vf016b NOR FLASH memory to first SPI */
-         Object *spi_dev;
-=20
--        spi_dev =3D object_resolve_path_component(OBJECT(&s->soc), "spi1")=
-;
-+        spi_dev =3D object_resolve_path_component(OBJECT(s), "spi1");
-         if (spi_dev) {
-             SSIBus *spi_bus;
-=20
-@@ -109,7 +101,7 @@ static void sabrelite_init(MachineState *machine)
-     sabrelite_binfo.secondary_cpu_reset_hook =3D sabrelite_reset_secondary=
-;
-=20
-     if (!qtest_enabled()) {
--        arm_load_kernel(&s->soc.cpu[0], machine, &sabrelite_binfo);
-+        arm_load_kernel(&s->cpu[0], machine, &sabrelite_binfo);
-     }
+     if (mch->kernel_filename) {
+@@ -52,6 +49,7 @@ static void machine_none_machine_init(MachineClass *mc)
+     mc->init =3D machine_none_init;
+     mc->max_cpus =3D 1;
+     mc->default_ram_size =3D 0;
++    mc->default_ram_id =3D "ram";
  }
 =20
-@@ -119,6 +111,7 @@ static void sabrelite_machine_init(MachineClass *mc)
-     mc->init =3D sabrelite_init;
-     mc->max_cpus =3D FSL_IMX6_NUM_CPUS;
-     mc->ignore_memory_transaction_failures =3D true;
-+    mc->default_ram_id =3D "sabrelite.ram";
- }
-=20
- DEFINE_MACHINE("sabrelite", sabrelite_machine_init)
+ DEFINE_MACHINE("none", machine_none_machine_init)
 --=20
 2.7.4
 
