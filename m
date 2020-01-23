@@ -2,74 +2,73 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2E3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F00C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:03:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5C4724125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:02:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E66424125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 13:03:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XXt92fTr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C4724125
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h31+qk33"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E66424125
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuc86-0004y9-7M
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:02:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37715)
+	id 1iuc8T-0005Tu-Oo
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 08:03:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iuays-00060L-8O
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:49:03 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub8x-0002DT-Qf
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iuayq-0007k2-S8
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:49:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51178
+ (envelope-from <dgilbert@redhat.com>) id 1iub8w-000568-EB
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32681
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iuayq-0007ji-M8
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:49:00 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub8w-00055u-AJ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780140;
+ s=mimecast20190719; t=1579780766;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NfGRJjtL0mrz5wsnRMh7k7VWJGSew4oR/uZnO3n83ss=;
- b=XXt92fTrpXb0yPdZeAgoZDJC/M8EQSqPhdA1LFa0ZAE01+2vB2p3NLQpAPLPFQAlJv5BW7
- mQTHPupm8B1pS+vKxGgLyX0yInt3nFobT6JzNauld77rLJmMbrlj5lvfv6zGJx/RfNHXlX
- EPfS7DpBE0Gfig5IJGfOFG4229Fo5TM=
+ bh=9Wsvi6ylmggzuEttsW+S6YDpnrJ0gXoKZtapOr0FXpA=;
+ b=h31+qk337zyZ3yCiXTEegNOQdNu31k/i7iA+GeLto1YoX3/SCmFLGG4htNQ9PtjwLOCsY/
+ ygg7i/f03USw1sz/Xu1pn6rAcXg+mgkoURyUhKbAEOvTLAhVDruVXZDzqTSEPuqfXfuPwM
+ dWpSgF6gOMpN8Ie+a782GL86Q5ToS3s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-fMVli3k6NbKEpdOA5ayA4w-1; Thu, 23 Jan 2020 06:48:56 -0500
+ us-mta-336-srSBkL41ObWvX0l95OWhJw-1; Thu, 23 Jan 2020 06:59:24 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E57D88010DE;
- Thu, 23 Jan 2020 11:48:55 +0000 (UTC)
-Received: from gondolin (ovpn-116-120.ams2.redhat.com [10.36.116.120])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 620D085750;
- Thu, 23 Jan 2020 11:48:46 +0000 (UTC)
-Date: Thu, 23 Jan 2020 12:48:44 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH 5/6] tests/acceptance/virtio_seg_max_adjust: Restrict to
- X86 architecture
-Message-ID: <20200123124844.32e2aa09.cohuck@redhat.com>
-In-Reply-To: <20200122223247.30419-6-philmd@redhat.com>
-References: <20200122223247.30419-1-philmd@redhat.com>
- <20200122223247.30419-6-philmd@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54E4C107ACC9
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:23 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 221E91CB;
+ Thu, 23 Jan 2020 11:59:19 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 029/111] virtiofsd: add --fd=FDNUM fd passing option
+Date: Thu, 23 Jan 2020 11:57:19 +0000
+Message-Id: <20200123115841.138849-30-dgilbert@redhat.com>
+In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: fMVli3k6NbKEpdOA5ayA4w-1
+X-MC-Unique: srSBkL41ObWvX0l95OWhJw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -87,160 +86,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 Jan 2020 23:32:46 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-> Running on mainstream KVM architectures, we get:
->=20
-> - Aarch64
->=20
->   Timeout.
->=20
->   job.log:
->   -------
->   No machine specified, and there is no default
->   Use -machine help to list supported machines
+Although --socket-path=3DPATH is useful for manual invocations, management
+tools typically create the UNIX domain socket themselves and pass it to
+the vhost-user device backend.  This way QEMU can be launched
+immediately with a valid socket.  No waiting for the vhost-user device
+backend is required when fd passing is used.
 
-The code probably needs to be made more clever to find the machines to
-run?
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/fuse_i.h        |  1 +
+ tools/virtiofsd/fuse_lowlevel.c | 16 ++++++++++++----
+ tools/virtiofsd/fuse_virtio.c   | 31 +++++++++++++++++++++++++------
+ 3 files changed, 38 insertions(+), 10 deletions(-)
 
->=20
-> - MIPS:
->=20
->    (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: argument of=
- type 'NoneType' is not iterable (0.14 s)
->=20
->   job.log:
->   -------
->   Could not load MIPS bios 'mipsel_bios.bin', and no -kernel argument was=
- specified
-
-Probably needs some hint from mips folks how this can be set up.
-
->=20
-> - PowerPC
->=20
->    (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: invalid lit=
-eral for int() with base 10: 'sxxm' (0.16 s)
->=20
->   job.log:
->   -------
->   >>> {'execute': 'query-machines'} =20
->   <<< {'return': [{'hotpluggable-cpus': True, 'name': 'pseries-2.12-sxxm'=
-, 'numa-mem-supported': True, 'default-cpu-type': 'power8_v2.0-powerpc64-cp=
-u', 'cpu-max': 1024, 'deprecated': False}, ...
-
-This seems to be because the machine type parsing code cannot deal with
-the format used here.
-
->=20
-> - S390X:
->=20
->    (1/1) VirtioMaxSegSettingsCheck.test_machine_types: ERROR: invalid lit=
-eral for int() with base 10: 'virtio' (0.14 s)
->=20
->   job.log:
->   -------
->   Traceback (most recent call last):
->     File "virtio_seg_max_adjust.py", line 139, in test_machine_types
->       if self.seg_max_adjust_enabled(m):
->     File "virtio_seg_max_adjust.py", line 113, in seg_max_adjust_enabled
->       major =3D int(ver[0])
->   ValueError: invalid literal for int() with base 10: 'virtio'
->   >>> {'execute': 'query-machines'} =20
->   <<< {'return': [{'hotpluggable-cpus': True, 'name': 's390-ccw-virtio-4.=
-0', 'numa-mem-supported': False, 'default-cpu-type': 'qemu-s390x-cpu', 'cpu=
--max': 248, 'deprecated': False}, ...
-
-Same here.
-
->=20
-> Assuming this test is only expected to run on the X86 architecture,
-> restrict the test to this particular architecture.
->=20
-> When this test is run on other architecture, the tests will be skipped.
->=20
-> Examples:
->=20
-> - running on S390X:
->=20
->  (1/1) tests/acceptance/virtio_seg_max_adjust.py:VirtioMaxSegSettingsChec=
-k.test_machine_types: SKIP: Architecture 's390' unsupported
->=20
-> - running on Aarch64 setting the QEMU binary path:
->=20
->   $ uname -m && avocado --show=3Dapp run -p qemu_bin=3Dx86_64-softmmu/qem=
-u-system-x86_64 tests/acceptance/virtio_seg_max_adjust.py
->   aarch64
->   JOB ID     : 92b7fae8868920aada0cb143f9571dffdf60931d
->   JOB LOG    : job-results/job-2020-01-22T17.54-92b7fae/job.log
->    (1/1) tests/acceptance/virtio_seg_max_adjust.py:VirtioMaxSegSettingsCh=
-eck.test_machine_types: PASS (25.99 s)
->   RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 =
-| CANCEL 0
->   JOB TIME   : 26.13 s
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  tests/acceptance/virtio_seg_max_adjust.py | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance=
-/virtio_seg_max_adjust.py
-> index ad736bcda3..2fc6bfcbd8 100755
-> --- a/tests/acceptance/virtio_seg_max_adjust.py
-> +++ b/tests/acceptance/virtio_seg_max_adjust.py
-> @@ -26,6 +26,7 @@ import logging
->  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pyt=
-hon'))
->  from qemu.machine import QEMUMachine
->  from avocado_qemu import Test
-> +from avocado.core.exceptions import TestSkipError
-> =20
->  #list of machine types and virtqueue properties to test
->  VIRTIO_SCSI_PROPS =3D {'seg_max_adjust': 'seg_max_adjust'}
-> @@ -117,12 +118,22 @@ class VirtioMaxSegSettingsCheck(Test):
->          return False
-> =20
->      def test_machine_types(self):
-> +        """
-> +        :avocado: tags=3Darch:i386
-> +        :avocado: tags=3Darch:x86_64
-> +        """
->          EXCLUDED_MACHINES =3D ['none', 'isapc', 'microvm']
->          if os.geteuid() !=3D 0:
->              EXCLUDED_MACHINES +=3D ['xenfv', 'xenpv']
->          # collect all machine types except the ones in EXCLUDED_MACHINES
->          with QEMUMachine(self.qemu_bin) as vm:
->              vm.launch()
-> +            # Skip test if target is not X86
-> +            # TODO: Move this check to Avocado (based on the test tags)
-> +            target_arch =3D vm.command('query-target')['arch']
-> +            if target_arch not in ['i386', 'x86_64']:
-> +                errmsg =3D "Architecture '%s' unsupported" % target_arch
-> +                raise TestSkipError(errmsg)
-
-I think we should rather fix the machine parsing code, and only then
-exclude architectures out of the box. (Sorry, my python-fu is lacking,
-or I would try it myself.)
-
-There does not seem to be anything that is really architecture specific
-in there. Just explicitly requesting the -pci versions of virtio-blk
-and virtio-scsi seems wrong, though, as this looks like a generic
-property, and should work on -ccw as well. (And probably also for
-virtio-mmio devices.) If not, I'd like to know :)
-
->              machines =3D [m['name'] for m in vm.command('query-machines'=
-)]
->              vm.shutdown()
->          for m in EXCLUDED_MACHINES:
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index 1126723d18..45995f3246 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -68,6 +68,7 @@ struct fuse_session {
+     size_t bufsize;
+     int error;
+     char *vu_socket_path;
++    int   vu_listen_fd;
+     int   vu_socketfd;
+     struct fv_VuDev *virtio_dev;
+ };
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 4f4684d942..95f4db8fcf 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -2130,6 +2130,7 @@ static const struct fuse_opt fuse_ll_opts[] =3D {
+     LL_OPTION("--debug", debug, 1),
+     LL_OPTION("allow_root", deny_others, 1),
+     LL_OPTION("--socket-path=3D%s", vu_socket_path, 0),
++    LL_OPTION("--fd=3D%d", vu_listen_fd, 0),
+     FUSE_OPT_END
+ };
+=20
+@@ -2147,7 +2148,8 @@ void fuse_lowlevel_help(void)
+      */
+     printf(
+         "    -o allow_root              allow access by root\n"
+-        "    --socket-path=3DPATH         path for the vhost-user socket\n=
+");
++        "    --socket-path=3DPATH         path for the vhost-user socket\n=
+"
++        "    --fd=3DFDNUM                 fd number of vhost-user socket\n=
+");
+ }
+=20
+ void fuse_session_destroy(struct fuse_session *se)
+@@ -2191,6 +2193,7 @@ struct fuse_session *fuse_session_new(struct fuse_arg=
+s *args,
+         goto out1;
+     }
+     se->fd =3D -1;
++    se->vu_listen_fd =3D -1;
+     se->conn.max_write =3D UINT_MAX;
+     se->conn.max_readahead =3D UINT_MAX;
+=20
+@@ -2212,8 +2215,13 @@ struct fuse_session *fuse_session_new(struct fuse_ar=
+gs *args,
+         goto out4;
+     }
+=20
+-    if (!se->vu_socket_path) {
+-        fprintf(stderr, "fuse: missing -o vhost_user_socket option\n");
++    if (!se->vu_socket_path && se->vu_listen_fd < 0) {
++        fuse_log(FUSE_LOG_ERR, "fuse: missing --socket-path or --fd option=
+\n");
++        goto out4;
++    }
++    if (se->vu_socket_path && se->vu_listen_fd >=3D 0) {
++        fuse_log(FUSE_LOG_ERR,
++                 "fuse: --socket-path and --fd cannot be given together\n"=
+);
+         goto out4;
+     }
+=20
+@@ -2253,7 +2261,7 @@ void fuse_session_unmount(struct fuse_session *se)
+=20
+ int fuse_lowlevel_is_virtio(struct fuse_session *se)
+ {
+-    return se->vu_socket_path !=3D NULL;
++    return !!se->virtio_dev;
+ }
+=20
+ #ifdef linux
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 7e2711b504..635f87756a 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -638,18 +638,21 @@ int virtio_loop(struct fuse_session *se)
+     return 0;
+ }
+=20
+-int virtio_session_mount(struct fuse_session *se)
++static int fv_create_listen_socket(struct fuse_session *se)
+ {
+     struct sockaddr_un un;
+     mode_t old_umask;
+=20
++    /* Nothing to do if fd is already initialized */
++    if (se->vu_listen_fd >=3D 0) {
++        return 0;
++    }
++
+     if (strlen(se->vu_socket_path) >=3D sizeof(un.sun_path)) {
+         fuse_log(FUSE_LOG_ERR, "Socket path too long\n");
+         return -1;
+     }
+=20
+-    se->fd =3D -1;
+-
+     /*
+      * Create the Unix socket to communicate with qemu
+      * based on QEMU's vhost-user-bridge
+@@ -682,15 +685,31 @@ int virtio_session_mount(struct fuse_session *se)
+         return -1;
+     }
+=20
++    se->vu_listen_fd =3D listen_sock;
++    return 0;
++}
++
++int virtio_session_mount(struct fuse_session *se)
++{
++    int ret;
++
++    ret =3D fv_create_listen_socket(se);
++    if (ret < 0) {
++        return ret;
++    }
++
++    se->fd =3D -1;
++
+     fuse_log(FUSE_LOG_INFO, "%s: Waiting for vhost-user socket connection.=
+..\n",
+              __func__);
+-    int data_sock =3D accept(listen_sock, NULL, NULL);
++    int data_sock =3D accept(se->vu_listen_fd, NULL, NULL);
+     if (data_sock =3D=3D -1) {
+         fuse_log(FUSE_LOG_ERR, "vhost socket accept: %m\n");
+-        close(listen_sock);
++        close(se->vu_listen_fd);
+         return -1;
+     }
+-    close(listen_sock);
++    close(se->vu_listen_fd);
++    se->vu_listen_fd =3D -1;
+     fuse_log(FUSE_LOG_INFO, "%s: Received vhost-user socket connection\n",
+              __func__);
+=20
+--=20
+2.24.1
 
 
