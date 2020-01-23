@@ -2,87 +2,77 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB056C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE61EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:12:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A730021835
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:12:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8798221835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:12:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AaS/WIK+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A730021835
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KaIaVaqf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8798221835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iueA3-0007g5-C6
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:12:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51284)
+	id 1iueAA-0007rA-5P
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:12:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrF-0004ny-Nx
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:18 -0500
+ (envelope-from <ovoshcha@redhat.com>) id 1iubdm-0008Ur-9B
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iucrE-0003BI-LD
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:17 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:33757)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iucrE-00039g-Ep
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:16 -0500
-Received: by mail-wm1-x329.google.com with SMTP id m10so1389237wmc.0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=edun+OJ+YJzFF5lv8jtNkTbaWNOC2ILXKY6V/xrxpmY=;
- b=AaS/WIK+Vp8VzdZ2g3g6E6uGHTOSpBadzOvJ49AzRVyDwY+B+VsS1T006rKFefGUC/
- Nx3O76y0b6zlIlcX0PJxGJBl2/vyMXKgh+T+kHTYKFOMtkOtWyoif7X9uS6Lk4fAhZyh
- ohzibnMwTHvMG6Q3508y6zAnGRYw3POF2fX4F+NGRHozKjECzXSsn2gnr7eImHT5ilS3
- 6VYnI+o3sP1a+WJyz9qKHa4Kk2K1vYYvQB9vGoxJmnAYrEo9IrYtOnf4zNWiYg18YbK+
- 33sNeJf0pvg7sInVRWDUfRecG/isFvD1eSy3IepM4kM3rxj2Tq9P+k8e2csWJP7aPgVU
- 82ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=edun+OJ+YJzFF5lv8jtNkTbaWNOC2ILXKY6V/xrxpmY=;
- b=RQGNtMBZmqdLBfuA7DKJSfi8icSKYFBa5JXWTe4zJOMNCze43QpPtD+igqX7WXyvBj
- HuVztaWLyJ0vfcoOiSKFJ1s2CbwwsnNqtxCuu+vWF0GL+7FvlSJf+3PXE2t0/DH4i7HM
- JIUHHtkvchSh14TGln6OJFFirp8CW1W71GI11N9EZysh4a2TxawKhwuCpShj+rJaHX/C
- k3RYAToGtWD51xZjsVKhlfdf7OXfSeKBfbHaYeWxETj4CKe0Sl06rPBmS5GzRr5wBJrj
- 4ODtGdiemBVrlEupH3bYQDEH2geJC/UgVy5iSRTQdceBRuJLiKNIQD8Sy/8MtI56vB82
- TXIw==
-X-Gm-Message-State: APjAAAV9JXDex9jox+VAMSxj+JYGNxyx5hJpFolq0sGi/khjPcDhdaVV
- R/QMGSfi8sozK9cexeN41de7rJRg
-X-Google-Smtp-Source: APXvYqzm+Ihy8uzmhSx5kYvJh0HGVcI3gbN2wEGPLoSf+bC2IoiPozlo+8lnqpaq5sgHjMLpairptw==
-X-Received: by 2002:a05:600c:d5:: with SMTP id
- u21mr1203162wmm.98.1579787355304; 
- Thu, 23 Jan 2020 05:49:15 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.14
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 23 Jan 2020 05:49:14 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <ovoshcha@redhat.com>) id 1iubdk-00016Q-VV
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:31:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27411
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1iubdk-00016F-SS
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:31:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579782676;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=qf+upfgHM9UbJpwPJ/l9fFPz6PQg3yqrvyzMt+T52mA=;
+ b=KaIaVaqfjJ2xV3eEpXDJSZ4VMvG/r7C52cH/UhHISWsXswTj9rybfvZmcf8lRNKYHeHZpp
+ u6rkfGqP1Cx1TNnY82C0J/Z/VmUHFPhTEATKTK+Ke+VT+OHuWWQWO/RB6ArS/DxHSc3ESj
+ 0jUVFOtDJbRQrTTLdQeEiGSN/G2/Om4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-XgcGiMsnMh29luiXW0S8tQ-1; Thu, 23 Jan 2020 07:30:06 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1ED0DBA9
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:30:05 +0000 (UTC)
+Received: from kh066.redhat.com (ovpn-117-189.ams2.redhat.com [10.36.117.189])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 43F3210016E8
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:30:05 +0000 (UTC)
+From: Oksana Vohchana <ovoshcha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/59] hw/net/imx_fec: Remove unuseful FALLTHROUGH comments
-Date: Thu, 23 Jan 2020 14:48:13 +0100
-Message-Id: <1579787342-27146-11-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
-References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] Acceptance test: provides to use different transport for
+ migration
+Date: Thu, 23 Jan 2020 14:30:04 +0200
+Message-Id: <20200123123004.28156-1-ovoshcha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: XgcGiMsnMh29luiXW0S8tQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
+X-Mailman-Approved-At: Thu, 23 Jan 2020 08:54:05 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,44 +84,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Along with VM migration via TCP, we can use migration through EXEC
+and UNIX transport protocol
 
-We don't need to explicit these obvious switch fall through
-comments. Stay consistent with the rest of the codebase.
-
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20191218192526.13845-6-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
 ---
- hw/net/imx_fec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/acceptance/migration.py | 50 ++++++++++++++++++++++++-----------
+ 1 file changed, 35 insertions(+), 15 deletions(-)
 
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index c01ce4f..5a83678 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -901,8 +901,8 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
-             s->regs[index] = 0;
-         }
-         break;
--    case ENET_TDAR1:    /* FALLTHROUGH */
--    case ENET_TDAR2:    /* FALLTHROUGH */
-+    case ENET_TDAR1:
-+    case ENET_TDAR2:
-         if (unlikely(single_tx_ring)) {
-             qemu_log_mask(LOG_GUEST_ERROR,
-                           "[%s]%s: trying to access TDAR2 or TDAR1\n",
--- 
-1.8.3.1
-
+diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+index a44c1ae58f..8bbe28d52d 100644
+--- a/tests/acceptance/migration.py
++++ b/tests/acceptance/migration.py
+@@ -10,10 +10,13 @@
+ # later.  See the COPYING file in the top-level directory.
+=20
+=20
++import tempfile
+ from avocado_qemu import Test
++from avocado import skipUnless\
+=20
+ from avocado.utils import network
+ from avocado.utils import wait
++from avocado.utils.path import find_command, CmdNotFoundError
+=20
+=20
+ class Migration(Test):
+@@ -24,6 +27,26 @@ class Migration(Test):
+     def migration_finished(vm):
+         return vm.command('query-migrate')['status'] in ('completed', 'fai=
+led')
+=20
++    def do_migrate(self, dest_uri, src_uri=3DNone):
++        source_vm =3D self.get_vm()
++        dest_vm =3D self.get_vm('-incoming', dest_uri)
++        dest_vm.launch()
++        if src_uri is None:
++            src_uri =3D dest_uri
++        source_vm.launch()
++        source_vm.qmp('migrate', uri=3Dsrc_uri)
++        self.assert_migration(source_vm, dest_vm)
++
++    def assert_migration(self, source_vm, dest_vm):
++        wait.wait_for(self.migration_finished,
++                      timeout=3Dself.timeout,
++                      step=3D0.1,
++                      args=3D(source_vm,))
++        self.assertEqual(source_vm.command('query-migrate')['status'], 'co=
+mpleted')
++        self.assertEqual(dest_vm.command('query-migrate')['status'], 'comp=
+leted')
++        self.assertEqual(dest_vm.command('query-status')['status'], 'runni=
+ng')
++        self.assertEqual(source_vm.command('query-status')['status'], 'pos=
+tmigrate')
++
+     def _get_free_port(self):
+         port =3D network.find_free_port()
+         if port is None:
+@@ -32,19 +55,16 @@ class Migration(Test):
+=20
+=20
+     def test_migration_with_tcp_localhost(self):
+-        source_vm =3D self.get_vm()
+         dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
+-        dest_vm =3D self.get_vm('-incoming', dest_uri)
+-        dest_vm.launch()
+-        source_vm.launch()
+-        source_vm.qmp('migrate', uri=3Ddest_uri)
+-        wait.wait_for(
+-            self.migration_finished,
+-            timeout=3Dself.timeout,
+-            step=3D0.1,
+-            args=3D(source_vm,)
+-        )
+-        self.assertEqual(dest_vm.command('query-migrate')['status'], 'comp=
+leted')
+-        self.assertEqual(source_vm.command('query-migrate')['status'], 'co=
+mpleted')
+-        self.assertEqual(dest_vm.command('query-status')['status'], 'runni=
+ng')
+-        self.assertEqual(source_vm.command('query-status')['status'], 'pos=
+tmigrate')
++        self.do_migrate(dest_uri)
++
++    def test_migration_with_unix(self):
++        with tempfile.TemporaryDirectory(prefix=3D'socket_') as socket_pat=
+h:
++            dest_uri =3D 'unix:%s/qemu-test.sock' % socket_path
++            self.do_migrate(dest_uri)
++    @skipUnless(find_command('nc', default=3DFalse), "nc command not found=
+ on the system")
++    def test_migration_with_exec(self):
++        free_port =3D self._get_free_port()
++        dest_uri =3D 'exec:nc -l localhost %u' % free_port
++        src_uri =3D 'exec:nc localhost %u' % free_port
++        self.do_migrate(dest_uri, src_uri)
+--=20
+2.21.1
 
 
