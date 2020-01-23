@@ -2,59 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C7CFC2D0DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 302ABC3F68F
 	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:41:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F28D4214AF
+	by mail.kernel.org (Postfix) with ESMTPS id EE27820704
 	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:41:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F28D4214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LVvRxe/d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE27820704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudfR-0005nG-N0
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:41:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46052)
+	id 1iudfS-0005oA-JS
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:41:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0001CM-2K
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:40 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iubAo-0004Ie-Jf
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUK-0000lN-FA
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:37 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:59639)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUK-0000fg-5j
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:36 -0500
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 7B184BCA9E;
- Thu, 23 Jan 2020 22:25:32 +0900 (JST)
-Received: from yo-satoh-debian.localdomain
- (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id E5080240091;
- Thu, 23 Jan 2020 22:25:31 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v29 03/22] hw/registerfields.h: Add 8bit and 16bit register
- macros
-Date: Thu, 23 Jan 2020 22:25:06 +0900
-Message-Id: <20200123132525.80891-4-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200123132525.80891-1-ysato@users.sourceforge.jp>
-References: <20200123132525.80891-1-ysato@users.sourceforge.jp>
+ (envelope-from <dgilbert@redhat.com>) id 1iubAn-0006iI-Br
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22468
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAn-0006hu-7q
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579780881;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YrSgQYkhcU4kRkGHIjoT5DICb+mHjWZQdwrkOwGUhaA=;
+ b=LVvRxe/deWIQXrkYxwu/e1EHca2v0ENEJuM71pmP1Hzo192rvZHJk1iuwQu2/0K9nldSgs
+ kBb+T44NEdQ8FGmMsisbeBLXZcgbrC+fdlOyO8rChN5fxQHlH8WWvSrflDYDsiKzP0S2G7
+ yCRJGXKjIZhMmC0Hs+XG22hyeeIYSEo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-129-ek3I9QnMNAOP1EWQhS96iA-1; Thu, 23 Jan 2020 07:01:19 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 286FE18A6ED6
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:18 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D0F31CB;
+ Thu, 23 Jan 2020 12:01:17 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 107/111] virtiofsd: add --thread-pool-size=NUM option
+Date: Thu, 23 Jan 2020 11:58:37 +0000
+Message-Id: <20200123115841.138849-108-dgilbert@redhat.com>
+In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: ek3I9QnMNAOP1EWQhS96iA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.14
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,131 +86,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Some RX peripheral using 8bit and 16bit registers.
-Added 8bit and 16bit APIs.
+Add an option to control the size of the thread pool.  Requests are now
+processed in parallel by default.
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-11-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/hw/registerfields.h | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ tools/virtiofsd/fuse_i.h        | 1 +
+ tools/virtiofsd/fuse_lowlevel.c | 7 ++++++-
+ tools/virtiofsd/fuse_virtio.c   | 5 +++--
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-index 2659a58737..a0bb0654d6 100644
---- a/include/hw/registerfields.h
-+++ b/include/hw/registerfields.h
-@@ -22,6 +22,14 @@
-     enum { A_ ## reg =3D (addr) };                                      =
-    \
-     enum { R_ ## reg =3D (addr) / 4 };
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index 1447d86866..4e47e5880d 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -72,6 +72,7 @@ struct fuse_session {
+     int   vu_listen_fd;
+     int   vu_socketfd;
+     struct fv_VuDev *virtio_dev;
++    int thread_pool_size;
+ };
 =20
-+#define REG8(reg, addr)                                                 =
- \
-+    enum { A_ ## reg =3D (addr) };                                      =
-    \
-+    enum { R_ ## reg =3D (addr) };
-+
-+#define REG16(reg, addr)                                                =
-  \
-+    enum { A_ ## reg =3D (addr) };                                      =
-    \
-+    enum { R_ ## reg =3D (addr) / 2 };
-+
- /* Define SHIFT, LENGTH and MASK constants for a field within a register=
- */
+ struct fuse_chan {
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 79a4031266..de2e2e0c65 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -28,6 +28,7 @@
+ #include <sys/file.h>
+ #include <unistd.h>
 =20
- /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_=
-LENGTH
-@@ -34,6 +42,12 @@
-                                         MAKE_64BIT_MASK(shift, length)};
++#define THREAD_POOL_SIZE 64
 =20
- /* Extract a field from a register */
-+#define FIELD_EX8(storage, reg, field)                                  =
-  \
-+    extract8((storage), R_ ## reg ## _ ## field ## _SHIFT,              =
-  \
-+              R_ ## reg ## _ ## field ## _LENGTH)
-+#define FIELD_EX16(storage, reg, field)                                 =
-  \
-+    extract16((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-+              R_ ## reg ## _ ## field ## _LENGTH)
- #define FIELD_EX32(storage, reg, field)                                 =
-  \
-     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-               R_ ## reg ## _ ## field ## _LENGTH)
-@@ -49,6 +63,22 @@
-  * Assigning values larger then the target field will result in
-  * compilation warnings.
-  */
-+#define FIELD_DP8(storage, reg, field, val) ({                          =
-  \
-+    struct {                                                            =
-  \
-+        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-+    } v =3D { .v =3D val };                                             =
-      \
-+    uint8_t d;                                                          =
-  \
-+    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-+    d; })
-+#define FIELD_DP16(storage, reg, field, val) ({                         =
-  \
-+    struct {                                                            =
-  \
-+        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-+    } v =3D { .v =3D val };                                             =
-      \
-+    uint16_t d;                                                         =
-  \
-+    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-+    d; })
- #define FIELD_DP32(storage, reg, field, val) ({                         =
-  \
-     struct {                                                            =
-  \
-         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-@@ -57,7 +87,7 @@
-     d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-                   R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-     d; })
--#define FIELD_DP64(storage, reg, field, val) ({                         =
-  \
-+#define FIELD_DP64(storage, reg, field, val) ({                         =
-\
-     struct {                                                            =
-  \
-         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-     } v =3D { .v =3D val };                                             =
-      \
+ #define OFFSET_MAX 0x7fffffffffffffffLL
+=20
+@@ -2519,6 +2520,7 @@ static const struct fuse_opt fuse_ll_opts[] =3D {
+     LL_OPTION("allow_root", deny_others, 1),
+     LL_OPTION("--socket-path=3D%s", vu_socket_path, 0),
+     LL_OPTION("--fd=3D%d", vu_listen_fd, 0),
++    LL_OPTION("--thread-pool-size=3D%d", thread_pool_size, 0),
+     FUSE_OPT_END
+ };
+=20
+@@ -2537,7 +2539,9 @@ void fuse_lowlevel_help(void)
+     printf(
+         "    -o allow_root              allow access by root\n"
+         "    --socket-path=3DPATH         path for the vhost-user socket\n=
+"
+-        "    --fd=3DFDNUM                 fd number of vhost-user socket\n=
+");
++        "    --fd=3DFDNUM                 fd number of vhost-user socket\n=
+"
++        "    --thread-pool-size=3DNUM     thread pool size limit (default =
+%d)\n",
++        THREAD_POOL_SIZE);
+ }
+=20
+ void fuse_session_destroy(struct fuse_session *se)
+@@ -2591,6 +2595,7 @@ struct fuse_session *fuse_session_new(struct fuse_arg=
+s *args,
+     }
+     se->fd =3D -1;
+     se->vu_listen_fd =3D -1;
++    se->thread_pool_size =3D THREAD_POOL_SIZE;
+     se->conn.max_write =3D UINT_MAX;
+     se->conn.max_readahead =3D UINT_MAX;
+=20
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 0dcf2ef57a..9f6582343c 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -572,10 +572,11 @@ static void *fv_queue_thread(void *opaque)
+     struct fv_QueueInfo *qi =3D opaque;
+     struct VuDev *dev =3D &qi->virtio_dev->dev;
+     struct VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
++    struct fuse_session *se =3D qi->virtio_dev->se;
+     GThreadPool *pool;
+=20
+-    pool =3D g_thread_pool_new(fv_queue_worker, qi, 1 /* TODO max_threads =
+*/,
+-                             TRUE, NULL);
++    pool =3D g_thread_pool_new(fv_queue_worker, qi, se->thread_pool_size, =
+TRUE,
++                             NULL);
+     if (!pool) {
+         fuse_log(FUSE_LOG_ERR, "%s: g_thread_pool_new failed\n", __func__)=
+;
+         return NULL;
 --=20
-2.20.1
+2.24.1
 
 
