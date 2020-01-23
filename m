@@ -2,80 +2,78 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E36C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15488C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33C6E2077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 969882077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:17:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EsNx8DkQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33C6E2077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T4zwblcQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 969882077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuh2D-0005wk-SS
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:16:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46336)
+	id 1iuh38-00076F-NZ
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:17:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iueHh-00026p-HM
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:20:42 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iufAM-00066p-Lo
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:17:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iueHg-0004lQ-Dt
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:20:41 -0500
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:42034)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iueHg-0004lB-7m
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:20:40 -0500
-Received: by mail-oi1-x236.google.com with SMTP id 18so3196543oin.9
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:20:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=E2IwaD1b6hdWWR9vufp/riiOvY31nSO/JhEKz88GNEc=;
- b=EsNx8DkQDIDTP4FSSYAh1I/ADb7ZgewoO7aQ1ParvxAhpiRwco19UOENnxfsPhk/lv
- d9FY7tmIC6tK7gZN1UB5PgIGt4s3II0o1N6H3K9YvpYuwNNUVl/PUcH8fMlatpCLcN9z
- a/lU2PCcZqbAPCF3yWK+9qdv7u3Q0joT2W/YZWJ2y9MnolMAtkgbYPtzrwd8EkY3Het+
- zvjTVnnV3VNy9jzOnxIEBr32AoFk3eiO2WE8CTLCKuY+G7n2lXYv3ZLktt4nkx6Kl91Q
- YVAlp5lxZG3zHGdTDibPTN0TBrV91nIyp6bk9W6bEwKh81qbDpre/uaRLIKhjCvp5Zcc
- lwQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=E2IwaD1b6hdWWR9vufp/riiOvY31nSO/JhEKz88GNEc=;
- b=A7kFP+QCFV19v2Qo1eYDT25h342piC+wY90qryJI8JupcWRGEe2kqfRiE95t+FwRww
- wPhghfAk7NQB8POTUZ/lqcTiSZ9LW1TLnjbrjiEYJEvC/+625JNBwFJkjEZrkV4jH6Vn
- AmTSeE4qumBpydh2y2MkMwe2tZbAE81iIWoAnQ9z2tLglBN85NDX+kbvPHu1O5rJuR/c
- 2olitCd5Bw/5NJFi+MHNVEYjPnnotA2ZvLhXDBu+NZpUu/ZW8pEL9caOPkgwoMryvQfZ
- 5aD+aI5hEA9H2/3IR0nd4AeDSlkrvceM6wSzAagylK3kyRGBwWSq/CBbFnXGBF/AHZ0p
- QGpg==
-X-Gm-Message-State: APjAAAUFFhgfRm09lrY2iWvE2c+mZwxJZkehQnpwZEZwPXMnEMndE7Mg
- rP82vMg964LQFa0ccoKR/fmJSOTwL5jjnLnI2f0+y042yK0=
-X-Google-Smtp-Source: APXvYqwwYbVvpAddc+K+1Xn4AlhfcdQ1PmBVU2eXd3DG+uCrKu7wRwKQyHLVkIRSPtarAjJvoZ8f4kcsr1b0Dydssuo=
-X-Received: by 2002:aca:d78b:: with SMTP id
- o133mr11025185oig.163.1579792839332; 
- Thu, 23 Jan 2020 07:20:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20200123115841.138849-1-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Jan 2020 15:20:28 +0000
-Message-ID: <CAFEAcA_7T2Yu8fXv7XycSSN=8xoi8aciR5NMh76o8LQxNU6rDw@mail.gmail.com>
-Subject: Re: [PULL 000/111] virtiofs queue
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::236
+ (envelope-from <imammedo@redhat.com>) id 1iufAL-00025c-8B
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:17:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45287
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iufAL-00024c-3w
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:17:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579796228;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nA1kJqd8EYgNKmWhDL/LpLCHeqo/KfgiYmPbRZKXtxg=;
+ b=T4zwblcQvdnz+1ViRldE2tWwcVwdjKGHA+xbsnsclHDhaCzrS8ExriMg39jFR/pXuxtwQG
+ AqUeCwdDfSDkbNgeFkv0YTiCWs8IMmEkJFe7kLVB87NSq0qsogNH/QhHaXdYxaG4meS/bf
+ 5qtwaMUGRr1p8T1mNmNjwqx5i5tNubo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-6dIm6GwMPPqiPPiLnO7YNg-1; Thu, 23 Jan 2020 11:17:03 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E0B21005512;
+ Thu, 23 Jan 2020 16:17:02 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F73F867E1;
+ Thu, 23 Jan 2020 16:17:01 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 81/80] m68k/q800: use memdev for RAM
+Date: Thu, 23 Jan 2020 17:14:41 +0100
+Message-Id: <1579796081-85416-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <68ba557d-e028-211b-8472-ec6e2437e897@vivier.eu>
+References: <68ba557d-e028-211b-8472-ec6e2437e897@vivier.eu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 6dIm6GwMPPqiPPiLnO7YNg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,52 +85,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 at 12:54, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
->
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The following changes since commit 3e08b2b9cb64bff2b73fa9128c0e49bfcde0dd40:
->
->   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/edk2-next-20200121' into staging (2020-01-21 15:29:25 +0000)
->
-> are available in the Git repository at:
->
->   git@gitlab.com:dagrh/qemu.git tags/pull-virtiofs-20200123
->
-> for you to fetch changes up to 87509325f70c78a28683f9460699915ea3300091:
->
->   virtiofsd: add some options to the help message (2020-01-23 10:54:49 +0000)
->
-> ----------------------------------------------------------------
-> virtiofsd first pull
->
-> Import our virtiofsd.
-> This pulls in the daemon to drive a file system connected to the
-> existing qemu virtiofsd device.
-> It's derived from upstream libfuse with lots of changes (and a lot
-> trimmed out).
-> The daemon lives in the newly created qemu/tools/virtiofsd
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Switch to using generic main RAM allocation. To do this set
+MachineClass::default_ram_id to m68k_mac.ram and use
+MachineState::ram instead of manually initializing
+RAM memory region.
 
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+CC: laurent@vivier.eu
+---
+ hw/m68k/q800.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
->  docs/tools/conf.py                        |   16 +
->  docs/tools/index.rst                      |   14 +
->  docs/tools/virtiofsd-security.rst         |  118 ++
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+index 12491ec..20537f2 100644
+--- a/hw/m68k/q800.c
++++ b/hw/m68k/q800.c
+@@ -160,7 +160,6 @@ static void q800_init(MachineState *machine)
+     ram_addr_t initrd_base;
+     int32_t initrd_size;
+     MemoryRegion *rom;
+-    MemoryRegion *ram;
+     MemoryRegion *io;
+     const int io_slice_nb =3D (IO_SIZE / IO_SLICE) - 1;
+     int i;
+@@ -194,9 +193,7 @@ static void q800_init(MachineState *machine)
+     qemu_register_reset(main_cpu_reset, cpu);
+=20
+     /* RAM */
+-    ram =3D g_malloc(sizeof(*ram));
+-    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abo=
+rt);
+-    memory_region_add_subregion(get_system_memory(), 0, ram);
++    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
+=20
+     /*
+      * Memory from IO_BASE to IO_BASE + IO_SLICE is repeated
+@@ -443,6 +440,7 @@ static void q800_machine_class_init(ObjectClass *oc, vo=
+id *data)
+     mc->max_cpus =3D 1;
+     mc->is_default =3D 0;
+     mc->block_default_type =3D IF_SCSI;
++    mc->default_ram_id =3D "m68k_mac.ram";
+ }
+=20
+ static const TypeInfo q800_machine_typeinfo =3D {
+--=20
+2.7.4
 
-Do we really want a new top-level manual? This isn't
-in the plan: https://wiki.qemu.org/Features/Documentation
-
-What defines what goes in docs/tools rather than
-docs/interop (like qemu-nbd and qemu-img do) ?
-
-thanks
--- PMM
 
