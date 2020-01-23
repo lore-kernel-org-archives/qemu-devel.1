@@ -2,56 +2,83 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF523C33CAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21113C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:25:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93E41214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:24:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93E41214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id D2BB52064C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:25:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XkCtbHku"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2BB52064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59267 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iueLk-0007T7-8r
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:24:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46059)
+	id 1iueMZ-0000Cd-Om
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:25:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUM-0001D4-Jn
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:41 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrQ-00053K-T1
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUK-0000lc-Ik
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:38 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:59638)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iucUK-0000fV-8e
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:25:36 -0500
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 11D2CBC5CC;
- Thu, 23 Jan 2020 22:25:32 +0900 (JST)
-Received: from yo-satoh-debian.localdomain
- (v046114.dynamic.ppp.asahi-net.or.jp [124.155.46.114])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 1309824008E;
- Thu, 23 Jan 2020 22:25:31 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrP-0003SD-Oz
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:28 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:55785)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iucrP-0003Ps-Ii
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:27 -0500
+Received: by mail-wm1-x332.google.com with SMTP id q9so2635473wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=+U+IhI9S2shiMvtu75gJowqZ/s3WgewzmHW03jb/rC4=;
+ b=XkCtbHkuWGN/UMK5R4mByTDuNLFXQnpP1hKyudOLDUPAlHjV3lYPfjQyFVXuyZENNr
+ Wo++6EkWtjXbO5UrjRBnVVj3PwpE+AAJuj3KiQ56k3IZ1AgPIphVtzoIS1YAAhnguiV4
+ Mi9XwoBZDEMIN0FkJNSMmCwI7OR/00Kd01pWVepo76XvP6/+qT0e7hhI1OM86aorNwqp
+ mtSsLBqKla92VyijvS8hjFjFIZ+fB8jxV5PWJSWFn6OpepUg+fEYFi7Hf0t8kI2iX9Lv
+ 5SL3+TvL1gykIqrU0fml6gBgdsJSeEN0w/4cNbt+UzV9nScJ+TiacbpbthVSsM9+MmGT
+ b68w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=+U+IhI9S2shiMvtu75gJowqZ/s3WgewzmHW03jb/rC4=;
+ b=l2smaxIgTbHJCYZyBrDe5nKEa00pp5OhP0rZLXgso1JxFqlNPi0CNtGz1nsZmsYTJE
+ ObueWORHPabJRraSOaMWrvDgezVQ9Cri4l2NFXZfWH5WlffHb5Ho/oWFabuDtF7z7uj2
+ 1F+XEWoPfIraBPB6rQksK3+K/6GsdrM2f7ocgo1CpPZn36Xrsz5+jdKFFTr9DHyvJm34
+ 45YQmM3WhcGqHP6cUuWtyKYa9shGAUs5flEgJPhmA0GBL1ul1e4sXZmyCb2YRpLQ/mpT
+ IFcp6dP8g1mzE7rJlVsc+PjzGZK4NS0OerUbBiGvrxt59+/Fejj9hakCd35jZaiY/spZ
+ H9IA==
+X-Gm-Message-State: APjAAAW3QJVmSvUtjYS8WrSbeTyK/0lVWQT2fGTigZlVAzwLO+DjfnmZ
+ 3oOUPme5Yr6AueI9O17Sttpo9XUL
+X-Google-Smtp-Source: APXvYqxvtoehS1A+AMWeedPNn6Sjr/W437HQSZVz8NYb4nDK4unxNP+7yiE01GRXOeVUtjqzB/9cmA==
+X-Received: by 2002:a05:600c:2318:: with SMTP id
+ 24mr4455975wmo.48.1579787366368; 
+ Thu, 23 Jan 2020 05:49:26 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.25
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 23 Jan 2020 05:49:25 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v29 00/22] Add RX archtecture support
-Date: Thu, 23 Jan 2020 22:25:03 +0900
-Message-Id: <20200123132525.80891-1-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Subject: [PULL 22/59] virtio-scsi: convert to new virtio_delete_queue
+Date: Thu, 23 Jan 2020 14:48:25 +0100
+Message-Id: <1579787342-27146-23-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,180 +90,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, philmd@redhat.com,
- Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Pan Nengyuan <pannengyuan@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello.
-This patch series is added Renesas RX target emulation.
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-Changes for v28.
-Allow -m option.
-With this option, 16 Mbytes or more can be specified.
-Add example for qemu-doc.
-Fix build error on latest master.
+Use virtio_delete_queue to make it more clear.
 
-Changes for v27.
-Added RX section to qemu-doc.
-Rebase for master
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200117075547.60864-3-pannengyuan@huawei.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/scsi/virtio-scsi.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Changes for v26.
-Rebase for 5.0
-Update machine.json for 5.0
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 858b3aa..d3af42e 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -945,10 +945,10 @@ void virtio_scsi_common_unrealize(DeviceState *dev)
+     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
+     int i;
+ 
+-    virtio_del_queue(vdev, 0);
+-    virtio_del_queue(vdev, 1);
++    virtio_delete_queue(vs->ctrl_vq);
++    virtio_delete_queue(vs->event_vq);
+     for (i = 0; i < vs->conf.num_queues; i++) {
+-        virtio_del_queue(vdev, i + 2);
++        virtio_delete_queue(vs->cmd_vqs[i]);
+     }
+     g_free(vs->cmd_vqs);
+     virtio_cleanup(vdev);
+-- 
+1.8.3.1
 
-Changes for v25.
-Update commit message.
-Squashed qapi/machine.json changes.
-
-Changes for v24.
-Add note for qapi/machine.json.
-Added Acked-by for 6/22.
-git rebase master.
-
-Changes for v23.
-Follow master changes.
-
-Changes for v22.
-Added some include.
-
-Changes for v21.
-rebase latest master.
-Remove unneeded hmp_info_tlb.
-
-Chanegs for v20.
-Reorderd patches.
-Squashed v19 changes.
-
-Changes for v19.
-Follow tcg changes.
-Cleanup cpu.c.
-simplify rx_cpu_class_by_name and rx_load_image move to rx-virt.
-
-My git repository is bellow.
-git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20200112
-
-Testing binaries bellow.
-u-boot
-Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
-
-starting
-$ gzip -d u-boot.bin.gz
-$ qemu-system-rx -bios u-boot.bin
-
-linux and pico-root (only sash)
-Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
-           https://osdn.net/users/ysato/pf/qemu/dl/rx-virt.dtb (DeviceTre=
-e)
-
-starting
-$ qemu-system-rx -kernel zImage -dtb rx-virt.dtb -append "earlycon"
-
-Philippe Mathieu-Daud=C3=A9 (3):
-  hw/registerfields.h: Add 8bit and 16bit register macros
-  hw/rx: Restrict the RX62N microcontroller to the RX62N CPU core
-  BootLinuxConsoleTest: Test the RX-Virt machine
-
-Richard Henderson (7):
-  target/rx: Disassemble rx_index_addr into a string
-  target/rx: Replace operand with prt_ldmi in disassembler
-  target/rx: Use prt_ldmi for XCHG_mr disassembly
-  target/rx: Emit all disassembly in one prt()
-  target/rx: Collect all bytes during disassembly
-  target/rx: Dump bytes for each insn during disassembly
-  hw/rx: Honor -accel qtest
-
-Yoshinori Sato (12):
-  MAINTAINERS: Add RX
-  qemu/bitops.h: Add extract8 and extract16
-  target/rx: TCG translation
-  target/rx: TCG helper
-  target/rx: CPU definition
-  target/rx: RX disassembler
-  hw/intc: RX62N interrupt controller (ICUa)
-  hw/timer: RX62N internal timer modules
-  hw/char: RX62N serial communication interface (SCI)
-  hw/rx: RX Target hardware definition
-  Add rx-softmmu
-  qemu-doc.texi: Add RX section.
-
- qemu-doc.texi                          |   44 +
- configure                              |    8 +
- default-configs/rx-softmmu.mak         |    3 +
- qapi/machine.json                      |    3 +-
- include/disas/dis-asm.h                |    5 +
- include/exec/poison.h                  |    1 +
- include/hw/char/renesas_sci.h          |   45 +
- include/hw/intc/rx_icu.h               |   56 +
- include/hw/registerfields.h            |   32 +-
- include/hw/rx/rx.h                     |    7 +
- include/hw/rx/rx62n.h                  |   91 +
- include/hw/timer/renesas_cmt.h         |   38 +
- include/hw/timer/renesas_tmr.h         |   53 +
- include/qemu/bitops.h                  |   38 +
- include/sysemu/arch_init.h             |    1 +
- target/rx/cpu-param.h                  |   31 +
- target/rx/cpu-qom.h                    |   42 +
- target/rx/cpu.h                        |  181 ++
- target/rx/helper.h                     |   31 +
- arch_init.c                            |    2 +
- hw/char/renesas_sci.c                  |  343 ++++
- hw/intc/rx_icu.c                       |  379 ++++
- hw/rx/rx-virt.c                        |  142 ++
- hw/rx/rx62n.c                          |  247 +++
- hw/timer/renesas_cmt.c                 |  278 +++
- hw/timer/renesas_tmr.c                 |  458 +++++
- target/rx/cpu.c                        |  217 +++
- target/rx/disas.c                      | 1446 ++++++++++++++
- target/rx/gdbstub.c                    |  112 ++
- target/rx/helper.c                     |  149 ++
- target/rx/op_helper.c                  |  470 +++++
- target/rx/translate.c                  | 2432 ++++++++++++++++++++++++
- tests/qtest/machine-none-test.c        |    1 +
- MAINTAINERS                            |   19 +
- hw/Kconfig                             |    1 +
- hw/char/Kconfig                        |    3 +
- hw/char/Makefile.objs                  |    1 +
- hw/intc/Kconfig                        |    3 +
- hw/intc/Makefile.objs                  |    1 +
- hw/rx/Kconfig                          |   14 +
- hw/rx/Makefile.objs                    |    2 +
- hw/timer/Kconfig                       |    6 +
- hw/timer/Makefile.objs                 |    3 +
- target/rx/Makefile.objs                |   11 +
- target/rx/insns.decode                 |  621 ++++++
- tests/acceptance/boot_linux_console.py |   47 +
- 46 files changed, 8116 insertions(+), 2 deletions(-)
- create mode 100644 default-configs/rx-softmmu.mak
- create mode 100644 include/hw/char/renesas_sci.h
- create mode 100644 include/hw/intc/rx_icu.h
- create mode 100644 include/hw/rx/rx.h
- create mode 100644 include/hw/rx/rx62n.h
- create mode 100644 include/hw/timer/renesas_cmt.h
- create mode 100644 include/hw/timer/renesas_tmr.h
- create mode 100644 target/rx/cpu-param.h
- create mode 100644 target/rx/cpu-qom.h
- create mode 100644 target/rx/cpu.h
- create mode 100644 target/rx/helper.h
- create mode 100644 hw/char/renesas_sci.c
- create mode 100644 hw/intc/rx_icu.c
- create mode 100644 hw/rx/rx-virt.c
- create mode 100644 hw/rx/rx62n.c
- create mode 100644 hw/timer/renesas_cmt.c
- create mode 100644 hw/timer/renesas_tmr.c
- create mode 100644 target/rx/cpu.c
- create mode 100644 target/rx/disas.c
- create mode 100644 target/rx/gdbstub.c
- create mode 100644 target/rx/helper.c
- create mode 100644 target/rx/op_helper.c
- create mode 100644 target/rx/translate.c
- create mode 100644 hw/rx/Kconfig
- create mode 100644 hw/rx/Makefile.objs
- create mode 100644 target/rx/Makefile.objs
- create mode 100644 target/rx/insns.decode
-
---=20
-2.20.1
 
 
