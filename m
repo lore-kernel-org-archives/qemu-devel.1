@@ -2,75 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8360FC33CB6
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCAFFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:35:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 581FA24125
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9283524125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:35:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GN3DEhzh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 581FA24125
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lboa/ALc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9283524125
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiFm-0002Hd-Ed
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:34:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46522)
+	id 1iuiFo-0002Ln-OM
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:35:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41109)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iufss-00054e-Lg
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:03:11 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufdg-0004hr-1w
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iufsr-0002ei-Fm
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:03:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20343
+ (envelope-from <dgilbert@redhat.com>) id 1iufde-0006Oh-9Y
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43019
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iufsr-0002eX-Cs
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 12:03:09 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufde-0006O9-6M
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798989;
+ s=mimecast20190719; t=1579798045;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=NWb4XuDCs4n0z+2XBax5eQCHpFm5HKv3ZHt9i1D5kmI=;
- b=GN3DEhzhjDZJkvN3WWsFMG2C2L7bcLGt0PtiCbSYAJkspI38jXaQodPEkfTuyOQLxFZq+l
- fA56sXJiJDCbcQrpYNlZQtkvDWbh7aiSTpZPO9SH2cxqwdRtRV28i+/qBrh/HcSES4HvsA
- oTGew0CFbGayJPxVTLU+Lzbtyp64IN0=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1yNZ903nBsp45b/CUHR2twKT/7zvjV6NUQqNyOO4Jko=;
+ b=Lboa/ALcJlQ68pFjNGS62XwPMqtFuoiDbtV3vP1z640sYdtroOyeYMPIglLSGvYuIp3OHG
+ 6MNDtR0nhgCP9bxHrRw27ZhvOimCvB/zChP8ptLX0LZ9vPKDRYgwYdg/zI4kQH28ChNMhs
+ vPu7fcJAipLmZu/29+3+giVeScI0CYg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-Mv-vsQZnN92QuJdzqsTeJw-1; Thu, 23 Jan 2020 12:03:07 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-180-d1L4HzFwM6SvrEDWFU2kig-1; Thu, 23 Jan 2020 11:47:21 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D3E81005512;
- Thu, 23 Jan 2020 17:03:04 +0000 (UTC)
-Received: from thuth.com (ovpn-116-64.ams2.redhat.com [10.36.116.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3505A620D8;
- Thu, 23 Jan 2020 17:03:00 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org
-Subject: [PATCH] hw/s390x: Add a more verbose comment about
- get_machine_class() and the wrappers
-Date: Thu, 23 Jan 2020 18:02:56 +0100
-Message-Id: <20200123170256.12386-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Mv-vsQZnN92QuJdzqsTeJw-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16BD3802A26
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:21 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6496228991;
+ Thu, 23 Jan 2020 16:47:20 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 026/108] virtiofsd: Keep track of replies
+Date: Thu, 23 Jan 2020 16:45:08 +0000
+Message-Id: <20200123164630.91498-27-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: d1L4HzFwM6SvrEDWFU2kig-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,75 +87,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Matthew Rosato <mjrosato@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While working on the "Enable adapter interruption suppression again"
-recently, I had to discover that the meaning of get_machine_class()
-and the related *_allowed() wrappers is not very obvious. Add a more
-verbose comment here to clarify how these should be used.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Keep track of whether we sent a reply to a request; this is a bit
+paranoid but it means:
+  a) We should always recycle an element even if there was an error
+     in the request
+  b) Never try and send two replies on one queue element
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ tools/virtiofsd/fuse_virtio.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index e0e28139a2..7fb389f0e5 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -505,6 +505,18 @@ static inline void machine_set_dea_key_wrap(Object *ob=
-j, bool value,
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 05d0e29f12..f1adeb6345 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -44,6 +44,7 @@ struct fv_QueueInfo {
 =20
- static S390CcwMachineClass *current_mc;
+     /* The element for the command currently being processed */
+     VuVirtqElement *qe;
++    bool reply_sent;
+ };
 =20
-+/*
-+ * Get the class of the s390-ccw-virtio machine that is currently in use.
-+ * Note: libvirt is using the "none" machine to probe for the features of =
-the
-+ * host CPU, so in case this is called with the "none" machine, the functi=
-on
-+ * returns the TYPE_S390_CCW_MACHINE base class. In this base class, all t=
-he
-+ * various "*_allowed" variables are enabled, so that the *_allowed() wrap=
-pers
-+ * below return the correct default value for the "none" machine.
-+ * Attention! Do *not* add additional new wrappers for CPU features (e.g. =
-like
-+ * the ri_allowed() wrapper) via this mechanism anymore. CPU features shou=
-ld
-+ * be handled via the CPU models, i.e. checking with cpu_model_allowed() d=
-uring
-+ * CPU initialization and s390_has_feat() later should be sufficient.
-+ */
- static S390CcwMachineClass *get_machine_class(void)
+ /*
+@@ -178,6 +179,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
+e_chan *ch,
  {
-     if (unlikely(!current_mc)) {
-@@ -521,19 +533,16 @@ static S390CcwMachineClass *get_machine_class(void)
+     VuVirtqElement *elem;
+     VuVirtq *q;
++    int ret =3D 0;
 =20
- bool ri_allowed(void)
- {
--    /* for "none" machine this results in true */
-     return get_machine_class()->ri_allowed;
+     assert(count >=3D 1);
+     assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
+@@ -191,6 +193,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
+e_chan *ch,
+     assert(out->unique);
+     /* For virtio we always have ch */
+     assert(ch);
++    assert(!ch->qi->reply_sent);
+     elem =3D ch->qi->qe;
+     q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
+=20
+@@ -208,19 +211,23 @@ int virtio_send_msg(struct fuse_session *se, struct f=
+use_chan *ch,
+     if (in_len < sizeof(struct fuse_out_header)) {
+         fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n",
+                  __func__, elem->index);
+-        return -E2BIG;
++        ret =3D -E2BIG;
++        goto err;
+     }
+     if (in_len < tosend_len) {
+         fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd\n",
+                  __func__, elem->index, tosend_len);
+-        return -E2BIG;
++        ret =3D -E2BIG;
++        goto err;
+     }
+=20
+     copy_iov(iov, count, in_sg, in_num, tosend_len);
+     vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
+     vu_queue_notify(&se->virtio_dev->dev, q);
++    ch->qi->reply_sent =3D true;
+=20
+-    return 0;
++err:
++    return ret;
  }
 =20
- bool cpu_model_allowed(void)
- {
--    /* for "none" machine this results in true */
-     return get_machine_class()->cpu_model_allowed;
- }
+ /* Thread function for individual queues, created when a queue is 'started=
+' */
+@@ -296,6 +303,9 @@ static void *fv_queue_thread(void *opaque)
+                 break;
+             }
 =20
- bool hpage_1m_allowed(void)
- {
--    /* for "none" machine this results in true */
-     return get_machine_class()->hpage_1m_allowed;
- }
++            qi->qe =3D elem;
++            qi->reply_sent =3D false;
++
+             if (!fbuf.mem) {
+                 fbuf.mem =3D malloc(se->bufsize);
+                 assert(fbuf.mem);
+@@ -331,6 +341,13 @@ static void *fv_queue_thread(void *opaque)
+             /* TODO: Add checks for fuse_session_exited */
+             fuse_session_process_buf_int(se, &fbuf, &ch);
 =20
++            if (!qi->reply_sent) {
++                fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
++                         __func__, elem->index);
++                /* I think we've still got to recycle the element */
++                vu_queue_push(dev, q, elem, 0);
++                vu_queue_notify(dev, q);
++            }
+             qi->qe =3D NULL;
+             free(elem);
+             elem =3D NULL;
 --=20
-2.18.1
+2.24.1
 
 
