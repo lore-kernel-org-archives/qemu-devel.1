@@ -2,90 +2,87 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BFF2C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03148C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:23:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56E7921734
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2C7C21734
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 16:22:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOPjZqfF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56E7921734
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlfEbDtL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C7C21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iufFR-0005C5-9Q
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:22:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
+	id 1iufFy-00060L-Ei
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 11:22:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsuvorov@redhat.com>) id 1iud9y-0004ja-It
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:08:39 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrg-0005Rd-Qd
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsuvorov@redhat.com>) id 1iud9w-0007Ed-7D
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:08:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25685
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsuvorov@redhat.com>) id 1iud9w-0007Dy-4E
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 09:08:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579788515;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=K0kXpGdqk/TMNu+RKePppuxu8JpP1SAe8vtq99kaRng=;
- b=hOPjZqfFWWVpcXkN/5yW/dz4YrwkmDTLe63xiEHHvidWntEYKU7D+NiE4J1oCV5bDZskY1
- 1RkMnEwtkPi+dxy35B8XeLTpnUI6C28ac6xTAlF8oeGDvWKk/1xi3C+2XDbUC1vMPh6/5a
- v7Voyj8iL917EQuvm0BSvpqfk2m4bns=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-2BU8dSM_Oqe6edHt4R8OCQ-1; Thu, 23 Jan 2020 09:08:33 -0500
-Received: by mail-lj1-f197.google.com with SMTP id y24so1118334ljc.19
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:08:33 -0800 (PST)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrf-0004G2-EU
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:44 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:39489)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iucrf-0004EI-7R
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:43 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id y11so3145706wrt.6
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PA5q0FZDEW8Y+8rLXWGciLnycgXwrVkUoj4n+I9lelQ=;
+ b=jlfEbDtL61E1kvuMnalngLPJbWwKJsXgeFcd7t8eFNIdPH1TYx2UcsBoxFSr7Qh6/l
+ 1V0dUVFYfJyy4H2M+f0qWKlpRpf6WL3hR59A0jxUX+sRYhHGjzIt/hPDJXunUiQ+gs4r
+ orsHPSzQt/urm+aw46r6xC7jg9Pt8ymTE9eQNn6AeqxpjnutMTrz63DJCqdBCVTyEENR
+ XYyJcejHr3S595PbnaCzox+G1/qgQ3ReWHBfSV8IWZTAndkxpfxVq2evG/CXHPMtqxj+
+ LdHQwKCWBv2wWs/5DR8ijvBWUb35v7z1jllGgiJ1QZY8U4NrCANqLEuKfSCiKUq4IGus
+ NXow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ETwFl7POxpscyrGVslJ5c+vJJvTTyE4q567xM5BwSdc=;
- b=MRznIbXaApeMReEt33uRaQtNdVI186Uort2ROh9+dUys1yEul8ivPUE0DwEhHFKAeM
- IQlNwD1EmY1Rh3xoZQDfJJ7ie2x3OMXVIqM989V+rZSscvFRP6ZNyJNrahFTxwk6s9BN
- J4kpklNHBKiB5d3ecDCt5oYpcnVTZNIqpRk/q1HMLKZa+T/IOkfv5Z+4Bf3sUQV47Srt
- NA0aMbUY1rq3y8qMAZWasvEf6KXESc+U3Mi+C67ygSLGk3O+c5C9MbYUTOzwTeyaVcKV
- xOreDozJMAcrv74dHZG4Cw5J7EUHH23weDzu399g097qqfh2HMBcudeii5rQxQThFTmz
- mdpw==
-X-Gm-Message-State: APjAAAU4GggGjjgYdOCgTEnmkQdoCcP5gNVxZCpnUUktBF478Up21ZSe
- qdJluoR6friuW3Cw6e0bSBJfUdq7/Ut4DXVfEw5qLKRIJadlGsZwf/JYU7uA+iB7+/MNYLT4Dpr
- SOktNPpdmnzGotC+o3m4QHXFe5HFLCCY=
-X-Received: by 2002:a2e:8316:: with SMTP id a22mr22731682ljh.141.1579788511774; 
- Thu, 23 Jan 2020 06:08:31 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz4oNkHMsbHN3XTbM/TjOJWyjuL7TbSPLaAJGeraHpOLq+yRp4xkR5wTbva5lHmdoFB6/tmjCQETjGGiO92sWI=
-X-Received: by 2002:a2e:8316:: with SMTP id a22mr22731670ljh.141.1579788511567; 
- Thu, 23 Jan 2020 06:08:31 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=PA5q0FZDEW8Y+8rLXWGciLnycgXwrVkUoj4n+I9lelQ=;
+ b=kCto0U/p2YQzbMUyi1xktF+VUZr7+/OIsZHGwZbMowj3Vpy4NAEBv6slMRM3NCYynn
+ BdZasmwCmitipc7I7kxU/Tmo0z0pDKU9F5Cr7sOWgNpIUgU9pLoUlUnn8rsisnKYKc97
+ HgRGjo10IDe3Gg7HGlLFhfmalNmVLgWWMYbsdfYPll8faIRdi2lBSRcS6hV+kfQB1AuY
+ lvYl2yKP2xFVotq+pQPeqgzv0etm6Kyc3TXOcIBPPM25rnIYZEb+JYIh2NwFlDGNStCf
+ jPTnDOYh45OsSHqRgkX96I83cYiHWP+ar9Bwc0ceI9n1/F3oOcTqDQwS4S1byV/GzxPd
+ m9kg==
+X-Gm-Message-State: APjAAAUe0gGCUvJMUed/QAqpIoWf47i+xrXFtTzMeiAsSAUXx0hKDAs6
+ 0L/HB7vb2G6NgreNoNcuAmih0Dlh
+X-Google-Smtp-Source: APXvYqzFcar7e49qi2hihpWVCIY/fRmKzcM0i2KaJYxOokpmEQMpiA0vDtHPGH5U+5eTejKhwMrRIg==
+X-Received: by 2002:adf:ee82:: with SMTP id b2mr17038078wro.194.1579787381895; 
+ Thu, 23 Jan 2020 05:49:41 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.41
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 23 Jan 2020 05:49:41 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 40/59] object: add object_property_set_defaut_{bool, str, int,
+ uint}()
+Date: Thu, 23 Jan 2020 14:48:43 +0100
+Message-Id: <1579787342-27146-41-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20200115224025.538368-1-jusual@redhat.com>
- <20200115224025.538368-3-jusual@redhat.com>
- <38fdd88d-1399-effb-b74b-e02b7343f044@redhat.com>
-In-Reply-To: <38fdd88d-1399-effb-b74b-e02b7343f044@redhat.com>
-From: Julia Suvorova <jusual@redhat.com>
-Date: Thu, 23 Jan 2020 15:08:20 +0100
-Message-ID: <CAMDeoFX1eFToYOWmBaVOYHTnNka8Fwruq6PtX7GsAGTuS++u8w@mail.gmail.com>
-Subject: Re: [PATCH 2/2] virtio-balloon: Reject qmp_balloon during hot-unplug
-To: David Hildenbrand <david@redhat.com>
-X-MC-Unique: 2BU8dSM_Oqe6edHt4R8OCQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,71 +94,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 16, 2020 at 1:36 PM David Hildenbrand <david@redhat.com> wrote:
->
-> On 15.01.20 23:40, Julia Suvorova wrote:
-> > Hot-unplug takes some time due to communication with the guest.
-> > Do not change the device while freeing up resources.
-> >
-> > Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> > ---
-> >  balloon.c                  | 2 +-
-> >  hw/virtio/virtio-balloon.c | 9 ++++++++-
-> >  include/sysemu/balloon.h   | 2 +-
-> >  3 files changed, 10 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/balloon.c b/balloon.c
-> > index f104b42961..998ec53a0f 100644
-> > --- a/balloon.c
-> > +++ b/balloon.c
-> > @@ -119,5 +119,5 @@ void qmp_balloon(int64_t target, Error **errp)
-> >      }
-> >
-> >      trace_balloon_event(balloon_opaque, target);
-> > -    balloon_event_fn(balloon_opaque, target);
-> > +    balloon_event_fn(balloon_opaque, target, errp);
-> >  }
-> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> > index 57f3b9f22d..0fa4e4454b 100644
-> > --- a/hw/virtio/virtio-balloon.c
-> > +++ b/hw/virtio/virtio-balloon.c
-> > @@ -717,12 +717,19 @@ static void virtio_balloon_stat(void *opaque, Bal=
-loonInfo *info)
-> >                                               VIRTIO_BALLOON_PFN_SHIFT)=
-;
-> >  }
-> >
-> > -static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
-> > +static void virtio_balloon_to_target(void *opaque, ram_addr_t target,
-> > +                                     Error **errp)
-> >  {
-> > +    DeviceState *bus_dev =3D qdev_get_bus_device(DEVICE(opaque));
-> >      VirtIOBalloon *dev =3D VIRTIO_BALLOON(opaque);
-> >      VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> >      ram_addr_t vm_ram_size =3D get_current_ram_size();
-> >
-> > +    if (bus_dev && bus_dev->pending_deleted_event) {
-> > +        error_setg(errp, "Hot-unplug of %s is in progress", vdev->name=
-);
-> > +        return;
-> > +    }
-> > +
->
-> How exactly does this help? The guest is free to inflate/deflate
-> whenever it wants.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Guest is aware of hot-unplug start, and virtio driver should not
-initiate any operations. This patch just restricts issuing commands
-from qmp monitor.
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200110153039.1379601-11-marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/qom/object.h | 37 ++++++++++++++++++++++++++++++++++
+ qom/object.c         | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+)
 
-Best regards, Julia Suvorova.
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 9f52bc3..fb133d6 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -386,6 +386,7 @@ struct ObjectProperty
+     ObjectPropertyInit *init;
+     ObjectPropertyGetDefault *get_default;
+     void *opaque;
++    QObject *defval;
+ };
+ 
+ /**
+@@ -1064,6 +1065,42 @@ ObjectProperty *object_class_property_add(ObjectClass *klass, const char *name,
+                                           void *opaque, Error **errp);
+ 
+ /**
++ * object_property_set_defaut_bool:
++ * @prop: the property to set
++ * @value: the value to be written to the property
++ *
++ * Set the property default value.
++ */
++void object_property_set_defaut_bool(ObjectProperty *prop, bool value);
++
++/**
++ * object_property_set_defaut_str:
++ * @prop: the property to set
++ * @value: the value to be written to the property
++ *
++ * Set the property default value.
++ */
++void object_property_set_defaut_str(ObjectProperty *prop, const char *value);
++
++/**
++ * object_property_set_defaut_int:
++ * @prop: the property to set
++ * @value: the value to be written to the property
++ *
++ * Set the property default value.
++ */
++void object_property_set_defaut_int(ObjectProperty *prop, int64_t value);
++
++/**
++ * object_property_set_defaut_uint:
++ * @prop: the property to set
++ * @value: the value to be written to the property
++ *
++ * Set the property default value.
++ */
++void object_property_set_defaut_uint(ObjectProperty *prop, uint64_t value);
++
++/**
+  * object_property_find:
+  * @obj: the object
+  * @name: the name of the property
+diff --git a/qom/object.c b/qom/object.c
+index 213a796..1423344 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -19,8 +19,10 @@
+ #include "qapi/visitor.h"
+ #include "qapi/string-input-visitor.h"
+ #include "qapi/string-output-visitor.h"
++#include "qapi/qobject-input-visitor.h"
+ #include "qapi/qapi-builtin-visit.h"
+ #include "qapi/qmp/qerror.h"
++#include "qapi/qmp/qjson.h"
+ #include "trace.h"
+ 
+ /* TODO: replace QObject with a simpler visitor to avoid a dependency
+@@ -268,6 +270,10 @@ static void object_property_free(gpointer data)
+ {
+     ObjectProperty *prop = data;
+ 
++    if (prop->defval) {
++        qobject_unref(prop->defval);
++        prop->defval = NULL;
++    }
+     g_free(prop->name);
+     g_free(prop->type);
+     g_free(prop->description);
+@@ -1447,6 +1453,52 @@ char *object_property_get_default(ObjectProperty *prop)
+     return prop->get_default(prop);
+ }
+ 
++static void object_property_init_defval(Object *obj, ObjectProperty *prop)
++{
++    Visitor *v = qobject_input_visitor_new(prop->defval);
++
++    assert(prop->set != NULL);
++    prop->set(obj, v, prop->name, prop->opaque, &error_abort);
++
++    visit_free(v);
++}
++
++static char *object_property_get_defval(ObjectProperty *prop)
++{
++    return qstring_free(qobject_to_json(prop->defval), TRUE);
++}
++
++static void object_property_set_defaut(ObjectProperty *prop, QObject *defval)
++{
++    assert(!prop->defval);
++    assert(!prop->init);
++    assert(!prop->get_default);
++
++    prop->defval = defval;
++    prop->init = object_property_init_defval;
++    prop->get_default = object_property_get_defval;
++}
++
++void object_property_set_defaut_bool(ObjectProperty *prop, bool value)
++{
++    object_property_set_defaut(prop, QOBJECT(qbool_from_bool(value)));
++}
++
++void object_property_set_defaut_str(ObjectProperty *prop, const char *value)
++{
++    object_property_set_defaut(prop, QOBJECT(qstring_from_str(value)));
++}
++
++void object_property_set_defaut_int(ObjectProperty *prop, int64_t value)
++{
++    object_property_set_defaut(prop, QOBJECT(qnum_from_int(value)));
++}
++
++void object_property_set_defaut_uint(ObjectProperty *prop, uint64_t value)
++{
++    object_property_set_defaut(prop, QOBJECT(qnum_from_uint(value)));
++}
++
+ void object_property_set_uint(Object *obj, uint64_t value,
+                               const char *name, Error **errp)
+ {
+@@ -2558,6 +2610,10 @@ void object_property_add_alias(Object *obj, const char *name,
+         goto out;
+     }
+     op->resolve = property_resolve_alias;
++    if (target_prop->get_default) {
++        op->get_default = target_prop->get_default;
++        op->defval = qobject_ref(target_prop->defval);
++    }
+ 
+     object_property_set_description(obj, op->name,
+                                     target_prop->description,
+-- 
+1.8.3.1
+
 
 
