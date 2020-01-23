@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A721C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C95CAC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 638B020704
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:58:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9424624655
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+6xuxy3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 638B020704
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X8zkOnpy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9424624655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iub8R-0000z6-Hj
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:58:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35305)
+	id 1iub94-0001cZ-6P
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 06:59:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuarx-0005ei-0o
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:54 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuas4-0005v7-Qo
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuaru-0004IR-Qv
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:52 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46229
+ (envelope-from <imammedo@redhat.com>) id 1iuas3-0004OQ-Hy
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34752
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuaru-0004IK-Nb
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:50 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuas3-0004OD-F8
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:41:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779710;
+ s=mimecast20190719; t=1579779719;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Dz70oqDjFQy03gviNg94YnDsOuTXGG0wlC186/lFKRU=;
- b=b+6xuxy3eS1vPCgIttMs+hZQP/RQ4kFx9yHO9/WIq3QaOVeqZCkz4nGkH0D3D7wZ0nz9hZ
- bGM1kYHEFQXUrghxCMbCGo8fBneWB+4pIKG8aUwSkiafpzgnQRdj2c2wZ8JQX9FhZxfHF7
- sMaNpIXtobLbywN6oAqaak03hJQijjo=
+ bh=LgCZ/pGkOf/xbrfC8klHSdk5ZNKIH9vXEKSiOqSFROE=;
+ b=X8zkOnpyLFjPxI4iyUnk4HfX2T0bpbggclP9BAHcEEFqVkJ2E1mQ5eBt4PvhWMcru9ai8W
+ CvMx8MFb2n5/hDLWuEDeZ+g2Lpy/X0T+LbWfDLkQ0ODFSsIjViUuk5/neyAXPJQM7yXiOf
+ aitt7nDjpepjwkUUpGe4FCxNV5WwzYM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-sHAtqkXqN8q0Td_nSc1jAQ-1; Thu, 23 Jan 2020 06:41:48 -0500
+ us-mta-235-0EoVcCViNmi4lvvHZzTmPA-1; Thu, 23 Jan 2020 06:41:55 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77C1C800D5C;
- Thu, 23 Jan 2020 11:41:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D2E618C8C06;
+ Thu, 23 Jan 2020 11:41:54 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 43AD81001DD7;
- Thu, 23 Jan 2020 11:41:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 39DBF1001DD7;
+ Thu, 23 Jan 2020 11:41:53 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 22/80] arm/musicpal: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:37:47 +0100
-Message-Id: <1579779525-20065-23-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 25/80] arm/palm: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:37:50 +0100
+Message-Id: <1579779525-20065-26-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: sHAtqkXqN8q0Td_nSc1jAQ-1
+X-MC-Unique: 0EoVcCViNmi4lvvHZzTmPA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -85,8 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-arm@nongnu.org,
- jan.kiszka@web.de
+Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,35 +109,46 @@ v2:
     (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 
 CC: drjones@redhat.com
-CC: jan.kiszka@web.de
+CC: balrogg@gmail.com
 CC: peter.maydell@linaro.org
 CC: qemu-arm@nongnu.org
 ---
- hw/arm/musicpal.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ hw/arm/palm.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index f68a399..c6418b0 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -32,6 +32,7 @@
- #include "sysemu/runstate.h"
+diff --git a/hw/arm/palm.c b/hw/arm/palm.c
+index 72eca8c..388b262 100644
+--- a/hw/arm/palm.c
++++ b/hw/arm/palm.c
+@@ -31,6 +31,7 @@
+ #include "hw/loader.h"
  #include "exec/address-spaces.h"
- #include "ui/pixel_ops.h"
+ #include "cpu.h"
 +#include "qemu/cutils.h"
 =20
- #define MP_MISC_BASE            0x80002000
- #define MP_MISC_SIZE            0x00001000
-@@ -1589,16 +1590,21 @@ static void musicpal_init(MachineState *machine)
-     int i;
-     unsigned long flash_size;
-     DriveInfo *dinfo;
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *sram =3D g_new(MemoryRegion, 1);
+ static uint64_t static_read(void *opaque, hwaddr offset, unsigned size)
+ {
+@@ -181,7 +182,6 @@ static void palmte_gpio_setup(struct omap_mpu_state_s *=
+cpu)
 =20
-+    /* For now we use a fixed - the original - RAM size */
+ static struct arm_boot_info palmte_binfo =3D {
+     .loader_start =3D OMAP_EMIFF_BASE,
+-    .ram_size =3D 0x02000000,
+     .board_id =3D 0x331,
+ };
+=20
+@@ -195,15 +195,21 @@ static void palmte_init(MachineState *machine)
+     static uint32_t cs2val =3D 0x0000e1a0;
+     static uint32_t cs3val =3D 0xe1a0e1a0;
+     int rom_size, rom_loaded =3D 0;
+-    MemoryRegion *dram =3D g_new(MemoryRegion, 1);
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     MemoryRegion *flash =3D g_new(MemoryRegion, 1);
+     MemoryRegion *cs =3D g_new(MemoryRegion, 4);
+=20
+-    memory_region_allocate_system_memory(dram, NULL, "omap1.dram",
+-                                         palmte_binfo.ram_size);
+-    memory_region_add_subregion(address_space_mem, OMAP_EMIFF_BASE, dram);
 +    if (machine->ram_size !=3D mc->default_ram_size) {
 +        char *sz =3D size_to_str(mc->default_ram_size);
 +        error_report("Invalid RAM size, should be %s", sz);
@@ -146,25 +156,23 @@ index f68a399..c6418b0 100644
 +        exit(EXIT_FAILURE);
 +    }
 +
-     cpu =3D ARM_CPU(cpu_create(machine->cpu_type));
++    memory_region_add_subregion(address_space_mem, OMAP_EMIFF_BASE,
++                                machine->ram);
 =20
--    /* For now we use a fixed - the original - RAM size */
--    memory_region_allocate_system_memory(ram, NULL, "musicpal.ram",
--                                         MP_RAM_DEFAULT_SIZE);
--    memory_region_add_subregion(address_space_mem, 0, ram);
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+-    mpu =3D omap310_mpu_init(dram, machine->cpu_type);
++    mpu =3D omap310_mpu_init(machine->ram, machine->cpu_type);
 =20
-     memory_region_init_ram(sram, NULL, "musicpal.sram", MP_SRAM_SIZE,
-                            &error_fatal);
-@@ -1714,6 +1720,8 @@ static void musicpal_machine_init(MachineClass *mc)
-     mc->init =3D musicpal_init;
+     /* External Flash (EMIFS) */
+     memory_region_init_ram(flash, NULL, "palmte.flash", flash_size,
+@@ -265,6 +271,8 @@ static void palmte_machine_init(MachineClass *mc)
+     mc->init =3D palmte_init;
      mc->ignore_memory_transaction_failures =3D true;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("arm926");
-+    mc->default_ram_size =3D MP_RAM_DEFAULT_SIZE;
-+    mc->default_ram_id =3D "musicpal.ram";
+     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("ti925t");
++    mc->default_ram_size =3D 0x02000000;
++    mc->default_ram_id =3D "omap1.dram";
  }
 =20
- DEFINE_MACHINE("musicpal", musicpal_machine_init)
+ DEFINE_MACHINE("cheetah", palmte_machine_init)
 --=20
 2.7.4
 
