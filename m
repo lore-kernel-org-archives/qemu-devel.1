@@ -2,63 +2,56 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F61C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B95D6C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:18:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B2B024655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B2B024655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
+	by mail.kernel.org (Postfix) with ESMTPS id 90A4722522
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:18:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90A4722522
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuXMU-000692-CQ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:57:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46175)
+	id 1iuXgy-0003EZ-C9
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:18:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <volker.ruemelin@t-online.de>) id 1iuXFd-00061d-R3
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:06 -0500
+ (envelope-from <johannes@sipsolutions.net>) id 1iuXfw-00020a-T1
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:17:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <volker.ruemelin@t-online.de>) id 1iuXFc-0004j0-UB
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:05 -0500
-Received: from mailout03.t-online.de ([194.25.134.81]:50686)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <volker.ruemelin@t-online.de>)
- id 1iuXFc-0004hu-OE
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:50:04 -0500
-Received: from fwd06.aul.t-online.de (fwd06.aul.t-online.de [172.20.26.150])
- by mailout03.t-online.de (Postfix) with SMTP id CAC18426D4ED;
- Thu, 23 Jan 2020 08:50:02 +0100 (CET)
-Received: from linpower.localnet
- (bdOpmsZawhWbFhK9XojQt-0+cJTgGNpHSj4-Vdy8o65QU2oaeQz3Suo1r9mdc4wwHq@[46.86.62.122])
- by fwd06.t-online.de
- with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1iuXFU-12fW7M0; Thu, 23 Jan 2020 08:49:56 +0100
-Received: by linpower.localnet (Postfix, from userid 1000)
- id 5CBB8200F75; Thu, 23 Jan 2020 08:49:43 +0100 (CET)
-From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH 6/9] ossaudio: prevent SIGSEGV in oss_enable_out
-Date: Thu, 23 Jan 2020 08:49:40 +0100
-Message-Id: <20200123074943.6699-6-vr_qemu@t-online.de>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <1e29e1d3-b59b-fcd6-cdff-a680bcdbffa4@t-online.de>
-References: <1e29e1d3-b59b-fcd6-cdff-a680bcdbffa4@t-online.de>
+ (envelope-from <johannes@sipsolutions.net>) id 1iuXfv-0005lE-K9
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:17:16 -0500
+Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:35492
+ helo=sipsolutions.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
+ id 1iuXfv-0005ia-DE
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:17:15 -0500
+Received: by sipsolutions.net with esmtpsa
+ (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+ (Exim 4.93) (envelope-from <johannes@sipsolutions.net>)
+ id 1iuXfs-00FGF5-H1; Thu, 23 Jan 2020 09:17:12 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 1/6] libvhost-user: implement
+ VHOST_USER_PROTOCOL_F_REPLY_ACK
+Date: Thu, 23 Jan 2020 09:17:03 +0100
+Message-Id: <20200123081708.7817-2-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200123081708.7817-1-johannes@sipsolutions.net>
+References: <20200123081708.7817-1-johannes@sipsolutions.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-ID: bdOpmsZawhWbFhK9XojQt-0+cJTgGNpHSj4-Vdy8o65QU2oaeQz3Suo1r9mdc4wwHq
-X-TOI-MSGID: ca8aec17-591c-475c-b00f-b6ac2ae58548
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 194.25.134.81
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:4f8:191:4433::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,40 +63,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>,
- =?UTF-8?q?Zolt=C3=A1n=20K=C5=91v=C3=A1g=C3=B3?= <dirty.ice.hu@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ Johannes Berg <johannes.berg@intel.com>, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With audiodev parameter out.mixing-engine=3Doff hw->mix_buf is
-NULL. This patch reverts a small part of dc88e38fa7 "audio:
-unify input and output mixeng buffer management".
+From: Johannes Berg <johannes.berg@intel.com>
 
-To reproduce the problem start qemu with
--audiodev oss,id=3Daudio0,try-mmap=3Don,out.mixing-engine=3Doff
+This is really simple, since we know whether a response is
+already requested or not, so we can just send a (successful)
+response when there isn't one already.
 
-Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
+Given that, it's not all _that_ useful but the master can at
+least be sure the message was processed, and we can exercise
+more code paths using the example code.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 ---
- audio/ossaudio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ contrib/libvhost-user/libvhost-user.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index 4965084a5a..6a3b78b381 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -592,7 +592,7 @@ static void oss_enable_out(HWVoiceOut *hw, bool enabl=
-e)
-             return;
-         }
-=20
--        audio_pcm_info_clear_buf(&hw->info, hw->buf_emul, hw->mix_buf->s=
-ize);
-+        audio_pcm_info_clear_buf(&hw->info, hw->buf_emul, hw->samples);
-         trig =3D PCM_ENABLE_OUTPUT;
-         if (ioctl(oss->fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0) {
-             oss_logerr(errno,
---=20
-2.16.4
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index ec27b78ff108..8cc3054fd510 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -1168,7 +1168,8 @@ vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
+                         1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
+                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
+                         1ULL << VHOST_USER_PROTOCOL_F_HOST_NOTIFIER |
+-                        1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD;
++                        1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD |
++                        1ULL << VHOST_USER_PROTOCOL_F_REPLY_ACK;
+ 
+     if (have_userfault()) {
+         features |= 1ULL << VHOST_USER_PROTOCOL_F_PAGEFAULT;
+@@ -1550,13 +1551,20 @@ vu_dispatch(VuDev *dev)
+ {
+     VhostUserMsg vmsg = { 0, };
+     int reply_requested;
+-    bool success = false;
++    bool need_reply, success = false;
+ 
+     if (!vu_message_read(dev, dev->sock, &vmsg)) {
+         goto end;
+     }
+ 
++    need_reply = vmsg.flags & VHOST_USER_NEED_REPLY_MASK;
++
+     reply_requested = vu_process_message(dev, &vmsg);
++    if (!reply_requested && need_reply) {
++        vmsg_set_reply_u64(&vmsg, 0);
++        reply_requested = 1;
++    }
++
+     if (!reply_requested) {
+         success = true;
+         goto end;
+-- 
+2.24.1
 
 
