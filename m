@@ -2,80 +2,87 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 084F1C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A20C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:20:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C64AA22522
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:20:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2819522522
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 18:20:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SQddhb2D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C64AA22522
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jmflZrYo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2819522522
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuh5L-0001Yq-AC
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:20:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41263)
+	id 1iuh5e-0001qk-Us
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 13:20:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48274)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufdv-0004w1-4n
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:44 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRT-00005I-FQ
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufdt-0006WJ-Kl
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:42 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24679
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufdt-0006WC-HX
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798061;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i36g49Wr23XnPzHPj1e2Sazsa2bVz3Y92a1xoz/YYmg=;
- b=SQddhb2DhyVwMPhmF48Q2b56+USzeHf7agvSv9bgrqKlZ5EvejoCWHmZlBJ2hOFFBVlPX+
- F8wLLw7q1XvAyyqjM/K0vsOljRYrcXtr28etioZMz5xRyea/z684Qr5JxX4tPEfl82hpuv
- nZAKCpuzpzLpsVDgkhjnNPxJAu70C9g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-CpqhfcZkN16Gqv8RIiVAdA-1; Thu, 23 Jan 2020 11:47:39 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A7186B313
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:38 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
- [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C728028998;
- Thu, 23 Jan 2020 16:47:37 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 041/108] virtiofsd: Plumb fuse_bufvec through to do_write_buf
-Date: Thu, 23 Jan 2020 16:45:23 +0000
-Message-Id: <20200123164630.91498-42-dgilbert@redhat.com>
-In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
-References: <20200123164630.91498-1-dgilbert@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iueRS-0003Z3-5M
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:47 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:33979)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iueRR-0003Y4-Vd
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 10:30:46 -0500
+Received: by mail-wr1-x432.google.com with SMTP id t2so3585086wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 07:30:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=jiFm42luXRGQ/r26a989FdFKx0ijBFZqT4Y/4nl+p6I=;
+ b=jmflZrYo/7+2fkwM6KpMQ3Zmmg1u357NTHiaZleVFhk1UQ0SyfCL5rWUHSoy/MB1cb
+ J8QKFS5zGhnuxaehPX2Xt9sTAuG9/ChoS7SNQvs2Y1nTIVw5NRLvQhZGXU9J1ywTkK5i
+ Od3tejUo/PWbZjQ0KkOnox9ZJYtFG0fiQug+D1qpAob1/up4gg6Lm5Zmq5Cub9ssiA4/
+ nZeH/f/4QVTgA9a1M5YlKjKL/H4H+rhBq9gjnwuo/PQHWbmvgbSF2iVC0hdW71B1UDLt
+ jBaaY+3BMCdPH77ZT6pB5PsHU6MbCs9DpZL4JD+aZypp/54TuDWnZ7XtrOS9hRxcmPYP
+ qyKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=jiFm42luXRGQ/r26a989FdFKx0ijBFZqT4Y/4nl+p6I=;
+ b=ZXzkx2kHDzwS2EIzd7yn2PoHXsF3xmLQYPoHrBSYsboKf9+VojOo2QEuV4LGnTlc8o
+ 1ZWWIhJUSlfnCDLHs5Hqc0+QNt4+3pAW7s1OiyYbKu2/YWXKLFChnEy/qQlZtQUzY2of
+ IWxTONDFbZeXW6/ywul6xB2TS/JWygvh5FoTKCbcoqozgBx7zDJeXgiM34AqsEN708BO
+ kPgXKbEtGoEK5hj+uJBBqc8zqlkTjlUNM3U1nR7ooyvlLNFvGgqdG19RVW0ZRdc3gJw5
+ Xe+Auqbm1SrxXrw3dzRmMMpbuAyhTnTzPDyDCzM2VsLuj70dSOs5iY3cIO/ZnTvH4wUR
+ i9SA==
+X-Gm-Message-State: APjAAAWeDvOGVM3imencmKACP2Myn/G4SaVx7qiTu2nC/UpR+YD+DTmC
+ 9M7P7glGkj25e05WLPHMM1wRkx5b1YwzjA==
+X-Google-Smtp-Source: APXvYqwMr1zTAdm7mJG4LWx5bvG9EGpATodLmz53yTXha4NrY4vu33kH56FGHm9Q2GsK8C/7HsNbMw==
+X-Received: by 2002:a5d:6b88:: with SMTP id n8mr18602037wrx.288.1579793444691; 
+ Thu, 23 Jan 2020 07:30:44 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s139sm2903592wme.35.2020.01.23.07.30.43
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 07:30:44 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 01/20] target/arm: add PMU feature to cortex-r5 and cortex-r5f
+Date: Thu, 23 Jan 2020 15:30:22 +0000
+Message-Id: <20200123153041.4248-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200123153041.4248-1-peter.maydell@linaro.org>
+References: <20200123153041.4248-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: CpqhfcZkN16Gqv8RIiVAdA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,161 +98,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Clement Deschamps <clement.deschamps@greensocs.com>
 
-Let fuse_session_process_buf_int take a fuse_bufvec * instead of a
-fuse_buf;  and then through to do_write_buf - where in the best
-case it can pass that straight through to op.write_buf without copying
-(other than skipping a header).
+The PMU is not optional on cortex-r5 and cortex-r5f (see
+the "Features" chapter of the Technical Reference Manual).
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200114105918.2366370-1-clement.deschamps@greensocs.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- tools/virtiofsd/fuse_i.h        |  2 +-
- tools/virtiofsd/fuse_lowlevel.c | 61 ++++++++++++++++++++++-----------
- tools/virtiofsd/fuse_virtio.c   |  3 +-
- 3 files changed, 44 insertions(+), 22 deletions(-)
+ target/arm/cpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index 45995f3246..a20854f1c4 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -100,7 +100,7 @@ int fuse_send_reply_iov_nofree(fuse_req_t req, int erro=
-r, struct iovec *iov,
- void fuse_free_req(fuse_req_t req);
-=20
- void fuse_session_process_buf_int(struct fuse_session *se,
--                                  const struct fuse_buf *buf,
-+                                  struct fuse_bufvec *bufv,
-                                   struct fuse_chan *ch);
-=20
-=20
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index 95f4db8fcf..7e10995adc 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -1004,11 +1004,12 @@ static void do_write(fuse_req_t req, fuse_ino_t nod=
-eid, const void *inarg)
- }
-=20
- static void do_write_buf(fuse_req_t req, fuse_ino_t nodeid, const void *in=
-arg,
--                         const struct fuse_buf *ibuf)
-+                         struct fuse_bufvec *ibufv)
- {
-     struct fuse_session *se =3D req->se;
--    struct fuse_bufvec bufv =3D {
--        .buf[0] =3D *ibuf,
-+    struct fuse_bufvec *pbufv =3D ibufv;
-+    struct fuse_bufvec tmpbufv =3D {
-+        .buf[0] =3D ibufv->buf[0],
-         .count =3D 1,
-     };
-     struct fuse_write_in *arg =3D (struct fuse_write_in *)inarg;
-@@ -1018,22 +1019,31 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t=
- nodeid, const void *inarg,
-     fi.fh =3D arg->fh;
-     fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
-=20
--    fi.lock_owner =3D arg->lock_owner;
--    fi.flags =3D arg->flags;
--    if (!(bufv.buf[0].flags & FUSE_BUF_IS_FD)) {
--        bufv.buf[0].mem =3D PARAM(arg);
--    }
--
--    bufv.buf[0].size -=3D
--        sizeof(struct fuse_in_header) + sizeof(struct fuse_write_in);
--    if (bufv.buf[0].size < arg->size) {
--        fuse_log(FUSE_LOG_ERR, "fuse: do_write_buf: buffer size too small\=
-n");
--        fuse_reply_err(req, EIO);
--        return;
-+    if (ibufv->count =3D=3D 1) {
-+        fi.lock_owner =3D arg->lock_owner;
-+        fi.flags =3D arg->flags;
-+        if (!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD)) {
-+            tmpbufv.buf[0].mem =3D PARAM(arg);
-+        }
-+        tmpbufv.buf[0].size -=3D
-+            sizeof(struct fuse_in_header) + sizeof(struct fuse_write_in);
-+        if (tmpbufv.buf[0].size < arg->size) {
-+            fuse_log(FUSE_LOG_ERR,
-+                     "fuse: do_write_buf: buffer size too small\n");
-+            fuse_reply_err(req, EIO);
-+            return;
-+        }
-+        tmpbufv.buf[0].size =3D arg->size;
-+        pbufv =3D &tmpbufv;
-+    } else {
-+        /*
-+         *  Input bufv contains the headers in the first element
-+         * and the data in the rest, we need to skip that first element
-+         */
-+        ibufv->buf[0].size =3D 0;
-     }
--    bufv.buf[0].size =3D arg->size;
-=20
--    se->op.write_buf(req, nodeid, &bufv, arg->offset, &fi);
-+    se->op.write_buf(req, nodeid, pbufv, arg->offset, &fi);
- }
-=20
- static void do_flush(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
-@@ -2024,13 +2034,24 @@ static const char *opname(enum fuse_opcode opcode)
- void fuse_session_process_buf(struct fuse_session *se,
-                               const struct fuse_buf *buf)
- {
--    fuse_session_process_buf_int(se, buf, NULL);
-+    struct fuse_bufvec bufv =3D { .buf[0] =3D *buf, .count =3D 1 };
-+    fuse_session_process_buf_int(se, &bufv, NULL);
- }
-=20
-+/*
-+ * Restriction:
-+ *   bufv is normally a single entry buffer, except for a write
-+ *   where (if it's in memory) then the bufv may be multiple entries,
-+ *   where the first entry contains all headers and subsequent entries
-+ *   contain data
-+ *   bufv shall not use any offsets etc to make the data anything
-+ *   other than contiguous starting from 0.
-+ */
- void fuse_session_process_buf_int(struct fuse_session *se,
--                                  const struct fuse_buf *buf,
-+                                  struct fuse_bufvec *bufv,
-                                   struct fuse_chan *ch)
- {
-+    const struct fuse_buf *buf =3D bufv->buf;
-     struct fuse_in_header *in;
-     const void *inarg;
-     struct fuse_req *req;
-@@ -2108,7 +2129,7 @@ void fuse_session_process_buf_int(struct fuse_session=
- *se,
-=20
-     inarg =3D (void *)&in[1];
-     if (in->opcode =3D=3D FUSE_WRITE && se->op.write_buf) {
--        do_write_buf(req, in->nodeid, inarg, buf);
-+        do_write_buf(req, in->nodeid, inarg, bufv);
-     } else {
-         fuse_ll_ops[in->opcode].func(req, in->nodeid, inarg);
-     }
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 635f87756a..fd588a4829 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -501,7 +501,8 @@ static void *fv_queue_thread(void *opaque)
-             /* TODO! Endianness of header */
-=20
-             /* TODO: Add checks for fuse_session_exited */
--            fuse_session_process_buf_int(se, &fbuf, &ch);
-+            struct fuse_bufvec bufv =3D { .buf[0] =3D fbuf, .count =3D 1 }=
-;
-+            fuse_session_process_buf_int(se, &bufv, &ch);
-=20
-             if (!qi->reply_sent) {
-                 fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
---=20
-2.24.1
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index d62fd5fdc64..64cd0a7d73c 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2121,6 +2121,7 @@ static void cortex_r5_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_V7);
+     set_feature(&cpu->env, ARM_FEATURE_V7MP);
+     set_feature(&cpu->env, ARM_FEATURE_PMSA);
++    set_feature(&cpu->env, ARM_FEATURE_PMU);
+     cpu->midr = 0x411fc153; /* r1p3 */
+     cpu->id_pfr0 = 0x0131;
+     cpu->id_pfr1 = 0x001;
+-- 
+2.20.1
 
 
