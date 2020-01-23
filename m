@@ -2,106 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E26DFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 200B0C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:21:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB1CD2051A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:20:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD3C32051A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:21:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NnmRM0bV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1CD2051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CSCYk6m0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3C32051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57877 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudLh-00039U-At
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:20:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56070)
+	id 1iudM4-0003ko-GM
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:21:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41454)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iubqp-0000K0-K5
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:44:48 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iubAU-000459-UX
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iubqo-0007vv-D7
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:44:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40104
+ (envelope-from <dgilbert@redhat.com>) id 1iubAR-0006L2-Ex
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23990
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iubqo-0007uu-82
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:44:46 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAR-0006G2-71
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579783485;
+ s=mimecast20190719; t=1579780856;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+koljWVKn8g07HRSUoUOLZ7KTyqbfsbxQyVP/IhRrek=;
- b=NnmRM0bV02XZyK6cBPEU3AZQj3BkKFbKUzzYJuAOFYPkA4b30fxQr4SncED7LPP3OPw3I4
- n4GpPEVZdgh+kd1tXxabp7844p5JdIauC0z7RqtU6zHnV5TVXVto7v98JDV57/ofB+V9Yf
- 8boPl79m+hsPJ+kVeblldEAZrWa/Sx0=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SS8/Hoivqb5xN70xcmEVb9n/1AGWeZGsFBcy+kDz9cE=;
+ b=CSCYk6m0plWdw2cdXAGh+bADdICADEbngynCUwcExvPUrSOYW+BwW46mjYP8r/vri313Qz
+ 2Zz3CGlKj1fmx91ojwdLQEU3BoFgvfpCGYDNO+GrFgL0ueOf+T6aEVubwt3oLMiH3f/zIW
+ mopCNZjJbRtf5n5nj6bkY+ZxFCkahYo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-v_nQOZcJPbmBlfynKScVhA-1; Thu, 23 Jan 2020 07:44:43 -0500
-X-MC-Unique: v_nQOZcJPbmBlfynKScVhA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-211-h268Re3jP62jlvI3H81wGA-1; Thu, 23 Jan 2020 07:00:54 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B55C18C43C1;
- Thu, 23 Jan 2020 12:44:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C0925C1BB;
- Thu, 23 Jan 2020 12:44:38 +0000 (UTC)
-Subject: Re: [PATCH] qemu-nbd: Removed deprecated --partition option
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200122214328.1413664-1-eblake@redhat.com>
- <bcf38c8e-c207-73bd-8707-44b500ef3fa2@redhat.com>
- <7084da4a-fa6a-e4ab-868d-2ad397dd5cb3@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <24c7b6e3-40dd-cbae-053d-ebc03babaf9f@redhat.com>
-Date: Thu, 23 Jan 2020 13:44:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0855E8010E2
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:00:53 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 539AC85754;
+ Thu, 23 Jan 2020 12:00:52 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 087/111] virtiofsd: Support remote posix locks
+Date: Thu, 23 Jan 2020 11:58:17 +0000
+Message-Id: <20200123115841.138849-88-dgilbert@redhat.com>
+In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7084da4a-fa6a-e4ab-868d-2ad397dd5cb3@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: h268Re3jP62jlvI3H81wGA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Niagb6s3Q55CyUrXmHTIJWDptYdHMtTun"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,93 +86,364 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "reviewer:Incompatible changes" <libvir-list@redhat.com>,
- qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Niagb6s3Q55CyUrXmHTIJWDptYdHMtTun
-Content-Type: multipart/mixed; boundary="OpD2anNmo0ql0HR87Zc68XhG2ilZZXL9l"
+From: Vivek Goyal <vgoyal@redhat.com>
 
---OpD2anNmo0ql0HR87Zc68XhG2ilZZXL9l
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Doing posix locks with-in guest kernel are not sufficient if a file/dir
+is being shared by multiple guests. So we need the notion of daemon doing
+the locks which are visible to rest of the guests.
 
-On 23.01.20 13:30, Eric Blake wrote:
-> On 1/23/20 6:10 AM, Max Reitz wrote:
->> On 22.01.20 22:43, Eric Blake wrote:
->>> The option was deprecated in 4.0.0 (commit 0ae2d546); it's now been
->>> long enough with no complaints to follow through with that process.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->=20
->>> -@code{qemu-nbd -t -P 1 -f qcow2 file.qcow2}
->>> -
->>> -can be rewritten as:
->>> -
->>> -@code{qemu-nbd -t --image-opts
->>> driver=3Draw,offset=3D1M,size=3D100M,file.driver=3Dqcow2,file.backing.d=
-river=3Dfile,file.backing.filename=3Dfile.qcow2}
->>>
->>> -
->=20
->>> +can be rewritten as:
->>> +
->>> +@code{qemu-nbd -t --image-opts
->>> driver=3Draw,offset=3D1M,size=3D100M,file.driver=3Dqcow2,file.backing.d=
-river=3Dfile,file.backing.filename=3Dfile.qcow2}
->>>
->>
->> I know you just moved it from above, but isn=E2=80=99t this wrong?=C2=A0=
- Shouldn=E2=80=99t it
->> be s/backing/file/g?
->=20
-> Indeed; file.file.driver=3Dfile,file.file.filename=3Dfile.qcow2 is requir=
-ed
-> for it to work, rather than fail with
-> qemu-nbd: Failed to blk_new_open
-> 'driver=3Draw,offset=3D1m,size=3D100m,file.driver=3Dqcow2,file.backing.dr=
-iver=3Dfile,file.backing.filename=3Dfile4':
-> A block device must be specified for "file"
->=20
-> I'll repost with the bug-fix as a separate commit (and it's a shame that
-> we've gone nearly a year with no one noticing the typo in the original).
+Given posix locks are per process, one can not call posix lock API on host,
+otherwise bunch of basic posix locks properties are broken. For example,
+If two processes (A and B) in guest open the file and take locks on differe=
+nt
+sections of file, if one of the processes closes the fd, it will close
+fd on virtiofsd and all posix locks on file will go away. This means if
+process A closes the fd, then locks of process B will go away too.
 
-It was actually meant as a service to our users!  So they can=E2=80=99t jus=
-t
-blindly copy-paste the example but have to think it through.  And the
-fact that noone has complained shows that our users indeed didn=E2=80=99t l=
-et
-themselves be caught off-guard!  /s O:-)
+Similar other problems exist too.
 
-Thanks!
+This patch set tries to emulate posix locks while using open file
+description locks provided on Linux.
 
-Max
+Daemon provides two options (-o posix_lock, -o no_posix_lock) to enable
+or disable posix locking in daemon. By default it is enabled.
 
+There are few issues though.
 
---OpD2anNmo0ql0HR87Zc68XhG2ilZZXL9l--
+- GETLK() returns pid of process holding lock. As we are emulating locks
+  using OFD, and these locks are not per process and don't return pid
+  of process, so GETLK() in guest does not reuturn process pid.
 
---Niagb6s3Q55CyUrXmHTIJWDptYdHMtTun
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+- As of now only F_SETLK is supported and not F_SETLKW. We can't block
+  the thread in virtiofsd for arbitrary long duration as there is only
+  one thread serving the queue. That means unlock request will not make
+  it to daemon and F_SETLKW will block infinitely and bring virtio-fs
+  to a halt. This is a solvable problem though and will require significant
+  changes in virtiofsd and kernel. Left as a TODO item for now.
 
------BEGIN PGP SIGNATURE-----
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/helper.c         |   3 +
+ tools/virtiofsd/passthrough_ll.c | 189 +++++++++++++++++++++++++++++++
+ 2 files changed, 192 insertions(+)
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4plTQACgkQ9AfbAGHV
-z0D5cQf7BlW5d3/Lk4XLE/77DB8g2yNXl4gCWZf99THVZsXS+nWREjV+tso1kYKm
-L9PZ0k9K5hYzTDsKlvBcY30mmuLkhEr1KKNNJlY/M2GSJw1rPXWVFIx8zz9Q+0Iw
-nmW9msKotE7sVFkTy962fgVmstyJpyNomAqN5rZRh7wBG2BSJwikXELKeTQyfF6w
-KPUmzirq6N6VrTm9xJcPBmjpsCPEYt9ym385Mw5r86Ekktit5RW22cB3xNhEAFDl
-HHt2X3NXuUcObvQuBBudl3aDAuu0Raq6SU1OoWc4xkBUZXzjeOzjIu3/6cXVm27X
-jxtnjOEBE9QZ0kxAGfUbkia2cEXI3g==
-=ugYU
------END PGP SIGNATURE-----
-
---Niagb6s3Q55CyUrXmHTIJWDptYdHMtTun--
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 567202444a..33749bfcb7 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -156,6 +156,9 @@ void fuse_cmdline_help(void)
+            "                               allowed (default: 10)\n"
+            "    -o norace                  disable racy fallback\n"
+            "                               default: false\n"
++           "    -o posix_lock|no_posix_lock\n"
++           "                               enable/disable remote posix loc=
+k\n"
++           "                               default: posix_lock\n"
+            "    -o readdirplus|no_readdirplus\n"
+            "                               enable/disable readirplus\n"
+            "                               default: readdirplus except wit=
+h "
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 05b5f898db..9414935b52 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -67,6 +67,12 @@
+ #include "passthrough_helpers.h"
+ #include "seccomp.h"
+=20
++/* Keep track of inode posix locks for each owner. */
++struct lo_inode_plock {
++    uint64_t lock_owner;
++    int fd; /* fd for OFD locks */
++};
++
+ struct lo_map_elem {
+     union {
+         struct lo_inode *inode;
+@@ -95,6 +101,8 @@ struct lo_inode {
+     struct lo_key key;
+     uint64_t refcount; /* protected by lo->mutex */
+     fuse_ino_t fuse_ino;
++    pthread_mutex_t plock_mutex;
++    GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
+ };
+=20
+ struct lo_cred {
+@@ -114,6 +122,7 @@ struct lo_data {
+     int norace;
+     int writeback;
+     int flock;
++    int posix_lock;
+     int xattr;
+     char *source;
+     double timeout;
+@@ -137,6 +146,8 @@ static const struct fuse_opt lo_opts[] =3D {
+     { "source=3D%s", offsetof(struct lo_data, source), 0 },
+     { "flock", offsetof(struct lo_data, flock), 1 },
+     { "no_flock", offsetof(struct lo_data, flock), 0 },
++    { "posix_lock", offsetof(struct lo_data, posix_lock), 1 },
++    { "no_posix_lock", offsetof(struct lo_data, posix_lock), 0 },
+     { "xattr", offsetof(struct lo_data, xattr), 1 },
+     { "no_xattr", offsetof(struct lo_data, xattr), 0 },
+     { "timeout=3D%lf", offsetof(struct lo_data, timeout), 0 },
+@@ -485,6 +496,17 @@ static void lo_init(void *userdata, struct fuse_conn_i=
+nfo *conn)
+         fuse_log(FUSE_LOG_DEBUG, "lo_init: activating flock locks\n");
+         conn->want |=3D FUSE_CAP_FLOCK_LOCKS;
+     }
++
++    if (conn->capable & FUSE_CAP_POSIX_LOCKS) {
++        if (lo->posix_lock) {
++            fuse_log(FUSE_LOG_DEBUG, "lo_init: activating posix locks\n");
++            conn->want |=3D FUSE_CAP_POSIX_LOCKS;
++        } else {
++            fuse_log(FUSE_LOG_DEBUG, "lo_init: disabling posix locks\n");
++            conn->want &=3D ~FUSE_CAP_POSIX_LOCKS;
++        }
++    }
++
+     if ((lo->cache =3D=3D CACHE_NONE && !lo->readdirplus_set) ||
+         lo->readdirplus_clear) {
+         fuse_log(FUSE_LOG_DEBUG, "lo_init: disabling readdirplus\n");
+@@ -772,6 +794,19 @@ static struct lo_inode *lo_find(struct lo_data *lo, st=
+ruct stat *st)
+     return p;
+ }
+=20
++/* value_destroy_func for posix_locks GHashTable */
++static void posix_locks_value_destroy(gpointer data)
++{
++    struct lo_inode_plock *plock =3D data;
++
++    /*
++     * We had used open() for locks and had only one fd. So
++     * closing this fd should release all OFD locks.
++     */
++    close(plock->fd);
++    free(plock);
++}
++
+ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *nam=
+e,
+                         struct fuse_entry_param *e)
+ {
+@@ -825,6 +860,9 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pare=
+nt, const char *name,
+         newfd =3D -1;
+         inode->key.ino =3D e->attr.st_ino;
+         inode->key.dev =3D e->attr.st_dev;
++        pthread_mutex_init(&inode->plock_mutex, NULL);
++        inode->posix_locks =3D g_hash_table_new_full(
++            g_direct_hash, g_direct_equal, NULL, posix_locks_value_destroy=
+);
+=20
+         pthread_mutex_lock(&lo->mutex);
+         inode->fuse_ino =3D lo_add_inode_mapping(req, inode);
+@@ -1160,6 +1198,11 @@ static void unref_inode_lolocked(struct lo_data *lo,=
+ struct lo_inode *inode,
+     if (!inode->refcount) {
+         lo_map_remove(&lo->ino_map, inode->fuse_ino);
+         g_hash_table_remove(lo->inodes, &inode->key);
++        if (g_hash_table_size(inode->posix_locks)) {
++            fuse_log(FUSE_LOG_WARNING, "Hash table is not empty\n");
++        }
++        g_hash_table_destroy(inode->posix_locks);
++        pthread_mutex_destroy(&inode->plock_mutex);
+         pthread_mutex_unlock(&lo->mutex);
+         close(inode->fd);
+         free(inode);
+@@ -1516,6 +1559,136 @@ out:
+     }
+ }
+=20
++/* Should be called with inode->plock_mutex held */
++static struct lo_inode_plock *lookup_create_plock_ctx(struct lo_data *lo,
++                                                      struct lo_inode *ino=
+de,
++                                                      uint64_t lock_owner,
++                                                      pid_t pid, int *err)
++{
++    struct lo_inode_plock *plock;
++    char procname[64];
++    int fd;
++
++    plock =3D
++        g_hash_table_lookup(inode->posix_locks, GUINT_TO_POINTER(lock_owne=
+r));
++
++    if (plock) {
++        return plock;
++    }
++
++    plock =3D malloc(sizeof(struct lo_inode_plock));
++    if (!plock) {
++        *err =3D ENOMEM;
++        return NULL;
++    }
++
++    /* Open another instance of file which can be used for ofd locks. */
++    sprintf(procname, "%i", inode->fd);
++
++    /* TODO: What if file is not writable? */
++    fd =3D openat(lo->proc_self_fd, procname, O_RDWR);
++    if (fd =3D=3D -1) {
++        *err =3D errno;
++        free(plock);
++        return NULL;
++    }
++
++    plock->lock_owner =3D lock_owner;
++    plock->fd =3D fd;
++    g_hash_table_insert(inode->posix_locks, GUINT_TO_POINTER(plock->lock_o=
+wner),
++                        plock);
++    return plock;
++}
++
++static void lo_getlk(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info=
+ *fi,
++                     struct flock *lock)
++{
++    struct lo_data *lo =3D lo_data(req);
++    struct lo_inode *inode;
++    struct lo_inode_plock *plock;
++    int ret, saverr =3D 0;
++
++    fuse_log(FUSE_LOG_DEBUG,
++             "lo_getlk(ino=3D%" PRIu64 ", flags=3D%d)"
++             " owner=3D0x%lx, l_type=3D%d l_start=3D0x%lx"
++             " l_len=3D0x%lx\n",
++             ino, fi->flags, fi->lock_owner, lock->l_type, lock->l_start,
++             lock->l_len);
++
++    inode =3D lo_inode(req, ino);
++    if (!inode) {
++        fuse_reply_err(req, EBADF);
++        return;
++    }
++
++    pthread_mutex_lock(&inode->plock_mutex);
++    plock =3D
++        lookup_create_plock_ctx(lo, inode, fi->lock_owner, lock->l_pid, &r=
+et);
++    if (!plock) {
++        pthread_mutex_unlock(&inode->plock_mutex);
++        fuse_reply_err(req, ret);
++        return;
++    }
++
++    ret =3D fcntl(plock->fd, F_OFD_GETLK, lock);
++    if (ret =3D=3D -1) {
++        saverr =3D errno;
++    }
++    pthread_mutex_unlock(&inode->plock_mutex);
++
++    if (saverr) {
++        fuse_reply_err(req, saverr);
++    } else {
++        fuse_reply_lock(req, lock);
++    }
++}
++
++static void lo_setlk(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info=
+ *fi,
++                     struct flock *lock, int sleep)
++{
++    struct lo_data *lo =3D lo_data(req);
++    struct lo_inode *inode;
++    struct lo_inode_plock *plock;
++    int ret, saverr =3D 0;
++
++    fuse_log(FUSE_LOG_DEBUG,
++             "lo_setlk(ino=3D%" PRIu64 ", flags=3D%d)"
++             " cmd=3D%d pid=3D%d owner=3D0x%lx sleep=3D%d l_whence=3D%d"
++             " l_start=3D0x%lx l_len=3D0x%lx\n",
++             ino, fi->flags, lock->l_type, lock->l_pid, fi->lock_owner, sl=
+eep,
++             lock->l_whence, lock->l_start, lock->l_len);
++
++    if (sleep) {
++        fuse_reply_err(req, EOPNOTSUPP);
++        return;
++    }
++
++    inode =3D lo_inode(req, ino);
++    if (!inode) {
++        fuse_reply_err(req, EBADF);
++        return;
++    }
++
++    pthread_mutex_lock(&inode->plock_mutex);
++    plock =3D
++        lookup_create_plock_ctx(lo, inode, fi->lock_owner, lock->l_pid, &r=
+et);
++
++    if (!plock) {
++        pthread_mutex_unlock(&inode->plock_mutex);
++        fuse_reply_err(req, ret);
++        return;
++    }
++
++    /* TODO: Is it alright to modify flock? */
++    lock->l_pid =3D 0;
++    ret =3D fcntl(plock->fd, F_OFD_SETLK, lock);
++    if (ret =3D=3D -1) {
++        saverr =3D errno;
++    }
++    pthread_mutex_unlock(&inode->plock_mutex);
++    fuse_reply_err(req, saverr);
++}
++
+ static void lo_fsyncdir(fuse_req_t req, fuse_ino_t ino, int datasync,
+                         struct fuse_file_info *fi)
+ {
+@@ -1617,6 +1790,19 @@ static void lo_flush(fuse_req_t req, fuse_ino_t ino,=
+ struct fuse_file_info *fi)
+ {
+     int res;
+     (void)ino;
++    struct lo_inode *inode;
++
++    inode =3D lo_inode(req, ino);
++    if (!inode) {
++        fuse_reply_err(req, EBADF);
++        return;
++    }
++
++    /* An fd is going away. Cleanup associated posix locks */
++    pthread_mutex_lock(&inode->plock_mutex);
++    g_hash_table_remove(inode->posix_locks, GUINT_TO_POINTER(fi->lock_owne=
+r));
++    pthread_mutex_unlock(&inode->plock_mutex);
++
+     res =3D close(dup(lo_fi_fd(req, fi)));
+     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+ }
+@@ -2080,6 +2266,8 @@ static struct fuse_lowlevel_ops lo_oper =3D {
+     .releasedir =3D lo_releasedir,
+     .fsyncdir =3D lo_fsyncdir,
+     .create =3D lo_create,
++    .getlk =3D lo_getlk,
++    .setlk =3D lo_setlk,
+     .open =3D lo_open,
+     .release =3D lo_release,
+     .flush =3D lo_flush,
+@@ -2434,6 +2622,7 @@ int main(int argc, char *argv[])
+     struct lo_data lo =3D {
+         .debug =3D 0,
+         .writeback =3D 0,
++        .posix_lock =3D 1,
+         .proc_self_fd =3D -1,
+     };
+     struct lo_map_elem *root_elem;
+--=20
+2.24.1
 
 
