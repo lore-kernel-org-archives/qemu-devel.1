@@ -2,101 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFEC7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B29CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EBB02077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2C962077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2GP0uxp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EBB02077C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Daj47p4p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2C962077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiZ9-0005GF-P7
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:54:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49694)
+	id 1iuiZC-0005IT-5A
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:55:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iuhMG-0008K2-D7
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:37:37 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iufe5-00056f-LU
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iuhMC-0003sj-KP
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:37:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21218
+ (envelope-from <dgilbert@redhat.com>) id 1iufe3-0006ch-W1
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35899
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuhMC-0003sI-GZ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 13:37:32 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufe3-0006cW-TM
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579804651;
+ s=mimecast20190719; t=1579798071;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8wYETtubdMkhSXWZ61HdTf21VDFypri2RTf9txI0mFw=;
- b=X2GP0uxpXZHpSByhV8jh7oIKsBaiazECmSRDS4EkXmuL8emLIOkbSTCnkFM1sa+F7tlaKq
- w+hciehnHWe8Z2k99JL4bfpVkHzYP1jmyOYKZa6tQ5au8s0TQf91dccuSnltFi5SwFyd45
- u+dRBhUUmxh03ZDsEXiUlc8q+dbWXag=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-TGCj0jxqN0WpCSGUd334dA-1; Thu, 23 Jan 2020 13:37:29 -0500
-Received: by mail-wr1-f70.google.com with SMTP id z15so2364833wrw.0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 10:37:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=rUqhRHPuwgmjAQhU/HcCDGSPjQxYNYnQ4sksW2u9Lo8=;
- b=e6knvbEmtxnWwNll3OUNnjyejWcWfU/HfXXCKuI2Nu3ShsCsfBc9D1V4o5UbfDzWTs
- DLTKIixLVVRUNUidmNzoSJ03HLnuQO3kBeflnyf7dTUMJ+H7MiK4ODYT8mA6Op/B1YPs
- U9/cZOTUpUhX2sBLOIBDRvrC1kpSE+/J2WisnZqN6s5xWt08Z2MaAe8UKxuCxjP1LGT8
- 3j9b76jxeArN4m5GPxAgSPNeGgMoSjGzbxgS8ElN1MqYWr1DWkbPcbWM0dWsg7nperY8
- u0iQKORSQxrQ2DR1UhSp9apuymf5mF/tnpWEQ+RjHFXdNHXUP2BZhOE030VJ+EY0R3vx
- Rsgg==
-X-Gm-Message-State: APjAAAULXCDQLKmTEiplUODazBxbtqWBQtQRbbJTEiZ/QSjkbSM46p6F
- j3k5gof7WPB20XFck5qFkAq9kM+3oM0/95kO7JkDGw0gi30dvUcgBnTxhM/ZYKfPi2qBBcVfwnw
- VkcubDEMbwVZcYz4=
-X-Received: by 2002:adf:d4ca:: with SMTP id w10mr19974739wrk.53.1579804648380; 
- Thu, 23 Jan 2020 10:37:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxbiFsYjaqyesMA2cDrF2yKRX8Ux58Virl4iyo3H6PAlPFFHAgHwBHF2abGKcUQ4wt/pgtHBQ==
-X-Received: by 2002:adf:d4ca:: with SMTP id w10mr19974714wrk.53.1579804648103; 
- Thu, 23 Jan 2020 10:37:28 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id x7sm3981468wrq.41.2020.01.23.10.37.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jan 2020 10:37:27 -0800 (PST)
-Subject: Re: [PATCH] tests/boot-serial-test: Allow the HPPA machine to shudown
-To: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20200123003603.11610-1-f4bug@amsat.org>
- <15bada61-7e0c-bb4d-a91e-2cdfd42161e1@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bcba70e2-9702-c080-1025-ad22fd344801@redhat.com>
-Date: Thu, 23 Jan 2020 19:37:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=KK/7qgjHzoRF+pgAqQJZ36ORUn7lwgLqQgxeveozNWk=;
+ b=Daj47p4pQwIoi1JaIr8pmH5V3fKfDZ17rBc5dkmTUmdS4kDald8d1hfLgvwn9xxNIL0D5Z
+ GZ+ZsNq+dheTefcaM7+975KqDtNkEJxVg0FO3u2nehsB1w77jK0LVdDA9kEDzT/q+V5Ul3
+ ec9fssGULGHrPOR17fwwhSA10seSDq4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-O8S-h3NCOt-Oe4t1-nrBfA-1; Thu, 23 Jan 2020 11:47:50 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63A091085946
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:49 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1B7728990;
+ Thu, 23 Jan 2020 16:47:48 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 052/108] virtiofsd: add seccomp whitelist
+Date: Thu, 23 Jan 2020 16:45:34 +0000
+Message-Id: <20200123164630.91498-53-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <15bada61-7e0c-bb4d-a91e-2cdfd42161e1@linaro.org>
-Content-Language: en-US
-X-MC-Unique: TGCj0jxqN0WpCSGUd334dA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: O8S-h3NCOt-Oe4t1-nrBfA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,66 +87,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Sven Schnelle <svens@stackframe.org>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/23/20 4:27 AM, Richard Henderson wrote:
-> On 1/22/20 2:36 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> The boot-serial test uses SeaBIOS on HPPA, and expects to read the
->> "SeaBIOS wants SYSTEM HALT" string, see [*]:
->>
->>   122 void __VISIBLE __noreturn hlt(void)
->>   123 {
->>   124     if (pdc_debug)
->>   125         printf("HALT initiated from %p\n",  __builtin_return_addre=
-ss(0));
->>   126     printf("SeaBIOS wants SYSTEM HALT.\n\n");
->>   127     asm volatile("\t.word 0xfffdead0": : :"memory");
->>   128     while (1);
->>   129 }
->>
->> A 'SYSTEM HALT' would really halts the CPU, but SeaBIOS implements
->> it as an infinite loop.
->=20
-> Well, SeaBIOS implements it as the magic QEMU halt instruction,
->=20
-> # These are artificial instructions used by QEMU firmware.
-> # They are allocated from the unassigned instruction space.
-> halt            1111 1111 1111 1101 1110 1010 1101 0000
-> reset           1111 1111 1111 1101 1110 1010 1101 0001
->=20
-> followed by an infinite loop, probably to avoid a compiler warning and Ju=
-st In
-> Case.  We really should halt here, unless shutdown is disabled.
->=20
->> -    qts =3D qtest_initf("%s %s -M %s -no-shutdown "
->> +    qts =3D qtest_initf("%s %s -M %s %s "
->>                         "-chardev file,id=3Dserial0,path=3D%s "
->>                         "-serial chardev:serial0 -accel tcg -accel kvm %=
-s",
->>                         codeparam, code ? codetmp : "", test->machine,
->> +                      shutdown ? "" : "-no-shutdown",
->>                         serialtmp, test->extra);
->=20
-> And thus avoiding the -no-shutdown should in fact shutdown.
->=20
-> Are you saying this doesn't happen, or what?  I think I got lost with the=
- rest
-> of the message...
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-"If the command-line option "-no-shutdown" has been specified,
-  qemu will not exit, and a STOP event will eventually follow
-  the SHUTDOWN event"
+Only allow system calls that are needed by virtiofsd.  All other system
+calls cause SIGSYS to be directed at the thread and the process will
+coredump.
 
-What I see is the HPPA firmware calling HALT, then QEMU doesn't exit.
+Restricting system calls reduces the kernel attack surface and limits
+what the process can do when compromised.
 
-The QTest keeps reading the console for "SeaBIOS wants SYSTEM HALT.".
-When this string is displayed on the graphic output instead of the=20
-serial, the QTest keep reading indefinitely, and the test never=20
-succeeds/fails, it is just stuck.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+with additional entries by:
+Signed-off-by: Ganesh Maharaj Mahalingam <ganesh.mahalingam@intel.com>
+Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Signed-off-by: piaojun <piaojun@huawei.com>
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+Signed-off-by: Eric Ren <renzhen@linux.alibaba.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ Makefile                         |   5 +-
+ tools/virtiofsd/Makefile.objs    |   5 +-
+ tools/virtiofsd/passthrough_ll.c |   2 +
+ tools/virtiofsd/seccomp.c        | 151 +++++++++++++++++++++++++++++++
+ tools/virtiofsd/seccomp.h        |  14 +++
+ 5 files changed, 174 insertions(+), 3 deletions(-)
+ create mode 100644 tools/virtiofsd/seccomp.c
+ create mode 100644 tools/virtiofsd/seccomp.h
+
+diff --git a/Makefile b/Makefile
+index 2f81271ee7..ad400f36b2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -327,7 +327,7 @@ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
+ vhost-user-json-y +=3D contrib/vhost-user-gpu/50-qemu-gpu.json
+ endif
+=20
+-ifdef CONFIG_LINUX
++ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP),yy)
+ HELPERS-y +=3D virtiofsd$(EXESUF)
+ vhost-user-json-y +=3D tools/virtiofsd/50-qemu-virtiofsd.json
+ endif
+@@ -674,7 +674,8 @@ rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+ =09$(call LINK, $^)
+=20
+-ifdef CONFIG_LINUX # relies on Linux-specific syscalls
++# relies on Linux-specific syscalls
++ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP),yy)
+ virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
+ =09$(call LINK, $^)
+ endif
+diff --git a/tools/virtiofsd/Makefile.objs b/tools/virtiofsd/Makefile.objs
+index 45a807500d..076f667e46 100644
+--- a/tools/virtiofsd/Makefile.objs
++++ b/tools/virtiofsd/Makefile.objs
+@@ -5,5 +5,8 @@ virtiofsd-obj-y =3D buffer.o \
+                   fuse_signals.o \
+                   fuse_virtio.o \
+                   helper.o \
+-                  passthrough_ll.o
++                  passthrough_ll.o \
++                  seccomp.o
+=20
++seccomp.o-cflags :=3D $(SECCOMP_CFLAGS)
++seccomp.o-libs :=3D $(SECCOMP_LIBS)
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 0947d14e5b..bd8925bd83 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -59,6 +59,7 @@
+ #include <unistd.h>
+=20
+ #include "passthrough_helpers.h"
++#include "seccomp.h"
+=20
+ struct lo_map_elem {
+     union {
+@@ -2091,6 +2092,7 @@ static void setup_sandbox(struct lo_data *lo, struct =
+fuse_session *se)
+ {
+     setup_namespaces(lo, se);
+     setup_mounts(lo->source);
++    setup_seccomp();
+ }
+=20
+ int main(int argc, char *argv[])
+diff --git a/tools/virtiofsd/seccomp.c b/tools/virtiofsd/seccomp.c
+new file mode 100644
+index 0000000000..691fb63dea
+--- /dev/null
++++ b/tools/virtiofsd/seccomp.c
+@@ -0,0 +1,151 @@
++/*
++ * Seccomp sandboxing for virtiofsd
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "seccomp.h"
++#include "fuse_i.h"
++#include "fuse_log.h"
++#include <errno.h>
++#include <glib.h>
++#include <seccomp.h>
++#include <stdlib.h>
++
++/* Bodge for libseccomp 2.4.2 which broke ppoll */
++#if !defined(__SNR_ppoll) && defined(__SNR_brk)
++#ifdef __NR_ppoll
++#define __SNR_ppoll __NR_ppoll
++#else
++#define __SNR_ppoll __PNR_ppoll
++#endif
++#endif
++
++static const int syscall_whitelist[] =3D {
++    /* TODO ireg sem*() syscalls */
++    SCMP_SYS(brk),
++    SCMP_SYS(capget), /* For CAP_FSETID */
++    SCMP_SYS(capset),
++    SCMP_SYS(clock_gettime),
++    SCMP_SYS(clone),
++#ifdef __NR_clone3
++    SCMP_SYS(clone3),
++#endif
++    SCMP_SYS(close),
++    SCMP_SYS(copy_file_range),
++    SCMP_SYS(dup),
++    SCMP_SYS(eventfd2),
++    SCMP_SYS(exit),
++    SCMP_SYS(exit_group),
++    SCMP_SYS(fallocate),
++    SCMP_SYS(fchmodat),
++    SCMP_SYS(fchownat),
++    SCMP_SYS(fcntl),
++    SCMP_SYS(fdatasync),
++    SCMP_SYS(fgetxattr),
++    SCMP_SYS(flistxattr),
++    SCMP_SYS(flock),
++    SCMP_SYS(fremovexattr),
++    SCMP_SYS(fsetxattr),
++    SCMP_SYS(fstat),
++    SCMP_SYS(fstatfs),
++    SCMP_SYS(fsync),
++    SCMP_SYS(ftruncate),
++    SCMP_SYS(futex),
++    SCMP_SYS(getdents),
++    SCMP_SYS(getdents64),
++    SCMP_SYS(getegid),
++    SCMP_SYS(geteuid),
++    SCMP_SYS(getpid),
++    SCMP_SYS(gettid),
++    SCMP_SYS(gettimeofday),
++    SCMP_SYS(linkat),
++    SCMP_SYS(lseek),
++    SCMP_SYS(madvise),
++    SCMP_SYS(mkdirat),
++    SCMP_SYS(mknodat),
++    SCMP_SYS(mmap),
++    SCMP_SYS(mprotect),
++    SCMP_SYS(mremap),
++    SCMP_SYS(munmap),
++    SCMP_SYS(newfstatat),
++    SCMP_SYS(open),
++    SCMP_SYS(openat),
++    SCMP_SYS(ppoll),
++    SCMP_SYS(prctl), /* TODO restrict to just PR_SET_NAME? */
++    SCMP_SYS(preadv),
++    SCMP_SYS(pread64),
++    SCMP_SYS(pwritev),
++    SCMP_SYS(pwrite64),
++    SCMP_SYS(read),
++    SCMP_SYS(readlinkat),
++    SCMP_SYS(recvmsg),
++    SCMP_SYS(renameat),
++    SCMP_SYS(renameat2),
++    SCMP_SYS(rt_sigaction),
++    SCMP_SYS(rt_sigprocmask),
++    SCMP_SYS(rt_sigreturn),
++    SCMP_SYS(sendmsg),
++    SCMP_SYS(setresgid),
++    SCMP_SYS(setresuid),
++#ifdef __NR_setresgid32
++    SCMP_SYS(setresgid32),
++#endif
++#ifdef __NR_setresuid32
++    SCMP_SYS(setresuid32),
++#endif
++    SCMP_SYS(set_robust_list),
++    SCMP_SYS(symlinkat),
++    SCMP_SYS(time), /* Rarely needed, except on static builds */
++    SCMP_SYS(tgkill),
++    SCMP_SYS(unlinkat),
++    SCMP_SYS(utimensat),
++    SCMP_SYS(write),
++    SCMP_SYS(writev),
++};
++
++void setup_seccomp(void)
++{
++    scmp_filter_ctx ctx;
++    size_t i;
++
++#ifdef SCMP_ACT_KILL_PROCESS
++    ctx =3D seccomp_init(SCMP_ACT_KILL_PROCESS);
++    /* Handle a newer libseccomp but an older kernel */
++    if (!ctx && errno =3D=3D EOPNOTSUPP) {
++        ctx =3D seccomp_init(SCMP_ACT_TRAP);
++    }
++#else
++    ctx =3D seccomp_init(SCMP_ACT_TRAP);
++#endif
++    if (!ctx) {
++        fuse_log(FUSE_LOG_ERR, "seccomp_init() failed\n");
++        exit(1);
++    }
++
++    for (i =3D 0; i < G_N_ELEMENTS(syscall_whitelist); i++) {
++        if (seccomp_rule_add(ctx, SCMP_ACT_ALLOW,
++                             syscall_whitelist[i], 0) !=3D 0) {
++            fuse_log(FUSE_LOG_ERR, "seccomp_rule_add syscall %d",
++                     syscall_whitelist[i]);
++            exit(1);
++        }
++    }
++
++    /* libvhost-user calls this for post-copy migration, we don't need it =
+*/
++    if (seccomp_rule_add(ctx, SCMP_ACT_ERRNO(ENOSYS),
++                         SCMP_SYS(userfaultfd), 0) !=3D 0) {
++        fuse_log(FUSE_LOG_ERR, "seccomp_rule_add userfaultfd failed\n");
++        exit(1);
++    }
++
++    if (seccomp_load(ctx) < 0) {
++        fuse_log(FUSE_LOG_ERR, "seccomp_load() failed\n");
++        exit(1);
++    }
++
++    seccomp_release(ctx);
++}
+diff --git a/tools/virtiofsd/seccomp.h b/tools/virtiofsd/seccomp.h
+new file mode 100644
+index 0000000000..86bce72652
+--- /dev/null
++++ b/tools/virtiofsd/seccomp.h
+@@ -0,0 +1,14 @@
++/*
++ * Seccomp sandboxing for virtiofsd
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef VIRTIOFSD_SECCOMP_H
++#define VIRTIOFSD_SECCOMP_H
++
++void setup_seccomp(void);
++
++#endif /* VIRTIOFSD_SECCOMP_H */
+--=20
+2.24.1
 
 
