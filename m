@@ -2,80 +2,93 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43090C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D504AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:36:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F252207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:36:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C09420704
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:36:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EAyGTvg3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F252207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="f5cKCAKi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C09420704
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudaa-0006xo-Lt
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:36:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41751)
+	id 1iudbI-0007kM-6f
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:36:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAm-0004GD-Ox
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:21 -0500
+ (envelope-from <dme@dme.org>) id 1iubQH-00079Q-7L
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:17:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAl-0006fe-NN
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37678
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAl-0006dC-FB
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780877;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dp4GreLUjRX8OdN+BXxczHvI9YCaaBlKuOswvS9jdOo=;
- b=EAyGTvg3NOebsA2YI5d4hJk89SSkTbrDwgKgABiVCj9nJx+tDZjMqyaleBBzjKVC7zstxN
- cgehZ+wWWbzAEakEWeygxcxeNp/NQm8RSCvuMYBoZAu/Suy9hahYwKjwMNvYPmfDhSMxvF
- SLQa4EM447tDnzkCYjyhvvrcoOsFu1s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-h6Bamv39O76QEH1HPBnFNA-1; Thu, 23 Jan 2020 07:01:10 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9D7DA0CD0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:01:09 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E967F1CB;
- Thu, 23 Jan 2020 12:01:08 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 101/111] virtiofsd: passthrough_ll: Use cache_readdir for
- directory open
-Date: Thu, 23 Jan 2020 11:58:31 +0000
-Message-Id: <20200123115841.138849-102-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-References: <20200123115841.138849-1-dgilbert@redhat.com>
+ (envelope-from <dme@dme.org>) id 1iubQF-0001Qc-1g
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:17:20 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35183)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dme@dme.org>) id 1iubQE-0001N9-1G
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:17:18 -0500
+Received: by mail-wm1-x344.google.com with SMTP id p17so2320946wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 04:17:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:subject:in-reply-to:references:from:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ghPuYZiXHTId5LdvMoeGG4ShL2m624b36Msb3cFnugA=;
+ b=f5cKCAKixztcaP9ET8Q9fNtqedKFLFBjQ8XB5CwvqA9L8M6NvT/5DZsMeBKYAErurb
+ 2bKEnDWoXLQIUkmW7VL+vLx+0U+UrVSLV6OFcAlQntfiP8z61rtabTydtQrzuPMK7svl
+ kqj37mhW8v+SlPCEMtC/d5CXPMYVd42BDRW4jNFt50E7DMCMFU4P1Xe6SgndZqB7KUhM
+ yQSt9MEj6MWZsBZnwVdiMChdnr1lGlx+mugdnFnbk+dROkbpk4d4sy23pHY0ZFWasWP5
+ 9ENIzVcmWLKmMQhCXjdqWMqi7p+hruTexgSGX5o47y8vYfN7Ur0sghkX2yWriiVftOGI
+ 4pEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:subject:in-reply-to:references:from:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ghPuYZiXHTId5LdvMoeGG4ShL2m624b36Msb3cFnugA=;
+ b=EoDhutUVgpmENqmlSq96f1PcR7PzNFv1jLcxsMqyEra68M1GZ+ylfPgJlFK2gUkM65
+ 57atD+c5AhbyLlW3r6sxq94fuF7DtpjKJyoKFRMaxLwns5lhaRZY1WOL/HmmC8ejfPGK
+ tStSPe5896ohBQGqmtSV7KqiDCDEPkbB1koTOhiJDhZo0pMHWfQBLcZ+zvd9rMHT74gn
+ o6LymlLRlJaF/17vqPnATnmf8B40b4nuGRHV7R/9mbCj0YSCEPQOHQ1zDsWQCcs3vR42
+ 0fwLE3GAaEHC7ro1GBO8DrHgPIPRWG4d48oLLyy4KUYIkROyFjIRJki3Tz3buQkHHFGp
+ UuJQ==
+X-Gm-Message-State: APjAAAXy+hC+z1uIVxSVKBQow8hJM85h4ALAUOANBfHaQCHyaYbmjsCt
+ YFGTOSM28xH5nUJr26dytFjYNu75o4M=
+X-Google-Smtp-Source: APXvYqzi7usCY+y0DSlvwSTH+8KDmEdmVlBxZcrdJedqjsibEEoDG7AkMtGiumpzFcDjGr4HAJtZYg==
+X-Received: by 2002:a1c:2089:: with SMTP id g131mr3737361wmg.63.1579781831627; 
+ Thu, 23 Jan 2020 04:17:11 -0800 (PST)
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net.
+ [81.149.164.25])
+ by smtp.gmail.com with ESMTPSA id f1sm2740182wrp.93.2020.01.23.04.17.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jan 2020 04:17:10 -0800 (PST)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id e1587faa;
+ Thu, 23 Jan 2020 12:17:09 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, Qemu-block
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH] qemu-img: Add --target-is-zero to convert
+In-Reply-To: <38073ceb-922e-b0fb-0c20-05fb4831e9a8@redhat.com>
+References: <id:m21rryz8al.fsf@dme.org>
+ <20200117103434.1363985-1-david.edmondson@oracle.com>
+ <38073ceb-922e-b0fb-0c20-05fb4831e9a8@redhat.com>
+X-HGTTG: heart-of-gold
+From: David Edmondson <dme@dme.org>
+X-Playing: Four Tet: Spirit Fingers (Live In Copenhagen)
+Date: Thu, 23 Jan 2020 12:17:09 +0000
+Message-ID: <m2muaev03e.fsf@dme.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: h6Bamv39O76QEH1HPBnFNA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,34 +104,160 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+On Tuesday, 2020-01-21 at 16:02:16 +01, Max Reitz wrote:
 
-Since keep_cache(FOPEN_KEEP_CACHE) has no effect for directory as
-described in fuse_common.h, use cache_readdir(FOPNE_CACHE_DIR) for
-diretory open when cache=3Dalways mode.
+> Hi,
+>
+> On 17.01.20 11:34, David Edmondson wrote:
+>> In many cases the target of a convert operation is a newly provisioned
+>> target that the user knows is blank (filled with zeroes). In this
+>> situation there is no requirement for qemu-img to wastefully zero out
+>> the entire device.
+>>=20
+>> Add a new option, --target-is-zero, allowing the user to indicate that
+>> an existing target device is already zero filled.
+>> ---
+>>  qemu-img.c | 19 ++++++++++++++++---
+>>  1 file changed, 16 insertions(+), 3 deletions(-)
+>>=20
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index 95a24b9762..56ca727e8c 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -70,6 +70,7 @@ enum {
+>>      OPTION_PREALLOCATION =3D 265,
+>>      OPTION_SHRINK =3D 266,
+>>      OPTION_SALVAGE =3D 267,
+>> +    OPTION_TARGET_IS_ZERO =3D 268,
+>>  };
+>>=20=20
+>>  typedef enum OutputFormat {
+>> @@ -1593,6 +1594,7 @@ typedef struct ImgConvertState {
+>>      bool copy_range;
+>>      bool salvage;
+>>      bool quiet;
+>> +    bool target_is_zero;
+>
+> As you already said, we probably don=E2=80=99t need this and it=E2=80=99d=
+ be sufficient
+> to set the has_zero_init value directly.
+>
+>>      int min_sparse;
+>>      int alignment;
+>>      size_t cluster_sectors;
+>> @@ -1984,10 +1986,11 @@ static int convert_do_copy(ImgConvertState *s)
+>>      int64_t sector_num =3D 0;
+>>=20=20
+>>      /* Check whether we have zero initialisation or can get it efficien=
+tly */
+>> -    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
+>> +    s->has_zero_init =3D s->target_is_zero;
+>
+> We cannot has_zero_init to true if the target has a backing file,
+> because convert_co_write() asserts that the target must not have a
+> backing file if has_zero_init is true.  (It=E2=80=99s impossible for a fi=
+le to
+> be initialized to zeroes if it has a backing file; or at least it
+> doesn=E2=80=99t make sense then to have a backing file.)
 
-Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/passthrough_ll.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'll add a check causing (has_zero_init && target_has_backing) to throw
+an error after the target_has_backing is determined.
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 4c61ac5065..79b8b71a4f 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1523,7 +1523,7 @@ static void lo_opendir(fuse_req_t req, fuse_ino_t ino=
-,
-=20
-     fi->fh =3D fh;
-     if (lo->cache =3D=3D CACHE_ALWAYS) {
--        fi->keep_cache =3D 1;
-+        fi->cache_readdir =3D 1;
-     }
-     fuse_reply_open(req, fi);
-     return;
+> Case in point:
+>
+> $ ./qemu-img create -f qcow2 src.qcow2 64M
+> Formatting 'src.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D65536
+> lazy_refcounts=3Doff refcount_bits=3D16
+> $ ./qemu-img create -f qcow2 backing.qcow2 64M
+> Formatting 'backing.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D65=
+536
+> lazy_refcounts=3Doff refcount_bits=3D16
+> $ ./qemu-img create -f qcow2 -b backing.qcow2 dst.qcow2 64M
+>
+> Formatting 'dst.qcow2', fmt=3Dqcow2 size=3D67108864
+> backing_file=3Dbacking.qcow2 cluster_size=3D65536 lazy_refcounts=3Doff
+> refcount_bits=3D16
+> $ ./qemu-img convert -n -B backing.qcow2 -f qcow2 -O qcow2
+> --target-is-zero src.qcow2 dst.qcow2
+> qemu-img: qemu-img.c:1812: convert_co_write: Assertion
+> `!s->target_has_backing' failed.
+> [1]    80813 abort (core dumped)  ./qemu-img convert -n -B backing.qcow2
+> -f qcow2 -O qcow2 --target-is-zero
+>
+>> +
+>> +    if (!s->has_zero_init && s->target_is_new && s->min_sparse &&
+>> +        !s->target_has_backing) {
+>
+> (This will be irrelevant after target_has_backing is gone, but because
+> has_zero_init and target_has_backing are equivalent here, there is no
+> need to check both.)
+
+I don't understand this comment - I must be missing something.
+
+If both has_zero_init and target_has_backing are false here, we should
+go and check bdrv_has_zero_init().
+
+They can't both be true (when the above mentioned test is added) and if
+either is true, we don't want to call brv_has_zero_init(), as either the
+user has asserted that the target is blank or we have a backing file.
+
+>>          s->has_zero_init =3D bdrv_has_zero_init(blk_bs(s->target));
+>> -    } else {
+>> -        s->has_zero_init =3D false;
+>>      }
+>>=20=20
+>>      if (!s->has_zero_init && !s->target_has_backing &&
+>> @@ -2076,6 +2079,7 @@ static int img_convert(int argc, char **argv)
+>>          .buf_sectors        =3D IO_BUF_SIZE / BDRV_SECTOR_SIZE,
+>>          .wr_in_order        =3D true,
+>>          .num_coroutines     =3D 8,
+>> +        .target_is_zero     =3D false,
+>>      };
+>>=20=20
+>>      for(;;) {
+>> @@ -2086,6 +2090,7 @@ static int img_convert(int argc, char **argv)
+>>              {"force-share", no_argument, 0, 'U'},
+>>              {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_O=
+PTS},
+>>              {"salvage", no_argument, 0, OPTION_SALVAGE},
+>> +            {"target-is-zero", no_argument, 0, OPTION_TARGET_IS_ZERO},
+>>              {0, 0, 0, 0}
+>>          };
+>>          c =3D getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
+>> @@ -2209,6 +2214,9 @@ static int img_convert(int argc, char **argv)
+>>          case OPTION_TARGET_IMAGE_OPTS:
+>>              tgt_image_opts =3D true;
+>>              break;
+>> +        case OPTION_TARGET_IS_ZERO:
+>> +            s.target_is_zero =3D true;
+>> +            break;
+>>          }
+>>      }
+>>=20=20
+>> @@ -2247,6 +2255,11 @@ static int img_convert(int argc, char **argv)
+>>          warn_report("This will become an error in future QEMU versions.=
+");
+>>      }
+>>=20=20
+>> +    if (s.target_is_zero && !skip_create) {
+>> +        error_report("--target-is-zero requires use of -n flag");
+>
+> Hm, I could imagine it being useful even without -n, but maybe it=E2=80=
+=99s
+> safer to forbid this case for now and reconsider if someone were to ask.
+>
+>> +        goto fail_getopt;
+>> +    }
+>> +
+>>      s.src_num =3D argc - optind - 1;
+>>      out_filename =3D s.src_num >=3D 1 ? argv[argc - 1] : NULL;
+>
+> This patch should also add some documentation for the new option (in
+> qemu-img-cmds.hx and in qemu-img.texi for the man page).
+
+Will do.
+
+dme.
 --=20
-2.24.1
-
+You can't hide from the flipside.
 
