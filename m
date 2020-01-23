@@ -2,81 +2,166 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BB4C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE73AC33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:44:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A4D42467B
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:36:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7CEC2073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 08:44:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScJxxz6z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4D42467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="xnFu9eGf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7CEC2073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53327 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuXyh-0002VW-IF
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:36:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60629)
+	id 1iuY62-0004gA-QN
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 03:44:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuXvZ-0006ub-17
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:33:26 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1iuY5N-00047i-Jj
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:43:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iuXvX-0003AW-Q8
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:33:24 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41355)
+ (envelope-from <aik@ozlabs.ru>) id 1iuY5L-0002TM-7s
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:43:32 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36486)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iuXvU-00033H-2n; Thu, 23 Jan 2020 03:33:20 -0500
-Received: by mail-wr1-x444.google.com with SMTP id c9so2046562wrw.8;
- Thu, 23 Jan 2020 00:33:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=RfcFUm3BQiAl9mzacls/FnuBZx1T3le9iUzoIO9A0t8=;
- b=ScJxxz6zt8TuBUoxchheQeCqB6sQHt8c8BOrdnHvuH5fSw+i21SQmN4YwPoZXwcqbC
- hcbiemL7THTMqwPDIMEDcQkuOY3zA0iWw2rB/5bYP8Frr6+3OOEOn6aaUd8tXP66FwNy
- cz1UzoINstnYiakbixWossJqmUuwJelfdHkU14doB7hybJWj4wcr45knlNLgiBmjuhHa
- NYM9MT8cDfnC5fwPVP30n2egHjPxsrHFCmeBAj2K8Giugv4fxt9Lr1REjsv8ruf2zOU8
- r84JSr6sbSUjOu8W0CTvbHv6uH8sn7Y9VS68CAh54ADvuTcW1SiyyspvkYvLdlifJyCH
- mkgg==
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iuY5K-0002Rs-Pf
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 03:43:31 -0500
+Received: by mail-pl1-x644.google.com with SMTP id a6so1066091plm.3
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 00:43:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=nWrsO1mJQ8LzWAixfiVHjrIyFCFy+YmU3w6FHqT9ZzE=;
+ b=xnFu9eGf0103b1za6SKb4qsEmRDjWz6qD/CaLOvIDLKsG/5sQjBXAryx0sPEaKWvhQ
+ QLmpdfctptRozEtoemrcpSNIdCqVa+HuZ7ynupQ3Q1QnPobEU8LLiLFlFMYnWQez5ZEn
+ 55q0Cjg/rs3r2bZVe7sGXKKA3Rn1oaNAQxHG75VUd9TelK18UJ7nw7T+ywj27qy6mPoX
+ h/gJ43xQNW0Yurd4gFKQOOXlHdOB/CaXHE4CrfJrMxYPviAgafZdAsCTW1qHIR2Xqyr5
+ zpH5c9O3yGqDtabNfOMdmvFJlPEC8RPpMtvqIac09bQc9FQ590fVE6Evq89QbpzvB9/q
+ y3Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=RfcFUm3BQiAl9mzacls/FnuBZx1T3le9iUzoIO9A0t8=;
- b=gqqgO0KFjTyElx+Wz+kccYnNqSyq2A0BBBcMJD5aYPS2hdxeETI4p5wv7ahuBSfn2E
- fqOP3j2fogMF8QQFErVjQDEqCkpW3mwB2QcbVvM389joSDGR5JGbOTHAqm83VYJk+1zA
- A0RjWOArHmxyYzRNG9Yshys0AWJkQ5r94NqozayiFzL/4Zzr5qOMEY5gKyQvRybuzttj
- ae8DaqYubNTygbgZxkcN15fNdtPVZ9k1vH3xXKyZ+Ri1evQJ6RRKiJEtMWBcpZq1Nvlk
- EsAuq4fB7Ka6/8fpte1p7dRgs5lRk3UnSKsAZUaEXEcpm8Caf2n55tQKCM5sEnegfEPy
- JhMw==
-X-Gm-Message-State: APjAAAUQ4yz9y9tH4OD2iCG7xB/QjAfbVrNHFCKdU+hVrJ1y5zijWYrN
- +1Z+0JRuM2H/Pup6SXhMa0yEzCelTzXlQQGLeVE=
-X-Google-Smtp-Source: APXvYqwnCLmm3eyafUVa9DGOtYsfuwi0//HsG6kdQJUPk4VRLyn11iFjULEsPl97TxbbjBZZjaDYHLGumRyQV6GjCyk=
-X-Received: by 2002:a5d:438c:: with SMTP id i12mr16000029wrq.196.1579768389808; 
- Thu, 23 Jan 2020 00:33:09 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=nWrsO1mJQ8LzWAixfiVHjrIyFCFy+YmU3w6FHqT9ZzE=;
+ b=jW2JxQfS4U2gGkB/+Dc288NJVrkWL+9rMYk28kIchhKtLT6yBvM5gVoQV4quxNjMaI
+ bIEQglw4wng52HgNkYbIqK5IgNhRpz+NmPb1dDHfsVkeUVb0TXagbEfRopn4+V/xvgem
+ 3RveLajIKnHTty5atDAStkUgk4dJNER98JftCLzgPgqszhpxe99ColB1aMAjaVR/oFG+
+ xwN/9NxevvK/jrrZNRTzoGMdivLHh1MdDNRoWkQTuv4OO5F0bUcZ+P5g2Qyl+FPhTjq2
+ IGY4+bydS5mMQchqt7CYjgYP4dNSADzyKauIL6h4YS0jAtcU88zFIejeDLuvKQ8GvVw0
+ JP/Q==
+X-Gm-Message-State: APjAAAVx0Ve7bEuTc4Fyy8C0wnYdmT4ajZqTE2p2auzB6WssmidY9mrm
+ cBCvTEImQwXNCdeUnwann8qOgw==
+X-Google-Smtp-Source: APXvYqz8ARyIatFp3HY/ND2FiZtpsIAIfj3gYsKa97kGxRjXK1WMs7NrQWGZsFnY5nw+APPfZafUyQ==
+X-Received: by 2002:a17:90a:d783:: with SMTP id z3mr3191849pju.3.1579769008892; 
+ Thu, 23 Jan 2020 00:43:28 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id f1sm1768203pjq.31.2020.01.23.00.43.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Jan 2020 00:43:28 -0800 (PST)
+Subject: Re: [PATCH qemu v5] spapr: Kill SLOF
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200110020925.98711-1-aik@ozlabs.ru>
+ <20200121051100.GG265522@umbus.fritz.box>
+ <2aee3928-0acb-65ee-de54-de2e8106a6ba@ozlabs.ru>
+ <20200122063222.GJ2347@umbus.fritz.box>
+ <6ccbb008-9300-0e4d-bfc2-873d8562cb68@ozlabs.ru>
+ <20200123051156.GO2347@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <629ddc00-b39e-59aa-6c69-20634c340d51@ozlabs.ru>
+Date: Thu, 23 Jan 2020 19:43:24 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-References: <20200121152935.649898-1-stefanb@linux.ibm.com>
- <20200121152935.649898-5-stefanb@linux.ibm.com>
-In-Reply-To: <20200121152935.649898-5-stefanb@linux.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 23 Jan 2020 12:32:56 +0400
-Message-ID: <CAJ+F1C+yL+LiHxrxcjphPTrr4sZH1yrOLjsU6zCb8O6+ktuEhw@mail.gmail.com>
-Subject: Re: [PATCH v9 4/6] tpm_spapr: Support suspend and resume
-To: Stefan Berger <stefanb@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200123051156.GO2347@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,141 +173,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>,
- "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 21, 2020 at 7:30 PM Stefan Berger <stefanb@linux.ibm.com> wrote=
-:
->
-> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
->
-> Extend the tpm_spapr frontend with VM suspend and resume support.
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
-> ---
->  hw/tpm/tpm_spapr.c  | 52 ++++++++++++++++++++++++++++++++++++++++++++-
->  hw/tpm/trace-events |  2 ++
->  2 files changed, 53 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-> index 1db9696ae0..8ba561f41c 100644
-> --- a/hw/tpm/tpm_spapr.c
-> +++ b/hw/tpm/tpm_spapr.c
-> @@ -76,6 +76,8 @@ typedef struct {
->
->      unsigned char *buffer;
->
-> +    uint32_t numbytes; /* number of bytes to deliver on resume */
-> +
->      TPMBackendCmd cmd;
->
->      TPMBackend *be_driver;
-> @@ -240,6 +242,14 @@ static void tpm_spapr_request_completed(TPMIf *ti, i=
-nt ret)
->
->      /* a max. of be_buffer_size bytes can be transported */
->      len =3D MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size);
-> +
-> +    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-> +        trace_tpm_spapr_caught_response(len);
-> +        /* defer delivery of response until .post_load */
-> +        s->numbytes =3D len;
-> +        return;
-> +    }
-> +
->      rc =3D spapr_vio_dma_write(&s->vdev, be32_to_cpu(crq->data),
->                               s->buffer, len);
->
-> @@ -288,6 +298,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
->      SpaprTpmState *s =3D VIO_SPAPR_VTPM(dev);
->
->      s->state =3D SPAPR_VTPM_STATE_NONE;
-> +    s->numbytes =3D 0;
->
->      s->be_tpm_version =3D tpm_backend_get_tpm_version(s->be_driver);
->
-> @@ -309,9 +320,48 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *=
-ti)
->      return tpm_backend_get_tpm_version(s->be_driver);
->  }
->
-> +/* persistent state handling */
-> +
-> +static int tpm_spapr_pre_save(void *opaque)
-> +{
-> +    SpaprTpmState *s =3D opaque;
-> +
-> +    tpm_backend_finish_sync(s->be_driver);
-> +    /*
-> +     * we cannot deliver the results to the VM since DMA would touch VM =
-memory
-> +     */
-> +
-> +    return 0;
-> +}
-> +
-> +static int tpm_spapr_post_load(void *opaque, int version_id)
-> +{
-> +    SpaprTpmState *s =3D opaque;
-> +
-> +    if (s->numbytes) {
-> +        trace_tpm_spapr_post_load();
-> +        /* deliver the results to the VM via DMA */
-> +        tpm_spapr_request_completed(TPM_IF(s), 0);
-> +        s->numbytes =3D 0;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static const VMStateDescription vmstate_spapr_vtpm =3D {
->      .name =3D "tpm-spapr",
-> -    .unmigratable =3D 1,
-> +    .pre_save =3D tpm_spapr_pre_save,
-> +    .post_load =3D tpm_spapr_post_load,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_SPAPR_VIO(vdev, SpaprTpmState),
-> +
-> +        VMSTATE_UINT8(state, SpaprTpmState),
-> +        VMSTATE_UINT32(numbytes, SpaprTpmState),
-> +        VMSTATE_VBUFFER_UINT32(buffer, SpaprTpmState, 0, NULL, numbytes)=
-,
-> +        /* remember DMA address */
-> +        VMSTATE_UINT32(crq.data, SpaprTpmState),
-> +        VMSTATE_END_OF_LIST(),
-> +    }
->  };
->
->  static Property tpm_spapr_properties[] =3D {
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 9143a8eaa3..439e514787 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -67,3 +67,5 @@ tpm_spapr_do_crq_get_version(uint32_t version) "respons=
-e: version %u"
->  tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspen=
-d"
->  tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x=
-%02x"
->  tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x=
-%02x 0x%02x ..."
-> +tpm_spapr_post_load(void) "Delivering TPM response after resume"
-> +tpm_spapr_caught_response(uint32_t v) "Caught response to deliver after =
-resume: %u bytes"
-> --
-> 2.24.1
->
->
+On 23/01/2020 16:11, David Gibson wrote:
+> On Wed, Jan 22, 2020 at 06:14:37PM +1100, Alexey Kardashevskiy wrote:
+>>
+>>
+>> On 22/01/2020 17:32, David Gibson wrote:
+>>> On Tue, Jan 21, 2020 at 06:25:36PM +1100, Alexey Kardashevskiy wrote:
+>>>>
+>>>>
+>>>> On 21/01/2020 16:11, David Gibson wrote:
+>>>>> On Fri, Jan 10, 2020 at 01:09:25PM +1100, Alexey Kardashevskiy wrote:
+>>>>>> The Petitboot bootloader is way more advanced than SLOF is ever going to
+>>>>>> be as Petitboot comes with the full-featured Linux kernel with all
+>>>>>> the drivers, and initramdisk with quite user friendly interface.
+>>>>>> The problem with ditching SLOF is that an unmodified pseries kernel can
+>>>>>> either start via:
+>>>>>> 1. kexec, this requires presence of RTAS and skips
+>>>>>> ibm,client-architecture-support entirely;
+>>>>>> 2. normal boot, this heavily relies on the OF1275 client interface to
+>>>>>> fetch the device tree and do early setup (claim memory).
+>>>>>>
+>>>>>> This adds a new bios-less mode to the pseries machine: "bios=on|off".
+>>>>>> When enabled, QEMU does not load SLOF and jumps to the kernel from
+>>>>>> "-kernel".
+>>>>>
+>>>>> I don't love the name "bios" for this flag, since BIOS tends to refer
+>>>>> to old-school x86 firmware.  Given the various plans we're considering
+>>>>> the future, I'd suggest "firmware=slof" for the current in-guest SLOF
+>>>>> mode, and say "firmware=vof" (Virtual Open Firmware) for the new
+>>>>> model.  We can consider firmware=petitboot or firmware=none (for
+>>>>> direct kexec-style boot into -kernel) or whatever in the future
+>>>>
+>>>> Ok. We could also enforce default loading addresses for SLOF/kernel/grub
+>>>> and drop "kernel-addr", although it is going to be confusing if it
+>>>> changes in not so obvious way...
+>>>
+>>> Yes, I think that would be confusing, so I think adding the
+>>> kernel-addr override is a good idea, I'd just like it split out for
+>>> clarity.
+>>>
+>>>> In fact, I will ideally need 3 flags:
+>>>> -bios: on|off to stop loading SLOF;
+>>>> -kernel-addr: 0x0 for slof/kernel; 0x20000 for grub;
+>>>
+>>> I'm happy for that one to be separate from the "firmware style"
+>>> option.
+>>>
+>>>> -kernel-translate-hack: on|off - as grub is linked to run from 0x20000
+>>>> and it only works when placed there, the hack breaks it.
+>>>
+>>> Hrm.  I don't really understand what this one is about.  That doesn't
+>>> really seem like something the user would ever want to fiddle with
+>>> directly.
+>>
+>> This allows loading grub, or actually any elf (not that I have anything
+>> else in mind that just grub but still) which is not capable of
+>> relocating itself.
+> 
+> Ok, why would we ever not want that?
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+Typical vmlinux is:
+
+[fstn1-p1 kernel]$ readelf --sections ~/pbuild/kernel-le-guest/vmlinux |
+head -n 100
+There are 54 section headers, starting at offset 0x1027d0b8:
+
+Section Headers:
+  [Nr] Name              Type             Address           Offset
+       Size              EntSize          Flags  Link  Info  Align
+  [ 0]                   NULL             0000000000000000  00000000
+       0000000000000000  0000000000000000           0     0     0
+  [ 1] .head.text        PROGBITS         c000000000000000  00010000
+       0000000000008000  0000000000000000  AX       0     0     128
+  [ 2] .text             PROGBITS         c000000000008000  00018000
+       0000000000ea2c50  0000000000000000  AX       0     0     256
+  [ 3] .rodata           PROGBITS         c000000000eb0000  00ec0000
+       00000000002f4b58  0000000000000000  WA       0     0     128
+  [ 4] .gnu.hash         GNU_HASH         c0000000011a4b58  011b4b58
+       000000000000001c  0000000000000000   A      27     0     8
+
+  [ 5] .pci_fixup        PROGBITS         c0000000011a4b78  011b4b78
+       0000000000003438  0000000000000000   A       0     0     8
+  [ 6] __param           PROGBITS         c0000000011a7fb0  011b7fb0
+       0000000000003fe8  0000000000000000  WA       0     0     8
+
+  [ 7] __modver          PROGBITS         c0000000011abf98  011bbf98
+       0000000000000118  0000000000000000  WA       0     0     8
+
+
+
+This - c000000000xxxxxx - is where QEMU will try loading the kernel if
+we did not have that translate_kernel_address.
+
+
+> 
+>>>> Or we can pass grub via -bios and not via -kernel but strictly speaking
+>>>> there is still a firmware - that new 20 bytes blob so it would not be
+>>>> accurate.
+>>>>
+>>>> We can put this all into a single
+>>>> -firmware slof|vof|grub|linux. Not sure.
+>>>
+>>> I'm not thinking of "grub" as a separate option - that would be the
+>>> same as "vof".  Using vof + no -kernel we'd need to scan the disks in
+>>> the same way SLOF does, and look for a boot partition, which will
+>>> probably contain a GRUB image. 
+>>
+>> I was hoping we can avoid that by allowing
+>> "-kernel grub" and let grub do filesystems and MBR/GPT.
+> 
+> I don't want that to be the only way, because I want the GRUB
+> installed by the OS installer to be the GRUB we use.
+
+
+Then it means implementing filesystems in the OF client in QEMU. Quite a
+lot.
+
+
+
+
+-- 
+Alexey
 
