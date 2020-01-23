@@ -2,98 +2,78 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03164C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA00C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:46:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C81C52253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:44:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99E6021D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:46:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zn6JV1r4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C81C52253D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQ49ofOS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E6021D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuiPN-0008RM-02
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:44:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58678)
+	id 1iuiQX-0002qU-NF
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:46:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iuhya-0005D7-2h
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:17:13 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuffA-0006P1-AC
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:49:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iuhyY-0007KA-HR
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:17:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44904
+ (envelope-from <dgilbert@redhat.com>) id 1iuff9-0000Rw-2x
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:49:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41160
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuhyY-0007Ec-9K
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 14:17:10 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuff8-0000Qr-Vp
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579807028;
+ s=mimecast20190719; t=1579798138;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Hs/34wwrKTMaZiIef+KKkRxsLnhtqdfYoVIkNU6mp5o=;
- b=Zn6JV1r4U29xXStlzS+MSwlqMXYLENA/f1MflBpTVdhHhhp/Ny2gETP3kDDhW7ZERcxOzt
- swsSweH52/BD6BhTvJ30zlFgh2Rn6D3ezNACJyFSV7uqW9INRISJjzB8oA1z8bmlApII/D
- vT5DRVUvU4oA4ezZGuYyAwZWz6MNLG0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-QF1QO6j1MFeicya0MRUpyg-1; Thu, 23 Jan 2020 14:16:55 -0500
-Received: by mail-wr1-f72.google.com with SMTP id v17so2348589wrm.17
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:16:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Hs/34wwrKTMaZiIef+KKkRxsLnhtqdfYoVIkNU6mp5o=;
- b=aOJqJDUe/WL/8aIsJMCQ6dsic1SigPoUNNHbY1JgfWe2Ov5w1KDVd7E6KEAt4JoaIT
- nW1H9iTKveDoMorudFeQVfLToAKqKXGMgvhpn9uixw/w3Q2SEi3ePsBxMLLF2KMMstZh
- XmbDC5ps7IaXF8bmJ9/u3Go7ta/W2rDp2/Ox5xdjkv9XXh1BkDkTCK6VR1umMxS2cER+
- TMWdl/Zg3d8IEJTm90JzTCmRfayoRfBcQB5qu2RNzUX2dD8l0haRd2XjfQge7zFTdctk
- dx7hcfKS1hLMQobGM5Zz1a6EkU2/kjDQf3xV1PH/a6jgrpi8vXmh9iN+H5aInLNPtNAx
- 4LkA==
-X-Gm-Message-State: APjAAAW9cq0zaKDAE00bJ+4lMIsb23sDrAjVJIUKkKdzKQ1klQoSsMX9
- LIOrRFgMUrMTGyYMwA7xfvURCjujsv5PBrv5dkAvn5ImUJP7bh8aUsQ4+t76RRbP3i/fyT+FaJK
- dfQEHpVCU4xRIzpI=
-X-Received: by 2002:a7b:c00c:: with SMTP id c12mr5726632wmb.174.1579807014182; 
- Thu, 23 Jan 2020 11:16:54 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzk77xzwX8XwtpGMO+KJj0GckVJbFkjGlhF0YUWmwcL9P8sFYKrihn5dClnRd2vSAyoL2bEgA==
-X-Received: by 2002:a7b:c00c:: with SMTP id c12mr5726619wmb.174.1579807013980; 
- Thu, 23 Jan 2020 11:16:53 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b8fe:679e:87eb:c059?
- ([2001:b07:6468:f312:b8fe:679e:87eb:c059])
- by smtp.gmail.com with ESMTPSA id q3sm3699795wmc.47.2020.01.23.11.16.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jan 2020 11:16:53 -0800 (PST)
-Subject: Re: 5.0 release schedule proposal
-To: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <CAFEAcA-HPAXpeWcJOvyJM3hdFR86u4HyovAAB8qmoZaye-P3Vg@mail.gmail.com>
- <CAFEAcA-1QcPEVDodRFFKQ_WdSR-avKp2rZw39KFhO_hh3y=Lxg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0af55f81-3f48-c61d-ffbb-ddb77ef78ca7@redhat.com>
-Date: Thu, 23 Jan 2020 20:16:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=DxAJgeP+0hPstRiShwv7lrQwRfRqOxM1T7uh9S2eayU=;
+ b=eQ49ofOSWb1pEdxWioeZbVPSCKuMD+ueWOZ2sZxI/6FoFKnZpwm9BOewqObvxUSIRojb/K
+ O47RSJVRvSoCeGSLwgUFtfpF5KpdlXMslpZF/3zn7b2eawHGMM3oJ/J3qvGIEH4X8OA19Y
+ bGRz5tH7qLDFrgJEfn7IUnqN2wRaRis=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-ZTHoOo80PgmizpofP5Ptyw-1; Thu, 23 Jan 2020 11:48:56 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16FF41005513
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:56 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
+ [10.36.116.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6603E28993;
+ Thu, 23 Jan 2020 16:48:55 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com
+Subject: [PULL 108/108] virtiofsd: add some options to the help message
+Date: Thu, 23 Jan 2020 16:46:30 +0000
+Message-Id: <20200123164630.91498-109-dgilbert@redhat.com>
+In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
+References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-1QcPEVDodRFFKQ_WdSR-avKp2rZw39KFhO_hh3y=Lxg@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: QF1QO6j1MFeicya0MRUpyg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: ZTHoOo80PgmizpofP5Ptyw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,36 +91,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/01/20 16:55, Peter Maydell wrote:
-> On Mon, 6 Jan 2020 at 15:29, Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->> Here's a suggested set of dates for the 5.0 release:
->>
->> 2020-03-17 softfreeze
->> 2020-03-24 hardfreeze/rc0
->> 2020-03-31 rc1
->> 2020-04-07 rc2
->> 2020-04-14 rc3
->> 2020-04-21 release, or rc4
->> 2020-04-28 release if we needed rc4
->>
->> (I'm at a conference week of 23-27 March, so possibly rc0
->> might get a little delayed if I'm not able to handle
->> pullreqs while away, but usually the big rush is for
->> softfreeze so I think this should be OK.)
->>
->> NB: Easter is 10th-13th April, so between rc2 and rc3.
->>
->> Any opinions/suggested tweaks/etc?
->>
->> Of course if somebody else wants to do this release cycle
->> they can set the dates :-)
-> 
-> Ping? Any opinions? In the absence of complaints I'll just
-> go with this set of dates...
+From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 
-Looks good to me.
+Add following options to the help message:
+- cache
+- flock|no_flock
+- norace
+- posix_lock|no_posix_lock
+- readdirplus|no_readdirplus
+- timeout
+- writeback|no_writeback
+- xattr|no_xattr
 
-Paolo
+Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+
+dgilbert: Split cache, norace, posix_lock, readdirplus off
+  into our own earlier patches that added the options
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/helper.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index f98d8f2eb2..0801cf752c 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -148,6 +148,8 @@ void fuse_cmdline_help(void)
+            "    -o cache=3D<mode>            cache mode. could be one of \=
+"auto, "
+            "always, none\"\n"
+            "                               default: auto\n"
++           "    -o flock|no_flock          enable/disable flock\n"
++           "                               default: no_flock\n"
+            "    -o log_level=3D<level>       log level, default to \"info\=
+"\n"
+            "                               level could be one of \"debug, =
+"
+            "info, warn, err\"\n"
+@@ -163,7 +165,13 @@ void fuse_cmdline_help(void)
+            "                               enable/disable readirplus\n"
+            "                               default: readdirplus except wit=
+h "
+            "cache=3Dnone\n"
+-          );
++           "    -o timeout=3D<number>        I/O timeout (second)\n"
++           "                               default: depends on cache=3D op=
+tion.\n"
++           "    -o writeback|no_writeback  enable/disable writeback cache\=
+n"
++           "                               default: no_writeback\n"
++           "    -o xattr|no_xattr          enable/disable xattr\n"
++           "                               default: no_xattr\n"
++           );
+ }
+=20
+ static int fuse_helper_opt_proc(void *data, const char *arg, int key,
+--=20
+2.24.1
 
 
