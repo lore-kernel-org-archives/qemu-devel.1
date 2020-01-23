@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A628C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4677C33CAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 509F221835
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:51:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EADC21835
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:51:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ecdi067S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 509F221835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bJv8c/yI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EADC21835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubwu-0006vo-SF
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:51:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39864)
+	id 1iubwv-0006vb-Px
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:51:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36477)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iub8G-0001Fe-4O
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:45 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuato-0008RW-QU
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iub8E-0004c8-Vv
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23041
+ (envelope-from <imammedo@redhat.com>) id 1iuatn-0005Ep-9b
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46900
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iub8E-0004bz-Qs
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:42 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuatl-0005DV-Rd
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780722;
+ s=mimecast20190719; t=1579779825;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0XLEsLYuEFTegFIRqqZZE8oFcNpiNrP2fq/YbTYyWmM=;
- b=Ecdi067Svzn2rWgtsozuUyX8RlzBa1lXVaDpFNCK5KlnxcXGTsiJaplLgOkM04GleaKzE+
- gbmAnhTYNhsrk+HgtlZe+iJBW3F0KMBGnFgUaaB+N0lokuG5HEhdv9MMWzidpNL+X6FNU7
- oh/pQRemeZSDC4Dh2XNNYz7GBDHwwmU=
+ bh=kGvKm2euBvR2ujc7HmsPpZFJgOYMJfHgdQmkQSJO81I=;
+ b=bJv8c/yIqkzwOZzv3OuS5xmA18c6ZAqOsCgmBiNa/R1XdfhvtBgn7qUfh+t0pdCmEIm2t+
+ rJr+jaRcpioy2av4Yf8J3q2OoEgbtl7RsgJS8QLRPSOcu3naMNuUo9pgmfLNhjlFQUydoK
+ 68KCWmaOoXv1zBp9xnB/+M2xOnpj9Hs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-j3IGRVP7OZO3OH9N1gPBQg-1; Thu, 23 Jan 2020 06:58:41 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-164-8tzs6CqTOPC_UQcu7BlMSQ-1; Thu, 23 Jan 2020 06:43:41 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34F80800D5A
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:58:40 +0000 (UTC)
-Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EBC2119C69;
- Thu, 23 Jan 2020 11:58:37 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEAE48010E0;
+ Thu, 23 Jan 2020 11:43:38 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 55867107A44C;
+ Thu, 23 Jan 2020 11:43:37 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 02/21] multifd: Make sure that we don't do any IO after an
- error
-Date: Thu, 23 Jan 2020 12:58:12 +0100
-Message-Id: <20200123115831.36842-3-quintela@redhat.com>
-In-Reply-To: <20200123115831.36842-1-quintela@redhat.com>
-References: <20200123115831.36842-1-quintela@redhat.com>
+Subject: [PATCH REPOST v3 69/80] ppc/virtex_ml507: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:34 +0100
+Message-Id: <1579779525-20065-70-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: j3IGRVP7OZO3OH9N1gPBQg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 8tzs6CqTOPC_UQcu7BlMSQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,75 +85,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: edgar.iglesias@gmail.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index d2208b5534..f95d656c26 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3445,7 +3445,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque=
-)
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+---
+CC: david@gibson.dropbear.id.au
+CC: qemu-ppc@nongnu.org
+CC: edgar.iglesias@gmail.com
+---
+ hw/ppc/virtex_ml507.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 651d8db..b74a269 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -193,7 +193,6 @@ static int xilinx_load_device_tree(hwaddr addr,
+=20
+ static void virtex_init(MachineState *machine)
  {
-     RAMState **temp =3D opaque;
-     RAMState *rs =3D *temp;
--    int ret;
-+    int ret =3D 0;
+-    ram_addr_t ram_size =3D machine->ram_size;
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     hwaddr initrd_base =3D 0;
+@@ -204,7 +203,6 @@ static void virtex_init(MachineState *machine)
+     CPUPPCState *env;
+     hwaddr ram_base =3D 0;
+     DriveInfo *dinfo;
+-    MemoryRegion *phys_ram =3D g_new(MemoryRegion, 1);
+     qemu_irq irq[32], *cpu_irq;
+     int kernel_size;
      int i;
-     int64_t t0;
-     int done =3D 0;
-@@ -3524,12 +3524,14 @@ static int ram_save_iterate(QEMUFile *f, void *opaq=
-ue)
-     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+@@ -221,8 +219,7 @@ static void virtex_init(MachineState *machine)
 =20
- out:
--    multifd_send_sync_main(rs);
--    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
--    qemu_fflush(f);
--    ram_counters.transferred +=3D 8;
-+    if (ret >=3D 0) {
-+        multifd_send_sync_main(rs);
-+        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+        qemu_fflush(f);
-+        ram_counters.transferred +=3D 8;
+     qemu_register_reset(main_cpu_reset, cpu);
 =20
--    ret =3D qemu_file_get_error(f);
-+        ret =3D qemu_file_get_error(f);
-+    }
-     if (ret < 0) {
-         return ret;
+-    memory_region_allocate_system_memory(phys_ram, NULL, "ram", ram_size);
+-    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
++    memory_region_add_subregion(address_space_mem, ram_base, machine->ram)=
+;
+=20
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     pflash_cfi01_register(PFLASH_BASEADDR, "virtex.flash", FLASH_SIZE,
+@@ -265,7 +262,7 @@ static void virtex_init(MachineState *machine)
+             /* If we failed loading ELF's try a raw image.  */
+             kernel_size =3D load_image_targphys(kernel_filename,
+                                               boot_offset,
+-                                              ram_size);
++                                              machine->ram_size);
+             boot_info.bootstrap_pc =3D boot_offset;
+             high =3D boot_info.bootstrap_pc + kernel_size + 8192;
+         }
+@@ -276,7 +273,7 @@ static void virtex_init(MachineState *machine)
+         if (machine->initrd_filename) {
+             initrd_base =3D high =3D ROUND_UP(high, 4);
+             initrd_size =3D load_image_targphys(machine->initrd_filename,
+-                                              high, ram_size - high);
++                                              high, machine->ram_size - hi=
+gh);
+=20
+             if (initrd_size < 0) {
+                 error_report("couldn't load ram disk '%s'",
+@@ -290,7 +287,7 @@ static void virtex_init(MachineState *machine)
+         boot_info.fdt =3D high + (8192 * 2);
+         boot_info.fdt &=3D ~8191;
+=20
+-        xilinx_load_device_tree(boot_info.fdt, ram_size,
++        xilinx_load_device_tree(boot_info.fdt, machine->ram_size,
+                                 initrd_base, initrd_size,
+                                 kernel_cmdline);
      }
-@@ -3581,9 +3583,11 @@ static int ram_save_complete(QEMUFile *f, void *opaq=
-ue)
-         ram_control_after_iterate(f, RAM_CONTROL_FINISH);
-     }
-=20
--    multifd_send_sync_main(rs);
--    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
--    qemu_fflush(f);
-+    if (ret >=3D 0) {
-+        multifd_send_sync_main(rs);
-+        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+        qemu_fflush(f);
-+    }
-=20
-     return ret;
+@@ -302,6 +299,7 @@ static void virtex_machine_init(MachineClass *mc)
+     mc->desc =3D "Xilinx Virtex ML507 reference design";
+     mc->init =3D virtex_init;
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("440-xilinx");
++    mc->default_ram_id =3D "ram";
  }
+=20
+ DEFINE_MACHINE("virtex-ml507", virtex_machine_init)
 --=20
-2.24.1
+2.7.4
 
 
