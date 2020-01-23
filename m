@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 096DAC33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9447AC33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFF8E24655
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:12:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFF8E24655
+	by mail.kernel.org (Postfix) with ESMTPS id 59F5724655
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 06:12:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F5724655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuVj4-0004kf-3c
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 01:12:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58660)
+	id 1iuVj5-0004kb-VH
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 01:12:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iuVhg-0003VP-QI
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:10:58 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iuVhf-0007qi-Le
+ (envelope-from <bounces@canonical.com>) id 1iuVhf-0003Sg-AN
  for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:10:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53730)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <bounces@canonical.com>) id 1iuVhe-0007p9-5z
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:10:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53672)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iuVhf-0007q0-GH
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:10:55 -0500
+ id 1iuVhe-0007op-0s
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 01:10:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iuVhe-0001Yp-N4
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:10:54 +0000
+ id 1iuVhd-0001VY-9r
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:10:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A9CA02E80C0
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:10:54 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 4976A2E80C3
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 06:10:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jan 2020 06:03:13 -0000
-From: Thomas Huth <1660010@bugs.launchpad.net>
+Date: Thu, 23 Jan 2020 05:59:55 -0000
+From: Thomas Huth <1812861@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
+X-Launchpad-Bug-Tags: crash linux-user
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee icenowy
-X-Launchpad-Bug-Reporter: Icenowy Zheng (icenowy)
+X-Launchpad-Bug-Commenters: pmaydell sleirsgoevy
+X-Launchpad-Bug-Reporter: Sergey Lisov (sleirsgoevy)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170128060834.11421.45757.malonedeb@soybean.canonical.com>
-Message-Id: <157975939413.18576.4969932704607535141.launchpad@gac.canonical.com>
-Subject: [Bug 1660010] Re: AArch64 system emulation cannot execute virt uefi
- in 2.7 or 2.8
+References: <154816740902.19321.3239172253055110269.malonedeb@gac.canonical.com>
+Message-Id: <157975919624.5279.6134380484275709754.launchpad@wampee.canonical.com>
+Subject: [Bug 1812861] Re: QEMU in user-mode emulation mode crashes when the
+ user program jumps to an invalid address
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0f05312ab04e884249ea8151ca48eb1b36cfb60e
+X-Launchpad-Hash: 7012ad5541fc5055f96d796f8b01c117e4c2410a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,40 +79,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1660010 <1660010@bugs.launchpad.net>
+Reply-To: Bug 1812861 <1812861@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 ** Changed in: qemu
-       Status: New =3D> Incomplete
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1660010
+https://bugs.launchpad.net/bugs/1812861
 
 Title:
-  AArch64 system emulation cannot execute virt uefi in 2.7 or 2.8
+  QEMU in user-mode emulation mode crashes when the user program jumps
+  to an invalid address
 
 Status in QEMU:
-  Incomplete
+  Fix Released
 
 Bug description:
-  The UEFI firmware file is retrieved from
-  http://snapshots.linaro.org/components/kernel/linaro-
-  edk2/latest/release/qemu64/QEMU_EFI.fd .
+  Running this code:
 
-  The error is:
-  ```
-  TODO /var/lib/abbs/build/tmp.p2dMBBlJ0D/qemu-2.7.0/tci.c:1049: tcg_qemu_t=
-b_exec()
-  /var/lib/abbs/build/tmp.p2dMBBlJ0D/qemu-2.7.0/tci.c:1049: tcg fatal error
-  ```
+  void (*func)() =3D 0x12345678;
 
-  (both 2.7.0 and 2.8.0 are tested to fail, 2.6.1 works)
+  int main()
+  {
+      func();
+      return 0;
+  }
+
+  Produces the following output:
+
+  qemu-arm-static: /build/qemu-DqynNa/qemu-2.8+dfsg/translate-all.c:175: tb=
+_lock: Assertion `!have_tb_lock' failed.
+  qemu-arm-static: /build/qemu-DqynNa/qemu-2.8+dfsg/translate-all.c:175: tb=
+_lock: Assertion `!have_tb_lock' failed.
+  Segmentation fault
+
+  The expected result is as follows:
+
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1660010/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1812861/+subscriptions
 
