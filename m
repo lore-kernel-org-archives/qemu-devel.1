@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E1BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C72C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10EDE21D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34D1021D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 19:03:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTV8Hic6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10EDE21D7D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h7ewzVIk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34D1021D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuhki-0004XC-HK
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:02:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41441)
+	id 1iuhla-0005uM-SK
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 14:03:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iufe9-0005DA-Cu
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:58 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuff6-0006JL-7g
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iufe8-0006eu-49
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:57 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58943
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iuff5-0000JR-0W
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53269
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iufe8-0006eS-0z
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:47:56 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuff4-0000Im-Td
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 11:48:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579798075;
+ s=mimecast20190719; t=1579798134;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=A2OLDzwvIkswhQnYmC967hKOHC8UuZ0BirW2egCo2xI=;
- b=KTV8Hic6mjjNRgBFl040CfB2JC3UcXd2EzNHe97dwYNf+tZ8j+RenOLNvHvtiTrz4lyBB+
- jzYct+4S4XbawgZWG6Ex1NLXohnGgSZbqGEkcHLOdlYYwx55bfkGBk5e7G5ehOwPArqLGL
- crZ0phnDAQAeGmP/uoGyEYL1HasmB8g=
+ bh=YrSgQYkhcU4kRkGHIjoT5DICb+mHjWZQdwrkOwGUhaA=;
+ b=h7ewzVIkONfAKCa8cgbbuZ8aVX2QzLvFVCZXXmGECEreUbOruYLBPR9+Q8ryZL6evjq/3g
+ xQDbmNvDNokNpUICBhiR2iKTBDz1UflNOqpbj/eZQRkPFT4JeFD8Wg8dkqHtGTg8JU9qqJ
+ MxDszBqTkPV+i1AFyUkT7a28vdYO60w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-uiYjjXtFNzW0xJdapgElZw-1; Thu, 23 Jan 2020 11:47:53 -0500
+ us-mta-234-sYoalHJHMOagqzTsJ2y7WA-1; Thu, 23 Jan 2020 11:48:52 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9DD67A0A7
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:47:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26A791005510
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 16:48:52 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-110.ams2.redhat.com
  [10.36.116.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AD59319C69;
- Thu, 23 Jan 2020 16:47:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 727C228993;
+ Thu, 23 Jan 2020 16:48:51 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 053/108] virtiofsd: Parse flag FUSE_WRITE_KILL_PRIV
-Date: Thu, 23 Jan 2020 16:45:35 +0000
-Message-Id: <20200123164630.91498-54-dgilbert@redhat.com>
+Subject: [PULL 104/108] virtiofsd: add --thread-pool-size=NUM option
+Date: Thu, 23 Jan 2020 16:46:26 +0000
+Message-Id: <20200123164630.91498-105-dgilbert@redhat.com>
 In-Reply-To: <20200123164630.91498-1-dgilbert@redhat.com>
 References: <20200123164630.91498-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: uiYjjXtFNzW0xJdapgElZw-1
+X-MC-Unique: sYoalHJHMOagqzTsJ2y7WA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,63 +91,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vivek Goyal <vgoyal@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Caller can set FUSE_WRITE_KILL_PRIV in write_flags. Parse it and pass it
-to the filesystem.
+Add an option to control the size of the thread pool.  Requests are now
+processed in parallel by default.
 
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Reviewed-by: Sergio Lopez <slp@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/fuse_common.h   | 6 +++++-
- tools/virtiofsd/fuse_lowlevel.c | 4 +++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ tools/virtiofsd/fuse_i.h        | 1 +
+ tools/virtiofsd/fuse_lowlevel.c | 7 ++++++-
+ tools/virtiofsd/fuse_virtio.c   | 5 +++--
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
-index f8f6433743..686c42c0a5 100644
---- a/tools/virtiofsd/fuse_common.h
-+++ b/tools/virtiofsd/fuse_common.h
-@@ -93,8 +93,12 @@ struct fuse_file_info {
-      */
-     unsigned int cache_readdir:1;
+diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+index 1447d86866..4e47e5880d 100644
+--- a/tools/virtiofsd/fuse_i.h
++++ b/tools/virtiofsd/fuse_i.h
+@@ -72,6 +72,7 @@ struct fuse_session {
+     int   vu_listen_fd;
+     int   vu_socketfd;
+     struct fv_VuDev *virtio_dev;
++    int thread_pool_size;
+ };
 =20
-+    /* Indicates that suid/sgid bits should be removed upon write */
-+    unsigned int kill_priv:1;
-+
-+
-     /** Padding.  Reserved for future use*/
--    unsigned int padding:25;
-+    unsigned int padding:24;
-     unsigned int padding2:32;
-=20
-     /*
+ struct fuse_chan {
 diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
 l.c
-index 02e1d83038..2d6dc5a680 100644
+index 79a4031266..de2e2e0c65 100644
 --- a/tools/virtiofsd/fuse_lowlevel.c
 +++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -1142,6 +1142,7 @@ static void do_write(fuse_req_t req, fuse_ino_t nodei=
-d,
-     memset(&fi, 0, sizeof(fi));
-     fi.fh =3D arg->fh;
-     fi.writepage =3D (arg->write_flags & FUSE_WRITE_CACHE) !=3D 0;
-+    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
+@@ -28,6 +28,7 @@
+ #include <sys/file.h>
+ #include <unistd.h>
 =20
-     fi.lock_owner =3D arg->lock_owner;
-     fi.flags =3D arg->flags;
-@@ -1177,7 +1178,8 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t n=
-odeid,
-     fi.lock_owner =3D arg->lock_owner;
-     fi.flags =3D arg->flags;
-     fi.fh =3D arg->fh;
--    fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
-+    fi.writepage =3D !!(arg->write_flags & FUSE_WRITE_CACHE);
-+    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
++#define THREAD_POOL_SIZE 64
 =20
-     if (ibufv->count =3D=3D 1) {
-         assert(!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD));
+ #define OFFSET_MAX 0x7fffffffffffffffLL
+=20
+@@ -2519,6 +2520,7 @@ static const struct fuse_opt fuse_ll_opts[] =3D {
+     LL_OPTION("allow_root", deny_others, 1),
+     LL_OPTION("--socket-path=3D%s", vu_socket_path, 0),
+     LL_OPTION("--fd=3D%d", vu_listen_fd, 0),
++    LL_OPTION("--thread-pool-size=3D%d", thread_pool_size, 0),
+     FUSE_OPT_END
+ };
+=20
+@@ -2537,7 +2539,9 @@ void fuse_lowlevel_help(void)
+     printf(
+         "    -o allow_root              allow access by root\n"
+         "    --socket-path=3DPATH         path for the vhost-user socket\n=
+"
+-        "    --fd=3DFDNUM                 fd number of vhost-user socket\n=
+");
++        "    --fd=3DFDNUM                 fd number of vhost-user socket\n=
+"
++        "    --thread-pool-size=3DNUM     thread pool size limit (default =
+%d)\n",
++        THREAD_POOL_SIZE);
+ }
+=20
+ void fuse_session_destroy(struct fuse_session *se)
+@@ -2591,6 +2595,7 @@ struct fuse_session *fuse_session_new(struct fuse_arg=
+s *args,
+     }
+     se->fd =3D -1;
+     se->vu_listen_fd =3D -1;
++    se->thread_pool_size =3D THREAD_POOL_SIZE;
+     se->conn.max_write =3D UINT_MAX;
+     se->conn.max_readahead =3D UINT_MAX;
+=20
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 0dcf2ef57a..9f6582343c 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -572,10 +572,11 @@ static void *fv_queue_thread(void *opaque)
+     struct fv_QueueInfo *qi =3D opaque;
+     struct VuDev *dev =3D &qi->virtio_dev->dev;
+     struct VuVirtq *q =3D vu_get_queue(dev, qi->qidx);
++    struct fuse_session *se =3D qi->virtio_dev->se;
+     GThreadPool *pool;
+=20
+-    pool =3D g_thread_pool_new(fv_queue_worker, qi, 1 /* TODO max_threads =
+*/,
+-                             TRUE, NULL);
++    pool =3D g_thread_pool_new(fv_queue_worker, qi, se->thread_pool_size, =
+TRUE,
++                             NULL);
+     if (!pool) {
+         fuse_log(FUSE_LOG_ERR, "%s: g_thread_pool_new failed\n", __func__)=
+;
+         return NULL;
 --=20
 2.24.1
 
