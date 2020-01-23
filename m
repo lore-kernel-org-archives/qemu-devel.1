@@ -2,78 +2,79 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7A3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:13:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 366AFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:13:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8442206A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F35EB206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:13:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbtp9I2m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8442206A2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpFa8CTX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F35EB206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubMa-0002Tq-Ga
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:13:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35677)
+	id 1iubMn-0002md-JY
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:13:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuasU-0006Ml-29
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:27 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuasV-0006Of-4w
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuasS-0004YP-JT
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41242
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iuasU-0004ZR-1G
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59275
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuasS-0004YC-GZ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:24 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuasT-0004Yz-UL
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779744;
+ s=mimecast20190719; t=1579779745;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Sqb06/u7/HlnqEYSOPG3/kB15+4rTfSQK/g9vVWJvFg=;
- b=hbtp9I2mp87VdujD4ZRUA1zLDSQg3AcQEpjMGgUckTI3ei7Lw4QxtpfpfwnO3n+6W7FZxl
- jECGMnCqivsPxVjVk5KIscMvSKsW5uX16Ncb085RmxYBZpADFfnHXfj49TgvFoTUQ72yUl
- 0Ar001/iQYWJHK2AhdSK5yejvYeHgLs=
+ bh=hONHx6K9/w9SK1Gd2hE8dPAHj7cwlhqn5ur3r2kgxOw=;
+ b=GpFa8CTXhJxPnGsATlc2MorHWVinLqA5lpIysCShxY82PnumuZ8N9GB/VTN8ao+OU79WvZ
+ S6EC6lcymJRw+6qkw1LKB6JosQr1cmDubSFBdxv4LBbWSkFxNBE1vI3/HAb360BHG2IJ/g
+ S0ssmBVT+7gDPs23L+lSWLoKPVH5AN0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-o1Y0_9OrOvunA69xyiDwng-1; Thu, 23 Jan 2020 06:42:20 -0500
+ us-mta-365-zSVScAVmP1ORUOEfVUexug-1; Thu, 23 Jan 2020 06:42:22 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 611E71005516;
- Thu, 23 Jan 2020 11:42:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 213B2800D41;
+ Thu, 23 Jan 2020 11:42:21 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8616B1001B05;
- Thu, 23 Jan 2020 11:42:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 746721001DDE;
+ Thu, 23 Jan 2020 11:42:20 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 36/80] s390x/s390-virtio-ccw: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:38:01 +0100
-Message-Id: <1579779525-20065-37-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 38/80] cris/axis_dev88: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:03 +0100
+Message-Id: <1579779525-20065-39-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: o1Y0_9OrOvunA69xyiDwng-1
+X-MC-Unique: zSVScAVmP1ORUOEfVUexug-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,8 +86,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com, cohuck@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: edgar.iglesias@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -101,56 +101,51 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
-CC: rth@twiddle.net
-CC: david@redhat.com
-CC: cohuck@redhat.com
-CC: pasic@linux.ibm.com
-CC: borntraeger@de.ibm.com
-CC: qemu-s390x@nongnu.org
+CC: edgar.iglesias@gmail.com
 ---
- hw/s390x/s390-virtio-ccw.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/cris/axis_dev88.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index e0e2813..cbdd4ba 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -154,14 +154,12 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
-=20
--static void s390_memory_init(ram_addr_t mem_size)
-+static void s390_memory_init(MemoryRegion *ram)
+diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
+index be77604..cf6790f 100644
+--- a/hw/cris/axis_dev88.c
++++ b/hw/cris/axis_dev88.c
+@@ -249,7 +249,6 @@ static struct cris_load_info li;
+ static
+ void axisdev88_init(MachineState *machine)
  {
-     MemoryRegion *sysmem =3D get_system_memory();
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     Error *local_err =3D NULL;
+-    ram_addr_t ram_size =3D machine->ram_size;
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     CRISCPU *cpu;
+@@ -261,16 +260,12 @@ void axisdev88_init(MachineState *machine)
+     struct etraxfs_dma_client *dma_eth;
+     int i;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+-    MemoryRegion *phys_ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *phys_intmem =3D g_new(MemoryRegion, 1);
 =20
-     /* allocate RAM for core */
--    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
-     memory_region_add_subregion(sysmem, 0, ram);
+     /* init CPUs */
+     cpu =3D CRIS_CPU(cpu_create(machine->cpu_type));
 =20
-     /*
-@@ -245,7 +243,7 @@ static void ccw_init(MachineState *machine)
+-    /* allocate RAM */
+-    memory_region_allocate_system_memory(phys_ram, NULL, "axisdev88.ram",
+-                                         ram_size);
+-    memory_region_add_subregion(address_space_mem, 0x40000000, phys_ram);
++    memory_region_add_subregion(address_space_mem, 0x40000000, machine->ra=
+m);
 =20
-     s390_sclp_init();
-     /* init memory + setup max page size. Required for the CPU model */
--    s390_memory_init(machine->ram_size);
-+    s390_memory_init(machine->ram);
-=20
-     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
-     s390_init_cpus(machine);
-@@ -471,6 +469,7 @@ static void ccw_machine_class_init(ObjectClass *oc, voi=
-d *data)
-     hc->plug =3D s390_machine_device_plug;
-     hc->unplug_request =3D s390_machine_device_unplug_request;
-     nc->nmi_monitor_handler =3D s390_nmi;
-+    mc->default_ram_id =3D "s390.ram";
+     /* The ETRAX-FS has 128Kb on chip ram, the docs refer to it as the=20
+        internal memory.  */
+@@ -351,6 +346,7 @@ static void axisdev88_machine_init(MachineClass *mc)
+     mc->init =3D axisdev88_init;
+     mc->is_default =3D 1;
+     mc->default_cpu_type =3D CRIS_CPU_TYPE_NAME("crisv32");
++    mc->default_ram_id =3D "axisdev88.ram";
  }
 =20
- static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
+ DEFINE_MACHINE("axis-dev88", axisdev88_machine_init)
 --=20
 2.7.4
 
