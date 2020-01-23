@@ -2,73 +2,76 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9749C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FEBC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:54:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8037622522
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:54:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AA0522522
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:54:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSZ4XTz9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8037622522
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfXaL+fB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AA0522522
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubzm-0002ak-2l
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:54:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39921)
+	id 1iuc0I-0003Tw-9c
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:54:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40074)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iub8O-0001TG-R7
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:54 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub8a-0001nP-Qv
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iub8M-0004gj-Tf
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29116
+ (envelope-from <dgilbert@redhat.com>) id 1iub8Y-0004pf-Sz
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55227
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub8M-0004gS-ME
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:58:50 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub8Y-0004pJ-Mk
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780730;
+ s=mimecast20190719; t=1579780742;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=S1/0M4MxKsN2qjG2ljyCJK6jHTNTg8IXurLNHgKg3x0=;
- b=HSZ4XTz9pI1HDBB8QapXwJ7qxfvMouWr+qtrrhEDJg0aMQTCkyye7742DIgR+gqJswXDo1
- uu6UpZT8wjzE+as2GmebFOIiKuEbkN5YohHXA1Yqh76bfW3oJQzjtuWhhEmFpub11nwijQ
- hinYYU1h7kkzTZhJ2tTiy0O5/z0rcJc=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mgz78ERMZkfkSADB5MVI/243cZq6gMfCJk8de9TTCYg=;
+ b=RfXaL+fB/DLBW7+Et3nnccYqVag1+20vv57nfAhqYIwEivs/PUREJu9G088vTpbou2vb7H
+ QV65fEpfue4WI1dMhjycnW4Lh97Dvxj5d0Eja6FN2Cy5fQo0iRE0xWftN0iLDUhngEpWZT
+ Wv64c1MAhyKDJgGuh1cxdj/zbVLcLSA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-BXk2K96HMQymHL5X4IbtnQ-1; Thu, 23 Jan 2020 06:58:48 -0500
+ us-mta-358-AK2RLXKbPsW8OfY7eiGtOQ-1; Thu, 23 Jan 2020 06:58:59 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E1441005510
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:58:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6274100550E
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:58:58 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0AB2585754;
- Thu, 23 Jan 2020 11:58:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 260051CB;
+ Thu, 23 Jan 2020 11:58:57 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 000/111] virtiofs queue
-Date: Thu, 23 Jan 2020 11:56:50 +0000
-Message-Id: <20200123115841.138849-1-dgilbert@redhat.com>
+Subject: [PULL 010/111] virtiofsd: Remove unused enum fuse_buf_copy_flags
+Date: Thu, 23 Jan 2020 11:57:00 +0000
+Message-Id: <20200123115841.138849-11-dgilbert@redhat.com>
+In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: BXk2K96HMQymHL5X4IbtnQ-1
+X-MC-Unique: AK2RLXKbPsW8OfY7eiGtOQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -87,239 +90,276 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Xiao Yang <yangx.jy@cn.fujitsu.com>
 
-The following changes since commit 3e08b2b9cb64bff2b73fa9128c0e49bfcde0dd40=
-:
-
-  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/edk2-next-202001=
-21' into staging (2020-01-21 15:29:25 +0000)
-
-are available in the Git repository at:
-
-  git@gitlab.com:dagrh/qemu.git tags/pull-virtiofs-20200123
-
-for you to fetch changes up to 87509325f70c78a28683f9460699915ea3300091:
-
-  virtiofsd: add some options to the help message (2020-01-23 10:54:49 +000=
-0)
-
-----------------------------------------------------------------
-virtiofsd first pull
-
-Import our virtiofsd.
-This pulls in the daemon to drive a file system connected to the
-existing qemu virtiofsd device.
-It's derived from upstream libfuse with lots of changes (and a lot
-trimmed out).
-The daemon lives in the newly created qemu/tools/virtiofsd
-
+Signed-off-by: Xiao Yang <yangx.jy@cn.fujitsu.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tools/virtiofsd/buffer.c         |  7 +++--
+ tools/virtiofsd/fuse_common.h    | 46 +-------------------------------
+ tools/virtiofsd/fuse_lowlevel.c  | 13 ++++-----
+ tools/virtiofsd/fuse_lowlevel.h  | 35 ++----------------------
+ tools/virtiofsd/passthrough_ll.c |  4 +--
+ 5 files changed, 13 insertions(+), 92 deletions(-)
 
-----------------------------------------------------------------
-Dr. David Alan Gilbert (35):
-      virtiofsd: Pull in upstream headers
-      virtiofsd: Pull in kernel's fuse.h
-      virtiofsd: Add auxiliary .c's
-      virtiofsd: Add fuse_lowlevel.c
-      virtiofsd: Add passthrough_ll
-      virtiofsd: Trim down imported files
-      virtiofsd: Format imported files to qemu style
-      virtiofsd: Fix fuse_daemonize ignored return values
-      virtiofsd: Fix common header and define for QEMU builds
-      virtiofsd: Trim out compatibility code
-      virtiofsd: Add options for virtio
-      virtiofsd: Open vhost connection instead of mounting
-      virtiofsd: Start wiring up vhost-user
-      virtiofsd: Add main virtio loop
-      virtiofsd: get/set features callbacks
-      virtiofsd: Start queue threads
-      virtiofsd: Poll kick_fd for queue
-      virtiofsd: Start reading commands from queue
-      virtiofsd: Send replies to messages
-      virtiofsd: Keep track of replies
-      virtiofsd: Add Makefile wiring for virtiofsd contrib
-      virtiofsd: Fast path for virtio read
-      virtiofs: Add maintainers entry
-      virtiofsd: Plumb fuse_bufvec through to do_write_buf
-      virtiofsd: Pass write iov's all the way through
-      virtiofsd: cap-ng helpers
-      docs:  Add docs/tools
-      virtiofsd: Handle reinit
-      virtiofsd: Handle hard reboot
-      virtiofsd: Kill threads when queues are stopped
-      vhost-user: Print unexpected slave message types
-      contrib/libvhost-user: Protect slave fd with mutex
-      virtiofsd: Clean up inodes on destroy
-      libvhost-user: Fix some memtable remap cases
-      virtiofsd: Convert lo_destroy to take the lo->mutex lock itself
-
-Eric Ren (1):
-      virtiofsd: fix incorrect error handling in lo_do_lookup
-
-Eryu Guan (3):
-      virtiofsd: print log only when priority is high enough
-      virtiofsd: convert more fprintf and perror to use fuse log infra
-      virtiofsd: stop all queue threads on exit in virtio_loop()
-
-Jiufei Xue (1):
-      virtiofsd: support nanosecond resolution for file timestamp
-
-Liu Bo (6):
-      virtiofsd: fix error handling in main()
-      virtiofsd: cleanup allocated resource in se
-      virtiofsd: fix memory leak on lo.source
-      virtiofsd: add helper for lo_data cleanup
-      virtiofsd: enable PARALLEL_DIROPS during INIT
-      Virtiofsd: fix memory leak on fuse queueinfo
-
-Masayoshi Mizuma (4):
-      virtiofsd: Add ID to the log with FUSE_LOG_DEBUG level
-      virtiofsd: Add timestamp to the log with FUSE_LOG_DEBUG level
-      virtiofsd: Prevent multiply running with same vhost_user_socket
-      virtiofsd: add some options to the help message
-
-Miklos Szeredi (10):
-      virtiofsd: passthrough_ll: add fallback for racy ops
-      virtiofsd: passthrough_ll: add renameat2 support
-      virtiofsd: passthrough_ll: disable readdirplus on cache=3Dnever
-      virtiofsd: passthrough_ll: control readdirplus
-      virtiofsd: rename unref_inode() to unref_inode_lolocked()
-      virtiofsd: fail when parent inode isn't known in lo_do_lookup()
-      virtiofsd: extract root inode init into setup_root()
-      virtiofsd: passthrough_ll: clean up cache related options
-      virtiofsd: passthrough_ll: use hashtable
-      virtiofsd: passthrough_ll: fix refcounting on remove/rename
-
-Misono Tomohiro (2):
-      virtiofsd: Fix data corruption with O_APPEND write in writeback mode
-      virtiofsd: passthrough_ll: Use cache_readdir for directory open
-
-Peng Tao (1):
-      virtiofsd: do not always set FUSE_FLOCK_LOCKS
-
-Stefan Hajnoczi (37):
-      virtiofsd: remove mountpoint dummy argument
-      virtiofsd: remove unused notify reply support
-      virtiofsd: add -o source=3DPATH to help output
-      virtiofsd: add --fd=3DFDNUM fd passing option
-      virtiofsd: make -f (foreground) the default
-      virtiofsd: add vhost-user.json file
-      virtiofsd: add --print-capabilities option
-      virtiofsd: passthrough_ll: add lo_map for ino/fh indirection
-      virtiofsd: passthrough_ll: add ino_map to hide lo_inode pointers
-      virtiofsd: passthrough_ll: add dirp_map to hide lo_dirp pointers
-      virtiofsd: passthrough_ll: add fd_map to hide file descriptors
-      virtiofsd: validate path components
-      virtiofsd: add fuse_mbuf_iter API
-      virtiofsd: validate input buffer sizes in do_write_buf()
-      virtiofsd: check input buffer size in fuse_lowlevel.c ops
-      virtiofsd: prevent ".." escape in lo_do_lookup()
-      virtiofsd: prevent ".." escape in lo_do_readdir()
-      virtiofsd: use /proc/self/fd/ O_PATH file descriptor
-      virtiofsd: sandbox mount namespace
-      virtiofsd: move to an empty network namespace
-      virtiofsd: move to a new pid namespace
-      virtiofsd: add seccomp whitelist
-      virtiofsd: set maximum RLIMIT_NOFILE limit
-      virtiofsd: fix libfuse information leaks
-      virtiofsd: add security guide document
-      virtiofsd: add --syslog command-line option
-      virtiofsd: use fuse_lowlevel_is_virtio() in fuse_session_destroy()
-      virtiofsd: prevent fv_queue_thread() vs virtio_loop() races
-      virtiofsd: make lo_release() atomic
-      virtiofsd: prevent races with lo_dirp_put()
-      virtiofsd: rename inode->refcount to inode->nlookup
-      virtiofsd: add man page
-      virtiofsd: introduce inode refcount to prevent use-after-free
-      virtiofsd: process requests in a thread pool
-      virtiofsd: prevent FUSE_INIT/FUSE_DESTROY races
-      virtiofsd: fix lo_destroy() resource leaks
-      virtiofsd: add --thread-pool-size=3DNUM option
-
-Vivek Goyal (6):
-      virtiofsd: Make fsync work even if only inode is passed in
-      virtiofsd: passthrough_ll: create new files in caller's context
-      virtiofsd: Parse flag FUSE_WRITE_KILL_PRIV
-      virtiofsd: Drop CAP_FSETID if client asked for it
-      virtiofsd: Support remote posix locks
-      virtiofsd: Reset O_DIRECT flag during file open
-
-Xiao Yang (3):
-      virtiofsd: Remove unused enum fuse_buf_copy_flags
-      vitriofsd/passthrough_ll: fix fallocate() ifdefs
-      virtiofsd/passthrough_ll: Pass errno to fuse_reply_err()
-
-piaojun (2):
-      virtiofsd: add definition of fuse_buf_writev()
-      virtiofsd: use fuse_buf_writev to replace fuse_buf_write for better p=
-erformance
-
- .gitignore                                |    1 +
- MAINTAINERS                               |    8 +
- Makefile                                  |   28 +-
- Makefile.objs                             |    1 +
- configure                                 |   16 +
- contrib/libvhost-user/libvhost-user.c     |   57 +-
- contrib/libvhost-user/libvhost-user.h     |    6 +
- docs/index.rst                            |    1 +
- docs/interop/vhost-user.json              |    4 +-
- docs/tools/conf.py                        |   16 +
- docs/tools/index.rst                      |   14 +
- docs/tools/virtiofsd-security.rst         |  118 ++
- hw/virtio/vhost-user.c                    |    2 +-
- include/standard-headers/linux/fuse.h     |  891 +++++++++
- scripts/update-linux-headers.sh           |    1 +
- tools/virtiofsd/50-qemu-virtiofsd.json.in |    5 +
- tools/virtiofsd/Makefile.objs             |   12 +
- tools/virtiofsd/buffer.c                  |  351 ++++
- tools/virtiofsd/fuse.h                    | 1249 ++++++++++++
- tools/virtiofsd/fuse_common.h             |  816 ++++++++
- tools/virtiofsd/fuse_i.h                  |  115 ++
- tools/virtiofsd/fuse_log.c                |   41 +
- tools/virtiofsd/fuse_log.h                |   74 +
- tools/virtiofsd/fuse_lowlevel.c           | 2761 +++++++++++++++++++++++++=
-+
- tools/virtiofsd/fuse_lowlevel.h           | 1991 +++++++++++++++++++
- tools/virtiofsd/fuse_misc.h               |   60 +
- tools/virtiofsd/fuse_opt.c                |  450 +++++
- tools/virtiofsd/fuse_opt.h                |  272 +++
- tools/virtiofsd/fuse_signals.c            |   98 +
- tools/virtiofsd/fuse_virtio.c             |  986 ++++++++++
- tools/virtiofsd/fuse_virtio.h             |   33 +
- tools/virtiofsd/helper.c                  |  349 ++++
- tools/virtiofsd/passthrough_helpers.h     |   51 +
- tools/virtiofsd/passthrough_ll.c          | 3006 +++++++++++++++++++++++++=
-++++
- tools/virtiofsd/seccomp.c                 |  165 ++
- tools/virtiofsd/seccomp.h                 |   16 +
- tools/virtiofsd/virtiofsd.texi            |  104 +
- 37 files changed, 14154 insertions(+), 15 deletions(-)
- create mode 100644 docs/tools/conf.py
- create mode 100644 docs/tools/index.rst
- create mode 100644 docs/tools/virtiofsd-security.rst
- create mode 100644 include/standard-headers/linux/fuse.h
- create mode 100644 tools/virtiofsd/50-qemu-virtiofsd.json.in
- create mode 100644 tools/virtiofsd/Makefile.objs
- create mode 100644 tools/virtiofsd/buffer.c
- create mode 100644 tools/virtiofsd/fuse.h
- create mode 100644 tools/virtiofsd/fuse_common.h
- create mode 100644 tools/virtiofsd/fuse_i.h
- create mode 100644 tools/virtiofsd/fuse_log.c
- create mode 100644 tools/virtiofsd/fuse_log.h
- create mode 100644 tools/virtiofsd/fuse_lowlevel.c
- create mode 100644 tools/virtiofsd/fuse_lowlevel.h
- create mode 100644 tools/virtiofsd/fuse_misc.h
- create mode 100644 tools/virtiofsd/fuse_opt.c
- create mode 100644 tools/virtiofsd/fuse_opt.h
- create mode 100644 tools/virtiofsd/fuse_signals.c
- create mode 100644 tools/virtiofsd/fuse_virtio.c
- create mode 100644 tools/virtiofsd/fuse_virtio.h
- create mode 100644 tools/virtiofsd/helper.c
- create mode 100644 tools/virtiofsd/passthrough_helpers.h
- create mode 100644 tools/virtiofsd/passthrough_ll.c
- create mode 100644 tools/virtiofsd/seccomp.c
- create mode 100644 tools/virtiofsd/seccomp.h
- create mode 100644 tools/virtiofsd/virtiofsd.texi
+diff --git a/tools/virtiofsd/buffer.c b/tools/virtiofsd/buffer.c
+index 5df946c82c..4d507f3302 100644
+--- a/tools/virtiofsd/buffer.c
++++ b/tools/virtiofsd/buffer.c
+@@ -171,7 +171,7 @@ static ssize_t fuse_buf_fd_to_fd(const struct fuse_buf =
+*dst, size_t dst_off,
+=20
+ static ssize_t fuse_buf_copy_one(const struct fuse_buf *dst, size_t dst_of=
+f,
+                                  const struct fuse_buf *src, size_t src_of=
+f,
+-                                 size_t len, enum fuse_buf_copy_flags flag=
+s)
++                                 size_t len)
+ {
+     int src_is_fd =3D src->flags & FUSE_BUF_IS_FD;
+     int dst_is_fd =3D dst->flags & FUSE_BUF_IS_FD;
+@@ -224,8 +224,7 @@ static int fuse_bufvec_advance(struct fuse_bufvec *bufv=
+, size_t len)
+     return 1;
+ }
+=20
+-ssize_t fuse_buf_copy(struct fuse_bufvec *dstv, struct fuse_bufvec *srcv,
+-                      enum fuse_buf_copy_flags flags)
++ssize_t fuse_buf_copy(struct fuse_bufvec *dstv, struct fuse_bufvec *srcv)
+ {
+     size_t copied =3D 0;
+=20
+@@ -249,7 +248,7 @@ ssize_t fuse_buf_copy(struct fuse_bufvec *dstv, struct =
+fuse_bufvec *srcv,
+         dst_len =3D dst->size - dstv->off;
+         len =3D min_size(src_len, dst_len);
+=20
+-        res =3D fuse_buf_copy_one(dst, dstv->off, src, srcv->off, len, fla=
+gs);
++        res =3D fuse_buf_copy_one(dst, dstv->off, src, srcv->off, len);
+         if (res < 0) {
+             if (!copied) {
+                 return res;
+diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
+index bd9bf861f0..0cb33acc2f 100644
+--- a/tools/virtiofsd/fuse_common.h
++++ b/tools/virtiofsd/fuse_common.h
+@@ -604,48 +604,6 @@ enum fuse_buf_flags {
+     FUSE_BUF_FD_RETRY =3D (1 << 3),
+ };
+=20
+-/**
+- * Buffer copy flags
+- */
+-enum fuse_buf_copy_flags {
+-    /**
+-     * Don't use splice(2)
+-     *
+-     * Always fall back to using read and write instead of
+-     * splice(2) to copy data from one file descriptor to another.
+-     *
+-     * If this flag is not set, then only fall back if splice is
+-     * unavailable.
+-     */
+-    FUSE_BUF_NO_SPLICE =3D (1 << 1),
+-
+-    /**
+-     * Force splice
+-     *
+-     * Always use splice(2) to copy data from one file descriptor
+-     * to another.  If splice is not available, return -EINVAL.
+-     */
+-    FUSE_BUF_FORCE_SPLICE =3D (1 << 2),
+-
+-    /**
+-     * Try to move data with splice.
+-     *
+-     * If splice is used, try to move pages from the source to the
+-     * destination instead of copying.  See documentation of
+-     * SPLICE_F_MOVE in splice(2) man page.
+-     */
+-    FUSE_BUF_SPLICE_MOVE =3D (1 << 3),
+-
+-    /**
+-     * Don't block on the pipe when copying data with splice
+-     *
+-     * Makes the operations on the pipe non-blocking (if the pipe
+-     * is full or empty).  See SPLICE_F_NONBLOCK in the splice(2)
+-     * man page.
+-     */
+-    FUSE_BUF_SPLICE_NONBLOCK =3D (1 << 4),
+-};
+-
+ /**
+  * Single data buffer
+  *
+@@ -741,11 +699,9 @@ size_t fuse_buf_size(const struct fuse_bufvec *bufv);
+  *
+  * @param dst destination buffer vector
+  * @param src source buffer vector
+- * @param flags flags controlling the copy
+  * @return actual number of bytes copied or -errno on error
+  */
+-ssize_t fuse_buf_copy(struct fuse_bufvec *dst, struct fuse_bufvec *src,
+-                      enum fuse_buf_copy_flags flags);
++ssize_t fuse_buf_copy(struct fuse_bufvec *dst, struct fuse_bufvec *src);
+=20
+ /*
+  * Signal handling
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index eb0ec49d38..3da80de233 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -490,16 +490,14 @@ static int fuse_send_data_iov_fallback(struct fuse_se=
+ssion *se,
+=20
+ static int fuse_send_data_iov(struct fuse_session *se, struct fuse_chan *c=
+h,
+                               struct iovec *iov, int iov_count,
+-                              struct fuse_bufvec *buf, unsigned int flags)
++                              struct fuse_bufvec *buf)
+ {
+     size_t len =3D fuse_buf_size(buf);
+-    (void)flags;
+=20
+     return fuse_send_data_iov_fallback(se, ch, iov, iov_count, buf, len);
+ }
+=20
+-int fuse_reply_data(fuse_req_t req, struct fuse_bufvec *bufv,
+-                    enum fuse_buf_copy_flags flags)
++int fuse_reply_data(fuse_req_t req, struct fuse_bufvec *bufv)
+ {
+     struct iovec iov[2];
+     struct fuse_out_header out;
+@@ -511,7 +509,7 @@ int fuse_reply_data(fuse_req_t req, struct fuse_bufvec =
+*bufv,
+     out.unique =3D req->unique;
+     out.error =3D 0;
+=20
+-    res =3D fuse_send_data_iov(req->se, req->ch, iov, 1, bufv, flags);
++    res =3D fuse_send_data_iov(req->se, req->ch, iov, 1, bufv);
+     if (res <=3D 0) {
+         fuse_free_req(req);
+         return res;
+@@ -1969,8 +1967,7 @@ int fuse_lowlevel_notify_delete(struct fuse_session *=
+se, fuse_ino_t parent,
+ }
+=20
+ int fuse_lowlevel_notify_store(struct fuse_session *se, fuse_ino_t ino,
+-                               off_t offset, struct fuse_bufvec *bufv,
+-                               enum fuse_buf_copy_flags flags)
++                               off_t offset, struct fuse_bufvec *bufv)
+ {
+     struct fuse_out_header out;
+     struct fuse_notify_store_out outarg;
+@@ -1999,7 +1996,7 @@ int fuse_lowlevel_notify_store(struct fuse_session *s=
+e, fuse_ino_t ino,
+     iov[1].iov_base =3D &outarg;
+     iov[1].iov_len =3D sizeof(outarg);
+=20
+-    res =3D fuse_send_data_iov(se, NULL, iov, 2, bufv, flags);
++    res =3D fuse_send_data_iov(se, NULL, iov, 2, bufv);
+     if (res > 0) {
+         res =3D -res;
+     }
+diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowleve=
+l.h
+index 12a84b460f..2fa225d40b 100644
+--- a/tools/virtiofsd/fuse_lowlevel.h
++++ b/tools/virtiofsd/fuse_lowlevel.h
+@@ -1363,33 +1363,6 @@ int fuse_reply_buf(fuse_req_t req, const char *buf, =
+size_t size);
+ /**
+  * Reply with data copied/moved from buffer(s)
+  *
+- * Zero copy data transfer ("splicing") will be used under
+- * the following circumstances:
+- *
+- * 1. FUSE_CAP_SPLICE_WRITE is set in fuse_conn_info.want, and
+- * 2. the kernel supports splicing from the fuse device
+- *    (FUSE_CAP_SPLICE_WRITE is set in fuse_conn_info.capable), and
+- * 3. *flags* does not contain FUSE_BUF_NO_SPLICE
+- * 4. The amount of data that is provided in file-descriptor backed
+- *    buffers (i.e., buffers for which bufv[n].flags =3D=3D FUSE_BUF_FD)
+- *    is at least twice the page size.
+- *
+- * In order for SPLICE_F_MOVE to be used, the following additional
+- * conditions have to be fulfilled:
+- *
+- * 1. FUSE_CAP_SPLICE_MOVE is set in fuse_conn_info.want, and
+- * 2. the kernel supports it (i.e, FUSE_CAP_SPLICE_MOVE is set in
+-      fuse_conn_info.capable), and
+- * 3. *flags* contains FUSE_BUF_SPLICE_MOVE
+- *
+- * Note that, if splice is used, the data is actually spliced twice:
+- * once into a temporary pipe (to prepend header data), and then again
+- * into the kernel. If some of the provided buffers are memory-backed,
+- * the data in them is copied in step one and spliced in step two.
+- *
+- * The FUSE_BUF_SPLICE_FORCE_SPLICE and FUSE_BUF_SPLICE_NONBLOCK flags
+- * are silently ignored.
+- *
+  * Possible requests:
+  *   read, readdir, getxattr, listxattr
+  *
+@@ -1400,11 +1373,9 @@ int fuse_reply_buf(fuse_req_t req, const char *buf, =
+size_t size);
+  *
+  * @param req request handle
+  * @param bufv buffer vector
+- * @param flags flags controlling the copy
+  * @return zero for success, -errno for failure to send reply
+  */
+-int fuse_reply_data(fuse_req_t req, struct fuse_bufvec *bufv,
+-                    enum fuse_buf_copy_flags flags);
++int fuse_reply_data(fuse_req_t req, struct fuse_bufvec *bufv);
+=20
+ /**
+  * Reply with data vector
+@@ -1705,12 +1676,10 @@ int fuse_lowlevel_notify_delete(struct fuse_session=
+ *se, fuse_ino_t parent,
+  * @param ino the inode number
+  * @param offset the starting offset into the file to store to
+  * @param bufv buffer vector
+- * @param flags flags controlling the copy
+  * @return zero for success, -errno for failure
+  */
+ int fuse_lowlevel_notify_store(struct fuse_session *se, fuse_ino_t ino,
+-                               off_t offset, struct fuse_bufvec *bufv,
+-                               enum fuse_buf_copy_flags flags);
++                               off_t offset, struct fuse_bufvec *bufv);
+=20
+ /*
+  * Utility functions
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 9377718d9d..126a56ccbd 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -931,7 +931,7 @@ static void lo_read(fuse_req_t req, fuse_ino_t ino, siz=
+e_t size, off_t offset,
+     buf.buf[0].fd =3D fi->fh;
+     buf.buf[0].pos =3D offset;
+=20
+-    fuse_reply_data(req, &buf, FUSE_BUF_SPLICE_MOVE);
++    fuse_reply_data(req, &buf);
+ }
+=20
+ static void lo_write_buf(fuse_req_t req, fuse_ino_t ino,
+@@ -952,7 +952,7 @@ static void lo_write_buf(fuse_req_t req, fuse_ino_t ino=
+,
+                  out_buf.buf[0].size, (unsigned long)off);
+     }
+=20
+-    res =3D fuse_buf_copy(&out_buf, in_buf, 0);
++    res =3D fuse_buf_copy(&out_buf, in_buf);
+     if (res < 0) {
+         fuse_reply_err(req, -res);
+     } else {
+--=20
+2.24.1
 
 
