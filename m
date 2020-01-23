@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 525C5C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B37C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AE272087E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C4C520718
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:19:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PsBMTvdw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE272087E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="caK+yGte"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C4C520718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iudK3-000101-0e
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:19:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41373)
+	id 1iudKD-0001DZ-NL
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:19:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iubAS-00042M-VE
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:02 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iub9r-0003UT-PI
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iubAR-0006KP-9U
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:01:00 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48158
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iub9m-0005lz-SH
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48500
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iubAR-0006Ej-2N
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:59 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub9m-0005lm-PN
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:00:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780854;
+ s=mimecast20190719; t=1579780818;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=imqdhMqGGCbqFjXzn1OvJMNkpWKq8bLqQVnL1jcujuQ=;
- b=PsBMTvdwbDcdJJ0yoTUuLDLMPcdNFYU+DOCrrr702w54HGdyFvzkWo4XIu6BmiUnTlyRVs
- DpYD9v+pNBzId8cdeBy5kciSDg2ABEJWGNnfOJkdc1WY7hhk+WErECdnEH/ir0fVZZWdDe
- mjvFpyigk/1CaTMpuzfZvYgvIjeIv+E=
+ bh=+CaNvpeLjRI12ufw52iaAhP4gycw/AeKBjNTqRpbn3o=;
+ b=caK+yGteIB5dEdKhcWl4IFX/hs5n79mXo5Bh3dxrlaGzyhOYgQwg0/cWgmpq8eAub8qTdE
+ kuojIGRvn9dm/ncX5CPBMTouiZQ6iDMonwTetSa00P3COoXyDNRfDqyq9tAGEnsw0n9zTD
+ I681pJcZIOhLBg9b1GuqN9JDGlw2kpI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-jm_InuB6NGCKyAE7aE0mfA-1; Thu, 23 Jan 2020 07:00:46 -0500
+ us-mta-305-BpV2HNT5M_ShYJ3q5N7XFw-1; Thu, 23 Jan 2020 07:00:16 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08598801E6D
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:00:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10DF0801E76
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:00:16 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 53AE81CB;
- Thu, 23 Jan 2020 12:00:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0CD3885750;
+ Thu, 23 Jan 2020 12:00:02 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com
-Subject: [PULL 079/111] virtiofsd: fix error handling in main()
-Date: Thu, 23 Jan 2020 11:58:09 +0000
-Message-Id: <20200123115841.138849-80-dgilbert@redhat.com>
+Subject: [PULL 064/111] virtiofsd: Handle reinit
+Date: Thu, 23 Jan 2020 11:57:54 +0000
+Message-Id: <20200123115841.138849-65-dgilbert@redhat.com>
 In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
 References: <20200123115841.138849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: jm_InuB6NGCKyAE7aE0mfA-1
+X-MC-Unique: BpV2HNT5M_ShYJ3q5N7XFw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,48 +90,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Bo <bo.liu@linux.alibaba.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Neither fuse_parse_cmdline() nor fuse_opt_parse() goes to the right place
-to do cleanup.
+Allow init->destroy->init  for mount->umount->mount
 
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ tools/virtiofsd/fuse_lowlevel.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 9ed77a17fd..af050c6d97 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2443,13 +2443,14 @@ int main(int argc, char *argv[])
-     lo_map_init(&lo.fd_map);
-=20
-     if (fuse_parse_cmdline(&args, &opts) !=3D 0) {
--        return 1;
-+        goto err_out1;
-     }
-     fuse_set_log_func(log_func);
-     use_syslog =3D opts.syslog;
-     if (use_syslog) {
-         openlog("virtiofsd", LOG_PID, LOG_DAEMON);
-     }
-+
-     if (opts.show_help) {
-         printf("usage: %s [options]\n\n", argv[0]);
-         fuse_cmdline_help();
-@@ -2468,7 +2469,7 @@ int main(int argc, char *argv[])
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index a7a19685b5..7d742b5a72 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -2028,6 +2028,7 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid=
+,
      }
 =20
-     if (fuse_opt_parse(&args, &lo, lo_opts, NULL) =3D=3D -1) {
--        return 1;
-+        goto err_out1;
+     se->got_init =3D 1;
++    se->got_destroy =3D 0;
+     if (se->op.init) {
+         se->op.init(se->userdata, &se->conn);
      }
+@@ -2130,6 +2131,7 @@ static void do_destroy(fuse_req_t req, fuse_ino_t nod=
+eid,
+     (void)iter;
 =20
-     /*
+     se->got_destroy =3D 1;
++    se->got_init =3D 0;
+     if (se->op.destroy) {
+         se->op.destroy(se->userdata);
+     }
 --=20
 2.24.1
 
