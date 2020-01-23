@@ -2,59 +2,55 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF883C33CAA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE51C33CAA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:46:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96C13206D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:42:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96C13206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
+	by mail.kernel.org (Postfix) with ESMTPS id 6CCD624125
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 07:46:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CCD624125
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuX8U-0002b5-QB
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:42:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43905)
+	id 1iuXCA-00046z-Lo
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 02:46:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vr_qemu@t-online.de>) id 1iuX7g-00020G-DZ
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:41:53 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iuXBV-0003c2-O9
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:45:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vr_qemu@t-online.de>) id 1iuX7f-0005PB-Bc
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:41:52 -0500
-Received: from mailout11.t-online.de ([194.25.134.85]:45924)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vr_qemu@t-online.de>) id 1iuX7f-0005LM-5b
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:41:51 -0500
-Received: from fwd29.aul.t-online.de (fwd29.aul.t-online.de [172.20.26.134])
- by mailout11.t-online.de (Postfix) with SMTP id 1F962422B887;
- Thu, 23 Jan 2020 08:41:48 +0100 (CET)
-Received: from [192.168.211.200]
- (rIZPGYZdwhDHRe+GAqfr5AAcz2nzkPUgDJCRzYoQM82HGjLY0bbWl120vLmGvVYgtk@[46.86.62.122])
- by fwd29.t-online.de
- with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1iuX7b-0l15Sy0; Thu, 23 Jan 2020 08:41:47 +0100
-To: Gerd Hoffmann <kraxel@redhat.com>
-From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
-Subject: [PATCH 0/9] more audio fixes and improvements
-Message-ID: <1e29e1d3-b59b-fcd6-cdff-a680bcdbffa4@t-online.de>
-Date: Thu, 23 Jan 2020 08:41:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <no-reply@patchew.org>) id 1iuXBT-0000iH-Tc
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:45:49 -0500
+Resent-Date: Thu, 23 Jan 2020 02:45:49 -0500
+Resent-Message-Id: <E1iuXBT-0000iH-Tc@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21193)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iuXBT-0000hJ-Lc
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 02:45:47 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579765533528413.4821897534248;
+ Wed, 22 Jan 2020 23:45:33 -0800 (PST)
+In-Reply-To: <20200123070913.626488-1-mst@redhat.com>
+Subject: Re: [PULL v3 00/18] virtio, pc: fixes, features
+Message-ID: <157976553234.12545.16551531339287540211@f6d1ed32ca6b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-ID: rIZPGYZdwhDHRe+GAqfr5AAcz2nzkPUgDJCRzYoQM82HGjLY0bbWl120vLmGvVYgtk
-X-TOI-MSGID: 9a71f653-af86-46d5-8997-0572de5e9b7b
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mst@redhat.com
+Date: Wed, 22 Jan 2020 23:45:33 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 194.25.134.85
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,42 +62,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>,
- =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The first two patches "audio: fix audio_generic_write" and
-"audio: fix audio_generic_read" are only compile tested. The
-code is only reachable from the DirectSound backend with the
-mixing-engine off. I don't know if it is reachable at all.
-I can't test because I don't have a Windows computer.
-
-Volker R=C3=BCmelin (9):
-  audio: fix audio_generic_write
-  audio: fix audio_generic_read
-  paaudio: remove unused variables
-  audio: prevent SIGSEGV in AUD_get_buffer_size_out
-  audio: fix bug 1858488
-  ossaudio: prevent SIGSEGV in oss_enable_out
-  ossaudio: prevent SIGPFE in oss_write
-  ossaudio: disable poll mode can't be reached
-  audio: audio_generic_get_buffer_in should honor *size
-
- audio/alsaaudio.c |  1 +
- audio/audio.c     | 77 ++++++++++++++++++++++++++-----------------------=
-------
- audio/audio_int.h |  4 +--
- audio/coreaudio.c |  7 +++--
- audio/noaudio.c   |  1 +
- audio/ossaudio.c  | 28 ++++++++++++--------
- audio/paaudio.c   |  6 ++---
- audio/sdlaudio.c  |  7 +++--
- audio/wavaudio.c  |  1 +
- 9 files changed, 71 insertions(+), 61 deletions(-)
-
---=20
-2.16.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyMzA3MDkxMy42MjY0
+ODgtMS1tc3RAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwMTIzMDcwOTEzLjYyNjQ4OC0x
+LW1zdEByZWRoYXQuY29tClN1YmplY3Q6IFtQVUxMIHYzIDAwLzE4XSB2aXJ0aW8sIHBjOiBmaXhl
+cywgZmVhdHVyZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
+di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJiODE5MWMgdmhvc3Q6IGNvZGluZyBzdHlsZSBmaXgK
+N2JiMWY3NCBpMzg2OmFjcGk6IFJlbW92ZSBfSElEIGZyb20gdGhlIFNNQnVzIEFDUEkgZW50cnkK
+NWQ1YWUwYiB2aG9zdDogT25seSBhbGlnbiBzZWN0aW9ucyBmb3Igdmhvc3QtdXNlcgoyZmU2OTBk
+IHZob3N0OiBBZGQgbmFtZXMgdG8gc2VjdGlvbiByb3VuZGVkIHdhcm5pbmcKODVmMmFhOSB2aG9z
+dC12c29jazogZGVsZXRlIHZxcyBpbiB2aG9zdF92c29ja191bnJlYWxpemUgdG8gYXZvaWQgbWVt
+bGVha3MKYWU3MjRkNyB2aXJ0aW8tc2NzaTogY29udmVydCB0byBuZXcgdmlydGlvX2RlbGV0ZV9x
+dWV1ZQozMmE4ZDdhIHZpcnRpby1zY3NpOiBkZWxldGUgdnFzIGluIHVucmVhbGl6ZSB0byBhdm9p
+ZCBtZW1sZWFrcwpjZTE1YWQ0IHZpcnRpby05cC1kZXZpY2U6IGNvbnZlcnQgdG8gbmV3IHZpcnRp
+b19kZWxldGVfcXVldWUKM2JkZjA3NiB2aXJ0aW8tOXAtZGV2aWNlOiBmaXggbWVtbGVhayBpbiB2
+aXJ0aW9fOXBfZGV2aWNlX3VucmVhbGl6ZQowMWZiM2JjIGJpb3MtdGFibGVzLXRlc3Q6IGRvY3Vt
+ZW50IGV4cGVjdGVkIGZpbGUgdXBkYXRlCjAyMTQ5N2MgYWNwaTogY3B1aHA6IGFkZCBDUEhQX0dF
+VF9DUFVfSURfQ01EIGNvbW1hbmQKOGRmNzQ2MSBhY3BpOiBjcHVocDogc3BlYzogYWRkIHR5cGlj
+YWwgdXNlY2FzZXMKZjM3ZmY2YiBhY3BpOiBjcHVocDogaW50cm9kdWNlICdDb21tYW5kIGRhdGEg
+MicgZmllbGQKOWMyZTJhMyBhY3BpOiBjcHVocDogc3BlYzogY2xhcmlmeSBzdG9yZSBpbnRvICdD
+b21tYW5kIGRhdGEnIHdoZW4gJ0NvbW1hbmQgZmllbGQnID09IDAKMzE2MzJmYiBhY3BpOiBjcHVo
+cDogc3BlYzogZml4ICdDb21tYW5kIGRhdGEnIGRlc2NyaXB0aW9uCjg4MzNiNzAgYWNwaTogY3B1
+aHA6IHNwZWM6IGNsYXJpZnkgJ0NQVSBzZWxlY3RvcicgcmVnaXN0ZXIgdXNhZ2UgYW5kIGVuZGlh
+bm5lc3MKNTk1MjljMiB0ZXN0czogcTM1OiBNQ0g6IGFkZCBkZWZhdWx0IFNNQkFTRSBTTVJBTSBs
+b2NrIHRlc3QKYWI0YWI4ZiBxMzU6IGltcGxlbWVudCAxMjhLIFNNUkFNIGF0IGRlZmF1bHQgU01C
+QVNFIGFkZHJlc3MKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTggQ2hlY2tpbmcgY29tbWl0IGFi
+NGFiOGZlZDhjMiAocTM1OiBpbXBsZW1lbnQgMTI4SyBTTVJBTSBhdCBkZWZhdWx0IFNNQkFTRSBh
+ZGRyZXNzKQoyLzE4IENoZWNraW5nIGNvbW1pdCA1OTUyOWMyMWRjMjAgKHRlc3RzOiBxMzU6IE1D
+SDogYWRkIGRlZmF1bHQgU01CQVNFIFNNUkFNIGxvY2sgdGVzdCkKMy8xOCBDaGVja2luZyBjb21t
+aXQgODgzM2I3MGYzOGEzIChhY3BpOiBjcHVocDogc3BlYzogY2xhcmlmeSAnQ1BVIHNlbGVjdG9y
+JyByZWdpc3RlciB1c2FnZSBhbmQgZW5kaWFubmVzcykKNC8xOCBDaGVja2luZyBjb21taXQgMzE2
+MzJmYjA0OTc2IChhY3BpOiBjcHVocDogc3BlYzogZml4ICdDb21tYW5kIGRhdGEnIGRlc2NyaXB0
+aW9uKQo1LzE4IENoZWNraW5nIGNvbW1pdCA5YzJlMmEzYzU1Y2YgKGFjcGk6IGNwdWhwOiBzcGVj
+OiBjbGFyaWZ5IHN0b3JlIGludG8gJ0NvbW1hbmQgZGF0YScgd2hlbiAnQ29tbWFuZCBmaWVsZCcg
+PT0gMCkKNi8xOCBDaGVja2luZyBjb21taXQgZjM3ZmY2YjAzMjhmIChhY3BpOiBjcHVocDogaW50
+cm9kdWNlICdDb21tYW5kIGRhdGEgMicgZmllbGQpCjcvMTggQ2hlY2tpbmcgY29tbWl0IDhkZjc0
+NjFmOGU5YyAoYWNwaTogY3B1aHA6IHNwZWM6IGFkZCB0eXBpY2FsIHVzZWNhc2VzKQo4LzE4IENo
+ZWNraW5nIGNvbW1pdCAwMjE0OTdjZmFlODEgKGFjcGk6IGNwdWhwOiBhZGQgQ1BIUF9HRVRfQ1BV
+X0lEX0NNRCBjb21tYW5kKQo5LzE4IENoZWNraW5nIGNvbW1pdCAwMWZiM2JjNDBhNDQgKGJpb3Mt
+dGFibGVzLXRlc3Q6IGRvY3VtZW50IGV4cGVjdGVkIGZpbGUgdXBkYXRlKQpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojMjM6IEZJTEU6IHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRl
+c3QuYzoyMDoKKyAqIENvbnRyaWJ1dG9yIG9yIEFDUEkgTWFpbnRhaW5lciAoc3RlcHMgNC03IG5l
+ZWQgdG8gYmUgcmVkb25lIHRvIHJlc29sdmUgY29uZmxpY3RzCgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KMTAvMTggQ2hlY2tpbmcgY29tbWl0IDNiZGYwNzZjNmRhMSAodmlydGlvLTlwLWRl
+dmljZTogZml4IG1lbWxlYWsgaW4gdmlydGlvXzlwX2RldmljZV91bnJlYWxpemUpCjExLzE4IENo
+ZWNraW5nIGNvbW1pdCBjZTE1YWQ0MjhjZGUgKHZpcnRpby05cC1kZXZpY2U6IGNvbnZlcnQgdG8g
+bmV3IHZpcnRpb19kZWxldGVfcXVldWUpCjEyLzE4IENoZWNraW5nIGNvbW1pdCAzMmE4ZDdhMGI1
+NTMgKHZpcnRpby1zY3NpOiBkZWxldGUgdnFzIGluIHVucmVhbGl6ZSB0byBhdm9pZCBtZW1sZWFr
+cykKMTMvMTggQ2hlY2tpbmcgY29tbWl0IGFlNzI0ZDc2YjhlZCAodmlydGlvLXNjc2k6IGNvbnZl
+cnQgdG8gbmV3IHZpcnRpb19kZWxldGVfcXVldWUpCjE0LzE4IENoZWNraW5nIGNvbW1pdCA4NWYy
+YWE5ZjhhYTAgKHZob3N0LXZzb2NrOiBkZWxldGUgdnFzIGluIHZob3N0X3Zzb2NrX3VucmVhbGl6
+ZSB0byBhdm9pZCBtZW1sZWFrcykKMTUvMTggQ2hlY2tpbmcgY29tbWl0IDJmZTY5MGRhMzljNyAo
+dmhvc3Q6IEFkZCBuYW1lcyB0byBzZWN0aW9uIHJvdW5kZWQgd2FybmluZykKMTYvMTggQ2hlY2tp
+bmcgY29tbWl0IDVkNWFlMGI5ZTA2MSAodmhvc3Q6IE9ubHkgYWxpZ24gc2VjdGlvbnMgZm9yIHZo
+b3N0LXVzZXIpCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0OTogRklMRTogaHcvdmlydGlv
+L3Zob3N0LmM6NTU0OgorICAgIGlmIChkZXYtPnZob3N0X29wcy0+YmFja2VuZF90eXBlID09IFZI
+T1NUX0JBQ0tFTkRfVFlQRV9VU0VSKSB7ICAgJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzY0OiBGSUxFOiBody92aXJ0aW8vdmhvc3QuYzo1Njk6CisgICAgICAgIHRyYWNlX3Zo
+b3N0X3JlZ2lvbl9hZGRfc2VjdGlvbl9hbGlnbmVkKHNlY3Rpb24tPm1yLT5uYW1lLCBtcnNfZ3Bh
+LCBtcnNfc2l6ZSwKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNDMgbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggMTYvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE3LzE4IENoZWNraW5n
+IGNvbW1pdCA3YmIxZjc0YjQwZTkgKGkzODY6YWNwaTogUmVtb3ZlIF9ISUQgZnJvbSB0aGUgU01C
+dXMgQUNQSSBlbnRyeSkKMTgvMTggQ2hlY2tpbmcgY29tbWl0IDJiODE5MWM0OTBhNiAodmhvc3Q6
+IGNvZGluZyBzdHlsZSBmaXgpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzIwMjAwMTIzMDcwOTEzLjYyNjQ4OC0xLW1zdEByZWRoYXQuY29tL3Rlc3Rp
+bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
