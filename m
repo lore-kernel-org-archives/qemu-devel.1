@@ -2,79 +2,80 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDF8C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62BD9C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:08:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 263D620684
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:08:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2CCF820684
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 14:08:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2uUP8UC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 263D620684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkRwqigL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CCF820684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iud9h-0003n5-03
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:08:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40609)
+	id 1iudA3-0004LI-Qv
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 09:08:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iub9A-0002VD-KB
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:42 -0500
+ (envelope-from <quintela@redhat.com>) id 1iubQr-0007cC-D5
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:17:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iub98-0005E5-E5
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48017
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1iubQq-0001lG-9M
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:17:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30822
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iub98-0005De-96
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:59:38 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iubQq-0001l3-5h
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 07:17:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579780777;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1579781875;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=i36g49Wr23XnPzHPj1e2Sazsa2bVz3Y92a1xoz/YYmg=;
- b=W2uUP8UCUdiDvQiyd0O0bQ1pAcRjQQWQJpDjOJ4GqHL/iZnyoDLxTszlR5fpEWImD60VR3
- qZJwfZ8AieFNYJm+xfzwUe9EjOp0Jc3iSwGL4jbHqSmVaWV17PW/+hrjpt6fkSOmzvRslu
- xutXDoULzuks6R73ktd0C0115OCBxhI=
+ bh=9uQd2c8aaLxJ4dHp0X3GeXb8bmhw3rqvGNTRN6GIPsY=;
+ b=VkRwqigL2RW1C8LUAnfnUudbFWv5uOYvyqAUF1O9+9DReJ5O6YIp9aSEOwKY3cTJvhL+Vd
+ W4wDSEBU7BMcOcyQJi6ihRnaVzXdBbrvT7735oZiGsSoqeGzd6oTo9WJc9ublIYeGPX5LT
+ Q3AVF33+Wcynw4t4Y0xvJn+0aCbRAIs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-hEmSgJVrMoGBQ6c6Nz878w-1; Thu, 23 Jan 2020 06:59:36 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-281-IysfI9I9Olq0XBkmLLa3Kw-1; Thu, 23 Jan 2020 07:17:51 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68EB21005512
- for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 11:59:35 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B8A981CB;
- Thu, 23 Jan 2020 11:59:34 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com
-Subject: [PULL 041/111] virtiofsd: Plumb fuse_bufvec through to do_write_buf
-Date: Thu, 23 Jan 2020 11:57:31 +0000
-Message-Id: <20200123115841.138849-42-dgilbert@redhat.com>
-In-Reply-To: <20200123115841.138849-1-dgilbert@redhat.com>
-References: <20200123115841.138849-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7EBA8010C5
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 12:17:50 +0000 (UTC)
+Received: from redhat.com (ovpn-116-168.ams2.redhat.com [10.36.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 59BB210016E8;
+ Thu, 23 Jan 2020 12:17:50 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v3 00/21] Multifd Migration Compression
+In-Reply-To: <20200123115831.36842-1-quintela@redhat.com> (Juan Quintela's
+ message of "Thu, 23 Jan 2020 12:58:10 +0100")
+References: <20200123115831.36842-1-quintela@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Thu, 23 Jan 2020 13:17:47 +0100
+Message-ID: <87o8uu9xjo.fsf@secure.laptop>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: hEmSgJVrMoGBQ6c6Nz878w-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: IysfI9I9Olq0XBkmLLa3Kw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,165 +87,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P. =?utf-8?Q?Ber?= =?utf-8?Q?rang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Juan Quintela <quintela@redhat.com> wrote:
+> [v3]
+> - rebased on top of upstream + previous multifd cancel series
+> - split multifd code into its own file (multifd.[ch])
+> - split zstd/zlib compression methods (multifd-zstd/zlib.c)
+> - use qemu module feauture to avoid ifdefs
+>   (my understanding is that zlib needs to be present, but
+>   we setup zstd only if it is not there or is disabled)
+> - multifd-method: none|zlib|zstd
+>
+>   As far as I can see, there is no easy way to convince qapi that zstd
+>   option could/couldn't be there depending on compliation flags. I
+>   ended just checking in migrate_parameters_check() if it is enabled
+>   and giving an error message otherwise.
+>
+> Questions:
+> - I am "reusing" the compress-level parameter for both zstd and zlib,
+>   but it poses a problem:
+>   * zlib values: 1-9 (default: 6?)
+>   * zstd values: 1-19 (default: 3)
+> So, what should I do:
+>   * create multifd-zstd-level and multifd-zlib-level (easier)
+>   * reuse compress-level, and change its maximum values depending on
+>     multifd-method
+>   * any other good option?
+>
+> Please, review.
+>
+> [v2] - rebase on top of previous arguments posted to the list -
+> introduces zlib compression - introduces zstd compression
+>
+> Please help if you know anything about zstd/zlib compression.
+>
+> This puts compression on top of multifd. Advantages about current
+> compression:
+>
+> - We copy all pages in a single packet and then compress the whole
+>   thing.
+>
+> - We reuse the compression stream for all the packets sent through the
+>   same channel.
+>
+> - We can select nocomp/zlib/zstd levels of compression.
+>
+> Please, review.
+>
+> Juan Quintela (21):
+>   migration-test: Use g_free() instead of free()
+>   multifd: Make sure that we don't do any IO after an error
+>   qemu-file: Don't do IO after shutdown
+>   migration-test: Make sure that multifd and cancel works
+>   migration: Create migration_is_running()
+>   migration: Don't send data if we have stopped
 
-Let fuse_session_process_buf_int take a fuse_bufvec * instead of a
-fuse_buf;  and then through to do_write_buf - where in the best
-case it can pass that straight through to op.write_buf without copying
-(other than skipping a header).
+This patches are from my previous series.  I forgot to pass the -b
+option to git-publish.  Please ignore them.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/fuse_i.h        |  2 +-
- tools/virtiofsd/fuse_lowlevel.c | 61 ++++++++++++++++++++++-----------
- tools/virtiofsd/fuse_virtio.c   |  3 +-
- 3 files changed, 44 insertions(+), 22 deletions(-)
-
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index 45995f3246..a20854f1c4 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -100,7 +100,7 @@ int fuse_send_reply_iov_nofree(fuse_req_t req, int erro=
-r, struct iovec *iov,
- void fuse_free_req(fuse_req_t req);
-=20
- void fuse_session_process_buf_int(struct fuse_session *se,
--                                  const struct fuse_buf *buf,
-+                                  struct fuse_bufvec *bufv,
-                                   struct fuse_chan *ch);
-=20
-=20
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index 95f4db8fcf..7e10995adc 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -1004,11 +1004,12 @@ static void do_write(fuse_req_t req, fuse_ino_t nod=
-eid, const void *inarg)
- }
-=20
- static void do_write_buf(fuse_req_t req, fuse_ino_t nodeid, const void *in=
-arg,
--                         const struct fuse_buf *ibuf)
-+                         struct fuse_bufvec *ibufv)
- {
-     struct fuse_session *se =3D req->se;
--    struct fuse_bufvec bufv =3D {
--        .buf[0] =3D *ibuf,
-+    struct fuse_bufvec *pbufv =3D ibufv;
-+    struct fuse_bufvec tmpbufv =3D {
-+        .buf[0] =3D ibufv->buf[0],
-         .count =3D 1,
-     };
-     struct fuse_write_in *arg =3D (struct fuse_write_in *)inarg;
-@@ -1018,22 +1019,31 @@ static void do_write_buf(fuse_req_t req, fuse_ino_t=
- nodeid, const void *inarg,
-     fi.fh =3D arg->fh;
-     fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
-=20
--    fi.lock_owner =3D arg->lock_owner;
--    fi.flags =3D arg->flags;
--    if (!(bufv.buf[0].flags & FUSE_BUF_IS_FD)) {
--        bufv.buf[0].mem =3D PARAM(arg);
--    }
--
--    bufv.buf[0].size -=3D
--        sizeof(struct fuse_in_header) + sizeof(struct fuse_write_in);
--    if (bufv.buf[0].size < arg->size) {
--        fuse_log(FUSE_LOG_ERR, "fuse: do_write_buf: buffer size too small\=
-n");
--        fuse_reply_err(req, EIO);
--        return;
-+    if (ibufv->count =3D=3D 1) {
-+        fi.lock_owner =3D arg->lock_owner;
-+        fi.flags =3D arg->flags;
-+        if (!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD)) {
-+            tmpbufv.buf[0].mem =3D PARAM(arg);
-+        }
-+        tmpbufv.buf[0].size -=3D
-+            sizeof(struct fuse_in_header) + sizeof(struct fuse_write_in);
-+        if (tmpbufv.buf[0].size < arg->size) {
-+            fuse_log(FUSE_LOG_ERR,
-+                     "fuse: do_write_buf: buffer size too small\n");
-+            fuse_reply_err(req, EIO);
-+            return;
-+        }
-+        tmpbufv.buf[0].size =3D arg->size;
-+        pbufv =3D &tmpbufv;
-+    } else {
-+        /*
-+         *  Input bufv contains the headers in the first element
-+         * and the data in the rest, we need to skip that first element
-+         */
-+        ibufv->buf[0].size =3D 0;
-     }
--    bufv.buf[0].size =3D arg->size;
-=20
--    se->op.write_buf(req, nodeid, &bufv, arg->offset, &fi);
-+    se->op.write_buf(req, nodeid, pbufv, arg->offset, &fi);
- }
-=20
- static void do_flush(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
-@@ -2024,13 +2034,24 @@ static const char *opname(enum fuse_opcode opcode)
- void fuse_session_process_buf(struct fuse_session *se,
-                               const struct fuse_buf *buf)
- {
--    fuse_session_process_buf_int(se, buf, NULL);
-+    struct fuse_bufvec bufv =3D { .buf[0] =3D *buf, .count =3D 1 };
-+    fuse_session_process_buf_int(se, &bufv, NULL);
- }
-=20
-+/*
-+ * Restriction:
-+ *   bufv is normally a single entry buffer, except for a write
-+ *   where (if it's in memory) then the bufv may be multiple entries,
-+ *   where the first entry contains all headers and subsequent entries
-+ *   contain data
-+ *   bufv shall not use any offsets etc to make the data anything
-+ *   other than contiguous starting from 0.
-+ */
- void fuse_session_process_buf_int(struct fuse_session *se,
--                                  const struct fuse_buf *buf,
-+                                  struct fuse_bufvec *bufv,
-                                   struct fuse_chan *ch)
- {
-+    const struct fuse_buf *buf =3D bufv->buf;
-     struct fuse_in_header *in;
-     const void *inarg;
-     struct fuse_req *req;
-@@ -2108,7 +2129,7 @@ void fuse_session_process_buf_int(struct fuse_session=
- *se,
-=20
-     inarg =3D (void *)&in[1];
-     if (in->opcode =3D=3D FUSE_WRITE && se->op.write_buf) {
--        do_write_buf(req, in->nodeid, inarg, buf);
-+        do_write_buf(req, in->nodeid, inarg, bufv);
-     } else {
-         fuse_ll_ops[in->opcode].func(req, in->nodeid, inarg);
-     }
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 635f87756a..fd588a4829 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -501,7 +501,8 @@ static void *fv_queue_thread(void *opaque)
-             /* TODO! Endianness of header */
-=20
-             /* TODO: Add checks for fuse_session_exited */
--            fuse_session_process_buf_int(se, &fbuf, &ch);
-+            struct fuse_bufvec bufv =3D { .buf[0] =3D fbuf, .count =3D 1 }=
-;
-+            fuse_session_process_buf_int(se, &bufv, &ch);
-=20
-             if (!qi->reply_sent) {
-                 fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
---=20
-2.24.1
+Sorry, Juan.
 
 
