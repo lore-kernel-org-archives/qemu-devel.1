@@ -2,68 +2,86 @@ Return-Path: <SRS0=mO9Z=3M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C21FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 350ADC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 087B921D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDBDD21D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 15:14:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="JT8kMWH9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087B921D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rv7YyKkV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDBDD21D7D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iueBi-0001mw-W6
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:14:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40844)
+	id 1iueC2-0002GD-IZ
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 10:14:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iucCb-0002h2-3x
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:07:19 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrI-0004rf-Ju
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iucCZ-0004m1-82
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:07:16 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:39989)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1iucCY-0004jm-NV
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:07:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=sAZNKaKJi3tOvw5qAVuxxNi5Pn6NBVaDhiiwpqHWOtY=; b=JT8kMWH92MIHv2PTo/Kw/MBkhm
- n1P0E301xR0s2XzCmaD6QWZLpMi3O9LHi/uQbKH4tKeG4Qh9ykMcoVuF05fIRO6s1wA9vTSDlS8Bt
- wCxoS/sX2wqFHFeiN4lYJRBCtVcAspxXeF26rrTR0fZTOGYpHHpgfnTSvQmy2lp/LG7c8F6wmvFCs
- 6jpaUREXtgNgOEJTnHowPWaHcDQXH0tfkGLiTp8W0yg8tu60C8xj5HMKfpjTGipUr7TxxHtREgpC1
- o5yWysuTgg0Z6a9kDZ/rW+uJhY9u33EjV3bU4cpZwETdzfAi68Kr92PlLhg6srO/z/BPZ4hhBYuGb
- 97tB39qBkxizcWoKEVnA/HrOxkLcUt6eWscwRg6X510DqfsLmnVM1xuQHRvEPR3Km8YsDU/NqktOb
- HPnLQLilpxGk19Unw/Ktk+swlac+aeKpM2bp/dXYsNmFgphSrMFTXW0I9XDPlqM2tAljVU+Yy+JZA
- DnbjyKYADW3lMW3tf6uAMxjWfQTVxUcrX5WO23P39zL0bTwTR6Pnjz1UYZA0Zc4dCZOYQ2vce6Ul4
- 1Vg9ggraUcjKQCRxzjfVlYOTxabCi3OrCU+MRNFkEyQ+AKafAKUKNHRvlQkOHyTJ09vXp4nWGw8mq
- CDGBEJNN+fSno54IbjOIsbcXzvaKVTjy4dYJCCMws=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iucrH-0003GH-IN
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:20 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33236)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iucrH-0003Eu-AV
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 08:49:19 -0500
+Received: by mail-wr1-x444.google.com with SMTP id b6so3192938wrq.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jan 2020 05:49:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=eTr7REOAleaAyfl/HuxFmf5p5T5F7PayCyv/OCMj0WQ=;
+ b=rv7YyKkVDjJpDA6wkmE/VA+FMWclXUowiWMkryXzuRero5HwlTUvNHMPY24MEjuVXl
+ XXMhOhxHB4pWSpMpCSnOv4dVA00Dd3B1lofx8ei5R1S+SrUX5fjLvAx9uyDHivlGy3N1
+ TAjpYyXjWSuR5gJ3ejNJxU/qbzPf4bgHfOt1zpKyGqg37Xrw+Ggt0WzAXhMaSYA0YhAY
+ m0E5ZNJnBEHd2BX8LPCHybdfnOSPlpldFgz5OZzG7yUZ38GqlwJjOuLtomwCHeS9RxeF
+ MVMwNSvXBh4jg6Z3Tyig/F59dB9h3h/7xJh9UX4IvXIO5di2Hc1L2SRySsZpI/pf6EyV
+ yDIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=eTr7REOAleaAyfl/HuxFmf5p5T5F7PayCyv/OCMj0WQ=;
+ b=cLIlcreyS/J9/bFliDKqEdO6gNvqzajHShnen27utUrmM+shb4wYTYA4wh+QvmdF2p
+ oE4hdjxN5tGrSZDRbZwLR8DfHDJXs6IBB1mYorRRb4WlPvvpJ8wGSr+sNCqgmYfh1rSU
+ 5PPYFME9EpEqUG3CFJqAKAiC0JjLhV9vJ0OO6PVehdRRY1GBgy/b+/JcTTM+8iRj+QLM
+ XYL14nzusuGNfuAwVfgGM2IX9H2dNzad9/XGD1RjSdBPA0jL+A6m6sgzGqjm/FXZ34Ep
+ PGJ9sJOnfR97+ZNnGEwEEw7vXP3bwW3hfmtntvgtgpuB3/oAHjLX4Ng554lXFekCVqMb
+ BK7A==
+X-Gm-Message-State: APjAAAW7ki9U0h5hVCfbytdvhT7nJ3cZ1PZWyt/L48nZ0RDHJ5DFEnQc
+ QVE934495bYRLp/YV5Gt39ET9mcK
+X-Google-Smtp-Source: APXvYqwfqD1KgnmTr1Cnzw25AFVZMF0V8tdquqWZbYWFga/U9aIg4PtVJGqKsEUXyIe46jkhRhK7tw==
+X-Received: by 2002:adf:f581:: with SMTP id f1mr17815471wro.264.1579787358106; 
+ Thu, 23 Jan 2020 05:49:18 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id s15sm3073171wrp.4.2020.01.23.05.49.16
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 23 Jan 2020 05:49:17 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v4 06/11] tests/virtio-9p: added splitted readdir test
-Date: Thu, 23 Jan 2020 14:07:06 +0100
-Message-ID: <38533076.nkKmY2FMRI@silver>
-In-Reply-To: <20200123113058.17e2c88d@bahia.lan>
-References: <cover.1579567019.git.qemu_oss@crudebyte.com>
- <17952898.t909x8hp7r@silver> <20200123113058.17e2c88d@bahia.lan>
+Subject: [PULL 13/59] Makefile: Clarify all the codebase requires qom/ objects
+Date: Thu, 23 Jan 2020 14:48:16 +0100
+Message-Id: <1579787342-27146-14-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
+References: <1579787342-27146-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,146 +93,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 23. Januar 2020 11:30:58 CET Greg Kurz wrote:
-> On Wed, 22 Jan 2020 23:36:22 +0100
-> 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > On Mittwoch, 22. Januar 2020 22:19:05 CET Greg Kurz wrote:
-> > > On Tue, 21 Jan 2020 01:16:21 +0100
-> > > 
-> > > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > > The previous, already existing readdir test simply used a 'count'
-> > > > parameter big enough to retrieve all directory entries with a
-> > > > single Treaddir request.
-> > > > 
-> > > > In this new 'splitted' readdir test, directory entries are
-> > > > retrieved, splitted over several Treaddir requests by picking small
-> > > > 'count' parameters which force the server to truncate the response.
-> > > > So the test client sends as many Treaddir requests as necessary to
-> > > > get all directory entries. Currently this test covers actually two
-> > > > tests: a sequence of Treaddir requests with count=512 and then a
-> > > > subsequent test with a sequence of Treaddir requests with count=256.
-> > > > 
-> > > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > > ---
-> > > 
-> > > Not sure it is really needed to check with multiple values for 'count',
-> > > but it doesn't eat too many cycles so I guess it doesn't hurt.
-> > 
-> > Yes, it is a cheap test, nobody will feel the difference. One could argue
-> > about the precise 'count' values being used ...
-> > 
-> > > Applied as well.
-> > > 
-> > > >  tests/qtest/virtio-9p-test.c | 91
-> > > >  ++++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 91 insertions(+)
-> > > > 
-> > > > diff --git a/tests/qtest/virtio-9p-test.c
-> > > > b/tests/qtest/virtio-9p-test.c
-> > > > index 2167322985..8b0d94546e 100644
-> > > > --- a/tests/qtest/virtio-9p-test.c
-> > > > +++ b/tests/qtest/virtio-9p-test.c
-> > > > @@ -578,6 +578,7 @@ static bool fs_dirents_contain_name(struct
-> > > > V9fsDirent
-> > > > *e, const char* name)>
-> > > > 
-> > > >      return false;
-> > > >  
-> > > >  }
-> > > > 
-> > > > +/* basic readdir test where reply fits into a single response message
-> > > > */
-> > > > 
-> > > >  static void fs_readdir(void *obj, void *data, QGuestAllocator
-> > > >  *t_alloc)
-> > > >  {
-> > > >  
-> > > >      QVirtio9P *v9p = obj;
-> > > > 
-> > > > @@ -631,6 +632,95 @@ static void fs_readdir(void *obj, void *data,
-> > > > QGuestAllocator *t_alloc)>
-> > > > 
-> > > >      g_free(wnames[0]);
-> > > >  
-> > > >  }
-> > > > 
-> > > > +/* readdir test where overall request is splitted over several
-> > > > messages
-> > > > */
-> > > > +static void fs_readdir_split(void *obj, void *data, QGuestAllocator
-> > > > *t_alloc) +{
-> > > > +    QVirtio9P *v9p = obj;
-> > > > +    alloc = t_alloc;
-> > > > +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR)
-> > > > };
-> > > > +    uint16_t nqid;
-> > > > +    v9fs_qid qid;
-> > > > +    uint32_t count, nentries, npartialentries;
-> > > > +    struct V9fsDirent *entries, *tail, *partialentries;
-> > > > +    P9Req *req;
-> > > > +    int subtest;
-> > > > +    int fid;
-> > > > +    uint64_t offset;
-> > > > +    /* the Treaddir 'count' parameter values to be tested */
-> > > > +    const uint32_t vcount[] = { 512, 256 };
-> > 
-> > ... here. But IMO it does make sense preserving the function's overall
-> > structure to allow testing with different 'count' values if necessary.
-> > Because that way this test could e.g. guard potential bugs when server's
-> > Treaddir handler is rolling back (or not) the dir offset for instance,
-> > which server has to do (or not) according to this 'count' value and the
-> > precise file name length of the individual directory entries.
-> 
-> I still agree it is useful to be able to check different values but I
-> now realize that it shouldn't be done like this because adding new
-> values to vcount[] doesn't scale well with the MAX_REQ limitation I
-> mentioned in another mail. More values, especially small ones, are
-> likely to trigger "Failed to decode VirtFS request type 40" at some
-> point.
-> 
-> I now think that fs_readdir_split() should rather get count as
-> an argument and only do one run. By default we would only call
-> this with an appropriate value, ideally derived from the test
-> environment (number of files, size of filenames... etc...).
-> If someone needs to test a specific value, it is easy as adding
-> a new qos_add_test() line.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I actually had this variant in the exact same way as you're suggesting here as 
-well before (not submitted to the list though), that is I had a version of 
-this function with a count argument, and I had 3 separate qtest cases, but 
-that variant failed in the exact same way.
+QEMU user-mode also requires the qom/ objects, it is not only
+used by "system emulation and qemu-img". As we will use a big
+if() block, move it upper in the "Common libraries for tools
+and emulators" section.
 
-Furthermore, I even get some strange "could not push stack" error messages 
-from the qtest environment when I just add some empty noop tests to the 9pfs 
-test suite. I am not sure if that's related to this ringbuffer issue here, but 
-it was a show stopper for this 'separate test for each count' variant, so I 
-reverted it to this suggested array solution for now.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20200118140619.26333-3-philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Makefile.objs | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-So to avoid any misapprehension: it seems to me as if you were thinking that 
-the ringbuffer is freed between every individual test. That's not what I am 
-observing here. It rather seems as space in the ringbuffer is never freed 
-(before the entire 9pfs test suite completed).
-
-> This would ensure at least that each run starts with the same
-> fixed number of possible requests, ie. MAX_REQ minus the cost of
-> fs_attach().
-> 
-> So I'll revert this patch for now.
-> 
-> > Whatever precise 'count' tests are desired, it would only mean a one line
-> > change here.
-> > 
-> > Best regards,
-> > Christian Schoenebeck
-
-
-Best regards,
-Christian Schoenebeck
+diff --git a/Makefile.objs b/Makefile.objs
+index 7c1e50f..5aae561 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -2,6 +2,7 @@
+ # Common libraries for tools and emulators
+ stub-obj-y = stubs/
+ util-obj-y = crypto/ util/ qobject/ qapi/
++qom-obj-y = qom/
+ 
+ chardev-obj-y = chardev/
+ 
+@@ -27,11 +28,6 @@ block-obj-m = block/
+ crypto-obj-y = crypto/
+ 
+ #######################################################################
+-# qom-obj-y is code used by both qemu system emulation and qemu-img
+-
+-qom-obj-y = qom/
+-
+-#######################################################################
+ # io-obj-y is code used by both qemu system emulation and qemu-img
+ 
+ io-obj-y = io/
+-- 
+1.8.3.1
 
 
 
