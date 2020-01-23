@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A25CCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CBCAC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BA69217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:20:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57D2D217F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jan 2020 12:20:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jk1NJKQ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BA69217F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SoChIcCH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57D2D217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iubT9-0001TJ-4T
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:20:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35744)
+	id 1iubTS-0001ww-Uu
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 07:20:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuasX-0006SG-71
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:30 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuatB-0007TV-Ae
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuasW-0004ap-2J
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:29 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55501
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iuatA-0004tZ-54
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32577
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuasV-0004ae-UV
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:42:28 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuatA-0004tN-1E
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 06:43:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579779747;
+ s=mimecast20190719; t=1579779787;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2CK3QXj2Sco51NzUwWk16BScvgoKQdBpN9s/7+wQuqU=;
- b=Jk1NJKQ50qe6C715PMnyOrbmvkVAnFOQBwssSUw8CFVLQFgq+FZPNOC343KD067rgv4Xwc
- D5UIJaVZ+Zt6tL+MJPjcCjERR0npf+ELlLyl86WqzGvNU/+7P8DW+MpxRVRiCz2UwZ2fd8
- rlZxx7GWCrEWPCoqeyU2P6nrCCVEIWA=
+ bh=upnn6TZ2z+RGb5mRcWQbvzFreS/ItZVM5qv6MZwdjto=;
+ b=SoChIcCH780dZL4eOw+pjpnVGYcx8DB45SVwhxVVTR0MzhKGP54rR1YjsOJgmbqFY4COIW
+ Yo2SAaShx6YRNK3JpA9AdwHGk/xrhtxL+ruKV8xHRBVKHT4JAjMic3i3ynd/LvIFtIX97K
+ veG+DkWm6gDKvaCSgchGEKo53kKptX0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-XaIN09MhN1ithJRaTlxteA-1; Thu, 23 Jan 2020 06:42:25 -0500
+ us-mta-256-No-b_eTEOGC0FEb_MkxDCA-1; Thu, 23 Jan 2020 06:43:05 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BF051800D48;
- Thu, 23 Jan 2020 11:42:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDE4ACF98B;
+ Thu, 23 Jan 2020 11:43:04 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C86E410016EB;
- Thu, 23 Jan 2020 11:42:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8793E100032E;
+ Thu, 23 Jan 2020 11:42:58 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH REPOST v3 42/80] hppa: use memdev for RAM
-Date: Thu, 23 Jan 2020 12:38:07 +0100
-Message-Id: <1579779525-20065-43-git-send-email-imammedo@redhat.com>
+Subject: [PATCH REPOST v3 44/80] x86/pc: use memdev for RAM
+Date: Thu, 23 Jan 2020 12:38:09 +0100
+Message-Id: <1579779525-20065-45-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: XaIN09MhN1ithJRaTlxteA-1
+X-MC-Unique: No-b_eTEOGC0FEb_MkxDCA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,7 +84,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: deller@gmx.de, rth@twiddle.net
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,51 +99,69 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
+CC: mst@redhat.com
+CC: pbonzini@redhat.com
 CC: rth@twiddle.net
-CC: deller@gmx.de
+CC: ehabkost@redhat.com
 ---
- hw/hppa/machine.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ hw/i386/pc.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 810e671..7e0c0ca 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -70,13 +70,10 @@ static void machine_hppa_init(MachineState *machine)
-     uint64_t kernel_entry =3D 0, kernel_low, kernel_high;
-     MemoryRegion *addr_space =3D get_system_memory();
-     MemoryRegion *rom_region;
--    MemoryRegion *ram_region;
-     MemoryRegion *cpu_region;
-     long i;
-     unsigned int smp_cpus =3D machine->smp.cpus;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 8054bc4..21b8290 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -935,7 +935,7 @@ void pc_memory_init(PCMachineState *pcms,
+                     MemoryRegion **ram_memory)
+ {
+     int linux_boot, i;
+-    MemoryRegion *ram, *option_rom_mr;
++    MemoryRegion *option_rom_mr;
+     MemoryRegion *ram_below_4g, *ram_above_4g;
+     FWCfgState *fw_cfg;
+     MachineState *machine =3D MACHINE(pcms);
+@@ -948,22 +948,20 @@ void pc_memory_init(PCMachineState *pcms,
 =20
--    ram_size =3D machine->ram_size;
--
-     /* Create CPUs.  */
-     for (i =3D 0; i < smp_cpus; i++) {
-         char *name =3D g_strdup_printf("cpu%ld-io-eir", i);
-@@ -95,10 +92,8 @@ static void machine_hppa_init(MachineState *machine)
-         error_report("RAM size is currently restricted to 3GB");
-         exit(EXIT_FAILURE);
-     }
--    ram_region =3D g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(ram_region, OBJECT(machine),
--                                         "ram", ram_size);
--    memory_region_add_subregion_overlap(addr_space, 0, ram_region, -1);
-+    memory_region_add_subregion_overlap(addr_space, 0, machine->ram, -1);
-+
+     linux_boot =3D (machine->kernel_filename !=3D NULL);
 =20
-     /* Init Dino (PCI host bus chip).  */
-     pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
-@@ -282,6 +277,7 @@ static void machine_hppa_machine_init(MachineClass *mc)
-     mc->is_default =3D 1;
-     mc->default_ram_size =3D 512 * MiB;
-     mc->default_boot_order =3D "cd";
-+    mc->default_ram_id =3D "ram";
- }
+-    /* Allocate RAM.  We allocate it as a single memory region and use
+-     * aliases to address portions of it, mostly for backwards compatibili=
+ty
+-     * with older qemus that used qemu_ram_alloc().
++    /*
++     * Split single memory region and use aliases to address portions of i=
+t,
++     * done for backwards compatibility with older qemus.
+      */
+-    ram =3D g_malloc(sizeof(*ram));
+-    memory_region_allocate_system_memory(ram, NULL, "pc.ram",
+-                                         machine->ram_size);
+-    *ram_memory =3D ram;
++    *ram_memory =3D machine->ram;
+     ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
+-    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
++    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", machine->=
+ram,
+                              0, x86ms->below_4g_mem_size);
+     memory_region_add_subregion(system_memory, 0, ram_below_4g);
+     e820_add_entry(0, x86ms->below_4g_mem_size, E820_RAM);
+     if (x86ms->above_4g_mem_size > 0) {
+         ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
+-        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
++        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g",
++                                 machine->ram,
+                                  x86ms->below_4g_mem_size,
+                                  x86ms->above_4g_mem_size);
+         memory_region_add_subregion(system_memory, 0x100000000ULL,
+@@ -1950,6 +1948,7 @@ static void pc_machine_class_init(ObjectClass *oc, vo=
+id *data)
+     mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported =3D true;
+     mc->numa_mem_supported =3D true;
++    mc->default_ram_id =3D "pc.ram";
 =20
- DEFINE_MACHINE("hppa", machine_hppa_machine_init)
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
 --=20
 2.7.4
 
