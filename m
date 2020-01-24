@@ -2,90 +2,108 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE04C35244
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCE6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:53:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BF4B2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:48:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YXdYUiwC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF4B2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 516AF2071E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:53:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 516AF2071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physik.fu-berlin.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv5s5-0003Zr-5n
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 15:48:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42779)
+	id 1iv5wp-0005mX-IH
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 15:52:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iv5kx-0008BA-L4
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:46 -0500
+ (envelope-from <glaubitz@physik.fu-berlin.de>) id 1iv5w3-0005MD-R9
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:52:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iv5ku-00065y-WA
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:43 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:35990)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iv5ku-00063w-Oi
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:40 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id z3so3602380wru.3
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 12:40:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=CO6Bh5iCXjaTaQynC+oib+Hg/v44ekrp+1dnmcnUnXM=;
- b=YXdYUiwC+kskyrxKRiG0WuNYg7xAiqdjeV9ItNT2q8p54GRtB9XcpDKbXMA+BnknGN
- IjFvspL9XBEB6Xefggz2xBlDRxqP0rRLmv17vR7UItX5EGAhq7/3vhombcyr2I7zyISk
- qGQDpYyrCzG4YgQjDuTytt8YyKozdfZOqoR1ifXoBRCLJZXOgUNjKqi0ZS7QQgbtKGwH
- RKdEmwSB6URxoU77HwdICnJL6DoQHVdSru+lVIUeBArgendSxLk+CsOhWcSG/7pbWWDG
- o6Yu+0Axjp0h6ZCtfEghSG77Jr8VQl/LqHafKFimh/y0nKz6J/tUyhla8RbQ4zBMcn1r
- uiaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=CO6Bh5iCXjaTaQynC+oib+Hg/v44ekrp+1dnmcnUnXM=;
- b=SZer4ZL7Lzlx0orOuICg1zgviTqgB6rARBg2x6KawwPGW+1Zr1EvpDv+LM+heBfgqf
- oXqGtz6ipApKjMYVC9FaFNTtvM93Xycd21UxuEidCuNY0Nq6C0XRjpHqyE6FCrxaGYia
- 6r2I/vySjF8FTNrjsC6abAjCsOpmgVfUv98FE6ZxTo612jfXlG0ygrDPjJCpkYAXIS6M
- CKlqJA7deqmfsLsiMsWOi96Y65ZsvAZI1je3rXwGdWKJ0n79SJxsN6QZo3CBaUj+LlAu
- VJMARGmIi4b5n+sBsjQjv1ZB1kCuFYiA5pjFeExJzRaMQyLaPMTr/F3OQ3Ct1QrZjBOu
- iqRA==
-X-Gm-Message-State: APjAAAUV7/1iAfk0YtjvTtLAhCIfcH3hyGGoY7ytn8cnK2HOXorIW3ig
- rUgc4ajTgsLwrPuXlxR6WhntSQ==
-X-Google-Smtp-Source: APXvYqw6b5Y7RfoCS77JpioH/+3gAcR2znNFrr9ZLZ/ec+lLJlk2K8sWieYE+Nggd8juDSUABpLsYg==
-X-Received: by 2002:adf:f6c1:: with SMTP id y1mr6098434wrp.17.1579898439673;
- Fri, 24 Jan 2020 12:40:39 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e12sm8804760wrn.56.2020.01.24.12.40.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 24 Jan 2020 12:40:33 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 319821FF99;
- Fri, 24 Jan 2020 20:40:27 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 09/13] tests/docker: switch to multiarch aware container
- support
-Date: Fri, 24 Jan 2020 20:40:22 +0000
-Message-Id: <20200124204026.2107-10-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200124204026.2107-1-alex.bennee@linaro.org>
-References: <20200124204026.2107-1-alex.bennee@linaro.org>
+ (envelope-from <glaubitz@physik.fu-berlin.de>) id 1iv5w2-0004P5-R1
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:52:11 -0500
+Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:53495)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
+ id 1iv5w2-0004OQ-K3
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:52:10 -0500
+Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
+ by outpost.zedat.fu-berlin.de (Exim 4.85)
+ with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+ (envelope-from <glaubitz@physik.fu-berlin.de>)
+ id <1iv5w0-002b1k-5r>; Fri, 24 Jan 2020 21:52:08 +0100
+Received: from x4e3685f7.dyn.telefonica.de ([78.54.133.247] helo=[192.168.1.8])
+ by inpost2.zedat.fu-berlin.de (Exim 4.85)
+ with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+ (envelope-from <glaubitz@physik.fu-berlin.de>)
+ id <1iv5vz-000RWP-VR>; Fri, 24 Jan 2020 21:52:08 +0100
+Subject: Re: Booting Debian in qemu-system-alpha
+To: Richard Henderson <richard.henderson@linaro.org>
+References: <b71832b2-8b2e-a49b-1bf9-6590056bbdbe@physik.fu-berlin.de>
+ <f3843562-cd89-d1b1-19ed-6ae505a94148@linaro.org>
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Autocrypt: addr=glaubitz@physik.fu-berlin.de; keydata=
+ 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
+ scOkTAZQGVpD/8AaLH4v1w==
+Message-ID: <22dd1024-6dd1-81b1-1a91-8d2cbf31853c@physik.fu-berlin.de>
+Date: Fri, 24 Jan 2020 21:52:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+In-Reply-To: <f3843562-cd89-d1b1-19ed-6ae505a94148@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: 78.54.133.247
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 130.133.4.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,206 +115,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: debian-alpha@lists.debian.org, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We drop support for DOCKER_PARTIAL_IMAGE and related hacks in favour
-of explicit building of lists of images by type. Currently we can't do
-any of the QEMU builds but the docker-image target will allow us to
-test that every docker image we declare can actually be built.
+On 1/24/20 9:19 PM, Richard Henderson wrote:
+> Oh.  Hah!  I just tried again, cutting and pasting your command-line.  You've
+> got unicode quotes, not ascii ' (\x27).  That gets passed through to the kernel
+> as-is and prevents console=ttyS0 from being parsed properly.
 
-Later commits will re-enable the builds for each host architecture we
-support.
+Good catch. That helped. Thanks.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include | 124 +++++++++++++---------------------
- 1 file changed, 46 insertions(+), 78 deletions(-)
+I'm considering setting up two qemu-based buildds for alpha in the cloud now.
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index c9e8bc40a1..b2b41c3e9b 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -5,12 +5,37 @@
- HOST_ARCH = $(if $(ARCH),$(ARCH),$(shell uname -m))
- 
- DOCKER_SUFFIX := .docker
--DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
--# we don't run tests on intermediate images (used as base by another image)
--DOCKER_PARTIAL_IMAGES := debian9 debian10
--DOCKER_PARTIAL_IMAGES += debian9-mxe debian-bootstrap
--DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker))))
--DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
-+DOCKER_BASE := $(SRC_PATH)/tests/docker
-+
-+#
-+# There are 3 classes of containers
-+#
-+#    BASE_CONTAINERS - intermeadiate containers which are used to build others
-+#    TEST_BUILD_CONTAINERS - contain enough compiler support to build tests
-+#    QEMU_BUILD_CONTAINERS - contain build dependencies enough to build QEMU
-+#
-+
-+BASE_CONTAINERS :=
-+TEST_BUILD_CONTAINERS :=
-+QEMU_BUILD_CONTAINERS :=
-+
-+#
-+# Helpers for sub-arch includes
-+#
-+# $1 = list of dockerfile paths
-+get-basenames = $(sort $(notdir $(basename $1)))
-+
-+#
-+# Dealing with different host architectures.
-+#
-+# For x86_64 this is easy enough as most cross compilers are built for
-+# x86. However for other build hosts we may have a limited choice. To
-+# fully support all potential build hosts we can use QEMU's own
-+# linux-user support to have a native version of the toolchain.
-+#
-+-include $(DOCKER_BASE)/dockerfiles.multiarch/Makefile.include
-+-include $(DOCKER_BASE)/dockerfiles.$(HOST_ARCH)/Makefile.include
-+
- # Use a global constant ccache directory to speed up repetitive builds
- DOCKER_CCACHE_DIR := $$HOME/.cache/qemu-docker-ccache
- 
-@@ -42,18 +67,21 @@ $(DOCKER_SRC_COPY):
- 
- docker-qemu-src: $(DOCKER_SRC_COPY)
- 
--docker-image: ${DOCKER_TARGETS}
-+# The global docker-image rule builds all docker images we are capable of building
-+DOCKER_TARGETS := $(patsubst %,docker-image-%,$(BASE_CONTAINERS) $(TEST_BUILD_CONTAINERS) $(QEMU_BUILD_CONTAINERS))
-+
-+docker-image: $(DOCKER_TARGETS)
- 
- # General rule for building docker images. If we are a sub-make
- # invoked with SKIP_DOCKER_BUILD we still check the image is up to date
- # though
- ifdef SKIP_DOCKER_BUILD
--docker-image-%: $(DOCKER_FILES_DIR)/%.docker
-+docker-image-%: %.docker
- 	$(call quiet-command, \
- 		$(DOCKER_SCRIPT) check --quiet qemu:$* $<, \
- 		"CHECK", "$*")
- else
--docker-image-%: $(DOCKER_FILES_DIR)/%.docker
-+docker-image-%: %.docker
- 	$(call quiet-command,\
- 		$(DOCKER_SCRIPT) build qemu:$* $< \
- 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
-@@ -62,7 +90,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
- 		"BUILD","$*")
- 
--docker-binfmt-image-debian-%: $(MULTARCH_BASE)/debian-bootstrap.docker
-+docker-binfmt-image-debian-%: $(DOCKER_BASE)/dockerfiles/debian-bootstrap.docker
- 	$(if $(EXECUTABLE),,\
- 		$(error EXECUTABLE not set, debootstrap of debian-$* would fail))
- 	$(if $(DEB_ARCH),,\
-@@ -86,69 +114,8 @@ docker-binfmt-image-debian-%: $(MULTARCH_BASE)/debian-bootstrap.docker
- 			"CHECK", "debian-$* exists"))
- endif
- 
--# Enforce dependencies for composite images
--docker-image-debian9-mxe: docker-image-debian9
--ifeq ($(HOST_ARCH),x86_64)
--docker-image-debian-amd64: docker-image-debian10
--DOCKER_PARTIAL_IMAGES += debian-amd64-cross
--else
--docker-image-debian-amd64-cross: docker-image-debian10
--DOCKER_PARTIAL_IMAGES += debian-amd64
--endif
--docker-image-debian-win32-cross: docker-image-debian9-mxe
--docker-image-debian-win64-cross: docker-image-debian9-mxe
--
--# For non-x86 hosts not all cross-compilers have been packaged
--ifneq ($(HOST_ARCH),x86_64)
--DOCKER_PARTIAL_IMAGES += debian-mips-cross debian-mipsel-cross debian-mips64el-cross
--DOCKER_PARTIAL_IMAGES += debian-ppc64el-cross
--DOCKER_PARTIAL_IMAGES += debian-s390x-cross
--DOCKER_PARTIAL_IMAGES += debian-win32-cross debian-win64-cross
--DOCKER_PARTIAL_IMAGES += fedora travis
--endif
--
--docker-image-debian-alpha-cross: docker-image-debian10
--docker-image-debian-arm64-cross: docker-image-debian10
--docker-image-debian-armel-cross: docker-image-debian10
--docker-image-debian-armhf-cross: docker-image-debian10
--docker-image-debian-hppa-cross: docker-image-debian10
--docker-image-debian-m68k-cross: docker-image-debian10
--docker-image-debian-mips-cross: docker-image-debian10
--docker-image-debian-mips64-cross: docker-image-debian10
--docker-image-debian-mips64el-cross: docker-image-debian10
--docker-image-debian-mipsel-cross: docker-image-debian10
--docker-image-debian-powerpc-cross: docker-image-debian10
--docker-image-debian-ppc64-cross: docker-image-debian10
--docker-image-debian-ppc64el-cross: docker-image-debian10
--docker-image-debian-riscv64-cross: docker-image-debian10
--docker-image-debian-s390x-cross: docker-image-debian10
--docker-image-debian-sh4-cross: docker-image-debian10
--docker-image-debian-sparc64-cross: docker-image-debian10
--
--docker-image-travis: NOUSER=1
--
--# Specialist build images, sometimes very limited tools
--docker-image-tricore-cross: docker-image-debian9
--
--# These images may be good enough for building tests but not for test builds
--DOCKER_PARTIAL_IMAGES += debian-alpha-cross
--DOCKER_PARTIAL_IMAGES += debian-hppa-cross
--DOCKER_PARTIAL_IMAGES += debian-m68k-cross debian-mips64-cross
--DOCKER_PARTIAL_IMAGES += debian-powerpc-cross debian-ppc64-cross
--DOCKER_PARTIAL_IMAGES += debian-riscv64-cross
--DOCKER_PARTIAL_IMAGES += debian-sh4-cross debian-sparc64-cross
--DOCKER_PARTIAL_IMAGES += debian-tricore-cross
--DOCKER_PARTIAL_IMAGES += debian-xtensa-cross
--DOCKER_PARTIAL_IMAGES += fedora-i386-cross fedora-cris-cross
--
--# Rules for building linux-user powered images
--#
--# These are slower than using native cross compiler setups but can
--# work around issues with poorly working multi-arch systems and broken
--# packages.
--
- # Expand all the pre-requistes for each docker image and test combination
--$(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES)), \
-+$(foreach i,$(QEMU_BUILD_CONTAINERS), \
- 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
- 		$(eval .PHONY: docker-$t@$i) \
- 		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
-@@ -174,15 +141,16 @@ docker:
- 	@echo '                         "IMAGE" is one of the listed container name.'
- 	@echo '    docker-image:        Build all images.'
- 	@echo '    docker-image-IMAGE:  Build image "IMAGE".'
-+	@echo '    docker-binfmt-image-debian-IMAGE:'
-+	@echo '                         Build a binfmt Debian bootstraped IMAGE'
-+	@echo '                         Specify DEB_ARCH, DEB_TYPE and EXECUTABLE.'
-+	@echo '				Optionally specify DEB_URL'
- 	@echo '    docker-run:          For manually running a "TEST" with "IMAGE".'
- 	@echo
- 	@echo 'Available container images:'
--	@echo '    $(DOCKER_IMAGES)'
--ifneq ($(DOCKER_USER_IMAGES),)
--	@echo
--	@echo 'Available linux-user images (docker-binfmt-image-debian-%):'
--	@echo '    $(DOCKER_USER_IMAGES)'
--endif
-+	@echo '    BASE: $(BASE_CONTAINERS)'
-+	@echo '    BUILD TESTS: $(TEST_BUILD_CONTAINERS)'
-+	@echo '    BUILD QEMU: $(QEMU_BUILD_CONTAINERS)'
- 	@echo
- 	@echo 'Available tests:'
- 	@echo '    $(DOCKER_TESTS)'
+Adrian
+
 -- 
-2.20.1
-
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer - glaubitz@debian.org
+`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
 
