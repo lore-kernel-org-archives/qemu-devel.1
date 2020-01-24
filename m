@@ -2,55 +2,87 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FED8C35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1B6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:51:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3991F20709
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:51:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3991F20709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAB9720709
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:51:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKKfuzgq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAB9720709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv1FA-0001ld-EW
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 10:51:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57664)
+	id 1iv1FV-0002Fj-4W
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 10:51:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58337)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv1CM-0005Z3-3K
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:48:43 -0500
+ (envelope-from <eblake@redhat.com>) id 1iv1Ej-0001MX-U3
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv1CK-0006MA-Kz
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:48:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:43569 helo=mail.rt-rk.com)
+ (envelope-from <eblake@redhat.com>) id 1iv1Eh-0000vr-TG
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:51:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56907
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iv1CK-0005x9-Dd
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:48:40 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 2F0A01A2108;
- Fri, 24 Jan 2020 16:47:35 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 03FB41A2040;
- Fri, 24 Jan 2020 16:47:35 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/4] linux-user: Add support for FITRIM ioctl
-Date: Fri, 24 Jan 2020 16:47:17 +0100
-Message-Id: <1579880839-31466-3-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1579880839-31466-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1579880839-31466-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iv1Eh-0000uM-JQ
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:51:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579881066;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Gwdnt1gcinRXboHO2Lt50qdjrSmpoA2FwtwFrZMd4Rw=;
+ b=YKKfuzgqKt+kkiOWjBmSPNVsD4JH6Q8bhjDJ4C0P3tSRkonOXXMAiXMKdjd45Kv6vqEUmy
+ Dp5yDIanP9ETIQOy4PgyWoqiEcmrwWOFwUp2sxfx9yM9GQl0/7oBjtJZ+S4KVIbZ0aKiSl
+ P7mxZGMD1wjxzJJSBQQpBAZy6fPZcLQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-gdoVFH22OK-wOmVLoPORBQ-1; Fri, 24 Jan 2020 10:51:02 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D485133FBE;
+ Fri, 24 Jan 2020 15:51:01 +0000 (UTC)
+Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 284C61001B05;
+ Fri, 24 Jan 2020 15:51:00 +0000 (UTC)
+Subject: Re: [Bug 1860759] Re: [REGRESSION] option `-snapshot` ignored with
+ blockdev
+To: Bug 1860759 <1860759@bugs.launchpad.net>, qemu-devel@nongnu.org,
+ Peter Krempa <pkrempa@redhat.com>,
+ "libvirt-list@redhat.com" <libvirt-list@redhat.com>
+References: <157985376657.5102.13233182944615356318.malonedeb@wampee.canonical.com>
+ <157986030424.5154.393920880621051062.malone@chaenomeles.canonical.com>
+ <CACAYGhuurXCHk7b9we2P7Vbx_dajAN5_i4FyL7Ck3q4-m7fbQA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <15cde2ad-31d0-69ea-fecf-4db380c55984@redhat.com>
+Date: Fri, 24 Jan 2020 09:50:59 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <CACAYGhuurXCHk7b9we2P7Vbx_dajAN5_i4FyL7Ck3q4-m7fbQA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: gdoVFH22OK-wOmVLoPORBQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,78 +94,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 1/24/20 4:41 AM, Ildar wrote:
+> Max, thanks a lot for the explanation.
+> Do you mean that snapshot-ing isn't possible totally for blockdev? Then I
+> guess some libvirt users are in trouble :((
+> Actually I didn't quite caught the reason why a blockdev supports backing
+> but not {backing to a file on /tmp then promptly deleted} ? What's the
+> technical difference?
+>=20
 
-FITRIM ioctl accepts a pointer to the structure
+On 1/24/20 4:05 AM, Max Reitz wrote:
+>=20
+>=20
+> I don=E2=80=99t know much about libvirt, but I would have thought that an=
+y
+> manual modification of the qemu command line isn=E2=80=99t supported and =
+might
+> always break.
+>=20
+> Anyway, from a QEMU POV, -snapshot only works with -drive (this includes
+> -hda, etc.).  It doesn=E2=80=99t work with -blockdev.  I can see that thi=
+s isn=E2=80=99t
+> documented for -snapshot, but basically whenever -blockdev is used, the
+> user assumes full responsibility for the block graph (or at least that
+> particular subgraph).  We cannot enable snapshot functionality then.
 
-struct fstrim_range {
-    __u64 start;
-    __u64 len;
-    __u64 minlen;
-};
+Libvirt has never produced a qemu command line containing '-snapshot'.=20
+Part of this is that libvirt wants to control SELinux settings, and=20
+letting qemu create a temporary overlay in /tmp in order to implement=20
+-snapshot does not play nicely with libvirt pre-creating all files that=20
+qemu is allowed to access.
 
-as its third argument.
+The fact that you were able to manually add -snapshot to your qemu=20
+command line with older libvirt using -drive (I'm assuming you were also=20
+not using libvirt's SELinux support, because if you were, qemu would=20
+have been unable to create/access the temporary wrapper in /tmp), is a=20
+nice hack.  But since modern qemu has declared -snapshot to be=20
+unsupported with -blockdev, and modern libvirt has switched to=20
+-blockdev, I claim that this is not a qemu bug, but a libvirt feature=20
+request.
 
-All ioctls in this group (FI* ioctl) are guarded with "#ifdef", so the
-guards are used in this implementation too for consistency (however,
-many of ioctls in FI* group became old enough that their #ifdef guards
-could be removed, bit this is out of the scope of this patch).
+That said, libvirt has had a vision for a design for implementing the=20
+equivalent of -drive -snapshot: the <transient/> sub-element added to=20
+the domain/disk/source/driver element has been documented for a long time:
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/ioctls.h        | 3 +++
- linux-user/syscall_defs.h  | 1 +
- linux-user/syscall_types.h | 5 +++++
- 3 files changed, 9 insertions(+)
+https://libvirt.org/formatdomain.html
+"transient
+     If present, this indicates that changes to the device contents=20
+should be reverted automatically when the guest exits. With some=20
+hypervisors, marking a disk transient prevents the domain from=20
+participating in migration or snapshots. Since 0.9.5 "
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 9fb9d6f..944fbeb 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -152,6 +152,9 @@
- #ifdef FIBMAP
-      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
- #endif
-+#ifdef FITRIM
-+     IOCTL(FITRIM, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_fstrim_range)))
-+#endif
- #ifdef FICLONE
-      IOCTL(FICLONE, IOC_W, TYPE_INT)
-      IOCTL(FICLONERANGE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_file_clone_range)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index ed5068f..8761841 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -950,6 +950,7 @@ struct target_rtc_pll_info {
- #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
- #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
- 
-+#define TARGET_FITRIM     TARGET_IOWR('X', 121, struct fstrim_range)
- #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
- #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
- 
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 5ba4155..dfd7608 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -226,6 +226,11 @@ STRUCT(dm_target_versions,
- STRUCT(dm_target_msg,
-        TYPE_ULONGLONG) /* sector */
- 
-+STRUCT(fstrim_range,
-+       TYPE_LONGLONG, /* start */
-+       TYPE_LONGLONG, /* len */
-+       TYPE_LONGLONG) /* minlen */
-+
- STRUCT(file_clone_range,
-        TYPE_LONGLONG, /* src_fd */
-        TYPE_ULONGLONG, /* src_offset */
--- 
-2.7.4
+However, no one has yet implemented it for libvirt's qemu driver.  Part=20
+of our reluctance has been that we knew that implementing it would=20
+require libvirt to precreate the wrapper file on every guest start, and=20
+it is only very recently that we've even had enough functionality in=20
+libvirt's qemu driver coupled with new qemu commands to create qcow2=20
+images using QMP rather than having to shell out to qemu-img.  And part=20
+of it is that there was no point in implementing something to work with=20
+-drive, when we knew we had to rework everything for -blockdev anyways.=20
+But now that the work in libvirt to switch to -blockdev is done, it=20
+should be a lot easier to implement PROPER support for the <transient/>=20
+tag, at least for -blockdev usage.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
