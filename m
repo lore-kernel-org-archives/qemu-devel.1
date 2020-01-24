@@ -2,82 +2,81 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04382C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BBDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:23:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C45122072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7327C2071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:23:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RlLAbCYL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C45122072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c26cwiay"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7327C2071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv2bV-0000AO-TX
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 12:18:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52460)
+	id 1iv2fp-0003ER-Ja
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 12:23:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53759)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iv2a9-0007Ld-Be
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:17:25 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iv2f2-0002iw-VL
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:22:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iv2a7-0006d1-3y
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:17:21 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45594)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iv2f0-0003Yo-AH
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:22:24 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45657)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iv2a6-0006bx-UD
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:17:19 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 59so2285136otp.12
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 09:17:18 -0800 (PST)
+ id 1iv2f0-0003Xs-4R; Fri, 24 Jan 2020 12:22:22 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 59so2302199otp.12;
+ Fri, 24 Jan 2020 09:22:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WHbtYtunOdgRjOTdqhwxgP5ee0OMJ+u6/lce82RTh88=;
- b=RlLAbCYLepwOq606r+DGe06GOXroXzwRqdgFSO3XBI6uk5dkl0jztkfwaTVA2wv0Yr
- EUp/4XTZnIn5QyZxjgnfIm9e7PSizu+HhB1LM3JMsn4mBFkUPX8gkapp3PAru9dsrHVY
- dclbl4A2TCvFAfgZuF6iABrzw2dDy6JMZR2ApF73CQQx/eXtPLytv5hsbtoxjYvRBhqL
- bxF0B01sUjWGB/NQT4lVKv11WXiEFMBoGjBhcHAa7kugfHpBAzPWOgnUrSZA/2OK3NoA
- XNJwRV5rlvHmqinjTDuegY+PHsKL9s0+TB6z/KBn/p1HbsklsCgP1r9H1fhPxA0n6c7j
- jhKQ==
+ :cc; bh=rAKShrNxMu3ZVat7CaRPVYDzrzP2/5uHm5ULUp8EUpc=;
+ b=c26cwiayGVDPDXdmJFWnl6MmTqthKhfn7DI0vXyZLxAY6dmcloeir5lUzRuFCvplMr
+ wWOEs/VH2fQCVghYrXRZwWF25sCmCneo7irwMaMUfQ6NKRjFqrRuOG2C4p+iBFFCVhy4
+ 6HPef2jBxh7EWvH34ltMTYGi7WjVoT2NSxWn3qy9kHJcez1Mv22aOgV9APGYjY/ekUWn
+ InTY+eyglVjd3Cw2+JOc/pV0s1lwHSRvMS+kF2uxyUJRgiozuYMV6artPZdOXfvU8SwZ
+ CT45vaJOijti2jlgGrmNFYT/KWEqFYe2vAL1SSfUt+s8iVhV2JYAllys5bljzoZ9QQbd
+ 0/kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=WHbtYtunOdgRjOTdqhwxgP5ee0OMJ+u6/lce82RTh88=;
- b=Ut1ZSmh6OngXfVZo+BzdrkAq1AfJaKEnSLXH23cniZStQdWklPd7tREoP4VQFtI8xa
- Aa6hbMa97POtPSOQ+XW+cxJcrDG6gOwYgvoy+VNPkHxVXHjbrazQoeBIAYw5o18klxM1
- FNCVCKQwXk7j4MA+G0IIvZ08T+AvwxeLL3nXVJxYKqr/HNO67yM6zn4UWQlY4UqvfzSm
- PoJ2UsAqzxP3eFdWEvWuvqTzj00MVMrVyXQEdmKHC0HmZUTBSoJ+EJCA08S6Og50qUB6
- QkMRQHWTCRfGdxAAKpcRsTbz4xQIMS7WhfDEWmT6TFowwGQco9KYzA4mkkmECSIoYse6
- +iPg==
-X-Gm-Message-State: APjAAAXREEpssZpQ3wbGTgD1Uev1OKJahQYKCJk6Z4GZt1X08M1kv5i4
- vytjTNLQfaJ+QsNwtwPXtZ7jI1G2nh/PQaJnbQY=
-X-Google-Smtp-Source: APXvYqx4LZR12VqqEvn9FV5Bz4rpirKsNzB4LuPex9Q7znWbw5LfweChAiUk1eO0lTggT70tepKrFyi3XJkAAIA/dpc=
-X-Received: by 2002:a05:6830:1042:: with SMTP id
- b2mr3441571otp.306.1579886237994; 
- Fri, 24 Jan 2020 09:17:17 -0800 (PST)
+ bh=rAKShrNxMu3ZVat7CaRPVYDzrzP2/5uHm5ULUp8EUpc=;
+ b=XmIumVFojWxixHhNk3BWac2jYnbJgequv4p6ex385h9nb6yFj7Q8y0EQZHvGlVN/GD
+ EECo4SLJ/Sit28Jgl4wU37bjF/DxvkZgPgM6K+5bB42cVY+oFFRLk1hgsOUL2uqH4WKG
+ OKMbmBd9yca/lLmyD84bDeZ9LINLKDgmnLsyajq0TLiDKJLUhKXJlwpCbnuY8kBWHPO+
+ a7GI2AvDc1nx+Jp4hB77hI1KR1H1C5ylcdutGKeyFITlIsBZORZMn+DNH+nRihWXHFQL
+ ffamDS1qYz9CGPLeDDb/21xCJN5v7nrspnWfL4YlqOFgqc5VxwqA909z7EpkaLmcEc+P
+ 2Odg==
+X-Gm-Message-State: APjAAAXiJBngYvimn++cpCNZNHZYnV8Jz7McW1Eo1FDRJ/XUZNz9n3iS
+ K49hk8Er2oj1H0xjOkd36C25tWxw9kR2WGOk0uU=
+X-Google-Smtp-Source: APXvYqw9aRbgM81GuxpOj1mlfaj+0Jt4PG+cf1703N0aLzFxN2zps2b6qqJBca9/Wr1sC6qH5iGYAOBN+MPnYIDPzek=
+X-Received: by 2002:a9d:198b:: with SMTP id k11mr3563830otk.295.1579886540773; 
+ Fri, 24 Jan 2020 09:22:20 -0800 (PST)
 MIME-Version: 1.0
-References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
- <1579779525-20065-56-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579779525-20065-56-git-send-email-imammedo@redhat.com>
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <20200106182425.20312-7-danielhb413@gmail.com>
+In-Reply-To: <20200106182425.20312-7-danielhb413@gmail.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 24 Jan 2020 18:17:07 +0100
-Message-ID: <CAL1e-=hYfyyCXqE5=N=yKXc89M_kf9We28kJx=hLGC_qe-Myiw@mail.gmail.com>
-Subject: Re: [PATCH REPOST v3 55/80] mips/mips_mipssim: use memdev for RAM
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000005493059ce5ee17"
+Date: Fri, 24 Jan 2020 18:22:09 +0100
+Message-ID: <CAL1e-=iaSis_dBzA+=GBQq5q24V2r8Tnt6jvQjtKs97RJ4-yJQ@mail.gmail.com>
+Subject: Re: [PATCH v1 06/59] mips-semi.c: remove 'uhi_done' label in
+ helper_do_semihosting()
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Content-Type: multipart/alternative; boundary="0000000000000c7124059ce6000e"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,198 +88,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000005493059ce5ee17
+--0000000000000c7124059ce6000e
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 23, 2020 at 1:22 PM Igor Mammedov <imammedo@redhat.com> wrote:
+On Mon, Jan 6, 2020 at 7:29 PM Daniel Henrique Barboza <
+danielhb413@gmail.com> wrote:
 
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->   MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
+> The label 'uhi_done' is a simple 'return' call and can
+> be removed for a bit more clarity in the code.
 >
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> CC: Aurelien Jarno <aurelien@aurel32.net>
+> CC: Aleksandar Markovic <amarkovic@wavecomp.com>
+> CC: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > ---
->  hw/mips/mips_mipssim.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+>  target/mips/mips-semi.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
 >
 >
 Applied to MIPS queue.
 
 
-> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> index 84c03dd..8df16d8 100644
-> --- a/hw/mips/mips_mipssim.c
-> +++ b/hw/mips/mips_mipssim.c
-> @@ -143,14 +143,12 @@ static void mipsnet_init(int base, qemu_irq irq,
-> NICInfo *nd)
->  static void
->  mips_mipssim_init(MachineState *machine)
->  {
-> -    ram_addr_t ram_size =3D machine->ram_size;
->      const char *kernel_filename =3D machine->kernel_filename;
->      const char *kernel_cmdline =3D machine->kernel_cmdline;
->      const char *initrd_filename =3D machine->initrd_filename;
->      char *filename;
->      MemoryRegion *address_space_mem =3D get_system_memory();
->      MemoryRegion *isa =3D g_new(MemoryRegion, 1);
-> -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
->      MemoryRegion *bios =3D g_new(MemoryRegion, 1);
->      MIPSCPU *cpu;
->      CPUMIPSState *env;
-> @@ -167,13 +165,11 @@ mips_mipssim_init(MachineState *machine)
->      qemu_register_reset(main_cpu_reset, reset_info);
+> diff --git a/target/mips/mips-semi.c b/target/mips/mips-semi.c
+> index 35bdfd7c77..10a710c1e8 100644
+> --- a/target/mips/mips-semi.c
+> +++ b/target/mips/mips-semi.c
+> @@ -218,7 +218,7 @@ static int copy_argn_to_target(CPUMIPSState *env, int
+> arg_num,
+>          if (!p) {                               \
+>              gpr[2] = -1;                        \
+>              gpr[3] = EFAULT;                    \
+> -            goto uhi_done;                      \
+> +            return;                             \
+>          }                                       \
+>      } while (0)
 >
->      /* Allocate RAM. */
-> -    memory_region_allocate_system_memory(ram, NULL, "mips_mipssim.ram",
-> -                                         ram_size);
->      memory_region_init_ram(bios, NULL, "mips_mipssim.bios", BIOS_SIZE,
->                             &error_fatal);
->      memory_region_set_readonly(bios, true);
+> @@ -228,14 +228,14 @@ static int copy_argn_to_target(CPUMIPSState *env,
+> int arg_num,
+>          if (!p) {                                       \
+>              gpr[2] = -1;                                \
+>              gpr[3] = EFAULT;                            \
+> -            goto uhi_done;                              \
+> +            return;                                     \
+>          }                                               \
+>          p2 = lock_user_string(addr2);                   \
+>          if (!p2) {                                      \
+>              unlock_user(p, addr, 0);                    \
+>              gpr[2] = -1;                                \
+>              gpr[3] = EFAULT;                            \
+> -            goto uhi_done;                              \
+> +            return;                                     \
+>          }                                               \
+>      } while (0)
 >
-> -    memory_region_add_subregion(address_space_mem, 0, ram);
-> +    memory_region_add_subregion(address_space_mem, 0, machine->ram);
->
->      /* Map the BIOS / boot exception handler. */
->      memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
-> @@ -200,7 +196,7 @@ mips_mipssim_init(MachineState *machine)
+> @@ -272,7 +272,7 @@ void helper_do_semihosting(CPUMIPSState *env)
+>          if (gpr[4] < 3) {
+>              /* ignore closing stdin/stdout/stderr */
+>              gpr[2] = 0;
+> -            goto uhi_done;
+> +            return;
+>          }
+>          gpr[2] = close(gpr[4]);
+>          gpr[3] = errno_mips(errno);
+> @@ -302,7 +302,7 @@ void helper_do_semihosting(CPUMIPSState *env)
+>              gpr[2] = fstat(gpr[4], &sbuf);
+>              gpr[3] = errno_mips(errno);
+>              if (gpr[2]) {
+> -                goto uhi_done;
+> +                return;
+>              }
+>              gpr[2] = copy_stat_to_target(env, &sbuf, gpr[5]);
+>              gpr[3] = errno_mips(errno);
+> @@ -314,14 +314,14 @@ void helper_do_semihosting(CPUMIPSState *env)
+>      case UHI_argnlen:
+>          if (gpr[4] >= semihosting_get_argc()) {
+>              gpr[2] = -1;
+> -            goto uhi_done;
+> +            return;
+>          }
+>          gpr[2] = strlen(semihosting_get_arg(gpr[4]));
+>          break;
+>      case UHI_argn:
+>          if (gpr[4] >= semihosting_get_argc()) {
+>              gpr[2] = -1;
+> -            goto uhi_done;
+> +            return;
+>          }
+>          gpr[2] = copy_argn_to_target(env, gpr[4], gpr[5]);
+>          break;
+> @@ -369,6 +369,5 @@ void helper_do_semihosting(CPUMIPSState *env)
+>          fprintf(stderr, "Unknown UHI operation %d\n", op);
+>          abort();
 >      }
->
->      if (kernel_filename) {
-> -        loaderparams.ram_size =3D ram_size;
-> +        loaderparams.ram_size =3D machine->ram_size;
->          loaderparams.kernel_filename =3D kernel_filename;
->          loaderparams.kernel_cmdline =3D kernel_cmdline;
->          loaderparams.initrd_filename =3D initrd_filename;
-> @@ -245,6 +241,7 @@ static void mips_mipssim_machine_init(MachineClass *m=
-c)
->  #else
->      mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
->  #endif
-> +    mc->default_ram_id =3D "mips_mipssim.ram";
+> -uhi_done:
+>      return;
 >  }
->
->  DEFINE_MACHINE("mipssim", mips_mipssim_machine_init)
 > --
-> 2.7.4
+> 2.24.1
 >
 >
 >
 
---000000000000005493059ce5ee17
+--0000000000000c7124059ce6000e
 Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: base64
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jan 23, 2020 at 1:22 PM Igor =
-Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">imammedo@redhat.com</a>=
-&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
-0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">memo=
-ry_region_allocate_system_memory() API is going away, so<br>
-replace it with memdev allocated MemoryRegion. The later is<br>
-initialized by generic code, so board only needs to opt in<br>
-to memdev scheme by providing<br>
-=C2=A0 MachineClass::default_ram_id<br>
-and using MachineState::ram instead of manually initializing<br>
-RAM memory region.<br>
-<br>
-Signed-off-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" tar=
-get=3D"_blank">imammedo@redhat.com</a>&gt;<br>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
-t.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
----<br>
-=C2=A0hw/mips/mips_mipssim.c | 9 +++------<br>
-=C2=A01 file changed, 3 insertions(+), 6 deletions(-)<br>
-<br></blockquote><div><br></div><div>Applied to MIPS queue.</div><div>=C2=
-=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
-x;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c<br>
-index 84c03dd..8df16d8 100644<br>
---- a/hw/mips/mips_mipssim.c<br>
-+++ b/hw/mips/mips_mipssim.c<br>
-@@ -143,14 +143,12 @@ static void mipsnet_init(int base, qemu_irq irq, NICI=
-nfo *nd)<br>
-=C2=A0static void<br>
-=C2=A0mips_mipssim_init(MachineState *machine)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 ram_addr_t ram_size =3D machine-&gt;ram_size;<br>
-=C2=A0 =C2=A0 =C2=A0const char *kernel_filename =3D machine-&gt;kernel_file=
-name;<br>
-=C2=A0 =C2=A0 =C2=A0const char *kernel_cmdline =3D machine-&gt;kernel_cmdli=
-ne;<br>
-=C2=A0 =C2=A0 =C2=A0const char *initrd_filename =3D machine-&gt;initrd_file=
-name;<br>
-=C2=A0 =C2=A0 =C2=A0char *filename;<br>
-=C2=A0 =C2=A0 =C2=A0MemoryRegion *address_space_mem =3D get_system_memory()=
-;<br>
-=C2=A0 =C2=A0 =C2=A0MemoryRegion *isa =3D g_new(MemoryRegion, 1);<br>
--=C2=A0 =C2=A0 MemoryRegion *ram =3D g_new(MemoryRegion, 1);<br>
-=C2=A0 =C2=A0 =C2=A0MemoryRegion *bios =3D g_new(MemoryRegion, 1);<br>
-=C2=A0 =C2=A0 =C2=A0MIPSCPU *cpu;<br>
-=C2=A0 =C2=A0 =C2=A0CPUMIPSState *env;<br>
-@@ -167,13 +165,11 @@ mips_mipssim_init(MachineState *machine)<br>
-=C2=A0 =C2=A0 =C2=A0qemu_register_reset(main_cpu_reset, reset_info);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0/* Allocate RAM. */<br>
--=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, NULL, &quot;mips_m=
-ipssim.ram&quot;,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ra=
-m_size);<br>
-=C2=A0 =C2=A0 =C2=A0memory_region_init_ram(bios, NULL, &quot;mips_mipssim.b=
-ios&quot;, BIOS_SIZE,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 &amp;error_fatal);<br>
-=C2=A0 =C2=A0 =C2=A0memory_region_set_readonly(bios, true);<br>
-<br>
--=C2=A0 =C2=A0 memory_region_add_subregion(address_space_mem, 0, ram);<br>
-+=C2=A0 =C2=A0 memory_region_add_subregion(address_space_mem, 0, machine-&g=
-t;ram);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0/* Map the BIOS / boot exception handler. */<br>
-=C2=A0 =C2=A0 =C2=A0memory_region_add_subregion(address_space_mem, 0x1fc000=
-00LL, bios);<br>
-@@ -200,7 +196,7 @@ mips_mipssim_init(MachineState *machine)<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0if (kernel_filename) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 loaderparams.ram_size =3D ram_size;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 loaderparams.ram_size =3D machine-&gt;ram_size=
-;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0loaderparams.kernel_filename =3D kernel_f=
-ilename;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0loaderparams.kernel_cmdline =3D kernel_cm=
-dline;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0loaderparams.initrd_filename =3D initrd_f=
-ilename;<br>
-@@ -245,6 +241,7 @@ static void mips_mipssim_machine_init(MachineClass *mc)=
-<br>
-=C2=A0#else<br>
-=C2=A0 =C2=A0 =C2=A0mc-&gt;default_cpu_type =3D MIPS_CPU_TYPE_NAME(&quot;24=
-Kf&quot;);<br>
-=C2=A0#endif<br>
-+=C2=A0 =C2=A0 mc-&gt;default_ram_id =3D &quot;mips_mipssim.ram&quot;;<br>
-=C2=A0}<br>
-<br>
-=C2=A0DEFINE_MACHINE(&quot;mipssim&quot;, mips_mipssim_machine_init)<br>
--- <br>
-2.7.4<br>
-<br>
-<br>
-</blockquote></div></div>
-
---000000000000005493059ce5ee17--
+PGRpdiBkaXI9Imx0ciI+PGRpdiBkaXI9Imx0ciI+PGJyPjwvZGl2Pjxicj48ZGl2IGNsYXNzPSJn
+bWFpbF9xdW90ZSI+PGRpdiBkaXI9Imx0ciIgY2xhc3M9ImdtYWlsX2F0dHIiPk9uIE1vbiwgSmFu
+IDYsIDIwMjAgYXQgNzoyOSBQTSBEYW5pZWwgSGVucmlxdWUgQmFyYm96YSAmbHQ7PGEgaHJlZj0i
+bWFpbHRvOmRhbmllbGhiNDEzQGdtYWlsLmNvbSI+ZGFuaWVsaGI0MTNAZ21haWwuY29tPC9hPiZn
+dDsgd3JvdGU6PGJyPjwvZGl2PjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9
+Im1hcmdpbjowcHggMHB4IDBweCAwLjhleDtib3JkZXItbGVmdDoxcHggc29saWQgcmdiKDIwNCwy
+MDQsMjA0KTtwYWRkaW5nLWxlZnQ6MWV4Ij5UaGUgbGFiZWwgJiMzOTt1aGlfZG9uZSYjMzk7IGlz
+IGEgc2ltcGxlICYjMzk7cmV0dXJuJiMzOTsgY2FsbCBhbmQgY2FuPGJyPg0KYmUgcmVtb3ZlZCBm
+b3IgYSBiaXQgbW9yZSBjbGFyaXR5IGluIHRoZSBjb2RlLjxicj4NCjxicj4NCkNDOiBBdXJlbGll
+biBKYXJubyAmbHQ7PGEgaHJlZj0ibWFpbHRvOmF1cmVsaWVuQGF1cmVsMzIubmV0IiB0YXJnZXQ9
+Il9ibGFuayI+YXVyZWxpZW5AYXVyZWwzMi5uZXQ8L2E+Jmd0Ozxicj4NCkNDOiBBbGVrc2FuZGFy
+IE1hcmtvdmljICZsdDs8YSBocmVmPSJtYWlsdG86YW1hcmtvdmljQHdhdmVjb21wLmNvbSIgdGFy
+Z2V0PSJfYmxhbmsiPmFtYXJrb3ZpY0B3YXZlY29tcC5jb208L2E+Jmd0Ozxicj4NCkNDOiBBbGVr
+c2FuZGFyIFJpa2FsbyAmbHQ7PGEgaHJlZj0ibWFpbHRvOmFsZWtzYW5kYXIucmlrYWxvQHJ0LXJr
+LmNvbSIgdGFyZ2V0PSJfYmxhbmsiPmFsZWtzYW5kYXIucmlrYWxvQHJ0LXJrLmNvbTwvYT4mZ3Q7
+PGJyPg0KU2lnbmVkLW9mZi1ieTogRGFuaWVsIEhlbnJpcXVlIEJhcmJvemEgJmx0OzxhIGhyZWY9
+Im1haWx0bzpkYW5pZWxoYjQxM0BnbWFpbC5jb20iIHRhcmdldD0iX2JsYW5rIj5kYW5pZWxoYjQx
+M0BnbWFpbC5jb208L2E+Jmd0Ozxicj4NCi0tLTxicj4NCsKgdGFyZ2V0L21pcHMvbWlwcy1zZW1p
+LmMgfCAxNSArKysrKysrLS0tLS0tLS08YnI+DQrCoDEgZmlsZSBjaGFuZ2VkLCA3IGluc2VydGlv
+bnMoKyksIDggZGVsZXRpb25zKC0pPGJyPg0KPGJyPjwvYmxvY2txdW90ZT48ZGl2Pjxicj48L2Rp
+dj48ZGl2PkFwcGxpZWQgdG8gTUlQUyBxdWV1ZS48YnI+PC9kaXY+PGRpdj7CoDwvZGl2PjxibG9j
+a3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHggMHB4IDBweCAwLjhl
+eDtib3JkZXItbGVmdDoxcHggc29saWQgcmdiKDIwNCwyMDQsMjA0KTtwYWRkaW5nLWxlZnQ6MWV4
+Ij4NCmRpZmYgLS1naXQgYS90YXJnZXQvbWlwcy9taXBzLXNlbWkuYyBiL3RhcmdldC9taXBzL21p
+cHMtc2VtaS5jPGJyPg0KaW5kZXggMzViZGZkN2M3Ny4uMTBhNzEwYzFlOCAxMDA2NDQ8YnI+DQot
+LS0gYS90YXJnZXQvbWlwcy9taXBzLXNlbWkuYzxicj4NCisrKyBiL3RhcmdldC9taXBzL21pcHMt
+c2VtaS5jPGJyPg0KQEAgLTIxOCw3ICsyMTgsNyBAQCBzdGF0aWMgaW50IGNvcHlfYXJnbl90b190
+YXJnZXQoQ1BVTUlQU1N0YXRlICplbnYsIGludCBhcmdfbnVtLDxicj4NCsKgIMKgIMKgIMKgIMKg
+aWYgKCFwKSB7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBc
+PGJyPg0KwqAgwqAgwqAgwqAgwqAgwqAgwqBncHJbMl0gPSAtMTvCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCBcPGJyPg0KwqAgwqAgwqAgwqAgwqAgwqAgwqBncHJbM10gPSBFRkFV
+TFQ7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgXDxicj4NCi3CoCDCoCDCoCDCoCDCoCDC
+oCBnb3RvIHVoaV9kb25lO8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFw8YnI+DQor
+wqAgwqAgwqAgwqAgwqAgwqAgcmV0dXJuO8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgXDxicj4NCsKgIMKgIMKgIMKgIMKgfcKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgXDxicj4NCsKgIMKgIMKgfSB3aGls
+ZSAoMCk8YnI+DQo8YnI+DQpAQCAtMjI4LDE0ICsyMjgsMTQgQEAgc3RhdGljIGludCBjb3B5X2Fy
+Z25fdG9fdGFyZ2V0KENQVU1JUFNTdGF0ZSAqZW52LCBpbnQgYXJnX251bSw8YnI+DQrCoCDCoCDC
+oCDCoCDCoGlmICghcCkge8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgXDxicj4NCsKgIMKgIMKgIMKgIMKgIMKgIMKgZ3ByWzJdID0gLTE7
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgXDxicj4NCsKg
+IMKgIMKgIMKgIMKgIMKgIMKgZ3ByWzNdID0gRUZBVUxUO8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIFw8YnI+DQotwqAgwqAgwqAgwqAgwqAgwqAgZ290byB1aGlfZG9u
+ZTvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBcPGJyPg0KK8Kg
+IMKgIMKgIMKgIMKgIMKgIHJldHVybjvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoFw8YnI+DQrCoCDCoCDCoCDCoCDCoH3CoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oFw8YnI+DQrCoCDCoCDCoCDCoCDCoHAyID0gbG9ja191c2VyX3N0cmluZyhhZGRyMik7wqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBcPGJyPg0KwqAgwqAgwqAgwqAgwqBpZiAoIXAyKSB7wqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgXDxi
+cj4NCsKgIMKgIMKgIMKgIMKgIMKgIMKgdW5sb2NrX3VzZXIocCwgYWRkciwgMCk7wqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgXDxicj4NCsKgIMKgIMKgIMKgIMKgIMKgIMKgZ3ByWzJdID0g
+LTE7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgXDxicj4N
+CsKgIMKgIMKgIMKgIMKgIMKgIMKgZ3ByWzNdID0gRUZBVUxUO8KgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIFw8YnI+DQotwqAgwqAgwqAgwqAgwqAgwqAgZ290byB1aGlf
+ZG9uZTvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBcPGJyPg0K
+K8KgIMKgIMKgIMKgIMKgIMKgIHJldHVybjvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoFw8YnI+DQrCoCDCoCDCoCDCoCDCoH3CoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoFw8YnI+DQrCoCDCoCDCoH0gd2hpbGUgKDApPGJyPg0KPGJyPg0KQEAgLTI3Miw3ICsyNzIs
+NyBAQCB2b2lkIGhlbHBlcl9kb19zZW1paG9zdGluZyhDUFVNSVBTU3RhdGUgKmVudik8YnI+DQrC
+oCDCoCDCoCDCoCDCoGlmIChncHJbNF0gJmx0OyAzKSB7PGJyPg0KwqAgwqAgwqAgwqAgwqAgwqAg
+wqAvKiBpZ25vcmUgY2xvc2luZyBzdGRpbi9zdGRvdXQvc3RkZXJyICovPGJyPg0KwqAgwqAgwqAg
+wqAgwqAgwqAgwqBncHJbMl0gPSAwOzxicj4NCi3CoCDCoCDCoCDCoCDCoCDCoCBnb3RvIHVoaV9k
+b25lOzxicj4NCivCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm47PGJyPg0KwqAgwqAgwqAgwqAgwqB9
+PGJyPg0KwqAgwqAgwqAgwqAgwqBncHJbMl0gPSBjbG9zZShncHJbNF0pOzxicj4NCsKgIMKgIMKg
+IMKgIMKgZ3ByWzNdID0gZXJybm9fbWlwcyhlcnJubyk7PGJyPg0KQEAgLTMwMiw3ICszMDIsNyBA
+QCB2b2lkIGhlbHBlcl9kb19zZW1paG9zdGluZyhDUFVNSVBTU3RhdGUgKmVudik8YnI+DQrCoCDC
+oCDCoCDCoCDCoCDCoCDCoGdwclsyXSA9IGZzdGF0KGdwcls0XSwgJmFtcDtzYnVmKTs8YnI+DQrC
+oCDCoCDCoCDCoCDCoCDCoCDCoGdwclszXSA9IGVycm5vX21pcHMoZXJybm8pOzxicj4NCsKgIMKg
+IMKgIMKgIMKgIMKgIMKgaWYgKGdwclsyXSkgezxicj4NCi3CoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCBnb3RvIHVoaV9kb25lOzxicj4NCivCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm47PGJy
+Pg0KwqAgwqAgwqAgwqAgwqAgwqAgwqB9PGJyPg0KwqAgwqAgwqAgwqAgwqAgwqAgwqBncHJbMl0g
+PSBjb3B5X3N0YXRfdG9fdGFyZ2V0KGVudiwgJmFtcDtzYnVmLCBncHJbNV0pOzxicj4NCsKgIMKg
+IMKgIMKgIMKgIMKgIMKgZ3ByWzNdID0gZXJybm9fbWlwcyhlcnJubyk7PGJyPg0KQEAgLTMxNCwx
+NCArMzE0LDE0IEBAIHZvaWQgaGVscGVyX2RvX3NlbWlob3N0aW5nKENQVU1JUFNTdGF0ZSAqZW52
+KTxicj4NCsKgIMKgIMKgY2FzZSBVSElfYXJnbmxlbjo8YnI+DQrCoCDCoCDCoCDCoCDCoGlmIChn
+cHJbNF0gJmd0Oz0gc2VtaWhvc3RpbmdfZ2V0X2FyZ2MoKSkgezxicj4NCsKgIMKgIMKgIMKgIMKg
+IMKgIMKgZ3ByWzJdID0gLTE7PGJyPg0KLcKgIMKgIMKgIMKgIMKgIMKgIGdvdG8gdWhpX2RvbmU7
+PGJyPg0KK8KgIMKgIMKgIMKgIMKgIMKgIHJldHVybjs8YnI+DQrCoCDCoCDCoCDCoCDCoH08YnI+
+DQrCoCDCoCDCoCDCoCDCoGdwclsyXSA9IHN0cmxlbihzZW1paG9zdGluZ19nZXRfYXJnKGdwcls0
+XSkpOzxicj4NCsKgIMKgIMKgIMKgIMKgYnJlYWs7PGJyPg0KwqAgwqAgwqBjYXNlIFVISV9hcmdu
+Ojxicj4NCsKgIMKgIMKgIMKgIMKgaWYgKGdwcls0XSAmZ3Q7PSBzZW1paG9zdGluZ19nZXRfYXJn
+YygpKSB7PGJyPg0KwqAgwqAgwqAgwqAgwqAgwqAgwqBncHJbMl0gPSAtMTs8YnI+DQotwqAgwqAg
+wqAgwqAgwqAgwqAgZ290byB1aGlfZG9uZTs8YnI+DQorwqAgwqAgwqAgwqAgwqAgwqAgcmV0dXJu
+Ozxicj4NCsKgIMKgIMKgIMKgIMKgfTxicj4NCsKgIMKgIMKgIMKgIMKgZ3ByWzJdID0gY29weV9h
+cmduX3RvX3RhcmdldChlbnYsIGdwcls0XSwgZ3ByWzVdKTs8YnI+DQrCoCDCoCDCoCDCoCDCoGJy
+ZWFrOzxicj4NCkBAIC0zNjksNiArMzY5LDUgQEAgdm9pZCBoZWxwZXJfZG9fc2VtaWhvc3Rpbmco
+Q1BVTUlQU1N0YXRlICplbnYpPGJyPg0KwqAgwqAgwqAgwqAgwqBmcHJpbnRmKHN0ZGVyciwgJnF1
+b3Q7VW5rbm93biBVSEkgb3BlcmF0aW9uICVkXG4mcXVvdDssIG9wKTs8YnI+DQrCoCDCoCDCoCDC
+oCDCoGFib3J0KCk7PGJyPg0KwqAgwqAgwqB9PGJyPg0KLXVoaV9kb25lOjxicj4NCsKgIMKgIMKg
+cmV0dXJuOzxicj4NCsKgfTxicj4NCi0tIDxicj4NCjIuMjQuMTxicj4NCjxicj4NCjxicj4NCjwv
+YmxvY2txdW90ZT48L2Rpdj48L2Rpdj4NCg==
+--0000000000000c7124059ce6000e--
 
