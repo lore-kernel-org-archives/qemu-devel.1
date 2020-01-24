@@ -2,99 +2,82 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21988C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF18C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:40:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC7B42070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:39:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD1DD2070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:40:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nwIL5M96"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC7B42070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZQUawZT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD1DD2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuwMt-0006RM-1y
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:39:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47668)
+	id 1iuwNg-0007Wr-U6
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:40:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48099)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david.edmondson@oracle.com>) id 1iuwLp-0005Wo-Le
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:38:10 -0500
+ (envelope-from <berrange@redhat.com>) id 1iuwMx-0006r4-S4
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:39:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david.edmondson@oracle.com>) id 1iuwLo-0002Ty-Cz
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:38:09 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:50238)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david.edmondson@oracle.com>)
- id 1iuwLl-0002MS-Lw; Fri, 24 Jan 2020 05:38:05 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OANHpE051393;
- Fri, 24 Jan 2020 10:38:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2019-08-05;
- bh=kJYuGOHxAJSijG0ahMlaMAPg8iWcWaOUuXKZkKmTajM=;
- b=nwIL5M96u+fRUucd+2W4y5k2wj7QcyeRG4jse2aOnCimgRkuRORkEFX7YJON6ePCeN8M
- fEAw7knrbEfnBPaTtUw0P2vvPjlG2ASNmmOWeL6Qjb/ksJlrd9DrrZcNLk72d7ttMmiI
- M2co+IZqEQCs0V8RCP1HztsXK4viXk4SDdEk/O41qN0cX1tW2MBcZFw0KNNjEaSqdAu5
- ukWVY6jtNcymDZxn+33lmR9VSUP65E7947qKq8KaAyXCSQ3n+JC9d79PlZrrbMCKcw+d
- QVii+Mk3GYdAW75q1vIjAYl8q2DVz4tJ7OmH2dsMaQ4u+qz8dpYgkh7+sMbJyp3rPpTm Lg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2xksyqr853-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jan 2020 10:38:04 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OAVJGR112268;
- Fri, 24 Jan 2020 10:36:04 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 2xqmuepue4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jan 2020 10:36:04 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00OAa4pa007328;
- Fri, 24 Jan 2020 10:36:04 GMT
-Received: from disaster-area.hh.sledj.net (/81.149.164.25)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 24 Jan 2020 02:36:03 -0800
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 4f429e87;
- Fri, 24 Jan 2020 10:36:00 +0000 (UTC)
-From: David Edmondson <david.edmondson@oracle.com>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Subject: [PATCH v2 2/2] doc: Use @code rather than @var for options
-Date: Fri, 24 Jan 2020 10:34:58 +0000
-Message-Id: <20200124103458.1525982-3-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200124103458.1525982-1-david.edmondson@oracle.com>
-References: <20200124103458.1525982-1-david.edmondson@oracle.com>
+ (envelope-from <berrange@redhat.com>) id 1iuwMw-00057v-OL
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:39:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60983
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iuwMw-00056P-K3
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:39:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579862358;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lzwOxQ0YetL2nkFOGH0j8PrGQhM5k+5KlQojPyVn/Pc=;
+ b=CZQUawZTSxd0C2Ws0NkAr4O1w3jHXN+PaWm3vW2VNhaD9tyHgsQoOdwWij6ujrz/5n40NG
+ Red0wnXYKv4AWMGP6aaa5kUBj+xxOZcTziD8wLedNK4+x7lv9t00IUIkRzwLhRMkEs7nC/
+ +2/g5u9XV//JABCIEG0lUzkXxTgboTU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-85-quvBKfy5NV-k3buE2byETg-1; Fri, 24 Jan 2020 05:39:14 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71E1C1083E80
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 10:39:13 +0000 (UTC)
+Received: from redhat.com (ovpn-112-52.ams2.redhat.com [10.36.112.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DAA265DA8C;
+ Fri, 24 Jan 2020 10:39:10 +0000 (UTC)
+Date: Fri, 24 Jan 2020 10:39:07 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v3 01/21] migration-test: Use g_free() instead of free()
+Message-ID: <20200124103907.GC824327@redhat.com>
+References: <20200123115831.36842-1-quintela@redhat.com>
+ <20200123115831.36842-2-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9509
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001240086
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9509
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001240086
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
+In-Reply-To: <20200123115831.36842-2-quintela@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: quvBKfy5NV-k3buE2byETg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,80 +89,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Edmondson <david.edmondson@oracle.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Texinfo defines @var for metasyntactic variables and such terms are
-shown in upper-case or italics in the output of makeinfo. When
-considering an option to a command, such as "-n", upper-casing is
-undesirable as it may confuse the reader or be in conflict with the
-equivalent upper-case option.
+On Thu, Jan 23, 2020 at 12:58:11PM +0100, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  tests/qtest/migration-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+> index 26e2e77289..b6a74a05ce 100644
+> --- a/tests/qtest/migration-test.c
+> +++ b/tests/qtest/migration-test.c
+> @@ -1291,7 +1291,7 @@ static void test_multifd_tcp(void)
+>      wait_for_serial("dest_serial");
+>      wait_for_migration_complete(from);
+>      test_migrate_end(from, to, true);
+> -    free(uri);
+> +    g_free(uri);
 
-Replace the use of @var for options with @code to avoid this.
+Not an objection to this patch, just a general FYI.
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- qemu-img.texi | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Our min glib guarantees that g_malloc/g_free are always using the
+system allocator. So using free() is not a correctness problem
+these days.
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 3b6dfd8682..6b4a1ac961 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -74,13 +74,13 @@ keys.
- @item --image-opts
- Indicates that the source @var{filename} parameter is to be interpreted as a
- full option string, not a plain filename. This parameter is mutually
--exclusive with the @var{-f} parameter.
-+exclusive with the @code{-f} parameter.
- 
- @item --target-image-opts
- Indicates that the @var{output_filename} parameter(s) are to be interpreted as
- a full option string, not a plain filename. This parameter is mutually
--exclusive with the @var{-O} parameters. It is currently required to also use
--the @var{-n} parameter to skip image creation. This restriction may be relaxed
-+exclusive with the @code{-O} parameters. It is currently required to also use
-+the @code{-n} parameter to skip image creation. This restriction may be relaxed
- in a future release.
- 
- @item --force-share (-U)
-@@ -103,13 +103,13 @@ with or without a command shows help and lists the supported formats
- 
- @item -p
- display progress bar (compare, convert and rebase commands only).
--If the @var{-p} option is not used for a command that supports it, the
-+If the @code{-p} option is not used for a command that supports it, the
- progress is reported when the process receives a @code{SIGUSR1} or
- @code{SIGINFO} signal.
- 
- @item -q
- Quiet mode - do not print any output (except errors). There's no progress bar
--in case both @var{-q} and @var{-p} options are used.
-+in case both @code{-q} and @code{-p} options are used.
- 
- @item -S @var{size}
- indicates the consecutive number of bytes that must contain only zeros
-@@ -298,14 +298,14 @@ the top image stays valid).
- Check if two images have the same content. You can compare images with
- different format or settings.
- 
--The format is probed unless you specify it by @var{-f} (used for
--@var{filename1}) and/or @var{-F} (used for @var{filename2}) option.
-+The format is probed unless you specify it by @code{-f} (used for
-+@var{filename1}) and/or @code{-F} (used for @var{filename2}) option.
- 
- By default, images with different size are considered identical if the larger
- image contains only unallocated and/or zeroed sectors in the area after the end
- of the other image. In addition, if any sector is not allocated in one image
- and contains only zero bytes in the second one, it is evaluated as equal. You
--can use Strict mode by specifying the @var{-s} option. When compare runs in
-+can use Strict mode by specifying the @code{-s} option. When compare runs in
- Strict mode, it fails in case image size differs or a sector is allocated in
- one image and is not allocated in the second one.
- 
--- 
-2.24.1
+In general I'd suggest eliminating both free() and g_free(), and instead
+annotating the variable decl for automatic free. eg
+
+  g_autofree char *uri =3D NULL;
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
