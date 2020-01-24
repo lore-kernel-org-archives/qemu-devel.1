@@ -2,79 +2,75 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC87C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4E9C32771
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:18:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B967A2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:18:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3690F214AF
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:18:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/DEk8w/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B967A2075D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZCuKX+gl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3690F214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuv6J-0008Ra-S6
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:18:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58313)
+	id 1iuv6M-0008VT-F4
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:18:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iuv5L-0007Ng-Fb
+ (envelope-from <pbonzini@redhat.com>) id 1iuv5L-0007Nf-FG
  for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iuv5J-0000Va-8Y
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:17:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44596
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1iuv5H-0000TY-SK
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:17:02 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47225
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuv5J-0000Uz-4T
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:17:01 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iuv5H-0000SF-FP
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:16:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579857420;
+ s=mimecast20190719; t=1579857418;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eX0NFtiZzz9M5qROBzq9+Z2yMg+grmZXSEvgDXkM7TY=;
- b=b/DEk8w/YFg4PxM/Mle5SQD4Svz95r/e0tkP0Rv92rUj3d8+vUKfLEgBTS8aLFhYD1fDOd
- CU/fGJu7XxQ56VWMu4i9uaSqdcTxvuQUMw40lb8cNghcPyLLTTWijjIr3nTtTUt0dFaE88
- KzU2M2WMeXHzIzNoSpfWEEN+zZu2AX8=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=5LJdmv9OwWPxA8vdr8msyiECtTvqC+Dy/FvgDQaI8gM=;
+ b=ZCuKX+glwDrhnSTyT05mHWGrCJF7nvx5hgOngoPaHS6La0Ujf4LtyVkt/xh9/8i9kYcmAW
+ 5zmS3OJVKd0zVRDibd8m7QeYsLrTb41SANSPLuoLed5j+YqixeD3NyWPF83CpWpOFb9osU
+ 0SEIuvh5BB8/bhjW/gQUrsSei2pxMDM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-fn4IxzqbPOKfArGUHW3GXg-1; Fri, 24 Jan 2020 04:16:58 -0500
+ us-mta-186-50XuSyOHN8SACKLCN8_IQA-1; Fri, 24 Jan 2020 04:16:55 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A9F61005513
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 09:16:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61C2A1800D48
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 09:16:54 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E82E35C1BB;
- Fri, 24 Jan 2020 09:16:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 754CE5C1BB
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 09:16:53 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 58/59] build-sys: clean up flags included in the linker
- command line
-Date: Fri, 24 Jan 2020 10:16:51 +0100
-Message-Id: <1579857411-12996-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1579857411-12996-1-git-send-email-pbonzini@redhat.com>
-References: <1579857411-12996-1-git-send-email-pbonzini@redhat.com>
+Subject: [PULL v2 00/59] Misc (x86 and QOM) patches for 2020-01-23
+Date: Fri, 24 Jan 2020 10:16:50 +0100
+Message-Id: <1579857411-12996-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: fn4IxzqbPOKfArGUHW3GXg-1
+X-MC-Unique: 50XuSyOHN8SACKLCN8_IQA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,387 +82,560 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some of the CFLAGS that are discovered during configure, for example
-compiler warnings, are being included on the linker command line because
-QEMU_CFLAGS is added to it.  Other flags, such as the -m32, appear twice
-because they are included in both QEMU_CFLAGS and LDFLAGS.  All this
-leads to confusion with respect to what goes in which Makefile variables
-(and we have plenty).
+The following changes since commit 3e08b2b9cb64bff2b73fa9128c0e49bfcde0dd40=
+:
 
-So, introduce QEMU_LDFLAGS for flags discovered by configure, following
-the lead of QEMU_CFLAGS, and stop adding to it:
+  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/edk2-next-202001=
+21' into staging (2020-01-21 15:29:25 +0000)
 
-1) options that are already in CFLAGS, for example "-g"
+are available in the git repository at:
 
-2) duplicate options
 
-At the same time, options that _are_ needed by both compiler and linker
-must now be added to both QEMU_CFLAGS and QEMU_LDFLAGS, which is clearer.
-This is mostly -fsanitize options.  For now, --extra-cflags has this behavi=
-or
-(but --extra-cxxflags does not).
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-Meson will not include CFLAGS on the linker command line, do the same in ou=
+for you to fetch changes up to b0993e347e065d2323fbb051fdd5a72c95a6e872:
+
+  tests: fix test-qga on macosx (2020-01-24 10:14:32 +0100)
+
+----------------------------------------------------------------
+* Register qdev properties as class properties (Marc-Andr=C3=A9)
+* Cleanups (Philippe)
+* virtio-scsi fix (Pan Nengyuan)
+* Tweak Skylake-v3 model id (Kashyap)
+* x86 UCODE_REV support and nested live migration fix (myself)
+* Advisory mode for pvpanic (Zhenwei)
+
+----------------------------------------------------------------
+Greg Kurz (2):
+      cpu: Introduce cpu_class_set_parent_reset()
+      cpu: Use cpu_class_set_parent_reset()
+
+Kashyap Chamarthy (1):
+      target/i386: Add the 'model-id' for Skylake -v3 CPU models
+
+Marc-Andr=C3=A9 Lureau (25):
+      object: add extra sanity checks
+      qdev: remove duplicated qdev_property_add_static() doc
+      qdev: remove extraneous error
+      qdev: move helper function to monitor/misc
+      object: avoid extra class property key duplication
+      object: add class property initializer
+      object: make object_class_property_add* return property
+      qstring: add qstring_free()
+      object: add object_property_set_default
+      object: do not free class properties
+      object: check strong flag with &
+      object: rename link "child" to "target"
+      object: add direct link flag
+      object: express const link with link property
+      object: add object_class_property_add_link()
+      object: release all props
+      object: return self in object_ref()
+      qdev: set properties with device_class_set_props()
+      qdev: move instance properties to class properties
+      qdev: register properties as class properties
+      vl: print default value in object help
+      qom: introduce object_property_help()
+      qapi/qmp: add ObjectPropertyInfo.default-value
+      qdev: use object_property_help()
+      tests: fix test-qga on macosx
+
+Pan Nengyuan (2):
+      virtio-scsi: delete vqs in unrealize to avoid memleaks
+      virtio-scsi: convert to new virtio_delete_queue
+
+Paolo Bonzini (6):
+      target/i386: kvm: initialize feature MSRs very early
+      target/i386: add a ucode-rev property
+      target/i386: kvm: initialize microcode revision from KVM
+      qdev: rename DeviceClass.props
+      qom: simplify qmp_device_list_properties()
+      build-sys: clean up flags included in the linker command line
+
+Philippe Mathieu-Daud=C3=A9 (21):
+      qom/object: Display more helpful message when an interface is missing
+      audio/audio: Add missing fall through comment
+      hw/display/tcx: Add missing fall through comments
+      hw/timer/aspeed_timer: Add a fall through comment
+      hw/net/imx_fec: Rewrite fall through comments
+      hw/net/imx_fec: Remove unuseful FALLTHROUGH comments
+      hw/pci-host/designware: Remove unuseful FALLTHROUGH comment
+      configure: Do not build libfdt if not required
+      Makefile: Clarify all the codebase requires qom/ objects
+      Makefile: Restrict system emulation and tools objects
+      Makefile: Remove unhelpful comment
+      hw/core: Restrict reset handlers API to system-mode
+      hw/core/Makefile: Group generic objects versus system-mode objects
+      hw/ppc/spapr_rtas: Use local MachineState variable
+      hw/ppc/spapr_rtas: Access MachineState via SpaprMachineState argument
+      hw/ppc/spapr_rtas: Remove local variable
+      target/arm/kvm: Use CPUState::kvm_state in kvm_arm_pmu_supported()
+      qom/object: Display more helpful message when a parent is missing
+      accel: Introduce the current_accel() wrapper
+      accel: Replace current_machine->accelerator by current_accel() wrappe=
 r
-build system as well.
+      accel/tcg: Sanitize include path
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .travis.yml                 |  2 +-
- Makefile                    |  4 +--
- configure                   | 61 +++++++++++++++++++++++------------------=
+Zhenwei Pi (2):
+      pvpanic: introduce crashloaded for pvpanic
+      pvpanic: implement crashloaded event handling
+
+ .travis.yml                         |   2 +-
+ Makefile                            |   4 +-
+ Makefile.objs                       |  31 ++--
+ accel/accel.c                       |   5 +
+ accel/kvm/kvm-all.c                 |   4 +-
+ accel/tcg/tcg-all.c                 |   8 +-
+ audio/audio.c                       |   1 +
+ configure                           |  63 ++++----
+ docs/specs/pvpanic.txt              |  18 ++-
+ hw/9pfs/virtio-9p-device.c          |   2 +-
+ hw/acpi/generic_event_device.c      |   2 +-
+ hw/acpi/piix4.c                     |   2 +-
+ hw/acpi/vmgenid.c                   |   2 +-
+ hw/arm/armsse.c                     |   2 +-
+ hw/arm/armv7m.c                     |   4 +-
+ hw/arm/aspeed_soc.c                 |   2 +-
+ hw/arm/bcm2836.c                    |   2 +-
+ hw/arm/integratorcp.c               |   2 +-
+ hw/arm/msf2-soc.c                   |   2 +-
+ hw/arm/musicpal.c                   |   2 +-
+ hw/arm/nrf51_soc.c                  |   2 +-
+ hw/arm/pxa2xx.c                     |   4 +-
+ hw/arm/pxa2xx_gpio.c                |   2 +-
+ hw/arm/smmu-common.c                |   2 +-
+ hw/arm/spitz.c                      |   2 +-
+ hw/arm/stm32f205_soc.c              |   2 +-
+ hw/arm/stm32f405_soc.c              |   2 +-
+ hw/arm/strongarm.c                  |   2 +-
+ hw/arm/xlnx-versal.c                |   2 +-
+ hw/arm/xlnx-zynqmp.c                |   2 +-
+ hw/audio/ac97.c                     |   2 +-
+ hw/audio/adlib.c                    |   2 +-
+ hw/audio/cs4231.c                   |   2 +-
+ hw/audio/cs4231a.c                  |   2 +-
+ hw/audio/es1370.c                   |   2 +-
+ hw/audio/gus.c                      |   2 +-
+ hw/audio/hda-codec.c                |   2 +-
+ hw/audio/intel-hda.c                |   4 +-
+ hw/audio/milkymist-ac97.c           |   2 +-
+ hw/audio/pcspk.c                    |   2 +-
+ hw/audio/pl041.c                    |   2 +-
+ hw/audio/sb16.c                     |   2 +-
+ hw/audio/wm8750.c                   |   2 +-
+ hw/block/fdc.c                      |   8 +-
+ hw/block/m25p80.c                   |   2 +-
+ hw/block/nand.c                     |   2 +-
+ hw/block/nvme.c                     |   2 +-
+ hw/block/onenand.c                  |   2 +-
+ hw/block/pflash_cfi01.c             |   2 +-
+ hw/block/pflash_cfi02.c             |   2 +-
+ hw/block/swim.c                     |   2 +-
+ hw/block/vhost-user-blk.c           |   2 +-
+ hw/block/virtio-blk.c               |   2 +-
+ hw/block/xen-block.c                |   2 +-
+ hw/char/bcm2835_aux.c               |   2 +-
+ hw/char/cadence_uart.c              |   2 +-
+ hw/char/cmsdk-apb-uart.c            |   2 +-
+ hw/char/debugcon.c                  |   2 +-
+ hw/char/digic-uart.c                |   2 +-
+ hw/char/escc.c                      |   2 +-
+ hw/char/etraxfs_ser.c               |   2 +-
+ hw/char/exynos4210_uart.c           |   2 +-
+ hw/char/grlib_apbuart.c             |   2 +-
+ hw/char/imx_serial.c                |   2 +-
+ hw/char/ipoctal232.c                |   2 +-
+ hw/char/lm32_juart.c                |   2 +-
+ hw/char/lm32_uart.c                 |   2 +-
+ hw/char/mcf_uart.c                  |   2 +-
+ hw/char/milkymist-uart.c            |   2 +-
+ hw/char/nrf51_uart.c                |   2 +-
+ hw/char/parallel.c                  |   2 +-
+ hw/char/pl011.c                     |   2 +-
+ hw/char/sclpconsole-lm.c            |   2 +-
+ hw/char/sclpconsole.c               |   2 +-
+ hw/char/serial-isa.c                |   2 +-
+ hw/char/serial-pci-multi.c          |   4 +-
+ hw/char/serial-pci.c                |   2 +-
+ hw/char/serial.c                    |   4 +-
+ hw/char/spapr_vty.c                 |   2 +-
+ hw/char/stm32f2xx_usart.c           |   2 +-
+ hw/char/terminal3270.c              |   2 +-
+ hw/char/virtio-console.c            |   2 +-
+ hw/char/virtio-serial-bus.c         |   4 +-
+ hw/char/xilinx_uartlite.c           |   2 +-
+ hw/core/Makefile.objs               |  31 ++--
+ hw/core/cpu.c                       |  10 +-
+ hw/core/generic-loader.c            |   2 +-
+ hw/core/or-irq.c                    |   2 +-
+ hw/core/platform-bus.c              |   2 +-
+ hw/core/qdev-properties.c           |  40 +++--
+ hw/core/qdev.c                      | 159 ++++++++-----------
+ hw/core/split-irq.c                 |   2 +-
+ hw/cpu/a15mpcore.c                  |   2 +-
+ hw/cpu/a9mpcore.c                   |   2 +-
+ hw/cpu/arm11mpcore.c                |   2 +-
+ hw/cpu/cluster.c                    |   2 +-
+ hw/cpu/realview_mpcore.c            |   2 +-
+ hw/display/ati.c                    |   2 +-
+ hw/display/bcm2835_fb.c             |   2 +-
+ hw/display/bochs-display.c          |   2 +-
+ hw/display/cg3.c                    |   2 +-
+ hw/display/cirrus_vga.c             |   2 +-
+ hw/display/cirrus_vga_isa.c         |   2 +-
+ hw/display/g364fb.c                 |   2 +-
+ hw/display/i2c-ddc.c                |   2 +-
+ hw/display/macfb.c                  |   4 +-
+ hw/display/milkymist-vgafb.c        |   2 +-
+ hw/display/qxl.c                    |   2 +-
+ hw/display/ramfb-standalone.c       |   2 +-
+ hw/display/sm501.c                  |   4 +-
+ hw/display/tcx.c                    |   4 +-
+ hw/display/vga-isa.c                |   2 +-
+ hw/display/vga-pci.c                |   4 +-
+ hw/display/vhost-user-gpu.c         |   2 +-
+ hw/display/virtio-gpu-pci.c         |   2 +-
+ hw/display/virtio-gpu.c             |   2 +-
+ hw/display/virtio-vga.c             |   2 +-
+ hw/display/vmware_vga.c             |   2 +-
+ hw/dma/i82374.c                     |   2 +-
+ hw/dma/i8257.c                      |   2 +-
+ hw/dma/pl080.c                      |   2 +-
+ hw/dma/pl330.c                      |   2 +-
+ hw/dma/pxa2xx_dma.c                 |   2 +-
+ hw/dma/xilinx_axidma.c              |   2 +-
+ hw/dma/xlnx-zdma.c                  |   2 +-
+ hw/gpio/imx_gpio.c                  |   2 +-
+ hw/gpio/omap_gpio.c                 |   4 +-
+ hw/i2c/aspeed_i2c.c                 |   2 +-
+ hw/i2c/core.c                       |   2 +-
+ hw/i2c/omap_i2c.c                   |   2 +-
+ hw/i386/intel_iommu.c               |   2 +-
+ hw/i386/kvm/clock.c                 |   2 +-
+ hw/i386/kvm/i8254.c                 |   2 +-
+ hw/i386/kvm/ioapic.c                |   2 +-
+ hw/i386/vmmouse.c                   |   2 +-
+ hw/i386/x86-iommu.c                 |   2 +-
+ hw/i386/xen/xen_pvdevice.c          |   2 +-
+ hw/ide/ahci.c                       |   2 +-
+ hw/ide/cmd646.c                     |   2 +-
+ hw/ide/isa.c                        |   2 +-
+ hw/ide/macio.c                      |   2 +-
+ hw/ide/mmio.c                       |   2 +-
+ hw/ide/qdev.c                       |   8 +-
+ hw/input/adb.c                      |   2 +-
+ hw/input/milkymist-softusb.c        |   2 +-
+ hw/input/virtio-input-hid.c         |   6 +-
+ hw/input/virtio-input-host.c        |   2 +-
+ hw/input/virtio-input.c             |   2 +-
+ hw/intc/apic_common.c               |   2 +-
+ hw/intc/arm_gic_common.c            |   2 +-
+ hw/intc/arm_gicv2m.c                |   2 +-
+ hw/intc/arm_gicv3_common.c          |   2 +-
+ hw/intc/arm_gicv3_its_kvm.c         |   2 +-
+ hw/intc/armv7m_nvic.c               |   2 +-
+ hw/intc/exynos4210_combiner.c       |   2 +-
+ hw/intc/exynos4210_gic.c            |   4 +-
+ hw/intc/i8259_common.c              |   2 +-
+ hw/intc/ioapic.c                    |   2 +-
+ hw/intc/mips_gic.c                  |   2 +-
+ hw/intc/omap_intc.c                 |   4 +-
+ hw/intc/ompic.c                     |   2 +-
+ hw/intc/openpic.c                   |   2 +-
+ hw/intc/openpic_kvm.c               |   2 +-
+ hw/intc/pnv_xive.c                  |   2 +-
+ hw/intc/s390_flic.c                 |   2 +-
+ hw/intc/spapr_xive.c                |   2 +-
+ hw/intc/xics.c                      |   4 +-
+ hw/intc/xilinx_intc.c               |   2 +-
+ hw/intc/xive.c                      |   8 +-
+ hw/intc/xlnx-pmu-iomod-intc.c       |   2 +-
+ hw/ipack/ipack.c                    |   2 +-
+ hw/ipmi/ipmi.c                      |   2 +-
+ hw/ipmi/ipmi_bmc_extern.c           |   2 +-
+ hw/ipmi/ipmi_bmc_sim.c              |   2 +-
+ hw/ipmi/isa_ipmi_bt.c               |   2 +-
+ hw/ipmi/isa_ipmi_kcs.c              |   2 +-
+ hw/isa/lpc_ich9.c                   |   2 +-
+ hw/isa/pc87312.c                    |   2 +-
+ hw/isa/vt82c686.c                   |   2 +-
+ hw/mem/nvdimm.c                     |   2 +-
+ hw/mem/pc-dimm.c                    |   2 +-
+ hw/mips/cps.c                       |   2 +-
+ hw/misc/a9scu.c                     |   2 +-
+ hw/misc/applesmc.c                  |   2 +-
+ hw/misc/arm11scu.c                  |   2 +-
+ hw/misc/arm_l2x0.c                  |   2 +-
+ hw/misc/arm_sysctl.c                |   2 +-
+ hw/misc/armsse-cpuid.c              |   2 +-
+ hw/misc/aspeed_scu.c                |   2 +-
+ hw/misc/aspeed_sdmc.c               |   2 +-
+ hw/misc/bcm2835_property.c          |   2 +-
+ hw/misc/debugexit.c                 |   2 +-
+ hw/misc/eccmemctl.c                 |   2 +-
+ hw/misc/iotkit-sysctl.c             |   2 +-
+ hw/misc/iotkit-sysinfo.c            |   2 +-
+ hw/misc/ivshmem.c                   |   4 +-
+ hw/misc/mac_via.c                   |   2 +-
+ hw/misc/macio/cuda.c                |   2 +-
+ hw/misc/macio/macio.c               |   4 +-
+ hw/misc/macio/pmu.c                 |   2 +-
+ hw/misc/mips_cmgcr.c                |   2 +-
+ hw/misc/mips_cpc.c                  |   2 +-
+ hw/misc/mips_itu.c                  |   2 +-
+ hw/misc/mos6522.c                   |   2 +-
+ hw/misc/mps2-fpgaio.c               |   2 +-
+ hw/misc/mps2-scc.c                  |   2 +-
+ hw/misc/msf2-sysreg.c               |   2 +-
+ hw/misc/nrf51_rng.c                 |   2 +-
+ hw/misc/pci-testdev.c               |   2 +-
+ hw/misc/pvpanic.c                   |  13 +-
+ hw/misc/tz-mpc.c                    |   2 +-
+ hw/misc/tz-msc.c                    |   2 +-
+ hw/misc/tz-ppc.c                    |   2 +-
+ hw/misc/unimp.c                     |   2 +-
+ hw/net/allwinner_emac.c             |   2 +-
+ hw/net/cadence_gem.c                |   2 +-
+ hw/net/dp8393x.c                    |   2 +-
+ hw/net/e1000.c                      |   2 +-
+ hw/net/e1000e.c                     |   2 +-
+ hw/net/eepro100.c                   |   2 +-
+ hw/net/etraxfs_eth.c                |   2 +-
+ hw/net/fsl_etsec/etsec.c            |   2 +-
+ hw/net/ftgmac100.c                  |   4 +-
+ hw/net/imx_fec.c                    |   9 +-
+ hw/net/lan9118.c                    |   2 +-
+ hw/net/lance.c                      |   2 +-
+ hw/net/mcf_fec.c                    |   2 +-
+ hw/net/milkymist-minimac2.c         |   2 +-
+ hw/net/mipsnet.c                    |   2 +-
+ hw/net/ne2000-isa.c                 |   2 +-
+ hw/net/ne2000-pci.c                 |   2 +-
+ hw/net/opencores_eth.c              |   2 +-
+ hw/net/pcnet-pci.c                  |   2 +-
+ hw/net/rocker/rocker.c              |   2 +-
+ hw/net/rtl8139.c                    |   2 +-
+ hw/net/smc91c111.c                  |   2 +-
+ hw/net/spapr_llan.c                 |   2 +-
+ hw/net/stellaris_enet.c             |   2 +-
+ hw/net/sungem.c                     |   2 +-
+ hw/net/sunhme.c                     |   2 +-
+ hw/net/tulip.c                      |   2 +-
+ hw/net/virtio-net.c                 |   2 +-
+ hw/net/vmxnet3.c                    |   2 +-
+ hw/net/xgmac.c                      |   2 +-
+ hw/net/xilinx_axienet.c             |   2 +-
+ hw/net/xilinx_ethlite.c             |   2 +-
+ hw/nvram/ds1225y.c                  |   2 +-
+ hw/nvram/eeprom_at24c.c             |   2 +-
+ hw/nvram/fw_cfg.c                   |   4 +-
+ hw/nvram/mac_nvram.c                |   2 +-
+ hw/nvram/nrf51_nvm.c                |   2 +-
+ hw/nvram/spapr_nvram.c              |   2 +-
+ hw/pci-bridge/gen_pcie_root_port.c  |   2 +-
+ hw/pci-bridge/pci_bridge_dev.c      |   2 +-
+ hw/pci-bridge/pci_expander_bridge.c |   4 +-
+ hw/pci-bridge/pcie_pci_bridge.c     |   2 +-
+ hw/pci-bridge/pcie_root_port.c      |   2 +-
+ hw/pci-bridge/xio3130_downstream.c  |   2 +-
+ hw/pci-host/designware.c            |   2 +-
+ hw/pci-host/grackle.c               |   2 +-
+ hw/pci-host/i440fx.c                |   2 +-
+ hw/pci-host/ppce500.c               |   2 +-
+ hw/pci-host/prep.c                  |   2 +-
+ hw/pci-host/q35.c                   |   4 +-
+ hw/pci-host/sabre.c                 |   2 +-
+ hw/pci-host/uninorth.c              |   2 +-
+ hw/pci-host/versatile.c             |   2 +-
+ hw/pci-host/xilinx-pcie.c           |   2 +-
+ hw/pci/pci.c                        |   2 +-
+ hw/pci/pcie_port.c                  |   4 +-
+ hw/ppc/pnv.c                        |   2 +-
+ hw/ppc/pnv_core.c                   |   4 +-
+ hw/ppc/pnv_homer.c                  |   2 +-
+ hw/ppc/pnv_lpc.c                    |   2 +-
+ hw/ppc/pnv_occ.c                    |   2 +-
+ hw/ppc/pnv_pnor.c                   |   2 +-
+ hw/ppc/pnv_psi.c                    |   2 +-
+ hw/ppc/ppc440_uc.c                  |   2 +-
+ hw/ppc/prep_systemio.c              |   2 +-
+ hw/ppc/rs6000_mc.c                  |   2 +-
+ hw/ppc/spapr_cpu_core.c             |   2 +-
+ hw/ppc/spapr_pci.c                  |   2 +-
+ hw/ppc/spapr_rng.c                  |   2 +-
+ hw/ppc/spapr_rtas.c                 |   9 +-
+ hw/ppc/spapr_tpm_proxy.c            |   2 +-
+ hw/rdma/vmw/pvrdma_main.c           |   2 +-
+ hw/riscv/riscv_hart.c               |   2 +-
+ hw/riscv/sifive_clint.c             |   2 +-
+ hw/riscv/sifive_plic.c              |   2 +-
+ hw/riscv/sifive_u_otp.c             |   2 +-
+ hw/rtc/m48t59-isa.c                 |   2 +-
+ hw/rtc/m48t59.c                     |   2 +-
+ hw/rtc/mc146818rtc.c                |   2 +-
+ hw/rtc/pl031.c                      |   2 +-
+ hw/s390x/3270-ccw.c                 |   2 +-
+ hw/s390x/ccw-device.c               |   2 +-
+ hw/s390x/css-bridge.c               |   2 +-
+ hw/s390x/ipl.c                      |   2 +-
+ hw/s390x/s390-pci-bus.c             |   2 +-
+ hw/s390x/vhost-vsock-ccw.c          |   2 +-
+ hw/s390x/virtio-ccw-9p.c            |   2 +-
+ hw/s390x/virtio-ccw-balloon.c       |   2 +-
+ hw/s390x/virtio-ccw-blk.c           |   2 +-
+ hw/s390x/virtio-ccw-crypto.c        |   2 +-
+ hw/s390x/virtio-ccw-gpu.c           |   2 +-
+ hw/s390x/virtio-ccw-input.c         |   2 +-
+ hw/s390x/virtio-ccw-net.c           |   2 +-
+ hw/s390x/virtio-ccw-rng.c           |   2 +-
+ hw/s390x/virtio-ccw-scsi.c          |   4 +-
+ hw/s390x/virtio-ccw-serial.c        |   2 +-
+ hw/scsi/megasas.c                   |   2 +-
+ hw/scsi/mptsas.c                    |   2 +-
+ hw/scsi/scsi-bus.c                  |   2 +-
+ hw/scsi/scsi-disk.c                 |   8 +-
+ hw/scsi/scsi-generic.c              |   2 +-
+ hw/scsi/spapr_vscsi.c               |   2 +-
+ hw/scsi/vhost-scsi.c                |   2 +-
+ hw/scsi/vhost-user-scsi.c           |   2 +-
+ hw/scsi/virtio-scsi.c               |   8 +-
+ hw/scsi/vmw_pvscsi.c                |   2 +-
+ hw/sd/sd.c                          |   2 +-
+ hw/sd/sdhci-pci.c                   |   2 +-
+ hw/sd/sdhci.c                       |   2 +-
+ hw/sparc/sun4m.c                    |   4 +-
+ hw/sparc/sun4m_iommu.c              |   2 +-
+ hw/sparc64/sun4u.c                  |   6 +-
+ hw/ssi/aspeed_smc.c                 |   2 +-
+ hw/ssi/xilinx_spi.c                 |   2 +-
+ hw/ssi/xilinx_spips.c               |   4 +-
+ hw/timer/a9gtimer.c                 |   2 +-
+ hw/timer/allwinner-a10-pit.c        |   2 +-
+ hw/timer/altera_timer.c             |   2 +-
+ hw/timer/arm_mptimer.c              |   2 +-
+ hw/timer/arm_timer.c                |   2 +-
+ hw/timer/aspeed_timer.c             |   4 +-
+ hw/timer/cmsdk-apb-dualtimer.c      |   2 +-
+ hw/timer/cmsdk-apb-timer.c          |   2 +-
+ hw/timer/grlib_gptimer.c            |   2 +-
+ hw/timer/hpet.c                     |   2 +-
+ hw/timer/i8254.c                    |   2 +-
+ hw/timer/lm32_timer.c               |   2 +-
+ hw/timer/milkymist-sysctl.c         |   2 +-
+ hw/timer/mss-timer.c                |   2 +-
+ hw/timer/pxa2xx_timer.c             |   4 +-
+ hw/timer/slavio_timer.c             |   2 +-
+ hw/timer/stm32f2xx_timer.c          |   2 +-
+ hw/timer/xilinx_timer.c             |   2 +-
+ hw/tpm/tpm_crb.c                    |   2 +-
+ hw/tpm/tpm_tis.c                    |   2 +-
+ hw/usb/bus.c                        |   2 +-
+ hw/usb/ccid-card-emulated.c         |   2 +-
+ hw/usb/ccid-card-passthru.c         |   2 +-
+ hw/usb/dev-audio.c                  |   2 +-
+ hw/usb/dev-hid.c                    |   6 +-
+ hw/usb/dev-hub.c                    |   2 +-
+ hw/usb/dev-mtp.c                    |   2 +-
+ hw/usb/dev-network.c                |   2 +-
+ hw/usb/dev-serial.c                 |   4 +-
+ hw/usb/dev-smartcard-reader.c       |   4 +-
+ hw/usb/dev-storage.c                |   2 +-
+ hw/usb/dev-uas.c                    |   2 +-
+ hw/usb/hcd-ehci-pci.c               |   2 +-
+ hw/usb/hcd-ehci-sysbus.c            |   2 +-
+ hw/usb/hcd-ohci-pci.c               |   2 +-
+ hw/usb/hcd-ohci.c                   |   2 +-
+ hw/usb/hcd-uhci.c                   |   4 +-
+ hw/usb/hcd-xhci-nec.c               |   2 +-
+ hw/usb/hcd-xhci.c                   |   2 +-
+ hw/usb/host-libusb.c                |   2 +-
+ hw/usb/redirect.c                   |   2 +-
+ hw/vfio/ap.c                        |   2 +-
+ hw/vfio/ccw.c                       |   2 +-
+ hw/vfio/pci.c                       |   4 +-
+ hw/vfio/platform.c                  |   2 +-
+ hw/virtio/vhost-scsi-pci.c          |   2 +-
+ hw/virtio/vhost-user-blk-pci.c      |   2 +-
+ hw/virtio/vhost-user-fs-pci.c       |   2 +-
+ hw/virtio/vhost-user-fs.c           |   2 +-
+ hw/virtio/vhost-user-scsi-pci.c     |   2 +-
+ hw/virtio/vhost-vsock-pci.c         |   2 +-
+ hw/virtio/vhost-vsock.c             |   2 +-
+ hw/virtio/virtio-9p-pci.c           |   2 +-
+ hw/virtio/virtio-balloon-pci.c      |   2 +-
+ hw/virtio/virtio-balloon.c          |   2 +-
+ hw/virtio/virtio-blk-pci.c          |   2 +-
+ hw/virtio/virtio-crypto-pci.c       |   2 +-
+ hw/virtio/virtio-crypto.c           |   2 +-
+ hw/virtio/virtio-input-pci.c        |   2 +-
+ hw/virtio/virtio-mmio.c             |   2 +-
+ hw/virtio/virtio-net-pci.c          |   2 +-
+ hw/virtio/virtio-pci.c              |   4 +-
+ hw/virtio/virtio-pmem.c             |   2 +-
+ hw/virtio/virtio-rng.c              |   2 +-
+ hw/virtio/virtio-scsi-pci.c         |   2 +-
+ hw/virtio/virtio-serial-pci.c       |   2 +-
+ hw/virtio/virtio.c                  |   2 +-
+ hw/watchdog/cmsdk-apb-watchdog.c    |   2 +-
+ hw/watchdog/wdt_aspeed.c            |   2 +-
+ hw/xen/xen-bus.c                    |   2 +-
+ hw/xen/xen-legacy-backend.c         |   4 +-
+ hw/xen/xen_pt.c                     |   2 +-
+ include/hw/core/cpu.h               |   4 +
+ include/hw/qdev-core.h              |  15 +-
+ include/hw/qdev-properties.h        |   3 +-
+ include/qapi/qmp/qstring.h          |   1 +
+ include/qom/object.h                | 109 +++++++++++--
+ include/sysemu/accel.h              |   2 +
+ include/sysemu/runstate.h           |   1 +
+ memory.c                            |   2 +-
+ migration/migration.c               |   2 +-
+ monitor/misc.c                      |  26 ++++
+ qapi/qom.json                       |   7 +-
+ qapi/run-state.json                 |  24 ++-
+ qdev-monitor.c                      |  30 ++--
+ qga/vss-win32/Makefile.objs         |   4 +-
+ qobject/qstring.c                   |  27 +++-
+ qom/object.c                        | 299 +++++++++++++++++++++++++++-----=
 ----
- qga/vss-win32/Makefile.objs |  4 +--
- rules.mak                   |  4 +--
- 5 files changed, 38 insertions(+), 37 deletions(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index 6c1038a..1ae645e 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -327,7 +327,7 @@ matrix:
-         - TEST_CMD=3D""
-       before_script:
-         - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
--        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags=3D"-g3 -O0 -Wno-er=
-ror=3Dstringop-truncation -fsanitize=3Dthread -fuse-ld=3Dgold" || { cat con=
-fig.log && exit 1; }
-+        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags=3D"-g3 -O0 -Wno-er=
-ror=3Dstringop-truncation -fsanitize=3Dthread" --extra-ldflags=3D"-fuse-ld=
-=3Dgold" || { cat config.log && exit 1; }
-=20
-=20
-     # Run check-tcg against linux-user
-diff --git a/Makefile b/Makefile
-index 6562b0d..c20c6fe 100644
---- a/Makefile
-+++ b/Makefile
-@@ -490,7 +490,7 @@ DTC_CPPFLAGS=3D-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$=
-(SRC_PATH)/dtc/libfdt
-=20
- .PHONY: dtc/all
- dtc/all: .git-submodule-status dtc/libfdt dtc/tests
--=09$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS=3D"$(DTC_CPPFLAG=
-S)" CFLAGS=3D"$(DTC_CFLAGS)" LDFLAGS=3D"$(LDFLAGS)" ARFLAGS=3D"$(ARFLAGS)" =
-CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a,=
-)
-+=09$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS=3D"$(DTC_CPPFLAG=
-S)" CFLAGS=3D"$(DTC_CFLAGS)" LDFLAGS=3D"$(QEMU_LDFLAGS)" ARFLAGS=3D"$(ARFLA=
-GS)" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libf=
-dt.a,)
-=20
- dtc/%: .git-submodule-status
- =09@mkdir -p $@
-@@ -517,7 +517,7 @@ slirp/all: .git-submodule-status
- =09=09BUILD_DIR=3D"$(BUILD_DIR)/slirp" =09=09=09\
- =09=09PKG_CONFIG=3D"$(PKG_CONFIG)" =09=09=09=09\
- =09=09CC=3D"$(CC)" AR=3D"$(AR)" =09LD=3D"$(LD)" RANLIB=3D"$(RANLIB)"=09\
--=09=09CFLAGS=3D"$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS=3D"$(LDFLAGS)")
-+=09=09CFLAGS=3D"$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS=3D"$(QEMU_LDFLAGS)")
-=20
- # Compatibility gunk to keep make working across the rename of targets
- # for recursion, to be removed some time after 4.1.
-diff --git a/configure b/configure
-index c67a7e7..f7c4d07 100755
---- a/configure
-+++ b/configure
-@@ -126,7 +126,7 @@ compile_object() {
- compile_prog() {
-   local_cflags=3D"$1"
-   local_ldflags=3D"$2"
--  do_cc $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $local_ldflags
-+  do_cc $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $QEMU_LDFLAGS $local_ldf=
-lags
- }
-=20
- # symbolically link $1 to $2.  Portable version of "ln -sf".
-@@ -523,10 +523,11 @@ for opt do
-   --cpu=3D*) cpu=3D"$optarg"
-   ;;
-   --extra-cflags=3D*) QEMU_CFLAGS=3D"$QEMU_CFLAGS $optarg"
-+                    QEMU_LDFLAGS=3D"$QEMU_LDFLAGS $optarg"
-   ;;
-   --extra-cxxflags=3D*) QEMU_CXXFLAGS=3D"$QEMU_CXXFLAGS $optarg"
-   ;;
--  --extra-ldflags=3D*) LDFLAGS=3D"$LDFLAGS $optarg"
-+  --extra-ldflags=3D*) QEMU_LDFLAGS=3D"$QEMU_LDFLAGS $optarg"
-                      EXTRA_LDFLAGS=3D"$optarg"
-   ;;
-   --enable-debug-info) debug_info=3D"yes"
-@@ -599,7 +600,6 @@ QEMU_INCLUDES=3D"-iquote . -iquote \$(SRC_PATH) -iquote=
- \$(SRC_PATH)/accel/tcg -iq
- QEMU_INCLUDES=3D"$QEMU_INCLUDES -iquote \$(SRC_PATH)/disas/libvixl"
- if test "$debug_info" =3D "yes"; then
-     CFLAGS=3D"-g $CFLAGS"
--    LDFLAGS=3D"-g $LDFLAGS"
- fi
-=20
- # running configure in the source tree?
-@@ -845,12 +845,12 @@ Darwin)
-   LDFLAGS_SHARED=3D"-bundle -undefined dynamic_lookup"
-   if [ "$cpu" =3D "x86_64" ] ; then
-     QEMU_CFLAGS=3D"-arch x86_64 $QEMU_CFLAGS"
--    LDFLAGS=3D"-arch x86_64 $LDFLAGS"
-+    QEMU_LDFLAGS=3D"-arch x86_64 $QEMU_LDFLAGS"
-   fi
-   cocoa=3D"yes"
-   audio_drv_list=3D"coreaudio try-sdl"
-   audio_possible_drivers=3D"coreaudio sdl"
--  LDFLAGS=3D"-framework CoreFoundation -framework IOKit $LDFLAGS"
-+  QEMU_LDFLAGS=3D"-framework CoreFoundation -framework IOKit $QEMU_LDFLAGS=
-"
-   libs_softmmu=3D"-F/System/Library/Frameworks -framework Cocoa -framework=
- IOKit $libs_softmmu"
-   # Disable attempts to use ObjectiveC features in os/object.h since they
-   # won't work when we're compiling with gcc as a C compiler.
-@@ -1025,7 +1025,7 @@ for opt do
-   ;;
-   --static)
-     static=3D"yes"
--    LDFLAGS=3D"-static $LDFLAGS"
-+    QEMU_LDFLAGS=3D"-static $QEMU_LDFLAGS"
-     QEMU_PKG_CONFIG_FLAGS=3D"--static $QEMU_PKG_CONFIG_FLAGS"
-   ;;
-   --mandir=3D*) mandir=3D"$optarg"
-@@ -1551,42 +1551,42 @@ done
- case "$cpu" in
-     ppc)
-            CPU_CFLAGS=3D"-m32"
--           LDFLAGS=3D"-m32 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m32 $QEMU_LDFLAGS"
-            ;;
-     ppc64)
-            CPU_CFLAGS=3D"-m64"
--           LDFLAGS=3D"-m64 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m64 $QEMU_LDFLAGS"
-            ;;
-     sparc)
-            CPU_CFLAGS=3D"-m32 -mv8plus -mcpu=3Dultrasparc"
--           LDFLAGS=3D"-m32 -mv8plus $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m32 -mv8plus $QEMU_LDFLAGS"
-            ;;
-     sparc64)
-            CPU_CFLAGS=3D"-m64 -mcpu=3Dultrasparc"
--           LDFLAGS=3D"-m64 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m64 $QEMU_LDFLAGS"
-            ;;
-     s390)
-            CPU_CFLAGS=3D"-m31"
--           LDFLAGS=3D"-m31 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m31 $QEMU_LDFLAGS"
-            ;;
-     s390x)
-            CPU_CFLAGS=3D"-m64"
--           LDFLAGS=3D"-m64 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m64 $QEMU_LDFLAGS"
-            ;;
-     i386)
-            CPU_CFLAGS=3D"-m32"
--           LDFLAGS=3D"-m32 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m32 $QEMU_LDFLAGS"
-            ;;
-     x86_64)
-            # ??? Only extremely old AMD cpus do not have cmpxchg16b.
-            # If we truly care, we should simply detect this case at
-            # runtime and generate the fallback to serial emulation.
-            CPU_CFLAGS=3D"-m64 -mcx16"
--           LDFLAGS=3D"-m64 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-m64 $QEMU_LDFLAGS"
-            ;;
-     x32)
-            CPU_CFLAGS=3D"-mx32"
--           LDFLAGS=3D"-mx32 $LDFLAGS"
-+           QEMU_LDFLAGS=3D"-mx32 $QEMU_LDFLAGS"
-            ;;
-     # No special flags required for other host CPUs
- esac
-@@ -1967,6 +1967,7 @@ EOF
-     if do_cc $QEMU_CFLAGS -Werror $flag -c -o $TMPO $TMPC &&
-        compile_prog "-Werror $flag" ""; then
-       QEMU_CFLAGS=3D"$QEMU_CFLAGS $flag"
-+      QEMU_LDFLAGS=3D"$QEMU_LDFLAGS $flag"
-       sp_on=3D1
-       break
-     fi
-@@ -2051,10 +2052,10 @@ EOF
-=20
-   if compile_prog "-fPIE -DPIE" "-pie"; then
-     QEMU_CFLAGS=3D"-fPIE -DPIE $QEMU_CFLAGS"
--    LDFLAGS=3D"-pie $LDFLAGS"
-+    QEMU_LDFLAGS=3D"-pie $QEMU_LDFLAGS"
-     pie=3D"yes"
-     if compile_prog "" "-Wl,-z,relro -Wl,-z,now" ; then
--      LDFLAGS=3D"-Wl,-z,relro -Wl,-z,now $LDFLAGS"
-+      QEMU_LDFLAGS=3D"-Wl,-z,relro -Wl,-z,now $QEMU_LDFLAGS"
-     fi
-   else
-     if test "$pie" =3D "yes"; then
-@@ -5837,7 +5838,7 @@ EOF
-     hvf=3D'no'
-   else
-     hvf=3D'yes'
--    LDFLAGS=3D"-framework Hypervisor $LDFLAGS"
-+    QEMU_LDFLAGS=3D"-framework Hypervisor $QEMU_LDFLAGS"
-   fi
- fi
-=20
-@@ -6071,8 +6072,8 @@ esac
- write_c_skeleton
-=20
- if test "$gcov" =3D "yes" ; then
--  CFLAGS=3D"-fprofile-arcs -ftest-coverage -g $CFLAGS"
--  LDFLAGS=3D"-fprofile-arcs -ftest-coverage $LDFLAGS"
-+  QEMU_CFLAGS=3D"-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
-+  QEMU_LDFLAGS=3D"-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
- elif test "$fortify_source" =3D "yes" ; then
-   CFLAGS=3D"-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 $CFLAGS"
- elif test "$debug" =3D "no"; then
-@@ -6080,7 +6081,8 @@ elif test "$debug" =3D "no"; then
- fi
-=20
- if test "$have_asan" =3D "yes"; then
--  CFLAGS=3D"-fsanitize=3Daddress $CFLAGS"
-+  QEMU_CFLAGS=3D"-fsanitize=3Daddress $QEMU_CFLAGS"
-+  QEMU_LDFLAGS=3D"-fsanitize=3Daddress $QEMU_LDFLAGS"
-   if test "$have_asan_iface_h" =3D "no" ; then
-       echo "ASAN build enabled, but ASAN header missing." \
-            "Without code annotation, the report may be inferior."
-@@ -6090,7 +6092,8 @@ if test "$have_asan" =3D "yes"; then
-   fi
- fi
- if test "$have_ubsan" =3D "yes"; then
--  CFLAGS=3D"-fsanitize=3Dundefined $CFLAGS"
-+  QEMU_CFLAGS=3D"-fsanitize=3Dundefined $QEMU_CFLAGS"
-+  QEMU_LDFLAGS=3D"-fsanitize=3Dundefined $QEMU_LDFLAGS"
- fi
-=20
- ##########################################
-@@ -6125,7 +6128,7 @@ fi
-=20
- if test "$solaris" =3D "no" ; then
-     if $ld --version 2>/dev/null | grep "GNU ld" >/dev/null 2>/dev/null ; =
-then
--        LDFLAGS=3D"-Wl,--warn-common $LDFLAGS"
-+        QEMU_LDFLAGS=3D"-Wl,--warn-common $QEMU_LDFLAGS"
-     fi
- fi
-=20
-@@ -6140,7 +6143,7 @@ fi
- if test "$mingw32" =3D "yes" ; then
-     for flag in --dynamicbase --no-seh --nxcompat; do
-         if ld_has $flag ; then
--            LDFLAGS=3D"-Wl,$flag $LDFLAGS"
-+            QEMU_LDFLAGS=3D"-Wl,$flag $QEMU_LDFLAGS"
-         fi
-     done
- fi
-@@ -6375,7 +6378,7 @@ EOF
-=20
-     update_cxxflags
-=20
--    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $LDFLAGS; then
-+    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
-         # C++ compiler $cxx works ok with C compiler $cc
-         :
-     else
-@@ -6427,7 +6430,6 @@ echo "Objective-C compiler $objcc"
- echo "ARFLAGS           $ARFLAGS"
- echo "CFLAGS            $CFLAGS"
- echo "QEMU_CFLAGS       $QEMU_CFLAGS"
--echo "LDFLAGS           $LDFLAGS"
- echo "QEMU_LDFLAGS      $QEMU_LDFLAGS"
- echo "make              $make"
- echo "install           $install"
-@@ -7479,9 +7481,8 @@ if test "$sparse" =3D "yes" ; then
-   echo "HOST_CC      :=3D REAL_CC=3D\"\$(HOST_CC)\" cgcc"  >> $config_host=
-_mak
-   echo "QEMU_CFLAGS  +=3D -Wbitwise -Wno-transparent-union -Wno-old-initia=
-lizer -Wno-non-pointer-null" >> $config_host_mak
- fi
--echo "LDFLAGS=3D$LDFLAGS" >> $config_host_mak
--echo "LDFLAGS_NOPIE=3D$LDFLAGS_NOPIE" >> $config_host_mak
- echo "QEMU_LDFLAGS=3D$QEMU_LDFLAGS" >> $config_host_mak
-+echo "LDFLAGS_NOPIE=3D$LDFLAGS_NOPIE" >> $config_host_mak
- echo "LD_REL_FLAGS=3D$LD_REL_FLAGS" >> $config_host_mak
- echo "LD_I386_EMULATION=3D$ld_i386_emulation" >> $config_host_mak
- echo "LIBS+=3D$LIBS" >> $config_host_mak
-@@ -7807,7 +7808,7 @@ if test "$target_bsd_user" =3D "yes" ; then
- fi
-=20
-=20
--# generate QEMU_CFLAGS/LDFLAGS for targets
-+# generate QEMU_CFLAGS/QEMU_LDFLAGS for targets
-=20
- cflags=3D""
- ldflags=3D""
-@@ -7928,7 +7929,7 @@ if test "$TARGET_ARCH" =3D "s390x" && test "$target_s=
-oftmmu" =3D "yes" && \
-     fi
- fi
-=20
--echo "LDFLAGS+=3D$ldflags" >> $config_target_mak
-+echo "QEMU_LDFLAGS+=3D$ldflags" >> $config_target_mak
- echo "QEMU_CFLAGS+=3D$cflags" >> $config_target_mak
-=20
- done # for target in $targets
-diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
-index fd3ba18..c82676a 100644
---- a/qga/vss-win32/Makefile.objs
-+++ b/qga/vss-win32/Makefile.objs
-@@ -5,9 +5,9 @@ qga-vss-dll-obj-y +=3D requester.o provider.o install.o
- obj-qga-vss-dll-obj-y =3D $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
- $(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS :=3D $(filter-out -fstack-protecto=
-r-all -fstack-protector-strong, $(QEMU_CXXFLAGS)) -Wno-unknown-pragmas -Wno=
--delete-non-virtual-dtor
-=20
--$(obj)/qga-vss.dll: LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enable-s=
-tdcall-fixup -lglib-2.0 -lole32 -loleaut32 -lshlwapi -luuid -lintl -lws2_32=
- -static
-+QGA_VSS_LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enable-stdcall-fixup=
- -lglib-2.0 -lole32 -loleaut32 -lshlwapi -luuid -lintl -lws2_32 -static
- $(obj)/qga-vss.dll: $(obj-qga-vss-dll-obj-y) $(SRC_PATH)/$(obj)/qga-vss.de=
-f
--=09$(call quiet-command,$(CXX) -o $@ $(qga-vss-dll-obj-y) $(SRC_PATH)/qga/=
-vss-win32/qga-vss.def $(CXXFLAGS) $(LDFLAGS),"LINK","$(TARGET_DIR)$@")
-+=09$(call quiet-command,$(CXX) -o $@ $(qga-vss-dll-obj-y) $(SRC_PATH)/qga/=
-vss-win32/qga-vss.def $(CXXFLAGS) $(QGA_VSS_LDFLAGS),"LINK","$(TARGET_DIR)$=
-@")
-=20
-=20
- # rules to build qga-provider.tlb
-diff --git a/rules.mak b/rules.mak
-index 967295d..c855887 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -76,7 +76,7 @@ expand-objs =3D $(strip $(sort $(filter %.o,$1)) \
- # must link with the C++ compiler, not the plain C compiler.
- LINKPROG =3D $(or $(CXX),$(CC))
-=20
--LINK =3D $(call quiet-command, $(LINKPROG) $(QEMU_LDFLAGS) $(QEMU_CFLAGS) =
-$(CFLAGS) $(LDFLAGS) -o $@ \
-+LINK =3D $(call quiet-command, $(LINKPROG) $(CFLAGS) $(QEMU_LDFLAGS) -o $@=
- \
-        $(call process-archive-undefs, $1) \
-        $(version-obj-y) $(call extract-libs,$1) $(LIBS),"LINK","$(TARGET_D=
-IR)$@")
-=20
-@@ -105,7 +105,7 @@ LINK =3D $(call quiet-command, $(LINKPROG) $(QEMU_LDFLA=
-GS) $(QEMU_CFLAGS) $(CFLAGS
-=20
- DSO_OBJ_CFLAGS :=3D -fPIC -DBUILD_DSO
- module-common.o: CFLAGS +=3D $(DSO_OBJ_CFLAGS)
--%$(DSOSUF): LDFLAGS +=3D $(LDFLAGS_SHARED)
-+%$(DSOSUF): QEMU_LDFLAGS +=3D $(LDFLAGS_SHARED)
- %$(DSOSUF): %.mo
- =09$(call LINK,$^)
- =09@# Copy to build root so modules can be loaded when program started wit=
-hout install
+ qom/object_interfaces.c             |  39 +++--
+ qom/qom-qmp-cmds.c                  |  54 +------
+ rules.mak                           |   4 +-
+ target/arm/cpu.c                    |  41 ++---
+ target/arm/kvm.c                    |   4 +-
+ target/arm/kvm64.c                  |   5 +-
+ target/cris/cpu.c                   |   3 +-
+ target/i386/cpu.c                   |  25 ++-
+ target/i386/cpu.h                   |   3 +
+ target/i386/hvf/x86_emu.c           |   4 +-
+ target/i386/kvm.c                   |  88 +++++++----
+ target/i386/kvm_i386.h              |   1 +
+ target/i386/misc_helper.c           |   4 +
+ target/lm32/cpu.c                   |   3 +-
+ target/m68k/cpu.c                   |   3 +-
+ target/microblaze/cpu.c             |   5 +-
+ target/mips/cpu.c                   |   3 +-
+ target/moxie/cpu.c                  |   3 +-
+ target/nios2/cpu.c                  |   5 +-
+ target/openrisc/cpu.c               |   3 +-
+ target/ppc/kvm.c                    |   4 +-
+ target/ppc/translate_init.inc.c     |  13 +-
+ target/riscv/cpu.c                  |   5 +-
+ target/s390x/cpu.c                  |   5 +-
+ target/sh4/cpu.c                    |   3 +-
+ target/sparc/cpu.c                  |   5 +-
+ target/tilegx/cpu.c                 |   3 +-
+ target/tricore/cpu.c                |   3 +-
+ target/xtensa/cpu.c                 |   3 +-
+ tests/Makefile.include              |   2 +-
+ tests/test-qdev-global-props.c      |   2 +-
+ tests/test-qga.c                    |  25 ++-
+ vl.c                                |  14 +-
+ 450 files changed, 1280 insertions(+), 948 deletions(-)
 --=20
 1.8.3.1
 
