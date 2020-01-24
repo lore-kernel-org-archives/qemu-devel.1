@@ -2,99 +2,99 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D634EC35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12873C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:38:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6EF12070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D08AD2070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mTA5uwvc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6EF12070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXn8kvKP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D08AD2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuwKr-000428-R8
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:37:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46985)
+	id 1iuwLv-0005UB-V3
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:38:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david.edmondson@oracle.com>) id 1iuwJv-0003A5-Uf
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:36:13 -0500
+ (envelope-from <philmd@redhat.com>) id 1iuwLM-0004xW-43
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:37:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david.edmondson@oracle.com>) id 1iuwJu-00064G-Im
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:36:11 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:48166)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david.edmondson@oracle.com>)
- id 1iuwJr-0005tS-6w; Fri, 24 Jan 2020 05:36:07 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OANFkR051386;
- Fri, 24 Jan 2020 10:36:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2019-08-05;
- bh=5GljaixeKsOYoXfgulGKQys/W9vJqv766ycj8860+Jw=;
- b=mTA5uwvc/+BJ9Vzt8Ju/fOzWtn3zJZVqqrEAnRmK7jzGYdMhqNipwKb9UiYz9h1LugvY
- A5LUfjFYO/7laAz9gmqaz0jYK3AIldJoKF9ykaQKri8fPTrv9jhdBt/IgMOu5noG9k8b
- luEM8c04rSYMGC7iWK5ybvVWBCp/uqRyWE0PgEw6VdKgDyj7u76yQ42d2myXtBhQQwez
- a5gWYpA0YBDApKiO1sgSc/7YY5+uS2swb4A5m4s42/MSKFhY/5L37nWo3NfBkOncRx2k
- IV98HfZ6VfmCbEd5yDmreT9IMu3rKMYPbtRzbReIiQV/LhZy9OMVLm0ku9rtqy5wygXu MQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2xksyqr7tb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jan 2020 10:36:05 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OAVIwT112194;
- Fri, 24 Jan 2020 10:36:04 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 2xqmuepud9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jan 2020 10:36:04 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00OAa3t8025711;
- Fri, 24 Jan 2020 10:36:03 GMT
-Received: from disaster-area.hh.sledj.net (/81.149.164.25)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 24 Jan 2020 02:36:03 -0800
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 3b9029b8;
- Fri, 24 Jan 2020 10:36:00 +0000 (UTC)
-From: David Edmondson <david.edmondson@oracle.com>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Subject: [PATCH v2 1/2] qemu-img: Add --target-is-zero to convert
-Date: Fri, 24 Jan 2020 10:34:57 +0000
-Message-Id: <20200124103458.1525982-2-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200124103458.1525982-1-david.edmondson@oracle.com>
-References: <20200124103458.1525982-1-david.edmondson@oracle.com>
+ (envelope-from <philmd@redhat.com>) id 1iuwLL-0001MS-2a
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:37:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47299
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuwLK-0001Le-VI
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:37:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579862258;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vWOuboyoxa8QftgZfcKl6xF2AJTk56c63OEGp+yDjlQ=;
+ b=hXn8kvKPleLZRjr7af/tynEUcXEEUg5V3LSVWgOC7zNuJ9L6DeuBMzZod+4kUn2/xsAou1
+ +l8Hr5auJ7EHggLbUYVka/ZBBUe+dlabjkeBNJSzzNeHvCvSht7zytbjdDGDZA68oxQxy9
+ rBAtHf4Bfq5Fhos8v1PniYDKiHYHpnk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-FPfMage-O8euliBgaoNuog-1; Fri, 24 Jan 2020 05:37:36 -0500
+Received: by mail-wm1-f72.google.com with SMTP id b202so479731wmb.2
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 02:37:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=NsRO/WuimR/M0aK+OudLIB1OER2zEAaKoIEePYYCFW4=;
+ b=iEia22DJe8gY4fKHPY/2LbLQFpJZ0jtHkHmSkc5saNWK8nT4M3BLPwSbl2qYdqHM3P
+ OWCLR9vPMWCdKP1al9IC3QqlShhYsLo4lk0Nr2WyE2+8c+zQbwETyDtVLCv+26UTnLZq
+ Qy7YBrdpi1qB0Ywh/X0VdVUoj4/gs5G9FsRxtWv/4ONwWwkL0kmMzS0r8+QuDsmRufge
+ oJN/SNJ9QlhvS2bjpW9i3IU2+ehFum7RnjrTVa+wqSfyAvkA2aOSXJSv8vVK4qs/1vMt
+ IO5fZTrMSJQAL+DZ9WXwz7EXrFuEKQUa4HGyc5wRamnjORefcgidKPIdvf9Fb0Finx/2
+ 8tLg==
+X-Gm-Message-State: APjAAAWvaMGuM6E4GrlceCMjtSHtqx9yNmKxO4tFSPTt/6H7ukLRrpT5
+ nEUz+NaUFPzzIxcVHlfhmvkFAjeVg/rfbnxv3WdAI2ij1b7IYhK2yVcF9CynTjFTZo8NARFN+wd
+ ydhHJQJ9zKQ1opAw=
+X-Received: by 2002:adf:d0c1:: with SMTP id z1mr3757546wrh.371.1579862255441; 
+ Fri, 24 Jan 2020 02:37:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz6rrDXzGMn8JPtjb4stqeevNFSEUNFDYHzgdc5XXLA//L973BAmMdlapDGh1uJj4n2bZXcUQ==
+X-Received: by 2002:adf:d0c1:: with SMTP id z1mr3757487wrh.371.1579862255073; 
+ Fri, 24 Jan 2020 02:37:35 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id f12sm6318461wmf.28.2020.01.24.02.37.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 24 Jan 2020 02:37:34 -0800 (PST)
+Subject: Re: [PATCH v8 01/11] add device_legacy_reset function to prepare for
+ reset api change
+To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
+References: <20200123132823.1117486-1-damien.hedde@greensocs.com>
+ <20200123132823.1117486-2-damien.hedde@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <40a77809-275f-9f88-7ae6-fba90a1edd63@redhat.com>
+Date: Fri, 24 Jan 2020 11:37:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9509
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001240086
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9509
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001240086
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
+In-Reply-To: <20200123132823.1117486-2-damien.hedde@greensocs.com>
+Content-Language: en-US
+X-MC-Unique: FPfMage-O8euliBgaoNuog-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,130 +106,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Edmondson <david.edmondson@oracle.com>
+Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org,
+ Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, david@gibson.dropbear.id.au,
+ ehabkost@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-s390x@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ berrange@redhat.com, cohuck@redhat.com, mark.burton@greensocs.com,
+ edgari@xilinx.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In many cases the target of a convert operation is a newly provisioned
-target that the user knows is blank (filled with zeroes). In this
-situation there is no requirement for qemu-img to wastefully zero out
-the entire device.
+On 1/23/20 2:28 PM, Damien Hedde wrote:
+> Provide a temporary device_legacy_reset function doing what
+> device_reset does to prepare for the transition with Resettable
+> API.
+>=20
+> All occurrence of device_reset in the code tree are also replaced
+> by device_legacy_reset.
+>=20
+> The new resettable API has different prototype and semantics
+> (resetting child buses as well as the specified device). Subsequent
+> commits will make the changeover for each call site individually; once
+> that is complete device_legacy_reset() will be removed.
+>=20
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Add a new option, --target-is-zero, allowing the user to indicate that
-an existing target device is already zero filled.
-
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- qemu-img-cmds.hx |  4 ++--
- qemu-img.c       | 25 ++++++++++++++++++++++---
- qemu-img.texi    |  4 ++++
- 3 files changed, 28 insertions(+), 5 deletions(-)
-
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 1c93e6d185..6f958a0a48 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -44,9 +44,9 @@ STEXI
- ETEXI
- 
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [--target-image-opts] [--target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
- STEXI
--@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] [--salvage] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [--target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] [--salvage] @var{filename} [@var{filename2} [...]] @var{output_filename}
- ETEXI
- 
- DEF("create", img_create,
-diff --git a/qemu-img.c b/qemu-img.c
-index 6233b8ca56..46db72dbe0 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -70,6 +70,7 @@ enum {
-     OPTION_PREALLOCATION = 265,
-     OPTION_SHRINK = 266,
-     OPTION_SALVAGE = 267,
-+    OPTION_TARGET_IS_ZERO = 268,
- };
- 
- typedef enum OutputFormat {
-@@ -1984,10 +1985,9 @@ static int convert_do_copy(ImgConvertState *s)
-     int64_t sector_num = 0;
- 
-     /* Check whether we have zero initialisation or can get it efficiently */
--    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
-+    if (!s->has_zero_init && s->target_is_new && s->min_sparse &&
-+        !s->target_has_backing) {
-         s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
--    } else {
--        s->has_zero_init = false;
-     }
- 
-     if (!s->has_zero_init && !s->target_has_backing &&
-@@ -2086,6 +2086,7 @@ static int img_convert(int argc, char **argv)
-             {"force-share", no_argument, 0, 'U'},
-             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
-             {"salvage", no_argument, 0, OPTION_SALVAGE},
-+            {"target-is-zero", no_argument, 0, OPTION_TARGET_IS_ZERO},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
-@@ -2209,6 +2210,14 @@ static int img_convert(int argc, char **argv)
-         case OPTION_TARGET_IMAGE_OPTS:
-             tgt_image_opts = true;
-             break;
-+        case OPTION_TARGET_IS_ZERO:
-+            /*
-+             * The user asserting that the target is blank has the
-+             * same effect as the target driver supporting zero
-+             * initialisation.
-+             */
-+            s.has_zero_init = true;
-+            break;
-         }
-     }
- 
-@@ -2247,6 +2256,11 @@ static int img_convert(int argc, char **argv)
-         warn_report("This will become an error in future QEMU versions.");
-     }
- 
-+    if (s.has_zero_init && !skip_create) {
-+        error_report("--target-is-zero requires use of -n flag");
-+        goto fail_getopt;
-+    }
-+
-     s.src_num = argc - optind - 1;
-     out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
- 
-@@ -2380,6 +2394,11 @@ static int img_convert(int argc, char **argv)
-     }
-     s.target_has_backing = (bool) out_baseimg;
- 
-+    if (s.has_zero_init && s.target_has_backing) {
-+        error_report("Cannot use --target-is-zero with a backing file");
-+        goto out;
-+    }
-+
-     if (s.src_num > 1 && out_baseimg) {
-         error_report("Having a backing file for the target makes no sense when "
-                      "concatenating multiple input images");
-diff --git a/qemu-img.texi b/qemu-img.texi
-index b5156d6316..3b6dfd8682 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -179,6 +179,10 @@ information.
- Try to ignore I/O errors when reading.  Unless in quiet mode (@code{-q}), errors
- will still be printed.  Areas that cannot be read from the source will be
- treated as containing only zeroes.
-+@item --target-is-zero
-+Assume that the destination is filled with zeros. This parameter is
-+mutually exclusive with the use of a backing file. It is required to
-+also use the @code{-n} parameter to skip image creation.
- @end table
- 
- Parameters to dd subcommand:
--- 
-2.24.1
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
