@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69955C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC769C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:27:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 358BE20704
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:27:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7580620704
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:27:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AKinrQfp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 358BE20704
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OBbo5yX7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7580620704
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv1nz-0004fk-56
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 11:27:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37999)
+	id 1iv1o4-0004tp-FU
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 11:27:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iv1mo-0002ih-Jx
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:26:24 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iv1mh-0002SU-Ck
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:26:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iv1mm-0002ux-UW
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:26:22 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:40119)
+ (envelope-from <peter.maydell@linaro.org>) id 1iv1mf-0002oD-UP
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:26:15 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:52077)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iv1mm-0002uK-O6
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:26:20 -0500
-Received: by mail-wr1-x435.google.com with SMTP id c14so2685686wrn.7
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:26:20 -0800 (PST)
+ id 1iv1mf-0002ms-On
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:26:13 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id t23so56443wmi.1
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:26:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Q/2xp+kGIEyT3zif8VALI0FfHSeCH2kcXqwffCVkOdw=;
- b=AKinrQfpa56VB6mWFIaAJWqoTEzUnKNWBDHm2YLZzYwjnayj9ACQkt1shrGaxNpQDH
- YI8o1FDAXppRiGLX9dMlGJnIHq/tk8daZNCHke9au3LvYM08r+Iw6PST6LQab5WbpNld
- 5XtR7tTPwShmctITO0BtjAds0MyE5p9pJqrQPlAtPJWKA1/MlLLyC7c8l4f62VvW9X/J
- UVTDkBHLuFks8aVgb849L8zSsYL8Qv5CIBWOtY0K3tDei9Y+7RX6IX53cNBH0osMp5sF
- yBanf37nyLq9qOYOSoLvhG8/MbD9bnQ1+ZESD6BZHESaSZUaPhY7bTdPfXUoWhu8BAab
- CZ4g==
+ bh=oOLCLALD3GcgJUBOZ9tz3obHiRR8ETIrIGcxOBvtbNk=;
+ b=OBbo5yX7o6dwaoqXuL1Is8LOx6HZBSkcU0PpObp/WwXEi0/80kPJnas0UZd9jLZzHS
+ JL4TA6bXVMCw6MMOLZq3qSXeX3igxYgGOJyfKE1KixG3LQf3nHBha71RTHSFz3wcEBnF
+ rWe6l74iNmeCjuLfIc/jlMPQectzaHKORod70eh7XYrSh7htONcZKxV+90sXm/PrtF6i
+ Wk87+Y61+cMJeOoC/83aBj/eBl6lyZT4Nw63H1Sca5xITXGZ5Jm0erivwcomMwpj1R9c
+ uIqTDHWpVcYfkghknMlwRushYZNinHtAGW+5/oZNs5FWOIzF6smTgYaSy5rllHp35mXd
+ aFtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Q/2xp+kGIEyT3zif8VALI0FfHSeCH2kcXqwffCVkOdw=;
- b=SldVBrx5nyvo8O5cgN+5tmJQldki7uEy2A0U2Xs3CGnlhAiMLv1qHMu4oxGfOT3YWq
- /UuhoZF9QtHKh6WSHyPFpKC3xusvSjk2p7O0imSroV4q39GNj2/lcTxQEalJGXXLp0Wd
- yU2mGzV580ikWI4ACQ8aY2r+TyjVZAvtZEF28y7ffYdts+se89aikb0AM1HMh9/5H7FI
- cdHcoKKscMIwDkaUlXQvPxEeoK0H/PdsoFY2nqiBcBap8cZ3ho5g69JkKbMkMbuap/LW
- 8d4yS7OmCBSpyTKyxg8jnvVLkbbYJvrXSfLOy9yr65caAquNS1Gey3IZ5+rp9OPbjG0C
- cnlA==
-X-Gm-Message-State: APjAAAVrstpxsvZqBWuhc3MzBNNsfjXRHDHFcSze4h3rGZ3sAETXOFPE
- mABJN86m9Sn+F6oz+ztwpeQ5MlYf9Mh5Qg==
-X-Google-Smtp-Source: APXvYqwijb+R6e13TAkomrMnF3flHeUIPFJLT582cTtHPl++LjT8si6wSWCeXqspsSUGWJz2MDQe1w==
-X-Received: by 2002:adf:ebc1:: with SMTP id v1mr5414670wrn.351.1579883179366; 
- Fri, 24 Jan 2020 08:26:19 -0800 (PST)
+ bh=oOLCLALD3GcgJUBOZ9tz3obHiRR8ETIrIGcxOBvtbNk=;
+ b=nw8JTdAgKxEDShTIBT/jMaP6qapj8qptAcx24QOUBGzylNMix7YBmpDetBBAlZYaSh
+ z1zzhEiSoNhrTf2JU0Vm01lBLh78IRij3STngZ3suCvnQBSdITg5tcitr/S4jmYVAejs
+ TjcNOpBD/sHenNxnUFGFoPdTndnGHG86w2TMoQVxpHhtlZaLgqDw4RIq97roNtxdxY79
+ 5QWds5yW8Jbg/IGhi4TPMrGd1AB/mtX9S7n14hMWySjpPL/FXb4a0E3C8mu1L5go5aeq
+ zUPNvvAWe/t0exqp5sXHT3p/blVA30tNpOhJkiH2c4CVKNMI8kzRxQXQK7dd0RvLuxUu
+ TkQA==
+X-Gm-Message-State: APjAAAVwgSY281CUynswnRXmKQZ4D3Vs8HX8giwowA2RxliG7W2VeMpa
+ a8QZkd/Qu/2fuqFsF3H0YpLHdX005rlEGA==
+X-Google-Smtp-Source: APXvYqyoARovtMX5fFiulhMbDetgUj9B0CwlmuOP9vflUWZdCLIItAd1yVhRGslZjznXYuqslcQrJg==
+X-Received: by 2002:a1c:a796:: with SMTP id q144mr70633wme.6.1579883170885;
+ Fri, 24 Jan 2020 08:26:10 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q3sm7054998wmj.38.2020.01.24.08.26.18
+ by smtp.gmail.com with ESMTPSA id q3sm7054998wmj.38.2020.01.24.08.26.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 24 Jan 2020 08:26:18 -0800 (PST)
+ Fri, 24 Jan 2020 08:26:10 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 6/8] qemu-img-cmds.hx: Remove texinfo document fragments
-Date: Fri, 24 Jan 2020 16:26:04 +0000
-Message-Id: <20200124162606.8787-7-peter.maydell@linaro.org>
+Subject: [PATCH v2 1/8] Makefile: Ensure we don't run Sphinx in parallel for
+ manpages
+Date: Fri, 24 Jan 2020 16:25:59 +0000
+Message-Id: <20200124162606.8787-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200124162606.8787-1-peter.maydell@linaro.org>
 References: <20200124162606.8787-1-peter.maydell@linaro.org>
@@ -80,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::435
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,167 +102,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now the qemu-img documentation has been converted to rST, we can
-remove the texinfo document fragments from qemu-img-cmds.hx, as
-they are no longer used.
+Sphinx will corrupt its doctree cache if we run two copies
+of it in parallel. In commit 6bda415c10d966c8d3 we worked
+around this by having separate doctrees for 'html' vs 'manpage'
+runs. However now that we have more than one manpage produced
+from a single manual we can run into this again when trying
+to produce the two manpages.
+
+Use the trick described in 'Atomic Rules in GNU Make'
+https://www.cmcrossroads.com/article/atomic-rules-gnu-make
+to ensure that we only run the Sphinx manpage builder once
+for each manual, even if we're producing several manpages.
+This fixes doctree corruption in parallel builds and also
+avoids pointlessly running Sphinx more often than we need to.
+
+(In GNU Make 4.3 there is builtin support for this, via
+the "&:" syntax, but we can't wait for that to be available
+in all the distros we support...)
+
+The generic "one invocation for multiple output files"
+machinery is provided as a macro named 'atomic' in rules.mak;
+we then wrap this in a more specific macro for defining
+the rule and dependencies for the manpages in a Sphinx
+manual, to avoid excessive repetition.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- qemu-img-cmds.hx | 56 +++---------------------------------------------
- 1 file changed, 3 insertions(+), 53 deletions(-)
+ Makefile  | 17 ++++++++++-------
+ rules.mak | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 7 deletions(-)
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 0c8b210b3c3..32e999d0965 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -1,143 +1,93 @@
- HXCOMM Keep the list of subcommands sorted by name.
- HXCOMM Use DEFHEADING() to define headings in both help text and texi
--HXCOMM Text between STEXI and ETEXI are copied to texi version and
-+HXCOMM Text between SRST and ERST are copied to rST version and
- HXCOMM discarded from C version
- HXCOMM DEF(command, callback, arg_string) is used to construct
- HXCOMM command structures and help message.
--HXCOMM HXCOMM can be used for comments, discarded from both texi and C
-+HXCOMM HXCOMM can be used for comments, discarded from both rST and C
+diff --git a/Makefile b/Makefile
+index 04c77d3b962..9b7ff1dc82f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1028,6 +1028,14 @@ build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" sphinx-build $(if
+ manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) \
+               $(wildcard $(SRC_PATH)/docs/$1/*.rst.inc) \
+               $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
++# Macro to write out the rule and dependencies for building manpages
++# Usage: $(call define-manpage-rule,manualname,manpage1 manpage2...[,extradeps])
++# 'extradeps' is optional, and specifies extra files (eg .hx files) that
++# the manual page depends on.
++define define-manpage-rule
++$(call atomic,$(foreach manpage,$2,$(MANUAL_BUILDDIR)/$1/$(manpage)),$(call manual-deps,$1) $3)
++	$(call build-manual,$1,man)
++endef
  
--HXCOMM When amending the TEXI sections, please remember to copy the usage
-+HXCOMM When amending the rST sections, please remember to copy the usage
- HXCOMM over to the per-command sections in qemu-img.texi.
+ $(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
+ 	$(call build-manual,devel,html)
+@@ -1041,14 +1049,9 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+ $(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
+ 	$(call build-manual,system,html)
  
--STEXI
--@table @option
--ETEXI
+-$(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
+-	$(call build-manual,interop,man)
++$(call define-manpage-rule,interop,qemu-ga.8 qemu-nbd.8)
+ 
+-$(MANUAL_BUILDDIR)/interop/qemu-nbd.8: $(call manual-deps,interop)
+-	$(call build-manual,interop,man)
 -
- DEF("amend", img_amend,
-     "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
--STEXI
--@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
--ETEXI
- SRST
- .. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] -o OPTIONS FILENAME
- ERST
+-$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7: $(call manual-deps,system)
+-	$(call build-manual,system,man)
++$(call define-manpage-rule,system,qemu-block-drivers.7)
  
- DEF("bench", img_bench,
-     "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [-U] filename")
--STEXI
--@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
--ETEXI
- SRST
- .. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=FLUSH_INTERVAL] [-n] [--no-drain] [-o OFFSET] [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
- ERST
- DEF("check", img_check,
-     "check [--object objectdef] [--image-opts] [-q] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] [-U] filename")
--STEXI
--@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
--ETEXI
- SRST
- .. option:: check [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [--output=OFMT] [-r [leaks | all]] [-T SRC_CACHE] [-U] FILENAME
- ERST
+ $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
+ 	@mkdir -p "$(MANUAL_BUILDDIR)"
+diff --git a/rules.mak b/rules.mak
+index 967295dd2b6..50f6776f529 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -399,3 +399,39 @@ GEN_SUBST = $(call quiet-command, \
  
- DEF("commit", img_commit,
-     "commit [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
--STEXI
--@item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
--ETEXI
- SRST
- .. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-d] [-p] FILENAME
- ERST
- 
- DEF("compare", img_compare,
-     "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] [-U] filename1 filename2")
--STEXI
--@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] [-U] @var{filename1} @var{filename2}
--ETEXI
- SRST
- .. option:: compare [--object OBJECTDEF] [--image-opts] [-f FMT] [-F FMT] [-T SRC_CACHE] [-p] [-q] [-s] [-U] FILENAME1 FILENAME2
- ERST
- 
- DEF("convert", img_convert,
-     "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
--STEXI
--@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] [--salvage] @var{filename} [@var{filename2} [...]] @var{output_filename}
--ETEXI
- SRST
- .. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] [--salvage] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
- ERST
- 
- DEF("create", img_create,
-     "create [--object objectdef] [-q] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
--STEXI
--@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
--ETEXI
- SRST
- .. option:: create [--object OBJECTDEF] [-q] [-f FMT] [-b BACKING_FILE] [-F BACKING_FMT] [-u] [-o OPTIONS] FILENAME [SIZE]
- ERST
- 
- DEF("dd", img_dd,
-     "dd [--image-opts] [-U] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
--STEXI
--@item dd [--image-opts] [-U] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
--ETEXI
- SRST
- .. option:: dd [--image-opts] [-U] [-f FMT] [-O OUTPUT_FMT] [bs=BLOCK_SIZE] [count=BLOCKS] [skip=BLOCKS] if=INPUT of=OUTPUT
- ERST
- 
- DEF("info", img_info,
-     "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] [-U] filename")
--STEXI
--@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] [-U] @var{filename}
--ETEXI
- SRST
- .. option:: info [--object OBJECTDEF] [--image-opts] [-f FMT] [--output=OFMT] [--backing-chain] [-U] FILENAME
- ERST
- 
- DEF("map", img_map,
-     "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-U] filename")
--STEXI
--@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [-U] @var{filename}
--ETEXI
- SRST
- .. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--output=OFMT] [-U] FILENAME
- ERST
- 
- DEF("measure", img_measure,
- "measure [--output=ofmt] [-O output_fmt] [-o options] [--size N | [--object objectdef] [--image-opts] [-f fmt] [-l snapshot_param] filename]")
--STEXI
--@item measure [--output=@var{ofmt}] [-O @var{output_fmt}] [-o @var{options}] [--size @var{N} | [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-l @var{snapshot_param}] @var{filename}]
--ETEXI
- SRST
- .. option:: measure [--output=OFMT] [-O OUTPUT_FMT] [-o OPTIONS] [--size N | [--object OBJECTDEF] [--image-opts] [-f FMT] [-l SNAPSHOT_PARAM] FILENAME]
- ERST
- 
- DEF("snapshot", img_snapshot,
-     "snapshot [--object objectdef] [--image-opts] [-U] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
--STEXI
--@item snapshot [--object @var{objectdef}] [--image-opts] [-U] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
--ETEXI
- SRST
- .. option:: snapshot [--object OBJECTDEF] [--image-opts] [-U] [-q] [-l | -a SNAPSHOT | -c SNAPSHOT | -d SNAPSHOT] FILENAME
- ERST
- 
- DEF("rebase", img_rebase,
-     "rebase [--object objectdef] [--image-opts] [-U] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
--STEXI
--@item rebase [--object @var{objectdef}] [--image-opts] [-U] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
--ETEXI
- SRST
- .. option:: rebase [--object OBJECTDEF] [--image-opts] [-U] [-q] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-p] [-u] -b BACKING_FILE [-F BACKING_FMT] FILENAME
- ERST
- 
- DEF("resize", img_resize,
-     "resize [--object objectdef] [--image-opts] [-f fmt] [--preallocation=prealloc] [-q] [--shrink] filename [+ | -]size")
--STEXI
--@item resize [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--preallocation=@var{prealloc}] [-q] [--shrink] @var{filename} [+ | -]@var{size}
--ETEXI
- SRST
- .. option:: resize [--object OBJECTDEF] [--image-opts] [-f FMT] [--preallocation=PREALLOC] [-q] [--shrink] FILENAME [+ | -]SIZE
- ERST
--
--STEXI
--@end table
--ETEXI
+ %.json: %.json.in
+ 	$(call GEN_SUBST)
++
++# Support for building multiple output files by atomically executing
++# a single rule which depends on several input files (so the rule
++# will be executed exactly once, not once per output file, and
++# not multiple times in parallel.) For more explanation see:
++# https://www.cmcrossroads.com/article/atomic-rules-gnu-make
++
++# Given a space-separated list of filenames, create the name of
++# a 'sentinel' file to use to indicate that they have been built.
++# We use fixed text on the end to avoid accidentally triggering
++# automatic pattern rules, and . on the start to make the file
++# not show up in ls output.
++sentinel = .$(subst $(SPACE),_,$(subst /,_,$1)).sentinel.
++
++# Define an atomic rule that builds multiple outputs from multiple inputs.
++# To use:
++#    $(call atomic,out1 out2 ...,in1 in2 ...)
++#    <TAB>rule to do the operation
++#
++# Make 4.3 will have native support for this, and you would be able
++# to instead write:
++#    out1 out2 ... &: in1 in2 ...
++#    <TAB>rule to do the operation
++#
++# The way this works is that it creates a make rule
++# "out1 out2 ... : sentinel-file ; @:" which says that the sentinel
++# depends on the dependencies, and the rule to do that is "do nothing".
++# Then we have a rule
++# "sentinel-file : in1 in2 ..."
++# whose commands start with "touch sentinel-file" and then continue
++# with the rule text provided by the user of this 'atomic' function.
++# The foreach... is there to delete the sentinel file if any of the
++# output files don't exist, so that we correctly rebuild in that situation.
++atomic = $(eval $1: $(call sentinel,$1) ; @:) \
++         $(call sentinel,$1) : $2 ; @touch $$@ \
++         $(foreach t,$1,$(if $(wildcard $t),,$(shell rm -f $(call sentinel,$1))))
 -- 
 2.20.1
 
