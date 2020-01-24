@@ -2,73 +2,94 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECB6C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5DDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76EB22071E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:21:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76EB22071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id EA2AF20702
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:46:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d45dVowB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2AF20702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv4WU-0006GA-HJ
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 14:21:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58581)
+	id 1iv4u2-0003D2-0q
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 14:46:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iv4VZ-0005li-69
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:20:46 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iv4t1-00023L-VY
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:45:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iv4VX-0002g3-Ic
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:20:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38436)
+ (envelope-from <alex.bennee@linaro.org>) id 1iv4sz-0005T4-Ti
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:44:59 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37124)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iv4VX-0002fS-Cx
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:20:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iv4VU-0007l6-82
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 19:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2C02A2E80C9
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 19:20:40 +0000 (UTC)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iv4sy-0005NK-7f
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:44:57 -0500
+Received: by mail-wm1-x342.google.com with SMTP id f129so601664wmf.2
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 11:44:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=IfNvriD/kjnho4+fsxK+u26kR73SYIOdRcnJHAOBq60=;
+ b=d45dVowBvjr5+HjedBiPHJm0mb1eQuZDVGzwLHddmPGCpPd+w5xEYiFWqL20BQExWP
+ Pnxc1CxMzYiDPmuZ6v+6EJBAfIQhU3KREK1jtF9dCmUw2KcfZjUDE7wnOVF023kwlaK0
+ fPubVTq7F2Kw1+L6YJJNi3yIlHJFR1joOrFb9I/yUmzOOrkrOVifXDbi6Qj0EDB+lRpm
+ aNVtqZ3vA2BW0DqWQvzbFvkFUtSlzn9/e8mxbpzvEBPppFcNjk4+YUQiAWLDQiLefeEr
+ aklNk3d7mSDYIjJv/9/JvfDf4VZzq+Cr7hKsqgZ9iZadzFuNrzF2qGyA2c95PYYMuwPB
+ vdmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=IfNvriD/kjnho4+fsxK+u26kR73SYIOdRcnJHAOBq60=;
+ b=D72O88JQsuXhxyO7VL6omdj0VDCUtMwGS7mq2dAE17DMn9tpyXIpg8l7kgaIfr4pvu
+ gIcM0gkG8fY9fUdqMXNT54XKspukoeYcUjVIOh/s+hPDhb3SH8TGtX4qkiRs74o6wqsd
+ WZCXbky3kiIYkkNHHv/hhkEJ7q9ZztbE14ujw46A6CNLPGWUFSIowOEJX7nCdofD0ynz
+ afv6iHuh4WuErj8rFl/DFhF3zbgjwQh7rHNLad0OCehY/x4kZF2K9DMNfWwRKMJUL8cz
+ MShdjepuDVWwFGDYU/1QwwKCC+1qkSdqnZ+nN6c1w0LoFNm5HSll5vLcBfVv70iaVfuF
+ lPYg==
+X-Gm-Message-State: APjAAAVBliUpQj6xdyxX/GsMMAAET/iN9ES5M7uSrbBMFgvoqm+EIMxy
+ rGDpGmTW4pNuX8SSvyjlNMrT9A==
+X-Google-Smtp-Source: APXvYqxRZMWzO3iw/MzNLJba2PLT5Nmn2/Os82s3STfigILxUsTZoxxv3C83+xt5qCMFKbI5VoLziA==
+X-Received: by 2002:a7b:c935:: with SMTP id h21mr640811wml.173.1579895092181; 
+ Fri, 24 Jan 2020 11:44:52 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f1sm8875535wro.85.2020.01.24.11.44.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jan 2020 11:44:51 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 795021FF87;
+ Fri, 24 Jan 2020 19:44:50 +0000 (GMT)
+References: <BL0PR2101MB1026C24DACAFB1771DE47706D60E0@BL0PR2101MB1026.namprd21.prod.outlook.com>
+ <87eevoak12.fsf@linaro.org>
+ <BL0PR2101MB10265432576D6FF63AFA2282D60E0@BL0PR2101MB1026.namprd21.prod.outlook.com>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Henry <robhenry@microsoft.com>
+Subject: Re: [EXTERNAL] Re: QEMU for aarch64 with plugins seems to fail
+ basic consistency checks
+In-reply-to: <BL0PR2101MB10265432576D6FF63AFA2282D60E0@BL0PR2101MB1026.namprd21.prod.outlook.com>
+Date: Fri, 24 Jan 2020 19:44:50 +0000
+Message-ID: <8736c4abbh.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jan 2020 19:15:26 -0000
-From: Richard Henderson <rth@twiddle.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: glaubitz laurent-vivier rth
-X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <157970117843.5560.13252417721225198010.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157989332690.18540.1671332584108575797.malone@gac.canonical.com>
-Subject: [Bug 1860553] Re: cmake crashes on qemu-alpha-user with Illegal
- Instruction
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 04529a16fec1a6cd39e630d768db7e75b16febff
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,113 +98,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1860553 <1860553@bugs.launchpad.net>
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no call insn in your listing at 0x40007fd988,
-so the easy assumption is that the return address has
-been corrupted on the stack.
 
-You'll have to dig deeper than just the insn listing.
+Robert Henry <robhenry@microsoft.com> writes:
 
--- =
+> I found at least one problem with my plugin.
+>
+> I was assuming that the insn data from
+>       struct qemu_plugin_insn *insn =3D qemu_plugin_tb_get_insn(tb, i);
+> could be passed into qemu_plugin_register_vcpu_insn_exec_cb both as the 1=
+st argument AND as the user data last argument.  This assumed that insn wou=
+ld persist and be unique from when qemu_plugin_register_vcpu_insn_exec_cb w=
+as called to when the execution-time callback (vcpu_insn_exec_before) was c=
+alled.
+>
+> This assumption is not true.
+>
+> I now capture pieces of *insn into my own persistent data structure, and =
+pass that in as void *udata, my problems went away.
+>
+> I think this lack of persistence of insn should be documented, or
+> treated as a bug to be fixed.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1860553
+I thought I had done this but it turns out I only mentioned it for
+hwaddr:
 
-Title:
-  cmake crashes on qemu-alpha-user with Illegal Instruction
+  /*
+   * qemu_plugin_get_hwaddr():
+   * @vaddr: the virtual address of the memory operation
+   *
+   * For system emulation returns a qemu_plugin_hwaddr handle to query
+   * details about the actual physical address backing the virtual
+   * address. For linux-user guests it just returns NULL.
+   *
+   * This handle is *only* valid for the duration of the callback. Any
+   * information about the handle should be recovered before the
+   * callback returns.
+   */
 
-Status in QEMU:
-  New
+But the concept of handle lifetime is true for all the handles. I
+propose something like this for the docs:
 
-Bug description:
-  I tried building cmake on Debian unstable for Alpha today using qemu-
-  user and the compiled cmake binary crashed with "Illegal Instruction":
 
-  g++ -Wl,-z,relro -Wl,--as-needed -g -O2 -fdebug-prefix-map=3D/<<PKGBUILDD=
-IR>>=3D. -Wformat -Werror=3Dformat-security -Wdate-time -D_FORTIFY_SOURCE=
-=3D2             -I/<<PKGBUILDDIR>>/Build/Bootstrap.cmk   -I/<<PKGBUILDDIR>=
->/Source   -I/<<PKGBUILDDIR>>/Source/LexerParser   -I/<<PKGBUILDDIR>>/Utili=
-ties  cmAddCustomCommandCommand.o cmAddCustomTargetCommand.o cmAddDefinitio=
-nsCommand.o cmAddDependenciesCommand.o cmAddExecutableCommand.o cmAddLibrar=
-yCommand.o cmAddSubDirectoryCommand.o cmAddTestCommand.o cmArgumentParser.o=
- cmBreakCommand.o cmBuildCommand.o cmCMakeMinimumRequired.o cmCMakePolicyCo=
-mmand.o cmCPackPropertiesGenerator.o cmCacheManager.o cmCommand.o cmCommand=
-ArgumentParserHelper.o cmCommands.o cmCommonTargetGenerator.o cmComputeComp=
-onentGraph.o cmComputeLinkDepends.o cmComputeLinkInformation.o cmComputeTar=
-getDepends.o cmConditionEvaluator.o cmConfigureFileCommand.o cmContinueComm=
-and.o cmCoreTryCompile.o cmCreateTestSourceList.o cmCustomCommand.o cmCusto=
-mCommandGenerator.o cmDefinePropertyCommand.o cmDefinitions.o cmDepends.o c=
-mDependsC.o cmDisallowedCommand.o cmDocumentationFormatter.o cmEnableLangua=
-geCommand.o cmEnableTestingCommand.o cmExecProgramCommand.o cmExecuteProces=
-sCommand.o cmExpandedCommandArgument.o cmExportBuildFileGenerator.o cmExpor=
-tFileGenerator.o cmExportInstallFileGenerator.o cmExportSet.o cmExportSetMa=
-p.o cmExportTryCompileFileGenerator.o cmExprParserHelper.o cmExternalMakefi=
-leProjectGenerator.o cmFileCommand.o cmFileCopier.o cmFileInstaller.o cmFil=
-eTime.o cmFileTimeCache.o cmFileTimes.o cmFindBase.o cmFindCommon.o cmFindF=
-ileCommand.o cmFindLibraryCommand.o cmFindPackageCommand.o cmFindPathComman=
-d.o cmFindProgramCommand.o cmForEachCommand.o cmFunctionCommand.o cmFSPermi=
-ssions.o cmGeneratedFileStream.o cmGeneratorExpression.o cmGeneratorExpress=
-ionContext.o cmGeneratorExpressionDAGChecker.o cmGeneratorExpressionEvaluat=
-ionFile.o cmGeneratorExpressionEvaluator.o cmGeneratorExpressionLexer.o cmG=
-eneratorExpressionNode.o cmGeneratorExpressionParser.o cmGeneratorTarget.o =
-cmGetCMakePropertyCommand.o cmGetDirectoryPropertyCommand.o cmGetFilenameCo=
-mponentCommand.o cmGetPipes.o cmGetPropertyCommand.o cmGetSourceFilePropert=
-yCommand.o cmGetTargetPropertyCommand.o cmGetTestPropertyCommand.o cmGlobal=
-CommonGenerator.o cmGlobalGenerator.o cmGlobalUnixMakefileGenerator3.o cmGl=
-obVerificationManager.o cmHexFileConverter.o cmIfCommand.o cmIncludeCommand=
-.o cmIncludeGuardCommand.o cmIncludeDirectoryCommand.o cmIncludeRegularExpr=
-essionCommand.o cmInstallCommand.o cmInstallCommandArguments.o cmInstallDir=
-ectoryGenerator.o cmInstallExportGenerator.o cmInstallFilesCommand.o cmInst=
-allFilesGenerator.o cmInstallGenerator.o cmInstallScriptGenerator.o cmInsta=
-llSubdirectoryGenerator.o cmInstallTargetGenerator.o cmInstallTargetsComman=
-d.o cmInstalledFile.o cmLinkDirectoriesCommand.o cmLinkItem.o cmLinkLineCom=
-puter.o cmLinkLineDeviceComputer.o cmListCommand.o cmListFileCache.o cmLoca=
-lCommonGenerator.o cmLocalGenerator.o cmLocalUnixMakefileGenerator3.o cmMSV=
-C60LinkLineComputer.o cmMacroCommand.o cmMakeDirectoryCommand.o cmMakefile.=
-o cmMakefileExecutableTargetGenerator.o cmMakefileLibraryTargetGenerator.o =
-cmMakefileTargetGenerator.o cmMakefileUtilityTargetGenerator.o cmMarkAsAdva=
-ncedCommand.o cmMathCommand.o cmMessageCommand.o cmMessenger.o cmNewLineSty=
-le.o cmOSXBundleGenerator.o cmOptionCommand.o cmOrderDirectories.o cmOutput=
-Converter.o cmParseArgumentsCommand.o cmPathLabel.o cmPolicies.o cmProcessO=
-utput.o cmProjectCommand.o cmProperty.o cmPropertyDefinition.o cmPropertyDe=
-finitionMap.o cmPropertyMap.o cmReturnCommand.o cmRulePlaceholderExpander.o=
- cmScriptGenerator.o cmSearchPath.o cmSeparateArgumentsCommand.o cmSetComma=
-nd.o cmSetDirectoryPropertiesCommand.o cmSetPropertyCommand.o cmSetSourceFi=
-lesPropertiesCommand.o cmSetTargetPropertiesCommand.o cmSetTestsPropertiesC=
-ommand.o cmSiteNameCommand.o cmSourceFile.o cmSourceFileLocation.o cmState.=
-o cmStateDirectory.o cmStateSnapshot.o cmStringReplaceHelper.o cmStringComm=
-and.o cmSubdirCommand.o cmSystemTools.o cmTarget.o cmTargetCompileDefinitio=
-nsCommand.o cmTargetCompileFeaturesCommand.o cmTargetCompileOptionsCommand.=
-o cmTargetIncludeDirectoriesCommand.o cmTargetLinkLibrariesCommand.o cmTarg=
-etPropCommandBase.o cmTargetPropertyComputer.o cmTargetSourcesCommand.o cmT=
-est.o cmTestGenerator.o cmTimestamp.o cmTryCompileCommand.o cmTryRunCommand=
-.o cmUnexpectedCommand.o cmUnsetCommand.o cmUVHandlePtr.o cmUVProcessChain.=
-o cmVersion.o cmWhileCommand.o cmWorkingDirectory.o cmake.o cmakemain.o cmc=
-md.o cm_string_view.o cmCommandArgumentLexer.o cmCommandArgumentParser.o cm=
-ExprLexer.o cmExprParser.o cmListFileLexer.o Directory.o EncodingCXX.o FStr=
-eam.o Glob.o RegularExpression.o SystemTools.o EncodingC.o ProcessUNIX.o St=
-ring.o System.o Terminal.o uv-src-strscpy.c.o uv-src-timer.c.o uv-src-uv-co=
-mmon.c.o uv-src-unix-cmake-bootstrap.c.o uv-src-unix-core.c.o uv-src-unix-f=
-s.c.o uv-src-unix-loop.c.o uv-src-unix-loop-watcher.c.o uv-src-unix-no-fsev=
-ents.c.o uv-src-unix-pipe.c.o uv-src-unix-poll.c.o uv-src-unix-posix-hrtime=
-.c.o uv-src-unix-posix-poll.c.o uv-src-unix-process.c.o uv-src-unix-signal.=
-c.o uv-src-unix-stream.c.o  -ldl -lrt -o cmake
-  make[2]: Leaving directory '/<<PKGBUILDDIR>>/Build/Bootstrap.cmk'
-  loading initial cache file /<<PKGBUILDDIR>>/Build/Bootstrap.cmk/InitialCa=
-cheFlags.cmake
-  Illegal instruction
-  ---------------------------------------------
-  Error when bootstrapping CMake:
-  Problem while running initial CMake
-  ---------------------------------------------
+--8<---------------cut here---------------start------------->8---
+docs/devel: document query handle lifetimes
 
-  I'm working on creating a chroot for download to reproduce the issue.
+I forgot to document the lifetime of handles in the developer
+documentation. Do so now.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1860553/+subscriptions
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+1 file changed, 11 insertions(+), 2 deletions(-)
+docs/devel/tcg-plugins.rst | 13 +++++++++++--
+
+modified   docs/devel/tcg-plugins.rst
+@@ -51,8 +51,17 @@ about how QEMU's translation works to the plugins. While=
+ there are
+ conceptions such as translation time and translation blocks the
+ details are opaque to plugins. The plugin is able to query select
+ details of instructions and system configuration only through the
+-exported *qemu_plugin* functions. The types used to describe
+-instructions and events are opaque to the plugins themselves.
++exported *qemu_plugin* functions.
++
++Query Handle Lifetime
++---------------------
++
++Each callback provides an opaque anonymous information handle which
++can usually be further queried to find out information about a
++translation, instruction or operation. The handles themselves are only
++valid during the lifetime of the callback so it is important that any
++information that is needed is extracted during the callback and saved
++by the plugin.
+=20
+ Usage
+ =3D=3D=3D=3D=3D
+
+--8<---------------cut here---------------end--------------->8---
+
+--=20
+Alex Benn=C3=A9e
 
