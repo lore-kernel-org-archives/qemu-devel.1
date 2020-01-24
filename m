@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0799FC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 04:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F635C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 04:46:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD2B52077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 04:36:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD2B52077C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physik.fu-berlin.de
+	by mail.kernel.org (Postfix) with ESMTPS id DD0EC20718
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 04:46:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD0EC20718
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuqhb-0003eq-0X
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 23:36:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43392)
+	id 1iuqrq-0006Ky-2c
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 23:46:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iuqgu-0003DO-Ft
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 23:35:33 -0500
+ (envelope-from <bounces@canonical.com>) id 1iuqqi-0005XV-Vt
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 23:45:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iuqgs-000813-Ri
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 23:35:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56416)
+ (envelope-from <bounces@canonical.com>) id 1iuqqh-0000s9-BB
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 23:45:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56548)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iuqgs-0007xj-ER
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 23:35:30 -0500
+ id 1iuqqh-0000rY-5m
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 23:45:39 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iuqgr-0007CX-0Q
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 04:35:29 +0000
+ id 1iuqqf-0007R1-MN
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 04:45:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E98FF2E80C8
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 04:35:28 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 9B95F2E8055
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 04:45:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jan 2020 04:28:53 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Date: Fri, 24 Jan 2020 04:39:39 -0000
+From: Richard Henderson <rth@twiddle.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: glaubitz
+X-Launchpad-Bug-Commenters: glaubitz rth
 X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
-X-Launchpad-Bug-Modifier: John Paul Adrian Glaubitz (glaubitz)
+X-Launchpad-Bug-Modifier: Richard Henderson (rth)
 References: <157970117843.5560.13252417721225198010.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157984013311.5723.11406962935545826661.malone@chaenomeles.canonical.com>
+Message-Id: <157984077993.4848.14343541039529400435.malone@chaenomeles.canonical.com>
 Subject: [Bug 1860553] Re: cmake crashes on qemu-alpha-user with Illegal
  Instruction
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 45dad8d25c78952a7be6616184cced17e0c58ab3
+X-Launchpad-Hash: c45e2fd58784318ab75283562890d9a62d50506c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,28 +82,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Can someone remind me how I can print the disassembly in this case?
-
-root@epyc:~> qemu-alpha-static -cpu help
-Available CPUs:
-  ev4-alpha-cpu
-  ev5-alpha-cpu
-  ev56-alpha-cpu
-  ev6-alpha-cpu
-  ev67-alpha-cpu
-  ev68-alpha-cpu
-  pca56-alpha-cpu
-root@epyc:~> export QEMU_CPU=3Dev68-alpha-cpu
-root@epyc:~> chroot /local_scratch/sid-alpha-sbuild/
-bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
-(sid-alpha-sbuild)root@epyc:/# cd /build/cmake-L20LIu/cmake-3.15.4/Build
-(sid-alpha-sbuild)root@epyc:/build/cmake-L20LIu/cmake-3.15.4/Build# ./Boots=
-trap.cmk/cmake ..
-Illegal instruction
-(sid-alpha-sbuild)root@epyc:/build/cmake-L20LIu/cmake-3.15.4/Build#
-
-I checked all documentation but qemu-monitor - which supports
-disassembly - seems to be available for qemu-system only.
+# chroot $root
+...
+# qemu-alpha-static -D logfile -d in_asm ./Bootstrap.cmk/cmake ..
 
 -- =
 
