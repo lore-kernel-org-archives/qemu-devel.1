@@ -2,79 +2,85 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE37EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E5EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B31420708
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:26:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF12D20708
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:26:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g3tXXjgD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B31420708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="vaPmsBmh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF12D20708
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuwAJ-0006GX-QT
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:26:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43846)
+	id 1iuwAe-0005oA-27
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:26:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuw9Q-0004s5-5r
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:25:21 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iuw81-0003VI-AZ
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuw9P-0005hF-0Z
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:25:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51849
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iuw80-0003x0-46
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:23:52 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:42126)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuw9O-0005h3-SB
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:25:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579861518;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iuw7z-0003ue-M8; Fri, 24 Jan 2020 05:23:52 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 19A0196EF0;
+ Fri, 24 Jan 2020 10:23:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1579861429;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ebd9wKVceLRG2XK92yG7UGUezSQ3892ylfqa3VwiSyM=;
- b=g3tXXjgDyeyOhHUXTVjilywE5/zUfmpkm3zo4arAnfrAlUlYu1kY2aAnYiLJBijnKibe1C
- PAte02rKXpVg4jkhVCb+eqp4EZJ+Ko5UYE6XSX4CtB1S4t+ZJbAcdFsT8QSTWfvL7CTnLp
- T9IDcoNhnuP3HoeHUIBkhfwFZxKE13s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-FBWLJXvUMsiJcFzZA7P6Pw-1; Fri, 24 Jan 2020 05:25:17 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B45B0800D48;
- Fri, 24 Jan 2020 10:25:15 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D8C21845A0;
- Fri, 24 Jan 2020 10:25:13 +0000 (UTC)
-Date: Fri, 24 Jan 2020 11:25:11 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH REPOST v3 74/80] exec: cleanup
- qemu_minrampagesize()/qemu_maxrampagesize()
-Message-ID: <20200124112511.7618c3a1@redhat.com>
-In-Reply-To: <1579779525-20065-75-git-send-email-imammedo@redhat.com>
-References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
- <1579779525-20065-75-git-send-email-imammedo@redhat.com>
+ bh=BySGxDsyN2GdcHiLz72LfERqzzxfEvMqN3wPn0ZWxX0=;
+ b=vaPmsBmh3MYuIgxHO/LqRjO652uRuRuYJK2LO48ncqJXEoruVBDMIzV+w7rMsi0UL0Qx73
+ JnsayMZLy7z4Hw/7CrmaydKDqfDCEeTLlK5K9iQXU9AGWMkdJ4VFz0QfrtTwjN5YZ2HPRV
+ kpvn3TbfyJf453N/id+xaMfCkg31TG0=
+Subject: Re: [PATCH v8 00/11] Multi-phase reset mechanism
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200123132823.1117486-1-damien.hedde@greensocs.com>
+ <CAFEAcA8G7zGwRkbGRjyK4P7KZ9V+cboBHwnTH=jJs4NWu7rMMA@mail.gmail.com>
+ <81bde2c9-76d3-f5a0-3e54-089028be9dfb@redhat.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <64bf5059-5ec0-bd0a-9375-17dd69229eca@greensocs.com>
+Date: Fri, 24 Jan 2020 11:23:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: FBWLJXvUMsiJcFzZA7P6Pw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <81bde2c9-76d3-f5a0-3e54-089028be9dfb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1579861429;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BySGxDsyN2GdcHiLz72LfERqzzxfEvMqN3wPn0ZWxX0=;
+ b=Hp0O508VKtQKRxMfQCWnafRb7LzxUxkwNbxTYt+6Ff9381KJOx2vWraUeWeXkOCkx5PruG
+ puZDuFgNsMRXUa79bYnJTLH8csaCZQgtIihpX5moY48oI02a0kMdK2T2IK0WXSNuLeI0hT
+ s60hrN4YgXaeEZlyivZPrSDr1LTQm9A=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1579861429; a=rsa-sha256; cv=none;
+ b=x9YUZC4mFELVdyNvNvdR8SNYmQyUaQCsZEICkqnroDKmn4egmGOIwv5v+5nIHCgXOUs8WX
+ BHRdUZfmO7POrWj480iRZYXMVZAW4NY+jgYg2QBCJRBl+BOPadvkzDITFkCpcTzKtiwAqV
+ RavHTUCggNJwxQfdsUT6ajjlPXmy7Zg=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,99 +92,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, rth@twiddle.net,
- david@gibson.dropbear.id.au
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 12:38:39 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
 
-> Since all RAM is backed by hostmem backends, drop
-> global -mem-path invariant and simplify code.
 
-Looks like origin of removed here code is PPC,
-could PPC folk review this please?
+On 1/24/20 11:17 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/24/20 11:05 AM, Peter Maydell wrote:
+>> On Thu, 23 Jan 2020 at 13:28, Damien Hedde
+>> <damien.hedde@greensocs.com> wrote:
+>>> v8:
+>>> =C2=A0=C2=A0 + patch 3&5: ResettableState::count type from uint32_t t=
+o unsigned
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 (Philippe)
+>>
+>> We'll have to change that back if we ever want to migrate
+>> the count (migration insists on fixed-sized types), but
+>> I guess we can do that when we get to it...
+>=20
+> Oh I forgot about migration :( (this was just a suggestion, not a
+> requirement).
 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: pbonzini@redhat.com
-> CC: rth@twiddle.net
-> ---
->  exec.c | 51 +++++----------------------------------------------
->  1 file changed, 5 insertions(+), 46 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 67e520d..809987c 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1667,60 +1667,19 @@ static int find_max_backend_pagesize(Object *obj, void *opaque)
->   */
->  long qemu_minrampagesize(void)
->  {
-> -    long hpsize = LONG_MAX;
-> -    long mainrampagesize;
-> -    Object *memdev_root;
-> -    MachineState *ms = MACHINE(qdev_get_machine());
-> -
-> -    mainrampagesize = qemu_mempath_getpagesize(mem_path);
-> -
-> -    /* it's possible we have memory-backend objects with
-> -     * hugepage-backed RAM. these may get mapped into system
-> -     * address space via -numa parameters or memory hotplug
-> -     * hooks. we want to take these into account, but we
-> -     * also want to make sure these supported hugepage
-> -     * sizes are applicable across the entire range of memory
-> -     * we may boot from, so we take the min across all
-> -     * backends, and assume normal pages in cases where a
-> -     * backend isn't backed by hugepages.
-> -     */
-> -    memdev_root = object_resolve_path("/objects", NULL);
-> -    if (memdev_root) {
-> -        object_child_foreach(memdev_root, find_min_backend_pagesize, &hpsize);
-> -    }
-> -    if (hpsize == LONG_MAX) {
-> -        /* No additional memory regions found ==> Report main RAM page size */
-> -        return mainrampagesize;
-> -    }
-> -
-> -    /* If NUMA is disabled or the NUMA nodes are not backed with a
-> -     * memory-backend, then there is at least one node using "normal" RAM,
-> -     * so if its page size is smaller we have got to report that size instead.
-> -     */
-> -    if (hpsize > mainrampagesize &&
-> -        (ms->numa_state == NULL ||
-> -         ms->numa_state->num_nodes == 0 ||
-> -         ms->numa_state->nodes[0].node_memdev == NULL)) {
-> -        static bool warned;
-> -        if (!warned) {
-> -            error_report("Huge page support disabled (n/a for main memory).");
-> -            warned = true;
-> -        }
-> -        return mainrampagesize;
-> -    }
-> +    long hpsize;
-> +    Object *memdev_root = object_resolve_path("/objects", NULL);
->  
-> +    object_child_foreach(memdev_root, find_min_backend_pagesize, &hpsize);
->      return hpsize;
->  }
->  
->  long qemu_maxrampagesize(void)
->  {
-> -    long pagesize = qemu_mempath_getpagesize(mem_path);
-> +    long pagesize;
->      Object *memdev_root = object_resolve_path("/objects", NULL);
->  
-> -    if (memdev_root) {
-> -        object_child_foreach(memdev_root, find_max_backend_pagesize,
-> -                             &pagesize);
-> -    }
-> +    object_child_foreach(memdev_root, find_max_backend_pagesize, &pagesize);
->      return pagesize;
->  }
->  #else
+I forgot it too, and I probably put a uint32_t in the first place
+because of migration in an earlier version of the patchset...
 
+Damien
 
