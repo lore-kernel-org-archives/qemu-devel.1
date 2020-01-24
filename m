@@ -2,79 +2,85 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3467EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B5BDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 14:00:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2EF320718
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8DEF2071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 14:00:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gEixOQEk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2EF320718
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e9PSolTu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8DEF2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuzQK-0003nF-6q
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:55:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38348)
+	id 1iuzVp-0005Pz-41
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 09:00:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39274)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuzPc-0003Ob-9R
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:54:17 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iuzUz-0004t9-Ix
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:59:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuzPb-0004O1-6I
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:54:16 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37403
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuzPb-0004Nr-2Q
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:54:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579874054;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zI8GZHtk1brZrDKZjkILvYha8suWt+XwEPRXOUiX3wk=;
- b=gEixOQEkFQ9RjdupSyjRGUu2LRNQUGKXUZlLkuq9a3K0rTGaPXNxD6dcgYJNovTeWPqcFu
- 3+WKvT5xORspiye5U9vA1HKhK9BH+0xb39QBpvPTXNUxBMRJV11UXHiGP2VLcqMR873opi
- 4f9a2XQUPAyiv1KDFrCOX+malLPZw3s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-d8TtE3xtOGW2EosK3JPa_A-1; Fri, 24 Jan 2020 08:54:13 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C2EA8010C9;
- Fri, 24 Jan 2020 13:54:12 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 828005DA76;
- Fri, 24 Jan 2020 13:54:06 +0000 (UTC)
-Date: Fri, 24 Jan 2020 14:54:04 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [Question] Regarding containers
- "unattached/peripheral/anonymous" - their relation with hot(un)plug of
- devices
-Message-ID: <20200124145404.1d15209e@redhat.com>
-In-Reply-To: <70446b6cbf5442488a40fe809f38c3c8@huawei.com>
-References: <70446b6cbf5442488a40fe809f38c3c8@huawei.com>
+ (envelope-from <stefanha@gmail.com>) id 1iuzUy-0001Ti-Gd
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:59:49 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38319)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iuzUy-0001Se-A1
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:59:48 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y17so2103626wrh.5
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 05:59:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=7d0iQF6zK8zjaz4CaWIrXy+8Z1qk0AjsD1O1Wk43Ph8=;
+ b=e9PSolTux1pa5OtWspUXRbiS8pg69zrpOPw5b7PuJerruDhHgkE87KS2mCLUhbnanD
+ 9Yz1Ci0CFZ4qKyABbuXGXfme3tn7DBoi8iyL5gAO4gPvWpvnnBfUa81e6Y1OEYxGfPnN
+ F1v2pm+L9lLlegJFM9NYCFAdHrkl/s6SfF3YMfz9rNRNoWx5RgeFqhu/IDL+LvC4rbg3
+ NrQh0kdac3n8U62fSkQRIggj0NcBUsNLC2IRD2b+6I1fSNoZyTCttz2Ilipw/bmZ3bt7
+ JLthZwQZQikPlOtFHsrF+agNJER7z1Aqk3jNsk2I0IVsdidSCkSqqvZrVWDmVD5opV5q
+ CV7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=7d0iQF6zK8zjaz4CaWIrXy+8Z1qk0AjsD1O1Wk43Ph8=;
+ b=a742XrhBkeOyO3CT1mbaiGrxekj9zSe9Ig5FN+mrLGGcQw021yXhov0YXme/o8epDB
+ sTUYeiQuzmFQQ3MnxSNi++5T5KSDQPWyN6Z5YsGvR4fdkbLyTPgiDc/am892vXJxHs6n
+ BZbpZTm7VOzxubeObFr3+G2ig+zkkxj1lj2lGksMvhpdRsXpN3Q0b11RPM12Xs7I1Hr9
+ H1mlPRT8bhRhNBeHiuDWsXGbwgjFGJ2HasJIyhADvU9uIbwBLERxl7LbgxGqocBBKL4C
+ 35JXzZerYifNwKPf5lfHs5PPHgKuAkmi2GDs9FsWXeSY+UXrzMJ1emolfaMu3tN1zdUB
+ 6aoQ==
+X-Gm-Message-State: APjAAAU0zGZsK/DXlLWdO601YNjsW1Hvk5/D+AmsBZ6R9AviiRudAZEI
+ u31LKeBoWUohivg/E6nJsbQ=
+X-Google-Smtp-Source: APXvYqxITPtGHxEWmfPPntf503do2WqPw2KqS/ObPVVZ6UVI+Cph+sJ2x0KJ0D2Hw2lV/YIUrI2qrw==
+X-Received: by 2002:adf:dd52:: with SMTP id u18mr4394269wrm.131.1579874387167; 
+ Fri, 24 Jan 2020 05:59:47 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id l7sm7497795wrq.61.2020.01.24.05.59.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jan 2020 05:59:46 -0800 (PST)
+Date: Fri, 24 Jan 2020 11:02:40 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [RFC 0/2] virtio-rng: add a control queue
+Message-ID: <20200124110240.GH736986@stefanha-x1.localdomain>
+References: <20200123151700.1367857-1-lvivier@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: d8TtE3xtOGW2EosK3JPa_A-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="poemUeGtc2GQvHuH"
+Content-Disposition: inline
+In-Reply-To: <20200123151700.1367857-1-lvivier@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,56 +92,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Amit Shah <amit@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 Jan 2020 11:20:15 +0000
-Salil Mehta <salil.mehta@huawei.com> wrote:
 
-> Hello,
-> I am working on vCPU Hotplug feature for ARM64 and I am in mid of understanding some aspect of device_add/device_del interface of the QEMU.
-> 
-> Observations:
-> 1. Any object initialised by qmp_device_add() gets into /machine/unattached container. I traced the flow to code leg inside  device_set_realized()
-> 2. I could see the reverse qmp_device_del() expects the device to be in  /machine/peripheral container.
-> 3. I could see any object initially added to unattached container did not had their parents until object_add_property_child() was called further in the leg.
->     which effectively meant a new property was created and property table populated and child was parented.
-> 4. Generally, container  /machine/peripheral was being used wherever DEVICE(dev)->id was present and non-null.
-> 
-> Question:
-> 1. Wanted to confirm my understanding about the use of having separate containers like unattached, peripheral and anonymous.
+--poemUeGtc2GQvHuH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 2. At init time all the vcpus goes under *unattached* container. Now, qmp_device_del() cannot be used to unplug them. I am wondering
+On Thu, Jan 23, 2020 at 04:16:58PM +0100, Laurent Vivier wrote:
+> The kernel needs sometime to be able to cancel an ongoing command.
+>=20
+> For instance, if the virtio-rng device uses the egd backend
+> and this backend doesn't provide data, the buffer provided by the
+> kernel is kept as long as it is needed.
+>=20
+> On the kernel side, a read blocks until the buffer returns from QEMU.
+>=20
+> As the read is done with a mutex held, all the hw_random interface
+> hangs and we cannot switch to another hw_random backend.
+>=20
+> So this series adds a control queue to the virtio-rng device to allow
+> to flush the virtio-rng input queue to release the kernel mutex and
+> to allow to switch to another device.
+>=20
+> The kernel side series can be found at:
+>=20
+> https://github.com/vivier/linux/commits/virtio-rng-ctrl
+>=20
+> Laurent Vivier (2):
+>   virtio-rng: prepare the introduction of a control queue
+>   virtio-rng: add a control queue
+>=20
+>  hw/core/machine.c                           |  1 +
+>  hw/virtio/trace-events                      |  6 ++
+>  hw/virtio/virtio-rng.c                      | 99 ++++++++++++++++++---
+>  include/hw/virtio/virtio-rng.h              |  5 +-
+>  include/standard-headers/linux/virtio_rng.h | 14 +++
+>  5 files changed, 111 insertions(+), 14 deletions(-)
 
-device is put into 'unattached' in case it wasn't assigned a parent.
-Usually it happens when board creates device directly.
+Where can I find the VIRTIO specification for this new virtqueue?
 
->    if all the hotplug devices need to go under the *peripheral* container while they are hotplugged and during object init time as well?
+Thanks,
+Stefan
 
-theoretically device_del may use QOM path (the later users can get with query-hotpluggable-cpus),
-but I think it's mostly debugging feature.
+--poemUeGtc2GQvHuH
+Content-Type: application/pgp-signature; name="signature.asc"
 
-users are supposed to specify 'id' during -device/device_add if they are going to manage that device
-afterwards (like unplugging it). Then they could use that 'id' in other commands (including device_del)
+-----BEGIN PGP SIGNATURE-----
 
-So 'id'-ed devices end up in 'peripheral' container
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4qztAACgkQnKSrs4Gr
+c8iB2Qf/ahMBEC8cQPLEp6PbRe+MXApQPztwhhwh+6sz2c6uV3qpMsjm5dSXxubr
+h7nkrE0k01ERVFFD3E4PKicg/2JQfsx+FqkyOofkF3YEVuz0foUoMRUA0dcSxBr9
+nUC95j/522tcdZ7Hh8P/JV4aB9dSyIX5U51vmm/ZGz9/w9yHekHRSH54THw3cg13
+68SijGGqNvH3cu98JRaDUZwMAqwLPjWdLWAt5wl00dxIKqr1HiDvdX8WAt+rah8k
+oAgMT2M3mKgWnZaCtfPZ1oIgSWa7UKO8kp+ci3S2nmJ5YUkKrcyAAhhyiwkYVd3Y
+oY9QDsskKPJ3WYTYOq9rlSTxAWNrEA==
+=Ibox
+-----END PGP SIGNATURE-----
 
-> 3. I could not see any device being place under *anonymous* container during init time. What is the use of this container?
-
-if I recall it right, devices created with help of device_add but without 'id' go to this container
-
-
-> 
-> I would be thankful for your valuable insights and answers and help in highlighting any gap in my understanding.
-> 
-> Thanks in anticipation!
-> 
-> Best Regards
-> Salil
-> 
-
+--poemUeGtc2GQvHuH--
 
