@@ -2,81 +2,80 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D167C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D780BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:23:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 270042075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:22:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1D472075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:23:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jok5xB+h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270042075D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I4ZoS0q4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D472075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuyur-0003xm-B7
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:22:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60514)
+	id 1iuyw5-0004qH-TF
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:23:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iuytx-0003JC-KK
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:21:34 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iuyvN-0004RK-5H
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:23:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iuytw-0002YW-8p
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:21:33 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:42580)
+ (envelope-from <peter.maydell@linaro.org>) id 1iuyvM-00045u-16
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:23:01 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45238)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iuytw-0002XG-2J
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:21:32 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id 66so1546868otd.9
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 05:21:31 -0800 (PST)
+ id 1iuyvL-00044q-RX
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:22:59 -0500
+Received: by mail-ot1-x342.google.com with SMTP id 59so1537151otp.12
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 05:22:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6vBwWJFt2KEYe/qCie/QQtar5VEO+Y5mvenX+hAAxiE=;
- b=Jok5xB+hXHyS7+7mfzu/N9N6fmfIuk6aHEBUqofIZMzvspLKDiMGK2lqKK5A4mbDFS
- coiY+fZHEXIiFnKEISIBjWS2prlkb8Z4vIpqfRaworI9MFqbKD0zX0/hD0kahAtQ0LXl
- l+SvmIQBAA4Jdxq7g114OFD8l+E5ZdbJZOdvmRYV5lkcrVQLKZyuVtVaCXVumqA7o6YF
- XJIrZJFivwl6dA2F3Pg50AHmAxAbl6PcKvwTraVvpQb0tPockJUntt94K4EDlR0xIu4u
- ZTrmI5BcNPonJM6gKTQbA2ihnBQH6p/3juoiNBYiBlumcHpFMHyf//ONEJ1FjZ1LV6ox
- c5Wg==
+ :cc; bh=ZfZNubndxTwD4Z8P2Tco1rSJrq5QdrlRCT/CLQh4dE4=;
+ b=I4ZoS0q4pCnJRQsZUdPYyd3lf2TPU4W/U1Htw7LmEib8X67qeZ8QBbFkXzSlIJc9Rs
+ I9s+gbvyUCrurSAi6eZm+g67aDzs3tl/71q0d2gyvVHs+OehE2ypaUMUjNmUuqBMMQIr
+ I83t46C4fzLD7t15OqmZ+1Xpr8ioDR2nNUCsjjuCxMBcASHe6gAX3hG3n/dtfNtiwPTm
+ Ws+wINmTdUT2/028tRJc+dy4dc79MdCl+f0CE90nqwgklVUsEvZafXT8BRbr1BCs9ci/
+ 5GcUSpWLmejKqERrjQSMv596u23feZ5XFqdQL+PNZEeSBv8HJO5z32eZVW1eu9Itc9jJ
+ 8mig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=6vBwWJFt2KEYe/qCie/QQtar5VEO+Y5mvenX+hAAxiE=;
- b=Vvt/8RDTO5/KJSmp9x8kPhGWPJG8nJ0LTc51EA08EIWpq8dtdYbpy7V9wCKTqrUzDB
- NsVRNYD9AIOCOwldSuFZ8AwPQe+BPUiLs5QV3vD8U9xi+N8NMv4tqG9bg57mCAuS4i6J
- VmrlxSLevZZCv0QAGFOihZElgs+csWoQwPGbJIHRXhsRMdApLWXiu/f0h+biAih/hQTW
- vWmIpXPbf3IpE5o79eRHxXdHQq1dHsVKDnE60N3Ab+iJpPEyz+BxEJf8RZv48dxUjPAX
- RsJdavcoz+PIINsqxx6ynAHYaG04qAoMd0IcuwXZTPD7WDI9ye5GsM5NZSpbeAe6Dwgr
- bOiA==
-X-Gm-Message-State: APjAAAW9BCxYl9tVfKc4stQAk5wEo3JPHTbPTwe6/wKeAbIPPMZpi/Jl
- HjWa0Cw/WU+Hd2z20vBSCRSiYRPlUyvE523f2dH39Q==
-X-Google-Smtp-Source: APXvYqyKN6fiDCGKWUwQsP/0yrQ4sW2C790k//4HZyo+F5oajTK9rWRzd9PVg02beAmlrKmzWWwaKkjXjN1wrIwl+Cc=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr2493859otq.97.1579872090706; 
- Fri, 24 Jan 2020 05:21:30 -0800 (PST)
+ bh=ZfZNubndxTwD4Z8P2Tco1rSJrq5QdrlRCT/CLQh4dE4=;
+ b=GOJFZ2/CWHoZZCuc6LunyRC0fcZ5CcTh3/2ZAXUQWKt9jOd36imE0aZdIP/PSNaBye
+ DcEU1T6n0nndmrEC7Q/kZ3GkR5QNtgLf4NrnrsVAinUzhwcSb5NQLc2jyIMDXo5yVSeV
+ w21FX3lve6QziU6pY4uLk/e7Q5mXA/qPhRkDbdebA3N2SiAbC/dKAm+Jmub/Ark+ZkGU
+ g6W8+Z9R+Y8lA/8IuFzRbXIayHTPchiHTHlPy47icm9TcuLKSr/vE0ndjte4S96RJXRl
+ +3d2N5sI0xv3uLV4ii4wYfYqq+SU4HiNj0kchmi672wtHww+vFTs1/PsjzFaDEnMp4P+
+ fL6w==
+X-Gm-Message-State: APjAAAWJFS6gpPC+UNDMD9iiQG59A1RIM5FXRzyUwLh065EW3Z4/D1p9
+ rYmW03kr4O41i4MyO5jkt4KDijnv9WgeQFSOQKK4/w==
+X-Google-Smtp-Source: APXvYqwIA+fB1f41fYWZjwTmvfA+wnNJbKU7duh3cS62X45h0e6LDzN73JAFZ8eoQeMzeaCFWThKWq6PsEzYsGWMA9o=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr2638018otd.91.1579872178423; 
+ Fri, 24 Jan 2020 05:22:58 -0800 (PST)
 MIME-Version: 1.0
-References: <20190108224600.23125-1-david@gibson.dropbear.id.au>
- <20190108224600.23125-13-david@gibson.dropbear.id.au>
-In-Reply-To: <20190108224600.23125-13-david@gibson.dropbear.id.au>
+References: <20200121225703.148465-1-palmerdabbelt@google.com>
+In-Reply-To: <20200121225703.148465-1-palmerdabbelt@google.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Jan 2020 13:21:19 +0000
-Message-ID: <CAFEAcA-6KiNwN_5xNgZQcJEHou5uO7KrMUgNyXf3ae6=DO7scA@mail.gmail.com>
-Subject: Re: [PULL 12/29] target/ppc: move FP and VMX registers into aligned
- vsr register array
-To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 24 Jan 2020 13:22:47 +0000
+Message-ID: <CAFEAcA_UKdGYLRPQd2rChqG5vJ=OCsjRzGNf1j3VcJznJ4YLxQ@mail.gmail.com>
+Subject: Re: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 1
+To: Palmer Dabbelt <palmerdabbelt@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32f
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,79 +87,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
- qemu-ppc <qemu-ppc@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 8 Jan 2019 at 22:46, David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, 21 Jan 2020 at 23:41, Palmer Dabbelt <palmerdabbelt@google.com> wrote:
 >
-> From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> The following changes since commit 28b58f19d269633b3d14b6aebf1e92b3cd3ab56e:
 >
-> The VSX register array is a block of 64 128-bit registers where the first 32
-> registers consist of the existing 64-bit FP registers extended to 128-bit
-> using new VSR registers, and the last 32 registers are the VMX 128-bit
-> registers as show below:
+>   ui/gtk: Get display refresh rate with GDK version 3.22 or later (2020-01-16 14:03:45 +0000)
 >
->             64-bit               64-bit
->     +--------------------+--------------------+
->     |        FP0         |                    |  VSR0
->     +--------------------+--------------------+
->     |        FP1         |                    |  VSR1
->     +--------------------+--------------------+
->     |        ...         |        ...         |  ...
->     +--------------------+--------------------+
->     |        FP30        |                    |  VSR30
->     +--------------------+--------------------+
->     |        FP31        |                    |  VSR31
->     +--------------------+--------------------+
->     |                  VMX0                   |  VSR32
->     +-----------------------------------------+
->     |                  VMX1                   |  VSR33
->     +-----------------------------------------+
->     |                  ...                    |  ...
->     +-----------------------------------------+
->     |                  VMX30                  |  VSR62
->     +-----------------------------------------+
->     |                  VMX31                  |  VSR63
->     +-----------------------------------------+
+> are available in the Git repository at:
 >
-> In order to allow for future conversion of VSX instructions to use TCG vector
-> operations, recreate the same layout using an aligned version of the existing
-> vsr register array.
+>   git@github.com:palmer-dabbelt/qemu.git tags/riscv-for-master-5.0-sf1
 >
-> Since the old fpr and avr register arrays are removed, the existing callers
-> must also be updated to use the correct offset in the vsr register array. This
-> also includes switching the relevant VMState fields over to using subarrays
-> to make sure that migration is preserved.
+> for you to fetch changes up to 82f014671cf057de51c4a577c9e2ad637dcec6f9:
+>
+>   target/riscv: update mstatus.SD when FS is set dirty (2020-01-16 10:03:15 -0800)
+>
+> ----------------------------------------------------------------
+> RISC-V Patches for the 5.0 Soft Freeze, Part 1
+>
+> This patch set contains a handful of collected fixes that I'd like to target
+> for the 5.0 soft freeze (I know that's a long way away, I just don't know what
+> else to call these):
+>
+> * A fix for a memory leak initializing the sifive_u board.
+> * Fixes to privilege mode emulation related to interrupts and fstatus.
+>
+> Notably absent is the H extension implementation.  That's pretty much reviewed,
+> but not quite ready to go yet and I didn't want to hold back these important
+> fixes.  This boots 32-bit and 64-bit Linux (buildroot this time, just for fun)
+> and passes "make check".
+>
+> ----------------------------------------------------------------
+> Pan Nengyuan (1):
+>       riscv/sifive_u: fix a memory leak in soc_realize()
+>
+> ShihPo Hung (3):
+>       target/riscv: Fix tb->flags FS status
+>       target/riscv: fsd/fsw doesn't dirty FP state
+>       target/riscv: update mstatus.SD when FS is set dirty
+>
+> Yiting Wang (1):
+>       riscv: Set xPIE to 1 after xRET
+>
 
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-> @@ -281,15 +281,17 @@ static void save_user_regs(CPUPPCState *env, struct target_mcontext *frame)
->      /* Save VSX second halves */
->      if (env->insns_flags2 & PPC2_VSX) {
->          uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
-
-This line didn't change in this patch, but the code change seems
-to have prompted Coverity to warn (CID 1396862):
-
- illegal_address: &frame->mc_vregs.altivec[34] evaluates to an address that is
- at byte offset 544 of an array of 528 bytes.
-
-> @@ -393,16 +395,18 @@ static void restore_user_regs(CPUPPCState *env,
->      /* Restore VSX second halves */
->      if (env->insns_flags2 & PPC2_VSX) {
->          uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
-
-...and then CID 1396863 is the same issue for this line.
-
-
-Is this legit, or a false-positive ?
-
-thanks
 -- PMM
 
