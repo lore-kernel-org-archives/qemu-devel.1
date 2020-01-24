@@ -2,71 +2,82 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78276C32771
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 11:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78AF3C35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 11:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5137220702
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 11:21:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5137220702
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 496EB2075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 11:38:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTeo4zXi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496EB2075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iux1K-0005RD-Gl
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 06:21:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60681)
+	id 1iuxII-0000W0-Ed
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 06:38:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <salil.mehta@huawei.com>) id 1iux0k-00052E-Lp
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 06:20:27 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuxHl-000054-DW
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 06:38:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <salil.mehta@huawei.com>) id 1iux0i-0002db-Je
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 06:20:25 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2063 helo=huawei.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iuxHh-00088j-3c
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 06:37:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38050
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <salil.mehta@huawei.com>)
- id 1iux0h-0002Sf-CE
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 06:20:23 -0500
-Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id 1C70AA7C730A7E265E29;
- Fri, 24 Jan 2020 11:20:16 +0000 (GMT)
-Received: from lhreml704-chm.china.huawei.com (10.201.108.53) by
- lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Fri, 24 Jan 2020 11:20:15 +0000
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml704-chm.china.huawei.com (10.201.108.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Fri, 24 Jan 2020 11:20:15 +0000
-Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
- lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1713.004; 
- Fri, 24 Jan 2020 11:20:15 +0000
-From: Salil Mehta <salil.mehta@huawei.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: [Question] Regarding containers "unattached/peripheral/anonymous" -
- their relation with hot(un)plug of devices
-Thread-Topic: [Question] Regarding containers
- "unattached/peripheral/anonymous" - their relation with hot(un)plug of
- devices
-Thread-Index: AdXSpuyfn6DVS59zTi+rGkiX0i4oLA==
-Date: Fri, 24 Jan 2020 11:20:15 +0000
-Message-ID: <70446b6cbf5442488a40fe809f38c3c8@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.226.53]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuxHg-000865-PN
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 06:37:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579865875;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VgOlFOMg5BbXwesM95rqBPdXzdG1SCLKd7sYSHjrCK0=;
+ b=ZTeo4zXi77AXSMGFlB7QMJoKYuvmrvN8UpaParEPtZa1u888dfpZh7vFVdTlufnqUdm6Ej
+ n2EluKvJQXzewQ/hNunP+SB9r4ckR3rhlVJUnoFCEe8lzJ43K9rWJUJmTUY0YNX9rPSyMO
+ Sn9BTb11KJ9e368kx4Emgh3OWKNvBE8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-FjMaUzGRNEeCJ6DljxhLRw-1; Fri, 24 Jan 2020 06:37:54 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A150100550E
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 11:37:53 +0000 (UTC)
+Received: from work-vm (ovpn-117-253.ams2.redhat.com [10.36.117.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0941E5C1BB;
+ Fri, 24 Jan 2020 11:37:48 +0000 (UTC)
+Date: Fri, 24 Jan 2020 11:37:46 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v3 12/21] multifd: multifd_queue_page only needs the
+ qemufile
+Message-ID: <20200124113746.GJ2970@work-vm>
+References: <20200123115831.36842-1-quintela@redhat.com>
+ <20200123115831.36842-13-quintela@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200123115831.36842-13-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: FjMaUzGRNEeCJ6DljxhLRw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 185.176.76.210
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,45 +89,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini <pbonzini@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
-I am working on vCPU Hotplug feature for ARM64 and I am in mid of understan=
-ding some aspect of device_add/device_del interface of the QEMU.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Observations:
-1. Any object initialised by qmp_device_add() gets into /machine/unattached=
- container. I traced the flow to code leg inside  device_set_realized()
-2. I could see the reverse qmp_device_del() expects the device to be in  /m=
-achine/peripheral container.
-3. I could see any object initially added to unattached container did not h=
-ad their parents until object_add_property_child() was called further in th=
-e leg.
-    which effectively meant a new property was created and property table p=
-opulated and child was parented.
-4. Generally, container  /machine/peripheral was being used wherever DEVICE=
-(dev)->id was present and non-null.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Question:
-1. Wanted to confirm my understanding about the use of having separate cont=
-ainers like unattached, peripheral and anonymous.
-2. At init time all the vcpus goes under *unattached* container. Now, qmp_d=
-evice_del() cannot be used to unplug them. I am wondering
-   if all the hotplug devices need to go under the *peripheral* container w=
-hile they are hotplugged and during object init time as well?
-3. I could not see any device being place under *anonymous* container durin=
-g init time. What is the use of this container?
+> ---
+>  migration/ram.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 19caf5ed4d..d4c829bc77 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -974,7 +974,7 @@ static int multifd_send_pages(QEMUFile *f)
+>      return 1;
+>  }
+> =20
+> -static int multifd_queue_page(RAMState *rs, RAMBlock *block, ram_addr_t =
+offset)
+> +static int multifd_queue_page(QEMUFile *f, RAMBlock *block, ram_addr_t o=
+ffset)
+>  {
+>      MultiFDPages_t *pages =3D multifd_send_state->pages;
+> =20
+> @@ -993,12 +993,12 @@ static int multifd_queue_page(RAMState *rs, RAMBloc=
+k *block, ram_addr_t offset)
+>          }
+>      }
+> =20
+> -    if (multifd_send_pages(rs->f) < 0) {
+> +    if (multifd_send_pages(f) < 0) {
+>          return -1;
+>      }
+> =20
+>      if (pages->block !=3D block) {
+> -        return  multifd_queue_page(rs, block, offset);
+> +        return  multifd_queue_page(f, block, offset);
+>      }
+> =20
+>      return 1;
+> @@ -2128,7 +2128,7 @@ static int ram_save_page(RAMState *rs, PageSearchSt=
+atus *pss, bool last_stage)
+>  static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
+>                                   ram_addr_t offset)
+>  {
+> -    if (multifd_queue_page(rs, block, offset) < 0) {
+> +    if (multifd_queue_page(rs->f, block, offset) < 0) {
+>          return -1;
+>      }
+>      ram_counters.normal++;
+> --=20
+> 2.24.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-I would be thankful for your valuable insights and answers and help in high=
-lighting any gap in my understanding.
-
-Thanks in anticipation!
-
-Best Regards
-Salil
 
