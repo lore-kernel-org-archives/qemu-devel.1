@@ -2,79 +2,83 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69223C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93932C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:57:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 352A820709
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:52:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6059620709
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 16:57:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L2ByoyQi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352A820709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mL7hhvik"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6059620709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv2CB-0001r1-Cj
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 11:52:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44583)
+	id 1iv2Gf-00057Q-GR
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 11:57:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45541)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iv2BY-0001Cs-88
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:51:57 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iv2Fr-0003cU-RV
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:56:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iv2BV-0008U2-MO
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:51:54 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31976
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iv2BV-0008Sr-Bj
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:51:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579884712;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:openpgp:openpgp;
- bh=x9FsuIAfGUDXqzlYBq2H3+I7Vtpi2lBfDhxCiluRJFo=;
- b=L2ByoyQi9wrjnJ8iDHbDQBifahcllAKViBb8seJSbwizOngZn0d6Vfp4tyyxu6CsDs1KrE
- lGWL11hpU0NFM2PIp008AihHMX2wAq5fnsQO8ZJiyuVzkjzh/iAlxrBN9ajOMsacFc0wIO
- DMKMnq/meuGfSwLsN5XAxCVkZn1ahD8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-bQDtHHHuP8S_obt5wp3QRA-1; Fri, 24 Jan 2020 11:51:44 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F36C8005A2;
- Fri, 24 Jan 2020 16:51:43 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-156.ams2.redhat.com [10.36.116.156])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B42BC857BB;
- Fri, 24 Jan 2020 16:51:42 +0000 (UTC)
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-From: Thomas Huth <thuth@redhat.com>
-Subject: OpenBIOS update broke Linux boot on qemu-system-sparc64
-Openpgp: preference=signencrypt
-Message-ID: <82c4a7e1-aafc-70e5-b00a-bd56c9cd1b61@redhat.com>
-Date: Fri, 24 Jan 2020 17:51:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: bQDtHHHuP8S_obt5wp3QRA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+ (envelope-from <robert.foley@linaro.org>) id 1iv2Fq-0002vm-UX
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:56:23 -0500
+Received: from mail-pj1-x102b.google.com ([2607:f8b0:4864:20::102b]:55740)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iv2Fq-0002vA-PK
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 11:56:22 -0500
+Received: by mail-pj1-x102b.google.com with SMTP id d5so61373pjz.5
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:56:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=X0NxLy9YfOGRAzvR5nre9SreXUazO7Ppv8M7S281EDw=;
+ b=mL7hhvikCjOfHRj5MDWBzw3Oi1/OGEqV5ZojROPHMBNhk4rd6opa737N0fpeb+ZTae
+ FIZevJI8OJoFcSnRod6z0NDeTtz06fxHJ5k8/SZW4jeiQQOLmKqrS6gYqZ+MSso4ytaX
+ 5h6aPLSImgq2xx3T7TNAavxxlXy3UoQ7IW8dtDc+Fmz+du+tWKqC+7Z1OFm4M1nt6BxZ
+ 1kKqvvYv+WtAhSurdxKZBmj4Gz0Vhqfzt+bxbnXIgSdQGzAn1cufH4KDB3j4KysrTssP
+ lNUTg3NcWlED68lrQaP2r6PRVTnzy+ZRAzZCT0TwkC7YG/J58XkEoxLMc6scQv9+tUuk
+ KjZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=X0NxLy9YfOGRAzvR5nre9SreXUazO7Ppv8M7S281EDw=;
+ b=GAGH4fDoWy54wgVuGpICj93KP5dO2GQ/s9/T5zb4fxfyC8vNM8B0EZkHT46T7mwecc
+ 8syhyD3TOD2phWQHJ/aHYrHwClsSLFTJxYggns2npvYEHAfcgDZP3plxYWn4v/iDQK6K
+ OkEUPnZSYDyLv3gBht4AmLOoluxIQ/xmm3QYbRTqywKsBhR7qt9Gkh8SmoqKYfe4Jn6h
+ Uz8YyGZTnIhEgzm+r1hj/rTF+2i/MNI/uVnT5LaHu4pmJ3euGbwCzn7Gl0TpnFMHdwvC
+ GvCcuO5kdyZ8/K7xwUM6hJHqfrl4PrFzErPs4hnwRgdaYN65GA9RKTOra8q/Ck73CEk1
+ YNMw==
+X-Gm-Message-State: APjAAAU+mn+rxa5y3nniyXeesMLYAzIZ+MVVS51mbAEmpp0VU64DfUuL
+ xURrh77/lMKZhPJgih1YF3TI38n+sls=
+X-Google-Smtp-Source: APXvYqza1F0gg1YP6n0jX3v6NCiga5uzfdZBZtZx9TJ3dw0Rnib+xD4tDoODGQdZYf2q+dRZYa9cIw==
+X-Received: by 2002:a17:902:708b:: with SMTP id
+ z11mr4552410plk.121.1579884981668; 
+ Fri, 24 Jan 2020 08:56:21 -0800 (PST)
+Received: from Rfoley-MA01.usrd.futurewei.com ([12.111.81.71])
+ by smtp.gmail.com with ESMTPSA id l10sm6969953pjy.5.2020.01.24.08.56.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jan 2020 08:56:21 -0800 (PST)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/8] tests/vm: Debug mode shows ssh output.
+Date: Fri, 24 Jan 2020 11:53:28 -0500
+Message-Id: <20200124165335.422-2-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200124165335.422-1-robert.foley@linaro.org>
+References: <20200124165335.422-1-robert.foley@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::102b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,28 +90,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, philmd@redhat.com, alex.bennee@linaro.org,
+ robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add changes to tests/vm/basevm.py so that during debug
+ mode we show ssh output.
 
- Hi Mark,
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+---
+ tests/vm/basevm.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-today, I noticed that the Sparc64 image from the QEMU advent calendar
-2018 does not work anymore with the recent QEMU:
-
- https://www.qemu-advent-calendar.org/2018/download/day23.tar.xz
-
-The Linux kernel now crashes during the boot process.
-
-Bisecting the issues pointed to:
-
- commit e9deadb1c10351213845428de7591931f790f111
- Update OpenBIOS images to 3464681b built from submodule.
-
-Do you maybe have an idea what might be going wrong here?
-
- Thomas
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index ed5dd4f3d0..991115e44b 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -122,11 +122,16 @@ class BaseVM(object):
+         return fname
+ 
+     def _ssh_do(self, user, cmd, check):
+-        ssh_cmd = ["ssh", "-q", "-t",
++        ssh_cmd = ["ssh",
++                   "-t",
+                    "-o", "StrictHostKeyChecking=no",
+                    "-o", "UserKnownHostsFile=" + os.devnull,
+                    "-o", "ConnectTimeout=1",
+                    "-p", self.ssh_port, "-i", self._ssh_key_file]
++        # If not in debug mode, set ssh to quiet mode to
++        # avoid printing the results of commands.
++        if not self.debug:
++            ssh_cmd.append("-q")
+         for var in self.envvars:
+             ssh_cmd += ['-o', "SendEnv=%s" % var ]
+         assert not isinstance(cmd, str)
+-- 
+2.17.1
 
 
