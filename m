@@ -2,99 +2,79 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 081D3C35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0A5C35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:51:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC416214AF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A96D82075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:51:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A5FwnkZ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC416214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mi47W6vj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96D82075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuvcI-0004b1-Ud
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:51:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36020)
+	id 1iuvcl-00054x-PD
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:51:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36068)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iuvbY-0003py-8V
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:21 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iuvbp-0004AR-En
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iuvbW-0003J4-Mo
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60612
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iuvbn-0003ri-Qt
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:37 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38440
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuvbW-0003I5-Ii
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:18 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuvbn-0003pi-MI
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579859417;
+ s=mimecast20190719; t=1579859435;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K4MbEmUcjT26ki78wRel742Jm5k5425+QlV0Ts2IY8o=;
- b=A5FwnkZ732vc7/7dDhKkwEzFNrH7Jg2ISWYVNqWx6qgrOMAtFY1votZtYZoRyIfMetBtXB
- lvo2FBYVlTNiBqKpNrQIRIrCsggL+JTh6b+HEJlFi1WBaeCcZ/DIg9/dWtdgCWFQQ+Pmiv
- 2/sWKoOz54T+ciHIm0pGcSwlsEjTkwo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-pDRW068zO26idzDfqZuswQ-1; Fri, 24 Jan 2020 04:50:13 -0500
-Received: by mail-wr1-f69.google.com with SMTP id z15so917922wrw.0
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 01:50:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mgid5mXPvk6KVOb6p24Xkfu9zXyL4soPCRdPvTqWdkM=;
- b=DKgh7KM2FoAJ6dq+vBfucBtCes3Bo4dVkQEajTrZQABWgFB997Wu9SyWcAAJRuG5BG
- pXfXZciLAXbLPqyw8g7nTlVsZ5ycyQFJ7PTCVAj5V7KT1bgladMwqit7pC5scKbkUFli
- STZl23a8jjYuw8mW3XMMvt9PPcbQB3Zki5BfxPlxu0Gj5OIZdqthNTa9koG9VqtCi5HR
- O1qJH4KSUgD6IcP/7FrG6HrJOovuDBNPMqJVYwxeyUaI/OvUOrwQEHiaCvKM7/F3bCXI
- N5xFnsbNR8t3WQPoOfmW0WF06UQzy+3oedei8+gIq5+sPrh35Wk3x3VS5gCp73VLTSD3
- DQxg==
-X-Gm-Message-State: APjAAAWxk7t+iz2GWk49U414BaUWpfb/wUDNqpotu/13W5okpS4exBfY
- t5/0ZRdxhvjogl/1sIcR2s30pe9NRknbrsT+F75zPli34Gz3lhfI+o3Vhcc/VWNCzCuz6HksevN
- ISgrSyWe0L+m5vyk=
-X-Received: by 2002:adf:82e7:: with SMTP id 94mr3608288wrc.60.1579859412127;
- Fri, 24 Jan 2020 01:50:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwjGnolcGId0nm0hBc6Mg9dhq0NcNe8eCN2JUqG/V7Evhv/ahd0BkXLN9r8De4pauhS4pN5Hg==
-X-Received: by 2002:adf:82e7:: with SMTP id 94mr3608266wrc.60.1579859411871;
- Fri, 24 Jan 2020 01:50:11 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id 60sm7026786wrn.86.2020.01.24.01.50.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Jan 2020 01:50:11 -0800 (PST)
-Subject: Re: [PATCH v3 01/21] migration-test: Use g_free() instead of free()
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-References: <20200123115831.36842-1-quintela@redhat.com>
- <20200123115831.36842-2-quintela@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ae7e0c5c-1d6d-60a9-91bf-3e3866af6509@redhat.com>
-Date: Fri, 24 Jan 2020 10:50:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=/YdpDzSfvfu3py0OzOOkBSLOOGYzv0wLlQ8AgA1nk/Y=;
+ b=Mi47W6vjONWi0neeVQfeUQ0H0LP8X2rG1jS+ty7CIXP1AgJAy2/JrC5CcJ7zy0WXQFfbUf
+ Nx2a8Hnyvvdru4esETLf4+HviYmnCv5Xhm9dMFZyaXKqhNP/1yD6VD/KtWO9f08gAFFcm5
+ Cwp+gqRzoSmHVwRjJXHfRKrO0h1HuPw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-zHqNg0kZOEuNbDGCvoC6MQ-1; Fri, 24 Jan 2020 04:50:33 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D0D610102B8;
+ Fri, 24 Jan 2020 09:50:32 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6E70B194B2;
+ Fri, 24 Jan 2020 09:50:31 +0000 (UTC)
+Date: Fri, 24 Jan 2020 10:50:30 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH REPOST v3 77/80] hostmem: introduce "prealloc-threads"
+ property
+Message-ID: <20200124105030.00dab6bc@redhat.com>
+In-Reply-To: <1579779525-20065-78-git-send-email-imammedo@redhat.com>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+ <1579779525-20065-78-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200123115831.36842-2-quintela@redhat.com>
-Content-Language: en-US
-X-MC-Unique: pDRW068zO26idzDfqZuswQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: zHqNg0kZOEuNbDGCvoC6MQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,46 +86,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: jitendra.kolhe@hpe.com, pbonzini@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/23/20 12:58 PM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On Thu, 23 Jan 2020 12:38:42 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Nothing changed since v4 (apart it is now v3),
-however it misses:
+> the property will allow user to specify number of threads to use
+> in pre-allocation stage. It also will allow to reduce implicit
+> hostmem dependency on current_machine.
+> On object creation it will default to 1, but via machine
+> compat property it will be updated to MachineState::smp::cpus
+> to keep current behavior for hostmem and main RAM (which is
+> now also hostmem based).
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Fixes: b99784ef6c3
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Jitendra,
 
-See:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg672805.html
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg672853.html
+As the one who introduced smp_cpus in backend
+
+(1e356fc14be mem-prealloc: reduce large guest start-up and migration time.)
+
+could you review this patch please?
 
 > ---
->   tests/qtest/migration-test.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-> index 26e2e77289..b6a74a05ce 100644
-> --- a/tests/qtest/migration-test.c
-> +++ b/tests/qtest/migration-test.c
-> @@ -1291,7 +1291,7 @@ static void test_multifd_tcp(void)
->       wait_for_serial("dest_serial");
->       wait_for_migration_complete(from);
->       test_migrate_end(from, to, true);
-> -    free(uri);
-> +    g_free(uri);
->   }
->  =20
->   int main(int argc, char **argv)
->=20
+> v3:
+>   - use object_register_sugar_prop() instead of directly hacking
+>     compat_props (Paolo Bonzini <pbonzini@redhat.com>)
+>   - fix TODO description
+> 
+> CC: pbonzini@redhat.com
+> CC: ehabkost@redhat.com
+> ---
+>  include/sysemu/hostmem.h |  2 ++
+>  backends/hostmem.c       | 43 +++++++++++++++++++++++++++++++++++++++----
+>  vl.c                     | 14 ++++++++++----
+>  3 files changed, 51 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+> index 5db0d66..bdf8666 100644
+> --- a/include/sysemu/hostmem.h
+> +++ b/include/sysemu/hostmem.h
+> @@ -61,6 +61,7 @@ struct HostMemoryBackendClass {
+>   * @parent: opaque parent object container
+>   * @size: amount of memory backend provides
+>   * @mr: MemoryRegion representing host memory belonging to backend
+> + * @prealloc_threads: number of threads to be used for preallocatining RAM
+>   */
+>  struct HostMemoryBackend {
+>      /* private */
+> @@ -70,6 +71,7 @@ struct HostMemoryBackend {
+>      uint64_t size;
+>      bool merge, dump, use_canonical_path;
+>      bool prealloc, force_prealloc, is_mapped, share;
+> +    uint32_t prealloc_threads;
+>      DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
+>      HostMemPolicy policy;
+>  
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index e773bdf..0988986 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -223,7 +223,6 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
+>  {
+>      Error *local_err = NULL;
+>      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> -    MachineState *ms = MACHINE(qdev_get_machine());
+>  
+>      if (backend->force_prealloc) {
+>          if (value) {
+> @@ -243,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
+>          void *ptr = memory_region_get_ram_ptr(&backend->mr);
+>          uint64_t sz = memory_region_size(&backend->mr);
+>  
+> -        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
+> +        os_mem_prealloc(fd, ptr, sz, backend->prealloc_threads, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>              return;
+> @@ -252,14 +251,45 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
+>      }
+>  }
+>  
+> +static void host_memory_backend_get_prealloc_threads(Object *obj, Visitor *v,
+> +    const char *name, void *opaque, Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> +    visit_type_uint32(v, name, &backend->prealloc_threads, errp);
+> +}
+> +
+> +static void host_memory_backend_set_prealloc_threads(Object *obj, Visitor *v,
+> +    const char *name, void *opaque, Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> +    Error *local_err = NULL;
+> +    uint32_t value;
+> +
+> +    visit_type_uint32(v, name, &value, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    if (value <= 0) {
+> +        error_setg(&local_err,
+> +                   "property '%s' of %s doesn't take value '%d'",
+> +                   name, object_get_typename(obj), value);
+> +        goto out;
+> +    }
+> +    backend->prealloc_threads = value;
+> +out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  static void host_memory_backend_init(Object *obj)
+>  {
+>      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>  
+> +    /* TODO: convert access to globals to compat properties */
+>      backend->merge = machine_mem_merge(machine);
+>      backend->dump = machine_dump_guest_core(machine);
+>      backend->prealloc = mem_prealloc;
+> +    backend->prealloc_threads = 1;
+>  }
+>  
+>  static void host_memory_backend_post_init(Object *obj)
+> @@ -313,7 +343,6 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+>  {
+>      HostMemoryBackend *backend = MEMORY_BACKEND(uc);
+>      HostMemoryBackendClass *bc = MEMORY_BACKEND_GET_CLASS(uc);
+> -    MachineState *ms = MACHINE(qdev_get_machine());
+>      Error *local_err = NULL;
+>      void *ptr;
+>      uint64_t sz;
+> @@ -378,7 +407,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+>           */
+>          if (backend->prealloc) {
+>              os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
+> -                            ms->smp.cpus, &local_err);
+> +                            backend->prealloc_threads, &local_err);
+>              if (local_err) {
+>                  goto out;
+>              }
+> @@ -456,6 +485,12 @@ host_memory_backend_class_init(ObjectClass *oc, void *data)
+>          host_memory_backend_set_prealloc, &error_abort);
+>      object_class_property_set_description(oc, "prealloc",
+>          "Preallocate memory", &error_abort);
+> +    object_class_property_add(oc, "prealloc-threads", "int",
+> +        host_memory_backend_get_prealloc_threads,
+> +        host_memory_backend_set_prealloc_threads,
+> +        NULL, NULL, &error_abort);
+> +    object_class_property_set_description(oc, "prealloc-threads",
+> +        "Number of CPU threads to use for prealloc", &error_abort);
+>      object_class_property_add(oc, "size", "int",
+>          host_memory_backend_get_size,
+>          host_memory_backend_set_size,
+> diff --git a/vl.c b/vl.c
+> index d825a34..21e3262 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2822,8 +2822,7 @@ static void configure_accelerators(const char *progname)
+>      }
+>  }
+>  
+> -static void create_default_memdev(MachineState *ms, const char *path,
+> -                                  bool prealloc)
+> +static void create_default_memdev(MachineState *ms, const char *path)
+>  {
+>      Object *obj;
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+> @@ -2832,7 +2831,6 @@ static void create_default_memdev(MachineState *ms, const char *path,
+>      if (path) {
+>          object_property_set_str(obj, path, "mem-path", &error_fatal);
+>      }
+> -    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
+>      object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
+>      object_property_add_child(object_get_objects_root(), mc->default_ram_id,
+>                                obj, &error_fatal);
+> @@ -3975,6 +3973,14 @@ int main(int argc, char **argv, char **envp)
+>          exit(1);
+>      }
+>  
+> +    if (mem_prealloc) {
+> +        char *val;
+> +
+> +        val = g_strdup_printf("%d", current_machine->smp.cpus);
+> +        object_register_sugar_prop("memory-backend", "prealloc-threads", val);
+> +        g_free(val);
+> +    }
+> +
+>      /*
+>       * Get the default machine options from the machine if it is not already
+>       * specified either by the configuration file or by the command line.
+> @@ -4309,7 +4315,7 @@ int main(int argc, char **argv, char **envp)
+>          machine_class->default_ram_size &&
+>          machine_class->default_ram_id &&
+>          !current_machine->ram_memdev) {
+> -        create_default_memdev(current_machine, mem_path, mem_prealloc);
+> +        create_default_memdev(current_machine, mem_path);
+>      }
+>      /* do monitor/qmp handling at preconfig state if requested */
+>      main_loop();
 
 
