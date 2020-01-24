@@ -2,81 +2,90 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38312C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0945EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 019822070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAA9C2070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:43:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dA+79j36"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 019822070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NUP+aFt/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAA9C2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuwOh-0000DB-7d
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:41:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48268)
+	id 1iuwQW-0001Wu-2D
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:43:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iuwNW-0007Us-NZ
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:39:55 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iuwPv-0000xm-NR
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:42:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iuwNV-0006ii-AU
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:39:54 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34335
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuwNV-0006hD-6J
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:39:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579862392;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Txes1tHFlN8wGGxefrtpyxNb8B5mcTcHfPI095nKwOI=;
- b=dA+79j36bdBybNpV4enX3mYRN3Lpq15YfA3J+Z9yld03pk5emD0QpOF75a2EUs2bStc9g+
- qi2Byhid3rV/tF7BVrObzC2nGSdpKJCImKrJ3Nr4d1p+Boa8u44EmHCUeQNOryA6o5obYu
- 5nfygAmD5CwGHOF6K4zbUePkRd7IEb4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-Fy8A_Ro3O_uPJZHUB_3WfA-1; Fri, 24 Jan 2020 05:39:50 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E46608010F5
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 10:39:49 +0000 (UTC)
-Received: from work-vm (ovpn-117-253.ams2.redhat.com [10.36.117.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F14FE28997;
- Fri, 24 Jan 2020 10:39:47 +0000 (UTC)
-Date: Fri, 24 Jan 2020 10:39:45 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v3 10/21] ram_addr: Split RAMBlock definition
-Message-ID: <20200124103945.GH2970@work-vm>
-References: <20200123115831.36842-1-quintela@redhat.com>
- <20200123115831.36842-11-quintela@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iuwPu-0002fi-Cr
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:42:23 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34550)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iuwPu-0002e0-4k
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:42:22 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t2so1398246wrr.1
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 02:42:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=56X4lhl7aUsrpjShD+4augsF21pKrzc55x7wSaRwTgQ=;
+ b=NUP+aFt/Wp2O9lVrcoF3I3kWqJitIZlkZpebR+wHFsHCLre7xhIAlbkFh2GeenmL+/
+ GRiThvSbYjYHnhI5lolFYa+WzX83NEHxqRPx6AuYavPzrvdyTOtpKYQ1iQlDeUq4SuKQ
+ 63YQinYBVHbFCLyT1iiQx8d9BvXXa4FqkGpa90/kpFtt8OC465xr2jWR5vwI8xXLlCeg
+ 0/TiF/BxdwQckmKN2yYUNSNVI8OXiqffkVyF6mxs/JT1NDqUS1vf/B/XkJF0FdjFOO4g
+ NFSehBuQTeUKFJeKeD/EUbw8khXQfnPGRztK8QWkLvtxUmXAlbYSYUlV+tMhHxqzFKDa
+ IXhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=56X4lhl7aUsrpjShD+4augsF21pKrzc55x7wSaRwTgQ=;
+ b=We4dTc7zFmJYVrskwl9O2YJHmNdiKEJ8lQy4/VtKlOV9NjYxNthfhn2iknhwkLiC11
+ DsaTZ1IFagck3NfpJVs1gKb4huPZRghvnOypygKpT2FQqSzog3IPcmPNmiImwSyUDeR4
+ CYDPVUEzOH5R0OrzqdfHRZBDykNgvtlCfVlv5D2OXrU1mLKzQwB/STRrQyTFcTPRL447
+ mK5kot5IcJONYHBG0zjSyFjV2fkg9Mkf5+MnDz2qY3DpaJl36X2gCbszO67UHY06D1RK
+ wvb86ViVNfOPMAXhCPyHrWP+j6HCiktiqtudtLvr1GIYjTBm4n7jTuzWPZq0G0asDqTH
+ QkOg==
+X-Gm-Message-State: APjAAAX9ynF4Z+T5ph7sUwvJHwrbv6rzZLeWnfyLH5eALkj8wqmFYd2Q
+ omQ/Ig+oxsPV1s6S3F9ts/rP/A==
+X-Google-Smtp-Source: APXvYqw2ELldAEOVUsONVf6STrTmfIEZ4vnSByUyHFX7DixVZ6YtEb4zeLjZ+IjXNAxJ7zoH/8sGfQ==
+X-Received: by 2002:adf:fa43:: with SMTP id y3mr3544652wrr.65.1579862540848;
+ Fri, 24 Jan 2020 02:42:20 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f1sm7021817wro.85.2020.01.24.02.42.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jan 2020 02:42:19 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 18C7A1FF87;
+ Fri, 24 Jan 2020 10:42:19 +0000 (GMT)
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-13-f4bug@amsat.org>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH rc2 12/25] hw/timer: Add limited support for Atmel 16
+ bit timer peripheral
+In-reply-to: <20200124005131.16276-13-f4bug@amsat.org>
+Date: Fri, 24 Jan 2020 10:42:19 +0000
+Message-ID: <875zh1yw38.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200123115831.36842-11-quintela@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Fy8A_Ro3O_uPJZHUB_3WfA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,173 +97,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, S.E.Harris@kent.ac.uk,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, me@xcancerberox.com.ar,
+ qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ Markus Armbruster <armbru@redhat.com>, dovgaluk@ispras.ru,
+ =?utf-8?Q?Marc-A?= =?utf-8?Q?ndr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ aleksandar.m.mail@gmail.com, Laurent Vivier <lvivier@redhat.com>,
+ thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+ richard.henderson@linaro.org, mrolnik@gmail.com,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-riscv@nongnu.org,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We need some of the fields without having to poison everything else.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-OK.
-(I guess the copyright matches the file we're splitting from; would be
-good to update the date some time).
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-I wondered if any of the RAMBlock related function declarations should
-move as wlel; but it's not obvious which ones.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+> From: Michael Rolnik <mrolnik@gmail.com>
+>
+> These were designed to facilitate testing but should provide enough
+> function to be useful in other contexts.  Only a subset of the functions
+> of each peripheral is implemented, mainly due to the lack of a standard
+> way to handle electrical connections (like GPIO pins).
+>
+> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Message-Id: <20200118191416.19934-13-mrolnik@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> [rth: Squash info mtree fixes and a file rename from f4bug, which was:]
+> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> [PMD: Use qemu_log_mask(LOG_UNIMP), replace goto by return]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  MAINTAINERS             |  1 +
->  include/exec/ram_addr.h | 40 +-------------------------
->  include/exec/ramblock.h | 64 +++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 66 insertions(+), 39 deletions(-)
->  create mode 100644 include/exec/ramblock.h
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 2c768ed3d8..3732f746b3 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1965,6 +1965,7 @@ F: ioport.c
->  F: include/exec/memop.h
->  F: include/exec/memory.h
->  F: include/exec/ram_addr.h
-> +F: include/exec/ramblock.h
->  F: memory.c
->  F: include/exec/memory-internal.h
->  F: exec.c
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 5adebb0bc7..5e59a3d8d7 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -24,45 +24,7 @@
->  #include "hw/xen/xen.h"
->  #include "sysemu/tcg.h"
->  #include "exec/ramlist.h"
-> -
-> -struct RAMBlock {
-> -    struct rcu_head rcu;
-> -    struct MemoryRegion *mr;
-> -    uint8_t *host;
-> -    uint8_t *colo_cache; /* For colo, VM's ram cache */
-> -    ram_addr_t offset;
-> -    ram_addr_t used_length;
-> -    ram_addr_t max_length;
-> -    void (*resized)(const char*, uint64_t length, void *host);
-> -    uint32_t flags;
-> -    /* Protected by iothread lock.  */
-> -    char idstr[256];
-> -    /* RCU-enabled, writes protected by the ramlist lock */
-> -    QLIST_ENTRY(RAMBlock) next;
-> -    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
-> -    int fd;
-> -    size_t page_size;
-> -    /* dirty bitmap used during migration */
-> -    unsigned long *bmap;
-> -    /* bitmap of already received pages in postcopy */
-> -    unsigned long *receivedmap;
-> -
-> -    /*
-> -     * bitmap to track already cleared dirty bitmap.  When the bit is
-> -     * set, it means the corresponding memory chunk needs a log-clear.
-> -     * Set this up to non-NULL to enable the capability to postpone
-> -     * and split clearing of dirty bitmap on the remote node (e.g.,
-> -     * KVM).  The bitmap will be set only when doing global sync.
-> -     *
-> -     * NOTE: this bitmap is different comparing to the other bitmaps
-> -     * in that one bit can represent multiple guest pages (which is
-> -     * decided by the `clear_bmap_shift' variable below).  On
-> -     * destination side, this should always be NULL, and the variable
-> -     * `clear_bmap_shift' is meaningless.
-> -     */
-> -    unsigned long *clear_bmap;
-> -    uint8_t clear_bmap_shift;
-> -};
-> +#include "exec/ramblock.h"
-> =20
->  /**
->   * clear_bmap_size: calculate clear bitmap size
-> diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
-> new file mode 100644
-> index 0000000000..07d50864d8
+<snip>
 > --- /dev/null
-> +++ b/include/exec/ramblock.h
-> @@ -0,0 +1,64 @@
+> +++ b/include/hw/timer/atmel_timer16.h
+> @@ -0,0 +1,94 @@
 > +/*
-> + * Declarations for cpu physical memory functions
+> + * Atmel AVR 16 bit timer
 > + *
-> + * Copyright 2011 Red Hat, Inc. and/or its affiliates
-> + *
-> + * Authors:
-> + *  Avi Kivity <avi@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * later.  See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +/*
-> + * This header is for use by exec.c and memory.c ONLY.  Do not include i=
-t.
-> + * The functions declared here will be removed soon.
-> + */
-> +
-> +#ifndef QEMU_EXEC_RAMBLOCK_H
-> +#define QEMU_EXEC_RAMBLOCK_H
-> +
-> +#ifndef CONFIG_USER_ONLY
-> +#include "cpu-common.h"
-> +
-> +struct RAMBlock {
-> +    struct rcu_head rcu;
-> +    struct MemoryRegion *mr;
-> +    uint8_t *host;
-> +    uint8_t *colo_cache; /* For colo, VM's ram cache */
-> +    ram_addr_t offset;
-> +    ram_addr_t used_length;
-> +    ram_addr_t max_length;
-> +    void (*resized)(const char*, uint64_t length, void *host);
-> +    uint32_t flags;
-> +    /* Protected by iothread lock.  */
-> +    char idstr[256];
-> +    /* RCU-enabled, writes protected by the ramlist lock */
-> +    QLIST_ENTRY(RAMBlock) next;
-> +    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
-> +    int fd;
-> +    size_t page_size;
-> +    /* dirty bitmap used during migration */
-> +    unsigned long *bmap;
-> +    /* bitmap of already received pages in postcopy */
-> +    unsigned long *receivedmap;
-> +
-> +    /*
-> +     * bitmap to track already cleared dirty bitmap.  When the bit is
-> +     * set, it means the corresponding memory chunk needs a log-clear.
-> +     * Set this up to non-NULL to enable the capability to postpone
-> +     * and split clearing of dirty bitmap on the remote node (e.g.,
-> +     * KVM).  The bitmap will be set only when doing global sync.
-> +     *
-> +     * NOTE: this bitmap is different comparing to the other bitmaps
-> +     * in that one bit can represent multiple guest pages (which is
-> +     * decided by the `clear_bmap_shift' variable below).  On
-> +     * destination side, this should always be NULL, and the variable
-> +     * `clear_bmap_shift' is meaningless.
-> +     */
-> +    unsigned long *clear_bmap;
-> +    uint8_t clear_bmap_shift;
-> +};
-> +#endif
-> +#endif
-> --=20
-> 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> + * Copyright (c) 2018 University of Kent
+> + * Author: Ed Robbins
 
+No sign off from the author here?
+> --- /dev/null
+> +++ b/hw/timer/atmel_timer16.c
+> @@ -0,0 +1,605 @@
+<snip>
+> +
+> +/* Helper macros */
+> +#define VAL16(l, h) ((h << 8) | l)
+> +#define DB_PRINT(fmt, args...) /* Nothing */
+> +/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ##
+> args)*/
+
+Format strings are likely to bitrot. Either use a if (GATE) or
+tracepoints.
+
+<snip>
+
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
