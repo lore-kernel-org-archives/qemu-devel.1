@@ -2,81 +2,80 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F63C35240
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 01:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F5B0C35240
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 01:03:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE7922071E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 01:02:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 497452071E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 01:03:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwvwCLxk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE7922071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FybnPBkZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497452071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iunMS-0005ao-TV
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 20:02:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44645)
+	id 1iunNN-0007ia-Ff
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jan 2020 20:03:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iunD3-0002s9-Ua
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 19:52:31 -0500
+ id 1iunD6-0002xM-Iu
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 19:52:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iunD2-0005s5-Oq
- for qemu-devel@nongnu.org; Thu, 23 Jan 2020 19:52:29 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38492)
+ id 1iunD5-0005yO-5F
+ for qemu-devel@nongnu.org; Thu, 23 Jan 2020 19:52:32 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39775)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iunD2-0005qB-IS; Thu, 23 Jan 2020 19:52:28 -0500
-Received: by mail-wr1-x443.google.com with SMTP id y17so74859wrh.5;
- Thu, 23 Jan 2020 16:52:28 -0800 (PST)
+ id 1iunD4-0005wd-UB; Thu, 23 Jan 2020 19:52:31 -0500
+Received: by mail-wr1-x443.google.com with SMTP id y11so70648wrt.6;
+ Thu, 23 Jan 2020 16:52:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=OnpC27SyHpc9dVU+hh1ArBidC5H9rjuvClffq7/FDC8=;
- b=hwvwCLxk2IP66snNmc+W/Xk5+sQCQyEf+KpPefyG2m0hkWVCe4An8F+juz+kSSRCKm
- VX+HFRl4TdTcyHTkgjzMdaPb1h5tKejL35kSET1kMCvqAJY8H4qEgkGl8lkcltyZaWlD
- UduG5OkIgbNj1ydO/WTRK2G3l23PEKYSj7qa+vErDfN3wfP8k7WZ5cVa0czSkvsjDGy/
- 4dQL4kzoTGKtf6HJ8yEStaiHtmLnV3tA9/rtWmyasb1rq9ADybAfSsfpRlTfySFoAu4t
- NtPJPaph4NRyWLWnRCW+17ClmWH5ZHKZU8czejHDjGeIaPOiJ/jvL3XM47pLaW8SWPeq
- NS1A==
+ bh=tNwLpgaqJBykaTc5oOgXwXD6VBqNzz53tLLzaYeMYrA=;
+ b=FybnPBkZS4YiM9UW0Pu9Qnrot/G1o/Xt6rv4EaBlnJP1cOlNjc+4FBRXTlyJf3Nctb
+ dMQg7+nBVoCikLZ8n/05reExMyJHi+mS9waPBVxlBK4oAuFQ8vSQr7XTJNoDg9GE7XLO
+ Fz3cup7aHnP+s8JlJ8pvGr3Cwi01UXTHA9oRJmMtu4Z0E2l3GnuDSDnCdK5TZRKvNnba
+ sXTnEZ2B2mwVSi2K/2OsSNEgOBSMNeQ2F4PxMF6ATcdUdIUZt+gH3GL8V4Gctzutqvu9
+ UuJiERNALGWXEAV0+rlrIopC2d0mGVuutBZitZ81FH7JjdFB149AyI8tfRDFbYBj8xhR
+ 0kUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=OnpC27SyHpc9dVU+hh1ArBidC5H9rjuvClffq7/FDC8=;
- b=hojdhJPrqnlI2zQjEwqXbgWGfd4g+sLmHcbrArBNN2aiyfOEbwBeNi5DMtRwhpPjYf
- AtaU9A1InF8jAZRWKqoa1v0Raqnn2dciCaE4W7+yao3kQiUWAU1+WUS4p6ZPr1YctyVi
- fLiC028QrSMCSBSLwTYYgonXVvr4CbOxl4RBeA8UFNsClMA58V9OmqXeF4TEg6q1iKZV
- /xe4hARYj/OCiVsJbR71cGLjlNcjXvdg+Nle3yvztjKbwh78uhi762jlX7S1aMVq0T60
- zQABlSWd9ChqnfKNJs3Ldrj5kteZipA7qrvQDlc2A4rDsS13zZo40V6UXzIwKu7c8CFL
- p9HQ==
-X-Gm-Message-State: APjAAAW79EcItGL/HoWeXDkNy8XkbVsZrVyUzvkLZ+nUWf+FBf31GSBo
- z3FswfnVfwmAHtDDUDGFmSaHiZB0
-X-Google-Smtp-Source: APXvYqwUmlBoRNZatAROoWt4+wpBIH2e4uoi6vIhNhlhPIOE1C/fSwCvjq91zXCz2c06wD+M45um2Q==
-X-Received: by 2002:a5d:4e0a:: with SMTP id p10mr883164wrt.229.1579827147338; 
- Thu, 23 Jan 2020 16:52:27 -0800 (PST)
+ bh=tNwLpgaqJBykaTc5oOgXwXD6VBqNzz53tLLzaYeMYrA=;
+ b=cmvCmpOHDUetprHSlRDLADsGWyPsfy2Pl/AsdGejNRMLCCxfr/6lQ5bJdthHaIvDAE
+ LbkWYtkQ0gplHk8YSfMWbROtVxyLlZvUAp7uUNxJD4FUjUZKvmaZ+fuesBlVV9jytD5Q
+ VCOBZ2YAFe3BNGd8gXulgezj8hVo0hZnnVS3eDwOWbN3gy5RIbkjqmLleWxGDMZ2yB+n
+ P5BXWnTHmDEuOoZrqXfFwCdYPBThoBctYDhEhKkXXi6kJrUoMJIBqA1/fyKd2WNAY9L4
+ Uk8UZAxUcA52m6aClSFuWaBnpZO9+YT0mJpJi/+1cTDDjKW4cJmjzNScWb6rBljrmi+m
+ m9jg==
+X-Gm-Message-State: APjAAAWeA7vp9Smw+nWBLI8EUkGEP1uSUOCrqj3sinI/jrhndbyAPk21
+ z79rBzC17oAG4H/zJKBsvTnBxToM
+X-Google-Smtp-Source: APXvYqyiWv0s1z8P4meCYE70SBEbnxzN04SU+FY3ZuVcgCqTHvX6kmnjiV+fJLaYXt38hQ+9GKquWQ==
+X-Received: by 2002:adf:b648:: with SMTP id i8mr831531wre.91.1579827149744;
+ Thu, 23 Jan 2020 16:52:29 -0800 (PST)
 Received: from x1w.redhat.com (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id s139sm4598271wme.35.2020.01.23.16.52.25
+ by smtp.gmail.com with ESMTPSA id s139sm4598271wme.35.2020.01.23.16.52.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Jan 2020 16:52:26 -0800 (PST)
+ Thu, 23 Jan 2020 16:52:29 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org, mrolnik@gmail.com, richard.henderson@linaro.org,
  me@xcancerberox.com.ar
-Subject: [PATCH rc2 23/25] tests/boot-serial-test: Test some Arduino boards
- (AVR based)
-Date: Fri, 24 Jan 2020 01:51:29 +0100
-Message-Id: <20200124005131.16276-24-f4bug@amsat.org>
+Subject: [PATCH rc2 24/25] tests/acceptance: Test the Arduino MEGA2560 board
+Date: Fri, 24 Jan 2020 01:51:30 +0100
+Message-Id: <20200124005131.16276-25-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200124005131.16276-1-f4bug@amsat.org>
 References: <20200124005131.16276-1-f4bug@amsat.org>
@@ -117,66 +116,90 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Print out 'T' through serial port
+The test is based on
+https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/Demo
+demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX' out.
+it also demostrates that timer and IRQ are working
 
-The Arduino Duemilanove is based on a AVR5 CPU, while the
-Arduino MEGA2560 on a AVR6 CPU.
+As the path name demonstrates, the FreeRTOS tests target a
+board based on a ATMega2560 MCU. We have one, the Arduino
+MEGA2560.
+
+Complementary documentation:
+
+https://feilipu.me/2012/01/15/ethermega-arduino-mega-2560-and-freertos/
+https://feilipu.me/2015/11/24/arduino_freertos/ (see 'Compatibility')
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Acked-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200118191416.19934-21-mrolnik@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[rth: Squash Arduino adjustments from f4bug]
+[rth: Squash multiple avocado fixups from f4bug]
 Tested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/qtest/boot-serial-test.c | 11 +++++++++++
- tests/qtest/Makefile.include   |  2 ++
- 2 files changed, 13 insertions(+)
+ tests/acceptance/machine_avr6.py | 50 ++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+ create mode 100644 tests/acceptance/machine_avr6.py
 
-diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-test.c
-index 05c7f44457..07067b76a2 100644
---- a/tests/qtest/boot-serial-test.c
-+++ b/tests/qtest/boot-serial-test.c
-@@ -16,6 +16,15 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- 
-+static const uint8_t bios_avr[] = {
-+    0x88, 0xe0,             /* ldi r24, 0x08   */
-+    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
-+    0x86, 0xe0,             /* ldi r24, 0x06   */
-+    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 */
-+    0x84, 0xe5,             /* ldi r24, 0x54   */
-+    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
-+};
+diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
+new file mode 100644
+index 0000000000..b644d2a81c
+--- /dev/null
++++ b/tests/acceptance/machine_avr6.py
+@@ -0,0 +1,50 @@
++#
++# QEMU AVR
++#
++# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
- static const uint8_t kernel_mcf5208[] = {
-     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-@@ -103,6 +112,8 @@ typedef struct testdef {
- 
- static testdef_t tests[] = {
-     { "alpha", "clipper", "", "PCI:" },
-+    { "avr", "arduino-duemilanove", "", "T", sizeof(bios_avr), NULL, bios_avr },
-+    { "avr", "arduino-mega-2560-v3", "", "T", sizeof(bios_avr), NULL, bios_avr},
-     { "ppc", "ppce500", "", "U-Boot" },
-     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
-     { "ppc", "g3beige", "", "PowerPC,750" },
-diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
-index e6bb4ab28c..4817b6320f 100644
---- a/tests/qtest/Makefile.include
-+++ b/tests/qtest/Makefile.include
-@@ -65,6 +65,8 @@ check-qtest-i386-y += numa-test
- 
- check-qtest-x86_64-y += $(check-qtest-i386-y)
- 
-+check-qtest-avr-y += boot-serial-test
++import time
 +
- check-qtest-alpha-y += boot-serial-test
- check-qtest-alpha-$(CONFIG_VGA) += display-vga-test
- 
++from avocado_qemu import Test
++
++class AVR6Machine(Test):
++    timeout = 5
++
++    def test_freertos(self):
++        """
++        :avocado: tags=arch:avr
++        :avocado: tags=machine:arduino-mega-2560-v3
++        """
++        """
++        https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
++        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
++        """
++        rom_url = ('https://github.com/seharris/qemu-avr-tests'
++                   '/raw/36c3e67b8755dcf/free-rtos/Demo'
++                   '/AVR_ATMega2560_GCC/demo.elf')
++        rom_hash = '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
++        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
++
++        self.vm.add_args('-bios', rom_path)
++        self.vm.add_args('-nographic')
++        self.vm.launch()
++
++        time.sleep(2)
++        self.vm.shutdown()
++
++        self.assertIn('ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX',
++                self.vm.get_log())
 -- 
 2.21.1
 
