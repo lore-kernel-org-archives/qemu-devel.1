@@ -2,77 +2,85 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0A5C35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE38C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:52:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A96D82075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB80320718
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:52:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mi47W6vj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96D82075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4MAh8Jr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB80320718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuvcl-00054x-PD
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:51:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36068)
+	id 1iuvdt-0006YJ-Q1
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:52:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36095)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuvbp-0004AR-En
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:38 -0500
+ (envelope-from <berrange@redhat.com>) id 1iuvc1-0004UG-3b
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuvbn-0003ri-Qt
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:37 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38440
+ (envelope-from <berrange@redhat.com>) id 1iuvbz-00043X-DO
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:49 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26870
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuvbn-0003pi-MI
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:35 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iuvbz-000436-96
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:50:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579859435;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1579859447;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/YdpDzSfvfu3py0OzOOkBSLOOGYzv0wLlQ8AgA1nk/Y=;
- b=Mi47W6vjONWi0neeVQfeUQ0H0LP8X2rG1jS+ty7CIXP1AgJAy2/JrC5CcJ7zy0WXQFfbUf
- Nx2a8Hnyvvdru4esETLf4+HviYmnCv5Xhm9dMFZyaXKqhNP/1yD6VD/KtWO9f08gAFFcm5
- Cwp+gqRzoSmHVwRjJXHfRKrO0h1HuPw=
+ bh=psCmyVvj912t2AYjaRoKtJzzrooJP0iYLVnRHIsFElo=;
+ b=b4MAh8JrN/qrM1M6AYtx4p8KSkNQpkI0wutZZfp5aGJgS/QxQu7z/6qdwUqqpDCnuvh/q3
+ SE4cPegiTRGAs/VI7JNagkGPhrywrbLEq4OBYDDsnfi6gnVVLhayYgMstOuDRBVD0I/vVC
+ Qy/hprg9XiW7y8OMEeLSaXNO9+TBKVo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-zHqNg0kZOEuNbDGCvoC6MQ-1; Fri, 24 Jan 2020 04:50:33 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-339-S2rSNH1_OFGOiTo6rq9nSw-1; Fri, 24 Jan 2020 04:50:43 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D0D610102B8;
- Fri, 24 Jan 2020 09:50:32 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E70B194B2;
- Fri, 24 Jan 2020 09:50:31 +0000 (UTC)
-Date: Fri, 24 Jan 2020 10:50:30 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH REPOST v3 77/80] hostmem: introduce "prealloc-threads"
- property
-Message-ID: <20200124105030.00dab6bc@redhat.com>
-In-Reply-To: <1579779525-20065-78-git-send-email-imammedo@redhat.com>
-References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
- <1579779525-20065-78-git-send-email-imammedo@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3BB3106BAAE;
+ Fri, 24 Jan 2020 09:50:41 +0000 (UTC)
+Received: from redhat.com (ovpn-112-52.ams2.redhat.com [10.36.112.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B940B5C1BB;
+ Fri, 24 Jan 2020 09:50:30 +0000 (UTC)
+Date: Fri, 24 Jan 2020 09:50:27 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200124095027.GA824327@redhat.com>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <87h81unja8.fsf@dusky.pond.sub.org>
+ <20191224134139.GD2710539@redhat.com>
+ <30664f6e-81da-a6e6-9b20-037fc91290fb@redhat.com>
+ <878slyej29.fsf@dusky.pond.sub.org>
+ <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
+ <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: zHqNg0kZOEuNbDGCvoC6MQ-1
+In-Reply-To: <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: S2rSNH1_OFGOiTo6rq9nSw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
@@ -86,208 +94,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jitendra.kolhe@hpe.com, pbonzini@redhat.com, ehabkost@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 12:38:42 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
+On Thu, Jan 23, 2020 at 04:07:09PM -0500, John Snow wrote:
+>=20
+>=20
+> On 1/23/20 2:01 PM, Daniel P. Berrang=C3=A9 wrote:
+> > IOW, the difficulty with configuring QEMU via JSON is not the fault
+> > of JSON itself, it is the lack of knowledge amongst users and docs,
+> > compounded by our never ending "improvements" to the human syntax.
+> > There are other factors too, such as our only partial coverage of
+> > config using JSON - some is only possible via the CLI still.
+> >=20
+>=20
+> I'm fine with getting rid of HMP entirely, I think. It's a weird
+> interface with bizarre behavior that's hard to support.
+>=20
+> There's a few commands in there we just don't support at all, but maybe
+> it's time to start deprecating one-by-one any of the individual commands
+> that are better served by QMP these days, to send the message that HMP's
+> days are numbered.
+>=20
+> Bye-bye!
+>=20
+> As for the CLI, well, that's part of the discussion at hand...
+>=20
+> >=20
+> > I guess my point is that with a scrap & startover view point, we
+> > should arguably completely ignore the design question of how to
+> > flatten JSON for humans/command line, as it is the wrong problem.
+> > Instead focus on the problem of making use of JSON the best way
+> > to deal with QEMU both functionally and practically, for humans
+> > and machines alike.
+> >=20
+>=20
+> Well, sure. The context of this email was qmp-shell though, which is
+> meant to help facilitate the entry of JSON commands so that you *can*
+> indeed just forego the CLI/HMP entirely.
+>=20
+> If you are of the opinion that every user of QEMU should be copy/pasting
+> JSON straight into a socket and we should delete qmp-shell, that's
+> certainly a fine opinion.
 
-> the property will allow user to specify number of threads to use
-> in pre-allocation stage. It also will allow to reduce implicit
-> hostmem dependency on current_machine.
-> On object creation it will default to 1, but via machine
-> compat property it will be updated to MachineState::smp::cpus
-> to keep current behavior for hostmem and main RAM (which is
-> now also hostmem based).
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+I think part of the pain of qmp-shell comes from the very fact that
+it is trying to be an interactive shell. This points people towards
+interactively typing in the commands, which is horrific when you get
+anywhere near the JSON, or even dot-notation traditional commands.
 
-Jitendra,
+If it was just a qmp-client that was single shot, we'd encourage
+people to create the JSON in a sensible way - vim/emacs/whatever.
 
-As the one who introduced smp_cpus in backend
+Bash/dash/zsh/$whatever is their interactive shell, with massively
+more features than qmp-shell. You have command history, autocomplete,
+conditional and looping constructs, and everything a normal shell
+offers.
 
-(1e356fc14be mem-prealloc: reduce large guest start-up and migration time.)
+The only strong reason for qmp-shell to be interactive would be if
+the initial protoocl handshake was too slow. I can't see that being
+a problem with QMP.=20
 
-could you review this patch please?
+> I'm coming from the side that I love qmp-shell; I find it useful, but it
+> has some syntax problems. How do I solve them? Is there a way to solve
+> them? QAPI is here to stay, and QAPI involves hierarchical data. That
+> data is usually best represented by something like json or yaml, but
+> those are hard to type in a shell.
+>=20
+> What do we do about that?
 
-> ---
-> v3:
->   - use object_register_sugar_prop() instead of directly hacking
->     compat_props (Paolo Bonzini <pbonzini@redhat.com>)
->   - fix TODO description
-> 
-> CC: pbonzini@redhat.com
-> CC: ehabkost@redhat.com
-> ---
->  include/sysemu/hostmem.h |  2 ++
->  backends/hostmem.c       | 43 +++++++++++++++++++++++++++++++++++++++----
->  vl.c                     | 14 ++++++++++----
->  3 files changed, 51 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-> index 5db0d66..bdf8666 100644
-> --- a/include/sysemu/hostmem.h
-> +++ b/include/sysemu/hostmem.h
-> @@ -61,6 +61,7 @@ struct HostMemoryBackendClass {
->   * @parent: opaque parent object container
->   * @size: amount of memory backend provides
->   * @mr: MemoryRegion representing host memory belonging to backend
-> + * @prealloc_threads: number of threads to be used for preallocatining RAM
->   */
->  struct HostMemoryBackend {
->      /* private */
-> @@ -70,6 +71,7 @@ struct HostMemoryBackend {
->      uint64_t size;
->      bool merge, dump, use_canonical_path;
->      bool prealloc, force_prealloc, is_mapped, share;
-> +    uint32_t prealloc_threads;
->      DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
->      HostMemPolicy policy;
->  
-> diff --git a/backends/hostmem.c b/backends/hostmem.c
-> index e773bdf..0988986 100644
-> --- a/backends/hostmem.c
-> +++ b/backends/hostmem.c
-> @@ -223,7 +223,6 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
->  {
->      Error *local_err = NULL;
->      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-> -    MachineState *ms = MACHINE(qdev_get_machine());
->  
->      if (backend->force_prealloc) {
->          if (value) {
-> @@ -243,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
->          void *ptr = memory_region_get_ram_ptr(&backend->mr);
->          uint64_t sz = memory_region_size(&backend->mr);
->  
-> -        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
-> +        os_mem_prealloc(fd, ptr, sz, backend->prealloc_threads, &local_err);
->          if (local_err) {
->              error_propagate(errp, local_err);
->              return;
-> @@ -252,14 +251,45 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
->      }
->  }
->  
-> +static void host_memory_backend_get_prealloc_threads(Object *obj, Visitor *v,
-> +    const char *name, void *opaque, Error **errp)
-> +{
-> +    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-> +    visit_type_uint32(v, name, &backend->prealloc_threads, errp);
-> +}
-> +
-> +static void host_memory_backend_set_prealloc_threads(Object *obj, Visitor *v,
-> +    const char *name, void *opaque, Error **errp)
-> +{
-> +    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-> +    Error *local_err = NULL;
-> +    uint32_t value;
-> +
-> +    visit_type_uint32(v, name, &value, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +    if (value <= 0) {
-> +        error_setg(&local_err,
-> +                   "property '%s' of %s doesn't take value '%d'",
-> +                   name, object_get_typename(obj), value);
-> +        goto out;
-> +    }
-> +    backend->prealloc_threads = value;
-> +out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static void host_memory_backend_init(Object *obj)
->  {
->      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
->      MachineState *machine = MACHINE(qdev_get_machine());
->  
-> +    /* TODO: convert access to globals to compat properties */
->      backend->merge = machine_mem_merge(machine);
->      backend->dump = machine_dump_guest_core(machine);
->      backend->prealloc = mem_prealloc;
-> +    backend->prealloc_threads = 1;
->  }
->  
->  static void host_memory_backend_post_init(Object *obj)
-> @@ -313,7 +343,6 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
->  {
->      HostMemoryBackend *backend = MEMORY_BACKEND(uc);
->      HostMemoryBackendClass *bc = MEMORY_BACKEND_GET_CLASS(uc);
-> -    MachineState *ms = MACHINE(qdev_get_machine());
->      Error *local_err = NULL;
->      void *ptr;
->      uint64_t sz;
-> @@ -378,7 +407,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
->           */
->          if (backend->prealloc) {
->              os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
-> -                            ms->smp.cpus, &local_err);
-> +                            backend->prealloc_threads, &local_err);
->              if (local_err) {
->                  goto out;
->              }
-> @@ -456,6 +485,12 @@ host_memory_backend_class_init(ObjectClass *oc, void *data)
->          host_memory_backend_set_prealloc, &error_abort);
->      object_class_property_set_description(oc, "prealloc",
->          "Preallocate memory", &error_abort);
-> +    object_class_property_add(oc, "prealloc-threads", "int",
-> +        host_memory_backend_get_prealloc_threads,
-> +        host_memory_backend_set_prealloc_threads,
-> +        NULL, NULL, &error_abort);
-> +    object_class_property_set_description(oc, "prealloc-threads",
-> +        "Number of CPU threads to use for prealloc", &error_abort);
->      object_class_property_add(oc, "size", "int",
->          host_memory_backend_get_size,
->          host_memory_backend_set_size,
-> diff --git a/vl.c b/vl.c
-> index d825a34..21e3262 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2822,8 +2822,7 @@ static void configure_accelerators(const char *progname)
->      }
->  }
->  
-> -static void create_default_memdev(MachineState *ms, const char *path,
-> -                                  bool prealloc)
-> +static void create_default_memdev(MachineState *ms, const char *path)
->  {
->      Object *obj;
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
-> @@ -2832,7 +2831,6 @@ static void create_default_memdev(MachineState *ms, const char *path,
->      if (path) {
->          object_property_set_str(obj, path, "mem-path", &error_fatal);
->      }
-> -    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
->      object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
->      object_property_add_child(object_get_objects_root(), mc->default_ram_id,
->                                obj, &error_fatal);
-> @@ -3975,6 +3973,14 @@ int main(int argc, char **argv, char **envp)
->          exit(1);
->      }
->  
-> +    if (mem_prealloc) {
-> +        char *val;
-> +
-> +        val = g_strdup_printf("%d", current_machine->smp.cpus);
-> +        object_register_sugar_prop("memory-backend", "prealloc-threads", val);
-> +        g_free(val);
-> +    }
-> +
->      /*
->       * Get the default machine options from the machine if it is not already
->       * specified either by the configuration file or by the command line.
-> @@ -4309,7 +4315,7 @@ int main(int argc, char **argv, char **envp)
->          machine_class->default_ram_size &&
->          machine_class->default_ram_id &&
->          !current_machine->ram_memdev) {
-> -        create_default_memdev(current_machine, mem_path, mem_prealloc);
-> +        create_default_memdev(current_machine, mem_path);
->      }
->      /* do monitor/qmp handling at preconfig state if requested */
->      main_loop();
+Here's one conceptual vision of how a better QEMU might look:
+
+  * qemu-runtime-$TARGET
+
+    A binary that contains the implementation for the machine
+    emulator for $TARGET.
+
+    This has no command line arguments except for a UNIX
+    socket path which is a QMP server
+
+
+  * qemu-launcher-$TARGET
+
+    A binary that is able to launch qemu-runtime-$TARGET
+    with jailers active.
+
+    This has no command line arguments except for a pair
+    of UNIX socket paths. One is a QMP server, the other
+    is the path for the QMP of qemu-runtime-$TARGET.
+
+    Commands it processes will be in automatically proxied
+    through to the qemu-runtime-$TARGET QMP, with appropriate
+    jailer updates being done in between.
+
+
+  * qemu-client
+
+    A binary that speaks QMP, connects, runs a single command,
+    disconnects.
+
+    It is used to talk to either qemu-runtime-$TARGET or
+    qemu-launcher-$TARGET, depending on whether the mgmt app
+    or user wants to be making use of the jailer facilities
+    or not. =20
+
+
+  * qemu-system-$TARGET
+
+    The current binaries that exist today.
+
+    qemu-system-$TARGET should not be part of our formal
+    stability promise. We won't gratuitously / knowingly
+    break without good reason, but we will accept that
+    breakage can happen. Stability is only offered by
+    the qemu-{runtime,launcher}-$TARGET.
+
+    Several choices for their future in long term:
+
+      - Leave them as-is and basically ignore them
+        whereever practical going forward, so we
+=09minimally worry about backcompat breakage
+
+      - Plan to re-write them so that they are simply
+        a shim the forks+execs qemu-runtime-$TARGET
+=09and does syntax translation from CLI/HMP/QMP.
+
+      - Deprecate them with a view to deletion entirely
+        in $NNN years. For some large-ish value of NNN,
+=09given how well known they are
+
+
+Example usage:
+
+1. Launch the QEMU runtime for the desired target
+
+     $ qemu-runtime-x86_64 myvm.sock
+
+2. Load the configuration to define the VM
+
+   $ cat myvm.yaml
+   commands:
+     - machine_declare:
+         name: pc-q35-5.0
+=09 ...
+     - blockdev_add:
+         ...
+     - device_add:
+         ...
+     - blockdev_add:
+         ...
+     - device_add:
+         ...
+   $ qemu-client myvm.sock myvm.yaml
+
+
+3. Hotplug a disk
+
+   $ cat mynewdisk.yaml
+   commands:
+     - blockdev_add:
+         ...
+     - device_add:
+         ...
+   $ qemu-client myvm.sock mynewdisk.yaml
+
+
+3. Hotunplug a disk
+
+   $ cat myolddisk.yaml
+   commands:
+     - device_del:
+         ...
+     - blockdev_del:
+         ...
+   $ qemu-client myvm.sock myolddisk.yaml
+
+Using jailers, just means adding in a use of qemu-launcher-$TARGET
+at the start.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
