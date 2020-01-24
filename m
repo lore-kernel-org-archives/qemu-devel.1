@@ -2,163 +2,82 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07CFC3F68F
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 18:59:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D92AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:01:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A24DF2071E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 18:59:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C9002071E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:01:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmXHJAmb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A24DF2071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VBpQDvjH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C9002071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv4Am-0006SF-SN
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 13:59:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49651)
+	id 1iv4Cr-0007W3-90
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 14:01:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iv4A7-0005hy-HT
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:58:36 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iv4C9-00074J-Lz
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:00:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iv4A6-0007iU-Fv
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:58:35 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35233
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iv4A6-0007gL-BT
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:58:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579892313;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=NF0/Ezz3jBCVIMe+svaQQMBEX8I3lpSNZMDIijmx1X4=;
- b=AmXHJAmbYDF3P5kdY3CZbyzoSPOCrV+cdPcCtdd/KvFiQQOh/pSd6lPyHJvI9f9HXVfWis
- w2Dttpi2Pbwt4M9c+Z0NswxYeedjE69PNvX/7pUteJmJLaKDtfSFf0KlQmXzcQkayxb6ui
- vafxJW5fuLWIghPTjrIgcFf53Ng8Kyo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-swPTX4RHMz2At05r5qgQIg-1; Fri, 24 Jan 2020 13:58:32 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7DC81800D78;
- Fri, 24 Jan 2020 18:58:30 +0000 (UTC)
-Received: from [10.10.124.155] (ovpn-124-155.rdu2.redhat.com [10.10.124.155])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9F0186802;
- Fri, 24 Jan 2020 18:58:23 +0000 (UTC)
-Subject: Re: Making QEMU easier for management tools and applications
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <878slyej29.fsf@dusky.pond.sub.org>
- <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
- <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <871rrp474i.fsf@dusky.pond.sub.org> <20200124102743.GB824327@redhat.com>
- <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
- <c89f4417-ca4e-d365-e795-4570200e9dae@redhat.com>
- <20200124183036.GD2969@work-vm>
- <50637c89-1c5d-ef1b-4c8c-f23de732bcbc@redhat.com>
- <20200124185208.GB2970@work-vm>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <1b37fe30-a6a4-5472-013a-7a6fe910b48e@redhat.com>
-Date: Fri, 24 Jan 2020 13:58:23 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <robert.foley@linaro.org>) id 1iv4C8-0003VD-BN
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:00:41 -0500
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:44558)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iv4C8-0003U7-3L
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:00:40 -0500
+Received: by mail-lf1-x144.google.com with SMTP id v201so1817691lfa.11
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 11:00:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=TMOSvFyLCpcLQiGDexwQOGb8tdaJr5bI8TnhXQlrHwU=;
+ b=VBpQDvjHmgkFEG3h8bkr+0BvpRgQ6+yQ9sqnl44JvgffK9yVapGsBjqCU2kQA8S2cQ
+ amYw9bUc4NOyQUI9Q4LVFi2yU4LOdMvAwtaHeL0PxPCt18XgrJ5Kn78MZQ1Wj00voflH
+ npLoxyA94OkFn5t7w0WhAdU8hH6FZWOlsy/NkkQlfwx5wraAhimR7EfGrh54qOzb/Msm
+ RVkGSwcKzcBpOc556W3m5eZCqzMUovGe7u27XM8yNnUpIh+I3rl4zPBmsYumFT/oznl9
+ Q6lM8g0gH3MTc7iw4PgIJ/UKjTBBGia4VYRes4gB148yz4h61eq5t8hVnNhfL3nIQWe4
+ 4vgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=TMOSvFyLCpcLQiGDexwQOGb8tdaJr5bI8TnhXQlrHwU=;
+ b=nNYfUT8SRhgAhXF/2VtflYylwclmI7izj7cpI7RvA9bmoL2+AI7P1B7tiCeezpy7+a
+ QU0zRsoaEjq8yZVo+D6hS2x/kd1p0uPRy1fA4CnIs/9yWpxoESJA1FhxE/ZZWhk80ESg
+ b+r7BpwfUb2zntCc/mKIuIGfcTQYQ6DRRUwUbN2UFiXUOUiRI5aOzXD+YsBInSibROv2
+ bZFMOYrMQnjXxF69dMd+TRStJchPklfSHaLV2uaRdyRZamC7IEkUQ4jNJ2oWgyhWEKsF
+ Qt3hyYJ7sG8Q1YLKKLupF2iEjnVzGCpt9f8pCRVu0oD+f8DW8Pox+ZBPIMlKDgVAUQRk
+ EBFw==
+X-Gm-Message-State: APjAAAXjHxSUIibM6hZG+bTXAkycUc9tv/ILe+tyBx6KLu9XnVzx9GCJ
+ tWGD9FAKfsBgcLguW52jqcG8uv6wqZizmgDfPGRuBw==
+X-Google-Smtp-Source: APXvYqwV3dhw75EKsVgBw5SEvBjJG5jm/VV3idIWN5IuA82JOwcz1D5vSJCmzvGx+Jnz9EKMl/SFpz0IXWelTmzBys4=
+X-Received: by 2002:a19:6445:: with SMTP id b5mr2023547lfj.187.1579892438510; 
+ Fri, 24 Jan 2020 11:00:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200124185208.GB2970@work-vm>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: swPTX4RHMz2At05r5qgQIg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+References: <20200124165335.422-1-robert.foley@linaro.org>
+ <20200124165335.422-3-robert.foley@linaro.org>
+ <075d1da4-f59a-489e-4c64-63e76265d5c4@redhat.com>
+In-Reply-To: <075d1da4-f59a-489e-4c64-63e76265d5c4@redhat.com>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 24 Jan 2020 14:00:27 -0500
+Message-ID: <CAEyhzFsqvjooH0SbmedKGAX51AUgGMvOfVdB3gcF7aziKUddOQ@mail.gmail.com>
+Subject: Re: [PATCH 2/8] tests/vm: increased max timeout for vm boot.
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -170,53 +89,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <cleber@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: fam@euphon.net, Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Phil,
 
+> I once suggested "When using TCG, wait longer for a VM to start"
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg550610.html
+>
+Thanks for the pointer.  This increase in timeout under TCG seems just
+right for the case we saw.  I will incorporate this into the patch.
 
-On 1/24/20 1:52 PM, Dr. David Alan Gilbert wrote:
-> * John Snow (jsnow@redhat.com) wrote:
->>
->>
->> On 1/24/20 1:30 PM, Dr. David Alan Gilbert wrote:
->>> However, I caution that too many people think that QMP has all the type
->>> of diagnostic stuff people want - it's just way too hard and beuracratic
->>> to add a simple diagnostic command to QMP, when you just want to add
->>> something to print some diagnostics out for your corner of qemu.
->>
->> I'm not sure I follow, do you mean bureaucratic in contrast to... HMP?
-> 
-> I mean, someone who adds a QMP command is expected to be a lot more
-> careful about the long term stability and proper structures etc etc.
-> Where for HMP, if someone wants to add a command that's useful to the
-> diagnostics of their part of QEMU and doesn't break anything else, then
-> fine.
-> 
-> Dave
+Thanks & Regards,
+-Rob
 
-It sounds like we want a formalized notion of "x-debug-" for QMP
-commands where we use feature flags to explicitly mark a command
-interface as a debugging interface.
-
-(We use such a command for bitmap iotests, to compute checksums of
-bitmaps to ensure they migrate correctly. We make no guarantee that this
-is stable or useful.)
-
-I'm not sure if it's wise or not, but we could disable these commands
-entirely unless you configure with --enable-qmp-debugging.
-
-Might ease that pain of migrating everything onto QMP.
-
---js
-
+On Fri, 24 Jan 2020 at 12:12, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Hi Robert,
+>
+> On 1/24/20 5:53 PM, Robert Foley wrote:
+> > Add change to increase timeout waiting for VM to boot.
+> > Needed for some emulation cases where it can take longer
+> > than 5 minutes to boot.
+> >
+> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> > Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> > ---
+> >   tests/vm/basevm.py | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> > index 991115e44b..86908f58ec 100755
+> > --- a/tests/vm/basevm.py
+> > +++ b/tests/vm/basevm.py
+> > @@ -310,7 +310,7 @@ class BaseVM(object):
+> >       def print_step(self, text):
+> >           sys.stderr.write("### %s ...\n" % text)
+> >
+> > -    def wait_ssh(self, seconds=3D300):
+> > +    def wait_ssh(self, seconds=3D600):
+> >           starttime =3D datetime.datetime.now()
+> >           endtime =3D starttime + datetime.timedelta(seconds=3Dseconds)
+> >           guest_up =3D False
+> >
+>
+> I once suggested "When using TCG, wait longer for a VM to start"
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg550610.html
+>
+> Cleber took some notes about 'kicking a expiring timer' but I can't find
+> it. This might be related:
+> https://trello.com/c/MYdgH4mz/90-delayed-failures
+>
+> Regards,
+>
+> Phil.
+>
 
