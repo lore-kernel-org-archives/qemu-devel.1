@@ -2,100 +2,81 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 681BAC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AFEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:16:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3335F2072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 106682072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:16:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZgsTwLe+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3335F2072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vJslOp6k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 106682072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv2WR-00045i-7g
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 12:13:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50672)
+	id 1iv2ZB-00067c-3h
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 12:16:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iv2Vn-0003eX-3v
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:12:52 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iv2YG-0005ah-92
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:15:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iv2Vl-00084E-3F
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:12:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41572
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iv2Vl-00083f-06
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:12:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579885967;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Gz+LMc0YooVWIStROLe3nU4YKwYoYFc0bVtt52toLdA=;
- b=ZgsTwLe+Fpw6W4iZEIUgD07qqbQ7L6G3tzM8gfnC5tgcvm3lshc/iOYaAoeJEvc08jXcIC
- ffXIgLqvY0QlAw/hRcolkfF4qqVyTZENaCut5zW7G71rU5PrZGsgSYgFieWlC8wc3uO/7L
- vpnVDjZQs3RDRX+hVVeMx2n+vgMo8Wc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-gA8SLNlbNDG-_vuwVDnG4w-1; Fri, 24 Jan 2020 12:12:46 -0500
-Received: by mail-wr1-f71.google.com with SMTP id z14so1732102wrs.4
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 09:12:46 -0800 (PST)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iv2YD-0003KY-VQ
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:15:23 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41699)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iv2YD-0003It-Mv
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:15:21 -0500
+Received: by mail-oi1-x243.google.com with SMTP id i1so178719oie.8
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 09:15:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yDKZvplGLLHJPDooKzLozxCmGjllqV4rfb+wD1y7tsw=;
+ b=vJslOp6k4FWL0wnAsgntXpdhSyy80QhtnnAG5ct8wkFvEoReABA7HzXxWfXcdx2f9V
+ CJXa88yBjl2WPUYexVs+TmAyyYM0K4Cf1pnAGLA73rM8C+V6/uM+fANeVMM7kufnyDeK
+ rv0f+A7C8GM1SS/WkRXL2fh8gs1m1SYLPwKd763if1HXYZ3wefOBX2BTgUPkrrs48w4O
+ yRpIBlbHVCP4OLutyNvvaHSSzNqH3iE1y2VwHBOp3kQlG93ujkq0Y64PWc6uYLnsjv1U
+ QcevSSuJK5/QgbMCVftYt6LhdRwdPsyBkTyVKEnq7LI1yHVvdfsYoOA7PdXZpqRBedEa
+ 3PDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Gz+LMc0YooVWIStROLe3nU4YKwYoYFc0bVtt52toLdA=;
- b=ip2EM7kWuFVG00zLQ1LkNPksCnI2b9KIlpNGuEq2AOtPZSecJPQVyNbXC0FMbGZWpZ
- RZ937oceV1B7+8tlSDtO/LUhNDKXcD2hRNTQimAeNkfQTxxf3sfSO3h7DEVsuItZa/V1
- /ogHE6DuZ8NmBSXHcdf+ULapIfK9WeJztPbu9wzDA5KcRkn7oGRQBq3Vk0h7qaQcFAgX
- Tc2lMBpPaVLSZNYxqnr5braKvd/cy/YuEIR/VdujKvQTj/PKAlOZXtBTQ92dVoHyKsaK
- dXcj78cCMfYLX+9s354Q7B3tp3RQffBRmZetf8gxO4pAt4LA0+pvqW76+N53JZn3ywDt
- Yf5A==
-X-Gm-Message-State: APjAAAUVWQvT9A55fIkCgGTbGbA0vBIZ1YpOeqKaPxUnSWogq3x7yroF
- NGKIg2flJmp2MtVRLPuYgSHvRH9ccR8dT+5ZrMIbs95XpGiGk2WJ+NuWyZiyFByVyVf48eybjdb
- 0eac7YldV/4g1vzg=
-X-Received: by 2002:a05:600c:211:: with SMTP id 17mr216775wmi.60.1579885963863; 
- Fri, 24 Jan 2020 09:12:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy6nxyrn7Ztp/NvJac8uHdR1/E7Jl5Lc+xYCSNHey4tFc+cIutkeaZA2zOZVu1cL2Sud/AFeg==
-X-Received: by 2002:a05:600c:211:: with SMTP id 17mr216680wmi.60.1579885962005; 
- Fri, 24 Jan 2020 09:12:42 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z11sm8408988wrt.82.2020.01.24.09.12.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Jan 2020 09:12:41 -0800 (PST)
-Subject: Re: [PATCH 2/8] tests/vm: increased max timeout for vm boot.
-To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>
-References: <20200124165335.422-1-robert.foley@linaro.org>
- <20200124165335.422-3-robert.foley@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <075d1da4-f59a-489e-4c64-63e76265d5c4@redhat.com>
-Date: Fri, 24 Jan 2020 18:12:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yDKZvplGLLHJPDooKzLozxCmGjllqV4rfb+wD1y7tsw=;
+ b=WFopRu8dB7v2TsubwNzZaEFZJVxQCn45NuCbFJdDKRtMVTlDGRYjRmikRhLF2Be+1E
+ WCdN7tWTNUjhqvv0d9kS2ndwmQB2l6pePb4Lh58Xxk/3kSxDz9PWKXnlaYIg9h++9k2o
+ 5mbNlTXnM97mya28r6gdSY+Na1geMxgpIeiXKtTQUv9zTHCc98cXCJlPUtea9Kdjnzgd
+ 1vMlSmvykQ8VnT0jABCWVQEXa+ewEVwLxwWZlpnIpIM1sK4hs4sGGW/bwmCYa8xjwnV/
+ 3aW5I3sdmQFScVD5REafJMfgVhGGTwH1c04ixecSbdQk7i2vqgNRpcY64oxbyUB58fkc
+ n+Dg==
+X-Gm-Message-State: APjAAAWDhCF+KiluhKMcMwOE420smm25hPgB452CEg0qC/sP3LhQ4j/B
+ LmB2OEGsYhAoIel5xGrcQdpR2zRKTT4sIXYpJyU=
+X-Google-Smtp-Source: APXvYqzqZ/nB/OovoDbrcv7uzsmoRU3htoxE4J5Hbz3chu0shnzK8GT/1/vWMeiKdkOu+qV2hPHMqfXGAdm64aozj08=
+X-Received: by 2002:a05:6808:6c5:: with SMTP id m5mr10488oih.106.1579886120580; 
+ Fri, 24 Jan 2020 09:15:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200124165335.422-3-robert.foley@linaro.org>
-Content-Language: en-US
-X-MC-Unique: gA8SLNlbNDG-_vuwVDnG4w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+ <1579779525-20065-54-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1579779525-20065-54-git-send-email-imammedo@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 24 Jan 2020 18:15:09 +0100
+Message-ID: <CAL1e-=h7Q0h0Rn8jghXfX1F94qXnMBBSSuiAs5m8B-T4YuedfQ@mail.gmail.com>
+Subject: Re: [PATCH REPOST v3 53/80] mips/mips_jazz: use memdev for RAM
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000000b9fc059ce5e7d4"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,48 +88,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.puhov@linaro.org, alex.bennee@linaro.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Robert,
+--00000000000000b9fc059ce5e7d4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/24/20 5:53 PM, Robert Foley wrote:
-> Add change to increase timeout waiting for VM to boot.
-> Needed for some emulation cases where it can take longer
-> than 5 minutes to boot.
-> 
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+On Thu, Jan 23, 2020 at 1:15 PM Igor Mammedov <imammedo@redhat.com> wrote:
+
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>   MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->   tests/vm/basevm.py | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 991115e44b..86908f58ec 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -310,7 +310,7 @@ class BaseVM(object):
->       def print_step(self, text):
->           sys.stderr.write("### %s ...\n" % text)
->   
-> -    def wait_ssh(self, seconds=300):
-> +    def wait_ssh(self, seconds=600):
->           starttime = datetime.datetime.now()
->           endtime = starttime + datetime.timedelta(seconds=seconds)
->           guest_up = False
-> 
+>  hw/mips/mips_jazz.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>
+>
+Applied to MIPS queue.
 
-I once suggested "When using TCG, wait longer for a VM to start"
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg550610.html
 
-Cleber took some notes about 'kicking a expiring timer' but I can't find 
-it. This might be related:
-https://trello.com/c/MYdgH4mz/90-delayed-failures
+> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+> index 66fd4d8..85d49cf 100644
+> --- a/hw/mips/mips_jazz.c
+> +++ b/hw/mips/mips_jazz.c
+> @@ -159,7 +159,6 @@ static void mips_jazz_init(MachineState *machine,
+>      ISABus *isa_bus;
+>      ISADevice *pit;
+>      DriveInfo *fds[MAX_FD];
+> -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+>      MemoryRegion *bios =3D g_new(MemoryRegion, 1);
+>      MemoryRegion *bios2 =3D g_new(MemoryRegion, 1);
+>      SysBusESPState *sysbus_esp;
+> @@ -191,9 +190,7 @@ static void mips_jazz_init(MachineState *machine,
+>      cc->do_transaction_failed =3D mips_jazz_do_transaction_failed;
+>
+>      /* allocate RAM */
+> -    memory_region_allocate_system_memory(ram, NULL, "mips_jazz.ram",
+> -                                         machine->ram_size);
+> -    memory_region_add_subregion(address_space, 0, ram);
+> +    memory_region_add_subregion(address_space, 0, machine->ram);
+>
+>      memory_region_init_ram(bios, NULL, "mips_jazz.bios", MAGNUM_BIOS_SIZ=
+E,
+>                             &error_fatal);
+> @@ -393,6 +390,7 @@ static void mips_magnum_class_init(ObjectClass *oc,
+> void *data)
+>      mc->init =3D mips_magnum_init;
+>      mc->block_default_type =3D IF_SCSI;
+>      mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("R4000");
+> +    mc->default_ram_id =3D "mips_jazz.ram";
+>  }
+>
+>  static const TypeInfo mips_magnum_type =3D {
+> @@ -409,6 +407,7 @@ static void mips_pica61_class_init(ObjectClass *oc,
+> void *data)
+>      mc->init =3D mips_pica61_init;
+>      mc->block_default_type =3D IF_SCSI;
+>      mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("R4000");
+> +    mc->default_ram_id =3D "mips_jazz.ram";
+>  }
+>
+>  static const TypeInfo mips_pica61_type =3D {
+> --
+> 2.7.4
+>
+>
+>
 
-Regards,
+--00000000000000b9fc059ce5e7d4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Phil.
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jan 23, 2020 at 1:15 PM Igor =
+Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">imammedo@redhat.com</a>=
+&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">memo=
+ry_region_allocate_system_memory() API is going away, so<br>
+replace it with memdev allocated MemoryRegion. The later is<br>
+initialized by generic code, so board only needs to opt in<br>
+to memdev scheme by providing<br>
+=C2=A0 MachineClass::default_ram_id<br>
+and using MachineState::ram instead of manually initializing<br>
+RAM memory region.<br>
+<br>
+Signed-off-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" tar=
+get=3D"_blank">imammedo@redhat.com</a>&gt;<br>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
+t.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/mips/mips_jazz.c | 7 +++----<br>
+=C2=A01 file changed, 3 insertions(+), 4 deletions(-)<br>
+<br></blockquote><div><br></div><div>Applied to MIPS queue.<br></div><div>=
+=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
+.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c<br>
+index 66fd4d8..85d49cf 100644<br>
+--- a/hw/mips/mips_jazz.c<br>
++++ b/hw/mips/mips_jazz.c<br>
+@@ -159,7 +159,6 @@ static void mips_jazz_init(MachineState *machine,<br>
+=C2=A0 =C2=A0 =C2=A0ISABus *isa_bus;<br>
+=C2=A0 =C2=A0 =C2=A0ISADevice *pit;<br>
+=C2=A0 =C2=A0 =C2=A0DriveInfo *fds[MAX_FD];<br>
+-=C2=A0 =C2=A0 MemoryRegion *ram =3D g_new(MemoryRegion, 1);<br>
+=C2=A0 =C2=A0 =C2=A0MemoryRegion *bios =3D g_new(MemoryRegion, 1);<br>
+=C2=A0 =C2=A0 =C2=A0MemoryRegion *bios2 =3D g_new(MemoryRegion, 1);<br>
+=C2=A0 =C2=A0 =C2=A0SysBusESPState *sysbus_esp;<br>
+@@ -191,9 +190,7 @@ static void mips_jazz_init(MachineState *machine,<br>
+=C2=A0 =C2=A0 =C2=A0cc-&gt;do_transaction_failed =3D mips_jazz_do_transacti=
+on_failed;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0/* allocate RAM */<br>
+-=C2=A0 =C2=A0 memory_region_allocate_system_memory(ram, NULL, &quot;mips_j=
+azz.ram&quot;,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ma=
+chine-&gt;ram_size);<br>
+-=C2=A0 =C2=A0 memory_region_add_subregion(address_space, 0, ram);<br>
++=C2=A0 =C2=A0 memory_region_add_subregion(address_space, 0, machine-&gt;ra=
+m);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0memory_region_init_ram(bios, NULL, &quot;mips_jazz.bios=
+&quot;, MAGNUM_BIOS_SIZE,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 &amp;error_fatal);<br>
+@@ -393,6 +390,7 @@ static void mips_magnum_class_init(ObjectClass *oc, voi=
+d *data)<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;init =3D mips_magnum_init;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;block_default_type =3D IF_SCSI;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;default_cpu_type =3D MIPS_CPU_TYPE_NAME(&quot;R4=
+000&quot;);<br>
++=C2=A0 =C2=A0 mc-&gt;default_ram_id =3D &quot;mips_jazz.ram&quot;;<br>
+=C2=A0}<br>
+<br>
+=C2=A0static const TypeInfo mips_magnum_type =3D {<br>
+@@ -409,6 +407,7 @@ static void mips_pica61_class_init(ObjectClass *oc, voi=
+d *data)<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;init =3D mips_pica61_init;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;block_default_type =3D IF_SCSI;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;default_cpu_type =3D MIPS_CPU_TYPE_NAME(&quot;R4=
+000&quot;);<br>
++=C2=A0 =C2=A0 mc-&gt;default_ram_id =3D &quot;mips_jazz.ram&quot;;<br>
+=C2=A0}<br>
+<br>
+=C2=A0static const TypeInfo mips_pica61_type =3D {<br>
+-- <br>
+2.7.4<br>
+<br>
+<br>
+</blockquote></div></div>
 
+--00000000000000b9fc059ce5e7d4--
 
