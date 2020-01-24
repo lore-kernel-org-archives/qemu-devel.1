@@ -2,84 +2,86 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D098BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D377DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 11:00:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ADDA2071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:59:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A25A12071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 11:00:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qigLY4sX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ADDA2071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BQlrhYLq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A25A12071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuwgf-0005Jp-Sj
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:59:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57242)
+	id 1iuwhe-0006F1-Q8
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 06:00:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iuwfr-0004QA-9f
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:58:52 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iuwgr-0005f8-Qx
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iuwfq-0000s7-1p
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:58:51 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46518)
+ (envelope-from <alex.bennee@linaro.org>) id 1iuwgq-0001kO-AI
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:59:53 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35037)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iuwfp-0000r0-PE
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:58:50 -0500
-Received: by mail-wr1-x443.google.com with SMTP id z7so1411076wrl.13
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 02:58:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=3aA2oAJCoddA0oWD5ByGuYaJh7hr3TALbXKYum+YPsM=;
- b=qigLY4sXo8D2HMcF9+qhz+E5NXvrV1xXUsMpJFudwbGXXg//0XgdOc2Ut9c5ZM8SMo
- V3PoG53hlNca2SiV/Jky1Pdpwmzqn6vvSL8/8XpJLIcFC10TT6t6qBT9qzoiE9oISOOZ
- TxegEtQHPACBr2Z/i8eJnUUPt2aV4e8ZDBKrPQnHyBffuDFDkJfR61qumjv34u/uu4Ld
- Ne//IAnNJfThI306qttpqFK03h+Qa3eayMwdXHfa4E8VTihQbmkqMRRwNer/00TeLO2J
- zn9Sc+CWxNuhK2sVGP8/k6JqJT8qePPCwuwMuCfoMYWPU/ZFAXpu4bzQty2v4B7EPZZA
- cIpg==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iuwgq-0001ih-1a
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:59:52 -0500
+Received: by mail-wr1-x443.google.com with SMTP id g17so1451282wro.2
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 02:59:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ZmUmEug5AG28bLAgJ6PJuweGUXbP2m9I2E5+btjjs4w=;
+ b=BQlrhYLqOQXCanLjBuAYXAyYvDzHYa53Q/HNC8GMGZn3YgX8+so4Dt3G3HWsZhcv4S
+ KzR67JxB0z6jjpbI77Bz3mfQFkdZXSIWV/1csEPJHQphokuxBMTfHc5sSIi7jxAvF/4v
+ L12/ZmPE+1FgVGN+kCGPHU3y50boYBrNSB8gJFOQvVFJIFNxMdD31zYMtj9pjstWpcwL
+ irlLsQT9xk/vYbMQiVJ/y2nT6AwGVLxEdNrXs7T7MHR8jedmIWHLxuLldAz1jZFE2Sdy
+ i2d+Qzh6KTAhxmdQc4Ys/d1mhN/8GtCvyfnBv4HvUecA/Pl3sFrOPHgKAs38qURUxLo3
+ noVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=3aA2oAJCoddA0oWD5ByGuYaJh7hr3TALbXKYum+YPsM=;
- b=cJSjOAMKGs3T+x+8NK7RGMsMrAdAfP4SLYnzG0pnSwBmzWPAvP9MDTnNXZzv9xnCEi
- Kzwj0SNcYtS81zgcmwAfbknpwBsVJBiXSUgpWUtOQUgDh9+I/5Ilcg2nzKHEV6WPr5RM
- jx+QmW2y/8+bmXGI5lj3KFAcupGICeCUrzjwrMqitUcZSZJpiVJR/msuMatRFA8BHACH
- Z+IJyqeWIQJMDcGch0wxdo6Xngzeh4ggaqArOyBRW6Ow12W2xSu8Ofsr4ft/fesj9hct
- yGe9NfyqMhXKwOZJqc2wsMjkLETpYZPl070fnQJeeJkoMLr9KpQMD0dsGpduk8UlrEfN
- r7Nw==
-X-Gm-Message-State: APjAAAUxwYjNEsP8M5MJelIZaj6aDX/Oz2nksoW+AeV/gIeue9lm0rJU
- fjXn/XeEaANXMmxbw1IK6Mc=
-X-Google-Smtp-Source: APXvYqyS5uzVn4X2gyyRKKDu1h8kb+TM8Q6+amy8JvIj/j2zaHXsol/TZiPW8AcOD5R3wZ+3zOgb2Q==
-X-Received: by 2002:a5d:610a:: with SMTP id v10mr3532673wrt.267.1579863528100; 
- Fri, 24 Jan 2020 02:58:48 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v14sm6988484wrm.28.2020.01.24.02.58.46
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ZmUmEug5AG28bLAgJ6PJuweGUXbP2m9I2E5+btjjs4w=;
+ b=IlPYBSjbnQFT111m75b2lnlXlODCMTxDiKl2O40H3HZ4FAlGUoT8FynyfQRbNCOKIr
+ b9nqtoo7eIAgioWIxLei2OeoVhdBJVu6CCxyrVCdGJaVWcTnVojm40Usz9Znq0pz6sh1
+ Cuo1jIiQ3mYlQmtiu28vl9pg0q1QBZFja/QyIirEqx1aEyFK21Disxbf1X7EpB5IQjpB
+ Oy7DHJLpE0cp+kF9XYa6dlCW2BGu+JU76CZpi0f8UVXZgc5Hr+6eX5nR5mTF1eHs6P0j
+ 9QT02yw3JsyDQ8tws5tBEXUyum9Zs7t1LjZPWT9m5LVd3VekGTf8swYBcYfX21cSjF7t
+ wuCw==
+X-Gm-Message-State: APjAAAWOp8ZPSUVTSH6utxo/DRTQfKaJjhYRYhC/U8jmqbnQ6DP2y5Ek
+ 1tGsKJCcIUWn4D814r1xpJyg7A==
+X-Google-Smtp-Source: APXvYqw4C2Gc+lLo+JULZMsoy+kz+1daIvNaPY9AHGBORNEDgSJBVmrVDhsk4uM24M9ViEFHFdeaZA==
+X-Received: by 2002:adf:ff84:: with SMTP id j4mr3729741wrr.27.1579863590776;
+ Fri, 24 Jan 2020 02:59:50 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t12sm6604421wrs.96.2020.01.24.02.59.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 24 Jan 2020 02:58:47 -0800 (PST)
-Date: Fri, 24 Jan 2020 10:58:46 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: Maintainers, please add Message-Id: when merging patches
-Message-ID: <20200124105846.GG736986@stefanha-x1.localdomain>
-References: <CAJSP0QX22cYJvnpb+zDDXLaYg0yY4CV3Jn5QY+ExxJyFcmQ3Gw@mail.gmail.com>
- <20200122122831.GB13482@linux.fritz.box>
- <20200123171857.GC5021@linux.fritz.box>
+ Fri, 24 Jan 2020 02:59:49 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DC0E41FF87;
+ Fri, 24 Jan 2020 10:59:47 +0000 (GMT)
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-23-f4bug@amsat.org>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH rc2 22/25] target/avr: Update build system
+In-reply-to: <20200124005131.16276-23-f4bug@amsat.org>
+Date: Fri, 24 Jan 2020 10:59:47 +0000
+Message-ID: <8736c5yva4.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="HKEL+t8MFpg/ASTE"
-Content-Disposition: inline
-In-Reply-To: <20200123171857.GC5021@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::443
@@ -94,79 +96,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, S.E.Harris@kent.ac.uk,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, me@xcancerberox.com.ar,
+ qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ Markus Armbruster <armbru@redhat.com>, dovgaluk@ispras.ru,
+ =?utf-8?Q?Marc-A?= =?utf-8?Q?ndr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ aleksandar.m.mail@gmail.com, Laurent Vivier <lvivier@redhat.com>,
+ thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+ richard.henderson@linaro.org, mrolnik@gmail.com,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-riscv@nongnu.org,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---HKEL+t8MFpg/ASTE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-On Thu, Jan 23, 2020 at 06:18:57PM +0100, Kevin Wolf wrote:
-> Am 22.01.2020 um 13:28 hat Kevin Wolf geschrieben:
-> > Am 22.01.2020 um 13:02 hat Stefan Hajnoczi geschrieben:
-> > > Around 66% of qemu.git commits since v4.1.0 include a Message-Id: tag=
-=2E  Hooray!
-> > >=20
-> > > Message-Id: references the patch email that a commit was merged from.
-> > > This information is helpful to anyone wishing to refer back to email
-> > > discussions and patch series.
-> > >=20
-> > > Please use git-am(1) -m/--message-id or set am.messageid in your git-=
-config(1).
-> >=20
-> > I've had -m in my scripts for a while (last time someone asked me to
-> > make the change, I guess), but it wasn't effective, because my .muttrc
-> > has 'set pipe_decode' enabled, which doesn't only decode the output, but
-> > also throws away most headers.
-> >=20
-> > I seem to remember that this was necessary at some point because
-> > otherwise some mails just wouldn't apply. Maybe 'git am' works better
-> > these days and can actually parse the mails that used to give me
-> > problems. I'll give it a try and disable pipe_decode.
->=20
-> Here is the first patch for which it failed for me:
->=20
-> Message-ID: <20200123124357.124019-1-felipe@nutanix.com>
->=20
-> The problem seems to be related to line endings because the patch that
-> git-apply sees eventually has "\r\n" whereas the file to be patched has
-> only "\n".
->=20
-> If I understand correctly (this is a bit of guesswork after reading man
-> pages and trying out a few options), git-mailsplit would normally get
-> rid of the "\r". However, this specific patch email is base64 encoded,
-> so the encoded "\r" characters survive this stage.
->=20
-> git-mailinfo later decodes the email, but doesn't seem to do anything
-> about "\r" again, so it survives this one as well. This means feeding a
-> patch with the wrong line endings to git-apply, which just fails.
->=20
-> Any suggestion how to fix this? (For this patch, I just enabled
-> pipe_decode again, so no Message-Id tag for it.)
+> From: Michael Rolnik <mrolnik@gmail.com>
+>
+> Make AVR support buildable
+>
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Message-Id: <20200118191416.19934-19-mrolnik@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  configure                       |  7 +++++++
+>  default-configs/avr-softmmu.mak |  5 +++++
+>  target/avr/Makefile.objs        | 34 +++++++++++++++++++++++++++++++++
+>  3 files changed, 46 insertions(+)
+>  create mode 100644 default-configs/avr-softmmu.mak
+>  create mode 100644 target/avr/Makefile.objs
+>
+> diff --git a/configure b/configure
+> index 557e4382ea..94e79ca634 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7612,6 +7612,10 @@ case "$target_name" in
+>      mttcg=3D"yes"
+>      gdb_xml_files=3D"aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-v=
+fp.xml arm-vfp3.xml arm-neon.xml"
+>    ;;
+> +  avr)
+> +    gdb_xml_files=3D"avr-cpu.xml"
+> +    target_compiler=3D$cross_cc_avr
 
-This might be a good question for the git mailing list
-<git@vger.kernel.org>.
+I don't think you want this here. target_compiler belongs in the
+tests/tcg/configure.sh config.
 
-Stefan
+A docker target with the compiler would also be nice.
 
---HKEL+t8MFpg/ASTE
-Content-Type: application/pgp-signature; name="signature.asc"
+> +  ;;
+>    cris)
+>    ;;
+>    hppa)
+> @@ -7831,6 +7835,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+>        disas_config "ARM_A64"
+>      fi
+>    ;;
+> +  avr)
+> +    disas_config "AVR"
+> +  ;;
+>    cris)
+>      disas_config "CRIS"
+>    ;;
+> diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmm=
+u.mak
+> new file mode 100644
+> index 0000000000..80218add98
+> --- /dev/null
+> +++ b/default-configs/avr-softmmu.mak
+> @@ -0,0 +1,5 @@
+> +# Default configuration for avr-softmmu
+> +
+> +# Boards:
+> +#
+> +CONFIG_ARDUINO=3Dy
+> diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
+> new file mode 100644
+> index 0000000000..7523e0c6e2
+> --- /dev/null
+> +++ b/target/avr/Makefile.objs
+> @@ -0,0 +1,34 @@
+> +#
+> +#  QEMU AVR CPU
+> +#
+> +#  Copyright (c) 2019 Michael Rolnik
+> +#
+> +#  This library is free software; you can redistribute it and/or
+> +#  modify it under the terms of the GNU Lesser General Public
+> +#  License as published by the Free Software Foundation; either
+> +#  version 2.1 of the License, or (at your option) any later version.
+> +#
+> +#  This library is distributed in the hope that it will be useful,
+> +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> +#  Lesser General Public License for more details.
+> +#
+> +#  You should have received a copy of the GNU Lesser General Public
+> +#  License along with this library; if not, see
+> +#  <http://www.gnu.org/licenses/lgpl-2.1.html>
+> +#
+> +
+> +DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
+> +decode-y =3D $(SRC_PATH)/target/avr/insn.decode
+> +
+> +target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
+> +	$(call quiet-command, \
+> +	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<,=
+ \
+> +	  "GEN", $(TARGET_DIR)$@)
+> +
+> +target/avr/translate.o: target/avr/decode_insn.inc.c
+> +
+> +obj-y +=3D translate.o cpu.o helper.o
+> +obj-y +=3D gdbstub.o
+> +obj-y +=3D disas.o
+> +obj-$(CONFIG_SOFTMMU) +=3D machine.o
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4qzeUACgkQnKSrs4Gr
-c8jUVggAr7IAY8xNP2P0aE9EWLqfxvFzKBOdBK0t72PTJlOJHmXsPi2kLfdhxlds
-DHqcdmckLS1gRqMe1BmKY45iv8QCDRbkNHPKCY5lj2zSVwX0sjIR2Rl+8/EbYU/a
-mCXqyD3Mlhm1kf76OHGw4D/w7lBk94ElAVy6OgprxW/2jM64ApNe0wOH5DPTRaTi
-toqrVvtSNTPloCDgC+6mXGG//01Ui3GjyZv5clRogPElLxVI1llYYJiiTpKt33QU
-d7qQtBlP4hEHiqM+kxkU+dSBboWMIFxR3sD6yPoD7m2iz7TTPwsJvp2O/lQkGUmn
-R2/sEuhnv3ubsVeuFFnN5M6i6x0Bgg==
-=4icb
------END PGP SIGNATURE-----
-
---HKEL+t8MFpg/ASTE--
+--=20
+Alex Benn=C3=A9e
 
