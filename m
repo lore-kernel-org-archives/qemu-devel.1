@@ -2,92 +2,54 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D044C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6009DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF7DD20702
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:46:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BqOqYhrx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF7DD20702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 322EB20702
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 19:48:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 322EB20702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv4uj-0003vH-3j
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 14:46:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34752)
+	id 1iv4wa-0005EC-Au
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 14:48:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iv4tC-0002IP-To
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:45:16 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iv4uW-00049B-TD
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:46:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iv4t7-0005fv-9q
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:45:10 -0500
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40636)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iv4t7-0005dr-32
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:45:05 -0500
-Received: by mail-pj1-x1044.google.com with SMTP id bg7so278344pjb.5
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 11:45:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CS1T8g6exv4pZWkk1CKFOOp8Y6k1wtSU7Ui31Lt3wUc=;
- b=BqOqYhrxJvNRQ4syh5+yFYy3OnlDQzw2suJo7y4UbkhEhPQuJFy3KOvfqxpt2pEsNH
- JWHv5ZVS/ICpquVo5Y5h3LnX++FjKHof8zov2mwC2Ed3mOsmygZYUcy3u7xrgWvKQKlk
- KsyLoIHc+1LOrfwZ1TTY40VP0y16oYNVuG7YLvYnUxhM+20H1FR9h4BSddrxESI+gImY
- AXhYFhFpwWc+1WgKErpUDZJF6OGkDslETvoeysB4vTLKCqn0xsYl0o0/KjF7B2+yo0hx
- wrYKPLyzv5fihHXijX020dZyxzEEqlyVh5kVa+NyjynOg+SZ6msiM+H37qaDoSCGEcCf
- bzeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CS1T8g6exv4pZWkk1CKFOOp8Y6k1wtSU7Ui31Lt3wUc=;
- b=m+kbQ9KvUTTxBw+T61u8lFS5IB4SUUE4XRNq3mC4bnvi4O0il5ZLmjDef8CiRtbw79
- +D2OvrP0KgRQUiI5PhEoqx3G/0YGxVZcvSwUuMUVCCe1SgH15URaSXzDJLeLAoEECRjQ
- mmWAjXgNiOdmUZ1T/Zi1rV/DtrJjhhTs/pEq1Navd4Aw6EqVv94AvPtPFvlOJwng85Vm
- JB0j3Ir3d1D719hrda96ePYR999tWCrZzQJZey5BSB4JPBkkQcv7yrLcOkHACnMx5Ufo
- QV6XErgp20OJQTFXbVKSrDsq7E3nREhfdjOM4/xHPFOTyRsl5B95x7Kp8azFq0yPj5Ww
- ds8w==
-X-Gm-Message-State: APjAAAWE7LHiESgYAY8P4ilFKB+HHdlTM/VguZkmqYVzQ2NmqHV90vJz
- /8whKKT303IDjntzZIA9T3Yltg==
-X-Google-Smtp-Source: APXvYqwK3T3PDq2eH4C078z6mvbMYuXE/umz7Y/DSJJD16uCw9WMk+3xtsLXEo9ktxfQ7v+omjm52Q==
-X-Received: by 2002:a17:902:8b89:: with SMTP id
- ay9mr5066508plb.309.1579895103611; 
- Fri, 24 Jan 2020 11:45:03 -0800 (PST)
-Received: from [10.5.50.117] (rrcs-173-198-77-92.west.biz.rr.com.
- [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id h128sm7230819pfe.172.2020.01.24.11.45.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Jan 2020 11:45:02 -0800 (PST)
-Subject: Re: [PATCH v4 6/7] disas: mips: Add micromips R6 disassembler -
- infrastructure and 16-bit instructions
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1579883929-1517-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1579883929-1517-7-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <779b7b35-16a8-0538-ad87-fac218c93e82@linaro.org>
-Date: Fri, 24 Jan 2020 09:44:57 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <no-reply@patchew.org>) id 1iv4uV-00070O-Bw
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:46:32 -0500
+Resent-Date: Fri, 24 Jan 2020 14:46:32 -0500
+Resent-Message-Id: <E1iv4uV-00070O-Bw@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21130)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iv4uV-0006y9-6y; Fri, 24 Jan 2020 14:46:31 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579895080042314.5570224837985;
+ Fri, 24 Jan 2020 11:44:40 -0800 (PST)
+In-Reply-To: <20200124183113.58039-1-salvador@qindel.com>
+Subject: Re: [PATCH] bsd-user: improve support for sparc syscall flags
+Message-ID: <157989507891.23531.10374377357103915501@f6d1ed32ca6b>
 MIME-Version: 1.0
-In-Reply-To: <1579883929-1517-7-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1044
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: salvador@qindel.com
+Date: Fri, 24 Jan 2020 11:44:40 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,90 +61,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@rt-rk.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, sfandino@yahoo.com, salvador@qindel.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/24/20 6:38 AM, Aleksandar Markovic wrote:
-> The basic disassembly logic was obtained by somewhat modified script
-> decodetree.py, and such output was further manually modified to
-> handle numerous details of micromips 32R6 instruction coding scheme.
-
-What modifications to the script?
-What manual modifications to the output?
-
-It's been a while since I looked at micromips, but I don't recall anything so
-odd that it couldn't be handled with the current output of decodetree.py.
-
-
-> +static void getAlias(char *buffer, int regNo)
-> +{
-> +    switch (regNo) {
-> +    case 0:
-> +        strncpy(buffer, "zero", 5);
-> +        break;
-> +    case 1:
-> +        strncpy(buffer, "at", 5);
-> +        break;
-> +    case 2:
-> +    case 3:
-> +        sprintf(buffer, "v%d", regNo - 2);
-> +        break;
-> +    case 4:
-> +    case 5:
-> +    case 6:
-> +    case 7:
-> +        sprintf(buffer, "a%d", regNo - 4);
-> +        break;
-> +    case 8:
-> +    case 9:
-> +    case 10:
-> +    case 11:
-> +    case 12:
-> +    case 13:
-> +    case 14:
-> +    case 15:
-> +        sprintf(buffer, "t%d", regNo - 8);
-> +        break;
-> +    case 16:
-> +    case 17:
-> +    case 18:
-> +    case 19:
-> +    case 20:
-> +    case 21:
-> +    case 22:
-> +    case 23:
-> +        sprintf(buffer, "s%d", regNo - 16);
-> +        break;
-> +    case 24:
-> +    case 25:
-> +        sprintf(buffer, "t%d", regNo - 16);
-> +        break;
-> +    case 28:
-> +        strncpy(buffer, "gp", 5);
-> +        break;
-> +    case 29:
-> +        strncpy(buffer, "sp", 5);
-> +        break;
-> +    case 30:
-> +        strncpy(buffer, "s8", 5);
-> +        break;
-> +    case 31:
-> +        strncpy(buffer, "ra", 5);
-> +        break;
-> +    default:
-> +        sprintf(buffer, "r%d", regNo);
-> +        break;
-> +    }
-> +}
-
-Surely this would be better as a const array of string literals.  There are
-only 32 of them after all.
-
-Then you can just return the const char *, which is much better than
-sprintf'ing into a caller-provided buffer of unknown size.
-
-
-r~
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyNDE4MzExMy41ODAz
+OS0xLXNhbHZhZG9yQHFpbmRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDEyNDE4MzExMy41ODAz
+OS0xLXNhbHZhZG9yQHFpbmRlbC5jb20KU3ViamVjdDogW1BBVENIXSBic2QtdXNlcjogaW1wcm92
+ZSBzdXBwb3J0IGZvciBzcGFyYyBzeXNjYWxsIGZsYWdzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDEyNDE4MzExMy41ODAzOS0xLXNh
+bHZhZG9yQHFpbmRlbC5jb20gLT4gcGF0Y2hldy8yMDIwMDEyNDE4MzExMy41ODAzOS0xLXNhbHZh
+ZG9yQHFpbmRlbC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3NGE1NmFiIGJz
+ZC11c2VyOiBpbXByb3ZlIHN1cHBvcnQgZm9yIHNwYXJjIHN5c2NhbGwgZmxhZ3MKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CkVSUk9SOiBlbHNlIHNob3VsZCBmb2xsb3cgY2xvc2UgYnJhY2UgJ30nCiM0
+NzogRklMRTogYnNkLXVzZXIvbWFpbi5jOjUyMDoKKyAgICAgICAgICAgIH0KKyAgICAgICAgICAg
+IGVsc2UgaWYgKGJzZF90eXBlID09IHRhcmdldF9uZXRic2QpIHsKCkVSUk9SOiBlbHNlIHNob3Vs
+ZCBmb2xsb3cgY2xvc2UgYnJhY2UgJ30nCiMxMDQ6IEZJTEU6IGJzZC11c2VyL21haW4uYzo1NzE6
+CiAgICAgICAgICAgICB9CisgICAgICAgICAgICBlbHNlIGlmIChic2RfdHlwZSA9PSB0YXJnZXRf
+bmV0YnNkKSB7CgpFUlJPUjogZWxzZSBzaG91bGQgZm9sbG93IGNsb3NlIGJyYWNlICd9JwojMTIw
+OiBGSUxFOiBic2QtdXNlci9tYWluLmM6NTg3OgorICAgICAgICAgICAgfQorICAgICAgICAgICAg
+ZWxzZSAgewoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTM2OiBG
+SUxFOiBic2QtdXNlci9uZXRic2Qvc3lzY2FsbF9uci5oOjM3NToKKy8qXkkkTmV0QlNEOiB0cmFw
+LmgsdiAxLjE4IDIwMTEvMDMvMjcgMTg6NDc6MDggbWFydGluIEV4cCAkICovJAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQwOiBGSUxFOiBic2QtdXNlci9uZXRi
+c2Qvc3lzY2FsbF9uci5oOjM3OToKKyAqXklUaGUgUmVnZW50cyBvZiB0aGUgVW5pdmVyc2l0eSBv
+ZiBDYWxpZm9ybmlhLiAgQWxsIHJpZ2h0cyByZXNlcnZlZC4kCgpFUlJPUjogY29kZSBpbmRlbnQg
+c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNDg6IEZJTEU6IGJzZC11c2VyL25ldGJzZC9zeXNjYWxs
+X25yLmg6Mzg3OgorICpeSVRoaXMgcHJvZHVjdCBpbmNsdWRlcyBzb2Z0d2FyZSBkZXZlbG9wZWQg
+YnkgdGhlIFVuaXZlcnNpdHkgb2YkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiMxNDk6IEZJTEU6IGJzZC11c2VyL25ldGJzZC9zeXNjYWxsX25yLmg6Mzg4OgorICpe
+SUNhbGlmb3JuaWEsIExhd3JlbmNlIEJlcmtlbGV5IExhYm9yYXRvcnkuJAoKRVJST1I6IGNvZGUg
+aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTc1OiBGSUxFOiBic2QtdXNlci9uZXRic2Qv
+c3lzY2FsbF9uci5oOjQxNDoKKyAqXklAKCMpdHJhcC5oXkk4LjEgKEJlcmtlbGV5KSA2LzExLzkz
+JAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxODQ6IEZJTEU6IGJzZC11c2VyL25l
+dGJzZC9zeXNjYWxsX25yLmg6NDIzOgorI2RlZmluZSAgICAgICAgVEFSR0VUX05FVEJTRF9TWVND
+QUxMX0cyUkZMQUcgICAweDQwMCAgIC8qIG9uIHN1Y2Nlc3MsIHJldHVybiB0byAlZzIgcmF0aGVy
+IHRoYW4gbnBjICovCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMx
+ODQ6IEZJTEU6IGJzZC11c2VyL25ldGJzZC9zeXNjYWxsX25yLmg6NDIzOgorI2RlZmluZV5JVEFS
+R0VUX05FVEJTRF9TWVNDQUxMX0cyUkZMQUdeSTB4NDAwXkkvKiBvbiBzdWNjZXNzLCByZXR1cm4g
+dG8gJWcyIHJhdGhlciB0aGFuIG5wYyAqLyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiMxODU6IEZJTEU6IGJzZC11c2VyL25ldGJzZC9zeXNjYWxsX25yLmg6NDI0OgorI2RlZmlu
+ZSAgICAgICAgVEFSR0VUX05FVEJTRF9TWVNDQUxMX0c3UkZMQUcgICAweDgwMCAgIC8qIHVzZSAl
+ZzcgYXMgYWJvdmUgKGRlcHJlY2F0ZWQpICovCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMxODU6IEZJTEU6IGJzZC11c2VyL25ldGJzZC9zeXNjYWxsX25yLmg6NDI0
+OgorI2RlZmluZV5JVEFSR0VUX05FVEJTRF9TWVNDQUxMX0c3UkZMQUdeSTB4ODAwXkkvKiB1c2Ug
+JWc3IGFzIGFib3ZlIChkZXByZWNhdGVkKSAqLyQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMTg2OiBGSUxFOiBic2QtdXNlci9uZXRic2Qvc3lzY2FsbF9uci5oOjQyNToKKyNkZWZp
+bmUgICAgICAgIFRBUkdFVF9ORVRCU0RfU1lTQ0FMTF9HNVJGTEFHICAgMHhjMDAgICAvKiB1c2Ug
+JWc1IGFzIGFib3ZlIChvbmx5IEFCSSBjb21wYXRpYmxlIHdheSkgKi8KCkVSUk9SOiBjb2RlIGlu
+ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE4NjogRklMRTogYnNkLXVzZXIvbmV0YnNkL3N5
+c2NhbGxfbnIuaDo0MjU6CisjZGVmaW5lXklUQVJHRVRfTkVUQlNEX1NZU0NBTExfRzVSRkxBR15J
+MHhjMDBeSS8qIHVzZSAlZzUgYXMgYWJvdmUgKG9ubHkgQUJJIGNvbXBhdGlibGUgd2F5KSAqLyQK
+CnRvdGFsOiAxMyBlcnJvcnMsIDEgd2FybmluZ3MsIDE1MyBsaW5lcyBjaGVja2VkCgpDb21taXQg
+NzRhNTZhYmVjMTU1IChic2QtdXNlcjogaW1wcm92ZSBzdXBwb3J0IGZvciBzcGFyYyBzeXNjYWxs
+IGZsYWdzKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDEyNDE4MzExMy41ODAzOS0xLXNhbHZh
+ZG9yQHFpbmRlbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
