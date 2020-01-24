@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C44BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9235BC32771
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 006992071E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:49:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 006992071E
+	by mail.kernel.org (Postfix) with ESMTPS id 6C8552071E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:49:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C8552071E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv1D9-0006oZ-0Y
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 10:49:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57663)
+	id 1iv1DA-0006sW-De
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 10:49:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv1CM-0005Z2-2t
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv1CM-0005Yo-41
  for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:48:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv1CK-0006Mw-QQ
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:48:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:43619 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv1CK-0006MV-Nk
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:48:41 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:43546 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iv1CK-0005xM-Eh
+ id 1iv1CK-0005x5-FP
  for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:48:40 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 5FD9A1A20B8;
+ by mail.rt-rk.com (Postfix) with ESMTP id 299331A1FE9;
  Fri, 24 Jan 2020 16:47:35 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 17EA51A205E;
- Fri, 24 Jan 2020 16:47:35 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id EE38B1A2006;
+ Fri, 24 Jan 2020 16:47:34 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/4] linux-user: Add support for FDGETFDCSTAT ioctl
-Date: Fri, 24 Jan 2020 16:47:19 +0100
-Message-Id: <1579880839-31466-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v2 1/4] linux-user: Add support for FS_IOC_FS<GET|SET>XATTR
+ ioctls
+Date: Fri, 24 Jan 2020 16:47:16 +0100
+Message-Id: <1579880839-31466-2-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1579880839-31466-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1579880839-31466-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -69,110 +70,64 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-FDGETFDCSTAT's third agrument is a pointer to the structure:
+Both FS_IOC_FSGETXATTR and FS_IOC_FSSETXATTR accept a pointer to
+the structure
 
-struct floppy_fdc_state {
-    int spec1;
-    int spec2;
-    int dtr;
-    unsigned char version;
-    unsigned char dor;
-    unsigned long address;
-    unsigned int rawcmd:2;
-    unsigned int reset:1;
-    unsigned int need_configure:1;
-    unsigned int perp_mode:2;
-    unsigned int has_fifo:1;
-    unsigned int driver_version;
-    unsigned char track[4];
+struct fsxattr {
+    __u32         fsx_xflags;     /* xflags field value (get/set) */
+    __u32         fsx_extsize;    /* extsize field value (get/set)*/
+    __u32         fsx_nextents;   /* nextents field value (get)	*/
+    __u32         fsx_projid;     /* project identifier (get/set) */
+    __u32         fsx_cowextsize; /* CoW extsize field value (get/set)*/
+    unsigned char fsx_pad[8];
 };
 
-defined in Linux kernel header <linux/fd.h>.
+as their third argument.
 
-Since there is a fields of the structure of type 'unsigned long', there is
-a need to define "target_format_descr". Also, five fields rawcmd, reset,
-need_configure, perp_mode, and has_fifo are all just bitfields and are
-part od a single 'unsigned int' field.
+These ioctls were relatively recently introduced, so the "#ifdef"
+guards are used in this implementation.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h        |  2 ++
- linux-user/syscall_defs.h  | 18 ++++++++++++++++++
- linux-user/syscall_types.h | 12 ++++++++++++
- 3 files changed, 32 insertions(+)
+ linux-user/ioctls.h       | 7 +++++++
+ linux-user/syscall_defs.h | 6 ++++++
+ 2 files changed, 13 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index adc07ad..b3bbe6a 100644
+index 73dcc76..9fb9d6f 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -145,6 +145,8 @@
-      IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-      IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-      IOCTL(FDRESET, 0, TYPE_NULL)
-+     IOCTL(FDGETFDCSTAT, IOC_R,
-+           MK_PTR(MK_STRUCT(STRUCT_target_floppy_fdc_state)))
-      IOCTL(FDRAWCMD, 0, TYPE_NULL)
-      IOCTL(FDTWADDLE, 0, TYPE_NULL)
-      IOCTL(FDEJECT, 0, TYPE_NULL)
+@@ -173,6 +173,13 @@
+      IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
++#ifdef FS_IOC_FSGETXATTR
++     IOCTL(FS_IOC_FSGETXATTR, IOC_W, MK_PTR(MK_STRUCT(STRUCT_fsxattr)))
++#endif
++#ifdef FS_IOC_FSSETXATTR
++     IOCTL(FS_IOC_FSSETXATTR, IOC_W, MK_PTR(MK_STRUCT(STRUCT_fsxattr)))
++#endif
++
+ 
+ #ifdef CONFIG_USBFS
+   /* USB ioctls */
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index ae4c048..e08e5bc 100644
+index 9b61ae8..ed5068f 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -933,6 +933,23 @@ struct target_rtc_pll_info {
+@@ -966,6 +966,12 @@ struct target_rtc_pll_info {
+ #define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
+ #define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
+ #define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
++#ifdef FS_IOC_FSGETXATTR
++#define TARGET_FS_IOC_FSGETXATTR TARGET_IOR('X', 31, struct fsxattr)
++#endif
++#ifdef FS_IOC_FSSETXATTR
++#define TARGET_FS_IOC_FSSETXATTR TARGET_IOR('X', 32, struct fsxattr)
++#endif
  
- /* From <linux/fd.h> */
- 
-+struct target_floppy_fdc_state {
-+    int spec1;                      /* spec1 value last used */
-+    int spec2;                      /* spec2 value last used */
-+    int dtr;
-+    unsigned char version;          /* FDC version code */
-+    unsigned char dor;
-+    abi_ulong address;              /* io address */
-+    unsigned int rawcmd:2;
-+    unsigned int reset:1;
-+    unsigned int need_configure:1;
-+    unsigned int perp_mode:2;
-+    unsigned int has_fifo:1;
-+    unsigned int driver_version;    /* version code for floppy driver */
-+    unsigned char track[4];
-+};
-+
-+
- #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
- #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
- #define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
-@@ -943,6 +960,7 @@ struct target_rtc_pll_info {
- #define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c, struct floppy_max_errors)
- #define TARGET_FDGETMAXERRS  TARGET_IOR(2, 0x0e, struct floppy_max_errors)
- #define TARGET_FDRESET        TARGET_IO(2, 0x54)
-+#define TARGET_FDGETFDCSTAT  TARGET_IOR(2, 0x15, struct target_floppy_fdc_state)
- #define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
- #define TARGET_FDTWADDLE      TARGET_IO(2, 0x59)
- #define TARGET_FDEJECT        TARGET_IO(2, 0x5a)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index dfd7608..e8f8984 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -303,6 +303,18 @@ STRUCT(floppy_max_errors,
-        TYPE_INT, /* recal */
-        TYPE_INT) /* reporting */
- 
-+STRUCT(target_floppy_fdc_state,
-+       TYPE_INT, /* spec1 */
-+       TYPE_INT, /* spec2 */
-+       TYPE_INT, /* dtr */
-+       TYPE_CHAR, /* version */
-+       TYPE_CHAR, /* dor */
-+       TYPE_ULONG, /* address */
-+       TYPE_INT, /* bit field for rawcmd:2, reset:1, need_configure:1, */
-+                 /* perp_mode:2, and has_fifo:1 */
-+       TYPE_INT, /* driver_version */
-+       MK_ARRAY(TYPE_CHAR, 4)) /* track */
-+
- #if defined(CONFIG_USBFS)
- /* usb device ioctls */
- STRUCT(usbdevfs_ctrltransfer,
+ /* usb ioctls */
+ #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
 -- 
 2.7.4
 
