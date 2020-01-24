@@ -2,83 +2,95 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CCCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 21:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74026C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:15:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C419C2071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 21:29:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItpBtEY3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C419C2071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40BA62075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:15:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40BA62075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48629 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv6W3-0000hx-TP
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 16:29:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59477)
+	id 1iv7Eg-0000k3-Bf
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 17:15:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51222)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iv6V9-0008Kx-FK
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 16:28:28 -0500
+ (envelope-from <walling@linux.ibm.com>) id 1iv7Dc-0007ns-QA
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:14:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iv6V7-0002Hl-7j
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 16:28:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34563
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iv6V6-0002Gm-W0
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 16:28:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579901304;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MHdnecRYf4mM9JFnSebp4hnxSswXhAnm979xUf63zTE=;
- b=ItpBtEY3R6l7Ekslkilvf7g6ORkR5DP0jHfApmWYOZ4BBEfM/sjtjHlM0sAcCQ3yy7Gf42
- 76GLUddihb6Z9tS6til2cKnrWIsHK0tsOEfN3gSV0Sntn8BQ/2SkuzDeQh3HByNcaXy40j
- l73F1u81E91ZFkSH7l1EgPEtlGJdaFg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-RKUPo4bWOzKL9BY0uKakuQ-1; Fri, 24 Jan 2020 16:28:18 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFD7A800D54;
- Fri, 24 Jan 2020 21:28:17 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-27.gru2.redhat.com
- [10.97.116.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C6F9860BE1;
- Fri, 24 Jan 2020 21:28:12 +0000 (UTC)
-Subject: Re: [PATCH] tests/acceptance: Add boot tests for some of the QEMU
- advent calendar images
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20200124170325.30072-1-thuth@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <8f085a1a-b9df-29d4-db51-eb345a44a971@redhat.com>
-Date: Fri, 24 Jan 2020 19:28:10 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200124170325.30072-1-thuth@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: RKUPo4bWOzKL9BY0uKakuQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ (envelope-from <walling@linux.ibm.com>) id 1iv7Db-0000Dc-PI
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:14:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61762
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+ id 1iv7Db-0000Bi-L7; Fri, 24 Jan 2020 17:14:23 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00OMCv15115910; Fri, 24 Jan 2020 17:14:22 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2xr61n5f59-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 24 Jan 2020 17:14:22 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00OMEL1g118672;
+ Fri, 24 Jan 2020 17:14:21 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2xr61n5f50-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 24 Jan 2020 17:14:21 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00OM542I016353;
+ Fri, 24 Jan 2020 22:14:21 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma03dal.us.ibm.com with ESMTP id 2xksn7rp5u-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 24 Jan 2020 22:14:21 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00OMEJ2f46137822
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 24 Jan 2020 22:14:19 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8FA21C60A0;
+ Fri, 24 Jan 2020 22:14:19 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2AF3EC609E;
+ Fri, 24 Jan 2020 22:14:19 +0000 (GMT)
+Received: from collin-ThinkPad-W541.pok.ibm.com (unknown [9.56.58.87])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 24 Jan 2020 22:14:19 +0000 (GMT)
+From: Collin Walling <walling@linux.ibm.com>
+To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Subject: [PATCH v6 1/2] s390/kvm: header sync for diag318
+Date: Fri, 24 Jan 2020 17:14:03 -0500
+Message-Id: <1579904044-20790-2-git-send-email-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1579904044-20790-1-git-send-email-walling@linux.ibm.com>
+References: <1579904044-20790-1-git-send-email-walling@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-24_07:2020-01-24,
+ 2020-01-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
+ malwarescore=0 phishscore=0 bulkscore=0 priorityscore=1501 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001240180
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,155 +102,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Cleber Rosa <crosa@redhat.com>
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: Collin Walling <walling@linux.ibm.com>
+Acked-by: David Hildenbrand <david@redhat.com>
+---
+ linux-headers/asm-s390/kvm.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On 1/24/20 3:03 PM, Thomas Huth wrote:
-> The 2018 edition of the QEMU advent calendar 2018 featured Linux images
-> for various non-x86 machines. We can use them for a boot tests in our
-> acceptance test suite.
->
-> Let's also make sure that we build the corresponding machines in Travis,
-> and while we're there, drop the superfluous --python parameter (python3
-> is now the only supported version anyway).
-
-Yes, please, removal of --python was in my wish list.
-
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   .travis.yml                            |  2 +-
->   tests/acceptance/boot_linux_console.py | 96 ++++++++++++++++++++++++++
->   2 files changed, 97 insertions(+), 1 deletion(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 6c1038a0f1..73ca12c921 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -268,7 +268,7 @@ matrix:
->   
->       # Acceptance (Functional) tests
->       - env:
-> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
-> +        - CONFIG="--target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
-
-
-Perhaps use MAIN_SOFTMMU_TARGETS in only append the other targets, like:
-
---target-list=${MAIN_SOFTMMU_TARGETS},alpha-softmmu,sparc-softmmu,....
-
-
->           - TEST_CMD="make check-acceptance"
->         after_script:
->           - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index e03add2989..f7ac2a3a59 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -584,3 +584,99 @@ class BootLinuxConsole(Test):
->           self.wait_for_console_pattern(console_pattern)
->           console_pattern = 'No filesystem could mount root'
->           self.wait_for_console_pattern(console_pattern)
-> +
-> +    def do_test_advcal_2018(self, day, tar_hash, kernel_name):
-> +        tar_url = ('https://www.qemu-advent-calendar.org'
-> +                   '/2018/download/day' + day + '.tar.xz')
-> +        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-> +        archive.extract(file_path, self.workdir)
-> +        self.vm.set_console()
-> +        self.vm.add_args('-kernel',
-> +                         self.workdir + '/day' + day + '/' + kernel_name)
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('QEMU advent calendar')
-> +
-> +    def test_arm_vexpressa9(self):
-> +        """
-> +        :avocado: tags=arch:arm
-> +        :avocado: tags=machine:vexpress-a9
-> +        """
-> +        tar_hash = '32b7677ce8b6f1471fb0059865f451169934245b'
-> +        self.vm.add_args('-dtb', self.workdir + '/day16/vexpress-v2p-ca9.dtb')
-> +        self.do_test_advcal_2018('16', tar_hash, 'winter.zImage')
-> +
-> +    def test_m68k_mcf5208evb(self):
-> +        """
-> +        :avocado: tags=arch:m68k
-> +        :avocado: tags=machine:mcf5208evb
-> +        """
-> +        tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
-> +        self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
-> +
-> +    def test_microblaze_s3adsp1800(self):
-> +        """
-> +        :avocado: tags=arch:microblaze
-> +        :avocado: tags=machine:petalogix-s3adsp1800
-> +        """
-> +        tar_hash = '08bf3e3bfb6b6c7ce1e54ab65d54e189f2caf13f'
-> +        self.do_test_advcal_2018('17', tar_hash, 'ballerina.bin')
-> +
-> +    def test_or1k_sim(self):
-> +        """
-> +        :avocado: tags=arch:or1k
-> +        :avocado: tags=machine:or1k-sim
-> +        """
-> +        tar_hash = '20334cdaf386108c530ff0badaecc955693027dd'
-> +        self.do_test_advcal_2018('20', tar_hash, 'vmlinux')
-> +
-> +    def test_nios2_10m50(self):
-> +        """
-> +        :avocado: tags=arch:nios2
-> +        :avocado: tags=machine:10m50-ghrd
-> +        """
-> +        tar_hash = 'e4251141726c412ac0407c5a6bceefbbff018918'
-> +        self.do_test_advcal_2018('14', tar_hash, 'vmlinux.elf')
-> +
-> +    def test_ppc64_e500(self):
-> +        """
-> +        :avocado: tags=arch:ppc64
-> +        :avocado: tags=machine:ppce500
-> +        """
-> +        tar_hash = '6951d86d644b302898da2fd701739c9406527fe1'
-> +        self.vm.add_args('-cpu', 'e5500')
-> +        self.do_test_advcal_2018('19', tar_hash, 'uImage')
-> +
-> +    def test_ppc_g3beige(self):
-> +        """
-> +        :avocado: tags=arch:ppc
-> +        :avocado: tags=machine:g3beige
-> +        """
-> +        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-> +        self.vm.add_args('-M', 'graphics=off')
-> +        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
-> +
-> +    def test_ppc_mac99(self):
-> +        """
-> +        :avocado: tags=arch:ppc
-> +        :avocado: tags=machine:mac99
-> +        """
-> +        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-> +        self.vm.add_args('-M', 'graphics=off')
-> +        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
-> +
-> +    def test_sparc_ss20(self):
-> +        """
-> +        :avocado: tags=arch:sparc
-> +        :avocado: tags=machine:SS-20
-> +        """
-> +        tar_hash = 'b18550d5d61c7615d989a06edace051017726a9f'
-> +        self.do_test_advcal_2018('11', tar_hash, 'zImage.elf')
-> +
-> +    def test_xtensa_lx60(self):
-> +        """
-> +        :avocado: tags=arch:xtensa
-> +        :avocado: tags=machine:lx60
-> +        """
-> +        tar_hash = '49e88d9933742f0164b60839886c9739cb7a0d34'
-> +        self.vm.add_args('-cpu', 'dc233c')
-> +        self.do_test_advcal_2018('02', tar_hash, 'santas-sleigh-ride.elf')
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 0138ccb..4633090 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+ #define KVM_S390_VM_CRYPTO		2
+ #define KVM_S390_VM_CPU_MODEL		3
+ #define KVM_S390_VM_MIGRATION		4
++#define KVM_S390_VM_MISC		5
+ 
+ /* kvm attributes for mem_ctrl */
+ #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+@@ -171,6 +172,9 @@ struct kvm_s390_vm_cpu_subfunc {
+ #define KVM_S390_VM_MIGRATION_START	1
+ #define KVM_S390_VM_MIGRATION_STATUS	2
+ 
++/* kvm attributes for KVM_S390_VM_MISC */
++#define KVM_S390_VM_MISC_DIAG318	0
++
+ /* for KVM_GET_REGS and KVM_SET_REGS */
+ struct kvm_regs {
+ 	/* general purpose regs for s390 */
+-- 
+2.7.4
 
 
