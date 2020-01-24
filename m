@@ -2,74 +2,56 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9FE6C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EA8C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95AFA20709
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:04:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLWt8JbC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95AFA20709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3731D20709
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 17:06:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3731D20709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv2Nq-0000au-K6
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 12:04:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48021)
+	id 1iv2PB-0002BE-AK
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 12:06:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iv2Mw-0007WI-78
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:03:43 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iv2OD-0001Ne-4I
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:05:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iv2Mu-0008C2-Fd
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:03:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36190
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iv2Mu-0008Bv-C9
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:03:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579885419;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=FTYl70o+JimXVFPX1d2Y2jssmIvhMUEHIlNkds+E2rM=;
- b=fLWt8JbCYkpe1hwU2P6pwolFDJ1fHPPYl8Vw2La2yInGIi/+aIV2txbqV2+TsKsm5B28gN
- KZe12EewSnEwGSaocAtd0owhRwxPGb5WUybGk0CdQY2ElcDgVdPVe1Cxj01W9HOBFPLa+d
- UkbrPjl+wk3mUUQSBdAB0Arwj73P1TA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-CugZ2v7yP7WcpAAr9uxs0g-1; Fri, 24 Jan 2020 12:03:35 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E56431083E7A;
- Fri, 24 Jan 2020 17:03:33 +0000 (UTC)
-Received: from thuth.com (ovpn-116-156.ams2.redhat.com [10.36.116.156])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 797C584D87;
- Fri, 24 Jan 2020 17:03:29 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests/acceptance: Add boot tests for some of the QEMU advent
- calendar images
-Date: Fri, 24 Jan 2020 18:03:25 +0100
-Message-Id: <20200124170325.30072-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: CugZ2v7yP7WcpAAr9uxs0g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <no-reply@patchew.org>) id 1iv2OB-0000gU-Ac
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:05:00 -0500
+Resent-Date: Fri, 24 Jan 2020 12:05:00 -0500
+Resent-Message-Id: <E1iv2OB-0000gU-Ac@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21161)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iv2OB-0000cB-2c
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 12:04:59 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 15798854616751006.7685000869205;
+ Fri, 24 Jan 2020 09:04:21 -0800 (PST)
+In-Reply-To: <1579883929-1517-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: Re: [PATCH v4 0/7] target/mips: Misc MIPS fixes and improvements for
+ 5.0
+Message-ID: <157988546030.23531.7354490297539534319@f6d1ed32ca6b>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: aleksandar.markovic@rt-rk.com
+Date: Fri, 24 Jan 2020 09:04:21 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,155 +63,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: amarkovic@wavecomp.com, aleksandar.rikalo@rt-rk.com, qemu-devel@nongnu.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 2018 edition of the QEMU advent calendar 2018 featured Linux images
-for various non-x86 machines. We can use them for a boot tests in our
-acceptance test suite.
-
-Let's also make sure that we build the corresponding machines in Travis,
-and while we're there, drop the superfluous --python parameter (python3
-is now the only supported version anyway).
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .travis.yml                            |  2 +-
- tests/acceptance/boot_linux_console.py | 96 ++++++++++++++++++++++++++
- 2 files changed, 97 insertions(+), 1 deletion(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index 6c1038a0f1..73ca12c921 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -268,7 +268,7 @@ matrix:
-=20
-     # Acceptance (Functional) tests
-     - env:
--        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-sof=
-tmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmm=
-u,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
-+        - CONFIG=3D"--target-list=3Daarch64-softmmu,alpha-softmmu,arm-soft=
-mmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-sof=
-tmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86=
-_64-softmmu,xtensa-softmmu"
-         - TEST_CMD=3D"make check-acceptance"
-       after_script:
-         - python3 -c 'import json; r =3D json.load(open("tests/results/lat=
-est/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"=
-] not in ("PASS", "SKIP")]' | xargs cat
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
-_linux_console.py
-index e03add2989..f7ac2a3a59 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -584,3 +584,99 @@ class BootLinuxConsole(Test):
-         self.wait_for_console_pattern(console_pattern)
-         console_pattern =3D 'No filesystem could mount root'
-         self.wait_for_console_pattern(console_pattern)
-+
-+    def do_test_advcal_2018(self, day, tar_hash, kernel_name):
-+        tar_url =3D ('https://www.qemu-advent-calendar.org'
-+                   '/2018/download/day' + day + '.tar.xz')
-+        file_path =3D self.fetch_asset(tar_url, asset_hash=3Dtar_hash)
-+        archive.extract(file_path, self.workdir)
-+        self.vm.set_console()
-+        self.vm.add_args('-kernel',
-+                         self.workdir + '/day' + day + '/' + kernel_name)
-+        self.vm.launch()
-+        self.wait_for_console_pattern('QEMU advent calendar')
-+
-+    def test_arm_vexpressa9(self):
-+        """
-+        :avocado: tags=3Darch:arm
-+        :avocado: tags=3Dmachine:vexpress-a9
-+        """
-+        tar_hash =3D '32b7677ce8b6f1471fb0059865f451169934245b'
-+        self.vm.add_args('-dtb', self.workdir + '/day16/vexpress-v2p-ca9.d=
-tb')
-+        self.do_test_advcal_2018('16', tar_hash, 'winter.zImage')
-+
-+    def test_m68k_mcf5208evb(self):
-+        """
-+        :avocado: tags=3Darch:m68k
-+        :avocado: tags=3Dmachine:mcf5208evb
-+        """
-+        tar_hash =3D 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
-+        self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
-+
-+    def test_microblaze_s3adsp1800(self):
-+        """
-+        :avocado: tags=3Darch:microblaze
-+        :avocado: tags=3Dmachine:petalogix-s3adsp1800
-+        """
-+        tar_hash =3D '08bf3e3bfb6b6c7ce1e54ab65d54e189f2caf13f'
-+        self.do_test_advcal_2018('17', tar_hash, 'ballerina.bin')
-+
-+    def test_or1k_sim(self):
-+        """
-+        :avocado: tags=3Darch:or1k
-+        :avocado: tags=3Dmachine:or1k-sim
-+        """
-+        tar_hash =3D '20334cdaf386108c530ff0badaecc955693027dd'
-+        self.do_test_advcal_2018('20', tar_hash, 'vmlinux')
-+
-+    def test_nios2_10m50(self):
-+        """
-+        :avocado: tags=3Darch:nios2
-+        :avocado: tags=3Dmachine:10m50-ghrd
-+        """
-+        tar_hash =3D 'e4251141726c412ac0407c5a6bceefbbff018918'
-+        self.do_test_advcal_2018('14', tar_hash, 'vmlinux.elf')
-+
-+    def test_ppc64_e500(self):
-+        """
-+        :avocado: tags=3Darch:ppc64
-+        :avocado: tags=3Dmachine:ppce500
-+        """
-+        tar_hash =3D '6951d86d644b302898da2fd701739c9406527fe1'
-+        self.vm.add_args('-cpu', 'e5500')
-+        self.do_test_advcal_2018('19', tar_hash, 'uImage')
-+
-+    def test_ppc_g3beige(self):
-+        """
-+        :avocado: tags=3Darch:ppc
-+        :avocado: tags=3Dmachine:g3beige
-+        """
-+        tar_hash =3D 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-+        self.vm.add_args('-M', 'graphics=3Doff')
-+        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
-+
-+    def test_ppc_mac99(self):
-+        """
-+        :avocado: tags=3Darch:ppc
-+        :avocado: tags=3Dmachine:mac99
-+        """
-+        tar_hash =3D 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
-+        self.vm.add_args('-M', 'graphics=3Doff')
-+        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
-+
-+    def test_sparc_ss20(self):
-+        """
-+        :avocado: tags=3Darch:sparc
-+        :avocado: tags=3Dmachine:SS-20
-+        """
-+        tar_hash =3D 'b18550d5d61c7615d989a06edace051017726a9f'
-+        self.do_test_advcal_2018('11', tar_hash, 'zImage.elf')
-+
-+    def test_xtensa_lx60(self):
-+        """
-+        :avocado: tags=3Darch:xtensa
-+        :avocado: tags=3Dmachine:lx60
-+        """
-+        tar_hash =3D '49e88d9933742f0164b60839886c9739cb7a0d34'
-+        self.vm.add_args('-cpu', 'dc233c')
-+        self.do_test_advcal_2018('02', tar_hash, 'santas-sleigh-ride.elf')
---=20
-2.18.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc5ODgzOTI5LTE1MTctMS1n
+aXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS8KCgoKSGksCgpUaGlz
+IHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0
+cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6
+IDE1Nzk4ODM5MjktMTUxNy0xLWdpdC1zZW5kLWVtYWlsLWFsZWtzYW5kYXIubWFya292aWNAcnQt
+cmsuY29tClN1YmplY3Q6IFtQQVRDSCB2NCAwLzddIHRhcmdldC9taXBzOiBNaXNjIE1JUFMgZml4
+ZXMgYW5kIGltcHJvdmVtZW50cyBmb3IgNS4wCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICBwYXRjaGV3LzE1Nzk4ODM5MjktMTUxNy0xLWdpdC1zZW5kLWVtYWlsLWFsZWtz
+YW5kYXIubWFya292aWNAcnQtcmsuY29tIC0+IHBhdGNoZXcvMTU3OTg4MzkyOS0xNTE3LTEtZ2l0
+LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20KICogW25ldyB0YWddICAg
+ICAgICAgcGF0Y2hldy8yMDIwMDEyNDE2MjYwNi44Nzg3LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8u
+b3JnIC0+IHBhdGNoZXcvMjAyMDAxMjQxNjI2MDYuODc4Ny0xLXBldGVyLm1heWRlbGxAbGluYXJv
+Lm9yZwogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwMTI0MTY1MzM1LjQyMi0xLXJv
+YmVydC5mb2xleUBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAyMDAxMjQxNjUzMzUuNDIyLTEtcm9i
+ZXJ0LmZvbGV5QGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozMzY5
+ODIzIGRpc2FzOiBtaXBzOiBBZGQgbWljcm9taXBzIFI2IGRpc2Fzc2VtYmxlciAtIDMyLWJpdCBp
+bnN0cnVjdGlvbnMKOWU5ODQ5MCBkaXNhczogbWlwczogQWRkIG1pY3JvbWlwcyBSNiBkaXNhc3Nl
+bWJsZXIgLSBpbmZyYXN0cnVjdHVyZSBhbmQgMTYtYml0IGluc3RydWN0aW9ucwphYTE5NmVjIGRp
+c2FzOiBBZGQgYSBmaWVsZCBmb3IgdGFyZ2V0LWRlcGVuZGFudCBkYXRhCjY5ODQyNzMgdGFyZ2V0
+L21pcHM6IEFkZCBpbXBsZW1lbnRhdGlvbiBvZiBHSU5WVCBpbnN0cnVjdGlvbgo1ZDc0ZGIxIHRh
+cmdldC9taXBzOiBBbWVuZCBDUDAgV2F0Y2hIaSByZWdpc3RlciBpbXBsZW1lbnRhdGlvbgpmNDAx
+YzYxIHRhcmdldC9taXBzOiBBZGQgc3VwcG9ydCBmb3IgTUlQUzwzMnw2ND5SNiBDUkMzMiBJU0EK
+ZjdlNTAwZCB0YXJnZXQvbWlwczogUmVjdGlmeSBkb2N1bWVudGF0aW9uIG9uIGRlcHJlY2F0aW5n
+IHI0ayBtYWNoaW5lCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzcgQ2hlY2tpbmcgY29tbWl0IGY3
+ZTUwMGQ4ZTYzNyAodGFyZ2V0L21pcHM6IFJlY3RpZnkgZG9jdW1lbnRhdGlvbiBvbiBkZXByZWNh
+dGluZyByNGsgbWFjaGluZSkKMi83IENoZWNraW5nIGNvbW1pdCBmNDAxYzYxYjYyN2QgKHRhcmdl
+dC9taXBzOiBBZGQgc3VwcG9ydCBmb3IgTUlQUzwzMnw2ND5SNiBDUkMzMiBJU0EpCjMvNyBDaGVj
+a2luZyBjb21taXQgNWQ3NGRiMTc0YzRhICh0YXJnZXQvbWlwczogQW1lbmQgQ1AwIFdhdGNoSGkg
+cmVnaXN0ZXIgaW1wbGVtZW50YXRpb24pCjQvNyBDaGVja2luZyBjb21taXQgNjk4NDI3M2QyZjBl
+ICh0YXJnZXQvbWlwczogQWRkIGltcGxlbWVudGF0aW9uIG9mIEdJTlZUIGluc3RydWN0aW9uKQo1
+LzcgQ2hlY2tpbmcgY29tbWl0IGFhMTk2ZWMwMDM0NiAoZGlzYXM6IEFkZCBhIGZpZWxkIGZvciB0
+YXJnZXQtZGVwZW5kYW50IGRhdGEpCjYvNyBDaGVja2luZyBjb21taXQgOWU5ODQ5MGI1NTI5IChk
+aXNhczogbWlwczogQWRkIG1pY3JvbWlwcyBSNiBkaXNhc3NlbWJsZXIgLSBpbmZyYXN0cnVjdHVy
+ZSBhbmQgMTYtYml0IGluc3RydWN0aW9ucykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
+ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzY6IApuZXcgZmls
+ZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBu
+YW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTI5NzogRklMRTogaW5jbHVkZS9kaXNhcy9k
+aXMtYXNtLmg6Mzk1OgoraW50IHByaW50X2luc25fbWljcm9taXBzX3I2ICAgICAgKGJmZF92bWEs
+IGRpc2Fzc2VtYmxlX2luZm8qKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMTI3MiBs
+aW5lcyBjaGVja2VkCgpQYXRjaCA2LzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjcvNyBD
+aGVja2luZyBjb21taXQgMzM2OTgyM2YzNTk4IChkaXNhczogbWlwczogQWRkIG1pY3JvbWlwcyBS
+NiBkaXNhc3NlbWJsZXIgLSAzMi1iaXQgaW5zdHJ1Y3Rpb25zKQo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
+YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTc5ODgzOTI5LTE1MTctMS1naXQtc2Vu
+ZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
