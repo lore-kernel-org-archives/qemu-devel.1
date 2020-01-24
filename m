@@ -7,76 +7,94 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90B6C32771
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CE7C35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93BCA20838
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:39:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03C6E20838
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:39:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbSvSjp/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93BCA20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AsF5chIT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03C6E20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuvR8-0003N6-Qz
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:39:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33736)
+	id 1iuvRJ-0003dc-62
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:39:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iuvQN-0002cL-Tg
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:38:49 -0500
+ (envelope-from <philmd@redhat.com>) id 1iuvQU-0002h2-3p
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:38:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iuvQM-0005RZ-NZ
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:38:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50458
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iuvQS-0005VB-Se
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:38:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39329
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuvQM-0005R5-Jo
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:38:46 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuvQS-0005V2-Ow
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:38:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579858726;
+ s=mimecast20190719; t=1579858732;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=p5xtIw1/Nwl4sB5Bb6PPHPzzrjsVDpTh75h5z4JrcMU=;
- b=bbSvSjp/LrkR0HDknmavLnpRVYM9BjZXa7D/c9S853z8pqN3m0txIYE+g9vZ2rbmbGcPw2
- SfldY5lWGu9bDm01KmkXyh8fVrzKaTITKfFFJ3tS0Bl29ZL7geKkZC0+friz72F/p5OJiw
- KwOlZd7Cac/SVmt6WOC3Bj7f9q5tMtU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-B_CFLA0kOBqwGSeNRFQlDQ-1; Fri, 24 Jan 2020 04:38:43 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2062618C8C01
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 09:38:43 +0000 (UTC)
-Received: from work-vm (ovpn-117-253.ams2.redhat.com [10.36.117.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A6245C28D;
- Fri, 24 Jan 2020 09:38:38 +0000 (UTC)
-Date: Fri, 24 Jan 2020 09:38:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v3 05/21] migration: Create migration_is_running()
-Message-ID: <20200124093836.GC2970@work-vm>
-References: <20200123115831.36842-1-quintela@redhat.com>
- <20200123115831.36842-6-quintela@redhat.com>
+ bh=hBL0I8ZQ+bCwWqG8VxW9HfKdWxgIJ0PesUPuydobCVc=;
+ b=AsF5chITOXVYWV6EgtvPgjUo0XQrXapq0dexWorj0qGY6J1WVc5OMggIIpoeWRR3ANX6s5
+ Ja0Sbdmj6SXOmY859H1ya7O1Rx8xMdiO8KmxicOPp5AfQm+KWBAtJit/bw+P3OvBRhuu7q
+ OJggMgoLF1nKsR5IAsM9OGoqBoA/Udo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-rMXLSAn_PY2oitwtw4nciw-1; Fri, 24 Jan 2020 04:38:47 -0500
+Received: by mail-wr1-f70.google.com with SMTP id f15so904047wrr.2
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 01:38:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hBL0I8ZQ+bCwWqG8VxW9HfKdWxgIJ0PesUPuydobCVc=;
+ b=dmuFthnyRxRfHsP4jyJds//oNA9JzeUZ6AmGrUiZ7Hr/V/ILDaiVcTpV/3YQaeaoEn
+ DoM7+CUm3XFquhM5t6CUtPNWbeuSTBEiNWF3AvpIMvA7yttgalYjwIrzVmd/n6WI20bK
+ ZBsLljY6RZk6+n1PcFZmdBHIG/Cz5rO/ro9piAnKkdy90wQ1UZNp+MtV+8LyQJ1h2+X1
+ gtHCIREmPfUn3BIHyKKzgF9LhQeh7OAKruUhAH5i+HucUNLp7eN5P716gMbhzp54YF3l
+ bOjjlGjdh4Po0NVLhUMjoLDeDbLzEwDMQ6SVtL444v9PNvaJSDrjqyzgw/Tfpql+g9pM
+ XSVQ==
+X-Gm-Message-State: APjAAAVX1+Nrw3zu7Raj4DMtsgHMNYK6ITtV/pT5IWsbjxbjqeyJIF3P
+ cGaSIhGGKDhV+5DO2nuCpkekqvohd3sEFleCfDyemNWa4qUFIi7VN+9mu4PYKjcCgmF/O2A5iE/
+ 073RcQXyJaKSnslw=
+X-Received: by 2002:a1c:964f:: with SMTP id y76mr2416066wmd.62.1579858726670; 
+ Fri, 24 Jan 2020 01:38:46 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz59ciFEiTXYQvU8c5TbUK8WClQnPcTObQcaPZZVxa4XWz6hM9M4oZNAjYOEegy76noDxbR6A==
+X-Received: by 2002:a1c:964f:: with SMTP id y76mr2416050wmd.62.1579858726392; 
+ Fri, 24 Jan 2020 01:38:46 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id p17sm6586535wrx.20.2020.01.24.01.38.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 24 Jan 2020 01:38:45 -0800 (PST)
+Subject: Re: [PATCH v3 4/4] travis.yml: Enable acceptance KVM tests
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+References: <20200122012753.9846-1-wainersm@redhat.com>
+ <20200122012753.9846-5-wainersm@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e500a1ce-d2b6-b372-b1cb-f9bddcbf8334@redhat.com>
+Date: Fri, 24 Jan 2020 10:38:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200123115831.36842-6-quintela@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: B_CFLA0kOBqwGSeNRFQlDQ-1
+In-Reply-To: <20200122012753.9846-5-wainersm@redhat.com>
+Content-Language: en-US
+X-MC-Unique: rMXLSAn_PY2oitwtw4nciw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,128 +106,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: thuth@redhat.com, alex.bennee@linaro.org, ehabkost@redhat.com,
+ crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> This function returns if we are in the middle of a migration.
-> It is like migration_is_setup_or_active() with CANCELLING and COLO.
-> Adapt all calers that are needed.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-Yes; the inclusion of cancelling is interesting because it's a state
-where you don't want to be running but it still is.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+On 1/22/20 2:27 AM, Wainer dos Santos Moschetta wrote:
+> Some acceptance tests require KVM or they are skipped. Travis
+> enables nested virtualization by default with Ubuntu
+> 18.04 (Bionic) on x86_64. So in order to run the kvm tests, this
+> changed the acceptance builder to run in a Bionic VM. Also
+> it was needed to ensure the current user has rw permission
+> to /dev/kvm.
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 > ---
->  migration/migration.c | 29 ++++++++++++++++++++++++-----
->  migration/migration.h |  1 +
->  migration/savevm.c    |  4 +---
->  3 files changed, 26 insertions(+), 8 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 990bff00c0..1fb0aab44d 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -829,6 +829,27 @@ bool migration_is_setup_or_active(int state)
->      }
->  }
-> =20
-> +bool migration_is_running(int state)
-> +{
-> +    switch (state) {
-> +    case MIGRATION_STATUS_ACTIVE:
-> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> +    case MIGRATION_STATUS_POSTCOPY_PAUSED:
-> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
-> +    case MIGRATION_STATUS_SETUP:
-> +    case MIGRATION_STATUS_PRE_SWITCHOVER:
-> +    case MIGRATION_STATUS_DEVICE:
-> +    case MIGRATION_STATUS_WAIT_UNPLUG:
-> +    case MIGRATION_STATUS_CANCELLING:
-> +    case MIGRATION_STATUS_COLO:
-> +        return true;
-> +
-> +    default:
-> +        return false;
-> +
-> +    }
-> +}
-> +
->  static void populate_time_info(MigrationInfo *info, MigrationState *s)
->  {
->      info->has_status =3D true;
-> @@ -1077,7 +1098,7 @@ void qmp_migrate_set_capabilities(MigrationCapabili=
-tyStatusList *params,
->      MigrationCapabilityStatusList *cap;
->      bool cap_list[MIGRATION_CAPABILITY__MAX];
-> =20
-> -    if (migration_is_setup_or_active(s->state)) {
-> +    if (migration_is_running(s->state)) {
->          error_setg(errp, QERR_MIGRATION_ACTIVE);
->          return;
->      }
-> @@ -1590,7 +1611,7 @@ static void migrate_fd_cancel(MigrationState *s)
-> =20
->      do {
->          old_state =3D s->state;
-> -        if (!migration_is_setup_or_active(old_state)) {
-> +        if (!migration_is_running(old_state)) {
->              break;
->          }
->          /* If the migration is paused, kick it out of the pause */
-> @@ -1888,9 +1909,7 @@ static bool migrate_prepare(MigrationState *s, bool=
- blk, bool blk_inc,
->          return true;
->      }
-> =20
-> -    if (migration_is_setup_or_active(s->state) ||
-> -        s->state =3D=3D MIGRATION_STATUS_CANCELLING ||
-> -        s->state =3D=3D MIGRATION_STATUS_COLO) {
-> +    if (migration_is_running(s->state)) {
->          error_setg(errp, QERR_MIGRATION_ACTIVE);
->          return false;
->      }
-> diff --git a/migration/migration.h b/migration/migration.h
-> index aa9ff6f27b..44b1d56929 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -279,6 +279,7 @@ void migrate_fd_error(MigrationState *s, const Error =
-*error);
->  void migrate_fd_connect(MigrationState *s, Error *error_in);
-> =20
->  bool migration_is_setup_or_active(int state);
-> +bool migration_is_running(int state);
-> =20
->  void migrate_init(MigrationState *s);
->  bool migration_is_blocked(Error **errp);
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index adfdca26ac..f19cb9ec7a 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1531,9 +1531,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **e=
-rrp)
->      MigrationState *ms =3D migrate_get_current();
->      MigrationStatus status;
-> =20
-> -    if (migration_is_setup_or_active(ms->state) ||
-> -        ms->state =3D=3D MIGRATION_STATUS_CANCELLING ||
-> -        ms->state =3D=3D MIGRATION_STATUS_COLO) {
-> +    if (migration_is_running(ms->state)) {
->          error_setg(errp, QERR_MIGRATION_ACTIVE);
->          return -EINVAL;
->      }
-> --=20
-> 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>   .travis.yml | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index 6c1038a0f1..c3edd0a907 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -2,6 +2,7 @@
+>   # Additional builds with specific requirements for a full VM need to
+>   # be added as additional matrix: entries later on
+>   dist: xenial
+> +sudo: true
+>   language: c
+>   compiler:
+>     - gcc
+> @@ -83,6 +84,9 @@ git:
+>   
+>   before_script:
+>     - if command -v ccache ; then ccache --zero-stats ; fi
+> +  - if [[ -e /dev/kvm ]] && ! [[ -r /dev/kvm && -w /dev/kvm ]]; then
+> +        sudo chmod o+rw /dev/kvm ;
+> +    fi
+>     - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+>     - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+>   script:
+> @@ -272,12 +276,13 @@ matrix:
+>           - TEST_CMD="make check-acceptance"
+>         after_script:
+>           - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
+> +      dist: bionic
+>         addons:
+>           apt:
+>             packages:
+>               - python3-pil
+>               - python3-pip
+> -            - python3.5-venv
+> +            - python3.6-venv
+
+This line doesn't seem related to the patch.
+
+>               - tesseract-ocr
+>               - tesseract-ocr-eng
+>   
+> 
 
 
