@@ -2,93 +2,65 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37990C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6602CC2D0CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:32:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC9C12072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:31:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Odn6Ko1g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC9C12072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 356792072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:32:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 356792072C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=qindel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv7Tg-0000Ip-4I
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 17:31:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49309)
+	id 1iv7V8-0001kS-DH
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 17:32:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iv7Sm-0008EH-LC
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:30:05 -0500
+ (envelope-from <salvador@qindel.com>) id 1iv7U7-0000ml-C9
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iv7Sl-00034u-HV
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:30:04 -0500
-Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:37076)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iv7Sl-00031P-B2
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:30:03 -0500
-Received: by mail-pj1-x1031.google.com with SMTP id m13so455344pjb.2
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 14:30:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=BKsswJKYOb9gGScy5M6SFelkoye4DJhjKamCn7/JI4M=;
- b=Odn6Ko1g7HdkmIs7WvY+yCvDDuvz+pyC5PKfaGjwBZOWHXcTbQUowpRJTy2/wE6DXn
- NExV5MGNcqQqLpORmpoCQzAkjdRfh49pRxIqyRNiiJ/cLTA2vHfkvIAWM1ynunpUn87n
- jaMAYlEK4ohTqeWgRZXFL1q24Bt0I2SWEkDR3hbN0E/wMTQyT14vxgcB3Gcaz4iu8Es3
- SzGQEM+vI4bM8gKfq6ZgBtjPRZBisZWkcqOHzyx7PHp5b77OoB5NS1vqVcsZEy7+VEHZ
- o8uMzBZEMBwBjO3TXQxOeL4gchbpmS2HOHboaWzHXK1M4JG7wK6QFPqn+P0xN43N80H8
- KykQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BKsswJKYOb9gGScy5M6SFelkoye4DJhjKamCn7/JI4M=;
- b=Yrt7BSqFTNTe+Q14Aavm7LoYBcjUxLU4ZJ6yWu6A9bKbJgTP/9XdwXeBd5bSyfllub
- DLijjqImcweVlLTu4Cr1WtHTensTPSgMyYohu2InDINmlkbjXylmVekPOlFolrg82XLt
- SaOUm3D18r/U+vq4lO37hu0x5K5SyvPXtDVecW+3u/pDt0LLTIwrg1KJCoyU6SpUxvLO
- Pv6Lof6BmTZSE8NA4uhGsarGPky+Ij/FmlJD2cqktPIrzSM9UooaVs9ZvV8nqV8JYklo
- blztZXuiYW0iH1zFdVUXuYdQaxpDBH+O3mCbS7ZJvcQCKUFgiAUx7n3PGWwKYTobo5dM
- i+jA==
-X-Gm-Message-State: APjAAAUh2bWscAHlMwauS1Ihlnwhr90+L9EJy6UiQQ02hBlhqSoLeSzX
- BgiZQ2NZt4B2PNPIFRLlh6Uwfg==
-X-Google-Smtp-Source: APXvYqzJL5rIC5cH5FVNisJ9KK2vw7uE6rDL2FU7gyqe7xyhz0PVbxcwxCPdJLnVXPW0no9zlfYj6g==
-X-Received: by 2002:a17:90a:be0d:: with SMTP id
- a13mr1661635pjs.78.1579905001845; 
- Fri, 24 Jan 2020 14:30:01 -0800 (PST)
-Received: from [10.5.50.117] (rrcs-173-198-77-92.west.biz.rr.com.
- [173.198.77.92])
- by smtp.gmail.com with ESMTPSA id v10sm7691175pgk.24.2020.01.24.14.29.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Jan 2020 14:30:01 -0800 (PST)
-Subject: Re: [PATCH v1 12/13] tests/docker: re-enable cross-compiling for
- x86_64 hosts
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200124204026.2107-1-alex.bennee@linaro.org>
- <20200124204026.2107-13-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7b3d8af5-0c37-9ba9-6503-0f15cba4d451@linaro.org>
-Date: Fri, 24 Jan 2020 12:29:57 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <salvador@qindel.com>) id 1iv7U5-0004di-JK
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:31:27 -0500
+Received: from smtp.qindel.com ([89.140.90.34]:48475 helo=thor.qindel.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <salvador@qindel.com>)
+ id 1iv7U5-0004Z8-8L; Fri, 24 Jan 2020 17:31:25 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by thor.qindel.com (Postfix) with ESMTP id EF38E6068A;
+ Fri, 24 Jan 2020 23:31:22 +0100 (CET)
+Received: from thor.qindel.com ([127.0.0.1])
+ by localhost (thor.qindel.com [127.0.0.1]) (amavisd-new, port 10032)
+ with ESMTP id 5nU1brbrjbIU; Fri, 24 Jan 2020 23:31:22 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by thor.qindel.com (Postfix) with ESMTP id C1BE26068C;
+ Fri, 24 Jan 2020 23:31:22 +0100 (CET)
+X-Virus-Scanned: amavisd-new at thor.qindel.com
+Received: from thor.qindel.com ([127.0.0.1])
+ by localhost (thor.qindel.com [127.0.0.1]) (amavisd-new, port 10026)
+ with ESMTP id HyoAS4yCBDCN; Fri, 24 Jan 2020 23:31:22 +0100 (CET)
+Received: from freeso.my.domain (unknown [82.213.225.96])
+ by thor.qindel.com (Postfix) with ESMTPSA id 3878E6068A;
+ Fri, 24 Jan 2020 23:31:22 +0100 (CET)
+From: salvador@qindel.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH] bsd-user: improve support for sparc syscall flags
+Date: Fri, 24 Jan 2020 23:31:18 +0100
+Message-Id: <20200124223118.58596-1-salvador@qindel.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <6cb0886b-2b28-6dd2-92d4-7b524a6b4bf7@qindel.com>
+References: <6cb0886b-2b28-6dd2-92d4-7b524a6b4bf7@qindel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200124204026.2107-13-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1031
+X-Received-From: 89.140.90.34
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,20 +72,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, f4bug@amsat.org,
- cota@braap.org, stefanha@redhat.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com, aurelien@aurel32.net
+Cc: qemu-trivial@nongnu.org, sfandino@yahoo.com,
+ Salvador Fandino <salvador@qindel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/24/20 10:40 AM, Alex Bennée wrote:
-> +../dockerfiles.cross/fedora-i386-build-qemu.docker
-> \ No newline at end of file
+From: Salvador Fandino <salvador@qindel.com>
 
-Lots of no trailing newlines.  Probably not intentional?
+Under sparc and sparc64, both NetBSD and OpenSSH use two bits of the
+syscall number as flags. Until now, those bits where only supported
+for sparc64 when emulating OpenBSD.
 
+This patch extends support for syscall flags to the sparc architecture
+and NetBSD emulation. It had allowed my to run simple NetBSD sparc
+applications with qemu-sparc on a FreeBSD x64 machine.
 
-r~
+The code supporting OpenBSD sparc and sparc64 emulation has been
+refactored in order to make it simpler and similar to the new one for
+NetBSD.
+
+Signed-off-by: Salvador Fandino <salvador@qindel.com>
+---
+ bsd-user/main.c              | 66 +++++++++++++++++++++++-------------
+ bsd-user/netbsd/syscall_nr.h | 52 ++++++++++++++++++++++++++++
+ 2 files changed, 95 insertions(+), 23 deletions(-)
+
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 770c2b267a..9158ecbc5c 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -491,7 +491,7 @@ static void flush_windows(CPUSPARCState *env)
+ void cpu_loop(CPUSPARCState *env)
+ {
+     CPUState *cs =3D env_cpu(env);
+-    int trapnr, ret, syscall_nr;
++    int trapnr, ret, syscall_nr, syscall_flags;
+     //target_siginfo_t info;
+=20
+     while (1) {
+@@ -511,21 +511,27 @@ void cpu_loop(CPUSPARCState *env)
+         case 0x100:
+ #endif
+             syscall_nr =3D env->gregs[1];
+-            if (bsd_type =3D=3D target_freebsd)
++            if (bsd_type =3D=3D target_freebsd) {
+                 ret =3D do_freebsd_syscall(env, syscall_nr,
+                                          env->regwptr[0], env->regwptr[1=
+],
+                                          env->regwptr[2], env->regwptr[3=
+],
+                                          env->regwptr[4], env->regwptr[5=
+], 0, 0);
+-            else if (bsd_type =3D=3D target_netbsd)
++            } else if (bsd_type =3D=3D target_netbsd) {
++                syscall_flags =3D syscall_nr & (TARGET_NETBSD_SYSCALL_G7=
+RFLAG |
++                                              TARGET_NETBSD_SYSCALL_G5RF=
+LAG |
++                                              TARGET_NETBSD_SYSCALL_G2RF=
+LAG);
++                syscall_nr &=3D ~(TARGET_NETBSD_SYSCALL_G7RFLAG |
++                                TARGET_NETBSD_SYSCALL_G5RFLAG |
++                                TARGET_NETBSD_SYSCALL_G2RFLAG);
+                 ret =3D do_netbsd_syscall(env, syscall_nr,
+                                         env->regwptr[0], env->regwptr[1]=
+,
+                                         env->regwptr[2], env->regwptr[3]=
+,
+                                         env->regwptr[4], env->regwptr[5]=
+);
+-            else { //if (bsd_type =3D=3D target_openbsd)
+-#if defined(TARGET_SPARC64)
+-                syscall_nr &=3D ~(TARGET_OPENBSD_SYSCALL_G7RFLAG |
+-                                TARGET_OPENBSD_SYSCALL_G2RFLAG);
+-#endif
++            } else { //if (bsd_type =3D=3D target_openbsd)
++                syscall_flags =3D syscall_nr & (TARGET_OPENBSD_SYSCALL_G=
+2RFLAG |
++                                              TARGET_OPENBSD_SYSCALL_G7R=
+FLAG);
++                syscall_nr &=3D ~(TARGET_OPENBSD_SYSCALL_G2RFLAG |
++                                TARGET_OPENBSD_SYSCALL_G7RFLAG);
+                 ret =3D do_openbsd_syscall(env, syscall_nr,
+                                          env->regwptr[0], env->regwptr[1=
+],
+                                          env->regwptr[2], env->regwptr[3=
+],
+@@ -547,23 +553,37 @@ void cpu_loop(CPUSPARCState *env)
+             }
+             env->regwptr[0] =3D ret;
+             /* next instruction */
+-#if defined(TARGET_SPARC64)
+-            if (bsd_type =3D=3D target_openbsd &&
+-                env->gregs[1] & TARGET_OPENBSD_SYSCALL_G2RFLAG) {
+-                env->pc =3D env->gregs[2];
+-                env->npc =3D env->pc + 4;
+-            } else if (bsd_type =3D=3D target_openbsd &&
+-                       env->gregs[1] & TARGET_OPENBSD_SYSCALL_G7RFLAG) {
+-                env->pc =3D env->gregs[7];
+-                env->npc =3D env->pc + 4;
+-            } else {
++            if (bsd_type =3D=3D target_openbsd) {
++                switch (syscall_flags) {
++                case 0:
++                    env->pc =3D env->npc;
++                    break;
++                case TARGET_OPENBSD_SYSCALL_G7RFLAG:
++                    env->pc =3D env->gregs[7];
++                    break;
++                default: /* G2 or G2|G7 */
++                    env->pc =3D env->gregs[2];
++                    break;
++                }
++            } else if (bsd_type =3D=3D target_netbsd) {
++                switch (syscall_flags) {
++                case 0:
++                    env->pc =3D env->npc;
++                    break;
++                case TARGET_NETBSD_SYSCALL_G7RFLAG:
++                    env->pc =3D env->gregs[7];
++                    break;
++                case TARGET_NETBSD_SYSCALL_G5RFLAG:
++                    env->pc =3D env->gregs[5];
++                    break;
++                case TARGET_NETBSD_SYSCALL_G2RFLAG:
++                    env->pc =3D env->gregs[2];
++                    break;
++                }
++            } else  {  //if (bsd_type =3D=3D target_freebsd)
+                 env->pc =3D env->npc;
+-                env->npc =3D env->npc + 4;
+             }
+-#else
+-            env->pc =3D env->npc;
+-            env->npc =3D env->npc + 4;
+-#endif
++            env->npc =3D env->pc + 4;
+             break;
+         case 0x83: /* flush windows */
+ #ifdef TARGET_ABI32
+diff --git a/bsd-user/netbsd/syscall_nr.h b/bsd-user/netbsd/syscall_nr.h
+index 2e9ab5378e..79022b0b4e 100644
+--- a/bsd-user/netbsd/syscall_nr.h
++++ b/bsd-user/netbsd/syscall_nr.h
+@@ -371,3 +371,55 @@
+ #define TARGET_NETBSD_NR_pset_assign 414
+ #define TARGET_NETBSD_NR__pset_bind  415
+ #define TARGET_NETBSD_NR___posix_fadvise50   416
++
++/*	$NetBSD: trap.h,v 1.18 2011/03/27 18:47:08 martin Exp $ */
++
++/*
++ * Copyright (c) 1992, 1993
++ *	The Regents of the University of California.  All rights reserved.
++ *
++ * This software was developed by the Computer Systems Engineering group
++ * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
++ * contributed to Berkeley.
++ *
++ * All advertising materials mentioning features or use of this software
++ * must display the following acknowledgement:
++ *	This product includes software developed by the University of
++ *	California, Lawrence Berkeley Laboratory.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in th=
+e
++ *    documentation and/or other materials provided with the distributio=
+n.
++ * 3. Neither the name of the University nor the names of its contributo=
+rs
++ *    may be used to endorse or promote products derived from this softw=
+are
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
++ * SUCH DAMAGE.
++ *
++ *	@(#)trap.h	8.1 (Berkeley) 6/11/93
++ */
++/*
++ * Sun4m support by Aaron Brown, Harvard University.
++ * Changes Copyright (c) 1995 The President and Fellows of Harvard Colle=
+ge.
++ * All rights reserved.
++ */
++
++/* flags to system call (flags in %g1 along with syscall number) */
++#define	TARGET_NETBSD_SYSCALL_G2RFLAG	0x400	/* on success, return to %g2=
+ rather than npc */
++#define	TARGET_NETBSD_SYSCALL_G7RFLAG	0x800	/* use %g7 as above (depreca=
+ted) */
++#define	TARGET_NETBSD_SYSCALL_G5RFLAG	0xc00	/* use %g5 as above (only AB=
+I compatible way) */
+--=20
+2.24.1
+
 
