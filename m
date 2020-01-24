@@ -2,72 +2,99 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DA4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3EEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:46:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A0F320709
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAA0F2072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:46:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STZaIwlv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0F320709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="agPiy6Ts"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAA0F2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv0ly-0001z5-La
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 10:21:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52116)
+	id 1iv1AL-0004Nj-2i
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 10:46:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57111)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iv0kv-0001Tu-Sr
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:20:22 -0500
+ (envelope-from <philmd@redhat.com>) id 1iv19V-0003pO-Gw
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:45:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iv0kt-0000fK-NM
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:20:20 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44539
+ (envelope-from <philmd@redhat.com>) id 1iv19S-0004f5-Uv
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:45:44 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57517
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iv0kt-0000dl-JP
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:20:19 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iv19S-0004ej-F0
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:45:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579879218;
+ s=mimecast20190719; t=1579880741;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=eTvZW/NuBUyjbIqaM5XAzELe4PNB00uLxVbFzd412W8=;
- b=STZaIwlvOjOx3msN/E8bcNSy+pgbsEsulGh42dvIxyKEWSBv1en3cn3Klrqpk8yQvJeH3v
- ny85O0zEgBNagfKO1LR5Jw4ssXFxm8JsP5T/wfXB+zjJ5ODNlHqkn22JvNrb182PQ2maiz
- osaE3UQj8bTG0W7IWvAmrODNfo28Wx4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-ZXwSItErOBebX4xchJR6Bw-1; Fri, 24 Jan 2020 10:20:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D655E10A6430
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 15:20:12 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0E78F8DC16;
- Fri, 24 Jan 2020 15:20:04 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] acpi: cpuhp: document how to use CPHP_GET_CPU_ID_CMD command
-Date: Fri, 24 Jan 2020 16:17:45 +0100
-Message-Id: <1579879065-3873-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: ZXwSItErOBebX4xchJR6Bw-1
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ft6Js2g8r48tbCyOVcYZwWFlaXb0cqxAevi/+1+w3dI=;
+ b=agPiy6TsetFFYD1QfMN29RTyvekRwUjwf5qy3I8xmFJU3WExG/YEAq13+rale/i7+WI2dQ
+ qWU+JWvGbLPALuyrBCn/+yvA1aTq5bQFeorFT4VwlHHbJq00dHBAUJI/hW9JlSdxkPWdjw
+ HXrCFpTDKmySCnSLbrcGTBIpH0P6hv8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-Bxlvy91nPB-LEHQiD0k-gw-1; Fri, 24 Jan 2020 10:45:39 -0500
+Received: by mail-wr1-f69.google.com with SMTP id z10so1503577wrt.21
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 07:45:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ft6Js2g8r48tbCyOVcYZwWFlaXb0cqxAevi/+1+w3dI=;
+ b=lhPuwmkttwstyyOPh3Ww+0D7SN1cJX+NapxmNV1b6cceaDSkvdDVpFdZWfmQtYWtYJ
+ YPXX2nlN/kNzcJGztL0LK5+OlAD96OB4ou/HP+4cJsiRnOkALhYtMLmtmPbwLqUbz+I8
+ 8vM+DCmKGDEBXpJcevEaOiTX7ino4XIF+ocO/HSXVrhvr3+WN28dbGt7LVAJDvdrHsz5
+ jFoOMugqpi3vzLNREpTNqyZ63WSuy9iwKqtgA8DC92GJp9a+pjLNVbyz/gSFp8t7ZdZv
+ BLICOvmo/BHunu346Lo8/3MVh1dLvD1ubp5c/0en5dfcFTK6kymOp5ix+auoh/Gv4IPr
+ rxYQ==
+X-Gm-Message-State: APjAAAV+60xtdzNoPmEyo2CAgcPZzARsfKcCdrGj7HujD41TPyoZLRTF
+ V70WD6UeRbkHphlt45XCGy+yPneqIzRdcYwqvFWMP2Jq3bQg4KDbVsRekQaovh9UcPWiX3tGhof
+ He5i9uwTtBQHinnE=
+X-Received: by 2002:adf:e6c5:: with SMTP id y5mr5356017wrm.210.1579880737862; 
+ Fri, 24 Jan 2020 07:45:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw8E+bOB8enthnxzpbWR/rKmpgxCmZH1uNOPahdEE8uDe2p7akV4Ebs8ZPwcY+7FfML0O28+g==
+X-Received: by 2002:adf:e6c5:: with SMTP id y5mr5355996wrm.210.1579880737640; 
+ Fri, 24 Jan 2020 07:45:37 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id i5sm8012970wrv.34.2020.01.24.07.45.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 24 Jan 2020 07:45:37 -0800 (PST)
+Subject: Re: [PATCH v3 2/4] tests/acceptance: boot_linux_console: Add boot
+ Linux with kvm tests
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, 
+ crosa@redhat.com
+References: <20200122012753.9846-1-wainersm@redhat.com>
+ <20200122012753.9846-3-wainersm@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <75a9cd31-a978-0b31-1d6d-1b34800e13a6@redhat.com>
+Date: Fri, 24 Jan 2020 16:45:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20200122012753.9846-3-wainersm@redhat.com>
+Content-Language: en-US
+X-MC-Unique: Bxlvy91nPB-LEHQiD0k-gw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,59 +108,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lersek@redhat.com, philmd@redhat.com, mst@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com,
+ alex.bennee@linaro.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 3a61c8db9d25 introduced CPHP_GET_CPU_ID_CMD command but
-did not sufficiently described how to use it. Fix it by adding
-missing command documentation and suggested work-flow to enumerate
-possible architecture specific CPU IDs.
+On 1/22/20 2:27 AM, Wainer dos Santos Moschetta wrote:
+> Added boot Linux test cases that launch QEMU with kvm
+> enabled. Likewise it was added tests for tcg.
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>   tests/acceptance/boot_linux_console.py | 88 ++++++++++++++++++++------
+>   1 file changed, 68 insertions(+), 20 deletions(-)
+> 
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index e40b84651b..a36eae630c 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -51,11 +51,7 @@ class BootLinuxConsole(Test):
+>           os.chdir(cwd)
+>           return self.workdir + path
+>   
+> -    def test_x86_64_pc(self):
+> -        """
+> -        :avocado: tags=arch:x86_64
+> -        :avocado: tags=machine:pc
+> -        """
+> +    def do_test_x86_64_pc(self):
+>           kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
+>                         '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
+>                         '/vmlinuz')
+> @@ -70,6 +66,22 @@ class BootLinuxConsole(Test):
+>           console_pattern = 'Kernel command line: %s' % kernel_command_line
+>           self.wait_for_console_pattern(console_pattern)
+>   
+> +    def test_x86_64_pc_kvm(self):
+> +        """
+> +        :avocado: tags=arch:x86_64
+> +        :avocado: tags=machine:pc
+> +        :avocado: tags=accel:kvm
+> +        """
+> +        self.do_test_x86_64_pc()
+> +
+> +    def test_x86_64_pc_tcg(self):
+> +        """
+> +        :avocado: tags=arch:x86_64
+> +        :avocado: tags=machine:pc
+> +        :avocado: tags=accel:tcg
+> +        """
+> +        self.do_test_x86_64_pc()
+[...]
+So you want to test a binary linked with multiple accelerators.
 
-Fixes: 3a61c8db9d25 ("acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command")
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- docs/specs/acpi_cpu_hotplug.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Isn't it possible to have something clever/simpler?
 
-diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
-txt
-index a8ce5e7..81b4534 100644
---- a/docs/specs/acpi_cpu_hotplug.txt
-+++ b/docs/specs/acpi_cpu_hotplug.txt
-@@ -94,6 +94,8 @@ write access:
-                register in QEMU
-             2: following writes to 'Command data' register set OST status
-                register in QEMU
-+            3: following reads from 'Command data' and 'Command data 2' re=
-turn
-+               architecture specific CPU ID value for currently selected C=
-PU.
-             other values: reserved
-     [0x6-0x7] reserved
-     [0x8] Command data: (DWORD access)
-@@ -147,3 +149,16 @@ Typical usecases:
-       11. Otherwise store 0x0 to the 'CPU selector' register, to put it
-           into a valid state and exit.
-           The iterator at this point equals "max_cpus".
-+
-+    - Enumerate present/non present CPUs architecture specific IDs
-+      (in case of x86: ACPIC IDs)
-+      01: Use "Enumerate CPUs present/non present CPUs" to get max_cpus
-+      02: Store 0x3 in the 'Command field' register
-+      03: Set 'current cpu selector' iterator to 0x0
-+      04: Store the iterator to the 'CPU selector' register
-+      05: Read from registers 'Command data' and 'Command data 2' parts of=
- ID,
-+          combine them into ID like following:
-+             'Command data 2' << 32 | 'Command data'
-+          and store pair 'current cpu selector' : ID for further processin=
-g
-+      06: Increment the iterator and if the iterator < max_cpus go to step=
- 4
-+      07: Otherwise store 0x0 to the 'CPU selector' register and exit.
---=20
-2.7.4
+    def test_x86_64_pc(self):
+        """
+        :avocado: tags=arch:x86_64
+        :avocado: tags=machine:pc
+        :avocado: tags=accel:kvm
+        :avocado: tags=accel:tcg
+        """
+        self.do_test_x86_64_pc()
+
+And use a mux config?
+
+Because else we are duplicating a lot of code, and there are various 
+accelerators available:
+
+$ git grep ACCEL_CLASS_NAME
+accel/qtest.c:41:#define TYPE_QTEST_ACCEL ACCEL_CLASS_NAME("qtest")
+accel/tcg/tcg-all.c:46:#define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
+hw/xen/xen-common.c:200:#define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+include/sysemu/hvf.h:100:#define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
+include/sysemu/kvm_int.h:36:#define TYPE_KVM_ACCEL ACCEL_CLASS_NAME("kvm")
+target/i386/hax-all.c:1127:    .name = ACCEL_CLASS_NAME("hax"),
+target/i386/whpx-all.c:1533:    .name = ACCEL_CLASS_NAME("whpx"),
+
+And also pending:
+target/i386/nvmm-all.c:   .name = ACCEL_CLASS_NAME("nvmm"),
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg668697.html
 
 
