@@ -2,80 +2,123 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4538FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF538C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1189E206D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:06:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BECB206D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:07:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dcnZntpq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1189E206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=livekentac.onmicrosoft.com header.i=@livekentac.onmicrosoft.com header.b="QdpYmtYJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BECB206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kent.ac.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41187 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuxjc-0001Vx-Di
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 07:06:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40128)
+	id 1iuxkX-0002QA-N3
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 07:07:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iuxir-00012g-Az
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:06:02 -0500
+ (envelope-from <S.E.Harris@kent.ac.uk>) id 1iuxjv-00020T-OJ
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:07:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iuxip-0006Z2-OT
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:06:01 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35880)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iuxip-0006Y7-Hn
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:05:59 -0500
-Received: by mail-ot1-x343.google.com with SMTP id g15so1379119otp.3
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 04:05:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4KNmT7UZKbBcyM8gkqPX5ZtXniX6lXpblhfeeoAi7fA=;
- b=dcnZntpqy02lYfKlMdpTQsZ+X5/zhsuIVn8Fmv1dLzDpcmFZytIcaiHuMfM1pNDdge
- TmR8CRvtSjhWWG7H/7yTGZZjmK391LCcnK6Ol9wq38ipYTsE4i6g/BXi/8BUYGfrdVrB
- FANnCC7LrbMaJvGNWr/CKhVC5kM9ykd5Jvu4OK0SWVSp0LWFnuw9w3JzDOoro4lBxqNu
- lQMMA2x36vZ5dBwEPZ/1mgxHs3tetyejx/tLWMudOStCjpYPj9fuFrBW8OAG/j1KXfwh
- B3+zrIFF7cK/LMRiejGvoZCPl99vvj5yWne9BE98dsDUkbac4jVS7JhXLmEk0WuIAN92
- bXNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4KNmT7UZKbBcyM8gkqPX5ZtXniX6lXpblhfeeoAi7fA=;
- b=tPZUEsuVokE8Ag+dMOsTQ5ICmZA7qNTUjrqIfA58d03MPNC+HEZa3mfvGImwiyoI7o
- 54GABIceNi8+VlUZhfGW3/Pfb9JBP3B5B2CvYQ/X7sm8tJX2/C82tKc1OcM9QYj9tmXg
- IENbwz29mknC+Qf2WB03dYhQcTq3KV7LldBFjd75f0nXrX06RqwTSsJXN2VfAT8i4Uql
- HqA3Z9U+Ka+vsDnNnPgBt69nZs5mJ4Nvcct8xpZlMYwRPv5A5/TBsXBvT20n4jyseyY6
- fK8kxm7tCjYBOe4nNYCVB1sxTeAg9EGs+0KGoGDmydWgVmHYyBWRwyR4RSrNU0M2Qds9
- ehhQ==
-X-Gm-Message-State: APjAAAX/4HXcSuGEUDTFei5cJXELYl3luqWr+0LjXnqPoSiooFKRL+sw
- yAOoBarBY/yQ/EbN2JL5+BryTzI2R4FNlVRNMO961w==
-X-Google-Smtp-Source: APXvYqwFU+fccZrCDOVXqZOADDmiPiPQP7jQPUaK+K99m6hHAlCJRNW+sIMIPIQe/dhQ20EFX9ogtfD2+QLwkuyFK94=
-X-Received: by 2002:a05:6830:13d3:: with SMTP id
- e19mr2432003otq.135.1579867558486; 
- Fri, 24 Jan 2020 04:05:58 -0800 (PST)
+ (envelope-from <S.E.Harris@kent.ac.uk>) id 1iuxju-0007bf-Cn
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:07:07 -0500
+Received: from mail-eopbgr150070.outbound.protection.outlook.com
+ ([40.107.15.70]:24448 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <S.E.Harris@kent.ac.uk>)
+ id 1iuxju-0007ZX-3p; Fri, 24 Jan 2020 07:07:06 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yg3fW1Zs7sdwKW0pVjZDhMk4q0FF0BhUk6rIC5/zfCWIoT0e5v0ChVkfSaeW4wza42I3RNiidhcX48KQIqzAWHzxsS4Z5zRekhlDa3qwCI7ov6wt3mYNgzoGdmFtxpU1wwfHZxZXxvwLHVVB/ulIpDxB+caOpRvdwsncIElJFGvanrXgsMrGDxATI2bNRsqvXcVeyD0Or5Dch1Na5t4hD4oguTnu+hoOytfepMDb9tNM76UTPe8KTG+dNiEAnh5s86jrMlPoDkMZ7GzC4pWEwqtYQv4p93ntZqhyCGbmjKQIRwebfnZsXXvfkGjO/WYG18dUUCQt0PDNDNu3PldiSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yI0mltqYSISy/I024hlvmGm/UPqF0z6LfE11Hx65y+w=;
+ b=WOAkEO6K4d5/XinSPo+bWyAaUxJCC62Br2IVbl1YGuYiWQ+5fnUHGm5cuF39BxfBZapgo1SZkaTOkUUwh0CLEAIr4W0JEQF9/rZcVGT87P55n3uM2FIAFdNryP+nFiDNY83fheQpbmyxwpb9YEN99mOCal4GtHvpA+YDY4QmyLAJP+Xl3dq27SqTgbII/zzTUcnF4+aRdP4WghxGlft/bF2Dxoev9dIRayT2RVSVgUuyUHEFKKqNcTpE5on4wJR+jg/fu3ibMQm7BVVCa2GRdwtC7yGQtD690VyH3A9x/YbvU8IizHRIR9Jnd/HN7MbnbhyMx/URknervnH7W0n3iQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=kent.ac.uk; dmarc=pass action=none header.from=kent.ac.uk;
+ dkim=pass header.d=kent.ac.uk; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=livekentac.onmicrosoft.com; s=selector2-livekentac-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yI0mltqYSISy/I024hlvmGm/UPqF0z6LfE11Hx65y+w=;
+ b=QdpYmtYJHKUH0cUdxqwrHq54cZDKN2rffZNchAAX1n4LusCFvHIgLphrsWN0tGFY6A0c9NmFQY8+lJaEsSBOcl1EIrycLM9/QuGdac98xQwnJv9eNAEcIzAUwJNGB+9EistY2UMQAJa1sCwiqzoHc4SNQYhmv5jl1JOSlsFtqcs=
+Received: from DB7PR01MB4348.eurprd01.prod.exchangelabs.com (52.135.135.22) by
+ DB7PR01MB5180.eurprd01.prod.exchangelabs.com (20.178.107.30) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.19; Fri, 24 Jan 2020 12:07:02 +0000
+Received: from DB7PR01MB4348.eurprd01.prod.exchangelabs.com
+ ([fe80::8072:b37a:57c5:7d6a]) by DB7PR01MB4348.eurprd01.prod.exchangelabs.com
+ ([fe80::8072:b37a:57c5:7d6a%7]) with mapi id 15.20.2665.017; Fri, 24 Jan 2020
+ 12:07:02 +0000
+Received: from cadance (129.12.216.170) by
+ LO2P265CA0092.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:8::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.10 via Frontend Transport; Fri, 24 Jan 2020 12:07:01 +0000
+From: Sarah Harris <seh53@kent.ac.uk>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH rc2 12/25] hw/timer: Add limited support for Atmel 16 bit
+ timer peripheral
+Thread-Topic: [PATCH rc2 12/25] hw/timer: Add limited support for Atmel 16 bit
+ timer peripheral
+Thread-Index: AQHV0lCDRBxm0GoaUk2I8zLlB2gHJ6f5oUaAgAACfICAABVHAA==
+Date: Fri, 24 Jan 2020 12:07:02 +0000
+Message-ID: <20200124120722.705ae8bac5cfc939dae2db5f@kent.ac.uk>
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-13-f4bug@amsat.org>	<875zh1yw38.fsf@linaro.org>
+ <790c5181-c4b0-ea7b-f4e4-07bacae220b2@redhat.com>
+In-Reply-To: <790c5181-c4b0-ea7b-f4e4-07bacae220b2@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: LO2P265CA0092.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:8::32) To DB7PR01MB4348.eurprd01.prod.exchangelabs.com
+ (2603:10a6:5:2f::22)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=S.E.Harris@kent.ac.uk; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-unknown-linux-gnu)
+x-originating-ip: [129.12.216.170]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fc000f6d-c802-44d1-7872-08d7a0c5eba3
+x-ms-traffictypediagnostic: DB7PR01MB5180:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB7PR01MB518050F1F06F88E40849206BF70E0@DB7PR01MB5180.eurprd01.prod.exchangelabs.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 02929ECF07
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(346002)(376002)(136003)(39860400002)(366004)(396003)(189003)(199004)(36756003)(52116002)(64756008)(66476007)(66556008)(53546011)(66946007)(6496006)(71200400001)(66446008)(786003)(16526019)(7416002)(316002)(26005)(186003)(54906003)(2616005)(956004)(8936002)(81166006)(6486002)(8676002)(81156014)(4326008)(1076003)(2906002)(478600001)(6916009)(5660300002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DB7PR01MB5180;
+ H:DB7PR01MB4348.eurprd01.prod.exchangelabs.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: kent.ac.uk does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4C1aQD9gUShEJuTmBDRUMvsD6HZlt4gCliqcXtExvrjqgXLd+PPZkaB79cRb/ywrekv+/V4c8BTjeE6k41CuGHzvuPLGWUoZ5iykFW+tYRAE27GgILpdlTHoHRxu/jzhIulcCeAImXBF9UTXQyBWTj4WiNKlWWuMRn0LWIXdg5DU34kmAOw0JZZxV9URt3xpz6txenSLXbc3SodPiwHEM5ORvJjkuUmrxCb+ga1/pFLgESX3lE9Q8jjEFYf/q5yezxHEgjeV9bvZzxk17CSn/vmtKgX8DFkpf8RkZapTCWF0bLEv9k4VydMO6QUXoc1yKaLJ0dB1039otKtUrP1wowBnPh9XXiwqJFZPYMqqfpnk5Vtmh5bYsfj0WN5EsnlYJPtM7Rl/3qFJxqo0ErSPsCcQgC1HGQlqFATjYCnOMmyK+bgnKnEq6RdAlgDba8/a
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <EC46ED32E308594085092F62ADCA09F7@eurprd01.prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20200123221035.20383-1-richard.henderson@linaro.org>
-In-Reply-To: <20200123221035.20383-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Jan 2020 12:05:47 +0000
-Message-ID: <CAFEAcA9aM5Pn1qVV=Cr-B4jG7_4hkPhEoWUEHhhY3a-q3=44gw@mail.gmail.com>
-Subject: Re: [PULL v2 00/11] target/hppa patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-OriginatorOrg: kent.ac.uk
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc000f6d-c802-44d1-7872-08d7a0c5eba3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2020 12:07:02.4513 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 51a9fa56-3f32-449a-a721-3e3f49aa5e9a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gmP9/GjTXVRE9oQhmj3aEtniZUUdyWPpNJaR9v3uzEYWvJaW79aFHLs9iD+64IpbDdmqV2xnQB4vXIfnxMZGZw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR01MB5180
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.15.70
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,97 +130,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, "S.Harris" <S.E.Harris@kent.ac.uk>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
+ "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>,
+ Laurent Vivier <lvivier@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "mrolnik@gmail.com" <mrolnik@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, "E.Robbins" <E.J.C.Robbins@kent.ac.uk>,
+ "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 at 22:10, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Change since v1:
->   * Incorporate Phil's -vga none fix for boot-serial-test (patch 7).
->
->
-> r~
->
->
-> The following changes since commit 6918ab2570bcf942651e69f7ad975e137679738b:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200123-4' into staging (2020-01-23 16:36:55 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-pa-20200123
->
-> for you to fetch changes up to b670f6d717a6a1795358c07823b4e968c0b61a86:
->
->   target/hppa: Allow, but diagnose, LDCW aligned only mod 4 (2020-01-23 10:55:20 -1000)
->
-> ----------------------------------------------------------------
-> Improve LASI emulation
-> Add Artist graphics
-> Fix main memory allocation
-> Improve LDCW emulation wrt real hw
->
+Hi,
 
-Hi; I'm afraid this has format-string errors for 32-bit and clang:
+Do I understand correctly that you need Ed to email a "Signed-off-by: Ed Ro=
+bbins <email>" himself?
+Ed's cc'ed already, but I'll email him directly to make sure he's seen this=
+ discussion.
 
-OSX:
+Sarah
 
-/Users/pm215/src/qemu-for-merges/hw/display/artist.c:1035:41: error:
-format specifies type 'unsigned long' but the argument has type
-'hwaddr' (aka 'unsigned long long') [-Werror,-Wformat]
-                " size=%d\n", __func__, addr, val, size);
-                                        ^~~~
-/Users/pm215/src/qemu-for-merges/include/qemu/log.h:118:30: note:
-expanded from macro 'qemu_log_mask'
-            qemu_log(FMT, ## __VA_ARGS__);              \
-                             ^~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/hw/display/artist.c:1035:47: error:
-format specifies type 'unsigned long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                " size=%d\n", __func__, addr, val, size);
-                                              ^~~
-/Users/pm215/src/qemu-for-merges/include/qemu/log.h:118:30: note:
-expanded from macro 'qemu_log_mask'
-            qemu_log(FMT, ## __VA_ARGS__);              \
-                             ^~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/hw/display/artist.c:1121:69: error:
-format specifies type 'unsigned long' but the argument has type
-'hwaddr' (aka 'unsigned long long') [-Werror,-Wformat]
-        qemu_log("%s: unknown register: %08lx size %d\n", __func__, addr, size);
-                                        ~~~~~                       ^~~~
-                                        %08llx
-3 errors generated.
+On Fri, 24 Jan 2020 11:51:13 +0100
+Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
 
-
-aarch32 has those 3 and also:
-
-/home/peter.maydell/qemu/hw/net/i82596.c: In function 'i82596_receive':
-/home/peter.maydell/qemu/hw/net/i82596.c:531:45: error: format '%lu'
-expects argument of type 'long unsigned int', but argument 2 has type
-'size_t {aka unsigned int}' [-Werror=format=]
-         printf("Received frame too small, %lu vs. %u bytes\n",
-                                           ~~^
-                                           %u
-
-
-OpenBSD has another 2:
-
-/home/qemu/qemu-test.HtS7yu/src/hw/input/lasips2.c:178:62: warning:
-format specifies type 'unsigned long' but the argument has type
-'hwaddr' (aka 'unsigned long long') [-Wformat]
-        qemu_log("%s: unknown register 0x%02lx\n", __func__, addr);
-                                         ~~~~~               ^~~~
-                                         %02llx
-/home/qemu/qemu-test.HtS7yu/src/hw/input/lasips2.c:239:62: warning:
-format specifies type 'unsigned long' but the argument has type
-'hwaddr' (aka 'unsigned long long') [-Wformat]
-        qemu_log("%s: unknown register 0x%02lx\n", __func__, addr);
-                                         ~~~~~               ^~~~
-                                         %02llx
-
-thanks
--- PMM
+> Hello Sarah,
+>=20
+> On 1/24/20 11:42 AM, Alex Benn=E9e wrote:
+> >=20
+> > Philippe Mathieu-Daud=E9 <f4bug@amsat.org> writes:
+> >=20
+> >> From: Michael Rolnik <mrolnik@gmail.com>
+> >>
+> >> These were designed to facilitate testing but should provide enough
+> >> function to be useful in other contexts.  Only a subset of the functio=
+ns
+> >> of each peripheral is implemented, mainly due to the lack of a standar=
+d
+> >> way to handle electrical connections (like GPIO pins).
+> >>
+> >> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> >> Message-Id: <20200118191416.19934-13-mrolnik@gmail.com>
+> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >> [rth: Squash info mtree fixes and a file rename from f4bug, which was:=
+]
+> >> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> >> [PMD: Use qemu_log_mask(LOG_UNIMP), replace goto by return]
+> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >> ---
+> > <snip>
+> >> --- /dev/null
+> >> +++ b/include/hw/timer/atmel_timer16.h
+> >> @@ -0,0 +1,94 @@
+> >> +/*
+> >> + * Atmel AVR 16 bit timer
+> >> + *
+> >> + * Copyright (c) 2018 University of Kent
+> >> + * Author: Ed Robbins
+> >=20
+> > No sign off from the author here?
+>=20
+> Hmmm I Sarah Harris's one, who is from the University of Kent, isn't it=20
+> enough? (I remember patched from Xilinx with Edgar S-o-b but from other=20
+> authors, Edgar vouched for Xilinx).
+>=20
+> Sarah, can you get Ed Signed-off-by?
+>=20
+> >> --- /dev/null
+> >> +++ b/hw/timer/atmel_timer16.c
+> >> @@ -0,0 +1,605 @@
+> > <snip>
+> >> +
+> >> +/* Helper macros */
+> >> +#define VAL16(l, h) ((h << 8) | l)
+> >> +#define DB_PRINT(fmt, args...) /* Nothing */
+> >> +/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ##
+> >> args)*/
+> >=20
+> > Format strings are likely to bitrot. Either use a if (GATE) or
+> > tracepoints.
+>=20
+> Yes...
+>=20
+> > <snip>
+> >=20
+> > Otherwise:
+> >=20
+> > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> Thanks!
+>=20
 
