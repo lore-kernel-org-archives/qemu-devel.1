@@ -2,82 +2,93 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B277BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFAFC32771
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8107921556
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 09:59:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bwg9Ntus"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8107921556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3793121556
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 10:03:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3793121556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuvjw-0004Cs-N3
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 04:59:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37409)
+	id 1iuvnt-00075o-7O
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 05:03:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iuvjG-0003LB-9n
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:58:19 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iuvmk-0005fZ-9N
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:01:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iuvjE-0002go-WD
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:58:18 -0500
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:45791)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iuvjE-0002gP-Q3
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 04:58:16 -0500
-Received: by mail-ot1-x329.google.com with SMTP id 59so1059664otp.12
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 01:58:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=qn/Ml24072IMiMVMgUYsgXluag9ssfwyyCIkQuVwnbI=;
- b=bwg9NtusYdJ/wAwFA8+/BH+UmsZkjSCdG058L4AnfnC4bgXTHhQcI2FQ0smHB2ddsS
- itXFsvpD1C4+xopgAxuJrHNjz4vHR0kWUq/jqcUNZ8+2D1CeWeVYOaBOzxY7vVQYEMFd
- 2FQXQObUnRYDSNlVLuBLY5Mq5BKshV/nht512kCQhV8RMbb9sDR4V7/X6GLv9gMLtGuc
- NNwjSd2WpRMYujG/KAH0Iw78Rg3eDkteTG0iuIIetGT0iO3OGm1gcNz3ITTxnR2pTOMq
- UVgwoB/AM+qh9ZRJd+lbx02oeLNY7Lswi1DiCJTcGs3Q6x8AxNXPQRHhxe7ys6W8W4lR
- DBxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=qn/Ml24072IMiMVMgUYsgXluag9ssfwyyCIkQuVwnbI=;
- b=nqR1QhEPkQK35SKmkGB32Lwj/xRwk60m9hrLSyI7n2E9DTMLAct8em8rU3c5bThmQr
- ORJqfiEDkTxt7myFRAtETDMT4yzY0c+s134yCTOPrvb/DDnKms3+5nCMH5FslTNhSLhX
- CV+VLHYm9f2Pv/U4Odlg6UnOqv/kaSk9wgCcI8548FgV/ilttm8YqQvX62xNsZr8f6XM
- N2JLV/WmBpB/siVHyriWie7GPs1vNjdnFkBztFPtcyZvnCMvB213Q4ZAUAMdhdSj2VWR
- EVtLWIjQDqwueg/xPhQEJAaDzH9+c26p6cOEoY5GL+wG2t4e2/j6muTkPBFRIuvZQfnL
- 9olw==
-X-Gm-Message-State: APjAAAVXbfh7lUqLwVfjtav/SXBaojjkDwMzsNqXPSZbFDLNTHWOfIk9
- 1U2APN13UYtKkaHzKIxVfRB8pJedbgECUEwVpwFkcg==
-X-Google-Smtp-Source: APXvYqxjFaN0WKa5gyDYXc/KDgOvQP9SVkBVQvpidRyaIoz5eExfqndMbJzs6BNhHm4Nhms2/IrNU40AVvAdoYNYMZs=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr1962543otq.97.1579859895926; 
- Fri, 24 Jan 2020 01:58:15 -0800 (PST)
+ (envelope-from <frankja@linux.ibm.com>) id 1iuvmf-00063d-G9
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:01:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27156)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iuvmf-00061q-8e
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 05:01:49 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00O9vcMd081422
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 05:01:48 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xqmjt0hkc-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 05:01:47 -0500
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 24 Jan 2020 10:01:45 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 24 Jan 2020 10:01:42 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 00OA0ote21758242
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 24 Jan 2020 10:00:50 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5266C4204C;
+ Fri, 24 Jan 2020 10:01:41 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B004642042;
+ Fri, 24 Jan 2020 10:01:39 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.180.45])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 24 Jan 2020 10:01:39 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] s390x: sigp: Fix sense running reporting
+Date: Fri, 24 Jan 2020 05:01:37 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20200123142122.13839-1-kraxel@redhat.com>
-In-Reply-To: <20200123142122.13839-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Jan 2020 09:58:04 +0000
-Message-ID: <CAFEAcA8HjCrXRhEaptgnwbk4vD0TbNgsiQDnFxLsn80gf8KA-A@mail.gmail.com>
-Subject: Re: [PULL 0/3] Ui 20200123 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20012410-0012-0000-0000-000003803E94
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012410-0013-0000-0000-000021BC883F
+Message-Id: <20200124100137.28656-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-24_02:2020-01-24,
+ 2020-01-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 clxscore=1015
+ spamscore=0 suspectscore=1 priorityscore=1501 mlxscore=0 phishscore=0
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001240082
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,47 +100,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com,
+ qemu-s390x@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 at 17:41, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 43d1455cf84283466e5c22a217db5ef4b8197b=
-14:
->
->   qapi: Fix code generation with Python 3.5 (2020-01-20 12:17:38 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20200123-pull-request
->
-> for you to fetch changes up to a1e8853ed2acbda29a52533abc91b035b723952e:
->
->   ui/console: Display the 'none' backend in '-display help' (2020-01-21 0=
-7:29:40 +0100)
->
-> ----------------------------------------------------------------
-> vnc: fix zlib compression artifacts.
-> ui: add "none" to -display help.
->
-> ----------------------------------------------------------------
->
-> Cameron Esfahani (1):
->   vnc: prioritize ZRLE compression over ZLIB
->
-> Gerd Hoffmann (1):
->   Revert "vnc: allow fall back to RAW encoding"
->
-> Philippe Mathieu-Daud=C3=A9 (1):
->   ui/console: Display the 'none' backend in '-display help'
+The logic was inversed and reported running if the cpu was stopped.
+Let's fix that.
 
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ target/s390x/sigp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied, thanks.
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index 727875bb4a..286c0d6c9c 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -347,7 +347,7 @@ static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
+     }
+ 
+     /* If halted (which includes also STOPPED), it is not running */
+-    if (CPU(dst_cpu)->halted) {
++    if (!CPU(dst_cpu)->halted) {
+         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+     } else {
+         set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
+-- 
+2.20.1
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
