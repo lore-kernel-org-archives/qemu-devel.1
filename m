@@ -2,77 +2,82 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D5AC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 08:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E692C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 08:17:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 158932075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 08:14:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33FE32075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 08:17:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bD2XDEUS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 158932075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JsUFQcf7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FE32075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuu6c-0004ZD-A4
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 03:14:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49508)
+	id 1iuu9R-00064D-7h
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 03:17:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iuu5x-00045o-3C
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 03:13:38 -0500
+ (envelope-from <thuth@redhat.com>) id 1iuu8d-0005YD-L7
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 03:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iuu5v-0003FR-Jx
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 03:13:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28478
+ (envelope-from <thuth@redhat.com>) id 1iuu8c-0006Dd-GU
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 03:16:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48771
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iuu5v-0003Eu-Ga
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 03:13:35 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iuu8c-0006D9-D3
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 03:16:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579853614;
+ s=mimecast20190719; t=1579853782;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RN9gaUQxuiWX0SOWadJplqQzr2RZtazK7KKNhKD2M2M=;
- b=bD2XDEUS27Hjn1kWCd8qcLhxfvmL9FV0a2Oks4Q02HbStY4ECAOeya0pQ0w0fgT2TRDzFp
- KoH+JZo9raIrWnVaB12HGxZRo105FtY1T+JsfAdV57fYX4M9j9SW4TMPnfg4uNEGWU6Ong
- ejP/I5rX6/TfjUK7/e3jE570stdwExA=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=5C8+m9fW+yJuLZ5D0kzdXtsOvXz97zVzTYHauIP1HK0=;
+ b=JsUFQcf7J9sZmq8IegUNYsftSTBFBHnxOF/MbYyZGEUr6f8hweR6aCwfPYIPJIipbqa5U3
+ mRzmgqNsp+YjCTOD1oaf7y3zvZSVTg/8cKJj08fHa21/p8ch5Q5CRPaETtZSjcjo95JUs8
+ 373vV1LtWgszbAotWjSxVNPN8p0LD7c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-sQvDns2ZOqC0g36Wf3a37w-1; Fri, 24 Jan 2020 03:13:31 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-408-9DAd2k-rM1OIir67totBKA-1; Fri, 24 Jan 2020 03:16:20 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 088E0100550E;
- Fri, 24 Jan 2020 08:13:30 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 803DC86CCC;
- Fri, 24 Jan 2020 08:13:29 +0000 (UTC)
-Date: Fri, 24 Jan 2020 09:13:27 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH REPOST v3 06/80] alpha:dp264: use memdev for RAM
-Message-ID: <20200124091327.30083143@redhat.com>
-In-Reply-To: <alpine.BSF.2.21.99999.352.2001231605230.72857@zero.eik.bme.hu>
-References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
- <1579779525-20065-7-git-send-email-imammedo@redhat.com>
- <alpine.BSF.2.21.99999.352.2001231605230.72857@zero.eik.bme.hu>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 185C0100550E;
+ Fri, 24 Jan 2020 08:16:18 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-156.ams2.redhat.com [10.36.116.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E0FA960BF3;
+ Fri, 24 Jan 2020 08:16:07 +0000 (UTC)
+Subject: Re: [PATCH rc2 12/25] hw/timer: Add limited support for Atmel 16 bit
+ timer peripheral
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, mrolnik@gmail.com, richard.henderson@linaro.org,
+ me@xcancerberox.com.ar
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-13-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4f9a6d13-63b3-3df6-ecd9-def3908f90b3@redhat.com>
+Date: Fri, 24 Jan 2020 09:16:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: sQvDns2ZOqC0g36Wf3a37w-1
+In-Reply-To: <20200124005131.16276-13-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 9DAd2k-rM1OIir67totBKA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -87,45 +92,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
+ S.E.Harris@kent.ac.uk, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, dovgaluk@ispras.ru, imammedo@redhat.com,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 16:07:19 +0100 (CET)
-BALATON Zoltan <balaton@eik.bme.hu> wrote:
-
-> On Thu, 23 Jan 2020, Igor Mammedov wrote:
-> > memory_region_allocate_system_memory() API is going away, so
-> > replace it with memdev allocated MemoryRegion. The later is
-> > initialized by generic code, so board only needs to opt in
-> > to memdev scheme by providing
-> >  MachineClass::default_ram_id
-> > and using MachineState::ram instead of manually initializing
-> > RAM memory region.
-> >
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Acked-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
-> > hw/alpha/alpha_sys.h | 2 +-
-> > hw/alpha/dp264.c     | 3 ++-
-> > hw/alpha/typhoon.c   | 8 ++------
-> > 3 files changed, 5 insertions(+), 8 deletions(-) =20
+On 24/01/2020 01.51, Philippe Mathieu-Daud=C3=A9 wrote:
+> From: Michael Rolnik <mrolnik@gmail.com>
 >=20
-> This still has a : instead of / in the patch title. Maybe should be=20
-> alpha/dp264: ... Probably does not worth a respin but you could correct i=
-t=20
-> if there will be another version for some other reason or when applying=
-=20
-I plan to respin series, so it will be fixed up in v4
-
-Thanks
-
-> it.
+> These were designed to facilitate testing but should provide enough
+> function to be useful in other contexts.  Only a subset of the functions
+> of each peripheral is implemented, mainly due to the lack of a standard
+> way to handle electrical connections (like GPIO pins).
 >=20
-> Regrards,
-> BALATON Zoltan
+> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Message-Id: <20200118191416.19934-13-mrolnik@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> [rth: Squash info mtree fixes and a file rename from f4bug, which was:]
+> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> [PMD: Use qemu_log_mask(LOG_UNIMP), replace goto by return]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> rc2: Use qemu_log_mask(LOG_UNIMP), replace goto by return (thuth)
+> ---
+>  include/hw/timer/atmel_timer16.h |  94 +++++
+>  hw/timer/atmel_timer16.c         | 605 +++++++++++++++++++++++++++++++
+>  hw/timer/Kconfig                 |   3 +
+>  hw/timer/Makefile.objs           |   2 +
+>  4 files changed, 704 insertions(+)
+>  create mode 100644 include/hw/timer/atmel_timer16.h
+>  create mode 100644 hw/timer/atmel_timer16.c
+[...]
+> +static void avr_timer16_clksrc_update(AVRTimer16State *t16)
+> +{
+> +    uint16_t divider =3D 0;
+> +    switch (CLKSRC(t16)) {
+> +    case T16_CLKSRC_EXT_FALLING:
+> +    case T16_CLKSRC_EXT_RISING:
+> +        qemu_log_mask(LOG_UNIMP, "%s: external clock source unsupported\=
+n",
+> +                      __func__);
+> +        break;
+> +    case T16_CLKSRC_STOPPED:
+> +        break;
+> +    case T16_CLKSRC_DIV1:
+> +        divider =3D 1;
+> +        break;
+> +    case T16_CLKSRC_DIV8:
+> +        divider =3D 8;
+> +        break;
+> +    case T16_CLKSRC_DIV64:
+> +        divider =3D 64;
+> +        break;
+> +    case T16_CLKSRC_DIV256:
+> +        divider =3D 256;
+> +        break;
+> +    case T16_CLKSRC_DIV1024:
+> +        divider =3D 1024;
+> +        break;
+> +    default:
+> +        break;
+> +    }
+> +    if (divider) {
+> +        t16->freq_hz =3D t16->cpu_freq_hz / divider;
+> +        t16->period_ns =3D NANOSECONDS_PER_SECOND / t16->freq_hz;
+> +        DB_PRINT("Timer frequency %" PRIu64 " hz, period %" PRIu64 " ns =
+(%f s)",
+> +                 t16->freq_hz, t16->period_ns, 1 / (double)t16->freq_hz)=
+;
+> +    }
+> +    return;
+> +}
+
+You can remove the "return;" at the end of the function now, too.
+
+ Thomas
 
 
