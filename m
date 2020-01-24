@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4534C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3258AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:43:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69B402071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:42:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F295F2075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:43:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="si5GAm+T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B402071A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d+X+u9de"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F295F2075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv5mB-0001SN-FJ
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 15:41:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42772)
+	id 1iv5nU-0004YU-3R
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 15:43:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iv5kx-00089u-4I
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:44 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iv5ks-0007xk-0G
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iv5kw-000687-4M
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:43 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51273)
+ (envelope-from <alex.bennee@linaro.org>) id 1iv5kr-0005uR-5k
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:37 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36231)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iv5kv-000679-UV
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:42 -0500
-Received: by mail-wm1-x341.google.com with SMTP id t23so728860wmi.1
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 12:40:41 -0800 (PST)
+ id 1iv5kq-0005sZ-WF
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:37 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z3so3602185wru.3
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 12:40:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=jkv4M+AkP1pQlh1PhGkDNRhpNbkYFJfPzkZzb2OKC/o=;
- b=si5GAm+TB98zvWp8qmGJvQuncs4iDqEeqOzJ/1JfRfUlKrKUtvdyGhXvWHnVlFZMfW
- UxEADr5++DP9koHT8HHn514XfGO7Xcd7rmNiqKekoGteTyC7SInkAloek+K66+TkNCzJ
- ZINuTtLIAZbV12Mi0OQ9IaaY3duroufG4qWQyB8HdvUZxqRRNE0CoaeoSveN4QXQV+kR
- tyqg8l18Ylt8+30LwUUA1JmxhvXWvYuczRbqnz293ljA33ZH1bdwWcg88phsQlEgBaqa
- cnrGmSWIHMw5ud9wVlJ2JVFeczjjFg7bbIrxNoLGA4a5t24VRJHNk1SIMvifiZXJEyW5
- OSzA==
+ bh=CT3wh8Y3xSMP1+ExU06YY5pwEwL732fslH3YW3xC8eU=;
+ b=d+X+u9dePCR6F45eM31qv4MaOF3hceSStw9vfa8ahr36zBJlPeudtaSFhC5scAEDjE
+ JG2t+4BR5pgtuiXfFCWqDzUiODDaHxO3kAJNpEw8otTXNr2x4pPyLBqNlox6sl3/5WGT
+ bXPAtBURAwkfxd9QLmXE+1UdQsGj3cVMsymIF4rOh2qVawUV9RGOVpbXULLCtkVa5ST6
+ VSiVx5TDRcXoea+GZFdyVkOODVCPIR2sGVZ8KPJlKeXVOTwlcx3Kops3Fpp6pfbY2Ydk
+ 0keiDvtM8dW+WEREP0/eei9Nxyg/DAu3cBmRpRh63WF4EmQnBbKcQd3dyfwp31x9tKBD
+ yQyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=jkv4M+AkP1pQlh1PhGkDNRhpNbkYFJfPzkZzb2OKC/o=;
- b=NZbmflNIEIKeBw22ptNRnXCRk7JXIf2B0Kb655ZiRXGk0BlJ/6+ZyHH3oBWRsJ4IG3
- XsrFIuL9ORIuz2Q1sjIdHwHGJ9GOayxy4Rlv23rOYzOkinyh2jO8mXkwQxVLLHZA10W1
- mVwEge1me2U0/ufC9H/+2P38aPc6F6Bpwbu4J99vXbI514Z8fQ0f+LvuOoTkDB2F6JIj
- ppJtTrPXxcshoIx2PyXc/o0esQI3QqgEUq6AUrlQRyuUjqzor6Wp1J0R6BiEy2hHgWf8
- usTR0js048it9aND9JYXTuHqPy3tUn4qFyCfvmBo99s/c7R25kq6zbfKVjNxid7e4leM
- Yhwg==
-X-Gm-Message-State: APjAAAW6ZlEULfmToDhvCY9VhlIVFaRyj4FguXBWof2xYamETpVTG6Uf
- mpQJ/saBkM8Ex48iXDxu/MCa4w==
-X-Google-Smtp-Source: APXvYqzfWKuZ318cl96r3j+FNaiYAffBWFCgex7eV9gLysY/loHTzPqUazmLHD7ybeMVLEclLNrsow==
-X-Received: by 2002:a1c:451:: with SMTP id 78mr827656wme.125.1579898440997;
- Fri, 24 Jan 2020 12:40:40 -0800 (PST)
+ bh=CT3wh8Y3xSMP1+ExU06YY5pwEwL732fslH3YW3xC8eU=;
+ b=ndyqLW4mVtgds7mk6HhMMBhooIS5fXWEhtqrhFmOJ+xIriSwH+F8iS35xbQjwXqswy
+ rRPZl9/+80BPCfTnkKLlFK6AbpW77f0/KQ8ep4bMTQLZPIhFgsVt68VrmvILmcqSflrM
+ ijfHHY3agEakUbS6uoX/yoJM1ucmE3DZgBNjq/ibMuRVIb+5fFtUtdE33bx1/kkrkRqL
+ R0w9HaOfhQvp+axvgZcH9s/+FiUa4qpt9y1bB8IBAq8qlqX+iRpMAxvMItm+xzEg4Hz3
+ XO5XWi0NQ/lKpT0H/FTphivFXp0/7uS9uAVxNa+QACUmOQ1c3oGIKmS3TAeSOtXlOyeL
+ tUBA==
+X-Gm-Message-State: APjAAAV090MXy/tRgHzviyGLJ6YhpggT3FLIgpI7EL+jbQk4v+KkR24n
+ vF1wriDyQj1S55IW2H8k10iNtA==
+X-Google-Smtp-Source: APXvYqxE0uPNv5Eo5PedGvod5OvWQrbDiOmzpF89Q88j6klNAWPEfkwlArehaN5jsqGCFRtbCeUQNQ==
+X-Received: by 2002:adf:d183:: with SMTP id v3mr6628091wrc.180.1579898436103; 
+ Fri, 24 Jan 2020 12:40:36 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a1sm8725970wrr.80.2020.01.24.12.40.31
+ by smtp.gmail.com with ESMTPSA id w8sm8877443wmm.0.2020.01.24.12.40.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 24 Jan 2020 12:40:33 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 473991FF9A;
- Fri, 24 Jan 2020 20:40:27 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id D3A111FF92;
+ Fri, 24 Jan 2020 20:40:26 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 10/13] tests/docker: add debian10-native-qemu-build
-Date: Fri, 24 Jan 2020 20:40:23 +0000
-Message-Id: <20200124204026.2107-11-alex.bennee@linaro.org>
+Subject: [PATCH  v1 05/13] .shippable: --disable-docs for cross-compile tests
+Date: Fri, 24 Jan 2020 20:40:18 +0000
+Message-Id: <20200124204026.2107-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200124204026.2107-1-alex.bennee@linaro.org>
 References: <20200124204026.2107-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,36 +106,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a new dockerfile which can build the native architecture QEMU
-on a Debian 10 based image whatever architecture that may be.
+The sphinx support is fairly new and we don't seem to have all the
+bugs worked out for cross development environments right now.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .../dockerfiles/debian10-native-qemu-build.docker | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian10-native-qemu-build.docker
+ .shippable.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/docker/dockerfiles/debian10-native-qemu-build.docker b/tests/docker/dockerfiles/debian10-native-qemu-build.docker
-new file mode 100644
-index 0000000000..71bd2b1d83
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian10-native-qemu-build.docker
-@@ -0,0 +1,15 @@
-+#
-+# Debain Native Build
-+#
-+# This docker target builds on the Debian Buster base image. It is
-+# deliberatly architecture agnostic as it can build on any Debian
-+# supported architecture.
-+#
-+FROM qemu:debian10
-+MAINTAINER Alex Bennée <alex.bennee@linaro.org>
-+
-+# We use --arch-only as not all hosts have what's needed to build all
-+# the binpkg's that come with QEMU (roms etc).
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt build-dep --arch-only -yy qemu
+diff --git a/.shippable.yml b/.shippable.yml
+index 83aae08bb4..2cce7b5689 100644
+--- a/.shippable.yml
++++ b/.shippable.yml
+@@ -37,5 +37,5 @@ build:
+     - unset CC
+     - mkdir build
+     - cd build
+-    - ../configure ${QEMU_CONFIGURE_OPTS} --target-list=${TARGET_LIST}
++    - ../configure --disable-docs ${QEMU_CONFIGURE_OPTS} --target-list=${TARGET_LIST}
+     - make -j$(($(getconf _NPROCESSORS_ONLN) + 1))
 -- 
 2.20.1
 
