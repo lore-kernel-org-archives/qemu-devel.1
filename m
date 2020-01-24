@@ -2,82 +2,126 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F87DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A99C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:16:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF6322087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3396920718
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:16:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XcB4hEPa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF6322087E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRZFgskz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3396920718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuyd9-0007Nf-2f
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:04:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58118)
+	id 1iuyp4-0002R2-Cq
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:16:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59907)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iuyc0-0006sG-1E
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:03:01 -0500
+ (envelope-from <david@redhat.com>) id 1iuyoF-0001yT-7i
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iuybu-0001ZI-Es
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:02:59 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36549
+ (envelope-from <david@redhat.com>) id 1iuyoD-0006Dq-Fr
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:15:38 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60437
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuybu-0001Vw-AE
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:02:54 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iuyoD-0006CQ-CV
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:15:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579870971;
+ s=mimecast20190719; t=1579871737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=28oYsWnjVO1HsVjLkmuTXWQEQ3yNsQC7rUp6R51O0uk=;
- b=XcB4hEPaAMcyb0/+AThT1u9S7tP6oj6/naJLrFyN1k+tbZibjmUikLLyf2fMy1fB19zP84
- qMz8A9dyPRXnGCR4O7QbfIq3PUHCIqTXIK+OGuiFD3+sOzSkgWfZHbK4TwuB2Deg2dNWMz
- Rdl29anKbXpfrvqOMimrbfcC9d8jfuw=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=i2cP2Og8nX72uKvV6ug4olV6c1wSW5Dyc4hry105WXM=;
+ b=PRZFgskzj7oQAxg3nnDkfwGyuJltd1XlhmgadsdonddL8GXIhFoKKdE5QTWAAJ16Q1gjxy
+ EW9z3ZO4gDWbF+o2FDQhINqkUOqwdTirCzOJz0iGqyhI8mD0BGI7JdVDqkVZ9U8+a+PhWN
+ G+21IwHbaKjW1bdspafwEga1xrQUjWE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-zAKmoDxOM5KYwWxhIuIrpA-1; Fri, 24 Jan 2020 08:02:49 -0500
+ us-mta-295-zmKW69pzNAKFNGSy5GUlaQ-1; Fri, 24 Jan 2020 08:15:33 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A23D108F9D8
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 13:02:48 +0000 (UTC)
-Received: from work-vm (ovpn-117-253.ams2.redhat.com [10.36.117.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B238B857A0;
- Fri, 24 Jan 2020 13:02:46 +0000 (UTC)
-Date: Fri, 24 Jan 2020 13:02:44 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v3 08/21] migration: Make multifd_load_setup() get an
- Error parameter
-Message-ID: <20200124130244.GR2970@work-vm>
-References: <20200123115831.36842-1-quintela@redhat.com>
- <20200123115831.36842-9-quintela@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E33F2801F77;
+ Fri, 24 Jan 2020 13:15:31 +0000 (UTC)
+Received: from [10.36.116.39] (ovpn-116-39.ams2.redhat.com [10.36.116.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AF4E3857AE;
+ Fri, 24 Jan 2020 13:15:27 +0000 (UTC)
+Subject: Re: [PATCH] s390x: sigp: Fix sense running reporting
+To: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+References: <20200124100137.28656-1-frankja@linux.ibm.com>
+ <20200124110547.50c73851.cohuck@redhat.com>
+ <c8310441-5104-6446-2399-840a127c56fd@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <e815e3ef-3580-6eef-b198-cb11fdf57e1c@redhat.com>
+Date: Fri, 24 Jan 2020 14:15:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200123115831.36842-9-quintela@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
+In-Reply-To: <c8310441-5104-6446-2399-840a127c56fd@linux.ibm.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: zAKmoDxOM5KYwWxhIuIrpA-1
+X-MC-Unique: zmKW69pzNAKFNGSy5GUlaQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,184 +133,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We need to change the full chain to pass the Error parameter.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> No idea.
+> How many people use smp with tcg?
+> 
 
->=20
-> ---
->=20
-> Always use a local_err, and in case of error propagate/print it as needed=
-.
-> ---
->  migration/migration.c | 35 +++++++++++++++++++++++++++++------
->  migration/migration.h |  2 +-
->  migration/ram.c       |  2 +-
->  migration/ram.h       |  2 +-
->  migration/rdma.c      |  2 +-
->  5 files changed, 33 insertions(+), 10 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 7140d1e040..ef17b9f3f2 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -518,13 +518,23 @@ fail:
->      exit(EXIT_FAILURE);
->  }
-> =20
-> -static void migration_incoming_setup(QEMUFile *f)
-> +/**
-> + * @migration_incoming_setup: Setup incoming migration
-> + *
-> + * Returns 0 for no error or 1 for error
-> + *
-> + * @f: file for main migration channel
-> + * @errp: where to put errors
-> + */
-> +static int migration_incoming_setup(QEMUFile *f, Error **errp)
->  {
->      MigrationIncomingState *mis =3D migration_incoming_get_current();
-> +    Error *local_err =3D NULL;
-> =20
-> -    if (multifd_load_setup() !=3D 0) {
-> +    if (multifd_load_setup(&local_err) !=3D 0) {
->          /* We haven't been able to create multifd threads
->             nothing better to do */
-> +        error_report_err(local_err);
->          exit(EXIT_FAILURE);
->      }
-> =20
-> @@ -532,6 +542,7 @@ static void migration_incoming_setup(QEMUFile *f)
->          mis->from_src_file =3D f;
->      }
->      qemu_file_set_blocking(f, false);
-> +    return 0;
->  }
-> =20
->  void migration_incoming_process(void)
-> @@ -572,19 +583,27 @@ static bool postcopy_try_recover(QEMUFile *f)
->      return false;
->  }
-> =20
-> -void migration_fd_process_incoming(QEMUFile *f)
-> +void migration_fd_process_incoming(QEMUFile *f, Error **errp)
->  {
-> +    Error *local_err =3D NULL;
-> +
->      if (postcopy_try_recover(f)) {
->          return;
->      }
-> =20
-> -    migration_incoming_setup(f);
-> +    if (migration_incoming_setup(f, &local_err)) {
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +        }
-> +        return;
-> +    }
->      migration_incoming_process();
->  }
-> =20
->  void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp)
->  {
->      MigrationIncomingState *mis =3D migration_incoming_get_current();
-> +    Error *local_err =3D NULL;
->      bool start_migration;
-> =20
->      if (!mis->from_src_file) {
-> @@ -596,7 +615,12 @@ void migration_ioc_process_incoming(QIOChannel *ioc,=
- Error **errp)
->              return;
->          }
-> =20
-> -        migration_incoming_setup(f);
-> +        if (migration_incoming_setup(f, &local_err)) {
-> +            if (local_err) {
-> +                error_propagate(errp, local_err);
-> +            }
-> +            return;
-> +        }
-> =20
->          /*
->           * Common migration only needs one channel, so we can start
-> @@ -604,7 +628,6 @@ void migration_ioc_process_incoming(QIOChannel *ioc, =
-Error **errp)
->           */
->          start_migration =3D !migrate_use_multifd();
->      } else {
-> -        Error *local_err =3D NULL;
->          /* Multiple connections */
->          assert(migrate_use_multifd());
->          start_migration =3D multifd_recv_new_channel(ioc, &local_err);
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 44b1d56929..8473ddfc88 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -265,7 +265,7 @@ struct MigrationState
-> =20
->  void migrate_set_state(int *state, int old_state, int new_state);
-> =20
-> -void migration_fd_process_incoming(QEMUFile *f);
-> +void migration_fd_process_incoming(QEMUFile *f, Error **errp);
->  void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp);
->  void migration_incoming_process(void);
-> =20
-> diff --git a/migration/ram.c b/migration/ram.c
-> index d537264ba5..125c6d0f60 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1463,7 +1463,7 @@ static void *multifd_recv_thread(void *opaque)
->      return NULL;
->  }
-> =20
-> -int multifd_load_setup(void)
-> +int multifd_load_setup(Error **errp)
->  {
->      int thread_count;
->      uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
-);
-> diff --git a/migration/ram.h b/migration/ram.h
-> index da22a417ea..42be471d52 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -43,7 +43,7 @@ uint64_t ram_bytes_total(void);
-> =20
->  int multifd_save_setup(Error **errp);
->  void multifd_save_cleanup(void);
-> -int multifd_load_setup(void);
-> +int multifd_load_setup(Error **errp);
->  int multifd_load_cleanup(Error **errp);
->  bool multifd_recv_all_channels_created(void);
->  bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp);
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index e241dcb992..2379b8345b 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -4004,7 +4004,7 @@ static void rdma_accept_incoming_migration(void *op=
-aque)
->      }
-> =20
->      rdma->migration_started_on_destination =3D 1;
-> -    migration_fd_process_incoming(f);
-> +    migration_fd_process_incoming(f, errp);
->  }
-> =20
->  void rdma_start_incoming_migration(const char *host_port, Error **errp)
-> --=20
-> 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The kernel uses it (pcpu_running()) to decide whether
+- To send an emergency call or an external call (external calls are
+  faster when the CPU is already running - e.g., SIE HW assist)
+- In arch_vcpu_is_preempted(), for an heuristic
+
+So nothing actually breaks (as I explained, only used for performance
+optimizations)
+
+-- 
+Thanks,
+
+David / dhildenb
 
 
