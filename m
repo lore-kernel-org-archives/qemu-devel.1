@@ -2,81 +2,80 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E248C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC8AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:44:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDA5620718
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 173862070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 12:44:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XzAT4W2I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDA5620718
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuU7+dny"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173862070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuyBv-0007Pu-28
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 07:36:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48044)
+	id 1iuyJp-0001dP-97
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 07:44:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iuyBL-0006tf-Jw
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:35:28 -0500
+ (envelope-from <quintela@redhat.com>) id 1iuyJE-0001B5-OR
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:43:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iuyBK-00028P-Eu
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:35:27 -0500
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:33355)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iuyBK-00027I-8j
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:35:26 -0500
-Received: by mail-ot1-x329.google.com with SMTP id b18so1466384otp.0
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 04:35:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oNAtJLnuhmMFXycXLNnPn7OxpMKxfxO07z4pOrrGKGA=;
- b=XzAT4W2IoM1bMkR3LSgVDVTu9eb2Z1tCXkew/RPz8RjGmPAwyUMHzTWZUf1ayNPKWf
- i5x2VzzAH8H7z+PmHw8klh2q2wfH1cGP7/uOUUuZkcUAtVwLYOP/9HgBuW9MnhVp9BUZ
- SJ52sGpyguZMmdqpuSbUp+O6jzzSGbqSlJuQUcF2+EBo2LSc7EigBeBtEC+Ogto1lQ1M
- BTj8cjkQwkDpGuKzWczcx/fub8o5KWUyxnal2/dawkPZH4E1hGWuwn1ChAKmBr+4IcYc
- 4cpZXVRwGmGQUrhxX/RvXldvNp6jZ2TaX036rPjhGfF5cfbJn5CVsjFTp3nhYCYuYY8S
- fB1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oNAtJLnuhmMFXycXLNnPn7OxpMKxfxO07z4pOrrGKGA=;
- b=OgdIQnW7+4UWOymuuFv2foxwTTZTteGSF3xb2MCZWlFd3CKFyzCw5+m5EkwzHusXeo
- WAIgQaq6e6yjCqtg7vR0VujUDzx4hlJc/K3WaAsdedjgXMA7aUV82u1SwX9MGgrzDNk/
- K+Zu8KAY54p/8DcXwLlX7PPgOZ6KSNKhEgh+OkcOL+VO5Ndo9EN2rHc9QJfsxFoba9qt
- dvJWBCEwqAtPZMCxFBbGGKSqVN7j/DPYBfjd9zDM0JXocs7xHwLm41ZuznBtt+0PqB2K
- EBLmK70zUvU7GL4FwfK7EfxtyhXGuqD5mPeK7KWivHV6nhg254K/MciTlF4nSwg6tBIE
- iZDA==
-X-Gm-Message-State: APjAAAXZsJVkYcPf/voVmKDJ42jHVSJSp53s0lVGiwJg6xfcbbcyC/SE
- iSCVhJJtt+o8/uvZ9myZW6a4YV2NwpPrEavHL59cVQ==
-X-Google-Smtp-Source: APXvYqzk++7qX0uy7J/QkZb1zfqlYyTqpnw5HE4NQLZFa69aWTTeyndiSzgpfxD2wXnYxfLm0R+HS6M9YHIvoRY2JSo=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr2490043otd.91.1579869325298; 
- Fri, 24 Jan 2020 04:35:25 -0800 (PST)
+ (envelope-from <quintela@redhat.com>) id 1iuyJC-0006KC-Hh
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:43:35 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26022
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iuyJC-0006Iq-8Y
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 07:43:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579869813;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+/kTGMTNptPaYkqkmSyRcDcTUY2yrWXo5yWx5CKGzUY=;
+ b=EuU7+dnyCx1eKnUgoje/qQK6Y78v2KN5Q4hMK5PlTiBzfQ+0HWCqW7p15OndQyTJLolasu
+ 58889jRtubjEKCfvYJG/bfPu9LTqeyE2K/9c/R1X+7622Fy5hkoLjsrWF8LIcFfn9+p8KN
+ yZfKpYSx+OlqyZQiwZAtIy5GgArMg8M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-6Vwjh7lGMg-7MdUEdIZmgQ-1; Fri, 24 Jan 2020 07:43:29 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBDAD1005510;
+ Fri, 24 Jan 2020 12:43:27 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A45D867E2;
+ Fri, 24 Jan 2020 12:43:26 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Subject: Re: [PATCH 0/3] migration: add sztd compression
+In-Reply-To: <20190226131535.30361-1-dplotnikov@virtuozzo.com> (Denis
+ Plotnikov's message of "Tue, 26 Feb 2019 16:15:32 +0300")
+References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Fri, 24 Jan 2020 13:43:23 +0100
+Message-ID: <87o8ut3tzo.fsf@secure.laptop>
 MIME-Version: 1.0
-References: <20200121225703.148465-1-palmerdabbelt@google.com>
- <CAFEAcA9YoAjASu4F1hZRjbq5S+h8GtBUVb9dgecMdaWb9YENEw@mail.gmail.com>
- <mhng-ea4d4047-6dfa-4be0-8ce7-424b1d17560a@palmerdabbelt-glaptop1>
-In-Reply-To: <mhng-ea4d4047-6dfa-4be0-8ce7-424b1d17560a@palmerdabbelt-glaptop1>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Jan 2020 12:35:14 +0000
-Message-ID: <CAFEAcA9HnhKE1nS+ubmCD4AgS-EZ_J_XcWapzUvM2pegHs-imw@mail.gmail.com>
-Subject: Re: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 1
-To: Palmer Dabbelt <palmerdabbelt@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 6Vwjh7lGMg-7MdUEdIZmgQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,36 +87,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: quintela@redhat.com
+Cc: den@virtuozzo.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jan 2020 at 18:43, Palmer Dabbelt <palmerdabbelt@google.com> wrote:
-> On Thu, 23 Jan 2020 06:38:07 PST (-0800), Peter Maydell wrote:
-> > Hi. This pull request doesn't seem to be signed with the GPG
-> > key that I have on record for you...
+Denis Plotnikov <dplotnikov@virtuozzo.com> wrote:
+> zstd date compression algorithm shows better performance on data compress=
+ion.
+> It might be useful to employ the algorithm in VM migration to reduce CPU =
+usage.
+> A user will be able to choose between those algorithms, therefor compress=
+-type
+> migration parameter is added.
 >
-> When I moved to Google I got a Yubikey and made new subkeys for it.  If I
-> understand correctly the new subkeys should be signed by my main key, but maybe
-> that didn't make it to your keyring?  I see
+> Here are some results of performance comparison zstd vs gzip:
+
+Please, could you comment on the series:
+
+[PATCH v3 00/21] Multifd Migration Compression
+
+That series integrated zstd/zlib compression on top of multifd,
+advantages over "old" compression code are:
+- We don't have to copy data back and forth
+- The unit of compression is 512KB instead of 4kb
+- We "conserve" the compression state between packets (this is specially
+  interesting for zstd, that uses dictionaries)
+
+> host: i7-4790 8xCPU @ 3.60GHz, 16G RAM
+> migration to the same host
+> VM: 2xVCPU, 8G RAM total
+> 5G RAM used, memory populated with postgreqsl data
+> produced by pgbench performance benchmark
 >
->     $ gpg --list-keys palmer@dabbelt.com
->     pub   rsa4096 2017-06-06 [SC] [expires: 2027-11-13]
->           00CE76D1834960DFCE886DF8EF4CA1502CCBAB41
->     uid           [ultimate] Palmer Dabbelt <palmer@dabbelt.com>
->     uid           [ultimate] Palmer Dabbelt <palmerdabbelt@google.com>
->     sub   rsa4096 2017-06-06 [E]
->     sub   rsa4096 2019-11-26 [S] [expires: 2024-11-24]
->     sub   rsa4096 2019-11-26 [A] [expires: 2024-11-24]
->     sub   rsa4096 2019-11-26 [E] [expires: 2024-11-24]
+>
+> Threads: 1 compress =E2=80=93 1 decompress
+>
+> zstd provides slightly less compression ratio with almost the same
+> CPU usage but copes with RAM  compression roghly 2 times faster
+>
+> compression type              zlib       |      zstd
+> ---------------------------------------------------------
+> compression level          1       5     |   1       5
+> compression ratio          6.92    7.05  |   6.69    6.89
+> cpu idle, %                82      83    |   86      80
+> time, sec                  49      71    |   26      31
+> time diff to zlib, sec                      -25     -41
+>
+>
+> Threads: 8 compress =E2=80=93 2 decompress
+>
+> zstd provides the same migration time with less cpu consumption
+>
+> compression type         none  |        gzip(zlib)    |          zstd
+> -------------------------------------------------------------------------=
+-----
+> compression level        -     |  1      5       9    |   1       5      =
+ 15
+> compression ratio        -     |  6.94   6.99    7.14 |   6.64    6.89   =
+ 6.93
+> time, sec                154   |  22     23      27   |   23      23     =
+ 25
+> cpu idle, %              99    |  45     30      12   |   70      52     =
+ 23
+> cpu idle diff to zlib          |                      |  -25%    -22%    =
+-11%
 
-Yeah, I have those. I think I must have fumbled something
-when I retried the pullreq after doing a refresh of your
-gpg key, because I just did a retry now and it's fine.
-(I'm just running the pull through my tests now.)
+I don't have handy results, but it looked for me like you:
+- zstd has a way better latency than zlib (i.e. the packet cames sooner)
+- And it compress much better
 
-thanks
--- PMM
+On the migration test (best possible case for a compressor, as we are
+writting just one byte of each page, and we write the same value in all
+pages):
+
+- zlib: compress 512KB -> 2500 bytes
+- zstd: compess 512KB -> 52 bytes (yeap, I tested several times, it
+  looked too small)
+
+See that I posted another patch to "delete" the old compression code.
+Why?
+- I have been unable to modify migration-test to test it and work
+  reliablely (only way was to allow a really huge downtime)
+- Even with slow networking (1Gigabit) I got really mixed results,
+  because as it is so slow, the guest continue dirtying memory, and in
+  my tests it was never a winner
+
+Thanks, Juan.
+
 
