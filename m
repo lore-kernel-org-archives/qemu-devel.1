@@ -2,136 +2,85 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B53C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D1B3C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6321E20718
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:51:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 582FA20718
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZHEw1H7q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6321E20718
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWn11BEY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 582FA20718
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuzMz-0001kw-Ks
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:51:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37954)
+	id 1iuzOR-0002ju-J9
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:53:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iuzM0-0000tA-MR
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:50:33 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iuzNs-0002Gh-Pw
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iuzLz-0001sD-FN
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:50:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30237
+ (envelope-from <kwolf@redhat.com>) id 1iuzNr-0003L6-Pu
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:52:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33902
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iuzLz-0001rj-Aq
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:50:31 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iuzNr-0003K2-Ml
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:52:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579873830;
+ s=mimecast20190719; t=1579873946;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=lfCBW0YF6ez/zngcfYfcXHcVVe0LNJEMZZU+VYdsqFY=;
- b=ZHEw1H7qPo/6I8pGUsHe7mI8wCXTX6TXBaPlNIA5eYwWO02V2qIP8LbjXD3/ZjUlhHnJQP
- BnXdu8lV9MSqSx5BhkpCNT44USbw3JEYCOPOthhlW33B7yLCcTubGRs492mvB7/AeLzkVR
- 3fYmHKNtp3QrbC6T/fqr8yHq2pX3xFE=
+ in-reply-to:in-reply-to:references:references;
+ bh=2MbeD4UnVuga+mofxHFVDXOBd56n8t/+z4vMgB1rBLM=;
+ b=hWn11BEYmMce1qW7vVN1n5zXx1x9oaMxLxSph5bvYTSFFm4raa6cWOgZIvAQxpmda0PqkT
+ wVEdJJp/LPmXzOPhirXYn2k/ngRV8UMtK/mJB2XuROzAi96mJLf18Whcz1Cd35odd11svX
+ J7InlMDgiazKlI/wOfU4rovTE2mZwak=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-gdvV86iANgGx8U6fOWJgmQ-1; Fri, 24 Jan 2020 08:50:28 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-303-pWw8BV48Mq6zMeyVhbtpxA-1; Fri, 24 Jan 2020 08:52:25 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 969BA100550E;
- Fri, 24 Jan 2020 13:50:27 +0000 (UTC)
-Received: from [10.40.204.119] (ovpn-204-119.brq.redhat.com [10.40.204.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 92DE2867E4;
- Fri, 24 Jan 2020 13:50:23 +0000 (UTC)
-Subject: Re: [RFC 0/2] virtio-rng: add a control queue
-To: Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
-References: <20200123151700.1367857-1-lvivier@redhat.com>
- <4aea60db5e20d3d8948046c6ffbde27edf64e194.camel@kernel.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <55122f87-8967-88d4-c13c-411fa05a6185@redhat.com>
-Date: Fri, 24 Jan 2020 14:50:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71CC4477;
+ Fri, 24 Jan 2020 13:52:23 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C9515E240;
+ Fri, 24 Jan 2020 13:52:14 +0000 (UTC)
+Date: Fri, 24 Jan 2020 14:52:13 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH] iscsi: Cap block count from GET LBA STATUS (CVE-2020-1711)
+Message-ID: <20200124135212.GF4732@dhcp-200-226.str.redhat.com>
+References: <B07CB62A-7860-4385-A6A4-4ECA211DBE42@nutanix.com>
+ <9F93582E-139B-45B2-8630-FDD331F09DEF@kamp.de>
+ <c00fc076-3a46-7a52-a539-66751fb2943a@redhat.com>
+ <6C861A00-A30A-4CED-85F7-412A13760C4B@nutanix.com>
+ <20200124133919.GD4732@dhcp-200-226.str.redhat.com>
+ <d6a7238c-1da2-6447-5eb6-8e0b729f239c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4aea60db5e20d3d8948046c6ffbde27edf64e194.camel@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: gdvV86iANgGx8U6fOWJgmQ-1
+In-Reply-To: <d6a7238c-1da2-6447-5eb6-8e0b729f239c@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: pWw8BV48Mq6zMeyVhbtpxA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,58 +92,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Turschmid <peter.turschm@nutanix.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Peter Lieven <pl@kamp.de>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Felipe Franciosi <felipe@nutanix.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/01/2020 13:43, Amit Shah wrote:
-> On Thu, 2020-01-23 at 16:16 +0100, Laurent Vivier wrote:
->> The kernel needs sometime to be able to cancel an ongoing command.
->>
->> For instance, if the virtio-rng device uses the egd backend
->> and this backend doesn't provide data, the buffer provided by the
->> kernel is kept as long as it is needed.
->>
->> On the kernel side, a read blocks until the buffer returns from QEMU.
->>
->> As the read is done with a mutex held, all the hw_random interface
->> hangs and we cannot switch to another hw_random backend.
->>
->> So this series adds a control queue to the virtio-rng device to allow
->> to flush the virtio-rng input queue to release the kernel mutex and
->> to allow to switch to another device.
->>
->> The kernel side series can be found at:
->>
->> https://github.com/vivier/linux/commits/virtio-rng-ctrl
-> 
-> Did you submit the kernel series too?  Can you please CC me to it?
+Am 24.01.2020 um 14:42 hat Philippe Mathieu-Daud=E9 geschrieben:
+> On 1/24/20 2:39 PM, Kevin Wolf wrote:
+> > Am 24.01.2020 um 11:48 hat Felipe Franciosi geschrieben:
+> > > On Jan 24, 2020, at 10:04 AM, Philippe Mathieu-Daud=E9 <philmd@redhat=
+.com> wrote:
+> > > > Also shouldn't we report some warning in case of such invalid
+> > > > request? So the management side can look at the 'malicious iSCSI
+> > > > server'?
+> > >=20
+> > > I think having the option to do so is a good idea. There are two case=
+s
+> > > I can think of that you run into a "malicious" storage server:
+> > > 1) Someone hacked your storage server
+> > > 2) Your control plane allows your compute to connect to a user
+> > > provided storage service
+> > >=20
+> > > Thinking as an admin, if I only allow storage servers I provide, then
+> > > I want to see such warnings. If I let people point the VMM to dodgy
+> > > servers, then I probably don't want the log spam.
+> >=20
+> > For this reason, we generally don't log things for failed I/O requests.
+> > If we wanted to introduce it, we'd better find a way to do so
+> > consistently everywhere and not just in a single place with a one-off
+> > option.
+>=20
+> I'm just suggesting to use error_report().
 
-No, I didn't. I'd like to have some comments on the QEMU side first.
-QEMU list is generally more responsive than kernel one.
+If you do this unconditionally with an untrusted server, you allow it to
+DoS you by filling up your disk with error logs.
 
-It's why I put the link to my linux branch here.
-
-> This will need spec changes as well, can you please point me to them
-> too?
-
-The same here. I didn't update the specs, I'd like to have some comments
-before.
-
-BTW, where can I find the specs to update?
-Is this https://github.com/oasis-tcs/virtio-spec ?
-
-> I also recall a previous discussion about this, but my search-fu is
-> failing to find it...
-
-See
-
-[RFC] virtio-rng: add a watchdog
-https://patchwork.kernel.org/patch/10987983/
-
-Thanks,
-Laurent
+Kevin
 
 
