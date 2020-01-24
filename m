@@ -2,93 +2,81 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57DCEC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 277C8C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:50:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AD0E2072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:49:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD0E2072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E681C2072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:50:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bFgGz1R3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E681C2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuzL4-0007zz-Dn
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:49:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37708)
+	id 1iuzLs-0000X3-5u
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:50:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37847)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iuzK9-0007X5-T0
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:48:38 -0500
+ (envelope-from <rjones@redhat.com>) id 1iuzL4-00089D-Kv
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:49:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iuzK8-0008Ng-J6
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:48:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60836)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iuzK8-0008Mr-Bx
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:48:36 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00ODmTKF088028
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:48:35 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xqmjtey12-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:48:33 -0500
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Fri, 24 Jan 2020 13:48:26 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 24 Jan 2020 13:48:23 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00ODmMBo39321708
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jan 2020 13:48:22 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 535EDA4054;
- Fri, 24 Jan 2020 13:48:22 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8AB31A405C;
- Fri, 24 Jan 2020 13:48:20 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.180.45])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 24 Jan 2020 13:48:20 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] s390x: sigp: Fix sense running reporting
-Date: Fri, 24 Jan 2020 08:48:18 -0500
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <rjones@redhat.com>) id 1iuzL3-0000w9-GJ
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:49:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35259
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rjones@redhat.com>) id 1iuzL3-0000u9-DT
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:49:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579873770;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1ODA48R1gifpbXlQl8XkbKUbGO9iAnQJeMDNRIiQNQc=;
+ b=bFgGz1R3JuwokvLbEpCQXap94YGt2duZnf0GnEYa9euFkHo2iRJQnxXvxpQGDxfxktMmAe
+ ppfolMuH4twrp4c6pXA9MpDotfhbBgfXbL6Iv0dT1tLOiWWHWTNUVZbOyxVbl7p3xbnJv7
+ b4UTlXB6MVi/jW72NgUvS/ksPMKD830=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-vurI-zbZPc2Pq_xxlwIGpg-1; Fri, 24 Jan 2020 08:49:24 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1422E8010CA;
+ Fri, 24 Jan 2020 13:49:23 +0000 (UTC)
+Received: from localhost (ovpn-117-237.ams2.redhat.com [10.36.117.237])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A9EB684D90;
+ Fri, 24 Jan 2020 13:49:22 +0000 (UTC)
+Date: Fri, 24 Jan 2020 13:49:21 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: qemu-img convert vs writing another copy tool
+Message-ID: <20200124134921.GO16477@redhat.com>
+References: <20200123183500.GA27166@redhat.com>
+ <bbcbb67f-74ad-b491-e988-09a380ac8068@redhat.com>
+ <20200124095555.GR3888@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20012413-4275-0000-0000-0000039A8CFE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012413-4276-0000-0000-000038AE9D87
-Message-Id: <20200124134818.9981-1-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-01-24_04:2020-01-24,
- 2020-01-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=0
- phishscore=0 adultscore=0 spamscore=0 mlxlogscore=999 suspectscore=1
- mlxscore=0 impostorscore=0 lowpriorityscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001240115
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20200124095555.GR3888@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: vurI-zbZPc2Pq_xxlwIGpg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,44 +88,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com,
- qemu-s390x@nongnu.org, david@redhat.com
+Cc: berrange@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ ptoscano@redhat.com, marnold@redhat.com, mkletzan@redhat.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The logic was inverted and reported running if the cpu was stopped.
-Let's fix that.
+On Fri, Jan 24, 2020 at 09:55:55AM +0000, Richard W.M. Jones wrote:
+> On Thu, Jan 23, 2020 at 01:21:28PM -0600, Eric Blake wrote:
+> > Could we also teach this to parse 'qemu-img map --output=3Djson'
+> > format? And/or add 'qemu-img map --output=3DXYZ' (different from the
+> > current --output=3Dhuman') that gives sufficient information?  (Note:
+> > --output=3Dhuman is NOT suitable for extent lists - it intentionally
+> > outputs only the data portions, and in so doing coalesces 'hole' and
+> > 'hole,zero' segments to be indistinguishable).
+>=20
+> If qemu-img doesn't have the data (we have to get it from
+> another source), is the output of qemu-img map relevant?
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Fixes: d1b468bc8869 ("s390x/tcg: implement SIGP SENSE RUNNING STATUS")
-Reviewed-by: David Hildenbrand <david@redhat.com>
----
+I can see that we might use this to transfer a map from one qemu
+source to another, which could be useful.  Unfortunately nbdkit
+doesn't link to any libraries that can read JSON at the moment :-(
+But certainly something to keep in mind for the future.
 
-Switched the actions instead of the condition so the comment still
-applies.
+Rich.
 
----
- target/s390x/sigp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index 727875bb4a..c604f17710 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -348,9 +348,9 @@ static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
- 
-     /* If halted (which includes also STOPPED), it is not running */
-     if (CPU(dst_cpu)->halted) {
--        si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
--    } else {
-         set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
-+    } else {
-+        si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
-     }
- }
- 
--- 
-2.20.1
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjon=
+es
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
 
 
