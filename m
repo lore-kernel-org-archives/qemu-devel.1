@@ -6,49 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CA6C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 18:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F02C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 18:11:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B8432071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 18:09:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8432071A
+	by mail.kernel.org (Postfix) with ESMTPS id 1073B2077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 18:11:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1073B2077C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv3OL-0002Uf-Cx
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 13:09:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35282)
+	id 1iv3Q3-0005bG-6y
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 13:10:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv3NB-0000u9-N5
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:08:02 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv3NC-0000uG-7e
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv3N9-0004v3-PU
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:08:01 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46487 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iv3NA-0004wj-Vb
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:08:02 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:46502 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iv3N9-0004rP-JP
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:07:59 -0500
+ id 1iv3NA-0004vB-P4
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 13:08:00 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 9F2A01A20EF;
+ by mail.rt-rk.com (Postfix) with ESMTP id CB6271A1E2C;
  Fri, 24 Jan 2020 19:07:55 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 8590E1A20F0;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id A60FF1A20F0;
  Fri, 24 Jan 2020 19:07:55 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 2/7] disas: Add a field for target-dependant data
-Date: Fri, 24 Jan 2020 19:07:44 +0100
-Message-Id: <1579889269-8122-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PULL v2 5/7] mips/mips_malta: use memdev for RAM
+Date: Fri, 24 Jan 2020 19:07:47 +0100
+Message-Id: <1579889269-8122-6-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1579889269-8122-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1579889269-8122-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,34 +70,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-This patch adds a field "target_info" to the structure
-disassemble_info. The purpose of this field is to enable targets
-to pass to disassembler code any additional data thet deem suitable.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1579883929-1517-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <1579779525-20065-55-git-send-email-imammedo@redhat.com>
 ---
- include/disas/dis-asm.h | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/mips/mips_malta.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index e9c7dd8..f87f468 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -372,6 +372,9 @@ typedef struct disassemble_info {
-   /* Command line options specific to the target disassembler.  */
-   char * disassembler_options;
- 
-+  /* Field intended to be used by targets in any way they deem suitable.  */
-+  int64_t target_info;
-+
-   /* Options for Capstone disassembly.  */
-   int cap_arch;
-   int cap_mode;
--- 
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 5aaeaa8..77995a5 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1223,7 +1223,6 @@ void mips_malta_init(MachineState *machine)
+     char *filename;
+     PFlashCFI01 *fl;
+     MemoryRegion *system_memory =3D get_system_memory();
+-    MemoryRegion *ram_high =3D g_new(MemoryRegion, 1);
+     MemoryRegion *ram_low_preio =3D g_new(MemoryRegion, 1);
+     MemoryRegion *ram_low_postio;
+     MemoryRegion *bios, *bios_copy =3D g_new(MemoryRegion, 1);
+@@ -1261,13 +1260,11 @@ void mips_malta_init(MachineState *machine)
+     }
+=20
+     /* register RAM at high address where it is undisturbed by IO */
+-    memory_region_allocate_system_memory(ram_high, NULL, "mips_malta.ram=
+",
+-                                         ram_size);
+-    memory_region_add_subregion(system_memory, 0x80000000, ram_high);
++    memory_region_add_subregion(system_memory, 0x80000000, machine->ram)=
+;
+=20
+     /* alias for pre IO hole access */
+     memory_region_init_alias(ram_low_preio, NULL, "mips_malta_low_preio.=
+ram",
+-                             ram_high, 0, MIN(ram_size, 256 * MiB));
++                             machine->ram, 0, MIN(ram_size, 256 * MiB));
+     memory_region_add_subregion(system_memory, 0, ram_low_preio);
+=20
+     /* alias for post IO hole access, if there is enough RAM */
+@@ -1275,7 +1272,7 @@ void mips_malta_init(MachineState *machine)
+         ram_low_postio =3D g_new(MemoryRegion, 1);
+         memory_region_init_alias(ram_low_postio, NULL,
+                                  "mips_malta_low_postio.ram",
+-                                 ram_high, 512 * MiB,
++                                 machine->ram, 512 * MiB,
+                                  ram_size - 512 * MiB);
+         memory_region_add_subregion(system_memory, 512 * MiB,
+                                     ram_low_postio);
+@@ -1447,6 +1444,7 @@ static void mips_malta_machine_init(MachineClass *m=
+c)
+ #else
+     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
+ #endif
++    mc->default_ram_id =3D "mips_malta.ram";
+ }
+=20
+ DEFINE_MACHINE("malta", mips_malta_machine_init)
+--=20
 2.7.4
 
 
