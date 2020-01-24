@@ -2,82 +2,93 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B82C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57DCEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D680F2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:47:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uw9U4ISS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D680F2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2AD0E2072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:49:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD0E2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuzJL-0006zx-2y
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:47:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37493)
+	id 1iuzL4-0007zz-Dn
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:49:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iuzII-00061g-46
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:46:43 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iuzK9-0007X5-T0
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:48:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iuzIH-0005Si-3P
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:46:42 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56838
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuzIH-0005SK-0D
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:46:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579873600;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Hm3o479UYkAMANigifiw3evQYlEHzMDnxJwVp76ifTE=;
- b=Uw9U4ISSqRhqC3QmhEXcKADlBvLi2S7ph8qxasxAFuAqZumpfzdeo20HEpsf54EnBX6cgh
- b7Y4vX+zvi2PYiwgYDbZegD7fkhvxWvJk+PAwVG+EX7ysbNh1pX6I36KIVyJcNjw8cRGd+
- jdyRtOLg4GE/FF4iyT4tqCNaCOCRJzA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-bCfadPDsMxGrkW11kkT3_w-1; Fri, 24 Jan 2020 08:46:36 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3399800D4C
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 13:46:35 +0000 (UTC)
-Received: from work-vm (ovpn-117-253.ams2.redhat.com [10.36.117.253])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CF3386457;
- Fri, 24 Jan 2020 13:46:33 +0000 (UTC)
-Date: Fri, 24 Jan 2020 13:46:31 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v3 18/21] migration: Make no compression operations into
- its own structure
-Message-ID: <20200124134631.GT2970@work-vm>
-References: <20200123115831.36842-1-quintela@redhat.com>
- <20200123115831.36842-19-quintela@redhat.com>
- <20200124124729.GO2970@work-vm> <87eevp3rev.fsf@secure.laptop>
+ (envelope-from <frankja@linux.ibm.com>) id 1iuzK8-0008Ng-J6
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:48:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60836)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iuzK8-0008Mr-Bx
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:48:36 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00ODmTKF088028
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:48:35 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xqmjtey12-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:48:33 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 24 Jan 2020 13:48:26 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 24 Jan 2020 13:48:23 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00ODmMBo39321708
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 24 Jan 2020 13:48:22 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 535EDA4054;
+ Fri, 24 Jan 2020 13:48:22 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8AB31A405C;
+ Fri, 24 Jan 2020 13:48:20 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.180.45])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 24 Jan 2020 13:48:20 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] s390x: sigp: Fix sense running reporting
+Date: Fri, 24 Jan 2020 08:48:18 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <87eevp3rev.fsf@secure.laptop>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: bCfadPDsMxGrkW11kkT3_w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20012413-4275-0000-0000-0000039A8CFE
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012413-4276-0000-0000-000038AE9D87
+Message-Id: <20200124134818.9981-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-24_04:2020-01-24,
+ 2020-01-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0
+ phishscore=0 adultscore=0 spamscore=0 mlxlogscore=999 suspectscore=1
+ mlxscore=0 impostorscore=0 lowpriorityscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001240115
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,65 +100,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com,
+ qemu-s390x@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> It will be used later.
-> >>=20
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >>=20
->=20
-> >> +int migrate_multifd_method(void)
-> >> +{
-> >> +    MigrationState *s;
-> >> +
-> >> +    s =3D migrate_get_current();
-> >> +
-> >> +    return s->parameters.multifd_compress;
-> >> +}
-> >
-> > Shouldn't that be a MultifdCompress enum returned?
->=20
-> You are right here.
-> >> =20
-> >>  #define MULTIFD_FLAG_SYNC (1 << 0)
-> >> +#define MULTIFD_FLAG_NOCOMP (1 << 1)
-> >
-> > I don't think this should be a set of individual flags; in later patche=
-s
-> > you define a flag for zlib and another for zstd etc etc - but you can't
-> > combine them - you could never have FLAG_NOCOMP|FLAG_ZSTD|FLAG_ZLIB - s=
-o
-> > this should be a 3 or 4 bit field which contains a compression id (0
-> > being none).  The ID can't exactly be the migrate_multifd_method() enum
-> > value - because I don't think that's defined to be stable (?).
->=20
-> The idea is to catch up if we got an incorrect packet with an incorrect
-> flag.
->=20
-> But yes, I agree that it could be the same expecting a value here.
-> The problem is that I already have the flags field.
->=20
-> Would it be ok for you if I reserve 3 bits for this?  (right now 2
-> should be enough).
+The logic was inverted and reported running if the cpu was stopped.
+Let's fix that.
 
-Yeh that's fine - I was going to suggest 4 bits, but 3 is OK;
-just define something like:
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Fixes: d1b468bc8869 ("s390x/tcg: implement SIGP SENSE RUNNING STATUS")
+Reviewed-by: David Hildenbrand <david@redhat.com>
+---
 
-  MULTIFD_FLAG_COMP_MASK (7 << 1)
+Switched the actions instead of the condition so the comment still
+applies.
 
-Dave
+---
+ target/s390x/sigp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Thanks, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index 727875bb4a..c604f17710 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -348,9 +348,9 @@ static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
+ 
+     /* If halted (which includes also STOPPED), it is not running */
+     if (CPU(dst_cpu)->halted) {
+-        si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+-    } else {
+         set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
++    } else {
++        si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+     }
+ }
+ 
+-- 
+2.20.1
 
 
