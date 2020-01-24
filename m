@@ -2,141 +2,82 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 403EFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F87DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:04:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 121312072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:02:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121312072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF6322087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:04:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XcB4hEPa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF6322087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuybV-0006QP-AI
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:02:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57726)
+	id 1iuyd9-0007Nf-2f
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:04:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58118)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iuyaX-0005al-0r
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:01:34 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuyc0-0006sG-1E
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:03:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iuyaS-0000Ip-5h
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:01:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55542)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iuyaR-0000Hx-T5
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:01:24 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00OCw7qC089427
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:01:23 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xqmjt6jej-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 08:01:22 -0500
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Fri, 24 Jan 2020 13:01:20 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 24 Jan 2020 13:01:18 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00OD1HYE45744234
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jan 2020 13:01:17 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7789FAE05F;
- Fri, 24 Jan 2020 13:01:17 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 244A7AE056;
- Fri, 24 Jan 2020 13:01:17 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.180.45])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 24 Jan 2020 13:01:17 +0000 (GMT)
-Subject: Re: [PATCH] s390x: sigp: Fix sense running reporting
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200124100137.28656-1-frankja@linux.ibm.com>
- <20200124110547.50c73851.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Fri, 24 Jan 2020 14:01:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <dgilbert@redhat.com>) id 1iuybu-0001ZI-Es
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:02:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36549
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuybu-0001Vw-AE
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:02:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579870971;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=28oYsWnjVO1HsVjLkmuTXWQEQ3yNsQC7rUp6R51O0uk=;
+ b=XcB4hEPaAMcyb0/+AThT1u9S7tP6oj6/naJLrFyN1k+tbZibjmUikLLyf2fMy1fB19zP84
+ qMz8A9dyPRXnGCR4O7QbfIq3PUHCIqTXIK+OGuiFD3+sOzSkgWfZHbK4TwuB2Deg2dNWMz
+ Rdl29anKbXpfrvqOMimrbfcC9d8jfuw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-zAKmoDxOM5KYwWxhIuIrpA-1; Fri, 24 Jan 2020 08:02:49 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A23D108F9D8
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 13:02:48 +0000 (UTC)
+Received: from work-vm (ovpn-117-253.ams2.redhat.com [10.36.117.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B238B857A0;
+ Fri, 24 Jan 2020 13:02:46 +0000 (UTC)
+Date: Fri, 24 Jan 2020 13:02:44 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v3 08/21] migration: Make multifd_load_setup() get an
+ Error parameter
+Message-ID: <20200124130244.GR2970@work-vm>
+References: <20200123115831.36842-1-quintela@redhat.com>
+ <20200123115831.36842-9-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200124110547.50c73851.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9DKbWzsHPHPlZTFxul7cLE6G8ugMnvlOC"
-X-TM-AS-GCONF: 00
-x-cbid: 20012413-0020-0000-0000-000003A39C8D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012413-0021-0000-0000-000021FB3A0B
-Message-Id: <c8310441-5104-6446-2399-840a127c56fd@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-01-24_03:2020-01-24,
- 2020-01-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0
- impostorscore=0 clxscore=1015 adultscore=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 bulkscore=0 lowpriorityscore=0
- malwarescore=0 mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-2001240107
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20200123115831.36842-9-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: zAKmoDxOM5KYwWxhIuIrpA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,91 +89,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com,
- qemu-devel@nongnu.org, david@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9DKbWzsHPHPlZTFxul7cLE6G8ugMnvlOC
-Content-Type: multipart/mixed; boundary="h8nZeJfqdRK7hmI1UuPVbpx9dqJNmDAfY"
-
---h8nZeJfqdRK7hmI1UuPVbpx9dqJNmDAfY
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 1/24/20 11:05 AM, Cornelia Huck wrote:
-> On Fri, 24 Jan 2020 05:01:37 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+* Juan Quintela (quintela@redhat.com) wrote:
+> We need to change the full chain to pass the Error parameter.
 >=20
->> The logic was inversed and reported running if the cpu was stopped.
->=20
-> s/inversed/inverted/ ?
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Ok
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 >=20
->> Let's fix that.
->>
+> ---
 >=20
-> Fixes: d1b468bc8869 ("s390x/tcg: implement SIGP SENSE RUNNING STATUS")
-
-Added
-
+> Always use a local_err, and in case of error propagate/print it as needed=
+.
+> ---
+>  migration/migration.c | 35 +++++++++++++++++++++++++++++------
+>  migration/migration.h |  2 +-
+>  migration/ram.c       |  2 +-
+>  migration/ram.h       |  2 +-
+>  migration/rdma.c      |  2 +-
+>  5 files changed, 33 insertions(+), 10 deletions(-)
 >=20
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  target/s390x/sigp.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
->> index 727875bb4a..286c0d6c9c 100644
->> --- a/target/s390x/sigp.c
->> +++ b/target/s390x/sigp.c
->> @@ -347,7 +347,7 @@ static void sigp_sense_running(S390CPU *dst_cpu, S=
-igpInfo *si)
->>      }
->> =20
->>      /* If halted (which includes also STOPPED), it is not running */
->> -    if (CPU(dst_cpu)->halted) {
->> +    if (!CPU(dst_cpu)->halted) {
->>          si->cc =3D SIGP_CC_ORDER_CODE_ACCEPTED;
->>      } else {
->>          set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 7140d1e040..ef17b9f3f2 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -518,13 +518,23 @@ fail:
+>      exit(EXIT_FAILURE);
+>  }
+> =20
+> -static void migration_incoming_setup(QEMUFile *f)
+> +/**
+> + * @migration_incoming_setup: Setup incoming migration
+> + *
+> + * Returns 0 for no error or 1 for error
+> + *
+> + * @f: file for main migration channel
+> + * @errp: where to put errors
+> + */
+> +static int migration_incoming_setup(QEMUFile *f, Error **errp)
+>  {
+>      MigrationIncomingState *mis =3D migration_incoming_get_current();
+> +    Error *local_err =3D NULL;
+> =20
+> -    if (multifd_load_setup() !=3D 0) {
+> +    if (multifd_load_setup(&local_err) !=3D 0) {
+>          /* We haven't been able to create multifd threads
+>             nothing better to do */
+> +        error_report_err(local_err);
+>          exit(EXIT_FAILURE);
+>      }
+> =20
+> @@ -532,6 +542,7 @@ static void migration_incoming_setup(QEMUFile *f)
+>          mis->from_src_file =3D f;
+>      }
+>      qemu_file_set_blocking(f, false);
+> +    return 0;
+>  }
+> =20
+>  void migration_incoming_process(void)
+> @@ -572,19 +583,27 @@ static bool postcopy_try_recover(QEMUFile *f)
+>      return false;
+>  }
+> =20
+> -void migration_fd_process_incoming(QEMUFile *f)
+> +void migration_fd_process_incoming(QEMUFile *f, Error **errp)
+>  {
+> +    Error *local_err =3D NULL;
+> +
+>      if (postcopy_try_recover(f)) {
+>          return;
+>      }
+> =20
+> -    migration_incoming_setup(f);
+> +    if (migration_incoming_setup(f, &local_err)) {
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +        }
+> +        return;
+> +    }
+>      migration_incoming_process();
+>  }
+> =20
+>  void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp)
+>  {
+>      MigrationIncomingState *mis =3D migration_incoming_get_current();
+> +    Error *local_err =3D NULL;
+>      bool start_migration;
+> =20
+>      if (!mis->from_src_file) {
+> @@ -596,7 +615,12 @@ void migration_ioc_process_incoming(QIOChannel *ioc,=
+ Error **errp)
+>              return;
+>          }
+> =20
+> -        migration_incoming_setup(f);
+> +        if (migration_incoming_setup(f, &local_err)) {
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +            }
+> +            return;
+> +        }
+> =20
+>          /*
+>           * Common migration only needs one channel, so we can start
+> @@ -604,7 +628,6 @@ void migration_ioc_process_incoming(QIOChannel *ioc, =
+Error **errp)
+>           */
+>          start_migration =3D !migrate_use_multifd();
+>      } else {
+> -        Error *local_err =3D NULL;
+>          /* Multiple connections */
+>          assert(migrate_use_multifd());
+>          start_migration =3D multifd_recv_new_channel(ioc, &local_err);
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 44b1d56929..8473ddfc88 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -265,7 +265,7 @@ struct MigrationState
+> =20
+>  void migrate_set_state(int *state, int old_state, int new_state);
+> =20
+> -void migration_fd_process_incoming(QEMUFile *f);
+> +void migration_fd_process_incoming(QEMUFile *f, Error **errp);
+>  void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp);
+>  void migration_incoming_process(void);
+> =20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index d537264ba5..125c6d0f60 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1463,7 +1463,7 @@ static void *multifd_recv_thread(void *opaque)
+>      return NULL;
+>  }
+> =20
+> -int multifd_load_setup(void)
+> +int multifd_load_setup(Error **errp)
+>  {
+>      int thread_count;
+>      uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
+);
+> diff --git a/migration/ram.h b/migration/ram.h
+> index da22a417ea..42be471d52 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -43,7 +43,7 @@ uint64_t ram_bytes_total(void);
+> =20
+>  int multifd_save_setup(Error **errp);
+>  void multifd_save_cleanup(void);
+> -int multifd_load_setup(void);
+> +int multifd_load_setup(Error **errp);
+>  int multifd_load_cleanup(Error **errp);
+>  bool multifd_recv_all_channels_created(void);
+>  bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp);
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index e241dcb992..2379b8345b 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -4004,7 +4004,7 @@ static void rdma_accept_incoming_migration(void *op=
+aque)
+>      }
+> =20
+>      rdma->migration_started_on_destination =3D 1;
+> -    migration_fd_process_incoming(f);
+> +    migration_fd_process_incoming(f, errp);
+>  }
+> =20
+>  void rdma_start_incoming_migration(const char *host_port, Error **errp)
+> --=20
+> 2.24.1
 >=20
-> I'm wondering why nobody noticed this before...
-
-No idea.
-How many people use smp with tcg?
-
-
-
---h8nZeJfqdRK7hmI1UuPVbpx9dqJNmDAfY--
-
---9DKbWzsHPHPlZTFxul7cLE6G8ugMnvlOC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4q6pwACgkQ41TmuOI4
-ufjY7RAAucLBjuuHuvIvNZlSzul6EZ9zKMb4U7vhOqFv5zmTSAYFmcumfdcw7j74
-ZjBLEQ0YvvWdrdYpeZ+O68R4G7FgTeGBAi1fWLWphpjbcbJXnmH/8zEQADBZG6b2
-bV/wY35VDE1lRgpoc4auc5FNwK0F0Zp+HB6o7g88WP5/1MNjhsnn/ceM8eCeNTwg
-M/SCbaz0oypuHd3dMi/F1C0xFniRibd9nJO/ql/f5LENSUmIFYOKGaqW3cLTh6ZK
-BVCAZzKi1TPlMhUQH6zfHLXkKySBkSUHYFf46ccOgMD7EeQnCNeQznpWotRi2tEj
-JZTjd6LKQYAz+NWiQd2mtSAZn6KV4Mwuz+WflRtBvsCn0jBnVSyiS90vTbu1J+LB
-fPwk+vWenSFqUeu+O25fBgeMZbNt2ZIKI2034Cr9vevxYOpQxp+Corpfar9rUdmr
-QWlOhniaRHLFjeyLdB6X8SwdTlpah2KYp4Io4K0zVDr6JmoqLEnsUzoO9K/8vjVk
-XTcEhEFPU+/7BBEPMXPHNgYIPsDA9NRYFA5NFFlYDHMbPzGPZ4PDATJbRz/bzBxE
-rkjGnavydQwFrcPJHlAohADuetMQZmexhDZR5MYOQKtXeHsFOQCMmXTKCcmO8uGY
-lzt7Ah6sJJ1EM+GPYEK1j0pmL+PN9wzI6Xcqi9+3dpxfY5W5Dvg=
-=JHtX
------END PGP SIGNATURE-----
-
---9DKbWzsHPHPlZTFxul7cLE6G8ugMnvlOC--
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
