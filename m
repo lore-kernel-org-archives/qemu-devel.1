@@ -2,78 +2,77 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9FAC32771
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 14:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D16C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:01:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66CC020704
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 14:52:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC31920704
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 15:01:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=btopenworld.com header.i=@btopenworld.com header.b="pjQI3RNO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CC020704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=btopenworld.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmFLmJSi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC31920704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv0JX-0001j8-KA
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 09:52:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47085)
+	id 1iv0Sw-00048n-T3
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 10:01:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48955)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <graemebrett.houston@btopenworld.com>)
- id 1iv0GK-0008RG-Rt
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 09:48:45 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iv0S8-0003fy-JG
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <graemebrett.houston@btopenworld.com>)
- id 1iv0GJ-00074N-Eu
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 09:48:44 -0500
-Received: from mailomta17-sa.btinternet.com ([213.120.69.23]:14434
- helo=sa-prd-fep-048.btinternet.com)
+ (envelope-from <cohuck@redhat.com>) id 1iv0S6-0003ts-Qe
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:00:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44512)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <graemebrett.houston@btopenworld.com>)
- id 1iv0GI-00072T-Tb
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 09:48:43 -0500
-Received: from sa-prd-rgout-003.btmx-prd.synchronoss.net ([10.2.38.6])
- by sa-prd-fep-048.btinternet.com with ESMTP id
- <20200124144840.BKXM8264.sa-prd-fep-048.btinternet.com@sa-prd-rgout-003.btmx-prd.synchronoss.net>
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 14:48:40 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=btopenworld.com;
- s=btmx201904; t=1579877320; 
- bh=xBZsUAPfjODqUwfi2NB8MMJhwP+8SvR4JdTYTRRd+LQ=;
- h=To:From:Subject:Message-ID:Date:MIME-Version;
- b=pjQI3RNOqTGCj2UD+DrE8cqUOuPizwz6I1i9NIXIss5iQ0+zitMKFPZ6h3AiOroGwIQ84z1BPMbVXc0EDBuZ7qAjSnpb6Xqe8PMf/uDwalrUzEJbUXoK3luT+scmPpRGGS0Vx6uKR5n0b5mNpaR9URo8T7PtrNbZRj5L9UxZBzalsmeo1LPRC9uEe1OfVWj3whDjGQ9ED80EJvvhELj3ijvybFnOcyUY6rlX5a4B7QmNl3rX/VrtWJIzu1PJnZeumrQt/Ji/q5ZhVCpZJhyNvWoWekSUFyUSAHZMnrpT+ZNfzhnLR1DZbjit3ODsTMuFpuV6yeBJAANlwY8Opt8Z0A==
-Authentication-Results: btinternet.com;
- auth=pass (PLAIN) smtp.auth=graemebrett.houston@btopenworld.com
-X-Originating-IP: [86.183.95.28]
-X-OWM-Source-IP: 86.183.95.28 (GB)
-X-OWM-Env-Sender: graemebrett.houston@btinternet.com
-X-VadeSecure-score: verdict=clean score=0/300, class=clean
-X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgedugedrvdeggdeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemuceutffkvffkuffjvffgnffgvefqofdpqfgfvfenuceurghilhhouhhtmecufedttdenucenucfjughrpefvhffukffffgggtgfgsehtjeertddtfeejnecuhfhrohhmpefirhgrvghmvgcuuehrvghtthcujfhouhhsthhonhcuoehgrhgrvghmvggsrhgvthhtrdhhohhushhtohhnsegsthhophgvnhifohhrlhgurdgtohhmqeenucfkphepkeeirddukeefrdelhedrvdeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehhvghloheplgduledvrdduieekrddtrdduvddtngdpihhnvghtpeekiedrudekfedrleehrddvkedpmhgrihhlfhhrohhmpeeoghhrrggvmhgvsghrvghtthdrhhhouhhsthhonhessghtihhnthgvrhhnvghtrdgtohhmqecuuefqffgjpeekuefkvffokffogfdprhgtphhtthhopeeoqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgheq
-X-RazorGate-Vade-Verdict: clean 0
-X-RazorGate-Vade-Classification: clean
-Received: from [192.168.0.120] (86.183.95.28) by
- sa-prd-rgout-003.btmx-prd.synchronoss.net (5.8.337) (authenticated as
- graemebrett.houston@btopenworld.com)
- id 5E1A306602030F4E for qemu-devel@nongnu.org; Fri, 24 Jan 2020 14:48:40 +0000
-To: qemu-devel@nongnu.org
-From: Graeme Brett Houston <graemebrett.houston@btopenworld.com>
-Subject: Documentation and VFIO on SPARC
-Message-ID: <1fe252e9-5c9d-a572-d3ae-76d51ef77026@btopenworld.com>
-Date: Fri, 24 Jan 2020 14:48:40 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iv0S6-0003rg-GZ
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 10:00:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579878053;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2PDhoqu/AMwlDnrtswmgH102Od/khgsUY3zL2uFie7E=;
+ b=QmFLmJSifZJiDRLntXvvfbr5fhgWnWLgYNeqc353hvjMCK8WOi/pVnlaV9UYufYgGi38di
+ kMX93sK8H2kZG7GJfu5gQe2b6dFa48SXqWTruxVCWZgbXpZlSTZxtkE8xU+hGeo8rF3mX3
+ l9hcybbTwUYnJKGwwZeWpWyNKnre72o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-Um4wxgDaNpi4cN_S8D9Ocg-1; Fri, 24 Jan 2020 10:00:47 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7876A0CCA;
+ Fri, 24 Jan 2020 15:00:39 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B0612857AF;
+ Fri, 24 Jan 2020 15:00:35 +0000 (UTC)
+Date: Fri, 24 Jan 2020 16:00:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v2] s390x: sigp: Fix sense running reporting
+Message-ID: <20200124160033.5ac3c9e8.cohuck@redhat.com>
+In-Reply-To: <20200124134818.9981-1-frankja@linux.ibm.com>
+References: <20200124134818.9981-1-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Um4wxgDaNpi4cN_S8D9Ocg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 213.120.69.23
-X-Mailman-Approved-At: Fri, 24 Jan 2020 09:51:25 -0500
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,18 +84,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com,
+ qemu-devel@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-2 Queries:
+On Fri, 24 Jan 2020 08:48:18 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-1st is there any Good Documentation on Writing VGA devices?
+> The logic was inverted and reported running if the cpu was stopped.
+> Let's fix that.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Fixes: d1b468bc8869 ("s390x/tcg: implement SIGP SENSE RUNNING STATUS")
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> ---
+> 
+> Switched the actions instead of the condition so the comment still
+> applies.
+> 
+> ---
+>  target/s390x/sigp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-2nd Can VFIO devices be successfully passed to the sparc engine & 
-hopefully Solaris 9 actually bootup
-
-I am thinking a Actual PCI SPARC Card with OpenFirmware ROM and other 
-dev ices i am interested in getting a PCI trace from.
+Thanks, applied.
 
 
