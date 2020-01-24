@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E773C32771
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88815C35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:45:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2F282071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:45:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4705B2071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 20:45:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PC/jBEjW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2F282071A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="POpqCcLG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4705B2071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv5pG-0007xo-3M
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 15:45:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42737)
+	id 1iv5pH-00081s-GM
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 15:45:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iv5kt-00081R-IG
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iv5ks-0005x0-Cr
+ (envelope-from <alex.bennee@linaro.org>) id 1iv5ks-0007xq-3f
  for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:39 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39811)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1iv5kq-0005rs-6w
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:38 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42360)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iv5ks-0005vQ-67
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:38 -0500
-Received: by mail-wr1-x442.google.com with SMTP id y11so3595327wrt.6
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 12:40:38 -0800 (PST)
+ id 1iv5kp-0005pg-Vl
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 15:40:36 -0500
+Received: by mail-wr1-x444.google.com with SMTP id q6so3562209wro.9
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 12:40:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qWVK9xW79o2SyKcnD6sKK7jgJNF31Jb/exBE+/34Imc=;
- b=PC/jBEjWM8bZydpb2myI59UE57n0+JTfSzMKj2URz3YuqmULhYS4KCRgNBvgybZitq
- C8HQe+dEtK7Jr8ntzduEO1C24tsvmHZkjJT5fVGtSe4YMZNjrrzzHjrYvUvlCbAT17Ob
- 6qY8yKn5IH5E5C5DRPz7dXp+hP/cnyCAUnnOPGdkGe7yQl/MNkzdQdpM4J0buWyGVfoF
- UvUOWpRO7fNiAKViSyPLT7+n/DT0rXEMyrHL2H4CpRdeQkPKXJj07jfgeUnH8tsMJXgQ
- 8rXctbtnk7GpSENuEzApp1VsQNk4w/DcaS6gQdedrxgIgqVjhNsRsTN1h7Yjpj9izRjH
- MILQ==
+ bh=SneCzotSwHMcNyP5CETRFEt/c6BUYP4c0Zs/+5k3iGo=;
+ b=POpqCcLGj0c65hgCMDRshA5ffsfS58Cjo2XwXUn92OzqOWOmTTwS8etcues6aedkXl
+ L0D2oKb7i9iMPV/3PSQgvs6IcZeGhkjTUrJoX2Vb/aRQCI+Xpq/iygGkP5WzPcKHQsyy
+ W0G+pySulP1merIZcOsy6aIOnyZSMw683inZIZFd92KU8zZTV7jVtR917GoOFaUWWsoO
+ RYCihqIN4HQPezGC0271VS+jFaQsd/CxIAl7siiwkg3A6mgP0PZpRpxXYFTud9pTAZD/
+ P11F8PGK/TVScCulAkWrziX09tDhaNb09n+V0ZutY/Th8c/t6NRsB/YgZyIn9EyYIQy7
+ ZvVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qWVK9xW79o2SyKcnD6sKK7jgJNF31Jb/exBE+/34Imc=;
- b=KvnqozcsOurjiw1nH43JxqzNZxorEIkqQjoJiN00c8N+bE0k9Ozcna5tGagjpg5piB
- irt+X3LyxzTWjbMYua6bAcHrO7fQQiFOUA+MAACrK1nszpBGgqwc3mYAdPFm1x2fdNuf
- 1Pec4AniPjjNRJ5CsVdIxbgHfaxTcqRCEFqZ/Ryhscvw+CDjOEKQh3R16iU+U+LguhaL
- 9SbP0VPDFywotU5lG+XPGVRE4dX19Jj0q7g9tiKNzdlzq2y0VOFYANFx3iMqhEkLS3lj
- Kmxn12cjhKuyvMC21Qwr5Z5T1I9iYRBkhkPKTCi2mV5ibM2gxUrM2Zt2pl1yKlpFHxQ/
- JMWw==
-X-Gm-Message-State: APjAAAXJs69HOOFwpEXXZr9nqxAoWANRxo8xhynGhNfuyjZmFg8dYaby
- inX00+7WAs+T/+QUh++f+rAEEA==
-X-Google-Smtp-Source: APXvYqyd6BzxiSI4s1rlRFyvWWV9K+sC157d7f1Ci8rKpc0yTAXIe94oC0hWvZi+Fi76PlrWe3uvnQ==
-X-Received: by 2002:adf:9427:: with SMTP id 36mr6617368wrq.166.1579898437227; 
- Fri, 24 Jan 2020 12:40:37 -0800 (PST)
+ bh=SneCzotSwHMcNyP5CETRFEt/c6BUYP4c0Zs/+5k3iGo=;
+ b=eXLPnzEN/xzsUqqYUt0gBRLwU5EbQDhh6JI6VbIuFgLr7PT47s5P+x8FcgphTQVJ0f
+ S9Qwny8LNDja1J+P1ljIRYUL6RWMzN5TRS5h3KVpb9BBqji7JjzVHRE6b2S+17B/26Sx
+ 8TnD+ruJbEiwU9gJ2FNqNx66Q1X4TFgx1Bl9jp4HsbxDgkRunr8N/uSH+VUssxwK/jkz
+ iXnglsjwamhdQMyiFuMIjBRVacRxXIE49tz1G5ZXRVnV3kVnkqifNdysw4uz4xUzjtpC
+ PICTJgjVcLEy1/8k6elwD9jAgnxyXI3tWDTvyb6P45MAVdO6MNF0Y48W5sQ55N7p5qnj
+ 2WwQ==
+X-Gm-Message-State: APjAAAUf+ZAu1dNSJs4ejaLuGyDs824u/egZmJAs4iAbSwx9+uo27N3/
+ r7+QwNoxxg4CEVtmzjA2bDVIEQ==
+X-Google-Smtp-Source: APXvYqyTDrPr4aOXw4jkiAhiO8kSt3bMiJvrtNtgU0nmJ8LvpNAvbl3U5/GjTgp4pzPfqooY/FFhhA==
+X-Received: by 2002:adf:f581:: with SMTP id f1mr6314692wro.264.1579898434833; 
+ Fri, 24 Jan 2020 12:40:34 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b16sm7926036wmj.39.2020.01.24.12.40.30
+ by smtp.gmail.com with ESMTPSA id o1sm8822069wrn.84.2020.01.24.12.40.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 24 Jan 2020 12:40:33 -0800 (PST)
+ Fri, 24 Jan 2020 12:40:32 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 088B61FF96;
- Fri, 24 Jan 2020 20:40:27 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id E6EFA1FF93;
+ Fri, 24 Jan 2020 20:40:26 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 07/13] tests/docker: move all multiarch containers into
- dockerfiles.multiarch
-Date: Fri, 24 Jan 2020 20:40:20 +0000
-Message-Id: <20200124204026.2107-8-alex.bennee@linaro.org>
+Subject: [PATCH v1 06/13] tests/docker: move all cross-compilers images into
+ dockerfiles.cross
+Date: Fri, 24 Jan 2020 20:40:19 +0000
+Message-Id: <20200124204026.2107-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200124204026.2107-1-alex.bennee@linaro.org>
 References: <20200124204026.2107-1-alex.bennee@linaro.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,83 +99,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
  stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
  aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We define multiarch as base distributions that are likely to have
-images for any given host architecture.
-
-They will shortly be re-included in the make Makefile.
+These images will no longer be visible to the main container build
+process. This is because we will want to selectively include them for
+each supported architecture later.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include                   |  4 +---
- .../dockerfiles.multiarch/Makefile.include      | 17 +++++++++++++++++
- .../debian10.docker                             |  0
- .../debian9.docker                              |  0
- 4 files changed, 18 insertions(+), 3 deletions(-)
- create mode 100644 tests/docker/dockerfiles.multiarch/Makefile.include
- rename tests/docker/{dockerfiles => dockerfiles.multiarch}/debian10.docker (100%)
- rename tests/docker/{dockerfiles => dockerfiles.multiarch}/debian9.docker (100%)
+ .../{dockerfiles => dockerfiles.cross}/debian-alpha-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-amd64-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-arm64-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-armel-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-armhf-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-hppa-cross.docker   | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-m68k-cross.docker   | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-mips-cross.docker   | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-mips64-cross.docker | 0
+ .../debian-mips64el-cross.docker                                  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-mipsel-cross.docker | 0
+ .../debian-powerpc-cross.docker                                   | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-ppc64-cross.docker  | 0
+ .../debian-ppc64el-cross.docker                                   | 0
+ .../debian-riscv64-cross.docker                                   | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-s390x-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-sh4-cross.docker    | 0
+ .../debian-sparc64-cross.docker                                   | 0
+ .../debian-tricore-cross.docker                                   | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-win32-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-win64-cross.docker  | 0
+ .../{dockerfiles => dockerfiles.cross}/debian-xtensa-cross.docker | 0
+ .../{dockerfiles => dockerfiles.cross}/fedora-cris-cross.docker   | 0
+ .../{dockerfiles => dockerfiles.cross}/fedora-i386-cross.docker   | 0
+ 24 files changed, 0 insertions(+), 0 deletions(-)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-alpha-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-amd64-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-arm64-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-armel-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-armhf-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-hppa-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-m68k-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-mips-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-mips64-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-mips64el-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-mipsel-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-powerpc-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-ppc64-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-ppc64el-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-riscv64-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-s390x-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-sh4-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-sparc64-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-tricore-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-win32-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-win64-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/debian-xtensa-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/fedora-cris-cross.docker (100%)
+ rename tests/docker/{dockerfiles => dockerfiles.cross}/fedora-i386-cross.docker (100%)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 43a8678688..c9e8bc40a1 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -62,8 +62,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
- 		"BUILD","$*")
- 
--# Special rule for debootstraped binfmt linux-user images
--docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/debian-bootstrap.docker
-+docker-binfmt-image-debian-%: $(MULTARCH_BASE)/debian-bootstrap.docker
- 	$(if $(EXECUTABLE),,\
- 		$(error EXECUTABLE not set, debootstrap of debian-$* would fail))
- 	$(if $(DEB_ARCH),,\
-@@ -85,7 +84,6 @@ docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/debian-bootstrap.docker
- 			$(DOCKER_SCRIPT) check --quiet qemu:debian-$* $< || 	\
- 			{ echo "You will need to build $(EXECUTABLE)"; exit 1;},\
- 			"CHECK", "debian-$* exists"))
--
- endif
- 
- # Enforce dependencies for composite images
-diff --git a/tests/docker/dockerfiles.multiarch/Makefile.include b/tests/docker/dockerfiles.multiarch/Makefile.include
-new file mode 100644
-index 0000000000..60617dd7db
---- /dev/null
-+++ b/tests/docker/dockerfiles.multiarch/Makefile.include
-@@ -0,0 +1,17 @@
-+# -*- Mode: makefile -*-
-+#
-+# Multiarch Containers
-+#
-+# These containers are ones that will build on any of the major
-+# architectures. As a result we can share the rules with whatever
-+# system we are installed on.
-+#
-+
-+MULTIARCH_BASE = $(DOCKER_BASE)/dockerfiles.multiarch
-+VPATH += $(MULTIARCH_BASE)
-+
-+#
-+# None of the multiarch images can build anything by themselves so
-+# they are all BASE containers.
-+#
-+BASE_CONTAINERS += $(sort $(notdir $(basename $(wildcard $(MULTIARCH_BASE)/*.docker))))
-diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles.multiarch/debian10.docker
+diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles.cross/debian-alpha-cross.docker
 similarity index 100%
-rename from tests/docker/dockerfiles/debian10.docker
-rename to tests/docker/dockerfiles.multiarch/debian10.docker
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles.multiarch/debian9.docker
+rename from tests/docker/dockerfiles/debian-alpha-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-alpha-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-amd64-cross.docker b/tests/docker/dockerfiles.cross/debian-amd64-cross.docker
 similarity index 100%
-rename from tests/docker/dockerfiles/debian9.docker
-rename to tests/docker/dockerfiles.multiarch/debian9.docker
+rename from tests/docker/dockerfiles/debian-amd64-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-amd64-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles.cross/debian-arm64-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-arm64-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-arm64-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-armel-cross.docker b/tests/docker/dockerfiles.cross/debian-armel-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-armel-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-armel-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles.cross/debian-armhf-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-armhf-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-armhf-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-hppa-cross.docker b/tests/docker/dockerfiles.cross/debian-hppa-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-hppa-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-hppa-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-m68k-cross.docker b/tests/docker/dockerfiles.cross/debian-m68k-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-m68k-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-m68k-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-mips-cross.docker b/tests/docker/dockerfiles.cross/debian-mips-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-mips-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-mips-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-mips64-cross.docker b/tests/docker/dockerfiles.cross/debian-mips64-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-mips64-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-mips64-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-mips64el-cross.docker b/tests/docker/dockerfiles.cross/debian-mips64el-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-mips64el-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-mips64el-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-mipsel-cross.docker b/tests/docker/dockerfiles.cross/debian-mipsel-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-mipsel-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-mipsel-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-powerpc-cross.docker b/tests/docker/dockerfiles.cross/debian-powerpc-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-powerpc-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-powerpc-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-ppc64-cross.docker b/tests/docker/dockerfiles.cross/debian-ppc64-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-ppc64-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-ppc64-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-ppc64el-cross.docker b/tests/docker/dockerfiles.cross/debian-ppc64el-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-ppc64el-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-ppc64el-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-riscv64-cross.docker b/tests/docker/dockerfiles.cross/debian-riscv64-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-riscv64-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-riscv64-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles.cross/debian-s390x-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-s390x-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-s390x-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-sh4-cross.docker b/tests/docker/dockerfiles.cross/debian-sh4-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-sh4-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-sh4-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-sparc64-cross.docker b/tests/docker/dockerfiles.cross/debian-sparc64-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-sparc64-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-sparc64-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-tricore-cross.docker b/tests/docker/dockerfiles.cross/debian-tricore-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-tricore-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-tricore-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/docker/dockerfiles.cross/debian-win32-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-win32-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-win32-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles.cross/debian-win64-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-win64-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-win64-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/tests/docker/dockerfiles.cross/debian-xtensa-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/debian-xtensa-cross.docker
+rename to tests/docker/dockerfiles.cross/debian-xtensa-cross.docker
+diff --git a/tests/docker/dockerfiles/fedora-cris-cross.docker b/tests/docker/dockerfiles.cross/fedora-cris-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/fedora-cris-cross.docker
+rename to tests/docker/dockerfiles.cross/fedora-cris-cross.docker
+diff --git a/tests/docker/dockerfiles/fedora-i386-cross.docker b/tests/docker/dockerfiles.cross/fedora-i386-cross.docker
+similarity index 100%
+rename from tests/docker/dockerfiles/fedora-i386-cross.docker
+rename to tests/docker/dockerfiles.cross/fedora-i386-cross.docker
 -- 
 2.20.1
 
