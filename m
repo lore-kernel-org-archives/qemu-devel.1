@@ -2,54 +2,86 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 938A0C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DF9C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 23:21:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A8DB2081E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 22:50:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8DB2081E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0FD682077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 23:21:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v155pzll"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FD682077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iv7mD-0006tl-Ik
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 17:50:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54843)
+	id 1iv8GR-0005Jz-5X
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 18:21:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iv7lY-0006M2-Nc
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:49:30 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iv8FM-00048c-Gx
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 18:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iv7lV-0008V1-QH
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 17:49:28 -0500
-Resent-Date: Fri, 24 Jan 2020 17:49:28 -0500
-Resent-Message-Id: <E1iv7lV-0008V1-QH@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21196)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iv7lV-0008S1-Il; Fri, 24 Jan 2020 17:49:25 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1579906149248782.059445585641;
- Fri, 24 Jan 2020 14:49:09 -0800 (PST)
-In-Reply-To: <20200124223118.58596-1-salvador@qindel.com>
-Subject: Re: [PATCH] bsd-user: improve support for sparc syscall flags
-Message-ID: <157990614813.23531.11665906860216456443@f6d1ed32ca6b>
+ (envelope-from <richard.henderson@linaro.org>) id 1iv8FK-0005WD-S2
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 18:20:16 -0500
+Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:39497)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iv8FK-0005Ue-Kp
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 18:20:14 -0500
+Received: by mail-pj1-x102a.google.com with SMTP id e11so491953pjt.4
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 15:20:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bsWQWdfCMNy/PRb3cJQvCp2v9hP5/oTK5wfykEmGUU8=;
+ b=v155pzlln7IQg9gJ2+6XMXM7LD+ssajDrdwivPbA+7g9OBbphwCJgv2sb70s4aAary
+ bHsQfyS8x76usuJ0gu28TGFasVzwBImmzlha8x42NQ7UL6znfNhpZRnXmPOqrJwK2z8I
+ rf79iQ1XnjiwHh8IyLpntm7GTugKC1QkbsDboZDetXdDuDyfIyyZWa+8OgoxH35nVPr5
+ BRgVREM/xQ70xa/OTsuke+Yuv4Be9iM6VUIW3axRti+MlUbYKDW1AfP9bs+BYyx9TwEw
+ 3cK0R/xj9QuqLRxL6bM4hxrDJ7klWItv/LhNyGHi35rKYbcAUs4dNBLrRkQkVzZ6ut4v
+ ylCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bsWQWdfCMNy/PRb3cJQvCp2v9hP5/oTK5wfykEmGUU8=;
+ b=Mm8Qk9OVijCmxj0J7eZuGhEWP9o5xkQzoGTUb/KzS/FbAyLYN7bbRkAQvqpy8F1VKu
+ 5MnIzJu3lND+luiBlXuXfRPghcr1pLuVJHKbJbkkPvr7TkmHjJeD/F7UcryHhvf9Linu
+ fNFuXdloG0xR2p/zDsk0yFTKuWfVB29alkN960qScm8IaSHCx1faPJS/N/g1j0VbjouK
+ bDipmNWpStA/m0eUcIRCP3shwcIcfTgopGZs1XJf2pnpGYEWC28DkpqIzExQSvrOzMEs
+ 9xlrSttQ5tM4kK4CTNczTrinQow19SOscwleLzaiL7RqWUjA0tPRMtt1KgeF3x1FMKAx
+ 9eWw==
+X-Gm-Message-State: APjAAAX4OEJ6w98d7zBghmKbEl9wBrd4dL3C1tVpz3Knjd6kH3ILyDGy
+ IH5GmbDOo+rOuhqdngfw96o0DxCJRMM=
+X-Google-Smtp-Source: APXvYqzP1uqb/KSXd3XOUDMhADghxnBqAjHEfZriSnO3X7rNURmbSmUena0XHP9SMdtgU7DtVLWGcQ==
+X-Received: by 2002:a17:90a:246c:: with SMTP id
+ h99mr1864503pje.134.1579908013033; 
+ Fri, 24 Jan 2020 15:20:13 -0800 (PST)
+Received: from localhost.localdomain (rrcs-173-198-77-92.west.biz.rr.com.
+ [173.198.77.92])
+ by smtp.gmail.com with ESMTPSA id v4sm8377880pgo.63.2020.01.24.15.20.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jan 2020 15:20:12 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL v3 00/11] target/hppa patch queue
+Date: Fri, 24 Jan 2020 13:19:58 -1000
+Message-Id: <20200124232009.12928-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: salvador@qindel.com
-Date: Fri, 24 Jan 2020 14:49:09 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.51
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::102a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,70 +93,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, sfandino@yahoo.com, salvador@qindel.com,
- qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, deller@gmx.de, svens@stackframe.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyNDIyMzExOC41ODU5
-Ni0xLXNhbHZhZG9yQHFpbmRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDEyNDIyMzExOC41ODU5
-Ni0xLXNhbHZhZG9yQHFpbmRlbC5jb20KU3ViamVjdDogW1BBVENIXSBic2QtdXNlcjogaW1wcm92
-ZSBzdXBwb3J0IGZvciBzcGFyYyBzeXNjYWxsIGZsYWdzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2MzYyMzhmIGJz
-ZC11c2VyOiBpbXByb3ZlIHN1cHBvcnQgZm9yIHNwYXJjIHN5c2NhbGwgZmxhZ3MKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNjI6IEZJTEU6
-IGJzZC11c2VyL21haW4uYzo1MzA6CisgICAgICAgICAgICB9IGVsc2UgeyAvL2lmIChic2RfdHlw
-ZSA9PSB0YXJnZXRfb3BlbmJzZCkKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwoj
-MTExOiBGSUxFOiBic2QtdXNlci9tYWluLmM6NTgzOgorICAgICAgICAgICAgfSBlbHNlICB7ICAv
-L2lmIChic2RfdHlwZSA9PSB0YXJnZXRfZnJlZWJzZCkKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzEzMjogRklMRTogYnNkLXVzZXIvbmV0YnNkL3N5c2NhbGxfbnIu
-aDozNzU6CisvKl5JJE5ldEJTRDogdHJhcC5oLHYgMS4xOCAyMDExLzAzLzI3IDE4OjQ3OjA4IG1h
-cnRpbiBFeHAgJCAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzEzNjogRklMRTogYnNkLXVzZXIvbmV0YnNkL3N5c2NhbGxfbnIuaDozNzk6CisgKl5JVGhlIFJl
-Z2VudHMgb2YgdGhlIFVuaXZlcnNpdHkgb2YgQ2FsaWZvcm5pYS4gIEFsbCByaWdodHMgcmVzZXJ2
-ZWQuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ0OiBGSUxF
-OiBic2QtdXNlci9uZXRic2Qvc3lzY2FsbF9uci5oOjM4NzoKKyAqXklUaGlzIHByb2R1Y3QgaW5j
-bHVkZXMgc29mdHdhcmUgZGV2ZWxvcGVkIGJ5IHRoZSBVbml2ZXJzaXR5IG9mJAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ1OiBGSUxFOiBic2QtdXNlci9uZXRi
-c2Qvc3lzY2FsbF9uci5oOjM4ODoKKyAqXklDYWxpZm9ybmlhLCBMYXdyZW5jZSBCZXJrZWxleSBM
-YWJvcmF0b3J5LiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE3
-MTogRklMRTogYnNkLXVzZXIvbmV0YnNkL3N5c2NhbGxfbnIuaDo0MTQ6CisgKl5JQCgjKXRyYXAu
-aF5JOC4xIChCZXJrZWxleSkgNi8xMS85MyQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
-cwojMTgwOiBGSUxFOiBic2QtdXNlci9uZXRic2Qvc3lzY2FsbF9uci5oOjQyMzoKKyNkZWZpbmUg
-ICAgICAgIFRBUkdFVF9ORVRCU0RfU1lTQ0FMTF9HMlJGTEFHICAgMHg0MDAgICAvKiBvbiBzdWNj
-ZXNzLCByZXR1cm4gdG8gJWcyIHJhdGhlciB0aGFuIG5wYyAqLwoKRVJST1I6IGNvZGUgaW5kZW50
-IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTgwOiBGSUxFOiBic2QtdXNlci9uZXRic2Qvc3lzY2Fs
-bF9uci5oOjQyMzoKKyNkZWZpbmVeSVRBUkdFVF9ORVRCU0RfU1lTQ0FMTF9HMlJGTEFHXkkweDQw
-MF5JLyogb24gc3VjY2VzcywgcmV0dXJuIHRvICVnMiByYXRoZXIgdGhhbiBucGMgKi8kCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTgxOiBGSUxFOiBic2QtdXNlci9uZXRic2Qv
-c3lzY2FsbF9uci5oOjQyNDoKKyNkZWZpbmUgICAgICAgIFRBUkdFVF9ORVRCU0RfU1lTQ0FMTF9H
-N1JGTEFHICAgMHg4MDAgICAvKiB1c2UgJWc3IGFzIGFib3ZlIChkZXByZWNhdGVkKSAqLwoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTgxOiBGSUxFOiBic2QtdXNl
-ci9uZXRic2Qvc3lzY2FsbF9uci5oOjQyNDoKKyNkZWZpbmVeSVRBUkdFVF9ORVRCU0RfU1lTQ0FM
-TF9HN1JGTEFHXkkweDgwMF5JLyogdXNlICVnNyBhcyBhYm92ZSAoZGVwcmVjYXRlZCkgKi8kCgpF
-UlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4MjogRklMRTogYnNkLXVzZXIvbmV0YnNk
-L3N5c2NhbGxfbnIuaDo0MjU6CisjZGVmaW5lICAgICAgICBUQVJHRVRfTkVUQlNEX1NZU0NBTExf
-RzVSRkxBRyAgIDB4YzAwICAgLyogdXNlICVnNSBhcyBhYm92ZSAob25seSBBQkkgY29tcGF0aWJs
-ZSB3YXkpICovCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxODI6
-IEZJTEU6IGJzZC11c2VyL25ldGJzZC9zeXNjYWxsX25yLmg6NDI1OgorI2RlZmluZV5JVEFSR0VU
-X05FVEJTRF9TWVNDQUxMX0c1UkZMQUdeSTB4YzAwXkkvKiB1c2UgJWc1IGFzIGFib3ZlIChvbmx5
-IEFCSSBjb21wYXRpYmxlIHdheSkgKi8kCgp0b3RhbDogMTIgZXJyb3JzLCAxIHdhcm5pbmdzLCAx
-NDkgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDYzNjIzOGY3ZWQ4MiAoYnNkLXVzZXI6IGltcHJvdmUg
-c3VwcG9ydCBmb3Igc3BhcmMgc3lzY2FsbCBmbGFncykgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAy
-MDAxMjQyMjMxMTguNTg1OTYtMS1zYWx2YWRvckBxaW5kZWwuY29tL3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Version 3 fixes printf formatting errors, and some indentation
+errors, in artist.c, lasips2.c, and i82596.c.
+
+
+r~
+
+
+The following changes since commit ba2ed84fe6a78f64b2da441750fc6e925d94106a:
+
+  Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-5.0-sf1' into staging (2020-01-24 12:34:04 +0000)
+
+are available in the Git repository at:
+
+  https://github.com/rth7680/qemu.git tags/pull-pa-20200124
+
+for you to fetch changes up to 5b33eecce852658121b1190fee466f01a69e1910:
+
+  target/hppa: Allow, but diagnose, LDCW aligned only mod 4 (2020-01-24 14:35:58 -0800)
+
+----------------------------------------------------------------
+Improve LASI emulation
+Add Artist graphics
+Fix main memory allocation
+Improve LDCW emulation wrt real hw
+
+----------------------------------------------------------------
+Helge Deller (3):
+      hw/hppa/dino.c: Improve emulation of Dino PCI chip
+      hppa: Add support for LASI chip with i82596 NIC
+      hppa: Switch to tulip NIC by default
+
+Philippe Mathieu-Daudé (3):
+      hw/hppa/machine: Correctly check the firmware is in PDC range
+      hw/hppa/machine: Restrict the total memory size to 3GB
+      hw/hppa/machine: Map the PDC memory region with higher priority
+
+Richard Henderson (1):
+      target/hppa: Allow, but diagnose, LDCW aligned only mod 4
+
+Sven Schnelle (4):
+      ps2: accept 'Set Key Make and Break' commands
+      hppa: add emulation of LASI PS2 controllers
+      seabios-hppa: update to latest version
+      hppa: Add emulation of Artist graphics
+
+ hw/hppa/hppa_hardware.h        |    1 +
+ hw/hppa/hppa_sys.h             |    2 +
+ hw/net/i82596.h                |   55 ++
+ include/hw/input/lasips2.h     |   16 +
+ include/hw/input/ps2.h         |    1 +
+ include/hw/net/lasi_82596.h    |   29 +
+ target/hppa/helper.h           |    2 +
+ hw/display/artist.c            | 1454 ++++++++++++++++++++++++++++++++++++++++
+ hw/hppa/dino.c                 |   97 ++-
+ hw/hppa/lasi.c                 |  368 ++++++++++
+ hw/hppa/machine.c              |   33 +-
+ hw/input/lasips2.c             |  291 ++++++++
+ hw/input/ps2.c                 |   15 +
+ hw/net/i82596.c                |  734 ++++++++++++++++++++
+ hw/net/lasi_i82596.c           |  188 ++++++
+ target/hppa/op_helper.c        |    9 +
+ target/hppa/translate.c        |   15 +-
+ tests/qtest/boot-serial-test.c |    3 +-
+ MAINTAINERS                    |    4 +-
+ hw/display/Kconfig             |    4 +
+ hw/display/Makefile.objs       |    1 +
+ hw/display/trace-events        |    9 +
+ hw/hppa/Kconfig                |    3 +
+ hw/hppa/Makefile.objs          |    2 +-
+ hw/hppa/trace-events           |   10 +
+ hw/input/Kconfig               |    3 +
+ hw/input/Makefile.objs         |    1 +
+ hw/input/trace-events          |    5 +
+ hw/net/Kconfig                 |    7 +
+ hw/net/Makefile.objs           |    2 +
+ hw/net/trace-events            |   13 +
+ pc-bios/hppa-firmware.img      |  Bin 783724 -> 766136 bytes
+ roms/seabios-hppa              |    2 +-
+ 33 files changed, 3351 insertions(+), 28 deletions(-)
+ create mode 100644 hw/net/i82596.h
+ create mode 100644 include/hw/input/lasips2.h
+ create mode 100644 include/hw/net/lasi_82596.h
+ create mode 100644 hw/display/artist.c
+ create mode 100644 hw/hppa/lasi.c
+ create mode 100644 hw/input/lasips2.c
+ create mode 100644 hw/net/i82596.c
+ create mode 100644 hw/net/lasi_i82596.c
 
