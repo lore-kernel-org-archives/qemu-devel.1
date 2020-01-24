@@ -2,101 +2,81 @@ Return-Path: <SRS0=z9mi=3N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C0CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13EBC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B43252072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:43:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69C042072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jan 2020 13:45:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyfOoO+Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B43252072C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZyNPO+O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69C042072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iuzFS-0003G2-Vm
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:43:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36542)
+	id 1iuzGu-0004UG-Ii
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 08:45:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iuzEc-0002Z7-4K
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:42:55 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iuzGA-0003k4-9E
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:44:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iuzEa-0005xn-04
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:42:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44041
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iuzG8-0008Jy-CP
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:44:30 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54503
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iuzEZ-0005xP-RG
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:42:51 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iuzG8-0008Iq-6s
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 08:44:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579873371;
+ s=mimecast20190719; t=1579873467;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XEG/fZoW1Urma7aRFs93gBrQ31zsS1GSoUOUGn89d3U=;
- b=VyfOoO+ZO32i2UthzOj9XQgBibXrIwxoLswGZPaHYKGXK/Xv/d4IJJ73EBm2mhILQTYVOb
- W6VQi8MA4WyaCTfMuU5d2Ld275Wj6+a1U0s5rGE+DJxH17pDXq9Vgo4nXS5X/2CncCzqvf
- ckJHnKMk0XuRKEl1T8R9VxDtkayk4bc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-Wtj3MfgpNeuB6L_VhdCKsg-1; Fri, 24 Jan 2020 08:42:49 -0500
-Received: by mail-wm1-f69.google.com with SMTP id g26so704609wmk.6
- for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 05:42:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4HYxYIO1KLE1cruK3O0fY4eIxCcaMAkNbKK6LL47eDA=;
- b=j8bEqnTwdlYX1NZXe95NkjSTUnFtQ/syIKLmCCbe5+hNxX3gve3sPhE3S8A+hEeOPO
- 0r1g8nx1xJEscE2TZ43OkNf5gV77i4la02Vky+PtZrl83OgWsxsF9nUtabSMcgkFxI83
- HAORAGjOeRI1ZYS46Wu3PbWrB8r+iPalhcwOYzFT6eLVaqkxKIGpf2+pricf7mH27itZ
- BYCzuV2vSdLEH6BP1DMRe/5t8FmXsSr1wQVoqrkLTF51zHfnzA8mUSYmISm0YViLwf6c
- 9qhdtfdioMyDEe8ZjU5l8JfVeDgJMZOpwjMVxFF14mWk7aznv6/Tn3md6MgzFlOUxejB
- lzPg==
-X-Gm-Message-State: APjAAAWpjeWgOASijWGNS6WQO/1PjQAmUi4Ecb9Nyfl3IuWEf4sC+2rE
- 3swHKpEtHzW4HUSgjim7mxdPOBzM2gFlrbldVInD93onpko3bOFG82CsgL2HqK4mgm9/9lYitt9
- anDoOgzhsb2y4L3g=
-X-Received: by 2002:adf:f10a:: with SMTP id r10mr4488062wro.202.1579873368426; 
- Fri, 24 Jan 2020 05:42:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw/x2wKcuKRzV7LYcrcEMASTLjFlq0FZq/TxrwKjrK839+5CoUH+cmBOrrHRY7AOySqBdE02g==
-X-Received: by 2002:adf:f10a:: with SMTP id r10mr4488034wro.202.1579873368192; 
- Fri, 24 Jan 2020 05:42:48 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z133sm7032645wmb.7.2020.01.24.05.42.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Jan 2020 05:42:47 -0800 (PST)
-Subject: Re: [PATCH] iscsi: Cap block count from GET LBA STATUS (CVE-2020-1711)
-To: Kevin Wolf <kwolf@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
-References: <B07CB62A-7860-4385-A6A4-4ECA211DBE42@nutanix.com>
- <9F93582E-139B-45B2-8630-FDD331F09DEF@kamp.de>
- <c00fc076-3a46-7a52-a539-66751fb2943a@redhat.com>
- <6C861A00-A30A-4CED-85F7-412A13760C4B@nutanix.com>
- <20200124133919.GD4732@dhcp-200-226.str.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d6a7238c-1da2-6447-5eb6-8e0b729f239c@redhat.com>
-Date: Fri, 24 Jan 2020 14:42:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=kQNWVFe7h6sePQhoCtVJ3vCnTXzegwBfS9nnCDEGC4s=;
+ b=QZyNPO+OQ831x4Q45yGjtYWjOmWOLsz+uJJrDcu4/3OHwrkkBqO01uUdJCAu05J5H2fnOl
+ f9i0uw2SkDPMAs71s/H6be9AbvtQcp/pepuMdkjOOlQRwRZ6THMnbJgCDVKQT2yAM/5vfN
+ qGlbPOXaprpIHaEohi4MtjDHBeL5NbI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-v6WdQ3cFM_idibOQk8Xr4g-1; Fri, 24 Jan 2020 08:44:24 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DB00477
+ for <qemu-devel@nongnu.org>; Fri, 24 Jan 2020 13:44:23 +0000 (UTC)
+Received: from work-vm (ovpn-117-253.ams2.redhat.com [10.36.117.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C581960BEC;
+ Fri, 24 Jan 2020 13:44:20 +0000 (UTC)
+Date: Fri, 24 Jan 2020 13:44:18 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v3 19/21] migration: Add zlib compression multifd support
+Message-ID: <20200124134418.GS2970@work-vm>
+References: <20200123115831.36842-1-quintela@redhat.com>
+ <20200123115831.36842-20-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200124133919.GD4732@dhcp-200-226.str.redhat.com>
-Content-Language: en-US
-X-MC-Unique: Wtj3MfgpNeuB6L_VhdCKsg-1
+In-Reply-To: <20200123115831.36842-20-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: v6WdQ3cFM_idibOQk8Xr4g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,119 +88,468 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Turschmid <peter.turschm@nutanix.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Peter Lieven <pl@kamp.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, P J P <ppandit@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/24/20 2:39 PM, Kevin Wolf wrote:
-> Am 24.01.2020 um 11:48 hat Felipe Franciosi geschrieben:
->>> On Jan 24, 2020, at 10:04 AM, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
-t.com> wrote:
->>> On 1/23/20 11:58 PM, Peter Lieven wrote:
->>>>> Am 23.01.2020 um 22:29 schrieb Felipe Franciosi <felipe@nutanix.com>:
->>>>>> On Jan 23, 2020, at 5:46 PM, Philippe Mathieu-Daud=C3=A9 <philmd@red=
-hat.com> wrote:
->>>>>>> On 1/23/20 1:44 PM, Felipe Franciosi wrote:
->>>>>>> When querying an iSCSI server for the provisioning status of blocks=
- (via
->>>>>>> GET LBA STATUS), Qemu only validates that the response descriptor z=
-ero's
->>>>>>> LBA matches the one requested. Given the SCSI spec allows servers t=
-o
->>>>>>> respond with the status of blocks beyond the end of the LUN, Qemu m=
-ay
->>>>>>> have its heap corrupted by clearing/setting too many bits at the en=
-d of
->>>>>>> its allocmap for the LUN.
->>>>>>> A malicious guest in control of the iSCSI server could carefully pr=
-ogram
->>>>>>> Qemu's heap (by selectively setting the bitmap) and then smash it.
->>>>>>> This limits the number of bits that iscsi_co_block_status() will tr=
-y to
->>>>>>> update in the allocmap so it can't overflow the bitmap.
->>>>>>
->>>>>> Please add:
->>>>>>
->>>>>> Fixes: CVE-2020-1711 (title of CVE if possible)
->>>>>
->>>>> I wasn't sure we had one yet. Kevin: can you do the needful in your b=
-ranch?
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/core/qdev-properties.c    |   2 +-
+>  migration/Makefile.objs      |   1 +
+>  migration/multifd-zlib.c     | 289 +++++++++++++++++++++++++++++++++++
+>  migration/multifd.c          |   6 +
+>  migration/multifd.h          |   4 +
+>  qapi/migration.json          |   2 +-
+>  tests/qtest/migration-test.c |   6 +
+>  7 files changed, 308 insertions(+), 2 deletions(-)
+>  create mode 100644 migration/multifd-zlib.c
 >=20
-> I added the CVE number, though I don't have a title.
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index ff6a752b19..07ec75d8e3 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -647,7 +647,7 @@ const PropertyInfo qdev_prop_fdc_drive_type =3D {
+>  const PropertyInfo qdev_prop_multifd_compress =3D {
+>      .name =3D "MultifdCompress",
+>      .description =3D "multifd_compress values, "
+> -                   "none",
+> +                   "none/zlib",
+>      .enum_table =3D &MultifdCompress_lookup,
+>      .get =3D get_enum,
+>      .set =3D set_enum,
+> diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+> index d3623d5f9b..0308caa5c5 100644
+> --- a/migration/Makefile.objs
+> +++ b/migration/Makefile.objs
+> @@ -8,6 +8,7 @@ common-obj-y +=3D xbzrle.o postcopy-ram.o
+>  common-obj-y +=3D qjson.o
+>  common-obj-y +=3D block-dirty-bitmap.o
+>  common-obj-y +=3D multifd.o
+> +common-obj-y +=3D multifd-zlib.o
+> =20
+>  common-obj-$(CONFIG_RDMA) +=3D rdma.o
+> =20
+> diff --git a/migration/multifd-zlib.c b/migration/multifd-zlib.c
+> new file mode 100644
+> index 0000000000..33d7ee6741
+> --- /dev/null
+> +++ b/migration/multifd-zlib.c
+> @@ -0,0 +1,289 @@
+> +/*
+> + * Multifd zlib compression implementation
+> + *
+> + * Copyright (c) 2020 Red Hat Inc
+> + *
+> + * Authors:
+> + *  Juan Quintela <quintela@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include <zlib.h>
+> +#include "qemu/rcu.h"
+> +#include "exec/target_page.h"
+> +#include "qapi/error.h"
+> +#include "migration.h"
+> +#include "trace.h"
+> +#include "multifd.h"
+> +
+> +struct zlib_data {
+> +    /* stream for compression */
+> +    z_stream zs;
+> +    /* compressed buffer */
+> +    uint8_t *zbuff;
+> +    /* size of compressed buffer */
+> +    uint32_t zbuff_len;
+> +};
+> +
+> +/* Multifd zlib compression */
+> +
+> +/**
+> + * zlib_send_setup: setup send side
+> + *
+> + * Setup each channel with zlib compression.
+> + *
+> + * Returns 0 for success or -1 for error
+> + *
+> + * @p: Params for the channel that we are using
+> + * @errp: pointer to an error
+> + */
+> +static int zlib_send_setup(MultiFDSendParams *p, Error **errp)
+> +{
+> +    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
+);
+> +    struct zlib_data *z =3D g_malloc0(sizeof(struct zlib_data));
+> +    z_stream *zs =3D &z->zs;
+> +
+> +    p->data =3D z;
+> +    zs->zalloc =3D Z_NULL;
+> +    zs->zfree =3D Z_NULL;
+> +    zs->opaque =3D Z_NULL;
+> +    if (deflateInit(zs, migrate_compress_level()) !=3D Z_OK) {
+> +        g_free(z);
+> +        error_setg(errp, "multifd %d: deflate init failed", p->id);
+> +        return -1;
+> +    }
+> +    /* We will never have more than page_count pages */
+> +    z->zbuff_len =3D page_count * qemu_target_page_size();
+> +    z->zbuff_len *=3D 2;
+> +    z->zbuff =3D g_try_malloc(z->zbuff_len);
+> +    if (!z->zbuff) {
 
-Thanks.
+Does a deflateEnd need to be called here?
 
+> +        g_free(z);
+> +        error_setg(errp, "multifd %d: out of memory for zbuff", p->id);
+> +        return -1;
+> +    }
+> +    return 0;
 
-[...]
->>> The description starts with "A malicious guest in control of the
->>> iSCSI server ..." so asserting (and killing the VM) doesn't seem
->>> correct...
->=20
-> assert() isn't an error check, but it means that we deem it impossible
-> for the assertion to fail. This would be the case because we fixed (in
-> this patch) the only code path that we think could cause the problem.
->=20
-> We would only add it to find other buggy code paths that we missed or
-> that are added later.
->=20
->> Correct. That's why I would have the proper checks (or "trim"s) closer
->> to where they were issued to fail sooner. What I meant is that if a
->> guest issues any operation that spans past the end of the drive, then
->> the operation stops there and an error is returned accordingly.
->=20
-> Guests can't issue operations that span past the end of the drive. They
-> would return an error befor the iscsi driver is even called.
->=20
-> The only reason why we get such a request here is because of an internal
-> call with BDRV_REQUEST_MAX_BYTES. Maybe this should actually be changed
-> into MIN(BDRV_REQUEST_MAX_BYTES, bs->total_sectors * BDRV_SECTOR_SIZE),
-> and then iscsi_co_block_status() could assert that the request doesn't
-> span past the end of the drive.
->=20
->> This means nothing should ever try to touch these bitmaps out of
->> bounds. Nevertheless, and further to that, assert()s can be used
->> closer to where the bitmap is touched to catch programming errors.
->>
->>> I suppose the iSCSI protocol has some error to return for invalid
->>> requests.
->>
->> Which invalid you are referring to? From the initiator or the target?
->> AFAICT the problem is that the SCSI SPEC doesn't limit a target to
->> respond provisioning status past the (current) end of the LUN (either
->> because this was not deemed important to stress, was forgotten, or is
->> intentionally allowed).
->=20
-> In any case, we don't get an invalid request here. We are who made the
-> request. It's an unexpected response that we got.
->=20
->>> Also shouldn't we report some warning in case of such invalid
->>> request? So the management side can look at the 'malicious iSCSI
->>> server'?
->>
->> I think having the option to do so is a good idea. There are two cases
->> I can think of that you run into a "malicious" storage server:
->> 1) Someone hacked your storage server
->> 2) Your control plane allows your compute to connect to a user
->> provided storage service
->>
->> Thinking as an admin, if I only allow storage servers I provide, then
->> I want to see such warnings. If I let people point the VMM to dodgy
->> servers, then I probably don't want the log spam.
->=20
-> For this reason, we generally don't log things for failed I/O requests.
-> If we wanted to introduce it, we'd better find a way to do so
-> consistently everywhere and not just in a single place with a one-off
-> option.
+I'd like to understand more aobut the failure path - lets say we exit
+through one of those return -1's, p->data is still set to point to z
+which is now been free'd.  Will zlib_send_cleanup get called?
+Maybe it's safer to move the 'p->data =3D z' to right at the bottom before
+the return 0 ?
 
-I'm just suggesting to use error_report().
+> +}
+> +
+> +/**
+> + * zlib_send_cleanup: cleanup send side
+> + *
+> + * Close the channel and return memory.
+> + *
+> + * @p: Params for the channel that we are using
+> + */
+> +static void zlib_send_cleanup(MultiFDSendParams *p, Error **errp)
+> +{
+> +    struct zlib_data *z =3D p->data;
+
+As previously asked above, could this ever get called if zlib_send_setup
+has failed? If so does this need to check for !z ?
+
+> +    deflateEnd(&z->zs);
+> +    g_free(z->zbuff);
+> +    z->zbuff =3D NULL;
+> +    g_free(p->data);
+> +    p->data =3D NULL;
+> +}
+> +
+> +/**
+> + * zlib_send_prepare: prepare date to be able to send
+> + *
+> + * Create a compressed buffer with all the pages that we are going to
+> + * send.
+> + *
+> + * Returns 0 for success or -1 for error
+> + *
+> + * @p: Params for the channel that we are using
+> + * @used: number of pages used
+> + */
+> +static int zlib_send_prepare(MultiFDSendParams *p, uint32_t used, Error =
+**errp)
+> +{
+> +    struct iovec *iov =3D p->pages->iov;
+> +    struct zlib_data *z =3D p->data;
+> +    z_stream *zs =3D &z->zs;
+> +    uint32_t out_size =3D 0;
+> +    int ret;
+> +    uint32_t i;
+> +
+> +    for (i =3D 0; i < used; i++) {
+> +        uint32_t available =3D z->zbuff_len - out_size;
+> +        int flush =3D Z_NO_FLUSH;
+> +
+> +        if (i =3D=3D used  - 1) {
+
+Odd double space formatting there.
+
+> +            flush =3D Z_SYNC_FLUSH;
+> +        }
+> +
+> +        zs->avail_in =3D iov[i].iov_len;
+> +        zs->next_in =3D iov[i].iov_base;
+> +
+> +        zs->avail_out =3D available;
+> +        zs->next_out =3D z->zbuff + out_size;
+> +
+> +        ret =3D deflate(zs, flush);
+> +        if (ret !=3D Z_OK) {
+> +            error_setg(errp, "multifd %d: deflate returned %d instead of=
+ Z_OK",
+> +                       p->id, ret);
+> +            return -1;
+> +        }
+> +        out_size +=3D available - zs->avail_out;
+> +    }
+> +    p->next_packet_size =3D out_size;
+> +    p->flags |=3D MULTIFD_FLAG_ZLIB;
+> +
+> +    return 0;
+> +}
+> +
+> +/**
+> + * zlib_send_write: do the actual write of the data
+> + *
+> + * Do the actual write of the comprresed buffer.
+> + *
+> + * Returns 0 for success or -1 for error
+> + *
+> + * @p: Params for the channel that we are using
+> + * @used: number of pages used
+> + * @errp: pointer to an error
+> + */
+> +static int zlib_send_write(MultiFDSendParams *p, uint32_t used, Error **=
+errp)
+> +{
+> +    struct zlib_data *z =3D p->data;
+> +
+> +    return qio_channel_write_all(p->c, (void *)z->zbuff, p->next_packet_=
+size,
+> +                                 errp);
+> +}
+> +
+> +/**
+> + * zlib_recv_setup: setup receive side
+> + *
+> + * Create the compressed channel and buffer.
+> + *
+> + * Returns 0 for success or -1 for error
+> + *
+> + * @p: Params for the channel that we are using
+> + * @errp: pointer to an error
+> + */
+> +static int zlib_recv_setup(MultiFDRecvParams *p, Error **errp)
+> +{
+> +    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
+);
+> +    struct zlib_data *z =3D g_malloc0(sizeof(struct zlib_data));
+> +    z_stream *zs =3D &z->zs;
+> +
+> +    p->data =3D z;
+> +    zs->zalloc =3D Z_NULL;
+> +    zs->zfree =3D Z_NULL;
+> +    zs->opaque =3D Z_NULL;
+> +    zs->avail_in =3D 0;
+> +    zs->next_in =3D Z_NULL;
+> +    if (inflateInit(zs) !=3D Z_OK) {
+> +        error_setg(errp, "multifd %d: inflate init failed", p->id);
+> +        return -1;
+> +    }
+> +    /* We will never have more than page_count pages */
+> +    z->zbuff_len =3D page_count * qemu_target_page_size();
+> +    /* We know compression "could" use more space */
+> +    z->zbuff_len *=3D 2;
+> +    z->zbuff =3D g_try_malloc(z->zbuff_len);
+> +    if (!z->zbuff) {
+
+inflateEnd and similar question to save?
+
+> +        error_setg(errp, "multifd %d: out of memory for zbuff", p->id);
+> +        return -1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +/**
+> + * zlib_recv_cleanup: setup receive side
+> + *
+> + * For no compression this function does nothing.
+> + *
+> + * @p: Params for the channel that we are using
+> + */
+> +static void zlib_recv_cleanup(MultiFDRecvParams *p)
+> +{
+> +    struct zlib_data *z =3D p->data;
+> +
+> +    inflateEnd(&z->zs);
+> +    g_free(z->zbuff);
+> +    z->zbuff =3D NULL;
+> +    g_free(p->data);
+> +    p->data =3D NULL;
+> +}
+> +
+> +/**
+> + * zlib_recv_pages: read the data from the channel into actual pages
+> + *
+> + * Read the compressed buffer, and uncompress it into the actual
+> + * pages.
+> + *
+> + * Returns 0 for success or -1 for error
+> + *
+> + * @p: Params for the channel that we are using
+> + * @used: number of pages used
+> + * @errp: pointer to an error
+> + */
+> +static int zlib_recv_pages(MultiFDRecvParams *p, uint32_t used, Error **=
+errp)
+> +{
+> +    uint32_t in_size =3D p->next_packet_size;
+> +    uint32_t out_size =3D 0;
+> +    uint32_t expected_size =3D used * qemu_target_page_size();
+> +    struct zlib_data *z =3D p->data;
+> +    z_stream *zs =3D &z->zs;
+> +    int ret;
+> +    int i;
+> +
+> +    if (p->flags !=3D MULTIFD_FLAG_ZLIB) {
+> +        error_setg(errp, "multifd %d: flags received %x flags expected %=
+x",
+> +                   p->id, MULTIFD_FLAG_ZLIB, p->flags);
+> +        return -1;
+> +    }
+> +    ret =3D qio_channel_read_all(p->c, (void *)z->zbuff, in_size, errp);
+> +
+> +    if (ret !=3D 0) {
+> +        return ret;
+> +    }
+> +
+> +    zs->avail_in =3D in_size;
+> +    zs->next_in =3D z->zbuff;
+> +
+> +    for (i =3D 0; i < used; i++) {
+> +        struct iovec *iov =3D &p->pages->iov[i];
+> +        int flush =3D Z_NO_FLUSH;
+> +
+> +        if (i =3D=3D used  - 1) {
+> +            flush =3D Z_SYNC_FLUSH;
+> +        }
+> +
+> +        zs->avail_out =3D iov->iov_len;
+> +        zs->next_out =3D iov->iov_base;
+> +
+> +        ret =3D inflate(zs, flush);
+> +        if (ret !=3D Z_OK) {
+> +            error_setg(errp, "multifd %d: inflate returned %d instead of=
+ Z_OK",
+> +                       p->id, ret);
+> +            return ret;
+> +        }
+> +        out_size +=3D iov->iov_len;
+
+How do we know that's iov_len ?
+
+> +    }
+> +    if (out_size !=3D expected_size) {
+> +        error_setg(errp, "multifd %d: packet size received %d size expec=
+ted %d",
+> +                   p->id, out_size, expected_size);
+> +        return -1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static MultiFDMethods multifd_zlib_ops =3D {
+> +    .send_setup =3D zlib_send_setup,
+> +    .send_cleanup =3D zlib_send_cleanup,
+> +    .send_prepare =3D zlib_send_prepare,
+> +    .send_write =3D zlib_send_write,
+> +    .recv_setup =3D zlib_recv_setup,
+> +    .recv_cleanup =3D zlib_recv_cleanup,
+> +    .recv_pages =3D zlib_recv_pages
+> +};
+> +
+> +static void multifd_zlib_register(void)
+> +{
+> +    multifd_register_ops(MULTIFD_COMPRESS_ZLIB, &multifd_zlib_ops);
+> +}
+> +
+> +migration_init(multifd_zlib_register);
+> diff --git a/migration/multifd.c b/migration/multifd.c
+> index 353140cd25..a1fc451d49 100644
+> --- a/migration/multifd.c
+> +++ b/migration/multifd.c
+> @@ -164,6 +164,12 @@ static MultiFDMethods *multifd_ops[MULTIFD_COMPRESS_=
+_MAX] =3D {
+>      [MULTIFD_COMPRESS_NONE] =3D &multifd_nocomp_ops,
+>  };
+> =20
+> +void multifd_register_ops(int method, MultiFDMethods *ops)
+> +{
+> +    assert(0 < method && method < MULTIFD_COMPRESS__MAX);
+> +    multifd_ops[method] =3D ops;
+> +}
+> +
+>  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **err=
+p)
+>  {
+>      MultiFDInit_t msg =3D {};
+> diff --git a/migration/multifd.h b/migration/multifd.h
+> index 8edea4fdac..85542f3222 100644
+> --- a/migration/multifd.h
+> +++ b/migration/multifd.h
+> @@ -23,8 +23,10 @@ void multifd_recv_sync_main(void);
+>  void multifd_send_sync_main(QEMUFile *f);
+>  int multifd_queue_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset);
+> =20
+> +/* Multifd Compression flags */
+>  #define MULTIFD_FLAG_SYNC (1 << 0)
+>  #define MULTIFD_FLAG_NOCOMP (1 << 1)
+> +#define MULTIFD_FLAG_ZLIB (1 << 2)
+> =20
+>  /* This value needs to be a multiple of qemu_target_page_size() */
+>  #define MULTIFD_PACKET_SIZE (512 * 1024)
+> @@ -157,5 +159,7 @@ typedef struct {
+>      int (*recv_pages)(MultiFDRecvParams *p, uint32_t used, Error **errp)=
+;
+>  } MultiFDMethods;
+> =20
+> +void multifd_register_ops(int method, MultiFDMethods *ops);
+> +
+>  #endif
+> =20
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index c2891e6ebf..1714ea51e3 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -499,7 +499,7 @@
+>  #
+>  ##
+>  { 'enum': 'MultifdCompress',
+> -  'data': [ 'none' ] }
+> +  'data': [ 'none', 'zlib' ] }
+> =20
+>  ##
+>  # @MigrationParameter:
+> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+> index 3d5d2aba8c..985a7d4b97 100644
+> --- a/tests/qtest/migration-test.c
+> +++ b/tests/qtest/migration-test.c
+> @@ -1313,6 +1313,11 @@ static void test_multifd_tcp_none(void)
+>      test_multifd_tcp("none");
+>  }
+> =20
+> +static void test_multifd_tcp_zlib(void)
+> +{
+> +    test_multifd_tcp("zlib");
+> +}
+> +
+>  /*
+>   * This test does:
+>   *  source               target
+> @@ -1475,6 +1480,7 @@ int main(int argc, char **argv)
+>      qtest_add_func("/migration/auto_converge", test_migrate_auto_converg=
+e);
+>      qtest_add_func("/migration/multifd/tcp/none", test_multifd_tcp_none)=
+;
+>      qtest_add_func("/migration/multifd/tcp/cancel", test_multifd_tcp_can=
+cel);
+> +    qtest_add_func("/migration/multifd/tcp/zlib", test_multifd_tcp_zlib)=
+;
+> =20
+>      ret =3D g_test_run();
+> =20
+> --=20
+> 2.24.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
