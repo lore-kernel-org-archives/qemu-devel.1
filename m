@@ -4,80 +4,107 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A2EC35241
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 08:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3742C35242
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 09:53:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CB622071E
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 08:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78C152071A
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 09:53:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GW7uuOjh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CB622071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=xcancerberox.com.ar header.i=@xcancerberox.com.ar header.b="f87ypW1u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C152071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xcancerberox.com.ar
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivH22-0000Be-D2
-	for qemu-devel@archiver.kernel.org; Sat, 25 Jan 2020 03:43:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43354)
+	id 1ivHvZ-0002Z5-AU
+	for qemu-devel@archiver.kernel.org; Sat, 25 Jan 2020 04:40:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ivH1J-0007kj-71
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 03:42:23 -0500
+ (envelope-from <me@xcancerberox.com.ar>) id 1ivHuN-00026F-Af
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 04:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ivH1E-00059C-3T
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 03:42:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33642
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ivH1D-00056q-Sk
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 03:42:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579941733;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MBXaUR/5j8rdNSyQRyTIEXHBnvpRXWI3J2MkTwJURnU=;
- b=GW7uuOjhHPKrd+d9dj9hUuxuEt70g4nTFfgxCjdagz7VAe9tlHOCkfKvcpnpW81z8lztbR
- S5Pt5TB55j+zTAyymDTCMJH0W765IPaIznSakKUHp/iscw3py0mc3AWD9Z6VyaCnbG91lT
- RL1r/JjECD1di70M9RP9XubwcxPfYnw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-U5jSwVlcMU-xk1l1_yxTzw-1; Sat, 25 Jan 2020 03:42:09 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D77C19057A0;
- Sat, 25 Jan 2020 08:42:07 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 933BF5C1D4;
- Sat, 25 Jan 2020 08:42:06 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DE8881138600; Sat, 25 Jan 2020 09:42:04 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [RFC] migration: Remove old compression code
-References: <20200123121628.37539-1-quintela@redhat.com>
-Date: Sat, 25 Jan 2020 09:42:04 +0100
-In-Reply-To: <20200123121628.37539-1-quintela@redhat.com> (Juan Quintela's
- message of "Thu, 23 Jan 2020 13:16:28 +0100")
-Message-ID: <87iml0x6zn.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: U5jSwVlcMU-xk1l1_yxTzw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+ (envelope-from <me@xcancerberox.com.ar>) id 1ivHuL-0007tN-Kv
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 04:39:15 -0500
+Received: from [51.158.76.159] (port=37974 helo=mail.xcancerberox.com.ar)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <me@xcancerberox.com.ar>)
+ id 1ivHuL-0007no-2q; Sat, 25 Jan 2020 04:39:13 -0500
+Subject: Re: [PATCH rc2 21/25] hw/avr: Add some Arduino boards
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xcancerberox.com.ar;
+ s=mail; t=1579944749;
+ bh=/v+mWBauk8doqq1EaqiCvFpU4WwDVqQApuraYsc20zM=;
+ h=Subject:To:Cc:References:From:In-Reply-To;
+ b=f87ypW1u09V7VFwekFI3U+Rs3zoY2/5uqbuhqwR8b10ZXsqRZAVHLBkfrBH9/eHdj
+ OGXxZooaQHJuzEjdjc0nUmc+QmuGT7r0r7UhMbUCJ01/ev2BMxMsjrBpEJ/mGV2ISo
+ kBrlz1NWmsCQVDzo8Hd1rHqc6rG9Wx7e6zRwkyXfkKMdQmyrtX1CJlBUPl/JgoRQAY
+ pgRf+Z/FQt+pS8vJVpOtQViClL3UANG+hotf94XSyZaGo+HWMrh+v4Yv5o9wFHuzrI
+ SWE4v/GcJdPvkAJj9t2aUjwUL/bPL35JLk3LApjuhhp4u88ukIHUT9Hd373ZAAe6pP
+ 7WL5dkoQ+hzkA==
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, mrolnik@gmail.com, richard.henderson@linaro.org
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-22-f4bug@amsat.org>
+From: Joaquin de Andres <me@xcancerberox.com.ar>
+Openpgp: preference=signencrypt
+Autocrypt: addr=me@xcancerberox.com.ar; keydata=
+ mQINBF00prkBEACvQbZS1Kz1YWo+kzwGInOzew7ROImCOleck7GzySI7IrhrMxfFFwD0MlP0
+ 5bVuvw2GiSKV+3A+FafHz9cfjqfNwzjeYu0LMB7B2quk753gAAfzoOQfJ1EmMdF2bRLK2Y5v
+ +p2nxLwkHFm9ledaX07U4Ol+vMnElJtBrZF3jCVFcy7ethjFPq/xnEnpdPU77dLarhOtos3C
+ ewdgkIDkkogl8BevMBm88YnHE83B8OP64J+r4CkcbR1ND8Q8WwEv7MOonDZ8TgYZeALrLirI
+ LGXGoXuFEhM72O23HksEYvDl5CqTQz+xkMhH1FcH89zEY5J1nTO49qo+Ngs2Ds+hvypPIeOe
+ gxbJUNtXfIOxxl4AS/LTHaig2/4OdZ8MIF9UD5BC/qpt59hLKKo0TxwN1A2/2jwpkooJNm1D
+ hBLvlKd+FP/iSOkmsAPs/Yle4/m4PVa2iXUfQ/90AqSPNQVu+FBg3WmPJvqcGl2VMZ9WlmDu
+ +k/SYVi2+n0TSIkzmMVQg1/a4mdv3/nH7wQ1MIH4L0BbLcxjol3+a6kS3/7+lr3QNLnmszm7
+ QtE37gEL148IVaaKAYDM6A5u1z7e6nwNmyBGl0iHQUInQ6ba5+/FiYrTyB1oYcHMkK9DOYeP
+ SF7e87Hc3vt8t/VnjYHCHlYT39m8Sb+ZsNntBGEtkjvcVdOuWwARAQABtEBKb2FxdWluIGRl
+ IEFuZHJlcyB5IE1hcnRpbmV6IGRlIEFyZW5hc2EgPG1lQHhjYW5jZXJiZXJveC5jb20uYXI+
+ iQJOBBMBCAA4FiEEUqEiz9cph90MYsVLwbNfcmJGyaEFAl00prkCGwMFCwkIBwMFFQoJCAsF
+ FgIDAQACHgECF4AACgkQwbNfcmJGyaGSGhAAi05FHZKmzpiGY6vMYlHvgS0ToR2wZAUaD2jh
+ pOhUmxG0uUl+Z+iEObpl62SJ73dSGB3UrFq6+3rjNFXGVp9L+7qo60OYAoEwPNIsHyS388Pa
+ xWoAdtGeoQV7v9mFbxMZ3ARiC4V1Y2jBHylf4TxLhs+kS7fnbNmCZ2YuvkX76unKPOLHSPgT
+ iyI8SvG00Wau1pW4beI1SqvwvlcVEg4SlGEKJ7MtLxIMjEPeUW5a2jAP8NyKv7pB0nPGuK/7
+ ZJCWlSh9aaS6R7IgmAmaieWu83leyGL5wQETJRZ8oNfiZWNZcLaJPOiQ3fj2OXLiyYOo1sIP
+ /EEYEkAAkrI43UQDWEYkS33bu7dGRGvpOBfwWoaosNUAcG5uDZUfnoKLj2YDlDm9VuChBPdC
+ jSzakWGCkgdQm0ZR8NcLKloun+sLhkTPor3HhhW6+fGHhLrzhlCPpa0ZdVOHtvKv8pZdcf/t
+ BZhUHy0C9xDcgZtH69viEEmec7dp9Bfif9CWkeIFQoTP/wLGVxkbF9GNuBo72yCHQWf1QjFe
+ td7aFUGWoI3klTFutOn6nLONfJuoyTMxnvh6QWSXyRA7PSY74njdadq7i2o7S5jds2lHnDPu
+ KsdVMwmWbngEtNLCaYqVGipXfZrZjKDOIkfMgTDy5F3tc92qO7Nipx/S+z8R6/GiyEmnIdO5
+ Ag0EXTSmuQEQALOHSm7UO0+q+lBP3Kre2QeEkLDUxUIYWHza1M6WlwXjUX8U/3CJuwcUPTkD
+ mvjINUldoL8NeABtdJieBEBVNhP+3s1byWlvew5J6aFL6UF6K3jbML2Yks33/vjvaUpfyF8r
+ mVinHhpdIX2GNARuTQHKv48YUQ2omrpWZ9P68lCUYsx1HGeptdDLuiPGq0wU99lQBe1czdD4
+ 694xtift8Fv6mHtTfbG3LkFwFkF93K1h/o3C3+ggcvFLIGowM+FalozXIjOm3wRjdsofOTRf
+ 6bUolpbuACvPj7LCO8QRUAIzXzlkx3Uv4f4lQj5TPZ/CEVjgCFxgTbWH1TYBzC7LVMsPfSzc
+ 3Upl84y7DLBmvYMcOwKS8LaDjBx+dtud4FuLs6YtaLWNh/qWvSMe2ihY+a5Ehl8lGiPB5dDa
+ eC/vSflFjdoZkkv5riZotU7m6M8MFRAGM9zxRkvCC9JCHZTFUgThkpBjr0uT5hsGwonVKKiW
+ CU6Hearjb/WVAoGDOjp+gg7HdRlYfudZ7Hmvy27sGx6tp+YMkS4waC3/y64C6LaVzpOahhkd
+ g3CEoQZBUliKo3Xm2vCYs8LuQPhbRnK7Ird5LKszllCvBQ1wDTS2UJnfau6d5LBIEZ5WI5Qy
+ bqDXuT+zx5y92B5NFLF+gmr3ekZ9pEzksmFAPTYB40qBeQgjABEBAAGJAjYEGAEIACAWIQRS
+ oSLP1ymH3QxixUvBs19yYkbJoQUCXTSmuQIbDAAKCRDBs19yYkbJoYJSD/45+1tNOaudcQ/1
+ XBGnqFn2iZy2bgXDJUK7HAmq88h95PaLK9Aub2Tyr/TcqXDz/vY9yLXuDBF5C60cc/eTQloz
+ 0rKsq3WHUG1W6+gkdNhYfrh0jFo+xNcFUtn581LqpmZJMgOw0q/MJHF32qhkYIgSQB0Cxypk
+ +3nNt4BDCG6wqyWh9QQVNWP2jarJSGUZ0Y8bAIyS9bubNV/bZI1tc4wq2qYSfoVPCl9Pf39g
+ P42K7dxRxFUndV8KaIJeT/IRgbM7u5sogtSLCsZ+JSrkuWnrJa8EhYWBraQzBUOJh2GB+AJh
+ DWkgut/G5qcXplVn0y7Mi/gWInbWGPYEt12/5WLosL5gYY3G7cW9deFQJhwUBAIcGcxWmdzq
+ 7ij3PpnoSo3vqMLd/8Bv/tqi6+ixJO4hZwh75nVoEs6WCEa3cYYpqcc53d+G3R2ZTceYk931
+ DXRJIWQWLRPde+PtYpCjiqUnY7SWFDDPmj0vbVnSGZhU97IXXTiM3YjL+0vp56JJ598/u9WG
+ iXbUySyoDW0MYWrha+20W2FLTmUi3k1o7n51juIr7OgVPwUBVdjS3mXXfIUMSeeKtywsGDUD
+ XGGMd13jjfUmFa6yojQWx7myW0zmfVxc/jFFN0VZbRkDnbGq33xo1xlOAtnyfQXFBX97Zeia
+ OZRo+ULKJ1xXuVGe8hnP9Q==
+Message-ID: <99d4c4d3-8cbd-9a92-13f5-b73e06ddfb17@xcancerberox.com.ar>
+Date: Sat, 25 Jan 2020 10:32:26 +0100
+Mime-Version: 1.0
+In-Reply-To: <20200124005131.16276-22-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 51.158.76.159
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,449 +116,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, liang.z.li@intel.com,
- xiaoguangrong@tencent.com, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, richardw.yang@linux.intel.com,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
+ S.E.Harris@kent.ac.uk, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, dovgaluk@ispras.ru,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, thuth@redhat.com,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, imammedo@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing like David did, plus Eric and Mike for additional QAPI expertise.
+On 1/24/20 1:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Arduino boards are build with AVR chipsets.
+> Add some of the popular boards:
+>=20
+> - Arduino Duemilanove
+> - Arduino Uno
+> - Arduino Mega
+>=20
+> For more information:
+>   https://www.arduino.cc/en/Main/Products
+>   https://store.arduino.cc/arduino-genuino/most-popular
+>=20
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Message-Id: <20200120220107.17825-15-f4bug@amsat.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> rc2:
+> - Use avr_load_firmware (Aleksandar)
+> - No default machine on AVR (Richard)
+> - Add entry in MAINTAINERS (Michael is still the maintainer of hw/avr/)
+> ---
+>  hw/avr/arduino.c     | 151 +++++++++++++++++++++++++++++++++++++++++++
+>  MAINTAINERS          |   6 ++
+>  hw/avr/Kconfig       |   4 ++
+>  hw/avr/Makefile.objs |   1 +
+>  4 files changed, 162 insertions(+)
+>  create mode 100644 hw/avr/arduino.c
+>=20
+> diff --git a/hw/avr/arduino.c b/hw/avr/arduino.c
+> new file mode 100644
+> index 0000000000..2fb2e96ffe
+> --- /dev/null
+> +++ b/hw/avr/arduino.c
+> @@ -0,0 +1,151 @@
+> +/*
+> + * QEMU Arduino boards
+> + *
+> + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
+> + *
+> + * This work is licensed under the terms of the GNU GPLv2 or later.
+> + * See the COPYING file in the top-level directory.
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +
+> +/* TODO: Implement the use of EXTRAM */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/boards.h"
+> +#include "atmel_atmega.h"
+> +#include "boot.h"
+> +
+> +typedef struct ArduinoMachineState {
+> +    /*< private >*/
+> +    MachineState parent_obj;
+> +    /*< public >*/
+> +    AtmegaMcuState mcu;
+> +} ArduinoMachineState;
+> +
+> +typedef struct ArduinoMachineClass {
+> +    /*< private >*/
+> +    MachineClass parent_class;
+> +    /*< public >*/
+> +    const char *mcu_type;
+> +    uint64_t xtal_hz;
+> +} ArduinoMachineClass;
+> +
+> +#define TYPE_ARDUINO_MACHINE \
+> +        MACHINE_TYPE_NAME("arduino")
+> +#define ARDUINO_MACHINE(obj) \
+> +        OBJECT_CHECK(ArduinoMachineState, (obj), TYPE_ARDUINO_MACHINE)
+> +#define ARDUINO_MACHINE_CLASS(klass) \
+> +        OBJECT_CLASS_CHECK(ArduinoMachineClass, (klass), TYPE_ARDUINO_=
+MACHINE)
+> +#define ARDUINO_MACHINE_GET_CLASS(obj) \
+> +        OBJECT_GET_CLASS(ArduinoMachineClass, (obj), TYPE_ARDUINO_MACH=
+INE)
+> +
+> +static void arduino_machine_init(MachineState *machine)
+> +{
+> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_GET_CLASS(machine);
+> +    ArduinoMachineState *ams =3D ARDUINO_MACHINE(machine);
+> +
+> +    sysbus_init_child_obj(OBJECT(machine), "mcu", &ams->mcu, sizeof(am=
+s->mcu),
+> +                          amc->mcu_type);
+> +    object_property_set_uint(OBJECT(&ams->mcu), amc->xtal_hz,
+> +                             "xtal-frequency-hz", &error_abort);
+> +    object_property_set_bool(OBJECT(&ams->mcu), true, "realized",
+> +                             &error_abort);
+> +
+> +    if (machine->firmware) {
+> +        if (!avr_load_firmware(&ams->mcu.cpu, machine,
+> +                               &ams->mcu.flash, machine->firmware)) {
+> +            exit(1);
+> +        }
+> +    }
+> +}
+> +
+> +static void arduino_machine_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +
+> +    mc->init =3D arduino_machine_init;
+> +    mc->default_cpus =3D 1;
+> +    mc->min_cpus =3D mc->default_cpus;
+> +    mc->max_cpus =3D mc->default_cpus;
+> +    mc->no_floppy =3D 1;
+> +    mc->no_cdrom =3D 1;
+> +    mc->no_parallel =3D 1;
+> +}
+> +
+> +static void arduino_duemilanove_class_init(ObjectClass *oc, void *data=
+)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
+> +
+> +    /* https://www.arduino.cc/en/Main/ArduinoBoardDuemilanove */
+> +    mc->desc        =3D "Arduino Duemilanove (ATmega168)",
+> +    mc->alias       =3D "2009";
+> +    amc->mcu_type   =3D TYPE_ATMEGA168_MCU;
+> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
+> +};
 
-Juan Quintela <quintela@redhat.com> writes:
+Hi! According to the page this board could be used with Atmega328 too.
+Maybe you can define both?
 
-> Hi
->
-> There are several problems with the old compression code:
-> * it compress one page at a time (i.e. 4KB)
->
-> * it has to copy all the page to the compression thread, the
->   compression thread compress it, it copies back the compressed data
->   to the main thread and it sends it there (equivalent for decompress).
->
-> * It is really slow (both the setup of it, and the compression of each pa=
-ge)
->
-> You can see that in the previous series, I added compression to multifd, =
-its advantages are:
-> * We compress "chunks" of 128 pages at a time
-> * We don't copy anything, we just compress everything that is sent throug=
-h the channel
-> * We don't send data over the main channel, so we have less overhead
-> * I added zstd support, that
->   o  Compress much more
->   o  It is way faster
->
-> * Using the migration-test values (best option for compressors, as we
->   only change one byte on each page):
->   * zstd is around the same latency than no compression (i.e. it takes th=
-e same time)
->   * zlib needs 2500 bytes to send 128 pages compressed (remember 1
->     byte changed in each page, rest are zeros)
->   * zstd needs 52 bytes for the same packets (yes, I checked several
->     times, it appears that its use of dictionaries is good here)
->
-> This is an RFC, you will ask why?
-> There are several questions:
-> * How to proceed to remove this?
->    - Deprecate it into the future?
->      Has the advantage that customers can continue using it.
->      But it is not so stable to use it.
->    - Remove it now?
->      Has the advantage of much less code, but ....
-> * Statistics:
->   Several of the statistics are already only printed when compression is
->   being used. My understanding is that we ase safe removing this ones.
-> * But whan about the migration_parameters?  Should we leave them
->   alone, and just don't care about them? Should we remove them?
-> * What to do with migration.json changes?  I will apprecciate comments he=
-re.
->
-> Thanks, Juan.
->
-> PD.  You can see from the previous series that putting compression on
->      top of multifd + splitting the code in different files + making it o=
-ptional:
->      around 1040 new lines of code.
->      Removing this ~ 960 lines of code.
->
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-[...]
+The rest of this patch looks good to me, so:
+Reviewed-by: Joaquin de Andres <me@xcancerberox.com.ar>
 
-Let's have a look at the changes to the stable external interface.
-
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 65db85970e..5477d4d20b 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -79,27 +79,6 @@
->             'cache-miss': 'int', 'cache-miss-rate': 'number',
->             'overflow': 'int' } }
+> +
+> +static void arduino_uno_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
+> +
+> +    /* https://store.arduino.cc/arduino-uno-rev3 */
+> +    mc->desc        =3D "Arduino UNO (ATmega328P)";
+> +    mc->alias       =3D "uno";
+> +    amc->mcu_type   =3D TYPE_ATMEGA328_MCU;
+> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
+> +};
+> +
+> +static void arduino_mega_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
+> +
+> +    /* https://www.arduino.cc/en/Main/ArduinoBoardMega */
+> +    mc->desc        =3D "Arduino Mega (ATmega1280)";
+> +    mc->alias       =3D "mega";
+> +    amc->mcu_type   =3D TYPE_ATMEGA1280_MCU;
+> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
+> +};
+> +
+> +static void arduino_mega2560_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
+> +
+> +    /* https://store.arduino.cc/arduino-mega-2560-rev3 */
+> +    mc->desc        =3D "Arduino Mega 2560 (ATmega2560)";
+> +    mc->alias       =3D "mega2560";
+> +    amc->mcu_type   =3D TYPE_ATMEGA2560_MCU;
+> +    amc->xtal_hz    =3D 16 * 1000 * 1000; /* CSTCE16M0V53-R0 */
+> +};
+> +
+> +static const TypeInfo arduino_machine_types[] =3D {
+> +    {
+> +        .name          =3D MACHINE_TYPE_NAME("arduino-duemilanove"),
+> +        .parent        =3D TYPE_ARDUINO_MACHINE,
+> +        .class_init    =3D arduino_duemilanove_class_init,
+> +    }, {
+> +        .name          =3D MACHINE_TYPE_NAME("arduino-uno"),
+> +        .parent        =3D TYPE_ARDUINO_MACHINE,
+> +        .class_init    =3D arduino_uno_class_init,
+> +    }, {
+> +        .name          =3D MACHINE_TYPE_NAME("arduino-mega"),
+> +        .parent        =3D TYPE_ARDUINO_MACHINE,
+> +        .class_init    =3D arduino_mega_class_init,
+> +    }, {
+> +        .name          =3D MACHINE_TYPE_NAME("arduino-mega-2560-v3"),
+> +        .parent        =3D TYPE_ARDUINO_MACHINE,
+> +        .class_init    =3D arduino_mega2560_class_init,
+> +    }, {
+> +        .name           =3D TYPE_ARDUINO_MACHINE,
+> +        .parent         =3D TYPE_MACHINE,
+> +        .instance_size  =3D sizeof(ArduinoMachineState),
+> +        .class_size     =3D sizeof(ArduinoMachineClass),
+> +        .class_init     =3D arduino_machine_class_init,
+> +        .abstract       =3D true,
+> +    }
+> +};
+> +
+> +DEFINE_TYPES(arduino_machine_types)
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 066515ac8e..07c8912489 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -904,6 +904,12 @@ F: hw/misc/atmel_power.c
+>  F: include/hw/misc/atmel_power.h
+>  F: tests/acceptance/machine_avr6.py
 > =20
-> -##
-> -# @CompressionStats:
-> -#
-> -# Detailed migration compression statistics
-> -#
-> -# @pages: amount of pages compressed and transferred to the target VM
-> -#
-> -# @busy: count of times that no free thread was available to compress da=
-ta
-> -#
-> -# @busy-rate: rate of thread busy
-> -#
-> -# @compressed-size: amount of bytes after compression
-> -#
-> -# @compression-rate: rate of compressed size
-> -#
-> -# Since: 3.1
-> -##
-> -{ 'struct': 'CompressionStats',
-> -  'data': {'pages': 'int', 'busy': 'int', 'busy-rate': 'number',
-> -=09   'compressed-size': 'int', 'compression-rate': 'number' } }
-> -
-
-Only user is MigrationInfo, which is next.
-
->  ##
->  # @MigrationStatus:
->  #
-> @@ -200,9 +179,6 @@
-   ##
-   # @MigrationInfo:
-[...]
->  #           only present when the postcopy-blocktime migration capabilit=
-y
->  #           is enabled. (Since 3.0)
->  #
-> -# @compression: migration compression statistics, only returned if compr=
-ession
-> -#           feature is on and status is 'active' or 'completed' (Since 3=
-.1)
-> -#
->  # @socket-address: Only used for tcp, to know what the real port is (Sin=
-ce 4.0)
->  #
->  # Since: 0.14.0
-> @@ -219,7 +195,6 @@
->             '*error-desc': 'str',
->             '*postcopy-blocktime' : 'uint32',
->             '*postcopy-vcpu-blocktime': ['uint32'],
-> -           '*compression': 'CompressionStats',
->             '*socket-address': ['SocketAddress'] } }
-
-MigrationInfo is returned by  query-migrate.  No other users.
-
-Doc comment gives us wiggle room: "only returned if compression feature
-is on".  Can it be on after this patch?
-
-If no, the member can go without breaking query-migrate compatibility.
-
-query-qmp-schema shows the change, though.  Could conceivably affect
-users, but it seems unlikely.
-
-Eric, Mike, we might want to grant ourselves explicit license to change
-query-qmp-schema in such ways, by having qapi-code-gen.txt state
-optional members may be removed when they can't be present anymore.
-What do you think?
-
-Alternatively, keep the member, hardcode value to whatever is returned
-before the patch when compression is off, deprecate, remove after grace
-period.  A bit more work, but safer.  Worthwhile?  Not for me to decide.
-
-> =20
->  ##
-> @@ -364,14 +339,6 @@
-   ##
-   # @MigrationCapability:
-[...]
->  #          to enable the capability on the source VM. The feature is dis=
-abled by
->  #          default. (since 1.6)
->  #
-> -# @compress: Use multiple compression threads to accelerate live migrati=
-on.
-> -#          This feature can help to reduce the migration traffic, by sen=
-ding
-> -#          compressed pages. Please note that if compress and xbzrle are=
- both
-> -#          on, compress only takes effect in the ram bulk stage, after t=
-hat,
-> -#          it will be disabled and only xbzrle takes effect, this can he=
-lp to
-> -#          minimize migration traffic. The feature is disabled by defaul=
-t.
-> -#          (since 2.4 )
-> -#
->  # @events: generate events for each migration state change
->  #          (since 2.4 )
->  #
-> @@ -425,7 +392,7 @@
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> -           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
-,
-> +           'events', 'postcopy-ram', 'x-colo', 'release-ram',
->             'block', 'return-path', 'pause-before-switchover', 'multifd',
->             'dirty-bitmaps', 'postcopy-blocktime', 'late-block-activate',
->             'x-ignore-shared', 'validate-uuid' ] }
-
-Only users are migrate-set-capabilities and query-migrate-capabilities,
-via MigrationCapabilityStatus, which are next.
-
-> @@ -479,7 +446,6 @@
-   ##
-   # @MigrationCapabilityStatus:
-   #
-   # Migration capability information
-   #
-   # @capability: capability enum
-   #
-   # @state: capability state bool
-   #
-   # Since: 1.2
-   ##
-   { 'struct': 'MigrationCapabilityStatus',
-     'data': { 'capability' : 'MigrationCapability', 'state' : 'bool' } }
-
-   ##
-   # @migrate-set-capabilities:
-   #
-   # Enable/Disable the following migration capabilities (like xbzrle)
-   #
-   # @capabilities: json array of capability modifications to make
-   #
-   # Since: 1.2
-   #
-   # Example:
-   #
-   # -> { "execute": "migrate-set-capabilities" , "arguments":
-   #      { "capabilities": [ { "capability": "xbzrle", "state": true } ] }=
- }
-   #
-   ##
-   { 'command': 'migrate-set-capabilities',
-     'data': { 'capabilities': ['MigrationCapabilityStatus'] } }
-
-With MigrationCapability @compress gone, attempting to set it with
-migrate-set-capabilities fails with GenericError, "desc": "Invalid
-parameter 'compress'".
-
-Setting capability "compress" can fail before this patch, but only when
-you do it in the middle of a migration, so this is actually a new error.
-
-Adding errors is explicitly permitted in docs/interop/qmp-spec.txt
-section "Compatibility Considerations":
-
-    However, Clients must not assume any particular:
-    [...]
-    - Amount of errors generated by a command, that is, new errors can be a=
-dded
-      to any existing command in newer versions of the Server
-
-We're good.
-
-   ##
-   # @query-migrate-capabilities:
-   #
-   # Returns information about the current migration capabilities status
-   #
-   # Returns: @MigrationCapabilitiesStatus
-   #
-   # Since: 1.2
-   #
-   # Example:
-   #
-   # -> { "execute": "query-migrate-capabilities" }
-   # <- { "return": [
-   #       {"state": false, "capability": "xbzrle"},
->  #       {"state": false, "capability": "rdma-pin-all"},
->  #       {"state": false, "capability": "auto-converge"},
->  #       {"state": false, "capability": "zero-blocks"},
-> -#       {"state": false, "capability": "compress"},
->  #       {"state": true, "capability": "events"},
->  #       {"state": false, "capability": "postcopy-ram"},
->  #       {"state": false, "capability": "x-colo"}
-   #    ]}
-   #
-   ##
-   { 'command': 'query-migrate-capabilities', 'returns':   ['MigrationCapab=
-ilityStatus']}
-
-What capabilties are returned when is not specified.
-
-Aside: it should be, shouldn't it?
-
-qmp_query_migrate_capabilities() returns them all, except it skips
-"block" when !defined CONFIG_LIVE_BLOCK_MIGRATION.  De facto ABI due to
-the gap in the documented ABI.
-
-Removing capability "compress" is a break of this de facto ABI.
-Acceptable when we're confident the ABI's users don't care.
-
-Alternatively, keep them, hardcode value to false, deprecate, remove
-after grace period.
-
-Aside: you might want to make MigrationCapability @block conditional like
-
-   { 'enum': 'MigrationCapability',
-     'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-              'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
-,
-              { 'name': 'block',
-                'if': 'defined(CONFIG_LIVE_BLOCK_MIGRATION)' },
-              'return-path', 'pause-before-switchover', 'multifd',
-              'dirty-bitmaps', 'postcopy-blocktime', 'late-block-activate',
-              'x-ignore-shared', 'validate-uuid' ] }
-
-> @@ -523,20 +489,6 @@
-   ##
-   # @MigrationParameter:
-[...]
->  #          no compression, 1 means the best compression speed, and 9 mea=
-ns best
->  #          compression ratio which will consume more CPU.
->  #
-> -# @compress-threads: Set compression thread count to be used in live mig=
-ration,
-> -#          the compression thread count is an integer between 1 and 255.
-> -#
-> -# @compress-wait-thread: Controls behavior when all compression threads =
-are
-> -#                        currently busy. If true (default), wait for a f=
-ree
-> -#                        compression thread to become available; otherwi=
-se,
-> -#                        send the page uncompressed. (Since 3.1)
-> -#
-> -# @decompress-threads: Set decompression thread count to be used in live
-> -#          migration, the decompression thread count is an integer betwe=
-en 1
-> -#          and 255. Usually, decompression is at least 4 times as fast a=
-s
-> -#          compression, so set the decompress-threads to the number abou=
-t 1/4
-> -#          of compress-threads is adequate.
-> -#
->  # @cpu-throttle-initial: Initial percentage of time guest cpus are throt=
-tled
->  #                        when migration auto-converge is activated. The
->  #                        default value is 20. (Since 2.7)
-> @@ -607,8 +559,7 @@
->  { 'enum': 'MigrationParameter',
->    'data': ['announce-initial', 'announce-max',
->             'announce-rounds', 'announce-step',
-> -           'compress-level', 'compress-threads', 'decompress-threads',
-> -           'compress-wait-thread',
-> +           'compress-level',
->             'cpu-throttle-initial', 'cpu-throttle-increment',
->             'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth',
->             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-
-Used internally; not part of the external interface.  Okay.
-
-> @@ -633,15 +584,6 @@
-   ##
-   # @MigrateSetParameters:
-[...]
->  #
->  # @compress-level: compression level
->  #
-> -# @compress-threads: compression thread count
-> -#
-> -# @compress-wait-thread: Controls behavior when all compression threads =
-are
-> -#                        currently busy. If true (default), wait for a f=
-ree
-> -#                        compression thread to become available; otherwi=
-se,
-> -#                        send the page uncompressed. (Since 3.1)
-> -#
-> -# @decompress-threads: decompression thread count
-> -#
->  # @cpu-throttle-initial: Initial percentage of time guest cpus are
->  #                        throttled when migration auto-converge is activ=
-ated.
->  #                        The default value is 20. (Since 2.7)
-> @@ -717,9 +659,6 @@
->              '*announce-rounds': 'size',
->              '*announce-step': 'size',
->              '*compress-level': 'int',
-> -            '*compress-threads': 'int',
-> -            '*compress-wait-thread': 'bool',
-> -            '*decompress-threads': 'int',
->              '*cpu-throttle-initial': 'int',
->              '*cpu-throttle-increment': 'int',
->              '*tls-creds': 'StrOrNull',
-
-MigrateSetParameters is the (boxed) argument of migrate-set-parameters.
-No other users.
-
-With these optional members, attempting to use them with
-migrate-set-parameters fails with GenericError, "desc": "Invalid
-parameter 'NAME'".
-
-Same argument as for migrate-set-capabilities above.  Good.
-
-> @@ -770,15 +709,6 @@
-   ##
-   # @MigrationParameters:
-   #
-   # The optional members aren't actually optional.
-[...]
->  # @compress-level: compression level
->  #
-> -# @compress-threads: compression thread count
-> -#
-> -# @compress-wait-thread: Controls behavior when all compression threads =
-are
-> -#                        currently busy. If true (default), wait for a f=
-ree
-> -#                        compression thread to become available; otherwi=
-se,
-> -#                        send the page uncompressed. (Since 3.1)
-> -#
-> -# @decompress-threads: decompression thread count
-> -#
->  # @cpu-throttle-initial: Initial percentage of time guest cpus are
->  #                        throttled when migration auto-converge is activ=
-ated.
->  #                        (Since 2.7)
-> @@ -854,9 +784,6 @@
->              '*announce-rounds': 'size',
->              '*announce-step': 'size',
->              '*compress-level': 'uint8',
-> -            '*compress-threads': 'uint8',
-> -            '*compress-wait-thread': 'bool',
-> -            '*decompress-threads': 'uint8',
->              '*cpu-throttle-initial': 'uint8',
->              '*cpu-throttle-increment': 'uint8',
->              '*tls-creds': 'str',
-> @@ -885,9 +812,7 @@
->  #
->  # -> { "execute": "query-migrate-parameters" }
->  # <- { "return": {
-> -#          "decompress-threads": 2,
->  #          "cpu-throttle-increment": 10,
-> -#          "compress-threads": 8,
->  #          "compress-level": 1,
->  #          "cpu-throttle-initial": 20,
->  #          "max-bandwidth": 33554432,
-
-MigrateSetParameters is returned by query-migrate-parameters.  No other
-users.
-
-Even thought the members are optional, the doc comment specifies all are
-returned.  qmp_query_migrate_parameters() does.
-
-Removing the parameters breaks this promise.  Acceptable when we're
-confident the ABI's users don't care.
-
-Alternatively, keep them, hardcode value to whatever is returned before
-the patch when compression is off, deprecate, remove after grace period.
-
-Questions?
-
+> +Arduino
+> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> +S: Maintained
+> +F: hw/avr/arduino.c
+> +F: hw/avr/atmel_atmega.*
+> +
+>  CRIS Machines
+>  -------------
+>  Axis Dev88
+> diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+> index da3b10afec..59d9649d27 100644
+> --- a/hw/avr/Kconfig
+> +++ b/hw/avr/Kconfig
+> @@ -3,3 +3,7 @@ config ATMEL_ATMEGA_MCU
+>      select ATMEL_TIMER16
+>      select ATMEL_USART
+>      select ATMEL_POWER
+> +
+> +config ARDUINO
+> +    select ATMEL_ATMEGA_MCU
+> +    select UNIMP
+> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+> index 1f73fd5469..c8a131923c 100644
+> --- a/hw/avr/Makefile.objs
+> +++ b/hw/avr/Makefile.objs
+> @@ -1,2 +1,3 @@
+>  obj-y +=3D boot.o
+>  obj-$(CONFIG_ATMEL_ATMEGA_MCU) +=3D atmel_atmega.o
+> +obj-$(CONFIG_ARDUINO) +=3D arduino.o
+>=20
 
