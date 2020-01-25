@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F91DC35241
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 04:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8930C35241
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 04:27:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0E0B20716
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 04:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E0B20716
+	by mail.kernel.org (Postfix) with ESMTPS id ADC1D20716
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 04:27:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC1D20716
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivD1o-0007uX-Vy
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 23:26:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33014)
+	id 1ivD2d-0000MB-TX
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jan 2020 23:27:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33015)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ivD1B-0007Ko-0G
+ (envelope-from <bounces@canonical.com>) id 1ivD1B-0007Ks-0Z
  for qemu-devel@nongnu.org; Fri, 24 Jan 2020 23:25:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ivD15-0000Mw-UD
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 23:25:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36974)
+ (envelope-from <bounces@canonical.com>) id 1ivD18-0000Pm-Dl
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 23:25:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37000)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ivD14-0000Ka-VN
- for qemu-devel@nongnu.org; Fri, 24 Jan 2020 23:25:51 -0500
+ id 1ivD15-0000L3-Rk
+ for qemu-devel@nongnu.org; Fri, 24 Jan 2020 23:25:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ivD12-00033M-O1
- for <qemu-devel@nongnu.org>; Sat, 25 Jan 2020 04:25:48 +0000
+ id 1ivD13-0002uk-5k
+ for <qemu-devel@nongnu.org>; Sat, 25 Jan 2020 04:25:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 69FF92E80D6
- for <qemu-devel@nongnu.org>; Sat, 25 Jan 2020 04:25:48 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 27A772E80D3
+ for <qemu-devel@nongnu.org>; Sat, 25 Jan 2020 04:25:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 25 Jan 2020 04:17:27 -0000
+Date: Sat, 25 Jan 2020 04:17:28 -0000
 From: Launchpad Bug Tracker <1852781@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -59,7 +59,7 @@ X-Launchpad-Bug-Commenters: colin-king janitor paelzer th-huth
 X-Launchpad-Bug-Reporter: Colin Ian King (colin-king)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
 References: <157384084797.7162.9983011521410421204.malonedeb@gac.canonical.com>
-Message-Id: <157992584739.32017.4679448992455642186.malone@loganberry.canonical.com>
+Message-Id: <157992584871.32017.12366759333544870897.malone@loganberry.canonical.com>
 Subject: [Bug 1852781] Re: qemu s390x on focal - applications breaking
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -67,7 +67,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 06828767c577086f6af710b66fd95c1110ae8e66
+X-Launchpad-Hash: a13876f4b930b382b77cb62d2edd8b7432030b70
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,9 +85,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+[Expired for Ubuntu on IBM z Systems because there has been no activity
+for 60 days.]
 
-** Changed in: qemu
+** Changed in: ubuntu-z-systems
        Status: Incomplete =3D> Expired
 
 -- =
