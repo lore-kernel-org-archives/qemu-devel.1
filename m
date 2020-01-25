@@ -2,74 +2,71 @@ Return-Path: <SRS0=4gpF=3O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA0DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 17:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8168DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 17:28:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BA792070A
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 17:27:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D50C2070A
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 17:28:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZ6DyQV1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA792070A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVfBKVWg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D50C2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivPDs-0000RH-OP
-	for qemu-devel@archiver.kernel.org; Sat, 25 Jan 2020 12:27:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38239)
+	id 1ivPE3-0000li-FK
+	for qemu-devel@archiver.kernel.org; Sat, 25 Jan 2020 12:28:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ivP7w-0000LE-GT
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 12:21:45 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ivPBC-000640-CR
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 12:25:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ivP7v-0006qQ-AU
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 12:21:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59692
+ (envelope-from <eric.auger@redhat.com>) id 1ivPBA-00086d-G3
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 12:25:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49769
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ivP7v-0006oq-6P
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 12:21:43 -0500
+ id 1ivPBA-0007xT-Au
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 12:25:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579972902;
+ s=mimecast20190719; t=1579973102;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pSGNxYFqQiUMxXpBMll+KUH7vlXCIEz4YZEkAy+zE/Q=;
- b=aZ6DyQV1Jf9ez5CwhnfZbrnh7GPzz1AjzocCESqsrF13wjAC/wA9kaDFN7QDuFBiIzpt5F
- L+v3kLYWT6ztR2CPUSqxT4l5qJnW48CejY9i4H64N2nJPn8EraGE3vnl1Yev39zl5TegQR
- d7mguH5Lmnjn05jB0+beEf53smTDpME=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=CYRkzMGr0qa4lzTOn1tCfqrIUWVP++89tVcGXamSgg0=;
+ b=hVfBKVWgMcPh5CIeuoEfru2gSSbgUgQgQ8J4umFzyHMr7sBNrL1TnwzWC+Uq4l+zfH/2lU
+ WNaJ5j8YRkS0Bb7aBEwACy3dANW6YhXzdCS+jADlyhbdZdad6Bmn33xKuHDRwEKDqtvJxz
+ xvWgUduJ6TQbx/n8blFE4l4jIObW3Vg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-SyHz6aTcM02IimmmP9FWSg-1; Sat, 25 Jan 2020 12:21:41 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-270-1r9HeJ-YNZGI1g2H6C76tw-1; Sat, 25 Jan 2020 12:25:00 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB3F518543A4;
- Sat, 25 Jan 2020 17:21:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E528B18543A4;
+ Sat, 25 Jan 2020 17:24:59 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E88186E19;
- Sat, 25 Jan 2020 17:21:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6AB2E8E5E2;
+ Sat, 25 Jan 2020 17:24:53 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, jean-philippe@linaro.org,
- dgilbert@redhat.com, quintela@redhat.com, mst@redhat.com, peterx@redhat.com
-Subject: [PATCH v13 09/10] virtio-iommu: Support migration
-Date: Sat, 25 Jan 2020 18:19:54 +0100
-Message-Id: <20200125171955.12825-10-eric.auger@redhat.com>
-In-Reply-To: <20200125171955.12825-1-eric.auger@redhat.com>
-References: <20200125171955.12825-1-eric.auger@redhat.com>
+ dgilbert@redhat.com, quintela@redhat.com
+Subject: [PATCH] migration: Simplify get_qlist
+Date: Sat, 25 Jan 2020 18:24:49 +0100
+Message-Id: <20200125172449.13175-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: SyHz6aTcM02IimmmP9FWSg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 1r9HeJ-YNZGI1g2H6C76tw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -87,159 +84,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, bharatb.linux@gmail.com, tnowicki@marvell.com
+Cc: peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add Migration support. We rely on recently added gtree and qlist
-migration. We only migrate the domain gtree. The endpoint gtree
-is re-constructed in a post-load operation.
+Instead of inserting read elements at the head and
+then reversing the list, it is simpler to add
+each element after the previous one. Introduce
+QLIST_RAW_INSERT_AFTER helper and use it in
+get_qlist().
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Peter Xu <peterx@redhat.com>
+Suggested-by: Juan Quintela <quintela@redhat.com>
 
 ---
-
-v11 -> v12:
-- do not migrate the endpoint gtree but reconstruct it from the
-  domain gtree (Peter's suggestion)
-- add MIG_PRI_IOMMU
 ---
- hw/virtio/virtio-iommu.c | 109 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 99 insertions(+), 10 deletions(-)
+ include/qemu/queue.h      | 19 ++++++-------------
+ migration/vmstate-types.c | 10 +++++++---
+ 2 files changed, 13 insertions(+), 16 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index ec8f42e167..8f5c6f17df 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -650,16 +650,6 @@ static uint64_t virtio_iommu_get_features(VirtIODevice=
- *vdev, uint64_t f,
-     return f;
- }
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index 4d4554a7ce..19425f973f 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -515,6 +515,12 @@ union {                                               =
+                  \
+              (elm);                                                       =
+     \
+              (elm) =3D *QLIST_RAW_NEXT(elm, entry))
 =20
--/*
-- * Migration is not yet supported: most of the state consists
-- * of balanced binary trees which are not yet ready for getting
-- * migrated
-- */
--static const VMStateDescription vmstate_virtio_iommu_device =3D {
--    .name =3D "virtio-iommu-device",
--    .unmigratable =3D 1,
--};
++#define QLIST_RAW_INSERT_AFTER(head, prev, elem, entry) do {              =
+     \
++        *QLIST_RAW_NEXT(prev, entry) =3D elem;                            =
+       \
++        *QLIST_RAW_PREVIOUS(elem, entry) =3D QLIST_RAW_NEXT(prev, entry); =
+       \
++        *QLIST_RAW_NEXT(elem, entry) =3D NULL;                            =
+       \
++} while (0)
++
+ #define QLIST_RAW_INSERT_HEAD(head, elm, entry) do {                      =
+     \
+         void *first =3D *QLIST_RAW_FIRST(head);                           =
+       \
+         *QLIST_RAW_FIRST(head) =3D elm;                                   =
+       \
+@@ -527,17 +533,4 @@ union {                                               =
+                  \
+         }                                                                 =
+     \
+ } while (0)
+=20
+-#define QLIST_RAW_REVERSE(head, elm, entry) do {                          =
+     \
+-        void *iter =3D *QLIST_RAW_FIRST(head), *prev =3D NULL, *next;     =
+         \
+-        while (iter) {                                                    =
+     \
+-            next =3D *QLIST_RAW_NEXT(iter, entry);                        =
+       \
+-            *QLIST_RAW_PREVIOUS(iter, entry) =3D QLIST_RAW_NEXT(next, entr=
+y);    \
+-            *QLIST_RAW_NEXT(iter, entry) =3D prev;                        =
+       \
+-            prev =3D iter;                                                =
+       \
+-            iter =3D next;                                                =
+       \
+-        }                                                                 =
+     \
+-        *QLIST_RAW_FIRST(head) =3D prev;                                  =
+       \
+-        *QLIST_RAW_PREVIOUS(prev, entry) =3D QLIST_RAW_FIRST(head);       =
+       \
+-} while (0)
 -
- static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
- {
-     guint ua =3D GPOINTER_TO_UINT(a);
-@@ -743,9 +733,108 @@ static void virtio_iommu_instance_init(Object *obj)
- {
- }
+ #endif /* QEMU_SYS_QUEUE_H */
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index 1eee36773a..35e784c9d9 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -879,7 +879,7 @@ static int get_qlist(QEMUFile *f, void *pv, size_t unus=
+ed_size,
+     /* offset of the QLIST entry in a QLIST element */
+     size_t entry_offset =3D field->start;
+     int version_id =3D field->version_id;
+-    void *elm;
++    void *elm, *prev =3D NULL;
 =20
-+#define VMSTATE_INTERVAL                               \
-+{                                                      \
-+    .name =3D "interval",                                \
-+    .version_id =3D 1,                                   \
-+    .minimum_version_id =3D 1,                           \
-+    .fields =3D (VMStateField[]) {                       \
-+        VMSTATE_UINT64(low, VirtIOIOMMUInterval),      \
-+        VMSTATE_UINT64(high, VirtIOIOMMUInterval),     \
-+        VMSTATE_END_OF_LIST()                          \
-+    }                                                  \
-+}
-+
-+#define VMSTATE_MAPPING                               \
-+{                                                     \
-+    .name =3D "mapping",                                \
-+    .version_id =3D 1,                                  \
-+    .minimum_version_id =3D 1,                          \
-+    .fields =3D (VMStateField[]) {                      \
-+        VMSTATE_UINT64(phys_addr, VirtIOIOMMUMapping),\
-+        VMSTATE_UINT32(flags, VirtIOIOMMUMapping),    \
-+        VMSTATE_END_OF_LIST()                         \
-+    },                                                \
-+}
-+
-+static const VMStateDescription vmstate_interval_mapping[2] =3D {
-+    VMSTATE_MAPPING,   /* value */
-+    VMSTATE_INTERVAL   /* key   */
-+};
-+
-+static int domain_preload(void *opaque)
-+{
-+    VirtIOIOMMUDomain *domain =3D opaque;
-+
-+    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,
-+                                       NULL, g_free, g_free);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_endpoint =3D {
-+    .name =3D "endpoint",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, VirtIOIOMMUEndpoint),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_domain =3D {
-+    .name =3D "domain",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .pre_load =3D domain_preload,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, VirtIOIOMMUDomain),
-+        VMSTATE_GTREE_V(mappings, VirtIOIOMMUDomain, 1,
-+                        vmstate_interval_mapping,
-+                        VirtIOIOMMUInterval, VirtIOIOMMUMapping),
-+        VMSTATE_QLIST_V(endpoint_list, VirtIOIOMMUDomain, 1,
-+                        vmstate_endpoint, VirtIOIOMMUEndpoint, next),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static gboolean reconstruct_endpoints(gpointer key, gpointer value,
-+                                      gpointer data)
-+{
-+    VirtIOIOMMU *s =3D (VirtIOIOMMU *)data;
-+    VirtIOIOMMUDomain *d =3D (VirtIOIOMMUDomain *)value;
-+    VirtIOIOMMUEndpoint *iter;
-+
-+    QLIST_FOREACH(iter, &d->endpoint_list, next) {
-+        iter->domain =3D d;
-+        g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
-+    }
-+    return false; /* continue the domain traversal */
-+}
-+
-+static int iommu_post_load(void *opaque, int version_id)
-+{
-+    VirtIOIOMMU *s =3D opaque;
-+
-+    g_tree_foreach(s->domains, reconstruct_endpoints, s);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_virtio_iommu_device =3D {
-+    .name =3D "virtio-iommu-device",
-+    .minimum_version_id =3D 1,
-+    .version_id =3D 1,
-+    .post_load =3D iommu_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_GTREE_DIRECT_KEY_V(domains, VirtIOIOMMU, 1,
-+                                   &vmstate_domain, VirtIOIOMMUDomain),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_virtio_iommu =3D {
-     .name =3D "virtio-iommu",
-     .minimum_version_id =3D 1,
-+    .priority =3D MIG_PRI_IOMMU,
-     .version_id =3D 1,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_VIRTIO_DEVICE,
+     trace_get_qlist(field->name, vmsd->name, vmsd->version_id);
+     if (version_id > vmsd->version_id) {
+@@ -900,9 +900,13 @@ static int get_qlist(QEMUFile *f, void *pv, size_t unu=
+sed_size,
+             g_free(elm);
+             return ret;
+         }
+-        QLIST_RAW_INSERT_HEAD(pv, elm, entry_offset);
++        if (!prev) {
++            QLIST_RAW_INSERT_HEAD(pv, elm, entry_offset);
++        } else {
++            QLIST_RAW_INSERT_AFTER(pv, prev, elm, entry_offset);
++        }
++        prev =3D elm;
+     }
+-    QLIST_RAW_REVERSE(pv, elm, entry_offset);
+     trace_get_qlist_end(field->name, vmsd->name);
+=20
+     return ret;
 --=20
 2.20.1
 
