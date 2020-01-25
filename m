@@ -2,109 +2,111 @@ Return-Path: <SRS0=4gpF=3O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3742C35242
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 09:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D94EC35242
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 09:53:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78C152071A
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 09:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18B142077C
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jan 2020 09:53:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=xcancerberox.com.ar header.i=@xcancerberox.com.ar header.b="f87ypW1u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C152071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xcancerberox.com.ar
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GEQPKtSN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B142077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivHvZ-0002Z5-AU
-	for qemu-devel@archiver.kernel.org; Sat, 25 Jan 2020 04:40:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56442)
+	id 1ivHl4-0008Fw-LG
+	for qemu-devel@archiver.kernel.org; Sat, 25 Jan 2020 04:29:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53979)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <me@xcancerberox.com.ar>) id 1ivHuN-00026F-Af
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 04:39:16 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ivHkM-0007K4-QL
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 04:28:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <me@xcancerberox.com.ar>) id 1ivHuL-0007tN-Kv
- for qemu-devel@nongnu.org; Sat, 25 Jan 2020 04:39:15 -0500
-Received: from [51.158.76.159] (port=37974 helo=mail.xcancerberox.com.ar)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <me@xcancerberox.com.ar>)
- id 1ivHuL-0007no-2q; Sat, 25 Jan 2020 04:39:13 -0500
-Subject: Re: [PATCH rc2 21/25] hw/avr: Add some Arduino boards
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xcancerberox.com.ar;
- s=mail; t=1579944749;
- bh=/v+mWBauk8doqq1EaqiCvFpU4WwDVqQApuraYsc20zM=;
- h=Subject:To:Cc:References:From:In-Reply-To;
- b=f87ypW1u09V7VFwekFI3U+Rs3zoY2/5uqbuhqwR8b10ZXsqRZAVHLBkfrBH9/eHdj
- OGXxZooaQHJuzEjdjc0nUmc+QmuGT7r0r7UhMbUCJ01/ev2BMxMsjrBpEJ/mGV2ISo
- kBrlz1NWmsCQVDzo8Hd1rHqc6rG9Wx7e6zRwkyXfkKMdQmyrtX1CJlBUPl/JgoRQAY
- pgRf+Z/FQt+pS8vJVpOtQViClL3UANG+hotf94XSyZaGo+HWMrh+v4Yv5o9wFHuzrI
- SWE4v/GcJdPvkAJj9t2aUjwUL/bPL35JLk3LApjuhhp4u88ukIHUT9Hd373ZAAe6pP
- 7WL5dkoQ+hzkA==
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, mrolnik@gmail.com, richard.henderson@linaro.org
-References: <20200124005131.16276-1-f4bug@amsat.org>
- <20200124005131.16276-22-f4bug@amsat.org>
-From: Joaquin de Andres <me@xcancerberox.com.ar>
-Openpgp: preference=signencrypt
-Autocrypt: addr=me@xcancerberox.com.ar; keydata=
- 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
- OZRo+ULKJ1xXuVGe8hnP9Q==
-Message-ID: <99d4c4d3-8cbd-9a92-13f5-b73e06ddfb17@xcancerberox.com.ar>
-Date: Sat, 25 Jan 2020 10:32:26 +0100
-Mime-Version: 1.0
-In-Reply-To: <20200124005131.16276-22-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <pbonzini@redhat.com>) id 1ivHkH-0005df-7E
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 04:28:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40522
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ivHkG-0005cb-AI
+ for qemu-devel@nongnu.org; Sat, 25 Jan 2020 04:28:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579944526;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gtNQ9rrYKcknnGHOzccIlXBRzgoWYu7FcEJFt787aWo=;
+ b=GEQPKtSNUrD4zgVEAZsbYlwTWn5seDoDzCopUTy6OWLZOrIpAlewEMMgqjVwamHpdij3ul
+ NaxjWwhf+HwHA0uiMaYcKbx/EuBT15feRdqwVEI8MCoAS5cn7ataMN6c78KszdvItAUF5N
+ XrFkvlNmQRUNnbgfzGq+DGf7wJ+x/GE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-G4L1OpCbODCY8Z1iWFMy6g-1; Sat, 25 Jan 2020 04:28:44 -0500
+Received: by mail-wr1-f70.google.com with SMTP id w6so2738242wrm.16
+ for <qemu-devel@nongnu.org>; Sat, 25 Jan 2020 01:28:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=32dqtyR5TBV35DUTqXrUjfhlXbgSaeuZ36JHPNNxpUo=;
+ b=tipBFwqRlbx6EAJdGZdd/ViaUagh+SKgk05FRL2RyiW3ZQqCSyT+jKc558eAfUpOqI
+ YvsVMZnnEouFmqD8h1W4a9d9WWZJd7YNucK2XYEeSUM/t5vStVHGNVlFfxz1VOge2sXW
+ ck8jOmCXkLcE/cjUJaRwvLLJR/b5/Ay+cGT/142yaNZDrwsrfHZQEwNH3+6PfPXvvhNM
+ i8OrLZoP7VFbQ2uAN0R2STl5qJcMFDCu2lQhLYqqKAWnOSWBZ3KdwJTgOqjYLQtoaYJw
+ 0BPepBa3dzuHBGBPhM3wbVxxB66sZ1yQETIinCWEBWCkC0XasMG6Pp9Yhz3nSqSgS2sF
+ /RQQ==
+X-Gm-Message-State: APjAAAW0USltfhvfIDc1uH+hBLp7sjxXbmBa3tNubXZyv6NX5c4b8Mjr
+ dckCXBHkhxA27KxdZWXo+PAgnpFZ/y5EgTnnk5U2zCfmnhnzSA24dUSlhIUbNXsx5u4DiSYHNY9
+ LNXbIc+kqxm4VUP8=
+X-Received: by 2002:a5d:45cc:: with SMTP id b12mr9114789wrs.424.1579944522721; 
+ Sat, 25 Jan 2020 01:28:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwR1Y4GennUua/OAie/sflnQewgnsl0Ybq4QyRyVzPSVigGg/4h2wk6BKNAS7Kjmdnz+U0LKQ==
+X-Received: by 2002:a5d:45cc:: with SMTP id b12mr9114761wrs.424.1579944522458; 
+ Sat, 25 Jan 2020 01:28:42 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id d12sm10997779wrp.62.2020.01.25.01.28.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 25 Jan 2020 01:28:41 -0800 (PST)
+Subject: Re: Integrating QOM into QAPI
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+References: <87d0bmchq0.fsf@dusky.pond.sub.org>
+ <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200120100849.GB345995@stefanha-x1.localdomain>
+ <871rrtmkko.fsf@dusky.pond.sub.org>
+ <20200121113224.GD630615@stefanha-x1.localdomain>
+ <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
+ <87wo9lc4oe.fsf_-_@dusky.pond.sub.org> <20200121143658.GB597037@redhat.com>
+ <871rrs97ld.fsf@dusky.pond.sub.org>
+ <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
+ <87y2tzzrwo.fsf@linaro.org> <87wo9ju19n.fsf@dusky.pond.sub.org>
+ <CAJ+F1CLu6xNJ834qWpJ6Bx1PHhv5QutdK2-Nzp+J2q80YV5tzA@mail.gmail.com>
+ <c68f8ffd-dc8a-f282-3195-aa9e8760de7a@redhat.com>
+ <CAJ+F1CKukvqb+=q922Eh1HHHFe6nOkLsnCwWamc0303F14QFqQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e2da6836-87f3-5d91-b969-198e00317a62@redhat.com>
+Date: Sat, 25 Jan 2020 10:28:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <CAJ+F1CKukvqb+=q922Eh1HHHFe6nOkLsnCwWamc0303F14QFqQ@mail.gmail.com>
 Content-Language: en-US
+X-MC-Unique: G4L1OpCbODCY8Z1iWFMy6g-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 51.158.76.159
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,255 +118,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
- S.E.Harris@kent.ac.uk, qemu-riscv@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, dovgaluk@ispras.ru,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, thuth@redhat.com,
- Markus Armbruster <armbru@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ John Snow <jsnow@redhat.com>, Christophe de Dinechin <dinechin@redhat.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, imammedo@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, aleksandar.m.mail@gmail.com
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/24/20 1:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Arduino boards are build with AVR chipsets.
-> Add some of the popular boards:
+On 25/01/20 05:44, Marc-Andr=C3=A9 Lureau wrote:
+>     On 22/01/20 13:42, Marc-Andr=C3=A9 Lureau wrote:
+>     > From the top of my mind, this is the pain point when trying to use
+>     GObject:
+>     > - static/inlined object, not supported by GObject, unlikely to ever=
+ be
+>     > - few users in qemu, transition possible.
+>     > - 64k limit of GObject, for some reason, unlikely to change but I w=
+ill
+>     > take a look. Some users in qemu, code adaptation possible.
+>     > - dynamic properties, possible in GObject with hacks, but not
+>     > recommended and going to be deprecated from what I remember
+>     > - "array" properties - would need extra layer/tweaks for compatibil=
+ity
+>     > - link properties - would need special handling
+>     > - different limitations for type names and properties names
 >=20
-> - Arduino Duemilanove
-> - Arduino Uno
-> - Arduino Mega
+>     The properties in general are very different between QOM and QAPI.=C2=
+=A0 They
+>     have different limitations and features as Marc-Andr=C3=A9 mentioned,=
+ but an
+>     especially important one is the integration with QAPI visitors.=C2=A0=
+ This is
+>     what allows us to support -object and object-add with the same code, =
+and
+>     is what separates QOM from GObject the most.
 >=20
-> For more information:
->   https://www.arduino.cc/en/Main/Products
->   https://store.arduino.cc/arduino-genuino/most-popular
+>     Maybe it would be possible to build an adapter, but having written in
+>     the past code that uses GType to do marshalling and unmarshalling, I'=
+m
+>     not really fond of repeating the experience...
 >=20
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Message-Id: <20200120220107.17825-15-f4bug@amsat.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> rc2:
-> - Use avr_load_firmware (Aleksandar)
-> - No default machine on AVR (Richard)
-> - Add entry in MAINTAINERS (Michael is still the maintainer of hw/avr/)
-> ---
->  hw/avr/arduino.c     | 151 +++++++++++++++++++++++++++++++++++++++++++
->  MAINTAINERS          |   6 ++
->  hw/avr/Kconfig       |   4 ++
->  hw/avr/Makefile.objs |   1 +
->  4 files changed, 162 insertions(+)
->  create mode 100644 hw/avr/arduino.c
->=20
-> diff --git a/hw/avr/arduino.c b/hw/avr/arduino.c
-> new file mode 100644
-> index 0000000000..2fb2e96ffe
-> --- /dev/null
-> +++ b/hw/avr/arduino.c
-> @@ -0,0 +1,151 @@
-> +/*
-> + * QEMU Arduino boards
-> + *
-> + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
-> + *
-> + * This work is licensed under the terms of the GNU GPLv2 or later.
-> + * See the COPYING file in the top-level directory.
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +/* TODO: Implement the use of EXTRAM */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/boards.h"
-> +#include "atmel_atmega.h"
-> +#include "boot.h"
-> +
-> +typedef struct ArduinoMachineState {
-> +    /*< private >*/
-> +    MachineState parent_obj;
-> +    /*< public >*/
-> +    AtmegaMcuState mcu;
-> +} ArduinoMachineState;
-> +
-> +typedef struct ArduinoMachineClass {
-> +    /*< private >*/
-> +    MachineClass parent_class;
-> +    /*< public >*/
-> +    const char *mcu_type;
-> +    uint64_t xtal_hz;
-> +} ArduinoMachineClass;
-> +
-> +#define TYPE_ARDUINO_MACHINE \
-> +        MACHINE_TYPE_NAME("arduino")
-> +#define ARDUINO_MACHINE(obj) \
-> +        OBJECT_CHECK(ArduinoMachineState, (obj), TYPE_ARDUINO_MACHINE)
-> +#define ARDUINO_MACHINE_CLASS(klass) \
-> +        OBJECT_CLASS_CHECK(ArduinoMachineClass, (klass), TYPE_ARDUINO_=
-MACHINE)
-> +#define ARDUINO_MACHINE_GET_CLASS(obj) \
-> +        OBJECT_GET_CLASS(ArduinoMachineClass, (obj), TYPE_ARDUINO_MACH=
-INE)
-> +
-> +static void arduino_machine_init(MachineState *machine)
-> +{
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_GET_CLASS(machine);
-> +    ArduinoMachineState *ams =3D ARDUINO_MACHINE(machine);
-> +
-> +    sysbus_init_child_obj(OBJECT(machine), "mcu", &ams->mcu, sizeof(am=
-s->mcu),
-> +                          amc->mcu_type);
-> +    object_property_set_uint(OBJECT(&ams->mcu), amc->xtal_hz,
-> +                             "xtal-frequency-hz", &error_abort);
-> +    object_property_set_bool(OBJECT(&ams->mcu), true, "realized",
-> +                             &error_abort);
-> +
-> +    if (machine->firmware) {
-> +        if (!avr_load_firmware(&ams->mcu.cpu, machine,
-> +                               &ams->mcu.flash, machine->firmware)) {
-> +            exit(1);
-> +        }
-> +    }
-> +}
-> +
-> +static void arduino_machine_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +
-> +    mc->init =3D arduino_machine_init;
-> +    mc->default_cpus =3D 1;
-> +    mc->min_cpus =3D mc->default_cpus;
-> +    mc->max_cpus =3D mc->default_cpus;
-> +    mc->no_floppy =3D 1;
-> +    mc->no_cdrom =3D 1;
-> +    mc->no_parallel =3D 1;
-> +}
-> +
-> +static void arduino_duemilanove_class_init(ObjectClass *oc, void *data=
-)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://www.arduino.cc/en/Main/ArduinoBoardDuemilanove */
-> +    mc->desc        =3D "Arduino Duemilanove (ATmega168)",
-> +    mc->alias       =3D "2009";
-> +    amc->mcu_type   =3D TYPE_ATMEGA168_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
-> +};
+> I agree it is one of the things that look very different from gobject.
+> At the same time, I think defining conventions/types or interface to
+> describe hierarchy isn't so difficult, and then adapting the visitors
+> shouldn't be either.
 
-Hi! According to the page this board could be used with Atmega328 too.
-Maybe you can define both?
+Note that there are a few "structured" properties that export a QAPI
+struct rather than a scalar.  Those would be a bit more complex.  Links
+might also be tricky.
 
-The rest of this patch looks good to me, so:
-Reviewed-by: Joaquin de Andres <me@xcancerberox.com.ar>
+Another small difference that came to mind is the different object
+liveness model; GObject is mostly plain old reference counting (plus the
+"floating reference" idea), while in QOM reference counting is secondary
+and lifetime is mostly dictated by the object tree and "unparenting".
+This is more of a conceptual difference; it could be easily retrofitted
+in GObject.
 
-> +
-> +static void arduino_uno_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://store.arduino.cc/arduino-uno-rev3 */
-> +    mc->desc        =3D "Arduino UNO (ATmega328P)";
-> +    mc->alias       =3D "uno";
-> +    amc->mcu_type   =3D TYPE_ATMEGA328_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
-> +};
-> +
-> +static void arduino_mega_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://www.arduino.cc/en/Main/ArduinoBoardMega */
-> +    mc->desc        =3D "Arduino Mega (ATmega1280)";
-> +    mc->alias       =3D "mega";
-> +    amc->mcu_type   =3D TYPE_ATMEGA1280_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000;
-> +};
-> +
-> +static void arduino_mega2560_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
-> +
-> +    /* https://store.arduino.cc/arduino-mega-2560-rev3 */
-> +    mc->desc        =3D "Arduino Mega 2560 (ATmega2560)";
-> +    mc->alias       =3D "mega2560";
-> +    amc->mcu_type   =3D TYPE_ATMEGA2560_MCU;
-> +    amc->xtal_hz    =3D 16 * 1000 * 1000; /* CSTCE16M0V53-R0 */
-> +};
-> +
-> +static const TypeInfo arduino_machine_types[] =3D {
-> +    {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-duemilanove"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_duemilanove_class_init,
-> +    }, {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-uno"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_uno_class_init,
-> +    }, {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-mega"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_mega_class_init,
-> +    }, {
-> +        .name          =3D MACHINE_TYPE_NAME("arduino-mega-2560-v3"),
-> +        .parent        =3D TYPE_ARDUINO_MACHINE,
-> +        .class_init    =3D arduino_mega2560_class_init,
-> +    }, {
-> +        .name           =3D TYPE_ARDUINO_MACHINE,
-> +        .parent         =3D TYPE_MACHINE,
-> +        .instance_size  =3D sizeof(ArduinoMachineState),
-> +        .class_size     =3D sizeof(ArduinoMachineClass),
-> +        .class_init     =3D arduino_machine_class_init,
-> +        .abstract       =3D true,
-> +    }
-> +};
-> +
-> +DEFINE_TYPES(arduino_machine_types)
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 066515ac8e..07c8912489 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -904,6 +904,12 @@ F: hw/misc/atmel_power.c
->  F: include/hw/misc/atmel_power.h
->  F: tests/acceptance/machine_avr6.py
-> =20
-> +Arduino
-> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> +S: Maintained
-> +F: hw/avr/arduino.c
-> +F: hw/avr/atmel_atmega.*
-> +
->  CRIS Machines
->  -------------
->  Axis Dev88
-> diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
-> index da3b10afec..59d9649d27 100644
-> --- a/hw/avr/Kconfig
-> +++ b/hw/avr/Kconfig
-> @@ -3,3 +3,7 @@ config ATMEL_ATMEGA_MCU
->      select ATMEL_TIMER16
->      select ATMEL_USART
->      select ATMEL_POWER
-> +
-> +config ARDUINO
-> +    select ATMEL_ATMEGA_MCU
-> +    select UNIMP
-> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
-> index 1f73fd5469..c8a131923c 100644
-> --- a/hw/avr/Makefile.objs
-> +++ b/hw/avr/Makefile.objs
-> @@ -1,2 +1,3 @@
->  obj-y +=3D boot.o
->  obj-$(CONFIG_ATMEL_ATMEGA_MCU) +=3D atmel_atmega.o
-> +obj-$(CONFIG_ARDUINO) +=3D arduino.o
->=20
+> I try to find a good reason qom was chosen over gobject, and I can't
+> find it.
+
+The main reasons were integration with QAPI, and the object tree.
+Though everything I say here is a kind of reverse engineering of
+Anthony's brain because there aren't really any design documents besides
+what's in include/qom/object.h (and he overlooked some aspects, for
+example "unparent" was introduced a few months later).
+
+Overall I don't think there would be much benefit in reusing GObject.
+It's about 3k lines of code, quite a few would stay (those implementing
+the tree) and a bunch more would have to be rewritten.  I don't think
+we'd have any use for most of the features that QOM lacks, such as
+signals.  Also, QOM is quite well documented and we should include its
+documentation in docs/devel instead.
+
+That said, coccinell-ing efforts on QOM code are definitely a good idea
+since it's quite mature now and we know better what we need.  And there
+are practical advantages too, it's not just code cleanups---see how your
+series shows the default value of the properties in -device foo,help.
+
+Paolo
+
 
