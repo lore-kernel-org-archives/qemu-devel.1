@@ -2,51 +2,55 @@ Return-Path: <SRS0=sDSq=3P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4715AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 460DBC3F68F
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:58:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AE1C206F0
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:57:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE1C206F0
+	by mail.kernel.org (Postfix) with ESMTPS id 1F74B206F0
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:58:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F74B206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivqqs-0007HM-8A
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 17:57:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33312)
+	id 1ivqqt-0007JN-75
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 17:57:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpk-0005UF-4V
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:49 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpm-0005V1-LV
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpi-0000LA-9N
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:47 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:37669 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpl-0000PC-7e
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:50 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:37944 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ivqph-0007zK-UJ
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:46 -0500
+ id 1ivqpk-0000Mo-Sd
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:49 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id A18DE1A1526;
- Sun, 26 Jan 2020 23:55:40 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id B02CC1A1D93;
+ Sun, 26 Jan 2020 23:55:54 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 83C761A0F00;
- Sun, 26 Jan 2020 23:55:40 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 94AD31A1D62;
+ Sun, 26 Jan 2020 23:55:54 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc3 00/30] target/avr merger
-Date: Sun, 26 Jan 2020 23:54:41 +0100
-Message-Id: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc3 08/30] target/avr: Add instruction translation - Registers
+ definition
+Date: Sun, 26 Jan 2020 23:54:49 +0100
+Message-Id: <1580079311-20447-9-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -63,195 +67,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Michael Rolnik <mrolnik@gmail.com>
 
-This is the AVR port from Michael release (merge) candidate 3.
-
-The series can be found also in this repository:
-
-https://github.com/AMarkovic/qemu-avr-merger-rc3
-
-History:
-
-Since v2:
-
-- First patch is split into six smaller logical units (net result
-  remains the same)
-- Patch "hw/core/loader: Let load_elf populate the processor-specific
-  flags" was redone to reflect the original intent that was lost in
-  transalation between multiple autors
-- Patch "hw/avr: Add helper to load raw/ELF firmware binaries" was
-  corrected only in one line to rectify type of "e_flags"
-- Patch "target/avr: Add section about AVR into QEMU documentation"
-- Spurious <message-Id:> elements were removed
-- The series was rebased to the latest code
-
-Since v1:
-
-- Addressed Thomas comments
-- Fixed a non-critical bug in ATmega (incorrect SRAM base address)
-- Added ELF parsing requested by Aleksandar
-- Dropped default machine (as with the ARM port)
-
-Michael Rolnik (25):
-  target/avr: Add basic parameters for new AVR platform
-  target/avr: Introduce AVR CPU class object
-  target/avr: Add migration support
-  target/avr: Add GDB support
-  target/avr: Introduce AVR features
-  target/avr: Add defintions of AVR core types
-  target/avr: Add instruction helpers
-  target/avr: Add instruction translation - Registers definition
-  target/avr: Add instruction translation - Arithmetic and Logic
-    Instructions
-  target/avr: Add instruction translation - Branch Instructions
-  target/avr: Add instruction translation - Data Transfer Instructions
-  target/avr: Add instruction translation - Bit and Bit-test
-    Instructions
-  target/avr: Add instruction translation - MCU Control Instructions
-  target/avr: Add instruction translation - CPU main translation
-    function
-  target/avr: Add instruction disassembly function
-  hw/char: Add limited support for Atmel USART peripheral
-  hw/timer: Add limited support for Atmel 16 bit timer peripheral
-  hw/misc: Add Atmel power device
-  target/avr: Add section about AVR into QEMU documentation
-  target/avr: Register AVR support with the rest of QEMU
-  target/avr: Add machine none test
-  target/avr: Update MAINTAINERS file
-  target/avr: Update build system
-  tests/boot-serial-test: Test some Arduino boards (AVR based)
-  tests/acceptance: Test the Arduino MEGA2560 board
-
-Philippe Mathieu-Daud=C3=A9 (5):
-  hw/core/loader: Let load_elf populate the processor-specific flags
-  hw/avr: Add helper to load raw/ELF firmware binaries
-  hw/avr: Add some ATmega microcontrollers
-  hw/avr: Add some Arduino boards
-  .travis.yml: Run the AVR acceptance tests
-
- .travis.yml                      |    2 +-
- MAINTAINERS                      |   30 +
- arch_init.c                      |    2 +
- configure                        |    7 +
- default-configs/avr-softmmu.mak  |    5 +
- gdb-xml/avr-cpu.xml              |   49 +
- hw/alpha/dp264.c                 |    4 +-
- hw/arm/armv7m.c                  |    2 +-
- hw/arm/boot.c                    |    2 +-
- hw/avr/Kconfig                   |    9 +
- hw/avr/Makefile.objs             |    3 +
- hw/avr/arduino.c                 |  151 ++
- hw/avr/atmel_atmega.c            |  470 ++++++
- hw/avr/atmel_atmega.h            |   48 +
- hw/avr/boot.c                    |   74 +
- hw/avr/boot.h                    |   33 +
- hw/char/Kconfig                  |    3 +
- hw/char/Makefile.objs            |    1 +
- hw/char/atmel_usart.c            |  320 ++++
- hw/core/generic-loader.c         |    2 +-
- hw/core/loader.c                 |   37 +-
- hw/cris/boot.c                   |    2 +-
- hw/hppa/machine.c                |    4 +-
- hw/i386/multiboot.c              |    2 +-
- hw/i386/x86.c                    |    2 +-
- hw/lm32/lm32_boards.c            |    4 +-
- hw/lm32/milkymist.c              |    2 +-
- hw/m68k/an5206.c                 |    2 +-
- hw/m68k/mcf5208.c                |    2 +-
- hw/m68k/q800.c                   |    2 +-
- hw/microblaze/boot.c             |    4 +-
- hw/mips/mips_fulong2e.c          |    2 +-
- hw/mips/mips_malta.c             |    3 +-
- hw/mips/mips_mipssim.c           |    2 +-
- hw/mips/mips_r4k.c               |    2 +-
- hw/misc/Kconfig                  |    3 +
- hw/misc/Makefile.objs            |    2 +
- hw/misc/atmel_power.c            |  112 ++
- hw/moxie/moxiesim.c              |    2 +-
- hw/nios2/boot.c                  |    4 +-
- hw/openrisc/openrisc_sim.c       |    2 +-
- hw/pci-host/prep.c               |    3 +-
- hw/ppc/e500.c                    |    2 +-
- hw/ppc/mac_newworld.c            |    4 +-
- hw/ppc/mac_oldworld.c            |    4 +-
- hw/ppc/ppc440_bamboo.c           |    2 +-
- hw/ppc/sam460ex.c                |    3 +-
- hw/ppc/spapr.c                   |    6 +-
- hw/ppc/virtex_ml507.c            |    2 +-
- hw/riscv/boot.c                  |    4 +-
- hw/s390x/ipl.c                   |    7 +-
- hw/sparc/leon3.c                 |    2 +-
- hw/sparc/sun4m.c                 |    4 +-
- hw/sparc64/sun4u.c               |    5 +-
- hw/timer/Kconfig                 |    3 +
- hw/timer/Makefile.objs           |    2 +
- hw/timer/atmel_timer16.c         |  605 ++++++++
- hw/tricore/tricore_testboard.c   |    2 +-
- hw/xtensa/sim.c                  |    2 +-
- hw/xtensa/xtfpga.c               |    2 +-
- include/disas/dis-asm.h          |   19 +
- include/elf.h                    |    2 +
- include/hw/char/atmel_usart.h    |   93 ++
- include/hw/elf_ops.h             |    6 +-
- include/hw/loader.h              |   21 +-
- include/hw/misc/atmel_power.h    |   46 +
- include/hw/timer/atmel_timer16.h |   94 ++
- include/sysemu/arch_init.h       |    1 +
- qapi/machine.json                |    3 +-
- qemu-doc.texi                    |   51 +
- target/avr/Makefile.objs         |   34 +
- target/avr/cpu-param.h           |   37 +
- target/avr/cpu-qom.h             |   54 +
- target/avr/cpu.c                 |  826 +++++++++++
- target/avr/cpu.h                 |  259 ++++
- target/avr/disas.c               |  246 ++++
- target/avr/gdbstub.c             |   84 ++
- target/avr/helper.c              |  347 +++++
- target/avr/helper.h              |   29 +
- target/avr/insn.decode           |  182 +++
- target/avr/machine.c             |  121 ++
- target/avr/translate.c           | 2997 ++++++++++++++++++++++++++++++++=
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+---
+ target/avr/translate.c | 171 +++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- tests/acceptance/machine_avr6.py |   50 +
- tests/qtest/Makefile.include     |    2 +
- tests/qtest/boot-serial-test.c   |   11 +
- tests/qtest/machine-none-test.c  |    1 +
- 86 files changed, 7613 insertions(+), 81 deletions(-)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 gdb-xml/avr-cpu.xml
- create mode 100644 hw/avr/Kconfig
- create mode 100644 hw/avr/Makefile.objs
- create mode 100644 hw/avr/arduino.c
- create mode 100644 hw/avr/atmel_atmega.c
- create mode 100644 hw/avr/atmel_atmega.h
- create mode 100644 hw/avr/boot.c
- create mode 100644 hw/avr/boot.h
- create mode 100644 hw/char/atmel_usart.c
- create mode 100644 hw/misc/atmel_power.c
- create mode 100644 hw/timer/atmel_timer16.c
- create mode 100644 include/hw/char/atmel_usart.h
- create mode 100644 include/hw/misc/atmel_power.h
- create mode 100644 include/hw/timer/atmel_timer16.h
- create mode 100644 target/avr/Makefile.objs
- create mode 100644 target/avr/cpu-param.h
- create mode 100644 target/avr/cpu-qom.h
- create mode 100644 target/avr/cpu.c
- create mode 100644 target/avr/cpu.h
- create mode 100644 target/avr/disas.c
- create mode 100644 target/avr/gdbstub.c
- create mode 100644 target/avr/helper.c
- create mode 100644 target/avr/helper.h
- create mode 100644 target/avr/insn.decode
- create mode 100644 target/avr/machine.c
+ 1 file changed, 171 insertions(+)
  create mode 100644 target/avr/translate.c
- create mode 100644 tests/acceptance/machine_avr6.py
 
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+new file mode 100644
+index 0000000..535f666
+--- /dev/null
++++ b/target/avr/translate.c
+@@ -0,0 +1,171 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/qemu-print.h"
++#include "tcg/tcg.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "tcg/tcg-op.h"
++#include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
++#include "exec/helper-gen.h"
++#include "exec/log.h"
++#include "exec/translator.h"
++#include "exec/gen-icount.h"
++
++/*
++ *  Define if you want a BREAK instruction translated to a breakpoint
++ *  Active debugging connection is assumed
++ *  This is for
++ *  https://github.com/seharris/qemu-avr-tests/tree/master/instruction-t=
+ests
++ *  tests
++ */
++#undef BREAKPOINT_ON_BREAK
++
++static TCGv cpu_pc;
++
++static TCGv cpu_Cf;
++static TCGv cpu_Zf;
++static TCGv cpu_Nf;
++static TCGv cpu_Vf;
++static TCGv cpu_Sf;
++static TCGv cpu_Hf;
++static TCGv cpu_Tf;
++static TCGv cpu_If;
++
++static TCGv cpu_rampD;
++static TCGv cpu_rampX;
++static TCGv cpu_rampY;
++static TCGv cpu_rampZ;
++
++static TCGv cpu_r[NUMBER_OF_CPU_REGISTERS];
++static TCGv cpu_eind;
++static TCGv cpu_sp;
++
++static TCGv cpu_skip;
++
++static const char reg_names[NUMBER_OF_CPU_REGISTERS][8] =3D {
++    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
++    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
++    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
++    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
++};
++#define REG(x) (cpu_r[x])
++
++enum {
++    DISAS_EXIT   =3D DISAS_TARGET_0,  /* We want return to the cpu main =
+loop.  */
++    DISAS_LOOKUP =3D DISAS_TARGET_1,  /* We have a variable condition ex=
+it.  */
++    DISAS_CHAIN  =3D DISAS_TARGET_2,  /* We have a single condition exit=
+.  */
++};
++
++typedef struct DisasContext DisasContext;
++
++/* This is the state at translation time. */
++struct DisasContext {
++    TranslationBlock *tb;
++
++    CPUAVRState *env;
++    CPUState *cs;
++
++    target_long npc;
++    uint32_t opcode;
++
++    /* Routine used to access memory */
++    int memidx;
++    int bstate;
++    int singlestep;
++
++    /*
++     * some AVR instructions can make the following instruction to be sk=
+ipped
++     * Let's name those instructions
++     *     A   - instruction that can skip the next one
++     *     B   - instruction that can be skipped. this depends on execut=
+ion of A
++     * there are two scenarios
++     * 1. A and B belong to the same translation block
++     * 2. A is the last instruction in the translation block and B is th=
+e last
++     *
++     * following variables are used to simplify the skipping logic, they=
+ are
++     * used in the following manner (sketch)
++     *
++     * TCGLabel *skip_label =3D NULL;
++     * if (ctx.skip_cond !=3D TCG_COND_NEVER) {
++     *     skip_label =3D gen_new_label();
++     *     tcg_gen_brcond_tl(skip_cond, skip_var0, skip_var1, skip_label=
+);
++     * }
++     *
++     * if (free_skip_var0) {
++     *     tcg_temp_free(skip_var0);
++     *     free_skip_var0 =3D false;
++     * }
++     *
++     * translate(&ctx);
++     *
++     * if (skip_label) {
++     *     gen_set_label(skip_label);
++     * }
++     */
++    TCGv skip_var0;
++    TCGv skip_var1;
++    TCGCond skip_cond;
++    bool free_skip_var0;
++};
++
++static int to_regs_16_31_by_one(DisasContext *ctx, int indx)
++{
++    return 16 + (indx % 16);
++}
++
++static int to_regs_16_23_by_one(DisasContext *ctx, int indx)
++{
++    return 16 + (indx % 8);
++}
++static int to_regs_24_30_by_two(DisasContext *ctx, int indx)
++{
++    return 24 + (indx % 4) * 2;
++}
++static int to_regs_00_30_by_two(DisasContext *ctx, int indx)
++{
++    return (indx % 16) * 2;
++}
++
++static uint16_t next_word(DisasContext *ctx)
++{
++    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
++}
++
++static int append_16(DisasContext *ctx, int x)
++{
++    return x << 16 | next_word(ctx);
++}
++
++
++static bool avr_have_feature(DisasContext *ctx, int feature)
++{
++    if (!avr_feature(ctx->env, feature)) {
++        gen_helper_unsupported(cpu_env);
++        ctx->bstate =3D DISAS_NORETURN;
++        return false;
++    }
++    return true;
++}
++
++static bool decode_insn(DisasContext *ctx, uint16_t insn);
++#include "decode_insn.inc.c"
 --=20
 2.7.4
 
