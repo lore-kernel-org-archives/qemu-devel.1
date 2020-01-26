@@ -2,112 +2,84 @@ Return-Path: <SRS0=sDSq=3P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74EBDC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 16:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 829EEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 16:51:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3965D206A2
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 16:48:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D4F9206A2
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 16:51:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RqDobmiP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3965D206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PL15SHow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D4F9206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivl59-00037S-DP
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 11:48:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34834)
+	id 1ivl80-0004JT-GK
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 11:51:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ivl4A-0002cc-7x
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 11:47:19 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ivl7N-0003re-Rz
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 11:50:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ivl47-0002zc-Rr
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 11:47:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60467
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ivl47-0002yp-Nw
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 11:47:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580057234;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VosXAJSOWRv+RjYNiRK3nHDNw6+1ZwiDWsU+8E+dS8A=;
- b=RqDobmiPqrSWPjaZUvIL/BGf+v+rtqd+9AwYH/zhEaCVOpn3vDrmtDK7aHXG1CMvK9mxwg
- 6+G1KbLs1d/M5EbYgeSOfbwMvAIwoUHmhKkOPeKr8/JUo+BWqxYyD0Yzxd5g1kCciORxFc
- FbVzpZgOIAUng9JFk2P7QX89uTCvRAM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-AXqMqo7mNbWa1AuApBiQsg-1; Sun, 26 Jan 2020 11:47:10 -0500
-Received: by mail-wr1-f70.google.com with SMTP id o6so4647927wrp.8
- for <qemu-devel@nongnu.org>; Sun, 26 Jan 2020 08:47:10 -0800 (PST)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ivl7M-0006Z7-Cv
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 11:50:37 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41856)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ivl7M-0006YW-7k
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 11:50:36 -0500
+Received: by mail-oi1-x243.google.com with SMTP id i1so4483572oie.8
+ for <qemu-devel@nongnu.org>; Sun, 26 Jan 2020 08:50:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tIVFwxogzwnrFBuYVAn08RcmIO8VOZNo3EoNm0qw4SE=;
+ b=PL15SHowEw5GlMDtU7TBD4PFCwThZ2CP3wdZ2+9tWYgU5yB6l9b4nuBjonnmFtyfxE
+ OJQIqebj5iHoTYFEUA4lVAcWBkX5IZWcllqkNYb+WezKfNugAp2wY7F3UbGPjE3g+8D4
+ dp0wUMURZLIKJZPHXux0mEYKIpUq5SEIDZjrx6wjdtJJyq/in/4piVzRYDon6JsFaHD6
+ ByXeGtiYKzpmvZue62PorD/ZesnUCUaoUgx8netUXPuhXNLnra/SpPlsB5P6PpD0tkjL
+ 18DsRNZ9F8y8v0LcgIc8Dox177N86tgNQ0bkE/AO0QNAUv+FAU72VA6sFW4znMLukfzp
+ aE4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=r8xdpEbui/mJTQseJTsbh0+qV0y+2P/d2fNkJKOIoXs=;
- b=QnmVutgxi6j4OYOJiKCOMu2rOHQQQIp9ln0KU83RugkL2aDAtzDx7yBBkL0oekyhVS
- zM1mBQFusEv4bvWSqR5b5aw5gnZK2wluRUzjCtL286ruloNug6GYPRtmxOa3j8d40riF
- Fsrsg9HJpxHIs7oPY28ypl0/d0a3C0SZR06q+9U7KAuWrNFXpjfsk8JkFSNnpyiRnizR
- N1vcH4SAkrJUIbqYaRR07VorURDHxSd4DovxksnC2PkVLNiU0WENxvAo091YS8BkgLZw
- KsuZmyabFycO/5830P5dA/teLoBrQGvPKswvSPutI67E2/j0p0REtVzC+R6ZCGskY5kT
- 8qaw==
-X-Gm-Message-State: APjAAAU9Kh5pUzFpVPBW6i6xUc+VKMJ3Ta2e0w0EkQh3lQl8CbgPhBnN
- dN0srwCSsOq/30p4hSwYmArRzdj7UGk2SHxfVPvpb5m7ZK6MR8pESsakPKQLezm52UP2dEbnHCK
- eW940NkoLVpre+Ho=
-X-Received: by 2002:a7b:c5cd:: with SMTP id n13mr9329437wmk.172.1580057229681; 
- Sun, 26 Jan 2020 08:47:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyIJTLqIkluPW8HIaaKxDokWTfrbMrDCnIUz0zR3ZXrv4xZihvyGK1coQE51yUsMYaKBCw1Yg==
-X-Received: by 2002:a7b:c5cd:: with SMTP id n13mr9329399wmk.172.1580057229339; 
- Sun, 26 Jan 2020 08:47:09 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:784d:f09c:63f4:b9cb?
- ([2001:b07:6468:f312:784d:f09c:63f4:b9cb])
- by smtp.gmail.com with ESMTPSA id t12sm16118333wrs.96.2020.01.26.08.47.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 26 Jan 2020 08:47:08 -0800 (PST)
-Subject: Re: Integrating QOM into QAPI
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Christophe de Dinechin <dinechin@redhat.com>
-References: <87d0bmchq0.fsf@dusky.pond.sub.org>
- <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200120100849.GB345995@stefanha-x1.localdomain>
- <871rrtmkko.fsf@dusky.pond.sub.org>
- <20200121113224.GD630615@stefanha-x1.localdomain>
- <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
- <87wo9lc4oe.fsf_-_@dusky.pond.sub.org> <20200121143658.GB597037@redhat.com>
- <871rrs97ld.fsf@dusky.pond.sub.org>
- <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
- <C4AB0E62-765F-45BC-A442-99C643CFFCCD@redhat.com>
- <CAJ+F1CL_nREHOyh4YffWwbES+wgq8tZTkd4n8Vf568b+hbzgDQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0e08d426-dc2a-d373-86f3-f2cc22694b74@redhat.com>
-Date: Sun, 26 Jan 2020 17:47:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tIVFwxogzwnrFBuYVAn08RcmIO8VOZNo3EoNm0qw4SE=;
+ b=Uk8uSKG/++ueAssoa5IopM5ifvK7lJCAyqfFpZV1UfzFo0K+djsxS+bw9pSgOO7amC
+ gWCZjzNJF3hhvWjo8oeo7D3VWn8sbxe1vfPUmozwAoIOXWnB1QVOwFtBVR92Jp1YPdR6
+ uZCFFHyGsxkafzivAcIuFuWB5g4sTsuqLBI7ALV7aQcHTBwxUtHyeoCCaZIpmxeEllZq
+ kjwgfbfh6oysY5OGFvVTAdUm8cBsUP3O6DdhwqHgvBkrsfS3qfitFP1EEePdZT1Prr8J
+ zew50pVYnOxwaMAUZATgHWWXFY1H/C8XeMAMhgwb54Z6hASWFs/0lAin9k9f59nmY2W1
+ rYrA==
+X-Gm-Message-State: APjAAAVlPc1jmTFnTHCFf9MPnxSjGNqjkHt+nwJwPkKhy/9+P2cP9RtU
+ qwbVMmZHQgvpSPwQu+VYnKlsZUmDCsu824N87+c=
+X-Google-Smtp-Source: APXvYqzu+7nowUD6WGs0Z+UjQMOZWwrZs50vLvLAfBOPc4VMXKnviIPb9uKCnIM4zd51IIYBdeL5zZNuMD38sizxqhU=
+X-Received: by 2002:a05:6808:64e:: with SMTP id
+ z14mr4980526oih.79.1580057435307; 
+ Sun, 26 Jan 2020 08:50:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL_nREHOyh4YffWwbES+wgq8tZTkd4n8Vf568b+hbzgDQ@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: AXqMqo7mNbWa1AuApBiQsg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+References: <324a-5e231180-7-6946d180@169257031>
+ <20200120145024.GJ345995@stefanha-x1.localdomain>
+ <CAL1e-=in3inmtH=4ZjM2bxnVPJz2GVW4pwTJ8PVkWoqiunPPfA@mail.gmail.com>
+ <20200122112818.GA663955@stefanha-x1.localdomain>
+In-Reply-To: <20200122112818.GA663955@stefanha-x1.localdomain>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sun, 26 Jan 2020 17:50:24 +0100
+Message-ID: <CAL1e-=hJ=vD6Ngy0_w-kGA2X4EP-yni+S0ZTkPKW36moqaBozg@mail.gmail.com>
+Subject: Re: [GSoC/Outreachy QEMU project proposal] Measure and Analyze QEMU
+ Performance
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,64 +91,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/01/20 10:11, Marc-Andr=C3=A9 Lureau wrote:
->> I=E2=80=99m still puzzled as to why anybody would switch to something li=
-ke
->> GObject when there is C++.
-> C++ is another level of complexity.
->=20
-> Replacing QOM with GObject would mainly bring us a more solid type
-> system with better tooling/features, gobject-introspection support,
-> and remove the burden of having our own OO from QEMU code base.
+On Wed, Jan 22, 2020 at 12:28 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Tue, Jan 21, 2020 at 03:07:53PM +0100, Aleksandar Markovic wrote:
+> > On Mon, Jan 20, 2020 at 3:51 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > >
+> > > On Sat, Jan 18, 2020 at 03:08:37PM +0100, Aleksandar Markovic wrote:
+> > > > 3) The community will be given all devised performance measurement methods in the form of easily reproducible step-by-step setup and execution procedures.
+> > >
+> > > Tracking performance is a good idea and something that has not been done
+> > > upstream yet.
+> >
+> > Thanks for the interest, Stefan!
+> >
+> > >  A few questions:
+> > >
+> > >  * Will benchmarks be run automatically (e.g. nightly or weekly) on
+> > >    someone's hardware or does every TCG architecture maintainer need to
+> > >    run them manually for themselves?
+> >
+> > If the community wants it, definitely yes. Once the methodology is
+> > developed, it should be straightforward to setup nightly and/or weekly
+> > benchmarks - that could definitely include sending mails with reports
+> > to the entire list or just individuals or subgroups. The recipient
+> > choice is just a matter or having decent criteria about
+> > appropriateness of information within the message (e.g. not to flood
+> > the list with the data most people are not really interested).
+> >
+> > For linux-user tests, they are typically very quick, and nightly tests
+> > are quite feasible to run. On someone hardware, of course, and
+> > consistently always on the same hardware, if possible. If it makes
+> > sense, one could setup multiple test beds with a variety of hardware
+> > setups.
+> >
+> > For system mode tests, I knoe they are much more difficult to
+> > automate, and, on top of that, there could be greater risk of
+> > hangs/crashes Also, considering the number of machines we support,
+> > those tests could consume much more time - perhaps even one day would
+> > not be sufficient, if we have many machines and boot/shutdown
+> > variants. For these reason, perhaps weekly executions would be more
+> > appropriate for them, and, in general, given greater complexity, the
+> > expectation from system-mode performance tests should be better kept
+> > quite low for now.
+> >
+> > >  * Where will the benchmark result history be stored?
+> > >
+> >
+> > If emailing is set up, the results could be reconstructed from emails.
+> > But, yes, it would be better if the result history is kept somewhere
+> > on an internet-connected file server
+>
+> Thanks.  I don't want to overcomplicate this project.  The main thing is
+> to identify the stakeholders (TCG target maintainers?) and make sure
+> they are happy.
+>
 
-In fact, C++ doesn't solve any of the problems that either QOM or
-GObject try to solve.  (Neither does Rust for that matter).
-Nevertheless, there is no stupid question, only stupid answers, and I
-think Christophe's remark is an example of a common misconception.  In
-the hope of not making this a stupid answer, let my try to formulate
-succinctly what I think the differences are between QOM, GObject and the
-C++ object model:
+Yes, Stefan, TCG target maintainers would be the main stakeholders. To
+some extent, various Machine maintainers would also be stakeholders,
+but they will most likely come back to TCG target maintainers looking
+for solution. In a literal sense, a number of maintainers were
+initially going to be very unhappy seeing the results (for example,
+seeing that the machine or entire target performs poorly compared to
+similar machines/targets), but after a while they should and will
+become happy realizing the problem was identified, and the culprit is
+at least approximately determined.
 
-- the C++ object model (at least "old-style" C++ with virtual functions
-and the like) provides you with _the intersection_ of what QOM and
-GObject try to solve.  This is what Marc-Andr=C3=A9 calls "OO", and it's
-essentially virtual functions and dynamic casts.  It's a relatively
-small part of both QOM and GObject, and unfortunately a wheel that
-almost every large C program ends up reinventing.
+I intentionally wanted to keep the project description simple in order
+to be realistic and not develop high expectation among any of us. And
+if the student proved to be capable, it will be very easy to add some
+more useful tasks for him in this area, to be included in his/hers
+GSoC/Outreachy activities.
 
-- Marc-Andr=C3=A9 also described above what GObject provides: a fully
-introspectable type system and the tools so that _libraries_ can define
-_types that will be used from multiple programming languages_.
+He had just today one case of performance degradation identified manually:
 
-- QOM also provides a fully introspectable type system, but with a
-different focus: it's so that _objects_ can expose _properties that will
-be accessed from multiple channels_.
+https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg06326.html
+
+This project aims to do these kind of things easier, and possibly in
+an automated way. Howard did this by manual measurements for one
+particular setup, but this project will cover much much more.
+
+Thanks, Stefan, again for your interest - and everything else!
+
+Aleksandar
 
 
-Everything else in both GObject and QOM follows from this core purpose,
-and the differences between the two follow from the differences.  For
-example:
 
-- GObject's focus on multiple programming languages:
-gobject-introspection, GClosure, support for non-object types (scalar
-and GBoxed)
-
-- QOM's focus on objects: dynamic properties, object tree, all types are
-classes
-
-- QOM's focus on properties: no introspection of methods
-
-- QOM's support for multiple channels: visitors
-
-Paolo
-
+> Stefan
 
