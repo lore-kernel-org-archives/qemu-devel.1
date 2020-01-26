@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9511AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A72C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:59:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BE12206F0
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE12206F0
+	by mail.kernel.org (Postfix) with ESMTPS id 8916A206F0
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 22:59:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8916A206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivqqu-0007Nu-Ft
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 17:58:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33370)
+	id 1ivqsa-0002Bq-Je
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 17:59:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpn-0005Vg-9N
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpm-0005Uj-Dq
  for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpl-0000P6-6r
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:51 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:37945 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpj-0000MM-Ri
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:50 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:37939 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ivqpk-0000Mn-RS
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:49 -0500
+ id 1ivqpj-0000LJ-C1
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:47 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id BFB1A1A1D7F;
- Sun, 26 Jan 2020 23:55:53 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 71B341A1D42;
+ Sun, 26 Jan 2020 23:55:52 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A53B31A1D62;
- Sun, 26 Jan 2020 23:55:53 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4C7D31A1D37;
+ Sun, 26 Jan 2020 23:55:52 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc3 07/30] target/avr: Add instruction helpers
-Date: Sun, 26 Jan 2020 23:54:48 +0100
-Message-Id: <1580079311-20447-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc3 06/30] target/avr: Add defintions of AVR core types
+Date: Sun, 26 Jan 2020 23:54:47 +0100
+Message-Id: <1580079311-20447-7-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -66,7 +66,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
- Michael Rolnik <mrolnik@gmail.com>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -74,426 +74,685 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Stubs for unimplemented instructions and helpers for instructions that
-need to interact with QEMU.  SPM and WDR are unimplemented because they
-require emulation of complex peripherals.  The implementation of SLEEP
-is very limited due to the lack of peripherals to generate wake interrupt=
-s.
-Memory access instructions are implemented here because some address rang=
-es
-actually refer to CPU registers.
+AVR core types are:
 
+  - avr1
+  - avr2
+  - avr25
+  - avr3
+  - avr31
+  - avr35
+  - avr4
+  - avr5
+  - avr51
+  - avr6
+  - avrtiny
+  - xmega2
+  - xmega3
+  - xmega4
+  - xmega5
+  - xmega6
+  - xmega7
+
+Each core type covers multiple AVR MCUs, mentioned in the comments
+before definition of particular AVR core type (part of this patch).
+
+AVR core type defines shared features that are valid for all AVR
+MCUs belonging in that type.
+
+Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- target/avr/helper.c | 347 ++++++++++++++++++++++++++++++++++++++++++++++=
+ target/avr/cpu.c | 601 +++++++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- target/avr/helper.h |  29 +++++
- 2 files changed, 376 insertions(+)
- create mode 100644 target/avr/helper.c
- create mode 100644 target/avr/helper.h
+ 1 file changed, 601 insertions(+)
 
-diff --git a/target/avr/helper.c b/target/avr/helper.c
-new file mode 100644
-index 0000000..c43a4b7
---- /dev/null
-+++ b/target/avr/helper.c
-@@ -0,0 +1,347 @@
+diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+index 673a0ee..c74c510 100644
+--- a/target/avr/cpu.c
++++ b/target/avr/cpu.c
+@@ -223,3 +223,604 @@ static void avr_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+     cc->gdb_num_core_regs =3D 35;
+     cc->gdb_core_xml_file =3D "avr-cpu.xml";
+ }
++
 +/*
-+ * QEMU AVR CPU
++ * Setting features of AVR core type avr1
++ * --------------------------------------
 + *
-+ * Copyright (c) 2019 Michael Rolnik
++ * This type of AVR core is present in the following AVR MCUs:
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ * at90s1200, attiny11, attiny12, attiny15, attiny28
 + */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "exec/helper-proto.h"
-+
-+bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++static void avr_avr1_initfn(Object *obj)
 +{
-+    bool ret =3D false;
-+    CPUClass *cc =3D CPU_GET_CLASS(cs);
-+    AVRCPU *cpu =3D AVR_CPU(cs);
++    AVRCPU *cpu =3D AVR_CPU(obj);
 +    CPUAVRState *env =3D &cpu->env;
 +
-+    if (interrupt_request & CPU_INTERRUPT_RESET) {
-+        if (cpu_interrupts_enabled(env)) {
-+            cs->exception_index =3D EXCP_RESET;
-+            cc->do_interrupt(cs);
-+
-+            cs->interrupt_request &=3D ~CPU_INTERRUPT_RESET;
-+
-+            ret =3D true;
-+        }
-+    }
-+    if (interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (cpu_interrupts_enabled(env) && env->intsrc !=3D 0) {
-+            int index =3D ctz32(env->intsrc);
-+            cs->exception_index =3D EXCP_INT(index);
-+            cc->do_interrupt(cs);
-+
-+            env->intsrc &=3D env->intsrc - 1; /* clear the interrupt */
-+            cs->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
-+
-+            ret =3D true;
-+        }
-+    }
-+    return ret;
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
 +}
 +
-+void avr_cpu_do_interrupt(CPUState *cs)
++/*
++ * Setting features of AVR core type avr2
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * at90s2313, at90s2323, at90s2333, at90s2343, attiny22, attiny26, at90s=
+4414,
++ * at90s4433, at90s4434, at90s8515, at90c8534, at90s8535
++ */
++static void avr_avr2_initfn(Object *obj)
 +{
-+    AVRCPU *cpu =3D AVR_CPU(cs);
++    AVRCPU *cpu =3D AVR_CPU(obj);
 +    CPUAVRState *env =3D &cpu->env;
 +
-+    uint32_t ret =3D env->pc_w;
-+    int vector =3D 0;
-+    int size =3D avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
-+    int base =3D 0;
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
 +
-+    if (cs->exception_index =3D=3D EXCP_RESET) {
-+        vector =3D 0;
-+    } else if (env->intsrc !=3D 0) {
-+        vector =3D ctz32(env->intsrc) + 1;
-+    }
-+
-+    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-+        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
-+    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-+    } else {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+    }
-+
-+    env->pc_w =3D base + vector * size;
-+    env->sregI =3D 0; /* clear Global Interrupt Flag */
-+
-+    cs->exception_index =3D -1;
-+}
-+
-+int avr_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf,
-+                                int len, bool is_write)
-+{
-+    return cpu_memory_rw_debug(cs, addr, buf, len, is_write);
-+}
-+
-+hwaddr avr_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-+{
-+    return addr; /* I assume 1:1 address correspondance */
-+}
-+
-+int avr_cpu_handle_mmu_fault(
-+    CPUState *cs, vaddr address, int size, int rw, int mmu_idx)
-+{
-+    /* currently it's assumed that this will never happen */
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_dump_state(cs, stderr, 0);
-+    return 1;
-+}
-+
-+bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                        MMUAccessType access_type, int mmu_idx,
-+                        bool probe, uintptr_t retaddr)
-+{
-+    int prot =3D 0;
-+    MemTxAttrs attrs =3D {};
-+    uint32_t paddr;
-+
-+    address &=3D TARGET_PAGE_MASK;
-+
-+    if (mmu_idx =3D=3D MMU_CODE_IDX) {
-+        /* access to code in flash */
-+        paddr =3D OFFSET_CODE + address;
-+        prot =3D PAGE_READ | PAGE_EXEC;
-+        if (paddr + TARGET_PAGE_SIZE > OFFSET_DATA) {
-+            error_report("execution left flash memory");
-+            exit(1);
-+        }
-+    } else if (address < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTER=
-S) {
-+        /*
-+         * access to CPU registers, exit and rebuilt this TB to use full=
- access
-+         * incase it touches specially handled registers like SREG or SP
-+         */
-+        AVRCPU *cpu =3D AVR_CPU(cs);
-+        CPUAVRState *env =3D &cpu->env;
-+        env->fullacc =3D 1;
-+        cpu_loop_exit_restore(cs, retaddr);
-+    } else {
-+        /* access to memory. nothing special */
-+        paddr =3D OFFSET_DATA + address;
-+        prot =3D PAGE_READ | PAGE_WRITE;
-+    }
-+
-+    tlb_set_page_with_attrs(
-+        cs, address, paddr, attrs, prot, mmu_idx, TARGET_PAGE_SIZE);
-+
-+    return true;
-+}
-+
-+void helper_sleep(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_HLT;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_unsupported(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    /*
-+     *  I count not find what happens on the real platform, so
-+     *  it's EXCP_DEBUG for meanwhile
-+     */
-+    cs->exception_index =3D EXCP_DEBUG;
-+    if (qemu_loglevel_mask(LOG_UNIMP)) {
-+        qemu_log("UNSUPPORTED\n");
-+        cpu_dump_state(cs, stderr, 0);
-+    }
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_debug(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_break(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_wdr(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    /* WD is not implemented yet, placeholder */
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
 +}
 +
 +/*
-+ * This function implements IN instruction
++ * Setting features of AVR core type avr25
++ * --------------------------------------
 + *
-+ * It does the following
-+ * a.  if an IO register belongs to CPU, its value is read and returned
-+ * b.  otherwise io address is translated to mem address and physical me=
-mory
-+ *     is read.
-+ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementat=
-ion
++ * This type of AVR core is present in the following AVR MCUs:
 + *
++ * ata5272, ata6616c, attiny13, attiny13a, attiny2313, attiny2313a, atti=
+ny24,
++ * attiny24a, attiny4313, attiny44, attiny44a, attiny441, attiny84, atti=
+ny84a,
++ * attiny25, attiny45, attiny85, attiny261, attiny261a, attiny461, attin=
+y461a,
++ * attiny861, attiny861a, attiny43u, attiny87, attiny48, attiny88, attin=
+y828,
++ * attiny841, at86rf401
 + */
-+target_ulong helper_inb(CPUAVRState *env, uint32_t port)
++static void avr_avr25_initfn(Object *obj)
 +{
-+    target_ulong data =3D 0;
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
 +
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        data =3D 0xff & (env->rampD >> 16);
-+        break;
-+    case 0x39: /* RAMPX */
-+        data =3D 0xff & (env->rampX >> 16);
-+        break;
-+    case 0x3a: /* RAMPY */
-+        data =3D 0xff & (env->rampY >> 16);
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        data =3D 0xff & (env->rampZ >> 16);
-+        break;
-+    case 0x3c: /* EIND */
-+        data =3D 0xff & (env->eind >> 16);
-+        break;
-+    case 0x3d: /* SPL */
-+        data =3D env->sp & 0x00ff;
-+        break;
-+    case 0x3e: /* SPH */
-+        data =3D env->sp >> 8;
-+        break;
-+    case 0x3f: /* SREG */
-+        data =3D cpu_get_sreg(env);
-+        break;
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++}
++
++/*
++ * Setting features of AVR core type avr3
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * at43usb355, at76c711
++ */
++static void avr_avr3_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++}
++
++/*
++ * Setting features of AVR core type avr31
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atmega103, at43usb320
++ */
++static void avr_avr31_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++}
++
++/*
++ * Setting features of AVR core type avr35
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * ata5505, ata6617c, ata664251, at90usb82, at90usb162, atmega8u2, atmeg=
+a16u2,
++ * atmega32u2, attiny167, attiny1634
++ */
++static void avr_avr35_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++}
++
++/*
++ * Setting features of AVR core type avr4
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * ata6285, ata6286, ata6289, ata6612c, atmega8, atmega8a, atmega48, atm=
+ega48a,
++ * atmega48p, atmega48pa, atmega48pb, atmega88, atmega88a, atmega88p,
++ * atmega88pa, atmega88pb, atmega8515, atmega8535, atmega8hva, at90pwm1,
++ * at90pwm2, at90pwm2b, at90pwm3, at90pwm3b, at90pwm81
++ */
++static void avr_avr4_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avr5
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * ata5702m322, ata5782, ata5790, ata5790n, ata5791, ata5795, ata5831, a=
+ta6613c,
++ * ata6614q, ata8210, ata8510, atmega16, atmega16a, atmega161, atmega162=
+,
++ * atmega163, atmega164a, atmega164p, atmega164pa, atmega165, atmega165a=
+,
++ * atmega165p, atmega165pa, atmega168, atmega168a, atmega168p, atmega168=
+pa,
++ * atmega168pb, atmega169, atmega169a, atmega169p, atmega169pa, atmega16=
+hvb,
++ * atmega16hvbrevb, atmega16m1, atmega16u4, atmega32a, atmega32, atmega3=
+23,
++ * atmega324a, atmega324p, atmega324pa, atmega325, atmega325a, atmega325=
+p,
++ * atmega325pa, atmega3250, atmega3250a, atmega3250p, atmega3250pa, atme=
+ga328,
++ * atmega328p, atmega328pb, atmega329, atmega329a, atmega329p, atmega329=
+pa,
++ * atmega3290, atmega3290a, atmega3290p, atmega3290pa, atmega32c1, atmeg=
+a32m1,
++ * atmega32u4, atmega32u6, atmega406, atmega64, atmega64a, atmega640, at=
+mega644,
++ * atmega644a, atmega644p, atmega644pa, atmega645, atmega645a, atmega645=
+p,
++ * atmega6450, atmega6450a, atmega6450p, atmega649, atmega649a, atmega64=
+9p,
++ * atmega6490, atmega16hva, atmega16hva2, atmega32hvb, atmega6490a, atme=
+ga6490p,
++ * atmega64c1, atmega64m1, atmega64hve, atmega64hve2, atmega64rfr2,
++ * atmega644rfr2, atmega32hvbrevb, at90can32, at90can64, at90pwm161, at9=
+0pwm216,
++ * at90pwm316, at90scr100, at90usb646, at90usb647, at94k, m3000
++ */
++static void avr_avr5_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avr51
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atmega128, atmega128a, atmega1280, atmega1281, atmega1284, atmega1284=
+p,
++ * atmega128rfa1, atmega128rfr2, atmega1284rfr2, at90can128, at90usb1286=
+,
++ * at90usb1287
++ */
++static void avr_avr51_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avr6
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atmega2560, atmega2561, atmega256rfr2, atmega2564rfr2
++ */
++static void avr_avr6_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++}
++
++/*
++ * Setting features of AVR core type avrtiny
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * attiny4, attiny5, attiny9, attiny10, attiny20, attiny40
++ */
++static void avr_avrtiny_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_1_BYTE_SP);
++}
++
++/*
++ * Setting features of AVR core type xmega2
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega8e5, atxmega16a4, atxmega16d4, atxmega16e5, atxmega32a4, atxme=
+ga32c3,
++ * atxmega32d3, atxmega32d4, atxmega16a4u, atxmega16c4, atxmega32a4u,
++ * atxmega32c4, atxmega32e5
++ */
++static void avr_xmega2_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega3
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * attiny212, attiny214, attiny412, attiny414, attiny416, attiny417, att=
+iny814,
++ * attiny816, attiny817, attiny1614, attiny1616, attiny1617, attiny3214,
++ * attiny3216, attiny3217, atmega808, atmega809, atmega1608, atmega1609,
++ * atmega3208, atmega3209, atmega4808, atmega4809
++ */
++static void avr_xmega3_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega4
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega64a3, atxmega64d3, atxmega64a3u, atxmega64a4u, atxmega64b1,
++ * atxmega64b3, atxmega64c3, atxmega64d4
++ */
++static void avr_xmega4_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega5
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega64a1, atxmega64a1u
++ */
++static void avr_xmega5_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPD);
++    avr_set_feature(env, AVR_FEATURE_RAMPX);
++    avr_set_feature(env, AVR_FEATURE_RAMPY);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega6
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega128a3, atxmega128d3, atxmega192a3, atxmega192d3, atxmega256a3,
++ * atxmega256a3b, atxmega256a3bu, atxmega256d3, atxmega128a3u, atxmega12=
+8b1,
++ * atxmega128b3, atxmega128c3, atxmega128d4, atxmega192a3u, atxmega192c3=
+,
++ * atxmega256a3u, atxmega256c3, atxmega384c3, atxmega384d3
++ */
++static void avr_xmega6_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++/*
++ * Setting features of AVR core type xmega7
++ * --------------------------------------
++ *
++ * This type of AVR core is present in the following AVR MCUs:
++ *
++ * atxmega128a1, atxmega128a1u, atxmega128a4u
++ */
++static void avr_xmega7_initfn(Object *obj)
++{
++    AVRCPU *cpu =3D AVR_CPU(obj);
++    CPUAVRState *env =3D &cpu->env;
++
++    avr_set_feature(env, AVR_FEATURE_LPM);
++    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
++    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
++    avr_set_feature(env, AVR_FEATURE_SRAM);
++    avr_set_feature(env, AVR_FEATURE_BREAK);
++
++    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
++    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
++    avr_set_feature(env, AVR_FEATURE_RAMPD);
++    avr_set_feature(env, AVR_FEATURE_RAMPX);
++    avr_set_feature(env, AVR_FEATURE_RAMPY);
++    avr_set_feature(env, AVR_FEATURE_RAMPZ);
++    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
++    avr_set_feature(env, AVR_FEATURE_ELPMX);
++    avr_set_feature(env, AVR_FEATURE_ELPM);
++    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
++    avr_set_feature(env, AVR_FEATURE_LPMX);
++    avr_set_feature(env, AVR_FEATURE_MOVW);
++    avr_set_feature(env, AVR_FEATURE_MUL);
++    avr_set_feature(env, AVR_FEATURE_RMW);
++}
++
++typedef struct AVRCPUInfo {
++    const char *name;
++    void (*initfn)(Object *obj);
++} AVRCPUInfo;
++
++
++static void avr_cpu_list_entry(gpointer data, gpointer user_data)
++{
++    const char *typename =3D object_class_get_name(OBJECT_CLASS(data));
++
++    qemu_printf("%s\n", typename);
++}
++
++void avr_cpu_list(void)
++{
++    GSList *list;
++    list =3D object_class_get_list_sorted(TYPE_AVR_CPU, false);
++    g_slist_foreach(list, avr_cpu_list_entry, NULL);
++    g_slist_free(list);
++}
++
++#define DEFINE_AVR_CPU_TYPE(model, initfn) \
++    { \
++        .parent =3D TYPE_AVR_CPU, \
++        .instance_init =3D initfn, \
++        .name =3D AVR_CPU_TYPE_NAME(model), \
++    }
++
++static const TypeInfo avr_cpu_type_info[] =3D {
++    {
++        .name =3D TYPE_AVR_CPU,
++        .parent =3D TYPE_CPU,
++        .instance_size =3D sizeof(AVRCPU),
++        .instance_init =3D avr_cpu_initfn,
++        .class_size =3D sizeof(AVRCPUClass),
++        .class_init =3D avr_cpu_class_init,
++        .abstract =3D true,
++    },
++    DEFINE_AVR_CPU_TYPE("avrtiny", avr_avrtiny_initfn),
++    DEFINE_AVR_CPU_TYPE("avr1", avr_avr1_initfn),
++    DEFINE_AVR_CPU_TYPE("avr2", avr_avr2_initfn),
++    DEFINE_AVR_CPU_TYPE("avr25", avr_avr25_initfn),
++    DEFINE_AVR_CPU_TYPE("avr3", avr_avr3_initfn),
++    DEFINE_AVR_CPU_TYPE("avr31", avr_avr31_initfn),
++    DEFINE_AVR_CPU_TYPE("avr35", avr_avr35_initfn),
++    DEFINE_AVR_CPU_TYPE("avr4", avr_avr4_initfn),
++    DEFINE_AVR_CPU_TYPE("avr5", avr_avr5_initfn),
++    DEFINE_AVR_CPU_TYPE("avr51", avr_avr51_initfn),
++    DEFINE_AVR_CPU_TYPE("avr6", avr_avr6_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega2", avr_xmega2_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega3", avr_xmega3_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega4", avr_xmega4_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega5", avr_xmega5_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega6", avr_xmega6_initfn),
++    DEFINE_AVR_CPU_TYPE("xmega7", avr_xmega7_initfn),
++};
++
++const char *avr_flags_to_cpu_type(uint32_t flags, const char *def_cpu_ty=
+pe)
++{
++    switch (flags & EF_AVR_MACH) {
++    case bfd_mach_avr1:
++        return AVR_CPU_TYPE_NAME("avr1");
++    case bfd_mach_avr2:
++        return AVR_CPU_TYPE_NAME("avr2");
++    case bfd_mach_avr25:
++        return AVR_CPU_TYPE_NAME("avr25");
++    case bfd_mach_avr3:
++        return AVR_CPU_TYPE_NAME("avr3");
++    case bfd_mach_avr31:
++        return AVR_CPU_TYPE_NAME("avr31");
++    case bfd_mach_avr35:
++        return AVR_CPU_TYPE_NAME("avr35");
++    case bfd_mach_avr4:
++        return AVR_CPU_TYPE_NAME("avr4");
++    case bfd_mach_avr5:
++        return AVR_CPU_TYPE_NAME("avr5");
++    case bfd_mach_avr51:
++        return AVR_CPU_TYPE_NAME("avr51");
++    case bfd_mach_avr6:
++        return AVR_CPU_TYPE_NAME("avr6");
++    case bfd_mach_avrtiny:
++        return AVR_CPU_TYPE_NAME("avrtiny");
++    case bfd_mach_avrxmega2:
++        return AVR_CPU_TYPE_NAME("xmega2");
++    case bfd_mach_avrxmega3:
++        return AVR_CPU_TYPE_NAME("xmega3");
++    case bfd_mach_avrxmega4:
++        return AVR_CPU_TYPE_NAME("xmega4");
++    case bfd_mach_avrxmega5:
++        return AVR_CPU_TYPE_NAME("xmega5");
++    case bfd_mach_avrxmega6:
++        return AVR_CPU_TYPE_NAME("xmega6");
++    case bfd_mach_avrxmega7:
++        return AVR_CPU_TYPE_NAME("xmega7");
 +    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
-+    }
-+
-+    return data;
-+}
-+
-+/*
-+ *  This function implements OUT instruction
-+ *
-+ *  It does the following
-+ *  a.  if an IO register belongs to CPU, its value is written into the =
-register
-+ *  b.  otherwise io address is translated to mem address and physical m=
-emory
-+ *      is written.
-+ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementa=
-tion
-+ *
-+ */
-+void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
-+{
-+    data &=3D 0x000000ff;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
-+            env->rampD =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x39: /* RAMPX */
-+        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
-+            env->rampX =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3a: /* RAMPY */
-+        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
-+            env->rampY =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
-+            env->rampZ =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3c: /* EIDN */
-+        env->eind =3D (data & 0xff) << 16;
-+        break;
-+    case 0x3d: /* SPL */
-+        env->sp =3D (env->sp & 0xff00) | (data);
-+        break;
-+    case 0x3e: /* SPH */
-+        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
-+            env->sp =3D (env->sp & 0x00ff) | (data << 8);
-+        }
-+        break;
-+    case 0x3f: /* SREG */
-+        cpu_set_sreg(env, data);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
++        return def_cpu_type;
 +    }
 +}
 +
-+/*
-+ *  this function implements LD instruction when there is a posibility t=
-o read
-+ *  from a CPU register
-+ */
-+target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
-+{
-+    uint8_t data;
-+
-+    env->fullacc =3D false;
-+
-+    if (addr < NUMBER_OF_CPU_REGISTERS) {
-+        /* CPU registers */
-+        data =3D env->r[addr];
-+    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
-{
-+        /* IO registers */
-+        data =3D helper_inb(env, addr - NUMBER_OF_CPU_REGISTERS);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
-+    }
-+    return data;
-+}
-+
-+/*
-+ *  this function implements ST instruction when there is a posibility t=
-o write
-+ *  into a CPU register
-+ */
-+void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
-+{
-+    env->fullacc =3D false;
-+
-+    /* Following logic assumes this: */
-+    assert(OFFSET_CPU_REGISTERS =3D=3D OFFSET_DATA);
-+    assert(OFFSET_IO_REGISTERS =3D=3D OFFSET_CPU_REGISTERS +
-+            NUMBER_OF_CPU_REGISTERS);
-+
-+    if (addr < NUMBER_OF_CPU_REGISTERS) {
-+        /* CPU registers */
-+        env->r[addr] =3D data;
-+    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
-{
-+        /* IO registers */
-+        helper_outb(env, addr - NUMBER_OF_CPU_REGISTERS, data);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
-+    }
-+}
-diff --git a/target/avr/helper.h b/target/avr/helper.h
-new file mode 100644
-index 0000000..bf08750
---- /dev/null
-+++ b/target/avr/helper.h
-@@ -0,0 +1,29 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+DEF_HELPER_1(wdr, void, env)
-+DEF_HELPER_1(debug, void, env)
-+DEF_HELPER_1(break, void, env)
-+DEF_HELPER_1(sleep, void, env)
-+DEF_HELPER_1(unsupported, void, env)
-+DEF_HELPER_3(outb, void, env, i32, i32)
-+DEF_HELPER_2(inb, tl, env, i32)
-+DEF_HELPER_3(fullwr, void, env, i32, i32)
-+DEF_HELPER_2(fullrd, tl, env, i32)
++DEFINE_TYPES(avr_cpu_type_info)
 --=20
 2.7.4
 
