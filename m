@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7403C35247
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE8FC35240
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0C0120700
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:10:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0C0120700
+	by mail.kernel.org (Postfix) with ESMTPS id 9FA7D20700
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA7D20700
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivr2r-0003gI-V7
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 18:10:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33587)
+	id 1ivr48-0005RA-RL
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 18:11:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpz-000638-VS
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:05 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqq1-000673-J3
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpy-0000b7-BC
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:03 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:37959 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpy-0000bC-C1
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:05 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:37962 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ivqpx-0000R1-Uw
+ id 1ivqpx-0000R8-VL
  for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:02 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 4BD061A1DDE;
- Sun, 26 Jan 2020 23:56:11 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id C2B181A1E10;
+ Sun, 26 Jan 2020 23:56:15 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 30EB61A1DBD;
- Sun, 26 Jan 2020 23:56:11 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id A83B91A1E05;
+ Sun, 26 Jan 2020 23:56:15 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc3 20/30] target/avr: Register AVR support with the rest of
- QEMU
-Date: Sun, 26 Jan 2020 23:55:01 +0100
-Message-Id: <1580079311-20447-21-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc3 24/30] hw/avr: Add helper to load raw/ELF firmware binaries
+Date: Sun, 26 Jan 2020 23:55:05 +0100
+Message-Id: <1580079311-20447-25-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -66,103 +65,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Michael Rolnik <mrolnik@gmail.com>,
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Rolnik <mrolnik@gmail.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Add AVR related definitions into QEMU
+Add avr_load_firmware() function to load firmware in ELF or
+raw binary format.
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+[AM: Corrected the type of the variable containing e_flags]
+
+Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- arch_init.c                |  2 ++
- include/disas/dis-asm.h    | 19 +++++++++++++++++++
- include/sysemu/arch_init.h |  1 +
- qapi/machine.json          |  3 ++-
- 4 files changed, 24 insertions(+), 1 deletion(-)
+ hw/avr/Makefile.objs |  1 +
+ hw/avr/boot.c        | 74 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ hw/avr/boot.h        | 33 +++++++++++++++++++++++
+ include/elf.h        |  2 ++
+ 4 files changed, 110 insertions(+)
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/boot.c
+ create mode 100644 hw/avr/boot.h
 
-diff --git a/arch_init.c b/arch_init.c
-index 705d0b9..6a74116 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -89,6 +89,8 @@ int graphic_depth =3D 32;
- #define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_XTENSA)
- #define QEMU_ARCH QEMU_ARCH_XTENSA
-+#elif defined(TARGET_AVR)
-+#define QEMU_ARCH QEMU_ARCH_AVR
- #endif
+diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+new file mode 100644
+index 0000000..123f174
+--- /dev/null
++++ b/hw/avr/Makefile.objs
+@@ -0,0 +1 @@
++obj-y +=3D boot.o
+diff --git a/hw/avr/boot.c b/hw/avr/boot.c
+new file mode 100644
+index 0000000..9ac2c88
+--- /dev/null
++++ b/hw/avr/boot.c
+@@ -0,0 +1,74 @@
++/*
++ * AVR loader helpers
++ *
++ * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
++ *
++ * This work is licensed under the terms of the GNU GPLv2 or later.
++ * See the COPYING file in the top-level directory.
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "hw/loader.h"
++#include "elf.h"
++#include "boot.h"
++#include "qemu/error-report.h"
++
++bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
++                       MemoryRegion *mr, const char *firmware)
++{
++    const char *filename;
++    int bytes_loaded;
++    uint64_t entry;
++    uint32_t e_flags;
++
++    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
++    if (filename =3D=3D NULL) {
++        error_report("Unable to find %s", firmware);
++        return false;
++    }
++
++    bytes_loaded =3D load_elf_ram_sym(filename,
++                                    NULL, NULL, NULL,
++                                    &entry, NULL, NULL,
++                                    &e_flags, 0, EM_AVR, 0, 0,
++                                    NULL, true, NULL);
++    if (bytes_loaded >=3D 0) {
++        /* If ELF file is provided, determine CPU type reading ELF e_fla=
+gs. */
++        const char *elf_cpu =3D avr_flags_to_cpu_type(e_flags, NULL);
++        const char *mcu_cpu_type =3D object_get_typename(OBJECT(cpu));
++        int cpu_len =3D strlen(mcu_cpu_type) - strlen(AVR_CPU_TYPE_SUFFI=
+X);
++
++        if (entry) {
++            error_report("BIOS entry_point must be 0x0000 "
++                         "(ELF image '%s' has entry_point 0x%04" PRIx64 =
+")",
++                         firmware, entry);
++            return false;
++        }
++        if (!elf_cpu) {
++            warn_report("Could not determine CPU type for ELF image '%s'=
+, "
++                        "assuming '%.*s' CPU",
++                         firmware, cpu_len, mcu_cpu_type);
++            return true;
++        }
++        if (strcmp(elf_cpu, mcu_cpu_type)) {
++            error_report("Current machine: %s with '%.*s' CPU",
++                         MACHINE_GET_CLASS(ms)->desc, cpu_len, mcu_cpu_t=
+ype);
++            error_report("ELF image '%s' is for '%.*s' CPU",
++                         firmware,
++                         (int)(strlen(elf_cpu) - strlen(AVR_CPU_TYPE_SUF=
+FIX)),
++                         elf_cpu);
++            return false;
++        }
++    } else {
++        bytes_loaded =3D load_image_targphys(filename, OFFSET_CODE,
++                                           memory_region_size(mr));
++    }
++    if (bytes_loaded < 0) {
++        error_report("Unable to load firmware image %s as ELF or raw bin=
+ary",
++                     firmware);
++        return false;
++    }
++    return true;
++}
+diff --git a/hw/avr/boot.h b/hw/avr/boot.h
+new file mode 100644
+index 0000000..62bc10c
+--- /dev/null
++++ b/hw/avr/boot.h
+@@ -0,0 +1,33 @@
++/*
++ * AVR loader helpers
++ *
++ * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
++ *
++ * This work is licensed under the terms of the GNU GPLv2 or later.
++ * See the COPYING file in the top-level directory.
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef HW_AVR_BOOT_H
++#define HW_AVR_BOOT_H
++
++#include "hw/boards.h"
++#include "cpu.h"
++
++/**
++ * avr_load_firmware:   load an image into a memory region
++ *
++ * @cpu:        Handle a AVR CPU object
++ * @ms:         A MachineState
++ * @mr:         Memory Region to load into
++ * @firmware:   Path to the firmware file (raw binary or ELF format)
++ *
++ * Load a firmware supplied by the machine or by the user  with the
++ * '-bios' command line option, and put it in target memory.
++ *
++ * Returns: true on success, false on error.
++ */
++bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
++                       MemoryRegion *mr, const char *firmware);
++
++#endif
+diff --git a/include/elf.h b/include/elf.h
+index 8fbfe60..3f08f68 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -202,6 +202,8 @@ typedef struct mips_elf_abiflags_v0 {
+ #define EM_MOXIE           223     /* Moxie processor family */
+ #define EM_MOXIE_OLD       0xFEED
 =20
- const uint32_t arch_type =3D QEMU_ARCH;
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index e9c7dd8..79bbc8b 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -211,6 +211,25 @@ enum bfd_architecture
- #define bfd_mach_m32r          0  /* backwards compatibility */
-   bfd_arch_mn10200,    /* Matsushita MN10200 */
-   bfd_arch_mn10300,    /* Matsushita MN10300 */
-+  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-+#define bfd_mach_avr1       1
-+#define bfd_mach_avr2       2
-+#define bfd_mach_avr25      25
-+#define bfd_mach_avr3       3
-+#define bfd_mach_avr31      31
-+#define bfd_mach_avr35      35
-+#define bfd_mach_avr4       4
-+#define bfd_mach_avr5       5
-+#define bfd_mach_avr51      51
-+#define bfd_mach_avr6       6
-+#define bfd_mach_avrtiny    100
-+#define bfd_mach_avrxmega1  101
-+#define bfd_mach_avrxmega2  102
-+#define bfd_mach_avrxmega3  103
-+#define bfd_mach_avrxmega4  104
-+#define bfd_mach_avrxmega5  105
-+#define bfd_mach_avrxmega6  106
-+#define bfd_mach_avrxmega7  107
-   bfd_arch_cris,       /* Axis CRIS */
- #define bfd_mach_cris_v0_v10   255
- #define bfd_mach_cris_v32      32
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 62c6fe4..893df26 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -24,6 +24,7 @@ enum {
-     QEMU_ARCH_NIOS2 =3D (1 << 17),
-     QEMU_ARCH_HPPA =3D (1 << 18),
-     QEMU_ARCH_RISCV =3D (1 << 19),
-+    QEMU_ARCH_AVR =3D (1 << 20),
- };
-=20
- extern const uint32_t arch_type;
-diff --git a/qapi/machine.json b/qapi/machine.json
-index b3d30bc..f2dc385 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -21,11 +21,12 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# avr: since 5.0
- #
- # Since: 3.0
- ##
- { 'enum' : 'SysEmuTarget',
--  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', '=
-lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
++#define EM_AVR 83 /* AVR 8-bit microcontroller */
++
+ /* This is the info that is needed to parse the dynamic section of the f=
+ile */
+ #define DT_NULL		0
+ #define DT_NEEDED	1
 --=20
 2.7.4
 
