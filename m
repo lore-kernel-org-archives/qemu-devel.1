@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83654C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7674FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:05:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59AE520702
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:05:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59AE520702
+	by mail.kernel.org (Postfix) with ESMTPS id 401EB20702
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jan 2020 23:05:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 401EB20702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivqyT-0004KU-Gx
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 18:05:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33548)
+	id 1ivqyV-0004N0-CR
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 18:05:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33421)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpy-0005zc-Or
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:06 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpp-0005ZL-B5
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpx-0000ZL-09
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:02 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:37956 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ivqpl-0000PN-DQ
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:53 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:37946 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ivqpw-0000Pt-KS
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:57:00 -0500
+ id 1ivqpk-0000Mr-To
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 17:56:49 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 4FE9C1A1DC9;
- Sun, 26 Jan 2020 23:56:09 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 906A11A1D95;
+ Sun, 26 Jan 2020 23:55:55 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 2F2F11A1DBD;
- Sun, 26 Jan 2020 23:56:09 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 69C8C1A1D62;
+ Sun, 26 Jan 2020 23:55:55 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc3 18/30] hw/misc: Add Atmel power device
-Date: Sun, 26 Jan 2020 23:54:59 +0100
-Message-Id: <1580079311-20447-19-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc3 09/30] target/avr: Add instruction translation -
+ Arithmetic and Logic Instructions
+Date: Sun, 26 Jan 2020 23:54:50 +0100
+Message-Id: <1580079311-20447-10-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -67,7 +68,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
  Michael Rolnik <mrolnik@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -75,244 +75,957 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-This is a simple device of just one register, whenver this register is
-written it calls qemu_set_irq function for each of 8 bits/IRQs..
-It is used to implement AVR Power Reduction
+This includes:
+- ADD, ADC, ADIW
+- SBIW, SUB, SUBI, SBC, SBCI
+- AND, ANDI
+- OR, ORI, EOR
+- COM, NEG
+- INC, DEC
+- MUL, MULS, MULSU
+- FMUL, FMULS, FMULSU
+- DES
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-[rth: Squash include fix and file rename from f4bug, which was:]
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- hw/misc/Kconfig               |   3 ++
- hw/misc/Makefile.objs         |   2 +
- hw/misc/atmel_power.c         | 112 ++++++++++++++++++++++++++++++++++++=
+ target/avr/insn.decode |  93 ++++++
+ target/avr/translate.c | 752 +++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- include/hw/misc/atmel_power.h |  46 +++++++++++++++++
- 4 files changed, 163 insertions(+)
- create mode 100644 hw/misc/atmel_power.c
- create mode 100644 include/hw/misc/atmel_power.h
+ 2 files changed, 845 insertions(+)
+ create mode 100644 target/avr/insn.decode
 
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index bdd77d8..3a3c32e 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -131,4 +131,7 @@ config MAC_VIA
-     select MOS6522
-     select ADB
-=20
-+config ATMEL_POWER
-+    bool
-+
- source macio/Kconfig
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index da993f4..e605964 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -85,3 +85,5 @@ common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_rng.o
- obj-$(CONFIG_MAC_VIA) +=3D mac_via.o
-=20
- common-obj-$(CONFIG_GRLIB) +=3D grlib_ahb_apb_pnp.o
-+
-+obj-$(CONFIG_ATMEL_POWER) +=3D atmel_power.o
-diff --git a/hw/misc/atmel_power.c b/hw/misc/atmel_power.c
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
 new file mode 100644
-index 0000000..adab729
+index 0000000..9c71ed6
 --- /dev/null
-+++ b/hw/misc/atmel_power.c
-@@ -0,0 +1,112 @@
++++ b/target/avr/insn.decode
+@@ -0,0 +1,93 @@
++#
++# AVR instruction decode definitions.
++#
++# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licen=
+ses/>.
++#
++
++#
++#   regs_16_31_by_one =3D [16 .. 31]
++#   regs_16_23_by_one =3D [16 .. 23]
++#   regs_24_30_by_two =3D [24, 26, 28, 30]
++#   regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]
++
++%rd             4:5
++%rr             9:1 0:4
++
++%rd_a           4:4                         !function=3Dto_regs_16_31_by=
+_one
++%rd_b           4:3                         !function=3Dto_regs_16_23_by=
+_one
++%rd_c           4:2                         !function=3Dto_regs_24_30_by=
+_two
++%rd_d           4:4                         !function=3Dto_regs_00_30_by=
+_two
++%rr_a           0:4                         !function=3Dto_regs_16_31_by=
+_one
++%rr_b           0:3                         !function=3Dto_regs_16_23_by=
+_one
++%rr_d           0:4                         !function=3Dto_regs_00_30_by=
+_two
++
++%imm6           6:2 0:4
++%imm8           8:4 0:4
++
++%io_imm         9:2 0:4
++%ldst_d_imm     13:1 10:2 0:3
++
++# The 22-bit immediate is partially in the opcode word,
++# and partially in the next.  Use append_16 to build the
++# complete 22-bit value.
++%imm_call       4:5 0:1                     !function=3Dappend_16
++
++
++&rd_rr          rd rr
++&rd_imm         rd imm
++
++@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=3D%rd rr=3D%r=
+r
++@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=3D%rd_c imm=3D=
+%imm6
++@op_rd_imm8     .... .... .... ....         &rd_imm     rd=3D%rd_a imm=3D=
+%imm8
++@op_bit         .... .... . bit:3 ....
++@op_bit_imm     .... .. imm:s7 bit:3
++@fmul           .... .... . ... . ...       &rd_rr      rd=3D%rd_b rr=3D=
+%rr_b
++@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=3D%rd imm=3D%=
+io_imm
++@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=3D%ldst_d_im=
+m
++
++# The 16-bit immediate is completely in the next word.
++# Fields cannot be defined with no bits, so we cannot play
++# the same trick and append to a zero-bit value.
++# Defer reading the immediate until trans_{LDS,STS}.
++@ldst_s         .... ... rd:5 ....          imm=3D0
++
++#
++# Arithmetic Instructions
++#
++ADD             0000 11 . ..... ....        @op_rd_rr
++ADC             0001 11 . ..... ....        @op_rd_rr
++ADIW            1001 0110 .. .. ....        @op_rd_imm6
++SUB             0001 10 . ..... ....        @op_rd_rr
++SUBI            0101 .... .... ....         @op_rd_imm8
++SBC             0000 10 . ..... ....        @op_rd_rr
++SBCI            0100 .... .... ....         @op_rd_imm8
++SBIW            1001 0111 .. .. ....        @op_rd_imm6
++AND             0010 00 . ..... ....        @op_rd_rr
++ANDI            0111 .... .... ....         @op_rd_imm8
++OR              0010 10 . ..... ....        @op_rd_rr
++ORI             0110 .... .... ....         @op_rd_imm8
++EOR             0010 01 . ..... ....        @op_rd_rr
++COM             1001 010 rd:5 0000
++NEG             1001 010 rd:5 0001
++INC             1001 010 rd:5 0011
++DEC             1001 010 rd:5 1010
++MUL             1001 11 . ..... ....        @op_rd_rr
++MULS            0000 0010 .... ....         &rd_rr      rd=3D%rd_a rr=3D=
+%rr_a
++MULSU           0000 0011 0 ... 0 ...       @fmul
++FMUL            0000 0011 0 ... 1 ...       @fmul
++FMULS           0000 0011 1 ... 0 ...       @fmul
++FMULSU          0000 0011 1 ... 1 ...       @fmul
++DES             1001 0100 imm:4 1011
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 535f666..00fb3f5 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -169,3 +169,755 @@ static bool avr_have_feature(DisasContext *ctx, int=
+ feature)
+=20
+ static bool decode_insn(DisasContext *ctx, uint16_t insn);
+ #include "decode_insn.inc.c"
++
 +/*
-+ * Atmel AVR Power Reduction Management
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
++ * Arithmetic Instructions
 + */
 +
-+#include "qemu/osdep.h"
-+#include "hw/misc/atmel_power.h"
-+#include "qemu/log.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/irq.h"
-+
-+#define DB_PRINT(fmt, args...) /* Nothing */
-+/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## ar=
-gs)*/
-+
-+static void avr_mask_reset(DeviceState *dev)
++static void gen_add_CHf(TCGv R, TCGv Rd, TCGv Rr)
 +{
-+    AVRMaskState *s =3D AVR_MASK(dev);
++    TCGv t1 =3D tcg_temp_new_i32();
++    TCGv t2 =3D tcg_temp_new_i32();
++    TCGv t3 =3D tcg_temp_new_i32();
 +
-+    s->val =3D 0x00;
++    tcg_gen_and_tl(t1, Rd, Rr); /* t1 =3D Rd & Rr */
++    tcg_gen_andc_tl(t2, Rd, R); /* t2 =3D Rd & ~R */
++    tcg_gen_andc_tl(t3, Rr, R); /* t3 =3D Rr & ~R */
++    tcg_gen_or_tl(t1, t1, t2); /* t1 =3D t1 | t2 | t3 */
++    tcg_gen_or_tl(t1, t1, t3);
++    tcg_gen_shri_tl(cpu_Cf, t1, 7); /* Cf =3D t1(7) */
++    tcg_gen_shri_tl(cpu_Hf, t1, 3); /* Hf =3D t1(3) */
++    tcg_gen_andi_tl(cpu_Hf, cpu_Hf, 1);
 +
-+    for (int i =3D 0; i < 8; i++) {
-+        qemu_set_irq(s->irq[i], 0);
-+    }
++    tcg_temp_free_i32(t3);
++    tcg_temp_free_i32(t2);
++    tcg_temp_free_i32(t1);
 +}
 +
-+static uint64_t avr_mask_read(void *opaque, hwaddr offset, unsigned size=
-)
-+{
-+    assert(size =3D=3D 1);
-+    assert(offset =3D=3D 0);
-+    AVRMaskState *s =3D opaque;
 +
-+    return (uint64_t)s->val;
++static void gen_add_Vf(TCGv R, TCGv Rd, TCGv Rr)
++{
++    TCGv t1 =3D tcg_temp_new_i32();
++    TCGv t2 =3D tcg_temp_new_i32();
++
++    /* t1 =3D Rd & Rr & ~R | ~Rd & ~Rr & R */
++    /*    =3D (Rd ^ R) & ~(Rd ^ Rr) */
++    tcg_gen_xor_tl(t1, Rd, R);
++    tcg_gen_xor_tl(t2, Rd, Rr);
++    tcg_gen_andc_tl(t1, t1, t2);
++    tcg_gen_shri_tl(cpu_Vf, t1, 7); /* Vf =3D t1(7) */
++
++    tcg_temp_free_i32(t2);
++    tcg_temp_free_i32(t1);
 +}
 +
-+static void avr_mask_write(void *opaque, hwaddr offset,
-+                              uint64_t val64, unsigned size)
++
++static void gen_sub_CHf(TCGv R, TCGv Rd, TCGv Rr)
 +{
-+    assert(size =3D=3D 1);
-+    assert(offset =3D=3D 0);
-+    AVRMaskState *s =3D opaque;
-+    uint8_t val8 =3D val64;
++    TCGv t1 =3D tcg_temp_new_i32();
++    TCGv t2 =3D tcg_temp_new_i32();
++    TCGv t3 =3D tcg_temp_new_i32();
 +
-+    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
++    tcg_gen_not_tl(t1, Rd); /* t1 =3D ~Rd */
++    tcg_gen_and_tl(t2, t1, Rr); /* t2 =3D ~Rd & Rr */
++    tcg_gen_or_tl(t3, t1, Rr); /* t3 =3D (~Rd | Rr) & R */
++    tcg_gen_and_tl(t3, t3, R);
++    tcg_gen_or_tl(t2, t2, t3); /* t2 =3D ~Rd & Rr | ~Rd & R | R & Rr */
++    tcg_gen_shri_tl(cpu_Cf, t2, 7); /* Cf =3D t2(7) */
++    tcg_gen_shri_tl(cpu_Hf, t2, 3); /* Hf =3D t2(3) */
++    tcg_gen_andi_tl(cpu_Hf, cpu_Hf, 1);
 +
-+    s->val =3D val8;
-+    for (int i =3D 0; i < 8; i++) {
-+        qemu_set_irq(s->irq[i], (val8 & (1 << i)) !=3D 0);
-+    }
++    tcg_temp_free_i32(t3);
++    tcg_temp_free_i32(t2);
++    tcg_temp_free_i32(t1);
 +}
 +
-+static const MemoryRegionOps avr_mask_ops =3D {
-+    .read =3D avr_mask_read,
-+    .write =3D avr_mask_write,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .impl =3D {.max_access_size =3D 1}
-+};
 +
-+static void avr_mask_init(Object *dev)
++static void gen_sub_Vf(TCGv R, TCGv Rd, TCGv Rr)
 +{
-+    AVRMaskState *s =3D AVR_MASK(dev);
-+    SysBusDevice *busdev =3D SYS_BUS_DEVICE(dev);
++    TCGv t1 =3D tcg_temp_new_i32();
++    TCGv t2 =3D tcg_temp_new_i32();
 +
-+    memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_MAS=
-K,
-+            0x01);
-+    sysbus_init_mmio(busdev, &s->iomem);
++    /* t1 =3D Rd & ~Rr & ~R | ~Rd & Rr & R */
++    /*    =3D (Rd ^ R) & (Rd ^ R) */
++    tcg_gen_xor_tl(t1, Rd, R);
++    tcg_gen_xor_tl(t2, Rd, Rr);
++    tcg_gen_and_tl(t1, t1, t2);
++    tcg_gen_shri_tl(cpu_Vf, t1, 7); /* Vf =3D t1(7) */
 +
-+    for (int i =3D 0; i < 8; i++) {
-+        sysbus_init_irq(busdev, &s->irq[i]);
-+    }
-+    s->val =3D 0x00;
++    tcg_temp_free_i32(t2);
++    tcg_temp_free_i32(t1);
 +}
 +
-+static void avr_mask_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
 +
-+    dc->reset =3D avr_mask_reset;
++static void gen_NSf(TCGv R)
++{
++    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf =3D R(7) */
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf =3D Nf ^ Vf */
 +}
 +
-+static const TypeInfo avr_mask_info =3D {
-+    .name          =3D TYPE_AVR_MASK,
-+    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(AVRMaskState),
-+    .class_init    =3D avr_mask_class_init,
-+    .instance_init =3D avr_mask_init,
-+};
 +
-+static void avr_mask_register_types(void)
++static void gen_ZNSf(TCGv R)
 +{
-+    type_register_static(&avr_mask_info);
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf =3D R(7) */
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf =3D Nf ^ Vf */
 +}
 +
-+type_init(avr_mask_register_types)
-diff --git a/include/hw/misc/atmel_power.h b/include/hw/misc/atmel_power.=
-h
-new file mode 100644
-index 0000000..5366e96
---- /dev/null
-+++ b/include/hw/misc/atmel_power.h
-@@ -0,0 +1,46 @@
 +/*
-+ * Atmel AVR Power Reduction Management
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
++ *  Adds two registers without the C Flag and places the result in the
++ *  destination register Rd.
 + */
++static bool trans_ADD(DisasContext *ctx, arg_ADD *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
 +
-+#ifndef HW_MISC_ATMEL_POWER_H
-+#define HW_MISC_ATMEL_POWER_H
++    tcg_gen_add_tl(R, Rd, Rr); /* Rd =3D Rd + Rr */
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++    /* update status register */
++    gen_add_CHf(R, Rd, Rr);
++    gen_add_Vf(R, Rd, Rr);
++    gen_ZNSf(R);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
 +
-+#include "hw/sysbus.h"
-+#include "hw/hw.h"
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Adds two registers and the contents of the C Flag and places the res=
+ult in
++ *  the destination register Rd.
++ */
++static bool trans_ADC(DisasContext *ctx, arg_ADC *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_add_tl(R, Rd, Rr); /* R =3D Rd + Rr + Cf */
++    tcg_gen_add_tl(R, R, cpu_Cf);
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++    /* update status register */
++    gen_add_CHf(R, Rd, Rr);
++    gen_add_Vf(R, Rd, Rr);
++    gen_ZNSf(R);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Adds an immediate value (0 - 63) to a register pair and places the r=
+esult
++ *  in the register pair. This instruction operates on the upper four re=
+gister
++ *  pairs, and is well suited for operations on the pointer registers.  =
+This
++ *  instruction is not available in all devices. Refer to the device spe=
+cific
++ *  instruction set summary.
++ */
++static bool trans_ADIW(DisasContext *ctx, arg_ADIW *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ADIW_SBIW)) {
++        return true;
++    }
++
++    TCGv RdL =3D cpu_r[a->rd];
++    TCGv RdH =3D cpu_r[a->rd + 1];
++    int Imm =3D (a->imm);
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv Rd =3D tcg_temp_new_i32();
++
++    tcg_gen_deposit_tl(Rd, RdL, RdH, 8, 8); /* Rd =3D RdH:RdL */
++    tcg_gen_addi_tl(R, Rd, Imm); /* R =3D Rd + Imm */
++    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
++    /* update status register */
++    tcg_gen_andc_tl(cpu_Cf, Rd, R); /* Cf =3D Rd & ~R */
++    tcg_gen_shri_tl(cpu_Cf, cpu_Cf, 15);
++    tcg_gen_andc_tl(cpu_Vf, R, Rd); /* Vf =3D R & ~Rd */
++    tcg_gen_shri_tl(cpu_Vf, cpu_Vf, 15);
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    tcg_gen_shri_tl(cpu_Nf, R, 15); /* Nf =3D R(15) */
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf);/* Sf =3D Nf ^ Vf */
++    /* update output registers */
++    tcg_gen_andi_tl(RdL, R, 0xff);
++    tcg_gen_shri_tl(RdH, R, 8);
++
++    tcg_temp_free_i32(Rd);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Subtracts two registers and places the result in the destination
++ *  register Rd.
++ */
++static bool trans_SUB(DisasContext *ctx, arg_SUB *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_sub_tl(R, Rd, Rr); /* R =3D Rd - Rr */
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++    /* update status register */
++    tcg_gen_andc_tl(cpu_Cf, Rd, R); /* Cf =3D Rd & ~R */
++    gen_sub_CHf(R, Rd, Rr);
++    gen_sub_Vf(R, Rd, Rr);
++    gen_ZNSf(R);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Subtracts a register and a constant and places the result in the
++ *  destination register Rd. This instruction is working on Register R16=
+ to R31
++ *  and is very well suited for operations on the X, Y, and Z-pointers.
++ */
++static bool trans_SUBI(DisasContext *ctx, arg_SUBI *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D tcg_const_i32(a->imm);
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_sub_tl(R, Rd, Rr); /* R =3D Rd - Imm */
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++    /* update status register */
++    gen_sub_CHf(R, Rd, Rr);
++    gen_sub_Vf(R, Rd, Rr);
++    gen_ZNSf(R);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(R);
++    tcg_temp_free_i32(Rr);
++
++    return true;
++}
++
++/*
++ *  Subtracts two registers and subtracts with the C Flag and places the
++ *  result in the destination register Rd.
++ */
++static bool trans_SBC(DisasContext *ctx, arg_SBC *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv zero =3D tcg_const_i32(0);
++
++    tcg_gen_sub_tl(R, Rd, Rr); /* R =3D Rd - Rr - Cf */
++    tcg_gen_sub_tl(R, R, cpu_Cf);
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++    /* update status register */
++    gen_sub_CHf(R, Rd, Rr);
++    gen_sub_Vf(R, Rd, Rr);
++    gen_NSf(R);
++
++    /*
++     * Previous value remains unchanged when the result is zero;
++     * cleared otherwise.
++     */
++    tcg_gen_movcond_tl(TCG_COND_EQ, cpu_Zf, R, zero, cpu_Zf, zero);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(zero);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  SBCI -- Subtract Immediate with Carry
++ */
++static bool trans_SBCI(DisasContext *ctx, arg_SBCI *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D tcg_const_i32(a->imm);
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv zero =3D tcg_const_i32(0);
++
++    tcg_gen_sub_tl(R, Rd, Rr); /* R =3D Rd - Rr - Cf */
++    tcg_gen_sub_tl(R, R, cpu_Cf);
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++    /* update status register */
++    gen_sub_CHf(R, Rd, Rr);
++    gen_sub_Vf(R, Rd, Rr);
++    gen_NSf(R);
++
++    /*
++     * Previous value remains unchanged when the result is zero;
++     * cleared otherwise.
++     */
++    tcg_gen_movcond_tl(TCG_COND_EQ, cpu_Zf, R, zero, cpu_Zf, zero);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(zero);
++    tcg_temp_free_i32(R);
++    tcg_temp_free_i32(Rr);
++
++    return true;
++}
++
++/*
++ *  Subtracts an immediate value (0-63) from a register pair and places =
+the
++ *  result in the register pair. This instruction operates on the upper =
+four
++ *  register pairs, and is well suited for operations on the Pointer Reg=
+isters.
++ *  This instruction is not available in all devices. Refer to the devic=
+e
++ *  specific instruction set summary.
++ */
++static bool trans_SBIW(DisasContext *ctx, arg_SBIW *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ADIW_SBIW)) {
++        return true;
++    }
++
++    TCGv RdL =3D cpu_r[a->rd];
++    TCGv RdH =3D cpu_r[a->rd + 1];
++    int Imm =3D (a->imm);
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv Rd =3D tcg_temp_new_i32();
++
++    tcg_gen_deposit_tl(Rd, RdL, RdH, 8, 8); /* Rd =3D RdH:RdL */
++    tcg_gen_subi_tl(R, Rd, Imm); /* R =3D Rd - Imm */
++    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
++    /* update status register */
++    tcg_gen_andc_tl(cpu_Cf, R, Rd);
++    tcg_gen_shri_tl(cpu_Cf, cpu_Cf, 15); /* Cf =3D R & ~Rd */
++    tcg_gen_andc_tl(cpu_Vf, Rd, R);
++    tcg_gen_shri_tl(cpu_Vf, cpu_Vf, 15); /* Vf =3D Rd & ~R */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    tcg_gen_shri_tl(cpu_Nf, R, 15); /* Nf =3D R(15) */
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf =3D Nf ^ Vf */
++    /* update output registers */
++    tcg_gen_andi_tl(RdL, R, 0xff);
++    tcg_gen_shri_tl(RdH, R, 8);
++
++    tcg_temp_free_i32(Rd);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Performs the logical AND between the contents of register Rd and reg=
+ister
++ *  Rr and places the result in the destination register Rd.
++ */
++static bool trans_AND(DisasContext *ctx, arg_AND *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_and_tl(R, Rd, Rr); /* Rd =3D Rd and Rr */
++    /* update status register */
++    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf =3D 0 */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    gen_ZNSf(R);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Performs the logical AND between the contents of register Rd and a c=
+onstant
++ *  and places the result in the destination register Rd.
++ */
++static bool trans_ANDI(DisasContext *ctx, arg_ANDI *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    int Imm =3D (a->imm);
++
++    tcg_gen_andi_tl(Rd, Rd, Imm); /* Rd =3D Rd & Imm */
++    /* update status register */
++    tcg_gen_movi_tl(cpu_Vf, 0x00); /* Vf =3D 0 */
++    gen_ZNSf(Rd);
++
++    return true;
++}
++
++/*
++ *  Performs the logical OR between the contents of register Rd and regi=
+ster
++ *  Rr and places the result in the destination register Rd.
++ */
++static bool trans_OR(DisasContext *ctx, arg_OR *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_or_tl(R, Rd, Rr);
++    /* update status register */
++    tcg_gen_movi_tl(cpu_Vf, 0);
++    gen_ZNSf(R);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Performs the logical OR between the contents of register Rd and a
++ *  constant and places the result in the destination register Rd.
++ */
++static bool trans_ORI(DisasContext *ctx, arg_ORI *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    int Imm =3D (a->imm);
++
++    tcg_gen_ori_tl(Rd, Rd, Imm); /* Rd =3D Rd | Imm */
++    /* update status register */
++    tcg_gen_movi_tl(cpu_Vf, 0x00); /* Vf =3D 0 */
++    gen_ZNSf(Rd);
++
++    return true;
++}
++
++/*
++ *  Performs the logical EOR between the contents of register Rd and
++ *  register Rr and places the result in the destination register Rd.
++ */
++static bool trans_EOR(DisasContext *ctx, arg_EOR *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++
++    tcg_gen_xor_tl(Rd, Rd, Rr);
++    /* update status register */
++    tcg_gen_movi_tl(cpu_Vf, 0);
++    gen_ZNSf(Rd);
++
++    return true;
++}
++
++/*
++ *  Clears the specified bits in register Rd. Performs the logical AND
++ *  between the contents of register Rd and the complement of the consta=
+nt mask
++ *  K. The result will be placed in register Rd.
++ */
++static bool trans_COM(DisasContext *ctx, arg_COM *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_xori_tl(Rd, Rd, 0xff);
++    /* update status register */
++    tcg_gen_movi_tl(cpu_Cf, 1); /* Cf =3D 1 */
++    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf =3D 0 */
++    gen_ZNSf(Rd);
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Replaces the contents of register Rd with its two's complement; the
++ *  value $80 is left unchanged.
++ */
++static bool trans_NEG(DisasContext *ctx, arg_NEG *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv t0 =3D tcg_const_i32(0);
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_sub_tl(R, t0, Rd); /* R =3D 0 - Rd */
++    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
++    /* update status register */
++    gen_sub_CHf(R, t0, Rd);
++    gen_sub_Vf(R, t0, Rd);
++    gen_ZNSf(R);
++    /* update output registers */
++    tcg_gen_mov_tl(Rd, R);
++
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  Adds one -1- to the contents of register Rd and places the result in=
+ the
++ *  destination register Rd.  The C Flag in SREG is not affected by the
++ *  operation, thus allowing the INC instruction to be used on a loop co=
+unter in
++ *  multiple-precision computations.  When operating on unsigned numbers=
+, only
++ *  BREQ and BRNE branches can be expected to perform consistently. When
++ *  operating on two's complement values, all signed branches are availa=
+ble.
++ */
++static bool trans_INC(DisasContext *ctx, arg_INC *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++
++    tcg_gen_addi_tl(Rd, Rd, 1);
++    tcg_gen_andi_tl(Rd, Rd, 0xff);
++    /* update status register */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Vf, Rd, 0x80); /* Vf =3D Rd =3D=
+=3D 0x80 */
++    gen_ZNSf(Rd);
++
++    return true;
++}
++
++/*
++ *  Subtracts one -1- from the contents of register Rd and places the re=
+sult
++ *  in the destination register Rd.  The C Flag in SREG is not affected =
+by the
++ *  operation, thus allowing the DEC instruction to be used on a loop co=
+unter in
++ *  multiple-precision computations.  When operating on unsigned values,=
+ only
++ *  BREQ and BRNE branches can be expected to perform consistently.  Whe=
+n
++ *  operating on two's complement values, all signed branches are availa=
+ble.
++ */
++static bool trans_DEC(DisasContext *ctx, arg_DEC *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++
++    tcg_gen_subi_tl(Rd, Rd, 1); /* Rd =3D Rd - 1 */
++    tcg_gen_andi_tl(Rd, Rd, 0xff); /* make it 8 bits */
++    /* update status register */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Vf, Rd, 0x7f); /* Vf =3D Rd =3D=
+=3D 0x7f */
++    gen_ZNSf(Rd);
++
++    return true;
++}
++
++/*
++ *  This instruction performs 8-bit x 8-bit -> 16-bit unsigned multiplic=
+ation.
++ */
++static bool trans_MUL(DisasContext *ctx, arg_MUL *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
++        return true;
++    }
++
++    TCGv R0 =3D cpu_r[0];
++    TCGv R1 =3D cpu_r[1];
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_mul_tl(R, Rd, Rr); /* R =3D Rd * Rr */
++    tcg_gen_andi_tl(R0, R, 0xff);
++    tcg_gen_shri_tl(R1, R, 8);
++    /* update status register */
++    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplicat=
+ion.
++ */
++static bool trans_MULS(DisasContext *ctx, arg_MULS *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
++        return true;
++    }
++
++    TCGv R0 =3D cpu_r[0];
++    TCGv R1 =3D cpu_r[1];
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv t0 =3D tcg_temp_new_i32();
++    TCGv t1 =3D tcg_temp_new_i32();
++
++    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
++    tcg_gen_ext8s_tl(t1, Rr); /* make Rr full 32 bit signed */
++    tcg_gen_mul_tl(R, t0, t1); /* R =3D Rd * Rr */
++    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
++    tcg_gen_andi_tl(R0, R, 0xff);
++    tcg_gen_shri_tl(R1, R, 8);
++    /* update status register */
++    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  This instruction performs 8-bit x 8-bit -> 16-bit multiplication of =
+a
++ *  signed and an unsigned number.
++ */
++static bool trans_MULSU(DisasContext *ctx, arg_MULSU *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
++        return true;
++    }
++
++    TCGv R0 =3D cpu_r[0];
++    TCGv R1 =3D cpu_r[1];
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv t0 =3D tcg_temp_new_i32();
++
++    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
++    tcg_gen_mul_tl(R, t0, Rr); /* R =3D Rd * Rr */
++    tcg_gen_andi_tl(R, R, 0xffff); /* make R 16 bits */
++    tcg_gen_andi_tl(R0, R, 0xff);
++    tcg_gen_shri_tl(R1, R, 8);
++    /* update status register */
++    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  This instruction performs 8-bit x 8-bit -> 16-bit unsigned
++ *  multiplication and shifts the result one bit left.
++ */
++static bool trans_FMUL(DisasContext *ctx, arg_FMUL *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
++        return true;
++    }
++
++    TCGv R0 =3D cpu_r[0];
++    TCGv R1 =3D cpu_r[1];
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++
++    tcg_gen_mul_tl(R, Rd, Rr); /* R =3D Rd * Rr */
++    /* update status register */
++    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    /* update output registers */
++    tcg_gen_shli_tl(R, R, 1);
++    tcg_gen_andi_tl(R0, R, 0xff);
++    tcg_gen_shri_tl(R1, R, 8);
++    tcg_gen_andi_tl(R1, R1, 0xff);
 +
 +
-+#define TYPE_AVR_MASK "atmel-power"
-+#define AVR_MASK(obj) OBJECT_CHECK(AVRMaskState, (obj), TYPE_AVR_MASK)
++    tcg_temp_free_i32(R);
 +
-+typedef struct {
-+    /* <private> */
-+    SysBusDevice parent_obj;
++    return true;
++}
 +
-+    /* <public> */
-+    MemoryRegion iomem;
++/*
++ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplicat=
+ion
++ *  and shifts the result one bit left.
++ */
++static bool trans_FMULS(DisasContext *ctx, arg_FMULS *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
++        return true;
++    }
 +
-+    uint8_t val;
-+    qemu_irq irq[8];
-+} AVRMaskState;
++    TCGv R0 =3D cpu_r[0];
++    TCGv R1 =3D cpu_r[1];
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv t0 =3D tcg_temp_new_i32();
++    TCGv t1 =3D tcg_temp_new_i32();
 +
-+#endif /* HW_MISC_ATMEL_POWER_H */
++    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
++    tcg_gen_ext8s_tl(t1, Rr); /* make Rr full 32 bit signed */
++    tcg_gen_mul_tl(R, t0, t1); /* R =3D Rd * Rr */
++    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
++    /* update status register */
++    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    /* update output registers */
++    tcg_gen_shli_tl(R, R, 1);
++    tcg_gen_andi_tl(R0, R, 0xff);
++    tcg_gen_shri_tl(R1, R, 8);
++    tcg_gen_andi_tl(R1, R1, 0xff);
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  This instruction performs 8-bit x 8-bit -> 16-bit signed multiplicat=
+ion
++ *  and shifts the result one bit left.
++ */
++static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
++        return true;
++    }
++
++    TCGv R0 =3D cpu_r[0];
++    TCGv R1 =3D cpu_r[1];
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv Rr =3D cpu_r[a->rr];
++    TCGv R =3D tcg_temp_new_i32();
++    TCGv t0 =3D tcg_temp_new_i32();
++
++    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
++    tcg_gen_mul_tl(R, t0, Rr); /* R =3D Rd * Rr */
++    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
++    /* update status register */
++    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    /* update output registers */
++    tcg_gen_shli_tl(R, R, 1);
++    tcg_gen_andi_tl(R0, R, 0xff);
++    tcg_gen_shri_tl(R1, R, 8);
++    tcg_gen_andi_tl(R1, R1, 0xff);
++
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(R);
++
++    return true;
++}
++
++/*
++ *  The module is an instruction set extension to the AVR CPU, performin=
+g
++ *  DES iterations. The 64-bit data block (plaintext or ciphertext) is p=
+laced in
++ *  the CPU register file, registers R0-R7, where LSB of data is placed =
+in LSB
++ *  of R0 and MSB of data is placed in MSB of R7. The full 64-bit key (i=
+ncluding
++ *  parity bits) is placed in registers R8- R15, organized in the regist=
+er file
++ *  with LSB of key in LSB of R8 and MSB of key in MSB of R15. Executing=
+ one DES
++ *  instruction performs one round in the DES algorithm. Sixteen rounds =
+must be
++ *  executed in increasing order to form the correct DES ciphertext or
++ *  plaintext. Intermediate results are stored in the register file (R0-=
+R15)
++ *  after each DES instruction. The instruction's operand (K) determines=
+ which
++ *  round is executed, and the half carry flag (H) determines whether en=
+cryption
++ *  or decryption is performed.  The DES algorithm is described in
++ *  "Specifications for the Data Encryption Standard" (Federal Informati=
+on
++ *  Processing Standards Publication 46). Intermediate results in this
++ *  implementation differ from the standard because the initial permutat=
+ion and
++ *  the inverse initial permutation are performed each iteration. This d=
+oes not
++ *  affect the result in the final ciphertext or plaintext, but reduces
++ *  execution time.
++ */
++static bool trans_DES(DisasContext *ctx, arg_DES *a)
++{
++    /* TODO */
++    if (!avr_have_feature(ctx, AVR_FEATURE_DES)) {
++        return true;
++    }
++
++    return true;
++}
 --=20
 2.7.4
 
