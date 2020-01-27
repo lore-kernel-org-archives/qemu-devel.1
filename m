@@ -2,75 +2,83 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14404C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF314C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:32:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D57CC20702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:26:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A44120720
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:32:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ak++zgi/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D57CC20702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FlDNmdwe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A44120720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47541 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw7DS-0004to-Vy
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 11:26:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59566)
+	id 1iw7J9-0006xR-NL
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 11:32:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iw7Cc-0004Sd-6L
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:25:33 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iw7I8-0006Xu-EE
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iw7Ca-0003PH-Er
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:25:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22470
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iw7Ca-0003Ox-AH
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:25:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580142327;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=7vRasnHn1TWS1kkDbzF6M4jxihQyaS0r7w9JAUdETvQ=;
- b=ak++zgi/taRdOKA4txxS/zeGJBEH/9fzu12s0C2y8PiwpGBOKVSa8Nh4krUqUKCnUWIlWK
- HpJEXdbrJdGSvk0c11r9xfeBgpMF88kQG1U0rQ365WbnYiTHPu2hW9RFqqcEFXV/NXxPxa
- MHmwZciQFiR7AR3NVr98GSrcH1FlSto=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-oFmbMbrTOlWwUPFVX2yqxg-1; Mon, 27 Jan 2020 11:25:22 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D70D109B318;
- Mon, 27 Jan 2020 16:25:21 +0000 (UTC)
-Received: from localhost (ovpn-117-180.ams2.redhat.com [10.36.117.180])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF05E60C05;
- Mon, 27 Jan 2020 16:25:15 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] docs: add virtiofsd(1) man page
-Date: Mon, 27 Jan 2020 16:25:14 +0000
-Message-Id: <20200127162514.56784-1-stefanha@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iw7I6-0002pw-S3
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:31:12 -0500
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:42344)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iw7I6-0002p7-MI
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:31:10 -0500
+Received: by mail-ot1-x329.google.com with SMTP id 66so8937393otd.9
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 08:31:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=S+IVAjk2ZSyg/FZRManzLWTqlGH1noOi1mK2FlXDH14=;
+ b=FlDNmdwekn6ZlUGkKJUWncywIhtCMnfEISIqr2FqNVF+Qq6TB9rsmHdz8ZkJGmXFPi
+ OIIKY2qQqyuzN0TcN3pQhTnmE7hnSPq4tEHzLkujIreapJ7ZjDOSyAU5ChecLTtahVSz
+ 2CJ8qvIBKJrupT0RGGv0G9r56mIZUzUvNZp8dvln5QZHC5NlLGcOlsycIwASSJD+qiNd
+ EfdOmgZlVLzjTFAxJ3e2Kfq+mExYHNkkdq0aTRuF0M27BUJAxQZHU2SPK5L6eO1JPCuH
+ +ie//QMuOxb/tVojf5fkWov4YKavGCznGA6Sukc+BvqJW68bF0RJAd//gfNXJs6VUIq9
+ Gt/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=S+IVAjk2ZSyg/FZRManzLWTqlGH1noOi1mK2FlXDH14=;
+ b=Vr77KcU5+yU2p14irmekdiVZj7NMFW0YDizBtnsHDUdAd2m/01iSE5pMaNDY0ULv7a
+ 1FdxaZEG/TtrFOTn9WU9Ug4bSIGQWfJYiCfWIj3Jms6ZmygdxNKQA6nHzoMggAXczGHv
+ aK/31t8GCMvS5yxuYsEAWgCTjES1R5feOc+GdPqdLviNcbvLXOOtwNU7shRLhSWhe5JX
+ ewuta7xoqmUMMrgfyXFdFxffxQqdhM4eI6XpYaEbonBWb9HtWeFuKV0XXyWPdn4zV7MD
+ WC0/cSt6bxUdgZdf4jEyvigiwD7KluKXewDP5h/7ebfqTb2Ay8qPPEn70BlLrOx32S5z
+ Dsrg==
+X-Gm-Message-State: APjAAAVPbQU5Nybm32CnDOdKiJgzPrppEJqsqfzzkHQd+PH6ch+VSkXm
+ Q9IAFntwYOW9X164q/UZZvZA14WpGtRrFDEkg/s=
+X-Google-Smtp-Source: APXvYqx0SHjDJ5CGSW9l63OFPMv9ReAW+LbEr4ogNFd6TRqcL9e5ve4idZULJ2sfzn/iyf+lNsgbpHOcg/GPt/6mo7o=
+X-Received: by 2002:a05:6830:1042:: with SMTP id
+ b2mr13004374otp.306.1580142669539; 
+ Mon, 27 Jan 2020 08:31:09 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: oFmbMbrTOlWwUPFVX2yqxg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+References: <CAL1e-=j5WJkV=X+KkfBuS3pjf6z3aJrtu4xpYeVbjEUYiWxxTQ@mail.gmail.com>
+ <20200127093004.GA18565@stefanha-x1.localdomain>
+In-Reply-To: <20200127093004.GA18565@stefanha-x1.localdomain>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 27 Jan 2020 17:30:58 +0100
+Message-ID: <CAL1e-=h+g4FWVDVe6a4T_X_nEA-catKd+7LiKXx++qS+G7mqOQ@mail.gmail.com>
+Subject: Re: [GSoC/Outreachy QEMU proposal] Extend support for ioctls in QEMU
+ linux-user mode
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000838241059d21a249"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,251 +90,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document the virtiofsd(1) program and its command-line options.  This
-man page is a rST conversion of the original texi documentation that I
-wrote.
+--000000000000838241059d21a249
+Content-Type: text/plain; charset="UTF-8"
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-Based-on: 20200124162606.8787-1-peter.maydell@linaro.org
-          ("[PATCH v2 0/8] qemu-img, qemu-trace-stap, virtfs-proxy-helper: =
-convert to rST")
----
- MAINTAINERS                |   1 +
- Makefile                   |   8 ++-
- docs/interop/conf.py       |   5 +-
- docs/interop/index.rst     |   1 +
- docs/interop/virtiofsd.rst | 123 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 136 insertions(+), 2 deletions(-)
- create mode 100644 docs/interop/virtiofsd.rst
+On Mon, Jan 27, 2020 at 10:30 AM Stefan Hajnoczi <stefanha@redhat.com>
+wrote:
+>
+> On Thu, Jan 23, 2020 at 02:34:01PM +0100, Aleksandar Markovic wrote:
+> > *Extend support for ioctls in QEMU linux-user mode*
+> >
+> >
+> >
+> > *PLANNED ACTIVITIES*
+> >
+> > BACKGROUND
+> >
+> > There is currently 2500+ ioctls defined in Linux kernel. QEMU linux-user
+> > currently supports only several hundred. There is a constant need for
+> > expanding ioctl support in QEMU. Users use Linux-user mode in variety of
+> > setups (for example, building and testing tools and applications under
+> > chroot environment), and, on a regular basis, efforts by multiple people
+> > are made to fill in missing support. However, these efforts have been
+> > usually done on a piece-by-piece basis, i a limited way covering a
+>
+> s/ i / in /
+>
+> > partucular need. This project will take more proactive stance, and try
+to
+>
+> s/partucular/particular/
+>
+> > improve QEMU before users start complaining.
+> >
+> > PART I:
+> >
+> >    a) Add strace support for outputing ioctl IDs (the second argument of
+> > ioctl()) as strings rather than numbers - for all platform independant
+> > ioctls.
+> >    b) Add strace support for printing the third argument of ioctl() (be
+it
+> > int, string, structure or array) - limited to selected ioctls that are
+> > frequently used.
+> >
+> > PART II:
+> >
+> >    a) Amend support for existing groups of ioctls that are not completed
+> > 100% (let's say, filesystem ioctls)
+> >    b) Add support for a selected group of ioctls that are not currently
+> > supported (for example, dm ioctls, Bluetooth ioctls, or Radeon DRM
+ioctls)
+> >
+> > PART III:
+> >
+> >   a) Develop unit tests for selected ioctls that are already supported
+in
+> > QEMU.
+> >
+> >
+> > *DELIVERABLES*
+> >
+> > The deliverables are in the form of source code for each part, intended
+to
+> > be upstreamed, and time needed for upstreaming (addressing reviews,
+etc.)
+> > process is included int this project.
+> >
+> > The delivery of results can and should be distributed over larger
+period of
+> > time 2-3 months.
+>
+> Good project idea.  Please choose concrete ioctls.  Applicants may not
+> have the necessary experience to choose a set of ioctls that are useful.
+>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 83fb32b860..1da0709129 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1603,6 +1603,7 @@ S: Supported
- F: tools/virtiofsd/*
- F: hw/virtio/vhost-user-fs*
- F: include/hw/virtio/vhost-user-fs.h
-+F: docs/interop/virtiofsd.rst
-=20
- virtio-input
- M: Gerd Hoffmann <kraxel@redhat.com>
-diff --git a/Makefile b/Makefile
-index 539f9ef079..ecd26044bc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -348,6 +348,9 @@ DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1
- DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-img.1
- DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-nbd.8
- DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-ga.8
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+DOCS+=3D$(MANUAL_BUILDDIR)/interop/virtiofsd.1
-+endif
- DOCS+=3D$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
- DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/=
-interop/qemu-qmp-ref.7
- DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/in=
-terop/qemu-ga-ref.7
-@@ -861,6 +864,9 @@ ifdef CONFIG_VIRTFS
- =09$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
- =09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1 "$(DES=
-TDIR)$(mandir)/man1"
- endif
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+=09$(INSTALL_DATA) docs/interop/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
-+endif
-=20
- install-datadir:
- =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
-@@ -1052,7 +1058,7 @@ $(MANUAL_BUILDDIR)/system/index.html: $(call manual-d=
-eps,system)
-=20
- $(call define-manpage-rule,interop,\
-        qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
--       virtfs-proxy-helper.1,\
-+       virtiofsd.1 virtfs-proxy-helper.1,\
-        $(SRC_PATH/qemu-img-cmds.hx))
-=20
- $(call define-manpage-rule,system,qemu-block-drivers.7)
-diff --git a/docs/interop/conf.py b/docs/interop/conf.py
-index b0f322207c..b3cda17042 100644
---- a/docs/interop/conf.py
-+++ b/docs/interop/conf.py
-@@ -27,5 +27,8 @@ man_pages =3D [
-      [], 1),
-     ('virtfs-proxy-helper', 'virtfs-proxy-helper',
-      u'QEMU 9p virtfs proxy filesystem helper',
--     ['M. Mohan Kumar'], 1)
-+     ['M. Mohan Kumar'], 1),
-+    ('virtiofsd', 'virtiofsd', u'QEMU virtio-fs shared file system daemon'=
-,
-+     ['Stefan Hajnoczi <stefanha@redhat.com>',
-+      'Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>'], 1),
- ]
-diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index 3b763b1eeb..e8455b4270 100644
---- a/docs/interop/index.rst
-+++ b/docs/interop/index.rst
-@@ -24,3 +24,4 @@ Contents:
-    vhost-user
-    vhost-user-gpu
-    virtfs-proxy-helper
-+   virtiofsd
-diff --git a/docs/interop/virtiofsd.rst b/docs/interop/virtiofsd.rst
-new file mode 100644
-index 0000000000..51a657ac0c
---- /dev/null
-+++ b/docs/interop/virtiofsd.rst
-@@ -0,0 +1,123 @@
-+QEMU virtio-fs shared file system daemon
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Synopsis
-+--------
-+
-+**virtiofsd** [*OPTIONS*]
-+
-+Description
-+-----------
-+
-+Share a host directory tree with a guest through a virtio-fs device.  This
-+program is a vhost-user backend that implements the virtio-fs device.  Eac=
-h
-+virtio-fs device instance requires its own virtiofsd process.
-+
-+This program is designed to work with QEMU's ``--device vhost-user-fs-pci`=
-`
-+but should work with any virtual machine monitor (VMM) that supports
-+vhost-user.  See the Examples section below.
-+
-+This program must be run as the root user.  Upon startup the program will
-+switch into a new file system namespace with the shared directory tree as =
-its
-+root.  This prevents "file system escapes" due to symlinks and other file
-+system objects that might lead to files outside the shared directory.  The
-+program also sandboxes itself using seccomp(2) to prevent ptrace(2) and ot=
-her
-+vectors that could allow an attacker to compromise the system after gainin=
-g
-+control of the virtiofsd process.
-+
-+Options
-+-------
-+
-+.. program:: virtiofsd
-+
-+.. option:: -h, --help
-+
-+  Print help.
-+
-+.. option:: -V, --version
-+
-+  Print version.
-+
-+.. option:: -d
-+
-+  Enable debug output.
-+
-+.. option:: --syslog
-+
-+  Print log messages to syslog instead of stderr.
-+
-+.. option:: -o OPTION
-+
-+  * debug -
-+    Enable debug output.
-+
-+  * flock|no_flock -
-+    Enable/disable flock.  The default is ``no_flock``.
-+
-+  * log_level=3DLEVEL -
-+    Print only log messages matching LEVEL or more severe.  LEVEL is one o=
-f
-+    ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
-+
-+  * norace -
-+    Disable racy fallback.  The default is false.
-+
-+  * posix_lock|no_posix_lock -
-+    Enable/disable remote POSIX locks.  The default is ``posix_lock``.
-+
-+  * readdirplus|no_readdirplus -
-+    Enable/disable readdirplus.  The default is ``readdirplus``.
-+
-+  * source=3DPATH -
-+    Share host directory tree located at PATH.  This option is required.
-+
-+  * timeout=3DTIMEOUT -
-+    I/O timeout in seconds.  The default depends on cache=3D option.
-+
-+  * vhost_user_socket=3DPATH -
-+    Listen on vhost-user UNIX domain socket at PATH.
-+
-+  * writeback|no_writeback -
-+    Enable/disable writeback cache. The cache alows the FUSE client to buf=
-fer
-+    and merge write requests.  The default is ``no_writeback``.
-+
-+  * xattr|no_xattr -
-+    Enable/disable extended attributes (xattr) on files and directories.  =
-The
-+    default is ``no_xattr``.
-+
-+.. option:: --socket-path=3DPATH
-+
-+  Listen on vhost-user UNIX domain socket at PATH.
-+
-+.. option:: --fd=3DFDNUM
-+
-+  Accept connections from vhost-user UNIX domain socket file descriptor FD=
-NUM.
-+  The file descriptor must already be listening for connections.
-+
-+.. option:: --thread-pool-size=3DNUM
-+
-+  Restrict the number of worker threads per request queue to NUM.  The def=
-ault
-+  is 64.
-+
-+.. option:: --cache=3Dnone|auto|always
-+
-+  Select the desired trade-off between coherency and performance.  ``none`=
-`
-+  forbids the FUSE client from caching to achieve best coherency at the co=
-st of
-+  performance.  ``auto`` acts similar to NFS with a 1 second metadata cach=
-e
-+  timeout.  ``always`` sets a long cache lifetime at the expense of cohere=
-ncy.
-+
-+Examples
-+--------
-+
-+Export ``/var/lib/fs/vm001/`` on vhost-user UNIX domain socket
-+``/var/run/vm001-vhost-fs.sock``:
-+
-+::
-+
-+  host# virtiofsd --socket-path=3D/var/run/vm001-vhost-fs.sock -o source=
-=3D/var/lib/fs/vm001
-+  host# qemu-system-x86_64 \
-+      -chardev socket,id=3Dchar0,path=3D/var/run/vm001-vhost-fs.sock \
-+      -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs \
-+      -object memory-backend-file,id=3Dmem,size=3D4G,mem-path=3D/dev/shm,s=
-hare=3Don \
-+      -numa node,memdev=3Dmem \
-+      ...
-+  guest# mount -t virtio_fs myfs /mnt
---=20
-2.24.1
+PART I should not be that difficult. PART II is, however, a minefield. An
+implementation of support of a ioctl range from 15 minutes to two months.
+The least we wont to happen is that the student is stuck with a problem for
+months. Therefore I suggest first some "low hanging fruit" for a student to
+get self-confidence and experience. One such group is DM ioctl group ( link
+<https://github.com/torvalds/linux/blob/master/include/uapi/linux/dm-ioctl.h#L251>
+) (Laurent may confirm, or "unconfirm" that). The next shoudl be something
+a little harder, but useful in terms of end user. PART III should be
+developed on the fly, but we need to provide a guideline/framework prior to
+starting working with a student, IMHO..
 
+> I wonder if it's possible to use something like the Debian popularity
+> contest (https://popcon.debian.org/) and then scan the source of the
+> most popular N packages for ioctl() calls.
+
+Great! I'll try. A very interesting site and method.
+
+Aleksandar
+
+>  Maybe this is overthinking
+> it, but it would give an idea of which ioctl() calls are relevant and
+> missing from QEMU.
+>
+> Stefan
+
+--000000000000838241059d21a249
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Mon, Jan 27, 2020 at 10:30 AM Stefan Hajnoczi &=
+lt;<a href=3D"mailto:stefanha@redhat.com">stefanha@redhat.com</a>&gt; wrote=
+:<br>&gt;<br>&gt; On Thu, Jan 23, 2020 at 02:34:01PM +0100, Aleksandar Mark=
+ovic wrote:<br>&gt; &gt; *Extend support for ioctls in QEMU linux-user mode=
+*<br>&gt; &gt;<br>&gt; &gt;<br>&gt; &gt;<br>&gt; &gt; *PLANNED ACTIVITIES*<=
+br>&gt; &gt;<br>&gt; &gt; BACKGROUND<br>&gt; &gt;<br>&gt; &gt; There is cur=
+rently 2500+ ioctls defined in Linux kernel. QEMU linux-user<br>&gt; &gt; c=
+urrently supports only several hundred. There is a constant need for<br>&gt=
+; &gt; expanding ioctl support in QEMU. Users use Linux-user mode in variet=
+y of<br>&gt; &gt; setups (for example, building and testing tools and appli=
+cations under<br>&gt; &gt; chroot environment), and, on a regular basis, ef=
+forts by multiple people<br>&gt; &gt; are made to fill in missing support. =
+However, these efforts have been<br>&gt; &gt; usually done on a piece-by-pi=
+ece basis, i a limited way covering a<br>&gt;<br>&gt; s/ i / in /<br>&gt;<b=
+r>&gt; &gt; partucular need. This project will take more proactive stance, =
+and try to<br>&gt;<br>&gt; s/partucular/particular/<br>&gt;<br>&gt; &gt; im=
+prove QEMU before users start complaining.<br>&gt; &gt;<br>&gt; &gt; PART I=
+:<br>&gt; &gt;<br>&gt; &gt; =C2=A0 =C2=A0a) Add strace support for outputin=
+g ioctl IDs (the second argument of<br>&gt; &gt; ioctl()) as strings rather=
+ than numbers - for all platform independant<br>&gt; &gt; ioctls.<br>&gt; &=
+gt; =C2=A0 =C2=A0b) Add strace support for printing the third argument of i=
+octl() (be it<br>&gt; &gt; int, string, structure or array) - limited to se=
+lected ioctls that are<br>&gt; &gt; frequently used.<br>&gt; &gt;<br>&gt; &=
+gt; PART II:<br>&gt; &gt;<br>&gt; &gt; =C2=A0 =C2=A0a) Amend support for ex=
+isting groups of ioctls that are not completed<br>&gt; &gt; 100% (let&#39;s=
+ say, filesystem ioctls)<br>&gt; &gt; =C2=A0 =C2=A0b) Add support for a sel=
+ected group of ioctls that are not currently<br>&gt; &gt; supported (for ex=
+ample, dm ioctls, Bluetooth ioctls, or Radeon DRM ioctls)<br>&gt; &gt;<br>&=
+gt; &gt; PART III:<br>&gt; &gt;<br>&gt; &gt; =C2=A0 a) Develop unit tests f=
+or selected ioctls that are already supported in<br>&gt; &gt; QEMU.<br>&gt;=
+ &gt;<br>&gt; &gt;<br>&gt; &gt; *DELIVERABLES*<br>&gt; &gt;<br>&gt; &gt; Th=
+e deliverables are in the form of source code for each part, intended to<br=
+>&gt; &gt; be upstreamed, and time needed for upstreaming (addressing revie=
+ws, etc.)<br>&gt; &gt; process is included int this project.<br>&gt; &gt;<b=
+r>&gt; &gt; The delivery of results can and should be distributed over larg=
+er period of<br>&gt; &gt; time 2-3 months.<br>&gt;<br>&gt; Good project ide=
+a.=C2=A0 Please choose concrete ioctls.=C2=A0 Applicants may not<br>&gt; ha=
+ve the necessary experience to choose a set of ioctls that are useful.<br>&=
+gt;<div><br></div><div>PART I should not be that difficult. PART II is, how=
+ever, a minefield. An implementation of support of a ioctl range from 15 mi=
+nutes to two months. The least we wont to happen is that the student is stu=
+ck with a problem for months. Therefore I suggest first some &quot;low hang=
+ing fruit&quot; for a student to get self-confidence and experience. One su=
+ch group is DM ioctl group (=C2=A0<a href=3D"https://github.com/torvalds/li=
+nux/blob/master/include/uapi/linux/dm-ioctl.h#L251">link</a> ) (Laurent may=
+ confirm, or &quot;unconfirm&quot; that). The next shoudl be something a li=
+ttle harder, but useful in terms of end user. PART III should be developed =
+on the fly, but we need to provide a guideline/framework prior to starting =
+working with a student, IMHO..</div><div><br>&gt; I wonder if it&#39;s poss=
+ible to use something like the Debian popularity<br>&gt; contest (<a href=
+=3D"https://popcon.debian.org/">https://popcon.debian.org/</a>) and then sc=
+an the source of the<br>&gt; most popular N packages for ioctl() calls.<div=
+><br></div><div>Great! I&#39;ll try. A very interesting site and method.</d=
+iv><div><br></div><div>Aleksandar</div><div><br></div><div>&gt;=C2=A0 Maybe=
+ this is overthinking<br>&gt; it, but it would give an idea of which ioctl(=
+) calls are relevant and<br>&gt; missing from QEMU.<br>&gt;<br>&gt; Stefan<=
+/div></div></div>
+
+--000000000000838241059d21a249--
 
