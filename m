@@ -2,104 +2,82 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA463C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE428C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:11:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F15C206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:10:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78DF22087F
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:11:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F5TqX2g/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F15C206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NGFnZnLO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78DF22087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw6xf-0005g9-ME
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 11:10:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56470)
+	id 1iw6zA-0007SB-NT
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 11:11:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iw6wq-00055N-I5
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:09:13 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iw6yH-0006cV-9p
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:10:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iw6wp-0004t1-2P
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:09:12 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40565
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iw6wo-0004sc-VQ
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:09:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580141350;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nVmB7YcFiUwYBFjLmovIRl9f7swqE+gVuOWaQiP6Fuc=;
- b=F5TqX2g/bgBtAiDDkkBPbjlIsltlE1x8bCw5yz0jqb0SgYIFsqTbvQYqhan5m3MClBa3Hh
- +zIGz8aWiTGIN26pIFJbS0QZSjRO9DJDLkJKCG1S3vdyR2k0CX8DGc05RZVIXgP2HCplE/
- rXzLLn6bxx10P91zGv7s7SRbxTcDzdE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-q1qBEzcMMD2pYnzsyEDhOQ-1; Mon, 27 Jan 2020 11:09:06 -0500
-Received: by mail-wr1-f71.google.com with SMTP id u12so6287634wrt.15
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 08:09:06 -0800 (PST)
+ (envelope-from <robert.foley@linaro.org>) id 1iw6yF-0006og-Vf
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:10:41 -0500
+Received: from mail-lj1-x232.google.com ([2a00:1450:4864:20::232]:44639)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iw6yF-0006mi-Mv
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:10:39 -0500
+Received: by mail-lj1-x232.google.com with SMTP id q8so11274772ljj.11
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 08:10:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=KmHvGloxj6scvbdA/M7Ea4iCSKg5n66TIQBrTFBoGFY=;
+ b=NGFnZnLO/0i4Npw0/p1/4DyzzRMwa1Cb1PS611Pp4rAYaoB7KXPar7yUuwCekncfBX
+ t1DMeLDa+MgMR2TpNG66Vzsk4RmJuOv/L28l7bPrEC5VhsKR0dLcyqj5R64aawFTk+TO
+ faLpVwaM9wKzpMStrz+S2e8KuXwMf2mAxZguU4FW33VxzpnjXlPCEOWv1OtNaAWL3W9B
+ MY9HxcNlBjQH2OY3eypnKocHvbBLuhE+17BW+Ykw3sot/LrMsQd1+9weu0LYtMNnlsdV
+ Dq1g5rQV9fxqAGISuOQ+zU9Chwse6A9/KE5WIwmu2aVCHtFaFUVulmdIy8HnGfaTcXJJ
+ 8cOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=D+Yt3nJ7VwPy/OdeOqWBLKPQIy+lce60X+aaHgjgj0g=;
- b=RrF9vl99FI0iKgtFFISoRnAlLQY5XbJGrfcDoZxnU8ZBv0jLDoPZw3gVInfP5X+Hnt
- GG9ZYb0cMnPQM7DaQZfNrXDK8Cknn8RMsE6QMSX0vCMBkHfodY7LZ4LyRNCggxDBPfGe
- cW/s13yYpw9o2CFlbXF952VS738YZ42Ye9ieTOYvlvQv868DhhPk3jzKH0jvzrH27GZ6
- VBHyDFJf7Yd/lMbp57tIrPnk0hvw3PdZzRHhfLHarrZhKtHBmfZq48qRdKiD6lQa6mQJ
- Eci664pgUpBg16p59m3UPxleb2pa1FeghIW5mrZqK81ELnaHtxTsJhrXeFLQAB6ko/8e
- +VCw==
-X-Gm-Message-State: APjAAAXM8jfTzO5Lhjq4POtaCEbYqU1bRomBvJyhNWYIfafBjWcIrvUe
- PyzkJS7Pqtk5695U5R5cisgPmcKswyfpLL4F2BEjKCquTLeWwPo/VeEkZxvsvILrzlJDwGky7Lv
- QT4xPJrmmgtNz//o=
-X-Received: by 2002:a05:600c:2207:: with SMTP id
- z7mr14683968wml.138.1580141345156; 
- Mon, 27 Jan 2020 08:09:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxjYf/x0euYVfFJFEN0eHouqkGj3uN7aIdO6AJPHGmiUu+MH5LJEeLP7J6CDO4tnwsc5VQ4IA==
-X-Received: by 2002:a05:600c:2207:: with SMTP id
- z7mr14683950wml.138.1580141344869; 
- Mon, 27 Jan 2020 08:09:04 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z3sm21180411wrs.94.2020.01.27.08.09.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 27 Jan 2020 08:09:04 -0800 (PST)
-Subject: Re: [PATCH v4 5/7] tests/boot_linux_console: Test booting U-Boot on
- the Raspberry Pi 2
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, qemu-devel@nongnu.org
-References: <20200120235159.18510-1-f4bug@amsat.org>
- <20200120235159.18510-6-f4bug@amsat.org>
- <d432f2d7-f238-0503-a242-373be81b7622@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5e986679-7aff-a33c-eefb-d878b72089ad@redhat.com>
-Date: Mon, 27 Jan 2020 17:09:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=KmHvGloxj6scvbdA/M7Ea4iCSKg5n66TIQBrTFBoGFY=;
+ b=aJVj0yrB/YIysmQGCamLrCbz115F3FOd7YgbqMnY1LnryoHW0BPGUSb5JuXkSG+rsg
+ 3MPfTG6uO0P26BT8SDFMzJEUO/BZjfFZVTGDejlozauJocn8Q6hkjpFwfhtHIoMAsFIR
+ B/xfecz82Hrmtu2mmY6EWsfUMh8Jg1h/iDHBI9vPKShwncboOylbp7JuRGa9qktU411o
+ /Ojz8ZjFx4P2BladdtG711hgr3MLIJ7B6XSF3YNd/cAs0w+FS2ebybxxI0jvpqJW0DdO
+ YJKfk80ljwnfP/mhP1jRyKCuPgDrrRd2MuDhAKJZBuJlRzopgNeZyVme9VeZYjcCMmzO
+ H+0g==
+X-Gm-Message-State: APjAAAW1oOrYQrLB5VJsk/0/43MzLw017IYfRuK3xvZi2gRohgDQEf4S
+ QaeO6+seOgYle0n+xijQvMI0AvpespaeAXG5jo3N/w==
+X-Google-Smtp-Source: APXvYqz//xkwDsSOj0h+ggvFpMdHAXFXLwXWYSjB7Tz3sj/udJFvQnzGyYOaFy3TuUR52HnWEFryqx3qiqgG6XEj1Nc=
+X-Received: by 2002:a2e:81d0:: with SMTP id s16mr10797312ljg.166.1580141437649; 
+ Mon, 27 Jan 2020 08:10:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d432f2d7-f238-0503-a242-373be81b7622@redhat.com>
-Content-Language: en-US
-X-MC-Unique: q1qBEzcMMD2pYnzsyEDhOQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20200124165335.422-1-robert.foley@linaro.org>
+ <20200124165335.422-6-robert.foley@linaro.org>
+ <87pnf5f50x.fsf@linaro.org>
+In-Reply-To: <87pnf5f50x.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Mon, 27 Jan 2020 11:10:26 -0500
+Message-ID: <CAEyhzFtEv8ewo82efBE8BMVwxLiNCwz8_9NWmNGx3zqszCGBhQ@mail.gmail.com>
+Subject: Re: [PATCH 5/8] tests/vm: Added configuration file support
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,80 +89,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- Cleber Rosa <crosa@redhat.com>, Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>
+Cc: fam@euphon.net, Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/27/20 5:02 PM, Thomas Huth wrote:
-> On 21/01/2020 00.51, Philippe Mathieu-Daud=C3=A9 wrote:
->> This test runs U-Boot on the Raspberry Pi 2.
->> It is very simple and fast:
->>
->>    $ avocado --show=3Dapp,console run -t raspi2 -t u-boot tests/acceptan=
-ce/
->>    JOB LOG    : avocado/job-results/job-2020-01-20T23.40-2424777/job.log
->>     (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_a=
-rm_raspi2_uboot:
->>    console: MMC:   sdhci@7e300000: 0
->>    console: Loading Environment from FAT... Card did not respond to volt=
-age select!
->>    console: In:    serial
->>    console: Out:   vidconsole
->>    console: Err:   vidconsole
->>    console: Net:   No ethernet found.
->>    console: starting USB...
->>    console: USB0:   Port not available.
->>    console: Hit any key to stop autoboot:  0
->>    console: U-Boot>
->>    console: U-Boot> bdinfo
->>    console: arch_number =3D 0x00000000
->>    console: boot_params =3D 0x00000100
->>    console: DRAM bank   =3D 0x00000000
->>    console: -> start    =3D 0x00000000
->>    console: -> size     =3D 0x3c000000
->>    console: baudrate    =3D 115200 bps
->>    console: TLB addr    =3D 0x3bff0000
->>    console: relocaddr   =3D 0x3bf64000
->>    console: reloc off   =3D 0x3bf5c000
->>    console: irq_sp      =3D 0x3bb5fec0
->>    console: sp start    =3D 0x3bb5feb0
->>    console: Early malloc usage: 2a4 / 400
->>    console: fdt_blob    =3D 0x3bfbdfb0
->>    console: U-Boot> version
->>    console: U-Boot 2019.01+dfsg-7 (May 14 2019 - 02:07:44 +0000)
->>    console: gcc (Debian 8.3.0-7) 8.3.0
->>    console: GNU ld (GNU Binutils for Debian) 2.31.1
->>    console: U-Boot> reset
->>    console: resetting ...
->>    PASS (0.46 s)
->>
->> U-Boot is built by the Debian project, see:
->> https://wiki.debian.org/InstallingDebianOn/Allwinner#Creating_a_bootable=
-_SD_Card_with_u-boot
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>   tests/acceptance/boot_linux_console.py | 28 ++++++++++++++++++++++++++
->>   1 file changed, 28 insertions(+)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/b=
-oot_linux_console.py
->> index e40b84651b..682b801b4f 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->=20
-> The file is called boot_*linux*_console.py ... so shouldn't tests that
-> don't use Linux rather go into another file instead?
-> Either machine_arm_raspi.py or maybe a boot_firmware_console.py file?
+On Mon, 27 Jan 2020 at 07:38, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> > +        if 'password' in target_dict:
+> > +            config['root_pass'] =3D target_dict['password']
+> > +            config['guest_pass'] =3D target_dict['password']
+>
+> This seems like impedance matching between two dictionaries. Surely it
+> would be nicer for the config to be read in fully formed and referable by
+> the rest of the code. We can also change the internal references.
 
-Yes I have a series ready splitting boot_linux_console.py per machines=20
-(as suggested machine_arm_raspi.py) not for consistency with fw/linux=20
-but because I'm tired of fixing conflicts while rebasing since months.
+Good point.  Will rework it to avoid this matching.  Basically we can
+put the values we
+read directly into the config dictionary in one step.
+>
+> > +        if any (k in target_dict for k in ("ssh_key","ssh_pub_key")) a=
+nd \
+> > +           not all (k in target_dict for k in ("ssh_key","ssh_pub_key"=
+)):
+> > +            missing_key =3D "ssh_pub_key" \
+> > +              if 'ssh_key' in target_dict else "ssh_key"
+> > +            raise Exception("both ssh_key and ssh_pub_key required. "
+> > +                            "{} key is missing.".format(missing_key))
+>
+> I guess validation has to be done at some time.. but
+>
+> > +        if 'ssh_key' in target_dict:
+> > +            config['ssh_key_file'] =3D target_dict['ssh_key']
+> > +            if not os.path.exists(config['ssh_key_file']):
+> > +                raise Exception("ssh key file not found.")
+> > +        if 'ssh_pub_key' in target_dict:
+> > +            config['ssh_pub_key_file'] =3D target_dict['ssh_pub_key']
+> > +            if not os.path.exists(config['ssh_pub_key_file']):
+> > +                raise Exception("ssh pub key file not found.")
+>
+> here we are both munging dictionaries again before checking the data.
+> Given we bail with an exception I'm now rethinking if it makes sense to
+> validate up here. It depends on how many places in the code expect to
+> use this data.
 
+Makes sense.  We will change it to validate in one place just before
+we expect to use this data.
+
+> > +    # By default we do not set the DNS.
+> > +    # You override the defaults by setting the below.
+> > +    #dns: 1.234.567.89
+> > +
+> > +    # By default we will use a "block" device, but
+> > +    # you can also boot from a "scsi" device.
+> > +    # Just keep in mind your scripts might need to change
+> > +    # As you will have /dev/sda instead of /dev/vda (for block device)
+> > +    #boot_dev_type: "scsi"
+> > +
+> > +    # By default the ssh port is not fixed.
+> > +    # A fixed ssh port makes it easier for automated tests.
+> > +    #ssh_port: 5555
+> > +
+> > +    # To install a different set of packages, provide a command to iss=
+ue
+> > +    #install_cmds: "apt-get update ; apt-get build-dep -y qemu"
+> > +
+
+>
+> Having the example is great. It would be nice to see at least one of the
+> others converted to a config driven approach as well
+
+The example we provided was primarily for aarch64, we will add one or
+more examples here for the other VMs to
+help provide a ready to use template for providing a config file.
+
+> - is the config driven approach going to reduce duplication across the va=
+rious bits of
+> VM configuring python? Should everything be config driven? Are we in
+> danger of re-inventing an exiting tooling?
+
+All interesting questions to explore.  Here is my take on this.
+
+One goal we had in mind is to not require a config file for any given
+VM.  So in this sense we are
+not going in the direction of a config driven approach.
+Even the VMs that we added for aarch64 do not require a config file.
+The VM scripts will work as is without a config file since the script
+itself provides all required defaults.
+Our intention was for the config approach to be used to allow
+overriding the defaults for any
+given VM, to give the flexibility of overriding the parameters.
+But on the other hand by not requiring a config file, we make is
+simpler and easier to
+only override the parameters that the user is interested in.  And also
+to limit the cases where
+we could generate a non-working VM if the user forgot to provide
+certain defaults.
+
+Thanks & Regards,
+-Rob
 
