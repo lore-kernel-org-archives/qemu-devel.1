@@ -2,83 +2,83 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E39B7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E8A2C33CB7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AD8A24679
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C39924680
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:06:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mu405pqf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AD8A24679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2zOg7aB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C39924680
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw9iP-0005m0-RX
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:06:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50250)
+	id 1iw9iW-0005xU-Qk
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:06:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dinechin@redhat.com>) id 1iw9hN-0004u3-Ah
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:05:27 -0500
+ (envelope-from <dinechin@redhat.com>) id 1iw9hX-00050c-Mz
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dinechin@redhat.com>) id 1iw9hK-0004qd-4Y
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:05:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23683
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dinechin@redhat.com>) id 1iw9hV-0004xS-TG
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:05:35 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36763
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1iw9hJ-0004pU-8p
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:05:22 -0500
+ (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1iw9hV-0004w5-Og
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:05:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580151920;
+ s=mimecast20190719; t=1580151933;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/sPoA2ydAQoLizKedPf2KzFJv1XJIB0Kou7QTXHKikc=;
- b=Mu405pqfqI8o5rbIyfl6EYjGusWtNqp6fY9tbYJqL2xDHhQC2VvjV39YOmXFeJpt1ERWIK
- BRro3gIwVHDuZzBtLAYw64RNrKZXsr7p1hXoHCIRrgvVJWp4/oX1LRC9zVllPukUlAyFhT
- pWN+pcZVaijhrd/Q5IBfFaVIKo3inW4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-RYiLkGxfMDarXMun7P8AGA-1; Mon, 27 Jan 2020 14:05:18 -0500
-Received: by mail-wr1-f70.google.com with SMTP id z15so6663451wrw.0
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 11:05:17 -0800 (PST)
+ bh=Vu4I6vnOIl8xsfv5K1F23drwF+M2luXQVIl2fRkRJ+4=;
+ b=X2zOg7aBW3UV2DyeUuDvgK9r7+Gnd7Lvd82+9YuxbLvHbrGvUoHyeIdB6htCMM0+UqCNXR
+ b8czj7JJyz7XbTsnkIeWUNAox3cuv/hgXjw61X7MT+EwWlgiy6QbQJaGVnCG1QYGnmrl0D
+ BgQzU9LlwQNKlCOd219K8KhNPwALhZI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-bGn4vEDLOJyAdZotjItu2w-1; Mon, 27 Jan 2020 14:05:26 -0500
+Received: by mail-wr1-f72.google.com with SMTP id z10so6618244wrt.21
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 11:05:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
  :content-transfer-encoding:message-id:references:to;
- bh=RhACkVO/W7XiLN8LGh5WECTBKRKMmkgfpG5ujrP+dwE=;
- b=ODzJF1OaEjAjn2REzsZJIQF/6Yqk/do/ktsoceR6OCn7PLhzJhpIJkiEE2N74KjiCh
- vx46qIiRSpz1KaYHbcuEpqObuVtvn7hwaDQ66PIab3Vkc/szCcafVLjnAYB2/852xZM6
- vIUvKhhN3vtpUOnQbqTPRhZDGuL5dc/9qCsa2RTrrw7O39bALdE7yGMuc6Z79i8+fdnR
- jxdQZWwx2QJb3fG+qDqFS8wLpP5BYIcR2OKhYuwY7WWinYhM6ms21qXrrLN8luuZade1
- WEp11CtoxvA6uWuG1zvmKk/b1a0Ajd6z5kJxKeByeQInVyqpwiueR4xiPcfCaMsOCf/C
- kuaA==
-X-Gm-Message-State: APjAAAVj6+2BVOS4gz+6myqH0MgziM1ZgD6Q0EoswgzrnfeWhsMSFc5T
- MjJu3kl2FkROOMaorx0QBSPM8GH8Z+74pOGsKP2K9R94zRTZQhIqEQwmnp6n0Cykgze2kaKLzSE
- A3tud8J1tTQQbhj8=
-X-Received: by 2002:adf:ebc1:: with SMTP id v1mr24531686wrn.351.1580151916522; 
- Mon, 27 Jan 2020 11:05:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzDYiJFyYYefPTYsBVKwYiAoJr8KWNKcZX9/U2gEY8TgCZk2eAzMGpiCpg5rxwgJPLxrX7aEQ==
-X-Received: by 2002:adf:ebc1:: with SMTP id v1mr24531652wrn.351.1580151916086; 
- Mon, 27 Jan 2020 11:05:16 -0800 (PST)
+ bh=kJBufNliXfRJx6OEtgwjB34dp8p5QyEBngBgep/jseo=;
+ b=RRbQMjtUGuke7q4Xe+0C5kIx8tSr2FAT0E3jaA4CEMTGRwlUsxV9bie2EQxMQibJ1g
+ bmx91DuZ5Loxm741boFgVUAaFIJOQ45Jf3OglW6WK5QJtZXWEArT5qvDrbjIeVl9SiF4
+ UbYFcSlb3kFzx4fpCSq7q/hFpJMZ1Ip3H66WX2+dUXTdGrr5x0XGy0+tSa8TtQn0EL0n
+ 2HBycNl8kAGITrEkTsc3SjBoDBFypxgqO/hxvivKVlH0IISsxISES3dgNHzhzoYbhFsV
+ 3htSkBF7BNxe7tqIBF5mYAg/ILRU8rnDhz8bg+qVLcaKKJ7TQ/mmMUqnzt66JOQ8Mnb0
+ pFUw==
+X-Gm-Message-State: APjAAAXBJMEOQWDT8Y/B61vIPUal6+cpudtvU0JBOABJ6knyhri9/xXX
+ dzqSh7vo3azHU/lqw7fWjy7RlboenK8L/dt1WAGvt08m/Mwl50mb3iHTt7FEoF6obx/bxtQfUt6
+ p5bDExIm+5kITzik=
+X-Received: by 2002:adf:8541:: with SMTP id 59mr23560600wrh.307.1580151924808; 
+ Mon, 27 Jan 2020 11:05:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwOXf7hkRQYpRhinjr2UMUggPMesEepgf9Jm2e11ISGC6mIel2rFGU6P0dn6brsw4IxDD7pJQ==
+X-Received: by 2002:adf:8541:: with SMTP id 59mr23560569wrh.307.1580151924441; 
+ Mon, 27 Jan 2020 11:05:24 -0800 (PST)
 Received: from [10.200.153.205] ([213.175.37.12])
- by smtp.gmail.com with ESMTPSA id b67sm20388348wmc.38.2020.01.27.11.05.14
+ by smtp.gmail.com with ESMTPSA id b67sm20388348wmc.38.2020.01.27.11.05.23
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 27 Jan 2020 11:05:14 -0800 (PST)
+ Mon, 27 Jan 2020 11:05:23 -0800 (PST)
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
 Subject: Re: Integrating QOM into QAPI
 From: Christophe de Dinechin <dinechin@redhat.com>
-In-Reply-To: <0e08d426-dc2a-d373-86f3-f2cc22694b74@redhat.com>
-Date: Mon, 27 Jan 2020 20:05:13 +0100
-Message-Id: <82B69BF4-B34B-4B76-81AD-2DE789C9F9EA@redhat.com>
+In-Reply-To: <CAJ+F1CL_nREHOyh4YffWwbES+wgq8tZTkd4n8Vf568b+hbzgDQ@mail.gmail.com>
+Date: Mon, 27 Jan 2020 20:05:23 +0100
+Message-Id: <24B41D90-0F94-422C-AE90-142AD21EFBD0@redhat.com>
 References: <87d0bmchq0.fsf@dusky.pond.sub.org>
  <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
  <87o8v52hz9.fsf@dusky.pond.sub.org>
@@ -93,17 +93,16 @@ References: <87d0bmchq0.fsf@dusky.pond.sub.org>
  <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
  <C4AB0E62-765F-45BC-A442-99C643CFFCCD@redhat.com>
  <CAJ+F1CL_nREHOyh4YffWwbES+wgq8tZTkd4n8Vf568b+hbzgDQ@mail.gmail.com>
- <0e08d426-dc2a-d373-86f3-f2cc22694b74@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
 X-Mailer: Apple Mail (2.3608.40.2.2.4)
-X-MC-Unique: RYiLkGxfMDarXMun7P8AGA-1
+X-MC-Unique: bGn4vEDLOJyAdZotjItu2w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain;
 	charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,264 +118,245 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
  =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
  "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
  Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-> On 26 Jan 2020, at 17:47, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 26 Jan 2020, at 10:11, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.=
+com> wrote:
 >=20
-> On 26/01/20 10:11, Marc-Andr=C3=A9 Lureau wrote:
->>> I=E2=80=99m still puzzled as to why anybody would switch to something l=
-ike
->>> GObject when there is C++.
->> C++ is another level of complexity.
+> Hi
+>=20
+> On Sun, Jan 26, 2020 at 9:10 AM Christophe de Dinechin
+> <dinechin@redhat.com> wrote:
 >>=20
->> Replacing QOM with GObject would mainly bring us a more solid type
->> system with better tooling/features, gobject-introspection support,
->> and remove the burden of having our own OO from QEMU code base.
->=20
-> In fact, C++ doesn't solve any of the problems that either QOM or
-> GObject try to solve.  (Neither does Rust for that matter).
-
-It does not solve all of them _easily_. I do believe that any solution
-to these problems can be engineered in C++, if only because C++
-is essentially a superset of C. The question is whether the result can
-be made easier / safer to use and generally more elegant. I believe
-that the answer is yes, see proof at end of mail.
-
-However, before going further, glib offers way more than gobject.
-So there=E2=80=99s that too=E2=80=A6 And I=E2=80=99m not saying migrating t=
-o C++ is a good
-idea, I=E2=80=99m just trying to evaluate the various options fairly.
-
-
-> Nevertheless, there is no stupid question, only stupid answers, and I
-> think Christophe's remark is an example of a common misconception.  In
-> the hope of not making this a stupid answer, let my try to formulate
-> succinctly what I think the differences are between QOM, GObject and the
-> C++ object model:
-
-Thank you for this remarkably non-stupid answer ;-) You have really
-isolated, in very clear terms, the essence of the discussion.
-
->=20
-> - the C++ object model (at least "old-style" C++ with virtual functions
-> and the like) provides you with _the intersection_ of what QOM and
-> GObject try to solve.  This is what Marc-Andr=C3=A9 calls "OO", and it's
-> essentially virtual functions and dynamic casts.  It's a relatively
-> small part of both QOM and GObject, and unfortunately a wheel that
-> almost every large C program ends up reinventing.
-
-This was the part I was pointing to in my initial comment.
-
-C++ solves that basic =E2=80=9COO=E2=80=9D stuff well, and goes a little be=
-yond QOM
-or GObject in offering IMO many other benefits, e.g. wrt type safety.
-
->=20
-> - Marc-Andr=C3=A9 also described above what GObject provides: a fully
-> introspectable type system and the tools so that _libraries_ can define
-> _types that will be used from multiple programming languages_.
-
-This kind of things has existed for a very long time. CORBA dates back
-to 1991. Also, I=E2=80=99m not sure how important multiple programming lang=
-uages
-are for the qemu use-case. I believe that what matters more is remotely
-accessible objects (e.g. over a socket), which in turn makes it almost
-trivial to call from another language as long as you accept some kind
-of serialization / deserialization process along the way.
-
-GObject only seems marginally better for the =E2=80=9Cin same process=E2=80=
-=9D use case,
-in the sense that it makes =E2=80=9Cobjects=E2=80=9D that can be used from =
-any language,
-indeed, but at the cost of being somewhat foreign and weird in all language=
-s,
-including C.
-
-Look at the GClosure marshalling, for example, and compare it with the
-example I give you at end of this email, and you tell me which one looks
-easier and safer to use.
-
->=20
-> - QOM also provides a fully introspectable type system, but with a
-> different focus: it's so that _objects_ can expose _properties that will
-> be accessed from multiple channels_.
-
-Exposing the properties and making them introspectable are the
-fundamental feature we need to discuss. So agreement here.
-
-What you have not explained to my satisfaction
-yet is how GObject is a better starting point for re-creating a new
-externally-accessible API than some kind of wrapper built in C++
-and taking advantage of modern C++ features.
-
-
-> Everything else in both GObject and QOM follows from this core purpose,
-> and the differences between the two follow from the differences.  For
-> example:
->=20
-> - GObject's focus on multiple programming languages:
-> gobject-introspection, GClosure, support for non-object types (scalar
-> and GBoxed)
-
-How much of that is actually useful to create a new usable qemu API?
-
->=20
-> - QOM's focus on objects: dynamic properties, object tree, all types are
-> classes
-
-That, to me, looks fundamental, since not having it would require
-a total re-architecture of the rest of qemu.
-
-But it looks also somewhat trivial to implement in C++.
-For example, obj[=E2=80=9Cid=E2=80=9D] could return a PropertyAccessor<T>
-that lets you read or write the object knowing that it is of type
-T, so you could write:
-
-=09if (my_object[=E2=80=9Cid=E2=80=9D] < 3) // Automatically checks the typ=
+>>=20
+>>=20
+>>> On 21 Jan 2020, at 16:11, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmai=
+l.com> wrote:
+>>>=20
+>>> Hi
+>>>=20
+>>> On Tue, Jan 21, 2020 at 7:01 PM Markus Armbruster <armbru@redhat.com> w=
+rote:
+>>>>=20
+>>>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>>>>=20
+>>>>> On Tue, Jan 21, 2020 at 02:36:17PM +0100, Markus Armbruster wrote:
+>>>>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>>>>>>=20
+>>>>>>> Hi
+>>>>>>>=20
+>>>>>>> On Tue, Jan 21, 2020 at 3:32 PM Stefan Hajnoczi <stefanha@gmail.com=
+> wrote:
+>>>>>>>>=20
+>>>>>>>> On Tue, Jan 21, 2020 at 06:42:47AM +0100, Markus Armbruster wrote:
+>>>>>>>>> Stefan Hajnoczi <stefanha@gmail.com> writes:
+>>>>>>>>>=20
+>>>>>>>>>> On Wed, Jan 15, 2020 at 01:15:17PM +0100, Markus Armbruster wrot=
+e:
+>>>>>>>>>>> Christophe de Dinechin <dinechin@redhat.com> writes:
+>>>>>>>>>>>>> On 15 Jan 2020, at 10:20, Markus Armbruster <armbru@redhat.co=
+m> wrote:
+>>>>>>>>>>> * qemuMonitorJSONSetIOThread() uses it to control iothread's pr=
+operties
+>>>>>>>>>>> poll-max-ns, poll-grow, poll-shrink.  Their use with -object is
+>>>>>>>>>>> documented (in qemu-options.hx), their use with qom-set is not.
+>>>>>>>>>>=20
+>>>>>>>>>> I'm happy to use a different interface.
+>>>>>>>>>>=20
+>>>>>>>>>> Writing a boilerplate "iothread-set-poll-params" QMP command in =
+C would
+>>>>>>>>>> be a step backwards.
+>>>>>>>>>=20
+>>>>>>>>> No argument.
+>>>>>>>>>=20
+>>>>>>>>>> Maybe the QAPI code generator could map something like this:
+>>>>>>>>>>=20
+>>>>>>>>>> { 'command': 'iothread-set-poll-params',
+>>>>>>>>>>   'data': {
+>>>>>>>>>>       'id': 'str',
+>>>>>>>>>>   '*max-ns': 'uint64',
+>>>>>>>>>>   '*grow': 'uint64',
+>>>>>>>>>>   '*shrink': 'uint64'
+>>>>>>>>>>   },
+>>>>>>>>>>   'map-to-qom-set': 'IOThread'
+>>>>>>>>>> }
+>>>>>>>>>>=20
+>>>>>>>>>> And turn it into QOM accessors on the IOThread object.
+>>>>>>>>>=20
+>>>>>>>>> I think a generic "set this configuration to that value" command =
+is just
+>>>>>>>>> fine.  qom-set fails on several counts, though:
+>>>>>>>>>=20
+>>>>>>>>> * Tolerable: qom-set is not actually generic, it applies only to =
+QOM.
+>>>>>>>>>=20
+>>>>>>>>> * qom-set lets you set tons of stuff that is not meant to be chan=
+ged at
+>>>>>>>>> run time.  If it breaks your guest, you get to keep the pieces.
+>>>>>>>>>=20
+>>>>>>>>> * There is virtually no documentation on what can be set to what =
+values,
+>>>>>>>>> and their semantics.
+>>>>>>>>>=20
+>>>>>>>>> In its current state, QOM is a user interface superfund site.
+>>>>>>>>=20
+>>>>>>>> Thoughts about a solution:
+>>>>>>>>=20
+>>>>>>>> Static QOM properties should be declared via QAPI instead of
+>>>>>>>> imperatively via QOM APIs.  That way they are introspectable and t=
+ype
+>>>>>>>> information is present in the schema.
+>>>>>>>>=20
+>>>>>>>> The QAPI code generator could emit a function that is callable fro=
+m
+>>>>>>>> .class_init().  This eliminates the need to manually call
+>>>>>>>> object_class_property_add().
+>>>>>>=20
+>>>>>> We need to make up our minds what exactly we want generated.  Then w=
 e
+>>>>>> can design the QAPI language, and code up the generator.
+>>>>>>=20
+>>>>>> Skeleton QOM type, to help with the discussion:
+>>>>>>=20
+>>>>>>   #define TYPE_FOO "foo"
+>>>>>>=20
+>>>>>>   #define FOO(obj) OBJECT_CHECK(Foo, (obj), TYPE_FOO)
+>>>>>>   #define FOO_CLASS(klass) \
+>>>>>>       OBJECT_CLASS_CHECK(FooClass, (klass), TYPE_FOO)
+>>>>>>   #define FOO_GET_CLASS(obj) \
+>>>>>>       OBJECT_GET_CLASS(FooClass, (obj), TYPE_FOO)
+>>>>>>=20
+>>>>>>   typedef FooClass {
+>>>>>>       ParentClass parent_class;
+>>>>>>       ... // hand-written per-class state
+>>>>>>   }
+>>>>>>=20
+>>>>>>   struct Chardev {
+>>>>>>       ParentObject parent_obj;
+>>>>>>       ... // hand-written instance (per-object) state
+>>>>>>   };
+>>>>>>=20
+>>>>>>   static const TypeInfo char_type_info =3D {
+>>>>>>       .name =3D TYPE_FOO,
+>>>>>>       .parent =3D TYPE_OBJECT,
+>>>>>>       .instance_size =3D sizeof(Foo),
+>>>>>>       .instance_init =3D ...,                   // methods to initia=
+lize
+>>>>>>       .instance_post_init =3D ...,              // and finalize inst=
+ances,
+>>>>>>       .instance_finalize =3D ...,               // all optional
+>>>>>>       .abstract =3D ...,                        // true or false (d'=
+oh)
+>>>>>>       .class_size =3D sizeof(FooClass),
+>>>>>>       .class_init =3D ...,                      // methods to initia=
+lize
+>>>>>>       .class_base_init =3D ...,                 // classes, optional
+>>>>>>       .class_data =3D ...,                      // extra argument fo=
+r them
+>>>>>>       .interfaces =3D ...
+>>>>>>   };
+>>>>>>=20
+>>>>>> There's substantial boilerplate, with plenty of hand-written code in=
+ the
+>>>>>> gaps.  What of the boilerplate do we plan to generate?  How do we pl=
+an
+>>>>>> to fill the gaps, if any?
+>>>>>=20
+>>>>> FWIW, even without a QOM generator, we can do waaaaaaay better on the
+>>>>> amount of boilerplate needed for QOM without very much work. It just
+>>>>> needs a few convenience macros writing.
+>>>>>=20
+>>>>> QOM is not GObject, but is heavily inspired by it and so looking at
+>>>>> GObject gives us a design pattern we can aim to match in terms of
+>>>>> amount of boilerplate.
+>>>>>=20
+>>>>> What we do manually with TypeInfo struct there has essentially always
+>>>>> been done by a 1 line macro in GObject:
+>>>>>=20
+>>>>> G_DEFINE_TYPE(virIdentity, vir_identity, G_TYPE_OBJECT)
+>>>>>=20
+>>>>> If implementing interfaces, there's 1 extra line needed per interface
+>>>>> to associate them.
+>>>>>=20
+>>>>> https://developer.gnome.org/gobject/stable/gobject-Type-Information.h=
+tml#G-DEFINE-TYPE:CAPS
+>>>>>=20
+>>>>>=20
+>>>>> And what we do in the header file to add the 4 or more FOO_XXX macros=
+,
+>>>>> and the class struct and the object struct has recently been turned
+>>>>> into a 2-liner:
+>>>>>=20
+>>>>> #define VIR_TYPE_IDENTITY vir_identity_get_type()
+>>>>> G_DECLARE_FINAL_TYPE(virIdentity, vir_identity, VIR, IDENTITY, GObjec=
+t);
+>>>>>=20
+>>>>> https://developer.gnome.org/gobject/stable/gobject-Type-Information.h=
+tml#G-DECLARE-FINAL-TYPE:CAPS
+>>>>>=20
+>>>>> Or
+>>>>>=20
+>>>>> #define VIR_TYPE_IDENTITY vir_identity_get_type()
+>>>>> G_DECLARE_DERIVABLE_TYPE(virIdentity, vir_identity, VIR, IDENTITY, GO=
+bject);
+>>>>>=20
+>>>>> https://developer.gnome.org/gobject/stable/gobject-Type-Information.h=
+tml#G-DECLARE-DERIVABLE-TYPE:CAPS
+>>>>>=20
+>>>>>=20
+>>>>> It would be nice to have a QOM code generator so that we can statical=
+ly
+>>>>> declare properties & parent/child/interface relationships, but for an
+>>>>> immediate low cost win, better macros would be very useful IMHO.
+>>>>=20
+>>>> Volunteers?
+>>>>=20
+>>>=20
+>>> Actually, we are not that far off from being able to use GObject
+>>> altogether (I hacked something like that to play with), but I
+>>> disgress...
+>>>=20
+>>> So introducing GObject-like macros? sure!
+>>=20
+>> I=E2=80=99m still puzzled as to why anybody would switch to something li=
+ke
+>> GObject when there is C++.
+>=20
+> C++ is another level of complexity.
 
-or=20
+Migrating an existing code base to C++ object, I agree.
 
-=09my_object[=E2=80=9Cid=E2=80=9D] =3D 42;
-
-The latter would call PropertyAccessor<int>::operator=3D(int), which
-in turn would check if property =E2=80=9Cid=E2=80=9D exists in my_object, i=
-f it has type
-=E2=80=9Cint=E2=80=9D, and so on.
-
-Implementation-wise, a simple std::map of BaseProperty pointers,
-where each would be an instance of some
-
-=09template<class T>
-=09class Property : public BaseProperty
-=09{
-=09=09operator T(); // get
-=09=09T& operator=3D(const T&); // set
-=09};
-
-=09template<class T, class Index>
-=09class PropertyAccessor
-=09{
-=09=09PropertyAccessor(PropertyOwner<T> &owner, Index &index) : owner(owner=
-), index(index) {}
-=09=09operator T() { return owner[index]; }
-=09=09T& operator =3D(const T&val) { return owner[index] =3D val; }
-=09};
-
-> - QOM's focus on properties: no introspection of methods
-
-OK. So I=E2=80=99m giving a bad example below, because I=E2=80=99m introspe=
-cting
-a method, but=E2=80=A6 ;-)
-
-> - QOM's support for multiple channels: visitors
-
-How different are visitors from iterators in C++? Sorry, showing my
-ignorance here=E2=80=A6=20
-
-
-I do not fully understand all the subtleties of QOM, nor all its use cases.
-However, my own experience with =E2=80=9Cmodern=E2=80=9D C++ shows that it=
-=E2=80=99s pretty
-straightforward to get it to do extremely interesting introspective work.
-
-As an illustration, which happens to be directly related to the problem
-of interconnecting with another language, I would like to share the followi=
-ng
-tidbit of code (https://github.com/c3d/xl/blob/master/src/runtime.cpp#L73).
-
-Tree *  xl_evaluate(Scope *scope, Tree *tree)
-// ------------------------------------------------------------------------=
-----
-//   Dispatch evaluation to the main entry point
-// ------------------------------------------------------------------------=
-----
-{
-    return MAIN->Evaluate(scope, tree);
-}
-XL_NATIVE(evaluate);
-
-With this little XL_NATIVE macro, the compiler automatically makes the
-function xl_evaluate available to the XL language as =E2=80=9Cevaluate=E2=
-=80=9D, with
-the correct parameter sets. In particular:
-
-- It inserts an object representing xl_evaluate in a list of all native fun=
-ctions
-- It generates a function that generates the source-code interface,
-  which in XL would look like `evaluate A:scope, B:tree as tree`,
-  see record #28601 in the output below. Note that this includes=20
-  all the required type conversions (e.g. from `Tree *` to `tree`).
-- It generates a function that generates a machine-level prototype
-  using LLVM, i.e. it automatically all the LLVM calls required to declare
-    Tree *xl_evaluate(Scope *scope, Tree *tree);
-- It generates a function that acts as a wrapper around it and calls
-  the prototype above, doing the necessary type conversions.
-
-Here is an example of output at run-time:
-> xl -tnative -O3
-[=E2=80=A6]
-[26809 0.007432] native: Entering prototype for same_text shape 0x111a3f540=
- [same_text A:tree, B:text as boolean]
-[27021 0.007512] native: Shape 1 infix 0x111615d28 [tree] : 0x111ac8838 [A]=
- =3D 0x111a94af0 [A:tree]
-[27213 0.007630] native: Return shape (one) 0x111615d28 [tree]
-[27274 0.007651] native: Native shape 1 0x111a94aa8 [A:tree as tree] return=
- 0x111615d28 [tree]
-[27447 0.007708] native: Entering prototype for stack_overflow shape 0x111a=
-3f510 [stack_overflow A:tree as tree]
-[27595 0.007784] native: Shape 1 infix 0x111615c10 [scope] : 0x111ac87c8 [A=
-] =3D 0x111a94a60 [A:scope]
-[27795 0.007844] native: Shape 2 infix 0x111615d28 [tree] : 0x111ac8790 [B]=
- =3D 0x111a94a18 [B:tree]
-[27991 0.007897] native: Shape 2 (...) 0x111a94a60 [A:scope],0x111a94a18 [B=
-:tree] =3D 0x111a949d0 [A:scope, B:tree]
-[28303 0.007985] native: Return shape (...) 0x111615d28 [tree]
-[28364 0.008014] native: Native shape 2 0x111a94988 [A:scope, B:tree as tre=
-e] return 0x111615d28 [tree]
-[28601 0.008077] native: Entering prototype for evaluate shape 0x111a3f4e0 =
-[evaluate A:scope, B:tree as tree]
-[=E2=80=A6]
-
-What I believe makes my point is that this is achieved with 476 lines of C+=
-+
-(admittedly not the simplest C++ on earth, but still not super-complex eith=
-er)
-If you are curious, this is done by https://github.com/c3d/xl/blob/master/i=
-nclude/native.h.
-
-So in 500 lines of C++ code, we have something that automatically turns any=
- C function into
-a wrapper object that:
-- Gives you introspected type information about the parameters and return t=
-ype of the function
-- Gives you directly-accessible methods that operate on that function in a =
-type-safe way
-
-The same approach could of course offer serialization, construction of obje=
-cts, etc.
-
-So to me, this proves that introspecting an API in C++ is not just =E2=80=
-=9Ceasy=E2=80=9D, it is highly usable.
-
-
-Cheers,
-Christophe
-
-PS: Again, I=E2=80=99m not necessarily advocating we start writing any C++ =
-code.
-I=E2=80=99m just trying to understand the value proposition of GObject, QOM=
-, etc,
-in order to make a more informed decision before doing anything.
+In the absolute, however, the boilerplate code is clearly
+another level of complexity in qom or gobject. And I don=E2=80=99t
+think it=E2=80=99s particularly hard to add dynamic properties to a
+Object class either, including in a form that would call the
+existing C functions.
 
 >=20
-> Paolo
+> Replacing QOM with GObject would mainly bring us a more solid type
+> system with better tooling/features, gobject-introspection support,
+> and remove the burden of having our own OO from QEMU code base.
+
+Agree with that.
+
 >=20
+> It sufficiently hard for GObject developers to allow writing GObjects
+> from Rust, I don't think anyone want to repeat that work for QOM/QDev.
+> I don't know how c++ and rust would interoperate, but that seems even
+> more complicated to me.
+
+Good point. But C++ has tools to solve that. Please see my response
+to Paolo.
+
+>=20
+>=20
+> --=20
+> Marc-Andr=C3=A9 Lureau
 
 
