@@ -2,90 +2,91 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE415C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE74C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:24:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87B9F22527
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:09:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 973722467E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:24:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rRsPhPOV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B9F22527
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LxzTXA/2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973722467E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw9lU-0000OF-Om
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:09:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50905)
+	id 1iw9zY-0006V4-Ne
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:24:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iw9kn-0008H8-SM
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:08:59 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1iw9yh-0005rp-Nk
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:23:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iw9km-0007v1-D8
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:08:57 -0500
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:43009)
+ (envelope-from <palmerdabbelt@google.com>) id 1iw9yg-0005bo-JV
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:23:19 -0500
+Received: from mail-pj1-x102d.google.com ([2607:f8b0:4864:20::102d]:36373)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iw9km-0007uH-5P
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:08:56 -0500
-Received: by mail-pg1-x52d.google.com with SMTP id u131so5606830pgc.10
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 11:08:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9waHl1ND7oMBy5z7DPQzvD+XSCh5HBUPl+8egDvLQ0A=;
- b=rRsPhPOVS3Ro48LT2zzSA/xdsEpHMa7GC/1YwmrLdSTbHftL8GQeABQHkYHLlmYV25
- qy7tiock9bAD3mq7/HMD3iDZexDAO1F2F04sJBWtoPKu6sVSrJ9VVulqnYNt7Jdt0GiH
- s3i+L6Iz6JydC6K3F9IsgkKHARU80zeqlzN0b1ApGrXp8Wp94njVM85S0Mh5D5jAuCtM
- hk6lXGuVNcaviZhAyKBj61CcUZ09AfUTlKryMdVbJvTBgSQo8d17f6aZVHApS/zXYdcn
- OYm0T7AZj2bV+Rs+LbfkouodwGVTwxM5xgB4zBRwRrFc19rCymoKcZkeBqnfLTyeduzi
- D/7w==
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1iw9yg-0005Wy-BZ
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:23:18 -0500
+Received: by mail-pj1-x102d.google.com with SMTP id gv17so3511382pjb.1
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 11:23:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:subject:cc:from:to:in-reply-to:references:message-id
+ :mime-version:content-transfer-encoding;
+ bh=JbOpXni6WU5muY6ZX256vLuCT+7/Qgls9M9WK/J6QbA=;
+ b=LxzTXA/2FZFrTdc3nMBhrnRTi7FGybheo1WgFZnukzmL8sJyuG8Ha9/ULLTYCLLtlB
+ EDKVv78hn6O16mbGvnLBsRlSyVu4vVWu0EJIlR2p5GsXgllRak6jbxfE6wpyoy6/mHGs
+ LSLCYihR/bS1vVXRPuSb604uv7oswp0QOeOy6sWDXMKTDi0L+epNoMAl9NrFv0LKEzEX
+ vIUyeZIeq6iXEKu5ZqTx7eLHTLwno7DR3ZSW8mhML/0Km89Zy8x25s0zag1gJI1ga90P
+ GmIs3vADNEp+1QykkQoEjY+QXnOyZUgj4tDOWL693Ckqo5vdTKGOXiBsjvODslx7trRv
+ buIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9waHl1ND7oMBy5z7DPQzvD+XSCh5HBUPl+8egDvLQ0A=;
- b=INrLzo2BmhDEooi/YkWgx2HijTY9v+skQ0JOVKaPNf8FJpj+wN8jjmEnois7/KOSmP
- XMNGaC5MlTRXRrlxAlqudErfCO/iGZ7Xtpo0nyhO8pS1D7fevNskvuQaWkBt5T8SPa8p
- 165MTPj/rI7m3XfMqJPTHNXdhWqB6wn5w8ucSLa2hiiNWRKeKxy/NslBoqOkzUoc7EPt
- gANuavX0JnwSHWvFl3NYwuF4eKaYrIH9GUb+PTWt1TlhKtRq04CE08ld2lOVQmcfX1jw
- SesPplHfOxEWhfT3ZDvBxFgr+YzFhJ8PVHiVZFm+Za+rYnVOZSjoas3W9MoR4hbmLeE+
- 7lzQ==
-X-Gm-Message-State: APjAAAWp0P+/LVTuk+HiwmYAuxB46+IQAvjNXxo9b/PnpV9vLqeFSKXD
- QROgw7cJ+xkjLPswRf/7TBnO3A==
-X-Google-Smtp-Source: APXvYqwQ/TS8KodQYwCJCnOwgzJt/H1ORgRuJI56ffGm5TkD9wcFzF7ceETzkgK2a0dhyaYCkePctA==
-X-Received: by 2002:a62:8e0a:: with SMTP id k10mr89531pfe.49.1580152134013;
- Mon, 27 Jan 2020 11:08:54 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- r187sm17850286pgr.56.2020.01.27.11.08.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 27 Jan 2020 11:08:53 -0800 (PST)
-Subject: Re: [PULL 00/11] target/hppa patch queue
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-References: <20200127190144.1456-1-richard.henderson@linaro.org>
-Message-ID: <e82d4459-934c-84cb-fc5f-e291d3c2dcdd@linaro.org>
-Date: Mon, 27 Jan 2020 11:08:51 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200127190144.1456-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ h=x-gm-message-state:date:subject:cc:from:to:in-reply-to:references
+ :message-id:mime-version:content-transfer-encoding;
+ bh=JbOpXni6WU5muY6ZX256vLuCT+7/Qgls9M9WK/J6QbA=;
+ b=VaR5VO6b4Vlq3f00QhuO+iw5IvUd+Y9TtfOST1IcbBmwXpa0vA6CJV4DvUY0PVZXuQ
+ 6NwkO7QPJF8BMQeI3reVAkiF0B7uGcg2nCWKoX4NkyDIcoxJWc1NaVFHcbfwcfp/GD4h
+ 3lyEwXjSGBWF4p7JTObOGBCfRk+5AlKqOMRn7HnZOCfEUHU3+aw5D7as/pv7AWvrHzuN
+ w5Yv0qaJpbCIAnkrzckb7Z1lk9wHmRAAVqXOfmJd6dpGn9JkD8ryRumO9KjmlGIamD+w
+ /NluPFII4kc4X/FmyQe6izRnMITC5S/mNEOnfmcP71n8YziXM6COzdULTMKGW9Xiv5AY
+ HM6A==
+X-Gm-Message-State: APjAAAWoAdLw3anTZZ3IkyrMCv8K7JNaSUAaWwUWUflJddidZlSZ9rrg
+ 2qReqoQq7ss3wir9BRrHBIqA3w==
+X-Google-Smtp-Source: APXvYqzjhnYbCujhvxLhAAx/fAUl7D4yF+p/dyU3g+lPmEOfeP5tsHM5eb7OAc5mBP9mRnKDa+CB3Q==
+X-Received: by 2002:a17:90a:36af:: with SMTP id
+ t44mr184738pjb.25.1580152996110; 
+ Mon, 27 Jan 2020 11:23:16 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:7e26:c73d:3c43:9c13])
+ by smtp.gmail.com with ESMTPSA id v9sm17127654pja.26.2020.01.27.11.23.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jan 2020 11:23:15 -0800 (PST)
+Date: Mon, 27 Jan 2020 11:23:15 -0800 (PST)
+X-Google-Original-Date: Mon, 27 Jan 2020 11:23:12 PST (-0800)
+Subject: Re: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 1
+CC: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+In-Reply-To: <CAFEAcA9HnhKE1nS+ubmCD4AgS-EZ_J_XcWapzUvM2pegHs-imw@mail.gmail.com>
+References: <CAFEAcA9HnhKE1nS+ubmCD4AgS-EZ_J_XcWapzUvM2pegHs-imw@mail.gmail.com>
+ <20200121225703.148465-1-palmerdabbelt@google.com>
+ <CAFEAcA9YoAjASu4F1hZRjbq5S+h8GtBUVb9dgecMdaWb9YENEw@mail.gmail.com>
+ <mhng-ea4d4047-6dfa-4be0-8ce7-424b1d17560a@palmerdabbelt-glaptop1>
+Message-ID: <mhng-3bff4d7f-3418-49db-879f-0df5612feccd@palmerdabbelt-glaptop2>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::52d
+X-Received-From: 2607:f8b0:4864:20::102d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,107 +98,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/27/20 11:01 AM, Richard Henderson wrote:
-> Version 4 fixes trivial conflicts with 
-> 
-> commit 4f67d30b5e74e060b8dbe10528829b47345cd6e8
-> Author: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Date:   Fri Jan 10 19:30:32 2020 +0400
-> 
->     qdev: set properties with device_class_set_props()
+On Fri, 24 Jan 2020 04:35:14 PST (-0800), Peter Maydell wrote:
+> On Thu, 23 Jan 2020 at 18:43, Palmer Dabbelt <palmerdabbelt@google.com> wrote:
+>> On Thu, 23 Jan 2020 06:38:07 PST (-0800), Peter Maydell wrote:
+>> > Hi. This pull request doesn't seem to be signed with the GPG
+>> > key that I have on record for you...
+>>
+>> When I moved to Google I got a Yubikey and made new subkeys for it.  If I
+>> understand correctly the new subkeys should be signed by my main key, but maybe
+>> that didn't make it to your keyring?  I see
+>>
+>>     $ gpg --list-keys palmer@dabbelt.com
+>>     pub   rsa4096 2017-06-06 [SC] [expires: 2027-11-13]
+>>           00CE76D1834960DFCE886DF8EF4CA1502CCBAB41
+>>     uid           [ultimate] Palmer Dabbelt <palmer@dabbelt.com>
+>>     uid           [ultimate] Palmer Dabbelt <palmerdabbelt@google.com>
+>>     sub   rsa4096 2017-06-06 [E]
+>>     sub   rsa4096 2019-11-26 [S] [expires: 2024-11-24]
+>>     sub   rsa4096 2019-11-26 [A] [expires: 2024-11-24]
+>>     sub   rsa4096 2019-11-26 [E] [expires: 2024-11-24]
+>
+> Yeah, I have those. I think I must have fumbled something
+> when I retried the pullreq after doing a refresh of your
+> gpg key, because I just did a retry now and it's fine.
+> (I'm just running the pull through my tests now.)
 
-Ho hum, missed "PULL" in the subject.
-
-
-r~
-
-
-
-> The following changes since commit 105b07f1ba462ec48b27e5cb74ddf81c6a79364c:
-> 
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200127' into staging (2020-01-27 13:02:36 +0000)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/rth7680/qemu.git tags/pull-pa-20200127
-> 
-> for you to fetch changes up to b1af755c33bf0d690553a5ccd93689dfd15a98e8:
-> 
->   target/hppa: Allow, but diagnose, LDCW aligned only mod 4 (2020-01-27 10:49:51 -0800)
-> 
-> ----------------------------------------------------------------
-> Improve LASI emulation
-> Add Artist graphics
-> Fix main memory allocation
-> Improve LDCW emulation wrt real hw
-> 
-> ----------------------------------------------------------------
-> Helge Deller (3):
->       hw/hppa/dino.c: Improve emulation of Dino PCI chip
->       hppa: Add support for LASI chip with i82596 NIC
->       hppa: Switch to tulip NIC by default
-> 
-> Philippe Mathieu-Daudé (3):
->       hw/hppa/machine: Correctly check the firmware is in PDC range
->       hw/hppa/machine: Restrict the total memory size to 3GB
->       hw/hppa/machine: Map the PDC memory region with higher priority
-> 
-> Richard Henderson (1):
->       target/hppa: Allow, but diagnose, LDCW aligned only mod 4
-> 
-> Sven Schnelle (4):
->       ps2: accept 'Set Key Make and Break' commands
->       hppa: add emulation of LASI PS2 controllers
->       seabios-hppa: update to latest version
->       hppa: Add emulation of Artist graphics
-> 
->  hw/hppa/hppa_hardware.h        |    1 +
->  hw/hppa/hppa_sys.h             |    2 +
->  hw/net/i82596.h                |   55 ++
->  include/hw/input/lasips2.h     |   16 +
->  include/hw/input/ps2.h         |    1 +
->  include/hw/net/lasi_82596.h    |   29 +
->  target/hppa/helper.h           |    2 +
->  hw/display/artist.c            | 1454 ++++++++++++++++++++++++++++++++++++++++
->  hw/hppa/dino.c                 |   97 ++-
->  hw/hppa/lasi.c                 |  368 ++++++++++
->  hw/hppa/machine.c              |   33 +-
->  hw/input/lasips2.c             |  291 ++++++++
->  hw/input/ps2.c                 |   15 +
->  hw/net/i82596.c                |  734 ++++++++++++++++++++
->  hw/net/lasi_i82596.c           |  188 ++++++
->  target/hppa/op_helper.c        |    9 +
->  target/hppa/translate.c        |   15 +-
->  tests/qtest/boot-serial-test.c |    3 +-
->  MAINTAINERS                    |    4 +-
->  hw/display/Kconfig             |    4 +
->  hw/display/Makefile.objs       |    1 +
->  hw/display/trace-events        |    9 +
->  hw/hppa/Kconfig                |    3 +
->  hw/hppa/Makefile.objs          |    2 +-
->  hw/hppa/trace-events           |   10 +
->  hw/input/Kconfig               |    3 +
->  hw/input/Makefile.objs         |    1 +
->  hw/input/trace-events          |    5 +
->  hw/net/Kconfig                 |    7 +
->  hw/net/Makefile.objs           |    2 +
->  hw/net/trace-events            |   13 +
->  pc-bios/hppa-firmware.img      |  Bin 783724 -> 766136 bytes
->  roms/seabios-hppa              |    2 +-
->  33 files changed, 3351 insertions(+), 28 deletions(-)
->  create mode 100644 hw/net/i82596.h
->  create mode 100644 include/hw/input/lasips2.h
->  create mode 100644 include/hw/net/lasi_82596.h
->  create mode 100644 hw/display/artist.c
->  create mode 100644 hw/hppa/lasi.c
->  create mode 100644 hw/input/lasips2.c
->  create mode 100644 hw/net/i82596.c
->  create mode 100644 hw/net/lasi_i82596.c
-> 
-
+Thanks!
 
