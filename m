@@ -2,79 +2,132 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 674C2C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6C6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:06:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 375B1206A2
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A315206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 16:06:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IcezoVoj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375B1206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="dRiGVSRZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A315206D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw6t8-0001oh-DX
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 11:05:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55513)
+	id 1iw6tv-000227-HC
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 11:06:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55105)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iw6sR-0001Hl-9g
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:04:40 -0500
+ (envelope-from <n54@gmx.com>) id 1iw6qZ-0008Ti-0N
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:02:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iw6sQ-00011a-DS
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:04:39 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59877
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iw6sQ-00010G-8e
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:04:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580141076;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NoKVjHd4fM7JngAm/gJmrlcPTfKhZZiwN/9rnEYuHzE=;
- b=IcezoVoj8azKd3AqqVx4wyZiTvD7xrZHoKvyUHCC1DE1703mLFO+kibkvhPkz3ltZo8oeY
- m6I32oKNQdKZXCF9lLQKPdeF7MDf3degrkl0QWu7YQ/FdGmGaEbCOSk4Ee1SxXnaqV4vL5
- hCl/O06iu0Pbkmlxi0l8jDDvxtXzAfA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-TRw9jrdBP52h_rBHSXqLcA-1; Mon, 27 Jan 2020 11:04:33 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C439A1089A7D;
- Mon, 27 Jan 2020 16:04:32 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9764585747;
- Mon, 27 Jan 2020 16:04:32 +0000 (UTC)
-Date: Mon, 27 Jan 2020 09:04:32 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Graeme Brett Houston <graemebrett.houston@btopenworld.com>
-Subject: Re: Documentation and VFIO on SPARC
-Message-ID: <20200127090432.57e41910@w520.home>
-In-Reply-To: <1fe252e9-5c9d-a572-d3ae-76d51ef77026@btopenworld.com>
-References: <1fe252e9-5c9d-a572-d3ae-76d51ef77026@btopenworld.com>
+ (envelope-from <n54@gmx.com>) id 1iw6qX-00081G-TC
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:02:42 -0500
+Received: from mout.gmx.net ([212.227.17.21]:55523)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <n54@gmx.com>) id 1iw6qX-0007zy-FP
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 11:02:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1580140949;
+ bh=UQDIRZOUUL9w3Mf0tALUps1kgp20Xa2aiqp+sG/NrCg=;
+ h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
+ b=dRiGVSRZtLXyz/dz1IHiQWiKu4Z9LgD2byU66Upj5Tfwy44FuSIBpzOpIN/ztyyc2
+ XqQ564emNiE0AwR4Q1YQlSPWssDUIhXJah+K7iFloRQVDUdB5fiK6ulYlWsKFuT0NE
+ m6sUgyA8qW0Cs5AIhue9N8BfI2ImVIewL/+psh7Q=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx104
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1Ma20q-1j8Kjw3Dca-00VvwD; Mon, 27
+ Jan 2020 17:02:28 +0100
+Subject: Re: [PATCH 0/4] Implements the NetBSD Virtual Machine Monitor
+ accelerator
+From: Kamil Rytarowski <n54@gmx.com>
+To: qemu-devel@nongnu.org
+References: <20200107125401.18126-1-n54@gmx.com>
+ <7f786d62-fafb-13d1-df1a-5a706ad4a665@gmx.com>
+Autocrypt: addr=n54@gmx.com; prefer-encrypt=mutual; keydata=
+ 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
+ 4XSbcg==
+Message-ID: <2c986674-ba87-885a-ccb3-787e7aededee@gmx.com>
+Date: Mon, 27 Jan 2020 17:01:41 +0100
+User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: TRw9jrdBP52h_rBHSXqLcA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <7f786d62-fafb-13d1-df1a-5a706ad4a665@gmx.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="e1JpJWfvnKK38AgOlqUWqo0qjW08EPlu3"
+X-Provags-ID: V03:K1:1Rt17XP+zB8owl+HGLtZV/Vhr02uOB1YsNxK1uAaRiwVrEfT8oM
+ Zwlw4Crqo7H2qEoFNfGNE5umCU3MJ1EkmjhSVpTQ27sYOYVg4qebxCSYzKkuB7HHPswdXS8
+ You6bnpY1aWHn46CdRP4gf4IoU9982qTu0jkCqVur5fXbAa6KhR+2jSo/zBxuPn/Z/fOPC6
+ gKr0mRC0lb1Ln+A7T7iUg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0STxjNcz6Yc=:+g4AhDsIb6b1NGjNZBEodi
+ X0Aujl4N79HYKyvOinmU7UkRzK3D8gq/PNFepixb7yN+6OKbWUUAU5nvvbwxzxpsFSOlDQ2bt
+ HjTRs9OQM56uUbpq2lXPNjec8RD4OGEV4yN56d0AY1ZgZ8QgatLXcllIKNgQtEpule6U1LpQe
+ ZmclWwR4aFUx+/5Uwod0UCBs29n6mKvlbY+Py/pocVZqOpkrMzflIuXjuMxbYrBwePkCy3I7w
+ IUihvvXmqIjwl/xB7hc2E0OluuNIJGnC5nufx1JnXTnMxz0lAKj0PC68bJPmdd1ILnR9eOOhy
+ rOsJNW9P5uQgdaGpQOKiBq4LxdTjrkRO+rtFJpPMiCYx9TM/xwf5bS7beEAIUYN2soK9rC2xN
+ 2REZQq0vfOyMpwLLHBnMyRgJ8jQK1Sp8W8uVkSf4ZzugC9o8n35W7eOPejpM6a/Q+cuiqkd6p
+ /8CBWgkX+w7aLRwtIfrQ5fupxg9EDVPRWhS3zrRWwOCGwxfDORfPUpHSinb9ss7lvDukRpgZX
+ Jr621ANbZxSxpFyG+8PDedFT66V5FiqOi21kGZGZkoSP0BQT4k9gnzojy+Q8zmK6DzResyqoe
+ 5hl9esm5Qfmxnis/Wiiy3xLGkH2WU5vq//US5T7jgG8rheUAVE0rAvkfS4Q8reIiyNRMjqQ8A
+ HdUBHpEHD71hX6S7A4wQKN9InUSL9jH2ReC5/tmvdroSiYdsIs1NEqpJTzzrLMhCXPddPgdO4
+ m8bMmeruFc2I97pEsUjodfyTeUnm6jhzAASI0jrwXk2zuSSOFshPwHAG1DgSROpiBQfTLwtuI
+ oV4Pa6D83+JlwKT8yofuUxBgGG3737FmuGBBIBBL0E+7pTDgz+Va2W4LoLyhWTsSV06EQH5PN
+ 4Lhk9M9Bn6/VFJ4GpK3Mnyl+1XGo3mFhwJL9tal2/vlFfaVMZbdNgeRQhjSeXcavNg6WOVY5O
+ BZYDy6XCiDufwWk3cmj82nAMY4zNcd+a/sIIRL9LAIdUcOgRXZSuSs04CaD/nBbJPz/n5q8d1
+ jqWM1Dv48qKzqpEU02uHpb+VBzfuVQe/8fXyrf6mmkD5aKcOwyKbfEXjrzJ/uk77cN0AlPeiz
+ 8MdhAfCzzlOZFFgyOhw5EuhcfcLrYIXgu5KLmgbESEs8L4tLiUSurlftbpPcfvRQpbe6fZyrU
+ hLugRVYaASP5iUcAGfcawniR2TE7hLYBw9S5xw2+nvk2v85Cj5EMoFX7Uv6I/yY/QaqiQ=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 212.227.17.21
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,30 +139,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Maxime Villard <maxv@netbsd.org>,
+ peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 Jan 2020 14:48:40 +0000
-Graeme Brett Houston <graemebrett.houston@btopenworld.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--e1JpJWfvnKK38AgOlqUWqo0qjW08EPlu3
+Content-Type: multipart/mixed; boundary="in89QeMdSgpvpVTFC6acuvXBaNlx44mUk";
+ protected-headers="v1"
+From: Kamil Rytarowski <n54@gmx.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org,
+ Maxime Villard <maxv@netbsd.org>
+Message-ID: <2c986674-ba87-885a-ccb3-787e7aededee@gmx.com>
+Subject: Re: [PATCH 0/4] Implements the NetBSD Virtual Machine Monitor
+ accelerator
+References: <20200107125401.18126-1-n54@gmx.com>
+ <7f786d62-fafb-13d1-df1a-5a706ad4a665@gmx.com>
+In-Reply-To: <7f786d62-fafb-13d1-df1a-5a706ad4a665@gmx.com>
 
-> 2 Queries:
-> 
-> 1st is there any Good Documentation on Writing VGA devices?
-> 
-> 2nd Can VFIO devices be successfully passed to the sparc engine & 
-> hopefully Solaris 9 actually bootup
-> 
-> I am thinking a Actual PCI SPARC Card with OpenFirmware ROM and other 
-> dev ices i am interested in getting a PCI trace from.
+--in89QeMdSgpvpVTFC6acuvXBaNlx44mUk
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Re: 2, try it and see.  When developing vfio I tested with an emulated
-powerpc machine as it was one of the few archs other than x86 systems
-that seemed to have functional PCI in QEMU, it worked.  I'm not sure
-what might have broken since then, it's been a long time since I've run
-that test case, but worth a shot.  Thanks,
+Ping? 2x
 
-Alex
+On 15.01.2020 14:14, Kamil Rytarowski wrote:
+> Ping?
+>=20
+> On 07.01.2020 13:53, Kamil Rytarowski wrote:
+>> Hello QEMU Community!
+>>
+>> Over the past year the NetBSD team has been working hard on a new user=
+-mode API
+>> for our hypervisor that will be released as part of the upcoming NetBS=
+D 9.0.
+>> This new API adds user-mode capabilities to create and manage virtual =
+machines,
+>> configure memory mappings for guest machines, and create and control e=
+xecution
+>> of virtual processors.
+>>
+>> With this new API we are now able to bring our hypervisor to the QEMU
+>> community! The following patches implement the NetBSD Virtual Machine =
+Monitor
+>> accelerator (NVMM) for QEMU on NetBSD 9.0 and newer hosts.
+>>
+>> When compiling QEMU for x86_64 passing the --enable-nvmm flag will com=
+pile the
+>> accelerator for use. At runtime using the '-accel nvmm' should see a
+>> significant performance improvement over emulation, much like when usi=
+ng 'hax'
+>> on NetBSD.
+>>
+>> The documentation for this new API is visible at https://man.netbsd.or=
+g under
+>> the libnvmm(3) and nvmm(4) pages.
+>>
+>> NVMM was designed and implemented by Maxime Villard.
+>>
+>> Thank you for your feedback.
+>>
+>> Maxime Villard (4):
+>>   Add the NVMM vcpu API
+>>   Add the NetBSD Virtual Machine Monitor accelerator.
+>>   Introduce the NVMM impl
+>>   Add the NVMM acceleration enlightenments
+>>
+>>  accel/stubs/Makefile.objs |    1 +
+>>  accel/stubs/nvmm-stub.c   |   43 ++
+>>  configure                 |   36 ++
+>>  cpus.c                    |   58 ++
+>>  include/sysemu/hw_accel.h |   14 +
+>>  include/sysemu/nvmm.h     |   35 ++
+>>  qemu-options.hx           |    4 +-
+>>  target/i386/Makefile.objs |    1 +
+>>  target/i386/helper.c      |    2 +-
+>>  target/i386/nvmm-all.c    | 1222 ++++++++++++++++++++++++++++++++++++=
++
+>>  10 files changed, 1413 insertions(+), 3 deletions(-)
+>>  create mode 100644 accel/stubs/nvmm-stub.c
+>>  create mode 100644 include/sysemu/nvmm.h
+>>  create mode 100644 target/i386/nvmm-all.c
+>>
+>> --
+>> 2.24.0
+>>
+>=20
+>=20
 
+
+
+--in89QeMdSgpvpVTFC6acuvXBaNlx44mUk--
+
+--e1JpJWfvnKK38AgOlqUWqo0qjW08EPlu3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAl4vCWwACgkQS7MI6bAu
+dmyF2Q/5AdKPDQIBQGg37euT9r3aR0WPtdspGtLKltrEkQRuV4z5qBEl1N3DPpVx
+u6OSRXdGBIGuG/bflvQ9Zz8bv9+SvXT8M6GlnlkpwGSU9qeno4mhfyZD7MyujZ3P
+rluUz8om8yFYlNv1SD3XMUJ8WN3pRwWFYmLW+HwJfTWdZ979w78c8631BNIueV7o
+I+V+2LX1rD6624dVbi/wLF092m874Jfwx5wkKRkpNDGHbKEpU3xydYzlTlapuDbP
+43Ur0oCgfgwvPa7Ccm7RVAxUyIk392MjbNOQKTKtX6o/dH77G2cHIYIhJILBCThX
+VRLJfD9KBLEJ341yzkhX6UNXlfV1RmuFajDGWjBG7MSod779SAVZJROZBDhJ1HET
+Jm8iJ4ZDiUm2KbVfYbCJcsIqfUCn5rn8cT0CodYuu3KQNJGMKpO2vZCHWY/BIJA9
+j99BmWBR3EDC5fIthuCVFNGCSiD8ObbBG7f88Gjs7PtpXtQlGQhX/jMvud6bkT9/
+OwoBMvRXH21/pexoktEQD1rFBHmPBpolgUdJq917162UvTZvSEj6SDIwIyIOtX4O
+gNQCi0kbIUZ+bdeZsgeVrSM6z/KIT6EvACXiAlBUmzsrgnOq6GTObr5XNGlZPhMY
+jrdqM8RyGBoZLWSTwHiGxNjTyxIg5IEO7SqFH/oX8KeO6vnzInk=
+=3tRh
+-----END PGP SIGNATURE-----
+
+--e1JpJWfvnKK38AgOlqUWqo0qjW08EPlu3--
 
