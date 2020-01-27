@@ -2,100 +2,86 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A90DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25184C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:29:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C84572467F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2A332467E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:29:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRuytB4u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84572467F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZeRTBGj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2A332467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwA1c-00006L-VN
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:26:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54343)
+	id 1iwA4s-0001fz-Vj
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:29:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iwA0Q-0007gK-Uf
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:25:07 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iwA4C-0000so-5A
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:29:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iwA0O-0007fF-Vk
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:25:05 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34682
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <wainersm@redhat.com>) id 1iwA4A-0003Fn-Cg
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:28:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54305
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwA0O-0007eO-SK
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:25:04 -0500
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iwA4A-0003FQ-8g
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:28:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580153104;
+ s=mimecast20190719; t=1580153337;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4w/7ix5bcgPZBVTYwrdl9DtBU/HWjSIyf4OdkV4cNUE=;
- b=CRuytB4uBG6isXFnXjYWn/AsBRi9FTb7+pFYAC/g+v2g74nQMDzNdKL1ievJTSzJhNDqz5
- THFqpwUEUg3Nk3JpVgNwq7t+eCqg5sQEBqgaF2WPrABO0NHFUvwT+3RiUtKGiz7+jwXIy0
- 2daSvyTeNV4+uV7u4pf3dJJSI9VGVTg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-tfdhxpLnPgKfp-W36Gq2nA-1; Mon, 27 Jan 2020 14:24:57 -0500
-Received: by mail-wm1-f72.google.com with SMTP id z7so1377085wmi.0
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 11:24:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=x02uidMh79A/UC5RnsLU5i29rWtrdO0B0MTNMPKEZ4I=;
- b=hLDIO3XHECdeTiqagqgqMXBhogEECvRmnlj1MyvEqnp9thOb85IaJeAfjAzOtxBc+1
- U26g7nF4NcvU7yQ/2I3mIMSvpaxV4EOf56WRWv3oJ1xzbAsIQnMvd1fTDmb9cORi8+XJ
- lz1aGUzY5wFSB8OpRWpwKFX9tPLstxaOROhLrRpywZXS8wlBmqkW/O27mNAzKfooapU6
- o1eBnFPc5yuvv0uDe5IZNPmhkjR87TAEhaVARUH6H/eWUBCzbyecZlEAOKZqKM1+2voO
- 5reitB0TTodH7dOl0ClmHjGru7l4M3/2nJczmL1wp9/vsSEE4KzIpSInpOJG8AaMDMx6
- Pvlg==
-X-Gm-Message-State: APjAAAWsf/ubOTMMeT2wgaj9mssDVQooDS8TBz5Quv/doqmDLCrAA7Uc
- xq3tVc+DwOv+bNRkMj7NtH0wKGplX59Mk9y6fUlBUEBw/NTYCYcnz83KLvkgLN0/06PH0eyVBoJ
- iE6b/fw40+38mlKs=
-X-Received: by 2002:a1c:9897:: with SMTP id a145mr180639wme.132.1580153096247; 
- Mon, 27 Jan 2020 11:24:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy/3f2mkxCxVoCXwxip/Es5ciKxWaF7YYAoeG7yxVX9V4qsYs/gRbAeVdrwkPz9CDwtp7aOag==
-X-Received: by 2002:a1c:9897:: with SMTP id a145mr180612wme.132.1580153095924; 
- Mon, 27 Jan 2020 11:24:55 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id x14sm19797517wmj.42.2020.01.27.11.24.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 27 Jan 2020 11:24:55 -0800 (PST)
-Subject: Re: [PATCH v1 02/13] tests/docker: better handle symlinked libs
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ bh=yotbmYH80MUxX/J35kDF4w25/HHaxlwLbxoyUlViADU=;
+ b=CZeRTBGjylfEvEKC/RyosYU2ta575mqJ98NYFnDIG7ylFW6V7PdFxNjX4MU0IHWORDga68
+ ykLN/3Cc6VWESySxVAz9MgVHK6w86MLgkbUzSZ6QG8iACOA40+naEWYfJvVENplykfcz/A
+ mJXrXSmWS8Dw9Ruf/7627dkvW9piVjc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-210-QYgdOyJ5OQeCZWrgsYG3UQ-1; Mon, 27 Jan 2020 14:28:53 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D88E08010C5;
+ Mon, 27 Jan 2020 19:28:52 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-27.gru2.redhat.com
+ [10.97.116.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18FCB19E9C;
+ Mon, 27 Jan 2020 19:28:45 +0000 (UTC)
+Subject: Re: [PATCH v3 1/4] tests/acceptance: avocado_qemu: Introduce the
+ 'accel' test parameter
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-References: <20200124204026.2107-1-alex.bennee@linaro.org>
- <20200124204026.2107-3-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bca8f112-4d93-1eed-421d-c98ca9fa16d6@redhat.com>
-Date: Mon, 27 Jan 2020 20:24:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+References: <20200122012753.9846-1-wainersm@redhat.com>
+ <20200122012753.9846-2-wainersm@redhat.com>
+ <49356b32-5530-a2dc-9c7a-5a86e74b8cb6@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <705772ab-9326-5dcb-20c6-37ab748bef4e@redhat.com>
+Date: Mon, 27 Jan 2020 17:28:44 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200124204026.2107-3-alex.bennee@linaro.org>
+In-Reply-To: <49356b32-5530-a2dc-9c7a-5a86e74b8cb6@redhat.com>
 Content-Language: en-US
-X-MC-Unique: tfdhxpLnPgKfp-W36Gq2nA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: QYgdOyJ5OQeCZWrgsYG3UQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,52 +93,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: thuth@redhat.com, alex.bennee@linaro.org, ehabkost@redhat.com,
+ crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/24/20 9:40 PM, Alex Benn=C3=A9e wrote:
-> When we are copying we want to ensure we grab the first
-> resolution (the found in path section). However even that binary might
-> be a symlink so lets make sure we chase the symlinks to copy the right
-> binary to where it can be found.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   tests/docker/docker.py | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 31d8adf836..7dfca63fe4 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -109,7 +109,7 @@ def _get_so_libs(executable):
->       ensure theright data is copied."""
->  =20
->       libs =3D []
-> -    ldd_re =3D re.compile(r"(/.*/)(\S*)")
-> +    ldd_re =3D re.compile(r"(?:\S+ =3D> )?(\S*) \(:?0x[0-9a-f]+\)")
->       try:
->           ldd_output =3D subprocess.check_output(["ldd", executable]).dec=
-ode('utf-8')
->           for line in ldd_output.split("\n"):
-> @@ -145,7 +145,8 @@ def _copy_binary_with_libs(src, bin_dest, dest_dir):
->       if libs:
->           for l in libs:
->               so_path =3D os.path.dirname(l)
-> -            _copy_with_mkdir(l, dest_dir, so_path)
-> +            real_l =3D os.path.realpath(l)
-> +            _copy_with_mkdir(real_l, dest_dir, so_path)
->  =20
->  =20
->   def _check_binfmt_misc(executable):
->=20
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 1/24/20 7:36 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/22/20 2:27 AM, Wainer dos Santos Moschetta wrote:
+>> The test case may need to boot the VM with an accelerator that
+>> isn't actually enabled on the QEMU binary and/or present in the host. In
+>> this case the test behavior is undefined, and the best course of
+>> action is to skip its execution.
+>>
+>> This change introduced the 'accel' parameter (and the handler of
+>> tag with same name) used to indicate the test case requires a
+>> given accelerator available. It was implemented a mechanism to
+>> skip the test case if the accelerator is not available. Moreover,
+>> =C2=A0 the QEMU -accel argument is set automatically to any VM
+>> launched if the parameter is present.
+>>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> ---
+>> =C2=A0 docs/devel/testing.rst=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
+16 ++++++++++++++++
+>> =C2=A0 tests/acceptance/avocado_qemu/__init__.py | 23 ++++++++++++++++++=
++++++
+>> =C2=A0 2 files changed, 39 insertions(+)
+>>
+>> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+>> index ab5be0c729..d17d0e90aa 100644
+>> --- a/docs/devel/testing.rst
+>> +++ b/docs/devel/testing.rst
+>> @@ -759,6 +759,17 @@ name.=C2=A0 If one is not given explicitly, it will=
+=20
+>> either be set to
+>> =C2=A0 ``None``, or, if the test is tagged with one (and only one)
+>> =C2=A0 ``:avocado: tags=3Dmachine:VALUE`` tag, it will be set to ``VALUE=
+``.
+>> =C2=A0 +accel
+>> +~~~~~
+>> +The accelerator that will be set to all QEMUMachine instances created
+>> +by the test.
+>> +
+>> +The ``accel`` attribute will be set to the test parameter of the same
+>> +name.=C2=A0 If one is not given explicitly, it will either be set to
+>> +``None``, or, if the test is tagged with one (and only one)
+>> +``:avocado: tags=3Daccel:VALUE`` tag, it will be set to ``VALUE``.=20
+>> Currently
+>> +``VALUE`` should be either ``kvm`` or ``tcg``.
+>> +
+>> =C2=A0 qemu_bin
+>> =C2=A0 ~~~~~~~~
+>> =C2=A0 @@ -800,6 +811,11 @@ machine
+>> =C2=A0 The machine type that will be set to all QEMUMachine instances cr=
+eated
+>> =C2=A0 by the test.
+>> =C2=A0 +accel
+>> +~~~~~
+>> +The accelerator that will be set to all QEMUMachine instances created
+>> +by the test. In case the accelerator is not available (both QEMU
+>> +binary and the host system are checked) then the test is canceled.
+>> =C2=A0 =C2=A0 qemu_bin
+>> =C2=A0 ~~~~~~~~
+>> diff --git a/tests/acceptance/avocado_qemu/__init__.py=20
+>> b/tests/acceptance/avocado_qemu/__init__.py
+>> index 6618ea67c1..c83a75ccbc 100644
+>> --- a/tests/acceptance/avocado_qemu/__init__.py
+>> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>> @@ -20,6 +20,7 @@ SRC_ROOT_DIR =3D=20
+>> os.path.join(os.path.dirname(__file__), '..', '..', '..')
+>> =C2=A0 sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+>> =C2=A0 =C2=A0 from qemu.machine import QEMUMachine
+>> +from qemu.accel import kvm_available, tcg_available
+>> =C2=A0 =C2=A0 def is_readable_executable_file(path):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return os.path.isfile(path) and os.access=
+(path, os.R_OK | os.X_OK)
+>> @@ -111,6 +112,8 @@ class Test(avocado.Test):
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def setUp(self):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self._vms =3D {}
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # VM argumments that are map=
+ped from parameters
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self._param_to_vm_args =3D [=
+]
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.arch =
+=3D self.params.get('arch',
+>> default=3Dself._get_unique_tag_val('arch'))
+>> @@ -124,10 +127,30 @@ class Test(avocado.Test):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.qemu_bin =
+is None:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 self.cancel("No QEMU binary defined or found in the=20
+>> source tree")
+>> =C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.accel =3D self.p=
+arams.get('accel',
+>> + default=3Dself._get_unique_tag_val('accel'))
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.accel:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 avai=
+l =3D False
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if s=
+elf.accel =3D=3D 'kvm':
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if kvm_available(self.arch, self.qemu_bin):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 avail =3D True
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 elif=
+ self.accel =3D=3D 'tcg':
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if tcg_available(self.qemu_bin):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 avail =3D True
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else=
+:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 self.cancel("Unknown accelerator: %s" % self.accel)
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if a=
+vail:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 self._param_to_vm_args.extend(['-accel', self.accel])
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else=
+:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 self.cancel("%s is not available" % self.accel)
+>
+> Why refuse to test the other accelerators?
+>
+> Isn't it better to QMP-ask QEMU which accelerator it supports, and=20
+> SKIP if it isn't available?
+
+
+python/qemu/accel.py:list_accel(qemu_bin) can be used for that end. For=20
+example:
+
+if self.accel not in list_accel(self.qemu_bin):
+
+ =C2=A0=C2=A0=C2=A0 self.cancel("%s is not available" % self.accel)
+
+However checking the support only on QEMU's binary may be very weak=20
+(take KVM as an example). I implemented checkers for kvm and tcg on=20
+python/qemu/accel.py. Given that I have zero knowledge on the other=20
+accelerators,=C2=A0 I simply did not touch on them.
+
+That said, IMHO it needs to implement checkers for those others=20
+accelerator before they get reliably handled by avocado_qemu=20
+automatically. And test writers can still run tests with those=20
+accelerators as long as 'accel' tag is not used.
+
+What do you think Philippe?
+
+Thanks, good point!
+
+- Wainer
+
+
+>
+>
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def _new_vm(self, *args):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm =3D QEMUMachin=
+e(self.qemu_bin, sock_dir=3Dtempfile.mkdtemp())
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if args:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 vm.add_args(*args)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self._param_to_vm_args:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm.a=
+dd_args(*self._param_to_vm_args)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return vm
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 @property
+>>
+>
 
 
