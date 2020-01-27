@@ -2,76 +2,112 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28942C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F786C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:44:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBD92207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:43:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A15D207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:44:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hff8K7b4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD92207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=xcancerberox.com.ar header.i=@xcancerberox.com.ar header.b="rGfOR49r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A15D207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xcancerberox.com.ar
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw1rX-0005af-51
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:43:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42447)
+	id 1iw1su-000700-9S
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:44:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43179)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1ls-0003Ht-2I
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:33 -0500
+ (envelope-from <me@xcancerberox.com.ar>) id 1iw1oI-0000PL-2l
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lp-00032z-Qx
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48375
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1lp-00032B-Mu
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580121449;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Tq/DcsaJDVwKavjLtW6/keUbJyhr/KZ3fMt/+V+dYiE=;
- b=hff8K7b4Cnp1Yc2jhTvPDztaK4EHbWf5Q3Tt0kA0x8XasxP/T6I0vEXYvl8MfBVWAuW4tF
- o4r7zi9U58In17I7MPhSguDHDBhZknFaf5sDl2K6MV6PGYxhCfPIUHkaT0uI1Q0YNuuJjR
- oyJwqEPF2f29NjxcrcnXANoqSFeLvI0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-QeiNRj11OcGdtqezrnJvrQ-1; Mon, 27 Jan 2020 05:37:27 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F78B107ACC4;
- Mon, 27 Jan 2020 10:37:26 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4EB46451F;
- Mon, 27 Jan 2020 10:37:24 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 11/13] monitor: Move hmp_drive_add_node to block-hmp-cmds.c
-Date: Mon, 27 Jan 2020 12:36:45 +0200
-Message-Id: <20200127103647.17761-12-mlevitsk@redhat.com>
-In-Reply-To: <20200127103647.17761-1-mlevitsk@redhat.com>
-References: <20200127103647.17761-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: QeiNRj11OcGdtqezrnJvrQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <me@xcancerberox.com.ar>) id 1iw1oH-0005Yh-4D
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:40:01 -0500
+Received: from [51.158.76.159] (port=45120 helo=mail.xcancerberox.com.ar)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <me@xcancerberox.com.ar>)
+ id 1iw1oG-0005Wi-BW; Mon, 27 Jan 2020 05:40:01 -0500
+Subject: Re: [PATCH rc2 01/25] target/avr: Add outward facing interfaces and
+ core CPU logic
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xcancerberox.com.ar;
+ s=mail; t=1580121597;
+ bh=Tf5BUO74dU2ST3RK1ZdbaSDVkYUtS2C1gdfE8DGJ+I4=;
+ h=Subject:To:Cc:References:From:In-Reply-To;
+ b=rGfOR49r36ZG56OPmkeA/5hOJvB1yuban3k3bEBbeoIekSM5RMJnmVMklwOLVzBAJ
+ Pd5RpwFBToNgq2XV8wcmvvQe9epKw+X6TH7y7QJwB018n5pboFKsKGa9BKgdzMW5En
+ 6wepEggys/d3F3Y3DMwQhsr+vEiy2vQzeGKuY0xbJ1pfIw6hIKRL0kP/llE0XvtqGV
+ WY0n9Q3teRVSV4tjrJJydqnt/t9IsFnjTzeIIpPKEyNeXPYkDuXqbBFmsheKYytHHB
+ 9hhZ1GqFgqSmTleua5HOr0BN9Cz6PoMNB2/vLAm057nLwW/TtVUZRCTucAkivB0uAS
+ k2CsRwAncAROw==
+To: Michael Rolnik <mrolnik@gmail.com>
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-2-f4bug@amsat.org>
+ <7ae1607e-060e-23ac-f651-8f2ace8991ba@xcancerberox.com.ar>
+ <CAK4993iH77DfpHQbNNR41C=rJy2M+uHDNMuof6Fq7ofhMtB9hw@mail.gmail.com>
+ <5f3a988c-c7a4-526a-47ab-1252de535787@xcancerberox.com.ar>
+ <CAK4993hX440rdQZVJokd0AzrENCQSwxgTGfyiDunPWBxW4nQWQ@mail.gmail.com>
+From: Joaquin de Andres <me@xcancerberox.com.ar>
+Openpgp: preference=signencrypt
+Autocrypt: addr=me@xcancerberox.com.ar; keydata=
+ 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
+ OZRo+ULKJ1xXuVGe8hnP9Q==
+Message-ID: <95759d35-8995-8e2e-acd4-b5291926f7e1@xcancerberox.com.ar>
+Date: Mon, 27 Jan 2020 11:39:56 +0100
+Mime-Version: 1.0
+In-Reply-To: <CAK4993hX440rdQZVJokd0AzrENCQSwxgTGfyiDunPWBxW4nQWQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 51.158.76.159
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,170 +119,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/monitor/block-hmp-cmds.c | 30 ++++++++++++++++++++++++
- blockdev.c                     | 42 +++++++---------------------------
- include/block/block_int.h      |  5 ++--
- 3 files changed, 41 insertions(+), 36 deletions(-)
+On 1/27/20 10:48 AM, Michael Rolnik wrote:
+> Not used. it's there just for clarity. to follow the pattern like PC
+>=20
+>      AVR_FEATURE_1_BYTE_PC,
+>      AVR_FEATURE_2_BYTE_PC,
+>      AVR_FEATURE_3_BYTE_PC,
+>=20
+>      AVR_FEATURE_1_BYTE_SP,
+>      AVR_FEATURE_2_BYTE_SP,
+>=20
+> To show that there is not 3 byte SP or so.
+>=20
+> Should I remove it?
 
-diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
-c
-index a4b1604aee..7bbe4e3814 100644
---- a/block/monitor/block-hmp-cmds.c
-+++ b/block/monitor/block-hmp-cmds.c
-@@ -33,6 +33,36 @@
- #include "monitor/hmp.h"
- #include "qemu-io.h"
-=20
-+static void hmp_drive_add_node(Monitor *mon, const char *optstr)
-+{
-+    QemuOpts *opts;
-+    QDict *qdict;
-+    Error *local_err =3D NULL;
-+
-+    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, optstr, false);
-+    if (!opts) {
-+        return;
-+    }
-+
-+    qdict =3D qemu_opts_to_qdict(opts, NULL);
-+
-+    if (!qdict_get_try_str(qdict, "node-name")) {
-+        qobject_unref(qdict);
-+        error_report("'node-name' needs to be specified");
-+        goto out;
-+    }
-+
-+    BlockDriverState *bs =3D bds_tree_init(qdict, &local_err);
-+    if (!bs) {
-+        error_report_err(local_err);
-+        goto out;
-+    }
-+
-+    bdrv_set_monitor_owned(bs);
-+out:
-+    qemu_opts_del(opts);
-+}
-+
- void hmp_drive_add(Monitor *mon, const QDict *qdict)
- {
-     Error *err =3D NULL;
-diff --git a/blockdev.c b/blockdev.c
-index df43e0aaef..63805f34b5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -64,7 +64,7 @@
- #include "qemu/main-loop.h"
- #include "qemu/throttle-options.h"
-=20
--static QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =3D
-+QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =3D
-     QTAILQ_HEAD_INITIALIZER(monitor_bdrv_states);
-=20
- static int do_open_tray(const char *blk_name, const char *qdev_id,
-@@ -75,6 +75,11 @@ static void blockdev_insert_medium(bool has_device, cons=
-t char *device,
-                                    bool has_id, const char *id,
-                                    const char *node_name, Error **errp);
-=20
-+void bdrv_set_monitor_owned(BlockDriverState *bs)
-+{
-+    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
-+}
-+
- static const char *const if_name[IF_COUNT] =3D {
-     [IF_NONE] =3D "none",
-     [IF_IDE] =3D "ide",
-@@ -652,7 +657,7 @@ err_no_opts:
- }
-=20
- /* Takes the ownership of bs_opts */
--static BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp)
-+BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp)
- {
-     int bdrv_flags =3D 0;
-=20
-@@ -4201,37 +4206,6 @@ out:
-     aio_context_release(aio_context);
- }
-=20
--void hmp_drive_add_node(Monitor *mon, const char *optstr)
--{
--    QemuOpts *opts;
--    QDict *qdict;
--    Error *local_err =3D NULL;
--
--    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, optstr, false);
--    if (!opts) {
--        return;
--    }
--
--    qdict =3D qemu_opts_to_qdict(opts, NULL);
--
--    if (!qdict_get_try_str(qdict, "node-name")) {
--        qobject_unref(qdict);
--        error_report("'node-name' needs to be specified");
--        goto out;
--    }
--
--    BlockDriverState *bs =3D bds_tree_init(qdict, &local_err);
--    if (!bs) {
--        error_report_err(local_err);
--        goto out;
--    }
--
--    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
--
--out:
--    qemu_opts_del(opts);
--}
--
- void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
- {
-     BlockDriverState *bs;
-@@ -4261,7 +4235,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error=
- **errp)
-         goto fail;
-     }
-=20
--    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
-+    bdrv_set_monitor_owned(bs);
-=20
- fail:
-     visit_free(v);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index dd033d0b37..10df257a61 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1217,8 +1217,6 @@ BlockJob *backup_job_create(const char *job_id, Block=
-DriverState *bs,
-                             BlockCompletionFunc *cb, void *opaque,
-                             JobTxn *txn, Error **errp);
-=20
--void hmp_drive_add_node(Monitor *mon, const char *optstr);
--
- BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
-                                   const char *child_name,
-                                   const BdrvChildRole *child_role,
-@@ -1320,4 +1318,7 @@ int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src=
-, uint64_t src_offset,
-=20
- int refresh_total_sectors(BlockDriverState *bs, int64_t hint);
-=20
-+void bdrv_set_monitor_owned(BlockDriverState *bs);
-+BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp);
-+
- #endif /* BLOCK_INT_H */
---=20
-2.17.2
+Just asking, I get confused doing the review. I ratter prefer not to
+have dead code, but is your call.
 
+--joa
 
