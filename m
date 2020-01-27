@@ -2,81 +2,91 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DB3C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 08:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE02FC32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C897620702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 08:55:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7280214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:07:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsaWa8ll"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C897620702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JnhNlyKs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7280214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw0BZ-0005WJ-07
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 03:55:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51997)
+	id 1iw0Mr-00087k-ST
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 04:07:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iw0Aq-0004hh-TM
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:55:14 -0500
+ (envelope-from <armbru@redhat.com>) id 1iw0MH-0007gN-Fr
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:07:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iw0Ao-0003T8-Fs
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:55:12 -0500
-Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:42504)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iw0Ao-0003Sw-AK
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:55:10 -0500
-Received: by mail-qv1-xf41.google.com with SMTP id dc14so4100798qvb.9
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 00:55:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NqDee+KM7MyUdml3onoslb1/X5F9cEJtYYQA7vXgqJE=;
- b=TsaWa8llTLbjPdXLmfC5msNphVymXFvciSp+qjuNnBeKw93mq02PxL5SAtzzlFFDNN
- o+4hmibJIe3QniRK5mgYSPPpnR+RAu3cr8puYPyoLvLDQH+qR07MT1nGwPVmMKyHhA4t
- cBWQUStQepln4dXur6/wNQbl7s939lw7KAs2AYGUQxIWH/e95zkqbHjBbDxd/87bfsvL
- dXcszaa7b03XXwcUAZBGRZxpZFN/VdXdxx5zikBgR1ZUWvotlPlC0v8Uxdo8OnB2PIX6
- d8iIJywhxyLqFu6CkEZc9yXhqElYL+4r1SiPtIj0O6vmOj6fa3QPdfhDgNOJ//aNagjQ
- a7pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NqDee+KM7MyUdml3onoslb1/X5F9cEJtYYQA7vXgqJE=;
- b=slWU/MSZkLMCvTEu/09+xlA3vg7M3UJVJTfZ/pEJx4HYK3m6wtPTsdW3eP0rc4Qibc
- qLEDaD3Ay8qaZ1mmeKm2aIWTGwXRkz4Ei+5Z9kshMcefGS6JtCpCezzgJeSYhsK8RAA/
- Il5NZld1k2Gt1/sDwEcjSwzlvPxBn3xPx6kB2R6e0B5eJqeCUVCGD1hRSn+w7EYKzC6T
- VFgLiweF8YeRINMtKQnrE6L4is+Zy+9lVTK3TzbiwkIUOTZDwcClFFoP+n9/+ZHD66zU
- ugnvytcC+XrKYy+iar4mRGLPN6GLe1NTJdszz/KoRmD8N0bdpSW4koQkMOY4NRI7R2+H
- +r3g==
-X-Gm-Message-State: APjAAAUVQQv9m/3H7fxWhWyGC/+3vQxCx8fnFQWksuNBnW5ukPIOPfOa
- fR+TQffA52A/7k4lcBBDj9rnqpDy46m5LmtSXWs=
-X-Google-Smtp-Source: APXvYqyccws+iTMuD4BOeVI4cwh63aj6M64D6Tpgln8CXSc0ClEICdOEjvwqHYbp5awDLJVnInhOxYeNne+/rw/mkQk=
-X-Received: by 2002:a0c:8d0a:: with SMTP id r10mr14694895qvb.7.1580115309651; 
- Mon, 27 Jan 2020 00:55:09 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1iw0MF-00005a-1Y
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:07:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23695
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iw0ME-0008VL-R5
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:06:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580116017;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=G9AFEWdiRXfRPCdQ/5HXfvyjbwcaOra1jkJk2OAgcEg=;
+ b=JnhNlyKsaF4FKjJ49XbtP3CAux+GryV1i3V45RhZJ65qYCGn+rsbAmmi16Djj1L+XxDAYl
+ ZnBgzEEpdfzZ+tgI72nDslVTWEP5FbBu62dhQLli33kK7B++qSb4QzEjvv1VoXVeYQv2WN
+ QD3DZi6vYjuN9xlTMfM7zX9z41fEf0g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-293-crj07tLINDi2xtB-l8Ie1A-1; Mon, 27 Jan 2020 04:06:56 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCBAC8010D6;
+ Mon, 27 Jan 2020 09:06:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1913686E22;
+ Mon, 27 Jan 2020 09:06:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A6DD01138600; Mon, 27 Jan 2020 10:06:45 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <87h81unja8.fsf@dusky.pond.sub.org>
+ <20191224134139.GD2710539@redhat.com>
+ <30664f6e-81da-a6e6-9b20-037fc91290fb@redhat.com>
+ <878slyej29.fsf@dusky.pond.sub.org>
+ <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
+ <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+ <20200124095027.GA824327@redhat.com>
+Date: Mon, 27 Jan 2020 10:06:45 +0100
+In-Reply-To: <20200124095027.GA824327@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
+ =?utf-8?Q?rrang=C3=A9=22's?=
+ message of "Fri, 24 Jan 2020 09:50:27 +0000")
+Message-ID: <87a769s1y2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1580079311-20447-2-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1580079311-20447-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Michael Rolnik <mrolnik@gmail.com>
-Date: Mon, 27 Jan 2020 10:54:26 +0200
-Message-ID: <CAK4993itnp5EyT8g-zGcMY6Oud9pC9GRv1Aa2dvofrH8mLWnOQ@mail.gmail.com>
-Subject: Re: [PATCH rc3 01/30] target/avr: Add basic parameters for new AVR
- platform
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Content-Type: multipart/alternative; boundary="000000000000bc6c9f059d1b43bd"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f41
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: crj07tLINDi2xtB-l8Ie1A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,353 +98,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000bc6c9f059d1b43bd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Thanks for you help guys.
+> On Thu, Jan 23, 2020 at 04:07:09PM -0500, John Snow wrote:
+>>=20
+>>=20
+>> On 1/23/20 2:01 PM, Daniel P. Berrang=C3=A9 wrote:
+[...]
+>> > I guess my point is that with a scrap & startover view point, we
+>> > should arguably completely ignore the design question of how to
+>> > flatten JSON for humans/command line, as it is the wrong problem.
+>> > Instead focus on the problem of making use of JSON the best way
+>> > to deal with QEMU both functionally and practically, for humans
+>> > and machines alike.
 
-On Mon, Jan 27, 2020 at 12:55 AM Aleksandar Markovic <
-aleksandar.markovic@rt-rk.com> wrote:
+Note: I understand "JSON" to stand for "JSON and possibly another
+concrete syntax better suited for humans".  Your examples below show
+YAML in that role.
 
-> From: Michael Rolnik <mrolnik@gmail.com>
+[...]
+> Here's one conceptual vision of how a better QEMU might look:
 >
-> This includes definitions of various basic parameters needed
-> for integration of a new platform into QEMU.
+>   * qemu-runtime-$TARGET
 >
-> Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-> Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> Acked-by: Igor Mammedov <imammedo@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-> ---
->  target/avr/cpu-param.h | 37 ++++++++++++++++++++++++++
->  target/avr/cpu.h       | 72
-> ++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 109 insertions(+)
->  create mode 100644 target/avr/cpu-param.h
->  create mode 100644 target/avr/cpu.h
+>     A binary that contains the implementation for the machine
+>     emulator for $TARGET.
 >
-> diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
-> new file mode 100644
-> index 0000000..0c29ce4
-> --- /dev/null
-> +++ b/target/avr/cpu-param.h
-> @@ -0,0 +1,37 @@
-> +/*
-> + * QEMU AVR CPU
-> + *
-> + * Copyright (c) 2019 Michael Rolnik
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2.1 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see
-> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> + */
-> +
-> +#ifndef AVR_CPU_PARAM_H
-> +#define AVR_CPU_PARAM_H
-> +
-> +#define TARGET_LONG_BITS 32
-> +/*
-> + * TARGET_PAGE_BITS cannot be more than 8 bits because
-> + * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and the=
-y
-> + *     should be implemented as a device and not memory
-> + * 2.  SRAM starts at the address 0x0100
-> + */
-> +#define TARGET_PAGE_BITS 8
-> +#define TARGET_PHYS_ADDR_SPACE_BITS 24
-> +#define TARGET_VIRT_ADDR_SPACE_BITS 24
-> +#define NB_MMU_MODES 2
-> +
-> +
-> +#endif
-> diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-> new file mode 100644
-> index 0000000..d122611
-> --- /dev/null
-> +++ b/target/avr/cpu.h
-> @@ -0,0 +1,72 @@
-> +/*
-> + * QEMU AVR CPU
-> + *
-> + * Copyright (c) 2019 Michael Rolnik
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2.1 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see
-> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> + */
-> +
-> +#ifndef QEMU_AVR_CPU_H
-> +#define QEMU_AVR_CPU_H
-> +
-> +#include "cpu-qom.h"
-> +#include "exec/cpu-defs.h"
-> +
-> +#define TCG_GUEST_DEFAULT_MO 0
-> +#define AVR_CPU_TYPE_SUFFIX "-" TYPE_AVR_CPU
-> +#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)
-> +#define CPU_RESOLVING_TYPE TYPE_AVR_CPU
-> +
-> +/*
-> + * AVR has two memory spaces, data & code.
-> + * e.g. both have 0 address
-> + * ST/LD instructions access data space
-> + * LPM/SPM and instruction fetching access code memory space
-> + */
-> +#define MMU_CODE_IDX 0
-> +#define MMU_DATA_IDX 1
-> +
-> +#define EXCP_RESET 1
-> +#define EXCP_INT(n) (EXCP_RESET + (n) + 1)
-> +
-> +/* Number of CPU registers */
-> +#define NUMBER_OF_CPU_REGISTERS 32
-> +/* Number of IO registers accessible by ld/st/in/out */
-> +#define NUMBER_OF_IO_REGISTERS 64
-> +
-> +/*
-> + * Offsets of AVR memory regions in host memory space.
-> + *
-> + * This is needed because the AVR has separate code and data address
-> + * spaces that both have start from zero but have to go somewhere in
-> + * host memory.
-> + *
-> + * It's also useful to know where some things are, like the IO registers=
-.
-> + */
-> +/* Flash program memory */
-> +#define OFFSET_CODE 0x00000000
-> +/* CPU registers, IO registers, and SRAM */
-> +#define OFFSET_DATA 0x00800000
-> +/* CPU registers specifically, these are mapped at the start of data */
-> +#define OFFSET_CPU_REGISTERS OFFSET_DATA
-> +/*
-> + * IO registers, including status register, stack pointer, and memory
-> + * mapped peripherals, mapped just after CPU registers
-> + */
-> +#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)
-> +
-> +#define EF_AVR_MACH 0x7F
-> +
-> +#endif /* !defined (QEMU_AVR_CPU_H) */
-> --
-> 2.7.4
+>     This has no command line arguments except for a UNIX
+>     socket path which is a QMP server
 >
 >
-
---=20
-Best Regards,
-Michael Rolnik
-
---000000000000bc6c9f059d1b43bd
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Thanks for you help guys.</div><br><div class=3D"gmail_quo=
-te"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jan 27, 2020 at 12:55 AM =
-Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.markovic@rt-rk.com">al=
-eksandar.markovic@rt-rk.com</a>&gt; wrote:<br></div><blockquote class=3D"gm=
-ail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,=
-204,204);padding-left:1ex">From: Michael Rolnik &lt;<a href=3D"mailto:mroln=
-ik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-<br>
-This includes definitions of various basic parameters needed<br>
-for integration of a new platform into QEMU.<br>
-<br>
-Co-developed-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" ta=
-rget=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Co-developed-by: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" =
-target=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt;<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
-et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Signed-off-by: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" ta=
-rget=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt;<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
-et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Acked-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" target=
-=3D"_blank">imammedo@redhat.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
-naro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
-Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@=
-gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt;<br>
----<br>
-=C2=A0target/avr/cpu-param.h | 37 ++++++++++++++++++++++++++<br>
-=C2=A0target/avr/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0| 72 +++++++++++++++++++++=
-+++++++++++++++++++++++++++++<br>
-=C2=A02 files changed, 109 insertions(+)<br>
-=C2=A0create mode 100644 target/avr/cpu-param.h<br>
-=C2=A0create mode 100644 target/avr/cpu.h<br>
-<br>
-diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h<br>
-new file mode 100644<br>
-index 0000000..0c29ce4<br>
---- /dev/null<br>
-+++ b/target/avr/cpu-param.h<br>
-@@ -0,0 +1,37 @@<br>
-+/*<br>
-+ * QEMU AVR CPU<br>
-+ *<br>
-+ * Copyright (c) 2019 Michael Rolnik<br>
-+ *<br>
-+ * This library is free software; you can redistribute it and/or<br>
-+ * modify it under the terms of the GNU Lesser General Public<br>
-+ * License as published by the Free Software Foundation; either<br>
-+ * version 2.1 of the License, or (at your option) any later version.<br>
-+ *<br>
-+ * This library is distributed in the hope that it will be useful,<br>
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<=
-br>
-+ * Lesser General Public License for more details.<br>
-+ *<br>
-+ * You should have received a copy of the GNU Lesser General Public<br>
-+ * License along with this library; if not, see<br>
-+ * &lt;<a href=3D"http://www.gnu.org/licenses/lgpl-2.1.html" rel=3D"norefe=
-rrer" target=3D"_blank">http://www.gnu.org/licenses/lgpl-2.1.html</a>&gt;<b=
-r>
-+ */<br>
-+<br>
-+#ifndef AVR_CPU_PARAM_H<br>
-+#define AVR_CPU_PARAM_H<br>
-+<br>
-+#define TARGET_LONG_BITS 32<br>
-+/*<br>
-+ * TARGET_PAGE_BITS cannot be more than 8 bits because<br>
-+ * 1.=C2=A0 all IO registers occupy [0x0000 .. 0x00ff] address range, and =
-they<br>
-+ *=C2=A0 =C2=A0 =C2=A0should be implemented as a device and not memory<br>
-+ * 2.=C2=A0 SRAM starts at the address 0x0100<br>
-+ */<br>
-+#define TARGET_PAGE_BITS 8<br>
-+#define TARGET_PHYS_ADDR_SPACE_BITS 24<br>
-+#define TARGET_VIRT_ADDR_SPACE_BITS 24<br>
-+#define NB_MMU_MODES 2<br>
-+<br>
-+<br>
-+#endif<br>
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h<br>
-new file mode 100644<br>
-index 0000000..d122611<br>
---- /dev/null<br>
-+++ b/target/avr/cpu.h<br>
-@@ -0,0 +1,72 @@<br>
-+/*<br>
-+ * QEMU AVR CPU<br>
-+ *<br>
-+ * Copyright (c) 2019 Michael Rolnik<br>
-+ *<br>
-+ * This library is free software; you can redistribute it and/or<br>
-+ * modify it under the terms of the GNU Lesser General Public<br>
-+ * License as published by the Free Software Foundation; either<br>
-+ * version 2.1 of the License, or (at your option) any later version.<br>
-+ *<br>
-+ * This library is distributed in the hope that it will be useful,<br>
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<=
-br>
-+ * Lesser General Public License for more details.<br>
-+ *<br>
-+ * You should have received a copy of the GNU Lesser General Public<br>
-+ * License along with this library; if not, see<br>
-+ * &lt;<a href=3D"http://www.gnu.org/licenses/lgpl-2.1.html" rel=3D"norefe=
-rrer" target=3D"_blank">http://www.gnu.org/licenses/lgpl-2.1.html</a>&gt;<b=
-r>
-+ */<br>
-+<br>
-+#ifndef QEMU_AVR_CPU_H<br>
-+#define QEMU_AVR_CPU_H<br>
-+<br>
-+#include &quot;cpu-qom.h&quot;<br>
-+#include &quot;exec/cpu-defs.h&quot;<br>
-+<br>
-+#define TCG_GUEST_DEFAULT_MO 0<br>
-+#define AVR_CPU_TYPE_SUFFIX &quot;-&quot; TYPE_AVR_CPU<br>
-+#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)<br>
-+#define CPU_RESOLVING_TYPE TYPE_AVR_CPU<br>
-+<br>
-+/*<br>
-+ * AVR has two memory spaces, data &amp; code.<br>
-+ * e.g. both have 0 address<br>
-+ * ST/LD instructions access data space<br>
-+ * LPM/SPM and instruction fetching access code memory space<br>
-+ */<br>
-+#define MMU_CODE_IDX 0<br>
-+#define MMU_DATA_IDX 1<br>
-+<br>
-+#define EXCP_RESET 1<br>
-+#define EXCP_INT(n) (EXCP_RESET + (n) + 1)<br>
-+<br>
-+/* Number of CPU registers */<br>
-+#define NUMBER_OF_CPU_REGISTERS 32<br>
-+/* Number of IO registers accessible by ld/st/in/out */<br>
-+#define NUMBER_OF_IO_REGISTERS 64<br>
-+<br>
-+/*<br>
-+ * Offsets of AVR memory regions in host memory space.<br>
-+ *<br>
-+ * This is needed because the AVR has separate code and data address<br>
-+ * spaces that both have start from zero but have to go somewhere in<br>
-+ * host memory.<br>
-+ *<br>
-+ * It&#39;s also useful to know where some things are, like the IO registe=
-rs.<br>
-+ */<br>
-+/* Flash program memory */<br>
-+#define OFFSET_CODE 0x00000000<br>
-+/* CPU registers, IO registers, and SRAM */<br>
-+#define OFFSET_DATA 0x00800000<br>
-+/* CPU registers specifically, these are mapped at the start of data */<br=
+>   * qemu-launcher-$TARGET
 >
-+#define OFFSET_CPU_REGISTERS OFFSET_DATA<br>
-+/*<br>
-+ * IO registers, including status register, stack pointer, and memory<br>
-+ * mapped peripherals, mapped just after CPU registers<br>
-+ */<br>
-+#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)<br>
-+<br>
-+#define EF_AVR_MACH 0x7F<br>
-+<br>
-+#endif /* !defined (QEMU_AVR_CPU_H) */<br>
--- <br>
-2.7.4<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
+>     A binary that is able to launch qemu-runtime-$TARGET
+>     with jailers active.
+>
+>     This has no command line arguments except for a pair
+>     of UNIX socket paths. One is a QMP server, the other
+>     is the path for the QMP of qemu-runtime-$TARGET.
+>
+>     Commands it processes will be in automatically proxied
+>     through to the qemu-runtime-$TARGET QMP, with appropriate
+>     jailer updates being done in between.
 
---000000000000bc6c9f059d1b43bd--
+See Paolo's reply.
+
+>   * qemu-client
+>
+>     A binary that speaks QMP, connects, runs a single command,
+>     disconnects.
+
+The single command is specified how?
+
+Ah, "Example usage" below shows it's taken from a file argument.
+
+>     It is used to talk to either qemu-runtime-$TARGET or
+>     qemu-launcher-$TARGET, depending on whether the mgmt app
+>     or user wants to be making use of the jailer facilities
+>     or not. =20
+
+Effectively ditches the CLI in favor of QMP.  One major external host
+interface instead of two.
+
+The connection to "making use of JSON the best way to deal with QEMU
+both functionally and practically, for humans and machines alike" is
+"make it possible to use just QMP for *everything*".  Correct?
+
+We've toyed with the "Just QMP" idea almost since QMP exists.  We never
+went beyond "wouldn't it be nice if".
+
+The main chunk of work is providing the CLI functionality we need in
+QMP.  Requires QAPIfication of the parts that aren't QAPIfied, yet.
+
+Since parts of CLI overlap with QMP, providing CLI functionality need
+not require new QMP commands.  For instance, CLI does cold plug, QMP
+does hot plug.  The existing QMP interface could do both: hot while the
+machine runs, else cold.
+
+Some functionality makes sense only during initial startup.  Implied in
+CLI.  In QMP, it has to be tied to the run state.  No big deal.
+
+"Just QMP" is of course not the only way to do "JSON first".  Another
+one is bringing JSON to the CLI.  I explored that: CLI QAPIfication.
+
+Requires the same QAPIfication as "Just QMP" does.
+
+Where "Just QMP" is a hard compatibility break by design, "JSON in CLI"
+gives us a choice: we can choose to break compatibility, e.g. by
+creating the exact same set of new executables you propose.  Or we can
+try to evolve the existing CLI compatibly.  The latter is a tar pit,
+because the existing CLI is.  But it's a tar pit *we* get to choose.  We
+can't blame "JSON in CLI" for it, only ourselves.
+
+Even though I've worked on "JSON in CLI", I'm not overly attached to it.
+If we decide "Just QMP" is the better path forward, I'll happily go
+along.  I believe the bulk of the work will be the same: QAPIfying
+stuff.
+
+>   * qemu-system-$TARGET
+>
+>     The current binaries that exist today.
+>
+>     qemu-system-$TARGET should not be part of our formal
+>     stability promise. We won't gratuitously / knowingly
+>     break without good reason, but we will accept that
+>     breakage can happen. Stability is only offered by
+>     the qemu-{runtime,launcher}-$TARGET.
+>
+>     Several choices for their future in long term:
+>
+>       - Leave them as-is and basically ignore them
+>         whereever practical going forward, so we
+> =09minimally worry about backcompat breakage
+>
+>       - Plan to re-write them so that they are simply
+>         a shim the forks+execs qemu-runtime-$TARGET
+> =09and does syntax translation from CLI/HMP/QMP.
+>
+>       - Deprecate them with a view to deletion entirely
+>         in $NNN years. For some large-ish value of NNN,
+> =09given how well known they are
+
+How do the other complex executables like qemu-img, qemu-nbd fit into
+this picture?
+
+Do they become redundant somehow for non-human users?
+
+If not, will they get a QMP-only sibling, like qemu-system-$TARGET gets
+qemu-runtime-$TARGET?
+
+> Example usage:
+>
+> 1. Launch the QEMU runtime for the desired target
+>
+>      $ qemu-runtime-x86_64 myvm.sock
+>
+> 2. Load the configuration to define the VM
+>
+>    $ cat myvm.yaml
+>    commands:
+>      - machine_declare:
+>          name: pc-q35-5.0
+> =09 ...
+>      - blockdev_add:
+>          ...
+>      - device_add:
+>          ...
+>      - blockdev_add:
+>          ...
+>      - device_add:
+>          ...
+>    $ qemu-client myvm.sock myvm.yaml
+>
+>
+> 3. Hotplug a disk
+>
+>    $ cat mynewdisk.yaml
+>    commands:
+>      - blockdev_add:
+>          ...
+>      - device_add:
+>          ...
+>    $ qemu-client myvm.sock mynewdisk.yaml
+>
+>
+> 3. Hotunplug a disk
+>
+>    $ cat myolddisk.yaml
+>    commands:
+>      - device_del:
+>          ...
+>      - blockdev_del:
+>          ...
+>    $ qemu-client myvm.sock myolddisk.yaml
+>
+> Using jailers, just means adding in a use of qemu-launcher-$TARGET
+> at the start.
+>
+>
+> Regards,
+> Daniel
+
 
