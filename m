@@ -2,130 +2,64 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06B4C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31CC0C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:21:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC74B214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:19:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E80402071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:21:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EzfXbzVQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC74B214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="F2p/+giD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E80402071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw0YD-0002Ry-S4
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 04:19:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55440)
+	id 1iw0aQ-0003gM-2e
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 04:21:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iw0XZ-0001yO-4M
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:18:42 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iw0Zp-00038h-6F
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iw0XX-0005iC-Ds
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:18:40 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49829
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1iw0Zn-0007PS-M3
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:21:00 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:43063)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iw0XX-0005hy-9z
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:18:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580116718;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=oVrXW/xJ8FH8tV0EP95wVtDPHWCSVPuwt84dOsiYoOQ=;
- b=EzfXbzVQfpnTEgc7zmym9TRbNoLZG+u9V6DJkmJfeyY+cNzXk74mw9sR1Y9cCl2b/QTp1h
- X1x1xqbY/qR3j0zqebVHHJaN5UsqLux54KE9oilGUCma0T/TDOoWFljO1KHPnraB8iuhlg
- 651dS+omTMzp39aSPNuDS0gqZOZLp3Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-763o-aChO3SDzW_llQYbdw-1; Mon, 27 Jan 2020 04:18:36 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EC7A800D41
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 09:18:35 +0000 (UTC)
-Received: from [10.36.118.65] (unknown [10.36.118.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AEE9B8E60C;
- Mon, 27 Jan 2020 09:18:26 +0000 (UTC)
-Subject: Re: [PATCH 2/2] virtio-balloon: Reject qmp_balloon during hot-unplug
-To: Julia Suvorova <jusual@redhat.com>
-References: <20200115224025.538368-1-jusual@redhat.com>
- <20200115224025.538368-3-jusual@redhat.com>
- <38fdd88d-1399-effb-b74b-e02b7343f044@redhat.com>
- <CAMDeoFX1eFToYOWmBaVOYHTnNka8Fwruq6PtX7GsAGTuS++u8w@mail.gmail.com>
- <095236a0-ba8c-55c6-f9fc-e2a4a809b274@redhat.com>
- <CAMDeoFWJJbLs_Dtkb2rqXYW-PMA=9Qwy83SnkqS2_-EOaNtiSg@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <0c84dd1a-4bef-1f68-3b42-cba547210e63@redhat.com>
-Date: Mon, 27 Jan 2020 10:18:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iw0Zm-0007Ln-Tw; Mon, 27 Jan 2020 04:20:59 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 485kkZ15R2z9sRR; Mon, 27 Jan 2020 20:20:54 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1580116854;
+ bh=wrO7VlkgeV4ypWjsPlmWLbiZrckiZtBRGDxecI+M+lY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=F2p/+giDQiLVHNDNfMY/vlsBb5bnqRbJLXJAq2HH5HyTgTVMq/sBEv/N8HHt/mS5i
+ KodAi3wg7zkod6cyGYr5MVJBbaINbOhlI53pxk5iKzNe0d5pRdVQjA4zGxVlWD4n//
+ 9FK48dt+ehaG3QLzj6jB3MUSkUcDirH+KkKtfYX0=
+Date: Mon, 27 Jan 2020 19:18:46 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH v3.1 74/80] exec: cleanup
+ qemu_minrampagesize()/qemu_maxrampagesize()
+Message-ID: <20200127081846.GA34829@umbus.fritz.box>
+References: <1579779525-20065-75-git-send-email-imammedo@redhat.com>
+ <1580112408-93354-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMDeoFWJJbLs_Dtkb2rqXYW-PMA=9Qwy83SnkqS2_-EOaNtiSg@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 763o-aChO3SDzW_llQYbdw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+Content-Disposition: inline
+In-Reply-To: <1580112408-93354-1-git-send-email-imammedo@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,91 +71,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: thuth@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.01.20 16:46, Julia Suvorova wrote:
-> On Thu, Jan 23, 2020 at 3:17 PM David Hildenbrand <david@redhat.com> wrote:
->>
->> On 23.01.20 15:08, Julia Suvorova wrote:
->>> On Thu, Jan 16, 2020 at 1:36 PM David Hildenbrand <david@redhat.com> wrote:
->>>>
->>>> On 15.01.20 23:40, Julia Suvorova wrote:
->>>>> Hot-unplug takes some time due to communication with the guest.
->>>>> Do not change the device while freeing up resources.
->>>>>
->>>>> Signed-off-by: Julia Suvorova <jusual@redhat.com>
->>>>> ---
->>>>>  balloon.c                  | 2 +-
->>>>>  hw/virtio/virtio-balloon.c | 9 ++++++++-
->>>>>  include/sysemu/balloon.h   | 2 +-
->>>>>  3 files changed, 10 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/balloon.c b/balloon.c
->>>>> index f104b42961..998ec53a0f 100644
->>>>> --- a/balloon.c
->>>>> +++ b/balloon.c
->>>>> @@ -119,5 +119,5 @@ void qmp_balloon(int64_t target, Error **errp)
->>>>>      }
->>>>>
->>>>>      trace_balloon_event(balloon_opaque, target);
->>>>> -    balloon_event_fn(balloon_opaque, target);
->>>>> +    balloon_event_fn(balloon_opaque, target, errp);
->>>>>  }
->>>>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->>>>> index 57f3b9f22d..0fa4e4454b 100644
->>>>> --- a/hw/virtio/virtio-balloon.c
->>>>> +++ b/hw/virtio/virtio-balloon.c
->>>>> @@ -717,12 +717,19 @@ static void virtio_balloon_stat(void *opaque, BalloonInfo *info)
->>>>>                                               VIRTIO_BALLOON_PFN_SHIFT);
->>>>>  }
->>>>>
->>>>> -static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
->>>>> +static void virtio_balloon_to_target(void *opaque, ram_addr_t target,
->>>>> +                                     Error **errp)
->>>>>  {
->>>>> +    DeviceState *bus_dev = qdev_get_bus_device(DEVICE(opaque));
->>>>>      VirtIOBalloon *dev = VIRTIO_BALLOON(opaque);
->>>>>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->>>>>      ram_addr_t vm_ram_size = get_current_ram_size();
->>>>>
->>>>> +    if (bus_dev && bus_dev->pending_deleted_event) {
->>>>> +        error_setg(errp, "Hot-unplug of %s is in progress", vdev->name);
->>>>> +        return;
->>>>> +    }
->>>>> +
->>>>
->>>> How exactly does this help? The guest is free to inflate/deflate
->>>> whenever it wants.
->>>
->>> Guest is aware of hot-unplug start, and virtio driver should not
->>> initiate any operations. This patch just restricts issuing commands
->>> from qmp monitor.
->>
->> Why shouldn't the guest driver inflate/deflate while memory hotplug is
->> going on?
->>
->> Simple balloon compaction in a Linux guest -> deflate/inflate triggered
->> in the hypervisor.
-> 
-> QEMU crashes if inflate happens after powering-off PCI slot. Guest is
-> unable to interact with virtio-balloon device then, driver is
-> unloaded. But inflate can still happen if initiated from qmp.
 
-Ah guest can inflate/deflate whenever it wants. What am I missing?
+--sdtB3X0nJg68CQEu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-IMHO, the right approach is to discard inflate/deflate requests on these
-areas instead.
+On Mon, Jan 27, 2020 at 09:06:48AM +0100, Igor Mammedov wrote:
+> Since all RAM is backed by hostmem backends, drop
+> global -mem-path invariant and simplify code.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v4:
+>   * fix access to uninitialized pagesize/hpsize
+>     (David Gibson <david@gibson.dropbear.id.au>)
 
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
--- 
-Thanks,
+> CC: thuth@redhat.com
+> CC: aik@ozlabs.ru
+> CC: mdroth@linux.vnet.ibm.com
+> CC: david@gibson.dropbear.id.au
+> CC: qemu-ppc@nongnu.org
+> CC: pbonzini@redhat.com
+> CC: rth@twiddle.net
+> ---
+>  exec.c | 49 ++++---------------------------------------------
+>  1 file changed, 4 insertions(+), 45 deletions(-)
+>=20
+> diff --git a/exec.c b/exec.c
+> index 67e520d..9f5421c 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1668,59 +1668,18 @@ static int find_max_backend_pagesize(Object *obj,=
+ void *opaque)
+>  long qemu_minrampagesize(void)
+>  {
+>      long hpsize =3D LONG_MAX;
+> -    long mainrampagesize;
+> -    Object *memdev_root;
+> -    MachineState *ms =3D MACHINE(qdev_get_machine());
+> -
+> -    mainrampagesize =3D qemu_mempath_getpagesize(mem_path);
+> -
+> -    /* it's possible we have memory-backend objects with
+> -     * hugepage-backed RAM. these may get mapped into system
+> -     * address space via -numa parameters or memory hotplug
+> -     * hooks. we want to take these into account, but we
+> -     * also want to make sure these supported hugepage
+> -     * sizes are applicable across the entire range of memory
+> -     * we may boot from, so we take the min across all
+> -     * backends, and assume normal pages in cases where a
+> -     * backend isn't backed by hugepages.
+> -     */
+> -    memdev_root =3D object_resolve_path("/objects", NULL);
+> -    if (memdev_root) {
+> -        object_child_foreach(memdev_root, find_min_backend_pagesize, &hp=
+size);
+> -    }
+> -    if (hpsize =3D=3D LONG_MAX) {
+> -        /* No additional memory regions found =3D=3D> Report main RAM pa=
+ge size */
+> -        return mainrampagesize;
+> -    }
+> -
+> -    /* If NUMA is disabled or the NUMA nodes are not backed with a
+> -     * memory-backend, then there is at least one node using "normal" RA=
+M,
+> -     * so if its page size is smaller we have got to report that size in=
+stead.
+> -     */
+> -    if (hpsize > mainrampagesize &&
+> -        (ms->numa_state =3D=3D NULL ||
+> -         ms->numa_state->num_nodes =3D=3D 0 ||
+> -         ms->numa_state->nodes[0].node_memdev =3D=3D NULL)) {
+> -        static bool warned;
+> -        if (!warned) {
+> -            error_report("Huge page support disabled (n/a for main memor=
+y).");
+> -            warned =3D true;
+> -        }
+> -        return mainrampagesize;
+> -    }
+> +    Object *memdev_root =3D object_resolve_path("/objects", NULL);
+> =20
+> +    object_child_foreach(memdev_root, find_min_backend_pagesize, &hpsize=
+);
+>      return hpsize;
+>  }
+> =20
+>  long qemu_maxrampagesize(void)
+>  {
+> -    long pagesize =3D qemu_mempath_getpagesize(mem_path);
+> +    long pagesize =3D 0;
+>      Object *memdev_root =3D object_resolve_path("/objects", NULL);
+> =20
+> -    if (memdev_root) {
+> -        object_child_foreach(memdev_root, find_max_backend_pagesize,
+> -                             &pagesize);
+> -    }
+> +    object_child_foreach(memdev_root, find_max_backend_pagesize, &pagesi=
+ze);
+>      return pagesize;
+>  }
+>  #else
 
-David / dhildenb
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--sdtB3X0nJg68CQEu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4unOQACgkQbDjKyiDZ
+s5JJXg//YCQvsE1JVDU5f8xvKbTsZpaf4WRmDNbJCbQkY3S/Hbzr40IEQVDR+Wyu
+Q+JmWYCAKbrBwi+S5VpSC8hVovj5CH6AJ9BROEH25QVBVg+gMUhPxq30fOz0Ospw
+25l9cjWVY7rY/Ec1O/6RQ+4Ip41FpK4QJxZY7PoQDuG/5Sb1dFGhGPkHx+2IOosd
+IEUVIDhc6UlQN2+c/IetZTV/WgxjwNloeKNwjUaTNyuMjm5RGi5QuUZqhc0Y+OUc
+1HoRIDU79U4iaPPoAIik5cpqwVK48Hbb7SWutCbI6mmOrYJ7VSqVazEIGgYaBohp
+5in3LgNio3LOyvDjq4jvV8FGcM7AIgqfNZs8DLnp8zaD/2UK0XH6gYTP/m/a4+Mh
+pzxGM/8GzkPBep3j8ORoc4KggmcHALgO3FloOodM/l54WrpMZR+NS/Tp6jCRKRwQ
+qzJRL9YkfCOEvPFx6/aJeidVBVsb7Vi3GHLqKyhZ5BfdErWzEjGVHfpliKHnThTv
+fXv5eU6Fb1w4tI4YU6ZrTwM+3Ka65syLERF7cj+klMERDC37WC/nrC6FWOOPiKly
+kUZCuPsbWwZIdbMiKZtdMDokGjyaPuqP3kZTxGEAsYHyQmcE/3gNuFFxiOU7XY/J
+4GNY6c2TaxHeQfvjQRDwBB/8iZNdG9rLv9QDl7Mim8QoIET0sxI=
+=iQJw
+-----END PGP SIGNATURE-----
+
+--sdtB3X0nJg68CQEu--
 
