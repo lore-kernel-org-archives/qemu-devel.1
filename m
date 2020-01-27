@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEDA5C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFA8C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E19520702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2ACB220702
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BqmxnWVE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E19520702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpgYkfm7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ACB220702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw1mh-00043v-JJ
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:38:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42141)
+	id 1iw1mk-00047m-9N
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:38:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lR-0002PB-DT
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:06 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1lS-0002PG-NX
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lO-0002W0-Pv
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30679
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1lQ-0002XL-IO
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:06 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22665
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1lN-0002TC-ER
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:02 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1lO-0002Vu-SN
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580121420;
+ s=mimecast20190719; t=1580121422;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sFkjv3btebeOLT0oNDEIwq9+w4CTYhbKRM0g2bdv1d0=;
- b=BqmxnWVE+T60zrxgXX66eF3Za5YJgZHLjzZ6hhOnyy5pR6fVPc9J4wWH052xsBB485E3j/
- n7Wvy5ohVJ8tgy2Sn40+gumvcLq6cuRgGMGUiNr/8Tq3KREaw+kooBzUaGf6/ubToBTnFC
- O97cAdoqCBJLG+9RRSRJZBlPS+CQapU=
+ bh=xIB5EKz/PP52nepCG9ZIBf61jVupUOv7U1wULQeWDdA=;
+ b=ZpgYkfm7QNfcF/kTdeExbKoyuIY6VY+jOc5TVx/S0WB8D9QWxAh8y+9b0MAqUdaXhOKrev
+ aolHr0BZs5l2Ov33TazerUQ9xjWE7D+LTYf7wQR5ZvxvHZtZnUA/4CA1Inu1+DIuG/LxFh
+ Ja4xgXLaVnW1xRjs/fLHAO16JlU7ics=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-SeCwTx_9PtmIIzixYrp3MA-1; Mon, 27 Jan 2020 05:36:58 -0500
+ us-mta-81-ncFaSDdtP0SiosadVhdSXQ-1; Mon, 27 Jan 2020 05:37:00 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30B63800D41;
- Mon, 27 Jan 2020 10:36:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 879E1800D4E;
+ Mon, 27 Jan 2020 10:36:59 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DC59F6C1;
- Mon, 27 Jan 2020 10:36:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 873B6F6C1;
+ Mon, 27 Jan 2020 10:36:57 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 01/13] usb/dev-storage: remove unused include
-Date: Mon, 27 Jan 2020 12:36:35 +0200
-Message-Id: <20200127103647.17761-2-mlevitsk@redhat.com>
+Subject: [PATCH v3 02/13] monitor/hmp: uninline add_init_drive
+Date: Mon, 27 Jan 2020 12:36:36 +0200
+Message-Id: <20200127103647.17761-3-mlevitsk@redhat.com>
 In-Reply-To: <20200127103647.17761-1-mlevitsk@redhat.com>
 References: <20200127103647.17761-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: SeCwTx_9PtmIIzixYrp3MA-1
+X-MC-Unique: ncFaSDdtP0SiosadVhdSXQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,23 +91,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- hw/usb/dev-storage.c | 1 -
- 1 file changed, 1 deletion(-)
+This is only used by hmp_drive_add.
+The code is just a bit shorter this way.
 
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 8545193488..50d12244ab 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -19,7 +19,6 @@
- #include "hw/scsi/scsi.h"
- #include "ui/console.h"
- #include "migration/vmstate.h"
--#include "monitor/monitor.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/block-backend.h"
- #include "qapi/visitor.h"
+No functional changes
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ device-hotplug.c | 31 ++++++++++++-------------------
+ 1 file changed, 12 insertions(+), 19 deletions(-)
+
+diff --git a/device-hotplug.c b/device-hotplug.c
+index f01d53774b..554e4d98db 100644
+--- a/device-hotplug.c
++++ b/device-hotplug.c
+@@ -34,42 +34,35 @@
+ #include "monitor/monitor.h"
+ #include "block/block_int.h"
+=20
+-static DriveInfo *add_init_drive(const char *optstr)
++
++void hmp_drive_add(Monitor *mon, const QDict *qdict)
+ {
+     Error *err =3D NULL;
+     DriveInfo *dinfo;
+     QemuOpts *opts;
+     MachineClass *mc;
++    const char *optstr =3D qdict_get_str(qdict, "opts");
++    bool node =3D qdict_get_try_bool(qdict, "node", false);
++
++    if (node) {
++        hmp_drive_add_node(mon, optstr);
++        return;
++    }
+=20
+     opts =3D drive_def(optstr);
+     if (!opts)
+-        return NULL;
++        return;
+=20
+     mc =3D MACHINE_GET_CLASS(current_machine);
+     dinfo =3D drive_new(opts, mc->block_default_type, &err);
+     if (err) {
+         error_report_err(err);
+         qemu_opts_del(opts);
+-        return NULL;
+-    }
+-
+-    return dinfo;
+-}
+-
+-void hmp_drive_add(Monitor *mon, const QDict *qdict)
+-{
+-    DriveInfo *dinfo =3D NULL;
+-    const char *opts =3D qdict_get_str(qdict, "opts");
+-    bool node =3D qdict_get_try_bool(qdict, "node", false);
+-
+-    if (node) {
+-        hmp_drive_add_node(mon, opts);
+-        return;
++        goto err;
+     }
+=20
+-    dinfo =3D add_init_drive(opts);
+     if (!dinfo) {
+-        goto err;
++        return;
+     }
+=20
+     switch (dinfo->type) {
 --=20
 2.17.2
 
