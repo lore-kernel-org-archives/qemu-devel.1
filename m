@@ -6,72 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 124C3C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EADFDC32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:40:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D17F520702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:39:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2C0D20702
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:40:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ow9JijR9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D17F520702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y8Xg5KS4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C0D20702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw1o9-0007zj-VQ
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:39:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42357)
+	id 1iw1oG-0008HA-Qi
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:40:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lj-000315-Pb
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:25 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1lZ-0002aq-Dq
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1li-0002ru-7C
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:23 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51588
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1lX-0002gX-Vj
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29415
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1li-0002qn-1r
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:22 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1lX-0002gP-Sq
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580121441;
+ s=mimecast20190719; t=1580121431;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sH/Jm8wqFvAlabLvAmrYRoUC/jk7ZOh1WJoqF40h1gI=;
- b=Ow9JijR9TWSJgLlxmynQap5PaF07E9zsqgKpVCyQZ0rW033FtU5hoc/ubmWv0D0phC+mdM
- rCTLkQAdAgYSZxW22GPsYXhkGXe77E3hP6tleXV39fsK+UCi/dOdtyBWlgra5R8rYjcFgm
- Rq/qGcZE+BXLGSCjqX8oB/1e40OGxRQ=
+ bh=497xetPwtROJH9zqL6ej5Q07kVkkJvN6ezgPOmx0y7Y=;
+ b=Y8Xg5KS42IofmgnO5IsxnuAUUsf7QPc9jAHQjvFryYspUs7lKgyqV6YFCWk2Yr6AVplR6g
+ XU4b4Jg1xy05JAF2BR5Ez7TpK1Fh8HkgPcOKH8gHamosmFq7Z0sfKit1K/vaoMSQjkvASa
+ 938QItcI7WC5jMzbHVIbQ7EBsmc4eO0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-68-FB-qQNdiNtaXMPoLPwg-1; Mon, 27 Jan 2020 05:37:19 -0500
+ us-mta-427-A1kRoboMOU6J1SjHfU4WIA-1; Mon, 27 Jan 2020 05:37:07 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAEEA107ACC4;
- Mon, 27 Jan 2020 10:37:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C28E5100551C;
+ Mon, 27 Jan 2020 10:37:06 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C97BCF6C1;
- Mon, 27 Jan 2020 10:37:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4C1F8451F;
+ Mon, 27 Jan 2020 10:37:02 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 08/13] monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
-Date: Mon, 27 Jan 2020 12:36:42 +0200
-Message-Id: <20200127103647.17761-9-mlevitsk@redhat.com>
+Subject: [PATCH v3 04/13] monitor/hmp: move hmp_drive_del and hmp_commit to
+ block-hmp-cmds.c
+Date: Mon, 27 Jan 2020 12:36:38 +0200
+Message-Id: <20200127103647.17761-5-mlevitsk@redhat.com>
 In-Reply-To: <20200127103647.17761-1-mlevitsk@redhat.com>
 References: <20200127103647.17761-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 68-FB-qQNdiNtaXMPoLPwg-1
+X-MC-Unique: A1kRoboMOU6J1SjHfU4WIA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,257 +94,282 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- block/monitor/block-hmp-cmds.c     | 88 ++++++++++++++++++++++++++++++
- include/block/block-hmp-commands.h |  5 ++
- include/monitor/hmp.h              |  4 --
- monitor/hmp-cmds.c                 | 87 -----------------------------
- 4 files changed, 93 insertions(+), 91 deletions(-)
+ block/monitor/block-hmp-cmds.c     | 97 +++++++++++++++++++++++++++++-
+ blockdev.c                         | 95 -----------------------------
+ include/block/block-hmp-commands.h |  3 +
+ include/sysemu/blockdev.h          |  4 --
+ 4 files changed, 99 insertions(+), 100 deletions(-)
 
 diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
 c
-index 9aa94ea6e0..df0178d0f9 100644
+index c65aaa86ea..9614c67e77 100644
 --- a/block/monitor/block-hmp-cmds.c
 +++ b/block/monitor/block-hmp-cmds.c
-@@ -22,8 +22,10 @@
- #include "qapi/qmp/qerror.h"
+@@ -12,6 +12,7 @@
+ #include "hw/boards.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
++#include "qapi/qapi-commands-block.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/error.h"
  #include "qemu/config-file.h"
- #include "qemu/option.h"
-+#include "qemu/sockets.h"
- #include "sysemu/sysemu.h"
- #include "monitor/monitor.h"
-+#include "block/nbd.h"
+@@ -21,7 +22,6 @@
  #include "block/block_int.h"
  #include "block/block-hmp-commands.h"
- #include "monitor/hmp.h"
-@@ -327,3 +329,89 @@ void hmp_snapshot_delete_blkdev_internal(Monitor *mon,=
- const QDict *qdict)
-                                                true, name, &err);
-     hmp_handle_error(mon, err);
+=20
+-
+ void hmp_drive_add(Monitor *mon, const QDict *qdict)
+ {
+     Error *err =3D NULL;
+@@ -69,3 +69,98 @@ err:
+         blk_unref(blk);
+     }
  }
 +
-+void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
++void hmp_drive_del(Monitor *mon, const QDict *qdict)
 +{
-+    const char *uri =3D qdict_get_str(qdict, "uri");
-+    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
-+    bool all =3D qdict_get_try_bool(qdict, "all", false);
++    const char *id =3D qdict_get_str(qdict, "id");
++    BlockBackend *blk;
++    BlockDriverState *bs;
++    AioContext *aio_context;
 +    Error *local_err =3D NULL;
-+    BlockInfoList *block_list, *info;
-+    SocketAddress *addr;
 +
-+    if (writable && !all) {
-+        error_setg(&local_err, "-w only valid together with -a");
-+        goto exit;
-+    }
-+
-+    /* First check if the address is valid and start the server.  */
-+    addr =3D socket_parse(uri, &local_err);
-+    if (local_err !=3D NULL) {
-+        goto exit;
-+    }
-+
-+    nbd_server_start(addr, NULL, NULL, &local_err);
-+    qapi_free_SocketAddress(addr);
-+    if (local_err !=3D NULL) {
-+        goto exit;
-+    }
-+
-+    if (!all) {
++    bs =3D bdrv_find_node(id);
++    if (bs) {
++        qmp_blockdev_del(id, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++        }
 +        return;
 +    }
 +
-+    /* Then try adding all block devices.  If one fails, close all and
-+     * exit.
-+     */
-+    block_list =3D qmp_query_block(NULL);
-+
-+    for (info =3D block_list; info; info =3D info->next) {
-+        if (!info->value->has_inserted) {
-+            continue;
-+        }
-+
-+        qmp_nbd_server_add(info->value->device, false, NULL,
-+                           true, writable, false, NULL, &local_err);
-+
-+        if (local_err !=3D NULL) {
-+            qmp_nbd_server_stop(NULL);
-+            break;
-+        }
++    blk =3D blk_by_name(id);
++    if (!blk) {
++        error_report("Device '%s' not found", id);
++        return;
 +    }
 +
-+    qapi_free_BlockInfoList(block_list);
++    if (!blk_legacy_dinfo(blk)) {
++        error_report("Deleting device added with blockdev-add"
++                     " is not supported");
++        return;
++    }
 +
-+exit:
-+    hmp_handle_error(mon, local_err);
++    aio_context =3D blk_get_aio_context(blk);
++    aio_context_acquire(aio_context);
++
++    bs =3D blk_bs(blk);
++    if (bs) {
++        if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_DRIVE_DEL, &local_err)) {
++            error_report_err(local_err);
++            aio_context_release(aio_context);
++            return;
++        }
++
++        blk_remove_bs(blk);
++    }
++
++    /* Make the BlockBackend and the attached BlockDriverState anonymous *=
+/
++    monitor_remove_blk(blk);
++
++    /* If this BlockBackend has a device attached to it, its refcount will=
+ be
++     * decremented when the device is removed; otherwise we have to do so =
+here.
++     */
++    if (blk_get_attached_dev(blk)) {
++        /* Further I/O must not pause the guest */
++        blk_set_on_error(blk, BLOCKDEV_ON_ERROR_REPORT,
++                         BLOCKDEV_ON_ERROR_REPORT);
++    } else {
++        blk_unref(blk);
++    }
++
++    aio_context_release(aio_context);
 +}
 +
-+void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
++void hmp_commit(Monitor *mon, const QDict *qdict)
 +{
 +    const char *device =3D qdict_get_str(qdict, "device");
-+    const char *name =3D qdict_get_try_str(qdict, "name");
-+    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
-+    Error *local_err =3D NULL;
++    BlockBackend *blk;
++    int ret;
 +
-+    qmp_nbd_server_add(device, !!name, name, true, writable,
-+                       false, NULL, &local_err);
-+    hmp_handle_error(mon, local_err);
-+}
++    if (!strcmp(device, "all")) {
++        ret =3D blk_commit_all();
++    } else {
++        BlockDriverState *bs;
++        AioContext *aio_context;
 +
-+void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
-+{
-+    const char *name =3D qdict_get_str(qdict, "name");
-+    bool force =3D qdict_get_try_bool(qdict, "force", false);
-+    Error *err =3D NULL;
++        blk =3D blk_by_name(device);
++        if (!blk) {
++            error_report("Device '%s' not found", device);
++            return;
++        }
++        if (!blk_is_available(blk)) {
++            error_report("Device '%s' has no medium", device);
++            return;
++        }
 +
-+    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
-+    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
-+    hmp_handle_error(mon, err);
-+}
++        bs =3D blk_bs(blk);
++        aio_context =3D bdrv_get_aio_context(bs);
++        aio_context_acquire(aio_context);
 +
-+void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err =3D NULL;
++        ret =3D bdrv_commit(bs);
 +
-+    qmp_nbd_server_stop(&err);
-+    hmp_handle_error(mon, err);
-+}
-diff --git a/include/block/block-hmp-commands.h b/include/block/block-hmp-c=
-ommands.h
-index 3fc2daf3a9..721b9a1978 100644
---- a/include/block/block-hmp-commands.h
-+++ b/include/block/block-hmp-commands.h
-@@ -21,4 +21,9 @@ void hmp_snapshot_blkdev(Monitor *mon, const QDict *qdict=
++        aio_context_release(aio_context);
++    }
++    if (ret < 0) {
++        error_report("'commit' error for '%s': %s", device, strerror(-ret)=
 );
- void hmp_snapshot_blkdev_internal(Monitor *mon, const QDict *qdict);
- void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict)=
-;
-=20
-+void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
-+void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
-+void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
-+void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
-+
- #endif
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index 6d34e29bb6..736a969131 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -94,10 +94,6 @@ void hmp_getfd(Monitor *mon, const QDict *qdict);
- void hmp_closefd(Monitor *mon, const QDict *qdict);
- void hmp_sendkey(Monitor *mon, const QDict *qdict);
- void hmp_screendump(Monitor *mon, const QDict *qdict);
--void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
--void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
--void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
--void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
- void hmp_chardev_add(Monitor *mon, const QDict *qdict);
- void hmp_chardev_change(Monitor *mon, const QDict *qdict);
- void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 46b46b6dd7..67d2ca8a4c 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -45,7 +45,6 @@
- #include "qapi/string-output-visitor.h"
- #include "qom/object_interfaces.h"
- #include "ui/console.h"
--#include "block/nbd.h"
- #include "block/qapi.h"
- #include "qemu-io.h"
- #include "qemu/cutils.h"
-@@ -2154,92 +2153,6 @@ void hmp_screendump(Monitor *mon, const QDict *qdict=
-)
-     hmp_handle_error(mon, err);
++    }
++}
+diff --git a/blockdev.c b/blockdev.c
+index 8e029e9c01..df43e0aaef 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1074,41 +1074,6 @@ static BlockBackend *qmp_get_blk(const char *blk_nam=
+e, const char *qdev_id,
+     return blk;
  }
 =20
--void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+-void hmp_commit(Monitor *mon, const QDict *qdict)
 -{
--    const char *uri =3D qdict_get_str(qdict, "uri");
--    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
--    bool all =3D qdict_get_try_bool(qdict, "all", false);
+-    const char *device =3D qdict_get_str(qdict, "device");
+-    BlockBackend *blk;
+-    int ret;
+-
+-    if (!strcmp(device, "all")) {
+-        ret =3D blk_commit_all();
+-    } else {
+-        BlockDriverState *bs;
+-        AioContext *aio_context;
+-
+-        blk =3D blk_by_name(device);
+-        if (!blk) {
+-            error_report("Device '%s' not found", device);
+-            return;
+-        }
+-        if (!blk_is_available(blk)) {
+-            error_report("Device '%s' has no medium", device);
+-            return;
+-        }
+-
+-        bs =3D blk_bs(blk);
+-        aio_context =3D bdrv_get_aio_context(bs);
+-        aio_context_acquire(aio_context);
+-
+-        ret =3D bdrv_commit(bs);
+-
+-        aio_context_release(aio_context);
+-    }
+-    if (ret < 0) {
+-        error_report("'commit' error for '%s': %s", device, strerror(-ret)=
+);
+-    }
+-}
+-
+ static void blockdev_do_action(TransactionAction *action, Error **errp)
+ {
+     TransactionActionList list;
+@@ -3101,66 +3066,6 @@ BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitm=
+ap_sha256(const char *node,
+     return ret;
+ }
+=20
+-void hmp_drive_del(Monitor *mon, const QDict *qdict)
+-{
+-    const char *id =3D qdict_get_str(qdict, "id");
+-    BlockBackend *blk;
+-    BlockDriverState *bs;
+-    AioContext *aio_context;
 -    Error *local_err =3D NULL;
--    BlockInfoList *block_list, *info;
--    SocketAddress *addr;
 -
--    if (writable && !all) {
--        error_setg(&local_err, "-w only valid together with -a");
--        goto exit;
--    }
--
--    /* First check if the address is valid and start the server.  */
--    addr =3D socket_parse(uri, &local_err);
--    if (local_err !=3D NULL) {
--        goto exit;
--    }
--
--    nbd_server_start(addr, NULL, NULL, &local_err);
--    qapi_free_SocketAddress(addr);
--    if (local_err !=3D NULL) {
--        goto exit;
--    }
--
--    if (!all) {
+-    bs =3D bdrv_find_node(id);
+-    if (bs) {
+-        qmp_blockdev_del(id, &local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-        }
 -        return;
 -    }
 -
--    /* Then try adding all block devices.  If one fails, close all and
--     * exit.
--     */
--    block_list =3D qmp_query_block(NULL);
--
--    for (info =3D block_list; info; info =3D info->next) {
--        if (!info->value->has_inserted) {
--            continue;
--        }
--
--        qmp_nbd_server_add(info->value->device, false, NULL,
--                           true, writable, false, NULL, &local_err);
--
--        if (local_err !=3D NULL) {
--            qmp_nbd_server_stop(NULL);
--            break;
--        }
+-    blk =3D blk_by_name(id);
+-    if (!blk) {
+-        error_report("Device '%s' not found", id);
+-        return;
 -    }
 -
--    qapi_free_BlockInfoList(block_list);
+-    if (!blk_legacy_dinfo(blk)) {
+-        error_report("Deleting device added with blockdev-add"
+-                     " is not supported");
+-        return;
+-    }
 -
--exit:
--    hmp_handle_error(mon, local_err);
+-    aio_context =3D blk_get_aio_context(blk);
+-    aio_context_acquire(aio_context);
+-
+-    bs =3D blk_bs(blk);
+-    if (bs) {
+-        if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_DRIVE_DEL, &local_err)) {
+-            error_report_err(local_err);
+-            aio_context_release(aio_context);
+-            return;
+-        }
+-
+-        blk_remove_bs(blk);
+-    }
+-
+-    /* Make the BlockBackend and the attached BlockDriverState anonymous *=
+/
+-    monitor_remove_blk(blk);
+-
+-    /* If this BlockBackend has a device attached to it, its refcount will=
+ be
+-     * decremented when the device is removed; otherwise we have to do so =
+here.
+-     */
+-    if (blk_get_attached_dev(blk)) {
+-        /* Further I/O must not pause the guest */
+-        blk_set_on_error(blk, BLOCKDEV_ON_ERROR_REPORT,
+-                         BLOCKDEV_ON_ERROR_REPORT);
+-    } else {
+-        blk_unref(blk);
+-    }
+-
+-    aio_context_release(aio_context);
 -}
 -
--void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
--{
--    const char *device =3D qdict_get_str(qdict, "device");
--    const char *name =3D qdict_get_try_str(qdict, "name");
--    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
--    Error *local_err =3D NULL;
+ void qmp_block_resize(bool has_device, const char *device,
+                       bool has_node_name, const char *node_name,
+                       int64_t size, Error **errp)
+diff --git a/include/block/block-hmp-commands.h b/include/block/block-hmp-c=
+ommands.h
+index 4f9033a8a6..c5e394c0fc 100644
+--- a/include/block/block-hmp-commands.h
++++ b/include/block/block-hmp-commands.h
+@@ -5,4 +5,7 @@
+=20
+ void hmp_drive_add(Monitor *mon, const QDict *qdict);
+=20
++void hmp_commit(Monitor *mon, const QDict *qdict);
++void hmp_drive_del(Monitor *mon, const QDict *qdict);
++
+ #endif
+diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+index d34c4920dc..a86d99b3d8 100644
+--- a/include/sysemu/blockdev.h
++++ b/include/sysemu/blockdev.h
+@@ -57,8 +57,4 @@ QemuOpts *drive_add(BlockInterfaceType type, int index, c=
+onst char *file,
+ DriveInfo *drive_new(QemuOpts *arg, BlockInterfaceType block_default_type,
+                      Error **errp);
+=20
+-/* device-hotplug */
 -
--    qmp_nbd_server_add(device, !!name, name, true, writable,
--                       false, NULL, &local_err);
--    hmp_handle_error(mon, local_err);
--}
--
--void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
--{
--    const char *name =3D qdict_get_str(qdict, "name");
--    bool force =3D qdict_get_try_bool(qdict, "force", false);
--    Error *err =3D NULL;
--
--    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
--    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
--    hmp_handle_error(mon, err);
--}
--
--void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
--{
--    Error *err =3D NULL;
--
--    qmp_nbd_server_stop(&err);
--    hmp_handle_error(mon, err);
--}
--
- void hmp_chardev_add(Monitor *mon, const QDict *qdict)
- {
-     const char *args =3D qdict_get_str(qdict, "args");
+-void hmp_commit(Monitor *mon, const QDict *qdict);
+-void hmp_drive_del(Monitor *mon, const QDict *qdict);
+ #endif
 --=20
 2.17.2
 
