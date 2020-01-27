@@ -2,54 +2,78 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD82AC32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9247C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:01:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6355820661
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6355820661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A45B1208CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:01:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAmCPEsj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A45B1208CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw24o-0006H4-He
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:57:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46131)
+	id 1iw293-0000Mi-Mk
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 06:01:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iw245-0005ne-R4
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:56:23 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iw27E-0007Hu-CY
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iw243-0006hh-AS
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:56:21 -0500
-Resent-Date: Mon, 27 Jan 2020 05:56:21 -0500
-Resent-Message-Id: <E1iw243-0006hh-AS@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21106)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iw243-0006fZ-2l; Mon, 27 Jan 2020 05:56:19 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1580122559147946.5577551513314;
- Mon, 27 Jan 2020 02:55:59 -0800 (PST)
-In-Reply-To: <20200127103647.17761-1-mlevitsk@redhat.com>
+ (envelope-from <mlevitsk@redhat.com>) id 1iw27B-0001Gh-V0
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:59:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43165
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw27B-0001GI-Rz
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:59:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580122773;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ie9fkpG4v/gcQbHZbleauYkbPlpwvxo3vJqIIqT/WGw=;
+ b=gAmCPEsjBkxMNtiYiPnOF5yK8GuA8ojaLg48IG9n5fmT4XdlT/8IMAytX7Vx1i2EKjLd4y
+ kAPQwazsn/8gKHc+CKDPg6VymGkKQv52xK17lotDbHkLOzuQ6gx0ZIDkCz5fT3CMc+wG7E
+ oaqy9L2jWXcNr8KxyEMxhddPwvh32z8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-317-QarHaZkAOkqyGXW59Zx5vQ-1; Mon, 27 Jan 2020 05:59:29 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8885A184BBA4;
+ Mon, 27 Jan 2020 10:59:28 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 28BDA60BF1;
+ Mon, 27 Jan 2020 10:59:23 +0000 (UTC)
+Message-ID: <d5eb3c52984afca9c9afb1436313ccc1cd305e04.camel@redhat.com>
 Subject: Re: [PATCH v3 00/13] RFC: [for 5.0]: HMP monitor handlers cleanups
-Message-ID: <158012255772.23531.2251214730955729844@f6d1ed32ca6b>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mlevitsk@redhat.com
-Date: Mon, 27 Jan 2020 02:55:59 -0800 (PST)
-X-ZohoMailClient: External
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 27 Jan 2020 12:59:23 +0200
+In-Reply-To: <158012255772.23531.2251214730955729844@f6d1ed32ca6b>
+References: <158012255772.23531.2251214730955729844@f6d1ed32ca6b>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: QarHaZkAOkqyGXW59Zx5vQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,255 +85,369 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kraxel@redhat.com,
- mlevitsk@redhat.com
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
+ mreitz@redhat.com, kraxel@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyNzEwMzY0Ny4xNzc2
-MS0xLW1sZXZpdHNrQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDEyNzEwMzY0Ny4xNzc2
-MS0xLW1sZXZpdHNrQHJlZGhhdC5jb20KU3ViamVjdDogW1BBVENIIHYzIDAwLzEzXSBSRkM6IFtm
-b3IgNS4wXTogSE1QIG1vbml0b3IgaGFuZGxlcnMgY2xlYW51cHMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
-CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMTU3OTc3OTUyNS0yMDA2NS0xLWdpdC1zZW5k
-LWVtYWlsLWltYW1tZWRvQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTc5Nzc5NTI1LTIwMDY1LTEt
-Z2l0LXNlbmQtZW1haWwtaW1hbW1lZG9AcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBw
-YXRjaGV3LzIwMjAwMTI0MTAwMTU5LjczNjIwOS0xLXN0ZWZhbmhhQHJlZGhhdC5jb20gLT4gcGF0
-Y2hldy8yMDIwMDEyNDEwMDE1OS43MzYyMDktMS1zdGVmYW5oYUByZWRoYXQuY29tCiAtIFt0YWcg
-dXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDAxMjQxNjI2MDYuODc4Ny0xLXBldGVyLm1heWRlbGxA
-bGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMjAwMTI0MTYyNjA2Ljg3ODctMS1wZXRlci5tYXlkZWxs
-QGxpbmFyby5vcmcKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDEyNDE3Mjk1NC4y
-ODQ4MS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMjAwMTI0MTcyOTU0
-LjI4NDgxLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
-dGNoZXcvMjAyMDAxMjcxMDM2NDcuMTc3NjEtMS1tbGV2aXRza0ByZWRoYXQuY29tIC0+IHBhdGNo
-ZXcvMjAyMDAxMjcxMDM2NDcuMTc3NjEtMS1tbGV2aXRza0ByZWRoYXQuY29tClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKOWQ3ZTRlNiBtb25pdG9yL2htcDogUHJlZmVyIHRvIHVzZSBo
-bXBfaGFuZGxlX2Vycm9yIGZvciBlcnJvciByZXBvcnRpbmcgaW4gYmxvY2sgaG1wIGNvbW1hbmRz
-CmE1NDk5NzEgYWRkICdlcnJvcicgcHJlZml4IHRvIHZyZXBvcnQKN2M3ZGEzYSBtb25pdG9yOiBN
-b3ZlIGhtcF9kcml2ZV9hZGRfbm9kZSB0byBibG9jay1obXAtY21kcy5jCmEyYTAyNjUgbW9uaXRv
-ci9obXA6IG1vdmUgaG1wX2luZm9fYmxvY2sqIHRvIGJsb2NrLWhtcC1jbWRzLmMKZDdmMTNkZSBt
-b25pdG9yL2htcDogbW92ZSByZW1haW5pbmcgaG1wX2Jsb2NrKiBmdW5jdGlvbnMgdG8gYmxvY2st
-aG1wLWNtZHMuYwpjMDY3NDk5IG1vbml0b3IvaG1wOiBtb3ZlIGhtcF9uYmRfc2VydmVyKiB0byBi
-bG9jay1obXAtY21kcy5jCmY1ZmFiOTQgbW9uaXRvci9obXA6IG1vdmUgaG1wX3NuYXBzaG90Xyog
-dG8gYmxvY2staG1wLWNtZHMuYwo0Y2IyNmY5IG1vbml0b3IvaG1wOiBtb3ZlIGhtcF9ibG9ja19q
-b2IqIHRvIGJsb2NrLWhtcC1jbWRzLmMKOTc5NTNkNSBtb25pdG9yL2htcDogbW92ZSBobXBfZHJp
-dmVfbWlycm9yIGFuZCBobXBfZHJpdmVfYmFja3VwIHRvIGJsb2NrLWhtcC1jbWRzLmMKMDBkYzNl
-OCBtb25pdG9yL2htcDogbW92ZSBobXBfZHJpdmVfZGVsIGFuZCBobXBfY29tbWl0IHRvIGJsb2Nr
-LWhtcC1jbWRzLmMKYTRhYTE4NCBtb25pdG9yL2htcDogcmVuYW1lIGRldmljZS1ob3RwbHVnLmMg
-dG8gYmxvY2svbW9uaXRvci9ibG9jay1obXAtY21kcy5jCmQ3NjM3NGEgbW9uaXRvci9obXA6IHVu
-aW5saW5lIGFkZF9pbml0X2RyaXZlCjEzZGVjYzkgdXNiL2Rldi1zdG9yYWdlOiByZW1vdmUgdW51
-c2VkIGluY2x1ZGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTMgQ2hlY2tpbmcgY29tbWl0IDEz
-ZGVjYzlhNTM5ZCAodXNiL2Rldi1zdG9yYWdlOiByZW1vdmUgdW51c2VkIGluY2x1ZGUpCjIvMTMg
-Q2hlY2tpbmcgY29tbWl0IGQ3NjM3NGE4ODI5ZCAobW9uaXRvci9obXA6IHVuaW5saW5lIGFkZF9p
-bml0X2RyaXZlKQozLzEzIENoZWNraW5nIGNvbW1pdCBhNGFhMTg0MmQzOWIgKG1vbml0b3IvaG1w
-OiByZW5hbWUgZGV2aWNlLWhvdHBsdWcuYyB0byBibG9jay9tb25pdG9yL2Jsb2NrLWhtcC1jbWRz
-LmMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzU4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgODMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8xMyBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgo0LzEzIENoZWNraW5nIGNvbW1pdCAwMGRjM2U4YzBjYzUgKG1v
-bml0b3IvaG1wOiBtb3ZlIGhtcF9kcml2ZV9kZWwgYW5kIGhtcF9jb21taXQgdG8gYmxvY2staG1w
-LWNtZHMuYykKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNl
-cGFyYXRlIGxpbmUKIzgxOiBGSUxFOiBibG9jay9tb25pdG9yL2Jsb2NrLWhtcC1jbWRzLmM6MTE5
-OgorICAgIC8qIElmIHRoaXMgQmxvY2tCYWNrZW5kIGhhcyBhIGRldmljZSBhdHRhY2hlZCB0byBp
-dCwgaXRzIHJlZmNvdW50IHdpbGwgYmUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjM0
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMTMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8x
-MyBDaGVja2luZyBjb21taXQgOTc5NTNkNTgzYzI1IChtb25pdG9yL2htcDogbW92ZSBobXBfZHJp
-dmVfbWlycm9yIGFuZCBobXBfZHJpdmVfYmFja3VwIHRvIGJsb2NrLWhtcC1jbWRzLmMpCjYvMTMg
-Q2hlY2tpbmcgY29tbWl0IDRjYjI2ZjljOWFmMSAobW9uaXRvci9obXA6IG1vdmUgaG1wX2Jsb2Nr
-X2pvYiogdG8gYmxvY2staG1wLWNtZHMuYykKNy8xMyBDaGVja2luZyBjb21taXQgZjVmYWI5NDU0
-YWNhIChtb25pdG9yL2htcDogbW92ZSBobXBfc25hcHNob3RfKiB0byBibG9jay1obXAtY21kcy5j
-KQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUg
-bGluZQojMjk6IEZJTEU6IGJsb2NrL21vbml0b3IvYmxvY2staG1wLWNtZHMuYzoyOTQ6CisgICAg
-ICAgIC8qIEluIHRoZSBmdXR1cmUsIGlmICdzbmFwc2hvdC1maWxlJyBpcyBub3Qgc3BlY2lmaWVk
-LCB0aGUgc25hcHNob3QKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSAqIG9uIHN1YnNlcXVl
-bnQgbGluZXMKIzMwOiBGSUxFOiBibG9jay9tb25pdG9yL2Jsb2NrLWhtcC1jbWRzLmM6Mjk1Ogor
-ICAgICAgICAvKiBJbiB0aGUgZnV0dXJlLCBpZiAnc25hcHNob3QtZmlsZScgaXMgbm90IHNwZWNp
-ZmllZCwgdGhlIHNuYXBzaG90CisgICAgICAgICAgIHdpbGwgYmUgdGFrZW4gaW50ZXJuYWxseS4g
-VG9kYXkgaXQncyBhY3R1YWxseSByZXF1aXJlZC4gKi8KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRz
-IHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMzA6IEZJTEU6IGJsb2NrL21v
-bml0b3IvYmxvY2staG1wLWNtZHMuYzoyOTU6CisgICAgICAgICAgIHdpbGwgYmUgdGFrZW4gaW50
-ZXJuYWxseS4gVG9kYXkgaXQncyBhY3R1YWxseSByZXF1aXJlZC4gKi8KCnRvdGFsOiAwIGVycm9y
-cywgMyB3YXJuaW5ncywgMTIwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMTMgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KOC8xMyBDaGVja2luZyBjb21taXQgYzA2NzQ5OTM1NTM1IChtb25pdG9y
-L2htcDogbW92ZSBobXBfbmJkX3NlcnZlciogdG8gYmxvY2staG1wLWNtZHMuYykKV0FSTklORzog
-QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzYwOiBG
-SUxFOiBibG9jay9tb25pdG9yL2Jsb2NrLWhtcC1jbWRzLmM6MzYzOgorICAgIC8qIFRoZW4gdHJ5
-IGFkZGluZyBhbGwgYmxvY2sgZGV2aWNlcy4gIElmIG9uZSBmYWlscywgY2xvc2UgYWxsIGFuZAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8x
-MyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzEzIENoZWNraW5nIGNvbW1pdCBkN2YxM2Rl
-ZDE2YjQgKG1vbml0b3IvaG1wOiBtb3ZlIHJlbWFpbmluZyBobXBfYmxvY2sqIGZ1bmN0aW9ucyB0
-byBibG9jay1obXAtY21kcy5jKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5n
-IC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNzU6IEZJTEU6IGJsb2NrL21vbml0b3IvYmxvY2staG1w
-LWNtZHMuYzo0Njg6CisgICAgLyogcW1wX2Jsb2NrX3NldF9pb190aHJvdHRsZSBoYXMgc2VwYXJh
-dGUgcGFyYW1ldGVycyBmb3IgdGhlCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFp
-bGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzc3OiBGSUxFOiBibG9jay9tb25pdG9yL2Jsb2Nr
-LWhtcC1jbWRzLmM6NDcwOgorICAgICAqIHZlcnNpb24gaGFzIG9ubHkgb25lLCBzbyB3ZSBtdXN0
-IGRlY2lkZSB3aGljaCBvbmUgdG8gcGFzcy4gKi8KCkVSUk9SOiAiZm9vKiBiYXIiIHNob3VsZCBi
-ZSAiZm9vICpiYXIiCiMxMDU6IEZJTEU6IGJsb2NrL21vbml0b3IvYmxvY2staG1wLWNtZHMuYzo0
-OTg6CisgICAgY29uc3QgY2hhciogZGV2aWNlID0gcWRpY3RfZ2V0X3N0cihxZGljdCwgImRldmlj
-ZSIpOwoKRVJST1I6ICJmb28qIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzEwNjogRklMRTog
-YmxvY2svbW9uaXRvci9ibG9jay1obXAtY21kcy5jOjQ5OToKKyAgICBjb25zdCBjaGFyKiBjb21t
-YW5kID0gcWRpY3RfZ2V0X3N0cihxZGljdCwgImNvbW1hbmQiKTsKCnRvdGFsOiAyIGVycm9ycywg
-MiB3YXJuaW5ncywgMzU5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTMgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCjEwLzEzIENoZWNraW5nIGNvbW1pdCBhMmEwMjY1YzA5MTAgKG1vbml0b3Iv
-aG1wOiBtb3ZlIGhtcF9pbmZvX2Jsb2NrKiB0byBibG9jay1obXAtY21kcy5jKQpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjc6IEZJTEU6IGJsb2NrL21vbml0b3IvYmxvY2staG1w
-LWNtZHMuYzo1OTM6CisgICAgICAgIGlmIChpbmZvLT5oYXNfaW9fc3RhdHVzICYmIGluZm8tPmlv
-X3N0YXR1cyAhPSBCTE9DS19ERVZJQ0VfSU9fU1RBVFVTX09LKSB7CgpXQVJOSU5HOiBCbG9jayBj
-b21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzgxOiBGSUxFOiBi
-bG9jay9tb25pdG9yL2Jsb2NrLWhtcC1jbWRzLmM6OTA3OgorICAgICAgICAgICAgLyogVGhlIElE
-IGlzIG5vdCBndWFyYW50ZWVkIHRvIGJlIHRoZSBzYW1lIG9uIGFsbCBpbWFnZXMsIHNvCgp0b3Rh
-bDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDg0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xMyBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8xMyBDaGVja2luZyBjb21taXQgN2M3ZGEzYTMx
-MWEzIChtb25pdG9yOiBNb3ZlIGhtcF9kcml2ZV9hZGRfbm9kZSB0byBibG9jay1obXAtY21kcy5j
-KQoxMi8xMyBDaGVja2luZyBjb21taXQgYTU0OTk3MWIzNDlmIChhZGQgJ2Vycm9yJyBwcmVmaXgg
-dG8gdnJlcG9ydCkKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzUxOiBGSUxFOiB0ZXN0cy9x
-ZW11LWlvdGVzdHMvMDI2Lm91dDo2OgorRXZlbnQ6IGwxX3VwZGF0ZTsgZXJybm86IDU7IGltbTog
-b2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzYyOiBG
-SUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2Lm91dDoxNjoKK0V2ZW50OiBsMV91cGRhdGU7IGVy
-cm5vOiA1OyBpbW06IG9mZjsgb25jZTogb2ZmOyB3cml0ZSAkCgpFUlJPUjogdHJhaWxpbmcgd2hp
-dGVzcGFjZQojNzk6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjMwOgorRXZlbnQ6
-IGwxX3VwZGF0ZTsgZXJybm86IDI4OyBpbW06IG9mZjsgb25jZTogb247IHdyaXRlICQKCkVSUk9S
-OiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM5MDogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5v
-dXQ6NDA6CitFdmVudDogbDFfdXBkYXRlOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBvZmY7
-IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxMDc6IEZJTEU6IHRlc3RzL3Fl
-bXUtaW90ZXN0cy8wMjYub3V0OjU0OgorRXZlbnQ6IGwyX2xvYWQ7IGVycm5vOiA1OyBpbW06IG9m
-Zjsgb25jZTogb247IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxMTY6IEZJ
-TEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjcwOgorRXZlbnQ6IGwyX2xvYWQ7IGVycm5v
-OiA1OyBpbW06IG9mZjsgb25jZTogb2ZmOyB3cml0ZSAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVz
-cGFjZQojMTI1OiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2Lm91dDo4NjoKK0V2ZW50OiBs
-Ml9sb2FkOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRy
-YWlsaW5nIHdoaXRlc3BhY2UKIzEzNDogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6
-MTAyOgorRXZlbnQ6IGwyX2xvYWQ7IGVycm5vOiAyODsgaW1tOiBvZmY7IG9uY2U6IG9mZjsgd3Jp
-dGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzE0MzogRklMRTogdGVzdHMvcWVtdS1p
-b3Rlc3RzLzAyNi5vdXQ6MTE4OgorRXZlbnQ6IGwyX3VwZGF0ZTsgZXJybm86IDU7IGltbTogb2Zm
-OyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzE1NDogRklM
-RTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MTI4OgorRXZlbnQ6IGwyX3VwZGF0ZTsgZXJy
-bm86IDU7IGltbTogb2ZmOyBvbmNlOiBvZmY7IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0
-ZXNwYWNlCiMxNzE6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjE0MjoKK0V2ZW50
-OiBsMl91cGRhdGU7IGVycm5vOiAyODsgaW1tOiBvZmY7IG9uY2U6IG9uOyB3cml0ZSAkCgpFUlJP
-UjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTgyOiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2
-Lm91dDoxNTI6CitFdmVudDogbDJfdXBkYXRlOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBv
-ZmY7IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxOTk6IEZJTEU6IHRlc3Rz
-L3FlbXUtaW90ZXN0cy8wMjYub3V0OjE2NjoKK0V2ZW50OiBsMl9hbGxvY193cml0ZTsgZXJybm86
-IDU7IGltbTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3Bh
-Y2UKIzIxMDogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MTc2OgorRXZlbnQ6IGwy
-X2FsbG9jX3dyaXRlOyBlcnJubzogNTsgaW1tOiBvZmY7IG9uY2U6IG9mZjsgd3JpdGUgJAoKRVJS
-T1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzIyNzogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAy
-Ni5vdXQ6MTkwOgorRXZlbnQ6IGwyX2FsbG9jX3dyaXRlOyBlcnJubzogMjg7IGltbTogb2ZmOyBv
-bmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzIzODogRklMRTog
-dGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MjAwOgorRXZlbnQ6IGwyX2FsbG9jX3dyaXRlOyBl
-cnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBvZmY7IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3
-aGl0ZXNwYWNlCiMyNTU6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjIxNDoKK0V2
-ZW50OiB3cml0ZV9haW87IGVycm5vOiA1OyBpbW06IG9mZjsgb25jZTogb247IHdyaXRlICQKCkVS
-Uk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyNjY6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8w
-MjYub3V0OjIyNDoKK0V2ZW50OiB3cml0ZV9haW87IGVycm5vOiA1OyBpbW06IG9mZjsgb25jZTog
-b2ZmOyB3cml0ZSAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjgzOiBGSUxFOiB0ZXN0
-cy9xZW11LWlvdGVzdHMvMDI2Lm91dDoyMzg6CitFdmVudDogd3JpdGVfYWlvOyBlcnJubzogMjg7
-IGltbTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UK
-IzI5NDogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MjQ4OgorRXZlbnQ6IHdyaXRl
-X2FpbzsgZXJybm86IDI4OyBpbW06IG9mZjsgb25jZTogb2ZmOyB3cml0ZSAkCgpFUlJPUjogdHJh
-aWxpbmcgd2hpdGVzcGFjZQojMzExOiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2Lm91dDoy
-NjI6CitFdmVudDogcmVmYmxvY2tfbG9hZDsgZXJybm86IDU7IGltbTogb2ZmOyBvbmNlOiBvbjsg
-d3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzMyMjogRklMRTogdGVzdHMvcWVt
-dS1pb3Rlc3RzLzAyNi5vdXQ6MjcyOgorRXZlbnQ6IHJlZmJsb2NrX2xvYWQ7IGVycm5vOiA1OyBp
-bW06IG9mZjsgb25jZTogb2ZmOyB3cml0ZSAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQoj
-MzM5OiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2Lm91dDoyODY6CitFdmVudDogcmVmYmxv
-Y2tfbG9hZDsgZXJybm86IDI4OyBpbW06IG9mZjsgb25jZTogb247IHdyaXRlICQKCkVSUk9SOiB0
-cmFpbGluZyB3aGl0ZXNwYWNlCiMzNTA6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0
-OjI5NjoKK0V2ZW50OiByZWZibG9ja19sb2FkOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBv
-ZmY7IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzNjc6IEZJTEU6IHRlc3Rz
-L3FlbXUtaW90ZXN0cy8wMjYub3V0OjMxMDoKK0V2ZW50OiByZWZibG9ja191cGRhdGVfcGFydDsg
-ZXJybm86IDU7IGltbTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdo
-aXRlc3BhY2UKIzM3ODogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MzIwOgorRXZl
-bnQ6IHJlZmJsb2NrX3VwZGF0ZV9wYXJ0OyBlcnJubzogNTsgaW1tOiBvZmY7IG9uY2U6IG9mZjsg
-d3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzM5NTogRklMRTogdGVzdHMvcWVt
-dS1pb3Rlc3RzLzAyNi5vdXQ6MzM0OgorRXZlbnQ6IHJlZmJsb2NrX3VwZGF0ZV9wYXJ0OyBlcnJu
-bzogMjg7IGltbTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRl
-c3BhY2UKIzQwNjogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MzQ0OgorRXZlbnQ6
-IHJlZmJsb2NrX3VwZGF0ZV9wYXJ0OyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBvZmY7IHdy
-aXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0MjM6IEZJTEU6IHRlc3RzL3FlbXUt
-aW90ZXN0cy8wMjYub3V0OjM1ODoKK0V2ZW50OiByZWZibG9ja19hbGxvYzsgZXJybm86IDU7IGlt
-bTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQz
-NDogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MzY4OgorRXZlbnQ6IHJlZmJsb2Nr
-X2FsbG9jOyBlcnJubzogNTsgaW1tOiBvZmY7IG9uY2U6IG9mZjsgd3JpdGUgJAoKRVJST1I6IHRy
-YWlsaW5nIHdoaXRlc3BhY2UKIzQ1MTogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6
-MzgyOgorRXZlbnQ6IHJlZmJsb2NrX2FsbG9jOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBv
-bjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ2MjogRklMRTogdGVzdHMv
-cWVtdS1pb3Rlc3RzLzAyNi5vdXQ6MzkyOgorRXZlbnQ6IHJlZmJsb2NrX2FsbG9jOyBlcnJubzog
-Mjg7IGltbTogb2ZmOyBvbmNlOiBvZmY7IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNw
-YWNlCiM0Nzk6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjQwNjoKK0V2ZW50OiBj
-bHVzdGVyX2FsbG9jOyBlcnJubzogNTsgaW1tOiBvZmY7IG9uY2U6IG9uOyB3cml0ZSAkCgpFUlJP
-UjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNDg4OiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2
-Lm91dDo0MTY6CitFdmVudDogY2x1c3Rlcl9hbGxvYzsgZXJybm86IDU7IGltbTogb2ZmOyBvbmNl
-OiBvZmY7IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0OTc6IEZJTEU6IHRl
-c3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjQyNjoKK0V2ZW50OiBjbHVzdGVyX2FsbG9jOyBlcnJu
-bzogMjg7IGltbTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRl
-c3BhY2UKIzUwNjogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6NDM2OgorRXZlbnQ6
-IGNsdXN0ZXJfYWxsb2M7IGVycm5vOiAyODsgaW1tOiBvZmY7IG9uY2U6IG9mZjsgd3JpdGUgJAoK
-RVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzUxNTogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3Rz
-LzAyNi5vdXQ6NDQ5OgorRXZlbnQ6IHJlZmJsb2NrX2FsbG9jX2hvb2t1cDsgZXJybm86IDI4OyBp
-bW06IG9mZjsgb25jZTogb247IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM1
-MjY6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjQ1OToKK0V2ZW50OiByZWZibG9j
-a19hbGxvY19ob29rdXA7IGVycm5vOiAyODsgaW1tOiBvZmY7IG9uY2U6IG9mZjsgd3JpdGUgJAoK
-RVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzU0MzogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3Rz
-LzAyNi5vdXQ6NDczOgorRXZlbnQ6IHJlZmJsb2NrX2FsbG9jX3dyaXRlOyBlcnJubzogMjg7IGlt
-bTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzU1
-NDogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAyNi5vdXQ6NDgzOgorRXZlbnQ6IHJlZmJsb2Nr
-X2FsbG9jX3dyaXRlOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBvZmY7IHdyaXRlICQKCkVS
-Uk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM1NzE6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8w
-MjYub3V0OjQ5NzoKK0V2ZW50OiByZWZibG9ja19hbGxvY193cml0ZV9ibG9ja3M7IGVycm5vOiAy
-ODsgaW1tOiBvZmY7IG9uY2U6IG9uOyB3cml0ZSAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFj
-ZQojNTgyOiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2Lm91dDo1MDc6CitFdmVudDogcmVm
-YmxvY2tfYWxsb2Nfd3JpdGVfYmxvY2tzOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBvZmY7
-IHdyaXRlICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM1OTk6IEZJTEU6IHRlc3RzL3Fl
-bXUtaW90ZXN0cy8wMjYub3V0OjUyMToKK0V2ZW50OiByZWZibG9ja19hbGxvY193cml0ZV90YWJs
-ZTsgZXJybm86IDI4OyBpbW06IG9mZjsgb25jZTogb247IHdyaXRlICQKCkVSUk9SOiB0cmFpbGlu
-ZyB3aGl0ZXNwYWNlCiM2MTA6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8wMjYub3V0OjUzMToK
-K0V2ZW50OiByZWZibG9ja19hbGxvY193cml0ZV90YWJsZTsgZXJybm86IDI4OyBpbW06IG9mZjsg
-b25jZTogb2ZmOyB3cml0ZSAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNjI3OiBGSUxF
-OiB0ZXN0cy9xZW11LWlvdGVzdHMvMDI2Lm91dDo1NDU6CitFdmVudDogcmVmYmxvY2tfYWxsb2Nf
-c3dpdGNoX3RhYmxlOyBlcnJubzogMjg7IGltbTogb2ZmOyBvbmNlOiBvbjsgd3JpdGUgJAoKRVJS
-T1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzYzODogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzAy
-Ni5vdXQ6NTU1OgorRXZlbnQ6IHJlZmJsb2NrX2FsbG9jX3N3aXRjaF90YWJsZTsgZXJybm86IDI4
-OyBpbW06IG9mZjsgb25jZTogb2ZmOyB3cml0ZSAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFj
-ZQojNzgxOiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMDQ5Lm91dDoxMDc6CitxZW11LWltZzog
-ZXJyb3I6IEludmFsaWQgaW1hZ2Ugc2l6ZSBzcGVjaWZpZWQhIFlvdSBtYXkgdXNlIGssIE0sIEcs
-IFQsIFAgb3IgRSBzdWZmaXhlcyBmb3IgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzc5
-MzogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzA0OS5vdXQ6MTE2OgorcWVtdS1pbWc6IGVycm9y
-OiBJbnZhbGlkIGltYWdlIHNpemUgc3BlY2lmaWVkISBZb3UgbWF5IHVzZSBrLCBNLCBHLCBULCBQ
-IG9yIEUgc3VmZml4ZXMgZm9yICQKCnRvdGFsOiA0OCBlcnJvcnMsIDAgd2FybmluZ3MsIDMwNTMg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMTMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEz
-LzEzIENoZWNraW5nIGNvbW1pdCA5ZDdlNGU2ZWJlNWQgKG1vbml0b3IvaG1wOiBQcmVmZXIgdG8g
-dXNlIGhtcF9oYW5kbGVfZXJyb3IgZm9yIGVycm9yIHJlcG9ydGluZyBpbiBibG9jayBobXAgY29t
-bWFuZHMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
-LzIwMjAwMTI3MTAzNjQ3LjE3NzYxLTEtbWxldml0c2tAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNr
-cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Mon, 2020-01-27 at 02:55 -0800, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200127103647.17761-1-mlevitsk@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+
+All of these errors are either from code that I moved, and I wanted to
+move it as is and from update of iotests, which shows that some of our
+error messages end with space, which is stripped by iotest filter,
+but once you update the iotest output, it appears again. I'll fix that
+in later version of that WIP patch.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> Type: series
+> Message-id: 20200127103647.17761-1-mlevitsk@redhat.com
+> Subject: [PATCH v3 00/13] RFC: [for 5.0]: HMP monitor handlers cleanups
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  - [tag update]      patchew/1579779525-20065-1-git-send-email-imammedo@redhat.com -> patchew/1579779525-20065-1-git-send-email-imammedo@redhat.com
+>  - [tag update]      patchew/20200124100159.736209-1-stefanha@redhat.com -> patchew/20200124100159.736209-1-stefanha@redhat.com
+>  - [tag update]      patchew/20200124162606.8787-1-peter.maydell@linaro.org -> patchew/20200124162606.8787-1-peter.maydell@linaro.org
+>  - [tag update]      patchew/20200124172954.28481-1-peter.maydell@linaro.org -> patchew/20200124172954.28481-1-peter.maydell@linaro.org
+>  * [new tag]         patchew/20200127103647.17761-1-mlevitsk@redhat.com -> patchew/20200127103647.17761-1-mlevitsk@redhat.com
+> Switched to a new branch 'test'
+> 9d7e4e6 monitor/hmp: Prefer to use hmp_handle_error for error reporting in block hmp commands
+> a549971 add 'error' prefix to vreport
+> 7c7da3a monitor: Move hmp_drive_add_node to block-hmp-cmds.c
+> a2a0265 monitor/hmp: move hmp_info_block* to block-hmp-cmds.c
+> d7f13de monitor/hmp: move remaining hmp_block* functions to block-hmp-cmds.c
+> c067499 monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
+> f5fab94 monitor/hmp: move hmp_snapshot_* to block-hmp-cmds.c
+> 4cb26f9 monitor/hmp: move hmp_block_job* to block-hmp-cmds.c
+> 97953d5 monitor/hmp: move hmp_drive_mirror and hmp_drive_backup to block-hmp-cmds.c
+> 00dc3e8 monitor/hmp: move hmp_drive_del and hmp_commit to block-hmp-cmds.c
+> a4aa184 monitor/hmp: rename device-hotplug.c to block/monitor/block-hmp-cmds.c
+> d76374a monitor/hmp: uninline add_init_drive
+> 13decc9 usb/dev-storage: remove unused include
+> 
+> === OUTPUT BEGIN ===
+> 1/13 Checking commit 13decc9a539d (usb/dev-storage: remove unused include)
+> 2/13 Checking commit d76374a8829d (monitor/hmp: uninline add_init_drive)
+> 3/13 Checking commit a4aa1842d39b (monitor/hmp: rename device-hotplug.c to block/monitor/block-hmp-cmds.c)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #58: 
+> new file mode 100644
+> 
+> total: 0 errors, 1 warnings, 83 lines checked
+> 
+> Patch 3/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 4/13 Checking commit 00dc3e8c0cc5 (monitor/hmp: move hmp_drive_del and hmp_commit to block-hmp-cmds.c)
+> WARNING: Block comments use a leading /* on a separate line
+> #81: FILE: block/monitor/block-hmp-cmds.c:119:
+> +    /* If this BlockBackend has a device attached to it, its refcount will be
+> 
+> total: 0 errors, 1 warnings, 234 lines checked
+> 
+> Patch 4/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 5/13 Checking commit 97953d583c25 (monitor/hmp: move hmp_drive_mirror and hmp_drive_backup to block-hmp-cmds.c)
+> 6/13 Checking commit 4cb26f9c9af1 (monitor/hmp: move hmp_block_job* to block-hmp-cmds.c)
+> 7/13 Checking commit f5fab9454aca (monitor/hmp: move hmp_snapshot_* to block-hmp-cmds.c)
+> WARNING: Block comments use a leading /* on a separate line
+> #29: FILE: block/monitor/block-hmp-cmds.c:294:
+> +        /* In the future, if 'snapshot-file' is not specified, the snapshot
+> 
+> WARNING: Block comments use * on subsequent lines
+> #30: FILE: block/monitor/block-hmp-cmds.c:295:
+> +        /* In the future, if 'snapshot-file' is not specified, the snapshot
+> +           will be taken internally. Today it's actually required. */
+> 
+> WARNING: Block comments use a trailing */ on a separate line
+> #30: FILE: block/monitor/block-hmp-cmds.c:295:
+> +           will be taken internally. Today it's actually required. */
+> 
+> total: 0 errors, 3 warnings, 120 lines checked
+> 
+> Patch 7/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 8/13 Checking commit c06749935535 (monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c)
+> WARNING: Block comments use a leading /* on a separate line
+> #60: FILE: block/monitor/block-hmp-cmds.c:363:
+> +    /* Then try adding all block devices.  If one fails, close all and
+> 
+> total: 0 errors, 1 warnings, 217 lines checked
+> 
+> Patch 8/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 9/13 Checking commit d7f13ded16b4 (monitor/hmp: move remaining hmp_block* functions to block-hmp-cmds.c)
+> WARNING: Block comments use a leading /* on a separate line
+> #75: FILE: block/monitor/block-hmp-cmds.c:468:
+> +    /* qmp_block_set_io_throttle has separate parameters for the
+> 
+> WARNING: Block comments use a trailing */ on a separate line
+> #77: FILE: block/monitor/block-hmp-cmds.c:470:
+> +     * version has only one, so we must decide which one to pass. */
+> 
+> ERROR: "foo* bar" should be "foo *bar"
+> #105: FILE: block/monitor/block-hmp-cmds.c:498:
+> +    const char* device = qdict_get_str(qdict, "device");
+> 
+> ERROR: "foo* bar" should be "foo *bar"
+> #106: FILE: block/monitor/block-hmp-cmds.c:499:
+> +    const char* command = qdict_get_str(qdict, "command");
+> 
+> total: 2 errors, 2 warnings, 359 lines checked
+> 
+> Patch 9/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 10/13 Checking commit a2a0265c0910 (monitor/hmp: move hmp_info_block* to block-hmp-cmds.c)
+> WARNING: line over 80 characters
+> #67: FILE: block/monitor/block-hmp-cmds.c:593:
+> +        if (info->has_io_status && info->io_status != BLOCK_DEVICE_IO_STATUS_OK) {
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #381: FILE: block/monitor/block-hmp-cmds.c:907:
+> +            /* The ID is not guaranteed to be the same on all images, so
+> 
+> total: 0 errors, 2 warnings, 845 lines checked
+> 
+> Patch 10/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 11/13 Checking commit 7c7da3a311a3 (monitor: Move hmp_drive_add_node to block-hmp-cmds.c)
+> 12/13 Checking commit a549971b349f (add 'error' prefix to vreport)
+> ERROR: trailing whitespace
+> #51: FILE: tests/qemu-iotests/026.out:6:
+> +Event: l1_update; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #62: FILE: tests/qemu-iotests/026.out:16:
+> +Event: l1_update; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #79: FILE: tests/qemu-iotests/026.out:30:
+> +Event: l1_update; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #90: FILE: tests/qemu-iotests/026.out:40:
+> +Event: l1_update; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #107: FILE: tests/qemu-iotests/026.out:54:
+> +Event: l2_load; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #116: FILE: tests/qemu-iotests/026.out:70:
+> +Event: l2_load; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #125: FILE: tests/qemu-iotests/026.out:86:
+> +Event: l2_load; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #134: FILE: tests/qemu-iotests/026.out:102:
+> +Event: l2_load; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #143: FILE: tests/qemu-iotests/026.out:118:
+> +Event: l2_update; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #154: FILE: tests/qemu-iotests/026.out:128:
+> +Event: l2_update; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #171: FILE: tests/qemu-iotests/026.out:142:
+> +Event: l2_update; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #182: FILE: tests/qemu-iotests/026.out:152:
+> +Event: l2_update; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #199: FILE: tests/qemu-iotests/026.out:166:
+> +Event: l2_alloc_write; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #210: FILE: tests/qemu-iotests/026.out:176:
+> +Event: l2_alloc_write; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #227: FILE: tests/qemu-iotests/026.out:190:
+> +Event: l2_alloc_write; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #238: FILE: tests/qemu-iotests/026.out:200:
+> +Event: l2_alloc_write; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #255: FILE: tests/qemu-iotests/026.out:214:
+> +Event: write_aio; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #266: FILE: tests/qemu-iotests/026.out:224:
+> +Event: write_aio; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #283: FILE: tests/qemu-iotests/026.out:238:
+> +Event: write_aio; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #294: FILE: tests/qemu-iotests/026.out:248:
+> +Event: write_aio; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #311: FILE: tests/qemu-iotests/026.out:262:
+> +Event: refblock_load; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #322: FILE: tests/qemu-iotests/026.out:272:
+> +Event: refblock_load; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #339: FILE: tests/qemu-iotests/026.out:286:
+> +Event: refblock_load; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #350: FILE: tests/qemu-iotests/026.out:296:
+> +Event: refblock_load; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #367: FILE: tests/qemu-iotests/026.out:310:
+> +Event: refblock_update_part; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #378: FILE: tests/qemu-iotests/026.out:320:
+> +Event: refblock_update_part; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #395: FILE: tests/qemu-iotests/026.out:334:
+> +Event: refblock_update_part; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #406: FILE: tests/qemu-iotests/026.out:344:
+> +Event: refblock_update_part; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #423: FILE: tests/qemu-iotests/026.out:358:
+> +Event: refblock_alloc; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #434: FILE: tests/qemu-iotests/026.out:368:
+> +Event: refblock_alloc; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #451: FILE: tests/qemu-iotests/026.out:382:
+> +Event: refblock_alloc; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #462: FILE: tests/qemu-iotests/026.out:392:
+> +Event: refblock_alloc; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #479: FILE: tests/qemu-iotests/026.out:406:
+> +Event: cluster_alloc; errno: 5; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #488: FILE: tests/qemu-iotests/026.out:416:
+> +Event: cluster_alloc; errno: 5; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #497: FILE: tests/qemu-iotests/026.out:426:
+> +Event: cluster_alloc; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #506: FILE: tests/qemu-iotests/026.out:436:
+> +Event: cluster_alloc; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #515: FILE: tests/qemu-iotests/026.out:449:
+> +Event: refblock_alloc_hookup; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #526: FILE: tests/qemu-iotests/026.out:459:
+> +Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #543: FILE: tests/qemu-iotests/026.out:473:
+> +Event: refblock_alloc_write; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #554: FILE: tests/qemu-iotests/026.out:483:
+> +Event: refblock_alloc_write; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #571: FILE: tests/qemu-iotests/026.out:497:
+> +Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #582: FILE: tests/qemu-iotests/026.out:507:
+> +Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #599: FILE: tests/qemu-iotests/026.out:521:
+> +Event: refblock_alloc_write_table; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #610: FILE: tests/qemu-iotests/026.out:531:
+> +Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #627: FILE: tests/qemu-iotests/026.out:545:
+> +Event: refblock_alloc_switch_table; errno: 28; imm: off; once: on; write $
+> 
+> ERROR: trailing whitespace
+> #638: FILE: tests/qemu-iotests/026.out:555:
+> +Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write $
+> 
+> ERROR: trailing whitespace
+> #781: FILE: tests/qemu-iotests/049.out:107:
+> +qemu-img: error: Invalid image size specified! You may use k, M, G, T, P or E suffixes for $
+> 
+> ERROR: trailing whitespace
+> #793: FILE: tests/qemu-iotests/049.out:116:
+> +qemu-img: error: Invalid image size specified! You may use k, M, G, T, P or E suffixes for $
+> 
+> total: 48 errors, 0 warnings, 3053 lines checked
+> 
+> Patch 12/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 13/13 Checking commit 9d7e4e6ebe5d (monitor/hmp: Prefer to use hmp_handle_error for error reporting in block hmp commands)
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20200127103647.17761-1-mlevitsk@redhat.com/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+
+
 
