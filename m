@@ -2,91 +2,100 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE74C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A90DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 973722467E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:24:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C84572467F
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:26:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LxzTXA/2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973722467E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRuytB4u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84572467F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw9zY-0006V4-Ne
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:24:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53977)
+	id 1iwA1c-00006L-VN
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:26:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1iw9yh-0005rp-Nk
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:23:20 -0500
+ (envelope-from <philmd@redhat.com>) id 1iwA0Q-0007gK-Uf
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:25:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1iw9yg-0005bo-JV
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:23:19 -0500
-Received: from mail-pj1-x102d.google.com ([2607:f8b0:4864:20::102d]:36373)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1iw9yg-0005Wy-BZ
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:23:18 -0500
-Received: by mail-pj1-x102d.google.com with SMTP id gv17so3511382pjb.1
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 11:23:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:subject:cc:from:to:in-reply-to:references:message-id
- :mime-version:content-transfer-encoding;
- bh=JbOpXni6WU5muY6ZX256vLuCT+7/Qgls9M9WK/J6QbA=;
- b=LxzTXA/2FZFrTdc3nMBhrnRTi7FGybheo1WgFZnukzmL8sJyuG8Ha9/ULLTYCLLtlB
- EDKVv78hn6O16mbGvnLBsRlSyVu4vVWu0EJIlR2p5GsXgllRak6jbxfE6wpyoy6/mHGs
- LSLCYihR/bS1vVXRPuSb604uv7oswp0QOeOy6sWDXMKTDi0L+epNoMAl9NrFv0LKEzEX
- vIUyeZIeq6iXEKu5ZqTx7eLHTLwno7DR3ZSW8mhML/0Km89Zy8x25s0zag1gJI1ga90P
- GmIs3vADNEp+1QykkQoEjY+QXnOyZUgj4tDOWL693Ckqo5vdTKGOXiBsjvODslx7trRv
- buIQ==
+ (envelope-from <philmd@redhat.com>) id 1iwA0O-0007fF-Vk
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:25:05 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34682
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwA0O-0007eO-SK
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:25:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580153104;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4w/7ix5bcgPZBVTYwrdl9DtBU/HWjSIyf4OdkV4cNUE=;
+ b=CRuytB4uBG6isXFnXjYWn/AsBRi9FTb7+pFYAC/g+v2g74nQMDzNdKL1ievJTSzJhNDqz5
+ THFqpwUEUg3Nk3JpVgNwq7t+eCqg5sQEBqgaF2WPrABO0NHFUvwT+3RiUtKGiz7+jwXIy0
+ 2daSvyTeNV4+uV7u4pf3dJJSI9VGVTg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-tfdhxpLnPgKfp-W36Gq2nA-1; Mon, 27 Jan 2020 14:24:57 -0500
+Received: by mail-wm1-f72.google.com with SMTP id z7so1377085wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 11:24:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:cc:from:to:in-reply-to:references
- :message-id:mime-version:content-transfer-encoding;
- bh=JbOpXni6WU5muY6ZX256vLuCT+7/Qgls9M9WK/J6QbA=;
- b=VaR5VO6b4Vlq3f00QhuO+iw5IvUd+Y9TtfOST1IcbBmwXpa0vA6CJV4DvUY0PVZXuQ
- 6NwkO7QPJF8BMQeI3reVAkiF0B7uGcg2nCWKoX4NkyDIcoxJWc1NaVFHcbfwcfp/GD4h
- 3lyEwXjSGBWF4p7JTObOGBCfRk+5AlKqOMRn7HnZOCfEUHU3+aw5D7as/pv7AWvrHzuN
- w5Yv0qaJpbCIAnkrzckb7Z1lk9wHmRAAVqXOfmJd6dpGn9JkD8ryRumO9KjmlGIamD+w
- /NluPFII4kc4X/FmyQe6izRnMITC5S/mNEOnfmcP71n8YziXM6COzdULTMKGW9Xiv5AY
- HM6A==
-X-Gm-Message-State: APjAAAWoAdLw3anTZZ3IkyrMCv8K7JNaSUAaWwUWUflJddidZlSZ9rrg
- 2qReqoQq7ss3wir9BRrHBIqA3w==
-X-Google-Smtp-Source: APXvYqzjhnYbCujhvxLhAAx/fAUl7D4yF+p/dyU3g+lPmEOfeP5tsHM5eb7OAc5mBP9mRnKDa+CB3Q==
-X-Received: by 2002:a17:90a:36af:: with SMTP id
- t44mr184738pjb.25.1580152996110; 
- Mon, 27 Jan 2020 11:23:16 -0800 (PST)
-Received: from localhost ([2620:0:1000:2514:7e26:c73d:3c43:9c13])
- by smtp.gmail.com with ESMTPSA id v9sm17127654pja.26.2020.01.27.11.23.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jan 2020 11:23:15 -0800 (PST)
-Date: Mon, 27 Jan 2020 11:23:15 -0800 (PST)
-X-Google-Original-Date: Mon, 27 Jan 2020 11:23:12 PST (-0800)
-Subject: Re: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 1
-CC: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
-From: Palmer Dabbelt <palmerdabbelt@google.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-Reply-To: <CAFEAcA9HnhKE1nS+ubmCD4AgS-EZ_J_XcWapzUvM2pegHs-imw@mail.gmail.com>
-References: <CAFEAcA9HnhKE1nS+ubmCD4AgS-EZ_J_XcWapzUvM2pegHs-imw@mail.gmail.com>
- <20200121225703.148465-1-palmerdabbelt@google.com>
- <CAFEAcA9YoAjASu4F1hZRjbq5S+h8GtBUVb9dgecMdaWb9YENEw@mail.gmail.com>
- <mhng-ea4d4047-6dfa-4be0-8ce7-424b1d17560a@palmerdabbelt-glaptop1>
-Message-ID: <mhng-3bff4d7f-3418-49db-879f-0df5612feccd@palmerdabbelt-glaptop2>
-Mime-Version: 1.0 (MHng)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=x02uidMh79A/UC5RnsLU5i29rWtrdO0B0MTNMPKEZ4I=;
+ b=hLDIO3XHECdeTiqagqgqMXBhogEECvRmnlj1MyvEqnp9thOb85IaJeAfjAzOtxBc+1
+ U26g7nF4NcvU7yQ/2I3mIMSvpaxV4EOf56WRWv3oJ1xzbAsIQnMvd1fTDmb9cORi8+XJ
+ lz1aGUzY5wFSB8OpRWpwKFX9tPLstxaOROhLrRpywZXS8wlBmqkW/O27mNAzKfooapU6
+ o1eBnFPc5yuvv0uDe5IZNPmhkjR87TAEhaVARUH6H/eWUBCzbyecZlEAOKZqKM1+2voO
+ 5reitB0TTodH7dOl0ClmHjGru7l4M3/2nJczmL1wp9/vsSEE4KzIpSInpOJG8AaMDMx6
+ Pvlg==
+X-Gm-Message-State: APjAAAWsf/ubOTMMeT2wgaj9mssDVQooDS8TBz5Quv/doqmDLCrAA7Uc
+ xq3tVc+DwOv+bNRkMj7NtH0wKGplX59Mk9y6fUlBUEBw/NTYCYcnz83KLvkgLN0/06PH0eyVBoJ
+ iE6b/fw40+38mlKs=
+X-Received: by 2002:a1c:9897:: with SMTP id a145mr180639wme.132.1580153096247; 
+ Mon, 27 Jan 2020 11:24:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy/3f2mkxCxVoCXwxip/Es5ciKxWaF7YYAoeG7yxVX9V4qsYs/gRbAeVdrwkPz9CDwtp7aOag==
+X-Received: by 2002:a1c:9897:: with SMTP id a145mr180612wme.132.1580153095924; 
+ Mon, 27 Jan 2020 11:24:55 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id x14sm19797517wmj.42.2020.01.27.11.24.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Jan 2020 11:24:55 -0800 (PST)
+Subject: Re: [PATCH v1 02/13] tests/docker: better handle symlinked libs
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200124204026.2107-1-alex.bennee@linaro.org>
+ <20200124204026.2107-3-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bca8f112-4d93-1eed-421d-c98ca9fa16d6@redhat.com>
+Date: Mon, 27 Jan 2020 20:24:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20200124204026.2107-3-alex.bennee@linaro.org>
+Content-Language: en-US
+X-MC-Unique: tfdhxpLnPgKfp-W36Gq2nA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::102d
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,34 +107,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 Jan 2020 04:35:14 PST (-0800), Peter Maydell wrote:
-> On Thu, 23 Jan 2020 at 18:43, Palmer Dabbelt <palmerdabbelt@google.com> wrote:
->> On Thu, 23 Jan 2020 06:38:07 PST (-0800), Peter Maydell wrote:
->> > Hi. This pull request doesn't seem to be signed with the GPG
->> > key that I have on record for you...
->>
->> When I moved to Google I got a Yubikey and made new subkeys for it.  If I
->> understand correctly the new subkeys should be signed by my main key, but maybe
->> that didn't make it to your keyring?  I see
->>
->>     $ gpg --list-keys palmer@dabbelt.com
->>     pub   rsa4096 2017-06-06 [SC] [expires: 2027-11-13]
->>           00CE76D1834960DFCE886DF8EF4CA1502CCBAB41
->>     uid           [ultimate] Palmer Dabbelt <palmer@dabbelt.com>
->>     uid           [ultimate] Palmer Dabbelt <palmerdabbelt@google.com>
->>     sub   rsa4096 2017-06-06 [E]
->>     sub   rsa4096 2019-11-26 [S] [expires: 2024-11-24]
->>     sub   rsa4096 2019-11-26 [A] [expires: 2024-11-24]
->>     sub   rsa4096 2019-11-26 [E] [expires: 2024-11-24]
->
-> Yeah, I have those. I think I must have fumbled something
-> when I retried the pullreq after doing a refresh of your
-> gpg key, because I just did a retry now and it's fine.
-> (I'm just running the pull through my tests now.)
+On 1/24/20 9:40 PM, Alex Benn=C3=A9e wrote:
+> When we are copying we want to ensure we grab the first
+> resolution (the found in path section). However even that binary might
+> be a symlink so lets make sure we chase the symlinks to copy the right
+> binary to where it can be found.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>   tests/docker/docker.py | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 31d8adf836..7dfca63fe4 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -109,7 +109,7 @@ def _get_so_libs(executable):
+>       ensure theright data is copied."""
+>  =20
+>       libs =3D []
+> -    ldd_re =3D re.compile(r"(/.*/)(\S*)")
+> +    ldd_re =3D re.compile(r"(?:\S+ =3D> )?(\S*) \(:?0x[0-9a-f]+\)")
+>       try:
+>           ldd_output =3D subprocess.check_output(["ldd", executable]).dec=
+ode('utf-8')
+>           for line in ldd_output.split("\n"):
+> @@ -145,7 +145,8 @@ def _copy_binary_with_libs(src, bin_dest, dest_dir):
+>       if libs:
+>           for l in libs:
+>               so_path =3D os.path.dirname(l)
+> -            _copy_with_mkdir(l, dest_dir, so_path)
+> +            real_l =3D os.path.realpath(l)
+> +            _copy_with_mkdir(real_l, dest_dir, so_path)
+>  =20
+>  =20
+>   def _check_binfmt_misc(executable):
+>=20
 
-Thanks!
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
 
