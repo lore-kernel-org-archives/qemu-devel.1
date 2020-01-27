@@ -2,86 +2,106 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ACBCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 18:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F05C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 18:53:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64FB9214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 18:43:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqyqlhmX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64FB9214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A5B321739
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 18:53:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5B321739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw9Lf-0005fi-GR
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 13:42:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45853)
+	id 1iw9W2-0007qG-Kh
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 13:53:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iw9Ky-0005Gy-8V
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 13:42:17 -0500
+ (envelope-from <walling@linux.ibm.com>) id 1iw9VH-0007Lm-4r
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 13:52:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iw9Kv-0002x5-Jm
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 13:42:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22749
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iw9Kv-0002wE-9o
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 13:42:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580150532;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ojO5w1TfYR50HRXN//XFhAxRZpoT/j35wgIOAHCecmg=;
- b=MqyqlhmXujiqPuNmr932fTZPIrlgMRfroVoxcWetUMYQTyJom84lKV8J7T0xBH8YgyYoZ6
- bXxiZKysY7JtOPxnFkY4vYLNeG97QP9pjN6A+AM0xq16iUAaUV7d1I65i1fNP0DbbvTzAw
- ItLxt7cv3/1ohFeAC1sIBM6PXEvsEzo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-5t5ziRUmMbeaPKz--g_b5w-1; Mon, 27 Jan 2020 13:42:08 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CA6A13E3;
- Mon, 27 Jan 2020 18:42:07 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-27.gru2.redhat.com
- [10.97.116.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D7D53B7;
- Mon, 27 Jan 2020 18:42:05 +0000 (UTC)
-Subject: Re: [GSoC/Outreachy QEMU project proposal] Measure and Analyze QEMU
- Performance
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Stefan Hajnoczi <stefanha@gmail.com>
-References: <324a-5e231180-7-6946d180@169257031>
- <20200120145024.GJ345995@stefanha-x1.localdomain>
- <CAL1e-=in3inmtH=4ZjM2bxnVPJz2GVW4pwTJ8PVkWoqiunPPfA@mail.gmail.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <b70dd597-40ee-ff39-3057-72c398c5c4a9@redhat.com>
-Date: Mon, 27 Jan 2020 16:42:04 -0200
+ (envelope-from <walling@linux.ibm.com>) id 1iw9VF-0004Ce-Tu
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 13:52:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12290)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+ id 1iw9VF-0004C2-LM; Mon, 27 Jan 2020 13:52:53 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00RInlHc135640; Mon, 27 Jan 2020 13:52:51 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xrgvmaasw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jan 2020 13:52:51 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00RIpjJN140380;
+ Mon, 27 Jan 2020 13:52:51 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xrgvmaas4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jan 2020 13:52:51 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00RIlldU004545;
+ Mon, 27 Jan 2020 18:52:50 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
+ [9.57.198.28]) by ppma01dal.us.ibm.com with ESMTP id 2xrda6g842-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jan 2020 18:52:50 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00RIqn7p54067698
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 27 Jan 2020 18:52:49 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3A3A1112061;
+ Mon, 27 Jan 2020 18:52:49 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1DF5D112064;
+ Mon, 27 Jan 2020 18:52:49 +0000 (GMT)
+Received: from [9.56.58.87] (unknown [9.56.58.87])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Mon, 27 Jan 2020 18:52:49 +0000 (GMT)
+Subject: Re: [PATCH v6 2/2] s390: diagnose 318 info reset and migration support
+From: Collin Walling <walling@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+References: <1579904044-20790-1-git-send-email-walling@linux.ibm.com>
+ <1579904044-20790-3-git-send-email-walling@linux.ibm.com>
+ <380c4902-e67d-0aff-103d-18815b221ac4@redhat.com>
+ <11435889-57d6-ed0b-d410-2f715324a20e@linux.ibm.com>
+ <899b67fb-a337-c30d-e250-42399276fe38@redhat.com>
+ <20200127182942.4071f54f.cohuck@redhat.com>
+ <f6708858-78ea-06d1-427f-704c09e75b3a@redhat.com>
+ <6d735fe2-5cf8-32da-982d-95af5151eca8@linux.ibm.com>
+Organization: IBM
+Message-ID: <96145c69-cead-2bf8-07b3-10989121588d@linux.ibm.com>
+Date: Mon, 27 Jan 2020 13:52:48 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=in3inmtH=4ZjM2bxnVPJz2GVW4pwTJ8PVkWoqiunPPfA@mail.gmail.com>
+In-Reply-To: <6d735fe2-5cf8-32da-982d-95af5151eca8@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 5t5ziRUmMbeaPKz--g_b5w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-27_06:2020-01-24,
+ 2020-01-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0
+ mlxlogscore=999 impostorscore=0 bulkscore=0 priorityscore=1501
+ clxscore=1015 spamscore=0 phishscore=0 lowpriorityscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001270149
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,73 +113,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 1/21/20 12:07 PM, Aleksandar Markovic wrote:
-> On Mon, Jan 20, 2020 at 3:51 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> On Sat, Jan 18, 2020 at 03:08:37PM +0100, Aleksandar Markovic wrote:
->>> 3) The community will be given all devised performance measurement methods in the form of easily reproducible step-by-step setup and execution procedures.
->> Tracking performance is a good idea and something that has not been done
->> upstream yet.
-> Thanks for the interest, Stefan!
->
->>   A few questions:
+On 1/27/20 1:21 PM, Collin Walling wrote:
+> On 1/27/20 12:55 PM, David Hildenbrand wrote:
+>> On 27.01.20 18:29, Cornelia Huck wrote:
+>>> On Mon, 27 Jan 2020 18:09:11 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>
+>>>>>>> +static void s390_diag318_reset(DeviceState *dev)
+>>>>>>> +{
+>>>>>>> +    if (kvm_enabled())
+>>>>>>> +        kvm_s390_set_diag318_info(0);
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static void s390_diag318_class_init(ObjectClass *klass, void *data)
+>>>>>>> +{
+>>>>>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>>>>>> +
+>>>>>>> +    dc->reset = s390_diag318_reset;
+>>>>>>> +    dc->vmsd = &vmstate_diag318;
+>>>>>>> +    dc->hotpluggable = false;
+>>>>>>> +    /* Reason: Created automatically during machine instantiation */
+>>>>>>> +    dc->user_creatable = false;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static const TypeInfo s390_diag318_info = {
+>>>>>>> +    .class_init = s390_diag318_class_init,
+>>>>>>> +    .parent = TYPE_DEVICE,
+>>>>>>> +    .name = TYPE_S390_DIAG318,
+>>>>>>> +    .instance_size = sizeof(DIAG318State),
+>>>>>>> +};
+>>>>>>> +
+>>>>>>> +static void s390_diag318_register_types(void)
+>>>>>>> +{
+>>>>>>> +    type_register_static(&s390_diag318_info);
+>>>>>>> +}  
+>>>>>>
+>>>>>> Do we really need a new device? Can't we simply glue that extended state
+>>>>>> to the machine state?
+>>>>>>  
+>>>>>> -> target/s390x/machine.c  
+>>>>>>  
+>>>>>
+>>>>> Those VM States relate to the CPU state... does it make sense to store the
+>>>>> diag318 info in a CPU state? (It doesn't seem necessary to store / migrate
+>>>>> this info for each CPU).  
+>>>>
+>>>> I'm sorry, I was looking at the wrong file ...
+>>>>
+>>>>>
+>>>>> Should we store this in the S390CcwMachineState? Or perhaps create a generic
+>>>>> S390MachineState for information that needs to be stored once and migrated
+>>>>> once?  
+>>>>
+>>>> ... I actually thought we have something like this already. Personally,
+>>>> I think that would make sense. At least spapr seems to have something
+>>>> like this already (hw/ppc/spapr.c:spapr_machine_init().
+>>>>
+>>>> @Conny?
+>>>
+>>> What are you referring to? I only see the one with the FIXME in front
+>>> of it...
 >>
->>   * Will benchmarks be run automatically (e.g. nightly or weekly) on
->>     someone's hardware or does every TCG architecture maintainer need to
->>     run them manually for themselves?
-> If the community wants it, definitely yes. Once the methodology is
-> developed, it should be straightforward to setup nightly and/or weekly
-> benchmarks - that could definitely include sending mails with reports
-> to the entire list or just individuals or subgroups. The recipient
-> choice is just a matter or having decent criteria about
-> appropriateness of information within the message (e.g. not to flood
-> the list with the data most people are not really interested).
->
-> For linux-user tests, they are typically very quick, and nightly tests
-> are quite feasible to run. On someone hardware, of course, and
-> consistently always on the same hardware, if possible. If it makes
-> sense, one could setup multiple test beds with a variety of hardware
-> setups.
->
-> For system mode tests, I knoe they are much more difficult to
-> automate, and, on top of that, there could be greater risk of
-> hangs/crashes Also, considering the number of machines we support,
-> those tests could consume much more time - perhaps even one day would
-> not be sufficient, if we have many machines and boot/shutdown
-> variants. For these reason, perhaps weekly executions would be more
-> appropriate for them, and, in general, given greater complexity, the
-> expectation from system-mode performance tests should be better kept
-> quite low for now.
->
->>   * Where will the benchmark result history be stored?
+>> That's the one I mean. The fixme states something about qdev ... but
+>> AFAIK that's only applicable if TYPE_DEVICE is involved. So maybe right
+>> now there is no other way than registering the vmstate directly.
 >>
-> If emailing is set up, the results could be reconstructed from emails.
-> But, yes, it would be better if the result history is kept somewhere
-> on an internet-connected file server
+> 
+> Hmm okay. I'll take a look at how spapr does it. I think I've registered a
+> vmstate via register_savevm_live() in an earlier version, but had difficulties
+> figuring out where to store the data. I'll revisit this approach.
+> 
+> Thanks for the feedback!
+> 
 
+Err perhaps not entirely in this manner...
 
-If you eventually choose Gitlab CI for weekly/nightly executions then 
-results can be simply archived [1].
+docs/devel/migration.rst declares the register_savevm_live() function as the
+"legacy way" of doing things. I'll have to see how other VMStateDescriptions
+are modeled. I think vmstate_register() is what I want.
 
-Also it can be attached machines in Gitlab CI then running the 
-system-mode experiment always on same environment.
+Sorry for the confusion.
 
-[1] https://docs.gitlab.com/ee/user/project/pipelines/job_artifacts.html
-
-IMHO, it is a very good GSoC proposal.
-
-- Wainer
-
->
-> Yours,
-> Aleksandar
->
->> Stefan
-
+-- 
+Respectfully,
+- Collin Walling
 
