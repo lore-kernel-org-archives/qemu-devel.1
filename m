@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 588AEC32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 124C3C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:39:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24C9520702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D17F520702
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:39:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q0tsz26M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C9520702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ow9JijR9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D17F520702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw1mx-0004sc-7E
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:38:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42221)
+	id 1iw1o9-0007zj-VQ
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:39:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42357)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lU-0002Pf-5l
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:09 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1lj-000315-Pb
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lS-0002c7-PK
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44432
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1li-0002ru-7C
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:23 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51588
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1lS-0002Xv-Ls
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:06 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1li-0002qn-1r
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580121424;
+ s=mimecast20190719; t=1580121441;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VSE4aUCWkyE6lXBB4C7/XSqsgq5OFFsdkg9eM2Q8C94=;
- b=Q0tsz26MMQ+vOx4/jarU3MFqwZ0RV+JbEZDVOkPwVcjlJmIfSZFGLJohwduJWqLFBj01oO
- vNEjHZ9taDtmfjxe8NNI1ot3/onGe9QR2BHvWUQx65DhKWwUOBr/EsvHNFktL+UIV0v9gx
- 4JlmvOxfuTU/nWATYJCuhML2yzuS+28=
+ bh=sH/Jm8wqFvAlabLvAmrYRoUC/jk7ZOh1WJoqF40h1gI=;
+ b=Ow9JijR9TWSJgLlxmynQap5PaF07E9zsqgKpVCyQZ0rW033FtU5hoc/ubmWv0D0phC+mdM
+ rCTLkQAdAgYSZxW22GPsYXhkGXe77E3hP6tleXV39fsK+UCi/dOdtyBWlgra5R8rYjcFgm
+ Rq/qGcZE+BXLGSCjqX8oB/1e40OGxRQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-PXLQkZPtMj-UaYsSkf9mng-1; Mon, 27 Jan 2020 05:37:02 -0500
+ us-mta-150-68-FB-qQNdiNtaXMPoLPwg-1; Mon, 27 Jan 2020 05:37:19 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E820D800D41;
- Mon, 27 Jan 2020 10:37:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAEEA107ACC4;
+ Mon, 27 Jan 2020 10:37:18 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E214CF6C1;
- Mon, 27 Jan 2020 10:36:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C97BCF6C1;
+ Mon, 27 Jan 2020 10:37:16 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 03/13] monitor/hmp: rename device-hotplug.c to
- block/monitor/block-hmp-cmds.c
-Date: Mon, 27 Jan 2020 12:36:37 +0200
-Message-Id: <20200127103647.17761-4-mlevitsk@redhat.com>
+Subject: [PATCH v3 08/13] monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
+Date: Mon, 27 Jan 2020 12:36:42 +0200
+Message-Id: <20200127103647.17761-9-mlevitsk@redhat.com>
 In-Reply-To: <20200127103647.17761-1-mlevitsk@redhat.com>
 References: <20200127103647.17761-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: PXLQkZPtMj-UaYsSkf9mng-1
+X-MC-Unique: 68-FB-qQNdiNtaXMPoLPwg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,171 +91,259 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These days device-hotplug.c only contains the hmp_drive_add
-In the next patch, rest of hmp_drive* functions will be moved
-there.
-
-Also change the license of that file to GPL2+ since most
-of the code that will be moved there is under that license
-
-Also add block-hmp-commands.h to contain prototypes of these
-functions
-
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- MAINTAINERS                                   |  1 +
- Makefile.objs                                 |  2 +-
- block/Makefile.objs                           |  1 +
- block/monitor/Makefile.objs                   |  1 +
- .../monitor/block-hmp-cmds.c                  | 23 ++++---------------
- include/block/block-hmp-commands.h            |  8 +++++++
- include/sysemu/sysemu.h                       |  3 ---
- monitor/misc.c                                |  1 +
- 8 files changed, 18 insertions(+), 22 deletions(-)
- create mode 100644 block/monitor/Makefile.objs
- rename device-hotplug.c =3D> block/monitor/block-hmp-cmds.c (55%)
- create mode 100644 include/block/block-hmp-commands.h
+ block/monitor/block-hmp-cmds.c     | 88 ++++++++++++++++++++++++++++++
+ include/block/block-hmp-commands.h |  5 ++
+ include/monitor/hmp.h              |  4 --
+ monitor/hmp-cmds.c                 | 87 -----------------------------
+ 4 files changed, 93 insertions(+), 91 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f6511d5120..5d50d09ad8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1882,6 +1882,7 @@ Block QAPI, monitor, command line
- M: Markus Armbruster <armbru@redhat.com>
- S: Supported
- F: blockdev.c
-+F: blockdev-hmp-cmds.c
- F: block/qapi.c
- F: qapi/block*.json
- F: qapi/transaction.json
-diff --git a/Makefile.objs b/Makefile.objs
-index ff396b9209..15209eb6b5 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -48,7 +48,7 @@ common-obj-y +=3D dump/
- common-obj-y +=3D job-qmp.o
- common-obj-y +=3D monitor/
- common-obj-y +=3D net/
--common-obj-y +=3D qdev-monitor.o device-hotplug.o
-+common-obj-y +=3D qdev-monitor.o
- common-obj-$(CONFIG_WIN32) +=3D os-win32.o
- common-obj-$(CONFIG_POSIX) +=3D os-posix.o
-=20
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 330529b0b7..3f65544a6b 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -44,6 +44,7 @@ block-obj-y +=3D crypto.o
- block-obj-y +=3D aio_task.o
- block-obj-y +=3D backup-top.o
- block-obj-y +=3D filter-compress.o
-+common-obj-y +=3D monitor/
-=20
- common-obj-y +=3D stream.o
-=20
-diff --git a/block/monitor/Makefile.objs b/block/monitor/Makefile.objs
-new file mode 100644
-index 0000000000..0a74f9a8b5
---- /dev/null
-+++ b/block/monitor/Makefile.objs
-@@ -0,0 +1 @@
-+common-obj-y +=3D block-hmp-cmds.o
-diff --git a/device-hotplug.c b/block/monitor/block-hmp-cmds.c
-similarity index 55%
-rename from device-hotplug.c
-rename to block/monitor/block-hmp-cmds.c
-index 554e4d98db..c65aaa86ea 100644
---- a/device-hotplug.c
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
+c
+index 9aa94ea6e0..df0178d0f9 100644
+--- a/block/monitor/block-hmp-cmds.c
 +++ b/block/monitor/block-hmp-cmds.c
-@@ -1,25 +1,11 @@
- /*
-- * QEMU device hotplug helpers
-+ * Blockdev HMP commands
-  *
-  * Copyright (c) 2004 Fabrice Bellard
-  *
-- * Permission is hereby granted, free of charge, to any person obtaining a=
- copy
-- * of this software and associated documentation files (the "Software"), t=
-o deal
-- * in the Software without restriction, including without limitation the r=
-ights
-- * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll
-- * copies of the Software, and to permit persons to whom the Software is
-- * furnished to do so, subject to the following conditions:
-- *
-- * The above copyright notice and this permission notice shall be included=
- in
-- * all copies or substantial portions of the Software.
-- *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
- OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,
-- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN
-- * THE SOFTWARE.
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * or (at your option) any later version.
-+ * See the COPYING file in the top-level directory.
-  */
-=20
- #include "qemu/osdep.h"
-@@ -33,6 +19,7 @@
+@@ -22,8 +22,10 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/config-file.h"
+ #include "qemu/option.h"
++#include "qemu/sockets.h"
  #include "sysemu/sysemu.h"
  #include "monitor/monitor.h"
++#include "block/nbd.h"
  #include "block/block_int.h"
-+#include "block/block-hmp-commands.h"
-=20
-=20
- void hmp_drive_add(Monitor *mon, const QDict *qdict)
+ #include "block/block-hmp-commands.h"
+ #include "monitor/hmp.h"
+@@ -327,3 +329,89 @@ void hmp_snapshot_delete_blkdev_internal(Monitor *mon,=
+ const QDict *qdict)
+                                                true, name, &err);
+     hmp_handle_error(mon, err);
+ }
++
++void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
++{
++    const char *uri =3D qdict_get_str(qdict, "uri");
++    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
++    bool all =3D qdict_get_try_bool(qdict, "all", false);
++    Error *local_err =3D NULL;
++    BlockInfoList *block_list, *info;
++    SocketAddress *addr;
++
++    if (writable && !all) {
++        error_setg(&local_err, "-w only valid together with -a");
++        goto exit;
++    }
++
++    /* First check if the address is valid and start the server.  */
++    addr =3D socket_parse(uri, &local_err);
++    if (local_err !=3D NULL) {
++        goto exit;
++    }
++
++    nbd_server_start(addr, NULL, NULL, &local_err);
++    qapi_free_SocketAddress(addr);
++    if (local_err !=3D NULL) {
++        goto exit;
++    }
++
++    if (!all) {
++        return;
++    }
++
++    /* Then try adding all block devices.  If one fails, close all and
++     * exit.
++     */
++    block_list =3D qmp_query_block(NULL);
++
++    for (info =3D block_list; info; info =3D info->next) {
++        if (!info->value->has_inserted) {
++            continue;
++        }
++
++        qmp_nbd_server_add(info->value->device, false, NULL,
++                           true, writable, false, NULL, &local_err);
++
++        if (local_err !=3D NULL) {
++            qmp_nbd_server_stop(NULL);
++            break;
++        }
++    }
++
++    qapi_free_BlockInfoList(block_list);
++
++exit:
++    hmp_handle_error(mon, local_err);
++}
++
++void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
++{
++    const char *device =3D qdict_get_str(qdict, "device");
++    const char *name =3D qdict_get_try_str(qdict, "name");
++    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
++    Error *local_err =3D NULL;
++
++    qmp_nbd_server_add(device, !!name, name, true, writable,
++                       false, NULL, &local_err);
++    hmp_handle_error(mon, local_err);
++}
++
++void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
++{
++    const char *name =3D qdict_get_str(qdict, "name");
++    bool force =3D qdict_get_try_bool(qdict, "force", false);
++    Error *err =3D NULL;
++
++    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
++    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
++    hmp_handle_error(mon, err);
++}
++
++void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
++{
++    Error *err =3D NULL;
++
++    qmp_nbd_server_stop(&err);
++    hmp_handle_error(mon, err);
++}
 diff --git a/include/block/block-hmp-commands.h b/include/block/block-hmp-c=
 ommands.h
-new file mode 100644
-index 0000000000..4f9033a8a6
---- /dev/null
+index 3fc2daf3a9..721b9a1978 100644
+--- a/include/block/block-hmp-commands.h
 +++ b/include/block/block-hmp-commands.h
-@@ -0,0 +1,8 @@
-+#ifndef BLOCK_HMP_COMMANDS_H
-+#define BLOCK_HMP_COMMANDS_H
-+
-+/* HMP commands related to the block layer*/
-+
-+void hmp_drive_add(Monitor *mon, const QDict *qdict);
-+
-+#endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 80c57fdc4e..c48635666d 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -68,9 +68,6 @@ extern int nb_option_roms;
- extern const char *prom_envs[MAX_PROM_ENVS];
- extern unsigned int nb_prom_envs;
+@@ -21,4 +21,9 @@ void hmp_snapshot_blkdev(Monitor *mon, const QDict *qdict=
+);
+ void hmp_snapshot_blkdev_internal(Monitor *mon, const QDict *qdict);
+ void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict)=
+;
 =20
--/* generic hotplug */
--void hmp_drive_add(Monitor *mon, const QDict *qdict);
--
- /* pcie aer error injection */
- void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
-=20
-diff --git a/monitor/misc.c b/monitor/misc.c
-index de1ca4d114..0466c00830 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -79,6 +79,7 @@
- #include "sysemu/cpus.h"
++void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
++void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
++void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
++void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
++
+ #endif
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index 6d34e29bb6..736a969131 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -94,10 +94,6 @@ void hmp_getfd(Monitor *mon, const QDict *qdict);
+ void hmp_closefd(Monitor *mon, const QDict *qdict);
+ void hmp_sendkey(Monitor *mon, const QDict *qdict);
+ void hmp_screendump(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_add(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_change(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 46b46b6dd7..67d2ca8a4c 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -45,7 +45,6 @@
+ #include "qapi/string-output-visitor.h"
+ #include "qom/object_interfaces.h"
+ #include "ui/console.h"
+-#include "block/nbd.h"
+ #include "block/qapi.h"
+ #include "qemu-io.h"
  #include "qemu/cutils.h"
- #include "tcg/tcg.h"
-+#include "block/block-hmp-commands.h"
+@@ -2154,92 +2153,6 @@ void hmp_screendump(Monitor *mon, const QDict *qdict=
+)
+     hmp_handle_error(mon, err);
+ }
 =20
- #if defined(TARGET_S390X)
- #include "hw/s390x/storage-keys.h"
+-void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+-{
+-    const char *uri =3D qdict_get_str(qdict, "uri");
+-    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
+-    bool all =3D qdict_get_try_bool(qdict, "all", false);
+-    Error *local_err =3D NULL;
+-    BlockInfoList *block_list, *info;
+-    SocketAddress *addr;
+-
+-    if (writable && !all) {
+-        error_setg(&local_err, "-w only valid together with -a");
+-        goto exit;
+-    }
+-
+-    /* First check if the address is valid and start the server.  */
+-    addr =3D socket_parse(uri, &local_err);
+-    if (local_err !=3D NULL) {
+-        goto exit;
+-    }
+-
+-    nbd_server_start(addr, NULL, NULL, &local_err);
+-    qapi_free_SocketAddress(addr);
+-    if (local_err !=3D NULL) {
+-        goto exit;
+-    }
+-
+-    if (!all) {
+-        return;
+-    }
+-
+-    /* Then try adding all block devices.  If one fails, close all and
+-     * exit.
+-     */
+-    block_list =3D qmp_query_block(NULL);
+-
+-    for (info =3D block_list; info; info =3D info->next) {
+-        if (!info->value->has_inserted) {
+-            continue;
+-        }
+-
+-        qmp_nbd_server_add(info->value->device, false, NULL,
+-                           true, writable, false, NULL, &local_err);
+-
+-        if (local_err !=3D NULL) {
+-            qmp_nbd_server_stop(NULL);
+-            break;
+-        }
+-    }
+-
+-    qapi_free_BlockInfoList(block_list);
+-
+-exit:
+-    hmp_handle_error(mon, local_err);
+-}
+-
+-void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+-{
+-    const char *device =3D qdict_get_str(qdict, "device");
+-    const char *name =3D qdict_get_try_str(qdict, "name");
+-    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
+-    Error *local_err =3D NULL;
+-
+-    qmp_nbd_server_add(device, !!name, name, true, writable,
+-                       false, NULL, &local_err);
+-    hmp_handle_error(mon, local_err);
+-}
+-
+-void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
+-{
+-    const char *name =3D qdict_get_str(qdict, "name");
+-    bool force =3D qdict_get_try_bool(qdict, "force", false);
+-    Error *err =3D NULL;
+-
+-    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
+-    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
+-    hmp_handle_error(mon, err);
+-}
+-
+-void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
+-{
+-    Error *err =3D NULL;
+-
+-    qmp_nbd_server_stop(&err);
+-    hmp_handle_error(mon, err);
+-}
+-
+ void hmp_chardev_add(Monitor *mon, const QDict *qdict)
+ {
+     const char *args =3D qdict_get_str(qdict, "args");
 --=20
 2.17.2
 
