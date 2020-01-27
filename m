@@ -2,76 +2,96 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E18BAC32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 08:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1355C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 08:23:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACF0E20702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 08:10:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CF4D20842
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 08:23:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NiiMnUhD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACF0E20702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b8sXZn8N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF4D20842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivzT6-0005Dl-PE
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 03:10:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45929)
+	id 1ivzgW-0000w5-Im
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 03:23:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ivzSP-0004oo-HN
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:09:18 -0500
+ (envelope-from <philmd@redhat.com>) id 1ivzfr-0000Qu-7r
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:23:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ivzSO-0003Pm-8a
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:09:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55117
+ (envelope-from <philmd@redhat.com>) id 1ivzfn-0005i0-KL
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:23:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26394
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ivzSO-0003PT-62
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:09:16 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ivzfn-0005gV-2r
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 03:23:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580112555;
+ s=mimecast20190719; t=1580113385;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8yoJjZ2FMqCMP/rTFRctrXLtvAxEeEovA+1PQpRhYpg=;
- b=NiiMnUhD+1jEbhxl/CaSLbTuiYAInzSoIJHiTzDIfCFdYrmJzjIbHjemsoF8TjsW2tGXmG
- sBsIq6RjEBfazimjIx6SmKD4WzWuGEvD7PTDSKabipWFOUmtjQhltpXEmfhnjXvaXUV7ck
- blbV8ZEoj3ZE0e4bayVwuH6ez0JCPwM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-omkf7XvwPmqDC41ReUPcew-1; Mon, 27 Jan 2020 03:09:10 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A61F810054E3;
- Mon, 27 Jan 2020 08:09:08 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A8F198E619;
- Mon, 27 Jan 2020 08:09:06 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3.1 74/80] exec: cleanup
- qemu_minrampagesize()/qemu_maxrampagesize()
-Date: Mon, 27 Jan 2020 09:06:48 +0100
-Message-Id: <1580112408-93354-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1579779525-20065-75-git-send-email-imammedo@redhat.com>
-References: <1579779525-20065-75-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: omkf7XvwPmqDC41ReUPcew-1
+ bh=K/tTcZ0EQg+wctppff0s86blRCdRIVqon2kTc/lUlXY=;
+ b=b8sXZn8NAYoWmvnOvk0+CRj6j2XKjxpsqxL/iXwZot1IfdUghifnpoxW5U1nBrHQcL8Ge+
+ ceYp/jcSzS62oZoOSp0/OerFt7foeKBW+blCVb4tAJsa2nxz3JPHYcRMdn8vSttYbjjFaG
+ 6D2irRFhKiFubfVrh6loBNXtciy1fxI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-Yfm6R48vNxqM9FHO4d4NsA-1; Mon, 27 Jan 2020 03:23:03 -0500
+Received: by mail-wr1-f70.google.com with SMTP id b13so5680358wrx.22
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 00:23:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FWQ9f0GT43JH2rrdzbGxlj9+Y9fHtnMNjilseCjcj8s=;
+ b=k9vMfrsLFR1Xl7z7ghWZthsbY1YKYZswSbBXAHCx8l/v2U7WHElA5CyD7ZHiYcBRs+
+ EHAt8niWhIzDLUoulZHnesYt612NWFEnAcL7RzCv9QmLkEWiXM0L9104Jku9lUTq2yfH
+ rLVdV/tkferuPH1FSpBlGgmB8K+wwRv1K642IW1ykg853+DfuxuEVN/EspLnf+dhByF9
+ 9mgR9IV/m+EGG6JYPpH9XhNIoQMXP5M+YZfaqe2UFJBw6w3oasVNfWmVikKB4aNTTfPR
+ F9+Z5Qn2wVcN9yHQQG7ZfXmIOXzJXWh9Rd6hCJ9IY50Wpy7A13/KDKwwSSZu3KJGQ3oz
+ kf9Q==
+X-Gm-Message-State: APjAAAUVYBKmJpB2wqKLy87/vbe0nAOOhKHigScB8x6UaH5BrmBQbBEW
+ 847mrmsKAEZN3xCAqb/NNAOBaec+izWtQTbYLfd/NVerIhX4d+MI02Z5J14//4OPGW4taZQUXvG
+ Te78KzRVAYl1gops=
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr18996619wrl.190.1580113382561; 
+ Mon, 27 Jan 2020 00:23:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzbSjYdoh/uid/lRoUOksP41T57U/wvmPJ4DeRdPbFZcri7UUiaULsF5jvTguN1PSEoJLG5Jg==
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr18996589wrl.190.1580113382322; 
+ Mon, 27 Jan 2020 00:23:02 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id t1sm18510825wma.43.2020.01.27.00.23.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Jan 2020 00:23:01 -0800 (PST)
+Subject: Re: [PATCH v2 2/8] hxtool: Support SRST/ERST directives
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20200124162606.8787-1-peter.maydell@linaro.org>
+ <20200124162606.8787-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1ff66395-d1c6-3d41-fabe-ab5094c789af@redhat.com>
+Date: Mon, 27 Jan 2020 09:23:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20200124162606.8787-3-peter.maydell@linaro.org>
+Content-Language: en-US
+X-MC-Unique: Yfm6R48vNxqM9FHO4d4NsA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 207.211.31.120
@@ -86,108 +106,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, rth@twiddle.net,
- david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since all RAM is backed by hostmem backends, drop
-global -mem-path invariant and simplify code.
+On 1/24/20 5:26 PM, Peter Maydell wrote:
+> We want to add support for including rST document fragments
+> in our .hx files, in the same way we currently have texinfo
+> fragments. These will be delimited by SRST and ERST directives,
+> in the same way the texinfo is delimited by STEXI/ETEXI.
+> The rST fragments will not be extracted by the hxtool
+> script, but by a different mechanism, so all we need to
+> do in hxtool is have it ignore all the text inside a
+> SRST/ERST section, with suitable error-checking for
+> mismatched rST-vs-texi fragment delimiters.
+>=20
+> The resulting effective state machine has only three states:
+>   * flag =3D 0, rstflag =3D 0 : reading section for C output
+>   * flag =3D 1, rstflag =3D 0 : reading texi fragment
+>   * flag =3D 0, rstflag =3D 1 : reading rST fragment
+> and flag =3D 1, rstflag =3D 1 is not possible. Using two
+> variables makes the parallel between the rST handling and
+> the texi handling clearer; in any case all this code will
+> be deleted once we've converted entirely to rST.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>   scripts/hxtool | 33 ++++++++++++++++++++++++++++++++-
+>   1 file changed, 32 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/hxtool b/scripts/hxtool
+> index 7d7c4289e32..0003e7b673d 100644
+> --- a/scripts/hxtool
+> +++ b/scripts/hxtool
+> @@ -7,7 +7,7 @@ hxtoh()
+>           case $str in
+>               HXCOMM*)
+>               ;;
+> -            STEXI*|ETEXI*) flag=3D$(($flag^1))
+> +            STEXI*|ETEXI*|SRST*|ERST*) flag=3D$(($flag^1))
+>               ;;
+>               *)
+>               test $flag -eq 1 && printf "%s\n" "$str"
+> @@ -27,12 +27,17 @@ print_texi_heading()
+>   hxtotexi()
+>   {
+>       flag=3D0
+> +    rstflag=3D0
+>       line=3D1
+>       while read -r str; do
+>           case "$str" in
+>               HXCOMM*)
+>               ;;
+>               STEXI*)
+> +            if test $rstflag -eq 1 ; then
+> +                printf "line %d: syntax error: expected ERST, found '%s'=
+\n" "$line" "$str" >&2
+> +                exit 1
+> +            fi
+>               if test $flag -eq 1 ; then
+>                   printf "line %d: syntax error: expected ETEXI, found '%=
+s'\n" "$line" "$str" >&2
+>                   exit 1
+> @@ -40,12 +45,38 @@ hxtotexi()
+>               flag=3D1
+>               ;;
+>               ETEXI*)
+> +            if test $rstflag -eq 1 ; then
+> +                printf "line %d: syntax error: expected ERST, found '%s'=
+\n" "$line" "$str" >&2
+> +                exit 1
+> +            fi
+>               if test $flag -ne 1 ; then
+>                   printf "line %d: syntax error: expected STEXI, found '%=
+s'\n" "$line" "$str" >&2
+>                   exit 1
+>               fi
+>               flag=3D0
+>               ;;
+> +            SRST*)
+> +            if test $rstflag -eq 1 ; then
+> +                printf "line %d: syntax error: expected ERST, found '%s'=
+\n" "$line" "$str" >&2
+> +                exit 1
+> +            fi
+> +            if test $flag -eq 1 ; then
+> +                printf "line %d: syntax error: expected ETEXI, found '%s=
+'\n" "$line" "$str" >&2
+> +                exit 1
+> +            fi
+> +            rstflag=3D1
+> +            ;;
+> +            ERST*)
+> +            if test $flag -eq 1 ; then
+> +                printf "line %d: syntax error: expected ETEXI, found '%s=
+'\n" "$line" "$str" >&2
+> +                exit 1
+> +            fi
+> +            if test $rstflag -ne 1 ; then
+> +                printf "line %d: syntax error: expected SRST, found '%s'=
+\n" "$line" "$str" >&2
+> +                exit 1
+> +            fi
+> +            rstflag=3D0
+> +            ;;
+>               DEFHEADING*)
+>               print_texi_heading "$(expr "$str" : "DEFHEADING(\(.*\))")"
+>               ;;
+>=20
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v4:
-  * fix access to uninitialized pagesize/hpsize
-    (David Gibson <david@gibson.dropbear.id.au>)
-
-CC: thuth@redhat.com
-CC: aik@ozlabs.ru
-CC: mdroth@linux.vnet.ibm.com
-CC: david@gibson.dropbear.id.au
-CC: qemu-ppc@nongnu.org
-CC: pbonzini@redhat.com
-CC: rth@twiddle.net
----
- exec.c | 49 ++++---------------------------------------------
- 1 file changed, 4 insertions(+), 45 deletions(-)
-
-diff --git a/exec.c b/exec.c
-index 67e520d..9f5421c 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1668,59 +1668,18 @@ static int find_max_backend_pagesize(Object *obj, v=
-oid *opaque)
- long qemu_minrampagesize(void)
- {
-     long hpsize =3D LONG_MAX;
--    long mainrampagesize;
--    Object *memdev_root;
--    MachineState *ms =3D MACHINE(qdev_get_machine());
--
--    mainrampagesize =3D qemu_mempath_getpagesize(mem_path);
--
--    /* it's possible we have memory-backend objects with
--     * hugepage-backed RAM. these may get mapped into system
--     * address space via -numa parameters or memory hotplug
--     * hooks. we want to take these into account, but we
--     * also want to make sure these supported hugepage
--     * sizes are applicable across the entire range of memory
--     * we may boot from, so we take the min across all
--     * backends, and assume normal pages in cases where a
--     * backend isn't backed by hugepages.
--     */
--    memdev_root =3D object_resolve_path("/objects", NULL);
--    if (memdev_root) {
--        object_child_foreach(memdev_root, find_min_backend_pagesize, &hpsi=
-ze);
--    }
--    if (hpsize =3D=3D LONG_MAX) {
--        /* No additional memory regions found =3D=3D> Report main RAM page=
- size */
--        return mainrampagesize;
--    }
--
--    /* If NUMA is disabled or the NUMA nodes are not backed with a
--     * memory-backend, then there is at least one node using "normal" RAM,
--     * so if its page size is smaller we have got to report that size inst=
-ead.
--     */
--    if (hpsize > mainrampagesize &&
--        (ms->numa_state =3D=3D NULL ||
--         ms->numa_state->num_nodes =3D=3D 0 ||
--         ms->numa_state->nodes[0].node_memdev =3D=3D NULL)) {
--        static bool warned;
--        if (!warned) {
--            error_report("Huge page support disabled (n/a for main memory)=
-.");
--            warned =3D true;
--        }
--        return mainrampagesize;
--    }
-+    Object *memdev_root =3D object_resolve_path("/objects", NULL);
-=20
-+    object_child_foreach(memdev_root, find_min_backend_pagesize, &hpsize);
-     return hpsize;
- }
-=20
- long qemu_maxrampagesize(void)
- {
--    long pagesize =3D qemu_mempath_getpagesize(mem_path);
-+    long pagesize =3D 0;
-     Object *memdev_root =3D object_resolve_path("/objects", NULL);
-=20
--    if (memdev_root) {
--        object_child_foreach(memdev_root, find_max_backend_pagesize,
--                             &pagesize);
--    }
-+    object_child_foreach(memdev_root, find_max_backend_pagesize, &pagesize=
-);
-     return pagesize;
- }
- #else
---=20
-2.7.4
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
