@@ -2,120 +2,82 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98EF0C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 07:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3377AC32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 07:26:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BE80214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 07:19:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD0FB20702
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 07:26:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="o3XPpO2w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE80214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qyp93t2Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD0FB20702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivygX-0007fC-GR
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 02:19:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39017)
+	id 1ivynH-0000sT-4F
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 02:26:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40368)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1ivyfw-0007Gi-Np
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 02:19:14 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ivymS-0000LR-N2
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 02:25:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1ivyfu-0007D3-Ti
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 02:19:12 -0500
-Received: from mail-db8eur05on2120.outbound.protection.outlook.com
- ([40.107.20.120]:52640 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1ivyfu-0007Be-Ao
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 02:19:10 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KYJN5OX0LUvkfpRTL3G6iQZMpo0eoBYP4iGqsGaoG1dBwJ5AWi3hgxeEWQ6fLMiVif+h9THFrjjZ/gUCJo40jHSKaloz5JMEFmXQDy3NJS44cbGZPDWKoqYYXbqgXPI/CaBcyz2h8a8IlyRUqf0dCJtn/xN4GgI3tyrhww5wExC1WEZOsqzIYDPIOxDiAt6lukeXsNaiXXm+PWrU2Mucwy0PKb4pOkS1Jo5Oa7iu9HVvjuB/gta/glqAIeeEPdTTfc5y7aSuwEJ6m1XgXXGx+uupEmac9BDXp69CAtAdQyVngBxHnDtddpU87SWXtj4Y3XsW2rhP6e/TvNb/3jEcDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m2S9hEDn3zJB9rozQUv9tPMJah4paJ4PrrSz9eT8uEA=;
- b=jXRdKtBTAsrMcty+L2p2SS/y7ziQyxHtxP02Y2TvO4NCUi8UuKD5obbB9O4+QIWP9MbrFFrJDvpVP5c17wofi+vR4dN7A+7WmpuRUnURho1ehm4cfyhIRnP0CLGLJI3gqjbwfy1zTyuJHRa+Rg5Cumc2VUitn7X65pX8eVEBc/HFr/mKU2NqvJz/WDkq28GdFefK4S+MsocOpGsWOZwsQsYjHraHOYHWeB0Xf0VZZ/5tRxX7LwDcVzQb2fp3/459QArT1jHqzGaK6bgRkFOAYCCByt98RDtjZfXQyvfpWri+UhH6jNKfjMsy/V/autoU5WvFbFe0T5+xxd8D4Q8rEg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m2S9hEDn3zJB9rozQUv9tPMJah4paJ4PrrSz9eT8uEA=;
- b=o3XPpO2wCGGQADsK585oRHqDXBIEpnGzDkC8nTtcFLykog2jgeeAaKgcyBqchchLNmjOlpjURQXXdc9uvzrcsTuc7oq83UQOKli7uIK8HN9zBP2Dyj7OSxVZuodV4TEnyxEha1hTtI7RsXlRaHsCCDzIxBTqZb86/bTGW8rV41k=
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
- AM0PR08MB3283.eurprd08.prod.outlook.com (52.134.94.28) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.22; Mon, 27 Jan 2020 07:19:06 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::5558:d9d2:7f7d:e4]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::5558:d9d2:7f7d:e4%2]) with mapi id 15.20.2665.025; Mon, 27 Jan 2020
- 07:19:06 +0000
-Received: from [192.168.1.63] (178.34.161.7) by
- HE1PR02CA0094.eurprd02.prod.outlook.com (2603:10a6:7:29::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.20 via Frontend Transport; Mon, 27 Jan 2020 07:19:05 +0000
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: "quintela@redhat.com" <quintela@redhat.com>
-Subject: Re: [PATCH 0/3] migration: add sztd compression
-Thread-Topic: [PATCH 0/3] migration: add sztd compression
-Thread-Index: AQHV0rPjbIT2jCdaJkOsmtBiLTdSD6f+HrEA
-Date: Mon, 27 Jan 2020 07:19:06 +0000
-Message-ID: <7cb3de14-6ba3-b978-4da1-1261e20950ae@virtuozzo.com>
-References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
- <87o8ut3tzo.fsf@secure.laptop>
-In-Reply-To: <87o8ut3tzo.fsf@secure.laptop>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR02CA0094.eurprd02.prod.outlook.com
- (2603:10a6:7:29::23) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=dplotnikov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [178.34.161.7]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2efe6222-888b-45d7-dc36-08d7a2f93190
-x-ms-traffictypediagnostic: AM0PR08MB3283:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB3283D7F48596A18542B08391CF0B0@AM0PR08MB3283.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 02951C14DC
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(346002)(136003)(396003)(366004)(39840400004)(199004)(189003)(81166006)(16576012)(4326008)(81156014)(316002)(8676002)(54906003)(8936002)(6916009)(6486002)(5660300002)(2616005)(956004)(26005)(16526019)(186003)(52116002)(53546011)(31686004)(66476007)(64756008)(66556008)(2906002)(478600001)(71200400001)(31696002)(86362001)(36756003)(66446008)(66946007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3283;
- H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: KIJbGPQjPZb6IjZZIE8XFyfBjnKZgPJUQEKL+eyJ/4IPprHgp58O+mCFPnkHITQ54MTew9Fy7A5BP7aoUNyPj8b+lvkXrFVZZk/O/+vR0Cyt8roMZu6fF2RyMlZDHtSRo9UX1jE3ClsRNlUmliYzpD2wmCLhrm3kFkFXcLXNL2SKrynN1TH7/HWQQigUbdCDwsUgR+D4hWMgVFA6wPjXnGvJZzdUwalmEgigZLSjEa66xNntEAEVAILnZQy5zWRi3mGzHubNmp+woBabIdVaiAyztHprcgxUMCAKM6qf2RQmDqeyj26d2e0QPKor7mXcYG+OLq85APDMoIdrIkvagjPr6uVY+TV0kFlfcnfHb6gbR1+qoalZcCNX51AMRBuvuDiAEA4BvfANhMf5rX0d/9vZRRGfQDaIZGfwSabTKmacLy7AujeCnTDmP2gFoLkq
-x-ms-exchange-antispam-messagedata: 5CkVJytvLw3PRSgxhzpxzMKzOUjSZjTdSQcXcTvklW7Z6CL3eGG2ciC/7OAGwybKFGLA2a7bMydAs5V+87pwTU61e6Wc/czTfX4Db+5VjZ/KizGb8NG7WD3EJK23DKUupEeJtlK0Ctbjic/Tj7i/jA==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <13B4252AF2364F47B1402D031EBD126A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ivymQ-0003Uz-8M
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 02:25:56 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37101)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ivymQ-0003UK-12
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 02:25:54 -0500
+Received: by mail-ot1-x344.google.com with SMTP id d3so7146651otp.4
+ for <qemu-devel@nongnu.org>; Sun, 26 Jan 2020 23:25:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ifJ+qc8puuujGB6Cvg83hZhE0hMg55OHc17ESvFBZeM=;
+ b=qyp93t2QxTJ+T2ecqWl+SXFoSU8MbpWx8KQsuxxPSDjmyO1ywdQ6/b8Hj6H8ErGb+u
+ dnYI9vtGfB2c9MQ0awsQQexoUlB/81WoLbHJa6vF9TP5nJsB6/M7fcRmTBNjbP7Tv1vw
+ rFYRu7hhYGCYbKNOAUUlkZU56sFnXHyRjTK0TrFK5b2uV2uYnkv+9p4r6xkVqW+Z7bL1
+ ugjQ98DhoI78UQ7wuNJUnJLiyk+OlqkLn0MuKVD67380w9kh9iJdbeDzDt7Vc5FgTUlk
+ w6tsIOC9E23n8OV50eODyFJr5kH3WnkiQ/hVheu36zw13OkXFyQoQobEwVaJ88MqaFCd
+ 6VBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ifJ+qc8puuujGB6Cvg83hZhE0hMg55OHc17ESvFBZeM=;
+ b=WYHpvGshJmefeo8oQKQyE9ppvVUraN1s/FA7unkfqvHN0JzwfuE8LEAxnMmPT3HeWB
+ d57Dw+Hq5M3GODcQvdYuNM3isBFiu1NSTG58ybLQd0gROWKxGqpbzuiXynJCVD1rvu2h
+ k/84H0uqmnGU5j/XfHsFo4v1g7cra/gwvkAW2VXaY0IbTXB1oPGnWUeVWAO9yG81ZJeS
+ cjlsJ7uZV3kSbB3slcXP6H0xSlZGJzDBcKUnW2zZcmQOZ8bPMI7E9ySTxWfWcmqj9g3I
+ kxPkc6lYHn+gJlMs1vAKfplbgmOrhcWO2PnGKX04A7waoxAbUX1ztB1eEQjqJ1R+1Rg5
+ 68CA==
+X-Gm-Message-State: APjAAAWHcr3sY2t7VuWKa50fT2+gRabByWMCfeH0oNuPNXrotzJrlQDV
+ KbAwy5SmRegcN5jmF8RUYEkY/nWdypHiN8hW0/M=
+X-Google-Smtp-Source: APXvYqwssM4GH3HFvsQzOlTYBSVwd+MKm33pkoQ/GCthKDl24l0Bq+uYDDdtzhhiB3WLyn+XPF/pYmVnEBhWYkHocSE=
+X-Received: by 2002:a9d:7305:: with SMTP id e5mr11061668otk.64.1580109952914; 
+ Sun, 26 Jan 2020 23:25:52 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2efe6222-888b-45d7-dc36-08d7a2f93190
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2020 07:19:06.1006 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JAKTaGFomQu0Pop3p6nTAelbDe+SM0n/Gg6J5UYEkjzRT801fHcNjG6TowNg1xiuSNhV8p1B52K8lC4XdlR7Ee0X6b2mDoKQ74k1raYQfzs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3283
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.20.120
+References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1580079311-20447-25-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1580079311-20447-25-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 27 Jan 2020 08:25:37 +0100
+Message-ID: <CAL1e-=iMiByEZ9iiLtNsp9-O62GU8giXS1ScDxZMfYorr5yFJw@mail.gmail.com>
+Subject: Re: [PATCH rc3 24/30] hw/avr: Add helper to load raw/ELF firmware
+ binaries
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Content-Type: multipart/alternative; boundary="0000000000007319a9059d1a04a9"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,72 +89,421 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGksIEp1YW4NCg0KSSdsbCByZWFkIHRoZSBzZXJpZXMgc29vbi4gVGhhbmtzIGZvciBzZW5kaW5n
-IHRoYXQgdG8gbWUhDQoNCkRlbmlzDQoNCk9uIDI0LjAxLjIwMjAgMTU6NDMsIEp1YW4gUXVpbnRl
-bGEgd3JvdGU6DQo+IERlbmlzIFBsb3RuaWtvdiA8ZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tPiB3
-cm90ZToNCj4+IHpzdGQgZGF0ZSBjb21wcmVzc2lvbiBhbGdvcml0aG0gc2hvd3MgYmV0dGVyIHBl
-cmZvcm1hbmNlIG9uIGRhdGEgY29tcHJlc3Npb24uDQo+PiBJdCBtaWdodCBiZSB1c2VmdWwgdG8g
-ZW1wbG95IHRoZSBhbGdvcml0aG0gaW4gVk0gbWlncmF0aW9uIHRvIHJlZHVjZSBDUFUgdXNhZ2Uu
-DQo+PiBBIHVzZXIgd2lsbCBiZSBhYmxlIHRvIGNob29zZSBiZXR3ZWVuIHRob3NlIGFsZ29yaXRo
-bXMsIHRoZXJlZm9yIGNvbXByZXNzLXR5cGUNCj4+IG1pZ3JhdGlvbiBwYXJhbWV0ZXIgaXMgYWRk
-ZWQuDQo+Pg0KPj4gSGVyZSBhcmUgc29tZSByZXN1bHRzIG9mIHBlcmZvcm1hbmNlIGNvbXBhcmlz
-b24genN0ZCB2cyBnemlwOg0KPiBQbGVhc2UsIGNvdWxkIHlvdSBjb21tZW50IG9uIHRoZSBzZXJp
-ZXM6DQo+DQo+IFtQQVRDSCB2MyAwMC8yMV0gTXVsdGlmZCBNaWdyYXRpb24gQ29tcHJlc3Npb24N
-Cj4NCj4gVGhhdCBzZXJpZXMgaW50ZWdyYXRlZCB6c3RkL3psaWIgY29tcHJlc3Npb24gb24gdG9w
-IG9mIG11bHRpZmQsDQo+IGFkdmFudGFnZXMgb3ZlciAib2xkIiBjb21wcmVzc2lvbiBjb2RlIGFy
-ZToNCj4gLSBXZSBkb24ndCBoYXZlIHRvIGNvcHkgZGF0YSBiYWNrIGFuZCBmb3J0aA0KPiAtIFRo
-ZSB1bml0IG9mIGNvbXByZXNzaW9uIGlzIDUxMktCIGluc3RlYWQgb2YgNGtiDQo+IC0gV2UgImNv
-bnNlcnZlIiB0aGUgY29tcHJlc3Npb24gc3RhdGUgYmV0d2VlbiBwYWNrZXRzICh0aGlzIGlzIHNw
-ZWNpYWxseQ0KPiAgICBpbnRlcmVzdGluZyBmb3IgenN0ZCwgdGhhdCB1c2VzIGRpY3Rpb25hcmll
-cykNCj4NCj4+IGhvc3Q6IGk3LTQ3OTAgOHhDUFUgQCAzLjYwR0h6LCAxNkcgUkFNDQo+PiBtaWdy
-YXRpb24gdG8gdGhlIHNhbWUgaG9zdA0KPj4gVk06IDJ4VkNQVSwgOEcgUkFNIHRvdGFsDQo+PiA1
-RyBSQU0gdXNlZCwgbWVtb3J5IHBvcHVsYXRlZCB3aXRoIHBvc3RncmVxc2wgZGF0YQ0KPj4gcHJv
-ZHVjZWQgYnkgcGdiZW5jaCBwZXJmb3JtYW5jZSBiZW5jaG1hcmsNCj4+DQo+Pg0KPj4gVGhyZWFk
-czogMSBjb21wcmVzcyDigJMgMSBkZWNvbXByZXNzDQo+Pg0KPj4genN0ZCBwcm92aWRlcyBzbGln
-aHRseSBsZXNzIGNvbXByZXNzaW9uIHJhdGlvIHdpdGggYWxtb3N0IHRoZSBzYW1lDQo+PiBDUFUg
-dXNhZ2UgYnV0IGNvcGVzIHdpdGggUkFNICBjb21wcmVzc2lvbiByb2dobHkgMiB0aW1lcyBmYXN0
-ZXINCj4+DQo+PiBjb21wcmVzc2lvbiB0eXBlICAgICAgICAgICAgICB6bGliICAgICAgIHwgICAg
-ICB6c3RkDQo+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0NCj4+IGNvbXByZXNzaW9uIGxldmVsICAgICAgICAgIDEgICAgICAgNSAgICAg
-fCAgIDEgICAgICAgNQ0KPj4gY29tcHJlc3Npb24gcmF0aW8gICAgICAgICAgNi45MiAgICA3LjA1
-ICB8ICAgNi42OSAgICA2Ljg5DQo+PiBjcHUgaWRsZSwgJSAgICAgICAgICAgICAgICA4MiAgICAg
-IDgzICAgIHwgICA4NiAgICAgIDgwDQo+PiB0aW1lLCBzZWMgICAgICAgICAgICAgICAgICA0OSAg
-ICAgIDcxICAgIHwgICAyNiAgICAgIDMxDQo+PiB0aW1lIGRpZmYgdG8gemxpYiwgc2VjICAgICAg
-ICAgICAgICAgICAgICAgIC0yNSAgICAgLTQxDQo+Pg0KPj4NCj4+IFRocmVhZHM6IDggY29tcHJl
-c3Mg4oCTIDIgZGVjb21wcmVzcw0KPj4NCj4+IHpzdGQgcHJvdmlkZXMgdGhlIHNhbWUgbWlncmF0
-aW9uIHRpbWUgd2l0aCBsZXNzIGNwdSBjb25zdW1wdGlvbg0KPj4NCj4+IGNvbXByZXNzaW9uIHR5
-cGUgICAgICAgICBub25lICB8ICAgICAgICBnemlwKHpsaWIpICAgIHwgICAgICAgICAgenN0ZA0K
-Pj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiBjb21wcmVzc2lvbiBsZXZlbCAgICAgICAgLSAg
-ICAgfCAgMSAgICAgIDUgICAgICAgOSAgICB8ICAgMSAgICAgICA1ICAgICAgIDE1DQo+PiBjb21w
-cmVzc2lvbiByYXRpbyAgICAgICAgLSAgICAgfCAgNi45NCAgIDYuOTkgICAgNy4xNCB8ICAgNi42
-NCAgICA2Ljg5ICAgIDYuOTMNCj4+IHRpbWUsIHNlYyAgICAgICAgICAgICAgICAxNTQgICB8ICAy
-MiAgICAgMjMgICAgICAyNyAgIHwgICAyMyAgICAgIDIzICAgICAgMjUNCj4+IGNwdSBpZGxlLCAl
-ICAgICAgICAgICAgICA5OSAgICB8ICA0NSAgICAgMzAgICAgICAxMiAgIHwgICA3MCAgICAgIDUy
-ICAgICAgMjMNCj4+IGNwdSBpZGxlIGRpZmYgdG8gemxpYiAgICAgICAgICB8ICAgICAgICAgICAg
-ICAgICAgICAgIHwgIC0yNSUgICAgLTIyJSAgICAtMTElDQo+IEkgZG9uJ3QgaGF2ZSBoYW5keSBy
-ZXN1bHRzLCBidXQgaXQgbG9va2VkIGZvciBtZSBsaWtlIHlvdToNCj4gLSB6c3RkIGhhcyBhIHdh
-eSBiZXR0ZXIgbGF0ZW5jeSB0aGFuIHpsaWIgKGkuZS4gdGhlIHBhY2tldCBjYW1lcyBzb29uZXIp
-DQo+IC0gQW5kIGl0IGNvbXByZXNzIG11Y2ggYmV0dGVyDQo+DQo+IE9uIHRoZSBtaWdyYXRpb24g
-dGVzdCAoYmVzdCBwb3NzaWJsZSBjYXNlIGZvciBhIGNvbXByZXNzb3IsIGFzIHdlIGFyZQ0KPiB3
-cml0dGluZyBqdXN0IG9uZSBieXRlIG9mIGVhY2ggcGFnZSwgYW5kIHdlIHdyaXRlIHRoZSBzYW1l
-IHZhbHVlIGluIGFsbA0KPiBwYWdlcyk6DQo+DQo+IC0gemxpYjogY29tcHJlc3MgNTEyS0IgLT4g
-MjUwMCBieXRlcw0KPiAtIHpzdGQ6IGNvbXBlc3MgNTEyS0IgLT4gNTIgYnl0ZXMgKHllYXAsIEkg
-dGVzdGVkIHNldmVyYWwgdGltZXMsIGl0DQo+ICAgIGxvb2tlZCB0b28gc21hbGwpDQo+DQo+IFNl
-ZSB0aGF0IEkgcG9zdGVkIGFub3RoZXIgcGF0Y2ggdG8gImRlbGV0ZSIgdGhlIG9sZCBjb21wcmVz
-c2lvbiBjb2RlLg0KPiBXaHk/DQo+IC0gSSBoYXZlIGJlZW4gdW5hYmxlIHRvIG1vZGlmeSBtaWdy
-YXRpb24tdGVzdCB0byB0ZXN0IGl0IGFuZCB3b3JrDQo+ICAgIHJlbGlhYmxlbHkgKG9ubHkgd2F5
-IHdhcyB0byBhbGxvdyBhIHJlYWxseSBodWdlIGRvd250aW1lKQ0KPiAtIEV2ZW4gd2l0aCBzbG93
-IG5ldHdvcmtpbmcgKDFHaWdhYml0KSBJIGdvdCByZWFsbHkgbWl4ZWQgcmVzdWx0cywNCj4gICAg
-YmVjYXVzZSBhcyBpdCBpcyBzbyBzbG93LCB0aGUgZ3Vlc3QgY29udGludWUgZGlydHlpbmcgbWVt
-b3J5LCBhbmQgaW4NCj4gICAgbXkgdGVzdHMgaXQgd2FzIG5ldmVyIGEgd2lubmVyDQo+DQo+IFRo
-YW5rcywgSnVhbi4NCj4NCg0K
+--0000000000007319a9059d1a04a9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+23:56 Ned, 26.01.2020. Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> Add avr_load_firmware() function to load firmware in ELF or
+> raw binary format.
+>
+> [AM: Corrected the type of the variable containing e_flags]
+>
+> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> ---
+>  hw/avr/Makefile.objs |  1 +
+>  hw/avr/boot.c        | 74
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/avr/boot.h        | 33 +++++++++++++++++++++++
+>  include/elf.h        |  2 ++
+>  4 files changed, 110 insertions(+)
+>  create mode 100644 hw/avr/Makefile.objs
+>  create mode 100644 hw/avr/boot.c
+>  create mode 100644 hw/avr/boot.h
+>
+> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+> new file mode 100644
+> index 0000000..123f174
+> --- /dev/null
+> +++ b/hw/avr/Makefile.objs
+> @@ -0,0 +1 @@
+> +obj-y +=3D boot.o
+> diff --git a/hw/avr/boot.c b/hw/avr/boot.c
+> new file mode 100644
+> index 0000000..9ac2c88
+> --- /dev/null
+> +++ b/hw/avr/boot.c
+> @@ -0,0 +1,74 @@
+> +/*
+> + * AVR loader helpers
+> + *
+> + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
+> + *
+> + * This work is licensed under the terms of the GNU GPLv2 or later.
+> + * See the COPYING file in the top-level directory.
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "hw/loader.h"
+> +#include "elf.h"
+> +#include "boot.h"
+> +#include "qemu/error-report.h"
+> +
+> +bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
+> +                       MemoryRegion *mr, const char *firmware)
+> +{
+> +    const char *filename;
+> +    int bytes_loaded;
+> +    uint64_t entry;
+> +    uint32_t e_flags;
+> +
+> +    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
+> +    if (filename =3D=3D NULL) {
+> +        error_report("Unable to find %s", firmware);
+> +        return false;
+> +    }
+> +
+> +    bytes_loaded =3D load_elf_ram_sym(filename,
+> +                                    NULL, NULL, NULL,
+> +                                    &entry, NULL, NULL,
+> +                                    &e_flags, 0, EM_AVR, 0, 0,
+> +                                    NULL, true, NULL);
+> +    if (bytes_loaded >=3D 0) {
+> +        /* If ELF file is provided, determine CPU type reading ELF
+e_flags. */
+> +        const char *elf_cpu =3D avr_flags_to_cpu_type(e_flags, NULL);
+> +        const char *mcu_cpu_type =3D object_get_typename(OBJECT(cpu));
+> +        int cpu_len =3D strlen(mcu_cpu_type) - strlen(AVR_CPU_TYPE_SUFFI=
+X);
+> +
+> +        if (entry) {
+> +            error_report("BIOS entry_point must be 0x0000 "
+> +                         "(ELF image '%s' has entry_point 0x%04" PRIx64
+")",
+> +                         firmware, entry);
+> +            return false;
+> +        }
+> +        if (!elf_cpu) {
+> +            warn_report("Could not determine CPU type for ELF image
+'%s', "
+> +                        "assuming '%.*s' CPU",
+> +                         firmware, cpu_len, mcu_cpu_type);
+> +            return true;
+> +        }
+> +        if (strcmp(elf_cpu, mcu_cpu_type)) {
+> +            error_report("Current machine: %s with '%.*s' CPU",
+> +                         MACHINE_GET_CLASS(ms)->desc, cpu_len,
+mcu_cpu_type);
+> +            error_report("ELF image '%s' is for '%.*s' CPU",
+> +                         firmware,
+> +                         (int)(strlen(elf_cpu) -
+strlen(AVR_CPU_TYPE_SUFFIX)),
+> +                         elf_cpu);
+> +            return false;
+> +        }
+> +    } else {
+> +        bytes_loaded =3D load_image_targphys(filename, OFFSET_CODE,
+> +                                           memory_region_size(mr));
+> +    }
+> +    if (bytes_loaded < 0) {
+> +        error_report("Unable to load firmware image %s as ELF or raw
+binary",
+> +                     firmware);
+> +        return false;
+> +    }
+> +    return true;
+> +}
+> diff --git a/hw/avr/boot.h b/hw/avr/boot.h
+> new file mode 100644
+> index 0000000..62bc10c
+> --- /dev/null
+> +++ b/hw/avr/boot.h
+> @@ -0,0 +1,33 @@
+> +/*
+> + * AVR loader helpers
+> + *
+> + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
+> + *
+> + * This work is licensed under the terms of the GNU GPLv2 or later.
+> + * See the COPYING file in the top-level directory.
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +
+> +#ifndef HW_AVR_BOOT_H
+> +#define HW_AVR_BOOT_H
+> +
+> +#include "hw/boards.h"
+> +#include "cpu.h"
+> +
+> +/**
+> + * avr_load_firmware:   load an image into a memory region
+> + *
+> + * @cpu:        Handle a AVR CPU object
+> + * @ms:         A MachineState
+> + * @mr:         Memory Region to load into
+> + * @firmware:   Path to the firmware file (raw binary or ELF format)
+> + *
+> + * Load a firmware supplied by the machine or by the user  with the
+> + * '-bios' command line option, and put it in target memory.
+> + *
+> + * Returns: true on success, false on error.
+> + */
+> +bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
+> +                       MemoryRegion *mr, const char *firmware);
+> +
+> +#endif
+> diff --git a/include/elf.h b/include/elf.h
+> index 8fbfe60..3f08f68 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -202,6 +202,8 @@ typedef struct mips_elf_abiflags_v0 {
+>  #define EM_MOXIE           223     /* Moxie processor family */
+>  #define EM_MOXIE_OLD       0xFEED
+>
+> +#define EM_AVR 83 /* AVR 8-bit microcontroller */
+> +
+
+This line is misplaced - it should be placed earlier, to respect the order
+of EM_XXX constants.
+
+>  /* This is the info that is needed to parse the dynamic section of the
+file */
+>  #define DT_NULL                0
+>  #define DT_NEEDED      1
+> --
+> 2.7.4
+>
+
+--0000000000007319a9059d1a04a9
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">23:56 Ned, 26.01.2020. Aleksandar Markovic &lt;<a href=3D"ma=
+ilto:aleksandar.markovic@rt-rk.com">aleksandar.markovic@rt-rk.com</a>&gt; =
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; From: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.or=
+g">f4bug@amsat.org</a>&gt;<br>
+&gt;<br>
+&gt; Add avr_load_firmware() function to load firmware in ELF or<br>
+&gt; raw binary format.<br>
+&gt;<br>
+&gt; [AM: Corrected the type of the variable containing e_flags]<br>
+&gt;<br>
+&gt; Suggested-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.m=
+ail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt;<br>
+&gt; Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug=
+@amsat.org">f4bug@amsat.org</a>&gt;<br>
+&gt; Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.=
+mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt;<br>
+&gt; ---<br>
+&gt; =C2=A0hw/avr/Makefile.objs |=C2=A0 1 +<br>
+&gt; =C2=A0hw/avr/boot.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 74 ++++++++++++++++++=
+++++++++++++++++++++++++++++++++++<br>
+&gt; =C2=A0hw/avr/boot.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 33 ++++++++++++++++++=
++++++<br>
+&gt; =C2=A0include/elf.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 ++<br>
+&gt; =C2=A04 files changed, 110 insertions(+)<br>
+&gt; =C2=A0create mode 100644 hw/avr/Makefile.objs<br>
+&gt; =C2=A0create mode 100644 hw/avr/boot.c<br>
+&gt; =C2=A0create mode 100644 hw/avr/boot.h<br>
+&gt;<br>
+&gt; diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs<br>
+&gt; new file mode 100644<br>
+&gt; index 0000000..123f174<br>
+&gt; --- /dev/null<br>
+&gt; +++ b/hw/avr/Makefile.objs<br>
+&gt; @@ -0,0 +1 @@<br>
+&gt; +obj-y +=3D boot.o<br>
+&gt; diff --git a/hw/avr/boot.c b/hw/avr/boot.c<br>
+&gt; new file mode 100644<br>
+&gt; index 0000000..9ac2c88<br>
+&gt; --- /dev/null<br>
+&gt; +++ b/hw/avr/boot.c<br>
+&gt; @@ -0,0 +1,74 @@<br>
+&gt; +/*<br>
+&gt; + * AVR loader helpers<br>
+&gt; + *<br>
+&gt; + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9<br>
+&gt; + *<br>
+&gt; + * This work is licensed under the terms of the GNU GPLv2 or later.<b=
+r>
+&gt; + * See the COPYING file in the top-level directory.<br>
+&gt; + * SPDX-License-Identifier: GPL-2.0-or-later<br>
+&gt; + */<br>
+&gt; +<br>
+&gt; +#include &quot;qemu/osdep.h&quot;<br>
+&gt; +#include &quot;qemu-common.h&quot;<br>
+&gt; +#include &quot;hw/loader.h&quot;<br>
+&gt; +#include &quot;elf.h&quot;<br>
+&gt; +#include &quot;boot.h&quot;<br>
+&gt; +#include &quot;qemu/error-report.h&quot;<br>
+&gt; +<br>
+&gt; +bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0MemoryRegion *mr, const char *firmware)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 const char *filename;<br>
+&gt; +=C2=A0 =C2=A0 int bytes_loaded;<br>
+&gt; +=C2=A0 =C2=A0 uint64_t entry;<br>
+&gt; +=C2=A0 =C2=A0 uint32_t e_flags;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmwa=
+re);<br>
+&gt; +=C2=A0 =C2=A0 if (filename =3D=3D NULL) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;Unable to find %s&quot=
+;, firmware);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 bytes_loaded =3D load_elf_ram_sym(filename,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 NULL, NULL, NULL,<=
+br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;entry, NULL, =
+NULL,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;e_flags, 0, E=
+M_AVR, 0, 0,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 NULL, true, NULL);=
+<br>
+&gt; +=C2=A0 =C2=A0 if (bytes_loaded &gt;=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* If ELF file is provided, determine CPU=
+ type reading ELF e_flags. */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 const char *elf_cpu =3D avr_flags_to_cpu_=
+type(e_flags, NULL);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 const char *mcu_cpu_type =3D object_get_t=
+ypename(OBJECT(cpu));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 int cpu_len =3D strlen(mcu_cpu_type) - st=
+rlen(AVR_CPU_TYPE_SUFFIX);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (entry) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;BIOS ent=
+ry_point must be 0x0000 &quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0&quot;(ELF image &#39;%s&#39; has entry_point 0x%04&qu=
+ot; PRIx64 &quot;)&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0firmware, entry);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!elf_cpu) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 warn_report(&quot;Could not=
+ determine CPU type for ELF image &#39;%s&#39;, &quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 &quot;assuming &#39;%.*s&#39; CPU&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0firmware, cpu_len, mcu_cpu_type);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return true;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (strcmp(elf_cpu, mcu_cpu_type)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;Current =
+machine: %s with &#39;%.*s&#39; CPU&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0MACHINE_GET_CLASS(ms)-&gt;desc, cpu_len, mcu_cpu_type)=
+;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;ELF imag=
+e &#39;%s&#39; is for &#39;%.*s&#39; CPU&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0firmware,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0(int)(strlen(elf_cpu) - strlen(AVR_CPU_TYPE_SUFFIX)),<=
+br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0elf_cpu);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 bytes_loaded =3D load_image_targphys(file=
+name, OFFSET_CODE,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0memory_region_size(mr));<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 if (bytes_loaded &lt; 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;Unable to load firmwar=
+e image %s as ELF or raw binary&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0firmware);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 return true;<br>
+&gt; +}<br>
+&gt; diff --git a/hw/avr/boot.h b/hw/avr/boot.h<br>
+&gt; new file mode 100644<br>
+&gt; index 0000000..62bc10c<br>
+&gt; --- /dev/null<br>
+&gt; +++ b/hw/avr/boot.h<br>
+&gt; @@ -0,0 +1,33 @@<br>
+&gt; +/*<br>
+&gt; + * AVR loader helpers<br>
+&gt; + *<br>
+&gt; + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9<br>
+&gt; + *<br>
+&gt; + * This work is licensed under the terms of the GNU GPLv2 or later.<b=
+r>
+&gt; + * See the COPYING file in the top-level directory.<br>
+&gt; + * SPDX-License-Identifier: GPL-2.0-or-later<br>
+&gt; + */<br>
+&gt; +<br>
+&gt; +#ifndef HW_AVR_BOOT_H<br>
+&gt; +#define HW_AVR_BOOT_H<br>
+&gt; +<br>
+&gt; +#include &quot;hw/boards.h&quot;<br>
+&gt; +#include &quot;cpu.h&quot;<br>
+&gt; +<br>
+&gt; +/**<br>
+&gt; + * avr_load_firmware:=C2=A0 =C2=A0load an image into a memory region<=
+br>
+&gt; + *<br>
+&gt; + * @cpu:=C2=A0 =C2=A0 =C2=A0 =C2=A0 Handle a AVR CPU object<br>
+&gt; + * @ms:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0A MachineState<br>
+&gt; + * @mr:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Memory Region to load into<b=
+r>
+&gt; + * @firmware:=C2=A0 =C2=A0Path to the firmware file (raw binary or EL=
+F format)<br>
+&gt; + *<br>
+&gt; + * Load a firmware supplied by the machine or by the user=C2=A0 with =
+the<br>
+&gt; + * &#39;-bios&#39; command line option, and put it in target memory.<=
+br>
+&gt; + *<br>
+&gt; + * Returns: true on success, false on error.<br>
+&gt; + */<br>
+&gt; +bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0MemoryRegion *mr, const char *firmware);<br>
+&gt; +<br>
+&gt; +#endif<br>
+&gt; diff --git a/include/elf.h b/include/elf.h<br>
+&gt; index 8fbfe60..3f08f68 100644<br>
+&gt; --- a/include/elf.h<br>
+&gt; +++ b/include/elf.h<br>
+&gt; @@ -202,6 +202,8 @@ typedef struct mips_elf_abiflags_v0 {<br>
+&gt; =C2=A0#define EM_MOXIE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0223=C2=
+=A0 =C2=A0 =C2=A0/* Moxie processor family */<br>
+&gt; =C2=A0#define EM_MOXIE_OLD=C2=A0 =C2=A0 =C2=A0 =C2=A00xFEED<br>
+&gt;<br>
+&gt; +#define EM_AVR 83 /* AVR 8-bit microcontroller */<br>
+&gt; +</p>
+<p dir=3D"ltr">This line is misplaced - it should be placed earlier, to res=
+pect the order of EM_XXX constants.</p>
+<p dir=3D"ltr">&gt; =C2=A0/* This is the info that is needed to parse the d=
+ynamic section of the file */<br>
+&gt; =C2=A0#define DT_NULL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 0<br>
+&gt; =C2=A0#define DT_NEEDED=C2=A0 =C2=A0 =C2=A0 1<br>
+&gt; -- <br>
+&gt; 2.7.4<br>
+&gt;<br>
+</p>
+
+--0000000000007319a9059d1a04a9--
 
