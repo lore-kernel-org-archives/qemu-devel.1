@@ -2,82 +2,79 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B67C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C30C33CB7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:11:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1210214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:01:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1F4620716
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:11:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YeSYrhI5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1210214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E1CIsw+H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F4620716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw40w-0004AQ-5Y
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 08:01:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43713)
+	id 1iw4Aq-0007mW-2Z
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 08:11:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1iw3zg-00038m-Kz
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:59:57 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iw4AD-0007LD-R8
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1iw3zf-0004kk-Bo
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:59:56 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:35900)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1iw3zf-0004hm-2r
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:59:55 -0500
-Received: by mail-lj1-x244.google.com with SMTP id r19so10574508ljg.3
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 04:59:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=wVBAbf00d2tPuEnDfJH33UTFD9tw3xYmPmOvJjAUbUI=;
- b=YeSYrhI5y9uCZgQbKsndnmvXd2CkB/zvAcZ9s6CjU7Ly5c4VGgIaQbQj170QTdiMVo
- Us7mmgAAZvd5V8CSiVX4B6/zHQtMQkI9kg864pCmvLqdXyRbV9dhP8+W8HEsAFUWPj+s
- 8IhDqN2wTZoQRNgWHLjWubmQ8RZGXHtHwuNloaJTlj7rWXTLry7Z89P3/m6Zg93Mvw1D
- bapWex7V+JtD+ZeOEiVFzGDRpHX3Wvd75w4tiLIqHXAuow8TfXCpuDyGtMNYGTFOaWah
- gvu4VXS3HpHHgfcw89S23xmCSy3P/m9z7s14AHp86Tx+bgzOBBLmESL2XRJoFdpNrRbU
- 0qrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=wVBAbf00d2tPuEnDfJH33UTFD9tw3xYmPmOvJjAUbUI=;
- b=JdseY4cCHZ2kkcTbBUd/xSZ/bgs91XRDwGAE8RdQC9SsWO27/aoWyaLR8BmdvXndHo
- PtTXZ3hLnazZVjO59nQdIOvs7Ml7E5XbG8lERR/+7QzxtS0qnpBdD7JqOZACdR5bWu2r
- M+e2Z308eD2z6JsVhrqH+0MSgGmNpZ84nWltS3AN1AsFLo0T//KVzA/0TcDM9/kOWDXx
- C2xijq76Lu3dZPVGInt7Hx+FX62k+k51nQiNsobmoE5UEI/688U1fKrG0XOu41k/1B3/
- NFLtUEs5YBQgtdst72MKdz3wfcYo+Ppe2mlfHEnFAMV9rbVmsn6uHoQETmTJI5H5L5be
- WG6w==
-X-Gm-Message-State: APjAAAVBtqi62tFnLT9tgO/mu6FABnZulLKB0Ts6HCJfjCGePb1tEmWB
- XEG/AUcY2PE8kcFcBlJRipJgn7/RKdDz8cG1Z4jK1A==
-X-Google-Smtp-Source: APXvYqyukMYgbhx5e10DN8rcAK3lFEiGOD52RmSIyVAPZapxi5OLs1K5m8IScyAk4ds6Ddiyq4DTAExZVJAlwJx1l68=
-X-Received: by 2002:a2e:924d:: with SMTP id v13mr10446125ljg.267.1580129993318; 
- Mon, 27 Jan 2020 04:59:53 -0800 (PST)
+ (envelope-from <cohuck@redhat.com>) id 1iw4AB-0003bY-Q2
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:10:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34321
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iw4AB-0003ai-N2
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:10:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580130646;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0uxvZFay6N93u8IhS4o9XRA3k6uRFZAIjKs5xbkT94o=;
+ b=E1CIsw+HJx0nZ7XSxqEi8bsqGIYa36q7hb3D1lZosMGfKj8aFMR+gu3rgAXAt+JsatxIxv
+ Pwb5mqiX7a2YrwWOi3jU0Y73UNTZRqP/TxR/mpGiiLEJJcDOz3bjaIH0m3bauRusEvp0W8
+ vWvH0XnNGgHWDZM1w1ktWrZgGTxbsEY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-kcf_gN2DPVaZyZo6bHSKLg-1; Mon, 27 Jan 2020 08:10:43 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 285BF477;
+ Mon, 27 Jan 2020 13:10:42 +0000 (UTC)
+Received: from gondolin (ovpn-116-220.ams2.redhat.com [10.36.116.220])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 447E4863CF;
+ Mon, 27 Jan 2020 13:10:34 +0000 (UTC)
+Date: Mon, 27 Jan 2020 14:10:31 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v2 2/4] virtio-scsi: default num_queues to -smp N
+Message-ID: <20200127141031.6e108839.cohuck@redhat.com>
+In-Reply-To: <20200124100159.736209-3-stefanha@redhat.com>
+References: <20200124100159.736209-1-stefanha@redhat.com>
+ <20200124100159.736209-3-stefanha@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200124165335.422-1-robert.foley@linaro.org>
- <20200124165335.422-4-robert.foley@linaro.org>
- <87v9oxf9b7.fsf@linaro.org>
-In-Reply-To: <87v9oxf9b7.fsf@linaro.org>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Mon, 27 Jan 2020 07:59:42 -0500
-Message-ID: <CAEyhzFsnC8Tdns6MchMqSsZk1gwBbQupF3BmaDqmVKahgCxCqA@mail.gmail.com>
-Subject: Re: [PATCH 3/8] tests/vm: change wait_ssh to optionally wait for root.
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: kcf_gN2DPVaZyZo6bHSKLg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,93 +86,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Peter Puhov <peter.puhov@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Jan 2020 at 06:06, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
-> > Allow wait_ssh to wait for root user to be ready.
-> > This solves the issue where we perform a wait_ssh()
-> > successfully, but the root user is not yet ready
-> > to be logged in.
->
-> So in the case it's the root user we care about...
-We care about both the root and guest users.  See below.
-> >  tests/vm/basevm.py | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> > index 86908f58ec..3b4403ddcb 100755
-> > --- a/tests/vm/basevm.py
-> > +++ b/tests/vm/basevm.py
-> > @@ -310,12 +310,17 @@ class BaseVM(object):
-> >      def print_step(self, text):
-> >          sys.stderr.write("### %s ...\n" % text)
-> >
-> > -    def wait_ssh(self, seconds=3D600):
-> > +    def wait_ssh(self, wait_root=3DFalse, seconds=3D600):
-> >          starttime =3D datetime.datetime.now()
-> >          endtime =3D starttime + datetime.timedelta(seconds=3Dseconds)
-> >          guest_up =3D False
-> >          while datetime.datetime.now() < endtime:
-> > -            if self.ssh("exit 0") =3D=3D 0:
-> > +            if wait_root:
-> > +                if self.ssh("exit 0") =3D=3D 0 and\
-> > +                   self.ssh_root("exit 0") =3D=3D 0:
->
-> ...why do we need to test both here?
-We want to make sure the root user is up in
-addition to the normal/guest user.  We're trying to add on the root user
-since the issue we saw is that the guest user was up, (wait_ssh() completed=
-),
-but then when the root user tries to do something we get an error,
-since root is not ready yet.
+On Fri, 24 Jan 2020 10:01:57 +0000
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
-> > +                    guest_up =3D True
-> > +                    break
-> > +            elif self.ssh("exit 0") =3D=3D 0:
->
-> Is this simpler?
-Certainly simpler.  :)
-And simpler seems like the right call here.  But we'll need to call
-into wait_ssh() twice,
-once with the wait_root option and once without.  But I think this is bette=
-r
-since it makes the code on the caller side more explicit and clear in
-that we will
-explicitly wait for the guest user and then wait for the root user.
+> Automatically size the number of request virtqueues to match the number
 
-Thanks,
--Rob Foley
->     def wait_ssh(self, wait_root=3DFalse, seconds=3D600):
->         starttime =3D datetime.datetime.now()
->         endtime =3D starttime + datetime.timedelta(seconds=3Dseconds)
->         guest_up =3D False
->         while datetime.datetime.now() < endtime:
->             if wait_root and self.ssh_root("exit 0") =3D=3D 0:
->                 guest_up =3D True
->                 break
->             elif self.ssh("exit 0") =3D=3D 0:
->                 guest_up =3D True
->                 break
->             seconds =3D (endtime - datetime.datetime.now()).total_seconds=
-()
->             logging.debug("%ds before timeout", seconds)
->             time.sleep(1)
->         if not guest_up:
->             raise Exception("Timeout while waiting for guest ssh")
->
->
-> >                  guest_up =3D True
-> >                  break
-> >              seconds =3D (endtime - datetime.datetime.now()).total_seco=
-nds()
->
->
-> --
-> Alex Benn=C3=A9e
+"If the pci transport is used, ..." ?
+
+> of vCPUs.  This ensures that completion interrupts are handled on the
+> same vCPU that submitted the request.  No IPI is necessary to complete
+> an I/O request and performance is improved.
+
+"For other transports, the number of request queues continues to
+default to 1." ?
+
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  hw/core/machine.c               |  3 +++
+>  hw/scsi/vhost-scsi.c            |  3 ++-
+>  hw/scsi/vhost-user-scsi.c       |  3 ++-
+>  hw/scsi/virtio-scsi.c           |  6 +++++-
+>  hw/virtio/vhost-scsi-pci.c      | 10 ++++++++--
+>  hw/virtio/vhost-user-scsi-pci.c | 10 ++++++++--
+>  hw/virtio/virtio-scsi-pci.c     | 10 ++++++++--
+>  include/hw/virtio/virtio-scsi.h |  2 ++
+>  8 files changed, 38 insertions(+), 9 deletions(-)
+> 
+(...)
+> diff --git a/hw/virtio/vhost-scsi-pci.c b/hw/virtio/vhost-scsi-pci.c
+> index e8dfbfc60f..38a8f0c3ef 100644
+> --- a/hw/virtio/vhost-scsi-pci.c
+> +++ b/hw/virtio/vhost-scsi-pci.c
+> @@ -17,6 +17,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "standard-headers/linux/virtio_pci.h"
+> +#include "hw/boards.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/virtio/vhost-scsi.h"
+>  #include "qapi/error.h"
+> @@ -47,10 +48,15 @@ static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>  {
+>      VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
+>      DeviceState *vdev = DEVICE(&dev->vdev);
+> -    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
+> +    VirtIOSCSIConf *conf = &dev->vdev.parent_obj.parent_obj.conf;
+> +
+> +    /* 1:1 vq to vcpu mapping is ideal because it avoids IPIs */
+> +    if (conf->num_queues == VIRTIO_SCSI_AUTO_NUM_QUEUES) {
+> +        conf->num_queues = current_machine->smp.cpus;
+
+This now maps the request vqs 1:1 to the vcpus. What about the fixed
+vqs? If they don't really matter, amend the comment to explain that?
+
+> +    }
+>  
+>      if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> -        vpci_dev->nvectors = vs->conf.num_queues + 3;
+> +        vpci_dev->nvectors = conf->num_queues + VIRTIO_SCSI_VQ_NUM_FIXED + 1;
+>      }
+>  
+>      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+
 
