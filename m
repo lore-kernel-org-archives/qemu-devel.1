@@ -2,81 +2,64 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BFE2C35240
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 02:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FA21C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 03:41:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 077E22071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 02:40:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 234E420720
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 03:41:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KglwsID0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077E22071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RCdMZcuz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234E420720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ivuJy-0002rd-63
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 21:40:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33474)
+	id 1ivvHR-0002wc-9z
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jan 2020 22:41:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ivuJO-0002QD-9i
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 21:39:39 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ivvGF-0001cl-BX
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 22:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ivuJM-0004rX-TD
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 21:39:38 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44750)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ivuJM-0004qX-Lp
- for qemu-devel@nongnu.org; Sun, 26 Jan 2020 21:39:36 -0500
-Received: by mail-oi1-x244.google.com with SMTP id d62so5295990oia.11
- for <qemu-devel@nongnu.org>; Sun, 26 Jan 2020 18:39:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=O6vd8VesyZ9MxGaX7dCjOSk7sk5X5pEY89JnMxMy1MM=;
- b=KglwsID02UHwpUWhmRKjYYQCVAPggsioOF+2TPBcESHuvCO8OoIRfqmuS0LlFCt6IE
- bg55ICsFWhn9Pm60nsEsCr0m05AJtr7KqW8YuqMOsEovi49FrDikImxA8oKuEr3uMAlk
- CZDtZ6Wcdg65KXu72OxXL8E0zKaErnimM/t/DW6hEKXvwFzh8e579T4YXYbtNLdW7uvs
- RfVwRveALcrILnX1Z8EN88HgGMWak6kHDYxY0Tx2yNZeuDSl4bL7+Vw+00DRbpxGhXu7
- S9uzblQsfbf0Hrur6etePxkPq1+RTk+jFEWRmjZGF4gywKo/u760PKwIsdi517ptB73W
- +tmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=O6vd8VesyZ9MxGaX7dCjOSk7sk5X5pEY89JnMxMy1MM=;
- b=Zn2L9G7dHuw/QTrtOX9bGT1eWUn7RamEAVYvh/t6bn/XCTfNXRKX4LmO6v8v9KMGO2
- rINlKYlSfvN18d2VBpH/IXOWMPiQArXohjjHP5Ey0Req4R9DGvqckIYUjvB/aYUaZBoL
- 4TfiLx3Zgwiet7XcqtECxuGFShKq0NDtnuGNblgatnjP4CAgTon0oB+6NM8xXYrEYty1
- jFg2epK+qKvNzGqg3Pu2U7cWMRJ1Jr489cLNNheNy2R8XRRGWnS59ACl3t9MyFk/SoUH
- IteEV7n4ZMPKuDIsj1KbMeETeEFYidDm/jaS3jsnMoR6o7bG9GncseqmEGlylZY2ajnj
- Rbyg==
-X-Gm-Message-State: APjAAAUy8gNoSBPAmI0ywwC7dRO+fiBLfOe9m2JWCqlu4GnRhfMRRqoA
- OGrzp7VeXJokD+0baCFyS+WRmeguHtxJfnMYWIQ=
-X-Google-Smtp-Source: APXvYqzEW1L0iV7TS0a3+PHDNlkK8g0lKPqBxN5AX11SQAkUEbvfHr/WbmIVpT1Uyq2IhsWnjE82QOAyX0zYFCvf/NE=
-X-Received: by 2002:a05:6808:3ba:: with SMTP id
- n26mr4608944oie.62.1580092775176; 
- Sun, 26 Jan 2020 18:39:35 -0800 (PST)
+ (envelope-from <dgibson@ozlabs.org>) id 1ivvGD-0005Mc-Fr
+ for qemu-devel@nongnu.org; Sun, 26 Jan 2020 22:40:27 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:43649)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ivvGC-0005Jv-H7; Sun, 26 Jan 2020 22:40:25 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 485b9Y226nz9sNx; Mon, 27 Jan 2020 14:40:17 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1580096417;
+ bh=kU9VDb2GKJYMOn/CesT+JqrXn9A9Yg7ZgCGqpecejE0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=RCdMZcuzod2e40dHNMvRHRbIEhZRUfcLLVjt2x0AC9WbqP4BniVmUvi7Eoso/Nl2g
+ 0J9Z8GkdPkrl9fD1vmfty6qKkVDqgR2Ild16oohGZ+6DLGqDduscOlCgtTn5DE6uNY
+ KdOwVhw6DHJv2hWa6jHzdfxU8Q9lxwqa7CW47/b8=
+Date: Mon, 27 Jan 2020 14:39:36 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH REPOST v3 64/80] ppc/{ppc440_bamboo,sam460ex}: drop RAM
+ size fixup
+Message-ID: <20200127033936.GC1818@umbus.fritz.box>
+References: <1579779525-20065-1-git-send-email-imammedo@redhat.com>
+ <1579779525-20065-65-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1580079311-20447-3-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1580079311-20447-3-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 27 Jan 2020 03:39:24 +0100
-Message-ID: <CAL1e-=h5v5nXBkoxhSx6inU6G59AHca_8_XrkOsX13C7uRU1jA@mail.gmail.com>
-Subject: Re: [PATCH rc3 02/30] target/avr: Introduce AVR CPU class object
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="m51xatjYGsM+13rf"
+Content-Disposition: inline
+In-Reply-To: <1579779525-20065-65-git-send-email-imammedo@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,272 +71,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> +static void avr_cpu_initfn(Object *obj)
-> +{
-> +    AVRCPU *cpu = AVR_CPU(obj);
-> +
-> +    cpu_set_cpustate_pointers(cpu);
-> +
-> +#ifndef CONFIG_USER_ONLY
-> +    /* Set the number of interrupts supported by the CPU. */
-> +    qdev_init_gpio_in(DEVICE(cpu), avr_cpu_set_int,
-> +            sizeof(cpu->env.intsrc) * 8);
-> +#endif
-> +}
 
-A question for Michael:
+--m51xatjYGsM+13rf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-What is CONFIG_USER_ONLY doing here, if we know AVR cores from this
-series doesn't have and will never have user mode, since they do not
-work with the kernel?
+On Thu, Jan 23, 2020 at 12:38:29PM +0100, Igor Mammedov wrote:
+> If user provided non-sense RAM size, board will complain and
+> continue running with max RAM size supported or sometimes
+> crash like this:
+>   %QEMU -M bamboo -m 1
+>     exec.c:1926: find_ram_offset: Assertion `size !=3D 0' failed.
+>     Aborted (core dumped)
+> Also RAM is going to be allocated by generic code, so it won't be
+> possible for board to fix things up for user.
+>=20
+> Make it error message and exit to force user fix CLI,
+> instead of accepting non-sense CLI values.
+> That also fixes crash issue, since wrongly calculated size
+> isn't used to allocate RAM
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Do you plan to support some AVR 32-bit CPUs in the same file, which
-would be able to have linux-user mode? But, in this case, many files
-must be completely redone. My advice is to separate them completely,
-and that this file supports only 8-bit AVR cores, and in that case
-checks for CONFIG_USER_ONLY do not make sense.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Regards,
-Aleksandar
-
+> ---
+> v2:
+>   * s/ppc4xx_sdram_adjust/ppc4xx_sdram_prep/
+>      (BALATON Zoltan <balaton@eik.bme.hu>)
+>   * print possible valid ram size id not all RAM was distributed
+>   * initialize ram_bases/ram_bases at the same time we are checking
+>     that user supplied RAM would fit available banks and drop nested
+>     loop that were duplicating the same calculations.
+>   * coincidentally fix crash when -m is less than minimal bank size
+> v3:
+>   * s/ppc4xx_sdram_prep/ppc4xx_sdram_banks/
+>       (BALATON Zoltan <balaton@eik.bme.hu>)
+>   * fix subject line in commit message
+> v3.1:
+>   * add lost 'break' statement in 'j' loop
+> v3.2:
+>   * replace global ram_size with machine->ram_size in ppc4xx_sdram_banks(=
+) call
+>   * add a comment about the expected sorting order within sdram_bank_size=
+s[]
+>     (BALATON Zoltan <balaton@eik.bme.hu>)
+>=20
+> CC: balaton@eik.bme.hu
+> CC: david@gibson.dropbear.id.au
+> CC: qemu-ppc@nongnu.org
+> ---
+>  include/hw/ppc/ppc4xx.h |  9 ++++----
+>  hw/ppc/ppc440_bamboo.c  | 11 ++++-----
+>  hw/ppc/ppc4xx_devs.c    | 60 ++++++++++++++++++++++++++-----------------=
+------
+>  hw/ppc/sam460ex.c       |  5 ++---
+>  4 files changed, 42 insertions(+), 43 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+> index 7d82259..b8c8f32 100644
+> --- a/include/hw/ppc/ppc4xx.h
+> +++ b/include/hw/ppc/ppc4xx.h
+> @@ -42,11 +42,10 @@ enum {
+>  qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
+>                         uint32_t dcr_base, int has_ssr, int has_vr);
+> =20
+> -ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+> -                               MemoryRegion ram_memories[],
+> -                               hwaddr ram_bases[],
+> -                               hwaddr ram_sizes[],
+> -                               const ram_addr_t sdram_bank_sizes[]);
+> +void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
+> +                        MemoryRegion ram_memories[],
+> +                        hwaddr ram_bases[], hwaddr ram_sizes[],
+> +                        const ram_addr_t sdram_bank_sizes[]);
+> =20
+>  void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
+>                          MemoryRegion ram_memories[],
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index b782641..29a9642 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -158,7 +158,6 @@ static void main_cpu_reset(void *opaque)
+> =20
+>  static void bamboo_init(MachineState *machine)
+>  {
+> -    ram_addr_t ram_size =3D machine->ram_size;
+>      const char *kernel_filename =3D machine->kernel_filename;
+>      const char *kernel_cmdline =3D machine->kernel_cmdline;
+>      const char *initrd_filename =3D machine->initrd_filename;
+> @@ -203,10 +202,8 @@ static void bamboo_init(MachineState *machine)
+>      /* SDRAM controller */
+>      memset(ram_bases, 0, sizeof(ram_bases));
+>      memset(ram_sizes, 0, sizeof(ram_sizes));
+> -    ram_size =3D ppc4xx_sdram_adjust(ram_size, PPC440EP_SDRAM_NR_BANKS,
+> -                                   ram_memories,
+> -                                   ram_bases, ram_sizes,
+> -                                   ppc440ep_sdram_bank_sizes);
+> +    ppc4xx_sdram_banks(machine->ram_size, PPC440EP_SDRAM_NR_BANKS, ram_m=
+emories,
+> +                       ram_bases, ram_sizes, ppc440ep_sdram_bank_sizes);
+>      /* XXX 440EP's ECC interrupts are on UIC1, but we've only created UI=
+C0. */
+>      ppc4xx_sdram_init(env, pic[14], PPC440EP_SDRAM_NR_BANKS, ram_memorie=
+s,
+>                        ram_bases, ram_sizes, 1);
+> @@ -268,7 +265,7 @@ static void bamboo_init(MachineState *machine)
+>      /* Load initrd. */
+>      if (initrd_filename) {
+>          initrd_size =3D load_image_targphys(initrd_filename, RAMDISK_ADD=
+R,
+> -                                          ram_size - RAMDISK_ADDR);
+> +                                          machine->ram_size - RAMDISK_AD=
+DR);
+> =20
+>          if (initrd_size < 0) {
+>              error_report("could not load ram disk '%s' at %x",
+> @@ -279,7 +276,7 @@ static void bamboo_init(MachineState *machine)
+> =20
+>      /* If we're loading a kernel directly, we must load the device tree =
+too. */
+>      if (kernel_filename) {
+> -        if (bamboo_load_device_tree(FDT_ADDR, ram_size, RAMDISK_ADDR,
+> +        if (bamboo_load_device_tree(FDT_ADDR, machine->ram_size, RAMDISK=
+_ADDR,
+>                                      initrd_size, kernel_cmdline) < 0) {
+>              error_report("couldn't load device tree");
+>              exit(1);
+> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+> index c2e5013..d89008a 100644
+> --- a/hw/ppc/ppc4xx_devs.c
+> +++ b/hw/ppc/ppc4xx_devs.c
+> @@ -668,21 +668,22 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq =
+irq, int nbanks,
+> =20
+>  /* Fill in consecutive SDRAM banks with 'ram_size' bytes of memory.
+>   *
+> - * sdram_bank_sizes[] must be 0-terminated.
+> + * sdram_bank_sizes[] must be in descending order, that is sizes[i] > si=
+zes[i+1]
+> + * and must be 0-terminated.
+>   *
+>   * The 4xx SDRAM controller supports a small number of banks, and each b=
+ank
+>   * must be one of a small set of sizes. The number of banks and the supp=
+orted
+>   * sizes varies by SoC. */
+> -ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+> -                               MemoryRegion ram_memories[],
+> -                               hwaddr ram_bases[],
+> -                               hwaddr ram_sizes[],
+> -                               const ram_addr_t sdram_bank_sizes[])
+> +void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
+> +                        MemoryRegion ram_memories[],
+> +                        hwaddr ram_bases[], hwaddr ram_sizes[],
+> +                        const ram_addr_t sdram_bank_sizes[])
+>  {
+>      MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
+>      ram_addr_t size_left =3D ram_size;
+>      ram_addr_t base =3D 0;
+>      ram_addr_t bank_size;
+> +    int last_bank =3D 0;
+>      int i;
+>      int j;
+> =20
+> @@ -690,7 +691,12 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, =
+int nr_banks,
+>          for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
+>              bank_size =3D sdram_bank_sizes[j];
+>              if (bank_size <=3D size_left) {
+> +                ram_bases[i] =3D base;
+> +                ram_sizes[i] =3D bank_size;
+> +                base +=3D bank_size;
+>                  size_left -=3D bank_size;
+> +                last_bank =3D i;
+> +                break;
+>              }
+>          }
+>          if (!size_left) {
+> @@ -699,34 +705,32 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size,=
+ int nr_banks,
+>          }
+>      }
+> =20
+> -    ram_size -=3D size_left;
+>      if (size_left) {
+> -        error_report("Truncating memory to %" PRId64 " MiB to fit SDRAM"
+> -                     " controller limits", ram_size / MiB);
+> +        ram_addr_t used_size =3D ram_size - size_left;
+> +        GString *s =3D g_string_new(NULL);
 > +
-> +static ObjectClass *avr_cpu_class_by_name(const char *cpu_model)
-> +{
-> +    ObjectClass *oc;
-> +
-> +    oc = object_class_by_name(cpu_model);
-> +    if (object_class_dynamic_cast(oc, TYPE_AVR_CPU) == NULL ||
-> +        object_class_is_abstract(oc)) {
-> +        oc = NULL;
-> +    }
-> +    return oc;
-> +}
-> +
-> +static void avr_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-> +{
-> +    AVRCPU *cpu = AVR_CPU(cs);
-> +    CPUAVRState *env = &cpu->env;
-> +    int i;
-> +
-> +    qemu_fprintf(f, "\n");
-> +    qemu_fprintf(f, "PC:    %06x\n", env->pc_w);
-> +    qemu_fprintf(f, "SP:      %04x\n", env->sp);
-> +    qemu_fprintf(f, "rampD:     %02x\n", env->rampD >> 16);
-> +    qemu_fprintf(f, "rampX:     %02x\n", env->rampX >> 16);
-> +    qemu_fprintf(f, "rampY:     %02x\n", env->rampY >> 16);
-> +    qemu_fprintf(f, "rampZ:     %02x\n", env->rampZ >> 16);
-> +    qemu_fprintf(f, "EIND:      %02x\n", env->eind >> 16);
-> +    qemu_fprintf(f, "X:       %02x%02x\n", env->r[27], env->r[26]);
-> +    qemu_fprintf(f, "Y:       %02x%02x\n", env->r[29], env->r[28]);
-> +    qemu_fprintf(f, "Z:       %02x%02x\n", env->r[31], env->r[30]);
-> +    qemu_fprintf(f, "SREG:    [ %c %c %c %c %c %c %c %c ]\n",
-> +                        env->sregI ? 'I' : '-',
-> +                        env->sregT ? 'T' : '-',
-> +                        env->sregH ? 'H' : '-',
-> +                        env->sregS ? 'S' : '-',
-> +                        env->sregV ? 'V' : '-',
-> +                        env->sregN ? '-' : 'N', /* Zf has negative logic */
-> +                        env->sregZ ? 'Z' : '-',
-> +                        env->sregC ? 'I' : '-');
-> +    qemu_fprintf(f, "SKIP:    %02x\n", env->skip);
-> +
-> +    qemu_fprintf(f, "\n");
-> +    for (i = 0; i < ARRAY_SIZE(env->r); i++) {
-> +        qemu_fprintf(f, "R[%02d]:  %02x   ", i, env->r[i]);
-> +
-> +        if ((i % 8) == 7) {
-> +            qemu_fprintf(f, "\n");
+> +        for (i =3D 0; sdram_bank_sizes[i]; i++) {
+> +            g_string_append_printf(s, "%" PRIi64 "%s",
+> +                                   sdram_bank_sizes[i] / MiB,
+> +                                   sdram_bank_sizes[i + 1] ? " ," : "");
 > +        }
-> +    }
-> +    qemu_fprintf(f, "\n");
-> +}
+> +        error_report("Max %d banks of %s MB DIMM/bank supported",
+> +            nr_banks, s->str);
+> +        error_report("Possible valid RAM size: %" PRIi64,
+> +            used_size ? used_size / MiB : sdram_bank_sizes[i - 1] / MiB);
 > +
-> +static void avr_cpu_class_init(ObjectClass *oc, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(oc);
-> +    CPUClass *cc = CPU_CLASS(oc);
-> +    AVRCPUClass *mcc = AVR_CPU_CLASS(oc);
-> +
-> +    mcc->parent_realize = dc->realize;
-> +    dc->realize = avr_cpu_realizefn;
-> +
-> +    mcc->parent_reset = cc->reset;
-> +    cc->reset = avr_cpu_reset;
-> +
-> +    cc->class_by_name = avr_cpu_class_by_name;
-> +
-> +    cc->has_work = avr_cpu_has_work;
-> +    cc->do_interrupt = avr_cpu_do_interrupt;
-> +    cc->cpu_exec_interrupt = avr_cpu_exec_interrupt;
-> +    cc->dump_state = avr_cpu_dump_state;
-> +    cc->set_pc = avr_cpu_set_pc;
-> +#if !defined(CONFIG_USER_ONLY)
-> +    cc->memory_rw_debug = avr_cpu_memory_rw_debug;
-> +#endif
-> +#ifdef CONFIG_USER_ONLY
-> +    cc->handle_mmu_fault = avr_cpu_handle_mmu_fault;
-> +#else
-> +    cc->get_phys_page_debug = avr_cpu_get_phys_page_debug;
-> +#endif
+> +        g_string_free(s, true);
+> +        exit(EXIT_FAILURE);
+>      }
+> =20
+>      memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_=
+size);
+> =20
+> -    size_left =3D ram_size;
+> -    for (i =3D 0; i < nr_banks && size_left; i++) {
+> -        for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
+> -            bank_size =3D sdram_bank_sizes[j];
+> -
+> -            if (bank_size <=3D size_left) {
+> -                char name[32];
+> -                snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
+> -                memory_region_init_alias(&ram_memories[i], NULL, name, r=
+am,
+> -                                         base, bank_size);
+> -                ram_bases[i] =3D base;
+> -                ram_sizes[i] =3D bank_size;
+> -                base +=3D bank_size;
+> -                size_left -=3D bank_size;
+> -                break;
+> -            }
+> -        }
+> +    for (i =3D 0; i <=3D last_bank; i++) {
+> +        char name[32];
+> +        snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
+> +        memory_region_init_alias(&ram_memories[i], NULL, name, ram,
+> +                                 ram_bases[i], ram_sizes[i]);
+>      }
+> -
+> -    return ram_size;
+>  }
+> =20
+>  /***********************************************************************=
+******/
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 437e214..949acba 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -324,9 +324,8 @@ static void sam460ex_init(MachineState *machine)
+>      /* SDRAM controller */
+>      /* put all RAM on first bank because board has one slot
+>       * and firmware only checks that */
+> -    machine->ram_size =3D ppc4xx_sdram_adjust(machine->ram_size, 1,
+> -                                   ram_memories, ram_bases, ram_sizes,
+> -                                   ppc460ex_sdram_bank_sizes);
+> +    ppc4xx_sdram_banks(machine->ram_size, 1, ram_memories, ram_bases, ra=
+m_sizes,
+> +                       ppc460ex_sdram_bank_sizes);
+> =20
+>      /* FIXME: does 460EX have ECC interrupts? */
+>      ppc440_sdram_init(env, SDRAM_NR_BANKS, ram_memories,
 
-The same question here.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +    cc->disas_set_info = avr_cpu_disas_set_info;
-> +    cc->tlb_fill = avr_cpu_tlb_fill;
-> +    cc->tcg_initialize = avr_cpu_tcg_init;
-> +    cc->synchronize_from_tb = avr_cpu_synchronize_from_tb;
-> +}
-> diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-> index d122611..f7a403a 100644
-> --- a/target/avr/cpu.h
-> +++ b/target/avr/cpu.h
-> @@ -69,4 +69,138 @@
->
->  #define EF_AVR_MACH 0x7F
->
-> +typedef struct CPUAVRState CPUAVRState;
-> +
-> +struct CPUAVRState {
-> +    uint32_t pc_w; /* 0x003fffff up to 22 bits */
-> +
-> +    uint32_t sregC; /* 0x00000001 1 bit */
-> +    uint32_t sregZ; /* 0x00000001 1 bit */
-> +    uint32_t sregN; /* 0x00000001 1 bit */
-> +    uint32_t sregV; /* 0x00000001 1 bit */
-> +    uint32_t sregS; /* 0x00000001 1 bit */
-> +    uint32_t sregH; /* 0x00000001 1 bit */
-> +    uint32_t sregT; /* 0x00000001 1 bit */
-> +    uint32_t sregI; /* 0x00000001 1 bit */
-> +
-> +    uint32_t rampD; /* 0x00ff0000 8 bits */
-> +    uint32_t rampX; /* 0x00ff0000 8 bits */
-> +    uint32_t rampY; /* 0x00ff0000 8 bits */
-> +    uint32_t rampZ; /* 0x00ff0000 8 bits */
-> +    uint32_t eind; /* 0x00ff0000 8 bits */
-> +
-> +    uint32_t r[NUMBER_OF_CPU_REGISTERS]; /* 8 bits each */
-> +    uint32_t sp; /* 16 bits */
-> +
-> +    uint32_t skip; /* if set skip instruction */
-> +
-> +    uint64_t intsrc; /* interrupt sources */
-> +    bool fullacc; /* CPU/MEM if true MEM only otherwise */
-> +
-> +    uint32_t features;
-> +};
-> +
-> +/**
-> + *  AVRCPU:
-> + *  @env: #CPUAVRState
-> + *
-> + *  A AVR CPU.
-> + */
-> +typedef struct AVRCPU {
-> +    /*< private >*/
-> +    CPUState parent_obj;
-> +    /*< public >*/
-> +
-> +    CPUNegativeOffsetState neg;
-> +    CPUAVRState env;
-> +} AVRCPU;
-> +
-> +void avr_cpu_do_interrupt(CPUState *cpu);
-> +bool avr_cpu_exec_interrupt(CPUState *cpu, int int_req);
-> +hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-> +
-> +#define cpu_list avr_cpu_list
-> +#define cpu_signal_handler cpu_avr_signal_handler
-> +#define cpu_mmu_index avr_cpu_mmu_index
-> +
-> +static inline int avr_cpu_mmu_index(CPUAVRState *env, bool ifetch)
-> +{
-> +    return ifetch ? MMU_CODE_IDX : MMU_DATA_IDX;
-> +}
-> +
-> +void avr_cpu_tcg_init(void);
-> +
-> +void avr_cpu_list(void);
-> +int cpu_avr_exec(CPUState *cpu);
-> +int cpu_avr_signal_handler(int host_signum, void *pinfo, void *puc);
-> +int avr_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
-> +                                int rw, int mmu_idx);
-> +int avr_cpu_memory_rw_debug(CPUState *cs, vaddr address, uint8_t *buf,
-> +                                int len, bool is_write);
-> +
-> +enum {
-> +    TB_FLAGS_FULL_ACCESS = 1,
-> +    TB_FLAGS_SKIP = 2,
-> +};
-> +
-> +static inline void cpu_get_tb_cpu_state(CPUAVRState *env, target_ulong *pc,
-> +                                target_ulong *cs_base, uint32_t *pflags)
-> +{
-> +    uint32_t flags = 0;
-> +
-> +    *pc = env->pc_w * 2;
-> +    *cs_base = 0;
-> +
-> +    if (env->fullacc) {
-> +        flags |= TB_FLAGS_FULL_ACCESS;
-> +    }
-> +    if (env->skip) {
-> +        flags |= TB_FLAGS_SKIP;
-> +    }
-> +
-> +    *pflags = flags;
-> +}
-> +
-> +static inline int cpu_interrupts_enabled(CPUAVRState *env)
-> +{
-> +    return env->sregI != 0;
-> +}
-> +
-> +static inline uint8_t cpu_get_sreg(CPUAVRState *env)
-> +{
-> +    uint8_t sreg;
-> +    sreg = (env->sregC) << 0
-> +         | (env->sregZ) << 1
-> +         | (env->sregN) << 2
-> +         | (env->sregV) << 3
-> +         | (env->sregS) << 4
-> +         | (env->sregH) << 5
-> +         | (env->sregT) << 6
-> +         | (env->sregI) << 7;
-> +    return sreg;
-> +}
-> +
-> +static inline void cpu_set_sreg(CPUAVRState *env, uint8_t sreg)
-> +{
-> +    env->sregC = (sreg >> 0) & 0x01;
-> +    env->sregZ = (sreg >> 1) & 0x01;
-> +    env->sregN = (sreg >> 2) & 0x01;
-> +    env->sregV = (sreg >> 3) & 0x01;
-> +    env->sregS = (sreg >> 4) & 0x01;
-> +    env->sregH = (sreg >> 5) & 0x01;
-> +    env->sregT = (sreg >> 6) & 0x01;
-> +    env->sregI = (sreg >> 7) & 0x01;
-> +}
-> +
-> +bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> +                        MMUAccessType access_type, int mmu_idx,
-> +                        bool probe, uintptr_t retaddr);
-> +
-> +typedef CPUAVRState CPUArchState;
-> +typedef AVRCPU ArchCPU;
-> +
-> +#include "exec/cpu-all.h"
-> +
-> +const char *avr_flags_to_cpu_type(uint32_t flags, const char *def_cpu_type);
-> +
->  #endif /* !defined (QEMU_AVR_CPU_H) */
-> --
-> 2.7.4
->
+--m51xatjYGsM+13rf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4uW3gACgkQbDjKyiDZ
+s5Iaag//SUW6uaoNgn2qEhEGuLR6EGnVISpYZRsUZmVbf85v1dv3VWpRef99n1aO
+neWuazv1Z7Ot8is/Dt+xyQO4/jKeClbCJjdNXGx0I/3EpWyKW+15zWg+wouEbXO/
+hWVifNelg2DGphwJmp758hYj5aFUugcexChfwoTzY1vaD7yXpMrZAbeuM/xGH9Ei
+Z+r/kvnhIs99kGnVRb4IqClLgApptLxYhGhxgOANXty34OxpxhpHkzKGGo1JuRea
+HDfVZfbdFB07iJEVHMlIzTCxG24/2KTLynfydWz2raqgOS8n3r7+Qkojnm9/FJ6q
+Ze/qa2wcyvACfBP+7pCtt6ThhIdMVSjNsAoL7mnIUIyefXT8fl81/6BJrPglFPQr
+V++cDg9S5pQa5tHeCl8BrMeLwMzVY3LnsPLLyU9SeOqsH2FUYdtybXgtUyW/ho+C
+HgiQtV4VfyA9boqwxoA8D3ELXkFl0CWrUk3LgxL8pvPZCg08UttY3rS4YDbcLFCg
+8Px3zDzkI0s8rIKvl0Qvy5Zsuv6TFae5UqmMoRla0mWUVmx/w3IRdMTjme8UViYg
+zTr2TDSUvDIWvAZpmbvUOdeWiOL99p6eWJ1FR3rzJm0/xf0jbG2k6uDCjv7J4/wT
+jd6CWD5KmMkZlF5g23mlxHsN2aSizdn7Bwt0NKUojOUC2LNekbM=
+=19SC
+-----END PGP SIGNATURE-----
+
+--m51xatjYGsM+13rf--
 
