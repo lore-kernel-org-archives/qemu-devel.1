@@ -2,80 +2,82 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9417C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 12:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6488DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 12:45:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4CA620702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 12:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E2B920702
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 12:45:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNcTe/NI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4CA620702
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJIAIu9g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2B920702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw3ij-0003xZ-QE
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 07:42:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40378)
+	id 1iw3lP-0005Lt-BI
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 07:45:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dinechin@redhat.com>) id 1iw3hx-0003Kb-UY
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:41:39 -0500
+ (envelope-from <thuth@redhat.com>) id 1iw3kl-0004na-Tx
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:44:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dinechin@redhat.com>) id 1iw3hv-0002qy-9v
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:41:36 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50834
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iw3kk-0004ja-K4
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:44:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31968
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1iw3hv-0002qW-0U
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:41:35 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iw3kk-0004ik-Gm
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:44:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580128894;
+ s=mimecast20190719; t=1580129068;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CTDk0k9Yir0j5YA6qE3yu+2cctRkp6nrM/g4CRUKNWU=;
- b=UNcTe/NI6+kinbxRrCJwtGrWxaQvWIwIkln4WZgxNWj5s5AcJWIBzkP/p1wKaj4KhVe5mz
- U31BWw8Voq2kkiESuVDV9Q5t+tK2fxNbYjHcLhY7RbafUUvvX6JFFrypcL+UDNolR7+RYw
- E88rJ2X2+TLTnM2CC0DM8AubXH8nRfA=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=YN3k8eIEEHeMJitCKfX/pS3BAEPaUOHd62mrG2iPfcY=;
+ b=VJIAIu9gxCHw/EoqzzKJijXldhdOSyVL22xSbZmlJ2TFoLTSdzULtETdnwXOmj5hGN5Z5W
+ epSVtxGumJYFXxEn9KLbtRUh0p7m+hJgmRVq6WB0KNi2AP3lbnXFUopCDme0vuPvEQv8sV
+ G1AVe+jcFCFr0OQXEkmnjnJQVsPX59E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-85-G2SvCT3EO9-N0L9d0uX-CA-1; Mon, 27 Jan 2020 07:41:30 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-248-mBYnmW0tMMuaw80pgKsmPw-1; Mon, 27 Jan 2020 07:44:26 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 350EF13E5
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 12:41:29 +0000 (UTC)
-Received: from ptitpuce (unknown [10.34.244.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7741E451F;
- Mon, 27 Jan 2020 12:41:25 +0000 (UTC)
-References: <20200123115841.138849-1-dgilbert@redhat.com>
- <20200123115841.138849-112-dgilbert@redhat.com>
-User-agent: mu4e 1.3.5; emacs 26.2
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PULL 111/111] virtiofsd: add some options to the help message
-In-reply-to: <20200123115841.138849-112-dgilbert@redhat.com>
-Message-ID: <m1o8upqdfv.fsf@redhat.com>
-Date: Mon, 27 Jan 2020 13:41:24 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69F9D10054E3;
+ Mon, 27 Jan 2020 12:44:25 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-94.ams2.redhat.com [10.36.117.94])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A33F86441;
+ Mon, 27 Jan 2020 12:44:24 +0000 (UTC)
+Subject: Re: [PATCH] iotests/279: Fix for non-qcow2 formats
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191219144243.1763246-1-mreitz@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <09c3452f-d110-1d72-af4a-fd3fd7522ab1@redhat.com>
+Date: Mon, 27 Jan 2020 13:44:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: G2SvCT3EO9-N0L9d0uX-CA-1
+In-Reply-To: <20191219144243.1763246-1-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: mBYnmW0tMMuaw80pgKsmPw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,79 +89,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Dr. David Alan Gilbert (git) writes:
-
-> From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
->
-> Add following options to the help message:
-> - cache
-> - flock|no_flock
-> - norace
-> - posix_lock|no_posix_lock
-> - readdirplus|no_readdirplus
-> - timeout
-> - writeback|no_writeback
-> - xattr|no_xattr
->
-> Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
->
-> dgilbert: Split cache, norace, posix_lock, readdirplus off
->   into our own earlier patches that added the options
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 19/12/2019 15.42, Max Reitz wrote:
+> First, driver=qcow2 will not work so well with non-qcow2 formats (and
+> this test claims to support qcow, qed, and vmdk).
+> 
+> Second, vmdk will always report the backing file format to be vmdk.
+> Filter that out so the output looks like for all other formats.
+> 
+> Third, the flat vmdk subformats do not support backing files, so they
+> will not work with this test.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tools/virtiofsd/helper.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-> index f98d8f2eb2..0801cf752c 100644
-> --- a/tools/virtiofsd/helper.c
-> +++ b/tools/virtiofsd/helper.c
-> @@ -148,6 +148,8 @@ void fuse_cmdline_help(void)
->             "    -o cache=3D<mode>            cache mode. could be one of=
- \"auto, "
->             "always, none\"\n"
->             "                               default: auto\n"
-> +           "    -o flock|no_flock          enable/disable flock\n"
-> +           "                               default: no_flock\n"
->             "    -o log_level=3D<level>       log level, default to \"inf=
-o\"\n"
->             "                               level could be one of \"debug=
-, "
->             "info, warn, err\"\n"
-> @@ -163,7 +165,13 @@ void fuse_cmdline_help(void)
->             "                               enable/disable readirplus\n"
->             "                               default: readdirplus except w=
-ith "
->             "cache=3Dnone\n"
-> -          );
-> +           "    -o timeout=3D<number>        I/O timeout (second)\n"
+>  tests/qemu-iotests/279 | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/279 b/tests/qemu-iotests/279
+> index 6682376808..30d29b1cb2 100755
+> --- a/tests/qemu-iotests/279
+> +++ b/tests/qemu-iotests/279
+> @@ -38,6 +38,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+>  _supported_fmt qcow qcow2 vmdk qed
+>  _supported_proto file
+>  _supported_os Linux
+> +_unsupported_imgopts "subformat=monolithicFlat" \
+> +                     "subformat=twoGbMaxExtentFlat" \
+>  
+>  TEST_IMG="$TEST_IMG.base" _make_test_img 64M
+>  TEST_IMG="$TEST_IMG.mid" _make_test_img -b "$TEST_IMG.base"
+> @@ -45,11 +47,12 @@ _make_test_img -b "$TEST_IMG.mid"
+>  
+>  echo
+>  echo '== qemu-img info --backing-chain =='
+> -_img_info --backing-chain | _filter_img_info
+> +_img_info --backing-chain | _filter_img_info | grep -v 'backing file format'
+>  
+>  echo
+>  echo '== qemu-img info --backing-chain --image-opts =='
+> -TEST_IMG="driver=qcow2,file.driver=file,file.filename=$TEST_IMG" _img_info --backing-chain --image-opts | _filter_img_info
+> +TEST_IMG="driver=$IMGFMT,file.driver=file,file.filename=$TEST_IMG" _img_info --backing-chain --image-opts \
+> +    | _filter_img_info | grep -v 'backing file format'
+>  
+>  # success, all done
+>  echo "*** done"
+> 
 
-s/second/seconds/ ? (Not sure, I'm not a native speaker)
+This fixes the problems with "check -qed 279" and "check -vmdk 279" for me.
 
-> +           "                               default: depends on cache=3D =
-option.\n"
-> +           "    -o writeback|no_writeback  enable/disable writeback cach=
-e\n"
-> +           "                               default: no_writeback\n"
-> +           "    -o xattr|no_xattr          enable/disable xattr\n"
-> +           "                               default: no_xattr\n"
-> +           );
->  }
->
->  static int fuse_helper_opt_proc(void *data, const char *arg, int key,
-
-
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
+Tested-by: Thomas Huth <thuth@redhat.com>
 
 
