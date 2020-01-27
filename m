@@ -2,79 +2,90 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D478C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 572E9C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC86F206A2
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:07:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18ADB214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:08:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VL1I5xqm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC86F206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XWN/+6rx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18ADB214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw2Eu-0007Ym-3P
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 06:07:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48178)
+	id 1iw2Fu-0008Ti-A4
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 06:08:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48361)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iw2D2-0004R4-TG
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:05:38 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iw2Da-0005TW-IK
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:06:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iw2D1-0005lt-Aa
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:05:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34069
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw2D1-0005lO-66
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:05:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580123134;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=U14zDHAAUsI/iH4k7uZbT+sMckbxTcQ6gy2p9o1U/x8=;
- b=VL1I5xqmEabL4XQ3PWP5n4KThvS6IMI2W7I5nlYXpQa6cUc2tR3OREBmHIvDyKNOlAzTK5
- RCEaC+Gkf4H3QKWI6Fo8N5sl0+8N8wJ9QNmvO31N8Zp31zxhDTOMM9BMa5VE2H8c3Y1iew
- A8UUpRJ2+Ogflz8Cfgguk4r/lsKbVmA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-u1EF-TazOCuO7nXLXZNECg-1; Mon, 27 Jan 2020 06:05:26 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A4B9800D48;
- Mon, 27 Jan 2020 11:05:25 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 79E851BC6D;
- Mon, 27 Jan 2020 11:05:23 +0000 (UTC)
-Message-ID: <f3b90836b28bcc59876fb3692a8344bd13d01d1d.camel@redhat.com>
-Subject: Re: [PATCH 8/9] monitor: move hmp_info_block* to blockdev-hmp-cmds.c
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 27 Jan 2020 13:05:22 +0200
-In-Reply-To: <87blsxkahl.fsf@dusky.pond.sub.org>
-References: <20191120185850.18986-1-mlevitsk@redhat.com>
- <20191120185850.18986-9-mlevitsk@redhat.com>
- <87blsxkahl.fsf@dusky.pond.sub.org>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: u1EF-TazOCuO7nXLXZNECg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+ (envelope-from <alex.bennee@linaro.org>) id 1iw2DZ-0006OV-Aq
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:06:10 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53312)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iw2DZ-0006Ly-35
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:06:09 -0500
+Received: by mail-wm1-x341.google.com with SMTP id s10so2787645wmh.3
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 03:06:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=0brxlos2dAT+TZz7MuM6STQmpKPKhSVrrcuFK/NGZVU=;
+ b=XWN/+6rxNKiywveyCAzvFkBAM03FBn7GVm1+2rF7nU4KxnegpSH2V3sBL450dS6uO8
+ doi68BWx6L6fafPiyFphmN1l0wfBGMmKvWM4pyozNtGQHbyBM7KROafbpM/8LakZLCQB
+ vlmc/F09/ciTXY/vBzJTstYzU6VBiWT6guszHeqPXugnyCiZq9ForYtJwZqiCmfUZKIG
+ JvbKgyVJMHcDH6Vy21Xx6j+ykyVT56hkh2LJw2Jmft2RNl76I1GSfEzdbQ3O3JDSxDzu
+ psgWQo4VHZQVBggv8ehtwEWYzRFtHzKOy7UM7emWzfGDSnjhsoBKgbdVqR+A0VPQyuSP
+ CBcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=0brxlos2dAT+TZz7MuM6STQmpKPKhSVrrcuFK/NGZVU=;
+ b=MjYDjQYFN9jC+PzpW/wdhFKsq7BvCISuVhcvMkT/htVZY0FYwrJ9YxqcO+YR2XWZkz
+ 8ziAuBAuwCqsfSsjqmJYGMaFsuR7DO4Vw4P1HC+erq7fAbQ+ckDRn9kNBeQTW6TiwN7N
+ PhxyFCgmbSoo/xyIPDocEHhSKnu1O5hd1IWTcFGIooHFF229mWpD+9ZanXtvONFRmaZ+
+ uY2Wvu5wJu4Yrip8WRIx6wORDt6mribhWST5EWI/2dna4yutE65fQ/a3ZWA05Twtjdx9
+ IE/C2T5FmBB4BrCwkG7Cdc9Otzx96P+/ERU5KkgIfo0qVLYBGdXP+mLmmVkI4Tz8BZW/
+ C5sw==
+X-Gm-Message-State: APjAAAVGikQHwsjE3gkxq6WDsNmR8d3eagHyB/hwIPN2ZZ7VKIp3qGhK
+ RrC3pTmwnKBvA0H3HOEEsy1z1A==
+X-Google-Smtp-Source: APXvYqyJ5R7NCqrstGS3SctuAfrxnnjsJjY2kXslnE/WUzpmO0568J+y3xjgIaq1vT9PNhPgq5Km4Q==
+X-Received: by 2002:a1c:a404:: with SMTP id n4mr13119567wme.186.1580123167043; 
+ Mon, 27 Jan 2020 03:06:07 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id w26sm8941579wmi.8.2020.01.27.03.06.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jan 2020 03:06:05 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 1D2C31FF87;
+ Mon, 27 Jan 2020 11:06:05 +0000 (GMT)
+References: <20200124165335.422-1-robert.foley@linaro.org>
+ <20200124165335.422-4-robert.foley@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH 3/8] tests/vm: change wait_ssh to optionally wait for root.
+In-reply-to: <20200124165335.422-4-robert.foley@linaro.org>
+Date: Mon, 27 Jan 2020 11:06:04 +0000
+Message-ID: <87v9oxf9b7.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,90 +97,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: fam@euphon.net, peter.puhov@linaro.org, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2019-11-27 at 09:08 +0100, Markus Armbruster wrote:
-> I think it makes sense to collect *all* block HMP stuff here.
-> 
-> Left in monitor/hmp-cmds.c: hmp_eject(), hmp_nbd_server_start(), ...
-> 
-> I guess hmp_change() has to stay there, because it's both block and ui.
-> 
-> Left in blockdev.c: hmp_drive_add_node().
 
-Thank you very much. I added these and bunch more to my patchset.
+Robert Foley <robert.foley@linaro.org> writes:
 
-> 
-> Quick grep for possible files to check:
-> 
-> $ git-grep -l 'monitor[a-z_-]*.h' | xargs grep -l 'block[a-z_-]*\.h'
-> MAINTAINERS
-> blockdev-hmp-cmds.c
-> 
+> Allow wait_ssh to wait for root user to be ready.
+> This solves the issue where we perform a wait_ssh()
+> successfully, but the root user is not yet ready
+> to be logged in.
 
-> blockdev.c
-hmp_drive_add_node is there and I moved it too.
+So in the case it's the root user we care about...
 
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> ---
+>  tests/vm/basevm.py | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 86908f58ec..3b4403ddcb 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -310,12 +310,17 @@ class BaseVM(object):
+>      def print_step(self, text):
+>          sys.stderr.write("### %s ...\n" % text)
+>=20=20
+> -    def wait_ssh(self, seconds=3D600):
+> +    def wait_ssh(self, wait_root=3DFalse, seconds=3D600):
+>          starttime =3D datetime.datetime.now()
+>          endtime =3D starttime + datetime.timedelta(seconds=3Dseconds)
+>          guest_up =3D False
+>          while datetime.datetime.now() < endtime:
+> -            if self.ssh("exit 0") =3D=3D 0:
+> +            if wait_root:
+> +                if self.ssh("exit 0") =3D=3D 0 and\
+> +                   self.ssh_root("exit 0") =3D=3D 0:
 
-> cpus.c
-Nothing suspicious
+...why do we need to test both here?=20
 
-> dump/dump.c
-qmp_dump_guest_memory is only monitor reference there I think
+> +                    guest_up =3D True
+> +                    break
+> +            elif self.ssh("exit 0") =3D=3D 0:
 
-> hw/display/qxl.c
-No way that is related to the block layer
+Is this simpler?
 
-> hw/scsi/vhost-scsi.c
-All right, the monitor_fd_param is an interesting thing.
-Not related to block though.
-
-> hw/usb/dev-storage.c
-All right, this for no reason includes monitor/monitor.h,
-added patch to remove this because why not.
-
-> include/monitor/monitor.h
-Nothing suspicious
-
-> migration/migration.c
-Nothing suspicious
-
-> monitor/hmp-cmds.c
-Added hmp_qemu_io
-
-Maybe I need to add hmp_delvm too?
-savevm/delvm do old style snapshots
-which are stored to the first block device
-
-
-> monitor/hmp.c
-There are some block references in monitor_find_completion,
-but I guess it is not worth it to move that
-
-> monitor/misc.c
-vm_completion for delvm/loadvm.
-
-> monitor/qmp-cmds.c
-Nothing hmp related at first glance.
-
-> qdev-monitor.c
-blk_by_qdev_id - used by both hmp and qmp code
-
-> vl.c
-Hopefully nothing hmp+block related, I searched the file for
-few things but I can't be fully sure.
-Out of the curiosity do you know why this file is called like that,
-since it hosts qemu main(), shouldn't it be called main.c ?
+    def wait_ssh(self, wait_root=3DFalse, seconds=3D600):
+        starttime =3D datetime.datetime.now()
+        endtime =3D starttime + datetime.timedelta(seconds=3Dseconds)
+        guest_up =3D False
+        while datetime.datetime.now() < endtime:
+            if wait_root and self.ssh_root("exit 0") =3D=3D 0:
+                guest_up =3D True
+                break
+            elif self.ssh("exit 0") =3D=3D 0:
+                guest_up =3D True
+                break
+            seconds =3D (endtime - datetime.datetime.now()).total_seconds()
+            logging.debug("%ds before timeout", seconds)
+            time.sleep(1)
+        if not guest_up:
+            raise Exception("Timeout while waiting for guest ssh")
 
 
-Best regards and thanks for the detailed review!
-	Maxim Levitsky
+>                  guest_up =3D True
+>                  break
+>              seconds =3D (endtime - datetime.datetime.now()).total_second=
+s()
 
 
-
+--=20
+Alex Benn=C3=A9e
 
