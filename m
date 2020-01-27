@@ -4,70 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BD9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5730FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:02:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AE272467B
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18C8420CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:02:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="icoKL0Lu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE272467B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RI3IOorL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C8420CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwBUP-0005x7-6J
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 16:00:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46843)
+	id 1iwBWr-0007e2-8t
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 16:02:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iwBTk-0005SR-Dp
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 15:59:30 -0500
+ (envelope-from <jsnow@redhat.com>) id 1iwBVv-00076r-15
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:01:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iwBTi-0003v6-0e
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 15:59:27 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50832
+ (envelope-from <jsnow@redhat.com>) id 1iwBVt-0007ni-ON
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:01:42 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25698
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iwBTh-0003rR-Ro
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 15:59:25 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iwBVt-0007nO-L8
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:01:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580158764;
+ s=mimecast20190719; t=1580158901;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=m25au9EO/EmQ2fsLXoOwEttFXOwJx3U39NwS2PxDCls=;
- b=icoKL0LuooZBx+4LV4YWcrpGYvs8pteX0n0X0NYMGTzSU5Zl415sDo2woQYBctyQn6xRHQ
- x/Ib/Z79GYPpMiAkBgM9WTnmJpHI/E+vUHLc7+i8Uy3h0gV1jWLjs+rv1R4wtUqSH8eCnF
- tGcpPOFGN4snNHxrzSeXaNPu5UIML80=
+ bh=MlOYoAw7MamUQdtnocGN2N3LAgknV+4Hu+QVV02eBHw=;
+ b=RI3IOorLXX+ANWncAKxqvegWoSnV3tH/G10vDbmCOdBNbiZKFrnfndFarmsA2QRr6rfU8H
+ rSdi03LZD+zF9utAyXyXpQYws/C3FIo7HnrAS706wI/mxlOxDsrgaJMQ46TBEFpClwz7Gx
+ e2UtTha+BF1JzsD9+PohAoteSrEfPfU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-hQOErmf7NvWWzDBtm-_nJQ-1; Mon, 27 Jan 2020 15:59:22 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-154-2VCIoECtOLmAanxSzOEfKg-1; Mon, 27 Jan 2020 16:01:36 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A97D713E1;
- Mon, 27 Jan 2020 20:59:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46438800D41;
+ Mon, 27 Jan 2020 21:01:35 +0000 (UTC)
 Received: from [10.18.17.116] (dhcp-17-116.bos.redhat.com [10.18.17.116])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3108E87026;
- Mon, 27 Jan 2020 20:59:15 +0000 (UTC)
-Subject: Re: Making QEMU easier for management tools and applications
-To: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
- <87h81unja8.fsf@dusky.pond.sub.org> <20191224134139.GD2710539@redhat.com>
- <30664f6e-81da-a6e6-9b20-037fc91290fb@redhat.com>
- <878slyej29.fsf@dusky.pond.sub.org>
- <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
- <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <20200124095027.GA824327@redhat.com> <20200127143505.GD5669@linux.fritz.box>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CBCD560BF4;
+ Mon, 27 Jan 2020 21:01:31 +0000 (UTC)
+Subject: Re: [PATCH v3 00/13] RFC: [for 5.0]: HMP monitor handlers cleanups
+To: Peter Krempa <pkrempa@redhat.com>
+References: <20200127103647.17761-1-mlevitsk@redhat.com>
+ <2e885a1d-94c7-53b5-44f7-feffe70f57c3@redhat.com>
+ <20200127204355.GE4544@andariel.pipo.sk>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -143,19 +137,19 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <bd4a2839-69d6-697b-dc07-567ba08ce044@redhat.com>
-Date: Mon, 27 Jan 2020 15:59:14 -0500
+Message-ID: <12217cd6-7866-ce9c-c0da-24775f9d045d@redhat.com>
+Date: Mon, 27 Jan 2020 16:01:31 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200127143505.GD5669@linux.fritz.box>
+In-Reply-To: <20200127204355.GE4544@andariel.pipo.sk>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: hQOErmf7NvWWzDBtm-_nJQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 2VCIoECtOLmAanxSzOEfKg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -169,236 +163,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Jan Tomko <jtomko@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 1/27/20 9:35 AM, Kevin Wolf wrote:
-> Am 24.01.2020 um 10:50 hat Daniel P. Berrang=C3=A9 geschrieben:
->> On Thu, Jan 23, 2020 at 04:07:09PM -0500, John Snow wrote:
->>> Well, sure. The context of this email was qmp-shell though, which is
->>> meant to help facilitate the entry of JSON commands so that you *can*
->>> indeed just forego the CLI/HMP entirely.
+On 1/27/20 3:43 PM, Peter Krempa wrote:
+> On Mon, Jan 27, 2020 at 14:39:02 -0500, John Snow wrote:
+>>
+>>
+>> On 1/27/20 5:36 AM, Maxim Levitsky wrote:
+>>> This patch series is bunch of cleanups
+>>> to the hmp monitor code.
 >>>
->>> If you are of the opinion that every user of QEMU should be copy/pastin=
-g
->>> JSON straight into a socket and we should delete qmp-shell, that's
->>> certainly a fine opinion.
+>>> This series only touched blockdev related hmp handlers.
+>>>
+>>> No functional changes expected other that
+>>> light error message changes by the last patch.
+>>>
+>>> This was inspired by this bugzilla:
+>>> https://bugzilla.redhat.com/show_bug.cgi?id=1719169
+>>>
+>>> Basically some users still parse hmp error messages,
+>>> and they would like to have them prefixed with 'Error:'
+>>>
 >>
->> I think part of the pain of qmp-shell comes from the very fact that
->> it is trying to be an interactive shell. This points people towards
->> interactively typing in the commands, which is horrific when you get
->> anywhere near the JSON, or even dot-notation traditional commands.
+>> HMP isn't meant to be parsed. It's explicitly *not* API or ABI. I do
+>> like consistency in my UIs (it's useful for human eyes, too), but I'd
+>> like to know more about the request.
+> 
+> That's true as long as there's an stable replacement ... see below.
+> 
+
+Thanks for the context!
+
 >>
->> If it was just a qmp-client that was single shot, we'd encourage
->> people to create the JSON in a sensible way - vim/emacs/whatever.
->=20
-> I don't see how this is sensible. QMP commands are something that I
-> reuse even less than VM configurations, so creating a one-off file for
-> each would take me a lot more time and I would still have to type the
-> same JSON code that I have to type with -qmp stdio.
->=20
-> The reason it is and should be an interactive shell is that I'm
-> interacting with it. Switching back and forth between a text editor and
-> a shell to actually send the command to QEMU would make things only even
-> more cumbersome than they already are.
->=20
->> Bash/dash/zsh/$whatever is their interactive shell, with massively
->> more features than qmp-shell. You have command history, autocomplete,
->> conditional and looping constructs, and everything a normal shell
->> offers.
->=20
-> If I wanted to program a QMP client, I would use Python. For me,
-> conditionals and loops are completely out of scope for a QMP shell. I
-> just want an easy way to tell QEMU to do something specific.
->=20
-> A command history already exists for qmp-shell. It's better than bash
-> because it doesn't mix QMP history with whatever else I do on my
-> computer.
->=20
-> Autocomplete in qmp-shell doesn't exist, as far as I know, but if
-> implemented, it could be a lot more useful than bash completion because
-> it could offer key completion based on the QMP schema.
->=20
+>> Is this request coming from libvirt? Can we wean them off of this
+>> interface? What do they need as a replacement?
+> 
+> There are 5 commands that libvirt still has HMP interfaces for:
+> 
+> drive_add
+> drive_del
+> 
+> savevm
+> loadvm
+> delvm
+> 
+> From upstream point of view there's no value in adding the 'error'
+> prefix to drive_add/drive_del as libvirt now uses blockdev-add/del QMP
+> command instead which have implicit error propagation.
+> 
 
-It does have tab completion for command names, but it does not know
-about or remember argument fields. It does not have autocomplete or
-typing hints like FiSH or bash ^r.
+As thought.
 
-I would like to change this, actually, by making the docstrings in QAPI
-schema a first class citizen of the spec and allowing them to be
-introspectable via the socket directly.
+> There are no replacements for the internal snapshot commands, but they
+> reported the 'error' prefix for some time even before this series.
+> 
+> Said that, please don't break savevm/loadvm/delvm until a QMP
+> replacement is added.
+> 
 
-(I.e., you can get the list of arguments and the docstrings that
-accompany them over the wire so you can display it in the client.)
+Yes, noted. I wonder where userfaultfd write support is these days...
 
-Problem I'm having with qmp-shell is, like Kevin says below ...
+> The bug was reported at the time when libvirt didn't use blockdev yet,
+> but at this point it's pointless from our side. This wouldn't even fix
+> the scenario when old (pre-5.10) libvirt would use new qemu because the
+> drive-add handler never checked the error prefix.
+> 
+> [1] https://libvirt.org/git/?p=libvirt.git;a=blob;f=src/qemu/qemu_monitor_text.c;h=9135a11f0a3aae718c86bb199112fba8d16d4d80;hb=HEAD
+> 
 
-> This is in fact a big part of the problem that qmp-shell really needs to
-> solve before it can replace HMP: How to make writing commands at least
-> almost as simple as with HMP. If I can just press tab a few times to
-> cycle through the available options for the command, that would already
-> be a massive improvement over writing JSON manually (which you would
-> still have to do with your text-file based approach, without any
-> QMP-specific support).
->=20
-
-... I can't figure out how to make writing commands simple.
-
-When you have a "simple" command, the abstraction works OK; you can type
-key=3Dval pairs and go about your way.
-
-As soon as you have anything nested, the gossamer-thin illusion is
-destroyed. I investigated making this a little easier by adding a parser
-that could read directly from stdin and would allow multi-line JSON
-inputs as arguments.
-
-(Like the python shell does it, for example: When you have a dictionary
-opening brace, it lets you continue to the next line.)
-
-I was a little disheartened that most JSON parsers in python expect to
-consume buffered objects and generally consume the entire buffer -- it
-didn't seem to play nice with the idea of wanting to parse from STDIN
-directly.
-
-
-So:
-
-- I think qmp-shell is worth having, especially if polished
-(autocomplete, docstrings, argument hints, etc).
-
-- Kevin mentioned getting this into the GTK shell. I think that would be
-great, as a step to help phase out HMP.
-
-- I think getting rid of HMP is good because I don't care for the idea
-of supporting two monitor protocols. One schema, one parser, one truth.
-
-- I do, however, like the idea of having a non-rigorous monitor that
-lets us get away with murder when we need to. HMP is useful for
-debugging, prototypes and other things where the rigor and permanence of
-a QAPI schema feels too burdensome.
-
-- So: maybe a turbocharged qmp-shell can offer some similar kinds of
-convenience commands that are build on top of real QMP. Sugar logic and
-other fanciful things could be implemented there in qmp-shell as
-extensions. You'd get a stock pile of them with your QEMU install that
-help you do certain tasks quickly and trivially.
-
-- Given all the above, I am willing to try to save, polish, or re-design
-qmp-shell; but am a bit starved for ideas on the syntax... This is why I
-was spending a bit of time talking about our flattening to dot syntax,
-and other projects related to representing hierarchical data.
-
-Would really love to hear ideas on what a good interactive shell syntax
-for a JSON-fueled schema would look like.
-
-Any prior art, other projects, and reading anyone can recommend would be
-nice.
-
-> The other part that it needs to solve is how to be available by default
-> without specifying anything on the command line. Basically, if I press
-> Ctrl-Alt-2, I want to get to a monitor shell. If that shell is
-> implemented internally or by an external Python process, I don't mind.
->=20
->> The only strong reason for qmp-shell to be interactive would be if
->> the initial protoocl handshake was too slow. I can't see that being
->> a problem with QMP.
->=20
-> Speed would be the least of my concerns. This is about manual use, and
-> it already takes me a while to type in my commands.
->=20
->> Example usage:
->>
->> 1. Launch the QEMU runtime for the desired target
->>
->>      $ qemu-runtime-x86_64 myvm.sock
->>
->> 2. Load the configuration to define the VM
->>
->>    $ cat myvm.yaml
->>    commands:
->>      - machine_declare:
->>          name: pc-q35-5.0
->> =09 ...
->>      - blockdev_add:
->>          ...
->>      - device_add:
->>          ...
->>      - blockdev_add:
->>          ...
->>      - device_add:
->>          ...
->>    $ qemu-client myvm.sock myvm.yaml
->>
->>
->> 3. Hotplug a disk
->>
->>    $ cat mynewdisk.yaml
->>    commands:
->>      - blockdev_add:
->>          ...
->>      - device_add:
->>          ...
->>    $ qemu-client myvm.sock mynewdisk.yaml
->>
->>
->> 3. Hotunplug a disk
->>
->>    $ cat myolddisk.yaml
->>    commands:
->>      - device_del:
->>          ...
->>      - blockdev_del:
->>          ...
->>    $ qemu-client myvm.sock myolddisk.yaml
->=20
-> Just to compare, this is what the human user oriented flow looks like
-> today:
->=20
-> 1. qemu-system-x86_64 -M pc-q35-5.0 -drive if=3Dvirtio,... -cdrom ...
->=20
-> 2. <Press Ctrl-Alt-2 to get to the HMP shell>
->    (qemu) drive_add ...
->    <Press Ctrl-Alt-1 to get back to the guest>
->=20
-> 3. <Press Ctrl-Alt-2 to get to the HMP shell>
->    (qemu) device_del ...
->    <Press Ctrl-Alt-1 to get back to the guest>
->=20
-> This is what we're competing with, and honestly I don't see how your
-> qemu-runtime-*/qemu-client based flow comes even close to it in terms of
-> usability.
->=20
-> QMP, JSON and YAML may be nice machine interfaces, but having nice
-> machine interfaces doesn't mean that you shouldn't also have something
-> that is suitable for humans. qmp-shell is trying to be that, and while
-> it leaves much to be desired in its current state, replacing it with
-> even more machine-friendly stuff that is cumbersome for humans isn't the
-> right answer.
->=20
-
-This is why I have two things I want to do:
-
-Part A:
-- Remove the CLI as it exists today*
-- Introduce a machine-readable, but human-friendly format, like YAML (or
-JSON) that's based directly on QAPI.
-
-Part B:
-- Improve qmp-shell such that it provides a sufficient usability layer
-on top of QMP
-- Make this tool prominent to users; e.g. putting it in the GTK
-interface would be nice.
-- Reduce prominence of HMP and works towards its removal.
+Thank you for the report from libvirtville :)
 
 --js
 
