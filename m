@@ -2,75 +2,130 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 769D4C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E06B4C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:19:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39B42214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:10:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC74B214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 09:19:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="fyGwHPV7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B42214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EzfXbzVQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC74B214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw0Pw-0000tO-Ed
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 04:10:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54091)
+	id 1iw0YD-0002Ry-S4
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 04:19:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <olaf@aepfle.de>) id 1iw0PI-0000Op-TM
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:10:10 -0500
+ (envelope-from <david@redhat.com>) id 1iw0XZ-0001yO-4M
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:18:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <olaf@aepfle.de>) id 1iw0PH-0001tB-LR
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:10:08 -0500
-Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::2]:24417)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1iw0PH-0001qD-0G
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:10:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1580116202;
- s=strato-dkim-0002; d=aepfle.de;
- h=References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:
- X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
- bh=sSIU6r6hRIdgeVmDEceNZxmA2hGuyuEnauCPB1f5h0k=;
- b=fyGwHPV7esPt0Ba6mNXsBzV376vh6ct0tarJHZBZBq8qXrlF0UQIaS/cCQFAjP3zwQ
- GY5Gtj2DKL7TzTWU5LT11n2otYMiO7OhNayPuoj+uYwZSpZzd4V5NJYCNsdt3uU0Kj3Q
- iDS8D4JP1AyAglTDUukRXIrKTOzPeALWZj6hgBCXVyXWFqrII1UbDlMvOBaucV0v5Kwk
- +5NCykdNpPP50EAqqrOiKoUS28He4JWecIfW7ymuOSO3MSHDSLotPXpRh/eAgzqRU2ii
- Fmbjxe89QVQ4XzxkFKe6/gt8BZlhXs54+rg4DJW7OQLChWl0+Jl/LiDn8FnlqHCYhWtq
- 8WPQ==
-X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QED/SSGq+wjGiUC4kV1cX92EW4mFvNjTRB"
-X-RZG-CLASS-ID: mo00
-Received: from sender by smtp.strato.de (RZmta 46.1.7 AUTH)
- with ESMTPSA id j07b1dw0R9A1BIg
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
- (Client did not present a certificate);
- Mon, 27 Jan 2020 10:10:01 +0100 (CET)
-Date: Mon, 27 Jan 2020 10:09:51 +0100
-From: Olaf Hering <olaf@aepfle.de>
-To: Paul Durrant <pdurrant@gmail.com>
-Subject: Re: [PATCH v2] hw/i386: disable smbus migration for xenfv
-Message-ID: <20200127100951.0803d167.olaf@aepfle.de>
-In-Reply-To: <CACCGGhCO_OqPq__t+V9RrFMYhXCJ5N4PPkq9CASJULV2rTkT-g@mail.gmail.com>
-References: <20200113174521.3336-1-olaf@aepfle.de>
- <20200116180321.24968-1-olaf@aepfle.de>
- <0335edd2-3d33-88f8-2ab4-4791f7289885@redhat.com>
- <20200117102244.22edd8a6.olaf@aepfle.de>
- <ea3a65c3-bd69-7815-6893-cb1cd8b9cfd6@redhat.com>
- <20200117140616.18cb8c45.olaf@aepfle.de>
- <CACCGGhCO_OqPq__t+V9RrFMYhXCJ5N4PPkq9CASJULV2rTkT-g@mail.gmail.com>
-X-Mailer: Claws Mail 2019.12.31 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+ (envelope-from <david@redhat.com>) id 1iw0XX-0005iC-Ds
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:18:40 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49829
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iw0XX-0005hy-9z
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 04:18:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580116718;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=oVrXW/xJ8FH8tV0EP95wVtDPHWCSVPuwt84dOsiYoOQ=;
+ b=EzfXbzVQfpnTEgc7zmym9TRbNoLZG+u9V6DJkmJfeyY+cNzXk74mw9sR1Y9cCl2b/QTp1h
+ X1x1xqbY/qR3j0zqebVHHJaN5UsqLux54KE9oilGUCma0T/TDOoWFljO1KHPnraB8iuhlg
+ 651dS+omTMzp39aSPNuDS0gqZOZLp3Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-763o-aChO3SDzW_llQYbdw-1; Mon, 27 Jan 2020 04:18:36 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EC7A800D41
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 09:18:35 +0000 (UTC)
+Received: from [10.36.118.65] (unknown [10.36.118.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AEE9B8E60C;
+ Mon, 27 Jan 2020 09:18:26 +0000 (UTC)
+Subject: Re: [PATCH 2/2] virtio-balloon: Reject qmp_balloon during hot-unplug
+To: Julia Suvorova <jusual@redhat.com>
+References: <20200115224025.538368-1-jusual@redhat.com>
+ <20200115224025.538368-3-jusual@redhat.com>
+ <38fdd88d-1399-effb-b74b-e02b7343f044@redhat.com>
+ <CAMDeoFX1eFToYOWmBaVOYHTnNka8Fwruq6PtX7GsAGTuS++u8w@mail.gmail.com>
+ <095236a0-ba8c-55c6-f9fc-e2a4a809b274@redhat.com>
+ <CAMDeoFWJJbLs_Dtkb2rqXYW-PMA=9Qwy83SnkqS2_-EOaNtiSg@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <0c84dd1a-4bef-1f68-3b42-cba547210e63@redhat.com>
+Date: Mon, 27 Jan 2020 10:18:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/es3fHPvEDX_VZIDDF8ItNpI"; protocol="application/pgp-signature"
+In-Reply-To: <CAMDeoFWJJbLs_Dtkb2rqXYW-PMA=9Qwy83SnkqS2_-EOaNtiSg@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 763o-aChO3SDzW_llQYbdw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 2a01:238:20a:202:5301::2
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,109 +137,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/es3fHPvEDX_VZIDDF8ItNpI
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 23.01.20 16:46, Julia Suvorova wrote:
+> On Thu, Jan 23, 2020 at 3:17 PM David Hildenbrand <david@redhat.com> wrote:
+>>
+>> On 23.01.20 15:08, Julia Suvorova wrote:
+>>> On Thu, Jan 16, 2020 at 1:36 PM David Hildenbrand <david@redhat.com> wrote:
+>>>>
+>>>> On 15.01.20 23:40, Julia Suvorova wrote:
+>>>>> Hot-unplug takes some time due to communication with the guest.
+>>>>> Do not change the device while freeing up resources.
+>>>>>
+>>>>> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+>>>>> ---
+>>>>>  balloon.c                  | 2 +-
+>>>>>  hw/virtio/virtio-balloon.c | 9 ++++++++-
+>>>>>  include/sysemu/balloon.h   | 2 +-
+>>>>>  3 files changed, 10 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/balloon.c b/balloon.c
+>>>>> index f104b42961..998ec53a0f 100644
+>>>>> --- a/balloon.c
+>>>>> +++ b/balloon.c
+>>>>> @@ -119,5 +119,5 @@ void qmp_balloon(int64_t target, Error **errp)
+>>>>>      }
+>>>>>
+>>>>>      trace_balloon_event(balloon_opaque, target);
+>>>>> -    balloon_event_fn(balloon_opaque, target);
+>>>>> +    balloon_event_fn(balloon_opaque, target, errp);
+>>>>>  }
+>>>>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+>>>>> index 57f3b9f22d..0fa4e4454b 100644
+>>>>> --- a/hw/virtio/virtio-balloon.c
+>>>>> +++ b/hw/virtio/virtio-balloon.c
+>>>>> @@ -717,12 +717,19 @@ static void virtio_balloon_stat(void *opaque, BalloonInfo *info)
+>>>>>                                               VIRTIO_BALLOON_PFN_SHIFT);
+>>>>>  }
+>>>>>
+>>>>> -static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
+>>>>> +static void virtio_balloon_to_target(void *opaque, ram_addr_t target,
+>>>>> +                                     Error **errp)
+>>>>>  {
+>>>>> +    DeviceState *bus_dev = qdev_get_bus_device(DEVICE(opaque));
+>>>>>      VirtIOBalloon *dev = VIRTIO_BALLOON(opaque);
+>>>>>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>>>>>      ram_addr_t vm_ram_size = get_current_ram_size();
+>>>>>
+>>>>> +    if (bus_dev && bus_dev->pending_deleted_event) {
+>>>>> +        error_setg(errp, "Hot-unplug of %s is in progress", vdev->name);
+>>>>> +        return;
+>>>>> +    }
+>>>>> +
+>>>>
+>>>> How exactly does this help? The guest is free to inflate/deflate
+>>>> whenever it wants.
+>>>
+>>> Guest is aware of hot-unplug start, and virtio driver should not
+>>> initiate any operations. This patch just restricts issuing commands
+>>> from qmp monitor.
+>>
+>> Why shouldn't the guest driver inflate/deflate while memory hotplug is
+>> going on?
+>>
+>> Simple balloon compaction in a Linux guest -> deflate/inflate triggered
+>> in the hypervisor.
+> 
+> QEMU crashes if inflate happens after powering-off PCI slot. Guest is
+> unable to interact with virtio-balloon device then, driver is
+> unloaded. But inflate can still happen if initiated from qmp.
 
-Am Mon, 20 Jan 2020 11:18:41 +0000
-schrieb Paul Durrant <pdurrant@gmail.com>:
+Ah guest can inflate/deflate whenever it wants. What am I missing?
 
-> On Fri, 17 Jan 2020 at 13:06, Olaf Hering <olaf@aepfle.de> wrote:
-> > What would future domUs lose if 'xenfv' would be locked to 'pc-i440fx-3=
-.0'?
-
-> I guess eventually that pc type would be removed and then we'd have a
-> compat issue. Ideally I think libxl should simply not use xenfv and
-> then it can be deprecated and removed, and then such issues can be
-> dealt with directly in xl/libxl.
-
-I think this does not answer the question at all.
-What future versions of libxl do is one thing.
-What existing versions of libxl do with future versions of qemu is another.
+IMHO, the right approach is to discard inflate/deflate requests on these
+areas instead.
 
 
-IMO it was wrong to map "xenfv" to "pc", simply because it entirely
-ignores live migration. We were just lucky until qemu-3.1. Maybe the
-creators of 'xenfv' just meant it to be "do everything to make it
-compatible with HVM".
+-- 
+Thanks,
 
-What about a variant of this change, to lock 'xenfv' to 'qemu-3.0'?
+David / dhildenb
 
-
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -490,6 +490,13 @@ static void pc_i440fx_3_0_machine_options(MachineClass=
- *m)
-     pc_i440fx_3_1_machine_options(m);
-     compat_props_add(m->compat_props, hw_compat_3_0, hw_compat_3_0_len);
-     compat_props_add(m->compat_props, pc_compat_3_0, pc_compat_3_0_len);
-+
-+    m->alias =3D "xenfv";
-+    if (xen_enabled()) {
-+        m->desc =3D "Xen Fully-virtualized PC";
-+        m->max_cpus =3D HVM_MAX_VCPUS;
-+        m->default_machine_opts =3D "accel=3Dxen";
-+    }
- }
-=20
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-@@ -500,6 +507,7 @@ static void pc_i440fx_2_12_machine_options(MachineClass=
- *m)
-     pc_i440fx_3_0_machine_options(m);
-     compat_props_add(m->compat_props, hw_compat_2_12, hw_compat_2_12_len);
-     compat_props_add(m->compat_props, pc_compat_2_12, pc_compat_2_12_len);
-+    m->alias =3D NULL;
- }
-=20
- DEFINE_I440FX_MACHINE(v2_12, "pc-i440fx-2.12", NULL,
-@@ -946,14 +954,3 @@ DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
-                   isapc_machine_options);
-=20
-=20
--#ifdef CONFIG_XEN
--static void xenfv_machine_options(MachineClass *m)
--{
--    m->desc =3D "Xen Fully-virtualized PC";
--    m->max_cpus =3D HVM_MAX_VCPUS;
--    m->default_machine_opts =3D "accel=3Dxen";
--}
--
--DEFINE_PC_MACHINE(xenfv, "xenfv", pc_xen_hvm_init,
--                  xenfv_machine_options);
--#endif
-
-
-Olaf
-
---Sig_/es3fHPvEDX_VZIDDF8ItNpI
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE97o7Um30LT3B+5b/86SN7mm1DoAFAl4uqN8ACgkQ86SN7mm1
-DoClMxAAi4ThJHLQhVHEiiFxzUjMVPVmE1JIKFJhX8Mrgdh2Jkzf2O1YG/L6hjPA
-J0epHgb+TwgDeHLfWUp26v8bV+duxNETt9VU7qyCgpwgNtQe3GzSyJGpTrRSTjLe
-BtbT3rJoPWLl8UiZ1ukJHy+BaaaTx/6CIHPBEyvFtu9DyjqYqM3e8K2rxvWpZtmT
-aCz7S83jt9TThUwyB+qyIRdjntcH8dWlQK7y9SsDPxwdlZrYkXYN21UJ0KhZHtBy
-auHq4ZT3NjT3Q+31g07AZK94fFCl3w3krn44EJLo0ek+HTnzYm1s7QQ2umH66wYe
-fDjYXSuCAh6CKnFh9u6nwX9pIyTe+T2oiotdMCvfgC8OfkAIDcr8JLTAr1on2BXz
-5I3enTtMukyyBxIEfsWKbQpwu4wYxflIunzlJ5QOpeGWI1C+tjGUzqDQAfynTSwv
-2FOAmsaudivR3IEnviXv5lzPkmdZqpolxeHoYW1hHajN0rtzoKCvvy5KDeDfYSIy
-2Tn4Ox6Lu8m7EYsiydM1BcSx+yhHO5Xwqt7nLfxb4Gp8z0M6PJk5wKrWAZmScO2M
-HuTyBz+lEJAoKnDx8yHFGoYWEeQ6NyVoKFkaPW30BJJjAx0iVIPIJCp4930TJzFR
-sIhu/MWGGtPKDkRXrs9tk4RIUX6IIxh8h7v4jnUpe+5tOzzXB3k=
-=ZMPM
------END PGP SIGNATURE-----
-
---Sig_/es3fHPvEDX_VZIDDF8ItNpI--
 
