@@ -7,79 +7,77 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C369C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89611C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:39:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB7B32467E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:32:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5329024679
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 19:39:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aop8P1M8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB7B32467E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hDbDNhv0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5329024679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwA7T-0003OH-5b
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:32:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55940)
+	id 1iwAE5-0006PQ-Gy
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 14:39:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iwA6c-0002rb-RH
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:31:31 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iwADH-0005lD-Gk
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:38:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iwA6b-0005D6-Cj
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:31:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52698
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iwADF-0004e6-Kf
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:38:22 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34613
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iwA6b-0005CH-8M
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:31:29 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iwADF-0004dk-AK
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 14:38:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580153488;
+ s=mimecast20190719; t=1580153899;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AG0N+1ROQUgMrc6UZxUzW632vZeX3ujGXUwEqs1w2lI=;
- b=aop8P1M8sU16zFu44+vPYisJ8cGXtljHWuzHzyZVTh3AzMVNPiUMf8Ittp4ACuwXkaXxUR
- M4C3OfCsRtNDH4xEKIwXLp7b57eKJznRkXyP5lxgaHZnGIj6jf2q6oqRp0zHxSAwsiQGaB
- xT9UFqhloAGf5LMzgtVqkxhw6v9baPc=
+ bh=mcKv3IplqNlyl2lcPdqIrwlnvS+S/oIGzJdupMEuVHM=;
+ b=hDbDNhv0Nn+pRrcQhtXLuDpzjly6FlMQNSh5XfpS9VJEZt1MtCstu/Mt4E8EWoxVTE5WlC
+ J94O+bx9xyxrtkuA3m6XP6iSTi6UX5EI6on6XnR9mMtK4K1AOCa0l56UVA6HtPjOAzKQg6
+ tT8u6vIsxhkmHvLHjVM2bV+J/e0fqCY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-vffQKKJSOiaus1ES0WKXvA-1; Mon, 27 Jan 2020 14:31:21 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-144-YAizSOXANL6TgsC5kwIDFg-1; Mon, 27 Jan 2020 14:38:17 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89567189F763;
- Mon, 27 Jan 2020 19:31:20 +0000 (UTC)
-Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 338D45D9CD;
- Mon, 27 Jan 2020 19:31:20 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] doc: Use @code rather than @var for options
-To: David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-References: <20200124103458.1525982-1-david.edmondson@oracle.com>
- <20200124103458.1525982-3-david.edmondson@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <8412b6bf-3819-9042-4ade-d42f36fd3a97@redhat.com>
-Date: Mon, 27 Jan 2020 13:31:19 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E06DA18B9FC4
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 19:38:16 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 496E21001B30;
+ Mon, 27 Jan 2020 19:38:10 +0000 (UTC)
+Date: Mon, 27 Jan 2020 19:38:08 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: [PULL 016/111] virtiofsd: Add options for virtio
+Message-ID: <20200127193808.GB3419@work-vm>
+References: <20200123115841.138849-1-dgilbert@redhat.com>
+ <20200123115841.138849-17-dgilbert@redhat.com>
+ <m1r1zlqf71.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200124103458.1525982-3-david.edmondson@oracle.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: vffQKKJSOiaus1ES0WKXvA-1
+In-Reply-To: <m1r1zlqf71.fsf@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: YAizSOXANL6TgsC5kwIDFg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,44 +89,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/24/20 4:34 AM, David Edmondson wrote:
-> Texinfo defines @var for metasyntactic variables and such terms are
-> shown in upper-case or italics in the output of makeinfo. When
-> considering an option to a command, such as "-n", upper-casing is
-> undesirable as it may confuse the reader or be in conflict with the
-> equivalent upper-case option.
-> 
-> Replace the use of @var for options with @code to avoid this.
-> 
-> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
-> ---
->   qemu-img.texi | 16 ++++++++--------
->   1 file changed, 8 insertions(+), 8 deletions(-)
+* Christophe de Dinechin (dinechin@redhat.com) wrote:
+>=20
+> Dr. David Alan Gilbert (git) writes:
+>=20
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > Add options to specify parameters for virtio-fs paths, i.e.
+> >
+> >    ./virtiofsd -o vhost_user_socket=3D/tmp/vhostqemu
+>=20
+> Shouldn't that be --socket-path=3D/tmp/vhostqemu now?
 
-Is this patch still needed given Peter's recent push to move to rST 
-documentation?
+Oops yes it should, that was the old syntax
 
-> 
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 3b6dfd8682..6b4a1ac961 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -74,13 +74,13 @@ keys.
->   @item --image-opts
->   Indicates that the source @var{filename} parameter is to be interpreted as a
->   full option string, not a plain filename. This parameter is mutually
-> -exclusive with the @var{-f} parameter.
-> +exclusive with the @code{-f} parameter.
->   
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  tools/virtiofsd/fuse_i.h        |  1 +
+> >  tools/virtiofsd/fuse_lowlevel.c | 11 ++++++++---
+> >  tools/virtiofsd/helper.c        | 14 +++++++-------
+> >  3 files changed, 16 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
+> > index bae06992e0..26b1a7da88 100644
+> > --- a/tools/virtiofsd/fuse_i.h
+> > +++ b/tools/virtiofsd/fuse_i.h
+> > @@ -63,6 +63,7 @@ struct fuse_session {
+> >      struct fuse_notify_req notify_list;
+> >      size_t bufsize;
+> >      int error;
+> > +    char *vu_socket_path;
+> >  };
+> >
+> >  struct fuse_chan {
+> > diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_low=
+level.c
+> > index 8552cfb8af..17e8718283 100644
+> > --- a/tools/virtiofsd/fuse_lowlevel.c
+> > +++ b/tools/virtiofsd/fuse_lowlevel.c
+> > @@ -2115,8 +2115,11 @@ reply_err:
+> >      }
+> >
+> >  static const struct fuse_opt fuse_ll_opts[] =3D {
+> > -    LL_OPTION("debug", debug, 1), LL_OPTION("-d", debug, 1),
+> > -    LL_OPTION("--debug", debug, 1), LL_OPTION("allow_root", deny_other=
+s, 1),
+> > +    LL_OPTION("debug", debug, 1),
+> > +    LL_OPTION("-d", debug, 1),
+> > +    LL_OPTION("--debug", debug, 1),
+> > +    LL_OPTION("allow_root", deny_others, 1),
+> > +    LL_OPTION("--socket-path=3D%s", vu_socket_path, 0),
+> >      FUSE_OPT_END
+> >  };
+> >
+> > @@ -2132,7 +2135,9 @@ void fuse_lowlevel_help(void)
+> >       * These are not all options, but the ones that are
+> >       * potentially of interest to an end-user
+> >       */
+> > -    printf("    -o allow_root          allow access by root\n");
+> > +    printf(
+> > +        "    -o allow_root              allow access by root\n"
+> > +        "    --socket-path=3DPATH         path for the vhost-user sock=
+et\n");
+> >  }
+> >
+> >  void fuse_session_destroy(struct fuse_session *se)
+> > diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> > index 9333691525..676032e71f 100644
+> > --- a/tools/virtiofsd/helper.c
+> > +++ b/tools/virtiofsd/helper.c
+> > @@ -127,13 +127,13 @@ static const struct fuse_opt conn_info_opt_spec[]=
+ =3D {
+> >
+> >  void fuse_cmdline_help(void)
+> >  {
+> > -    printf(
+> > -        "    -h   --help            print help\n"
+> > -        "    -V   --version         print version\n"
+> > -        "    -d   -o debug          enable debug output (implies -f)\n=
+"
+> > -        "    -f                     foreground operation\n"
+> > -        "    -o max_idle_threads    the maximum number of idle worker =
+threads\n"
+> > -        "                           allowed (default: 10)\n");
+> > +    printf("    -h   --help                print help\n"
+> > +           "    -V   --version             print version\n"
+> > +           "    -d   -o debug              enable debug output (implie=
+s -f)\n"
+> > +           "    -f                         foreground operation\n"
+> > +           "    -o max_idle_threads        the maximum number of idle =
+worker "
+> > +           "threads\n"
+> > +           "                               allowed (default: 10)\n");
+> >  }
+> >
+> >  static int fuse_helper_opt_proc(void *data, const char *arg, int key,
+>=20
+>=20
+> --
+> Cheers,
+> Christophe de Dinechin (IRC c3d)
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
