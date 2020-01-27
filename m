@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6454C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D6AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:19:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B01B9214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:15:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F362214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:19:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJ9YiIDB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B01B9214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h9bxyf3G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F362214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw4Eg-0000kW-Sz
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 08:15:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47085)
+	id 1iw4IS-00035m-Ls
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 08:19:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iw4Dy-0000Aa-TF
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:14:44 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iw4Gd-0001wd-GY
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:17:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iw4Dx-0006PY-NO
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:14:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36562
+ (envelope-from <cohuck@redhat.com>) id 1iw4Gc-0000DJ-EZ
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:17:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24924
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iw4Dx-0006Mn-KF
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:14:41 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iw4Gc-0000CW-Ba
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:17:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580130880;
+ s=mimecast20190719; t=1580131045;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qb/ulFR6/uvTP2Hxq1vn/YS2A/KqIb2+6zNPYqghZ64=;
- b=DJ9YiIDBMGzsA1ctpDeRUwgm2/llLphymPnZ1ZB8aagUVYjl5K5O+FH4kdagkD5+Dtqzqp
- XvbgWu5Cjf/3kCrwfsEk/2z9ejomJcMaaHYCs7Quk57+M9VH495m+rQ6hFTr6Y7/3mX6Lu
- Gzq9MfGJCD5SsGcSaEXcGKKEUOqipWw=
+ bh=M1QNBPm0dPk21ccuCJlkr4/JbdkwMj+uewoMY/utAHg=;
+ b=h9bxyf3GYewSmi5F1oUCdOuQzDJWwR3GV2Rhl59O08Hk3IfesX4UIgle2b8rXfn6Paurb2
+ ED91NYG/5Y7fcsl+wac7+DOy9mN8k3/4oQY5nLTBlvOAsblN94TOnZ+Ng82V0fdWo3D2qJ
+ OQJqP9FUQNSba+xGMhjN0cwtUDHq5jQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-Nnd7UIhLOkG3VkMI1KWSLQ-1; Mon, 27 Jan 2020 08:14:39 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-16-YniVxzA7NjSxWU07fJsl1Q-1; Mon, 27 Jan 2020 08:17:21 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1317D1800D41;
- Mon, 27 Jan 2020 13:14:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1A7F803A29;
+ Mon, 27 Jan 2020 13:17:20 +0000 (UTC)
 Received: from gondolin (ovpn-116-220.ams2.redhat.com [10.36.116.220])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 93361863CC;
- Mon, 27 Jan 2020 13:14:31 +0000 (UTC)
-Date: Mon, 27 Jan 2020 14:14:28 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0728F38C;
+ Mon, 27 Jan 2020 13:17:13 +0000 (UTC)
+Date: Mon, 27 Jan 2020 14:17:10 +0100
 From: Cornelia Huck <cohuck@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v2 3/4] virtio-blk: default num_queues to -smp N
-Message-ID: <20200127141428.4347b4bd.cohuck@redhat.com>
-In-Reply-To: <20200124100159.736209-4-stefanha@redhat.com>
+Subject: Re: [PATCH v2 4/4] vhost-user-blk: default num_queues to -smp N
+Message-ID: <20200127141710.5785ba2b.cohuck@redhat.com>
+In-Reply-To: <20200124100159.736209-5-stefanha@redhat.com>
 References: <20200124100159.736209-1-stefanha@redhat.com>
- <20200124100159.736209-4-stefanha@redhat.com>
+ <20200124100159.736209-5-stefanha@redhat.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Nnd7UIhLOkG3VkMI1KWSLQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: YniVxzA7NjSxWU07fJsl1Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,7 +94,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 Jan 2020 10:01:58 +0000
+On Fri, 24 Jan 2020 10:01:59 +0000
 Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
 > Automatically size the number of request virtqueues to match the number
@@ -102,16 +102,16 @@ Stefan Hajnoczi <stefanha@redhat.com> wrote:
 > same vCPU that submitted the request.  No IPI is necessary to complete
 > an I/O request and performance is improved.
 
-Same comment regarding other transports.
+Ok, that one is pci-only anyway.
 
 > 
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  hw/block/virtio-blk.c          | 6 +++++-
->  hw/core/machine.c              | 1 +
->  hw/virtio/virtio-blk-pci.c     | 9 ++++++++-
->  include/hw/virtio/virtio-blk.h | 2 ++
->  4 files changed, 16 insertions(+), 2 deletions(-)
+>  hw/block/vhost-user-blk.c          | 6 +++++-
+>  hw/core/machine.c                  | 1 +
+>  hw/virtio/vhost-user-blk-pci.c     | 6 ++++++
+>  include/hw/virtio/vhost-user-blk.h | 2 ++
+>  4 files changed, 14 insertions(+), 1 deletion(-)
 
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
