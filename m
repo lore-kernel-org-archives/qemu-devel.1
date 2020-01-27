@@ -2,156 +2,87 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5730FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1BFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:54:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18C8420CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:02:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7E1521739
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 21:54:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RI3IOorL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C8420CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BD41emc9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E1521739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwBWr-0007e2-8t
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 16:02:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47442)
+	id 1iwCKu-0006eX-0U
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 16:54:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iwBVv-00076r-15
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:01:44 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iwCKA-00066l-V7
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:53:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iwBVt-0007ni-ON
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:01:42 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25698
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iwBVt-0007nO-L8
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:01:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580158901;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=MlOYoAw7MamUQdtnocGN2N3LAgknV+4Hu+QVV02eBHw=;
- b=RI3IOorLXX+ANWncAKxqvegWoSnV3tH/G10vDbmCOdBNbiZKFrnfndFarmsA2QRr6rfU8H
- rSdi03LZD+zF9utAyXyXpQYws/C3FIo7HnrAS706wI/mxlOxDsrgaJMQ46TBEFpClwz7Gx
- e2UtTha+BF1JzsD9+PohAoteSrEfPfU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-2VCIoECtOLmAanxSzOEfKg-1; Mon, 27 Jan 2020 16:01:36 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46438800D41;
- Mon, 27 Jan 2020 21:01:35 +0000 (UTC)
-Received: from [10.18.17.116] (dhcp-17-116.bos.redhat.com [10.18.17.116])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CBCD560BF4;
- Mon, 27 Jan 2020 21:01:31 +0000 (UTC)
-Subject: Re: [PATCH v3 00/13] RFC: [for 5.0]: HMP monitor handlers cleanups
-To: Peter Krempa <pkrempa@redhat.com>
-References: <20200127103647.17761-1-mlevitsk@redhat.com>
- <2e885a1d-94c7-53b5-44f7-feffe70f57c3@redhat.com>
- <20200127204355.GE4544@andariel.pipo.sk>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <12217cd6-7866-ce9c-c0da-24775f9d045d@redhat.com>
-Date: Mon, 27 Jan 2020 16:01:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <robert.foley@linaro.org>) id 1iwCK9-00070v-RU
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:53:38 -0500
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:46161)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iwCK9-00070K-JO
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 16:53:37 -0500
+Received: by mail-lf1-x144.google.com with SMTP id z26so7435952lfg.13
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 13:53:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=FSxUlbHmoPGnQ/ALbAy10kMhC8x7z+0r4aZNKHWbKYA=;
+ b=BD41emc9LoQV4Xy4DZGlJu0Ys31e8oxdapeFEUTHe8zKFn2Nq/x7WTmWWVb6MWSDW1
+ mZfiJWB6t4gE9X9l5rTgghqY7oR5BXhNSNEDKCcE1n3reldgschENjpdCdChy2FXTNPX
+ 86GZhEpBpN2ozKuWrO+5LG2qn4/0lcKhRKtXvldr+xwf3vvCh1eLZjrWAkan7qun4cQL
+ bp3ucpzxMOFBMKGNToajBHNH2+TYkSv1XEysdIWe7BGddP6ReIrLoLnXErMS1CkWBetU
+ c4+lFxMETTHUNW/7tyhV7EtzfFiWomV/DWidEmPNleObqTCRWWuJUhYzaEwvphicx4J4
+ 1+PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=FSxUlbHmoPGnQ/ALbAy10kMhC8x7z+0r4aZNKHWbKYA=;
+ b=ewGPq/4yyV86FSTRY2TVRufzdOwPgjvrw/80+aZwFGN4hO0wHg0H5W0RcndGYMYYaq
+ /IcYcb5rpQkNIh0ppSEPSvThTXVLECFf/AwPb9mb5NnnvKQplbRfrE7sOcoNkw+J9+y0
+ PJKNKL5Bm35ZRTlUvO3hXLxOLCsKq3Pk7fY6YfTvyHUCMUqUI9cFdq/SudTmoFLVI2Zb
+ VJMW8QmlM/M3j2RKDAuhxQ178/A6EZD/znEVJwpikVneGSBSa79d2onCSCwLK5/1cdCP
+ WnUZ5Q159QTbhIBVFmc8jC2Izf/YCA3wWvU/7/sg9g+SsXJrhRK7FMi/9tPVfc0N0ID3
+ 0iWA==
+X-Gm-Message-State: APjAAAUUwWukRc0QwMmJJXofuK7OnAeakxkLumvgyZ9MIFV5qsh6XLgm
+ tv+/8OC2cQVolKcP7rKnBKno1XU4Nv5RCg2pjkHmSg==
+X-Google-Smtp-Source: APXvYqw6ss0nj1wiAs+TIdoZ4Q7VohIpf3e8HiiLe8JAB9XJcMz4dZ9z5TdCsg9+J1a7y2cDLZLVpoFsOO7VgO9t69U=
+X-Received: by 2002:a05:6512:1cc:: with SMTP id
+ f12mr446681lfp.128.1580162016053; 
+ Mon, 27 Jan 2020 13:53:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200127204355.GE4544@andariel.pipo.sk>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 2VCIoECtOLmAanxSzOEfKg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200124165335.422-1-robert.foley@linaro.org>
+ <20200124165335.422-8-robert.foley@linaro.org>
+ <87imkxeyew.fsf@linaro.org>
+ <CAEyhzFtRV_4oss4gxYJi5ojGrXvNZExXfM+Ae-idLqidtcPpcQ@mail.gmail.com>
+ <20200127172716.xvfkyhqznjlxefgn@kamzik.brq.redhat.com>
+ <CAEyhzFs9-b4QzemPGY9+3KABV_maq7iCQ1u7m-HKcHWjTN3Cug@mail.gmail.com>
+ <87d0b4fytx.fsf@linaro.org>
+In-Reply-To: <87d0b4fytx.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Mon, 27 Jan 2020 16:53:25 -0500
+Message-ID: <CAEyhzFvf8uArzwC4=o3WZWx5V1qDyAiq_y=nNarSw=9rNTkYug@mail.gmail.com>
+Subject: Re: [PATCH 7/8] tests/vm: Added a new script for ubuntu.aarch64.
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,85 +94,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Jan Tomko <jtomko@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: fam@euphon.net, Peter Puhov <peter.puhov@linaro.org>,
+ Andrew Jones <drjones@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 27 Jan 2020 at 15:07, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Robert Foley <robert.foley@linaro.org> writes:
+>
+> > Hi Drew,
+> >
+> > On Mon, 27 Jan 2020 at 12:27, Andrew Jones <drjones@redhat.com> wrote:
+> >
+> >> >
+> >> > I suppose we could check the version of QEMU and use the above
+> >> > defaults only for earlier versions of QEMU.
+> >> > This is something we will probably move to aarch64vm.py since it is =
+common.
+> >>
+> >> What versions of QEMU do these tests *have* to support? Because we cou=
+ld
+> >> just skip the tests for QEMU that doesn't support cpu=3Dmax,gic-versio=
+n=3Dmax.
+> >> 'max' is indeed the nicest selection for using the same command line o=
+n
+> >> KVM (gicv2 and gicv3 hosts) and TCG.
+> >
+> > I believe these test scripts which build/launch the VM have to support
+> > the older version of QEMU since
+> > this is the version of QEMU currently used when these VMs are
+> > launched.  I don't know the history on
+> > this, but it seems intentional that we use one older/different version
+> > of QEMU to launch the VM,
+>
+> Well we defer to the system QEMU as it should be stable. It can be
+> overridden with the QEMU environment variable which worked well enough
+> when we only had VMs of one architecture. Perhaps we needs a new way to
+> say "use the appropriate QEMU from this build"?
 
+Good idea.  This is a pretty common use case and it makes sense to
+make it easy to use.
+I will add some support for this in my patch series.
 
-On 1/27/20 3:43 PM, Peter Krempa wrote:
-> On Mon, Jan 27, 2020 at 14:39:02 -0500, John Snow wrote:
->>
->>
->> On 1/27/20 5:36 AM, Maxim Levitsky wrote:
->>> This patch series is bunch of cleanups
->>> to the hmp monitor code.
->>>
->>> This series only touched blockdev related hmp handlers.
->>>
->>> No functional changes expected other that
->>> light error message changes by the last patch.
->>>
->>> This was inspired by this bugzilla:
->>> https://bugzilla.redhat.com/show_bug.cgi?id=1719169
->>>
->>> Basically some users still parse hmp error messages,
->>> and they would like to have them prefixed with 'Error:'
->>>
->>
->> HMP isn't meant to be parsed. It's explicitly *not* API or ABI. I do
->> like consistency in my UIs (it's useful for human eyes, too), but I'd
->> like to know more about the request.
-> 
-> That's true as long as there's an stable replacement ... see below.
-> 
-
-Thanks for the context!
-
->>
->> Is this request coming from libvirt? Can we wean them off of this
->> interface? What do they need as a replacement?
-> 
-> There are 5 commands that libvirt still has HMP interfaces for:
-> 
-> drive_add
-> drive_del
-> 
-> savevm
-> loadvm
-> delvm
-> 
-> From upstream point of view there's no value in adding the 'error'
-> prefix to drive_add/drive_del as libvirt now uses blockdev-add/del QMP
-> command instead which have implicit error propagation.
-> 
-
-As thought.
-
-> There are no replacements for the internal snapshot commands, but they
-> reported the 'error' prefix for some time even before this series.
-> 
-> Said that, please don't break savevm/loadvm/delvm until a QMP
-> replacement is added.
-> 
-
-Yes, noted. I wonder where userfaultfd write support is these days...
-
-> The bug was reported at the time when libvirt didn't use blockdev yet,
-> but at this point it's pointless from our side. This wouldn't even fix
-> the scenario when old (pre-5.10) libvirt would use new qemu because the
-> drive-add handler never checked the error prefix.
-> 
-> [1] https://libvirt.org/git/?p=libvirt.git;a=blob;f=src/qemu/qemu_monitor_text.c;h=9135a11f0a3aae718c86bb199112fba8d16d4d80;hb=HEAD
-> 
-
-Thank you for the report from libvirtville :)
-
---js
-
+Thanks & Regards,
+-Rob
+>
+> > while we test the 'current' build of QEMU inside the VM.
+> > It also seems like a 'nice to have' to automatically support the
+> > latest version where we could
+> > use max as you pointed out.
+> >
+> > Thanks & Regards,
+> > -Rob
+>
+>
+> --
+> Alex Benn=C3=A9e
 
