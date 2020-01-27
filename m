@@ -2,90 +2,83 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 542B3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 15:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB835C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 15:05:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09C6B214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 15:02:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A18BD214DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 15:05:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u5fkohGI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C6B214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2Eqf2id"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18BD214DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw5uS-0000eb-7L
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 10:02:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42165)
+	id 1iw5wi-0002Hc-Qy
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 10:05:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iw5tO-0008Ul-9o
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 10:01:36 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iw5vt-0001VR-A9
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 10:04:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iw5tL-0001aU-Mu
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 10:01:34 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:33029)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iw5tL-0001ZQ-Cz
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 10:01:31 -0500
-Received: by mail-wr1-x436.google.com with SMTP id b6so11729985wrq.0
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 07:01:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=xqLG31zl12L2CFvSpBHsgw8f5+UitdoxDWCninRmQHM=;
- b=u5fkohGI3awDOoXYX10HU7rO73YrGRGB5Wn5DWyOHrctAJjexAZrHb2P+mKEj/oxbf
- FUMwwRXqgfv/g3VjiWiy7LtnTmHpkLVEVAbl91U0JL0k6MjTF2ASgAQiote9Cz5D26UY
- Kh3/MtsZ6SYP3nG8gLRU9XKpEOMtlmDgzXC8RhDof2TnJhvvuVmVK5IrJvimTyz1jOwp
- 8o+ReNmrZBGbO34vM2OlZ+O2TilEEOmjXlO9kML7i3HzawTLKb6NCPVGNiktTPrSzWWP
- sNtDD77L1njrsnw7OlJD4y5ikQJgQ7HMfLk94m0gbul69gvQOqZ9wNAWhYBC7ziHDutD
- 5Qgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=xqLG31zl12L2CFvSpBHsgw8f5+UitdoxDWCninRmQHM=;
- b=kgDWd0Mw5vWmPxKyyzQVXdD9FYjCiNqjmFt4cR1/Ou29hdniDWs85wOV0DRMNYydzL
- J6lSuINZ2LV/xVOJV3s1pYGUYgovgJ1sNUwZcuumCoT785lLMqzN9x+tmwBHT+My/gVz
- 4f5k7cc6rYg+P8zeQ18dWwPORAFmYJL/DR1GgxtoBTQK7p/lVM9FmYWAlZxcChy/ZEq9
- 2KqK6cMOxo+jIZGxCcdJIG8cSskUxSR9guzKK2Th/wagXFEaeFRTm9tKMUu9yzdHuOR0
- L8laPnoFxIwY/v13PpHjXkk/j6cXl8M9x0CJOaZK+h7/AgaVA5V6g1c0bQaglBJE90Pt
- 6TUQ==
-X-Gm-Message-State: APjAAAUtnVFtvpaANiWD5stD59Olp1h8qpTQ3QA7TUEsorKq7LoXZOFo
- e5hLJYE+qhIyNoVwnXrQxOVydw==
-X-Google-Smtp-Source: APXvYqzGnQL/kmMjX3ny1aC14tXJ85vrC3wK+MAUxZjWiRY3lKhDIavFbXzAk0MbsOo/ibUmcBEUdw==
-X-Received: by 2002:adf:f885:: with SMTP id u5mr22466569wrp.359.1580137289881; 
- Mon, 27 Jan 2020 07:01:29 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x10sm20958559wrp.58.2020.01.27.07.01.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jan 2020 07:01:28 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 41C1C1FF87;
- Mon, 27 Jan 2020 15:01:27 +0000 (GMT)
-References: <20200124165335.422-1-robert.foley@linaro.org>
- <20200124165335.422-8-robert.foley@linaro.org>
-User-agent: mu4e 1.3.7; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH 7/8] tests/vm: Added a new script for ubuntu.aarch64.
-In-reply-to: <20200124165335.422-8-robert.foley@linaro.org>
-Date: Mon, 27 Jan 2020 15:01:27 +0000
-Message-ID: <87imkxeyew.fsf@linaro.org>
+ (envelope-from <imammedo@redhat.com>) id 1iw5vq-0007cO-8y
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 10:04:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34473
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iw5vp-0007at-R5
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 10:04:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580137445;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xo5zbZlHZbJ2t2WdV1ju8mBi1UCFiVEluP3IfP0hbug=;
+ b=K2Eqf2idQqLby/2jtCoI5YAoHzFPQmmsin8AJgAqJWVUgcFTbKs/hFy9Woz97K022pcuQk
+ lUtQsPVIpCHdAb7C1/+j9J9v8H/MqOtGt5r/cdR65ndWSHvKCaAJlARzJGOq47VbnbR1SZ
+ njlu2Ov2g3SsBt1EoiMtasmFYf4BWH8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-317-kBFQ6xCwMwebjrQyEIHIew-1; Mon, 27 Jan 2020 10:04:02 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F7121800D41;
+ Mon, 27 Jan 2020 15:04:00 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE92260BF4;
+ Mon, 27 Jan 2020 15:03:53 +0000 (UTC)
+Date: Mon, 27 Jan 2020 16:03:52 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [Question] Regarding containers
+ "unattached/peripheral/anonymous" - their relation with hot(un)plug of
+ devices
+Message-ID: <20200127160352.54f95875@redhat.com>
+In-Reply-To: <b8fccc99d7344b2485c0db76886af9c8@huawei.com>
+References: <70446b6cbf5442488a40fe809f38c3c8@huawei.com>
+ <20200124145404.1d15209e@redhat.com>
+ <77dbc712482545078986adcd72567630@huawei.com>
+ <20200124170645.3d794ac6@redhat.com>
+ <b8fccc99d7344b2485c0db76886af9c8@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: kBFQ6xCwMwebjrQyEIHIew-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,369 +90,405 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.puhov@linaro.org, philmd@redhat.com,
- qemu-devel@nongnu.org
+Cc: Andrew Jones <drjones@redhat.com>, gshan@redhat.com,
+ "mst@redhat.com" <mst@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will.deacon@arm.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, pbonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 24 Jan 2020 18:44:16 +0000
+Salil Mehta <salil.mehta@huawei.com> wrote:
 
-Robert Foley <robert.foley@linaro.org> writes:
+> > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > Sent: Friday, January 24, 2020 4:07 PM
+> >=20
+> > On Fri, 24 Jan 2020 15:02:10 +0000
+> > Salil Mehta <salil.mehta@huawei.com> wrote:
+> >  =20
+> > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > > > Sent: Friday, January 24, 2020 1:54 PM
+> > > > To: Salil Mehta <salil.mehta@huawei.com>
+> > > >
+> > > > On Fri, 24 Jan 2020 11:20:15 +0000
+> > > > Salil Mehta <salil.mehta@huawei.com> wrote:
+> > > > =20
+> > > > > Hello,
+> > > > > I am working on vCPU Hotplug feature for ARM64 and I am in mid of=
+ understanding
+> > > > > some aspect of device_add/device_del interface of the QEMU.
+> > > > >
+> > > > > Observations:
+> > > > > 1. Any object initialised by qmp_device_add() gets into /machine/=
+unattached
+> > > > > container. I traced the flow to code leg inside  device_set_reali=
+zed()
+> > > > > 2. I could see the reverse qmp_device_del() expects the device to=
+ be in
+> > > > > /machine/peripheral container.
+> > > > > 3. I could see any object initially added to unattached container=
+ did not had
+> > > > > their parents until object_add_property_child() was called furthe=
+r in the leg.
+> > > > > which effectively meant a new property was created and property t=
+able
+> > > > > populated and child was parented.
+> > > > > 4. Generally, container  /machine/peripheral was being used where=
+ver
+> > > > > DEVICE(dev)->id was present and non-null.
+> > > > >
+> > > > > Question:
+> > > > > 1. Wanted to confirm my understanding about the use of having sep=
+arate
+> > > > > containers like unattached, peripheral and anonymous. =20
+> > > > =20
+> > > > > 2. At init time all the vcpus goes under *unattached* container. =
+Now,
+> > > > > qmp_device_del() cannot be used to unplug them. I am wondering =
+=20
+> > > >
+> > > > device is put into 'unattached' in case it wasn't assigned a parent=
+.
+> > > > Usually it happens when board creates device directly. =20
+> > >
+> > >
+> > > Sure, but if we decide that certain number(N) of vcpus are hotplugabb=
+le
+> > > and certain subset of N (say 'n' < 'N') should be allowed to be prese=
+nt
+> > > or cold-plugged at the init time then I wonder which of the following
+> > > is correct approach:
+> > >
+> > > 1. Bring all of N vcpus at boot time under "peripheral" container
+> > >                                    OR
+> > > 2. Just bring subset 'n' of 'N' under "peripheral" container and rest
+> > >     under "unattached" container? And later as and when rest of the
+> > >     vcpus are hotplugged they should be transferred from "unattached"
+> > >     container to "peripheral" container? =20
+> >=20
+> > issue with that is that to put device into "peripheral" container,
+> > 'the user' must provide 'id'. (currently QEMU isn't able to do it on it=
+s own
+> > [1])
+> >=20
+> > But it doesn't mean that cold-plugged CPUs can't be unpluged.
+> > What current users could do is start QEMU like this (simplified version=
+):
+> >=20
+> >  $QEMU -smp 1,maxcpus=3DN -device foo-cpu-type,id=3DCPU00 -device
+> > foo-cpu-type,id=3DCPU01 ...
+> >=20
+> > i.e. 1st CPU is not manageable due to lack if 'id' and is created by bo=
+ard code,
+> > the rest have 'id' and could be managed. =20
+>=20
+>=20
+> I understand, that we can somehow assign ids from the QMP interface but
+> above will not push vcpus into "peripheral" container. They will appear
+> in "unattached" container but with specified names and as-far-as I can
+> see in the code 'device_del' can only delete objects/devices from the
+> 'peripheral' container?
 
-> ubuntu.aarch64 provides a script to create an Ubuntu 18.04 VM.
-> Another new file is also added aarch64vm.py, which is a module with
-> common methods used by aarch64 VMs, such as how to create the
-> flash images.
+qemu-system-x86_64 -monitor stdio \
+    -smp 1,maxcpus=3D3 \
+    -device qemu64-x86_64-cpu,id=3Dfoo,socket-id=3D1,core-id=3D0,thread-id=
+=3D0 \
+    -device qemu64-x86_64-cpu,socket-id=3D2,core-id=3D0,thread-id=3D0
+
+(qemu) info hotpluggable-cpus=20
+Hotpluggable CPUs:
+  type: "qemu64-x86_64-cpu"
+  vcpus_count: "1"
+  qom_path: "/machine/peripheral-anon/device[0]"
+                      ^^^^^^^^^^^^^^^
+  CPUInstance Properties:
+    socket-id: "2"
+    core-id: "0"
+    thread-id: "0"
+  type: "qemu64-x86_64-cpu"
+  vcpus_count: "1"
+  qom_path: "/machine/peripheral/foo"
+                      ^^^^^^^^^^
+
+in gist, if device is created with any variant of device_add,
+it goes to "peripheral[-anon]" including cold-plugged one.
+
+  CPUInstance Properties:
+    socket-id: "1"
+    core-id: "0"
+    thread-id: "0"
+  type: "qemu64-x86_64-cpu"
+  vcpus_count: "1"
+  qom_path: "/machine/unattached/device[0]"
+  CPUInstance Properties:
+    socket-id: "0"
+    core-id: "0"
+    thread-id: "0"
+
+
+
+
+
+>=20
+> Plus, having those many ids specified for over large number of vcpus
+> does not looks very practical solution. We need interface like auto
+number of IDs is not a problem since it's usually handled by management
+software just fine (ex: libvirt does it)
+
+> Generation of ids even at the boot time. I could see from the link you
+> have shared that it is already being used by ID_BLOCK subsystem. Can we
+> create a new subsystem for cpus under this and do the auto Generation
+> of vcpu ids as well?
+
+I'm not sure that auto ids was actually merged.
+(I thought it wasn't)
+
+Anyway auto IDs are not directly related to enabling CPU hotplug for ARM,
+if you feel they should be generated you can try to propose patches.
+
+> > Question is:
+> >   why you are looking into 'what container' is used for CPUs? =20
+>=20
+>=20
+> Idea is to be able to use 'device_del' interface to unplug vcpus
+> both for the cold-plugged and hot-plugged cases using the standard
+> 'device_add' interface.
+
+As far as CPU devices in QEMU are created with help of -device/device_add
+with 'id' provided it should work with current code.
+
+=20
+> Plus, there is another unique requirement specifically for realizing
+> vcpu hotplug for ARM64.
+>=20
+> Summary:
+> Right now ARM architecture does not allows reinitializing the GIC
+> after VM has booted. Therefore, we are planning to pre-size the GIC
+> interfaces at init time by initializing all of the possible vcpus
+> and keep them in 'realized' but 'unavailable' state to the Guest
+> VM. They shall be made available as-and-when vcpus are hot-plugged
+> later-on. Therefore, current efforts are to be able to plug and
+> unplug from the qemu QOM without destroying the existing state of
+> the devices/objects representing vcpus. These all possible vcpus
+> shall be created once at the boot time of the VM. The vcpus which
+> are not available to the Guest VM can be Parked.=20
 >
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-> ---
->  tests/vm/Makefile.include |   7 +-
->  tests/vm/aarch64vm.py     |  41 +++++++++++
->  tests/vm/ubuntu.aarch64   | 144 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 190 insertions(+), 2 deletions(-)
->  create mode 100644 tests/vm/aarch64vm.py
->  create mode 100755 tests/vm/ubuntu.aarch64
->
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> index 9e7c46a473..966b417ba7 100644
-> --- a/tests/vm/Makefile.include
-> +++ b/tests/vm/Makefile.include
-> @@ -2,7 +2,7 @@
->=20=20
->  .PHONY: vm-build-all vm-clean-all
->=20=20
-> -IMAGES :=3D ubuntu.i386 freebsd netbsd openbsd centos fedora
-> +IMAGES :=3D ubuntu.i386 freebsd netbsd openbsd centos fedora ubuntu.aarc=
-h64
->  IMAGES_DIR :=3D $(HOME)/.cache/qemu-vm/images
->  IMAGE_FILES :=3D $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
->=20=20
-> @@ -18,6 +18,7 @@ vm-help vm-test:
->  	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM"
->  	@echo "  vm-build-centos                 - Build QEMU in CentOS VM, wit=
-h Docker"
->  	@echo "  vm-build-fedora                 - Build QEMU in Fedora VM"
-> +	@echo "  vm-build-ubuntu.aarch64         - Build QEMU in ubuntu aarch64=
- VM"
->  	@echo ""
->  	@echo "  vm-build-all                    - Build QEMU in all VMs"
->  	@echo "  vm-clean-all                    - Clean up VM images"
-> @@ -35,6 +36,8 @@ vm-help vm-test:
->  	@echo "    V=3D1				 - Enable verbose ouput on host and guest commands"
->  	@echo "    QEMU=3D/path/to/qemu		 - Change path to QEMU binary"
->  	@echo "    QEMU_IMG=3D/path/to/qemu-img	 - Change path to qemu-img tool"
-> +	@echo "    QEMU_CONFIG=3D/path/conf.yml    - Change path to VM configur=
-ation .yml file."
-> +	@echo "                                    See config_example.yml for f=
-ile format details."
->=20=20
->  vm-build-all: $(addprefix vm-build-, $(IMAGES))
->=20=20
-> @@ -80,7 +83,7 @@ vm-boot-serial-%: $(IMAGES_DIR)/%.img
->=20=20
->  vm-boot-ssh-%: $(IMAGES_DIR)/%.img
->  	$(call quiet-command, \
-> -		$(SRC_PATH)/tests/vm/$* \
-> +		$(PYTHON) $(SRC_PATH)/tests/vm/$* \
+> Once the vcpus are hot-(un)plug'ged only the (pre-)plug/unplug(-request)
+> interfaces are used to convey this even information to the Guest
+> VM.
+>=20
+> I have tested this solution and it works but I wanted to make sure
+> that I am not doing anything which breaks any of the existing Qemu
+> QOM interfaces and basic fundamental idea behind being able to attach
+> and detach from the Qemu QOM is okay?
+>=20
+> Any suggestion are welcome in this regard?
 
-This seems like it should be in a different patch.
+From discussion with Drew [CCed], I got that kvm/arm isn't designed
+to support vCPU hotplug (and it would require heavy refactoring to
+separate GIC and VCPUs, which probably won't be welcomed by maintainers).
 
->  		$(if $(J),--jobs $(J)) \
->  		--image "$<" \
->  		--interactive \
-> diff --git a/tests/vm/aarch64vm.py b/tests/vm/aarch64vm.py
-> new file mode 100644
-> index 0000000000..43f841571f
-> --- /dev/null
-> +++ b/tests/vm/aarch64vm.py
-> @@ -0,0 +1,41 @@
-> +#!/usr/bin/env python
-> +#
-> +# VM testing aarch64 library
-> +#
-> +# Copyright 2020 Linaro
-> +#
-> +# Authors:
-> +#  Robert Foley <robert.foley@linaro.org>
-> +#
-> +# This code is licensed under the GPL version 2 or later.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +import os
-> +import sys
-> +import subprocess
-> +import basevm
-> +
-> +
-> +def create_flash_images():
-> +    """Creates the appropriate pflash files
-> +       for an aarch64 VM."""
-> +    subprocess.check_call(["dd", "if=3D/dev/zero", "of=3Dflash0.img",
-> +                           "bs=3D1M", "count=3D64"])
-> +    # A reliable way to get the QEMU EFI image is via an installed packa=
-ge.
-> +    efi_img =3D "/usr/share/qemu-efi-aarch64/QEMU_EFI.fd"
-> +    if not os.path.exists(efi_img):
-> +        sys.stderr.write("*** {} is missing\n".format(efi_img))
-> +        sys.stderr.write("*** please install qemu-efi-aarch64 package\n")
-> +        exit(3)
-> +    subprocess.check_call(["dd", "if=3D{}".format(efi_img),
-> +                           "of=3Dflash0.img", "conv=3Dnotrunc"])
-> +    subprocess.check_call(["dd", "if=3D/dev/zero",
-> +                           "of=3Dflash1.img", "bs=3D1M", "count=3D64"])
-> +
-> +def get_pflash_args():
-> +    """Returns a string that can be used to
-> +       boot qemu using the appropriate pflash files
-> +       for aarch64."""
-> +    pflash_args =3D "-drive file=3Dflash0.img,format=3Draw,if=3Dpflash "\
-> +                  "-drive file=3Dflash1.img,format=3Draw,if=3Dpflash"
-> +    return pflash_args.split(" ")
-> diff --git a/tests/vm/ubuntu.aarch64 b/tests/vm/ubuntu.aarch64
-> new file mode 100755
-> index 0000000000..941f7f5166
-> --- /dev/null
-> +++ b/tests/vm/ubuntu.aarch64
-> @@ -0,0 +1,144 @@
-> +#!/usr/bin/env python
-> +#
-> +# Ubuntu aarch64 image
-> +#
-> +# Copyright 2020 Linaro
-> +#
-> +# Authors:
-> +#  Robert Foley <robert.foley@linaro.org>
-> +#  Originally based on ubuntu.i386 Fam Zheng <famz@redhat.com>
-> +#
-> +# This code is licensed under the GPL version 2 or later.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import subprocess
-> +import basevm
-> +import time
-> +import aarch64vm
-> +
-> +DEFAULT_CONFIG =3D {
-> +    'cpu'          : "max",
-> +    'machine'      : "virt,gic-version=3Dmax",
+But that's only KVM side of the equation. Assuming that we don't
+touch KVM much, the only QEMU side is left.
 
-According to virt.c:
+Further lets call
+ * vCPU - a kvm's part of CPU
+ * CPU - QEMU object which is linked to vCPU via file descriptor.
 
-  Valid values are 2, 3 and host
+In QEMU we have CPU devices which optionally might create vCPUs
+during device realize time (if QEMU runs with KVM accelerator).
 
-but max should work on TCG. However we need a more recent QEMU than my
-system one for it to work. Otherwise you see:
+So from design point of view, I'd suggest to dynamically
+create/remove CPU devices on demand using existing
+ -device/device_add/device_del interface
+like we do for other architectures.
 
-  DEBUG:qemu.machine:Error launching VM
-  DEBUG:qemu.machine:Command: 'qemu-system-aarch64 -display none -vga none =
--chardev socket,id=3Dmon,path=3D/var/tmp/qemu-18443-monitor.sock -mon chard=
-ev=3Dmon,mode=3Dcontrol -machine
-  virt,gic-version=3Dmax -chardev socket,id=3Dconsole,path=3D/var/tmp/qemu-=
-18443-console.sock,server,nowait -serial chardev:console -nodefaults -m 4G =
--cpu max -netdev user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device virtio-n=
-et-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -drive file=3D/home/alex.benn=
-ee/.cache/qemu-vm/images/ubuntu.aarch64.img.tmp,if=3Dnone,id=3Ddrive0,cache=
-=3Dwriteback -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -cdrom /home/a=
-lex.bennee/lsrc/qemu.git/builds/all/vm-test-v8jttvl3.tmp/cloud-init.iso -dr=
-ive file=3Dflash0.img,format=3Draw,if=3Dpflash -drive file=3Dflash1.img,for=
-mat=3Draw,if=3Dpflash -accel tcg,thread=3Dmulti -smp 8 -device VGA'
-  DEBUG:qemu.machine:Output: 'qemu-system-aarch64: Invalid gic-version valu=
-e\nValid values are 3, 2, host.\n'
-  ERROR:root:Failed to launch QEMU, command line:
-  ERROR:root:qemu-system-aarch64 -nodefaults -m 4G -cpu max -netdev user,id=
-=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device virtio-net-pci,netdev=3Dvnet -vn=
-c 127.0.0.1:0,to=3D20 -drive file=3D/home/alex.bennee/.cache/qemu-vm/images=
-/ubuntu.aarch64.img.tmp,if=3Dnone,id=3Ddrive0,cache=3Dwriteback -device vir=
-tio-blk,drive=3Ddrive0,bootindex=3D0 -cdrom /home/alex.bennee/lsrc/qemu.git=
-/builds/all/vm-test-v8jttvl3.tmp/cloud-init.iso -drive file=3Dflash0.img,fo=
-rmat=3Draw,if=3Dpflash -drive file=3Dflash1.img,format=3Draw,if=3Dpflash -a=
-ccel tcg,thread=3Dmulti -smp 8 -device VGA
-  ERROR:root:Log:
-  ERROR:root:qemu-system-aarch64: Invalid gic-version value
-  Valid values are 3, 2, host.
+But in case of running with KVM accelerator, to accommodate
+current non dynamic ARM/KVM, I'd move vCPU creation to "kvm_init()"
+time or board init time, so it would pre-create vCPUs in
+KVM early in parked state and put them in 'kvm_parked_vcpus' list
+but won't create CPU devices for them.
 
-  ERROR:root:QEMU version >=3D 2.10 is required
-  Failed to prepare guest environment
-  Traceback (most recent call last):
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/basevm.py", line 514, in=
- main
-      return vm.build_image(args.image)
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/ubuntu.aarch64", line 11=
-4, in build_image
-      self.boot(img_tmp, extra_args =3D ["-cdrom", ci_img])
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/ubuntu.aarch64", line 10=
-5, in boot
-      super(UbuntuAarch64VM, self).boot(img, extra_args=3Dextra_args)
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/basevm.py", line 246, in=
- boot
-      guest.launch()
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/../../python/qemu/machin=
-e.py", line 302, in launch
-      self._launch()
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/../../python/qemu/machin=
-e.py", line 329, in _launch
-      self._post_launch()
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/../../python/qemu/machin=
-e.py", line 274, in _post_launch
-      self._qmp.accept()
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/../../python/qemu/qmp.py=
-", line 157, in accept
-      return self.__negotiate_capabilities()
-    File "/home/alex.bennee/lsrc/qemu.git/tests/vm/../../python/qemu/qmp.py=
-", line 73, in __negotiate_capabilities
-      raise QMPConnectError
-  qemu.qmp.QMPConnectError
-  /home/alex.bennee/lsrc/qemu.git/tests/vm/Makefile.include:51: recipe for =
-target '/home/alex.bennee/.cache/qemu-vm/images/ubuntu.aarch64.img' failed
-  make: *** [/home/alex.bennee/.cache/qemu-vm/images/ubuntu.aarch64.img] Er=
-ror 2
+Then later when management adds CPU device either with
+'-device' or 'device_add', a new CPU device will pick up
+pre-created parked vCPU file descriptor and re-use it.
+
+Parked vCPU infrastructure is already exists in QEMU as we use it
+for hot-unplugged CPUs for the same reasons (it needs too much
+refactoring on KVM side to really remove vCPU).
+
+So when CPU is hot-unplugged, we put linked vCPU file descriptor
+into kvm_parked_vcpus (see: kvm_destroy_vcpu) and completely delete
+CPU device on QEMU side. Then when the same CPU is hot-plugged again,
+we reuse previously parked vCPU file descriptor (see: kvm_get_vcpu).
 
 
-> +    'install_cmds' : "apt-get update,"\
-> +                     "apt-get build-dep -y qemu,"\
-> +                     "apt-get install -y libfdt-dev flex bison",
-> +    # We increase beyond the default time since during boot
-> +    # it can take some time (many seconds) to log into the VM
-> +    # especially using softmmu.
-> +    'ssh_timeout'  : 60,
-> +}
-> +
-> +class UbuntuAarch64VM(basevm.BaseVM):
-> +    name =3D "ubuntu.aarch64"
-> +    arch =3D "aarch64"
-> +    image_name =3D "ubuntu-18.04-server-cloudimg-arm64.img"
-> +    image_link =3D "https://cloud-images.ubuntu.com/releases/18.04/relea=
-se/" + image_name
-> +    login_prompt =3D "ubuntu-guest login:"
-> +    BUILD_SCRIPT =3D """
-> +        set -e;
-> +        cd $(mktemp -d);
-> +        sudo chmod a+r /dev/vdb;
-> +        tar --checkpoint=3D.10 -xf /dev/vdb;
-> +        ./configure {configure_opts};
-> +        make --output-sync {target} -j{jobs} {verbose};
-> +    """
-> +    def _gen_cloud_init_iso(self):
-> +        cidir =3D self._tmpdir
-> +        mdata =3D open(os.path.join(cidir, "meta-data"), "w")
-> +        mdata.writelines(["instance-id: ubuntu-vm-0\n",
-> +                          "local-hostname: ubuntu-guest\n"])
-> +        mdata.close()
-> +        udata =3D open(os.path.join(cidir, "user-data"), "w")
-> +        print("guest user:pw {}:{}".format(self.GUEST_USER, self.GUEST_P=
-ASS))
-> +        udata.writelines(["#cloud-config\n",
-> +                          "chpasswd:\n",
-> +                          "  list: |\n",
-> +                          "    root:%s\n" % self.ROOT_PASS,
-> +                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_P=
-ASS),
-> +                          "  expire: False\n",
-> +                          "users:\n",
-> +                          "  - name: %s\n" % self.GUEST_USER,
-> +                          "    sudo: ALL=3D(ALL) NOPASSWD:ALL\n",
-> +                          "    ssh-authorized-keys:\n",
-> +                          "    - %s\n" % self.ssh_pub_key,
-> +                          "  - name: root\n",
-> +                          "    ssh-authorized-keys:\n",
-> +                          "    - %s\n" % self.ssh_pub_key,
-> +                          "locale: en_US.UTF-8\n"])
-> +        proxy =3D os.environ.get("http_proxy")
-> +        if not proxy is None:
-> +            udata.writelines(["apt:\n",
-> +                              "  proxy: %s" % proxy])
-> +        udata.close()
-> +        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso=
-",
-> +                               "-volid", "cidata", "-joliet", "-rock",
-> +                               "user-data", "meta-data"],
-> +                               cwd=3Dcidir,
-> +                               stdin=3Dself._devnull, stdout=3Dself._std=
-out,
-> +                               stderr=3Dself._stdout)
-> +
-> +        return os.path.join(cidir, "cloud-init.iso")
+> NOTE: I plan to share the patches with the community which includes
+> both the changes of the Linux Kernel and the QEMU in near future.
+>=20
+>=20
+>=20
+> > 1) here is what I could find on IDs topic
+> >    https://lists.gnu.org/archive/html/qemu-block/2015-09/msg00011.html
+> >  =20
+> > > > >    if all the hotplug devices need to go under the *peripheral* c=
+ontainer while
+> > > > > they are hotplugged and during object init time as well? =20
+> > > >
+> > > > theoretically device_del may use QOM path (the later users can get =
+with
+> > > > query-hotpluggable-cpus),
+> > > > but I think it's mostly debugging feature. =20
+> > >
+> > >
+> > > Sure.
+> > >
+> > > =20
+> > > > users are supposed to specify 'id' during -device/device_add if the=
+y are going
+> > > > to manage that device.
+> > > > afterwards (like unplugging it). Then they could use that 'id' in o=
+ther commands
+> > > > (including device_del)
+> > > >
+> > > > So 'id'-ed devices end up in 'peripheral' container. =20
+> > >
+> > >
+> > > Sure, what if hotplugged device is removed and then added again? It l=
+ooks
+> > > qmp_device_add() interface will again end up calling the device_set_r=
+ealized()
+> > > which eventually would put hotplugged devices under "unattached" cont=
+ainer? =20
+> >=20
+> > it won't, see call chain:
+> >=20
+> >   qmp_device_add() =20
+> >       -> qdev_device_add()
+> >           -> qdev_set_id() =20
+>=20
+> Ok, sure. I did see the qdev_set_id() interface. Infact, earlier I was ac=
+tually
+> trying to play with it by making it more generic and adding even the 'una=
+ttached'
+> container handling to it(which is missing right now) and calling it insid=
+e the
+> device_set_realized()  instead of below code:
+>=20
+>         if (!obj->parent) {
+>             gchar *name =3D g_strdup_printf("device[%d]", unattached_coun=
+t++);
+>=20
+>             object_property_add_child(container_get(qdev_get_machine(),
+>                                                     "/unattached"),
+>                                       name, obj, &error_abort);
+>             unattached_parent =3D true;
+>             g_free(name);
+>         }
+>=20
+> Idea of above dabbling was to have common interface for 'unattached' cont=
+ainer
+> and call it from virt.c from machvirt_init() where possible vcpus are bei=
+ng
+> created. Force them to be located either inside 'unttached' or 'periphera=
+l'
+> container akin to the example you had given.
+>=20
+> If we look at qdev_device_add() function, after setting dev->id using
+> qdev_set_id() (which would also result in parenting of an object under
+> 'peripheral' container), it calls the function to 'realize' the device/ob=
+ject
+> which would end up in hitting above shared code excerpt and now because
+> it will have the parent already set, the object won't go into 'unattached=
+'
+> container.
+>=20
+> Currently, later cannot be controlled for the cold-lugged vcpus. Therefor=
+e,
+> before this discussion my initial thought process was to either make
+> qdev_set_id() universal (i.e. include handling for all type of containers
+> unattached/peripheral/anonymous in qdev_set_id()). Then call it from
+> machvirt_init() just before the vcpus have been 'realized' so that
+> cold-plugged cpus could get into 'peripheral' container. This would help
+> in hot-unplugging using the standard 'device_del' interface.
 
-It seems this function is proliferating. It certainly seems common
-enough to be basevm functionality.
+I think we understand cold-plugged vcpus differently.
+From QEMU point of view there are 2 kinds of cold-plugged CPU devices.
 
-> +
-> +    def boot(self, img, extra_args=3DNone):
-> +        aarch64vm.create_flash_images()
-> +        default_args =3D aarch64vm.get_pflash_args()
-> +        if extra_args:
-> +            extra_args.extend(default_args)
-> +        else:
-> +            extra_args =3D default_args
-> +        # We always add these performance tweaks
-> +        # because without them, we boot so slowly that we
-> +        # can time out finding the boot efi device.
-> +        if os.geteuid() !=3D 0:
-> +            extra_args.extend(["-accel", "tcg,thread=3Dmulti"])
+Ones that are currently created by board directly following pattern
 
-Hmmm thread=3Dmulti should already be enabled by default where it is safe
-to do so. Also what has it to do with euid?
+ object_new()
+ set properties
+ relalize
 
-> +        if '-smp' not in extra_args and \
-> +           '-smp' not in self._config['extra_args'] and \
-> +           '-smp' not in self._args:
-> +            # Only add if not already there to give caller option to cha=
-nge it.
-> +            extra_args.extend(["-smp", "8"])
-> +
-> +        # We have overridden boot() since aarch64 has additional paramet=
-ers.
-> +        # Call down to the base class method.
-> +        super(UbuntuAarch64VM, self).boot(img, extra_args=3Dextra_args)
-> +
-> +    def build_image(self, img):
-> +        os_img =3D self._download_with_cache(self.image_link)
-> +        img_tmp =3D img + ".tmp"
-> +        subprocess.check_call(["cp", "-f", os_img, img_tmp])
-> +        subprocess.check_call(["qemu-img", "resize", img_tmp, "+50G"])
-> +        ci_img =3D self._gen_cloud_init_iso()
-> +
-> +        self.boot(img_tmp, extra_args =3D ["-cdrom", ci_img])
-> +        self.wait_ssh(wait_root=3DTrue)
-> +        # Fix for slow ssh login.
-> +        self.ssh_root("chmod -x /etc/update-motd.d/*")
-> +        self.ssh_root("touch /etc/cloud/cloud-init.disabled")
-> +        # Disable auto upgrades.
-> +        # We want to keep the VM system state stable.
-> +        self.ssh_root('sed -ie \'s/"1"/"0"/g\' /etc/apt/apt.conf.d/20aut=
-o-upgrades')
-> +
-> +        # If the user chooses *not* to do the second phase,
-> +        # then we will jump right to the graceful shutdown
-> +        if self._config['install_cmds'] !=3D "":
-> +            # Don't check the status in case the guest hang up too quick=
-ly
-> +            self.ssh_root("sync && reboot")
-> +
-> +            self.wait_ssh(wait_root=3DTrue)
-> +            # The previous update sometimes doesn't survive a reboot, so=
- do it again
-> +            self.ssh_root("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sour=
-ces.list")
-> +
-> +            # Issue the install commands.
-> +            # This can be overriden by the user in the config .yml.
-> +            install_cmds =3D self._config['install_cmds'].split(',')
-> +            for cmd in install_cmds:
-> +                self.ssh_root(cmd)
-> +        self.graceful_shutdown()
-> +        self.wait()
-> +        os.rename(img_tmp, img)
-> +        return 0
-> +
-> +if __name__ =3D=3D "__main__":
-> +    sys.exit(basevm.main(UbuntuAarch64VM, DEFAULT_CONFIG))
+these are created (lets call them builtin) in amount specified by -smp X
+and are not manageable by external applications.
 
+The second kind of cold-plugged CPUs are the ones created on command
+line with help of:
 
---=20
-Alex Benn=C3=A9e
+ -device cpu-type-foo
+
+these are created by management applications and could be hot-removed
+if management supplied 'id'. For example libvirt starts qemu with 1
+built-in cpu in paused mode (-s) QEMU, then it hotplugs via QMP N cpus
+and lets VM run (it's essentially the same as using -device on CLI).
+This way it can remove all CPUs except of 1st one which is good enough
+in almost all the cases.
+
+> Earlier, I was not sure if there was any special significance to the
+> 'unattached' container - which by the discussion it looks there is not
+> any and we could actually choose to place all of the cold-plugged vpus
+> as well in the 'peripheral' container. Please correct me here if I
+> have mis-understood anything here?
+>=20
+> Now, assuming we are allowed to push all of the vcpus in the 'peripheral'
+> container then I could simply call unmodified qdev_set_id() just before
+> the 'realization' of the cold-plugged vcpus. And maybe we could generate
+> the cpus-ids using auto generate function which has been mentioned in the
+> link you shared and just like it is being done for the block devices.
+
+In ARM case, I'd consider to implementing -device/device_add support first.
+So it would be on par with other architectures in QEMU that support cpu hot=
+plug.
+
+Then try to implement id auto-generation on top and discuss if making
+built-in CPUs hot-removable is worthwhile, as it's a separate issues
+and could be done later.
+
+Separating feature on distinct self-sufficient chunks usually makes
+reviews/merging easier comparing to trying to do everything at once.
+
+> Thoughts?
+>=20
+>=20
+> > > > > 3. I could not see any device being place under *anonymous* conta=
+iner during =20
+> > > > init time. What is the use of this container?
+> > > >
+> > > > if I recall it right, devices created with help of device_add but w=
+ithout =20
+> > 'id' =20
+> > > > go to this container =20
+> > >
+> > >
+> > > Any examples on top of your head where such an interface might be of =
+use? =20
+> >=20
+> > ex:
+> > one could use -device/device_add without any ids if such devices aren't=
+ planned
+> > to be unplugged during runtime or for unpluggable devices =20
+>=20
+> Ok. Thanks!
+>=20
+>=20
+> Best Regards
+> Salil
+>=20
+
 
