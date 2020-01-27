@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4167C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 22:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33143C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 22:37:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9334B24656
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 22:36:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF54524656
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 22:37:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sx3pAlud"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9334B24656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aEUdiRU5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF54524656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwD06-00053z-OE
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 17:36:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47390)
+	id 1iwD0T-0005Oo-0D
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 17:37:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iwCxK-0000Y6-Gy
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 17:34:07 -0500
+ (envelope-from <quintela@redhat.com>) id 1iwCx7-0000Mr-1l
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 17:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iwCxJ-0003Sj-GJ
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 17:34:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36160
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1iwCx5-0003Dc-Gw
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 17:33:52 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48878
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwCxJ-0003Sd-CW
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 17:34:05 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwCx5-0003DL-AM
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 17:33:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580164445;
+ s=mimecast20190719; t=1580164431;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ODGnHSNVJSUkrrQsMhUmiBKE7p98IabU3841tLj6X7c=;
- b=Sx3pAlud+8dytvslO0/mnzcW/RK6wDnCtVjJy29dY9s9qSjKXIMWf3NcJCt53JLcXGH5AX
- PBNHACmx580fe5u16syRSh2K9i+H1HXIlyUaD6dLwixWzoQ5WnqzFWdxpROJ1DjwAR9988
- hGZxNTSp7cPRQur4z4EgYSLnjvU1YsE=
+ bh=QShwzqsSqNNWsL07G5daaUgnmf/VhkxFoYYuPVdlVVA=;
+ b=aEUdiRU5a/8+swBYZHVJpIFqh2W/9psbUv+iqTJKyrvF/ygUVUwJe09c4YvdCaavpj8GE2
+ YhPwPYpk4SmWmFORmcHxaae2+ypu/1svWRNsi6rgQX73Byj3vphYbu7N9maWb+O67CZR1a
+ hUkU/jzqmkENttihFxxKViYrKm8ZRxI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-NcDbwinPOAGL_4rVAO6bMg-1; Mon, 27 Jan 2020 17:34:00 -0500
+ us-mta-401-jNhoSIMBNX2z4QzGi3VeEA-1; Mon, 27 Jan 2020 17:33:49 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55515107ACC5
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 22:33:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98801800D41
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 22:33:48 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-64.ams2.redhat.com [10.36.116.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 11AE43B7;
- Mon, 27 Jan 2020 22:33:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0EA64165D3;
+ Mon, 27 Jan 2020 22:33:43 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/19] multifd: multifd_queue_page only needs the qemufile
-Date: Mon, 27 Jan 2020 23:33:12 +0100
-Message-Id: <20200127223321.2742-11-quintela@redhat.com>
+Subject: [PULL 06/19] migration: Create migration_is_running()
+Date: Mon, 27 Jan 2020 23:33:08 +0100
+Message-Id: <20200127223321.2742-7-quintela@redhat.com>
 In-Reply-To: <20200127223321.2742-1-quintela@redhat.com>
 References: <20200127223321.2742-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: NcDbwinPOAGL_4rVAO6bMg-1
+X-MC-Unique: jNhoSIMBNX2z4QzGi3VeEA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,53 +94,114 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This function returns true if we are in the middle of a migration.
+It is like migration_is_setup_or_active() with CANCELLING and COLO.
+Adapt all callers that are needed.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/ram.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 602e9ca5a0..ad9cc3e7bd 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -974,7 +974,7 @@ static int multifd_send_pages(QEMUFile *f)
-     return 1;
+---
+
+Fix typo.  Thanks Denis.
+---
+ migration/migration.c | 29 ++++++++++++++++++++++++-----
+ migration/migration.h |  1 +
+ migration/savevm.c    |  4 +---
+ 3 files changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index efd5350e84..77768fb2c7 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -829,6 +829,27 @@ bool migration_is_setup_or_active(int state)
+     }
  }
 =20
--static int multifd_queue_page(RAMState *rs, RAMBlock *block, ram_addr_t of=
-fset)
-+static int multifd_queue_page(QEMUFile *f, RAMBlock *block, ram_addr_t off=
-set)
++bool migration_is_running(int state)
++{
++    switch (state) {
++    case MIGRATION_STATUS_ACTIVE:
++    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
++    case MIGRATION_STATUS_POSTCOPY_PAUSED:
++    case MIGRATION_STATUS_POSTCOPY_RECOVER:
++    case MIGRATION_STATUS_SETUP:
++    case MIGRATION_STATUS_PRE_SWITCHOVER:
++    case MIGRATION_STATUS_DEVICE:
++    case MIGRATION_STATUS_WAIT_UNPLUG:
++    case MIGRATION_STATUS_CANCELLING:
++    case MIGRATION_STATUS_COLO:
++        return true;
++
++    default:
++        return false;
++
++    }
++}
++
+ static void populate_time_info(MigrationInfo *info, MigrationState *s)
  {
-     MultiFDPages_t *pages =3D multifd_send_state->pages;
+     info->has_status =3D true;
+@@ -1077,7 +1098,7 @@ void qmp_migrate_set_capabilities(MigrationCapability=
+StatusList *params,
+     MigrationCapabilityStatusList *cap;
+     bool cap_list[MIGRATION_CAPABILITY__MAX];
 =20
-@@ -993,12 +993,12 @@ static int multifd_queue_page(RAMState *rs, RAMBlock =
-*block, ram_addr_t offset)
+-    if (migration_is_setup_or_active(s->state)) {
++    if (migration_is_running(s->state)) {
+         error_setg(errp, QERR_MIGRATION_ACTIVE);
+         return;
+     }
+@@ -1590,7 +1611,7 @@ static void migrate_fd_cancel(MigrationState *s)
+=20
+     do {
+         old_state =3D s->state;
+-        if (!migration_is_setup_or_active(old_state)) {
++        if (!migration_is_running(old_state)) {
+             break;
          }
+         /* If the migration is paused, kick it out of the pause */
+@@ -1888,9 +1909,7 @@ static bool migrate_prepare(MigrationState *s, bool b=
+lk, bool blk_inc,
+         return true;
      }
 =20
--    if (multifd_send_pages(rs->f) < 0) {
-+    if (multifd_send_pages(f) < 0) {
-         return -1;
+-    if (migration_is_setup_or_active(s->state) ||
+-        s->state =3D=3D MIGRATION_STATUS_CANCELLING ||
+-        s->state =3D=3D MIGRATION_STATUS_COLO) {
++    if (migration_is_running(s->state)) {
+         error_setg(errp, QERR_MIGRATION_ACTIVE);
+         return false;
      }
+diff --git a/migration/migration.h b/migration/migration.h
+index aa9ff6f27b..44b1d56929 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -279,6 +279,7 @@ void migrate_fd_error(MigrationState *s, const Error *e=
+rror);
+ void migrate_fd_connect(MigrationState *s, Error *error_in);
 =20
-     if (pages->block !=3D block) {
--        return  multifd_queue_page(rs, block, offset);
-+        return  multifd_queue_page(f, block, offset);
-     }
+ bool migration_is_setup_or_active(int state);
++bool migration_is_running(int state);
 =20
-     return 1;
-@@ -2136,7 +2136,7 @@ static int ram_save_page(RAMState *rs, PageSearchStat=
-us *pss, bool last_stage)
- static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
-                                  ram_addr_t offset)
- {
--    if (multifd_queue_page(rs, block, offset) < 0) {
-+    if (multifd_queue_page(rs->f, block, offset) < 0) {
-         return -1;
+ void migrate_init(MigrationState *s);
+ bool migration_is_blocked(Error **errp);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index adfdca26ac..f19cb9ec7a 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1531,9 +1531,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **err=
+p)
+     MigrationState *ms =3D migrate_get_current();
+     MigrationStatus status;
+=20
+-    if (migration_is_setup_or_active(ms->state) ||
+-        ms->state =3D=3D MIGRATION_STATUS_CANCELLING ||
+-        ms->state =3D=3D MIGRATION_STATUS_COLO) {
++    if (migration_is_running(ms->state)) {
+         error_setg(errp, QERR_MIGRATION_ACTIVE);
+         return -EINVAL;
      }
-     ram_counters.normal++;
 --=20
 2.24.1
 
