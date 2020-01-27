@@ -2,89 +2,80 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B92B8C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 12:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2CDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:00:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80EB7214DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 12:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12B69214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:00:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s8oYQwIh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80EB7214DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g5V8Xlus"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12B69214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw3wf-0001KJ-PB
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 07:56:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43002)
+	id 1iw3zv-00038I-71
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 08:00:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iw3w5-0000pF-Fc
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:56:14 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iw3z3-0002Z1-De
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iw3w4-0002xP-7o
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:56:13 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37438)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iw3w4-0002ws-0m
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:56:12 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w15so11174716wru.4
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 04:56:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=BnZ0q+Tssd0RAZBX91cVG0K31426QbEcYTlMguk2lBc=;
- b=s8oYQwIhe4W0zNWCxN1OZ7U6F8Rt7HiLzx/hZBj8lP/q706OobFOmcowJHZfn98oQN
- eXIRmvUexblibMgUK/TSKuCvKqvNZ/1TaKwZ2TDXXDqasmKER8m8kJt5G4V6bgidYGQw
- +bK2s0npY6OKuDptrabacY1J6ABwgM5ccnRnLTfb3vRhr8DLSErXCRsXMtqi9rqBSDN7
- dfgCYpxCppO377M3uiTjZ+mG2s3sJqPgQYFNFKHGfNy0Z30oq7zkHXagjSc4vK0fayDv
- eQi8gI3bwGuyJI74G2W8N8poHR67WfoCTWNbno39fZoIZv8rWknAhBvmiJybE9fodWm6
- hPPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=BnZ0q+Tssd0RAZBX91cVG0K31426QbEcYTlMguk2lBc=;
- b=Z50dVm14Q3bLo5uy+0oPNx/zbOdStykHqFAWdXVDUJpPizfCbGB3dSLJNKDS+32TSv
- hCdX2B6mUZiv9nQfmPdKZTFP9tI3Y+YsTOVObNZwukpfTFjIx+cBX4NFByZHPYV/TJZ+
- M4qzRiPTRb/Kc1fJhjJ/IPpU2IOop9WbMiaTfWMc6Fa4KgtKbE7JBAqfs45TS/8bF+Qi
- IpI3QWg3mn0ene/Lyl/T6D31MkdcJWKpg+o0bczZWZha1y00ogGmg1g04ywZhyMHr4I9
- CtfPf5qDpA6gGoUa5Df0+BE9UVmtbmiWClwdJBSpQ7hfABVgeH7FDKMSOr+Wjszj09T6
- eraQ==
-X-Gm-Message-State: APjAAAWI0SERpm5LCRldRRTl1mNweBpK2MfiRLa5ymYEf5GTQQqfL3y3
- YRdLY64J1RsIIWyb2ogiJbufjA==
-X-Google-Smtp-Source: APXvYqz3MMB/qBnn+l8FUiD7FfWHGLIGe1doawfHsZ4NhyPXEKJ1yOpSwD0HnwhyWwzVQwsanV9vsg==
-X-Received: by 2002:adf:f605:: with SMTP id t5mr20897435wrp.282.1580129770591; 
- Mon, 27 Jan 2020 04:56:10 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s8sm20236288wrt.57.2020.01.27.04.56.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jan 2020 04:56:09 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B3C341FF87;
- Mon, 27 Jan 2020 12:56:08 +0000 (GMT)
-References: <20200124165335.422-1-robert.foley@linaro.org>
- <20200124165335.422-7-robert.foley@linaro.org>
-User-agent: mu4e 1.3.7; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH 6/8] tests/vm: add --boot-console switch
-In-reply-to: <20200124165335.422-7-robert.foley@linaro.org>
-Date: Mon, 27 Jan 2020 12:56:08 +0000
-Message-ID: <87mua9f47r.fsf@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1iw3z1-00048q-KW
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:59:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48502
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iw3z1-000489-3M
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 07:59:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580129954;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1D2jPHpOQo89HGQzcT2OYvzuwaBoeci6jYs5mkhx/70=;
+ b=g5V8XluscXFvcxlx+v3OrPzZjYVD0TpxHcnMhG0dtcSJtIfqnAXYv/AXVgmGTEWCivPJEa
+ fQrrEvP+mhyweuyewUzihxWOR1QnQGuZQ2JflWBoCxdPpjOsLyN1T5sq/oSSYq6arNgWdv
+ DsoRNHiLhB9as4FRTSeXgDQbAZgUpLo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-DjdrEMj3NFCM-AOwmUx_UQ-1; Mon, 27 Jan 2020 07:59:13 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BED2E1005510;
+ Mon, 27 Jan 2020 12:59:11 +0000 (UTC)
+Received: from gondolin (ovpn-116-220.ams2.redhat.com [10.36.116.220])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B77C60BF1;
+ Mon, 27 Jan 2020 12:59:02 +0000 (UTC)
+Date: Mon, 27 Jan 2020 13:59:00 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v2 1/4] virtio-scsi: introduce a constant for fixed
+ virtqueues
+Message-ID: <20200127135900.76046ba5.cohuck@redhat.com>
+In-Reply-To: <20200124100159.736209-2-stefanha@redhat.com>
+References: <20200124100159.736209-1-stefanha@redhat.com>
+ <20200124100159.736209-2-stefanha@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: DjdrEMj3NFCM-AOwmUx_UQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,57 +87,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.puhov@linaro.org, philmd@redhat.com,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 24 Jan 2020 10:01:56 +0000
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
-Robert Foley <robert.foley@linaro.org> writes:
-
-> Added ability to view console during boot via
-> --boot-console switch.  This helps debug issues that occur
-> during the boot sequence.
->
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> The event and control virtqueues are always present, regardless of the
+> multi-queue configuration.  Define a constant so that virtqueue number
+> calculations are easier to read.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  tests/vm/basevm.py | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 08a8989ac0..aa8b39beb7 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -489,6 +489,8 @@ def parse_args(vmcls):
->      parser.add_option("--config", "-c", default=3DNone,
->                        help=3D"Provide config yaml for configuration. "\
->                             "See config_example.yaml for example.")
-> +    parser.add_option("--boot-console", action=3D"store_true",
-> +                      help=3D"Show console during boot. ")
->      parser.disable_interspersed_args()
->      return parser.parse_args()
->=20=20
-> @@ -523,6 +525,10 @@ def main(vmcls, config=3DNone):
->          if args.snapshot:
->              img +=3D ",snapshot=3Don"
->          vm.boot(img)
-> +        wait_boot =3D getattr(vm, "wait_boot", None)
+>  hw/scsi/vhost-user-scsi.c       | 2 +-
+>  hw/scsi/virtio-scsi.c           | 7 ++++---
+>  include/hw/virtio/virtio-scsi.h | 3 +++
+>  3 files changed, 8 insertions(+), 4 deletions(-)
 
-Didn't we add a __getattr method, so we can do self._config['wait_boot']
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-> +        if args.boot_console and callable(wait_boot):
-> +            vm.console_init()
-> +            wait_boot()
-
-isn't wait_boot always callable because it's part of the basevm?
-
->          vm.wait_ssh()
->      except Exception as e:
->          if isinstance(e, SystemExit) and e.code =3D=3D 0:
-
-
---=20
-Alex Benn=C3=A9e
 
