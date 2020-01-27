@@ -2,73 +2,77 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8ADC33CB7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 588AEC32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 888A120702
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24C9520702
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 10:38:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ErJuSGnZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 888A120702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q0tsz26M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C9520702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw1mk-0004CZ-M8
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:38:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42185)
+	id 1iw1mx-0004sc-7E
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 05:38:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lS-0002PF-NC
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:08 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1lU-0002Pf-5l
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iw1lQ-0002Y5-R7
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:06 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47062
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1iw1lS-0002c7-PK
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44432
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1lQ-0002XT-O9
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:04 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iw1lS-0002Xv-Ls
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 05:37:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1580121424;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=bEZBUSI+T2V8TDYRTQq0xDhrQPT8zUv9+CBFdQ3L8sA=;
- b=ErJuSGnZ10wFjHdI85TBLkdcznE2z8JSIt0ALnP+g8TJWeFM/V2rm8pGvpx4oapH56BPXB
- DrQ1b+oxEtzxAmAhuzFBHULbo+e0JK36OC0eEsVMpGsEi0MgkoTE9dO+UUKCgl/Mc0loMt
- oJcnhbFAtwAeO8mV7dVqPSxyjX6Qfrk=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VSE4aUCWkyE6lXBB4C7/XSqsgq5OFFsdkg9eM2Q8C94=;
+ b=Q0tsz26MMQ+vOx4/jarU3MFqwZ0RV+JbEZDVOkPwVcjlJmIfSZFGLJohwduJWqLFBj01oO
+ vNEjHZ9taDtmfjxe8NNI1ot3/onGe9QR2BHvWUQx65DhKWwUOBr/EsvHNFktL+UIV0v9gx
+ 4JlmvOxfuTU/nWATYJCuhML2yzuS+28=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-YgtqEWhZOW2bsdRiTNacVg-1; Mon, 27 Jan 2020 05:36:56 -0500
+ us-mta-440-PXLQkZPtMj-UaYsSkf9mng-1; Mon, 27 Jan 2020 05:37:02 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA39C10054E3;
- Mon, 27 Jan 2020 10:36:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E820D800D41;
+ Mon, 27 Jan 2020 10:37:01 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 311353B7;
- Mon, 27 Jan 2020 10:36:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E214CF6C1;
+ Mon, 27 Jan 2020 10:36:59 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 00/13] RFC: [for 5.0]: HMP monitor handlers cleanups
-Date: Mon, 27 Jan 2020 12:36:34 +0200
-Message-Id: <20200127103647.17761-1-mlevitsk@redhat.com>
+Subject: [PATCH v3 03/13] monitor/hmp: rename device-hotplug.c to
+ block/monitor/block-hmp-cmds.c
+Date: Mon, 27 Jan 2020 12:36:37 +0200
+Message-Id: <20200127103647.17761-4-mlevitsk@redhat.com>
+In-Reply-To: <20200127103647.17761-1-mlevitsk@redhat.com>
+References: <20200127103647.17761-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: YgtqEWhZOW2bsdRiTNacVg-1
+X-MC-Unique: PXLQkZPtMj-UaYsSkf9mng-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,140 +92,171 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch series is bunch of cleanups
-to the hmp monitor code.
+These days device-hotplug.c only contains the hmp_drive_add
+In the next patch, rest of hmp_drive* functions will be moved
+there.
 
-This series only touched blockdev related hmp handlers.
+Also change the license of that file to GPL2+ since most
+of the code that will be moved there is under that license
 
-No functional changes expected other that
-light error message changes by the last patch.
+Also add block-hmp-commands.h to contain prototypes of these
+functions
 
-This was inspired by this bugzilla:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1719169
-
-Basically some users still parse hmp error messages,
-and they would like to have them prefixed with 'Error:'
-
-In commit 66363e9a43f649360a3f74d2805c9f864da027eb we added
-the hmp_handle_error which does exactl that but some hmp handlers
-don't use it.
-
-In this patch series, I moved all the block related hmp handlers
-into blockdev-hmp-cmds.c, and then made them use this function
-to report the errors.
-
-I hope I didn't change too much code, I just felt that if
-I touch this code, I can also make it easier to find these
-handlers, that were scattered over 3 different files.
-
-Changes from V1:
-   * move the handlers to block/monitor/block-hmp-cmds.c
-   * tiny cleanup for the commit messages
-
-Changes from V2:
-   * Moved all the function prototypes to new header (blockdev-hmp-cmds.h)
-   * Set the license of blockdev-hmp-cmds.c to GPLv2+
-   * Moved hmp_snapshot_* functions to blockdev-hmp-cmds.c
-   * Moved hmp_drive_add_node to blockdev-hmp-cmds.c
-     (this change needed some new exports, thus in separate new patch)
-   * Moved hmp_qemu_io and hmp_eject to blockdev-hmp-cmds.c
-   * Added 'error:' prefix to vreport, and updated the iotests
-     This is invasive change, but really feels like the right one
-   * Added minor refactoring patch that drops an unused #include
-
-Best regards,
-=09Maxim Levitsky
-
-Maxim Levitsky (13):
-  usb/dev-storage: remove unused include
-  monitor/hmp: uninline add_init_drive
-  monitor/hmp: rename device-hotplug.c to block/monitor/block-hmp-cmds.c
-  monitor/hmp: move hmp_drive_del and hmp_commit to block-hmp-cmds.c
-  monitor/hmp: move hmp_drive_mirror and hmp_drive_backup to
-    block-hmp-cmds.c
-  monitor/hmp: move hmp_block_job* to block-hmp-cmds.c
-  monitor/hmp: move hmp_snapshot_* to block-hmp-cmds.c
-  monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
-  monitor/hmp: move remaining hmp_block* functions to block-hmp-cmds.c
-  monitor/hmp: move hmp_info_block* to block-hmp-cmds.c
-  monitor: Move hmp_drive_add_node to block-hmp-cmds.c
-  add 'error' prefix to vreport
-  monitor/hmp: Prefer to use hmp_handle_error for error reporting in
-    block hmp commands
-
- MAINTAINERS                        |   1 +
- Makefile.objs                      |   2 +-
- block/Makefile.objs                |   1 +
- block/monitor/Makefile.objs        |   1 +
- block/monitor/block-hmp-cmds.c     | 980 +++++++++++++++++++++++++++++
- blockdev.c                         | 137 +---
- device-hotplug.c                   |  91 ---
- hw/usb/dev-storage.c               |   1 -
- include/block/block-hmp-commands.h |  42 ++
- include/block/block_int.h          |   5 +-
- include/monitor/hmp.h              |  24 -
- include/sysemu/blockdev.h          |   4 -
- include/sysemu/sysemu.h            |   3 -
- monitor/hmp-cmds.c                 | 771 +----------------------
- monitor/misc.c                     |   1 +
- tests/qemu-iotests/020.out         |   2 +-
- tests/qemu-iotests/026.out         | 260 ++++----
- tests/qemu-iotests/036.out         |  16 +-
- tests/qemu-iotests/043.out         |   6 +-
- tests/qemu-iotests/049.out         |  30 +-
- tests/qemu-iotests/051.pc.out      | 150 ++---
- tests/qemu-iotests/054.out         |   4 +-
- tests/qemu-iotests/060.out         |  20 +-
- tests/qemu-iotests/061.out         |  26 +-
- tests/qemu-iotests/069.out         |   2 +-
- tests/qemu-iotests/071.out         |   4 +-
- tests/qemu-iotests/074.out         |   4 +-
- tests/qemu-iotests/079.out         |   2 +-
- tests/qemu-iotests/080.out         |  72 +--
- tests/qemu-iotests/081.out         |   2 +-
- tests/qemu-iotests/082.out         |  38 +-
- tests/qemu-iotests/083.out         |  68 +-
- tests/qemu-iotests/098.out         |   8 +-
- tests/qemu-iotests/103.out         |  14 +-
- tests/qemu-iotests/106.out         |   4 +-
- tests/qemu-iotests/111.out         |   2 +-
- tests/qemu-iotests/112.out         |  24 +-
- tests/qemu-iotests/113.out         |   6 +-
- tests/qemu-iotests/114.out         |   2 +-
- tests/qemu-iotests/122.out         |   4 +-
- tests/qemu-iotests/133.out         |  30 +-
- tests/qemu-iotests/137.out         |  28 +-
- tests/qemu-iotests/140.out         |   2 +-
- tests/qemu-iotests/142.out         |  38 +-
- tests/qemu-iotests/143.out         |   2 +-
- tests/qemu-iotests/153.out         | 118 ++--
- tests/qemu-iotests/162.out         |  10 +-
- tests/qemu-iotests/172.out         |  16 +-
- tests/qemu-iotests/178.out.qcow2   |  30 +-
- tests/qemu-iotests/178.out.raw     |  26 +-
- tests/qemu-iotests/182.out         |   2 +-
- tests/qemu-iotests/187.out         |   6 +-
- tests/qemu-iotests/188.out         |   2 +-
- tests/qemu-iotests/197.out         |   2 +-
- tests/qemu-iotests/205             |   2 +-
- tests/qemu-iotests/215.out         |   2 +-
- tests/qemu-iotests/217.out         |   2 +-
- tests/qemu-iotests/226.out         |  12 +-
- tests/qemu-iotests/232.out         |  12 +-
- tests/qemu-iotests/233.out         |  24 +-
- tests/qemu-iotests/242.out         |   2 +-
- tests/qemu-iotests/244.out         |  14 +-
- tests/qemu-iotests/249.out         |   6 +-
- tests/qemu-iotests/261.out         |  24 +-
- tests/qemu-iotests/267.out         |  16 +-
- tests/qemu-iotests/common.filter   |   2 +-
- util/qemu-error.c                  |   1 +
- 67 files changed, 1640 insertions(+), 1625 deletions(-)
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ MAINTAINERS                                   |  1 +
+ Makefile.objs                                 |  2 +-
+ block/Makefile.objs                           |  1 +
+ block/monitor/Makefile.objs                   |  1 +
+ .../monitor/block-hmp-cmds.c                  | 23 ++++---------------
+ include/block/block-hmp-commands.h            |  8 +++++++
+ include/sysemu/sysemu.h                       |  3 ---
+ monitor/misc.c                                |  1 +
+ 8 files changed, 18 insertions(+), 22 deletions(-)
  create mode 100644 block/monitor/Makefile.objs
- create mode 100644 block/monitor/block-hmp-cmds.c
- delete mode 100644 device-hotplug.c
+ rename device-hotplug.c =3D> block/monitor/block-hmp-cmds.c (55%)
  create mode 100644 include/block/block-hmp-commands.h
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f6511d5120..5d50d09ad8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1882,6 +1882,7 @@ Block QAPI, monitor, command line
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+ F: blockdev.c
++F: blockdev-hmp-cmds.c
+ F: block/qapi.c
+ F: qapi/block*.json
+ F: qapi/transaction.json
+diff --git a/Makefile.objs b/Makefile.objs
+index ff396b9209..15209eb6b5 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -48,7 +48,7 @@ common-obj-y +=3D dump/
+ common-obj-y +=3D job-qmp.o
+ common-obj-y +=3D monitor/
+ common-obj-y +=3D net/
+-common-obj-y +=3D qdev-monitor.o device-hotplug.o
++common-obj-y +=3D qdev-monitor.o
+ common-obj-$(CONFIG_WIN32) +=3D os-win32.o
+ common-obj-$(CONFIG_POSIX) +=3D os-posix.o
+=20
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 330529b0b7..3f65544a6b 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -44,6 +44,7 @@ block-obj-y +=3D crypto.o
+ block-obj-y +=3D aio_task.o
+ block-obj-y +=3D backup-top.o
+ block-obj-y +=3D filter-compress.o
++common-obj-y +=3D monitor/
+=20
+ common-obj-y +=3D stream.o
+=20
+diff --git a/block/monitor/Makefile.objs b/block/monitor/Makefile.objs
+new file mode 100644
+index 0000000000..0a74f9a8b5
+--- /dev/null
++++ b/block/monitor/Makefile.objs
+@@ -0,0 +1 @@
++common-obj-y +=3D block-hmp-cmds.o
+diff --git a/device-hotplug.c b/block/monitor/block-hmp-cmds.c
+similarity index 55%
+rename from device-hotplug.c
+rename to block/monitor/block-hmp-cmds.c
+index 554e4d98db..c65aaa86ea 100644
+--- a/device-hotplug.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -1,25 +1,11 @@
+ /*
+- * QEMU device hotplug helpers
++ * Blockdev HMP commands
+  *
+  * Copyright (c) 2004 Fabrice Bellard
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
+- * of this software and associated documentation files (the "Software"), t=
+o deal
+- * in the Software without restriction, including without limitation the r=
+ights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included=
+ in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
+,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
+- * THE SOFTWARE.
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * or (at your option) any later version.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+@@ -33,6 +19,7 @@
+ #include "sysemu/sysemu.h"
+ #include "monitor/monitor.h"
+ #include "block/block_int.h"
++#include "block/block-hmp-commands.h"
+=20
+=20
+ void hmp_drive_add(Monitor *mon, const QDict *qdict)
+diff --git a/include/block/block-hmp-commands.h b/include/block/block-hmp-c=
+ommands.h
+new file mode 100644
+index 0000000000..4f9033a8a6
+--- /dev/null
++++ b/include/block/block-hmp-commands.h
+@@ -0,0 +1,8 @@
++#ifndef BLOCK_HMP_COMMANDS_H
++#define BLOCK_HMP_COMMANDS_H
++
++/* HMP commands related to the block layer*/
++
++void hmp_drive_add(Monitor *mon, const QDict *qdict);
++
++#endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 80c57fdc4e..c48635666d 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -68,9 +68,6 @@ extern int nb_option_roms;
+ extern const char *prom_envs[MAX_PROM_ENVS];
+ extern unsigned int nb_prom_envs;
+=20
+-/* generic hotplug */
+-void hmp_drive_add(Monitor *mon, const QDict *qdict);
+-
+ /* pcie aer error injection */
+ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
+=20
+diff --git a/monitor/misc.c b/monitor/misc.c
+index de1ca4d114..0466c00830 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -79,6 +79,7 @@
+ #include "sysemu/cpus.h"
+ #include "qemu/cutils.h"
+ #include "tcg/tcg.h"
++#include "block/block-hmp-commands.h"
+=20
+ #if defined(TARGET_S390X)
+ #include "hw/s390x/storage-keys.h"
 --=20
 2.17.2
 
