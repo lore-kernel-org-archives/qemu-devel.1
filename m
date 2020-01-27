@@ -2,82 +2,79 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4100C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D50C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:24:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0DFF20842
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:22:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CA4520CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:24:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=megamailservers.eu header.i=@megamailservers.eu header.b="ns00dkns"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0DFF20842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=o2online.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zdxyv5Ml"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CA4520CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw2T0-00067k-RJ
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 06:22:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51260)
+	id 1iw2V0-0007i4-I8
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 06:24:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rsta2@o2online.de>) id 1iw2S9-0004ug-Mn
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:21:15 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iw2UR-0007B3-Py
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:23:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rsta2@o2online.de>) id 1iw2S8-0005WV-Ce
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:21:13 -0500
-Received: from mail229c50.megamailservers.eu ([91.136.10.239]:48592
- helo=mail36c50.megamailservers.eu)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rsta2@o2online.de>)
- id 1iw2S4-0005Hp-GI; Mon, 27 Jan 2020 06:21:09 -0500
-X-Authenticated-User: 017626146082@o2online.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megamailservers.eu;
- s=maildub; t=1580124057;
- bh=5mxXBJF9kNB9eZK7UMToWMAhB9cHOuCiUWMIAMBkDEE=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ns00dknsXHxc7zBOScGQhovq+E4ZEaTYE14DO67gI9c2+QHz3vmn4fXh15ZGo/nR0
- mgGiuue6wCn19KhpdCM7tvXgwZWbmTPVtUREQoMjZga6geK1s6jdn7l0coya5CMaX2
- +2Tnn0RSwdvBWGqKdxijTV3dWFTQb6r5yYLgNTh4=
-Feedback-ID: rsta2@o2online.
-Received: from desktop2.localnet (178-21-1-177.ilmprovider.net [178.21.1.177])
- (authenticated bits=0)
- by mail36c50.megamailservers.eu (8.14.9/8.13.1) with ESMTP id 00RBKsAD013615
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
- Mon, 27 Jan 2020 11:20:56 +0000
-From: Rene Stange <rsta2@o2online.de>
-To: Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] bcm2835_dma: Fix TD mode
-Date: Mon, 27 Jan 2020 12:20:54 +0100
-Message-ID: <2852675.bWBgnKVUkk@desktop2>
-In-Reply-To: <9d885f77-0bb2-2ab6-cf46-400a0bc2deb8@redhat.com>
-References: <5099495.CBsx362VbF@desktop2>
- <9d885f77-0bb2-2ab6-cf46-400a0bc2deb8@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iw2UQ-00015X-JW
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:23:35 -0500
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:46776)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iw2UQ-000146-Du
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:23:34 -0500
+Received: by mail-oi1-x236.google.com with SMTP id 13so6249428oij.13
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 03:23:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KjtxNLJZOIn3QoVIh/aMZfpEZ6EMGJVSqbvoKVa6OBw=;
+ b=zdxyv5Mlwe8LlWdhBK6eLa9Iq20MxzpfcBzgw4HqdhP0QcU9DPLWTqdAAFIUScnnq4
+ 3mCOr/Do5u54Ub6H/tkSM8ueOYy6r8WfwNcWB/IfcoFWGsslNWtDfr5jaDg9h9Mx6jXI
+ SlFJ+Y1SSuroDaVynFW1YhORQtflJGqtf6T1VXPE2X2yp6J2QjZAH+H6/U6NyvvZ5nbF
+ EzdQ4fQsOSliptU+/yDz8XFykOrn8PRMBU5mTBeYCGrKmpA5oZYqRzSX8ypKOpraTyI6
+ x9d7HPR2jA2EmGg0YT3FWbLgoBIkzWDb3a2Ws9BJpUrWYXnatIvDN2Tiks+Am9cbuHVx
+ hAoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KjtxNLJZOIn3QoVIh/aMZfpEZ6EMGJVSqbvoKVa6OBw=;
+ b=mLlu5Pw7bZZJonYHM/4+CMx6fuLSBC7o9Mp4y6rRjoi5KQ6AlWwu0rXMzWK5UQ2rzg
+ IxQ+tvLuOeSbJAasWMXVcv1DKM8J2FwQy2xyeyZtwB0BA5hbN/EQIlrQ+SmzrPIWXFEK
+ zt450VC545BRqQbTfatpSr7qTgtiRuIQL3bP0tUDk+yWQourWOddbZedz0nmiT5oV4P1
+ MMYBuHqPDH+Ozv7cci2DVx2PBY892A7Zi4OVDe2JB/kxDDH97m8gIX6PBfUY7bskhd/0
+ CbvlufYudL5iYK7FfH7J/KOmQM+YU5vVWdZm+zUsEhufMISeRJ1z6NXA7Csonp0bDTDl
+ wfpQ==
+X-Gm-Message-State: APjAAAUTroUBck/2DgTr5+Q14GdSloiwqj2ivBLOUL2gmZKdq+E6oMF+
+ vXDJnMIGODmjW65b6HV9qd10tw3UpelMzqfbYLOtvQ==
+X-Google-Smtp-Source: APXvYqyA6yruhpC6qViNhMmG1uimsb5u01866rt5irDzp79cYSEfVoAVP+Qy0oqKonF9lnad83foiHO04MNipD7O2go=
+X-Received: by 2002:aca:f484:: with SMTP id s126mr6769202oih.48.1580124213574; 
+ Mon, 27 Jan 2020 03:23:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-CTCH-RefID: str=0001.0A0B020C.5E2EC799.005C, ss=1, re=0.000, recu=0.000,
- reip=0.000, cl=1, cld=1, fgs=0
-X-CTCH-VOD: Unknown
-X-CTCH-Spam: Unknown
-X-CTCH-Score: 0.000
-X-CTCH-Rules: 
-X-CTCH-Flags: 0
-X-CTCH-ScoreCust: 0.000
-X-CSC: 0
-X-CHA: v=2.3 cv=bd8Vr9HB c=1 sm=1 tr=0 a=oFQkuSNlBNCQRuITVo1IXg==:117
- a=oFQkuSNlBNCQRuITVo1IXg==:17 a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19
- a=8nJEP1OIZ-IA:10 a=7CQSdrXTAAAA:8 a=rTsyARspAAAA:20 a=20KFwNOVAAAA:8
- a=vxNqc9rRQqJLtr7q4cgA:9 a=6w-0JV3Zq0mKVwE1:21 a=zxFjX95f0CasTnp2:21
- a=wPNLvfGTeEIA:10 a=a-qgeE7W1pNrGK8U0ZQC:22
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic]
-X-Received-From: 91.136.10.239
+References: <20200124232009.12928-1-richard.henderson@linaro.org>
+In-Reply-To: <20200124232009.12928-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Jan 2020 11:23:22 +0000
+Message-ID: <CAFEAcA9wEGWe1E5JZssEJwvXTtaWZrVTwOpCdG7_h4RkbUsXdg@mail.gmail.com>
+Subject: Re: [PULL v3 00/11] target/hppa patch queue
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::236
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,116 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+On Fri, 24 Jan 2020 at 23:20, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Version 3 fixes printf formatting errors, and some indentation
+> errors, in artist.c, lasips2.c, and i82596.c.
+>
+>
+> r~
+>
+>
+> The following changes since commit ba2ed84fe6a78f64b2da441750fc6e925d94106a:
+>
+>   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-5.0-sf1' into staging (2020-01-24 12:34:04 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-pa-20200124
+>
+> for you to fetch changes up to 5b33eecce852658121b1190fee466f01a69e1910:
+>
+>   target/hppa: Allow, but diagnose, LDCW aligned only mod 4 (2020-01-24 14:35:58 -0800)
+>
+> ----------------------------------------------------------------
+> Improve LASI emulation
+> Add Artist graphics
+> Fix main memory allocation
+> Improve LDCW emulation wrt real hw
 
-I'm running an example program for my Circle bare metal framework for the
-Raspberry Pi using the LittlevGL graphics library. It uses the TD DMA mode =
-to
-transfer pixel data to the screen buffer (10 lines at a time). Without the
-given patch applied to QEMU only the first pixel line of each transfer is
-shown in TigerVNC viewer, after applying it, a solid image is shown.
+This fails to compile -- I suspect your pullreq needs updating
+to account for something in Paolo's most recent applied pull:
 
-You can reproduce the problem on a 64-bit Linux machine as follows. The "se=
-d"
-command modifies the example program, so that it doesn't try to access the
-(not available) USB HCI controller of the Raspberry Pi 3.
+/home/petmay01/qemu-for-merges/hw/net/lasi_i82596.c: In function
+'lasi_82596_class_init':
+/home/petmay01/qemu-for-merges/hw/net/lasi_i82596.c:171:7: error:
+'DeviceClass {aka struct DeviceClass}' has no member named 'props'
+     dc->props = lasi_82596_properties;
+       ^
 
-Regards,
+(and similar in hw/display/artist.c)
 
-Rene
+Looks like these should now be
+     device_class_set_props(dc, lasi_82596_properties);
 
-
-cd
-mkdir dma-test
-cd dma-test/
-wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/bi=
-nrel/gcc-arm-8.3-2019.03-x86_64-aarch64-elf.tar.xz
-tar xJf gcc-arm-8.3-2019.03-x86_64-aarch64-elf.tar.xz
-git clone https://github.com/rsta2/circle.git
-cd circle
-git submodule update --init
-echo "AARCH =3D 64" > Config.mk
-echo "RASPPI =3D 3" >> Config.mk
-echo "PREFIX64 =3D ~/dma-test/gcc-arm-8.3-2019.03-x86_64-aarch64-elf/bin/aa=
-rch64-elf-" >> Config.mk
-=2E/makeall
-cd addon/littlevgl/
-make
-cd sample/
-sed -i -e "s/bOK =3D m_USBHCI/\/\/bOK =3D m_USBHCI/" kernel.cpp
-make
-qemu-system-aarch64 -M raspi3 -kernel kernel8.img
-
-
-On Monday, 27 January 2020, 09:29:59 CET, Philippe Mathieu-Daud=E9 <philmd@=
-redhat.com> wrote:
-> Hi Rene,
->=20
-> On 1/24/20 6:55 PM, Rene Stange wrote:
-> > TD (two dimensions) DMA mode did not work, because the xlen variable has
-> > not been re-initialized before each additional ylen run through in
-> > bcm2835_dma_update(). Furthermore ylen has to be increased by one after
-> > reading it from the TXFR_LEN register, because a value of zero has to
-> > result in one run through of the ylen loop. Both issues have been fixed.
->=20
-> What were you running, how can we reproduce?
->=20
-> >=20
-> > Signed-off-by: Rene Stange <rsta2@o2online.de>
-> > ---
-> >   hw/dma/bcm2835_dma.c | 9 +++++----
-> >   1 file changed, 5 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
-> > index 1e458d7fba..0881c9506e 100644
-> > --- a/hw/dma/bcm2835_dma.c
-> > +++ b/hw/dma/bcm2835_dma.c
-> > @@ -54,7 +54,7 @@
-> >   static void bcm2835_dma_update(BCM2835DMAState *s, unsigned c)
-> >   {
-> >       BCM2835DMAChan *ch =3D &s->chan[c];
-> > -    uint32_t data, xlen, ylen;
-> > +    uint32_t data, xlen, xlen_td, ylen;
-> >       int16_t dst_stride, src_stride;
-> >  =20
-> >       if (!(s->enable & (1 << c))) {
-> > @@ -72,13 +72,13 @@ static void bcm2835_dma_update(BCM2835DMAState *s, =
-unsigned c)
-> >  =20
-> >           if (ch->ti & BCM2708_DMA_TDMODE) {
-> >               /* 2D transfer mode */
-> > -            ylen =3D (ch->txfr_len >> 16) & 0x3fff;
-> > -            xlen =3D ch->txfr_len & 0xffff;
-> > +            ylen =3D ((ch->txfr_len >> 16) & 0x3fff) + 1;
-> > +            xlen_td =3D xlen =3D ch->txfr_len & 0xffff;
-> >               dst_stride =3D ch->stride >> 16;
-> >               src_stride =3D ch->stride & 0xffff;
-> >           } else {
-> >               ylen =3D 1;
-> > -            xlen =3D ch->txfr_len;
-> > +            xlen_td =3D xlen =3D ch->txfr_len;
-> >               dst_stride =3D 0;
-> >               src_stride =3D 0;
-> >           }
-> > @@ -117,6 +117,7 @@ static void bcm2835_dma_update(BCM2835DMAState *s, =
-unsigned c)
-> >               if (--ylen !=3D 0) {
-> >                   ch->source_ad +=3D src_stride;
-> >                   ch->dest_ad +=3D dst_stride;
-> > +                xlen =3D xlen_td;
-> >               }
-> >           }
-> >           ch->cs |=3D BCM2708_DMA_END;
-> >=20
->=20
->=20
-
-
-
+thanks
+-- PMM
 
