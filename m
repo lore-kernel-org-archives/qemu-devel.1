@@ -2,83 +2,88 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3834C33CB7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 518C6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:56:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83EA220716
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DF7B214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 11:56:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="FvwT9+en"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83EA220716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ObalJ3F4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DF7B214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw2ym-0007OS-Mj
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 06:54:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58079)
+	id 1iw30f-0000QB-C7
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 06:56:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1iw2y7-0006b8-QX
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:54:17 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iw303-0008RW-HV
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:56:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1iw2y6-0007CP-Ka
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:54:15 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35037)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1iw2y6-0007B1-8e
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:54:14 -0500
-Received: by mail-wm1-x344.google.com with SMTP id p17so6757952wmb.0
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 03:54:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=CBQWlQ+e9xHpvFgCMnkhKOFdTaOlhA9b2acXy9cEd68=;
- b=FvwT9+enG8MTe8OqRI7Fyf4qr0V1vV2/cgN60daAO5vdIjWjVQPrT3NWfrcgXk6cBj
- q7eTbF0si5zPuHvYyxjogZVytB/kTIHQhYNjddea7O1+cZhUgDnhvtt8IWT/dTYrJbip
- zF03lRDCmH8B90nj1Sp9cXVijkDvaYyELhf370NzEavX8kNICJQvtiWOzgpgIsaGUXl2
- JdLcoVwVo3opfxOCPSPIdE2A/TmE3JW53azApMWXngHZlL4Z99TkAyVE1pYKTYOCIZnl
- YkL/ojqX5ZXvRJc47ZfKTaAEZ4INDnRqhBpnBG9ARVzRBX+SYwG/d2UFhfeWHprNiD8n
- +BLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=CBQWlQ+e9xHpvFgCMnkhKOFdTaOlhA9b2acXy9cEd68=;
- b=tM4iWg6p53oxDx2dmS5oW9XLepzUwQBPobGQuGP2oWDXMRWx0Q0woAXrt2KSZyPxpc
- 7brPk+CFu8BLBTtl8qcKWtHDqOR6Lz2vrGZeCLtRovZQGUdwBs2yoc867/BRmMQCbQ0R
- cnCN56V872/r4vWdnvxC7LGTCMNE3NkPY/eVf0M9XPzw30XOFmpJnD+DLIHtUKzWmrH+
- XmWSp8n9Wl6VdiAUhfkn6o9+cfrH98NzGd6QyUNn0keN2ucQ6fh3ElAZvhkCAiPymTP2
- HQanSRYCLYPwIt6X7cKvv84GEMBqKWxyuT6RR3N6JSrEAQPdnOj3uy6kI0dJR+2bxrsb
- vO3Q==
-X-Gm-Message-State: APjAAAXRU0zGNP/gwBaPUtDZWBO7HsF613/vt0i//Q5U5mQ+bUXdFGwT
- hcqkUOe4XDjTQ2FogtBtZLBQBA==
-X-Google-Smtp-Source: APXvYqzs7Eu5FW5Q7MAFuQ+alsnfSo2Xrc7+/DmQbVd3thnhq66GTyV4fhfbru02Esp21gCndzvGsg==
-X-Received: by 2002:a1c:791a:: with SMTP id l26mr8404349wme.58.1580126052778; 
- Mon, 27 Jan 2020 03:54:12 -0800 (PST)
-Received: from f2.redhat.com (bzq-79-177-42-131.red.bezeqint.net.
- [79.177.42.131])
- by smtp.gmail.com with ESMTPSA id s16sm20866490wrn.78.2020.01.27.03.54.11
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 27 Jan 2020 03:54:12 -0800 (PST)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: dmitry.fleytman@gmail.com,
-	jasowang@redhat.com,
-	qemu-devel@nongnu.org
-Subject: [PATCH 1/2] NetRxPkt: Introduce support for additional hash types
-Date: Mon, 27 Jan 2020 13:54:04 +0200
-Message-Id: <20200127115405.13459-1-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+ (envelope-from <kwolf@redhat.com>) id 1iw302-0008KM-3Y
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:56:15 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60999
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iw301-0008K7-QA
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 06:56:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580126172;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RXtLu6tNTYnVbDY0pNesqp5p6Ys5Z4M7dK4Psle82os=;
+ b=ObalJ3F4rvsubX2bHFSnEOvJ6l3+D7MHSiq2uuM1BnPYF4NPbP802RW1CM8+a4guC+wWiM
+ 5PSkqUPp9SEU4hzRwar3sqeTNMz1pPepxQ5ch4F2GRXSr8h5PdOT3kngZIJUCU1WJ54nQO
+ Y+M899nOfv6DyE1FAYxO0Frea9KaP+A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-frlDbaOQNNKqOlkpO-WPbA-1; Mon, 27 Jan 2020 06:56:11 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13B2A184BBD8;
+ Mon, 27 Jan 2020 11:56:10 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C78F85735;
+ Mon, 27 Jan 2020 11:56:07 +0000 (UTC)
+Date: Mon, 27 Jan 2020 12:56:06 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200127115606.GA5669@linux.fritz.box>
+References: <20191224134139.GD2710539@redhat.com>
+ <30664f6e-81da-a6e6-9b20-037fc91290fb@redhat.com>
+ <878slyej29.fsf@dusky.pond.sub.org>
+ <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
+ <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+ <871rrp474i.fsf@dusky.pond.sub.org>
+ <20200124102743.GB824327@redhat.com>
+ <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
+ <87sgk3x2im.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+In-Reply-To: <87sgk3x2im.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: frlDbaOQNNKqOlkpO-WPbA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,120 +95,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add support for following hash types:
-IPV6 TCP with extension headers
-IPV4 UDP
-IPV6 UDP
-IPV6 UDP with extension headers
+Am 25.01.2020 um 11:18 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+> > Am 24.01.2020 um 11:27 hat Daniel P. Berrang=E9 geschrieben:
+> >> This is finally something I'd consider to be on a par with the
+> >> original QEMU syntax, before we added hierarchical data. You
+> >> have the minimal possible amount of syntax here. No commas,
+> >> no quotes, no curly brackets, etc.
+> >
+> > This seems to have the same problems as the QEMU command line (how do
+> > you distinguish strings from ints, from bools, from null?).
+>=20
+> True: YAML provides only string scalars.
+>=20
+> TOML provides strings, integers, floats, booleans, and several flavors
+> of time.  It lacks null.
+>=20
+> >                                                             It's
+> > basically just a pretty-printed version of it with the consequence that
+> > it needs to be stored in an external file and there is no reasonable wa=
+y
+> > to keep it in my shell history.
+>=20
+> There is a reasonable way to keep it in my file system, though.  I find
+> that decidedly superior.
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/net/net_rx_pkt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- hw/net/net_rx_pkt.h |  6 +++++-
- hw/net/trace-events |  4 ++++
- 3 files changed, 51 insertions(+), 1 deletion(-)
+That depends a lot on your use case.
 
-diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-index 98a5030ace..b2a06bd27d 100644
---- a/hw/net/net_rx_pkt.c
-+++ b/hw/net/net_rx_pkt.c
-@@ -307,6 +307,20 @@ _net_rx_rss_prepare_tcp(uint8_t *rss_input,
-                           &tcphdr->th_dport, sizeof(uint16_t));
- }
- 
-+static inline void
-+_net_rx_rss_prepare_udp(uint8_t *rss_input,
-+                        struct NetRxPkt *pkt,
-+                        size_t *bytes_written)
-+{
-+    struct udp_header *udphdr = &pkt->l4hdr_info.hdr.udp;
-+
-+    _net_rx_rss_add_chunk(rss_input, bytes_written,
-+                          &udphdr->uh_sport, sizeof(uint16_t));
-+
-+    _net_rx_rss_add_chunk(rss_input, bytes_written,
-+                          &udphdr->uh_dport, sizeof(uint16_t));
-+}
-+
- uint32_t
- net_rx_pkt_calc_rss_hash(struct NetRxPkt *pkt,
-                          NetRxPktRssType type,
-@@ -347,6 +361,34 @@ net_rx_pkt_calc_rss_hash(struct NetRxPkt *pkt,
-         trace_net_rx_pkt_rss_ip6_ex();
-         _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, &rss_length);
-         break;
-+    case NetPktRssIpV6TcpEx:
-+        assert(pkt->isip6);
-+        assert(pkt->istcp);
-+        trace_net_rx_pkt_rss_ip6_ex_tcp();
-+        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, &rss_length);
-+        _net_rx_rss_prepare_tcp(&rss_input[0], pkt, &rss_length);
-+        break;
-+    case NetPktRssIpV4Udp:
-+        assert(pkt->isip4);
-+        assert(pkt->isudp);
-+        trace_net_rx_pkt_rss_ip4_udp();
-+        _net_rx_rss_prepare_ip4(&rss_input[0], pkt, &rss_length);
-+        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
-+        break;
-+    case NetPktRssIpV6Udp:
-+        assert(pkt->isip6);
-+        assert(pkt->isudp);
-+        trace_net_rx_pkt_rss_ip6_udp();
-+        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, false, &rss_length);
-+        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
-+        break;
-+    case NetPktRssIpV6UdpEx:
-+        assert(pkt->isip6);
-+        assert(pkt->isudp);
-+        trace_net_rx_pkt_rss_ip6_ex_udp();
-+        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, &rss_length);
-+        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
-+        break;
-     default:
-         assert(false);
-         break;
-diff --git a/hw/net/net_rx_pkt.h b/hw/net/net_rx_pkt.h
-index 7adf0fad51..048e3461f0 100644
---- a/hw/net/net_rx_pkt.h
-+++ b/hw/net/net_rx_pkt.h
-@@ -133,7 +133,11 @@ typedef enum {
-     NetPktRssIpV4Tcp,
-     NetPktRssIpV6Tcp,
-     NetPktRssIpV6,
--    NetPktRssIpV6Ex
-+    NetPktRssIpV6Ex,
-+    NetPktRssIpV6TcpEx,
-+    NetPktRssIpV4Udp,
-+    NetPktRssIpV6Udp,
-+    NetPktRssIpV6UdpEx,
- } NetRxPktRssType;
- 
- /**
-diff --git a/hw/net/trace-events b/hw/net/trace-events
-index 6f990ede87..73d4558f7e 100644
---- a/hw/net/trace-events
-+++ b/hw/net/trace-events
-@@ -92,9 +92,13 @@ net_rx_pkt_l3_csum_validate_csum(size_t l3hdr_off, uint32_t csl, uint32_t cntr,
- 
- net_rx_pkt_rss_ip4(void) "Calculating IPv4 RSS  hash"
- net_rx_pkt_rss_ip4_tcp(void) "Calculating IPv4/TCP RSS  hash"
-+net_rx_pkt_rss_ip4_udp(void) "Calculating IPv4/UDP RSS  hash"
- net_rx_pkt_rss_ip6_tcp(void) "Calculating IPv6/TCP RSS  hash"
-+net_rx_pkt_rss_ip6_udp(void) "Calculating IPv6/UDP RSS  hash"
- net_rx_pkt_rss_ip6(void) "Calculating IPv6 RSS  hash"
- net_rx_pkt_rss_ip6_ex(void) "Calculating IPv6/EX RSS  hash"
-+net_rx_pkt_rss_ip6_ex_tcp(void) "Calculating IPv6/EX/TCP RSS  hash"
-+net_rx_pkt_rss_ip6_ex_udp(void) "Calculating IPv6/EX/UDP RSS  hash"
- net_rx_pkt_rss_hash(size_t rss_length, uint32_t rss_hash) "RSS hash for %zu bytes: 0x%X"
- net_rx_pkt_rss_add_chunk(void* ptr, size_t size, size_t input_offset) "Add RSS chunk %p, %zu bytes, RSS input offset %zu bytes"
- 
--- 
-2.17.1
+If you have a long-lived production VM that you always run with the same
+configuration, then yes, having a config file for it in the file system
+is what you probably want. Currently, for this case, people directly
+using QEMU tend to write a script that contains the command line. I
+think I do have such scripts somewhere, but their number is very small.
+
+My common case is short-lived VMs with configurations that change very
+often between QEMU invocations. Here the command line is decidedly
+superior.
+
+Requiring me to create a file in the file system each time and to
+remember deleting it after I'm done feels about as convenient as a *nix
+shell that doesn't accept parameters for commands on the command line,
+but instead requires you to write a one-off script first and then run
+that.
+
+Kevin
 
 
