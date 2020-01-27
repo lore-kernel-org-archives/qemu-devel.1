@@ -2,76 +2,110 @@ Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CA0C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DA1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:29:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF239207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:27:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9179207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 13:29:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="IZvkZsJn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF239207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=xcancerberox.com.ar header.i=@xcancerberox.com.ar header.b="h9JXVGkH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9179207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xcancerberox.com.ar
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iw4QW-00071l-2S
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 08:27:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49501)
+	id 1iw4S4-0007yt-Vr
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 08:29:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49850)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <olaf@aepfle.de>) id 1iw4Pc-0006Qj-KC
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:26:45 -0500
+ (envelope-from <me@xcancerberox.com.ar>) id 1iw4QV-0007Ci-Ao
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:27:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <olaf@aepfle.de>) id 1iw4Pa-0006wR-GN
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:26:44 -0500
-Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::8]:11074)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1iw4PZ-0006sS-QS
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:26:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1580131598;
- s=strato-dkim-0002; d=aepfle.de;
- h=References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:
- X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
- bh=QP4etj++K9qY8hELfrmPLMMuHBtJ3RkRMHnRBP/E6cY=;
- b=IZvkZsJn8IDEOBSCg0ip/YEirfeISCiGojaDhahKnSJGYfioYAwHrQMOS4DRZQh+//
- QE+IsqNmtDwt0GgphYSd2JlcOsKwAVGTFOc8FDLDdvPY4+G9+zdWVM/aEUDtuHPIAk3n
- 0zoxGjDoWuR6lEQpgqdGS1b4zxHpD6v3M0syhyAoEDJjWklho0W0GtEJ4W7FWt6LNKc0
- PgkFBY+GmtLR/bMQbzb81DSFY+n6Ee2OXFVeYmDwkN5+ha6/LD73bfcgw6SRWqzAvNpH
- lTp7WLX9IAZGUMY/EnnAZoOiLnEFek0aG3N19VjVcWTLoz7Ybcrbwup3paFaLIcpgM+x
- jgWw==
-X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QED/SSGq+wjGiUC4kV1cX92EW4mFvNjTRB"
-X-RZG-CLASS-ID: mo00
-Received: from sender by smtp.strato.de (RZmta 46.1.7 AUTH)
- with ESMTPSA id j07b1dw0RDQaCtY
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
- (Client did not present a certificate);
- Mon, 27 Jan 2020 14:26:36 +0100 (CET)
-Date: Mon, 27 Jan 2020 14:26:30 +0100
-From: Olaf Hering <olaf@aepfle.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] hw/i386: disable smbus migration for xenfv
-Message-ID: <20200127142630.48551ea3.olaf@aepfle.de>
-In-Reply-To: <d8d31bb7-01d1-8bb9-889e-c03c55818df3@redhat.com>
-References: <20200113174521.3336-1-olaf@aepfle.de>
- <20200116180321.24968-1-olaf@aepfle.de>
- <0335edd2-3d33-88f8-2ab4-4791f7289885@redhat.com>
- <20200117102244.22edd8a6.olaf@aepfle.de>
- <ea3a65c3-bd69-7815-6893-cb1cd8b9cfd6@redhat.com>
- <20200117140616.18cb8c45.olaf@aepfle.de>
- <CACCGGhCO_OqPq__t+V9RrFMYhXCJ5N4PPkq9CASJULV2rTkT-g@mail.gmail.com>
- <d8d31bb7-01d1-8bb9-889e-c03c55818df3@redhat.com>
-X-Mailer: Claws Mail 2019.12.31 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/bG4V3aRAJE1KqfP3CqcxoOR"; protocol="application/pgp-signature"
+ (envelope-from <me@xcancerberox.com.ar>) id 1iw4QS-000849-8z
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 08:27:39 -0500
+Received: from [51.158.76.159] (port=45984 helo=mail.xcancerberox.com.ar)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <me@xcancerberox.com.ar>)
+ id 1iw4QR-0007uj-Ly; Mon, 27 Jan 2020 08:27:36 -0500
+Subject: Re: [PATCH rc2 01/25] target/avr: Add outward facing interfaces and
+ core CPU logic
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xcancerberox.com.ar;
+ s=mail; t=1580131649;
+ bh=LNepkTTft75YKLHu+tJKpzW+WV3XJ7iffrR1RL5YM+4=;
+ h=Subject:To:Cc:References:From:In-Reply-To;
+ b=h9JXVGkHqBOuQYXyK/AyYqVR9If2nWZftkIJmS1NPRiy+V83JSQTcqkA6TIxCQYiQ
+ qalzfZxG744rscZpBKLTY2Kngq6d1YgnVTWy+j/ypvoDRY1jEMITv0GfwKExicJtg7
+ wkQn+KAHityWh2wAUh1Xmv6xG8A1U5DOb/XqRUa8xrvzui9hxdU0G18y4Jj4RMO4Cx
+ u2+v/cS5f6I5TI3WyR5F5XonxrgH9B9UuqGD2ciRXQjcSn379aeNHF3uLHbmRuCQJJ
+ 9SBsv+u4eYqBOgRS62rdMPS8WCUS5y7TRn5LvYB41+AqSpLPmu1XXXHU8JV55Lp6gZ
+ N5TSuzUm/jeEw==
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, mrolnik@gmail.com, richard.henderson@linaro.org
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-2-f4bug@amsat.org>
+From: Joaquin de Andres <me@xcancerberox.com.ar>
+Openpgp: preference=signencrypt
+Autocrypt: addr=me@xcancerberox.com.ar; keydata=
+ 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
+ OZRo+ULKJ1xXuVGe8hnP9Q==
+Message-ID: <8be57265-7077-45cc-5b5a-d3a4345b4eae@xcancerberox.com.ar>
+Date: Mon, 27 Jan 2020 14:27:28 +0100
+Mime-Version: 1.0
+In-Reply-To: <20200124005131.16276-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 2a01:238:20a:202:5301::8
+X-Received-From: 51.158.76.159
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,55 +117,985 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Paul Durrant <pdurrant@gmail.com>, Anthony Perard <anthony.perard@citrix.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
+ S.E.Harris@kent.ac.uk, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, thuth@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ dovgaluk@ispras.ru, imammedo@redhat.com,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/bG4V3aRAJE1KqfP3CqcxoOR
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 1/24/20 1:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> From: Michael Rolnik <mrolnik@gmail.com>
+>=20
+> This includes:
+> - CPU data structures
+> - object model classes and functions
+> - migration functions
+> - GDB hooks
+>=20
+> Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+> Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Message-Id: <20200118191416.19934-2-mrolnik@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> ...
+> diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+> new file mode 100644
+> index 0000000000..c74c5106fe
+> --- /dev/null
+> +++ b/target/avr/cpu.c
+> @@ -0,0 +1,826 @@
+> ...
+> +/*
+> + * Setting features of AVR core type avr1
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * at90s1200, attiny11, attiny12, attiny15, attiny28
+> + */
+> +static void avr_avr1_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +> +    avr_set_feature(env, AVR_FEATURE_LPM);
 
-Am Mon, 27 Jan 2020 10:35:59 +0100
-schrieb Paolo Bonzini <pbonzini@redhat.com>:
+Hi! According to the datasheets the at90s1200 is an special case and the
+LPM instruction is not present.
 
-> That's years away, so ideally libxl would have migrated away from xenfv
-> before that.  For now, sticking to a fixed version as in Olaf's patch is
-> a good stopgap measure.
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
 
-Is there a way to inspect a running qemu process to see what version it is?=
- I assume one thing is to poke at /proc/$PID/cmdline and make some guesses.=
- Would a running qemu report what pc-i440fx it supports? With such info an =
-enlightened libxl might be able construct a compatible commandline for the =
-receiving host.
+Ok. Checked with at90s1200 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr2
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * at90s2313, at90s2323, at90s2333, at90s2343, attiny22, attiny26, at9=
+0s4414,
+> + * at90s4433, at90s4434, at90s8515, at90c8534, at90s8535
+> + */
+> +static void avr_avr2_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with at90s2313 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with at90s2313 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with at90s2313 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with at90s2313 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with at90s2313 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr25
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * ata5272, ata6616c, attiny13, attiny13a, attiny2313, attiny2313a, at=
+tiny24,
+> + * attiny24a, attiny4313, attiny44, attiny44a, attiny441, attiny84, at=
+tiny84a,
+> + * attiny25, attiny45, attiny85, attiny261, attiny261a, attiny461, att=
+iny461a,
+> + * attiny861, attiny861a, attiny43u, attiny87, attiny48, attiny88, att=
+iny828,
+> + * attiny841, at86rf401
+> + */
+> +static void avr_avr25_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with attiny13 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with attiny13 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with attiny13 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with attiny13 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with attiny13 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);> +    avr_set_feature(env,=
+ AVR_FEATURE_MOVW);
+
+Ok. Checked with attiny13 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr3
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * at43usb355, at76c711
+> + */
+> +static void avr_avr3_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with at43usb355 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);> +    avr_set_featur=
+e(env, AVR_FEATURE_ADIW_SBIW);
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with at43usb355 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with at43usb355 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+> +}
+
+I couldn't find the full instruction set for this microcontrollers, but
+according with this [1] (not a certainty at all) wikipedia page, all the
+instructions in the features are part of the instruction set (BREAK,
+ICALL, IJMP, JMP, CALL, ADIW, SBIW).
+
+> +
+> +/*
+> + * Setting features of AVR core type avr31
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atmega103, at43usb320
+> + */
+> +static void avr_avr31_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atmega103 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atmega103 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atmega103 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atmega103 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPZ);
+
+Ok. Checked with atmega103 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ELPM);
+
+Ok. Checked with atmega103 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atmega103 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr35
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * ata5505, ata6617c, ata664251, at90usb82, at90usb162, atmega8u2, atm=
+ega16u2,
+> + * atmega32u2, attiny167, attiny1634
+> + */
+> +static void avr_avr35_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atmega8u2/16u2/32u2 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr4
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * ata6285, ata6286, ata6289, ata6612c, atmega8, atmega8a, atmega48, a=
+tmega48a,
+> + * atmega48p, atmega48pa, atmega48pb, atmega88, atmega88a, atmega88p,
+> + * atmega88pa, atmega88pb, atmega8515, atmega8535, atmega8hva, at90pwm=
+1,
+> + * at90pwm2, at90pwm2b, at90pwm3, at90pwm3b, at90pwm81
+> + */
+> +static void avr_avr4_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atmega8 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr5
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * ata5702m322, ata5782, ata5790, ata5790n, ata5791, ata5795, ata5831,=
+ ata6613c,
+> + * ata6614q, ata8210, ata8510, atmega16, atmega16a, atmega161, atmega1=
+62,
+> + * atmega163, atmega164a, atmega164p, atmega164pa, atmega165, atmega16=
+5a,
+> + * atmega165p, atmega165pa, atmega168, atmega168a, atmega168p, atmega1=
+68pa,
+> + * atmega168pb, atmega169, atmega169a, atmega169p, atmega169pa, atmega=
+16hvb,
+> + * atmega16hvbrevb, atmega16m1, atmega16u4, atmega32a, atmega32, atmeg=
+a323,
+> + * atmega324a, atmega324p, atmega324pa, atmega325, atmega325a, atmega3=
+25p,
+> + * atmega325pa, atmega3250, atmega3250a, atmega3250p, atmega3250pa, at=
+mega328,
+> + * atmega328p, atmega328pb, atmega329, atmega329a, atmega329p, atmega3=
+29pa,
+> + * atmega3290, atmega3290a, atmega3290p, atmega3290pa, atmega32c1, atm=
+ega32m1,
+> + * atmega32u4, atmega32u6, atmega406, atmega64, atmega64a, atmega640, =
+atmega644,
+> + * atmega644a, atmega644p, atmega644pa, atmega645, atmega645a, atmega6=
+45p,
+> + * atmega6450, atmega6450a, atmega6450p, atmega649, atmega649a, atmega=
+649p,
+> + * atmega6490, atmega16hva, atmega16hva2, atmega32hvb, atmega6490a, at=
+mega6490p,
+> + * atmega64c1, atmega64m1, atmega64hve, atmega64hve2, atmega64rfr2,
+> + * atmega644rfr2, atmega32hvbrevb, at90can32, at90can64, at90pwm161, a=
+t90pwm216,
+> + * at90pwm316, at90scr100, at90usb646, at90usb647, at94k, m3000
+> + */
+> +static void avr_avr5_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atmega640 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atmega8 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);> +    avr_set_feature=
+(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atmega8 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atmega8 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr51
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atmega128, atmega128a, atmega1280, atmega1281, atmega1284, atmega12=
+84p,
+> + * atmega128rfa1, atmega128rfr2, atmega1284rfr2, at90can128, at90usb12=
+86,
+> + * at90usb1287
+> + */
+> +static void avr_avr51_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atmega128 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPZ);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ELPMX);
+> +    avr_set_feature(env, AVR_FEATURE_ELPM);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atmega128 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atmega128 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avr6
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atmega2560, atmega2561, atmega256rfr2, atmega2564rfr2
+> + */
+> +static void avr_avr6_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPZ);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ELPMX);
+> +    avr_set_feature(env, AVR_FEATURE_ELPM);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atmega2560 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type avrtiny
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * attiny4, attiny5, attiny9, attiny10, attiny20, attiny40
+> + */
+> +static void avr_avrtiny_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+According with the attiny4/5/9/10 datasheet there is no LPM instruction.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with attiny4/5/9/10 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with attiny4/5/9/10 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with attiny4/5/9/10 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_1_BYTE_SP);
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type xmega2
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atxmega8e5, atxmega16a4, atxmega16d4, atxmega16e5, atxmega32a4, atx=
+mega32c3,
+> + * atxmega32d3, atxmega32d4, atxmega16a4u, atxmega16c4, atxmega32a4u,
+> + * atxmega32c4, atxmega32e5
+> + */
+> +static void avr_xmega2_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atxmega8e5/16e5/32e5 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atxmega8e5/16e5/32e5 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atxmega8e5/16e5/32e5 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atxmega8e5/16e5/32e5 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atxmega8e5/16e5/32e5 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atxmega8e5/16e5/32e5 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_RMW);
+
+Ok. Checked with atxmega8e5/16e5/32e5 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type xmega3
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * attiny212, attiny214, attiny412, attiny414, attiny416, attiny417, a=
+ttiny814,
+> + * attiny816, attiny817, attiny1614, attiny1616, attiny1617, attiny321=
+4,
+> + * attiny3216, attiny3217, atmega808, atmega809, atmega1608, atmega160=
+9,
+> + * atmega3208, atmega3209, atmega4808, atmega4809
+> + */
+> +static void avr_xmega3_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with attiny212 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with attiny212 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_RMW);
+
+Ok. Checked with attiny212 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type xmega4
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atxmega64a3, atxmega64d3, atxmega64a3u, atxmega64a4u, atxmega64b1,
+> + * atxmega64b3, atxmega64c3, atxmega64d4
+> + */
+> +static void avr_xmega4_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_ELPMX);
+> +    avr_set_feature(env, AVR_FEATURE_ELPM);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_RMW);
+
+Ok. Checked with atxmega64a3 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type xmega5
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atxmega64a1, atxmega64a1u
+> + */
+> +static void avr_xmega5_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPD);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPX);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPY);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPZ);
+> +    avr_set_feature(env, AVR_FEATURE_ELPMX);
+> +    avr_set_feature(env, AVR_FEATURE_ELPM);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_RMW);
+
+Ok. Checked with atxmega64a1 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type xmega6
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atxmega128a3, atxmega128d3, atxmega192a3, atxmega192d3, atxmega256a=
+3,
+> + * atxmega256a3b, atxmega256a3bu, atxmega256d3, atxmega128a3u, atxmega=
+128b1,
+> + * atxmega128b3, atxmega128c3, atxmega128d4, atxmega192a3u, atxmega192=
+c3,
+> + * atxmega256a3u, atxmega256c3, atxmega384c3, atxmega384d3
+> + */
+> +static void avr_xmega6_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPZ);
+> +    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ELPMX);
+> +    avr_set_feature(env, AVR_FEATURE_ELPM);
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_RMW);
+
+Ok. Checked with atxmega128a3 datasheet.
+
+> +}
+> +
+> +/*
+> + * Setting features of AVR core type xmega7
+> + * --------------------------------------
+> + *
+> + * This type of AVR core is present in the following AVR MCUs:
+> + *
+> + * atxmega128a1, atxmega128a1u, atxmega128a4u
+> + */
+> +static void avr_xmega7_initfn(Object *obj)
+> +{
+> +    AVRCPU *cpu =3D AVR_CPU(obj);
+> +    CPUAVRState *env =3D &cpu->env;
+> +
+> +    avr_set_feature(env, AVR_FEATURE_LPM);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_SRAM);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_BREAK);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +
+> +    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
+> +    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPD);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPX);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPY);
+> +    avr_set_feature(env, AVR_FEATURE_RAMPZ);
+> +    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_ELPMX);
+> +    avr_set_feature(env, AVR_FEATURE_ELPM);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_LPMX);
+> +    avr_set_feature(env, AVR_FEATURE_MOVW);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_MUL);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +    avr_set_feature(env, AVR_FEATURE_RMW);
+
+Ok. Checked with atxmega128a1 datasheet.
+
+> +}
+> ...
 
 
-Olaf
+I hope this cross check is useful. The features that I didn't comment on
+is because I'm not sure.
 
---Sig_/bG4V3aRAJE1KqfP3CqcxoOR
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
+Really nice to have this in qemu :). Thanks!
 
------BEGIN PGP SIGNATURE-----
+--joa
 
-iQIzBAEBCAAdFiEE97o7Um30LT3B+5b/86SN7mm1DoAFAl4u5QYACgkQ86SN7mm1
-DoB49w/7BY4I6KaKyQRx2KaO0pHeVnG+K3uboqekOMkof2+NECBygjNSM3AxjBNf
-vRYEFvZhld7sQVR++tG8ZFJ4SBSBHkTP+vUo2gSgZSqBlb9OMQrDGHkW35PynRbk
-ezGfnoeGEiHYjU4mTxYFL0yT23UIdbJSAah2K8srt5jIOD8tDWHywuBXYGaO2Ahm
-ARb+6uq+ZPU1957uG5xlegpaHCPO+vsjfpK+kcKi87ctIdbL+xGcgF48HnUEvSlF
-ZMVuVfr55OzpP8E9e4wRAXjNIUEkDi9mVHQahg0PmUco0qBeAJBJBfpND9gemKrC
-hs+WexfpbdOUngauHNuJ6ZShbIW7yAZzJ0Qmqm92BgBwhFzxg9lDXL1qWTA2i5xN
-5ngn0yUv8oNp95wymWvlG5vk7e9n0o2DqBEk3ua74Vkl4GnNKHSdwD2ay9czbb7y
-by01LcjHPFDiDo0MtC6Ebv7v70Ma7V1A+ThInVIhiUs9x935vEx+Rl14XvceL+VG
-/WdDI4a0WgmHzQUmd3dY6W+dMrtAFtgXrp16nYNvG4fSaC9VH3FsvnXjJRFGuGAR
-Y8ECcGaLM1RX734XK6vR9GRJdb3mUOd1kBcMzDCwUiyU96bqINGop+w4QgbOGYfN
-0xkZDZ/gBVsZT4wvmttPTQd4e/FM/7SFcCakcsUYzt95hlUot8Q=
-=oRAj
------END PGP SIGNATURE-----
-
---Sig_/bG4V3aRAJE1KqfP3CqcxoOR--
+[1] https://en.wikipedia.org/wiki/Atmel_AVR_instruction_set
 
