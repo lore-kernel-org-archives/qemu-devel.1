@@ -2,88 +2,77 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BFBC33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D51C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:42:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D43522467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F29062467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:42:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QleiOTHn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D43522467E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TZpmxGlt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F29062467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwOJm-0003qZ-4H
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 05:42:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49267)
+	id 1iwOKC-0004Qr-7u
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 05:42:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iwOHy-0000QB-7V
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:40:11 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iwOEV-0000nY-3n
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:36:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iwOHw-0002mY-W2
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:40:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29548
+ (envelope-from <eric.auger@redhat.com>) id 1iwOET-0000jk-10
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:36:35 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45222
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iwOHw-0002mJ-Ra
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:40:08 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iwOES-0000jX-TI
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:36:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580208008;
+ s=mimecast20190719; t=1580207792;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UvEH43SRCWad+s2by8ERmczOsieaoKG/DjhsXrp0vns=;
- b=QleiOTHna8joeQAMoXweds4fwavTrAgklEPWKAuWgyyA59NiPNRzQfDLNyy44CfLWx0BaQ
- cPNWpSuFURkUBm2CBdwfEQs1YpdUph6hxJeUeMqBxHSrfytmB3uIsRnKWo2gDaNkzimarC
- 4xOqrIwNA9vs9E86ZdUwc5E1/CLa7zc=
+ bh=AMnFoycaRqVR3q3J7wrgsZqqrGsLu5esjXYok9mZrus=;
+ b=TZpmxGltZt4HxLtBuMjN5qrT3eOxMsIB56eLvj+xSJhe1Gkghays+uUFkC7I/7wjIeFCRu
+ 3pF50oQXRzuWqdd8CW79lHwl2VU8Uao+/ucsGNKlbFhHHBIDLoE4kReOKNywhULp3fmsNo
+ eaFhTQbgv8OMSso7QvpSTij76yBJI+8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-Jfx_wHs-NvSDRXipNXGxqQ-1; Tue, 28 Jan 2020 05:39:59 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-9-U2jGCtRmO8iAIYcIG8p_xg-1; Tue, 28 Jan 2020 05:36:30 -0500
+X-MC-Unique: U2jGCtRmO8iAIYcIG8p_xg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82BC618C43C2;
- Tue, 28 Jan 2020 10:39:58 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-106.ams2.redhat.com [10.36.117.106])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C2D960BE0;
- Tue, 28 Jan 2020 10:39:48 +0000 (UTC)
-Date: Tue, 28 Jan 2020 11:39:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: Making QEMU easier for management tools and applications
-Message-ID: <20200128103947.GB6431@linux.fritz.box>
-References: <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <871rrp474i.fsf@dusky.pond.sub.org>
- <20200124102743.GB824327@redhat.com>
- <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
- <87sgk3x2im.fsf@dusky.pond.sub.org>
- <20200127115606.GA5669@linux.fritz.box>
- <1c65b678-7bb4-a4cc-5fa6-03d6d27cf381@redhat.com>
- <CABgObfZNHP68i4xLEYhBw=cRFgXcKnUKnqEk_7LFseoeKizB=Q@mail.gmail.com>
- <20200128101622.GG1446339@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0EED107ACC5;
+ Tue, 28 Jan 2020 10:36:28 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD7B01001B30;
+ Tue, 28 Jan 2020 10:36:22 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+Subject: [kvm-unit-tests PATCH v3 10/14] arm/arm64: ITS: commands
+Date: Tue, 28 Jan 2020 11:34:55 +0100
+Message-Id: <20200128103459.19413-11-eric.auger@redhat.com>
+In-Reply-To: <20200128103459.19413-1-eric.auger@redhat.com>
+References: <20200128103459.19413-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200128101622.GG1446339@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Jfx_wHs-NvSDRXipNXGxqQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,86 +84,576 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
- John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
+ thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.01.2020 um 11:16 hat Daniel P. Berrang=E9 geschrieben:
-> On Mon, Jan 27, 2020 at 11:38:49PM +0100, Paolo Bonzini wrote:
-> > Il lun 27 gen 2020, 21:11 John Snow <jsnow@redhat.com> ha scritto:
-> >=20
-> > >
-> > > > ./qemu-core <<EOF
-> > > {
-> > >     "machine": "Q35",
-> > >     "memory": "2GiB",
-> > >     "accel": "kvm"
-> > > }
-> > > EOF
-> > >
-> >=20
-> > And now you have to keep all the syntactic sugar that is in vl.c. I don=
-'t
-> > think a redesign of -readconfig should accept anything less verbose tha=
-n
-> >=20
-> > - machine:
-> >     type: q35
-> >     ram:
-> >        type: memory-backend-hostmem
-> >        size: 2G
-> > - accel:
-> >   - type: kvm
-> >=20
-> > And this is not even taking into account disks.
-> >=20
-> > I like the idea of refactoring all the syntactic sugar into a pre-pass =
-on
-> > command line options. This is not an entirely new idea, see
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg35024.html.
-> >=20
-> > I am afraid that this thread is derailing a bit, with lots of pipe drea=
-ms
-> > and no actionable items. How do we get it back in track?
->=20
-> To me the one thing that is clear. No matter what approach we want to
-> take to QEMU configuration/interaction/CLI/etc, one critical bit of
-> work is a pre-requisite...
->=20
-> ...we must finish[1] the QAPI modelling of QEMU's features in some
-> short, finite timeframe. We can't let it drag on for another 5 years
-> or more. I'd say we need a timeframe that is 2 years max, preferrably
-> 1 year.
->=20
-> I don't think we can achieve this by leaving the task up to to the
-> QAPI maintainers alone. It is unreasonable to put such a burden to
-> on a small number of people to both implement & review it all. We
-> need to consider it a project wide priority item so that we can get
-> broader involvement across all maintainers, in closing the gaps.
->=20
-> I'm not sure if we have any clear list of where our known gaps exist ?
+Implement main ITS commands. The code is largely inherited from
+the ITS driver.
 
-I don't know about a full list, but I've been discussing command line
-QAPIfication a bit with Markus recently because we had the idea of using
-qemu-storage-daemon as a guinea pig for it.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-The big one seems to be QOM (and qdev). object-add and device-add are
-both not defined in terms of QAPI. One of them uses an "any" type (which
-results in QObjects with arbitrary content being passed), the other one
-"gen": false (which avoids generating anything from the schema).
+---
 
-I know that some more options exist that have unusual syntax and are
-hard to convert to QAPI while maintaining command line compatibility.
-Maybe that should be solved by just designing new options and
-deprecating the old ones.
+v2 -> v3:
+- do not use report() anymore
+- assert if cmd_write exceeds the queue capacity
 
-Kevin
+v1 -> v2:
+- removed its_print_cmd_state
+---
+ arm/Makefile.arm64       |   2 +-
+ lib/arm/asm/gic-v3-its.h |  38 +++-
+ lib/arm/gic-v3-its-cmd.c | 454 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 492 insertions(+), 2 deletions(-)
+ create mode 100644 lib/arm/gic-v3-its-cmd.c
+
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index 2571ffb..d12aea5 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -19,7 +19,7 @@ endef
+ cstart.o =3D $(TEST_DIR)/cstart64.o
+ cflatobjs +=3D lib/arm64/processor.o
+ cflatobjs +=3D lib/arm64/spinlock.o
+-cflatobjs +=3D lib/arm/gic-v3-its.o
++cflatobjs +=3D lib/arm/gic-v3-its.o lib/arm/gic-v3-its-cmd.o
+=20
+ OBJDIRS +=3D lib/arm64
+=20
+diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+index acd97a9..0e5c5b6 100644
+--- a/lib/arm/asm/gic-v3-its.h
++++ b/lib/arm/asm/gic-v3-its.h
+@@ -45,6 +45,8 @@ struct its_collection {
+ 	u16 col_id;
+ };
+=20
++struct its_cmd_block;
++
+ struct its_data {
+ 	void *base;
+ 	struct its_typer typer;
+@@ -107,6 +109,24 @@ extern struct its_data its_data;
+ #define GITS_BASER_TYPE_DEVICE		1
+ #define GITS_BASER_TYPE_COLLECTION	4
+=20
++/*
++ * ITS commands
++ */
++#define GITS_CMD_MAPD                   0x08
++#define GITS_CMD_MAPC                   0x09
++#define GITS_CMD_MAPTI                  0x0a
++/* older GIC documentation used MAPVI for this command */
++#define GITS_CMD_MAPVI                  GITS_CMD_MAPTI
++#define GITS_CMD_MAPI                   0x0b
++#define GITS_CMD_MOVI                   0x01
++#define GITS_CMD_DISCARD                0x0f
++#define GITS_CMD_INV                    0x0c
++#define GITS_CMD_MOVALL                 0x0e
++#define GITS_CMD_INVALL                 0x0d
++#define GITS_CMD_INT                    0x03
++#define GITS_CMD_CLEAR                  0x04
++#define GITS_CMD_SYNC                   0x05
++
+ struct its_cmd_block {
+ 	u64 raw_cmd[4];
+ };
+@@ -119,11 +139,27 @@ extern void its_enable_defaults(void);
+ extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
+ extern struct its_collection *its_create_collection(u32 col_id, u32 targ=
+et_pe);
+=20
++extern void its_send_mapd(struct its_device *dev, int valid);
++extern void its_send_mapc(struct its_collection *col, int valid);
++extern void its_send_mapti(struct its_device *dev, u32 irq_id,
++			   u32 event_id, struct its_collection *col);
++extern void its_send_int(struct its_device *dev, u32 event_id);
++extern void its_send_inv(struct its_device *dev, u32 event_id);
++extern void its_send_discard(struct its_device *dev, u32 event_id);
++extern void its_send_clear(struct its_device *dev, u32 event_id);
++extern void its_send_invall(struct its_collection *col);
++extern void its_send_movi(struct its_device *dev,
++			  struct its_collection *col, u32 id);
++extern void its_send_sync(struct its_collection *col);
++
++#define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
++#define ITS_FLAGS_WORKAROUND_CAVIUM_22375       (1ULL << 1)
++#define ITS_FLAGS_WORKAROUND_CAVIUM_23144       (1ULL << 2)
++
+ #else /* __arm__ */
+=20
+ static inline void its_init(void) {}
+=20
+ #endif
+-
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_V3_ITS_H_ */
+diff --git a/lib/arm/gic-v3-its-cmd.c b/lib/arm/gic-v3-its-cmd.c
+new file mode 100644
+index 0000000..fb4364c
+--- /dev/null
++++ b/lib/arm/gic-v3-its-cmd.c
+@@ -0,0 +1,454 @@
++/*
++ * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
++ *
++ * Most of the code is copy-pasted from:
++ * drivers/irqchip/irq-gic-v3-its.c
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#include <asm/io.h>
++#include <asm/gic.h>
++#include <asm/gic-v3-its.h>
++
++#define ITS_ITT_ALIGN           SZ_256
++
++static const char * const its_cmd_string[] =3D {
++	[GITS_CMD_MAPD]		=3D "MAPD",
++	[GITS_CMD_MAPC]		=3D "MAPC",
++	[GITS_CMD_MAPTI]	=3D "MAPTI",
++	[GITS_CMD_MAPI]		=3D "MAPI",
++	[GITS_CMD_MOVI]		=3D "MOVI",
++	[GITS_CMD_DISCARD]	=3D "DISCARD",
++	[GITS_CMD_INV]		=3D "INV",
++	[GITS_CMD_MOVALL]	=3D "MOVALL",
++	[GITS_CMD_INVALL]	=3D "INVALL",
++	[GITS_CMD_INT]		=3D "INT",
++	[GITS_CMD_CLEAR]	=3D "CLEAR",
++	[GITS_CMD_SYNC]		=3D "SYNC",
++};
++
++struct its_cmd_desc {
++	union {
++		struct {
++			struct its_device *dev;
++			u32 event_id;
++		} its_inv_cmd;
++
++		struct {
++			struct its_device *dev;
++			u32 event_id;
++		} its_int_cmd;
++
++		struct {
++			struct its_device *dev;
++			bool valid;
++		} its_mapd_cmd;
++
++		struct {
++			struct its_collection *col;
++			bool valid;
++		} its_mapc_cmd;
++
++		struct {
++			struct its_device *dev;
++			u32 phys_id;
++			u32 event_id;
++			u32 col_id;
++		} its_mapti_cmd;
++
++		struct {
++			struct its_device *dev;
++			struct its_collection *col;
++			u32 event_id;
++		} its_movi_cmd;
++
++		struct {
++			struct its_device *dev;
++			u32 event_id;
++		} its_discard_cmd;
++
++		struct {
++			struct its_device *dev;
++			u32 event_id;
++		} its_clear_cmd;
++
++		struct {
++			struct its_collection *col;
++		} its_invall_cmd;
++
++		struct {
++			struct its_collection *col;
++		} its_sync_cmd;
++	};
++};
++
++typedef void (*its_cmd_builder_t)(struct its_cmd_block *,
++				  struct its_cmd_desc *);
++
++/* ITS COMMANDS */
++
++static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
++{
++	cmd->raw_cmd[0] &=3D ~0xffUL;
++	cmd->raw_cmd[0] |=3D cmd_nr;
++}
++
++static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
++{
++	cmd->raw_cmd[0] &=3D BIT_ULL(32) - 1;
++	cmd->raw_cmd[0] |=3D ((u64)devid) << 32;
++}
++
++static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
++{
++	cmd->raw_cmd[1] &=3D ~0xffffffffUL;
++	cmd->raw_cmd[1] |=3D id;
++}
++
++static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
++{
++	cmd->raw_cmd[1] &=3D 0xffffffffUL;
++	cmd->raw_cmd[1] |=3D ((u64)phys_id) << 32;
++}
++
++static void its_encode_size(struct its_cmd_block *cmd, u8 size)
++{
++	cmd->raw_cmd[1] &=3D ~0x1fUL;
++	cmd->raw_cmd[1] |=3D size & 0x1f;
++}
++
++static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
++{
++	cmd->raw_cmd[2] &=3D ~0xffffffffffffUL;
++	cmd->raw_cmd[2] |=3D itt_addr & 0xffffffffff00UL;
++}
++
++static void its_encode_valid(struct its_cmd_block *cmd, int valid)
++{
++	cmd->raw_cmd[2] &=3D ~(1UL << 63);
++	cmd->raw_cmd[2] |=3D ((u64)!!valid) << 63;
++}
++
++static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr=
+)
++{
++	cmd->raw_cmd[2] &=3D ~(0xfffffffffUL << 16);
++	cmd->raw_cmd[2] |=3D (target_addr & (0xffffffffUL << 16));
++}
++
++static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
++{
++	cmd->raw_cmd[2] &=3D ~0xffffUL;
++	cmd->raw_cmd[2] |=3D col;
++}
++
++static inline void its_fixup_cmd(struct its_cmd_block *cmd)
++{
++	/* Let's fixup BE commands */
++	cmd->raw_cmd[0] =3D cpu_to_le64(cmd->raw_cmd[0]);
++	cmd->raw_cmd[1] =3D cpu_to_le64(cmd->raw_cmd[1]);
++	cmd->raw_cmd[2] =3D cpu_to_le64(cmd->raw_cmd[2]);
++	cmd->raw_cmd[3] =3D cpu_to_le64(cmd->raw_cmd[3]);
++}
++
++static u64 its_cmd_ptr_to_offset(struct its_cmd_block *ptr)
++{
++	return (ptr - its_data.cmd_base) * sizeof(*ptr);
++}
++
++static struct its_cmd_block *its_post_commands(void)
++{
++	u64 wr =3D its_cmd_ptr_to_offset(its_data.cmd_write);
++
++	writeq(wr, its_data.base + GITS_CWRITER);
++	return its_data.cmd_write;
++}
++
++
++static struct its_cmd_block *its_allocate_entry(void)
++{
++	struct its_cmd_block *cmd;
++
++	assert((u64)its_data.cmd_write < (u64)its_data.cmd_base + SZ_64K);
++	cmd =3D its_data.cmd_write++;
++	return cmd;
++}
++
++static void its_wait_for_range_completion(struct its_cmd_block *from,
++					  struct its_cmd_block *to)
++{
++	u64 rd_idx, from_idx, to_idx;
++	u32 count =3D 1000000;    /* 1s! */
++
++	from_idx =3D its_cmd_ptr_to_offset(from);
++	to_idx =3D its_cmd_ptr_to_offset(to);
++	while (1) {
++		rd_idx =3D readq(its_data.base + GITS_CREADR);
++		if (rd_idx >=3D to_idx || rd_idx < from_idx)
++			break;
++
++		count--;
++		if (!count) {
++			unsigned int cmd_id =3D from->raw_cmd[0] & 0xFF;
++
++			assert_msg(false, "%s timeout!",
++			       cmd_id <=3D 0xF ? its_cmd_string[cmd_id] :
++			       "Unexpected");
++			return;
++		}
++		cpu_relax();
++		udelay(1);
++	}
++}
++
++static void its_send_single_command(its_cmd_builder_t builder,
++				    struct its_cmd_desc *desc)
++{
++	struct its_cmd_block *cmd, *next_cmd;
++
++	cmd =3D its_allocate_entry();
++	builder(cmd, desc);
++	next_cmd =3D its_post_commands();
++
++	its_wait_for_range_completion(cmd, next_cmd);
++}
++
++
++static void its_build_mapd_cmd(struct its_cmd_block *cmd,
++			       struct its_cmd_desc *desc)
++{
++	unsigned long itt_addr;
++	u8 size =3D 12; /* 4096 eventids */
++
++	itt_addr =3D (unsigned long)desc->its_mapd_cmd.dev->itt;
++	itt_addr =3D ALIGN(itt_addr, ITS_ITT_ALIGN);
++
++	its_encode_cmd(cmd, GITS_CMD_MAPD);
++	its_encode_devid(cmd, desc->its_mapd_cmd.dev->device_id);
++	its_encode_size(cmd, size - 1);
++	its_encode_itt(cmd, itt_addr);
++	its_encode_valid(cmd, desc->its_mapd_cmd.valid);
++
++	its_fixup_cmd(cmd);
++	printf("ITS: MAPD devid=3D%d size =3D 0x%x itt=3D0x%lx valid=3D%d\n",
++		desc->its_mapd_cmd.dev->device_id,
++		size, itt_addr, desc->its_mapd_cmd.valid);
++
++}
++
++static void its_build_mapc_cmd(struct its_cmd_block *cmd,
++			       struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_MAPC);
++	its_encode_collection(cmd, desc->its_mapc_cmd.col->col_id);
++	its_encode_target(cmd, desc->its_mapc_cmd.col->target_address);
++	its_encode_valid(cmd, desc->its_mapc_cmd.valid);
++
++	its_fixup_cmd(cmd);
++	report_info("MAPC col_id=3D%d target_addr =3D 0x%lx valid=3D%d",
++		    desc->its_mapc_cmd.col->col_id,
++		    desc->its_mapc_cmd.col->target_address,
++		    desc->its_mapc_cmd.valid);
++}
++
++static void its_build_mapti_cmd(struct its_cmd_block *cmd,
++				struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_MAPTI);
++	its_encode_devid(cmd, desc->its_mapti_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_mapti_cmd.event_id);
++	its_encode_phys_id(cmd, desc->its_mapti_cmd.phys_id);
++	its_encode_collection(cmd, desc->its_mapti_cmd.col_id);
++
++	its_fixup_cmd(cmd);
++	report_info("MAPTI dev_id=3D%d event_id=3D%d -> phys_id=3D%d, col_id=3D=
+%d",
++		    desc->its_mapti_cmd.dev->device_id,
++		    desc->its_mapti_cmd.event_id,
++		    desc->its_mapti_cmd.phys_id,
++		    desc->its_mapti_cmd.col_id);
++}
++
++static void its_build_invall_cmd(struct its_cmd_block *cmd,
++			      struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_INVALL);
++	its_encode_collection(cmd, desc->its_invall_cmd.col->col_id);
++
++	its_fixup_cmd(cmd);
++	report_info("INVALL col_id=3D%d", desc->its_invall_cmd.col->col_id);
++}
++
++static void its_build_clear_cmd(struct its_cmd_block *cmd,
++				struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_CLEAR);
++	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
++
++	its_fixup_cmd(cmd);
++	report_info("CLEAR col_id=3D%d", desc->its_invall_cmd.col->col_id);
++}
++
++static void its_build_discard_cmd(struct its_cmd_block *cmd,
++				  struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_DISCARD);
++	its_encode_devid(cmd, desc->its_discard_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_discard_cmd.event_id);
++
++	its_fixup_cmd(cmd);
++	report_info("DISCARD col_id=3D%d", desc->its_invall_cmd.col->col_id);
++}
++
++static void its_build_inv_cmd(struct its_cmd_block *cmd,
++			      struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_INV);
++	its_encode_devid(cmd, desc->its_inv_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_inv_cmd.event_id);
++
++	its_fixup_cmd(cmd);
++	report_info("INV dev_id=3D%d event_id=3D%d",
++		    desc->its_inv_cmd.dev->device_id,
++		    desc->its_inv_cmd.event_id);
++}
++
++static void its_build_int_cmd(struct its_cmd_block *cmd,
++			      struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_INT);
++	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
++
++	its_fixup_cmd(cmd);
++	report_info("INT dev_id=3D%d event_id=3D%d",
++		    desc->its_int_cmd.dev->device_id,
++		    desc->its_int_cmd.event_id);
++}
++
++static void its_build_sync_cmd(struct its_cmd_block *cmd,
++			       struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_SYNC);
++	its_encode_target(cmd, desc->its_sync_cmd.col->target_address);
++	its_fixup_cmd(cmd);
++	report_info("SYNC target_addr =3D 0x%lx",
++		    desc->its_sync_cmd.col->target_address);
++}
++
++static void its_build_movi_cmd(struct its_cmd_block *cmd,
++			       struct its_cmd_desc *desc)
++{
++	its_encode_cmd(cmd, GITS_CMD_MOVI);
++	its_encode_devid(cmd, desc->its_movi_cmd.dev->device_id);
++	its_encode_event_id(cmd, desc->its_movi_cmd.event_id);
++	its_encode_collection(cmd, desc->its_movi_cmd.col->col_id);
++
++	its_fixup_cmd(cmd);
++	report_info("MOVI dev_id=3D%d event_id =3D %d col_id=3D%d",
++		    desc->its_movi_cmd.dev->device_id,
++		    desc->its_movi_cmd.event_id,
++		    desc->its_movi_cmd.col->col_id);
++}
++
++void its_send_mapd(struct its_device *dev, int valid)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_mapd_cmd.dev =3D dev;
++	desc.its_mapd_cmd.valid =3D !!valid;
++
++	its_send_single_command(its_build_mapd_cmd, &desc);
++}
++
++void its_send_mapc(struct its_collection *col, int valid)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_mapc_cmd.col =3D col;
++	desc.its_mapc_cmd.valid =3D !!valid;
++
++	its_send_single_command(its_build_mapc_cmd, &desc);
++}
++
++void its_send_mapti(struct its_device *dev, u32 irq_id,
++		    u32 event_id, struct its_collection *col)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_mapti_cmd.dev =3D dev;
++	desc.its_mapti_cmd.phys_id =3D irq_id;
++	desc.its_mapti_cmd.event_id =3D event_id;
++	desc.its_mapti_cmd.col_id =3D col->col_id;
++
++	its_send_single_command(its_build_mapti_cmd, &desc);
++}
++
++void its_send_int(struct its_device *dev, u32 event_id)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_int_cmd.dev =3D dev;
++	desc.its_int_cmd.event_id =3D event_id;
++
++	its_send_single_command(its_build_int_cmd, &desc);
++}
++
++void its_send_movi(struct its_device *dev,
++		   struct its_collection *col, u32 id)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_movi_cmd.dev =3D dev;
++	desc.its_movi_cmd.col =3D col;
++	desc.its_movi_cmd.event_id =3D id;
++
++	its_send_single_command(its_build_movi_cmd, &desc);
++}
++
++void its_send_invall(struct its_collection *col)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_invall_cmd.col =3D col;
++
++	its_send_single_command(its_build_invall_cmd, &desc);
++}
++
++void its_send_inv(struct its_device *dev, u32 event_id)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_inv_cmd.dev =3D dev;
++	desc.its_inv_cmd.event_id =3D event_id;
++
++	its_send_single_command(its_build_inv_cmd, &desc);
++}
++
++void its_send_discard(struct its_device *dev, u32 event_id)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_discard_cmd.dev =3D dev;
++	desc.its_discard_cmd.event_id =3D event_id;
++
++	its_send_single_command(its_build_discard_cmd, &desc);
++}
++
++void its_send_clear(struct its_device *dev, u32 event_id)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_clear_cmd.dev =3D dev;
++	desc.its_clear_cmd.event_id =3D event_id;
++
++	its_send_single_command(its_build_clear_cmd, &desc);
++}
++
++void its_send_sync(struct its_collection *col)
++{
++	struct its_cmd_desc desc;
++
++	desc.its_sync_cmd.col =3D col;
++
++	its_send_single_command(its_build_sync_cmd, &desc);
++}
++
+--=20
+2.20.1
 
 
