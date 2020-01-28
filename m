@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02345C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DABC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82DA52467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27D152467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqVPe/jE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82DA52467E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pGRSQC10"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27D152467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwW0g-0008LU-DI
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:54:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36045)
+	id 1iwW0j-0008TG-A4
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:54:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7S-00033J-TD
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:47 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5u-0000oT-Hr
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7R-0007LG-QK
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:46 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53132)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5r-0003Vv-Ke
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:08 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:37767)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV7R-0007EU-JT
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:45 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p9so3518340wmc.2
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:45 -0800 (PST)
+ id 1iwV5r-0003Sl-Cr
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:07 -0500
+Received: by mail-wm1-x334.google.com with SMTP id f129so3580375wmf.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=q2jpfAnc2KRQsp1K1I4kxr6g0Wc0w9Jp+uUoDxrj7nQ=;
- b=UqVPe/jEsahUQDM5q2dAvXAyelowN1aMVKwSHPoqJWfdGVDd7eWwkZJMEMdxMBZL5F
- oRwepO/dic0yN1Cz2QG8QV/5EIwKK5LlnDA20y9jid29vqIakqow5tJ3fpxIgdT8R9Xi
- c74gEA/ab9xmjEgs5+KezaseAwBwR5DdouLl6UIX0fXvdZAEKBNxe7QyJ9F0M8cVsWv1
- WlX9jqyTkIA8A1o1/X2g6TmdQWBYlcl5Io/dGkWzKeZgQpQUzP8NjPJJqwjOW8u283FQ
- 0/H/TizDFnSLql8LjM/kd4BwV7sC7AHL2U2Vn7swbsau3/LlHR5SuIuBfy1rgpnghDnn
- eCcg==
+ bh=4ob/sfkbts6dDG4RDCRaCyMU8UFlczZj8w1orN4lxo8=;
+ b=pGRSQC10B+Hz/IHH5F4klp8CZQinLHfE8Va0C0J/sE6kJJBnaMBVOtcdbbXyh/Ednf
+ Nn0hiEvx6ajqChwNtPdLVVkyoei8emHxi/B0ZNFDY/dg6DIBr83wYAdW0ayXmeucSvx+
+ IaIrCJrrHgJSd9d/gBrY0FW2MmgbEZg/uFDbzqQQaAEhVFo7XbaJddxKLKP+zUv/uSY/
+ 2vcGIieSw1q884QubFPs6Iky04+NA4PqN8N/iqzFknHnZ0ITG8wz4mjHc0X+pCQt/F8q
+ CKpvwQjNUr6UQuIFdecngvT1/k9Ai3ZGcE0Hg2XFTp+DnQw8oMlFqSxKRyDOI6jze1ej
+ A3dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=q2jpfAnc2KRQsp1K1I4kxr6g0Wc0w9Jp+uUoDxrj7nQ=;
- b=d6xv6eawMKSddgD3sCvv2aJa2FlUgDK3JQ53GLPh7uo3HAq+yU7/0PW6LadieMBHW6
- VKbT4sQnGTNM404cdCJPSbohEbLx5DR33GnSGL+HFC+L2ntoBaLFKhBZ9SY5oya1hot1
- FUwEAOXU7MbgEsa6fgkENdQnyWrgzvjN/D8yBLcPTQTTWCVNjTCOdF9n3amufluqRlrA
- zOxjwfIrAlM+HnmkKz8JynVDOQgcfBBEl3jVecpzz2c1rLNFX27evz7MrjAydxTyji5x
- 3Kc0ZcY+BzG3h2jJVS3dZClt3K0mmzse5GxtLsSxjX33ZvG5m8stGyBSWVl7UcpOqtj+
- 1SFQ==
-X-Gm-Message-State: APjAAAXHS5+irFnNgkhXtK+XND4TPJDk9sgV9HYilJoOx9+s/gqid/8F
- FCS+vig0cA6CZRH24fyrQgyQFLyP
-X-Google-Smtp-Source: APXvYqxQfYFr6gY6EX9LWYkYBQKKjGI5tE/fjdzKyXIGavuYzf7X5Ul2xLQ56vmMDHLyfhQZptq1gA==
-X-Received: by 2002:a1c:bc08:: with SMTP id m8mr6649548wmf.189.1580234263230; 
- Tue, 28 Jan 2020 09:57:43 -0800 (PST)
+ bh=4ob/sfkbts6dDG4RDCRaCyMU8UFlczZj8w1orN4lxo8=;
+ b=Il+2QJTiyYt6fCQVDXjIzV/Uf4DUiX9kq7w/8/RVrs4DYerC/AwroJnO7QCnjcTquZ
+ mxBzRwOqptI72wy0vA9RtAE/yqXr+04hEDkks0moAxMWLNX35Zr5yx9NmYf0LmlNA0+3
+ W3KKW4p9wYaQZ7uIf8E2uZyiBJT1d4La6KhuxDqYJVwOjvOv+L7PMNp0iSDxVVnN4tvl
+ Aklm4mSAcGaeKrUvsGTc6iTwweGBQGkCjgzX6AgZ27cPweuKrsYW+1RscCIo2FykOJse
+ pcbSF18iaQPs275JeVlaDIzMaM9iO7e0DfDWOvsCPhrE0gQ/+G0s4isG8mLV33Bz3Gdo
+ HrEg==
+X-Gm-Message-State: APjAAAW/TFeIVjtM3ZhIiKkrz+vrhtWUc4dJAYW3iUETVpF2tefBdY9/
+ ODTucg3yKUtctxt6/KnyDKnknWwW
+X-Google-Smtp-Source: APXvYqzo91ivbW4cg3L8RaG6ddfWM3PyT4/j3QtQ262JsjE6yjHKSg779/B06AjMF3c7gvJM6VqRPw==
+X-Received: by 2002:a1c:7203:: with SMTP id n3mr6268316wmc.119.1580234166199; 
+ Tue, 28 Jan 2020 09:56:06 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.41
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:57:42 -0800 (PST)
+ Tue, 28 Jan 2020 09:56:05 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 100/142] meson: convert hw/hyperv
-Date: Tue, 28 Jan 2020 18:53:00 +0100
-Message-Id: <20200128175342.9066-101-pbonzini@redhat.com>
+Subject: [PATCH 058/142] meson: convert block/
+Date: Tue, 28 Jan 2020 18:52:18 +0100
+Message-Id: <20200128175342.9066-59-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,52 +103,23 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs        | 1 -
- hw/hyperv/Makefile.objs | 2 --
- hw/hyperv/meson.build   | 2 ++
- hw/meson.build          | 1 +
- 4 files changed, 3 insertions(+), 3 deletions(-)
- delete mode 100644 hw/hyperv/Makefile.objs
- create mode 100644 hw/hyperv/meson.build
+ Makefile.objs | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 95c065d18f..c9999a846b 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -9,7 +9,6 @@ devices-dirs-y += cpu/
- devices-dirs-y += display/
- devices-dirs-y += dma/
- devices-dirs-y += gpio/
--devices-dirs-$(CONFIG_HYPERV) += hyperv/
- endif
+diff --git a/Makefile.objs b/Makefile.objs
+index 8a158b93bb..56d5e855da 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -35,8 +35,7 @@ qom-obj-y = qom/libqom.fa
+ # single QEMU executable should support all CPUs and machines.
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/hyperv/Makefile.objs b/hw/hyperv/Makefile.objs
-deleted file mode 100644
-index edaca2f763..0000000000
---- a/hw/hyperv/Makefile.objs
-+++ /dev/null
-@@ -1,2 +0,0 @@
--obj-y += hyperv.o
--obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
-diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
-new file mode 100644
-index 0000000000..98663ece7a
---- /dev/null
-+++ b/hw/hyperv/meson.build
-@@ -0,0 +1,2 @@
-+specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
-+specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
-diff --git a/hw/meson.build b/hw/meson.build
-index 983edc1d47..f9e5adfb48 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('hyperv')
- subdir('i2c')
- subdir('ide')
- subdir('input')
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = block/
+-common-obj-y += dump/
++common-obj-y = dump/
+ common-obj-y += monitor/
+ common-obj-y += net/
+ common-obj-$(CONFIG_LINUX) += fsdev/
 -- 
 2.21.0
 
