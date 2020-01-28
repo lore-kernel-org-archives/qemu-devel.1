@@ -2,79 +2,79 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ACAAC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3753FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:12:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67DB2214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 071FA214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:12:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+dRQ59x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67DB2214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqL/hsf1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 071FA214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVL1-0004Wv-JH
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:11:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57993)
+	id 1iwVMA-00062p-6x
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:12:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4B-0006Q5-KK
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:26 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4M-0006fC-Ha
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV49-00088M-4p
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:22 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:37751)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4L-0008SW-C4
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:34 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36693)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV48-00085X-Se
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:21 -0500
-Received: by mail-wm1-x332.google.com with SMTP id f129so3574816wmf.2
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:54:19 -0800 (PST)
+ id 1iwV4L-0008Rg-2O
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:33 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p17so3574733wma.1
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:54:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HVk4rk8Hs1aHWLt8//y3A+CwPwqc2G6pl0VklRB6s3U=;
- b=U+dRQ59xaEnQ9FxMU+Qi/hn+nPFFoTZGRaTotxR+jjuHfiNcLFX7GB8q7zi8Jm9q/6
- fkaeBckJkKLX19LF8AgMi9h+nPRoZgiIlG7nb5dFmxcMs4BuArawS3VSSO5n+uGrLYU7
- cYMdDYT0BPJ+THETPZ7CFlX1iSgHgqn2LfJlAZU5ND59x/L3dpP9SueSl07Qsy4vVKCj
- IbzaJo6AeqKulb1QG1TzhGWnudlVZTp6c1pEq9HzNLLdiB3Dh5JV/4ENIisfdeB6kyR/
- 0tV83cottLg8ffNY0XW8a8WOjYhvMbMf3Lb06PbwhNaXL+lIfxSmfm2/29D5LswrrABh
- 5XmQ==
+ bh=O0aGg9Yz9DeZQOFtWCPtMk5o81vJvnxbOPUerWKfM88=;
+ b=SqL/hsf1JWiNOkjwaK/yGM3VZe6KEHij+LDZ93sjQlGumbICeNz1P0ti+FILqRgC4d
+ U9u3rVyMkq6NMNUuFRF1pElEt0ulbcF5AP7i3ml1B/kMHLGwF3kU1M/7IBZY9NTKufrN
+ wjGOTqeHlpVAdxPRAXMgeTS4cNxvlXnS3WCSry/dS9fctZHM3lnsaHEoQFCvI/kvd75J
+ 8dTNggYlH/fRXLTSYfmsM8XhUn0RzDSrahzsRwSfnF8O5EL31692Wh/ZCufur5dwhr25
+ vu2sEVXf4k0cfB5M/lclNbISY75L1Xrik6PRCBEtiVWSSdkMkLvziZTedRNAy+JFkxRE
+ jASA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=HVk4rk8Hs1aHWLt8//y3A+CwPwqc2G6pl0VklRB6s3U=;
- b=d1uBXb9uQQO+lH0PGTuXaxZFDkqp94xHNKr54KWD9wJbUQuXBuFtlqriycC4JTfdNy
- ZW22jRLKmrpSLEZC6M5puPozsH93Mrstag3PzyX1huiH9WY7qpm3hnRDnyUOh9eod7Gy
- iHLufbHJd6yNDeT1UzFhlg/S4hKPgUMcTFLykhWR03VXA+YBojNf/25m9GWxdpf5vsmU
- QW3u7N8q+xt/CvVX/+5uB7feczHVD6uWNs4z+uSaRWpStBXzEp2nm6W/jHdBdx2FOipf
- OSQw8+MQ6nr5rbfIcmJvkQ2MmJtFoGLevyEo0pisOahFM1PboBm0WMBOq+DnfJbEBfMz
- psaA==
-X-Gm-Message-State: APjAAAWg3jCbOFWSPQzPV5ytzulXpulS4jru5qI38H3CgGeRiZu7pbFv
- Jjm5KtheO4rw4KLfkcu7mAPcGotT
-X-Google-Smtp-Source: APXvYqztby9Bt1WnlIj9WjbqI3r55vtOQ7MEwpJCjTB3lWFUCh+xPqJk2OiP9UDHOtx0E+wcx7KHWg==
-X-Received: by 2002:a05:600c:230d:: with SMTP id
- 13mr6610655wmo.12.1580234058715; 
- Tue, 28 Jan 2020 09:54:18 -0800 (PST)
+ bh=O0aGg9Yz9DeZQOFtWCPtMk5o81vJvnxbOPUerWKfM88=;
+ b=WGSDGBBesdZ6WWNS+uA5G4FrSMB3UdG8zb6z1DemGr9Z7SG8f+OvW3BIScqgftm5VM
+ WSTCWb7SbixPVfWZrtnmTNCSNZFnH3mWtw75DRV6FmlvvgWHr8aYfyL9SuLSgqXvNHQs
+ eSUTVvsinjvRzvHznRx7vvJaGRKS1mswsgVDs/Iux4flp4DpUnssqndPzzVNikY8DuVY
+ 8WNSoiUO49vSO9ixXT4Y2Ng3iOrvKpGTCV8FASbb25UfOf/fMu3WbTZgfG3V9Qrgs6qi
+ kz5+bF9zsnWAsotEwBDYYKy6n5fKXfUgWIkarZT9lejr8GhFI1G8wokT6Zc2weKxR6sF
+ zjKA==
+X-Gm-Message-State: APjAAAXW6rsfvPlQWmJgAK0nBRIzrYjocfN86nqg6dz0Ja9AoG/rxLRK
+ uRr1f2N4WGznn+jtGodvQCKVhY2w
+X-Google-Smtp-Source: APXvYqxqLLlf2tT75tlyCZ1JsQYcX3sIwCRfqQuTCnWdPS8FHeCp0FBeDdGhNJazNMzzYMPwK24Dmw==
+X-Received: by 2002:a1c:1f56:: with SMTP id f83mr6223260wmf.93.1580234071772; 
+ Tue, 28 Jan 2020 09:54:31 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.54.17
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.54.29
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:54:18 -0800 (PST)
+ Tue, 28 Jan 2020 09:54:31 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 012/142] meson: add testsuite Makefile generator
-Date: Tue, 28 Jan 2020 18:51:32 +0100
-Message-Id: <20200128175342.9066-13-pbonzini@redhat.com>
+Subject: [PATCH 018/142] contrib/vhost-user-scsi: convert to Meson
+Date: Tue, 28 Jan 2020 18:51:38 +0100
+Message-Id: <20200128175342.9066-19-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,154 +98,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rules to execute tests are generated by a simple Python program
-that integrates into the existing "make check" mechanism.  This
-provides familiarity for developers, and also allows piecewise
-conversion of the testsuite Makefiles to meson.
+The libiscsi pkg-config information is extracted from config-host.mak and
+used to link vhost-user-blk.
 
-The generated rules are based on QEMU's existing test harness
-Makefile and TAP parser.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile               |   4 ++
- scripts/mtest2make.py  | 101 +++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include |   1 -
- 3 files changed, 105 insertions(+), 1 deletion(-)
- create mode 100644 scripts/mtest2make.py
+ Makefile                              | 3 ---
+ Makefile.objs                         | 3 ---
+ contrib/vhost-user-scsi/Makefile.objs | 1 -
+ contrib/vhost-user-scsi/meson.build   | 5 +++++
+ meson.build                           | 6 ++++++
+ 5 files changed, 11 insertions(+), 7 deletions(-)
+ delete mode 100644 contrib/vhost-user-scsi/Makefile.objs
+ create mode 100644 contrib/vhost-user-scsi/meson.build
 
 diff --git a/Makefile b/Makefile
-index 9aa0808649..fee6f739fd 100644
+index 8c88288d6d..2272d834cc 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -61,6 +61,10 @@ ninjatool: ninjatool.stamp
- ninjatool.stamp: $(SRC_PATH)/scripts/ninjatool.py
- 	$(MESON) setup --reconfigure . $(SRC_PATH) && touch $@
+@@ -290,7 +290,6 @@ dummy := $(call unnest-vars,, \
+                 ivshmem-client-obj-y \
+                 ivshmem-server-obj-y \
+                 rdmacm-mux-obj-y \
+-                vhost-user-scsi-obj-y \
+                 vhost-user-input-obj-y \
+                 vhost-user-gpu-obj-y \
+                 qga-vss-dll-obj-y \
+@@ -499,8 +498,6 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
+ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ endif
+-vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+-	$(call LINK, $^)
  
-+Makefile.mtest: build.ninja scripts/mtest2make.py
-+	$(MESON) introspect --tests | $(PYTHON) scripts/mtest2make.py > $@
-+-include Makefile.mtest
-+
- .git-submodule-status: git-submodule-update config-host.mak
- 
- # Check that we're not trying to do an out-of-tree build from
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
+ rdmacm-mux$(EXESUF): LIBS += "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+diff --git a/Makefile.objs b/Makefile.objs
+index 04c424bfa6..02cee554ad 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -108,9 +108,6 @@ qga-vss-dll-obj-y = qga/
+ elf2dmp-obj-y = contrib/elf2dmp/
+ ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
+ ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
+-vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
+-vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
+-vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
+ rdmacm-mux-obj-y = contrib/rdmacm-mux/
+ vhost-user-input-obj-y = contrib/vhost-user-input/
+ vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
+diff --git a/contrib/vhost-user-scsi/Makefile.objs b/contrib/vhost-user-scsi/Makefile.objs
+deleted file mode 100644
+index e83a38a85b..0000000000
+--- a/contrib/vhost-user-scsi/Makefile.objs
++++ /dev/null
+@@ -1 +0,0 @@
+-vhost-user-scsi-obj-y = vhost-user-scsi.o
+diff --git a/contrib/vhost-user-scsi/meson.build b/contrib/vhost-user-scsi/meson.build
 new file mode 100644
-index 0000000000..ac4010ff8f
+index 0000000000..0bdd5a51cd
 --- /dev/null
-+++ b/scripts/mtest2make.py
-@@ -0,0 +1,101 @@
-+#! /usr/bin/env python3
-+
-+# Create Makefile targets to run tests, from Meson's test introspection data.
-+#
-+# Author: Paolo Bonzini <pbonzini@redhat.com>
-+
-+from collections import defaultdict
-+import json
-+import os
-+import shlex
-+import sys
-+
-+class Suite(object):
-+    def __init__(self):
-+        self.tests = list()
-+        self.slow_tests = list()
-+        self.executables = set()
-+
-+print('''
-+SPEED = quick
-+
-+# $1 = test command, $2 = test name
-+.test-human-tap = $1 < /dev/null | ./scripts/tap-driver.pl --test-name="$2" $(if $(V),, --show-failures-only)
-+.test-human-exitcode = $1 < /dev/null $(if $(V),,> /dev/null 2>&1)
-+.test-tap-tap = $1 < /dev/null | sed "s/^[a-z][a-z]* [0-9]*/& $2/" || true
-+.test-tap-exitcode = printf "%s\\n" 1..1 "`$1 < /dev/null > /dev/null || echo "not "`ok 1 $2"
-+.test.print = echo $(if $(V),'$1','Running test $2') >&3
-+.test.env = MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))}
-+
-+# $1 = test name, $2 = test target (human or tap)
-+.test.run = $(call .test.print,$(.test.cmd.$1),$(.test.name.$1)) && $(call .test-$2-$(.test.driver.$1),$(.test.cmd.$1),$(.test.name.$1))
-+
-+define .test.human_k
-+        @exec 3>&1; rc=0; $(foreach TEST, $1, $(call .test.run,$(TEST),human) || rc=$$?;) \\
-+              exit $$rc
-+endef
-+define .test.human_no_k
-+        $(foreach TEST, $1, @exec 3>&1; $(call .test.run,$(TEST),human)
-+)
-+endef
-+.test.human = \\
-+        $(if $(findstring k, $(MAKEFLAGS)), $(.test.human_k), $(.test.human_no_k))
-+
-+define .test.tap
-+        @exec 3>&1; { $(foreach TEST, $1, $(call .test.run,$(TEST),tap); ) } \\
-+              | ./scripts/tap-merge.pl | tee "$@" \\
-+              | ./scripts/tap-driver.pl $(if $(V),, --show-failures-only)
-+endef
-+''')
-+
-+suites = defaultdict(Suite)
-+i = 0
-+for test in json.load(sys.stdin):
-+    env = ' '.join(('%s=%s' % (shlex.quote(k), shlex.quote(v))
-+                    for k, v in test['env'].items()))
-+    executable = os.path.relpath(test['cmd'][0])
-+    if test['workdir'] is not None:
-+        test['cmd'][0] = os.path.relpath(test['cmd'][0], test['workdir'])
-+    else:
-+        test['cmd'][0] = executable
-+    cmd = '$(.test.env) %s %s' % (env, ' '.join((shlex.quote(x) for x in test['cmd'])))
-+    if test['workdir'] is not None:
-+        cmd = '(cd %s && %s)' % (shlex.quote(test['workdir']), cmd)
-+    driver = test['protocol'] if 'protocol' in test else 'exitcode'
-+
-+    i += 1
-+    print('.test.name.%d := %s' % (i, test['name']))
-+    print('.test.driver.%d := %s' % (i, driver))
-+    print('.test.cmd.%d := %s' % (i, cmd))
-+
-+    test_suites = test['suite'] or ['default']
-+    is_slow = 'slow' in test_suites
-+    for s in test_suites:
-+        if s == 'slow':
-+            continue
-+        # The suite name in the introspection info is "PROJECT:SUITE"
-+        s = s.split(':')[1]
-+        if is_slow:
-+            suites[s].slow_tests.append(i)
-+        else:
-+            suites[s].tests.append(i)
-+        suites[s].executables.add(executable)
-+
-+print('.PHONY: check check-report.tap')
-+print('check:')
-+print('check-report.tap:')
-+print('\t$(call quiet-command, cat $^ | scripts/tap-merge.pl >$@,"GEN","$@")')
-+for name, suite in suites.items():
-+    executables = ' '.join(suite.executables)
-+    slow_test_numbers = ' '.join((str(x) for x in suite.slow_tests))
-+    test_numbers = ' '.join((str(x) for x in suite.tests))
-+    print('.test.suite-quick.%s := %s' % (name, test_numbers))
-+    print('.test.suite-slow.%s := $(.test.suite-quick.%s) %s' % (name, name, slow_test_numbers))
-+    print('.PHONY: check-%s' % name)
-+    print('.PHONY: check-report-%s.tap' % name)
-+    print('check: check-%s' % name)
-+    print('check-%s: %s' % (name, executables))
-+    print('\t$(call .test.human, $(.test.suite-$(SPEED).%s))' % (name, ))
-+    print('check-report.tap: check-report-%s.tap' % name)
-+    print('check-report-%s.tap: %s' % (name, executables))
-+    print('\t$(call .test.tap, $(.test.suite-$(SPEED).%s))' % (name, ))
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 9146e1bdee..eaa57196f9 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -936,7 +936,6 @@ check-report-unit.tap: $(check-unit-y)
- # Reports and overall runs
++++ b/contrib/vhost-user-scsi/meson.build
+@@ -0,0 +1,5 @@
++if 'CONFIG_LIBISCSI' in config_host
++  executable('vhost-user-scsi', files('vhost-user-scsi.c'),
++             link_with: libvhost_user,
++             dependencies: [qemuutil, libiscsi])
++endif
+diff --git a/meson.build b/meson.build
+index c95fc7c8f3..fd5a7aa2e8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -52,6 +52,11 @@ if 'CONFIG_GNUTLS' in config_host
+   gnutls = declare_dependency(compile_args: config_host['GNUTLS_CFLAGS'].split(),
+                               link_args: config_host['GNUTLS_LIBS'].split())
+ endif
++libiscsi = declare_dependency()
++if 'CONFIG_LIBISCSI' in config_host
++  libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
++                                link_args: config_host['LIBISCSI_LIBS'].split())
++endif
  
- check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
--	$(call quiet-command, cat $^ | scripts/tap-merge.pl >$@,"GEN","$@")
- 
- # FPU Emulation tests (aka softfloat)
- #
+ target_dirs = config_host['TARGET_DIRS'].split()
+ have_user = false
+@@ -194,5 +199,6 @@ if have_tools
+   if 'CONFIG_VHOST_USER' in config_host
+     subdir('contrib/libvhost-user')
+     subdir('contrib/vhost-user-blk')
++    subdir('contrib/vhost-user-scsi')
+   endif
+ endif
 -- 
 2.21.0
 
