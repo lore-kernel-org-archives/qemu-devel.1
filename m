@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F9EC33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:37:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A70F9C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:38:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C02E62467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:37:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 749A22467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 10:38:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hYRn4BGA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C02E62467E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAxGI6RO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 749A22467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwOFl-0003Np-V9
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 05:37:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48239)
+	id 1iwOFs-0003bN-M1
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 05:38:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iwOE2-00086B-C7
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:36:07 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iwODP-0006xX-Ew
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iwODy-0000Y7-2H
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:36:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21519
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1iwODO-0000Gm-5s
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:35:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27280
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iwODx-0000Xr-Tb
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:36:02 -0500
+ id 1iwODO-0000GZ-2e
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:35:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580207761;
+ s=mimecast20190719; t=1580207725;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Pu5G8euGek2YOgV/Xm7PleFVJneOrBcGo10vPoYLEG0=;
- b=hYRn4BGA8pXPK+kRH+gssLWINxQLJOM9vrCNLyEA/fjAaM4tEH2TkyvfQRuRORSUp+UGwJ
- RrxurqJvjlD0Us642doo5YtHqrWsi9KYgS9JLUXc/RjUyc1DOGZFMjxcBImDyYqvyrXBq4
- MSAYpNbxqdzKhQwEgVdogZ79gLgoi/A=
+ bh=hksWhfx/qjqLBl2kwSG6HIa1DnV2Yh8CnWY4dayzAHc=;
+ b=KAxGI6ROO/L68XdlNESrogr807MaG0fNXdZcxfzCOcSt2IhD9f7T5xu71oQ4lzSknGXbXG
+ XBE3bX1TTVbvtCVjXA+8n+mlZnrKXMz0Rs35Sdc8S/sVKCgXelZ+rn7C8WHp9hq7UAho9b
+ rDeN7phtd1G+vYn836oZOkSk+Y3p7jc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-jOExBHJ_PC2UojAYgGWC_g-1; Tue, 28 Jan 2020 05:35:59 -0500
-X-MC-Unique: jOExBHJ_PC2UojAYgGWC_g-1
+ us-mta-221-CymzZg9NPg-7tVbWGeDa5g-1; Tue, 28 Jan 2020 05:35:23 -0500
+X-MC-Unique: CymzZg9NPg-7tVbWGeDa5g-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB2C41005513;
- Tue, 28 Jan 2020 10:35:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CBB3DB60;
+ Tue, 28 Jan 2020 10:35:22 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B9061001B08;
- Tue, 28 Jan 2020 10:35:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D1BFF1001B08;
+ Tue, 28 Jan 2020 10:35:16 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v3 06/14] arm/arm64: gicv3: Set the LPI config
- and pending tables
-Date: Tue, 28 Jan 2020 11:34:51 +0100
-Message-Id: <20200128103459.19413-7-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 02/14] arm: gic: Provide per-IRQ helper
+ functions
+Date: Tue, 28 Jan 2020 11:34:47 +0100
+Message-Id: <20200128103459.19413-3-eric.auger@redhat.com>
 In-Reply-To: <20200128103459.19413-1-eric.auger@redhat.com>
 References: <20200128103459.19413-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,149 +91,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allocate the LPI configuration and per re-distributor pending table.
-Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
-by default in the config table.
+From: Andre Przywara <andre.przywara@arm.com>
 
-Also introduce a helper routine that allows to set the pending table
-bit for a given LPI.
+A common theme when accessing per-IRQ parameters in the GIC distributor
+is to set fields of a certain bit width in a range of MMIO registers.
+Examples are the enabled status (one bit per IRQ), the level/edge
+configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Add a generic helper function which is able to mask and set the
+respective number of bits, given the IRQ number and the MMIO offset.
+Provide wrappers using this function to easily allow configuring an IRQ.
+
+For now assume that private IRQ numbers always refer to the current CPU.
+In a GICv2 accessing the "other" private IRQs is not easily doable (the
+registers are banked per CPU on the same MMIO address), so we impose the
+same limitation on GICv3, even though those registers are not banked
+there anymore.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
 ---
 
-v2 -> v3:
-- Move the helpers in lib/arm/gic-v3.c and prefix them with "gicv3_"
-  and add _lpi prefix too
-
-v1 -> v2:
-- remove memory attributes
+initialize reg
 ---
- lib/arm/asm/gic-v3.h | 16 +++++++++++
- lib/arm/gic-v3.c     | 64 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 80 insertions(+)
+ lib/arm/asm/gic-v3.h |  2 +
+ lib/arm/asm/gic.h    |  8 ++++
+ lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 100 insertions(+)
 
 diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index ffb2e26..ec2a6f0 100644
+index 0dc838b..6beeab6 100644
 --- a/lib/arm/asm/gic-v3.h
 +++ b/lib/arm/asm/gic-v3.h
-@@ -48,6 +48,16 @@
- #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
- 	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level=
- ## _SHIFT)
+@@ -23,6 +23,8 @@
+ #define GICD_CTLR_ENABLE_G1A		(1U << 1)
+ #define GICD_CTLR_ENABLE_G1		(1U << 0)
 =20
-+#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
++#define GICD_IROUTER			0x6000
 +
-+#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
+ /* Re-Distributor registers, offsets from RD_base */
+ #define GICR_TYPER			0x0008
+=20
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index 09826fd..21cdb58 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -74,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
+ extern void gic_ipi_send_single(int irq, int cpu);
+ extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
+=20
++void gic_set_irq_bit(int irq, int offset);
++void gic_enable_irq(int irq);
++void gic_disable_irq(int irq);
++void gic_set_irq_priority(int irq, u8 prio);
++void gic_set_irq_target(int irq, int cpu);
++void gic_set_irq_group(int irq, int group);
++int gic_get_irq_group(int irq);
 +
-+#define LPI_PROP_GROUP1		(1 << 1)
-+#define LPI_PROP_ENABLED	(1 << 0)
-+#define LPI_PROP_DEFAULT_PRIO   0xa0
-+#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | \
-+				 LPI_PROP_ENABLED)
-+
- #include <asm/arch_gicv3.h>
-=20
- #ifndef __ASSEMBLY__
-@@ -64,6 +74,8 @@ struct gicv3_data {
- 	void *dist_base;
- 	void *redist_bases[GICV3_NR_REDISTS];
- 	void *redist_base[NR_CPUS];
-+	void *lpi_prop;
-+	void *lpi_pend[NR_CPUS];
- 	unsigned int irq_nr;
- };
- extern struct gicv3_data gicv3_data;
-@@ -80,6 +92,10 @@ extern void gicv3_write_eoir(u32 irqstat);
- extern void gicv3_ipi_send_single(int irq, int cpu);
- extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest);
- extern void gicv3_set_redist_base(size_t stride);
-+extern void gicv3_lpi_set_config(int n, u8 val);
-+extern u8 gicv3_lpi_get_config(int n);
-+extern void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set);
-+extern void gicv3_lpi_alloc_tables(void);
-=20
- static inline void gicv3_do_wait_for_rwp(void *base)
- {
-diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-index feecb5e..c33f883 100644
---- a/lib/arm/gic-v3.c
-+++ b/lib/arm/gic-v3.c
-@@ -5,6 +5,7 @@
-  */
- #include <asm/gic.h>
- #include <asm/io.h>
-+#include <alloc_page.h>
-=20
- void gicv3_set_redist_base(size_t stride)
- {
-@@ -147,3 +148,66 @@ void gicv3_ipi_send_single(int irq, int cpu)
- 	cpumask_set_cpu(cpu, &dest);
- 	gicv3_ipi_send_mask(irq, &dest);
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 9430116..aa9cb86 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
+t)
+ 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+ 	gic_common_ops->ipi_send_mask(irq, dest);
  }
 +
-+#if defined(__aarch64__)
-+/* alloc_lpi_tables: Allocate LPI config and pending tables */
-+void gicv3_lpi_alloc_tables(void)
++enum gic_bit_access {
++	ACCESS_READ,
++	ACCESS_SET,
++	ACCESS_RMW
++};
++
++static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
++			      enum gic_bit_access access)
 +{
-+	unsigned long n =3D SZ_64K >> PAGE_SHIFT;
-+	unsigned long order =3D fls(n);
-+	u64 prop_val;
-+	int cpu;
++	void *base;
++	int split =3D 32 / bits;
++	int shift =3D (irq % split) * bits;
++	u32 reg =3D 0, mask =3D ((1U << bits) - 1) << shift;
 +
-+	gicv3_data.lpi_prop =3D (void *)virt_to_phys(alloc_pages(order));
-+
-+	/* ID bits =3D 13, ie. up to 14b LPI INTID */
-+	prop_val =3D (u64)gicv3_data.lpi_prop | 13;
-+
-+	/*
-+	 * Allocate pending tables for each redistributor
-+	 * and set PROPBASER and PENDBASER
-+	 */
-+	for_each_present_cpu(cpu) {
-+		u64 pend_val;
-+		void *ptr;
-+
-+		ptr =3D gicv3_data.redist_base[cpu];
-+
-+		writeq(prop_val, ptr + GICR_PROPBASER);
-+
-+		gicv3_data.lpi_pend[cpu] =3D (void *)virt_to_phys(alloc_pages(order));
-+
-+		pend_val =3D (u64)gicv3_data.lpi_pend[cpu];
-+
-+		writeq(pend_val, ptr + GICR_PENDBASER);
++	switch (gic_version()) {
++	case 2:
++		base =3D gicv2_dist_base();
++		break;
++	case 3:
++		if (irq < 32)
++			base =3D gicv3_sgi_base();
++		else
++			base =3D gicv3_dist_base();
++		break;
++	default:
++		return 0;
 +	}
++	base +=3D offset + (irq / split) * 4;
++
++	switch (access) {
++	case ACCESS_READ:
++		return (readl(base) & mask) >> shift;
++	case ACCESS_SET:
++		reg =3D 0;
++		break;
++	case ACCESS_RMW:
++		reg =3D readl(base) & ~mask;
++		break;
++	}
++
++	writel(reg | ((u32)value << shift), base);
++
++	return 0;
 +}
 +
-+void gicv3_lpi_set_config(int n, u8 value)
++void gic_set_irq_bit(int irq, int offset)
 +{
-+	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-+
-+	*entry =3D value;
++	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
 +}
 +
-+u8 gicv3_lpi_get_config(int n)
++void gic_enable_irq(int irq)
 +{
-+	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-+
-+	return *entry;
++	gic_set_irq_bit(irq, GICD_ISENABLER);
 +}
 +
-+void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
++void gic_disable_irq(int irq)
 +{
-+	u8 *ptr =3D phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
-+	u8 mask =3D 1 << (n % 8), byte;
-+
-+	ptr +=3D (n / 8);
-+	byte =3D *ptr;
-+	if (set)
-+		byte |=3D  mask;
-+	else
-+		byte &=3D ~mask;
-+	*ptr =3D byte;
++	gic_set_irq_bit(irq, GICD_ICENABLER);
 +}
-+#endif /* __aarch64__ */
++
++void gic_set_irq_priority(int irq, u8 prio)
++{
++	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
++}
++
++void gic_set_irq_target(int irq, int cpu)
++{
++	if (irq < 32)
++		return;
++
++	if (gic_version() =3D=3D 2) {
++		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
++				    ACCESS_RMW);
++
++		return;
++	}
++
++	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
++}
++
++void gic_set_irq_group(int irq, int group)
++{
++	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
++}
++
++int gic_get_irq_group(int irq)
++{
++	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
++}
 --=20
 2.20.1
 
