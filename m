@@ -2,89 +2,86 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED69DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97FB2C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:14:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBFD3205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:03:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 647332468E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:14:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MAW5JlG+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBFD3205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="iiSpAt5K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 647332468E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwRSL-0008BD-1e
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 09:03:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41605)
+	id 1iwRdB-0004ZI-GZ
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 09:14:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44215)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iwRRH-0007cy-1I
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:02:04 -0500
+ (envelope-from <n54@gmx.com>) id 1iwRa3-0003B5-4p
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:11:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iwRRF-0000rI-72
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:01:58 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47981
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iwRRF-0000qR-2i
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:01:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580220116;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KXg/X3vLFRTWY3nsE39OIA4RzJ5gQ0H3jrsDYrJ6ngs=;
- b=MAW5JlG+mD1iI2EBDRxjuk8Rahn7DEHIrffxqRPP5NKO+mF9tFuu0CtLBrSnvxWdvXMsp0
- EHhgwoyvlLj+uam1H9kFaUjWPQUU8ewMSW9iufINVHsM3YgDsPMjFSGQWxTCh6uImBqZEV
- A5ErAyOo3846mx3hJ2ESh3pcQRiutdw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-yhb9YR8hPGyA8omKbpKG5Q-1; Tue, 28 Jan 2020 09:01:48 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9E4B10071F9;
- Tue, 28 Jan 2020 14:01:46 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-65.gru2.redhat.com
- [10.97.116.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 92FFB1001281;
- Tue, 28 Jan 2020 14:01:40 +0000 (UTC)
-Subject: Re: [PATCH] tests/acceptance: Add a test for the canon-a1100 machine
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, qemu-devel@nongnu.org
-References: <20200127144126.15515-1-thuth@redhat.com>
- <cd60a444-620e-3366-09e8-e9c8d72894ad@redhat.com>
- <c4976fd4-f1f0-c48b-aad4-4414564f8258@redhat.com>
- <05f7e133-8ad3-8627-79a1-a046e6d42d16@redhat.com>
- <2a303987-ad19-538b-98ce-a2cb83d8fade@redhat.com>
- <9856cc15-2365-4609-5af9-f6582cb20ed8@redhat.com>
- <6b5cba1d-4aba-cd59-74a8-880a8d800a35@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <766805d9-0dbc-eda1-4157-1feb33fc9ea5@redhat.com>
-Date: Tue, 28 Jan 2020 12:01:38 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <n54@gmx.com>) id 1iwRa1-0005Qh-Rv
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:11:02 -0500
+Received: from mout.gmx.net ([212.227.15.15]:37429)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <n54@gmx.com>) id 1iwRa1-0005Nf-EU
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:11:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1580220651;
+ bh=5T5EeHP93+UFDJyj4hGYbu4E19lxTL0aMpGCbkzXAMw=;
+ h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
+ b=iiSpAt5Ksv9d3FKvHXsFaIGOjLI++6gEzk3iQU2Aoqgk2rr1u3zndaaoXu3NeN5k0
+ QPSyR/i2bQO1EojGP+v+Czo91KNhoA/9iOOo8asbrmyLO/3orIVaon7hMOY4kLhNJz
+ dbHZCiERCrHSMcCffYGxVfFIIIWUH4TPB9z24Y6Q=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from localhost.localdomain ([89.71.135.231]) by mail.gmx.com
+ (mrgmx005 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 1N9Mta-1jbGUI3xfo-015Kbn; Tue, 28 Jan 2020 15:10:51 +0100
+From: Kamil Rytarowski <n54@gmx.com>
+To: rth@twiddle.net, ehabkost@redhat.com, philmd@redhat.com, slp@redhat.com,
+ pbonzini@redhat.com, peter.maydell@linaro.org, max@m00nbsd.net
+Subject: [PATCH v2 0/4] Implements the NetBSD Virtual Machine Monitor
+ accelerator
+Date: Tue, 28 Jan 2020 15:09:41 +0100
+Message-Id: <20200128140945.929-1-n54@gmx.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200107124903.16505-1-n54@gmx.com>
+References: <20200107124903.16505-1-n54@gmx.com>
 MIME-Version: 1.0
-In-Reply-To: <6b5cba1d-4aba-cd59-74a8-880a8d800a35@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: yhb9YR8hPGyA8omKbpKG5Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:0d9yom2QoLaFN43T/E9x9LQgEEC8AKxlTwCRhpWaxeYQZkWPDjQ
+ GRUsVLxxlUigipA7v+S4lgqAkqbVkJjkkFK0E8O+j6aTkziSrHjbmv0gMMEvpaHyddJDnzJ
+ H4x3mFG/PNiuk649d6u/RPodUcPoJniWbzlFV3Cax9H2UALWqoUtwYLuVzGz26EOC3jCewQ
+ iemx9I5XGy/rmPN0OOrIw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:HlazbCzbTJA=:KdbB6nZvisnDVYrCMxJn8O
+ GRfqNWss16Ib8ARMM7S1LuGmpJ/LbIMlivCAbJ753D8J62NJff4OUAq1JeiKugPg3AFbi4vCV
+ fqXV1hw5RHQ85KMZj0eIBSZwhZiwAgU0u0QJRMo0vpHGAPS3mScutPIcHGKnmOVIzIKHMDZWq
+ wZ/eLpr8JqUWQ+BBQF41WyzTXHS3keKMCg6jppXU/7ufwggH5Q7OpMb/4DtN9V04ejJ3oYpXd
+ XioM7S2oIxdNR65S7LtOKmBZ/ycIsizDp4bVAaDw373EWjmNEFN2KrvWWr0XM4TPL3gpGLWS6
+ n/bsF7I7luF4HYd8H6gGbcx+Pq+/YTz7hNGxLoUPCZB/XAfZqQvM0M1XSJsmjlxnk7w9IRGOU
+ Sf69uHDbkcvI5wJ8spmr0y2fxRkJ8wopK11OmREeXR/vYow82E71Vwk15lFQPywWrLZMu1cCy
+ btRk2AHDiueSEDdZwn8P58rpSfrLE7vBLR2I373J8khBykGvXK8QiO6s3JY8PIqaazP2pi0Ax
+ ebZnfJZ2j0NK7XIhL1tJa/C0cdy14Qd0bf4Ukoy0/QYu0wRjRZ74pN0MGNmYCla+xGxwzSqtk
+ AQz7kBXmD2s+ftjppJYpQwgSi5lEkEmVOpeBvlfzLz8oQyVAyKOboL6s7qBFL96m2oWP6vYsM
+ cAs1mkUsAbs9WoLmyT0/KHcHXkb/BKxbeQmzHd5npxJrg4wI8ChcseQHfOq6iKMIydu5AKBog
+ LQl1XNCtQk5G/EqAyRk90hOVEjMKL7Lude+6XUzVTzBZMKhhz6q3DODHCb++yV9KlSd2NVnw9
+ 0WQn2qKQJu/ZCg/09urTYJG82RujQ+qu7gSXn2VVvj9z42hckozmy+g+OPhmTy/Vhyqdp0daT
+ bPdJt+3KMdgAtdboR6WWCtJFa8fmNIeYvCcWs05BdvB/TfBfKH91hgSX6QFCpA4MXX4S8JZf8
+ XtzphWf56BcDxcFyitMpaBz2CtirsD4tWVo9Ej5DBUPsSpscSYGkFar1jLYORba188xTfNj6f
+ Aj3qUQVdGLvFCgZPS2tSZdIDV/SR7SyvfVbt4SN8XUY5kAyMHabwc2zvVoPslX67AGe6TQ5nJ
+ ygdWfnDn16Lg62GiE0tUDD1hgSsNtqBUq2v1QpwRiY3zLQTURXbnSTcoQsI4ZglDbF1OQ1O8m
+ oe2ttns/WwNO3uDYoFTLzYZTAHVyMPjI76yyJhvx7e0ZYfgW/13vkjs96snSAopL4hEEY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 212.227.15.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,72 +93,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org,
- Antony Pavlov <antonynpavlov@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello QEMU Community!
 
-On 1/28/20 10:16 AM, Thomas Huth wrote:
-> On 27/01/2020 21.56, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hey Wainer,
->>
->> On 1/27/20 6:45 PM, Wainer dos Santos Moschetta wrote:
->>> On 1/27/20 1:41 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> On 1/27/20 4:39 PM, Thomas Huth wrote:
->>>>> On 27/01/2020 16.18, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>>> On 1/27/20 3:41 PM, Thomas Huth wrote:
->>>>>>> The canon-a1100 machine can be used with the Barebox firmware. The
->>>>>>> QEMU Advent Calendar 2018 features a pre-compiled image which we
->>>>>>> can use for testing.
->>>>>>>
->>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>>>> ---
->>>>>>>  =C2=A0=C2=A0 tests/acceptance/machine_arm_canon-a1100.py | 33
->>>>>>> +++++++++++++++++++++
->>>
->>> What is the reason for not adding this case in boot_linux_console suite=
-?
->> Because there are too many tests in this file and it became hardly
->> maintainable. Also it is easier to add a 'F:' entry in the MAINTAINERS
->> file to each machine section.
+Over the past year the NetBSD team has been working hard on a new user-mod=
+e API
+for our hypervisor that will be released as part of the upcoming NetBSD 9.=
+0.
+This new API adds user-mode capabilities to create and manage virtual mach=
+ines,
+configure memory mappings for guest machines, and create and control execu=
+tion
+of virtual processors.
+
+With this new API we are now able to bring our hypervisor to the QEMU
+community! The following patches implement the NetBSD Virtual Machine Moni=
+tor
+accelerator (NVMM) for QEMU on NetBSD 9.0 and newer hosts.
+
+When compiling QEMU for x86_64 passing the --enable-nvmm flag will compile=
+ the
+accelerator for use. At runtime using the '-accel nvmm' should see a
+significant performance improvement over emulation, much like when using '=
+hax'
+on NetBSD.
+
+The documentation for this new API is visible at https://man.netbsd.org un=
+der
+the libnvmm(3) and nvmm(4) pages.
+
+NVMM was designed and implemented by Maxime Villard.
+
+Thank you for your feedback.
+
+Refrences:
+https://m00nbsd.net/4e0798b7f2620c965d0dd9d6a7a2f296.html
+
+Test plan:
+
+1. Download a NetBSD 9.0 pre-release snapshot:
+http://nycdn.netbsd.org/pub/NetBSD-daily/netbsd-9/latest/images/NetBSD-9.0=
+_RC1-amd64.iso
+
+2. Install it natively on a not too old x86_64 hardware (Intel or AMD).
+
+There is no support for nested virtualization in NVMM.
+
+3. Setup the system.
+
+ export PKG_PATH=3Dhttp://www.ki.nu/pkgsrc/packages/current/NetBSD-9.0_RC1=
+/All
+ pkg_add git gmake python37 glib2 bison pkgconf pixman
+
+Install mozilla-rootcerts and follow post-install instructions.
+
+ pkg_add mozilla-rootcerts
+
+More information: https://wiki.qemu.org/Hosts/BSD#NetBSD
+
+4. Build qemu
+
+ mkdir build
+ cd build
+ ../configure --python=3Dpython3.7
+ gmake
+ gmake check
+
+5. Test
+
+ qemu -accel nvmm ...
 
 
-Maybe it reached an inflection point and deserves to be split among=20
-files and directories...
+History:
+v1 -> v2:
+ - Included the testing plan as requested by Philippe Mathieu-Daude
+ - Formatting nit fix in qemu-options.hx
+ - Document NVMM in the accel section of qemu-options.hx
 
+Maxime Villard (4):
+  Add the NVMM vcpu API
+  Add the NetBSD Virtual Machine Monitor accelerator.
+  Introduce the NVMM impl
+  Add the NVMM acceleration enlightenments
 
-> Additionally, this is not a test with a Linux kernel, it uses the
-> Barebox firmware instead. So boot_*linux*_console.py sounds like the
-> wrong place for this test.
+ accel/stubs/Makefile.objs |    1 +
+ accel/stubs/nvmm-stub.c   |   43 ++
+ configure                 |   36 ++
+ cpus.c                    |   58 ++
+ include/sysemu/hw_accel.h |   14 +
+ include/sysemu/nvmm.h     |   35 ++
+ qemu-options.hx           |   16 +-
+ target/i386/Makefile.objs |    1 +
+ target/i386/helper.c      |    2 +-
+ target/i386/nvmm-all.c    | 1222 +++++++++++++++++++++++++++++++++++++
+ 10 files changed, 1419 insertions(+), 9 deletions(-)
+ create mode 100644 accel/stubs/nvmm-stub.c
+ create mode 100644 include/sysemu/nvmm.h
+ create mode 100644 target/i386/nvmm-all.c
 
-OK, makes complete sense.
-
-One last comment about this new file. To not look like boring I let=20
-pylint say that for me :) :
-
-[wainersm@localhost qemu]$ pylint-3=20
-tests/acceptance/machine_arm_canon-a1100.py
-************* Module machine_arm_canon-a1100
-tests/acceptance/machine_arm_canon-a1100.py:1:0: C0103: Module name=20
-"machine_arm_canon-a1100" doesn't conform to snake_case naming style=20
-(invalid-name)
-
-With that fix:
-
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
-Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
-Thanks,
-
-Wainer
-
-
->
->   Thomas
-
+=2D-
+2.24.1
 
