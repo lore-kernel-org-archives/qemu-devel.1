@@ -2,82 +2,117 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7329CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5A5C33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:47:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F870206A2
+	by mail.kernel.org (Postfix) with ESMTPS id DC016206A2
 	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:47:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ep/Q1xVN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F870206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="4SNJs7iM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC016206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWpv-0007Qc-CB
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:47:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44711)
+	id 1iwWpw-0007Qv-15
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:47:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iwW2U-0003JU-Nh
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:56:44 -0500
+ (envelope-from <Babu.Moger@amd.com>) id 1iwWnq-0004hC-0x
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 14:45:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iwW2R-00089h-Ta
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:56:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38322
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iwW2R-00085w-Oj
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:56:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580237797;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PMQU7mVcTDCnN/Er/sQ02BHz1Gv8O/zjiHQrxzf5lT8=;
- b=ep/Q1xVNczgdoXfriKvo39VwSWQjFrk6skQpV3nHGJJkAJNgn+reY36YdDRzW7ejUn5OWG
- y0gNaC8+iZVncw1GRfyvdOF3y1nW1GV3RPgALpqMVL0xz+ZWT7awjlJ41XkYT+CDZVVs2Z
- C2UDXE5JUKWycBxt25iCpDrjic2lGks=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-70F24y_4M_28GzZHdqVWWA-1; Tue, 28 Jan 2020 13:56:35 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E721A107ACC9;
- Tue, 28 Jan 2020 18:56:33 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 78E207C35A;
- Tue, 28 Jan 2020 18:56:29 +0000 (UTC)
-Date: Tue, 28 Jan 2020 18:56:27 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, eblake@redhat.com
-Subject: Re: [PATCH v3 08/13] monitor/hmp: move hmp_nbd_server* to
- block-hmp-cmds.c
-Message-ID: <20200128185627.GD3215@work-vm>
-References: <20200127103647.17761-1-mlevitsk@redhat.com>
- <20200127103647.17761-9-mlevitsk@redhat.com>
+ (envelope-from <Babu.Moger@amd.com>) id 1iwWno-0003gi-4I
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 14:45:37 -0500
+Received: from mail-bn8nam11on2046.outbound.protection.outlook.com
+ ([40.107.236.46]:6223 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1iwWnn-0003gJ-OQ
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 14:45:36 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kTxRWc3BV5xxUygWMHHjwgfWfCxw44BVSO3MaXA+V3tyIdWl4M3iv4ilNY//dSWyJw4+6y5w8KMm3sTQzHCV8MKo7nJCguXXXR5K+vtd+lPTgS+JBN9RhHgLyWDe1KtZemzTpGAHm4qrDfq0FKmZlP59WohVJNLLY52tSaywnbSqvZTiWySr8dXYP2tP6HzpfvrpilHG47ZIcN37tJ3H5880jHyBcYXol+7OXYjTaOx8WZNEChCU899YrMpoePs5ArgGRvae8pVynI2BJR7E05OKtTeJBDl73rOeLR+T+e/NLRcrXi0vCWsrBh/1i1ASMNadZRscWy6pfqEZvujzKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kfOaLhCK7c6hwojxFacn5UUfLV9ANHh2Kz9lpJCoXcY=;
+ b=Y8Eq50/Uc8ElZNhbxJ7fGZ2boQl9xpdEtowJbipv3e40A/iEfklfmKohHpuwWJJMbskm3wXJtDtnlUMEX3atsgJQaALjNp/bKVxOrdlIjg0NhKD7bNoZSTCr0+aKunuVdkcYK5AG3qeKGv05LX6jxJExWhF35aVNYl0qSKyeYphwyNcTCkd4rB7J4vnUkS3YoJCYfri9dhPrw1IxOo8qXDYCL9pvw4Etq3GNQS7nEhGndt41XqOY79QiP+IFp+NC91TMd040jWk12XxXLCUrjfDKeJc4IKE+5zjesYGPU/jyyzUcPgHa/DYfw1/QvKDQmTArPBL7wL+j8dsJrYNYSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kfOaLhCK7c6hwojxFacn5UUfLV9ANHh2Kz9lpJCoXcY=;
+ b=4SNJs7iMRzUreyZjwVjnFxUx4C7WraldbuqB8t8ttVMS3OGlaYbcmNOORSdgI3g4P3osVxAADJUSf1Ugi9e51h9jKTcv4e11BA40oMAiOLQYYxQ8nOAoRfzimTBCX2A9mYdC4oDeDTfOp4kMVlVTbifahHBAWau4QJUWVqtUoCI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
+ CY4PR12MB1271.namprd12.prod.outlook.com (10.168.167.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.22; Tue, 28 Jan 2020 19:45:33 +0000
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd]) by CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd%7]) with mapi id 15.20.2665.026; Tue, 28 Jan 2020
+ 19:45:33 +0000
+Subject: Re: [PATCH v3 07/18] machine: Add a new function init_apicid_fn in
+ MachineClass
+To: Igor Mammedov <imammedo@redhat.com>
+References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
+ <157541986210.46157.5082551407581177819.stgit@naples-babu.amd.com>
+ <20200128172919.4ecb5896@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <e5271e1c-55bc-e3d2-eb4c-2329eef07c9f@amd.com>
+Date: Tue, 28 Jan 2020 13:45:31 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+In-Reply-To: <20200128172919.4ecb5896@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR01CA0006.prod.exchangelabs.com (2603:10b6:805:b6::19)
+ To CY4PR12MB1574.namprd12.prod.outlook.com
+ (2603:10b6:910:e::23)
 MIME-Version: 1.0
-In-Reply-To: <20200127103647.17761-9-mlevitsk@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 70F24y_4M_28GzZHdqVWWA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Received: from [10.236.30.87] (165.204.77.1) by
+ SN6PR01CA0006.prod.exchangelabs.com (2603:10b6:805:b6::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.19 via Frontend Transport; Tue, 28 Jan 2020 19:45:32 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 0d581349-fe54-46e1-4be7-08d7a42aa353
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1271:
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1271F5F14C3696CCC4237F43950A0@CY4PR12MB1271.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Forefront-PRVS: 029651C7A1
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(189003)(199004)(8936002)(53546011)(8676002)(81156014)(956004)(81166006)(52116002)(66556008)(186003)(26005)(16526019)(2616005)(66476007)(66946007)(6916009)(36756003)(316002)(44832011)(16576012)(5660300002)(31686004)(6486002)(2906002)(4326008)(31696002)(86362001)(478600001);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR12MB1271;
+ H:CY4PR12MB1574.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IEqVYVNwW0fsiFTsDrKVXo8vm/wPtcKwqfI7UbwwXZWuzUjFUGBihD26UZ2hvGqYdkJSazi9xEeM0dD0YcSwQbh68kkqQ4WdSKcFM+jvMMqrYFIgqdgON2rTW5RgtfiEZpgYsloG46AVqJsCtkDBWtsGCoZubrwxqbqF1MOfgu6YafbL2hSKzcEAR4Fw1w5GwzaxGRQlY2ti9PxGcp8slXq1aObbtbb2/amA8ciIC0T+YBZ08mFDKc4FuUHKRclw338pfqez7O/87Vcp7ISvTmOSo9wodPc0Ux0whoecIaRwQ+PmKvwNEHnIWZkIG3bE9WZs3BStgPjB/4+uctJqZm4o8IroGmloUvVOWWTR0YPYQZGrn/koWlqPIiJwNAGuj1vwtXNydOAaLG8+0NO7oM4k9Nd8Kr3anElPOHhfcVIANKI1UAlF4VMySYR6tB3J
+X-MS-Exchange-AntiSpam-MessageData: sFgIWbh0Uaxvc+KpWzZgGDkt/qRAXe+OzW/swe0qhN9qWwkyx3vRvnqwfSI6l0ZLmMUSe+H3X6TUQY/fNHU3ollMwoTw5ovnhG+Yi43Xec1unwFNMYjRLn1tDyU5V+0tzfNvaYjTuBlxY48gxP4GCA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d581349-fe54-46e1-4be7-08d7a42aa353
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2020 19:45:33.4240 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zvVYIuuExtDTVd3qKFmmUiHZw9YSH8U6Jc9AwsirPzn3FBnTSDqLdnUwVT93XRE9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1271
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.236.46
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,280 +124,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Maxim Levitsky (mlevitsk@redhat.com) wrote:
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Yes, I think that's OK; I can imagine nbd might want to move on it's own
-somewhere since it's not really core block code; copying in Eric.
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 1/28/20 10:29 AM, Igor Mammedov wrote:
+> On Tue, 03 Dec 2019 18:37:42 -0600
+> Babu Moger <babu.moger@amd.com> wrote:
+> 
+>> Add a new function init_apicid_fn in MachineClass to initialize the mode
+>> specific handlers to decode the apic ids.
+>>
+>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+>> ---
+>>  include/hw/boards.h |    1 +
+>>  vl.c                |    3 +++
+>>  2 files changed, 4 insertions(+)
+>>
+>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>> index d4fab218e6..ce5aa365cb 100644
+>> --- a/include/hw/boards.h
+>> +++ b/include/hw/boards.h
+>> @@ -238,6 +238,7 @@ struct MachineClass {
+>>                                                           unsigned cpu_index);
+>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+>>      int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
+>> +    void (*init_apicid_fn)(MachineState *ms);
+> it's x86 specific, so why it wasn put into PCMachineClass?
 
-> ---
->  block/monitor/block-hmp-cmds.c     | 88 ++++++++++++++++++++++++++++++
->  include/block/block-hmp-commands.h |  5 ++
->  include/monitor/hmp.h              |  4 --
->  monitor/hmp-cmds.c                 | 87 -----------------------------
->  4 files changed, 93 insertions(+), 91 deletions(-)
->=20
-> diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmd=
-s.c
-> index 9aa94ea6e0..df0178d0f9 100644
-> --- a/block/monitor/block-hmp-cmds.c
-> +++ b/block/monitor/block-hmp-cmds.c
-> @@ -22,8 +22,10 @@
->  #include "qapi/qmp/qerror.h"
->  #include "qemu/config-file.h"
->  #include "qemu/option.h"
-> +#include "qemu/sockets.h"
->  #include "sysemu/sysemu.h"
->  #include "monitor/monitor.h"
-> +#include "block/nbd.h"
->  #include "block/block_int.h"
->  #include "block/block-hmp-commands.h"
->  #include "monitor/hmp.h"
-> @@ -327,3 +329,89 @@ void hmp_snapshot_delete_blkdev_internal(Monitor *mo=
-n, const QDict *qdict)
->                                                 true, name, &err);
->      hmp_handle_error(mon, err);
->  }
-> +
-> +void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
-> +{
-> +    const char *uri =3D qdict_get_str(qdict, "uri");
-> +    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
-> +    bool all =3D qdict_get_try_bool(qdict, "all", false);
-> +    Error *local_err =3D NULL;
-> +    BlockInfoList *block_list, *info;
-> +    SocketAddress *addr;
-> +
-> +    if (writable && !all) {
-> +        error_setg(&local_err, "-w only valid together with -a");
-> +        goto exit;
-> +    }
-> +
-> +    /* First check if the address is valid and start the server.  */
-> +    addr =3D socket_parse(uri, &local_err);
-> +    if (local_err !=3D NULL) {
-> +        goto exit;
-> +    }
-> +
-> +    nbd_server_start(addr, NULL, NULL, &local_err);
-> +    qapi_free_SocketAddress(addr);
-> +    if (local_err !=3D NULL) {
-> +        goto exit;
-> +    }
-> +
-> +    if (!all) {
-> +        return;
-> +    }
-> +
-> +    /* Then try adding all block devices.  If one fails, close all and
-> +     * exit.
-> +     */
-> +    block_list =3D qmp_query_block(NULL);
-> +
-> +    for (info =3D block_list; info; info =3D info->next) {
-> +        if (!info->value->has_inserted) {
-> +            continue;
-> +        }
-> +
-> +        qmp_nbd_server_add(info->value->device, false, NULL,
-> +                           true, writable, false, NULL, &local_err);
-> +
-> +        if (local_err !=3D NULL) {
-> +            qmp_nbd_server_stop(NULL);
-> +            break;
-> +        }
-> +    }
-> +
-> +    qapi_free_BlockInfoList(block_list);
-> +
-> +exit:
-> +    hmp_handle_error(mon, local_err);
-> +}
-> +
-> +void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
-> +{
-> +    const char *device =3D qdict_get_str(qdict, "device");
-> +    const char *name =3D qdict_get_try_str(qdict, "name");
-> +    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
-> +    Error *local_err =3D NULL;
-> +
-> +    qmp_nbd_server_add(device, !!name, name, true, writable,
-> +                       false, NULL, &local_err);
-> +    hmp_handle_error(mon, local_err);
-> +}
-> +
-> +void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
-> +{
-> +    const char *name =3D qdict_get_str(qdict, "name");
-> +    bool force =3D qdict_get_try_bool(qdict, "force", false);
-> +    Error *err =3D NULL;
-> +
-> +    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
-> +    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err=
-);
-> +    hmp_handle_error(mon, err);
-> +}
-> +
-> +void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *err =3D NULL;
-> +
-> +    qmp_nbd_server_stop(&err);
-> +    hmp_handle_error(mon, err);
-> +}
-> diff --git a/include/block/block-hmp-commands.h b/include/block/block-hmp=
--commands.h
-> index 3fc2daf3a9..721b9a1978 100644
-> --- a/include/block/block-hmp-commands.h
-> +++ b/include/block/block-hmp-commands.h
-> @@ -21,4 +21,9 @@ void hmp_snapshot_blkdev(Monitor *mon, const QDict *qdi=
-ct);
->  void hmp_snapshot_blkdev_internal(Monitor *mon, const QDict *qdict);
->  void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdic=
-t);
-> =20
-> +void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
-> +void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
-> +void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
-> +void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
-> +
->  #endif
-> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-> index 6d34e29bb6..736a969131 100644
-> --- a/include/monitor/hmp.h
-> +++ b/include/monitor/hmp.h
-> @@ -94,10 +94,6 @@ void hmp_getfd(Monitor *mon, const QDict *qdict);
->  void hmp_closefd(Monitor *mon, const QDict *qdict);
->  void hmp_sendkey(Monitor *mon, const QDict *qdict);
->  void hmp_screendump(Monitor *mon, const QDict *qdict);
-> -void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
-> -void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
-> -void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
-> -void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
->  void hmp_chardev_add(Monitor *mon, const QDict *qdict);
->  void hmp_chardev_change(Monitor *mon, const QDict *qdict);
->  void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 46b46b6dd7..67d2ca8a4c 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -45,7 +45,6 @@
->  #include "qapi/string-output-visitor.h"
->  #include "qom/object_interfaces.h"
->  #include "ui/console.h"
-> -#include "block/nbd.h"
->  #include "block/qapi.h"
->  #include "qemu-io.h"
->  #include "qemu/cutils.h"
-> @@ -2154,92 +2153,6 @@ void hmp_screendump(Monitor *mon, const QDict *qdi=
-ct)
->      hmp_handle_error(mon, err);
->  }
-> =20
-> -void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
-> -{
-> -    const char *uri =3D qdict_get_str(qdict, "uri");
-> -    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
-> -    bool all =3D qdict_get_try_bool(qdict, "all", false);
-> -    Error *local_err =3D NULL;
-> -    BlockInfoList *block_list, *info;
-> -    SocketAddress *addr;
-> -
-> -    if (writable && !all) {
-> -        error_setg(&local_err, "-w only valid together with -a");
-> -        goto exit;
-> -    }
-> -
-> -    /* First check if the address is valid and start the server.  */
-> -    addr =3D socket_parse(uri, &local_err);
-> -    if (local_err !=3D NULL) {
-> -        goto exit;
-> -    }
-> -
-> -    nbd_server_start(addr, NULL, NULL, &local_err);
-> -    qapi_free_SocketAddress(addr);
-> -    if (local_err !=3D NULL) {
-> -        goto exit;
-> -    }
-> -
-> -    if (!all) {
-> -        return;
-> -    }
-> -
-> -    /* Then try adding all block devices.  If one fails, close all and
-> -     * exit.
-> -     */
-> -    block_list =3D qmp_query_block(NULL);
-> -
-> -    for (info =3D block_list; info; info =3D info->next) {
-> -        if (!info->value->has_inserted) {
-> -            continue;
-> -        }
-> -
-> -        qmp_nbd_server_add(info->value->device, false, NULL,
-> -                           true, writable, false, NULL, &local_err);
-> -
-> -        if (local_err !=3D NULL) {
-> -            qmp_nbd_server_stop(NULL);
-> -            break;
-> -        }
-> -    }
-> -
-> -    qapi_free_BlockInfoList(block_list);
-> -
-> -exit:
-> -    hmp_handle_error(mon, local_err);
-> -}
-> -
-> -void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
-> -{
-> -    const char *device =3D qdict_get_str(qdict, "device");
-> -    const char *name =3D qdict_get_try_str(qdict, "name");
-> -    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
-> -    Error *local_err =3D NULL;
-> -
-> -    qmp_nbd_server_add(device, !!name, name, true, writable,
-> -                       false, NULL, &local_err);
-> -    hmp_handle_error(mon, local_err);
-> -}
-> -
-> -void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
-> -{
-> -    const char *name =3D qdict_get_str(qdict, "name");
-> -    bool force =3D qdict_get_try_bool(qdict, "force", false);
-> -    Error *err =3D NULL;
-> -
-> -    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
-> -    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err=
-);
-> -    hmp_handle_error(mon, err);
-> -}
-> -
-> -void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
-> -{
-> -    Error *err =3D NULL;
-> -
-> -    qmp_nbd_server_stop(&err);
-> -    hmp_handle_error(mon, err);
-> -}
-> -
->  void hmp_chardev_add(Monitor *mon, const QDict *qdict)
->  {
->      const char *args =3D qdict_get_str(qdict, "args");
-> --=20
-> 2.17.2
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Yes. It is x86 specific for now. I tried to make it generic function so
+other OSes can use it if required(like we have done in
+possible_cpu_arch_ids). It initializes functions required to build the
+apicid for each CPUs. We need these functions much early in the
+initialization. It should be initialized before parse_numa_opts or
+machine_run_board_init(in v1.c) which are called from generic context. We
+cannot use PCMachineClass at this time.
 
+> 
+> 
+>>  };
+>>  
+>>  /**
+>> diff --git a/vl.c b/vl.c
+>> index a42c24a77f..b6af604e11 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -4318,6 +4318,9 @@ int main(int argc, char **argv, char **envp)
+>>      current_machine->cpu_type = machine_class->default_cpu_type;
+>>      if (cpu_option) {
+>>          current_machine->cpu_type = parse_cpu_option(cpu_option);
+>> +        if (machine_class->init_apicid_fn) {
+>> +            machine_class->init_apicid_fn(current_machine);
+>> +        }
+>>      }
+>>      parse_numa_opts(current_machine);
+>>  
+>>
+>>
+> 
 
