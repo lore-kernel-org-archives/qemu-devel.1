@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA3EDC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1733C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:18:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB5B4214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:16:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70287214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:18:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="myRHrI5E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB5B4214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QlxOaWKZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70287214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVPd-0001V2-Vd
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:16:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58368)
+	id 1iwVR7-0004El-IZ
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:18:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4W-000723-KH
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:45 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5f-0000Vo-SR
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4V-0000Ij-1Y
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:44 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:38589)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5e-000327-39
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:55 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34410)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV4U-0000Dt-QV
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:42 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id a9so3565119wmj.3
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:54:41 -0800 (PST)
+ id 1iwV5c-0002yM-UX
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:54 -0500
+Received: by mail-wr1-x442.google.com with SMTP id t2so17098584wrr.1
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=h755r6Ys4Hk7ZRHLjfISHRxt60EtDeGxbGM6erYTA8I=;
- b=myRHrI5E0DPj0NqN4n0XA/JjAZ15VBHSg/UsL3k+dLoSwBW/RuacNHXayO4TKSuS+u
- i1ysZQxolQnVysyMU3C7z3bjjXN5ozTiYcunXDZTWdeVTLPosUsROUaVnd42pKqq4zQl
- SaX+yWhDTbyYlnVqTsHjTUFLudFZPiSCCufQDzqnGDHIE7kWKJhfWG8OZmXDQOKAVNYK
- 7vUqoqR3X73WvohhYaja+JBDYNjgzVu8XtJA/gtw/ccllw8yztn37mZ6i1s0Apim4su4
- y5+8gtECZXJ8t2LsalopKIC5EqALWDKM0IuugcSAiCctNaDcxDyvhaT/ZYScZRAHDGhM
- b1fQ==
+ bh=DIpao2wiSZrcXVkYxq+H6UyeJnhxpyHCws3dP6NHkE4=;
+ b=QlxOaWKZWXAlURUEfvZdKGCV+JtcT4lNDW8x9Mx6N6jzChAjrFPSn9am+TAk7YAAXP
+ 6b0+ZOOG2GEOeXbRUgI+1Dx9bWq9Z/5kFCD/gBhH/WBKF1FQElQgP5FCNPFlLQPU6Zn/
+ P6GoxlCYnItPHnc1Hf06yWTEiKKbY9FiXzgzzLVeKgzL/bLhx8nvC1TuOgpp4w5niJXv
+ iloF1WXAxO1XGpzwRndnywXQmrttJnyXeHr/HdgaHCY2jl3aLh4xs27CPVbg8iQsxnR5
+ qa+qHQddzVGOb98GQCdLIzpYlgYztmE+NMRvgeXe8Fi0uOOZUycabhGWl0d/l2ppr65L
+ 3vHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=h755r6Ys4Hk7ZRHLjfISHRxt60EtDeGxbGM6erYTA8I=;
- b=FO5vAbnz3W19VUmc7cu6tbzUpKa/kwNnv22vEfu0VZXe2MqHrUgiuzUfo1Pd1fkqFu
- 1O6fGkX5HHf8DuO9hvVWV4r1Qzj8gTNdJ1JSloMoswoImmeCRs1riVenZH/3M0AsQxxG
- kTMer9BHsS41AXvUhW3p/EbdoXzNCCWAioG57rp3k2BjjoRpGcPS+BRnnetvV09UkwLh
- uky7U/wy6BZlS0ZfVNcPfrF6LXirBsQbCfCT6eIvGfElTN39QgoLkoje/qp9C2EXe+mc
- /iO83HWh68s3BMeOit31bJ1FBM8rPBR0GhDgLqRqq9vPVWhWzpPYxPe6x6kGSv1LYbll
- 0ctg==
-X-Gm-Message-State: APjAAAWpz8GGjM8qeCaz6CyBVSMFXxW7FJjHeMiFrmYI0Ofq86dmPy/W
- OvqTLrCU7+6tVHO8O484nzKSNv81
-X-Google-Smtp-Source: APXvYqzLZ0l+ONDtb7jR8G/6xmtJRDLMaNVr+03fDpBTVkOq3kMjzL7epFQMA+oL4S7b4DYnN1thcQ==
-X-Received: by 2002:a1c:4e05:: with SMTP id g5mr6125503wmh.138.1580234080525; 
- Tue, 28 Jan 2020 09:54:40 -0800 (PST)
+ bh=DIpao2wiSZrcXVkYxq+H6UyeJnhxpyHCws3dP6NHkE4=;
+ b=LCdCjzzGOvHQ5JkF7N/P7ZMUYDQqGhuxTexxIx9M5IZP0IN8EggdQUgAOVTFxbFP5w
+ tG9IWtlUNqT3ezdox5CvPvaxCKpcDl3j/0mbwdf27B0yOO2mwVUtG7Z7oInXrqIzCCUT
+ gAW+Y9ZEHI3phgWsVBa1xM4F5LKfzmvR7ay3iCyxJWF+KWbs6sX57WvnabKkmq4OaI7M
+ bYBFpCoKJYOmE8WIvTuBIWD2mA9enQIDM58Fx0au5E9z9oVomopbSLVxVEHpKlu19oH7
+ TQ7Do+cHJ1X5sua52X+g/s9nX+qhPbDVMZuyofAbH3EKuFUtMiMWrv+aiyJbjGd+IyFb
+ s82g==
+X-Gm-Message-State: APjAAAVxKEnHzaXe9DhlUWVcDs8yLGwndJBS38hA8jUKvT+X2wEudXGn
+ qCC2f/IeWt/AtBwtwsfohIPjZEP0
+X-Google-Smtp-Source: APXvYqy5jLAHtBs1NiZ8+/hWuchQF0EGULWU/PpOsczzlDSkIQ3Nyp7wEMYFVjuzTw5lDHtED3YzRA==
+X-Received: by 2002:a5d:484f:: with SMTP id n15mr29687093wrs.365.1580234150412; 
+ Tue, 28 Jan 2020 09:55:50 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.54.38
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.48
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:54:40 -0800 (PST)
+ Tue, 28 Jan 2020 09:55:49 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 022/142] contrib/ivshmem: convert to meson
-Date: Tue, 28 Jan 2020 18:51:42 +0100
-Message-Id: <20200128175342.9066-23-pbonzini@redhat.com>
+Subject: [PATCH 051/142] configure, Makefile;
+ remove TOOLS and HELPERS-y variable
+Date: Tue, 28 Jan 2020 18:52:11 +0100
+Message-Id: <20200128175342.9066-52-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,137 +95,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Everything involving tools is now done by meson.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                             | 9 ---------
- Makefile.objs                        | 2 --
- configure                            | 3 ---
- contrib/ivshmem-client/Makefile.objs | 1 -
- contrib/ivshmem-client/meson.build   | 3 +++
- contrib/ivshmem-server/Makefile.objs | 1 -
- contrib/ivshmem-server/meson.build   | 3 +++
- meson.build                          | 6 ++++++
- 8 files changed, 12 insertions(+), 16 deletions(-)
- delete mode 100644 contrib/ivshmem-client/Makefile.objs
- create mode 100644 contrib/ivshmem-client/meson.build
- delete mode 100644 contrib/ivshmem-server/Makefile.objs
- create mode 100644 contrib/ivshmem-server/meson.build
+ Makefile  | 12 ++----------
+ configure |  2 --
+ 2 files changed, 2 insertions(+), 12 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 5c000b2a2f..c0e62d8053 100644
+index ee79c2dbfa..25eb7336cc 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -286,8 +286,6 @@ dummy := $(call unnest-vars,, \
-                 chardev-obj-y \
-                 qga-obj-y \
-                 elf2dmp-obj-y \
--                ivshmem-client-obj-y \
--                ivshmem-server-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -488,13 +486,6 @@ endif
- elf2dmp$(EXESUF): $(elf2dmp-obj-y)
- 	$(call LINK, $^)
+@@ -124,8 +124,6 @@ $(call set-vpath, $(SRC_PATH))
  
--ifdef CONFIG_IVSHMEM
--ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
--	$(call LINK, $^)
--ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
--	$(call LINK, $^)
--endif
+ LIBS+=-lz $(LIBS_TOOLS)
+ 
+-HELPERS-y =
 -
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-diff --git a/Makefile.objs b/Makefile.objs
-index 2f375be444..92dc309fd7 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -106,7 +106,5 @@ qga-vss-dll-obj-y = qga/
- ######################################################################
- # contrib
- elf2dmp-obj-y = contrib/elf2dmp/
--ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
--ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
+ # Sphinx does not allow building manuals into the same directory as
+ # the source files, so if we're doing an in-tree QEMU build we must
+ # build the manuals into a subdirectory (and then install them from
+@@ -165,7 +163,7 @@ dummy := $(call unnest-vars,, \
  
- ######################################################################
+ include $(SRC_PATH)/tests/Makefile.include
+ 
+-all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules
++all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
+ 
+ TARGET_DIRS_RULES := $(foreach t, all clean install, $(addsuffix /$(t), $(TARGET_DIRS)))
+ SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
+@@ -265,7 +263,7 @@ clean: recurse-clean
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+ 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+ 		-exec rm {} +
+-	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
++	rm -f TAGS cscope.* *.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
+ 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+ 
+@@ -415,12 +413,6 @@ install: all $(if $(BUILD_DOCS),install-doc) \
+ 	install-datadir install-localstatedir install-includedir \
+ 	$(if $(INSTALL_BLOBS),$(edk2-decompressed)) \
+ 	recurse-install
+-ifneq ($(TOOLS),)
+-	$(call install-prog,$(TOOLS),$(DESTDIR)$(bindir))
+-endif
+-ifneq ($(HELPERS-y),)
+-	$(call install-prog,$(HELPERS-y),$(DESTDIR)$(libexecdir))
+-endif
+ ifdef CONFIG_TRACE_SYSTEMTAP
+ 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
+ endif
 diff --git a/configure b/configure
-index a650183ff6..52269b4ca6 100755
+index 11586bfc20..a9919d5c58 100755
 --- a/configure
 +++ b/configure
-@@ -6209,9 +6209,6 @@ if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-nbd\$(EXESUF) $tools"
-   fi
--  if [ "$ivshmem" = "yes" ]; then
--    tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
--  fi
-   if [ "$curl" = "yes" ]; then
-       tools="elf2dmp\$(EXESUF) $tools"
-   fi
-diff --git a/contrib/ivshmem-client/Makefile.objs b/contrib/ivshmem-client/Makefile.objs
-deleted file mode 100644
-index bfab2d20dd..0000000000
---- a/contrib/ivshmem-client/Makefile.objs
-+++ /dev/null
-@@ -1 +0,0 @@
--ivshmem-client-obj-y = ivshmem-client.o main.o
-diff --git a/contrib/ivshmem-client/meson.build b/contrib/ivshmem-client/meson.build
-new file mode 100644
-index 0000000000..92ad844a9c
---- /dev/null
-+++ b/contrib/ivshmem-client/meson.build
-@@ -0,0 +1,3 @@
-+executable('ivshmem-client', files('ivshmem-client.c', 'main.c'),
-+           dependencies: glib,
-+           install: true)
-diff --git a/contrib/ivshmem-server/Makefile.objs b/contrib/ivshmem-server/Makefile.objs
-deleted file mode 100644
-index c060dd3698..0000000000
---- a/contrib/ivshmem-server/Makefile.objs
-+++ /dev/null
-@@ -1 +0,0 @@
--ivshmem-server-obj-y = ivshmem-server.o main.o
-diff --git a/contrib/ivshmem-server/meson.build b/contrib/ivshmem-server/meson.build
-new file mode 100644
-index 0000000000..6dbe240df6
---- /dev/null
-+++ b/contrib/ivshmem-server/meson.build
-@@ -0,0 +1,3 @@
-+executable('ivshmem-server', files('ivshmem-server.c', 'main.c'),
-+           dependencies: [qemuutil, rt],
-+           install: true)
-diff --git a/meson.build b/meson.build
-index 6613eae7e2..53e453026c 100644
---- a/meson.build
-+++ b/meson.build
-@@ -54,6 +54,7 @@ if 'CONFIG_GNUTLS' in config_host
- endif
- pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-                             link_args: config_host['PIXMAN_LIBS'].split())
-+rt = cc.find_library('rt', required: false)
- libiscsi = declare_dependency()
- if 'CONFIG_LIBISCSI' in config_host
-   libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-@@ -219,4 +220,9 @@ if have_tools
-     subdir('contrib/vhost-user-input')
-     subdir('contrib/vhost-user-scsi')
-   endif
-+
-+  if 'CONFIG_IVSHMEM' in config_host
-+    subdir('contrib/ivshmem-client')
-+    subdir('contrib/ivshmem-server')
-+  endif
- endif
+@@ -6203,7 +6203,6 @@ if [ "$eventfd" = "yes" ]; then
+   ivshmem=yes
+ fi
+ 
+-tools=""
+ if test "$softmmu" = yes ; then
+   if test "$linux" = yes; then
+     if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
+@@ -7471,7 +7470,6 @@ else
+ fi
+ QEMU_INCLUDES="-iquote ${source_path}/tcg $QEMU_INCLUDES"
+ 
+-echo "TOOLS=$tools" >> $config_host_mak
+ echo "ROMS=$roms" >> $config_host_mak
+ echo "MAKE=$make" >> $config_host_mak
+ echo "INSTALL=$install" >> $config_host_mak
 -- 
 2.21.0
 
