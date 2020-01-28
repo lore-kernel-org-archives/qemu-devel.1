@@ -2,79 +2,87 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D572C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D330C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:55:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D15321739
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:54:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3991421739
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KG0WPZwf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D15321739
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoL1lgah"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3991421739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwV3t-0005GU-9k
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 12:54:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54708)
+	id 1iwV5N-0007gi-Ct
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 12:55:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iwV2I-0002ss-JL
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:52:30 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV3n-0005kh-Lj
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iwV2F-0004ZG-TE
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:52:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58950
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iwV2F-0004Xb-Nj
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:52:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580233943;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9IgWSZPNNbHrS45oYaXZiZ8Xu0BZadcFCn0T1GXnCIo=;
- b=KG0WPZwfpzCwEjgipqDn6FFXXuybhRYJdu8H6kshJeJmR57Itj24fQFURaY2JE0U6QzGiw
- 0R2luV/Ijd3YHK86KQsvLfQcwCWf7EZ/NSVoFqQbDpCFLICWdsKurCZHOhWfjemPe8ddVj
- G1cYSGJziVSuSSXIQ5c9v4RliJf6rUU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-zqFKIWZXMUaqKTQxGK0J6g-1; Tue, 28 Jan 2020 12:52:20 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75CF1189F762;
- Tue, 28 Jan 2020 17:52:19 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-117-106.ams2.redhat.com
- [10.36.117.106])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 51BFB60BE0;
- Tue, 28 Jan 2020 17:52:18 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 2/4] qapi: Create module 'control'
-Date: Tue, 28 Jan 2020 18:52:09 +0100
-Message-Id: <20200128175211.30007-3-kwolf@redhat.com>
-In-Reply-To: <20200128175211.30007-1-kwolf@redhat.com>
-References: <20200128175211.30007-1-kwolf@redhat.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV3m-0007LL-7W
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:53:59 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42876)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iwV3l-0007Fo-VY
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:53:58 -0500
+Received: by mail-wr1-x444.google.com with SMTP id k11so2413997wrd.9
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:53:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=v7fP+V9ixvBHX58L9pfbBMpyNUVrGlItPTLd0Obr3k0=;
+ b=BoL1lgahF/lhS3PwpFzVequl9uOTx1rqxrGLix5RU2vYzZfPCHDMjrdT9GC/aD0AP0
+ LrsnuCPOQQwpd+AcqWFv2emQevs/KOv1HWWatq5cttz3f4CxpWmJ/MsMv+X3uVfNs/Ev
+ wJUhr41qj4Ql8iOKaIVm9bHHu+4t7+2bLG7woITR8e6oa7dI3TlHFJmKZUy674JiW6dz
+ 0Y9BCkdlvz0zRoNfx03WQ3wKycf91iFVJzcav8ZsImFhtRVi6iA6RDxNNJDiGUGyfwyS
+ qgy4bTpFkYKcOg66SG5xSMdUgrKrPJ6u7r2M7GSH4AjpL5cbjDVDLNMkBBpNQSVqtv6T
+ STyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=v7fP+V9ixvBHX58L9pfbBMpyNUVrGlItPTLd0Obr3k0=;
+ b=ubThG8asSLEGRvDhIprGm9IKVh0MQJCKAQmTPutrOUDr5UlJeYWjt9fOe7JuT28roK
+ 0DI0DrChGWjoMcm34hje3zoGF8vzUAj8ynWlr2YD0zzUo5wHOGh2nYoSig4er8YGBqxv
+ fbzm69FgGdbLAjFth5RJMFKq4RQcWpK6+e2DZuJJ/OwmtcU79QdPwb/gtEV/RQAC8JD8
+ AY4s9+dVJVDxHIQBnbKCIP/Ekcog7DwZP8ARJGUO2JRWTOqIMTiFT6lTclh6mmV49M2T
+ PyqXlcAXlsiBtMXj3Y01aA+Wd+XGWkr3aiGNZAaCu+yyMPo1N4HsXEK2N1ozA+JmtjPU
+ 6O5w==
+X-Gm-Message-State: APjAAAWprpU+mJzQQ6I3dvy+y6SFMGUJiatVld1ieZHde6ptbDwS1itZ
+ aS2Snh8bvGO2yVM8bMSSoQ+sOxS1
+X-Google-Smtp-Source: APXvYqx7+JDUBgRIRAqx9jXuaF/WlEqWtQMCBODqVDGDnWfO8D0uAM7+RAPMheVYfKchdOgtPpctEA==
+X-Received: by 2002:adf:edd0:: with SMTP id v16mr29337586wro.310.1580234034537; 
+ Tue, 28 Jan 2020 09:53:54 -0800 (PST)
+Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
+ [93.36.56.206])
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.53.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Jan 2020 09:53:54 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 002/142] optionrom: simplify Makefile
+Date: Tue, 28 Jan 2020 18:51:22 +0100
+Message-Id: <20200128175342.9066-3-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
+References: <20200128175342.9066-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: zqFKIWZXMUaqKTQxGK0J6g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,625 +94,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-misc.json contains definitions that are related to the system emulator,
-so it can't be used for other tools like the storage daemon. This patch
-moves basic functionality that is shared between all tools (and mostly
-related to the monitor itself) into a new control.json, which could be
-used in tools as well.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Make it independent from the rules.mak, and clean up to use pattern rules.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qapi/control.json          | 218 +++++++++++++++++++++++++++++++++++++
- qapi/misc.json             | 212 ------------------------------------
- qapi/qapi-schema.json      |   1 +
- monitor/monitor-internal.h |   1 +
- monitor/hmp-cmds.c         |   1 +
- monitor/misc.c             |   1 +
- monitor/qmp-cmds.c         |   1 +
- monitor/qmp.c              |   2 +-
- tests/qtest/qmp-test.c     |   2 +-
- ui/gtk.c                   |   1 +
- qapi/Makefile.objs         |   6 +-
- 11 files changed, 229 insertions(+), 217 deletions(-)
- create mode 100644 qapi/control.json
+ pc-bios/optionrom/Makefile | 67 +++++++++++++++++++++++---------------
+ 1 file changed, 41 insertions(+), 26 deletions(-)
 
-diff --git a/qapi/control.json b/qapi/control.json
-new file mode 100644
-index 0000000000..a82a18da1a
---- /dev/null
-+++ b/qapi/control.json
-@@ -0,0 +1,218 @@
-+# -*- Mode: Python -*-
-+#
+diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
+index e33a24da0d..51cb6ca9d8 100644
+--- a/pc-bios/optionrom/Makefile
++++ b/pc-bios/optionrom/Makefile
+@@ -1,13 +1,16 @@
+-all: build-all
++CURRENT_MAKEFILE := $(realpath $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
++SRC_DIR := $(dir $(CURRENT_MAKEFILE))
++TOPSRC_DIR := $(SRC_DIR)/../..
++VPATH = $(SRC_DIR)
 +
-+##
-+# =3D Monitor definitions (shared between system emulator and tools)
-+##
-+
-+##
-+# @qmp_capabilities:
-+#
-+# Enable QMP capabilities.
-+#
-+# Arguments:
-+#
-+# @enable:   An optional list of QMPCapability values to enable.  The
-+#            client must not enable any capability that is not
-+#            mentioned in the QMP greeting message.  If the field is not
-+#            provided, it means no QMP capabilities will be enabled.
-+#            (since 2.12)
-+#
-+# Example:
-+#
-+# -> { "execute": "qmp_capabilities",
-+#      "arguments": { "enable": [ "oob" ] } }
-+# <- { "return": {} }
-+#
-+# Notes: This command is valid exactly when first connecting: it must be
-+# issued before any other command will be accepted, and will fail once the
-+# monitor is accepting other commands. (see qemu docs/interop/qmp-spec.txt=
-)
-+#
-+# The QMP client needs to explicitly enable QMP capabilities, otherwise
-+# all the QMP capabilities will be turned off by default.
-+#
-+# Since: 0.13
-+#
-+##
-+{ 'command': 'qmp_capabilities',
-+  'data': { '*enable': [ 'QMPCapability' ] },
-+  'allow-preconfig': true }
-+
-+##
-+# @QMPCapability:
-+#
-+# Enumeration of capabilities to be advertised during initial client
-+# connection, used for agreeing on particular QMP extension behaviors.
-+#
-+# @oob:   QMP ability to support out-of-band requests.
-+#         (Please refer to qmp-spec.txt for more information on OOB)
-+#
-+# Since: 2.12
-+#
-+##
-+{ 'enum': 'QMPCapability',
-+  'data': [ 'oob' ] }
-+
-+##
-+# @VersionTriple:
-+#
-+# A three-part version number.
-+#
-+# @major:  The major version number.
-+#
-+# @minor:  The minor version number.
-+#
-+# @micro:  The micro version number.
-+#
-+# Since: 2.4
-+##
-+{ 'struct': 'VersionTriple',
-+  'data': {'major': 'int', 'minor': 'int', 'micro': 'int'} }
-+
-+
-+##
-+# @VersionInfo:
-+#
-+# A description of QEMU's version.
-+#
-+# @qemu:        The version of QEMU.  By current convention, a micro
-+#               version of 50 signifies a development branch.  A micro ver=
-sion
-+#               greater than or equal to 90 signifies a release candidate =
-for
-+#               the next minor version.  A micro version of less than 50
-+#               signifies a stable release.
-+#
-+# @package:     QEMU will always set this field to an empty string.  Downs=
-tream
-+#               versions of QEMU should set this to a non-empty string.  T=
-he
-+#               exact format depends on the downstream however it highly
-+#               recommended that a unique name is used.
-+#
-+# Since: 0.14.0
-+##
-+{ 'struct': 'VersionInfo',
-+  'data': {'qemu': 'VersionTriple', 'package': 'str'} }
-+
-+##
-+# @query-version:
-+#
-+# Returns the current version of QEMU.
-+#
-+# Returns:  A @VersionInfo object describing the current version of QEMU.
-+#
-+# Since: 0.14.0
-+#
-+# Example:
-+#
-+# -> { "execute": "query-version" }
-+# <- {
-+#       "return":{
-+#          "qemu":{
-+#             "major":0,
-+#             "minor":11,
-+#             "micro":5
-+#          },
-+#          "package":""
-+#       }
-+#    }
-+#
-+##
-+{ 'command': 'query-version', 'returns': 'VersionInfo',
-+  'allow-preconfig': true }
-+
-+##
-+# @CommandInfo:
-+#
-+# Information about a QMP command
-+#
-+# @name: The command name
-+#
-+# Since: 0.14.0
-+##
-+{ 'struct': 'CommandInfo', 'data': {'name': 'str'} }
-+
-+##
-+# @query-commands:
-+#
-+# Return a list of supported QMP commands by this server
-+#
-+# Returns: A list of @CommandInfo for all supported commands
-+#
-+# Since: 0.14.0
-+#
-+# Example:
-+#
-+# -> { "execute": "query-commands" }
-+# <- {
-+#      "return":[
-+#         {
-+#            "name":"query-balloon"
-+#         },
-+#         {
-+#            "name":"system_powerdown"
-+#         }
-+#      ]
-+#    }
-+#
-+# Note: This example has been shortened as the real response is too long.
-+#
-+##
-+{ 'command': 'query-commands', 'returns': ['CommandInfo'],
-+  'allow-preconfig': true }
-+
-+##
-+# @EventInfo:
-+#
-+# Information about a QMP event
-+#
-+# @name: The event name
-+#
-+# Since: 1.2.0
-+##
-+{ 'struct': 'EventInfo', 'data': {'name': 'str'} }
-+
-+##
-+# @query-events:
-+#
-+# Return information on QMP events.
-+#
-+# Returns: A list of @EventInfo.
-+#
-+# Since: 1.2.0
-+#
-+# Note: This command is deprecated, because its output doesn't reflect
-+# compile-time configuration.  Use query-qmp-schema instead.
-+#
-+# Example:
-+#
-+# -> { "execute": "query-events" }
-+# <- {
-+#      "return": [
-+#          {
-+#             "name":"SHUTDOWN"
-+#          },
-+#          {
-+#             "name":"RESET"
-+#          }
-+#       ]
-+#    }
-+#
-+# Note: This example has been shortened as the real response is too long.
-+#
-+##
-+{ 'command': 'query-events', 'returns': ['EventInfo'] }
-+
-+##
-+# @quit:
-+#
-+# This command will cause the QEMU process to exit gracefully.  While ever=
-y
-+# attempt is made to send the QMP response before terminating, this is not
-+# guaranteed.  When using this interface, a premature EOF would not be
-+# unexpected.
-+#
-+# Since: 0.14.0
-+#
-+# Example:
-+#
-+# -> { "execute": "quit" }
-+# <- { "return": {} }
-+##
-+{ 'command': 'quit' }
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 33b94e3589..cf656e9d4b 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -7,159 +7,6 @@
-=20
- { 'include': 'common.json' }
-=20
--##
--# @qmp_capabilities:
--#
--# Enable QMP capabilities.
--#
--# Arguments:
--#
--# @enable:   An optional list of QMPCapability values to enable.  The
--#            client must not enable any capability that is not
--#            mentioned in the QMP greeting message.  If the field is not
--#            provided, it means no QMP capabilities will be enabled.
--#            (since 2.12)
--#
--# Example:
--#
--# -> { "execute": "qmp_capabilities",
--#      "arguments": { "enable": [ "oob" ] } }
--# <- { "return": {} }
--#
--# Notes: This command is valid exactly when first connecting: it must be
--# issued before any other command will be accepted, and will fail once the
--# monitor is accepting other commands. (see qemu docs/interop/qmp-spec.txt=
-)
--#
--# The QMP client needs to explicitly enable QMP capabilities, otherwise
--# all the QMP capabilities will be turned off by default.
--#
--# Since: 0.13
--#
--##
--{ 'command': 'qmp_capabilities',
--  'data': { '*enable': [ 'QMPCapability' ] },
--  'allow-preconfig': true }
++all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
+ # Dummy command so that make thinks it has done something
+ 	@true
+ 
+ include ../../config-host.mak
+-include $(SRC_PATH)/rules.mak
 -
--##
--# @QMPCapability:
--#
--# Enumeration of capabilities to be advertised during initial client
--# connection, used for agreeing on particular QMP extension behaviors.
--#
--# @oob:   QMP ability to support out-of-band requests.
--#         (Please refer to qmp-spec.txt for more information on OOB)
--#
--# Since: 2.12
--#
--##
--{ 'enum': 'QMPCapability',
--  'data': [ 'oob' ] }
+-$(call set-vpath, $(SRC_PATH)/pc-bios/optionrom)
+ 
+-.PHONY : all clean build-all
++quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
++cc-option = $(if $(shell $(CC) $1 -S -o /dev/null -xc /dev/null >/dev/null 2>&1 && echo OK), $1, $2)
+ 
+ # Compiling with no optimization creates ROMs that are too large
+ ifeq ($(lastword $(filter -O%, -O0 $(CFLAGS))),-O0)
+@@ -15,48 +18,60 @@ override CFLAGS += -O2
+ endif
+ override CFLAGS += -march=i486
+ 
+-# Drop -fstack-protector and the like
+-QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS)) $(CFLAGS_NOPIE) -ffreestanding
+-QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
+-QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -m16)
+-ifeq ($(filter -m16, $(QEMU_CFLAGS)),)
++# Flags for dependency generation
++override CPPFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
++
++override CFLAGS += $(filter -W%, $(QEMU_CFLAGS))
++override CFLAGS += $(CFLAGS_NOPIE) -ffreestanding -I$(TOPSRC_DIR)/include
++override CFLAGS += $(call cc-option, -fno-stack-protector)
++override CFLAGS += $(call cc-option, -m16)
++
++ifeq ($(filter -m16, $(CFLAGS)),)
+ # Attempt to work around compilers that lack -m16 (GCC <= 4.8, clang <= ??)
+ # On GCC we add -fno-toplevel-reorder to keep the order of asm blocks with
+ # respect to the rest of the code.  clang does not have -fno-toplevel-reorder,
+ # but it places all asm blocks at the beginning and we're relying on it for
+ # the option ROM header.  So just force clang not to use the integrated
+ # assembler, which doesn't support .code16gcc.
+-QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-toplevel-reorder)
+-QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -no-integrated-as)
+-QEMU_CFLAGS += -m32 -include $(SRC_PATH)/pc-bios/optionrom/code16gcc.h
++override CFLAGS += $(call cc-option, -fno-toplevel-reorder)
++override CFLAGS += $(call cc-option, -no-integrated-as)
++override CFLAGS += -m32 -include $(SRC_DIR)/code16gcc.h
+ endif
+ 
+-QEMU_INCLUDES += -I$(SRC_PATH)
 -
--##
--# @VersionTriple:
--#
--# A three-part version number.
--#
--# @major:  The major version number.
--#
--# @minor:  The minor version number.
--#
--# @micro:  The micro version number.
--#
--# Since: 2.4
--##
--{ 'struct': 'VersionTriple',
--  'data': {'major': 'int', 'minor': 'int', 'micro': 'int'} }
--
--
--##
--# @VersionInfo:
--#
--# A description of QEMU's version.
--#
--# @qemu:        The version of QEMU.  By current convention, a micro
--#               version of 50 signifies a development branch.  A micro ver=
-sion
--#               greater than or equal to 90 signifies a release candidate =
-for
--#               the next minor version.  A micro version of less than 50
--#               signifies a stable release.
--#
--# @package:     QEMU will always set this field to an empty string.  Downs=
-tream
--#               versions of QEMU should set this to a non-empty string.  T=
-he
--#               exact format depends on the downstream however it highly
--#               recommended that a unique name is used.
--#
--# Since: 0.14.0
--##
--{ 'struct': 'VersionInfo',
--  'data': {'qemu': 'VersionTriple', 'package': 'str'} }
--
--##
--# @query-version:
--#
--# Returns the current version of QEMU.
--#
--# Returns:  A @VersionInfo object describing the current version of QEMU.
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "query-version" }
--# <- {
--#       "return":{
--#          "qemu":{
--#             "major":0,
--#             "minor":11,
--#             "micro":5
--#          },
--#          "package":""
--#       }
--#    }
--#
--##
--{ 'command': 'query-version', 'returns': 'VersionInfo',
--  'allow-preconfig': true }
--
--##
--# @CommandInfo:
--#
--# Information about a QMP command
--#
--# @name: The command name
--#
--# Since: 0.14.0
--##
--{ 'struct': 'CommandInfo', 'data': {'name': 'str'} }
--
--##
--# @query-commands:
--#
--# Return a list of supported QMP commands by this server
--#
--# Returns: A list of @CommandInfo for all supported commands
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "query-commands" }
--# <- {
--#      "return":[
--#         {
--#            "name":"query-balloon"
--#         },
--#         {
--#            "name":"system_powerdown"
--#         }
--#      ]
--#    }
--#
--# Note: This example has been shortened as the real response is too long.
--#
--##
--{ 'command': 'query-commands', 'returns': ['CommandInfo'],
--  'allow-preconfig': true }
--
- ##
- # @LostTickPolicy:
- #
-@@ -300,48 +147,6 @@
- ##
- { 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true =
-}
-=20
--##
--# @EventInfo:
--#
--# Information about a QMP event
--#
--# @name: The event name
--#
--# Since: 1.2.0
--##
--{ 'struct': 'EventInfo', 'data': {'name': 'str'} }
--
--##
--# @query-events:
--#
--# Return information on QMP events.
--#
--# Returns: A list of @EventInfo.
--#
--# Since: 1.2.0
--#
--# Note: This command is deprecated, because its output doesn't reflect
--# compile-time configuration.  Use query-qmp-schema instead.
--#
--# Example:
--#
--# -> { "execute": "query-events" }
--# <- {
--#      "return": [
--#          {
--#             "name":"SHUTDOWN"
--#          },
--#          {
--#             "name":"RESET"
--#          }
--#       ]
--#    }
--#
--# Note: This example has been shortened as the real response is too long.
--#
--##
--{ 'command': 'query-events', 'returns': ['EventInfo'] }
--
- ##
- # @IOThreadInfo:
- #
-@@ -764,23 +569,6 @@
- ##
- { 'command': 'query-pci', 'returns': ['PciInfo'] }
-=20
--##
--# @quit:
--#
--# This command will cause the QEMU process to exit gracefully.  While ever=
-y
--# attempt is made to send the QMP response before terminating, this is not
--# guaranteed.  When using this interface, a premature EOF would not be
--# unexpected.
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "quit" }
--# <- { "return": {} }
--##
--{ 'command': 'quit' }
--
- ##
- # @stop:
- #
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 9751b11f8f..61fd91ede7 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -103,6 +103,7 @@
- { 'include': 'qdev.json' }
- { 'include': 'machine.json' }
- { 'include': 'machine-target.json' }
-+{ 'include': 'control.json' }
- { 'include': 'misc.json' }
- { 'include': 'misc-target.json' }
- { 'include': 'audio.json' }
-diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
-index d78f5ca190..4d402ded85 100644
---- a/monitor/monitor-internal.h
-+++ b/monitor/monitor-internal.h
-@@ -27,6 +27,7 @@
-=20
- #include "chardev/char-fe.h"
- #include "monitor/monitor.h"
-+#include "qapi/qapi-types-control.h"
- #include "qapi/qmp/dispatch.h"
- #include "qapi/qmp/json-parser.h"
- #include "qemu/readline.h"
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index d0e0af893a..abb052836b 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -33,6 +33,7 @@
- #include "qapi/qapi-commands-char.h"
- #include "qapi/qapi-commands-migration.h"
- #include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-control.h"
- #include "qapi/qapi-commands-net.h"
- #include "qapi/qapi-commands-rocker.h"
- #include "qapi/qapi-commands-run-state.h"
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 4752150a67..ce89cdb282 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -67,6 +67,7 @@
- #include "qemu/thread.h"
- #include "block/qapi.h"
- #include "qapi/qapi-commands-char.h"
-+#include "qapi/qapi-commands-control.h"
- #include "qapi/qapi-commands-migration.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-commands-qom.h"
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index c6faa3eaf0..263b39e700 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -34,6 +34,7 @@
- #include "qapi/qapi-commands-block-core.h"
- #include "qapi/qapi-commands-machine.h"
- #include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-control.h"
- #include "qapi/qapi-commands-ui.h"
- #include "qapi/qmp/qerror.h"
- #include "hw/mem/memory-device.h"
-diff --git a/monitor/qmp.c b/monitor/qmp.c
-index 54c06ba824..8379c8f96e 100644
---- a/monitor/qmp.c
-+++ b/monitor/qmp.c
-@@ -27,7 +27,7 @@
- #include "chardev/char-io.h"
- #include "monitor-internal.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-control.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qlist.h"
-diff --git a/tests/qtest/qmp-test.c b/tests/qtest/qmp-test.c
-index 1b0eb69832..1a8876b6ca 100644
---- a/tests/qtest/qmp-test.c
-+++ b/tests/qtest/qmp-test.c
-@@ -13,7 +13,7 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- #include "qapi/error.h"
--#include "qapi/qapi-visit-misc.h"
-+#include "qapi/qapi-visit-control.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
- #include "qapi/qobject-input-visitor.h"
-diff --git a/ui/gtk.c b/ui/gtk.c
-index d18892d1de..8ebbebe4ec 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -33,6 +33,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-control.h"
- #include "qemu/cutils.h"
-=20
- #include "ui/console.h"
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index a8f1f4c35e..20fcc37c2c 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -5,9 +5,9 @@ util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
- util-obj-y +=3D qmp-event.o
- util-obj-y +=3D qapi-util.o
-=20
--QAPI_COMMON_MODULES =3D audio authz block-core block char common crypto
--QAPI_COMMON_MODULES +=3D dump error introspect job machine migration misc =
-net
--QAPI_COMMON_MODULES +=3D qdev qom rdma rocker run-state sockets tpm
-+QAPI_COMMON_MODULES =3D audio authz block-core block char common control c=
-rypto
-+QAPI_COMMON_MODULES +=3D dump error introspect job machine migration misc
-+QAPI_COMMON_MODULES +=3D net qdev qom rdma rocker run-state sockets tpm
- QAPI_COMMON_MODULES +=3D trace transaction ui
- QAPI_TARGET_MODULES =3D machine-target misc-target
- QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
---=20
-2.20.1
+ Wa = -Wa,
+-ASFLAGS += -32
+-QEMU_CFLAGS += $(call cc-c-option, $(QEMU_CFLAGS), $(Wa)-32)
++override ASFLAGS += -32
++override CFLAGS += $(call cc-option, $(Wa)-32)
+ 
+-build-all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
+ 
+-# suppress auto-removal of intermediate files
+-.SECONDARY:
++LD_I386_EMULATION ?= elf_i386
++override LDFLAGS = -m $(LD_I386_EMULATION) -T $(SRC_DIR)/flat.lds
++override LDFLAGS += $(LDFLAGS_NOPIE)
+ 
++all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
++
++pvh.img: pvh.o pvh_main.o
+ 
+ %.o: %.S
+-	$(call quiet-command,$(CPP) $(QEMU_INCLUDES) $(QEMU_DGFLAGS) -c -o - $< | $(AS) $(ASFLAGS) -o $@,"AS","$(TARGET_DIR)$@")
++	$(call quiet-command,$(CPP) $(CPPFLAGS) -c -o - $< | $(AS) $(ASFLAGS) -o $@,"AS","$@")
+ 
+-pvh.img: pvh.o pvh_main.o
+-	$(call quiet-command,$(LD) $(LDFLAGS_NOPIE) -m $(LD_I386_EMULATION) -T $(SRC_PATH)/pc-bios/optionrom/flat.lds -s -o $@ $^,"BUILD","$(TARGET_DIR)$@")
++%.o: %.c
++	$(call quiet-command,$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@,"CC","$@")
+ 
+ %.img: %.o
+-	$(call quiet-command,$(LD) $(LDFLAGS_NOPIE) -m $(LD_I386_EMULATION) -T $(SRC_PATH)/pc-bios/optionrom/flat.lds -s -o $@ $<,"BUILD","$(TARGET_DIR)$@")
++	$(call quiet-command,$(LD) $(LDFLAGS) -s -o $@ $^,"BUILD","$@")
+ 
+ %.raw: %.img
+-	$(call quiet-command,$(OBJCOPY) -O binary -j .text $< $@,"BUILD","$(TARGET_DIR)$@")
++	$(call quiet-command,$(OBJCOPY) -O binary -j .text $< $@,"BUILD","$@")
+ 
+ %.bin: %.raw
+-	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/signrom.py $< $@,"SIGN","$(TARGET_DIR)$@")
++	$(call quiet-command,$(PYTHON) $(TOPSRC_DIR)/scripts/signrom.py $< $@,"SIGN","$@")
++
++include $(wildcard *.d)
+ 
+ clean:
+ 	rm -f *.o *.d *.raw *.img *.bin *~
++
++# suppress auto-removal of intermediate files
++.SECONDARY:
++
++.PHONY: all clean
+-- 
+2.21.0
+
 
 
