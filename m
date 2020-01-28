@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C0BCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E37C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:34:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D0DF207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 991B9207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:34:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="otYfhksO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D0DF207FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6btbjtQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 991B9207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVgV-0001vX-FE
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:33:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60082)
+	id 1iwVga-00028Q-R0
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:34:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34320)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5G-0008Er-L3
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:32 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6d-000236-0w
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5D-00023N-V2
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:30 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:35052)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6b-0005KM-KI
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:54 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:37764)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV5D-0001ye-Ng
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:27 -0500
-Received: by mail-wr1-x433.google.com with SMTP id g17so17089975wro.2
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:26 -0800 (PST)
+ id 1iwV6b-0005IO-5o
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:53 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id f129so3582589wmf.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=VvB3WRAgwL5yPLB9c3GF0RgQDT7qHJdukwYTjB5TZ+g=;
- b=otYfhksOV2OdOmE5wsetnxnL1t4ovXHLHjqjHgUtzd/rLWVK++SCPyLc3j1oxxCHsZ
- Vd2PC/E6SSpUnZHFSQfAlRh0o5RW9mA04H0SX3GkBHnvtfXuoqFfqcFrJ+JBe3KK1fQ1
- a+MxPDbdll+LiqLiecrz2GwtA7VNlO/62HUUYilvNJrzBn1axYpyoB9LJbv9iGFZNRva
- ssBHRibosbvskxVaIeNdW8Cj5CvflFWqCU9zAZ5IHKB74B3ebxMI+TlhMlBlY6Z4Mjy/
- wlmNdOq+qIMWthwVStI2tuDeik8k27pSSa1qxl8STPKKGtYKKvivsJkcFT+QFICiah0F
- TLpw==
+ bh=Vp0ZbOZIEBGYBbtolu8tVtbusC0ujkh32S2sGuGwqEE=;
+ b=V6btbjtQiz5SCLOXDG2NjSlvBzVw2MjJQ7I/lHfOO9cWPDJVGmwqVicxBIT/ReYfZH
+ wdudF2DZHvgYN+0jl196MmLo1VpZH+qjbTWMEOFIA8K11cRKOw3uXqOmnF6FgTTwRKte
+ tCDuGzYrBxEn092WZMK1w3ncMWqw+eyZvqOQiTQWCTKhR01g/C6XDnEBSnZ3TvBud0D0
+ nmiPNDViJLAkhcMFgLEMcFqhQ3wmYRv/UaYy1eX8wRtEuHRoA3myTUuu3/WocRpZwGnB
+ 8SnuXvDfF7keVfvgTP1MgqAfe3NYncjO01G26oicxKNDAOewPXzmX7bEcFIPEyGT3TDo
+ e6jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=VvB3WRAgwL5yPLB9c3GF0RgQDT7qHJdukwYTjB5TZ+g=;
- b=QWp30xX1zOBa46I7spFjpwIicV7TIkJyeG1Gl3s+eyBVV5B5ArMnPbFVfoKBXU4wGF
- TGFjWLn8hSvL9ptz6JNYM05HKiaUEQaZHVrLh5GBLuY8Sj695mYZ00G+0eKoi4CcMWaj
- G7LdH84lHa88AzoC//MTzUl3DutxLv5P4OdYvkabaFZDYzkE6fV8nhrh2majAiTEXZrg
- tRBePT+TAopJVcqGSl6XmFCCLWBFWe0RrR40tsPd1uDdffY/aOTf1fe/DQgcYuz8FX+x
- xdgh7FF2TQZE+uldMc4Rcou7itAJI+qtzVBA2xbvanmrn+WC/5D8kJgkBNy7P1wJXGMU
- yzdg==
-X-Gm-Message-State: APjAAAXvRejdpOYCpxCKwq0xcj/gmR7llDGMYoxEjOnYhzrfs9705rbh
- wqhQ4yQdUNYcqqa+7hykOJiA1/Xy
-X-Google-Smtp-Source: APXvYqzQ4xWUzzxWNHXGOF5JlGpFn17sMasQ4EFFsvzLKnePe7rOIT7mtxVOrDdRxSV+r9X4wxsMhw==
-X-Received: by 2002:a5d:5403:: with SMTP id g3mr31426437wrv.302.1580234125374; 
- Tue, 28 Jan 2020 09:55:25 -0800 (PST)
+ bh=Vp0ZbOZIEBGYBbtolu8tVtbusC0ujkh32S2sGuGwqEE=;
+ b=GxlIHTYqaWQG539I4O0dTDCs/Z/mBkGHVLfn3x2gDebrXHR0p1uDsq8NwpxPTWOL+a
+ vmdnjTEeUAQ1+JXpZfodMaq/JlpV2ZMp8Jrx/3Tp599+0PLpu9MJCLmjqGyMrsgIulnq
+ j1IwuNTwV1gWtPo8x1ILnkKYDPDW6xwc0znRnbZsRh8ZChxwgJxOAxE9aATA3+/7UHHz
+ 1g7zLGFvMpSvxisW0GmqDJbsFTitvE0hxGWufmT9JuT8kNKHXOB+lNKuJghQK8Jmt4E/
+ 57deApHmWb0zNVo6ReE92B12egQ3Dow17c8fNrOyY1jTPAEMA1aMuMyRLgHd4yDXOh7o
+ DFMg==
+X-Gm-Message-State: APjAAAWjBfghynTyk9RLhjPJ6xSfXBlEnlQbwnuO+CRvfn8K8Z6vDa1P
+ Ys9ww+AeHNhTriUnNubrxonEAdmG
+X-Google-Smtp-Source: APXvYqx/VCS61MXEM/fKKGJ1L7steaHjvnWBglhcwCi/nbHH9QZLlNHkDUye1Fm0ckgbwnUEsTMuBQ==
+X-Received: by 2002:a05:600c:108a:: with SMTP id
+ e10mr6264037wmd.10.1580234211486; 
+ Tue, 28 Jan 2020 09:56:51 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.23
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:55:24 -0800 (PST)
+ Tue, 28 Jan 2020 09:56:51 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 041/142] meson: convert crypto directory to Meson
-Date: Tue, 28 Jan 2020 18:52:01 +0100
-Message-Id: <20200128175342.9066-42-pbonzini@redhat.com>
+Subject: [PATCH 077/142] meson: convert hw/vfio
+Date: Tue, 28 Jan 2020 18:52:37 +0100
+Message-Id: <20200128175342.9066-78-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,208 +103,75 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile             |  1 -
- Makefile.objs        |  7 ++-----
- Makefile.target      |  2 +-
- crypto/Makefile.objs | 34 -------------------------------
- crypto/meson.build   | 48 ++++++++++++++++++++++++++++++++++++++++++++
- meson.build          |  4 ++--
- qom/meson.build      |  2 +-
- 7 files changed, 54 insertions(+), 44 deletions(-)
- delete mode 100644 crypto/Makefile.objs
+ hw/Makefile.objs      |  1 -
+ hw/meson.build        |  1 +
+ hw/vfio/Makefile.objs |  7 -------
+ hw/vfio/meson.build   | 17 +++++++++++++++++
+ 4 files changed, 18 insertions(+), 8 deletions(-)
+ delete mode 100644 hw/vfio/Makefile.objs
+ create mode 100644 hw/vfio/meson.build
 
-diff --git a/Makefile b/Makefile
-index 64c7430951..4d5db51869 100644
---- a/Makefile
-+++ b/Makefile
-@@ -223,7 +223,6 @@ dummy := $(call unnest-vars,, \
-                 chardev-obj-y \
-                 block-obj-y \
-                 block-obj-m \
--                crypto-obj-y \
-                 io-obj-y \
-                 common-obj-y \
-                 common-obj-m)
-diff --git a/Makefile.objs b/Makefile.objs
-index bbeb87ec82..7c9156313b 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -13,17 +13,14 @@ block-obj-$(CONFIG_REPLICATION) += replication.o
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 742b310f13..cbd4e07fe5 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -31,7 +31,6 @@ devices-dirs-y += ssi/
+ devices-dirs-y += timer/
+ devices-dirs-$(CONFIG_TPM) += tpm/
+ devices-dirs-y += usb/
+-devices-dirs-$(CONFIG_VFIO) += vfio/
+ endif
  
- block-obj-m = block/
- 
--#######################################################################
--# crypto-obj-y is code used by both qemu system emulation and qemu-img
--
--crypto-obj-y = crypto/
--
- #######################################################################
- # libraries built entirely from meson
- 
- authz-obj-y = authz/libauthz.fa
- authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
- 
-+crypto-obj-y = crypto/libcrypto.fa
-+
- qom-obj-y = qom/libqom.fa
- 
- #######################################################################
-diff --git a/Makefile.target b/Makefile.target
-index a9f5cac98a..f9e79492aa 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -180,12 +180,12 @@ all-obj-y := $(obj-y)
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call fix-paths,../,, \
-               authz-obj-y \
-+              crypto-obj-y \
-               qom-obj-y)
- dummy := $(call unnest-vars,.., \
-                block-obj-y \
-                block-obj-m \
-                chardev-obj-y \
--               crypto-obj-y \
-                io-obj-y \
-                common-obj-y \
-                common-obj-m)
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index 8338fc4408..4dafc8a08e 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -3,6 +3,7 @@ subdir('mem')
+ subdir('nubus')
+ subdir('semihosting')
+ subdir('smbios')
++subdir('vfio')
+ subdir('virtio')
+ subdir('watchdog')
+ subdir('xen')
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
 deleted file mode 100644
-index fe8b2eadf7..0000000000
---- a/crypto/Makefile.objs
+index abad8b818c..0000000000
+--- a/hw/vfio/Makefile.objs
 +++ /dev/null
-@@ -1,34 +0,0 @@
--crypto-obj-y = init.o
--crypto-obj-y += hash.o
--crypto-obj-$(CONFIG_NETTLE) += hash-nettle.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += hash-gcrypt.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += hash-glib.o
--crypto-obj-y += hmac.o
--crypto-obj-$(CONFIG_NETTLE) += hmac-nettle.o
--crypto-obj-$(CONFIG_GCRYPT_HMAC) += hmac-gcrypt.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib.o
--crypto-obj-y += aes.o
--crypto-obj-y += desrfb.o
--crypto-obj-y += cipher.o
--crypto-obj-$(CONFIG_AF_ALG) += afalg.o
--crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
--crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
--crypto-obj-y += tlscreds.o
--crypto-obj-y += tlscredsanon.o
--crypto-obj-y += tlscredspsk.o
--crypto-obj-y += tlscredsx509.o
--crypto-obj-y += tlssession.o
--crypto-obj-y += secret.o
--crypto-obj-y += pbkdf.o
--crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += pbkdf-gcrypt.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += pbkdf-stub.o
--crypto-obj-y += ivgen.o
--crypto-obj-y += ivgen-essiv.o
--crypto-obj-y += ivgen-plain.o
--crypto-obj-y += ivgen-plain64.o
--crypto-obj-y += afsplit.o
--crypto-obj-$(CONFIG_QEMU_PRIVATE_XTS) += xts.o
--crypto-obj-y += block.o
--crypto-obj-y += block-qcow.o
--crypto-obj-y += block-luks.o
-diff --git a/crypto/meson.build b/crypto/meson.build
-index 7250ffc9ca..d11b34f61e 100644
---- a/crypto/meson.build
-+++ b/crypto/meson.build
-@@ -1,3 +1,51 @@
-+crypto_ss = ss.source_set()
-+crypto_ss.add(genh)
-+crypto_ss.add(files(
-+  'afsplit.c',
-+  'block-luks.c',
-+  'block-qcow.c',
-+  'block.c',
-+  'cipher.c',
-+  'desrfb.c',
-+  'hash.c',
-+  'hmac.c',
-+  'ivgen-essiv.c',
-+  'ivgen-plain.c',
-+  'ivgen-plain64.c',
-+  'ivgen.c',
-+  'pbkdf.c',
-+  'secret.c',
-+  'tlscreds.c',
-+  'tlscredsanon.c',
-+  'tlscredspsk.c',
-+  'tlscredsx509.c',
-+  'tlssession.c',
+@@ -1,7 +0,0 @@
+-obj-y += common.o spapr.o
+-obj-$(CONFIG_VFIO_PCI) += pci.o pci-quirks.o display.o
+-obj-$(CONFIG_VFIO_CCW) += ccw.o
+-obj-$(CONFIG_VFIO_PLATFORM) += platform.o
+-obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+-obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+-obj-$(CONFIG_VFIO_AP) += ap.o
+diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
+new file mode 100644
+index 0000000000..b9a31caf74
+--- /dev/null
++++ b/hw/vfio/meson.build
+@@ -0,0 +1,17 @@
++vfio_ss = ss.source_set()
++vfio_ss.add(files(
++  'common.c',
++  'spapr.c',
 +))
++vfio_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
++  'display.c',
++  'pci-quirks.c',
++  'pci.c',
++))
++vfio_ss.add(when: 'CONFIG_VFIO_CCW', if_true: files('ccw.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_PLATFORM', if_true: files('platform.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_XGMAC', if_true: files('calxeda-xgmac.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_AMD_XGBE', if_true: files('amd-xgbe.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_AP', if_true: files('ap.c'))
 +
-+if 'CONFIG_GCRYPT' in config_host
-+  wo_nettle = files('hash-gcrypt.c', 'pbkdf-gcrypt.c')
-+else
-+  wo_nettle = files('hash-glib.c', 'pbkdf-stub.c')
-+endif
-+if 'CONFIG_GCRYPT_HMAC' not in config_host
-+  wo_nettle += files('hmac-glib.c')
-+endif
-+crypto_ss.add(when: [nettle, 'CONFIG_NETTLE'],
-+             if_true: files('hash-nettle.c', 'hmac-nettle.c', 'pbkdf-nettle.c'),
-+             if_false: wo_nettle)
-+
-+crypto_ss.add(when: 'CONFIG_QEMU_PRIVATE_XTS', if_true: files('xts.c'))
-+crypto_ss.add(when: 'CONFIG_GCRYPT_HMAC', if_true: files('hmac-gcrypt.c'))
-+crypto_ss.add(when: 'CONFIG_AF_ALG', if_true: files('afalg.c', 'cipher-afalg.c', 'hash-afalg.c'))
-+
-+crypto_ss = crypto_ss.apply(config_host, strict: false)
-+libcrypto = static_library('crypto', crypto_ss.sources(),
-+                           dependencies: [crypto_ss.dependencies()],
-+                           name_suffix: 'fa',
-+                           build_by_default: false)
-+
-+crypto = declare_dependency(link_whole: libcrypto)
-+
- util_ss.add(files('aes.c'))
- util_ss.add(files('init.c'))
- if 'CONFIG_GCRYPT' in config_host
-diff --git a/meson.build b/meson.build
-index 218c495063..f11c474302 100644
---- a/meson.build
-+++ b/meson.build
-@@ -276,6 +276,8 @@ subdir('qobject')
- subdir('stubs')
- subdir('trace')
- subdir('util')
-+subdir('qom')
-+subdir('authz')
- subdir('crypto')
- subdir('ui')
- 
-@@ -291,8 +293,6 @@ libqemuutil = static_library('qemuutil',
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: version_res)
- 
--subdir('qom')
--subdir('authz')
- subdir('fsdev')
- 
- # Other build targets
-diff --git a/qom/meson.build b/qom/meson.build
-index 3c41ed37e4..4af044d858 100644
---- a/qom/meson.build
-+++ b/qom/meson.build
-@@ -1,4 +1,5 @@
- qom_ss = ss.source_set()
-+qom_ss.add(genh)
- qom_ss.add(files(
-   'container.c',
-   'object.c',
-@@ -9,7 +10,6 @@ qom_ss.add(files(
- qom_ss = qom_ss.apply(config_host, strict: false)
- libqom = static_library('qom', qom_ss.sources(),
-                         dependencies: [qom_ss.dependencies()],
--                        link_with: [libqemuutil],
-                         name_suffix: 'fa')
- 
- qom = declare_dependency(link_whole: libqom)
++specific_ss.add_all(when: 'CONFIG_VFIO', if_true: vfio_ss)
 -- 
 2.21.0
 
