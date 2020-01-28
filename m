@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CEB4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FA2C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:15:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDA912173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:15:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A040D2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:15:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZzuoELgP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA912173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sz7RcOcr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A040D2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWKf-0004dJ-1x
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:15:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34943)
+	id 1iwWKu-0005JO-Ik
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:15:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6x-0002Nj-8j
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:16 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8h-0005Mv-54
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6w-00064h-3Y
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:15 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:35719)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8f-0001vm-Us
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:03 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:50764)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV6v-0005zu-TQ
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:14 -0500
-Received: by mail-wm1-x333.google.com with SMTP id b2so3598328wma.0
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:12 -0800 (PST)
+ id 1iwV8f-0001su-Nl
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:01 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id a5so3537223wmb.0
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:59:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bxrJtCRAcUaCAeENX33YYHYKJlZ9qAoaPZno4MAqgGk=;
- b=ZzuoELgP0l/mloxxs8zl2ugp09Kg1fM5+bkBuX3xvQaSF0ysXcb2R4eBe3d45AJ5hr
- nU49W9YwbmLyz1zAFVsi3xbjmUx4mXpt2P4aDcGwRlWGAeJD6Kucb8Lzb92figd49wQQ
- YznnVe5tRmwRpZrTMjGDMO2hiOOPFg89pIwmLhcEoGTE4O4tInDHKKSN6bV3hhIQzGNw
- D2xBgWi9dBYzjXd7nvpXZIR4yY4WE8r6EUtU4gl+ZSWCEb1WkButcYD9uYK3VWCxtdjz
- Df4HFX3nu8gkNI7rNkCV+W1Xoyk9mwjj1aQcAwn9F4/E0NKRNLjdvNlhUN6+G5GK1mvJ
- Fcuw==
+ bh=S2BwddqM4KyEVlQnjNFvdzFycjeND7cyvTUeQLgDTTs=;
+ b=Sz7RcOcrjl9IB3PtZC14PcihXqhH3w7rg3n09nKJOSgusvKEuvacTzHtn0Dit26Z93
+ mD8/jWVRpO/EStt6gPthcp//XpK86sDrp2dcxK0GBr3VNFZnCPXP03RlWy9DMI7ZTRUG
+ YD5D7G86ZtfwCF8+Bn07yDPU+4FOpmhLqGWBW8MOa3jOGKWQ81RCWbCUyeYE51XdvVKu
+ 30sP4qBwcD5pK4eguWBbL0DQMMxZoRNMDhpxPnslCueVe4+3tSD2qoMC0phifxJYbqFt
+ FrK9Excikre86QTI/VbYo7NG2DPZ3NYKhDBDV5ZTkbmXGvDS4a13h6N08XWGWBg2wJb1
+ dNUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=bxrJtCRAcUaCAeENX33YYHYKJlZ9qAoaPZno4MAqgGk=;
- b=QdC89cMe9z1Lu6eNbWAVZG4L6DpFQpgOKDIU5AY80u1VJPMAfZUWD+aPIdte85NMsI
- 2WXBaZDGOh6g2ZxdGYobF4kpyvB/8y4XyOoAH4/hA8Y2Qp5eEtwDLrOPPBHs68j5tfGF
- yCkSZflifnRXrWbJfKv1IUbxZACCTePHdyZuQhqke86MJySD/K8uSbEK63hZKtczVymP
- YBvQdk7xaiPG+En29TGygQf+DQHWpPSEpgvsR+rAhBLQ2bod1fK3Ob+iFegMOblgue9s
- rFVcIpj9VtTTQ6SWDP4x1gqC7S5cGOtCDXb2kK+RQ4wxRuoHzNyZsf1WSJoD0zASICs/
- b2kg==
-X-Gm-Message-State: APjAAAXRu5odpJXPPi71fQzAc+ROWM7afdaUySDTd0eNqBS7tU7vV9Le
- A6fL9Mf3OUR9sOPcGSWSyPEvhwUj
-X-Google-Smtp-Source: APXvYqxgAllkwuqRg54qWAZ/VS/8RCndFIZC0J6W8Sr4kl6hd+wuqMJFGnvbYWbDsW7+JXaPMm9l6w==
-X-Received: by 2002:a7b:c109:: with SMTP id w9mr6187753wmi.14.1580234231714;
- Tue, 28 Jan 2020 09:57:11 -0800 (PST)
+ bh=S2BwddqM4KyEVlQnjNFvdzFycjeND7cyvTUeQLgDTTs=;
+ b=HRpvJu485RzrXFYhoV0rY2dDzrZTtbJ3OHZMsjZiiwZ8W5KcHa991DlnyIYpZArqNQ
+ 3ttAKNJwQDP/2t/jeHptgNJjeW+2C4mnbg5ditomWSk/kAIsVmjA565mZegy0L03FJrg
+ 78vFvkGbRU+qpiKsXwd1DwrZrwZW9fvHxfpLqRDT+uK17eLknCPG7U0A6N/lXt6A0XjB
+ zFknLJ8v1/vhHzidHDYY6oiz41vJRQZATTxDcwRTIf7NsJOlRkJ1F7WYQyVdfzj9LmIS
+ nTyjEv+31HfxSIrFrYoOggk/EVQjsHSt+Awbi99mKqqCSayvDYV0Bv5niXbFAr7hmSkq
+ wSOw==
+X-Gm-Message-State: APjAAAXKmyaqWvvbEbeYzQ2SB2vFV4dd0LXcmnTn0GgqWpxBH6goazYP
+ SGHtTPXP9BgF7B2j+GACH8n7Eb/t
+X-Google-Smtp-Source: APXvYqybloEqI3Ro+mNzl0NAhNupOn3aTZaU1dlmkmT+6ikp2p58TdI/vE6hqU8i83o3QCNtLSpGNw==
+X-Received: by 2002:a7b:cc14:: with SMTP id f20mr6257925wmh.58.1580234340496; 
+ Tue, 28 Jan 2020 09:59:00 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.10
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.58.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:57:11 -0800 (PST)
+ Tue, 28 Jan 2020 09:59:00 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 086/142] meson: convert hw/pci-host
-Date: Tue, 28 Jan 2020 18:52:46 +0100
-Message-Id: <20200128175342.9066-87-pbonzini@redhat.com>
+Subject: [PATCH 132/142] meson: install desktop file
+Date: Tue, 28 Jan 2020 18:53:32 +0100
+Message-Id: <20200128175342.9066-133-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,96 +103,35 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs          |  2 +-
- hw/meson.build            |  1 +
- hw/pci-host/Makefile.objs | 22 ----------------------
- hw/pci-host/meson.build   | 23 +++++++++++++++++++++++
- 4 files changed, 25 insertions(+), 23 deletions(-)
- delete mode 100644 hw/pci-host/Makefile.objs
- create mode 100644 hw/pci-host/meson.build
+ Makefile       | 3 ---
+ ui/meson.build | 2 ++
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 21d3f6045c..ef4c5e503e 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -22,7 +22,7 @@ devices-dirs-y += net/
- devices-dirs-y += rdma/
- devices-dirs-y += nvram/
- devices-dirs-y += pci/
--devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
-+devices-dirs-$(CONFIG_PCI) += pci-bridge/
+diff --git a/Makefile b/Makefile
+index 898949ded6..474aaeb1a9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -230,9 +230,6 @@ endif
  endif
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/meson.build b/hw/meson.build
-index ed25644237..ca36e486e7 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,6 +1,7 @@
- subdir('core')
- subdir('mem')
- subdir('nubus')
-+subdir('pci-host')
- subdir('pcmcia')
- subdir('rtc')
- subdir('scsi')
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-deleted file mode 100644
-index 9c466fab01..0000000000
---- a/hw/pci-host/Makefile.objs
-+++ /dev/null
-@@ -1,22 +0,0 @@
--common-obj-$(CONFIG_PAM) += pam.o
--
--# PPC devices
--common-obj-$(CONFIG_PREP_PCI) += prep.o
--common-obj-$(CONFIG_GRACKLE_PCI) += grackle.o
--# NewWorld PowerMac
--common-obj-$(CONFIG_UNIN_PCI) += uninorth.o
--# PowerPC E500 boards
--common-obj-$(CONFIG_PPCE500_PCI) += ppce500.o
--
--# ARM devices
--common-obj-$(CONFIG_VERSATILE_PCI) += versatile.o
--
--common-obj-$(CONFIG_PCI_SABRE) += sabre.o
--common-obj-$(CONFIG_FULONG) += bonito.o
--common-obj-$(CONFIG_PCI_I440FX) += i440fx.o
--common-obj-$(CONFIG_XEN_IGD_PASSTHROUGH) += xen_igd_pt.o
--common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
--common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) += gpex.o
--common-obj-$(CONFIG_PCI_EXPRESS_XILINX) += xilinx-pcie.o
--
--common-obj-$(CONFIG_PCI_EXPRESS_DESIGNWARE) += designware.o
-diff --git a/hw/pci-host/meson.build b/hw/pci-host/meson.build
-new file mode 100644
-index 0000000000..ad5d8ad4e0
---- /dev/null
-+++ b/hw/pci-host/meson.build
-@@ -0,0 +1,23 @@
-+pci_ss = ss.source_set()
-+pci_ss.add(when: 'CONFIG_FULONG', if_true: files('bonito.c'))
-+pci_ss.add(when: 'CONFIG_PAM', if_true: files('pam.c'))
-+pci_ss.add(when: 'CONFIG_PCI_EXPRESS_DESIGNWARE', if_true: files('designware.c'))
-+pci_ss.add(when: 'CONFIG_PCI_EXPRESS_GENERIC_BRIDGE', if_true: files('gpex.c'))
-+pci_ss.add(when: 'CONFIG_PCI_EXPRESS_Q35', if_true: files('q35.c'))
-+pci_ss.add(when: 'CONFIG_PCI_EXPRESS_XILINX', if_true: files('xilinx-pcie.c'))
-+pci_ss.add(when: 'CONFIG_PCI_I440FX', if_true: files('i440fx.c'))
-+pci_ss.add(when: 'CONFIG_PCI_SABRE', if_true: files('sabre.c'))
-+pci_ss.add(when: 'CONFIG_XEN_IGD_PASSTHROUGH', if_true: files('xen_igd_pt.c'))
+ install: all install-datadir install-localstatedir
+-	mkdir -p "$(DESTDIR)$(qemu_desktopdir)"
+-	$(INSTALL_DATA) $(SRC_PATH)/ui/qemu.desktop \
+-		"$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
+ ifdef CONFIG_GTK
+ 	$(MAKE) -C po $@
+ endif
+diff --git a/ui/meson.build b/ui/meson.build
+index 1d87b975e1..024aa18bac 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -110,4 +110,6 @@ endforeach
+ subdir('shader')
+ subdir('icons')
+ 
++install_data('qemu.desktop', install_dir: config_host['qemu_desktopdir'])
 +
-+# PPC devices
-+pci_ss.add(when: 'CONFIG_PREP_PCI', if_true: files('prep.c'))
-+pci_ss.add(when: 'CONFIG_GRACKLE_PCI', if_true: files('grackle.c'))
-+# NewWorld PowerMac
-+pci_ss.add(when: 'CONFIG_UNIN_PCI', if_true: files('uninorth.c'))
-+# PowerPC E500 boards
-+pci_ss.add(when: 'CONFIG_PPCE500_PCI', if_true: files('ppce500.c'))
-+
-+# ARM devices
-+pci_ss.add(when: 'CONFIG_VERSATILE_PCI', if_true: files('versatile.c'))
-+
-+softmmu_ss.add_all(when: 'CONFIG_PCI', if_true: pci_ss)
+ modules += {'ui': ui_modules}
 -- 
 2.21.0
 
