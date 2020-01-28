@@ -2,79 +2,79 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E31C33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 09:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD52C33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 09:33:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4240424684
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 09:27:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A7242467B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 09:33:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xkrgfh6n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4240424684
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ifwOkuL4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A7242467B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwN9W-0005cN-G9
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 04:27:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32878)
+	id 1iwNFE-0007c6-9r
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 04:33:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iwN8v-0004x6-13
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 04:26:46 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iwNEZ-00074j-U6
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 04:32:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iwN8t-0004dv-MN
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 04:26:44 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36630)
+ (envelope-from <peter.maydell@linaro.org>) id 1iwNEY-0003I3-JG
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 04:32:35 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39682)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iwN8t-0004cV-Fv
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 04:26:43 -0500
-Received: by mail-ot1-x344.google.com with SMTP id g15so11371466otp.3
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 01:26:43 -0800 (PST)
+ id 1iwNEY-0003FW-Ce
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 04:32:34 -0500
+Received: by mail-oi1-x242.google.com with SMTP id z2so9674304oih.6
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 01:32:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5Spr0i7p9df6cetWmvq1eFR/35DVSFU8jnLP9lOVwKE=;
- b=Xkrgfh6n7LyBnsbxZgqS6D/vqdxCNvaf01OtsLRY+DJypn07P2vz0l9uOj6oXkVL6Q
- DNLVesaSscXepz0YrHcWEA3pznS1NgG6WTNuvWbHahdJ6lAw3Z6TJYWUnDaBoiGN+VgD
- zpp5q1lfI8+s5jDUCsZEE7/rT+SYOeS72CNzjGtJVl+Qnf2S24MHa8lkMYGOQu11kaPZ
- 5O6oILrM/ubtirYTDH0n1mXuC2VqysIj/v6mGFz4diJZnaAwR15Q86pIWp2Fx4/OWaPR
- WNymAXsMLg0FSB/jxFSHBzXK7rHsxI/nN9H0LpXTFyBKn/o7ouWMdreNZUIF0tvMoEtP
- tAgg==
+ :cc; bh=3Cgm2LVkWdI0MgfVRfsoA6xBdhzQnTxBEhmmqV9vFb4=;
+ b=ifwOkuL4OcHgaXvmLSrp8hmNy03KaHW4A8j/JOG5cMpP54d+0Tz53SKWrz8b7UchLG
+ mWFMyD5ZX5DEbmE1ll0lCvBDAXBXtVynG9UpDyCJx8xdckvm/4519k/FZ1RMbovXz2Xx
+ EUVX6Am3moY7sG6z8I0kolYVxirPKe5phjSDS43Bivg+RhWiwNQOxTkMXi03YiU4SfLn
+ JjC+aNarvAVZ01v7t8TsLCpgLEk5gGKIFmHhA4g9l/ZNb36vJwMk8HzOl0Arv2zGYAZO
+ aJWXb6wYamriOmZpMEfc3Vqj12i8NleQsqK9ZSmL6RGi0LJjjTTiDPApr3kKrrYDwMiD
+ 7pjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=5Spr0i7p9df6cetWmvq1eFR/35DVSFU8jnLP9lOVwKE=;
- b=qIYRKzaSZjHYMBJPDrs5InjD2H74u2lIWB7i5VoTuKC+SROaReWBIZtdRQLGqL+iSM
- IhRiSczL/4gVztIzRXOrcCrNf78R9Ylnzi+oT86yXQYhQcK4bblw5nDcKnO2ZQb986Zi
- ExEF/AOELXWHHXTREBur83wTRYJexP7KyzP2g0iAH0Fa2ovye6k8RregFxGyO46VduDG
- m6iyHygdkdgMdkDzJ4ITSTxQz+bbbN3Fvivj5YMnqZDA+vZub0OvIK0e5m21Y9VHerCl
- IrKZk7993of5Qah4oysThpT7YyJI3spGLhihLBA9Loc99pe9Jvg2/n61E5ZOfBOjA8Ds
- bDDQ==
-X-Gm-Message-State: APjAAAVlYcbuJyHQboe37D2YAdGDwBCXJj8NDbwgjwUdUaZO4HJjkodV
- LL4Yx9OQvREjq0on+wgRlsY+Tk7MBhChfUhidViQeA==
-X-Google-Smtp-Source: APXvYqwTctdN0gze9FbBebfBj6+ucx45GT7IRtcxPmlrq8r28b6KK6i7TLarXU8Ybo8EvdhQLPsPTxf1GMiEvQlkOkY=
-X-Received: by 2002:a05:6830:184:: with SMTP id
- q4mr16029508ota.232.1580203602545; 
- Tue, 28 Jan 2020 01:26:42 -0800 (PST)
+ bh=3Cgm2LVkWdI0MgfVRfsoA6xBdhzQnTxBEhmmqV9vFb4=;
+ b=gGWsI1YZcNpaLTXbdTmMbPNYJ4Yk3h91ZYIAXqHMgpTYx9qBjMPVCTDkGpQX1rgsBl
+ 62nt3VA7f6Mu16XmSQeiAIcBN3TRH7xQmn9+J78Rly/Qk0Hh8VZZCsSu+HwpqOK3g369
+ zdLa2XbXli9p812lvndMtsnUIPgKSo8L9Pdc+D31V0IVsMdEMuA6NCvJqlDQdhafWgUf
+ lc79r+wgLoN1mRQr5+Ich2HtJI5QVINeO6n80Eljo3QYuS/vgRugibMdyghQAOIYnFT/
+ 7k6xEtLqAyiJVpwy4sU+VurXPUx3khi6zDA+AYRwutoImC3GIEEulwdcQWCHQrzuLQMm
+ l3gw==
+X-Gm-Message-State: APjAAAWm9W2eoGmVW6OYWmBD8U0uk41wxLPVYYAgKJ8MW7eeMKJKqUmx
+ yag01L6gRhouGcKriNdupNgLMYF4NeOdrtlh13fwuQ==
+X-Google-Smtp-Source: APXvYqw1t9MI6fkQ98GWqazm9xoR8nsqrGDHyC/oeUufE8JQR6b8v60zQiQt0+owWgPWaNxL0/V7prGG1eXOd+tPauQ=
+X-Received: by 2002:aca:f484:: with SMTP id s126mr2169065oih.48.1580203953422; 
+ Tue, 28 Jan 2020 01:32:33 -0800 (PST)
 MIME-Version: 1.0
-References: <20200116115700.127951-1-mkysel@tachyum.com>
-In-Reply-To: <20200116115700.127951-1-mkysel@tachyum.com>
+References: <20200127175559.18173-1-kwolf@redhat.com>
+In-Reply-To: <20200127175559.18173-1-kwolf@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jan 2020 09:26:31 +0000
-Message-ID: <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
-Subject: Re: [PATCH] Handling SIGSETXID used by glibc NPTL setuid/setgid
-To: Matus Kysel <mkysel@tachyum.com>
+Date: Tue, 28 Jan 2020 09:32:22 +0000
+Message-ID: <CAFEAcA_rsVARS16J0nDrhJeSyyb8tYu8eRCrnhfyyjJ0Kz-QWw@mail.gmail.com>
+Subject: Re: [PULL 00/13] Block layer patches
+To: Kevin Wolf <kwolf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,58 +86,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Jan 2020 at 11:58, Matus Kysel <mkysel@tachyum.com> wrote:
+On Mon, 27 Jan 2020 at 17:56, Kevin Wolf <kwolf@redhat.com> wrote:
 >
-> Used same style to handle another glibc reserved signal SIGSETXID (33),
-> that is used by glibc NPTL setuid/setgid functions. This should fix problems
-> with application using those functions and failing with error
-> "qemu:handle_cpu_signal received signal outside vCPU context".
+> The following changes since commit 105b07f1ba462ec48b27e5cb74ddf81c6a79364c:
 >
-> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
-> ---
->  linux-user/signal.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200127' into staging (2020-01-27 13:02:36 +0000)
 >
-> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> index 0128bde4d2..c59221fd0a 100644
-> --- a/linux-user/signal.c
-> +++ b/linux-user/signal.c
-> @@ -66,11 +66,16 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
->      [SIGPWR] = TARGET_SIGPWR,
->      [SIGSYS] = TARGET_SIGSYS,
->      /* next signals stay the same */
-> -    /* Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
-> -       host libpthread signals.  This assumes no one actually uses SIGRTMAX :-/
-> -       To fix this properly we need to do manual signal delivery multiplexed
-> -       over a single host signal.  */
-> +    /*
-> +     * Nasty hack: Swap SIGRTMIN and SIGRTMIN + 1 with SIGRTMAX and SIGRTMAX - 1
-> +     * to avoid overlap with host libpthread (NPTL glibc) signals.
-> +     * This assumes no one actually uses SIGRTMAX and SIGRTMAX - 1 :-/
-> +     * To fix this properly we need to do manual signal delivery multiplexed
-> +     * over a single host signal.
-> +     */
->      [__SIGRTMIN] = __SIGRTMAX,
-> +    [__SIGRTMIN + 1] = __SIGRTMAX - 1,
-> +    [__SIGRTMAX - 1] = __SIGRTMIN + 1,
->      [__SIGRTMAX] = __SIGRTMIN,
->  };
->  static uint8_t target_to_host_signal_table[_NSIG];
-> --
-> 2.17.1
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 5fbf1d56c24018772e900a40a0955175ff82f35c:
+>
+>   iscsi: Don't access non-existent scsi_lba_status_descriptor (2020-01-27 17:19:53 +0100)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - iscsi: Cap block count from GET LBA STATUS (CVE-2020-1711)
+> - AioContext fixes in QMP commands for backup and bitmaps
+> - iotests fixes
+>
+> ----------------------------------------------------------------
 
-This is a long-standing known problem, but doing this is likely
-to break currently-working guest binaries (notably things written
-in Go). See for example the discussion on this thread:
-https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03804.html
 
-thanks
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
 -- PMM
 
