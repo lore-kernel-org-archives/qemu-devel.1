@@ -2,92 +2,117 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A474C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE1E6C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:45:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28D0A24683
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A22A2051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:45:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJipcIgn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28D0A24683
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Po/Gk+PJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A22A2051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwSwB-0005sd-8S
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 10:37:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37110)
+	id 1iwT2x-0000an-Fg
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 10:44:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iwSvT-0005Sp-R7
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:37:17 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iwT29-00088L-Cp
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:44:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iwSvS-0007Gh-4j
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:37:15 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41146
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iwSvS-0007GK-1C
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:37:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580225833;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CgKSAc3CpnHd13rgHLzZTZ0adltD5pXbnis1TA8gVK8=;
- b=DJipcIgnelY1Pmn972J7GUdbZY9F3pm6v1ARhy6E4CdGDY06YW0LqBZHr8x+N9H96jzoTQ
- etu+Cy93flvOcYnPbUMwI/wuPe4ZCILgfcAt4QaNUWJXX1IUCrI7WgWOrpCnFj6WsgPbMi
- GOLLhkHPXJ5RW8NfbjAt0bsMqIzd3+s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-QhRRQ0QANSuytvS9iVm7HA-1; Tue, 28 Jan 2020 10:36:54 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5B811084443;
- Tue, 28 Jan 2020 15:36:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D90088840;
- Tue, 28 Jan 2020 15:36:38 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1810B1138600; Tue, 28 Jan 2020 16:36:37 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: Making QEMU easier for management tools and applications
-References: <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <871rrp474i.fsf@dusky.pond.sub.org>
- <20200124102743.GB824327@redhat.com>
- <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
- <87sgk3x2im.fsf@dusky.pond.sub.org>
- <20200127115606.GA5669@linux.fritz.box>
- <1c65b678-7bb4-a4cc-5fa6-03d6d27cf381@redhat.com>
- <CABgObfZNHP68i4xLEYhBw=cRFgXcKnUKnqEk_7LFseoeKizB=Q@mail.gmail.com>
- <20200128101622.GG1446339@redhat.com>
- <20200128103947.GB6431@linux.fritz.box>
-Date: Tue, 28 Jan 2020 16:36:37 +0100
-In-Reply-To: <20200128103947.GB6431@linux.fritz.box> (Kevin Wolf's message of
- "Tue, 28 Jan 2020 11:39:47 +0100")
-Message-ID: <87blqnbnju.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iwT27-0005R8-Rf
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:44:09 -0500
+Received: from mail-eopbgr30118.outbound.protection.outlook.com
+ ([40.107.3.118]:25504 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iwT27-0005OY-AB
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:44:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bTHkNIN4LQPhikqrRhNDnt9Nm5ZRbPyN2x1DhETsvvxdzCv1qCFSCWZoC8LeqwCNAyT8v8imejCFiZiDhz2mo1CY3iKPwhdaJvAdX2ZOY2nMug1NFI967pwUENQ/FqKos3n3KtCIXuDKdPpmmAG74h0CDYMPwgPdvcK5i8kezxxqT7eBgi/lCuV0JkzWa/J+9RYEmt9X+7npgG7tyQHqGFsRJPIlXjsw03Iv/M7ubFxUybEoKbWkP+6GI2cc7yeFxDkk1PgK+e/Fyyq1BISRyy9Azfu5oDYHdTCjoJuwtXGG9QiSwebDyqd8h4pSmahsYGYsdBAH3PdjVPaDwXLRGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1irsbPR0ib7jioJA7P2t52etK1jDYPN3dLvAJX3n018=;
+ b=jhJblS1iCQ8nkxBOKNf37Xp9NZaN+obFWmj5BfO383jv5DqES2ciPxxRkITaKBWUAt2QfHLPy3RocdfR/TS9egeOL9wAhTDmW6t6wCnuNLNNwoNzkIdnYMMi2bN5RbIasp/e6XNN/OqMdFtDPnJYHy1pURecZiNSlWGbAEa/ipWFGigF0USDPP/1fwDqgFKYmPq4eTaY57DicML8sGwcrSpzmzhDZDXWaEgzjZnqMvJ9QsO2DlZz5o5s3Fh31ZH4PgepKsROmK9i0bV/fhKud948wM4qBQIRmKck+xh7b1ruBS90hqIExvhz7cV7BryssDKNmLK8caD95el3UWj3MA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1irsbPR0ib7jioJA7P2t52etK1jDYPN3dLvAJX3n018=;
+ b=Po/Gk+PJcGMVsypoZFsmgL6pISSzmtrFjPBusmmX+RJgZ97rCZUqjK6ArXTURaq0K/sN9G629UctOLbiTlWrnvCDvBhP3G6gLJ6Fzw4JQ94ejlNyP+S4rVhOQCAy2TcyUeTKGpy6KIGKf5CC1kLEOfibV43sTJam+MjkfwfeiQQ=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3541.eurprd08.prod.outlook.com (20.177.116.95) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.24; Tue, 28 Jan 2020 15:44:04 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2665.026; Tue, 28 Jan 2020
+ 15:44:04 +0000
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR05CA0366.eurprd05.prod.outlook.com (2603:10a6:7:94::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.20 via Frontend Transport; Tue, 28 Jan 2020 15:44:03 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: python3 script header and rhel8
+Thread-Topic: python3 script header and rhel8
+Thread-Index: AQHV1fHEgKhq97GBT0GwxX/lyokU2Q==
+Date: Tue, 28 Jan 2020 15:44:04 +0000
+Message-ID: <2cb797a9-25ec-8b36-2268-ec9638b14e1e@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0366.eurprd05.prod.outlook.com
+ (2603:10a6:7:94::25) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 11bcc879-3fa7-4f55-1c73-08d7a408e726
+x-ms-traffictypediagnostic: AM6PR08MB3541:
+x-microsoft-antispam-prvs: <AM6PR08MB3541933D01A4E8ACE8D33D65C10A0@AM6PR08MB3541.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 029651C7A1
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(39850400004)(136003)(346002)(396003)(366004)(189003)(199004)(31686004)(186003)(66446008)(6486002)(86362001)(66946007)(66476007)(8936002)(64756008)(478600001)(16526019)(2906002)(36756003)(66556008)(5660300002)(8676002)(31696002)(6916009)(71200400001)(16576012)(956004)(52116002)(81156014)(81166006)(26005)(316002)(2616005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3541;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 71+40N7nuWfpdZ4ilTKniI44bWUvYGGFZJKG6zAxkR6mEB1MZfcQ6lgcRUuwqewpiP8Uj+bYD80I4xW9pSEFwIhXWDYxCxLCl9Q+hihKNQvM1jg5nGbLnRfp+647rEF2jhNTImJ6HChrGRFBMnWg9OpRjcnXALlMraWFkSOWUZhUJ9dLqYq7aYuUyfgZQoK5rJ9VOGR6yAnSnV/XVQz5sTqCu9toaBSf0/MZP5wYg5nbLnanNJbWFKeMWhwhW//qXZecrF51Tkra0PxqktfD7DgfWVXvz6JYyEYKmKsSH2/SfJHwI+LrRixDqHjqMRBRqosB43+H6K/oGAm1/e8PJDaeopk/fQjWBPlSz4qycoq/Ue/a0KBr63yue6i8RbgJmBSycwnv8irA10A87iSe49kCLPM3j96n9FQCGICOzsmSXkmzXvIFrX8iGovvoTSp
+x-ms-exchange-antispam-messagedata: ulasCIh8z9xuejcfMuPk/IMA+hVnvWS8KT1V0PvW/fJxXEXAJJEgbtPEvq00w9vV2TAWQtv+/jMCi1mKwwCfH4LYdAAQfiCNWu0l3oNnAuKPK3ybgFyQwao9FqIFlIqYVDD5hzmyexEqgPZ55hNfnw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <070A958534045841A7651344932EF7F9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: QhRRQ0QANSuytvS9iVm7HA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11bcc879-3fa7-4f55-1c73-08d7a408e726
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2020 15:44:04.4061 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lHsv0AGDXzj2G7mtr/p1ldHJGthp6oG2X9T4ogtGF6LAxjFJhWDLcIbIZWPn5QauxUXtrsJbC/PxWbV4U9UZDBO3Xgg09R0HLZECkn/+jG4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3541
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.118
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,112 +124,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: Eric for netdev_add QAPIfication.
-
-Kevin Wolf <kwolf@redhat.com> writes:
-
-> Am 28.01.2020 um 11:16 hat Daniel P. Berrang=C3=A9 geschrieben:
->> On Mon, Jan 27, 2020 at 11:38:49PM +0100, Paolo Bonzini wrote:
->> > Il lun 27 gen 2020, 21:11 John Snow <jsnow@redhat.com> ha scritto:
->> >=20
->> > >
->> > > > ./qemu-core <<EOF
->> > > {
->> > >     "machine": "Q35",
->> > >     "memory": "2GiB",
->> > >     "accel": "kvm"
->> > > }
->> > > EOF
->> > >
->> >=20
->> > And now you have to keep all the syntactic sugar that is in vl.c. I do=
-n't
->> > think a redesign of -readconfig should accept anything less verbose th=
-an
->> >=20
->> > - machine:
->> >     type: q35
->> >     ram:
->> >        type: memory-backend-hostmem
->> >        size: 2G
->> > - accel:
->> >   - type: kvm
->> >=20
->> > And this is not even taking into account disks.
->> >=20
->> > I like the idea of refactoring all the syntactic sugar into a pre-pass=
- on
->> > command line options. This is not an entirely new idea, see
->> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg35024.html.
->> >=20
->> > I am afraid that this thread is derailing a bit, with lots of pipe dre=
-ams
->> > and no actionable items. How do we get it back in track?
->>=20
->> To me the one thing that is clear. No matter what approach we want to
->> take to QEMU configuration/interaction/CLI/etc, one critical bit of
->> work is a pre-requisite...
->>=20
->> ...we must finish[1] the QAPI modelling of QEMU's features in some
->> short, finite timeframe. We can't let it drag on for another 5 years
->> or more. I'd say we need a timeframe that is 2 years max, preferrably
->> 1 year.
->>=20
->> I don't think we can achieve this by leaving the task up to to the
->> QAPI maintainers alone. It is unreasonable to put such a burden to
->> on a small number of people to both implement & review it all. We
->> need to consider it a project wide priority item so that we can get
->> broader involvement across all maintainers, in closing the gaps.
-
-Thank you, Daniel.  More on it below.
-
->> I'm not sure if we have any clear list of where our known gaps exist ?
->
-> I don't know about a full list, but I've been discussing command line
-> QAPIfication a bit with Markus recently because we had the idea of using
-> qemu-storage-daemon as a guinea pig for it.
-
-I still like that idea.  We can explore a 100% QAPIfied CLI there with
-minimal disruption elsewhere, and without CLI compatibility concerns.
-Constraints due to the shared QAPI schema remain, unless we freely
-duplicate stuff, which would probably be a bad idea.
-
-> The big one seems to be QOM (and qdev). object-add and device-add are
-> both not defined in terms of QAPI. One of them uses an "any" type (which
-> results in QObjects with arbitrary content being passed), the other one
-> "gen": false (which avoids generating anything from the schema).
-
-These are the known "cheats" in QMP.  There's also netdev_add, but Eric
-has patches to QAPIfy it properly.  Eric, I hope you can dust them off.
-
-For CLI, we have numerous options to QAPIfy.  Some of them are trivial.
-Others involve QAPIfying substantial code behind them: I don't want a
-QAPIfied option to immediately stuff everything into QemuOpts for
-outmoded internal interfaces.  Such shortcuts is what got us into the
-netdev_add mess.
-
-QAPIfying internal interfaces is one of the areas where we QAPI guys
-will need help.
-
-> I know that some more options exist that have unusual syntax and are
-> hard to convert to QAPI while maintaining command line compatibility.
-
-Weird semantics can also get in the way.  For instance, when we replaced
--drive with -blockdev, we used the opportunity to ditch block backend
-auto-deletion.
-
-> Maybe that should be solved by just designing new options and
-> deprecating the old ones.
-
+SGkgYWxsIQ0KDQpIbW0gUWVtdSBkcm9wcGVkIHN1cHBvcnQgZm9yIHB5dGhvbjIsIGFuZCBhbnl3
+YXkgcHl0aG9uMiBpcyBub3Qgc3VwcG9ydGVkIG5vdyBhdCBhbGwuDQoNClN0aWxsLCB3ZSBoYXZl
+IGEgbG90IG9mICIjIS91c3IvYmluL2VudiBweXRob24iIGhlYWRpbmdzIGluIG91ciBzY3JpcHRz
+LCB3aGljaCBpcw0KdW5zdXBwb3J0ZWQgYnkgcmhlbDggYnkgZGVmYXVsdC4gU28sIGZvciBleGFt
+cGxlLCBiZWNhdXNlIG9mIHN1Y2ggbGluZSBpbg0KdGVzdHMvcWVtdS1pb3Rlc3RzL25iZC1mYXVs
+dC1pbmplY3Rvci5weSwgaW90ZXN0IDI3NyBmYWlscy4NCg0KT2YgY291cnNlLCBpdCdzIHNpbXBs
+ZSB0byBzZXQgcHl0aG9uIGluIHJoZWw4IHRvIGJlIHB5dGhvbjMuLi4gQnV0IHNob3VsZCB3ZSBm
+aXgNCmFsbCB0aGUgaGVhZGluZ3MgdG8gYmUgIiMhL3Vzci9iaW4vZW52IHB5dGhvbjMiPyBPciB3
+aGF0IGlzIHRoZSBjb3JyZWN0IGhlYWRpbmcNCmZvciBzY3JpcHRzIGluIGEgbmV3IHB5dGhvbjMg
+d29ybGQ/DQoNCg0KIyBnaXQgZ3JlcCAtbCAnXiMhL3Vzci9iaW4vZW52IHB5dGhvbiQnDQpzY3Jp
+cHRzL2FuYWx5c2UtOXAtc2ltcGxldHJhY2UucHkNCnNjcmlwdHMvYW5hbHlzZS1sb2Nrcy1zaW1w
+bGV0cmFjZS5weQ0Kc2NyaXB0cy9kZWNvZGV0cmVlLnB5DQpzY3JpcHRzL2RldmljZS1jcmFzaC10
+ZXN0DQpzY3JpcHRzL2t2bS9rdm1fZmxpZ2h0cmVjb3JkZXINCnNjcmlwdHMvcWFwaS1nZW4ucHkN
+CnNjcmlwdHMvcmVuZGVyX2Jsb2NrX2dyYXBoLnB5DQpzY3JpcHRzL3JlcGxheS1kdW1wLnB5DQpz
+Y3JpcHRzL3NpbXBsZXRyYWNlLnB5DQpzY3JpcHRzL3RyYWNldG9vbC5weQ0Kc2NyaXB0cy90cmFj
+ZXRvb2wvX19pbml0X18ucHkNCnNjcmlwdHMvdHJhY2V0b29sL2JhY2tlbmQvX19pbml0X18ucHkN
+CnNjcmlwdHMvdHJhY2V0b29sL2JhY2tlbmQvZHRyYWNlLnB5DQpzY3JpcHRzL3RyYWNldG9vbC9i
+YWNrZW5kL2Z0cmFjZS5weQ0Kc2NyaXB0cy90cmFjZXRvb2wvYmFja2VuZC9sb2cucHkNCnNjcmlw
+dHMvdHJhY2V0b29sL2JhY2tlbmQvc2ltcGxlLnB5DQpzY3JpcHRzL3RyYWNldG9vbC9iYWNrZW5k
+L3N5c2xvZy5weQ0Kc2NyaXB0cy90cmFjZXRvb2wvYmFja2VuZC91c3QucHkNCnNjcmlwdHMvdHJh
+Y2V0b29sL2Zvcm1hdC9fX2luaXRfXy5weQ0Kc2NyaXB0cy90cmFjZXRvb2wvZm9ybWF0L2MucHkN
+CnNjcmlwdHMvdHJhY2V0b29sL2Zvcm1hdC9kLnB5DQpzY3JpcHRzL3RyYWNldG9vbC9mb3JtYXQv
+aC5weQ0Kc2NyaXB0cy90cmFjZXRvb2wvZm9ybWF0L2xvZ19zdGFwLnB5DQpzY3JpcHRzL3RyYWNl
+dG9vbC9mb3JtYXQvc2ltcGxldHJhY2Vfc3RhcC5weQ0Kc2NyaXB0cy90cmFjZXRvb2wvZm9ybWF0
+L3N0YXAucHkNCnNjcmlwdHMvdHJhY2V0b29sL2Zvcm1hdC90Y2dfaC5weQ0Kc2NyaXB0cy90cmFj
+ZXRvb2wvZm9ybWF0L3RjZ19oZWxwZXJfYy5weQ0Kc2NyaXB0cy90cmFjZXRvb2wvZm9ybWF0L3Rj
+Z19oZWxwZXJfaC5weQ0Kc2NyaXB0cy90cmFjZXRvb2wvZm9ybWF0L3RjZ19oZWxwZXJfd3JhcHBl
+cl9oLnB5DQpzY3JpcHRzL3RyYWNldG9vbC9mb3JtYXQvdXN0X2V2ZW50c19jLnB5DQpzY3JpcHRz
+L3RyYWNldG9vbC9mb3JtYXQvdXN0X2V2ZW50c19oLnB5DQpzY3JpcHRzL3RyYWNldG9vbC90cmFu
+c2Zvcm0ucHkNCnNjcmlwdHMvdHJhY2V0b29sL3ZjcHUucHkNCnRlc3RzL2FjY2VwdGFuY2Uvdmly
+dGlvX3NlZ19tYXhfYWRqdXN0LnB5DQp0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVy
+c2lvbnMucHkNCnRlc3RzL2RvY2tlci90cmF2aXMucHkNCnRlc3RzL3FhcGktc2NoZW1hL3Rlc3Qt
+cWFwaS5weQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzAzMA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzA0MA0K
+dGVzdHMvcWVtdS1pb3Rlc3RzLzA0MQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzA0NA0KdGVzdHMvcWVt
+dS1pb3Rlc3RzLzA0NQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzA1NQ0KdGVzdHMvcWVtdS1pb3Rlc3Rz
+LzA1Ng0KdGVzdHMvcWVtdS1pb3Rlc3RzLzA1Nw0KdGVzdHMvcWVtdS1pb3Rlc3RzLzA2NQ0KdGVz
+dHMvcWVtdS1pb3Rlc3RzLzA5Mw0KdGVzdHMvcWVtdS1pb3Rlc3RzLzA5Ng0KdGVzdHMvcWVtdS1p
+b3Rlc3RzLzExOA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzEyNA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzEy
+OQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzEzMg0KdGVzdHMvcWVtdS1pb3Rlc3RzLzEzNg0KdGVzdHMv
+cWVtdS1pb3Rlc3RzLzEzOQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzE0Nw0KdGVzdHMvcWVtdS1pb3Rl
+c3RzLzE0OA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzE0OQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzE1MQ0K
+dGVzdHMvcWVtdS1pb3Rlc3RzLzE1Mg0KdGVzdHMvcWVtdS1pb3Rlc3RzLzE1NQ0KdGVzdHMvcWVt
+dS1pb3Rlc3RzLzE2Mw0KdGVzdHMvcWVtdS1pb3Rlc3RzLzE2NQ0KdGVzdHMvcWVtdS1pb3Rlc3Rz
+LzE2OQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzE5NA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzE5Ng0KdGVz
+dHMvcWVtdS1pb3Rlc3RzLzE5OQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIwMg0KdGVzdHMvcWVtdS1p
+b3Rlc3RzLzIwMw0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIwNQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIw
+Ng0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIwNw0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIwOA0KdGVzdHMv
+cWVtdS1pb3Rlc3RzLzIwOQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIxMA0KdGVzdHMvcWVtdS1pb3Rl
+c3RzLzIxMQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIxMg0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIxMw0K
+dGVzdHMvcWVtdS1pb3Rlc3RzLzIxNg0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIxOA0KdGVzdHMvcWVt
+dS1pb3Rlc3RzLzIxOQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMg0KdGVzdHMvcWVtdS1pb3Rlc3Rz
+LzIyNA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIyOA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNA0KdGVz
+dHMvcWVtdS1pb3Rlc3RzLzIzNQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNg0KdGVzdHMvcWVtdS1p
+b3Rlc3RzLzIzNw0KdGVzdHMvcWVtdS1pb3Rlc3RzLzIzOA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI0
+Mg0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI0NQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Ng0KdGVzdHMv
+cWVtdS1pb3Rlc3RzLzI0OA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI1NA0KdGVzdHMvcWVtdS1pb3Rl
+c3RzLzI1NQ0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI1Ng0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI1Nw0K
+dGVzdHMvcWVtdS1pb3Rlc3RzLzI1OA0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI2MA0KdGVzdHMvcWVt
+dS1pb3Rlc3RzLzI2Mg0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI2NA0KdGVzdHMvcWVtdS1pb3Rlc3Rz
+LzI2Ng0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI3Nw0KdGVzdHMvcWVtdS1pb3Rlc3RzLzI4MA0KdGVz
+dHMvcWVtdS1pb3Rlc3RzL25iZC1mYXVsdC1pbmplY3Rvci5weQ0KdGVzdHMvcWVtdS1pb3Rlc3Rz
+L3Fjb3cyLnB5DQp0ZXN0cy9xZW11LWlvdGVzdHMvcWVkLnB5DQp0ZXN0cy92bS9iYXNldm0ucHkN
+CnRlc3RzL3ZtL2NlbnRvcw0KdGVzdHMvdm0vZmVkb3JhDQp0ZXN0cy92bS9mcmVlYnNkDQp0ZXN0
+cy92bS9uZXRic2QNCnRlc3RzL3ZtL29wZW5ic2QNCnRlc3RzL3ZtL3VidW50dS5pMzg2DQoNCg0K
+DQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
