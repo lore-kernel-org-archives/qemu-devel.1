@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0797C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29677C33CB2
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:39:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ACC6207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:39:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFF4D207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:39:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gxrzIb3y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ACC6207FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AOG8gFL2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF4D207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVlr-00011V-GM
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:39:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60219)
+	id 1iwVlt-00012V-3K
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:39:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34527)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5N-0008U5-AN
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:39 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6p-00027q-6r
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5M-0002P2-6d
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:37 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:34273)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6n-0005eo-2R
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:07 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:37768)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV5L-0002Nn-Vc
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:36 -0500
-Received: by mail-wm1-x335.google.com with SMTP id s144so2319378wme.1
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:35 -0800 (PST)
+ id 1iwV6l-0005aP-Rt
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:05 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id f129so3583030wmf.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HFNCZ7pWzXAToecUolMwlXj4aONy0IJRYuCUtjLrwXI=;
- b=gxrzIb3yH8BP2IU7zZG5gjMT+IqsKMqfOdK/RQnd89DC5VLwd4oJ+O/t5EQg58RGY7
- +Rb4QE/PLVb6lCVcYZfhrJlkQdaDqUm22e0N+898vm92ofUNrOvOdI9e0RQbZh2FCudY
- HUB9dJEOvn2jCmdEbap6KfrQlvxYs05yDBEZec4LlHUyHRdgGBd7UyWtKMCFCvLlqp4L
- 9icxyFITs37IQIHvh2dJLk6sORxjEix0Q223vd2vVZyqHF5VTfk3a6v7STewpJtcgAme
- BPL7BcuMHHj5fLMgK+n1KY2qZkSAcAqsclDi7ZVYLVots9QJ1kerquSHeFwXXCCanVYw
- F8pQ==
+ bh=d8v5bRzec34yfkf1QOj74f3k3RNnmyYBfKj/VWRJGh0=;
+ b=AOG8gFL2aUs+0fmtmQCWVOuKUsR7Rd8LFFBIKLnPDFdAsEnQ3IZwWnSiVULiQxTeKy
+ TprEzk2n24K6SmMfKoYnmCmua089DHptLbX10OMSRbZm1uoGrZAng/iO4UFZlkToF4VW
+ LccfrQ8xt8otlGqFvg78CQeLNLEwgxHHsvpEe+pdltI7W6D+T2DW+B4i3p1kiDqRsOKM
+ /uSHe4qnFlpZ60Ov3Elz0F+7H3/0yCYc+Oje0fOTAmgfwk4ItDbI6W98AoX6Mnpvf7gh
+ olNfl4GKgBgoAoI5p6qkPTPKT+ZrtVc388Ob8dNaZIOQ7bD5+NBqnvSZiJKFaK6LLpcT
+ 4lYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=HFNCZ7pWzXAToecUolMwlXj4aONy0IJRYuCUtjLrwXI=;
- b=DuAr0sxRtNvpwr1snmbDPt56gMKU+vivFXuSIGXDHVF+BbhlRErhiv0d4kKnKzf0ut
- DZPpQ5iWXP2i7M61afxe0Wd6AxEhrHMmhhwUSgXoChCxYGwYasDGqT6TlFwY+TCbDlsO
- szAVJ1kVxbGlc3IGmKvu3Rzm0EJbwdJvb8OvN6gxRZMitPG7gqA5VVlih8w/aUCtxQt4
- hkTVucWHXQOw7ZGp+6CI3XuCLooF0zdtu4mTAthniVnx9aNS3RdYdC5uasB0XlfI8x+w
- ciO3tV1rHyqLsDvSy4Wtt1cKxCwH46ql63tKcwqgq4a6WKD7CPqzufo7wzWQTTUA8W6H
- o07Q==
-X-Gm-Message-State: APjAAAUq0AQVXN4Hjbx4X2zakdO8FbUFlfo1/bxmNokUNT3cL+18O5PT
- z0DApXYFSlIqcoYYliyAmfcr77Rk
-X-Google-Smtp-Source: APXvYqygPSBapjuvOQd1q4Y5wQafNPcs5vU8zCn43/hgwx6uvQuSQU0aagq64FfFDHklb8qdyYX0Hw==
-X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr6421449wmi.89.1580234134658;
- Tue, 28 Jan 2020 09:55:34 -0800 (PST)
+ bh=d8v5bRzec34yfkf1QOj74f3k3RNnmyYBfKj/VWRJGh0=;
+ b=jYoxenCrLkAfyO3b31DweWLh/7Rl+O1H1CD3v6K1Wt6zhEO7cuhGi3pVjJ7Gq90gp7
+ E8slbRusVHE0lMA3sUI6jYIdEC7dkxROKsCPqYmBpl3drG3M3zPcitTlpNAm++A9upAG
+ DWBEb39ntPTYFbQEbEo2JZ4ccOdR7xzgntfgRFIdH/uCXvp4bYPTr16+K241UCIbRRil
+ 4+xZkgNOlCXDVwYzzFCeNV6MxvibDP3G+6ZSRXZ9qnWTwGSIo3kuugaEnQAcHvryTzoq
+ 1v0uHhSapk/PU8a2Tgoo2lpNmBEA7fLyoahhiRKKY7F1pqebgi1d0qJen2pa0zIZ7OHu
+ +9Mw==
+X-Gm-Message-State: APjAAAWOk/3XxQHXMFYkaQWHL4UHl74rW1rGJc/aJfCTVNsLYDfASu5r
+ Ve+0l/xC5Z4mf1SC1p0CTnqQNDOb
+X-Google-Smtp-Source: APXvYqzC3+/UX5xBMv0XUbQd0XWBkGSjTvttFXlRVi4lUd69+CH6WANvmkk7t223JzUextwJNtgpTQ==
+X-Received: by 2002:a1c:6755:: with SMTP id b82mr6504771wmc.126.1580234220762; 
+ Tue, 28 Jan 2020 09:57:00 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.32
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.58
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:55:34 -0800 (PST)
+ Tue, 28 Jan 2020 09:57:00 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 045/142] meson: add macos dependencies
-Date: Tue, 28 Jan 2020 18:52:05 +0100
-Message-Id: <20200128175342.9066-46-pbonzini@redhat.com>
+Subject: [PATCH 081/142] meson: convert hw/rtc
+Date: Tue, 28 Jan 2020 18:52:41 +0100
+Message-Id: <20200128175342.9066-82-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::335
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,67 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-There is no probing in configure, so no need to pass them as
-variables to meson. Do a regular meson dependency() instead.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ hw/Makefile.objs     |  1 -
+ hw/meson.build       |  1 +
+ hw/rtc/Makefile.objs | 13 -------------
+ hw/rtc/meson.build   | 14 ++++++++++++++
+ 4 files changed, 15 insertions(+), 14 deletions(-)
+ delete mode 100644 hw/rtc/Makefile.objs
+ create mode 100644 hw/rtc/meson.build
 
-diff --git a/meson.build b/meson.build
-index 06f531d2b7..3c398d1bf5 100644
---- a/meson.build
-+++ b/meson.build
-@@ -9,7 +9,7 @@ config_all_disas = kconfig.load(meson.current_build_dir() / 'config-all-disas.ma
- add_project_arguments(config_host['CFLAGS'].split(),
-                       language: ['c', 'objc'])
- add_project_arguments(config_host['QEMU_CFLAGS'].split(),
--                      language: 'c')
-+                      language: ['c', 'objc'])
- add_project_arguments(config_host['QEMU_CXXFLAGS'].split(),
-                       language: 'cpp')
- add_project_link_arguments(config_host['LDFLAGS'].split(),
-@@ -17,7 +17,7 @@ add_project_link_arguments(config_host['LDFLAGS'].split(),
- add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
-                            language: ['c', 'cpp', 'objc'])
- add_project_arguments(config_host['QEMU_INCLUDES'].split(),
--                      language: ['c', 'cpp'])
-+                      language: ['c', 'cpp', 'objc'])
- 
- qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
-                     meson.current_source_dir(),
-@@ -37,6 +37,10 @@ m = cc.find_library('m', required: false)
- util = cc.find_library('util', required: false)
- socket = []
- version_res = []
-+coref = []
-+iokit = []
-+cocoa = []
-+hvf = []
- if host_machine.system() == 'windows'
-   socket = cc.find_library('ws2_32')
- 
-@@ -44,6 +48,12 @@ if host_machine.system() == 'windows'
-   version_res = win.compile_resources('version.rc',
-                                       depend_files: files('pc-bios/qemu-nsis.ico'),
-                                       include_directories: include_directories('.'))
-+elif host_machine.system() == 'darwin'
-+  add_languages('objc', required: false)
-+  coref = dependency('appleframeworks', modules: 'CoreFoundation')
-+  iokit = dependency('appleframeworks', modules: 'IOKit')
-+  cocoa = dependency('appleframeworks', modules: 'Cocoa')
-+  hvf = dependency('appleframeworks', modules: 'Hypervisor')
- endif
- glib = declare_dependency(compile_args: config_host['GLIB_CFLAGS'].split(),
-                           link_args: config_host['GLIB_LIBS'].split())
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 9df81ac96e..6152f8074b 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -24,7 +24,6 @@ devices-dirs-y += nvram/
+ devices-dirs-y += pci/
+ devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
+ devices-dirs-y += pcmcia/
+-devices-dirs-y += rtc/
+ devices-dirs-$(CONFIG_SCSI) += scsi/
+ devices-dirs-y += sd/
+ devices-dirs-y += ssi/
+diff --git a/hw/meson.build b/hw/meson.build
+index 50b26db852..1fb1687e1e 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,6 +1,7 @@
+ subdir('core')
+ subdir('mem')
+ subdir('nubus')
++subdir('rtc')
+ subdir('semihosting')
+ subdir('smbios')
+ subdir('timer')
+diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+deleted file mode 100644
+index 8dc9fcd3a9..0000000000
+--- a/hw/rtc/Makefile.objs
++++ /dev/null
+@@ -1,13 +0,0 @@
+-common-obj-$(CONFIG_DS1338) += ds1338.o
+-common-obj-$(CONFIG_M41T80) += m41t80.o
+-common-obj-$(CONFIG_M48T59) += m48t59.o
+-ifeq ($(CONFIG_ISA_BUS),y)
+-common-obj-$(CONFIG_M48T59) += m48t59-isa.o
+-endif
+-common-obj-$(CONFIG_PL031) += pl031.o
+-common-obj-$(CONFIG_TWL92230) += twl92230.o
+-common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
+-common-obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
+-obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
+-common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+-common-obj-$(CONFIG_ASPEED_SOC) += aspeed_rtc.o
+diff --git a/hw/rtc/meson.build b/hw/rtc/meson.build
+new file mode 100644
+index 0000000000..665a539a37
+--- /dev/null
++++ b/hw/rtc/meson.build
+@@ -0,0 +1,14 @@
++
++softmmu_ss.add(when: 'CONFIG_DS1338', if_true: files('ds1338.c'))
++softmmu_ss.add(when: 'CONFIG_M41T80', if_true: files('m41t80.c'))
++softmmu_ss.add(when: 'CONFIG_M48T59', if_true: files('m48t59.c'))
++softmmu_ss.add(when: 'CONFIG_PL031', if_true: files('pl031.c'))
++softmmu_ss.add(when: 'CONFIG_TWL92230', if_true: files('twl92230.c'))
++softmmu_ss.add(when: ['CONFIG_ISA_BUS', 'CONFIG_M48T59'], if_true: files('m48t59-isa.c'))
++softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP', if_true: files('xlnx-zynqmp-rtc.c'))
++
++softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_rtc.c'))
++softmmu_ss.add(when: 'CONFIG_SUN4V_RTC', if_true: files('sun4v-rtc.c'))
++softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_rtc.c'))
++
++specific_ss.add(when: 'CONFIG_MC146818RTC', if_true: files('mc146818rtc.c'))
 -- 
 2.21.0
 
