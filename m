@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF72DC33CB2
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAEBFC3F68F
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8408420716
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87A662467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:26:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/IShE9R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8408420716
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nk/nuWjM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87A662467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVZe-0008Ac-Ng
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:26:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34159)
+	id 1iwVZf-0008F1-N6
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:26:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6Q-0001nQ-3V
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:43 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV50-0007mY-Lu
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6O-0004z6-VL
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:41 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:50743)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4x-0001Su-Bf
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:13 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39939)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV6O-0004ws-N0
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:40 -0500
-Received: by mail-wm1-x329.google.com with SMTP id a5so3530569wmb.0
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:40 -0800 (PST)
+ id 1iwV4w-0001Pf-U2
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:11 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id j104so1194978wrj.7
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rlcX0g3gZr1RKZ26KMKoAK10o27TGbBldeE4UAtXzII=;
- b=K/IShE9R+4WNkfWJPvewnZlNJYr/rQ4T3szEJuRmAzNC8b/VVayhnlRAWwTWiLlX98
- DtIzn4P/aXexMYKjRY7uMAFDyaIMcKJGC8s1JmvinYnFfF2N45NyS62JXXPFXSTDv0Do
- gGAFkPloHEjA2mO7NHWl3KE5W8QnMC2Y5yjNGIG/GFHhqCMD0A5HANAJD1z/JsfMhDIZ
- t1g6xyCXFxL9ilNeLrWd7KUZkdWnBoeU7KUs1xmalbqmrrvPamiZ+Z09MKjdy+KuZ3GK
- LZh8nbCnjT3v8VEU2R40WScC48brwsL5YL8d8qXJXP1bGJlU/em95DBbJuM5aU76WV9g
- ft8g==
+ bh=+PRwhO35mAAi2GwkKyXhmnr9zSDCkYdOi56nsRT+0tI=;
+ b=nk/nuWjMpMnKXBWo4fMsQOMIs8msHBuy4OVTPuHK8aBhDziJzV+EIzQfE5twBRuoUQ
+ acokM9YWrWJYI5IoS1Bc0vfExIgdEjPCZNz89BNz3aYe54JnXvKSf9a5K9X7M2eRgXBG
+ w6kI7w12kJ+GsxctqRuWevx9P4GfhNndmsEJetoO0yvY10rbyDcUGHVC8c8v6i0GeSKy
+ XtLRPxn+7Gdi5ytdZ6bOCLxz5yYNyYDPwOsxEiFOXI8M+wVnGVsqIK0pUihCkF0DW2zX
+ wEJ6X2kmacwQs4MeUWilGgMlZb4txB8GBtGMoaMUN2kFnQRmuM4mlUhnR9fQ6ublIn/J
+ Bk0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=rlcX0g3gZr1RKZ26KMKoAK10o27TGbBldeE4UAtXzII=;
- b=YLUEnQHM4DR6FhDiREUHNTvi361mkNdLxEq55R778wKpnuIb32FmSt5WNraCRqw8gj
- 2maXnmW3BFAqMi/6nmNOiC7f9qjfsB6VtQNRhhy1a5LcBFg+1l+jCVmtj5pxj3jrz31f
- ufLlqOomZZirieseBTVRPBi1WIFUrRvz9VesbYFoO092DKhXoDxK4GlVCLIFEDiypEWQ
- QjaUB55E4va9qip2qAZQqvB0jDTil4++hPNsZfD11kWplLPO2I2GbWZfKqu7WMgF+fX/
- 86VN+zhvsV7kqpWxTybhDUDqR9vFrqmB6+Q5wu1EzXb2zzxhBZxbvcwuAnwepnBo5tY/
- hezQ==
-X-Gm-Message-State: APjAAAW5++psiiAYTHSPZW8MzyduUcFYTrykOs3nk3bsyUk9CBRODsJ/
- Jrm+p6JigzUsV34SO6NQtmlmmLzT
-X-Google-Smtp-Source: APXvYqyohJIWgJKJ5ZxiPkHtxXqGdWGSnLUjrizc14UZ0qqcPaicBCT1cFEwCP7W8o8JkHUUKd+gdg==
-X-Received: by 2002:a1c:1b4d:: with SMTP id b74mr6515223wmb.33.1580234199559; 
- Tue, 28 Jan 2020 09:56:39 -0800 (PST)
+ bh=+PRwhO35mAAi2GwkKyXhmnr9zSDCkYdOi56nsRT+0tI=;
+ b=C/eZ1r6RqkhBIY2vJgcajU5Jr30ZlUdOHEGy9Q2NvJYv5xdNoLVanZeauKu41D+1BQ
+ MHVE2s3NokCxKslpDaJ3Ja3hSlogCL3P3IzhtJiyYXJhlwIMYwmzwmi+67IBxEg4vEDk
+ tv9FKpxXemTsducjZUGTl+XsTFCpKY2U1NKUvWPzmW9tohj9muzSlZ3/Hvw/jF3ZyHFK
+ WQXq5NOD4UWw3iIpELbuPDsrxwmzfQMvd3N9BM35vYv82MYp5Zdhvw4WLrC+lMk9/LkS
+ aJW/CgdWg2oO0jJU80d4FeHPAume+RGlPx35PQ5Ykn17Xa1C01KderPz+ZEbC4sl/QqA
+ VQ4Q==
+X-Gm-Message-State: APjAAAUXYv+OzUMjVYscu7OTiu191wKqajS+/PYxkxQIdfCh3Ev1v3uR
+ 5758uiXynlR9UTdc6FnLrvDuzC0Z
+X-Google-Smtp-Source: APXvYqyfAjpfZcam8weYzst7OWwnfpOB9MKDDpP8fJ/JHdORsvfLVig3IRW6ySrUKq2kujJWAKcvhg==
+X-Received: by 2002:adf:f80b:: with SMTP id s11mr31543100wrp.12.1580234108712; 
+ Tue, 28 Jan 2020 09:55:08 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.37
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:56:39 -0800 (PST)
+ Tue, 28 Jan 2020 09:55:08 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 072/142] meson: convert hw/nubus
-Date: Tue, 28 Jan 2020 18:52:32 +0100
-Message-Id: <20200128175342.9066-73-pbonzini@redhat.com>
+Subject: [PATCH 033/142] meson: generate qemu-version.h
+Date: Tue, 28 Jan 2020 18:51:53 +0100
+Message-Id: <20200128175342.9066-34-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,64 +94,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs       | 1 -
- hw/meson.build         | 1 +
- hw/nubus/Makefile.objs | 4 ----
- hw/nubus/meson.build   | 7 +++++++
- 4 files changed, 8 insertions(+), 5 deletions(-)
- delete mode 100644 hw/nubus/Makefile.objs
- create mode 100644 hw/nubus/meson.build
+ Makefile                | 27 +--------------------------
+ meson.build             | 10 ++++++++++
+ scripts/qemu-version.sh | 25 +++++++++++++++++++++++++
+ 3 files changed, 36 insertions(+), 26 deletions(-)
+ create mode 100755 scripts/qemu-version.sh
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 3501559584..29c4aa20b7 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -35,7 +35,6 @@ devices-dirs-$(CONFIG_VFIO) += vfio/
- devices-dirs-y += virtio/
- devices-dirs-y += watchdog/
- devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
--devices-dirs-$(CONFIG_NUBUS) += nubus/
- devices-dirs-y += smbios/
- endif
+diff --git a/Makefile b/Makefile
+index 54249c6fc2..b77014faa4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -106,21 +106,7 @@ include $(SRC_PATH)/rules.mak
+ # lor is defined in rules.mak
+ CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
  
-diff --git a/hw/meson.build b/hw/meson.build
-index 66a2f6cddd..03ef30212e 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,3 +1,4 @@
- subdir('core')
-+subdir('nubus')
- subdir('semihosting')
- subdir('xen')
-diff --git a/hw/nubus/Makefile.objs b/hw/nubus/Makefile.objs
-deleted file mode 100644
-index 135ba7878d..0000000000
---- a/hw/nubus/Makefile.objs
-+++ /dev/null
-@@ -1,4 +0,0 @@
--common-obj-y += nubus-device.o
--common-obj-y += nubus-bus.o
--common-obj-y += nubus-bridge.o
--common-obj-$(CONFIG_Q800) += mac-nubus-bridge.o
-diff --git a/hw/nubus/meson.build b/hw/nubus/meson.build
-new file mode 100644
-index 0000000000..9287c633aa
---- /dev/null
-+++ b/hw/nubus/meson.build
-@@ -0,0 +1,7 @@
-+nubus_ss = ss.source_set()
-+nubus_ss.add(files('nubus-device.c'))
-+nubus_ss.add(files('nubus-bus.c'))
-+nubus_ss.add(files('nubus-bridge.c'))
-+nubus_ss.add(when: 'CONFIG_Q800', if_true: files('mac-nubus-bridge.c'))
+-# Create QEMU_PKGVERSION and FULL_VERSION strings
+-# If PKGVERSION is set, use that; otherwise get version and -dirty status from git
+-QEMU_PKGVERSION := $(if $(PKGVERSION),$(PKGVERSION),$(shell \
+-  cd $(SRC_PATH); \
+-  if test -e .git; then \
+-    git describe --match 'v*' 2>/dev/null | tr -d '\n'; \
+-    if ! git diff-index --quiet HEAD &>/dev/null; then \
+-      echo "-dirty"; \
+-    fi; \
+-  fi))
+-
+-# Either "version (pkgversion)", or just "version" if pkgversion not set
+-FULL_VERSION := $(if $(QEMU_PKGVERSION),$(VERSION) ($(QEMU_PKGVERSION)),$(VERSION))
+-
+-generated-files-y = qemu-version.h config-host.h qemu-options.def
++generated-files-y = config-host.h qemu-options.def
+ 
+ generated-files-y += module_block.h
+ 
+@@ -256,17 +242,6 @@ include $(SRC_PATH)/tests/Makefile.include
+ 
+ all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules $(vhost-user-json-y)
+ 
+-qemu-version.h: FORCE
+-	$(call quiet-command, \
+-                (printf '#define QEMU_PKGVERSION "$(QEMU_PKGVERSION)"\n'; \
+-		printf '#define QEMU_FULL_VERSION "$(FULL_VERSION)"\n'; \
+-		) > $@.tmp)
+-	$(call quiet-command, if ! cmp -s $@ $@.tmp; then \
+-	  mv $@.tmp $@; \
+-	 else \
+-	  rm $@.tmp; \
+-	 fi)
+-
+ config-host.h: config-host.h-timestamp
+ config-host.h-timestamp: config-host.mak
+ qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+diff --git a/meson.build b/meson.build
+index 5cde258529..afa53bee00 100644
+--- a/meson.build
++++ b/meson.build
+@@ -18,6 +18,16 @@ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
+ add_project_arguments(config_host['QEMU_INCLUDES'].split(),
+                       language: ['c', 'cpp'])
+ 
++qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
++                    meson.current_source_dir(),
++                    config_host['PKGVERSION'], config_host['VERSION']]
++qemu_version = custom_target('QEMU version',
++                             output: 'qemu-version.h',
++                             command: qemu_version_cmd,
++                             capture: true,
++                             build_by_default: true,
++                             build_always_stale: true)
 +
-+softmmu_ss.add_all(when: 'CONFIG_NUBUS', if_true: nubus_ss)
+ configure_file(input: files('scripts/ninjatool.py'),
+                output: 'ninjatool',
+                configuration: config_host)
+diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
+new file mode 100755
+index 0000000000..4847385e42
+--- /dev/null
++++ b/scripts/qemu-version.sh
+@@ -0,0 +1,25 @@
++#!/bin/sh
++
++set -eu
++
++dir="$1"
++pkgversion="$2"
++version="$3"
++
++if [ -z "$pkgversion"]; then
++    cd "$dir"
++    if [ -e .git ]; then
++        pkgversion=$(git describe --match 'v*' --dirty | echo "")
++    fi
++fi
++
++if [ -n "$pkgversion" ]; then
++    fullversion="$version ($pkgversion)"
++else
++    fullversion="$version"
++fi
++
++cat <<EOF
++#define QEMU_PKGVERSION "$pkgversion"
++#define QEMU_FULL_VERSION "$fullversion"
++EOF
 -- 
 2.21.0
 
