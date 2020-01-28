@@ -2,58 +2,88 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC11C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 12:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D487C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 12:55:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2C64206A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 12:48:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C64206A2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id EBCD024681
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 12:55:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bc/VhzZF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBCD024681
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwQII-0002e0-UR
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 07:48:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52581)
+	id 1iwQOe-000519-02
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 07:55:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1iwQHk-0002Ca-JB
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 07:48:05 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iwQNx-0004ES-6F
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 07:54:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1iwQHj-0005En-7a
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 07:48:04 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:45553)
+ (envelope-from <kwolf@redhat.com>) id 1iwQNu-0001ZZ-6z
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 07:54:27 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28081
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1iwQHj-0005Dq-10; Tue, 28 Jan 2020 07:48:03 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 74E33746386;
- Tue, 28 Jan 2020 13:48:00 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 5533B74637E; Tue, 28 Jan 2020 13:48:00 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 53C0D74637B;
- Tue, 28 Jan 2020 13:48:00 +0100 (CET)
-Date: Tue, 28 Jan 2020 13:48:00 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Howard Spoelstra <hsp.cat7@gmail.com>
-Subject: Re: Performance hit in qemu-system-ppc
-In-Reply-To: <CABLmASG93Fz-=XR45Z7pcaUkF8De3EdZbS_=901w_vhYUPiuXg@mail.gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2001281344260.9839@zero.eik.bme.hu>
-References: <CABLmASG93Fz-=XR45Z7pcaUkF8De3EdZbS_=901w_vhYUPiuXg@mail.gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iwQNt-0001Y9-TH
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 07:54:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580216064;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=81fRbXREOADLVyogpz/ZGWxZ7Y7NMXfiUqHL7bFwk70=;
+ b=Bc/VhzZFMGHOIjh5oEZLgVo+/ze4bmnRvm36QTasyPptnxgoi85OcGv4F5HakabCcMLBOe
+ yT3fde4t5FoElRYnugp4Ad2k/gnQ26MYSAOb0kkxFS5SMea5y0cObDqsYQ29TuvV9uClnE
+ Y1um9asWXeelmF5bY9o5A741/8Di3/4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-f8S6XeXuPIKw3gzeg8-Ehw-1; Tue, 28 Jan 2020 07:54:22 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AD4A10054E3;
+ Tue, 28 Jan 2020 12:54:21 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-106.ams2.redhat.com [10.36.117.106])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5CC665DA7E;
+ Tue, 28 Jan 2020 12:54:11 +0000 (UTC)
+Date: Tue, 28 Jan 2020 13:54:09 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200128125409.GF6431@linux.fritz.box>
+References: <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+ <871rrp474i.fsf@dusky.pond.sub.org>
+ <20200124102743.GB824327@redhat.com>
+ <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
+ <87sgk3x2im.fsf@dusky.pond.sub.org>
+ <20200127115606.GA5669@linux.fritz.box>
+ <1c65b678-7bb4-a4cc-5fa6-03d6d27cf381@redhat.com>
+ <20200128102855.GA6431@linux.fritz.box>
+ <87mua7bvwf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- BOUNDARY="3866299591-1544100175-1580215477=:9839"
-Content-ID: <alpine.BSF.2.22.395.2001281344550.9839@zero.eik.bme.hu>
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <87mua7bvwf.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: f8S6XeXuPIKw3gzeg8-Ehw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,74 +95,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-ppc@nongnu.org,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Am 28.01.2020 um 13:36 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+> > Am 27.01.2020 um 21:11 hat John Snow geschrieben:
+> [...]
+> >> (The argument here is: It's a little harder and a little longer to typ=
+e,
+> >> but the benefits from the schema organization may improve productivity
+> >> of using QEMU directly instead of harming it.)
+> >
+> > I think this is a false dichotomy.
+> >
+> > You can have everything defined by the schema and properly documented
+> > and still have a non-JSON command line. Translating the QAPI schema to
+> > a command line option is a solved problem, this is exactly how
+> > -blockdev works.
+> >
+> > The unsolved part is how to compatibly convert the existing options. If
+> > you're willing to sacrifice compatibility, great. Then we can just
+> > define stuff in the QAPI schema and still keep a command line syntax
+> > that is usable for humans. The code for mapping a QAPI type to the
+> > argument of an option is basically already there.
+>=20
+> Correct.
+>=20
+> Solving that problem took time, but that's sunk cost now.
+>=20
+> > The only question is "is compatibility important"? If the answer is no,
+> > then we'll be there in no time.
+>=20
+> I doubt we'll be there in no time, but certainly much sooner than if we
+> have to grapple with compatibility to a byzantine CLI nobody truly
+> understands.
+>=20
+> There's one known issue caused by having "a non-JSON command line"
+> (actually: dotted keys as sugar for JSON): pressure to reduce nesting.
+>=20
+> Consider chardev-add.  Example:
+>=20
+>     {"execute": "chardev-add",
+>      "arguments": {"id": "bar",
+>                    "backend": {"type": "file",
+>                                "data": {"out": "/tmp/bar.log"}}}}
+>=20
+> The arguments as dotted keys:
+>=20
+>     id=3Dbar,backend.type=3Dfile,backend.data.out=3D/tmp/bar.log
+>=20
+> Observe there's quite some of nesting.  While that's somewhat cumbersome
+> in JSON, it's a lot worse with dotted keys, because there nesting means
+> repeated key prefixes.  I could give much worse examples, actually.
 
---3866299591-1544100175-1580215477=:9839
-Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
-Content-ID: <alpine.BSF.2.22.395.2001281344551.9839@zero.eik.bme.hu>
-Content-Transfer-Encoding: quoted-printable
+This is true, but even without the repeated keys (e.g. in a syntax that
+would use brackets), it would still be unnecessarily verbose and
+probably hard to remember:
 
-Hello,
+    id=3Dbar,backend=3D{type=3Dfile,data=3D{out=3D/tmp/bar.log}}
 
-cc-ing the ppc list, maintainer and original author of the patch could=20
-increase the chances that they actually see your message which they might=
-=20
-miss on qemu-devel. David explicitely said he usually cannot read all=20
-mails on qemu-devel so likely should be cc-d on all PPC issues (or also c=
-c=20
-the qemu-ppc list besides qemu-devel).
+> We'd rather have something like
+>=20
+>     id=3Dbar,type=3Dfile,out=3D/tmp/bar.log
+>=20
+> Back to JSON:
+>=20
+>     "arguments": {"id": "bar", "type": "file", "out": "/tmp/bar.log"}
+>=20
+> QAPI can do this, but it uses feature that predate chardev-add.
+>=20
+> We don't want to duplicate the chardev-add schema in modern, flattened
+> form for the CLI.
+>=20
+> So the compatibility problem actually shifts to QMP: can we evolve the
+> existing QMP command compatibly at a reasonable cost in design, coding
+> and complexity to support flat arguments?
 
-Regards,
-BALATON Zoltan
+Well, first of all: Do we need compatibility? If we don't, then we can
+just make the change.
 
-On Sun, 26 Jan 2020, Howard Spoelstra wrote:
-> Hi,
->
-> I noticed a considerable (~20%) slowdown in the cpu performance of
-> qemu-system-ppc.
-> Bisecting led me to this commit:
->
-> d03f140804b345a85973976506492027f703d82d is the first bad commit
-> commit d03f140804b345a85973976506492027f703d82d
-> Author: Richard Henderson <richard.henderson@linaro.org>
-> Date:   Mon Dec 9 13:49:58 2019 -0800
->
->    cputlb: Move body of cpu_ldst_template.h out of line
->
->    With the tracing hooks, the inline functions are no longer
->    so simple.  Once out-of-line, the current tlb_entry lookup
->    is redundant with the one in the main load/store_helper.
->
->    This also begins the introduction of a new target facing
->    interface, with suffix *_mmuidx_ra.  This is not yet
->    official because the interface is not done for user-only.
->
->    Use abi_ptr instead of target_ulong in preparation for
->    user-only; the two types are identical for softmmu.
->
->    What remains in cpu_ldst_template.h are the expansions
->    for _code, _data, and MMU_MODE<N>_SUFFIX.
->
->    Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->    Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->
-> accel/tcg/cputlb.c               | 116 ++++++++++++++++++++++++++++++++=
-++++
-> include/exec/cpu_ldst.h          |  25 +++++++-
-> include/exec/cpu_ldst_template.h | 125
-> ++++++++-------------------------------
-> 3 files changed, 166 insertions(+), 100 deletions(-)
->
-> Thanks for looking into this issue,
-> Howard
->
---3866299591-1544100175-1580215477=:9839--
+Much of this threads plays with the though that maybe we don't need any
+compatibility and make the radical conclusion that we don't need any
+human-friendly interface at all. Keeping full compatibility is the other
+extreme.
+
+There might be some middle ground where we break compatibility where the
+old way can't easily be maintained with the new infrastructure, but
+don't give up on the idea of being used by humans.
+
+Kevin
+
 
