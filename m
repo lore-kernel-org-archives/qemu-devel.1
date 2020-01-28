@@ -2,102 +2,93 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6165CC33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B913C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C37824684
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:06:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 582E221739
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:07:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ra1pIZ+E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C37824684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aNh41fYq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 582E221739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwOhF-0006Rk-AO
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:06:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55380)
+	id 1iwOhy-0007Gj-D0
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:07:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1iwOew-0002sV-Ge
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:03:55 -0500
+ (envelope-from <pmathieu@redhat.com>) id 1iwOfu-0004Ky-HC
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:04:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1iwOev-0003kV-L7
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:03:54 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:46448)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1iwOet-0003jQ-HN; Tue, 28 Jan 2020 06:03:51 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00SAxIWG116083;
- Tue, 28 Jan 2020 11:03:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=DYh0RIFuVSZpob2NSOUwbR0dZjvLnDjhfJ8y8tcSRaw=;
- b=ra1pIZ+EfY/9Ia+i7P4FP+K3yIDdM9Dg2uR9D7U9QkdleJnEPouvQdS3XJ6PReGo8yzP
- wqCLufL0DqkttXomhM7vlhNkKwh16Nt/1UZBIuN7of5ygqFRNEpI8GQS7c59XD5jErnN
- DIbng7ex+PnjfD9Ay10uRlWYHx6KvJQWCQJZl3EY56KedoDVDTnFAJ3eQSFeYLtGnm2/
- R/l4CPEyk0imQJw5C3eXYk16Lf+V8Ta0v+c+TK2R9hqNqJKP1z/9Gnp6X5R1ABsXmb9E
- lzkmKBEmFgZelMthLytJG53T8xfKSml2XA6KERwusvubTgIhQE2U2dmtXZdpxkguu4O3 iQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2xrdmqdh06-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jan 2020 11:03:10 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00SAxM6S066892;
- Tue, 28 Jan 2020 11:01:09 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2xry70f6x0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jan 2020 11:01:09 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00SB170B026049;
- Tue, 28 Jan 2020 11:01:07 GMT
-Received: from [10.175.203.109] (/10.175.203.109)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 28 Jan 2020 03:01:06 -0800
-Subject: Re: [PATCH v4 2/7] Acceptance tests: Extract _console_interaction()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200120235159.18510-1-f4bug@amsat.org>
- <20200120235159.18510-3-f4bug@amsat.org>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <3b9b2028-1562-1fe2-65d8-bc038f60573c@oracle.com>
-Date: Tue, 28 Jan 2020 11:01:03 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <pmathieu@redhat.com>) id 1iwOft-0004b7-Co
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:04:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21675
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1iwOft-0004ae-9i
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:04:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580209492;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ie97vwGgpNnbq9LeP6eV17/f8uunbL/XRYOgBvuEroA=;
+ b=aNh41fYqheyZZ0Yn4hLXfls0OyNVUX4qUe6P4pve4B48mawc8ZTP+rVXlmPI4y3HrJ1J5/
+ CNJsX2/4cPzOkBrkKVEfsLb4Iyr/h3ZccrzRkSD5/a48qKwaLsLXiSuOfWbaEdciD/j7Zw
+ jFmONYYmaUQuO2wFa3nOzwQxjKZeNqs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-g0jVNCHdOSKbmIcCDoyWEQ-1; Tue, 28 Jan 2020 06:04:49 -0500
+Received: by mail-wr1-f70.google.com with SMTP id d8so7812036wrq.12
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 03:04:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ie97vwGgpNnbq9LeP6eV17/f8uunbL/XRYOgBvuEroA=;
+ b=KgUVQLFJOQptsLougN3Gs4lrwijAADNpxmZncFjLS//c3r5JmeoFp5jL4F99x/9fff
+ RVQRXwrvFinb1vXrYZcMCRpuDpWZlafov7EIyXezAaYq1Lnz3B0NIU2XhmanSxkZM2m/
+ YfKYZ+2++h0FkgMR+eXXNC8Xy4CqyEl/t2KOYlhn/gokb+BybylHwuWde+H+8AnNJ4MZ
+ noKupdlDglTtDI8cuC8OANWSzwcYRKWrW/NLVhKJKj+SvSfXZoTATjiMOrX/rSU0gisJ
+ uwQVm2Ldg819BiSoZO1Q50G24f7OONrhRhINvUgqxjFRbYf7PMaKpk84NdnxLmhCHENd
+ RbKw==
+X-Gm-Message-State: APjAAAUbU6Q9sXbPNQft7iZJphOjLmz2euRXJn8SRqGJ1ksKobCxbltc
+ cKRDktDDbDk738iiw+ecOeFIOpYKRwNP72grjwN0vurEN5QujfqojVdHFAzbB4bRFz3qMKfX7JL
+ Iy4m633cQRy6xmNRO1kXl2ZyXN8hJO5w=
+X-Received: by 2002:adf:f6c1:: with SMTP id y1mr27259025wrp.17.1580209488166; 
+ Tue, 28 Jan 2020 03:04:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzQ2OItNEA/pUjqRwtp+Yd5/VA9audTMkm8/0OecZoA2TNkvc/nsB2XdgRaKIQFy8lG3iY/p/EUwgFdiKIBkQs=
+X-Received: by 2002:adf:f6c1:: with SMTP id y1mr27259007wrp.17.1580209487971; 
+ Tue, 28 Jan 2020 03:04:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200120235159.18510-3-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9513
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001280089
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9513
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001280089
+References: <cover.1579474761.git.fthain@telegraphics.com.au>
+ <a582b4412af479e0830d1ef0005a91a98bfc56cc.1579474761.git.fthain@telegraphics.com.au>
+ <b47b1144-bb76-9f70-3351-86ba605e4ac3@redhat.com>
+In-Reply-To: <b47b1144-bb76-9f70-3351-86ba605e4ac3@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 28 Jan 2020 12:04:36 +0100
+Message-ID: <CAP+75-Ud4U5=7N0SerV9JAo7m2TOiFAR+1CO2MAHdX+PRmRUVA@mail.gmail.com>
+Subject: Re: [PATCH v3 04/14] dp8393x: Have dp8393x_receive() return the
+ packet size
+To: Finn Thain <fthain@telegraphics.com.au>, Jason Wang <jasowang@redhat.com>, 
+ QEMU Developers <qemu-devel@nongnu.org>
+X-MC-Unique: g0jVNCHdOSKbmIcCDoyWEQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- 00SAxIWG116083
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,31 +100,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
- Cleber Rosa <crosa@redhat.com>, Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/01/2020 23:51, Philippe Mathieu-Daud=C3=A9 wrote:
-> Since we are going to re-use the code shared between
-> wait_for_console_pattern() and exec_command_and_wait_for_pattern(),
-> extract the common part into a local function.
->=20
-> Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Tue, Jan 28, 2020 at 12:03 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+> On 1/19/20 11:59 PM, Finn Thain wrote:
+> > This function re-uses its 'size' argument as a scratch variable.
+> > Instead, declare a local 'size' variable for that purpose so that the
+> > function result doesn't get messed up.
+> >
+> > Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Tested-by: Laurent Vivier <laurent@vivier.eu>
+> > ---
+> >   hw/net/dp8393x.c | 9 +++++----
+> >   1 file changed, 5 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+> > index 2d2ace2549..ece72cbf42 100644
+> > --- a/hw/net/dp8393x.c
+> > +++ b/hw/net/dp8393x.c
+> > @@ -757,20 +757,21 @@ static int dp8393x_receive_filter(dp8393xState *s=
+, const uint8_t * buf,
+> >   }
+> >
+> >   static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * bu=
+f,
+> > -                               size_t size)
+> > +                               size_t pkt_size)
+> >   {
+> >       dp8393xState *s =3D qemu_get_nic_opaque(nc);
+> >       int packet_type;
+> >       uint32_t available, address;
+> > -    int width, rx_len =3D size;
+> > +    int width, rx_len =3D pkt_size;
+> >       uint32_t checksum;
+> > +    int size;
+> >
+> >       width =3D (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
+> >
+> >       s->regs[SONIC_RCR] &=3D ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_R=
+CR_FAER |
+> >           SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC=
+);
+> >
+> > -    packet_type =3D dp8393x_receive_filter(s, buf, size);
+> > +    packet_type =3D dp8393x_receive_filter(s, buf, pkt_size);
+> >       if (packet_type < 0) {
+> >           DPRINTF("packet not for netcard\n");
+> >           return -1;
+> > @@ -864,7 +865,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
+const uint8_t * buf,
+> >       /* Done */
+> >       dp8393x_update_irq(s);
+> >
+> > -    return size;
+> > +    return pkt_size;
+> >   }
+> >
+> >   static void dp8393x_reset(DeviceState *dev)
+> >
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Tested-by: Liam Merwick <liam.merwick@oracle.com>
+One R-b tag is enough btw ;)
 
-> ---
->   tests/acceptance/avocado_qemu/__init__.py | 31 +++++++++++++---------=
--
->   1 file changed, 17 insertions(+), 14 deletions(-)
 
