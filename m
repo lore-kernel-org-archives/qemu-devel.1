@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5CCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED484C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:24:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FDD2214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:23:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3E59214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:24:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKrTvhRN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FDD2214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XjTRSur7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3E59214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwUZq-000085-8I
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 12:23:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45789)
+	id 1iwUbX-0001Y0-Rf
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 12:24:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iwUYo-0007YZ-Sc
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:22:00 -0500
+ (envelope-from <berrange@redhat.com>) id 1iwUam-0000zU-Se
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:24:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iwUYm-0004vz-Gx
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:21:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54589
+ (envelope-from <berrange@redhat.com>) id 1iwUal-0006rE-2K
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:24:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58395
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iwUYm-0004v7-BR
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:21:56 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iwUak-0006qI-Tu
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:23:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580232116;
+ s=mimecast20190719; t=1580232238;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tESL0AnUgcx+QjtyZrfaw6ydYUlPzVoPu/KNo1cnOKQ=;
- b=SKrTvhRNwkZ00xPOJ7VR4zqBxhcyMNxQ4gNSXhBGIk79Xbz66jrxr6lfTYy9h/NMxPLkzN
- 6PaXcN2qMshwXRVAhuVp8XNc9Dzu0rl5a2yM1cdOwAzCzMvcoRVEUZJ7fQbAqUn7fONTgk
- ZpZHi2crSuLlx8Cx6eNBqMPasizGJ+s=
+ bh=LwDYR8xbIGR790ZgP3HK9zKlils55l4PwkHY7IEa8MI=;
+ b=XjTRSur7ApcND2yIIMBf8NqE3Xeo+Xpa5yHxaF2q9AZuRgmrIc5hP6zJmdFAMENUF0982Q
+ eIDMTOeerHhic43P7o5egLiVZxGmkm7QA7lTmXN40GB+AXklW0PxEx99H+CWQG7NXBSQXT
+ Nzotf/bfra2AjDezDKauGV2YoIUR76o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-64KcwLebPtq_1HwvRZA7FQ-1; Tue, 28 Jan 2020 12:21:38 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-420-znaocZXYPlaBRYVjD6AASA-1; Tue, 28 Jan 2020 12:23:55 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D0F818B9FC1;
- Tue, 28 Jan 2020 17:21:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17113107ACC9;
+ Tue, 28 Jan 2020 17:23:54 +0000 (UTC)
 Received: from redhat.com (ovpn-112-34.ams2.redhat.com [10.36.112.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2670B87025;
- Tue, 28 Jan 2020 17:21:31 +0000 (UTC)
-Date: Tue, 28 Jan 2020 17:21:29 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AE77B5C219;
+ Tue, 28 Jan 2020 17:23:46 +0000 (UTC)
+Date: Tue, 28 Jan 2020 17:23:43 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 02/13] qcrypto-luks: implement encryption key management
-Message-ID: <20200128172129.GV1446339@redhat.com>
+Subject: Re: [PATCH 04/13] block: amend: separate amend and create options
+ for qemu-img
+Message-ID: <20200128172343.GW1446339@redhat.com>
 References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
+ <20200114193350.10830-5-mlevitsk@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200114193350.10830-3-mlevitsk@redhat.com>
+In-Reply-To: <20200114193350.10830-5-mlevitsk@redhat.com>
 User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 64KcwLebPtq_1HwvRZA7FQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: znaocZXYPlaBRYVjD6AASA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -97,527 +98,291 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 14, 2020 at 09:33:39PM +0200, Maxim Levitsky wrote:
-> Next few patches will expose that functionality
-> to the user.
+On Tue, Jan 14, 2020 at 09:33:41PM +0200, Maxim Levitsky wrote:
+> Some options are only useful for creation
+> (or hard to be amended, like cluster size for qcow2), while some other
+> options are only useful for amend, like upcoming keyslot management
+> options for luks
+>=20
+> Since currently only qcow2 supports amend, move all its options
+> to a common macro and then include it in each action option list.
+>=20
+> In future it might be useful to remove some options which are
+> not supported anyway from amend list, which currently
+> cause an error message if amended.
+
+I think I would have done that in this commit. At least the
+encrypt.* options shouldn't be added to the amend_opts list,
+since they're being removed from it again a few patches later.
+
 >=20
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  crypto/block-luks.c | 374 +++++++++++++++++++++++++++++++++++++++++++-
->  qapi/crypto.json    |  50 +++++-
->  2 files changed, 421 insertions(+), 3 deletions(-)
+>  block/qcow2.c             | 160 +++++++++++++++++++++-----------------
+>  include/block/block_int.h |   4 +
+>  qemu-img.c                |  18 ++---
+>  3 files changed, 100 insertions(+), 82 deletions(-)
 >=20
-> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> index 4861db810c..349e95fed3 100644
-> --- a/crypto/block-luks.c
-> +++ b/crypto/block-luks.c
-> @@ -32,6 +32,7 @@
->  #include "qemu/uuid.h"
-> =20
->  #include "qemu/coroutine.h"
-> +#include "qemu/bitmap.h"
-> =20
->  /*
->   * Reference for the LUKS format implemented here is
-> @@ -70,6 +71,9 @@ typedef struct QCryptoBlockLUKSKeySlot QCryptoBlockLUKS=
-KeySlot;
-> =20
->  #define QCRYPTO_BLOCK_LUKS_SECTOR_SIZE 512LL
-> =20
-> +#define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME_MS 2000
-> +#define QCRYPTO_BLOCK_LUKS_ERASE_ITERATIONS 40
-> +
->  static const char qcrypto_block_luks_magic[QCRYPTO_BLOCK_LUKS_MAGIC_LEN]=
- =3D {
->      'L', 'U', 'K', 'S', 0xBA, 0xBE
->  };
-> @@ -219,6 +223,9 @@ struct QCryptoBlockLUKS {
-> =20
->      /* Hash algorithm used in pbkdf2 function */
->      QCryptoHashAlgorithm hash_alg;
-> +
-> +    /* Name of the secret that was used to open the image */
-> +    char *secret;
->  };
-> =20
-> =20
-> @@ -1069,6 +1076,112 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
->      return -1;
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 6bcf4a5fc4..c6c2deee75 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -5445,83 +5445,96 @@ void qcow2_signal_corruption(BlockDriverState *bs=
+, bool fatal, int64_t offset,
+>      s->signaled_corruption =3D true;
 >  }
 > =20
-> +/*
-> + * Returns true if a slot i is marked as active
-> + * (contains encrypted copy of the master key)
-> + */
-> +static bool
-> +qcrypto_block_luks_slot_active(const QCryptoBlockLUKS *luks,
-> +                               unsigned int slot_idx)
-> +{
-> +    uint32_t val =3D luks->header.key_slots[slot_idx].active;
-> +    return val =3D=3D  QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED;
-> +}
+> +#define QCOW_COMMON_OPTIONS                                         \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_SIZE,                                     \
+> +        .type =3D QEMU_OPT_SIZE,                                      \
+> +        .help =3D "Virtual disk size"                                 \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_COMPAT_LEVEL,                             \
+> +        .type =3D QEMU_OPT_STRING,                                    \
+> +        .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"       \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_BACKING_FILE,                             \
+> +        .type =3D QEMU_OPT_STRING,                                    \
+> +        .help =3D "File name of a base image"                         \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_BACKING_FMT,                              \
+> +        .type =3D QEMU_OPT_STRING,                                    \
+> +        .help =3D "Image format of the base image"                    \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_DATA_FILE,                                \
+> +        .type =3D QEMU_OPT_STRING,                                    \
+> +        .help =3D "File name of an external data file"                \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_DATA_FILE_RAW,                            \
+> +        .type =3D QEMU_OPT_BOOL,                                      \
+> +        .help =3D "The external data file must stay valid "           \
+> +                "as a raw image"                                    \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_ENCRYPT,                                  \
+> +        .type =3D QEMU_OPT_BOOL,                                      \
+> +        .help =3D "Encrypt the image with format 'aes'. (Deprecated " \
+> +                "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",    \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_ENCRYPT_FORMAT,                           \
+> +        .type =3D QEMU_OPT_STRING,                                    \
+> +        .help =3D "Encrypt the image, format choices: 'aes', 'luks'", \
+> +    },                                                              \
+> +    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",                     \
+> +        "ID of secret providing qcow AES key or LUKS passphrase"),  \
+> +    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),               \
+> +    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),              \
+> +    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),                \
+> +    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),           \
+> +    BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),                 \
+> +    BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),                \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_CLUSTER_SIZE,                             \
+> +        .type =3D QEMU_OPT_SIZE,                                      \
+> +        .help =3D "qcow2 cluster size",                               \
+> +        .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)            \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_PREALLOC,                                 \
+> +        .type =3D QEMU_OPT_STRING,                                    \
+> +        .help =3D "Preallocation mode (allowed values: off, "         \
+> +                "metadata, falloc, full)"                           \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_LAZY_REFCOUNTS,                           \
+> +        .type =3D QEMU_OPT_BOOL,                                      \
+> +        .help =3D "Postpone refcount updates",                        \
+> +        .def_value_str =3D "off"                                      \
+> +    },                                                              \
+> +    {                                                               \
+> +        .name =3D BLOCK_OPT_REFCOUNT_BITS,                            \
+> +        .type =3D QEMU_OPT_NUMBER,                                    \
+> +        .help =3D "Width of a reference count entry in bits",         \
+> +        .def_value_str =3D "16"                                       \
+> +    }                                                               \
 > +
-> +/*
-> + * Returns the number of slots that are marked as active
-> + * (slots that contain encrypted copy of the master key)
-> + */
-> +static unsigned int
-> +qcrypto_block_luks_count_active_slots(const QCryptoBlockLUKS *luks)
-> +{
-> +    size_t i =3D 0;
-> +    unsigned int ret =3D 0;
-> +
-> +    for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> +        if (qcrypto_block_luks_slot_active(luks, i)) {
-> +            ret++;
-> +        }
-> +    }
-> +    return ret;
-> +}
-> +
-> +/*
-> + * Finds first key slot which is not active
-> + * Returns the key slot index, or -1 if it doesn't exist
-> + */
-> +static int
-> +qcrypto_block_luks_find_free_keyslot(const QCryptoBlockLUKS *luks)
-> +{
-> +    size_t i;
-> +
-> +    for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> +        if (!qcrypto_block_luks_slot_active(luks, i)) {
-> +            return i;
-> +        }
-> +    }
-> +    return -1;
-> +
-> +}
-> +
-> +/*
-> + * Erases an keyslot given its index
-> + * Returns:
-> + *    0 if the keyslot was erased successfully
-> + *   -1 if a error occurred while erasing the keyslot
-> + *
-> + */
-> +static int
-> +qcrypto_block_luks_erase_key(QCryptoBlock *block,
-> +                             unsigned int slot_idx,
-> +                             QCryptoBlockWriteFunc writefunc,
-> +                             void *opaque,
-> +                             Error **errp)
-> +{
-> +    QCryptoBlockLUKS *luks =3D block->opaque;
-> +    QCryptoBlockLUKSKeySlot *slot =3D &luks->header.key_slots[slot_idx];
-> +    g_autofree uint8_t *garbagesplitkey =3D NULL;
-> +    size_t splitkeylen =3D luks->header.master_key_len * slot->stripes;
-> +    size_t i;
-> +
-> +    assert(slot_idx < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
-> +    assert(splitkeylen > 0);
-> +
-> +    garbagesplitkey =3D g_new0(uint8_t, splitkeylen);
-> +
-> +    /* Reset the key slot header */
-> +    memset(slot->salt, 0, QCRYPTO_BLOCK_LUKS_SALT_LEN);
-> +    slot->iterations =3D 0;
-> +    slot->active =3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED;
-> +
-> +    qcrypto_block_luks_store_header(block,  writefunc, opaque, errp);
-> +
-> +    /*
-> +     * Now try to erase the key material, even if the header
-> +     * update failed
-> +     */
-> +    for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_ERASE_ITERATIONS; i++) {
-> +        if (qcrypto_random_bytes(garbagesplitkey, splitkeylen, errp) < 0=
-) {
-> +            /*
-> +             * If we failed to get the random data, still write
-> +             * at least zeros to the key slot at least once
-> +             */
-> +            if (i > 0) {
-> +                return -1;
-> +            }
-> +        }
-> +
-> +        if (writefunc(block,
-> +                      slot->key_offset_sector * QCRYPTO_BLOCK_LUKS_SECTO=
-R_SIZE,
-> +                      garbagesplitkey,
-> +                      splitkeylen,
-> +                      opaque,
-> +                      errp) !=3D splitkeylen) {
-> +            return -1;
-> +        }
-> +    }
-> +    return 0;
-> +}
-> =20
->  static int
->  qcrypto_block_luks_open(QCryptoBlock *block,
-> @@ -1099,6 +1212,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> =20
->      luks =3D g_new0(QCryptoBlockLUKS, 1);
->      block->opaque =3D luks;
-> +    luks->secret =3D g_strdup(options->u.luks.key_secret);
-> =20
->      if (qcrypto_block_luks_load_header(block, readfunc, opaque, errp) < =
-0) {
->          goto fail;
-> @@ -1164,6 +1278,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
->   fail:
->      qcrypto_block_free_cipher(block);
->      qcrypto_ivgen_free(block->ivgen);
-> +    g_free(luks->secret);
->      g_free(luks);
->      return -1;
->  }
-> @@ -1204,7 +1319,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-> =20
->      memcpy(&luks_opts, &options->u.luks, sizeof(luks_opts));
->      if (!luks_opts.has_iter_time) {
-> -        luks_opts.iter_time =3D 2000;
-> +        luks_opts.iter_time =3D QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME_MS;
->      }
->      if (!luks_opts.has_cipher_alg) {
->          luks_opts.cipher_alg =3D QCRYPTO_CIPHER_ALG_AES_256;
-> @@ -1244,6 +1359,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
->                     optprefix ? optprefix : "");
->          goto error;
->      }
-> +    luks->secret =3D g_strdup(options->u.luks.key_secret);
-> +
->      password =3D qcrypto_secret_lookup_as_utf8(luks_opts.key_secret, err=
-p);
->      if (!password) {
->          goto error;
-> @@ -1471,10 +1588,260 @@ qcrypto_block_luks_create(QCryptoBlock *block,
->      qcrypto_block_free_cipher(block);
->      qcrypto_ivgen_free(block->ivgen);
-> =20
-> +    g_free(luks->secret);
->      g_free(luks);
->      return -1;
->  }
-> =20
-> +/*
-> + * Given LUKSKeyslotUpdate command, return @slots_bitmap with all slots
-> + * that will be updated with new password (or erased)
-> + * returns number of affected slots
-> + */
-> +static int qcrypto_block_luks_get_slots_bitmap(QCryptoBlock *block,
-> +                                               QCryptoBlockReadFunc read=
-func,
-> +                                               void *opaque,
-> +                                               const LUKSKeyslotUpdate *=
-command,
-> +                                               unsigned long *slots_bitm=
-ap,
-> +                                               Error **errp)
-> +{
-> +    const QCryptoBlockLUKS *luks =3D block->opaque;
-> +    size_t i;
-> +    int ret =3D 0;
-> +
-> +    if (command->has_keyslot) {
-> +        /* keyslot set, select only this keyslot */
-> +        int keyslot =3D command->keyslot;
-> +
-> +        if (keyslot < 0 || keyslot >=3D QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS=
-) {
-> +            error_setg(errp,
-> +                       "Invalid slot %u specified, must be between 0 and=
- %u",
-> +                       keyslot, QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS - 1);
-> +            goto error;
-> +        }
-> +        bitmap_set(slots_bitmap, keyslot, 1);
-> +        ret++;
-> +
-> +    } else if (command->has_old_secret) {
-> +        /* initially select all active keyslots */
-> +        for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> +            if (qcrypto_block_luks_slot_active(luks, i)) {
-> +                bitmap_set(slots_bitmap, i, 1);
-> +                ret++;
-> +            }
-> +        }
-> +    } else {
-> +        /* find a free keyslot */
-> +        int slot =3D qcrypto_block_luks_find_free_keyslot(luks);
-> +
-> +        if (slot =3D=3D -1) {
-> +            error_setg(errp,
-> +                       "Can't add a keyslot - all key slots are in use")=
-;
-> +            goto error;
-> +        }
-> +        bitmap_set(slots_bitmap, slot, 1);
-> +        ret++;
-> +    }
-> +
-> +    if (command->has_old_secret) {
-> +        /* now deselect all keyslots that don't contain the password */
-> +        g_autofree uint8_t *tmpkey =3D g_new0(uint8_t,
-> +                                            luks->header.master_key_len)=
-;
-> +
-> +        for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> +            g_autofree char *old_password =3D NULL;
-> +            int rv;
-> +
-> +            if (!test_bit(i, slots_bitmap)) {
-> +                continue;
-> +            }
-> +
-> +            old_password =3D qcrypto_secret_lookup_as_utf8(command->old_=
-secret,
-> +                                                         errp);
-> +            if (!old_password) {
-> +                goto error;
-> +            }
-> +
-> +            rv =3D qcrypto_block_luks_load_key(block,
-> +                                             i,
-> +                                             old_password,
-> +                                             tmpkey,
-> +                                             readfunc,
-> +                                             opaque,
-> +                                             errp);
-> +            if (rv =3D=3D -1)
-> +                goto error;
-> +            else if (rv =3D=3D 0) {
-> +                bitmap_clear(slots_bitmap, i, 1);
-> +                ret--;
-> +            }
-> +        }
-> +    }
-> +    return ret;
-> +error:
-> +    return -1;
-> +}
-> +
-> +/*
-> + * Apply a single keyslot update command as described in @command
-> + * Optionally use @unlock_secret to retrieve the master key
-> + */
-> +static int
-> +qcrypto_block_luks_apply_keyslot_update(QCryptoBlock *block,
-> +                                        QCryptoBlockReadFunc readfunc,
-> +                                        QCryptoBlockWriteFunc writefunc,
-> +                                        void *opaque,
-> +                                        LUKSKeyslotUpdate *command,
-> +                                        const char *unlock_secret,
-> +                                        uint8_t **master_key,
-> +                                        bool force,
-> +                                        Error **errp)
-> +{
-> +    QCryptoBlockLUKS *luks =3D block->opaque;
-> +    g_autofree unsigned long *slots_bitmap =3D NULL;
-> +    int64_t iter_time =3D QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME_MS;
-> +    int slot_count;
-> +    size_t i;
-> +    char *new_password;
-> +    bool erasing;
-> +
-> +    slots_bitmap =3D bitmap_new(QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
-> +    slot_count =3D qcrypto_block_luks_get_slots_bitmap(block, readfunc, =
-opaque,
-> +                                                     command, slots_bitm=
-ap,
-> +                                                     errp);
-> +    if (slot_count =3D=3D -1) {
-> +        goto error;
-> +    }
-> +    /* no matching slots, so nothing to do */
-> +    if (slot_count =3D=3D 0) {
-> +        error_setg(errp, "Requested operation didn't match any slots");
-> +        goto error;
-> +    }
-> +    /*
-> +     * slot is erased when the password is set to null, or empty string
-> +     * (for compatibility with command line)
-> +     */
-> +    erasing =3D command->new_secret->type =3D=3D QTYPE_QNULL ||
-> +              strlen(command->new_secret->u.s) =3D=3D 0;
-> +
-> +    /* safety checks */
-> +    if (!force) {
-> +        if (erasing) {
-> +            if (slot_count =3D=3D qcrypto_block_luks_count_active_slots(=
-luks)) {
-> +                error_setg(errp,
-> +                           "Requested operation will erase all active ke=
-yslots"
-> +                           " which will erase all the data in the image"
-> +                           " irreversibly - refusing operation");
-> +                goto error;
-> +            }
-> +        } else {
-> +            for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> +                if (!test_bit(i, slots_bitmap)) {
-> +                    continue;
-> +                }
-> +                if (qcrypto_block_luks_slot_active(luks, i)) {
-> +                    error_setg(errp,
-> +                               "Refusing to overwrite active slot %zu - =
+>  static QemuOptsList qcow2_create_opts =3D {
+>      .name =3D "qcow2-create-opts",
+>      .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_create_opts.head),
+>      .desc =3D {
+> -        {
+> -            .name =3D BLOCK_OPT_SIZE,
+> -            .type =3D QEMU_OPT_SIZE,
+> -            .help =3D "Virtual disk size"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_COMPAT_LEVEL,
+> -            .type =3D QEMU_OPT_STRING,
+> -            .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_BACKING_FILE,
+> -            .type =3D QEMU_OPT_STRING,
+> -            .help =3D "File name of a base image"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_BACKING_FMT,
+> -            .type =3D QEMU_OPT_STRING,
+> -            .help =3D "Image format of the base image"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_DATA_FILE,
+> -            .type =3D QEMU_OPT_STRING,
+> -            .help =3D "File name of an external data file"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_DATA_FILE_RAW,
+> -            .type =3D QEMU_OPT_BOOL,
+> -            .help =3D "The external data file must stay valid as a raw i=
+mage"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_ENCRYPT,
+> -            .type =3D QEMU_OPT_BOOL,
+> -            .help =3D "Encrypt the image with format 'aes'. (Deprecated =
 "
-> +                               "please erase it first", i);
-> +                    goto error;
-> +                }
-> +            }
-> +        }
+> -                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_ENCRYPT_FORMAT,
+> -            .type =3D QEMU_OPT_STRING,
+> -            .help =3D "Encrypt the image, format choices: 'aes', 'luks'"=
+,
+> -        },
+> -        BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",
+> -            "ID of secret providing qcow AES key or LUKS passphrase"),
+> -        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),
+> -        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),
+> -        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),
+> -        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),
+> -        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),
+> -        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),
+> -        {
+> -            .name =3D BLOCK_OPT_CLUSTER_SIZE,
+> -            .type =3D QEMU_OPT_SIZE,
+> -            .help =3D "qcow2 cluster size",
+> -            .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_PREALLOC,
+> -            .type =3D QEMU_OPT_STRING,
+> -            .help =3D "Preallocation mode (allowed values: off, metadata=
+, "
+> -                    "falloc, full)"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_LAZY_REFCOUNTS,
+> -            .type =3D QEMU_OPT_BOOL,
+> -            .help =3D "Postpone refcount updates",
+> -            .def_value_str =3D "off"
+> -        },
+> -        {
+> -            .name =3D BLOCK_OPT_REFCOUNT_BITS,
+> -            .type =3D QEMU_OPT_NUMBER,
+> -            .help =3D "Width of a reference count entry in bits",
+> -            .def_value_str =3D "16"
+> -        },
+> +        QCOW_COMMON_OPTIONS,
+> +        { /* end of list */ }
 > +    }
+> +};
 > +
-> +    /* setup the data needed for storing the new keyslot */
-> +    if (!erasing) {
-> +        /* Load the master key if it wasn't already loaded */
-> +        if (!*master_key) {
-> +            g_autofree char *old_password;
-> +            old_password =3D qcrypto_secret_lookup_as_utf8(unlock_secret=
-,  errp);
-> +            if (!old_password) {
-> +                goto error;
-> +            }
-> +            *master_key =3D g_new0(uint8_t, luks->header.master_key_len)=
-;
-> +
-> +            if (qcrypto_block_luks_find_key(block, old_password, *master=
-_key,
-> +                                            readfunc, opaque, errp) < 0)=
- {
-> +                error_append_hint(errp, "Failed to retrieve the master k=
-ey");
-> +                goto error;
-> +            }
-> +        }
-> +        new_password =3D qcrypto_secret_lookup_as_utf8(command->new_secr=
-et->u.s,
-> +                                                     errp);
-> +        if (!new_password) {
-> +            goto error;
-> +        }
-> +        if (command->has_iter_time) {
-> +            iter_time =3D command->iter_time;
-> +        }
-> +    }
-> +
-> +    /* new apply the update */
-> +    for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> +        if (!test_bit(i, slots_bitmap)) {
-> +            continue;
-> +        }
-> +        if (erasing) {
-> +            if (qcrypto_block_luks_erase_key(block, i,
-> +                                             writefunc,
-> +                                             opaque,
-> +                                             errp)) {
-> +                error_append_hint(errp, "Failed to erase keyslot %zu", i=
-);
-> +                goto error;
-> +            }
-> +        } else {
-> +            if (qcrypto_block_luks_store_key(block, i,
-> +                                             new_password,
-> +                                             *master_key,
-> +                                             iter_time,
-> +                                             writefunc,
-> +                                             opaque,
-> +                                             errp)) {
-> +                error_append_hint(errp, "Failed to write to keyslot %zu"=
-, i);
-> +                goto error;
-> +            }
-> +        }
-> +    }
-> +    return 0;
-> +error:
-> +    return -EINVAL;
-> +}
-
-I feel the this method is confusing from trying to handle both
-adding and erasing keyslots....
-
-
-> +
-> +static int
-> +qcrypto_block_luks_amend_options(QCryptoBlock *block,
-> +                                 QCryptoBlockReadFunc readfunc,
-> +                                 QCryptoBlockWriteFunc writefunc,
-> +                                 void *opaque,
-> +                                 QCryptoBlockAmendOptions *options,
-> +                                 bool force,
-> +                                 Error **errp)
-> +{
-> +    QCryptoBlockLUKS *luks =3D block->opaque;
-> +    QCryptoBlockAmendOptionsLUKS *options_luks =3D &options->u.luks;
-> +    LUKSKeyslotUpdateList *ptr;
-> +    g_autofree uint8_t *master_key =3D NULL;
-> +    int ret;
-> +
-> +    char *unlock_secret =3D options_luks->has_unlock_secret ?
-> +                          options_luks->unlock_secret :
-> +                          luks->secret;
-> +
-> +    for (ptr =3D options_luks->keys; ptr; ptr =3D ptr->next) {
-> +        ret =3D qcrypto_block_luks_apply_keyslot_update(block, readfunc,
-> +                                                      writefunc, opaque,
-> +                                                      ptr->value,
-> +                                                      unlock_secret,
-> +                                                      &master_key,
-> +                                                      force, errp);
-
-.... imho we sould do
-
-    bool  erasing =3D command->new_secret->type =3D=3D QTYPE_QNULL;
-
-    if (erasing) {
-         ret =3D qcrypto_block_luks_disable_keyslot(block, readfunc,
-                                                       writefunc, opaque,
-                                                       ptr->value,
-                                                       unlock_secret,
-                                                       &master_key,
-                                                       force, errp);
-    } else {
-        ret =3D qcrypto_block_luks_enable_keyslot(block, readfunc,
-                                                       writefunc, opaque,
-                                                       ptr->value,
-                                                       unlock_secret,
-                                                       &master_key,
-                                                       force, errp);
-    }
-
-> +
-> +        if (ret !=3D 0) {
-> +            goto error;
-> +        }
-> +    }
-> +    return 0;
-> +error:
-> +    return -1;
-> +}
-
-If there's no code to run in the 'error' label, then we should just
-get rid of it and 'return -1' instead of "goto error"
-
+> +static QemuOptsList qcow2_amend_opts =3D {
+> +    .name =3D "qcow2-amend-opts",
+> +    .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_amend_opts.head),
+> +    .desc =3D {
+> +        QCOW_COMMON_OPTIONS,
+>          { /* end of list */ }
+>      }
+>  };
+> @@ -5581,6 +5594,7 @@ BlockDriver bdrv_qcow2 =3D {
+>      .bdrv_inactivate            =3D qcow2_inactivate,
 > =20
->  static int qcrypto_block_luks_get_info(QCryptoBlock *block,
->                                         QCryptoBlockInfo *info,
-> @@ -1523,7 +1890,9 @@ static int qcrypto_block_luks_get_info(QCryptoBlock=
- *block,
+>      .create_opts         =3D &qcow2_create_opts,
+> +    .amend_opts          =3D &qcow2_amend_opts,
+>      .strong_runtime_opts =3D qcow2_strong_runtime_opts,
+>      .mutable_opts        =3D mutable_opts,
+>      .bdrv_co_check       =3D qcow2_co_check,
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 810a9ecb86..6f0abf8544 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -407,6 +407,10 @@ struct BlockDriver {
 > =20
->  static void qcrypto_block_luks_cleanup(QCryptoBlock *block)
->  {
-> -    g_free(block->opaque);
-> +    QCryptoBlockLUKS *luks =3D block->opaque;
-> +    g_free(luks->secret);
-
-Check if "luks" is non-NULL for robustness in early failure scenarios
-
-> +    g_free(luks);
+>      /* List of options for creating images, terminated by name =3D=3D NU=
+LL */
+>      QemuOptsList *create_opts;
+> +
+> +    /* List of options for image amend*/
+> +    QemuOptsList *amend_opts;
+> +
+>      /*
+>       * If this driver supports reopening images this contains a
+>       * NULL-terminated list of the runtime options that can be
+> diff --git a/qemu-img.c b/qemu-img.c
+> index a79f3904db..befd53943b 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -3878,11 +3878,11 @@ static int print_amend_option_help(const char *fo=
+rmat)
+>          return 1;
+>      }
+> =20
+> -    /* Every driver supporting amendment must have create_opts */
+> -    assert(drv->create_opts);
+> +    /* Every driver supporting amendment must have amend_opts */
+> +    assert(drv->amend_opts);
+> =20
+>      printf("Creation options for '%s':\n", format);
+> -    qemu_opts_print_help(drv->create_opts, false);
+> +    qemu_opts_print_help(drv->amend_opts, false);
+>      printf("\nNote that not all of these options may be amendable.\n");
+>      return 0;
 >  }
+> @@ -3892,7 +3892,7 @@ static int img_amend(int argc, char **argv)
+>      Error *err =3D NULL;
+>      int c, ret =3D 0;
+>      char *options =3D NULL;
+> -    QemuOptsList *create_opts =3D NULL;
+> +    QemuOptsList *amend_opts =3D NULL;
+>      QemuOpts *opts =3D NULL;
+>      const char *fmt =3D NULL, *filename, *cache;
+>      int flags;
+> @@ -4031,11 +4031,11 @@ static int img_amend(int argc, char **argv)
+>          goto out;
+>      }
 > =20
+> -    /* Every driver supporting amendment must have create_opts */
+> -    assert(bs->drv->create_opts);
+> +    /* Every driver supporting amendment must have amend_opts */
+> +    assert(bs->drv->amend_opts);
+> =20
+> -    create_opts =3D qemu_opts_append(create_opts, bs->drv->create_opts);
+> -    opts =3D qemu_opts_create(create_opts, NULL, 0, &error_abort);
+> +    amend_opts =3D qemu_opts_append(amend_opts, bs->drv->amend_opts);
+> +    opts =3D qemu_opts_create(amend_opts, NULL, 0, &error_abort);
+>      qemu_opts_do_parse(opts, options, NULL, &err);
+>      if (err) {
+>          error_report_err(err);
+> @@ -4058,7 +4058,7 @@ out:
+>  out_no_progress:
+>      blk_unref(blk);
+>      qemu_opts_del(opts);
+> -    qemu_opts_free(create_opts);
+> +    qemu_opts_free(amend_opts);
+>      g_free(options);
+> =20
+>      if (ret) {
+> --=20
+> 2.17.2
+>=20
 
 Regards,
 Daniel
