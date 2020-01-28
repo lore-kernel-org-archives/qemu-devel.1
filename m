@@ -1,91 +1,94 @@
-Return-Path: <SRS0=8p31=3Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF0DC32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 23:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 179A2C32771
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 00:05:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 838E622527
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jan 2020 23:46:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D10F52173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 00:05:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NOnZbaTv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 838E622527
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FMbr/Q+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10F52173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwE50-00047q-MT
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 18:46:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34822)
+	id 1iwENt-00018T-0Z
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 19:05:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38833)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iwE4B-00036n-Fn
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 18:45:16 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iwENA-0000Jw-FU
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:04:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iwE4A-00069Q-BI
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 18:45:15 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34756)
+ (envelope-from <richard.henderson@linaro.org>) id 1iwEN9-0002d8-Cz
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:04:52 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36163)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iwE4A-00068N-4R
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 18:45:14 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t2so13872595wrr.1
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 15:45:14 -0800 (PST)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iwEN9-0002cf-5r
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:04:51 -0500
+Received: by mail-pf1-x442.google.com with SMTP id 185so1907758pfv.3
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 16:04:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ExdRy6VAl9ttBB0k1+O+8Kdxo6uu4LrPkBFtm3v/e8w=;
- b=NOnZbaTvB3JWKO5i1o+oU6OyFIK8cIKFtl9huWzzQqs2LfAnUPQb696jCZgGZEjQok
- otscINsBvHJaAH6QCSdpyLkvRwYviU0Xfn4Ez/xEnsRByreSi1ZjhBgE4ulFfhQcVqcF
- Q/RCPy5lrjYEhuglQzzuuGNknoELyZfEHCBd14rU9hPJyc5iGqe9CMoit0qxZi04mEEh
- qZUrqn1JKZMWb/KyDmfNFVl2Oh7VwsRV2kEg0nJ0PHR0eM0kaee2Tb420NlXgSxqDPoA
- AqQEvpqo/MvEqJ5gi6Vd6C7ZjK3RSnrUSZzoToyUcvqld0hLtQTxwY/XMWV/LvF/P8w+
- n/5g==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=T7t1MXsPVviLhXgv7hxfGRZSnDG0LkdWhBaGF4qkcQU=;
+ b=FMbr/Q+wy8byUDDzftlQevnTLqGFXK55UgWQba5qik//JOMN6TQQU9/lI6YuJxrDbq
+ cysRGJK2w3QHBDkZTLA3QZDYtk9LeDXgBWpw++Fnmn4yv3NS8Q+rjEsYJydWZxuYGYAg
+ oaEFH12oBU/x0EAM+nulpXREYCW49Qot85Uj/Vy2RHieqES9vaK88D28D9d8XGv3ORdF
+ /KFvGxlZMEdwRgocDbKGOkoSIk8eWqT/aeNTpEm/rs9YGtKzRm0SAx/sbIxn8q26bV4z
+ enESgs0EpMdEomTvWydiSYTOYug2fIYdqyBIKLxiE6RdYxH1kpUZWDB+Ze5pWtBgG5nq
+ Wyqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ExdRy6VAl9ttBB0k1+O+8Kdxo6uu4LrPkBFtm3v/e8w=;
- b=qizne9OgFvTVIn7v6TaJWsH1lYBRQOWAiNxpPDMQ5QpD9CujgvC2yyEBHWSsp9HY7J
- wENEOY4QlT5kRCu+i/295JJ8VpBaYfBGiPEAmWwaP9BiGmAj9kj65krgyFlKmlfynC2r
- YYd7atkypnj3WqnksMXFcy4QaU0ofH70gbbWmvlpZZkGK2VDXJ7A5ntSSTA5bEigT+Ap
- 7ZaBQeXFmn6Ic1wSOHYQFpGgTCdpqCRwje4TSfV1lPbyzDWPnLDhbRMXnMxEPm7DeHIW
- ieZhMm0yX+53XGHY7BCB62M73UaoWGrlVnmlwGphIgCdA+F1Ts8VkePKBo0mNuLYhpXH
- zkLw==
-X-Gm-Message-State: APjAAAVXbkhVsrEOvEwDK7DzC3/WAvAhhF3TkPUe8QChchq2G3n8pxZs
- GvmmFTrHja+LGeEjxnOiX08I7w==
-X-Google-Smtp-Source: APXvYqzqacxfo1lIB88UZddvnupCMnqFoyfkw4i+QKdPkYJVT/rMzqHK6YfAPEyVP2hNCgHyyl8HnA==
-X-Received: by 2002:adf:97d6:: with SMTP id t22mr24281045wrb.407.1580168712754; 
- Mon, 27 Jan 2020 15:45:12 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d14sm24513703wru.9.2020.01.27.15.45.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jan 2020 15:45:11 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B0EBD1FF87;
- Mon, 27 Jan 2020 23:45:10 +0000 (GMT)
-References: <20200125184217.30034-1-f4bug@amsat.org>
-User-agent: mu4e 1.3.7; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] .travis.yml: Drop superfluous use of --python=python3
- parameter
-In-reply-to: <20200125184217.30034-1-f4bug@amsat.org>
-Date: Mon, 27 Jan 2020 23:45:10 +0000
-Message-ID: <87a768foqh.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=T7t1MXsPVviLhXgv7hxfGRZSnDG0LkdWhBaGF4qkcQU=;
+ b=tYhxj6+Y5NQs5FkFZ6TOl0hV+RgI00jsOFKzMkRDKBhFMBt2gOExYzAlMeP5tlmGoV
+ VzlCz09UkkKfnmfrX4qA/h4ZxpLCgOKFJ8dHYJ0fvTKeh61rGL86a7d+NAicGxIFp2IQ
+ mBDJnM0Zo7AiWPiPNyF8xqW7qKyHaJgP6Jj41TPpQsWBZBsGHQNzRdKJ9DFpgLx0/7CP
+ bvJwCfMEr338oyI64He8t+boDdIA6+SdZro0I6njN3m23jZCV0RbLQ6JlYW7f6DusUYq
+ xQDuQ6kfwqxum9POwPPgGIhX3641vY36p4AAsIyS9gpveZRzZlD17tcNnvoD3sr3FWik
+ Wa2Q==
+X-Gm-Message-State: APjAAAV0OjhZjFWowWmifgXlZCo90Q+2zpE6o1Vbl5sHlA1RyOb877kc
+ gST8XQbZgcVVpe0PqWXzCWgfiA==
+X-Google-Smtp-Source: APXvYqzNQUET7nU3jdb1lpkuPbFgARPvCCNwkhaZcZlLrV0SG8faYc/iDhw9mC+z71uDrNapXVBzWA==
+X-Received: by 2002:a65:4b89:: with SMTP id t9mr7845848pgq.102.1580169889828; 
+ Mon, 27 Jan 2020 16:04:49 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ p24sm16893088pff.69.2020.01.27.16.04.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Jan 2020 16:04:49 -0800 (PST)
+Subject: Re: [PATCH v4 29/40] target/arm: Flush tlb for ASID changes in EL2&0
+ translation regime
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-30-richard.henderson@linaro.org>
+ <CAFEAcA9=4MXFEnVbPpa1CmG8xHx-xuVt8MXwsNGyT+nB2+L1Mw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a78956ca-4327-f25b-67d5-f7c0c7fdd513@linaro.org>
+Date: Mon, 27 Jan 2020 16:04:46 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9=4MXFEnVbPpa1CmG8xHx-xuVt8MXwsNGyT+nB2+L1Mw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,55 +100,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 12/6/19 9:05 AM, Peter Maydell wrote:
+> On Tue, 3 Dec 2019 at 02:30, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Since we only support a single ASID, flush the tlb when it changes.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/helper.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index 9df55a8d6b..2a4d4c2c0d 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -3740,6 +3740,15 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>>  static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>>                                      uint64_t value)
+>>  {
+>> +    /*
+>> +     * If we are running with E2&0 regime, then the ASID is active.
+>> +     * Flush if that changes.
+>> +     */
+>> +    if ((arm_hcr_el2_eff(env) & HCR_E2H) &&
+>> +        extract64(raw_read(env, ri) ^ value, 48, 16)) {
+>> +        tlb_flush_by_mmuidx(env_cpu(env),
+>> +                            ARMMMUIdxBit_EL20_2 | ARMMMUIdxBit_EL20_0);
+>> +    }
+>>      raw_write(env, ri, value);
+>>  }
+> 
+> For the existing EL1 setup we have separate write functions
+> for TTBR registers and for TCR_EL1 (vmsa_tcr_el1_write()
+> and vmsa_ttbr_write()), rather than a single one, and they
+> don't do the same thing. Why do we use a single writefn
+> here? It looks particularly odd because we're actually looking
+> at the value written here.
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> As we require Python3 since commit ddf9069963, we don't need to
-> explicit it with the --python=3D/usr/bin/python3 configure option.
->
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Queued to testing/next, thanks.
-
-> ---
-> Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Cleber Rosa <crosa@redhat.com>
-> ---
->  .travis.yml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 6c1038a0f1..ee93180283 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -268,7 +268,7 @@ matrix:
->=20=20
->      # Acceptance (Functional) tests
->      - env:
-> -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-soft=
-mmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
-> +        - CONFIG=3D"--target-list=3Dx86_64-softmmu,mips-softmmu,mips64el=
--softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmm=
-u,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
->          - TEST_CMD=3D"make check-acceptance"
->        after_script:
->          - python3 -c 'import json; r =3D json.load(open("tests/results/l=
-atest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["statu=
-s"] not in ("PASS", "SKIP")]' | xargs cat
+Yes, Laurent noticed the same problem wrt patch 4.
+Fixed.
 
 
---=20
-Alex Benn=C3=A9e
+r~
+
 
