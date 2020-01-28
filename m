@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CE1C2D0DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A78C33CB3
 	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:19:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1ADD2173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:19:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61AAC2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:19:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jxJHHhq3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1ADD2173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z5majDoR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61AAC2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWO5-0002pU-TO
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:19:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38831)
+	id 1iwWO6-0002ss-GU
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:19:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8t-0005Pp-G2
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:20 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7j-0003Up-LV
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8m-00027V-R7
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:10 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55097)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7h-0007yB-FY
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:02 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:46955)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV8m-00024w-IP
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:08 -0500
-Received: by mail-wm1-x343.google.com with SMTP id g1so3507768wmh.4
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:59:06 -0800 (PST)
+ id 1iwV7h-0007wF-34
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:01 -0500
+Received: by mail-wr1-x435.google.com with SMTP id z7so17071971wrl.13
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:58:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=mxfBBpFk2HL0soEj2DJhlcL5zgYjAjxBqQDT/uKJ5IQ=;
- b=jxJHHhq3s0TUOeLFykXaJtD0MesbMXN8sGjn3cpq5iOAwoWHcDWe051FYhrwfmD2OM
- 5n7Dboai5mFBWu8tp56Ei9/AHop67Ps6FCH+5wGM01KrsyvM05t6IjVLxQ1qSXiijsMn
- Ev1UWGclEaBSbNOlZJTHRrH5C8FZkrMgu5AWdU7ChvnDLgBpLbtQ1XubDyoF//fb1iC4
- 4xCpWbpFnuTChoeFTVGnX6kQyLF0kPU481ItAlyCvEhGLsA1TsrshOZUhAe+xFIbFe2u
- wFjNhXneDXvzTA7SAQ7NNPC3Rpoey2U1sAPKmSgoPwwdHTdo4AfIGLPZjRUButzWYIbP
- oDAg==
+ bh=piG9fnu8CqJWz4rBnn4CXq8uYJkBwt1Za50SBLzi8lQ=;
+ b=Z5majDoRYe6nu6RotpelZO/5x5aYLmTmBTy88P3fUvXd5VyS7WGOThv3O10xMpHtdu
+ YEu/NMMH1WF3gYPZDFCxwi2vt5jwW2223UD+vQCvkZbJP7z7tl8WuYQ0RJEC3V12WhiV
+ DmqL65IWp4zWXvOan5NE8DPrJS832OkjlqPu4ncxluNd09Eto9r85nDkt7b/UIAJ4+SH
+ cqL3JpoTsMmRAyNBaYyJK39vEvbEhA+uBOjpxjw9+BKaGYzsd1AtT68F7jwROsQJziAz
+ wZnu21fSsRSGybEQ7r+ky3KFeV7+jVmBPbvYlfzyHinl8W3C8Ruab6G8cnO+416K41j9
+ LZug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=mxfBBpFk2HL0soEj2DJhlcL5zgYjAjxBqQDT/uKJ5IQ=;
- b=Dxg5NDswgYX7ma14QO3KNmbefNmSBh0VQZbpduU4v7a7CUWcXHPJnA3r7ZZIfBou3p
- KExb5b5z1RMA3f5t+YQL1JtO+7LUkyKAFaB85/jb+b2qXxxKfeBCZK2ledwTv6EsrU+q
- X6a24uS87TjYBNGrS/TV15GNOUbCEdpy1BjklhNCCDJwisg2fZowI6q7pv8/XTr/jod8
- BzQjUg38tkakg4AL+qAnCxTt3YXGNph9giF/scrbiVt5gXGgZRDWpD7c7urAsLNIR9gL
- Vc8Zd+sEggZg9pUyygXYRRNZab/Dd7B7UIVgRuiFfkFnMkoL18acyA3/sdW76IYrWJPY
- HnKA==
-X-Gm-Message-State: APjAAAX3AA0XAwIn/bcjX1bZR3vxlz0F9ba81mhebgSTdW/+KZFBVMAz
- qiFLlUBhSZqYG2u3S588WIsGgXwx
-X-Google-Smtp-Source: APXvYqx1MpfuX5SPMkVWAw+Si9+OgEJ2MeHBdgtbZkSDLcQ0DWM7xchudKkmwsPEOAmck4a200jlUA==
-X-Received: by 2002:a7b:c459:: with SMTP id l25mr6169301wmi.17.1580234345050; 
- Tue, 28 Jan 2020 09:59:05 -0800 (PST)
+ bh=piG9fnu8CqJWz4rBnn4CXq8uYJkBwt1Za50SBLzi8lQ=;
+ b=jvFQOfYM+ZV/iFNe1iKzT3Zi/smOYlEoYMCevdGKasY2a9EErlZmc8w2UQ6c0z3Vkz
+ dSN2jzcxU5NGp+R9Dlm/tE41FaSkVthLPK4PF0b9N3cKp0KsMoZisTA+ykuAHoIWUmmO
+ 7ezWhixG/6bzh1aEVSNNDlRF8ibMl/oy0REjb3DQNe8GB/UHDEJsUrdtzZfu6diBGJ+V
+ vhm1VwbpB8G+fcoXfXepc/nfGKQ1myES5E645i4bipHOHpPRn9SdjZcJYqbj6tf2I+/j
+ tvMNMZaiOmuqv2EqIu4KIuytxT9LZnguwLqsXRcCxXToiSGQTmHGzG198YRvgt2Q3wU1
+ BAYg==
+X-Gm-Message-State: APjAAAV7nIANJ/KviqM5YdvsHgSBmUVRZQMEMk57jh7LxITeKEihglTm
+ v8Mdt7JQ17srvLnC0scDwsOJDnQq
+X-Google-Smtp-Source: APXvYqyc8oSE3MjPZvohsC3oZp5RvhWXTwTiWN2LUQsv4HrGLEUPaBMeole1kf5w3R7XQ3AJHCIn1g==
+X-Received: by 2002:adf:c145:: with SMTP id w5mr30561116wre.205.1580234279938; 
+ Tue, 28 Jan 2020 09:57:59 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.59.03
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:59:04 -0800 (PST)
+ Tue, 28 Jan 2020 09:57:59 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 134/142] meson: convert po/
-Date: Tue, 28 Jan 2020 18:53:34 +0100
-Message-Id: <20200128175342.9066-135-pbonzini@redhat.com>
+Subject: [PATCH 107/142] meson: convert hw/audio
+Date: Tue, 28 Jan 2020 18:53:07 +0100
+Message-Id: <20200128175342.9066-108-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,215 +103,79 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile       |  3 --
- meson.build    |  4 +++
- po/LINGUAS     |  7 +++++
- po/Makefile    | 52 -----------------------------------
- po/POTFILES    |  1 +
- po/meson.build |  5 ++++
- po/messages.po | 74 --------------------------------------------------
- 7 files changed, 17 insertions(+), 129 deletions(-)
- create mode 100644 po/LINGUAS
- delete mode 100644 po/Makefile
- create mode 100644 po/POTFILES
- create mode 100644 po/meson.build
- delete mode 100644 po/messages.po
+ hw/Makefile.objs       |  1 -
+ hw/audio/Makefile.objs | 18 ------------------
+ hw/audio/meson.build   | 14 ++++++++++++++
+ hw/meson.build         |  1 +
+ 4 files changed, 15 insertions(+), 19 deletions(-)
+ delete mode 100644 hw/audio/Makefile.objs
+ create mode 100644 hw/audio/meson.build
 
-diff --git a/Makefile b/Makefile
-index 24bacf6e3a..112bae68b2 100644
---- a/Makefile
-+++ b/Makefile
-@@ -222,9 +222,6 @@ endif
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 0c92a04856..c69c3aa4c5 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -2,7 +2,6 @@ ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+ devices-dirs-y += acpi/
+ devices-dirs-y += adc/
+-devices-dirs-y += audio/
  endif
  
- install: all install-localstatedir
--ifdef CONFIG_GTK
--	$(MAKE) -C po $@
--endif
- 
- # Add a dependency on the generated files, so that they are always
- # rebuilt before other object files
-diff --git a/meson.build b/meson.build
-index 2d042017bf..6083897fc7 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1089,3 +1089,7 @@ if host_machine.system() == 'windows'
-                 build_always_stale: true,
-                 command: nsis_cmd + ['@INPUT@'])
- endif
-+
-+if 'CONFIG_GTK' in config_host
-+  subdir('po')
-+endif
-diff --git a/po/LINGUAS b/po/LINGUAS
-new file mode 100644
-index 0000000000..054930d8d6
---- /dev/null
-+++ b/po/LINGUAS
-@@ -0,0 +1,7 @@
-+bg
-+de_DE
-+fr_FR
-+hu
-+it
-+tr
-+zh_CN
-diff --git a/po/Makefile b/po/Makefile
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/audio/Makefile.objs b/hw/audio/Makefile.objs
 deleted file mode 100644
-index c041f4c858..0000000000
---- a/po/Makefile
+index 63db383709..0000000000
+--- a/hw/audio/Makefile.objs
 +++ /dev/null
-@@ -1,52 +0,0 @@
--# This makefile is very special as it's meant to build as part of the build
--# process and also within the source tree to update the translation files.
+@@ -1,18 +0,0 @@
+-# Sound
+-common-obj-$(CONFIG_SB16) += sb16.o
+-common-obj-$(CONFIG_ES1370) += es1370.o
+-common-obj-$(CONFIG_AC97) += ac97.o
+-common-obj-$(CONFIG_ADLIB) += fmopl.o adlib.o
+-common-obj-$(CONFIG_GUS) += gus.o gusemu_hal.o gusemu_mixer.o
+-common-obj-$(CONFIG_CS4231A) += cs4231a.o
+-common-obj-$(CONFIG_HDA) += intel-hda.o hda-codec.o
 -
--# Set SRC_PATH for in-tree builds without configuration.
--SRC_PATH=..
+-common-obj-$(CONFIG_PCSPK) += pcspk.o
+-common-obj-$(CONFIG_WM8750) += wm8750.o
+-common-obj-$(CONFIG_PL041) += pl041.o lm4549.o
 -
--# The default target must come before any include statements.
--all:
+-common-obj-$(CONFIG_CS4231) += cs4231.o
+-common-obj-$(CONFIG_MARVELL_88W8618) += marvell_88w8618.o
+-common-obj-$(CONFIG_MILKYMIST) += milkymist-ac97.o
 -
--.PHONY:	all build clean install update
--
--%.mo: %.po
--	$(call quiet-command, msgfmt -o $@ $<,"GEN","$@")
--
---include ../config-host.mak
--include $(SRC_PATH)/rules.mak
--
--PO_PATH=$(SRC_PATH)/po
--
--VERSION=$(shell cat $(SRC_PATH)/VERSION)
--SRCS=$(filter-out $(PO_PATH)/messages.po,$(wildcard $(PO_PATH)/*.po))
--OBJS=$(patsubst $(PO_PATH)/%.po,%.mo,$(SRCS))
--
--vpath %.po $(PO_PATH)
--
--all:
--	@echo "Use 'make update' to update translation files or use 'make build'"
--	@echo "or 'make install' to build and install the translation files."
--
--update: $(SRCS)
--
--build: $(OBJS)
--
--clean:
--	rm -f $(OBJS)
--
--install: $(OBJS)
--	for obj in $(OBJS); do \
--	    base=$$(basename $$obj .mo); \
--	    $(INSTALL) -d $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES; \
--	    $(INSTALL) -m644 $$obj $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES/qemu.mo; \
--	done
--
--$(PO_PATH)/messages.po: $(SRC_PATH)/ui/gtk.c
--	$(call quiet-command, ( cd $(SRC_PATH) && \
--          xgettext -o - --from-code=UTF-8 --foreign-user --no-location \
--	    --package-name=QEMU --package-version=$(VERSION) \
--	    --msgid-bugs-address=qemu-devel@nongnu.org -k_ -C ui/gtk.c | \
--	  sed -e s/CHARSET/UTF-8/) >$@,"GEN","$@")
--
--$(PO_PATH)/%.po: $(PO_PATH)/messages.po
--	$(call quiet-command, msgmerge -q $@ $< > $@.bak && mv $@.bak $@,"GEN","$@")
-diff --git a/po/POTFILES b/po/POTFILES
+-common-obj-y += soundhw.o
+diff --git a/hw/audio/meson.build b/hw/audio/meson.build
 new file mode 100644
-index 0000000000..d34d5ed9aa
+index 0000000000..549e9a0396
 --- /dev/null
-+++ b/po/POTFILES
-@@ -0,0 +1 @@
-+ui/gtk.c
-diff --git a/po/meson.build b/po/meson.build
-new file mode 100644
-index 0000000000..b99d8e2f22
---- /dev/null
-+++ b/po/meson.build
-@@ -0,0 +1,5 @@
-+i18n = import('i18n')
-+
-+i18n.gettext(meson.project_name(),
-+             args: '--msgid-bugs-address=qemu-devel@nongnu.org',
-+             preset: 'glib')
-diff --git a/po/messages.po b/po/messages.po
-deleted file mode 100644
-index 065bd459a0..0000000000
---- a/po/messages.po
-+++ /dev/null
-@@ -1,74 +0,0 @@
--# SOME DESCRIPTIVE TITLE.
--# This file is put in the public domain.
--# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
--#
--#, fuzzy
--msgid ""
--msgstr ""
--"Project-Id-Version: QEMU 2.12.91\n"
--"Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
--"POT-Creation-Date: 2018-07-18 07:56+0200\n"
--"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
--"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
--"Language-Team: LANGUAGE <LL@li.org>\n"
--"Language: \n"
--"MIME-Version: 1.0\n"
--"Content-Type: text/plain; charset=UTF-8\n"
--"Content-Transfer-Encoding: 8bit\n"
--
--msgid " - Press Ctrl+Alt+G to release grab"
--msgstr ""
--
--msgid " [Paused]"
--msgstr ""
--
--msgid "_Pause"
--msgstr ""
--
--msgid "_Reset"
--msgstr ""
--
--msgid "Power _Down"
--msgstr ""
--
--msgid "_Quit"
--msgstr ""
--
--msgid "_Fullscreen"
--msgstr ""
--
--msgid "_Copy"
--msgstr ""
--
--msgid "Zoom _In"
--msgstr ""
--
--msgid "Zoom _Out"
--msgstr ""
--
--msgid "Best _Fit"
--msgstr ""
--
--msgid "Zoom To _Fit"
--msgstr ""
--
--msgid "Grab On _Hover"
--msgstr ""
--
--msgid "_Grab Input"
--msgstr ""
--
--msgid "Show _Tabs"
--msgstr ""
--
--msgid "Detach Tab"
--msgstr ""
--
--msgid "Show Menubar"
--msgstr ""
--
--msgid "_Machine"
--msgstr ""
--
--msgid "_View"
--msgstr ""
++++ b/hw/audio/meson.build
+@@ -0,0 +1,14 @@
++softmmu_ss.add(files('soundhw.c'))
++softmmu_ss.add(when: 'CONFIG_AC97', if_true: files('ac97.c'))
++softmmu_ss.add(when: 'CONFIG_ADLIB', if_true: files('fmopl.c', 'adlib.c'))
++softmmu_ss.add(when: 'CONFIG_CS4231', if_true: files('cs4231.c'))
++softmmu_ss.add(when: 'CONFIG_CS4231A', if_true: files('cs4231a.c'))
++softmmu_ss.add(when: 'CONFIG_ES1370', if_true: files('es1370.c'))
++softmmu_ss.add(when: 'CONFIG_GUS', if_true: files('gus.c', 'gusemu_hal.c', 'gusemu_mixer.c'))
++softmmu_ss.add(when: 'CONFIG_HDA', if_true: files('intel-hda.c', 'hda-codec.c'))
++softmmu_ss.add(when: 'CONFIG_MARVELL_88W8618', if_true: files('marvell_88w8618.c'))
++softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-ac97.c'))
++softmmu_ss.add(when: 'CONFIG_PCSPK', if_true: files('pcspk.c'))
++softmmu_ss.add(when: 'CONFIG_PL041', if_true: files('pl041.c', 'lm4549.c'))
++softmmu_ss.add(when: 'CONFIG_SB16', if_true: files('sb16.c'))
++softmmu_ss.add(when: 'CONFIG_WM8750', if_true: files('wm8750.c'))
+diff --git a/hw/meson.build b/hw/meson.build
+index f968aa8374..624335be90 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('audio')
+ subdir('block')
+ subdir('char')
+ subdir('core')
 -- 
 2.21.0
 
