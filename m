@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61541C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F017CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:59:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30C8A2467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFDFD2467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:59:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rbtgsg2F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30C8A2467E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E+D8JiSP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFDFD2467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwW5I-00078o-A2
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:59:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36586)
+	id 1iwW5R-0007NX-Sp
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:59:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33552)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7f-0003Pz-Ej
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:00 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV68-0001IT-Ds
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7e-0007rO-0u
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:59 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:50764)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV65-000498-UB
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:24 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:35061)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV7d-0007o2-L2
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:57 -0500
-Received: by mail-wm1-x335.google.com with SMTP id a5so3534188wmb.0
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:56 -0800 (PST)
+ id 1iwV65-000460-Gs
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:21 -0500
+Received: by mail-wr1-x435.google.com with SMTP id g17so17093344wro.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9DgqWnWCxy8tt44ULg7kNP/pB4huP4GqDZOAtPow0Ac=;
- b=Rbtgsg2FzjQXgveR04huu+tq4Lr3WAEiDY/o2pErwCGhFvt18N+xOHfDF1l5bC0mqG
- gV7OemwenrSqIycIIDdB2TT9+4jnr9A5/Iaj2NXOh2im3R93xeA9GypY69fOqaUiaCOl
- TEm75wPiqJeqV7Zc7UnPEjJ1kO4C2pZvvi0y9U5dHoOrxAqiOtJcmqSriV70nxG5ZeT0
- 6Y8Km3XOq3J8HN2TmdknGYVshT8og3kPkbrHnASBno64PJzi7u02e7/20AUpRiIQwGey
- wQ7flGpTDxp4nwQG9UVnOQXnA4s1IVsdA6KRptLy14Qstu40uoae2+KO6elBpK1h47ZD
- 3tiA==
+ bh=jwPNTWSRuJEifivMRLEkLif5DqoqN42PTC3/6WoOGhU=;
+ b=E+D8JiSPHL2O5terGKRd4bUPvcLo1PkuUsvVtJPWV9+Izmy+jWunuQhVrR2TW0dTYy
+ WawRPUVC8o3J3uCvnh1jsDF0owemh1BWuMxitn082kQbnw2yijUpK2/CGhoB8ZYMtG1j
+ K0KRHjs6cbReQDBSwWNew3YZEKVeBStybL7p6kihpivCTbt2Orhvofb+VqObqPkr0QyB
+ OSjVRl9ep0c7aY0Vc1oa+7QFrRW28BdJev2hTBng8M6Vs6pJTRIneZm6djsGOeJs8SsR
+ C/Z/7D18vnFKdERR8Hsk4CXyt3QvQ8Dhfbg12dvvvsZbKlc75Oy7c6ozeCKYVjl0tgkp
+ rYzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=9DgqWnWCxy8tt44ULg7kNP/pB4huP4GqDZOAtPow0Ac=;
- b=IAqOTAuPmQ6x1BqD+qtgeCqdfUAWVcfNa/CeCagtgnl0jWmoaG3Kw+gEe/s7bUHNLY
- VtqvTd2LYak7GOx7oHgbXCtYEq1INkBj7mqqKi64O/ISWnS9rFtKQ+L1a3AeKw/nU6J0
- ROdspYBNhWF8sN/lkA8+3btWvt5OFO4kPGLThrYMhO3H21gP+XUzte2f6npWErd23xxu
- lcO5O8roMlnPDa5WJogH2uDqsBIhbNaZiQLgBlPbP5bpyrMETWgOYyRqNCcmB08H7gDt
- yYZNBV+kcJ9zUejra1Vq/qWMGSISqeVP5iMfhtXjbPHwNdzXuySZ8GkOn/wU6BI4/Kbu
- 8iRg==
-X-Gm-Message-State: APjAAAV3l0A/PIR32liGShY/W6P47OwwJHouPyPOAdYoPs34tdJDfCwc
- jtW8lBITseKlRn7NIKYyUL8Mf1v1
-X-Google-Smtp-Source: APXvYqxXbAKwULMxOc+M94HoFbrwiFblxQ2zzlKE8fslFtqmLClxQiI+wzG+HQj2fTYF4+BG9YPyBA==
-X-Received: by 2002:a7b:c109:: with SMTP id w9mr6190469wmi.14.1580234275255;
- Tue, 28 Jan 2020 09:57:55 -0800 (PST)
+ bh=jwPNTWSRuJEifivMRLEkLif5DqoqN42PTC3/6WoOGhU=;
+ b=LPK835Ma2haFJ+P4d9fMS+yjVJHxNMwLivtkVOp+83cJJl739bC0PiR2F4iwXaxiTp
+ taspEBebIcoaUpSIQEYMqf6k3jAZ72VrJc0+KAh9CSEDll4AD/e/Un1qjKOcXMaiuB7F
+ UHy26wQCMsPIJuacGJI6a/xV/Izy7dtNb4pf5ij2j8ebN/36E6fQPmaS/h3Q/yKTK5tm
+ be4L4CuZ1DainToH8/bOgciZm5e5Hfw+89s5FDvRE3MK2hXW/Sti/iyYtswtcAVdkX+0
+ kZK6ymIsXANLbPNMgvjmv7zYI2HyLWDwMIBOs5Ozg+bseY6U6QLO8/fVqII4iFze1yzY
+ yTBQ==
+X-Gm-Message-State: APjAAAV/ERHtJauCdsMskbDTHPA/BgnlTK8tSsdi9nY80TImdKi7tCgv
+ EtknBXg4TtGdUjgh9OnIykEPNIZP
+X-Google-Smtp-Source: APXvYqyOipEHkeEQXzSZwUpWV/U2ZFkaY7GyrgldgDyZQlpv07svaLmF1H2TAEQtXnzAiBS9tQf4sg==
+X-Received: by 2002:adf:ed83:: with SMTP id c3mr29052164wro.51.1580234180207; 
+ Tue, 28 Jan 2020 09:56:20 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.52
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:57:54 -0800 (PST)
+ Tue, 28 Jan 2020 09:56:19 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 105/142] meson: convert hw/char
-Date: Tue, 28 Jan 2020 18:53:05 +0100
-Message-Id: <20200128175342.9066-106-pbonzini@redhat.com>
+Subject: [PATCH 064/142] meson: convert net directory to Meson
+Date: Tue, 28 Jan 2020 18:52:24 +0100
+Message-Id: <20200128175342.9066-65-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::335
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,118 +102,177 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/char/Makefile.objs | 36 ------------------------------------
- hw/char/meson.build   | 34 ++++++++++++++++++++++++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 35 insertions(+), 37 deletions(-)
- delete mode 100644 hw/char/Makefile.objs
- create mode 100644 hw/char/meson.build
+ Makefile.objs         |  3 +--
+ Makefile.target       |  1 +
+ meson.build           | 10 ++++++++++
+ net/Makefile.objs     | 32 --------------------------------
+ net/can/Makefile.objs |  2 --
+ net/can/meson.build   |  5 +++++
+ net/meson.build       | 39 +++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 56 insertions(+), 36 deletions(-)
+ delete mode 100644 net/Makefile.objs
+ delete mode 100644 net/can/Makefile.objs
+ create mode 100644 net/can/meson.build
+ create mode 100644 net/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 0b9879456f..6ddffced72 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -4,7 +4,6 @@ devices-dirs-y += acpi/
- devices-dirs-y += adc/
- devices-dirs-y += audio/
- devices-dirs-y += block/
--devices-dirs-y += char/
- endif
+diff --git a/Makefile.objs b/Makefile.objs
+index fc2868f1bf..2b68f487a3 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -35,8 +35,7 @@ qom-obj-y = qom/libqom.fa
+ # single QEMU executable should support all CPUs and machines.
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = net/
+-common-obj-$(CONFIG_LINUX) += fsdev/
++common-obj-$(CONFIG_LINUX) = fsdev/
+ 
+ common-obj-y += accel/
+ 
+diff --git a/Makefile.target b/Makefile.target
+index 3587da499e..1a7102c27c 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -169,6 +169,7 @@ LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS)
+ endif
+ LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS) $(SECCOMP_LIBS)
+ LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
++LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
+ 
+ # Hardware support
+ ifeq ($(TARGET_NAME), sparc64)
+diff --git a/meson.build b/meson.build
+index 40411f0960..713aca221e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -113,6 +113,15 @@ if 'CONFIG_XKBCOMMON' in config_host
+   xkbcommon = declare_dependency(compile_args: config_host['XKBCOMMON_CFLAGS'].split(),
+                                  link_args: config_host['XKBCOMMON_LIBS'].split())
+ endif
++slirp = declare_dependency()
++if config_host.has_key('CONFIG_SLIRP')
++  slirp = declare_dependency(compile_args: config_host['SLIRP_CFLAGS'].split(),
++                             link_args: config_host['SLIRP_LIBS'].split())
++endif
++vde = declare_dependency()
++if config_host.has_key('CONFIG_VDE')
++  vde = declare_dependency(link_args: config_host['VDE_LIBS'].split())
++endif
+ pulse = declare_dependency()
+ if 'CONFIG_LIBPULSE' in config_host
+   pulse = declare_dependency(compile_args: config_host['PULSE_CFLAGS'].split(),
+@@ -611,6 +620,7 @@ common_ss.add(files('cpus-common.c'))
+ 
+ subdir('migration')
+ subdir('monitor')
++subdir('net')
+ subdir('replay')
+ 
+ mods = []
+diff --git a/net/Makefile.objs b/net/Makefile.objs
 deleted file mode 100644
-index 02d8a66925..0000000000
---- a/hw/char/Makefile.objs
+index c5d076d19c..0000000000
+--- a/net/Makefile.objs
 +++ /dev/null
-@@ -1,36 +0,0 @@
--common-obj-$(CONFIG_IPACK) += ipoctal232.o
--common-obj-$(CONFIG_ESCC) += escc.o
--common-obj-$(CONFIG_NRF51_SOC) += nrf51_uart.o
--common-obj-$(CONFIG_PARALLEL) += parallel.o
--common-obj-$(CONFIG_ISA_BUS) += parallel-isa.o
--common-obj-$(CONFIG_PL011) += pl011.o
--common-obj-$(CONFIG_SERIAL) += serial.o
--common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
--common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
--common-obj-$(CONFIG_SERIAL_PCI_MULTI) += serial-pci-multi.o
--common-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-console.o
--common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
--common-obj-$(CONFIG_XEN) += xen_console.o
--common-obj-$(CONFIG_CADENCE) += cadence_uart.o
+@@ -1,32 +0,0 @@
+-common-obj-y = net.o queue.o checksum.o util.o hub.o
+-common-obj-y += socket.o
+-common-obj-y += dump.o
+-common-obj-y += eth.o
+-common-obj-y += announce.o
+-common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
+-common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
+-common-obj-$(CONFIG_ALL) += vhost-user-stub.o
+-common-obj-$(CONFIG_SLIRP) += slirp.o
+-slirp.o-cflags := $(SLIRP_CFLAGS)
+-slirp.o-libs := $(SLIRP_LIBS)
+-common-obj-$(CONFIG_VDE) += vde.o
+-common-obj-$(CONFIG_NETMAP) += netmap.o
+-common-obj-y += filter.o
+-common-obj-y += filter-buffer.o
+-common-obj-y += filter-mirror.o
+-common-obj-y += colo-compare.o
+-common-obj-y += colo.o
+-common-obj-y += filter-rewriter.o
+-common-obj-y += filter-replay.o
 -
--obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
--obj-$(CONFIG_COLDFIRE) += mcf_uart.o
--obj-$(CONFIG_OMAP) += omap_uart.o
--obj-$(CONFIG_SH4) += sh_serial.o
--obj-$(CONFIG_PSERIES) += spapr_vty.o
--obj-$(CONFIG_DIGIC) += digic-uart.o
--obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
--obj-$(CONFIG_RASPI) += bcm2835_aux.o
+-tap-obj-$(CONFIG_LINUX) = tap-linux.o
+-tap-obj-$(CONFIG_BSD) = tap-bsd.o
+-tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
+-tap-obj-y ?= tap-stub.o
+-common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
+-common-obj-$(CONFIG_WIN32) += tap-win32.o
 -
--common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
--common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
--common-obj-$(CONFIG_ISA_DEBUG) += debugcon.o
--common-obj-$(CONFIG_GRLIB) += grlib_apbuart.o
--common-obj-$(CONFIG_IMX) += imx_serial.o
--common-obj-$(CONFIG_LM32) += lm32_juart.o
--common-obj-$(CONFIG_LM32) += lm32_uart.o
--common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
--common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
+-vde.o-libs = $(VDE_LIBS)
 -
--obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
--obj-$(CONFIG_TERMINAL3270) += terminal3270.o
-diff --git a/hw/char/meson.build b/hw/char/meson.build
+-common-obj-$(CONFIG_CAN_BUS) += can/
+diff --git a/net/can/Makefile.objs b/net/can/Makefile.objs
+deleted file mode 100644
+index 9f35dc5c87..0000000000
+--- a/net/can/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-common-obj-y += can_core.o can_host.o
+-common-obj-$(CONFIG_LINUX) += can_socketcan.o
+diff --git a/net/can/meson.build b/net/can/meson.build
 new file mode 100644
-index 0000000000..002e5d01d3
+index 0000000000..f53d9ec54f
 --- /dev/null
-+++ b/hw/char/meson.build
-@@ -0,0 +1,34 @@
-+softmmu_ss.add(when: 'CONFIG_CADENCE', if_true: files('cadence_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_CMSDK_APB_UART', if_true: files('cmsdk-apb-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_ESCC', if_true: files('escc.c'))
-+softmmu_ss.add(when: 'CONFIG_ETRAXFS', if_true: files('etraxfs_ser.c'))
-+softmmu_ss.add(when: 'CONFIG_GRLIB', if_true: files('grlib_apbuart.c'))
-+softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_serial.c'))
-+softmmu_ss.add(when: 'CONFIG_IPACK', if_true: files('ipoctal232.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_BUS', if_true: files('parallel-isa.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_DEBUG', if_true: files('debugcon.c'))
-+softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_juart.c'))
-+softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_PARALLEL', if_true: files('parallel.c'))
-+softmmu_ss.add(when: 'CONFIG_PL011', if_true: files('pl011.c'))
-+softmmu_ss.add(when: 'CONFIG_SCLPCONSOLE', if_true: files('sclpconsole.c', 'sclpconsole-lm.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL', if_true: files('serial.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_ISA', if_true: files('serial-isa.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_PCI', if_true: files('serial-pci.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_PCI_MULTI', if_true: files('serial-pci-multi.c'))
-+softmmu_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-console.c'))
-+softmmu_ss.add(when: 'CONFIG_XEN', if_true: files('xen_console.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX', if_true: files('xilinx_uartlite.c'))
++++ b/net/can/meson.build
+@@ -0,0 +1,5 @@
++can_ss = ss.source_set()
++can_ss.add(files('can_core.c', 'can_host.c'))
++can_ss.add(when: 'CONFIG_LINUX', if_true: files('can_socketcan.c'))
 +
-+specific_ss.add(when: 'CONFIG_COLDFIRE', if_true: files('mcf_uart.c'))
-+specific_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic-uart.c'))
-+specific_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_uart.c'))
-+specific_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_uart.c'))
-+specific_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr_vty.c'))
-+specific_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_aux.c'))
-+specific_ss.add(when: 'CONFIG_SH4', if_true: files('sh_serial.c'))
-+specific_ss.add(when: 'CONFIG_STM32F2XX_USART', if_true: files('stm32f2xx_usart.c'))
-+specific_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('terminal3270.c'))
-+specific_ss.add(when: 'CONFIG_VIRTIO', if_true: files('virtio-serial-bus.c'))
-diff --git a/hw/meson.build b/hw/meson.build
-index 103da4840b..dd0c77ec2b 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,3 +1,4 @@
-+subdir('char')
- subdir('core')
- subdir('cpu')
- subdir('display')
++softmmu_ss.add_all(when: 'CONFIG_CAN_BUS', if_true: can_ss)
+diff --git a/net/meson.build b/net/meson.build
+new file mode 100644
+index 0000000000..a67f5af44a
+--- /dev/null
++++ b/net/meson.build
+@@ -0,0 +1,39 @@
++softmmu_ss.add(files(
++  'announce.c',
++  'checksum.c',
++  'colo-compare.c',
++  'colo.c',
++  'dump.c',
++  'eth.c',
++  'filter-buffer.c',
++  'filter-mirror.c',
++  'filter-replay.c',
++  'filter-rewriter.c',
++  'filter.c',
++  'hub.c',
++  'net.c',
++  'queue.c',
++  'socket.c',
++  'util.c',
++))
++
++softmmu_ss.add(when: 'CONFIG_L2TPV3', if_true: files('l2tpv3.c'))
++softmmu_ss.add(when: ['CONFIG_SLIRP', slirp], if_true: files('slirp.c'))
++softmmu_ss.add(when: ['CONFIG_VDE', vde], if_true: files('vde.c'))
++softmmu_ss.add(when: 'CONFIG_NETMAP', if_true: files('netmap.c'))
++vhost_user_ss = ss.source_set()
++vhost_user_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('vhost-user.c'), if_false: files('vhost-user-stub.c'))
++softmmu_ss.add_all(when: 'CONFIG_VHOST_NET_USER', if_true: vhost_user_ss)
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-user-stub.c'))
++
++softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('tap-linux.c'))
++softmmu_ss.add(when: 'CONFIG_BSD', if_true: files('tap-bsd.c'))
++softmmu_ss.add(when: 'CONFIG_SOLARIS', if_true: files('tap-solaris.c'))
++tap_posix = ['tap.c']
++if not config_host.has_key('CONFIG_LINUX') and not config_host.has_key('CONFIG_BSD') and not config_host.has_key('CONFIG_SOLARIS')
++  tap_posix += 'tap-stub.c'
++endif
++softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files(tap_posix))
++softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('tap-win32.c'))
++
++subdir('can')
 -- 
 2.21.0
 
