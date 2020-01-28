@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0588AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC95C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:49:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C84BF207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 504252467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:49:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyH0VlA9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84BF207FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NrsHSgFa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504252467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVuv-0007Vr-Ty
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:48:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33855)
+	id 1iwVvp-0000NU-Fi
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:49:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6H-0001Wh-2J
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:34 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6r-0002CQ-1W
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6B-0004R1-Tk
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:32 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40184)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6p-0005lK-S3
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:08 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40842)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV6B-0004O7-4T
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:27 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id t14so3546120wmi.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:27 -0800 (PST)
+ id 1iwV6p-0005f1-Kb
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:07 -0500
+Received: by mail-wr1-x444.google.com with SMTP id j104so1202229wrj.7
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UHb/Mcs6Z7m1KUajTQkHLwnYid7R1JKme9HPwSSvlZU=;
- b=VyH0VlA9x+xJwvZpAY7BXDyiOmMs7KjmTSG/D/wW6+wuA1cy04Gn50Saagc/nKiHco
- B5S4oAI5+W7IL52ZPvGS85Hf427gHhj6QYXTLrctv3xqRicnuaQBkJ55Z22ZHV97Sjsr
- yrcNhGWY2qhK0csQHBbQTtNlOOzKO12k1e41DljrgrKuYKy8ZDUcom0Xg64MtKbO4OnU
- D1edXcID4t2i3IcxH+YtyA53fFyW/54wG+w6Fhocm5ej5dkEdTFGRnOy9CHbepYtpI2+
- mRSI7UVhsNm9ecrYs6v5rFA/Y1fLIC/5uH5wfEw7/luzOTWZVMZ1fXatARJPs6eYcY54
- YSgQ==
+ bh=AcA80Oa9glsB9Xn7cH9me7kaQhwthAOTPazgC6s1fw8=;
+ b=NrsHSgFa8uoc5/W3Uv3nq2HJk6pB4f/1Oehf8qGn4vbDzk1EaV1qIqKMIG+XaEj6hy
+ LQ3yq/jo3hOlDoVDBeAXbc2H4hFQf0YqZ5n7mBn8iHteNFbVRqGtLzNIUWJarYLwJxR+
+ bmEfwtcaBgdowW8+3ykHHTpsLeq2bt6jGNTEjGUNVt3EN0SQzZE+sRrUZoZhdfg88YYV
+ N8EDXTsiTb7MXfFokdbnUb8+0yqOtd+228qdMiAK1a1aClW1Ss9vu4xr88UtAWc9jC16
+ 0W161G95mjjibc7lXaHpTKcgRVnSploFOEBxnDx6cca6Baj/MPP0h+pXeei97ANOvvom
+ h3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=UHb/Mcs6Z7m1KUajTQkHLwnYid7R1JKme9HPwSSvlZU=;
- b=ZP6SqAbrolORxllU6wU4ZH8/paX8GtvY1AzawiVa0g5sJ4hqXC7K35IVpgA8FuLVBm
- FI+symcSOJa2RbEFfo89YVREHqRbtWGhNrlKkM5V/9xp1Km2ctC2z218JdeCEX/HO+0D
- d9X2sDALtv/RgADgSk++Y2BUWdbobOks5AebdPMgmbV1g8BW+/LwysWKjLUqHb/fE1op
- p8EP2b2hMZiHnXaHOEj55xLoycngK7sED6uE/YgGUKqQft7ngN9PNQiZgFeZCjdkw1GD
- SIxtx+zgLHVnSD5qcMKiluUH1ZCIqP7sndxIGBiGBOTJPN9eF/FyTW47ruFYiE5JFPVe
- EHUw==
-X-Gm-Message-State: APjAAAXAmtrkVyjKyciqB/8+nDtVJNDGHD/URX7IOKgc051/nahhxqX2
- s6TPrRwXVUDeyRFN0UQl18UxvP8P
-X-Google-Smtp-Source: APXvYqw25K2VcI2o9tmRkAksJw0KCr/OWNEvmfYTEi+N1OErYXujC5CU1tgtmcDNbTruIOsGWrvwCQ==
-X-Received: by 2002:a05:600c:108a:: with SMTP id
- e10mr6262462wmd.10.1580234185721; 
- Tue, 28 Jan 2020 09:56:25 -0800 (PST)
+ bh=AcA80Oa9glsB9Xn7cH9me7kaQhwthAOTPazgC6s1fw8=;
+ b=Y8crLzuBrRtutxbW7rMa4R2I9YokqvqDg/Wq3mXay+sUmzavFA0JZjWIUZfkHLWcWx
+ lfnahk5VABSyfW32upx6O2G9MdqCsMjXBkWqbkq9I+QCjSk1Af8P08kj9lnYzYGdv73A
+ Tx7WkF5I5SVDHRikTHfacn64s0EPAmC730oPFwDlgEZ/uv9SKYEotn0lvLhOR0DJAqH4
+ /GCMb9AbW3m1bHB+SV2Il0cZwxoWNcqd+ljw6Hb6/OKbX5TJWHUMDjk7kHEXFdbU4Xv7
+ f0BwAKqca8vLsTpVyWot+1JubrI/ZgHloRrR59HRjNhCcjFwaL7pI0kldUEVo3Uj6BAQ
+ 2rVg==
+X-Gm-Message-State: APjAAAUtavtUFvTaP2r29gnJWyZwGvN2CRpDWQKAewqyGc2Qt1V+ULpU
+ 8applrUneUsWr7YUsjcMBabH73bD
+X-Google-Smtp-Source: APXvYqy1aWzC2bbJf0FDKmIZq6RqPs0kcF9JkTHAKpoOt+KZ5Imhtw+bWsW3IU4jedxP4+sMMlDIbw==
+X-Received: by 2002:adf:90e7:: with SMTP id i94mr28549602wri.47.1580234225001; 
+ Tue, 28 Jan 2020 09:57:05 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.23
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:56:25 -0800 (PST)
+ Tue, 28 Jan 2020 09:57:04 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 066/142] meson: convert fsdev/
-Date: Tue, 28 Jan 2020 18:52:26 +0100
-Message-Id: <20200128175342.9066-67-pbonzini@redhat.com>
+Subject: [PATCH 083/142] meson: convert hw/sd
+Date: Tue, 28 Jan 2020 18:52:43 +0100
+Message-Id: <20200128175342.9066-84-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,77 +103,72 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile.objs       |  6 +-----
- fsdev/Makefile.objs | 12 ------------
- fsdev/meson.build   | 10 ++++++++++
- 3 files changed, 11 insertions(+), 17 deletions(-)
- delete mode 100644 fsdev/Makefile.objs
+ hw/Makefile.objs    |  1 -
+ hw/meson.build      |  1 +
+ hw/sd/Makefile.objs | 11 -----------
+ hw/sd/meson.build   | 11 +++++++++++
+ 4 files changed, 12 insertions(+), 12 deletions(-)
+ delete mode 100644 hw/sd/Makefile.objs
+ create mode 100644 hw/sd/meson.build
 
-diff --git a/Makefile.objs b/Makefile.objs
-index e56106400c..63796fe8bc 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -35,8 +35,6 @@ qom-obj-y = qom/libqom.fa
- # single QEMU executable should support all CPUs and machines.
- 
- ifeq ($(CONFIG_SOFTMMU),y)
--common-obj-$(CONFIG_LINUX) = fsdev/
--
- common-obj-y += accel/
- 
- common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
-@@ -58,14 +56,12 @@ common-obj-$(if $(CONFIG_RBD),m) += block-rbd$(DSOSUF)
- 
- common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
- common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
--
--common-obj-y += hw/
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 55433f352e..a72fa7895c 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -25,7 +25,6 @@ devices-dirs-y += pci/
+ devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
+ devices-dirs-y += pcmcia/
+ devices-dirs-$(CONFIG_SCSI) += scsi/
+-devices-dirs-y += sd/
  endif
  
- #######################################################################
- # Target-independent parts used in system and user emulation
- 
--common-obj-y += hw/
-+common-obj-y = hw/
- common-obj-y += disas/
- 
- ######################################################################
-diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index 75644266f2..a73f4aebde 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -2,6 +2,7 @@ subdir('core')
+ subdir('mem')
+ subdir('nubus')
+ subdir('rtc')
++subdir('sd')
+ subdir('semihosting')
+ subdir('smbios')
+ subdir('ssi')
+diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
 deleted file mode 100644
-index 42cd70c367..0000000000
---- a/fsdev/Makefile.objs
+index a884c238df..0000000000
+--- a/hw/sd/Makefile.objs
 +++ /dev/null
-@@ -1,12 +0,0 @@
--# Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
--# only pull in the actual 9p backend if we also enabled virtio or xen.
--ifeq ($(CONFIG_FSDEV_9P),y)
--common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
--else
--common-obj-y = qemu-fsdev-dummy.o
--endif
--common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+@@ -1,11 +0,0 @@
+-common-obj-$(CONFIG_PL181) += pl181.o
+-common-obj-$(CONFIG_SSI_SD) += ssi-sd.o
+-common-obj-$(CONFIG_SD) += sd.o core.o sdmmc-internal.o
+-common-obj-$(CONFIG_SDHCI) += sdhci.o
+-common-obj-$(CONFIG_SDHCI_PCI) += sdhci-pci.o
 -
--# Toplevel always builds this; targets without virtio will put it in
--# common-obj-y
--common-obj-$(CONFIG_ALL) += qemu-fsdev-dummy.o
-diff --git a/fsdev/meson.build b/fsdev/meson.build
-index eee8507033..ae84c13069 100644
---- a/fsdev/meson.build
-+++ b/fsdev/meson.build
-@@ -1,3 +1,13 @@
-+fsdev_ss = ss.source_set()
-+fsdev_ss.add(files('qemu-fsdev-opts.c', 'qemu-fsdev-throttle.c'))
-+fsdev_ss.add(when: 'CONFIG_ALL', if_true: files('qemu-fsdev-dummy.c'))
-+fsdev_ss.add(when: ['CONFIG_FSDEV_9P'], if_true: files(
-+  '9p-iov-marshal.c',
-+  '9p-marshal.c',
-+  'qemu-fsdev.c',
-+), if_false: files('qemu-fsdev-dummy.c'))
-+softmmu_ss.add_all(when: 'CONFIG_LINUX', if_true: fsdev_ss)
+-obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
+-obj-$(CONFIG_OMAP) += omap_mmc.o
+-obj-$(CONFIG_PXA2XX) += pxa2xx_mmci.o
+-obj-$(CONFIG_RASPI) += bcm2835_sdhost.o
+-obj-$(CONFIG_ASPEED_SOC) += aspeed_sdhci.o
+diff --git a/hw/sd/meson.build b/hw/sd/meson.build
+new file mode 100644
+index 0000000000..2b88a956d6
+--- /dev/null
++++ b/hw/sd/meson.build
+@@ -0,0 +1,11 @@
++softmmu_ss.add(when: 'CONFIG_PL181', if_true: files('pl181.c'))
++softmmu_ss.add(when: 'CONFIG_SD', if_true: files('sd.c', 'core.c', 'sdmmc-internal.c'))
++softmmu_ss.add(when: 'CONFIG_SDHCI', if_true: files('sdhci.c'))
++softmmu_ss.add(when: 'CONFIG_SDHCI_PCI', if_true: files('sdhci-pci.c'))
++softmmu_ss.add(when: 'CONFIG_SSI_SD', if_true: files('ssi-sd.c'))
 +
- if have_tools and libattr.found() and libcap_ng.found() and 'CONFIG_VIRTFS' in config_host
-   executable('virtfs-proxy-helper', files('virtfs-proxy-helper.c', '9p-marshal.c', '9p-iov-marshal.c'),
-              dependencies: [qemuutil, libattr, libcap_ng])
++specific_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-memcard.c'))
++specific_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_mmc.c'))
++specific_ss.add(when: 'CONFIG_PXA2XX', if_true: files('pxa2xx_mmci.c'))
++specific_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_sdhost.c'))
++specific_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_sdhci.c'))
 -- 
 2.21.0
 
