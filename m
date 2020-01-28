@@ -2,87 +2,87 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 773DFC33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 13:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891B1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 13:54:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EAA224686
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 13:50:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4672D2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 13:54:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keuUPDRy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EAA224686
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UfXma7Tt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4672D2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwRFp-000480-9t
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 08:50:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38735)
+	id 1iwRJm-0005od-Gu
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 08:54:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39986)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwRF8-0003GC-2U
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 08:49:28 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iwRJA-0005KS-UK
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 08:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwRF5-0002LT-5y
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 08:49:25 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33976)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iwRF4-0002JP-Tr
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 08:49:23 -0500
-Received: by mail-ot1-x344.google.com with SMTP id a15so12004329otf.1
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 05:49:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=FFX6Dydvc33whDU6rWqPYV8zFxFbah3eM8dWs+OIWxs=;
- b=keuUPDRykpaNc+ZBPOGklk0j1HPVj48lLSrwWS26r+EpesYS2QFQnMWb/gQ8sdRbtj
- 5SHK/4QzFy7TYEoKha4KKeoN0Y2yilT1UvZ0EEssh+TUwgyK9ZzZxZkeAj0bdRBzge0I
- ekR7/VcKsmTHoKva6o2nEuuF9bGpmVgy4kzlaLxjoMTsVX7xBkM6+PSvJYf90+Fj061I
- ty2GinqX+GE/MqmOwem4EPmXq8hJq494CpTfYmYOWxTpjSyiORlXh24Kaffwq1cmYin1
- TDEvfIpxcX5tsrxqhpZWjobJnVG1lPps9JROjrKtomCt2NWVAZEk1SuvLnYbYd8fMA2D
- dGGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=FFX6Dydvc33whDU6rWqPYV8zFxFbah3eM8dWs+OIWxs=;
- b=W0T12aTlwERZX+1Dh6/xyzw/qoWztqNN6Ut5y2Me4FmagF+3rD8wRdp4zEJrCpFAf6
- 3+ulRg+d2HQlYIp0bKd3CZbsyca8cjSCOMtYX5YOTdWZfhVfxipyd8p3YlJq5AfYISb1
- AkykEWfK6kRfBPN6DkckCyzPB3jcHdouc+VVlMuRk3D/Dv6tdvs68d834GCOc4H2qd69
- rRzHYCaFhSypeGZj+aDlPpuejtyuX3+BhF2xwFRJbZ5T55Nt+Zqo2y6mEpk7nE3f88YP
- p60nEGwUAWb+3O9rbuXOXiivIV4iGx6KAp4rfRbHnPSo1SIGfwlepGQOlwJsgLNFtVIi
- jUiQ==
-X-Gm-Message-State: APjAAAXAz+sZIzDhhD2TW5WZjD/yebOH0DUYsTOxucfs9FeMEqBgbess
- pL65QsspB14fNAnRGGf/SeQZr/QirjHSCrCq5MU=
-X-Google-Smtp-Source: APXvYqzEGk6GGPVgMH/x0XRVYSi9SvAqsKbt25+Pred4b78KvP98oWs5rvFuk72r6OfKuGQY7gWDiPLgwHLnNGJ/r/M=
-X-Received: by 2002:a05:6830:1042:: with SMTP id
- b2mr16322982otp.306.1580219362166; 
- Tue, 28 Jan 2020 05:49:22 -0800 (PST)
+ (envelope-from <eric.auger@redhat.com>) id 1iwRJ9-0001TM-85
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 08:53:36 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59893
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iwRJ9-0001Sx-4G
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 08:53:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580219614;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZGes1y/lHnSO1YVFn+bnS9SeDLmoV+B2H1XAU0fwmQc=;
+ b=UfXma7Tt+vXHbw25gKoEdTrEs1kS7alXMIlipnLriCw+DpM311sdXbdGxG1Wa+jPSVe9JE
+ lR09IK2d4ZGbena895n+vVjO19mRN+/qbb8tVOvOP0JkRNWU923/iQoI9Uw7sWQzyRwfMH
+ GgpcFSyO9aFAcqv8o6V68WL0xRhBtJY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-tsuBPZFQOROyCrQLfoMA1g-1; Tue, 28 Jan 2020 08:53:33 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3F9985EE6D;
+ Tue, 28 Jan 2020 13:53:31 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B48E8702F;
+ Tue, 28 Jan 2020 13:53:29 +0000 (UTC)
+Subject: Re: [question] hw/arm/virt: about the default gic-version in
+ accelerated mode
+To: Andrew Jones <drjones@redhat.com>
+References: <df1d6ae5-b734-ef64-4ef9-c661e8f797e8@redhat.com>
+ <CAFEAcA8hib-3YWuS-MajjvokOFCGKUHeuz+XQTBYf8LBz+PuFQ@mail.gmail.com>
+ <20200128122915.ehzgj5kpmsw5azap@kamzik.brq.redhat.com>
+ <e0b73504-b37a-cc57-3c3f-b9872dd1e16c@redhat.com>
+ <20200128124143.cmbl3po2uvhsgd23@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <79e4dc6e-1136-039d-8212-738111c738d9@redhat.com>
+Date: Tue, 28 Jan 2020 14:53:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Tue, 28 Jan 2020 05:49:21 -0800 (PST)
-In-Reply-To: <CAK4993hTqhuZArVNbNs8M8MJkdQbneq0fCsW2b2-fEKaAtCuOQ@mail.gmail.com>
-References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1580079311-20447-2-git-send-email-aleksandar.markovic@rt-rk.com>
- <CAK4993itnp5EyT8g-zGcMY6Oud9pC9GRv1Aa2dvofrH8mLWnOQ@mail.gmail.com>
- <CAK4993hTqhuZArVNbNs8M8MJkdQbneq0fCsW2b2-fEKaAtCuOQ@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 28 Jan 2020 14:49:21 +0100
-Message-ID: <CAL1e-=jeQAqQ3GrVg2z9Y9qW+5KXvOURhpX6ApM5SJ2aJ8oDMQ@mail.gmail.com>
-Subject: Re: [PATCH rc3 01/30] target/avr: Add basic parameters for new AVR
- platform
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000bfcd23059d337d4e"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <20200128124143.cmbl3po2uvhsgd23@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: tsuBPZFQOROyCrQLfoMA1g-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,419 +94,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu list <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000bfcd23059d337d4e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Tuesday, January 28, 2020, Michael Rolnik <mrolnik@gmail.com> wrote:
-
-> Hi all.
->
-> I am totally lost in the email.
-> Are there any action items for me / someone else ?
->
-> Regards,
-> Michael Rolnik
->
->
-I think it would be helpful if we have rc4 with two action items:
-
-   - remove CONFIG_USER_ONLY references, and all dead code thay may have
-come with it + add check in cpu.h that Philippe suggested.
-   - remove "Atmel" word from all elements of the series (patch names,
-messages, filenames, structure names, ...)
-
-Needless to say that this must be done with extreme care.
-
-I propose that Philippe do rc4.
-
-Sincerely,
-Aleksandar
-
-
-
->
-> On Mon, Jan 27, 2020 at 10:54 AM Michael Rolnik <mrolnik@gmail.com> wrote=
-:
->
->> Thanks for you help guys.
+On 1/28/20 1:41 PM, Andrew Jones wrote:
+> On Tue, Jan 28, 2020 at 01:34:06PM +0100, Auger Eric wrote:
+>> Hi Drew,
 >>
->> On Mon, Jan 27, 2020 at 12:55 AM Aleksandar Markovic <
->> aleksandar.markovic@rt-rk.com> wrote:
->>
->>> From: Michael Rolnik <mrolnik@gmail.com>
+>> On 1/28/20 1:29 PM, Andrew Jones wrote:
+>>> On Tue, Jan 28, 2020 at 10:52:50AM +0000, Peter Maydell wrote:
+>>>> On Tue, 28 Jan 2020 at 10:47, Auger Eric <eric.auger@redhat.com> wrote:
+>>>>> When arm virt machine is run in accelerated mode with "-cpu host
+>>>>> -machine virt", the default gic version is 2.
+>>>>>
+>>>>> I understand the rationale with TCG where we don't have MSI ITS
+>>>>> emulation along with GICv3 so we need to choose GICv2 to get GICv2M
+>>>>> functionality.
+>>>>>
+>>>>> However in KVM mode, I would have expected to see the host GIC probed to
+>>>>> set the same version on guest. Indeed most of our HW now have GICv3
+>>>>> without GICv2 compat mode so our default values lead to weird traces:
+>>>>>
+>>>>> "
+>>>>> qemu-system-aarch64: PMU: KVM_SET_DEVICE_ATTR: Invalid argument
+>>>>> qemu-system-aarch64: failed to set irq for PMU
+>>>>> "
+>>>>>
+>>>>> I would like to propose a patch to improve those errors and also suggest
+>>>>> a hint. But I also wanted to know whether you would accept to change the
+>>>>> default value with KVM and choose the host version instead of 2. For TCG
+>>>>> we would keep v2.
+>>>>
+>>>> As with the -cpu option, the default is there for command
+>>>> line backward compatibility primarily. Even if we had
+>>>> better support for MSI ITS emulation we'd still leave
+>>>> the default at GICv2.
+>>>>
+>>>> If you want "do the best you can, regardless of accelerator"
+>>>> that is "-cpu max -machine gic-version=max".
+>>>>
 >>>
->>> This includes definitions of various basic parameters needed
->>> for integration of a new platform into QEMU.
->>>
->>> Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
->>> Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
->>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->>> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
->>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->>> Acked-by: Igor Mammedov <imammedo@redhat.com>
->>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->>> ---
->>>  target/avr/cpu-param.h | 37 ++++++++++++++++++++++++++
->>>  target/avr/cpu.h       | 72 ++++++++++++++++++++++++++++++
->>> ++++++++++++++++++++
->>>  2 files changed, 109 insertions(+)
->>>  create mode 100644 target/avr/cpu-param.h
->>>  create mode 100644 target/avr/cpu.h
->>>
->>> diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
->>> new file mode 100644
->>> index 0000000..0c29ce4
->>> --- /dev/null
->>> +++ b/target/avr/cpu-param.h
->>> @@ -0,0 +1,37 @@
->>> +/*
->>> + * QEMU AVR CPU
->>> + *
->>> + * Copyright (c) 2019 Michael Rolnik
->>> + *
->>> + * This library is free software; you can redistribute it and/or
->>> + * modify it under the terms of the GNU Lesser General Public
->>> + * License as published by the Free Software Foundation; either
->>> + * version 2.1 of the License, or (at your option) any later version.
->>> + *
->>> + * This library is distributed in the hope that it will be useful,
->>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>> + * Lesser General Public License for more details.
->>> + *
->>> + * You should have received a copy of the GNU Lesser General Public
->>> + * License along with this library; if not, see
->>> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
->>> + */
->>> +
->>> +#ifndef AVR_CPU_PARAM_H
->>> +#define AVR_CPU_PARAM_H
->>> +
->>> +#define TARGET_LONG_BITS 32
->>> +/*
->>> + * TARGET_PAGE_BITS cannot be more than 8 bits because
->>> + * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and
->>> they
->>> + *     should be implemented as a device and not memory
->>> + * 2.  SRAM starts at the address 0x0100
->>> + */
->>> +#define TARGET_PAGE_BITS 8
->>> +#define TARGET_PHYS_ADDR_SPACE_BITS 24
->>> +#define TARGET_VIRT_ADDR_SPACE_BITS 24
->>> +#define NB_MMU_MODES 2
->>> +
->>> +
->>> +#endif
->>> diff --git a/target/avr/cpu.h b/target/avr/cpu.h
->>> new file mode 100644
->>> index 0000000..d122611
->>> --- /dev/null
->>> +++ b/target/avr/cpu.h
->>> @@ -0,0 +1,72 @@
->>> +/*
->>> + * QEMU AVR CPU
->>> + *
->>> + * Copyright (c) 2019 Michael Rolnik
->>> + *
->>> + * This library is free software; you can redistribute it and/or
->>> + * modify it under the terms of the GNU Lesser General Public
->>> + * License as published by the Free Software Foundation; either
->>> + * version 2.1 of the License, or (at your option) any later version.
->>> + *
->>> + * This library is distributed in the hope that it will be useful,
->>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>> + * Lesser General Public License for more details.
->>> + *
->>> + * You should have received a copy of the GNU Lesser General Public
->>> + * License along with this library; if not, see
->>> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
->>> + */
->>> +
->>> +#ifndef QEMU_AVR_CPU_H
->>> +#define QEMU_AVR_CPU_H
->>> +
->>> +#include "cpu-qom.h"
->>> +#include "exec/cpu-defs.h"
->>> +
->>> +#define TCG_GUEST_DEFAULT_MO 0
->>> +#define AVR_CPU_TYPE_SUFFIX "-" TYPE_AVR_CPU
->>> +#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)
->>> +#define CPU_RESOLVING_TYPE TYPE_AVR_CPU
->>> +
->>> +/*
->>> + * AVR has two memory spaces, data & code.
->>> + * e.g. both have 0 address
->>> + * ST/LD instructions access data space
->>> + * LPM/SPM and instruction fetching access code memory space
->>> + */
->>> +#define MMU_CODE_IDX 0
->>> +#define MMU_DATA_IDX 1
->>> +
->>> +#define EXCP_RESET 1
->>> +#define EXCP_INT(n) (EXCP_RESET + (n) + 1)
->>> +
->>> +/* Number of CPU registers */
->>> +#define NUMBER_OF_CPU_REGISTERS 32
->>> +/* Number of IO registers accessible by ld/st/in/out */
->>> +#define NUMBER_OF_IO_REGISTERS 64
->>> +
->>> +/*
->>> + * Offsets of AVR memory regions in host memory space.
->>> + *
->>> + * This is needed because the AVR has separate code and data address
->>> + * spaces that both have start from zero but have to go somewhere in
->>> + * host memory.
->>> + *
->>> + * It's also useful to know where some things are, like the IO
->>> registers.
->>> + */
->>> +/* Flash program memory */
->>> +#define OFFSET_CODE 0x00000000
->>> +/* CPU registers, IO registers, and SRAM */
->>> +#define OFFSET_DATA 0x00800000
->>> +/* CPU registers specifically, these are mapped at the start of data *=
-/
->>> +#define OFFSET_CPU_REGISTERS OFFSET_DATA
->>> +/*
->>> + * IO registers, including status register, stack pointer, and memory
->>> + * mapped peripherals, mapped just after CPU registers
->>> + */
->>> +#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)
->>> +
->>> +#define EF_AVR_MACH 0x7F
->>> +
->>> +#endif /* !defined (QEMU_AVR_CPU_H) */
->>> --
->>> 2.7.4
->>>
->>>
->>
->> --
->> Best Regards,
->> Michael Rolnik
->>
->
->
-> --
-> Best Regards,
-> Michael Rolnik
->
+>>> There is a case where we can probe without breaking backward
+>>> compatibility. That case is kvm-enabled and no gic-version
+>>> specified. The reason it would be safe to probe the GIC version
+>>> is because unless the host was a gicv2 host, then that command
+>>> line wouldn't have worked anyway.
+>> Except if the host GICv3 has a GICv2 compat (which is pretty unlikely)?
+> 
+> Is there a way to probe that? If so, and the setting up of gicv2 on
+> a gicv3 host with the gicv2-compat is the same as setting up gicv2,
+> then we can just choose gicv2 to keep the command line compatibility.
+I think that if the host GICv3 is GICv2 compatible then you can create
+both a KVM_DEV_TYPE_ARM_VGIC_V2 device and a KVM_DEV_TYPE_ARM_VGIC_V3
+device. Otherwise you can only create a KVM_DEV_TYPE_ARM_VGIC_V3 KVM device.
 
---000000000000bfcd23059d337d4e
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Thanks
 
-<br><br>On Tuesday, January 28, 2020, Michael Rolnik &lt;<a href=3D"mailto:=
-mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D=
-"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding=
--left:1ex"><div dir=3D"ltr">Hi all.<div><br></div><div>I am totally lost in=
- the email.</div><div>Are there any action items for me / someone=C2=A0else=
- ?</div><div><br></div><div>Regards,</div><div>Michael Rolnik</div><div><br=
-></div></div></blockquote><div><br></div><div>I think it would be helpful i=
-f we have rc4 with two action items:</div><div><br></div><div>=C2=A0 =C2=A0=
-- remove CONFIG_USER_ONLY references, and all dead code thay may have come =
-with it + add check in cpu.h that Philippe suggested.</div><div>=C2=A0 =C2=
-=A0- remove &quot;Atmel&quot; word from all elements of the series (patch n=
-ames, messages, filenames, structure names, ...)</div><div><br></div><div>N=
-eedless to say that this must be done with extreme care.</div><div><br></di=
-v><div>I propose that Philippe do rc4.</div><div><br></div><div>Sincerely,<=
-/div><div>Aleksandar</div><div><br></div><div>=C2=A0</div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex"><div dir=3D"ltr"></div><br><div class=3D"gmail_quote"><div di=
-r=3D"ltr" class=3D"gmail_attr">On Mon, Jan 27, 2020 at 10:54 AM Michael Rol=
-nik &lt;<a href=3D"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmai=
-l.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex"><div dir=3D"ltr">Thanks for you help guys.</div><br><div class=3D"gmai=
-l_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jan 27, 2020 at 12:5=
-5 AM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.markovic@rt-rk.co=
-m" target=3D"_blank">aleksandar.markovic@rt-rk.com</a><wbr>&gt; wrote:<br><=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
-rder-left:1px solid rgb(204,204,204);padding-left:1ex">From: Michael Rolnik=
- &lt;<a href=3D"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.c=
-om</a>&gt;<br>
-<br>
-This includes definitions of various basic parameters needed<br>
-for integration of a new platform into QEMU.<br>
-<br>
-Co-developed-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" ta=
-rget=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Co-developed-by: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" =
-target=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt;<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
-et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Signed-off-by: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" ta=
-rget=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt;<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
-et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Acked-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" target=
-=3D"_blank">imammedo@redhat.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
-naro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
-Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@=
-gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt;<br>
----<br>
-=C2=A0target/avr/cpu-param.h | 37 ++++++++++++++++++++++++++<br>
-=C2=A0target/avr/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0| 72 +++++++++++++++++++++=
-+++++++++<wbr>++++++++++++++++++++<br>
-=C2=A02 files changed, 109 insertions(+)<br>
-=C2=A0create mode 100644 target/avr/cpu-param.h<br>
-=C2=A0create mode 100644 target/avr/cpu.h<br>
-<br>
-diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h<br>
-new file mode 100644<br>
-index 0000000..0c29ce4<br>
---- /dev/null<br>
-+++ b/target/avr/cpu-param.h<br>
-@@ -0,0 +1,37 @@<br>
-+/*<br>
-+ * QEMU AVR CPU<br>
-+ *<br>
-+ * Copyright (c) 2019 Michael Rolnik<br>
-+ *<br>
-+ * This library is free software; you can redistribute it and/or<br>
-+ * modify it under the terms of the GNU Lesser General Public<br>
-+ * License as published by the Free Software Foundation; either<br>
-+ * version 2.1 of the License, or (at your option) any later version.<br>
-+ *<br>
-+ * This library is distributed in the hope that it will be useful,<br>
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<=
-br>
-+ * Lesser General Public License for more details.<br>
-+ *<br>
-+ * You should have received a copy of the GNU Lesser General Public<br>
-+ * License along with this library; if not, see<br>
-+ * &lt;<a href=3D"http://www.gnu.org/licenses/lgpl-2.1.html" rel=3D"norefe=
-rrer" target=3D"_blank">http://www.gnu.org/licenses/<wbr>lgpl-2.1.html</a>&=
-gt;<br>
-+ */<br>
-+<br>
-+#ifndef AVR_CPU_PARAM_H<br>
-+#define AVR_CPU_PARAM_H<br>
-+<br>
-+#define TARGET_LONG_BITS 32<br>
-+/*<br>
-+ * TARGET_PAGE_BITS cannot be more than 8 bits because<br>
-+ * 1.=C2=A0 all IO registers occupy [0x0000 .. 0x00ff] address range, and =
-they<br>
-+ *=C2=A0 =C2=A0 =C2=A0should be implemented as a device and not memory<br>
-+ * 2.=C2=A0 SRAM starts at the address 0x0100<br>
-+ */<br>
-+#define TARGET_PAGE_BITS 8<br>
-+#define TARGET_PHYS_ADDR_SPACE_BITS 24<br>
-+#define TARGET_VIRT_ADDR_SPACE_BITS 24<br>
-+#define NB_MMU_MODES 2<br>
-+<br>
-+<br>
-+#endif<br>
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h<br>
-new file mode 100644<br>
-index 0000000..d122611<br>
---- /dev/null<br>
-+++ b/target/avr/cpu.h<br>
-@@ -0,0 +1,72 @@<br>
-+/*<br>
-+ * QEMU AVR CPU<br>
-+ *<br>
-+ * Copyright (c) 2019 Michael Rolnik<br>
-+ *<br>
-+ * This library is free software; you can redistribute it and/or<br>
-+ * modify it under the terms of the GNU Lesser General Public<br>
-+ * License as published by the Free Software Foundation; either<br>
-+ * version 2.1 of the License, or (at your option) any later version.<br>
-+ *<br>
-+ * This library is distributed in the hope that it will be useful,<br>
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<=
-br>
-+ * Lesser General Public License for more details.<br>
-+ *<br>
-+ * You should have received a copy of the GNU Lesser General Public<br>
-+ * License along with this library; if not, see<br>
-+ * &lt;<a href=3D"http://www.gnu.org/licenses/lgpl-2.1.html" rel=3D"norefe=
-rrer" target=3D"_blank">http://www.gnu.org/licenses/<wbr>lgpl-2.1.html</a>&=
-gt;<br>
-+ */<br>
-+<br>
-+#ifndef QEMU_AVR_CPU_H<br>
-+#define QEMU_AVR_CPU_H<br>
-+<br>
-+#include &quot;cpu-qom.h&quot;<br>
-+#include &quot;exec/cpu-defs.h&quot;<br>
-+<br>
-+#define TCG_GUEST_DEFAULT_MO 0<br>
-+#define AVR_CPU_TYPE_SUFFIX &quot;-&quot; TYPE_AVR_CPU<br>
-+#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)<br>
-+#define CPU_RESOLVING_TYPE TYPE_AVR_CPU<br>
-+<br>
-+/*<br>
-+ * AVR has two memory spaces, data &amp; code.<br>
-+ * e.g. both have 0 address<br>
-+ * ST/LD instructions access data space<br>
-+ * LPM/SPM and instruction fetching access code memory space<br>
-+ */<br>
-+#define MMU_CODE_IDX 0<br>
-+#define MMU_DATA_IDX 1<br>
-+<br>
-+#define EXCP_RESET 1<br>
-+#define EXCP_INT(n) (EXCP_RESET + (n) + 1)<br>
-+<br>
-+/* Number of CPU registers */<br>
-+#define NUMBER_OF_CPU_REGISTERS 32<br>
-+/* Number of IO registers accessible by ld/st/in/out */<br>
-+#define NUMBER_OF_IO_REGISTERS 64<br>
-+<br>
-+/*<br>
-+ * Offsets of AVR memory regions in host memory space.<br>
-+ *<br>
-+ * This is needed because the AVR has separate code and data address<br>
-+ * spaces that both have start from zero but have to go somewhere in<br>
-+ * host memory.<br>
-+ *<br>
-+ * It&#39;s also useful to know where some things are, like the IO registe=
-rs.<br>
-+ */<br>
-+/* Flash program memory */<br>
-+#define OFFSET_CODE 0x00000000<br>
-+/* CPU registers, IO registers, and SRAM */<br>
-+#define OFFSET_DATA 0x00800000<br>
-+/* CPU registers specifically, these are mapped at the start of data */<br=
->
-+#define OFFSET_CPU_REGISTERS OFFSET_DATA<br>
-+/*<br>
-+ * IO registers, including status register, stack pointer, and memory<br>
-+ * mapped peripherals, mapped just after CPU registers<br>
-+ */<br>
-+#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)<br>
-+<br>
-+#define EF_AVR_MACH 0x7F<br>
-+<br>
-+#endif /* !defined (QEMU_AVR_CPU_H) */<br>
--- <br>
-2.7.4<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Best Regards,<br>Michael Rolnik</div>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Best Regards,<br>Michael Rolnik</div>
-</blockquote>
+Eric
 
---000000000000bfcd23059d337d4e--
+> 
+> Thanks,
+> drew
+> 
+> 
+
 
