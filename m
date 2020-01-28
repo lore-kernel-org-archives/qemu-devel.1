@@ -2,73 +2,94 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8865CC33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 07:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A99C33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 07:40:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F2B82173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 07:36:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F2B82173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 295902173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 07:40:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="l+IrpJcg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295902173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwLQN-0001xf-Gl
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 02:36:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36845)
+	id 1iwLTb-0003Ov-Dn
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 02:39:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iwLPM-0001WR-DW
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:35:37 -0500
+ (envelope-from <dme@dme.org>) id 1iwLSv-0002vA-1H
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:39:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iwLPK-0006Yk-TH
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:35:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58242)
+ (envelope-from <dme@dme.org>) id 1iwLSt-0001X5-PH
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:39:16 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53533)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iwLPK-0006Vl-Nu
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:35:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iwLPI-00055c-QU
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 07:35:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C74672E80C7
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 07:35:32 +0000 (UTC)
+ (Exim 4.71) (envelope-from <dme@dme.org>) id 1iwLSt-0001WE-ER
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:39:15 -0500
+Received: by mail-wm1-x342.google.com with SMTP id s10so1334236wmh.3
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 23:39:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:subject:in-reply-to:references:from:date:message-id:mime-version;
+ bh=ebCi1LDysOkXXC38u1i+mPgHoG6dAotOoZjAyRPynOM=;
+ b=l+IrpJcgpAcbNMGmJrbwEg9zJixiQO1J48Fl0FGjp9r60aKpgeRhp1tehE3Y246R0G
+ 4NdycpasgmRFyo9ptGZlaoH92+Llhx1kRFx5YAmwSPvM3/hiTQ52LNQJCUfzJ22jgSoZ
+ /50Nqdt5bDE4FQQDfqElDQCCba+rDVEgy/ergjWsGWZvyUK9dAQtiaRMJsXYbQH2CbB9
+ Igv3h+CVKQtevTSxlKS6IyLy8EPRmojeo8R+c9SLs4hyHKIpEPGtW6yg28XePmAZouuJ
+ 7y4j4K9Sg2Hrwn9AxdtPYx3C33rEtISysZiF3FwIT75RORYeE0WYvS9xZ+sS2P5PC+V7
+ pPPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:subject:in-reply-to:references:from:date
+ :message-id:mime-version;
+ bh=ebCi1LDysOkXXC38u1i+mPgHoG6dAotOoZjAyRPynOM=;
+ b=lMR6/DTpJsAcIgkAbguXWM6dP39txz7DPsg0SAIVgd4FuWZdmeRN/20rQYVDFMgXym
+ Ml55IelsEYYdovrzMprQdfiJo2atEtM+4GRLPNn6eZLUJ4DW/665sfhPW5yehBqujAGv
+ tadEsVZLv/dkXz7KRX3iOQTS8j384Fq7ffVtF1+7CpvTAYFAcP/OYxCogqT2ZiuUoyqN
+ BhBjuOTi5EepdIbV5KsTuKmU4cRAiLqXIAaw/OCoQDWyZW8VSNKGunarUK9d0rxDf5gp
+ 7pJiJUno3GLP0VtikLQtSHnxi1/1z4xvpeWCstV6TUIhi2efugP76qSDYwYdarvXQgcD
+ 3MEw==
+X-Gm-Message-State: APjAAAUyVKLAeMiVzKZv74OJVemI71UNL14ICWEmESsJ8Cz+nGKHV2Sm
+ ijQ8LJew+Apyezj6ukvHJA8zqA==
+X-Google-Smtp-Source: APXvYqxjvBbEmKuLErExrM55eC1pv/rmqOG3zsG8V2m6hunH4POog2ETQ1jF0IohKsmscVA9C3LPBA==
+X-Received: by 2002:a1c:4e05:: with SMTP id g5mr3159044wmh.138.1580197153458; 
+ Mon, 27 Jan 2020 23:39:13 -0800 (PST)
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net.
+ [81.149.164.25])
+ by smtp.gmail.com with ESMTPSA id n3sm22921949wrs.8.2020.01.27.23.39.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jan 2020 23:39:12 -0800 (PST)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 22222fc7;
+ Tue, 28 Jan 2020 07:39:11 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 2/2] doc: Use @code rather than @var for options
+In-Reply-To: <8412b6bf-3819-9042-4ade-d42f36fd3a97@redhat.com>
+References: <20200124103458.1525982-1-david.edmondson@oracle.com>
+ <20200124103458.1525982-3-david.edmondson@oracle.com>
+ <8412b6bf-3819-9042-4ade-d42f36fd3a97@redhat.com>
+X-HGTTG: gag-halfrunt
+From: David Edmondson <dme@dme.org>
+Date: Tue, 28 Jan 2020 07:39:11 +0000
+Message-ID: <cunr1zk9gio.fsf@gag-halfrunt.hh.sledj.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Jan 2020 07:28:21 -0000
-From: Fabian Godehardt <1856837@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm gcc9.2 segfault
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fgodeh pmaydell
-X-Launchpad-Bug-Reporter: Fabian Godehardt (fgodeh)
-X-Launchpad-Bug-Modifier: Fabian Godehardt (fgodeh)
-References: <157666594314.15384.3778802807711797985.malonedeb@wampee.canonical.com>
-Message-Id: <158019650171.18878.10018190609478351951.malone@gac.canonical.com>
-Subject: [Bug 1856837] Re: qemu 4.2.0 arm  segmentation fault with gcc 9.2
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a5790b2d2d2f0124b0f230433fee280137d69a97
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,88 +98,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856837 <1856837@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks, this helps a lot! We will now check the code again and see what
-causes the behaviour.
+Eric Blake <eblake@redhat.com> writes:
 
-Fabian
+> On 1/24/20 4:34 AM, David Edmondson wrote:
+>> Texinfo defines @var for metasyntactic variables and such terms are
+>> shown in upper-case or italics in the output of makeinfo. When
+>> considering an option to a command, such as "-n", upper-casing is
+>> undesirable as it may confuse the reader or be in conflict with the
+>> equivalent upper-case option.
+>> 
+>> Replace the use of @var for options with @code to avoid this.
+>> 
+>> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+>> ---
+>>   qemu-img.texi | 16 ++++++++--------
+>>   1 file changed, 8 insertions(+), 8 deletions(-)
+>
+> Is this patch still needed given Peter's recent push to move to rST 
+> documentation?
 
--- =
+No, it would be obviated by those changes.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856837
+>> 
+>> diff --git a/qemu-img.texi b/qemu-img.texi
+>> index 3b6dfd8682..6b4a1ac961 100644
+>> --- a/qemu-img.texi
+>> +++ b/qemu-img.texi
+>> @@ -74,13 +74,13 @@ keys.
+>>   @item --image-opts
+>>   Indicates that the source @var{filename} parameter is to be interpreted as a
+>>   full option string, not a plain filename. This parameter is mutually
+>> -exclusive with the @var{-f} parameter.
+>> +exclusive with the @code{-f} parameter.
+>>   
+>
+>
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
 
-Title:
-  qemu 4.2.0 arm  segmentation fault with gcc 9.2
-
-Status in QEMU:
-  New
-
-Bug description:
-  As discussed with f4bug yesterday on IRC here comes the bug
-  description.
-
-  I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
-  6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
-  linux-user" and debug enabled. I use the arm-linux-user variant,
-  "qemu-arm".
-
-  Then i'm trying to cross-compile (arm gcc) an old version of googles
-  v8 (as i need this version of the lib for binary compatibility) which
-  uses qemu during build.
-
-  It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
-  7.4.0 and 8.3.0 but those are also causing the same segmentation
-  fault.
-
-  The executed command wich breaks qemu is:
-
-   qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
-  positions --logfile
-  /tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
-  --random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
-
-  The printed error message is:
-
-  ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=
-=3D1 MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  Calling qemu with gdb gives the following information:
-
-   Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
-   0x0000555555d63d11 in static_code_gen_buffer ()
-
-  and
-
-   (gdb) bt
-   #0  0x0000555555d63d11 in static_code_gen_buffer ()
-   #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55=
-5557c33930) at =
-
-   /tmp/build/qemu/accel/tcg/cpu-exec.c:172
-   #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<syntheti=
-c pointer>, tb=3D<optimized out>, =
-
-   cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
-   #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel=
-/tcg/cpu-exec.c:731
-   #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/=
-qemu/linux-user/arm/cpu_loop.c:219
-  #5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
-
-  Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the
-  log in the attached file.
-
-  Thanks for any hints!
-  Fabian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856837/+subscriptions
+dme.
+-- 
+Don't you know you're never going to get to France.
 
