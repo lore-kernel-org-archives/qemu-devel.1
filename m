@@ -2,101 +2,84 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40205C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4360AC33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:15:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B1C321739
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:14:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E8FC21739
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:15:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMbFYMY8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B1C321739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="HND4zrJo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E8FC21739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwOpG-00030u-1x
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:14:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57877)
+	id 1iwOqB-00043Q-8R
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:15:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57923)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iwOoQ-0002LZ-1P
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:13:43 -0500
+ (envelope-from <maz@kernel.org>) id 1iwOoW-0002Tz-IX
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:13:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iwOoO-0004C7-ID
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:13:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46120
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <maz@kernel.org>) id 1iwOoV-0004Hp-Hp
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:13:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53228)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwOoO-0004Bf-F4
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:13:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580210019;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5KTRF1G5NHP+wL2HdIa7m0WVCdKa5AGli4KujKYxDZ8=;
- b=gMbFYMY89jVyHqGn/yhpKBAFLgGKOPKsTs4ZrojtuEqNJCh8iLsWqrtHXfTIqRCRpxMTE9
- Vyy3yCrmgikpCM0hbQPVoYUyEc60+ZHws7JqwAc9023M8Uh6bhF8vjXWbxxTIQbDMBok/D
- 4pYKC6MlRjehYP4qfKcpKoHhfKdpAfE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-OYwC7QUqOcGCHCTyQIuKmA-1; Tue, 28 Jan 2020 06:13:37 -0500
-Received: by mail-wr1-f72.google.com with SMTP id v17so7799406wrm.17
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 03:13:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=v1DFQTUiMRN7FzFOeDEuoFNFmHHb8bVFGxFX3jwzuQI=;
- b=IM3KifDO67OJJi/VkCnFi7eUH7Pa8FeZ1karpG2rMa0D5i88XN73UNbI0MKsDqaVAL
- 8nAE0UCUf/E7+6zE/eqU6yyxYxvO2JM03lWTCb+N1r9g4sUHpH7MmWGotSAYnhwULqMa
- /90iZcCz6Kp9N19Ypcm7pog7Ib91OfmvBh8XIkJC58ct/ptW1ds0DaekLMixvIL/0YOC
- s4XbsIbg5/J0wYAzaFl6QZDrIiAACLcxsFXD/p3foQV3dmwnryrfXfI002SLBmA4W60S
- 4LRaNImExqnD7XQPJZIs9GHec57y7do7me+lZ8K16FZRW0kUMbevEqkRitgrVvGWeywa
- Xmig==
-X-Gm-Message-State: APjAAAXKeQxdi/IvInKSrdV1ULTnwng8zuDJ1dVuJ982SC+UZ6FZTpV3
- m42r5xBQwBuP3PEtwyroKgr9IGX3HCX1LnWRiTPDr+4YUXk1c0B57lECMQiECPnroZgHdHWuRr/
- DeSiC083ZejjpVJ8=
-X-Received: by 2002:adf:ec4c:: with SMTP id w12mr29389305wrn.124.1580210016247; 
- Tue, 28 Jan 2020 03:13:36 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz14EolL9sPVagTlXxNDTNM8Ooe+RHWTJJMI+I5m2uYWx4CKFLLQ6UxlcELO+OZfLw9ulPDog==
-X-Received: by 2002:adf:ec4c:: with SMTP id w12mr29389283wrn.124.1580210016026; 
- Tue, 28 Jan 2020 03:13:36 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id u7sm2593098wmj.3.2020.01.28.03.13.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Jan 2020 03:13:35 -0800 (PST)
-Subject: Re: [PATCH v3 09/14] dp8393x: Use long-word-aligned RRA pointers in
- 32-bit mode
-To: Finn Thain <fthain@telegraphics.com.au>, Jason Wang
- <jasowang@redhat.com>, qemu-devel@nongnu.org
-References: <cover.1579474761.git.fthain@telegraphics.com.au>
- <b971aa27c59c56f5c7c6bfaf26080fd97bb5cb9f.1579474761.git.fthain@telegraphics.com.au>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ec30b6a0-a99e-9cae-fe25-a6e77d7be2f1@redhat.com>
-Date: Tue, 28 Jan 2020 12:13:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <maz@kernel.org>)
+ id 1iwOoT-0004G2-BJ; Tue, 28 Jan 2020 06:13:45 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 29DF821739;
+ Tue, 28 Jan 2020 11:13:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1580210024;
+ bh=M+CDq/a4jwD0PmQTrnO8ciZK2J5DAAtG91pLWGSuqUc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=HND4zrJoUI5Fs2HHJbyJkEF2kn6rn4d9oLFnHse11yGmuLVd8js9MCrFi0hzky5hI
+ bzTRwQiqvWo1TYiv/5M65Ab5HuKN/zcw08EsdS0niLgWF5bOmLokRDPMXtG3/Zk986
+ kNXXUtoAeXfnH2Ks4IeUNPm5dUMmROjp31xUht1M=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1iwOoQ-001nok-EY; Tue, 28 Jan 2020 11:13:42 +0000
 MIME-Version: 1.0
-In-Reply-To: <b971aa27c59c56f5c7c6bfaf26080fd97bb5cb9f.1579474761.git.fthain@telegraphics.com.au>
-Content-Language: en-US
-X-MC-Unique: OYwC7QUqOcGCHCTyQIuKmA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 28 Jan 2020 11:13:42 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
+In-Reply-To: <CAFEAcA92URHhhm8TiGqijig_jM1=94PZz5Ptmfg1JrWSP7mSHQ@mail.gmail.com>
+References: <20191219040612.28431-1-gshan@redhat.com>
+ <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
+ <1b718429-c74e-fbac-84b8-379f3291db40@redhat.com>
+ <ff78ed012e7b8fbd656e7e4b477ee0a4@kernel.org>
+ <3ae0557c-c289-8a23-d62f-3dc2a12c0623@redhat.com>
+ <CAFEAcA92URHhhm8TiGqijig_jM1=94PZz5Ptmfg1JrWSP7mSHQ@mail.gmail.com>
+Message-ID: <97bd5cbfec30624aead987a0fd1c4ac6@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.8
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, eric.auger@redhat.com,
+ drjones@redhat.com, gshan@redhat.com, jthierry@redhat.com, aik@ozlabs.ru,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, shan.gavin@gmail.com,
+ pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 198.145.29.99
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,57 +91,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Laurent Vivier <laurent@vivier.eu>, qemu-stable@nongnu.org
+Cc: Andrew Jones <drjones@redhat.com>, Gavin Shan <gshan@redhat.com>,
+ jthierry@redhat.com, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ QEMU Developers <qemu-devel@nongnu.org>, Auger Eric <eric.auger@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Shan Gavin <shan.gavin@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/19/20 11:59 PM, Finn Thain wrote:
-> Section 3.4.1 of the datasheet says,
->=20
->      The alignment of the RRA is confined to either word or long word
->      boundaries, depending upon the data width mode. In 16-bit mode,
->      the RRA must be aligned to a word boundary (A0 is always zero)
->      and in 32-bit mode, the RRA is aligned to a long word boundary
->      (A0 and A1 are always zero).
->=20
-> This constraint has been implemented for 16-bit mode; implement it
-> for 32-bit mode too.
->=20
-> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-> Tested-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   hw/net/dp8393x.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index 947ceef37c..b052e2c854 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -663,12 +663,16 @@ static void dp8393x_write(void *opaque, hwaddr addr=
-, uint64_t data,
->                   qemu_flush_queued_packets(qemu_get_queue(s->nic));
->               }
->               break;
-> -        /* Ignore least significant bit */
-> +        /* The guest is required to store aligned pointers here */
->           case SONIC_RSA:
->           case SONIC_REA:
->           case SONIC_RRP:
->           case SONIC_RWP:
-> -            s->regs[reg] =3D val & 0xfffe;
-> +            if (s->regs[SONIC_DCR] & SONIC_DCR_DW) {
-> +                s->regs[reg] =3D val & 0xfffc;
-> +            } else {
-> +                s->regs[reg] =3D val & 0xfffe;
-> +            }
->               break;
->           /* Invert written value for some registers */
->           case SONIC_CRCT:
->=20
+On 2020-01-28 10:59, Peter Maydell wrote:
+> On Tue, 28 Jan 2020 at 10:56, Auger Eric <eric.auger@redhat.com> wrote:
+>> On 1/28/20 10:25 AM, Marc Zyngier wrote:
+>> > You *could* try something like SDEI [1], but that's a pretty terrible
+>> > interface too.
+>> 
+>> Thank you for the pointer.
+> 
+> There was a patchset recently that had an SDEI implementation,
+> but I would strongly prefer not to have QEMU itself take
+> on the job of firmware API implementation, and the facilities
+> provided are somewhere between awkward and impossible to
+> implement from within a guest firmware blob :-/
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Hey, I said it was terrible! ;-)
 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 
