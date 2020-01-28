@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B78C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6773DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:02:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13A562467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:02:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 360D22467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:02:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/y2vl5z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A562467E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HaiyIjjJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 360D22467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwW8N-0002Cq-6v
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:02:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35548)
+	id 1iwW8Q-0002Ki-Ar
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:02:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7A-0002nm-6t
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:31 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7p-0003j4-WF
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV78-0006iu-9K
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:28 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:54070)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7o-00088K-J7
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:09 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:50765)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV78-0006fY-00
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:26 -0500
-Received: by mail-wm1-x333.google.com with SMTP id s10so3523129wmh.3
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:25 -0800 (PST)
+ id 1iwV7o-00087c-C2
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:08 -0500
+Received: by mail-wm1-x335.google.com with SMTP id a5so3534740wmb.0
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:58:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=pmsiidTbK3/Z0JINckWilzGW07vymGZcAnAmUSpq7v0=;
- b=K/y2vl5zo/u4kyczfyKvW/OusLX/7kyWCge7/b5Vfjap2atL2QVIwHFwD2aEwvlz8C
- A1UH57KVu9rYybbVmvHAAevEjc9rFCyh66rfCFRPsQZJoNyjdfZyXqm1dDm2JnvNvnVJ
- YgM2Ep0gobVrxqdXaFB5zj9CH5OSnT2B1dcg435vDrTLhmzB7gI+xOGn5iYsgUHvSG+x
- GgYr/QDjFwVFC+cJEq2GlSYJcKqiB62sH/ERIlzzcqOG9+GFqZjL16AoW862V/cuh7Cy
- GrK3ZlsG+UbMih2yh/ApN0Kp8KolGYxA8xaxH2cfNCOOipduzzUX+2frA8su+2eQWN75
- PFqA==
+ bh=R63pa3BaoQR6sTJRowljkz1+uv2L05XdtkPzVnlv3Tw=;
+ b=HaiyIjjJbvyuSmF7G6d/pt6AqbeEIpRB6V0k39wqMU0vK18dieFS651QptELRUWEZV
+ JdYondakpx3Z29SoyFS6hg7Fr3X4ORskNhCe2nanf9iYSRiM0XSUNC6bXD5axryOqxTh
+ liZD+MidKecCoeRfFAk6mlwJLVFUgYimRwXsloDva/PrcXPCmUHR3NSWK2EF97vYslX5
+ RAzwE7bUyHgVhd71a7q5D7z/0cjudm6cWDSWCgi4lUgi5U0SMj0Sz1+NdbSW/wqU8uux
+ TxnN5AvZM3kIhnqmqOjGr2tPj0XdY9Cdr/YGHUExeAl/MzBQpJet/mp7efOzsV2PcRC/
+ gUSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=pmsiidTbK3/Z0JINckWilzGW07vymGZcAnAmUSpq7v0=;
- b=ld4K+OdK5tHMxJeKGZCtupD2LDY2f9yDHUi1dh19Pdz3uMViNvlXrPk1K7xLwd0563
- w42mF33gNSywZde0GWFhA/y4rreLKpFDrjzTy45l5puDL/nHMTUdaBXdOsxYA2F+H7jw
- 30E28UpbG7MFuAPx5ZuP8B6wMLiu0L0RQZKKRdcH5QldQTl0PCJTAFIbjgV+liDm39Yn
- dBZnfFhkeTsp5I+iUiISLVpqmoaj61MkHIjPt3piojHBHKpJ76xu6k0B3GwSJq3n+P3B
- oFXZR7vOSDJAkorn5llje1CsH2ihlXDfBnKK5dcOf4obipiyXgvxdODXzB/s1EFywzXg
- TefQ==
-X-Gm-Message-State: APjAAAUMmTvKgqrP7ry5xEYNM56pjdm/Z36WbVZVV7nTNjVxlaOQlCRb
- iLwoxhCuqyzQxe5KzPu+hURfms9f
-X-Google-Smtp-Source: APXvYqyYOzhOLsIU2Jd17FAmEPwQiQ2JGhrEKMT054N/k2gtejzgd1pRBWppjRUXOqsf9kgFaoImAg==
-X-Received: by 2002:a05:600c:1050:: with SMTP id
- 16mr6442166wmx.86.1580234244539; 
- Tue, 28 Jan 2020 09:57:24 -0800 (PST)
+ bh=R63pa3BaoQR6sTJRowljkz1+uv2L05XdtkPzVnlv3Tw=;
+ b=OAjvZPb6eZgxQoYRjs/VgJMC16b2vDEwTNKuawgCjh3ZzunsUbz3Jf14UamzBTipPv
+ KekZAdWNcUrk9CTlN2JrKWnsG5m4RFJuryKCuWeDmOcypEY+keaxbR7IlKH7HB09Td2z
+ YfDgFb+J/lnLzzrqJrs7zJytxzsdr+GkcdIkeqPbylm24mQP7hIrqhd+n4dT38XcswBz
+ rocuhG9Gtu1Op4o5l2tGxvnu911vdWdy1lOVhs5HQN4bZpj4w4SeAImZJzNrUPQt47K8
+ RSHUQ+93Xpw/Io90iBtqXUxp9f6LzpI1wTQbgUDidwXswwQG4aHB/vsbRi11PWYEFzp8
+ mXJw==
+X-Gm-Message-State: APjAAAW2H4lWBZ9v9ROwZPdzhKFd/C4l85WNcvfg5Hq7ABNnUikhR3F8
+ 9sOa5AkSVWzVpU7FW8LuesAzZ1Dg
+X-Google-Smtp-Source: APXvYqyawrOaPy2l/4q//2WLklEmmxvCVeVoR9RmhaUsLEQs4s1pnj9OBJBzdBlQpV4ZfhREUYE6qg==
+X-Received: by 2002:a1c:7203:: with SMTP id n3mr6275900wmc.119.1580234287231; 
+ Tue, 28 Jan 2020 09:58:07 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.22
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.58.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:57:24 -0800 (PST)
+ Tue, 28 Jan 2020 09:58:06 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 092/142] meson: convert hw/misc
-Date: Tue, 28 Jan 2020 18:52:52 +0100
-Message-Id: <20200128175342.9066-93-pbonzini@redhat.com>
+Subject: [PATCH 110/142] meson: convert hw/9pfs
+Date: Tue, 28 Jan 2020 18:53:10 +0100
+Message-Id: <20200128175342.9066-111-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,250 +103,138 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs            |  1 -
- hw/meson.build              |  1 +
- hw/misc/Makefile.objs       | 84 -----------------------------------
- hw/misc/macio/Makefile.objs |  5 ---
- hw/misc/macio/meson.build   |  8 ++++
- hw/misc/meson.build         | 88 +++++++++++++++++++++++++++++++++++++
- 6 files changed, 97 insertions(+), 90 deletions(-)
- delete mode 100644 hw/misc/Makefile.objs
- delete mode 100644 hw/misc/macio/Makefile.objs
- create mode 100644 hw/misc/macio/meson.build
- create mode 100644 hw/misc/meson.build
+ Kconfig.host          |  1 +
+ Makefile.objs         |  5 -----
+ Makefile.target       |  1 -
+ hw/9pfs/Kconfig       |  4 ++++
+ hw/9pfs/Makefile.objs |  9 ---------
+ hw/9pfs/meson.build   | 20 ++++++++++++++++++++
+ hw/Makefile.objs      |  6 ------
+ hw/meson.build        |  1 +
+ 8 files changed, 26 insertions(+), 21 deletions(-)
+ delete mode 100644 hw/9pfs/Makefile.objs
+ create mode 100644 hw/9pfs/meson.build
+ delete mode 100644 hw/Makefile.objs
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 8da7540793..ea808bc4f4 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -17,7 +17,6 @@ devices-dirs-y += intc/
- devices-dirs-$(CONFIG_IPACK) += ipack/
- devices-dirs-$(CONFIG_IPMI) += ipmi/
- devices-dirs-y += isa/
--devices-dirs-y += misc/
+diff --git a/Kconfig.host b/Kconfig.host
+index 55136e037d..ce78e49c5c 100644
+--- a/Kconfig.host
++++ b/Kconfig.host
+@@ -34,6 +34,7 @@ config VHOST_KERNEL
+ config XEN
+     bool
+     select FSDEV_9P if VIRTFS
++    select 9PFS if VIRTFS
+ 
+ config VIRTFS
+     bool
+diff --git a/Makefile.objs b/Makefile.objs
+index 25468baee4..9006b282bd 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -58,11 +58,6 @@ common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
+ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
  endif
  
- common-obj-y += $(devices-dirs-y)
+-#######################################################################
+-# Target-independent parts used in system and user emulation
+-
+-common-obj-y = hw/
+-
+ ######################################################################
+ # Resource file for Windows executables
+ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
+diff --git a/Makefile.target b/Makefile.target
+index 1ce0c7f800..e269300203 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -155,7 +155,6 @@ endif #CONFIG_BSD_USER
+ ifdef CONFIG_SOFTMMU
+ obj-y += arch_init.o cpus.o gdbstub.o balloon.o ioport.o
+ obj-y += qtest.o
+-obj-y += hw/
+ obj-y += memory.o
+ obj-y += memory_mapping.o
+ LIBS := $(libs_softmmu) $(LIBS)
+diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
+index 3ae5749661..d3ebd73730 100644
+--- a/hw/9pfs/Kconfig
++++ b/hw/9pfs/Kconfig
+@@ -2,8 +2,12 @@ config FSDEV_9P
+     bool
+     depends on VIRTFS
+ 
++config 9PFS
++    bool
++
+ config VIRTIO_9P
+     bool
+     default y
+     depends on VIRTFS && VIRTIO
+     select FSDEV_9P
++    select 9PFS
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+deleted file mode 100644
+index 70ded6fd8f..0000000000
+--- a/hw/9pfs/Makefile.objs
++++ /dev/null
+@@ -1,9 +0,0 @@
+-common-obj-y  = 9p.o 9p-util.o
+-common-obj-y += 9p-local.o 9p-xattr.o
+-common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+-common-obj-y += coth.o cofs.o codir.o cofile.o
+-common-obj-y += coxattr.o 9p-synth.o
+-common-obj-y += 9p-proxy.o
+-
+-common-obj-$(CONFIG_XEN) += xen-9p-backend.o
+-obj-$(CONFIG_VIRTIO_9P) += virtio-9p-device.o
+diff --git a/hw/9pfs/meson.build b/hw/9pfs/meson.build
+new file mode 100644
+index 0000000000..cc09426212
+--- /dev/null
++++ b/hw/9pfs/meson.build
+@@ -0,0 +1,20 @@
++fs_ss = ss.source_set()
++fs_ss.add(files(
++  '9p-local.c',
++  '9p-posix-acl.c',
++  '9p-proxy.c',
++  '9p-synth.c',
++  '9p-util.c',
++  '9p-xattr-user.c',
++  '9p-xattr.c',
++  '9p.c',
++  'codir.c',
++  'cofile.c',
++  'cofs.c',
++  'coth.c',
++  'coxattr.c',
++))
++fs_ss.add(when: 'CONFIG_XEN', if_true: files('xen-9p-backend.c'))
++softmmu_ss.add_all(when: 'CONFIG_9PFS', if_true: fs_ss)
++
++specific_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-device.c'))
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+deleted file mode 100644
+index 3dc4decfb5..0000000000
+--- a/hw/Makefile.objs
++++ /dev/null
+@@ -1,6 +0,0 @@
+-ifeq ($(CONFIG_SOFTMMU), y)
+-devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+-endif
+-
+-common-obj-y += $(devices-dirs-y)
+-obj-y += $(devices-dirs-y)
 diff --git a/hw/meson.build b/hw/meson.build
-index 1f7b2c4fb9..6ca82b0375 100644
+index 55ca2b2b61..ba8763cad8 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,5 +1,6 @@
- subdir('core')
- subdir('mem')
-+subdir('misc')
- subdir('net')
- subdir('nubus')
- subdir('nvram')
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-deleted file mode 100644
-index ba898a5781..0000000000
---- a/hw/misc/Makefile.objs
-+++ /dev/null
-@@ -1,84 +0,0 @@
--common-obj-$(CONFIG_APPLESMC) += applesmc.o
--common-obj-$(CONFIG_MAX111X) += max111x.o
--common-obj-$(CONFIG_TMP105) += tmp105.o
--common-obj-$(CONFIG_TMP421) += tmp421.o
--common-obj-$(CONFIG_ISA_DEBUG) += debugexit.o
--common-obj-$(CONFIG_SGA) += sga.o
--common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
--common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
--common-obj-$(CONFIG_EDU) += edu.o
--common-obj-$(CONFIG_PCA9552) += pca9552.o
--
--common-obj-$(CONFIG_UNIMP) += unimp.o
--common-obj-$(CONFIG_FW_CFG_DMA) += vmcoreinfo.o
--
--# ARM devices
--common-obj-$(CONFIG_PL310) += arm_l2x0.o
--common-obj-$(CONFIG_INTEGRATOR_DEBUG) += arm_integrator_debug.o
--common-obj-$(CONFIG_A9SCU) += a9scu.o
--common-obj-$(CONFIG_ARM11SCU) += arm11scu.o
--
--# Mac devices
--common-obj-$(CONFIG_MOS6522) += mos6522.o
--
--# PKUnity SoC devices
--common-obj-$(CONFIG_PUV3) += puv3_pm.o
--
--common-obj-$(CONFIG_MACIO) += macio/
--
--common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
--
--common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
--common-obj-$(CONFIG_NSERIES) += cbus.o
--common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
--common-obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o exynos4210_rng.o
--common-obj-$(CONFIG_IMX) += imx_ccm.o
--common-obj-$(CONFIG_IMX) += imx31_ccm.o
--common-obj-$(CONFIG_IMX) += imx25_ccm.o
--common-obj-$(CONFIG_IMX) += imx6_ccm.o
--common-obj-$(CONFIG_IMX) += imx6ul_ccm.o
--obj-$(CONFIG_IMX) += imx6_src.o
--common-obj-$(CONFIG_IMX) += imx7_ccm.o
--common-obj-$(CONFIG_IMX) += imx2_wdt.o
--common-obj-$(CONFIG_IMX) += imx7_snvs.o
--common-obj-$(CONFIG_IMX) += imx7_gpr.o
--common-obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
--common-obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
--common-obj-$(CONFIG_MAINSTONE) += mst_fpga.o
--common-obj-$(CONFIG_OMAP) += omap_clk.o
--common-obj-$(CONFIG_OMAP) += omap_gpmc.o
--common-obj-$(CONFIG_OMAP) += omap_l4.o
--common-obj-$(CONFIG_OMAP) += omap_sdrc.o
--common-obj-$(CONFIG_OMAP) += omap_tap.o
--common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
--common-obj-$(CONFIG_RASPI) += bcm2835_property.o
--common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
--common-obj-$(CONFIG_RASPI) += bcm2835_thermal.o
--common-obj-$(CONFIG_SLAVIO) += slavio_misc.o
--common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
--common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
--common-obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
--obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
--obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
--obj-$(CONFIG_MIPS_ITU) += mips_itu.o
--common-obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
--common-obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
--
--common-obj-$(CONFIG_TZ_MPC) += tz-mpc.o
--common-obj-$(CONFIG_TZ_MSC) += tz-msc.o
--common-obj-$(CONFIG_TZ_PPC) += tz-ppc.o
--common-obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
--obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
--common-obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
--common-obj-$(CONFIG_ARMSSE_CPUID) += armsse-cpuid.o
--common-obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
--
--common-obj-$(CONFIG_PVPANIC) += pvpanic.o
--common-obj-$(CONFIG_AUX) += auxbus.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_xdma.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
--common-obj-$(CONFIG_MSF2) += msf2-sysreg.o
--common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
--obj-$(CONFIG_MAC_VIA) += mac_via.o
--
--common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
-diff --git a/hw/misc/macio/Makefile.objs b/hw/misc/macio/Makefile.objs
-deleted file mode 100644
-index 07fdb320d4..0000000000
---- a/hw/misc/macio/Makefile.objs
-+++ /dev/null
-@@ -1,5 +0,0 @@
--common-obj-y += macio.o
--common-obj-$(CONFIG_CUDA) += cuda.o
--common-obj-$(CONFIG_MAC_PMU) += pmu.o
--common-obj-$(CONFIG_MAC_DBDMA) += mac_dbdma.o
--common-obj-$(CONFIG_MACIO_GPIO) += gpio.o
-diff --git a/hw/misc/macio/meson.build b/hw/misc/macio/meson.build
-new file mode 100644
-index 0000000000..17282da20a
---- /dev/null
-+++ b/hw/misc/macio/meson.build
-@@ -0,0 +1,8 @@
-+macio_ss = ss.source_set()
-+macio_ss.add(files('macio.c'))
-+macio_ss.add(when: 'CONFIG_CUDA', if_true: files('cuda.c'))
-+macio_ss.add(when: 'CONFIG_MACIO_GPIO', if_true: files('gpio.c'))
-+macio_ss.add(when: 'CONFIG_MAC_DBDMA', if_true: files('mac_dbdma.c'))
-+macio_ss.add(when: 'CONFIG_MAC_PMU', if_true: files('pmu.c'))
-+
-+softmmu_ss.add_all(when: 'CONFIG_MACIO', if_true: macio_ss)
-diff --git a/hw/misc/meson.build b/hw/misc/meson.build
-new file mode 100644
-index 0000000000..dfad08146c
---- /dev/null
-+++ b/hw/misc/meson.build
-@@ -0,0 +1,88 @@
-+softmmu_ss.add(when: 'CONFIG_APPLESMC', if_true: files('applesmc.c'))
-+softmmu_ss.add(when: 'CONFIG_EDU', if_true: files('edu.c'))
-+softmmu_ss.add(when: 'CONFIG_FW_CFG_DMA', if_true: files('vmcoreinfo.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_DEBUG', if_true: files('debugexit.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_TESTDEV', if_true: files('pc-testdev.c'))
-+softmmu_ss.add(when: 'CONFIG_MAX111X', if_true: files('max111x.c'))
-+softmmu_ss.add(when: 'CONFIG_PCA9552', if_true: files('pca9552.c'))
-+softmmu_ss.add(when: 'CONFIG_PCI_TESTDEV', if_true: files('pci-testdev.c'))
-+softmmu_ss.add(when: 'CONFIG_SGA', if_true: files('sga.c'))
-+softmmu_ss.add(when: 'CONFIG_TMP105', if_true: files('tmp105.c'))
-+softmmu_ss.add(when: 'CONFIG_TMP421', if_true: files('tmp421.c'))
-+softmmu_ss.add(when: 'CONFIG_UNIMP', if_true: files('unimp.c'))
-+
-+# ARM devices
-+softmmu_ss.add(when: 'CONFIG_PL310', if_true: files('arm_l2x0.c'))
-+softmmu_ss.add(when: 'CONFIG_INTEGRATOR_DEBUG', if_true: files('arm_integrator_debug.c'))
-+softmmu_ss.add(when: 'CONFIG_A9SCU', if_true: files('a9scu.c'))
-+softmmu_ss.add(when: 'CONFIG_ARM11SCU', if_true: files('arm11scu.c'))
-+
-+# Mac devices
-+softmmu_ss.add(when: 'CONFIG_MOS6522', if_true: files('mos6522.c'))
-+
-+# PKUnity SoC devices
-+softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_pm.c'))
-+
-+subdir('macio')
-+
-+softmmu_ss.add(when: 'CONFIG_IVSHMEM_DEVICE', if_true: files('ivshmem.c'))
-+
-+softmmu_ss.add(when: 'CONFIG_REALVIEW', if_true: files('arm_sysctl.c'))
-+softmmu_ss.add(when: 'CONFIG_NSERIES', if_true: files('cbus.c'))
-+softmmu_ss.add(when: 'CONFIG_ECCMEMCTL', if_true: files('eccmemctl.c'))
-+softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_pmu.c', 'exynos4210_clk.c', 'exynos4210_rng.c'))
-+softmmu_ss.add(when: 'CONFIG_IMX', if_true: files(
-+  'imx25_ccm.c',
-+  'imx2_wdt.c',
-+  'imx31_ccm.c',
-+  'imx6_ccm.c',
-+  'imx6ul_ccm.c',
-+  'imx7_ccm.c',
-+  'imx7_gpr.c',
-+  'imx7_snvs.c',
-+  'imx_ccm.c',
-+))
-+softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-hpdmc.c', 'milkymist-pfpu.c'))
-+softmmu_ss.add(when: 'CONFIG_MAINSTONE', if_true: files('mst_fpga.c'))
-+softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files(
-+  'omap_clk.c',
-+  'omap_gpmc.c',
-+  'omap_l4.c',
-+  'omap_sdrc.c',
-+  'omap_tap.c',
-+))
-+softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files(
-+  'bcm2835_mbox.c',
-+  'bcm2835_property.c',
-+  'bcm2835_rng.c',
-+  'bcm2835_thermal.c',
-+))
-+softmmu_ss.add(when: 'CONFIG_SLAVIO', if_true: files('slavio_misc.c'))
-+softmmu_ss.add(when: 'CONFIG_ZYNQ', if_true: files('zynq_slcr.c', 'zynq-xadc.c'))
-+softmmu_ss.add(when: 'CONFIG_STM32F2XX_SYSCFG', if_true: files('stm32f2xx_syscfg.c'))
-+softmmu_ss.add(when: 'CONFIG_MPS2_FPGAIO', if_true: files('mps2-fpgaio.c'))
-+softmmu_ss.add(when: 'CONFIG_MPS2_SCC', if_true: files('mps2-scc.c'))
-+
-+softmmu_ss.add(when: 'CONFIG_TZ_MPC', if_true: files('tz-mpc.c'))
-+softmmu_ss.add(when: 'CONFIG_TZ_MSC', if_true: files('tz-msc.c'))
-+softmmu_ss.add(when: 'CONFIG_TZ_PPC', if_true: files('tz-ppc.c'))
-+softmmu_ss.add(when: 'CONFIG_IOTKIT_SECCTL', if_true: files('iotkit-secctl.c'))
-+softmmu_ss.add(when: 'CONFIG_IOTKIT_SYSINFO', if_true: files('iotkit-sysinfo.c'))
-+softmmu_ss.add(when: 'CONFIG_ARMSSE_CPUID', if_true: files('armsse-cpuid.c'))
-+softmmu_ss.add(when: 'CONFIG_ARMSSE_MHU', if_true: files('armsse-mhu.c'))
-+
-+softmmu_ss.add(when: 'CONFIG_PVPANIC', if_true: files('pvpanic.c'))
-+softmmu_ss.add(when: 'CONFIG_AUX', if_true: files('auxbus.c'))
-+softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_scu.c', 'aspeed_sdmc.c', 'aspeed_xdma.c'))
-+softmmu_ss.add(when: 'CONFIG_MSF2', if_true: files('msf2-sysreg.c'))
-+softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_rng.c'))
-+
-+softmmu_ss.add(when: 'CONFIG_GRLIB', if_true: files('grlib_ahb_apb_pnp.c'))
-+
-+specific_ss.add(when: 'CONFIG_IMX', if_true: files('imx6_src.c'))
-+specific_ss.add(when: 'CONFIG_IOTKIT_SYSCTL', if_true: files('iotkit-sysctl.c'))
-+
-+specific_ss.add(when: 'CONFIG_MAC_VIA', if_true: files('mac_via.c'))
-+
-+specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_cmgcr.c', 'mips_cpc.c'))
-+specific_ss.add(when: 'CONFIG_MIPS_ITU', if_true: files('mips_itu.c'))
+@@ -1,3 +1,4 @@
++subdir('9pfs')
+ subdir('acpi')
+ subdir('adc')
+ subdir('audio')
 -- 
 2.21.0
 
