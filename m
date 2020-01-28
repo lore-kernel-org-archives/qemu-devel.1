@@ -2,45 +2,42 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A390DC35240
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F415EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:52:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D3E824686
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D3E824686
+	by mail.kernel.org (Postfix) with ESMTPS id C47DD214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:52:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47DD214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwS50-0003tX-P8
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 09:43:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53632)
+	id 1iwSE8-000878-Vw
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 09:52:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iwS4J-0003HO-2Y
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:42:20 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwSDT-0007ba-O1
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:51:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iwS4H-0008R6-LF
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:42:19 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:40497)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwS4H-0008Pi-Bc
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:42:17 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwSDS-0000Ch-Kl
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:51:47 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:36613)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwSDS-00006V-BV
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:51:46 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MA7b8-1iqQiB1sQE-00Bazm; Tue, 28 Jan 2020 15:41:53 +0100
-To: Peter Maydell <peter.maydell@linaro.org>,
- Taylor Simpson <tsimpson@quicinc.com>
-References: <20200116115700.127951-1-mkysel@tachyum.com>
- <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
- <BYAPR02MB4886C0D683ABE475CBC1F23BDE0A0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <CAFEAcA_v7MSfDEfUkBa3Gd2ChAcRvKXx4Z2oL7w7aNpQYt_Jnw@mail.gmail.com>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MElhb-1imJzT1BbX-00GJIo; Tue, 28 Jan 2020 15:51:32 +0100
+To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
+References: <20200117192808.129398-1-jkz@google.com>
+ <20200117192808.129398-2-jkz@google.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH] Handling SIGSETXID used by glibc NPTL setuid/setgid
-Message-ID: <899cd001-04b8-9829-dc46-8482d6168208@vivier.eu>
-Date: Tue, 28 Jan 2020 15:41:50 +0100
+Subject: Re: [PATCH v2 1/4] linux-user: Use `qemu_log' for non-strace logging
+Message-ID: <295472c5-4378-4ae1-1e9f-854b15075cf6@vivier.eu>
+Date: Tue, 28 Jan 2020 15:51:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_v7MSfDEfUkBa3Gd2ChAcRvKXx4Z2oL7w7aNpQYt_Jnw@mail.gmail.com>
+In-Reply-To: <20200117192808.129398-2-jkz@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:808Sk5UDZryDVil645phhhTAJikczXv6LkfIjnA04E8YwQLONB+
- MwrgHnkESys3rAgROsp6eKryh0eU7hlyQur6lfFpZ5MnQNaj9fMrSxWdvbkprQd8Qgmayk5
- WW8HREuLSIu+anweYCR0GLAiqxjDHqPUeg3SJT6YbBI4K1AVzh0T6IVMzwJ67yOrIcHaXVG
- OJDeAsjY3TKo6lX1rz0wg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KLvJR57of/o=:lueilSZxrmd21uzSlnAGQI
- laVukPLnmj1cRYlqOdHsXnsIpvFFpgXeyaOVjmns0bp1UFqvyVIowDuILEtksdeiS7BPILDVp
- Ek4PU0offoHRpoPdwlusvaEMqn1ebd9W7JxsLiyQXpIQXq2E4daETG7a+xDPPSmM4PV73fKBj
- mYLavnIAkfXZxd7BZm9l1962lDhWd2559fRkHPEAvCNuRYJRdfLqTOE7q0gqqzW/Rb19JkX2q
- 4HaQvug/sS95Enm08jxNXSnsFKVeTWnLh6Rq1hjYCMw9wB3cLSad3nv22udVSjZEUbzBVbg/H
- fo3e3eQE0Bv0P68rVg+XpErufj0+YwbHHiEYzK8ozBdP0EjqdLHBKZ6B2klvb8II0FpCHdyq3
- At3EPj9X0f0DOLmEaaKLuVi3xcYAkTlb3Ze0M1Qgyx5BWbuL19o+Ftd9iAgPAkWJlPOZK3tn/
- 8fhI5oaY5HSjmWFxy1A84vXbbRClruzcYQVpc6HxuPlsnR10IahF0pKtJoXukcg7p/QOmT23P
- UCPUvQFxdllW4SfQklU2I0Qo0wLdjH7hLs9Zek+e/gGdfgNWwIOTsMWoIFVLQ3NgbOiVKIiNl
- p78GFk/mVbijq0tonQPhOPQFhjEAC6uV9GjfB5/NQYsEgNWUjx5iELlQRt0cXOM+qXzkC+pZz
- LRM3bKixGN63UT3mj4cV9mICKr1TIyDvMjy0CA9tU+fN4prGNbNEpDvyaDFYcMSSuRmM1IV49
- 6pVRSIZCWGneAuXYtPty79JV1EBB0woDwC3DwBbTtpp6wRrXH+Tn9QYUuf6ZxBHSXCo4hsKbQ
- xR0Ycp9/I5/sPXH6teVbqGkLIcqHnDKQBIaz0HoIMhqAMJ8UtSGEZlBieILRQtru0flI7SQ
+X-Provags-ID: V03:K1:SMElex6Dtpln9Q8h9unWjBNuB9paOSsX8msUEdA9F3zZwbM4uXB
+ Cpvx0kcfYVAcx9kgA5ZiaLu841wPZbHEHnAI2T8ciScY8jyYpiqPmMf9Ew1s1pLCLWGVajI
+ Obykkw7otedYW0X9dt9IE7vHEmnlQ44cL/LMav6OQa7kyWGgzmaRww5FPEtC0CL1VQk6ugu
+ u6+N/EOEZD2unzy2LqcnA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/sYmbq9xXGg=:CeGxgi+GtfA9Yq69NBHukL
+ f6/7D2NqCBWh7NhY/BPUasuzXTtyveK5C4YhKpvNPK5+njcUJFFFhG8r5hcX+9rDkmsNdhgBB
+ nYCq+SJmm18GRm+9iCxloTssR+C5JqDsOSTGF6jq7G4BnYPU0rkErggrXQr4CdsxzLWETXmLz
+ FjuyXE4w+TNYzKl9Cl+RVpqBue8AomhduEU4AFwMtSAlB1eJcanAzQa5TfV4/1K8ZtSnsImdH
+ Bs5scPEMqIBEAuhE1nieJAlCj8IjZb37PItnMUifNyVg7VaZWc52ujXZaNsPelaqpHLyW/z2c
+ aNNM/MLQVG5vs5m9OU97LnXR80soDGxyhAP5VAiTzZGtZqrQ6xGlv3Cp3bE4K2Zei35oWgQYP
+ eht7uxaBnm9zGDpabEUqsiPWe7xFaoek+ydDOXV5EdMC/8P0DPmvFKg0txDV/H49ENjUtGWz7
+ E4lgVlrCkZnPum8lbDSlcucDpXZtuf1iHuTSHOY5ICFI84LkuvbZ7XiPJY1ajE0Cot/WTgKA8
+ HwwgbKEMLbTbN0AVR0s+KbRgLj9Q6xzVep06zDnLFQ5sQ9uDJvfOMXoYahHrx8fhNQH19K1Pj
+ opEXvg6ALrtnWGe3+6Qam3jC0BIIKWkcXfmeCDZvs0kJ7HnAbELRgGajmfk6uw6UIH1XHqplS
+ YEUmGq6U95BrPP6tXk1DNqbxyTdlBRhLo2iC73vnM++jdWDsdna02ZJnK/6wQu/2jxKesDP/T
+ kEHpN2OuiHYKQ7W6epzaTnAoGrLP4+kYWl88dzlq9OY2tw863vYIjNNR4LFgwIQblnGNjIWYu
+ DHki07RPG5A1t8tRmxkoeTiPu3yaC22c8jAcGLiT5scDPjFZrJ4bNZyfWq/Fg4EJK7I8R6S
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,37 +121,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>, Riku Voipio <riku.voipio@iki.fi>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, Matus Kysel <mkysel@tachyum.com>
+Cc: riku.voipio@iki.fi, alex.bennee@linaro.org, armbru@redhat.com,
+ imp@bsdimp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 28/01/2020 à 13:45, Peter Maydell a écrit :
-> On Tue, 28 Jan 2020 at 12:33, Taylor Simpson <tsimpson@quicinc.com> wrote:
->>
->> I proposed a similar patch guarded by #ifdef TARGET_HEXAGON.  I understand we don't want to break things that are working, and we don't want to open the door for a bunch of #ifdef's here.  However, more than one scenario needs this capability.
->>
->> Would a suitable compromise be to provide a hook in linux-user/signal.c for the target to put in the changes they need?
+Le 17/01/2020 à 20:28, Josh Kunz a écrit :
+> Since most calls to `gemu_log` are actually logging unimplemented features,
+> this change replaces most non-strace calls to `gemu_log` with calls to
+> `qemu_log_mask(LOG_UNIMP, ...)`.  This allows the user to easily log to
+> a file, and to mask out these log messages if they desire.
 > 
-> No; this isn't target-specific, and we don't want
-> per-target different behaviour.
+> Note: This change is slightly backwards incompatible, since now these
+> "unimplemented" log messages will not be logged by default.
 
-So I guess the only way to fix the problem is to implement the signal
-multiplexing initiated by Milos [1] and tried again by Josh [2].
+This is a good incompatibility as these messages were unexpected by  the
+tools catching stderr. They don't happen on "real" systems.
 
-Any volunteer?
+...
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 249e4b95fc..629f3a21b5 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1545,20 +1545,18 @@ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+>              - sizeof(struct target_cmsghdr);
+>  
+>          space += CMSG_SPACE(len);
+> -        if (space > msgh->msg_controllen) {
+> -            space -= CMSG_SPACE(len);
+> -            /* This is a QEMU bug, since we allocated the payload
+> -             * area ourselves (unlike overflow in host-to-target
+> -             * conversion, which is just the guest giving us a buffer
+> -             * that's too small). It can't happen for the payload types
+> -             * we currently support; if it becomes an issue in future
+> -             * we would need to improve our allocation strategy to
+> -             * something more intelligent than "twice the size of the
+> -             * target buffer we're reading from".
+> -             */
+> -            gemu_log("Host cmsg overflow\n");
+> -            break;
+> -        }
+> +
+> +        /*
+> +         * This is a QEMU bug, since we allocated the payload
+> +         * area ourselves (unlike overflow in host-to-target
+> +         * conversion, which is just the guest giving us a buffer
+> +         * that's too small). It can't happen for the payload types
+> +         * we currently support; if it becomes an issue in future
+> +         * we would need to improve our allocation strategy to
+> +         * something more intelligent than "twice the size of the
+> +         * target buffer we're reading from".
+> +         */
+> +        assert(space > msgh->msg_controllen && "Host cmsg overflow");
+>  
+>          if (tswap32(target_cmsg->cmsg_level) == TARGET_SOL_SOCKET) {
+>              cmsg->cmsg_level = SOL_SOCKET;
 
-If not, I will try to find some time to do that...
+Could you move this to a separate patch: you are not using qemu_log()
+here and I'm not convinced that crashing is better than ignoring the
+remaining part of the buffer.
+
+For the other changes:
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 Thanks,
-Laurent
-
-[1] "[PATCH 0/5] linux-user: Support signal passing for targets having
-more signals than host"
-
-https://patchew.org/QEMU/1558550785-20098-1-git-send-email-aleksandar.markovic@rt-rk.com/
-
-[2] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00738.html
+Lauren
 
