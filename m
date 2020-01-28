@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6B4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B34BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:07:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E25A214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0771214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:07:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzI0FXcu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E25A214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U91c/q0A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0771214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVGw-0007S6-Kr
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:07:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58102)
+	id 1iwVHB-0007xO-0v
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:07:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59891)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4I-0006WJ-Ei
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:31 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5C-00085V-Aq
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV4H-0008Mk-99
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:30 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:32930)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5A-0001um-Oq
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:26 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34404)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV4H-0008Kk-2U
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:54:29 -0500
-Received: by mail-wm1-x342.google.com with SMTP id m10so2318108wmc.0
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:54:29 -0800 (PST)
+ id 1iwV5A-0001s8-Gl
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:24 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t2so17096873wrr.1
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qSGNSZ4LLs8L913XxoD2kYp6B0ALh2tsPmhGXALrdSs=;
- b=OzI0FXcutbJ9y5lw59va4idbimLGg3tiNr06ZHGXYZA8CRtI77m3ZfWn6C8BeCqTtu
- Qm/G1XBqYJqlAtTh2oum6nPvp86uv75LGYbMk20xTssBqPpwMTGqxjd8YKSoVVeRmQdI
- S4YwZflasYzBdvkep5vukVNc2DR0x94Su08FZ4FadXykfGsJD/BS3QQBsrlG59OBxuMV
- vAjf7K6/wbkh3uWJPyOf8KGtJcH+Mr30gMGoSuuCfOx9rBROdEHn+b/ok2uAlOFpSsmf
- oxbdslWSEMzz4NUehWwBKwQiaGwhihCWMCeEjBKb9kRg8kogXGii05UEns0oOkzki5hM
- Ai1Q==
+ bh=/aEAr34ixJ4O2vbRsA1gthdOZCShKGFTDPmiGLW8Xb4=;
+ b=U91c/q0ASHPsdWvSBiFyEgNEzhrJmaASeFyLh5YnULhG6EmFFcBk7f4z1tNyviLuUN
+ 3nLxBAdKN229sHZjYG27dsUemgeNZoF4SwzF2ytMma1l844SStnGQHrD5QLS/nqtHJVK
+ /1X5qYwBSdaVtVRbNXyx+OrWFvkoZJ9hQ3qTegvIn98BJHK9IAyrQc5dyd53Sqi6qLV3
+ uyynFaBB4Mgem2dM8Hilnfqqs3RPcdObPFSadVdkon9F0f0AsaRkd8g4pl1TAGTkbIvX
+ IBHXRj6599BNQ5Kga+33RopNa9WtE9g6dz1sDVEELt6hKohIqpAy7JNN9HXErQYQ6STd
+ k/rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=qSGNSZ4LLs8L913XxoD2kYp6B0ALh2tsPmhGXALrdSs=;
- b=gIuIZH3I3EBnOaqmSbPsno3F1gNd09z0Iv6Q/Xzj/2UWuXI0VxWMRmne8b/l0mFDqV
- wFkvST+K5NDMLAPEbBMIC1FkiapQCUctC/+EoC8FHCYj1BuRA+pkNKcn3ehqt5JwmfJ4
- tfnKUCHGSjXaCmUnvIW1JjmGovB8muayW/zj+S7o+QozuTu1skyyc+wBqWkzBwqPMCsA
- khlvqVtPZASPDX/DbndsPkXalUKDW7zfHxRAdZmtllKr3ln1ensFYIpP/Xufk6b61yZf
- 0taPogx4YnhnHTzg7rRy2+z3AsyPVHeK82w4AWODivcQaWXyiW3tv34glrnnEHWxO4cX
- i9jQ==
-X-Gm-Message-State: APjAAAUOZEsOh6vD5TIMK6KdCcYSXMgxSX9fAsfGLCCtFbsKR6zrx+cr
- HE/oX8Y/84vfUOUB99MmWLSe4WdF
-X-Google-Smtp-Source: APXvYqwkG8E02rXpPH5nNw+h0xSxTuyfP0s+Erq8fHPbDN7zNX8t5VEb/uNQKhXMWi86syj2LcmMeA==
-X-Received: by 2002:a7b:c152:: with SMTP id z18mr6233429wmi.70.1580234067863; 
- Tue, 28 Jan 2020 09:54:27 -0800 (PST)
+ bh=/aEAr34ixJ4O2vbRsA1gthdOZCShKGFTDPmiGLW8Xb4=;
+ b=gPVWf0e5bTB8FV8W1bzg7avmRYJzgjZ4/sePfdTP9K1m7PSZdTLoVCyVmp8m0BMQfL
+ GnyDFZqox7D4nckJLZby0+KNQt3tNDIiWb56zic3fFLzQbkxXqkHYG+Kmh4XGyytYMgP
+ NI4J597+9wLZbOCp9kz9EvjwZs7kosQxVt+5zJrLvAOX75wiArFLklGVcirKhhbwZLyb
+ 4T8SKaSxQ31bvXVilFwEfYS7/8wDZK7y7ivu8j6cgEXHIXZrw5ulfMWAXyYuoFKwbbpw
+ 2mWXoVqjbjOyMDs26VkFUajTJ7kvt3N+AppxeKTNmIWThT+a05EhpuiOrn4MjrnD+qkf
+ xOKg==
+X-Gm-Message-State: APjAAAXS7r4cAk4XWsrmwln36sX9v5fqIBKlkBVClXSXknEuFWXxp6rr
+ 85CTUGGXhLOdfDeqZf7HVxNoBGoV
+X-Google-Smtp-Source: APXvYqzsX/Ie0EMVewi0iWM4WhEMPji4m+oB3ZfhpI2gsz0cohnkKVV6BbLPC0VRWZY/BCT/5CE8Xw==
+X-Received: by 2002:adf:fe12:: with SMTP id n18mr32296780wrr.158.1580234123333; 
+ Tue, 28 Jan 2020 09:55:23 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.54.26
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:54:27 -0800 (PST)
+ Tue, 28 Jan 2020 09:55:22 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 016/142] contrib/libvhost-user: convert to Meson
-Date: Tue, 28 Jan 2020 18:51:36 +0100
-Message-Id: <20200128175342.9066-17-pbonzini@redhat.com>
+Subject: [PATCH 040/142] meson: convert authz directory to Meson
+Date: Tue, 28 Jan 2020 18:52:00 +0100
+Message-Id: <20200128175342.9066-41-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,117 +94,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since libqemuutil.a has been converted to Meson, the conversion is
-straightforward.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                            | 14 ++++----------
- Makefile.objs                       |  1 -
- contrib/libvhost-user/Makefile.objs |  1 -
- contrib/libvhost-user/meson.build   |  2 ++
- meson.build                         |  8 ++++++++
- 5 files changed, 14 insertions(+), 12 deletions(-)
- delete mode 100644 contrib/libvhost-user/Makefile.objs
- create mode 100644 contrib/libvhost-user/meson.build
+ Makefile            |  1 -
+ Makefile.objs       |  8 +++-----
+ Makefile.target     |  2 +-
+ authz/Makefile.objs |  7 -------
+ authz/meson.build   | 18 ++++++++++++++++++
+ meson.build         |  5 +++++
+ 6 files changed, 27 insertions(+), 14 deletions(-)
+ delete mode 100644 authz/Makefile.objs
+ create mode 100644 authz/meson.build
 
 diff --git a/Makefile b/Makefile
-index f9c3b73ba6..e09b20887c 100644
+index 80894601dc..64c7430951 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -290,7 +290,6 @@ dummy := $(call unnest-vars,, \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-                 rdmacm-mux-obj-y \
--                libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-                 vhost-user-input-obj-y \
-@@ -405,11 +404,6 @@ $(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
- 
- Makefile: $(version-obj-y)
- 
--######################################################################
--# Build libraries
--
--libvhost-user.a: $(libvhost-user-obj-y)
--
- ######################################################################
- 
- COMMON_LDADDS = libqemuutil.a
-@@ -506,21 +500,21 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
+@@ -220,7 +220,6 @@ include $(SRC_PATH)/Makefile.objs
  endif
--vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a $(COMMON_LDADDS)
-+vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
--vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a $(COMMON_LDADDS)
-+vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
  
- rdmacm-mux$(EXESUF): LIBS += "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
--vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) $(COMMON_LDADDS)
-+vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
- ifdef CONFIG_VHOST_USER_INPUT
- ifdef CONFIG_LINUX
--vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a $(COMMON_LDADDS)
-+vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
- # build by default, do not install
+ dummy := $(call unnest-vars,, \
+-                authz-obj-y \
+                 chardev-obj-y \
+                 block-obj-y \
+                 block-obj-m \
 diff --git a/Makefile.objs b/Makefile.objs
-index dc726b2131..9a14ef50fd 100644
+index 18caccdba8..bbeb87ec82 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -108,7 +108,6 @@ qga-vss-dll-obj-y = qga/
- elf2dmp-obj-y = contrib/elf2dmp/
- ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
- ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
--libvhost-user-obj-y = contrib/libvhost-user/
- vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
-diff --git a/contrib/libvhost-user/Makefile.objs b/contrib/libvhost-user/Makefile.objs
+@@ -2,11 +2,6 @@
+ # chardev-obj-y is code used by both qemu system emulation and some tests
+ chardev-obj-y = chardev/
+ 
+-#######################################################################
+-# authz-obj-y is code used by both qemu system emulation and qemu-img
+-
+-authz-obj-y = authz/
+-
+ #######################################################################
+ # block-obj-y is code used by both qemu system emulation and qemu-img
+ 
+@@ -26,6 +21,9 @@ crypto-obj-y = crypto/
+ #######################################################################
+ # libraries built entirely from meson
+ 
++authz-obj-y = authz/libauthz.fa
++authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
++
+ qom-obj-y = qom/libqom.fa
+ 
+ #######################################################################
+diff --git a/Makefile.target b/Makefile.target
+index 40ab105568..a9f5cac98a 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -179,9 +179,9 @@ all-obj-y := $(obj-y)
+ 
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call fix-paths,../,, \
++              authz-obj-y \
+               qom-obj-y)
+ dummy := $(call unnest-vars,.., \
+-               authz-obj-y \
+                block-obj-y \
+                block-obj-m \
+                chardev-obj-y \
+diff --git a/authz/Makefile.objs b/authz/Makefile.objs
 deleted file mode 100644
-index ef3778edd4..0000000000
---- a/contrib/libvhost-user/Makefile.objs
+index ed7b273596..0000000000
+--- a/authz/Makefile.objs
 +++ /dev/null
-@@ -1 +0,0 @@
--libvhost-user-obj-y += libvhost-user.o libvhost-user-glib.o
-diff --git a/contrib/libvhost-user/meson.build b/contrib/libvhost-user/meson.build
+@@ -1,7 +0,0 @@
+-authz-obj-y += base.o
+-authz-obj-y += simple.o
+-authz-obj-y += list.o
+-authz-obj-y += listfile.o
+-authz-obj-$(CONFIG_AUTH_PAM) += pamacct.o
+-
+-pamacct.o-libs = -lpam
+diff --git a/authz/meson.build b/authz/meson.build
 new file mode 100644
-index 0000000000..03ba2af071
+index 0000000000..f485b8076a
 --- /dev/null
-+++ b/contrib/libvhost-user/meson.build
-@@ -0,0 +1,2 @@
-+libvhost_user = static_library('vhost-user',
-+                               [files('libvhost-user.c', 'libvhost-user-glib.c')])
++++ b/authz/meson.build
+@@ -0,0 +1,18 @@
++authz_ss = ss.source_set()
++authz_ss.add(genh)
++authz_ss.add(files(
++  'base.c',
++  'list.c',
++  'listfile.c',
++  'simple.c',
++))
++
++authz_ss.add(when: ['CONFIG_AUTH_PAM', pam], if_true: files('pamacct.c'))
++
++authz_ss = authz_ss.apply(config_host, strict: false)
++libauthz = static_library('authz', authz_ss.sources(),
++                          dependencies: [authz_ss.dependencies()],
++                          name_suffix: 'fa',
++                          build_by_default: false)
++
++authz = declare_dependency(link_whole: libauthz)
 diff --git a/meson.build b/meson.build
-index 94727e8dfb..6e5240c37e 100644
+index 0c4e5e5823..218c495063 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -187,3 +187,11 @@ libqemuutil = static_library('qemuutil',
-                              dependencies: [util_ss.dependencies(), m, glib, socket])
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: version_res)
-+
-+# Other build targets
-+
-+if have_tools
-+  if 'CONFIG_VHOST_USER' in config_host
-+    subdir('contrib/libvhost-user')
-+  endif
+@@ -66,6 +66,10 @@ if 'CONFIG_GNUTLS' in config_host
+ endif
+ pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
+                             link_args: config_host['PIXMAN_LIBS'].split())
++pam = declare_dependency()
++if 'CONFIG_AUTH_PAM' in config_host
++  pam = cc.find_library('pam')
 +endif
+ libattr = declare_dependency()
+ if 'CONFIG_ATTR' in config_host
+   libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
+@@ -288,6 +292,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: version_res)
+ 
+ subdir('qom')
++subdir('authz')
+ subdir('fsdev')
+ 
+ # Other build targets
 -- 
 2.21.0
 
