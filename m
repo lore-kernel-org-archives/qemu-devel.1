@@ -2,83 +2,113 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED484C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:24:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 021A7C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:27:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3E59214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:24:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XjTRSur7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3E59214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C9CAC214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 17:27:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9CAC214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwUbX-0001Y0-Rf
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 12:24:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46331)
+	id 1iwUeJ-0002gJ-V8
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 12:27:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iwUam-0000zU-Se
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:24:02 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwUdS-0002Ee-5c
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:26:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iwUal-0006rE-2K
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:24:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58395
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iwUak-0006qI-Tu
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:23:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580232238;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LwDYR8xbIGR790ZgP3HK9zKlils55l4PwkHY7IEa8MI=;
- b=XjTRSur7ApcND2yIIMBf8NqE3Xeo+Xpa5yHxaF2q9AZuRgmrIc5hP6zJmdFAMENUF0982Q
- eIDMTOeerHhic43P7o5egLiVZxGmkm7QA7lTmXN40GB+AXklW0PxEx99H+CWQG7NXBSQXT
- Nzotf/bfra2AjDezDKauGV2YoIUR76o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-znaocZXYPlaBRYVjD6AASA-1; Tue, 28 Jan 2020 12:23:55 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17113107ACC9;
- Tue, 28 Jan 2020 17:23:54 +0000 (UTC)
-Received: from redhat.com (ovpn-112-34.ams2.redhat.com [10.36.112.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AE77B5C219;
- Tue, 28 Jan 2020 17:23:46 +0000 (UTC)
-Date: Tue, 28 Jan 2020 17:23:43 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 04/13] block: amend: separate amend and create options
- for qemu-img
-Message-ID: <20200128172343.GW1446339@redhat.com>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-5-mlevitsk@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1iwUdQ-0002Bz-Ru
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:26:45 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:56757)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwUdQ-00029d-JG
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:26:44 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M2w4S-1izmQP1gA0-003JNk; Tue, 28 Jan 2020 18:26:41 +0100
+Subject: Re: [PATCH v2 0/5] linux-user: Implement x86_64 vsyscalls
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200116194341.402-1-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <7da64d23-9e67-db73-f93c-d04f48f33a35@vivier.eu>
+Date: Tue, 28 Jan 2020 18:26:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200114193350.10830-5-mlevitsk@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: znaocZXYPlaBRYVjD6AASA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200116194341.402-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:t/b5eXp4GIQwIa5yzCCWxzj7LRHxJVveo1vOhA2ZJk2UlZtO/x8
+ w+fB4FkgENiv6y/BJx4oT5IkqWx8vj291b+DVJW1z5hYaPGtk4pnt6IV4LMhY22gIcc6++z
+ EQOFV2xVycyarSANMoOIULYmnaAyLZIaOLE7dozgogW5rF7wLwanxzgXJvm8fzaTCd3Xlxk
+ 2Yyr1OYtFg+f8B0Ca9I6w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ldJtppqNArs=:h95uLyA1vAV+B24tJPljJw
+ +n9lTIz7NDTksqQ2JLwlEAoD6e71LqfiWSlEfc3AaPl5YRFMYQg4EYFK/eLO+7q9FsBTA6iPl
+ amvK+DecfxPewFOcvQEdkJu3221lqyNJDU8o2NY5HzW9Xm9Qrx3nGvjoGRSI5EWLgcKWT6+lM
+ p/gPH17K9caMd6YZgEFLFaPE65qE06N3aBDp3iKQbVpFW83tsXj+pZVD8B980TmmgIfVDEO5d
+ d7iGEqU9UUaBJkLILZqjcZuk4lz6u0G8QI7d0VP2LqT1rtv+7eIUKR3sWvk9z2TIicXyt9C/3
+ 2kMxzI3b+zqiHRcrYINYT/N7DroikW11N9WTXSFzr+lP/RDn8Wk3iik8Xba5e81ATmPnixfE+
+ ZiYABer6lMsQGOO0ao3NyrzTYSuahQA9zArx/Lvw9pOT04Q0jQoWR2lVLGNeRbEGM1a0jJ27G
+ pqHxOyO55bCtxD9BXw/ojzxLhu8xLmDNDrrqn96pfuaDLQiTIhhpMBL1+QRAvhOXFe+DnLReI
+ NqJc9SiO9smpXQj9Ft3V5JyXR1jOZeMjqGHlXkXRhlkTkUfY1D3DykjEieBlmZn0dICTYtisZ
+ /fEJ7Xp4FkZ+34NCLRAEopwrTzabdWbSwOys+nv18UEtdItzRve6hd4iwTaGfjkKmpcD+h48a
+ Xo5dwgW6RsVod4TQ5ic2vGtOMRC3CtUlEX50g2VZcnQ4klvWXM+4mkolpqqUuwDYtPbd/KSPX
+ iisGMR5dQCLqUeE8wkQ1tJQXAZG8CkajGvhfHK5E2avMVtsjhciTed32o81RbXSzTcHMaPqxq
+ HVh116WVlOxoVxrTQJqn176dekvl8ihL9rFJ20nJ3ErRDPFvIRBdI9NTes4ej+QL08UWOee
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,308 +120,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 14, 2020 at 09:33:41PM +0200, Maxim Levitsky wrote:
-> Some options are only useful for creation
-> (or hard to be amended, like cluster size for qcow2), while some other
-> options are only useful for amend, like upcoming keyslot management
-> options for luks
->=20
-> Since currently only qcow2 supports amend, move all its options
-> to a common macro and then include it in each action option list.
->=20
-> In future it might be useful to remove some options which are
-> not supported anyway from amend list, which currently
-> cause an error message if amended.
+Le 16/01/2020 à 20:43, Richard Henderson a écrit :
+> Changes since v2:
+> 
+>   * Add /proc/self/maps line
+> 
+> 	I'm not sure this is really necessary.  The linux kernel
+> 	self-test checks for it, and modifies the set of tests that
+> 	it runs based on it.  But otherwise I think it's unused.
+> 
+>   * Fix errors in base gettimeofday syscall
+> 
+> 	This is also checked by test_vsyscall, as noticed by AJB.
+> 
 
-I think I would have done that in this commit. At least the
-encrypt.* options shouldn't be added to the amend_opts list,
-since they're being removed from it again a few patches later.
+Hi Richard,
 
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  block/qcow2.c             | 160 +++++++++++++++++++++-----------------
->  include/block/block_int.h |   4 +
->  qemu-img.c                |  18 ++---
->  3 files changed, 100 insertions(+), 82 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 6bcf4a5fc4..c6c2deee75 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -5445,83 +5445,96 @@ void qcow2_signal_corruption(BlockDriverState *bs=
-, bool fatal, int64_t offset,
->      s->signaled_corruption =3D true;
->  }
-> =20
-> +#define QCOW_COMMON_OPTIONS                                         \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_SIZE,                                     \
-> +        .type =3D QEMU_OPT_SIZE,                                      \
-> +        .help =3D "Virtual disk size"                                 \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_COMPAT_LEVEL,                             \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"       \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_BACKING_FILE,                             \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "File name of a base image"                         \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_BACKING_FMT,                              \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Image format of the base image"                    \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_DATA_FILE,                                \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "File name of an external data file"                \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_DATA_FILE_RAW,                            \
-> +        .type =3D QEMU_OPT_BOOL,                                      \
-> +        .help =3D "The external data file must stay valid "           \
-> +                "as a raw image"                                    \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_ENCRYPT,                                  \
-> +        .type =3D QEMU_OPT_BOOL,                                      \
-> +        .help =3D "Encrypt the image with format 'aes'. (Deprecated " \
-> +                "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",    \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_ENCRYPT_FORMAT,                           \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Encrypt the image, format choices: 'aes', 'luks'", \
-> +    },                                                              \
-> +    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",                     \
-> +        "ID of secret providing qcow AES key or LUKS passphrase"),  \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),               \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),              \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),                \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),           \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),                 \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),                \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_CLUSTER_SIZE,                             \
-> +        .type =3D QEMU_OPT_SIZE,                                      \
-> +        .help =3D "qcow2 cluster size",                               \
-> +        .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)            \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_PREALLOC,                                 \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Preallocation mode (allowed values: off, "         \
-> +                "metadata, falloc, full)"                           \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_LAZY_REFCOUNTS,                           \
-> +        .type =3D QEMU_OPT_BOOL,                                      \
-> +        .help =3D "Postpone refcount updates",                        \
-> +        .def_value_str =3D "off"                                      \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_REFCOUNT_BITS,                            \
-> +        .type =3D QEMU_OPT_NUMBER,                                    \
-> +        .help =3D "Width of a reference count entry in bits",         \
-> +        .def_value_str =3D "16"                                       \
-> +    }                                                               \
-> +
->  static QemuOptsList qcow2_create_opts =3D {
->      .name =3D "qcow2-create-opts",
->      .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_create_opts.head),
->      .desc =3D {
-> -        {
-> -            .name =3D BLOCK_OPT_SIZE,
-> -            .type =3D QEMU_OPT_SIZE,
-> -            .help =3D "Virtual disk size"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_COMPAT_LEVEL,
-> -            .type =3D QEMU_OPT_STRING,
-> -            .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_BACKING_FILE,
-> -            .type =3D QEMU_OPT_STRING,
-> -            .help =3D "File name of a base image"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_BACKING_FMT,
-> -            .type =3D QEMU_OPT_STRING,
-> -            .help =3D "Image format of the base image"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_DATA_FILE,
-> -            .type =3D QEMU_OPT_STRING,
-> -            .help =3D "File name of an external data file"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_DATA_FILE_RAW,
-> -            .type =3D QEMU_OPT_BOOL,
-> -            .help =3D "The external data file must stay valid as a raw i=
-mage"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_ENCRYPT,
-> -            .type =3D QEMU_OPT_BOOL,
-> -            .help =3D "Encrypt the image with format 'aes'. (Deprecated =
-"
-> -                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_ENCRYPT_FORMAT,
-> -            .type =3D QEMU_OPT_STRING,
-> -            .help =3D "Encrypt the image, format choices: 'aes', 'luks'"=
-,
-> -        },
-> -        BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",
-> -            "ID of secret providing qcow AES key or LUKS passphrase"),
-> -        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),
-> -        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),
-> -        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),
-> -        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),
-> -        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),
-> -        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),
-> -        {
-> -            .name =3D BLOCK_OPT_CLUSTER_SIZE,
-> -            .type =3D QEMU_OPT_SIZE,
-> -            .help =3D "qcow2 cluster size",
-> -            .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_PREALLOC,
-> -            .type =3D QEMU_OPT_STRING,
-> -            .help =3D "Preallocation mode (allowed values: off, metadata=
-, "
-> -                    "falloc, full)"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_LAZY_REFCOUNTS,
-> -            .type =3D QEMU_OPT_BOOL,
-> -            .help =3D "Postpone refcount updates",
-> -            .def_value_str =3D "off"
-> -        },
-> -        {
-> -            .name =3D BLOCK_OPT_REFCOUNT_BITS,
-> -            .type =3D QEMU_OPT_NUMBER,
-> -            .help =3D "Width of a reference count entry in bits",
-> -            .def_value_str =3D "16"
-> -        },
-> +        QCOW_COMMON_OPTIONS,
-> +        { /* end of list */ }
-> +    }
-> +};
-> +
-> +static QemuOptsList qcow2_amend_opts =3D {
-> +    .name =3D "qcow2-amend-opts",
-> +    .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_amend_opts.head),
-> +    .desc =3D {
-> +        QCOW_COMMON_OPTIONS,
->          { /* end of list */ }
->      }
->  };
-> @@ -5581,6 +5594,7 @@ BlockDriver bdrv_qcow2 =3D {
->      .bdrv_inactivate            =3D qcow2_inactivate,
-> =20
->      .create_opts         =3D &qcow2_create_opts,
-> +    .amend_opts          =3D &qcow2_amend_opts,
->      .strong_runtime_opts =3D qcow2_strong_runtime_opts,
->      .mutable_opts        =3D mutable_opts,
->      .bdrv_co_check       =3D qcow2_co_check,
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 810a9ecb86..6f0abf8544 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -407,6 +407,10 @@ struct BlockDriver {
-> =20
->      /* List of options for creating images, terminated by name =3D=3D NU=
-LL */
->      QemuOptsList *create_opts;
-> +
-> +    /* List of options for image amend*/
-> +    QemuOptsList *amend_opts;
-> +
->      /*
->       * If this driver supports reopening images this contains a
->       * NULL-terminated list of the runtime options that can be
-> diff --git a/qemu-img.c b/qemu-img.c
-> index a79f3904db..befd53943b 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -3878,11 +3878,11 @@ static int print_amend_option_help(const char *fo=
-rmat)
->          return 1;
->      }
-> =20
-> -    /* Every driver supporting amendment must have create_opts */
-> -    assert(drv->create_opts);
-> +    /* Every driver supporting amendment must have amend_opts */
-> +    assert(drv->amend_opts);
-> =20
->      printf("Creation options for '%s':\n", format);
-> -    qemu_opts_print_help(drv->create_opts, false);
-> +    qemu_opts_print_help(drv->amend_opts, false);
->      printf("\nNote that not all of these options may be amendable.\n");
->      return 0;
->  }
-> @@ -3892,7 +3892,7 @@ static int img_amend(int argc, char **argv)
->      Error *err =3D NULL;
->      int c, ret =3D 0;
->      char *options =3D NULL;
-> -    QemuOptsList *create_opts =3D NULL;
-> +    QemuOptsList *amend_opts =3D NULL;
->      QemuOpts *opts =3D NULL;
->      const char *fmt =3D NULL, *filename, *cache;
->      int flags;
-> @@ -4031,11 +4031,11 @@ static int img_amend(int argc, char **argv)
->          goto out;
->      }
-> =20
-> -    /* Every driver supporting amendment must have create_opts */
-> -    assert(bs->drv->create_opts);
-> +    /* Every driver supporting amendment must have amend_opts */
-> +    assert(bs->drv->amend_opts);
-> =20
-> -    create_opts =3D qemu_opts_append(create_opts, bs->drv->create_opts);
-> -    opts =3D qemu_opts_create(create_opts, NULL, 0, &error_abort);
-> +    amend_opts =3D qemu_opts_append(amend_opts, bs->drv->amend_opts);
-> +    opts =3D qemu_opts_create(amend_opts, NULL, 0, &error_abort);
->      qemu_opts_do_parse(opts, options, NULL, &err);
->      if (err) {
->          error_report_err(err);
-> @@ -4058,7 +4058,7 @@ out:
->  out_no_progress:
->      blk_unref(blk);
->      qemu_opts_del(opts);
-> -    qemu_opts_free(create_opts);
-> +    qemu_opts_free(amend_opts);
->      g_free(options);
-> =20
->      if (ret) {
-> --=20
-> 2.17.2
->=20
+do you plan to send a v3?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Thanks,
+Laurent
+
+> r~
+> 
+> 
+> Original blurb:
+> 
+> The x86_64 abi has a legacy vsyscall page.  The kernel folk
+> have been trying to deprecate this since at least v3.1, but
+> 
+> (1) We don't implement the vdso that replaces vsyscalls,
+> (2) As of v5.5, the vsyscall page is still enabled by default.
+> 
+> This lack is affecting Peter's linux-user testing.
+> 
+> The dependency is not obvious because Peter is running the tests
+> on x86_64, so the host is providing a vsyscall page to qemu.
+> 
+> Because of how user-only memory operations are handled, with no
+> validation of guest vs host pages, so long as qemu chooses to
+> run with guest_base == 0, the guest may Just So Happen to read
+> the host's vsyscall page.
+> 
+> Complicating this, new OS releases may use a kernel configured
+> with CONFIG_LEGACY_VSYSCALL_XONLY=y, which means the the vsyscall
+> page cannot be read, only executed.  Which means that the guest
+> then cannot read the host vsyscall page during translation and
+> will SIGSEGV.
+> 
+> Exactly which of these many variables is affecting Peter's testing
+> with Ubuntu 18.04 of my TCG merge, I'm not exactly sure.  I suspect
+> that it is the change to drop the textseg_addr adjustment to user-only
+> static binaries.  IIRC bionic does not support -static-pie, which is
+> the preferred replacement.  This could mean that the host and guest
+> binaries overlap, which leads to guest_base != 0.
+> 
+> I vaguely remember someone (Paolo?) implementing something like
+> this many years ago, but clearly it never got merged.
+> 
+> In any case, this emulation has been missing for too long.
+> 
+> 
+> Richard Henderson (5):
+>   target/i386: Renumber EXCP_SYSCALL
+>   linux-user/i386: Split out gen_signal
+>   linux-user/i386: Emulate x86_64 vsyscalls
+>   linux-user: Add x86_64 vsyscall page to /proc/self/maps
+>   linux-user: Flush out implementation of gettimeofday
+> 
+>  target/i386/cpu.h          |   6 +-
+>  linux-user/i386/cpu_loop.c | 198 ++++++++++++++++++++++++++-----------
+>  linux-user/syscall.c       |  36 ++++++-
+>  target/i386/translate.c    |  16 ++-
+>  4 files changed, 190 insertions(+), 66 deletions(-)
+> 
 
 
