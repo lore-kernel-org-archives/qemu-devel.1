@@ -2,83 +2,75 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B55CC33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D053C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:29:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB0D924681
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECA8F24681
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:29:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LRC4UmHl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB0D924681
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FoSgo4/P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECA8F24681
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwOzV-0002Fp-5Z
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:25:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60178)
+	id 1iwP42-0003rK-5C
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:29:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iwOys-0001q1-H7
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:24:31 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iwP3G-0003Jc-Fn
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iwOyq-0003uT-S2
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:24:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27811
+ (envelope-from <kraxel@redhat.com>) id 1iwP3F-00018F-1R
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:29:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43201
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iwOyq-0003tJ-OY
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:24:28 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iwP3D-00013y-0x
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:29:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580210668;
+ s=mimecast20190719; t=1580210938;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=C9EhQdcctfHBal6s7JqbJIBfivGfxtbRt7Hg27OolxI=;
- b=LRC4UmHldPrtsaPrMPc7LOovzty0sTkadt38EHWIAXWeaKJqYS3uLkp5CI4hvF8MSLbhkK
- RagWAzH+Ms76wjeMwDPU94Gs8PhnIMA/eJcqnMMDu3mVfpJCaVnClZ1Ug12UdBHMo/+491
- CKPfOkIFlF2fHERADc1CUbinVn3pbAc=
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=OI8mBVqEcBZzaiINjHqhGlUuIS1h5Vf43Ur1+cM7j6c=;
+ b=FoSgo4/P3uwD1T0L910vKMWYm4HoDuvedXe7opl+afge3DB23SfDZqygpdCoZ7vH4VaU73
+ svYg4DUE02aIzdTMS7I2Xj2XcKNU9qlEdi/zejkjJKq1kQrtKyQ7s/lm+3dgUYtXqg5Cvw
+ UTqAgU81vmlb92r3ZZbRnh3+WxiWiGM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-Fzc_iIJhN2WyDbOjwCyi5w-1; Tue, 28 Jan 2020 06:24:26 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-408-Yw361nmmM9yzTYQLpRGmkQ-1; Tue, 28 Jan 2020 06:28:56 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33841800D4C;
- Tue, 28 Jan 2020 11:24:25 +0000 (UTC)
-Received: from gondolin (ovpn-116-186.ams2.redhat.com [10.36.116.186])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 801CB5D9C9;
- Tue, 28 Jan 2020 11:24:21 +0000 (UTC)
-Date: Tue, 28 Jan 2020 12:24:18 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Collin Walling <walling@linux.ibm.com>
-Subject: Re: [PATCH v6 2/2] s390: diagnose 318 info reset and migration support
-Message-ID: <20200128122418.7533f4bb.cohuck@redhat.com>
-In-Reply-To: <a4bfb688-3641-6c31-ad7b-e72afd5e6d50@linux.ibm.com>
-References: <1579904044-20790-1-git-send-email-walling@linux.ibm.com>
- <1579904044-20790-3-git-send-email-walling@linux.ibm.com>
- <20200127124756.3627f754.cohuck@redhat.com>
- <1cbd5354-d9ca-a10e-0053-a61a00223f53@linux.ibm.com>
- <20200127183504.2de2654f.cohuck@redhat.com>
- <a4bfb688-3641-6c31-ad7b-e72afd5e6d50@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: Fzc_iIJhN2WyDbOjwCyi5w-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5875213E4;
+ Tue, 28 Jan 2020 11:28:55 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.36.118.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7BED188883;
+ Tue, 28 Jan 2020 11:28:52 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 71D2F9D61; Tue, 28 Jan 2020 12:28:51 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qxl: introduce hardware revision 5
+Date: Tue, 28 Jan 2020 12:28:51 +0100
+Message-Id: <20200128112851.15895-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: Yw361nmmM9yzTYQLpRGmkQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,74 +82,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, david@redhat.com,
- qemu-devel@nongnu.org, rth@twiddle.net
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Jan 2020 18:05:36 -0500
-Collin Walling <walling@linux.ibm.com> wrote:
+The only difference to hardware revision 4 is that the device doesn't
+switch to VGA mode in case someone happens to touch a VGA register,
+which should make things more robust in configurations with multiple
+vga devices.
 
-> On 1/27/20 12:35 PM, Cornelia Huck wrote:
-> > On Mon, 27 Jan 2020 11:39:02 -0500
-> > Collin Walling <walling@linux.ibm.com> wrote:
-> >   
-> >> On 1/27/20 6:47 AM, Cornelia Huck wrote:  
-> >>> On Fri, 24 Jan 2020 17:14:04 -0500
-> >>> Collin Walling <walling@linux.ibm.com> wrote:
-> >>>     
-> 
-> [...]
-> 
-> >>>>
-> >>>> The availability of this instruction is determined by byte 134, bit 0
-> >>>> of the Read Info block. This coincidentally expands into the space used    
-> >>>
-> >>> "SCLP Read Info"
-> >>>     
-> >>>> for CPU entries by taking away one byte, which means VMs running with
-> >>>> the diag318 capability will not be able to retrieve information regarding
-> >>>> the 248th CPU. This will not effect performance, and VMs can still be
-> >>>> ran with 248 CPUs.    
-> >>>
-> >>> Are there other ways in which that might affect guests? I assume Linux
-> >>> can deal with it? Is it ok architecture-wise?
-> >>>
-> >>> In any case, should go into the patch description :)
-> >>>     
-> >>
-> >> Same as above. I'll try to provide more information regarding what happens
-> >> here in my next reply.  
-> > 
-> > I think you can lift some stuff from the cover letter.
-> >   
-> 
-> Here's what I found out:
-> 
-> Each CPU entry holds info regarding the CPU's address / ID as well as an 
-> indication of the availability of certain CPU features. With these patches,
-> we lose a CPU entry for one CPU (essentially what would be the CPU at the
-> tail-end of the list). This CPU exists, but is essentially in limbo... the
-> machine cannot access any information regarding it.
+Swtiching back to VGA mode happens on reset, either full machine
+reset or qxl device reset (QXL_IO_RESET ioport command).
 
-s/machine/guest/ ?
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/qxl.h  | 2 +-
+ hw/core/machine.c | 2 ++
+ hw/display/qxl.c  | 7 ++++++-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
 
-> 
-> So, a VM can run with the original N max CPUs, but in reality we can only
-> utilize n-1. 
-
-s/we/the guest/ ?
-
-With those changes, it makes sense to put your explanations into the
-patch description (for later reference).
-
-> 
-> >>  
-> >>>>  
-> 
-> [...]
-> 
-> 
+diff --git a/hw/display/qxl.h b/hw/display/qxl.h
+index 80eb0d267269..707631a1f573 100644
+--- a/hw/display/qxl.h
++++ b/hw/display/qxl.h
+@@ -144,7 +144,7 @@ typedef struct PCIQXLDevice {
+         }                                                               \
+     } while (0)
+=20
+-#define QXL_DEFAULT_REVISION QXL_REVISION_STABLE_V12
++#define QXL_DEFAULT_REVISION (QXL_REVISION_STABLE_V12 + 1)
+=20
+ /* qxl.c */
+ void *qxl_phys2virt(PCIQXLDevice *qxl, QXLPHYSICAL phys, int group_id);
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 3e288bfceb7f..13a3b2c9c425 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -34,6 +34,8 @@ GlobalProperty hw_compat_4_2[] =3D {
+     { "vhost-blk-device", "seg_max_adjust", "off"},
+     { "usb-host", "suppress-remote-wake", "off" },
+     { "usb-redir", "suppress-remote-wake", "off" },
++    { "qxl", "revision", "4" },
++    { "qxl-vga", "revision", "4" },
+ };
+ const size_t hw_compat_4_2_len =3D G_N_ELEMENTS(hw_compat_4_2);
+=20
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index 6d43b7433cff..c2e89ea40924 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -1309,7 +1309,8 @@ static void qxl_vga_ioport_write(void *opaque, uint32=
+_t addr, uint32_t val)
+     PCIQXLDevice *qxl =3D container_of(vga, PCIQXLDevice, vga);
+=20
+     trace_qxl_io_write_vga(qxl->id, qxl_mode_to_string(qxl->mode), addr, v=
+al);
+-    if (qxl->mode !=3D QXL_MODE_VGA) {
++    if (qxl->mode !=3D QXL_MODE_VGA &&
++        qxl->revision <=3D QXL_REVISION_STABLE_V12) {
+         qxl_destroy_primary(qxl, QXL_SYNC);
+         qxl_soft_reset(qxl);
+     }
+@@ -2121,6 +2122,10 @@ static void qxl_realize_common(PCIQXLDevice *qxl, Er=
+ror **errp)
+         pci_device_rev =3D QXL_REVISION_STABLE_V12;
+         io_size =3D pow2ceil(QXL_IO_RANGE_SIZE);
+         break;
++    case 5: /* qxl-5 */
++        pci_device_rev =3D QXL_REVISION_STABLE_V12 + 1;
++        io_size =3D pow2ceil(QXL_IO_RANGE_SIZE);
++        break;
+     default:
+         error_setg(errp, "Invalid revision %d for qxl device (max %d)",
+                    qxl->revision, QXL_DEFAULT_REVISION);
+--=20
+2.18.1
 
 
