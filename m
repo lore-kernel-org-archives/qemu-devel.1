@@ -6,38 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCD2C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBDBEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:08:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 450B4207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:08:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450B4207FD
+	by mail.kernel.org (Postfix) with ESMTPS id 9200D207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:08:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9200D207FD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwSTg-00065B-DD
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 10:08:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59463)
+	id 1iwSU5-0006kG-P6
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 10:08:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iwSSz-0005Xp-9t
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:07:50 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwSTK-0005qN-R0
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iwSSy-0005t5-74
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:07:49 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:36223)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwSSx-0005sY-UN
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:07:48 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwSTJ-00062u-Pa
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:08:10 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:44057)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwSTJ-00062B-Gf
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:08:09 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N1fzM-1jgkaB22C8-011xnr; Tue, 28 Jan 2020 16:07:31 +0100
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N3sye-1jeYiA34nA-00zqbO; Tue, 28 Jan 2020 16:07:54 +0100
+Subject: Re: [PATCH v2 3/4] linux-user: remove gemu_log from the linux-user
+ tree
 To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
 References: <20200117192808.129398-1-jkz@google.com>
- <20200117192808.129398-3-jkz@google.com>
+ <20200117192808.129398-4-jkz@google.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +83,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH v2 2/4] linux-user: Use `qemu_log' for strace
-Message-ID: <ab5d3c15-9060-47be-fdb6-70ab76dfcc06@vivier.eu>
-Date: Tue, 28 Jan 2020 16:07:28 +0100
+Message-ID: <a9021918-ca59-98ea-9e2c-cc6498a1f208@vivier.eu>
+Date: Tue, 28 Jan 2020 16:07:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200117192808.129398-3-jkz@google.com>
+In-Reply-To: <20200117192808.129398-4-jkz@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:M2JiKnbEyTiZz+HfH+8Dou4KiNEaLqyPMEivq1U9Nc4SRrX3oLQ
- dNbiZVOsB8xTcZ2yjmp9zfWyXVDMBgDIe22SkTLaT62/nDCc00NsppfgiNn5v+n+OLbLOvp
- p0mqce6hlRqs1YY6y+giFOf//+yUoCgCwN9X7y4u2derxKgZMT8zlpz4jd7Sb5Y6NvJKnTL
- 49uWKi2wr9m5FLxIukANQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Z2Cg77OVmL0=:AF68hd6i9ssxjn0Xyt6dSQ
- HuF6P7g7GsgifyYGOAt9mpLDXLlQPWafTDzRx6yFz0ny4dEzwyP+l/EeTVcf16pEffR4nkuiW
- YbhnlW3HE98uZ9hQgtVCPTsX7A/xyGZOe/hCWUNsIrsZR9VbBJBtEPltKcss7l3kyfMAHGhSe
- sL+WT6xIfsFJ1jX7WvHbSE72BSaEVFhhJqu3/8kuX1EYzwm6TY7y4MIm1vLw8SirVf349/aLr
- m+WSM/jYpg3RjBOaQgRzMif96zjQLIyccQ0Otw4re/ylNO1puZM4P+OKoZAI5D70C4plCZnue
- dZKrOhIU/lfxILxP430BZr2RfG6tYP5xvTGA/XkUxi1Xb8pQs+iOXPBOJhyPgeuvdCFwG0604
- OeI1X02KSuJcQS8gSGD1qVdyXUFzq69ZwVeOfKeqQySMr36bWqCI4k6GDvVJK3MqdvcCLQXjN
- 7sUdTQF6Q3hcy63RRR2gUFNGAFi797MwitRRjnzbC1EcBa7bwHstdVT2wOOnXx/96u4AWOSH0
- sWjHgtIzMaeo5SMSehAS+K7iatoXhKUKGOLoR6W4zS8e14yaeei+OKWVgrxMzs5791//XWt0S
- WN73hE0h7aFOt8kWsP696/dGP0uTA+E/uLd+0C9KOSq7u7EipIF+8SJ+4N25GB8bUIc6zfRv6
- 7EGjNMDgJkXSYq88bJ/EVw1FRgJtwxrZ5gxZr+cRc+CGklX+9ec84oz64OdhmUmv4WUbEr6Sw
- VdliwrPLC44BB2raB27W3ITYTMSlkUkJgjM3qx9JukMW6CFOkz06RJF7lrTVOBZ+vbgv7BEG9
- si3iOign7Wjs3cXuRVm6N2sGvkKlxWG1ZIagOEbl1Gfejvt/qvqlJtUnloMSaNOx592LGew
+X-Provags-ID: V03:K1:B8NyYeP9hutteEc8o8hJtKle5K2jYD3I6cJGUh8nbYfcIdQ1YPj
+ 1TQk6xPfe3IYmK9ZUGRGyBqA/U6JhAuYg/49mN1hj2jf0mFVgqL6v3YvEXabQmKZD1v5BVF
+ SQCLlUQILARJMYMeM2g/h/qULGeW9oSWzWDt5yia0N9IO0XRr/9y5/XtqY1fO4MXLw3krhq
+ dR8WJnIVsVBCwsvwTwPvA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:835bXMEVikA=:f6MAR8snwKUvdjuQ6y6Hnu
+ /H9TQvOgzNPQEBEmjsdiOdgwIXsvKIZgAIVmU+qrkHSk1m/2n39/XOtuavbxnIXM8VBwlAu0z
+ 1CfAcuoPbRP7uyqLAe+Y26EdZkNhyuOt6PIJXh/zL/yo2Iadi5/CKyCZ+wzt6FXXDQWIsdq34
+ BoUysM9d9PFSUXwLdT2kpov1a31Tbw4LYL0YWoCmNLX7ASLvJHmCFWL9nLIN8yRnsbwaJE+ip
+ lK9A+8Ac333cWXF6jLor0vbcnVuF6/MTMUeAmOgM5pij21QAGu4K9TGNfePn/p1Uelidecb84
+ mSoICLWI3iyIsDg39eXciWvi9cgvj27NmfEfW81+M18cnL9ZWN7W8g/zumpTea6ko9rp2TUiR
+ 1Uf8Uopg8ulnoYb7LPThle1dFTpn79ZwvXDmz3PmIBz9e6LnVhFcogLWHqSzzTECeVkMkdWLQ
+ +Cenouwt9rPiaat9xwTJQtrY0zfF+VxNgfTIhga34EQV2OkusSZhx9SuqeqCZONomxCzPGxHA
+ FTMk3XcnX/xj7y26tpwFLbIOesfOeMuXzcZN3ZE2EtGZCT/efEzAdgqHqIHAz8/i+XCugXhiI
+ AkoabNlP9rTrXYKOy75fALL438AfqL63oPOy6zRGBCcDu4sUSZwJ2WwEt71pkAnZuAO5KEI0p
+ X3vVg6ROchepIThDUOqWGE0COvYYOmsQSyRb9fAEflDbcqpFAJmQax67xODsGMIA6XIlB2+2R
+ zx//+2rdIj8dWqbP2FeElq6pt2Nqr4axlO458byeHXPvjeyfVAAm+cbGj5ktd6z7c6am1+kGe
+ x8xIM17fJqgTkq9m/VzlHRq5VhXTbvsNtw/BEiVVXIdOusTLLUEh8K1BvppW+asVXUD23uC
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,61 +129,48 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 17/01/2020 à 20:28, Josh Kunz a écrit :
-> This change switches linux-user strace logging to use the newer `qemu_log`
-> logging subsystem rather than the older `gemu_log` (notice the "g")
-> logger. `qemu_log` has several advantages, namely that it allows logging
-> to a file, and provides a more unified interface for configuration
-> of logging (via the QEMU_LOG environment variable or options).
-> 
-> This change introduces a new log mask: `LOG_STRACE` which is used for
-> logging of user-mode strace messages.
+> Now that all uses have been migrated to `qemu_log' it is no longer
+> needed.
 > 
 > Signed-off-by: Josh Kunz <jkz@google.com>
 > ---
->  include/qemu/log.h   |   2 +
->  linux-user/main.c    |  30 ++-
->  linux-user/qemu.h    |   1 -
->  linux-user/signal.c  |   2 +-
->  linux-user/strace.c  | 479 ++++++++++++++++++++++---------------------
->  linux-user/syscall.c |  13 +-
->  util/log.c           |   2 +
->  7 files changed, 278 insertions(+), 251 deletions(-)
+>  linux-user/main.c | 9 ---------
+>  linux-user/qemu.h | 1 -
+>  2 files changed, 10 deletions(-)
 > 
-...
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 629f3a21b5..54e60f3807 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -12098,14 +12098,15 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->      record_syscall_start(cpu, num, arg1,
->                           arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 8f1d07cdd6..22578b1633 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -112,15 +112,6 @@ const char *qemu_uname_release;
+>     by remapping the process stack directly at the right place */
+>  unsigned long guest_stack_size = 8 * 1024 * 1024UL;
 >  
-> -    if (unlikely(do_strace)) {
-> +    if (unlikely(qemu_loglevel_mask(LOG_STRACE))) {
->          print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
-> -        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
-> -                          arg5, arg6, arg7, arg8);
-> +    }
-> +
-> +    ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
-> +                      arg5, arg6, arg7, arg8);
-> +
-> +    if (unlikely(qemu_loglevel_mask(LOG_STRACE))) {
->          print_syscall_ret(num, ret);
-> -    } else {
-> -        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
-> -                          arg5, arg6, arg7, arg8);
->      }
->  
->      record_syscall_return(cpu, num, ret);
-
-In term of performance perhaps it sould be better to only test once for
-the mask as it is done before?
-
-For the other parts:
+> -void gemu_log(const char *fmt, ...)
+> -{
+> -    va_list ap;
+> -
+> -    va_start(ap, fmt);
+> -    vfprintf(stderr, fmt, ap);
+> -    va_end(ap);
+> -}
+> -
+>  #if defined(TARGET_I386)
+>  int cpu_get_pic_interrupt(CPUX86State *env)
+>  {
+> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+> index 02c6890c8a..329b409e65 100644
+> --- a/linux-user/qemu.h
+> +++ b/linux-user/qemu.h
+> @@ -210,7 +210,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>                      abi_long arg2, abi_long arg3, abi_long arg4,
+>                      abi_long arg5, abi_long arg6, abi_long arg7,
+>                      abi_long arg8);
+> -void gemu_log(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+>  extern __thread CPUState *thread_cpu;
+>  void cpu_loop(CPUArchState *env);
+>  const char *target_strerror(int err);
+> 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-
-Thanks,
-Laurent
 
