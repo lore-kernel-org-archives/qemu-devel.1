@@ -2,80 +2,101 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D541BC33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 06:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB4DC33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 06:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DA3E22522
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 06:49:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4D002173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 06:53:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/25Tote"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DA3E22522
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JeIhW/XX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4D002173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwKgq-00005z-Om
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 01:49:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56822)
+	id 1iwKl4-0001c9-QN
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 01:53:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57535)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gshan@redhat.com>) id 1iwKg4-0007gF-UA
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 01:48:50 -0500
+ (envelope-from <philmd@redhat.com>) id 1iwKkS-000168-Ue
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 01:53:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gshan@redhat.com>) id 1iwKg2-00028p-KI
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 01:48:47 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46993
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iwKkR-0008RS-H9
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 01:53:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43825
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1iwKg2-00026B-CD
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 01:48:46 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwKkR-0008Qn-E1
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 01:53:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580194125;
+ s=mimecast20190719; t=1580194399;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qiR8c2SnZd4lTxYa17yVHPAFb7s96wnrb03L/DW2qME=;
- b=g/25Totery1lqRm6DKIEVjGNQsUvBNWElou+SjS3iWoHRDFlv6q7pKI83F4+ZD6up0XEVi
- ogRdJHhEe858URzOX6JJ8pH+jg38UuuNl6XlxqaWqp0qmcrkGmET/Nqn7f2jlnH2oEfG6U
- 8TuWfDSqA/h1GuLo1Qs3QQziBzIZ8eg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-YQ86la4EOmKZjwq4m748Vw-1; Tue, 28 Jan 2020 01:48:43 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 530B68017CC;
- Tue, 28 Jan 2020 06:48:42 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-77.bne.redhat.com [10.64.54.77])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0120410027A1;
- Tue, 28 Jan 2020 06:48:34 +0000 (UTC)
-Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
-From: Gavin Shan <gshan@redhat.com>
-To: qemu-arm@nongnu.org
-References: <20191219040612.28431-1-gshan@redhat.com>
-Message-ID: <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
-Date: Tue, 28 Jan 2020 17:48:32 +1100
+ bh=bKL9132Az6p0nZnR1vq/tcC+AZJv4+lL3MEYYl/rqbo=;
+ b=JeIhW/XXNIUueCoQzhet7zDNFCjxlcWOrSjaUez0JYMOXE7MrPFDHvXuVFq3nqePdSSJUs
+ 1/6O5/wi0Vl6oHz1UZ3OFC+BGUa02UXQxeRdXgvgTcc3nXisfTdwQLZVzVHjDCFl/AxThT
+ JBLXT9vw4AkrHp6pRMyhuRBSKfpWfus=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-ZwRf8A90OP24IBFA54ULjg-1; Tue, 28 Jan 2020 01:53:14 -0500
+Received: by mail-wm1-f70.google.com with SMTP id o193so512013wme.8
+ for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 22:53:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1Obb92N5U1ZdbHAQBGBc5mrueWUHclkw6B/w11+y5W8=;
+ b=rgcX7RTpgiqPkFPHpd2dZbcRO+Gz+Dd40YKuDgd/6KGFgGc7nzlW3XDCb4tw3Z2NGK
+ eVQUlDIDN6zmMsPLrC4jg2XleoBaA6KGH3N8WdULX6/mxfC2oi1OqYw3uOOysfNU53IF
+ 57nrAfmKgIw5OsMTwpyJ78drMlBVITlZqBIfatRg+I/SwRSdSZAqUTKvQRlzA6VCwDAZ
+ UpOgcG3nOoUktpx1cNtRJrK9vZtiP9Aq0tpjhPexGG57wTG198sWBM4aJoo4dfm+F4pX
+ zi3rboue3SQoJ7//l7u4bp1iqe3kPr51YE7Abb3nPd+QzzNK8iCMZjwCMgk51MuzlnxB
+ SEyA==
+X-Gm-Message-State: APjAAAXDoUsmk33Y6DC6fo5bNICeD49nd4fwRTUSugFn/vOylKseI9BC
+ HalCTyJNvm9UDdjd8pqIaSm0tCxDmgr9EOG6r10hqJWoovd3+FHAPGo/+AFQETiL3CYnrCbU8Kb
+ a1VNd9P0qJSNZ0UU=
+X-Received: by 2002:a05:600c:1009:: with SMTP id
+ c9mr2960142wmc.162.1580194393092; 
+ Mon, 27 Jan 2020 22:53:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyajVfpIfEHs3BdAjUFRafQrX8B9u0FZNCML5MnRobE1XU9Pp5lSyvUoDezm1esN1zXShnclg==
+X-Received: by 2002:a05:600c:1009:: with SMTP id
+ c9mr2960093wmc.162.1580194392655; 
+ Mon, 27 Jan 2020 22:53:12 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id q6sm26172070wrx.72.2020.01.27.22.53.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Jan 2020 22:53:12 -0800 (PST)
+Subject: Re: [PATCH v4 0/7] hw/arm/raspi: Run U-Boot on the raspi machines
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200120235159.18510-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <773d1201-17fc-40b1-fa9a-06ed03732e89@redhat.com>
+Date: Tue, 28 Jan 2020 07:53:10 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191219040612.28431-1-gshan@redhat.com>
+In-Reply-To: <20200120235159.18510-1-f4bug@amsat.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: YQ86la4EOmKZjwq4m748Vw-1
+X-MC-Unique: ZwRf8A90OP24IBFA54ULjg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,67 +108,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
- aik@ozlabs.ru, maz@kernel.org, qemu-devel@nongnu.org, eric.auger@redhat.com,
- shan.gavin@gmail.com, pbonzini@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Laurent Bonnans <laurent.bonnans@here.com>,
+ Cheng Xiang <ext-cheng.xiang@here.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[including more folks into the discussion]
+Hi Peter,
 
-> On Fri, 17 Jan 2020 at 14:00, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On Thu, 19 Dec 2019 at 04:06, Gavin Shan <gshan@redhat.com> wrote:
->>> This supports NMI injection for virtual machine and currently it's only
->>> supported on GICv3 controller, which is emulated by qemu or host kernel.
->>> The design is highlighted as below:
->>>
->>> * The NMI is identified by its priority (0x20). In the guest (linux)
->>> kernel, the GICC_PMR is set to 0x80, to block all interrupts except
->>> the NMIs when the external interrupt is disabled. It means the FIQ
->>> and IRQ bit in PSTATE isn't touched when the functionality (NMI) is
->>> functional.
->>> * LPIs aren't considered as NMIs because of their nature. It means NMI
->>> is either SPI or PPI. Besides, the NMIs are injected in round-robin
->>> fashion is there are multiple NMIs existing.
->>> * When the GICv3 controller is emulated by qemu, the interrupt states
->>> (e.g. enabled, priority) is fetched from the corresponding data struct
->>> directly. However, we have to pause all CPUs to fetch the interrupt
->>> states from host in advance if the GICv3 controller is emulated by
->>> host.
->>>
->>> The testing scenario is to tweak guest (linux) kernel where the pl011 SPI
->>> can be enabled as NMI by request_nmi(). Check "/proc/interrupts" after injecting
->>> several NMIs, to see if the interrupt count is increased or not. The result
->>> is just as expected.
->>>
->
-> So, QEMU is trying to emulate actual hardware. None of this
-> looks to me like what GICv3 hardware does... If you want to
-> have the virt board send an interrupt, do it the usual way
-> by wiring up a qemu_irq from some device to the GIC, please.
-> (More generally, there is no concept of an "NMI" in the GIC;
-> there are just interrupts at varying possible guest-programmable
-> priority levels.)
->
+(Cc'ed Wainer from the Python part).
 
-Peter, I missed to read your reply in time and apologies for late response.
+On 1/21/20 12:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Following Laurent report:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg639950.html
+>=20
+> The SYS_timer is already merged, see:
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dd05be883fc
+> "hw/timer/bcm2835: Add the BCM2835 SYS_timer"
+>=20
+> The first patch should fix Laurent other issue.
+> Then few python patches are require to break into U-Boot console,
+> and the last patches add U-Boot tests for Raspi2 and Raspi3.
+>=20
+> Laurent, if you successfully test U-Boot with this patchset again,
+> do you mind replying with a "Tested-by:" tag?
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Since v3:
+> - rewrote '-smp' fix.
+> - tests use Debian 'trustable' u-boot.elf
+>=20
+> previous feedbacks from Peter on v3:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg655415.html
+>=20
+> v3: https://www.mail-archive.com/qemu-devel@nongnu.org/msg653807.html
+> Supersedes: <20191019234715.25750-1-f4bug@amsat.org>
+>=20
+> Philippe Mathieu-Daud=C3=A9 (7):
+>    hw/arm/raspi: Remove obsolete use of -smp to set the soc 'enabled-cpus=
+'
 
-Yes, there is no concept of "NMI" in the GIC from hardware perspective.
-However, NMI has been supported from the software by kernel commit
-bc3c03ccb4641 ("arm64: Enable the support of pseudo-NMIs"). The NMIs
-have higher priority than normal ones. NMIs are deliverable after
-local_irq_disable() because the SYS_ICC_PMR_EL1 is tweaked so that
-normal interrupts are masked only.
+While the first patch is reviewed by Alistair, the rest (acceptance=20
+tests) still requires an eye from Cleber/Eduardo.
 
-It's unclear about the purpose of "nmi" QMP/HMP command. It's why I
-put a RFC tag. The command has been supported by multiple architects
-including x86/ppc. However, they are having different behaviors. The
-system will be restarted on ppc with this command, but a NMI is injected
-through LAPIC on x86. So I'm not sure what architect (system reset on
-ppc or injecting NMI on x86) aarch64 should follow.
+Can you queue the first patch via your qemu-arm tree?
 
 Thanks,
-Gavin
+
+Phil.
+
+>    Acceptance tests: Extract _console_interaction()
+>    Acceptance tests: Add interrupt_interactive_console_until_pattern()
+>    python/qemu/machine: Allow to use other serial consoles than default
+>    tests/boot_linux_console: Test booting U-Boot on the Raspberry Pi 2
+>    tests/boot_linux_console: Test booting U-Boot on the Raspberry Pi 3
+>    tests/boot_linux_console: Tag Emcraft Smartfusion2 as running 'u-boot'
+>=20
+>   hw/arm/raspi.c                            |  2 -
+>   python/qemu/machine.py                    |  9 +++-
+>   tests/acceptance/avocado_qemu/__init__.py | 59 +++++++++++++++++------
+>   tests/acceptance/boot_linux_console.py    | 54 +++++++++++++++++++++
+>   4 files changed, 107 insertions(+), 17 deletions(-)
+>=20
 
 
