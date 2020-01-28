@@ -2,103 +2,79 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB118C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD980C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7830B21739
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:09:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnfoDiMI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7830B21739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B3C8121739
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C8121739
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwOkZ-0000Ce-ME
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:09:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56614)
+	id 1iwOmS-0001f6-TC
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:11:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iwOju-0007tx-Fm
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:09:07 -0500
+ (envelope-from <bounces@canonical.com>) id 1iwOls-0001Cs-Pz
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:11:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iwOjt-0007Lw-9l
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:09:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21527
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwOjt-0007LT-5A
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:09:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580209740;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1cZqk+6kPtdczzGJ/Wfl4TJaPg/W0JrGzpMSVuttE94=;
- b=KnfoDiMIeFd0n+dVXUZT0OkGbaryDkL+H8BoWwODGeZ/t9oNQOSkLiZEHOTfO9lLvO8UYz
- toFl7qbkxDXqHRrSGa1fsN+KS3AKmCRKrxEtuZJpzmaUqRIuZM8/WJb1lTgtIPUMQlCYLE
- cVefdZOVx74jRiF1G6m3uy9y6GIwz/c=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-gcIaDj7mNPO--d1JJWDuiQ-1; Tue, 28 Jan 2020 06:08:58 -0500
-Received: by mail-wm1-f71.google.com with SMTP id a10so534200wme.9
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 03:08:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1cZqk+6kPtdczzGJ/Wfl4TJaPg/W0JrGzpMSVuttE94=;
- b=U24sBlH7nK8TGZ5TihHmwPesvmSr1JtAjcQncPmEGzOUVkZCMflneaDRT2QLbceKIj
- aILLjHUnvYd8Di/KY+k3mC2WqtF2pwBiPwPDrSCFlOcunqWAu/FePP+K5ZtieZUJVwkl
- gLSimNCo7oeeMqqTxrBXGOZdNCnWQPcwJCaMPqEgQdnuSvT4c2WzNEiHiStStpie38WZ
- qu0JJ19UUDE2Nq9Hr5USdWHfeUYD2l6kqsIKa0fmmFunpwUywLsP4y5TU2MSBoCxc+Ur
- +CKKBeKBK16LM6/20sgXWJWWra2qeK8wSWeSLGaFputfzVKHCP7+1rkt1tCSbLKPJ3X1
- iYDg==
-X-Gm-Message-State: APjAAAWWYpby1MUUBmMnBO2x7h1CQ4VG7yTojBSG5h7m8nk7mW/TLtn3
- riAzSW9ViJYsAKawqgkCLmUx6tOCVAOVa2E6khcfG8z4QRZxrBs7wmcLP18OY+8cHjw/7jgJGWF
- j/daHlR4pXKg3g1s=
-X-Received: by 2002:adf:d850:: with SMTP id k16mr28380129wrl.96.1580209736966; 
- Tue, 28 Jan 2020 03:08:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz8Pd3bRdkGev6FxXbfQkfn+S8FO7+CpIgit74xGC3DCVy3OzX/lc0//OynjBXUKuUabrt6yw==
-X-Received: by 2002:adf:d850:: with SMTP id k16mr28380098wrl.96.1580209736708; 
- Tue, 28 Jan 2020 03:08:56 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id p7sm2513090wmp.31.2020.01.28.03.08.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Jan 2020 03:08:56 -0800 (PST)
-Subject: Re: [PATCH v3 13/14] dp8393x: Don't reset Silicon Revision register
-To: Finn Thain <fthain@telegraphics.com.au>, Jason Wang
- <jasowang@redhat.com>, qemu-devel@nongnu.org
-References: <cover.1579474761.git.fthain@telegraphics.com.au>
- <34caf9dea82cd30dc51b4f8768adb7a90b236bf2.1579474761.git.fthain@telegraphics.com.au>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <dcd1dcd2-719c-1db0-e9ce-25d26ed1f6d4@redhat.com>
-Date: Tue, 28 Jan 2020 12:08:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <bounces@canonical.com>) id 1iwOlr-0001ET-C9
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:11:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45742)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iwOlr-0001Da-53
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 06:11:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iwOlp-0006D7-Eh
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 11:11:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6CC9E2E80CB
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 11:11:01 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <34caf9dea82cd30dc51b4f8768adb7a90b236bf2.1579474761.git.fthain@telegraphics.com.au>
-Content-Language: en-US
-X-MC-Unique: gcIaDj7mNPO--d1JJWDuiQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jan 2020 10:58:17 -0000
+From: Frank Heimes <1859656@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=maas; status=New; importance=Undecided;
+ assignee=lee.trager@canonical.com; 
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
+ assignee=maas; 
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fheimes ltrager paelzer sfeole
+X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
+X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
+References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
+Message-Id: <158020909766.19232.18348718339215570447.malone@gac.canonical.com>
+Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
+ initial deploy
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3f7dcde994e6be0b25b1274fba8c91c01e664d0e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,75 +83,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Laurent Vivier <laurent@vivier.eu>, qemu-stable@nongnu.org
+Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/19/20 11:59 PM, Finn Thain wrote:
-> The jazzsonic driver in Linux uses the Silicon Revision register value
-> to probe the chip. The driver fails unless the SR register contains 4.
-> Unfortunately, reading this register in QEMU usually returns 0 because
-> the s->regs[] array gets wiped after a software reset.
-> 
-> Fixes: bd8f1ebce4 ("net/dp8393x: fix hardware reset")
-> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-> ---
->   hw/net/dp8393x.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index 1b73a8703b..71af0fad51 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -591,6 +591,10 @@ static uint64_t dp8393x_read(void *opaque, hwaddr addr, unsigned int size)
->                   val |= s->cam[s->regs[SONIC_CEP] & 0xf][2* (SONIC_CAP0 - reg)];
->               }
->               break;
-> +        /* Read-only */
-> +        case SONIC_SR:
-> +            val = 4; /* only revision recognized by Linux/mips */
-> +            break;
->           /* All other registers have no special contrainst */
->           default:
->               val = s->regs[reg];
-> @@ -971,7 +975,6 @@ static void dp8393x_realize(DeviceState *dev, Error **errp)
->       qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
->   
->       s->watchdog = timer_new_ns(QEMU_CLOCK_VIRTUAL, dp8393x_watchdog, s);
-> -    s->regs[SONIC_SR] = 0x0004; /* only revision recognized by Linux */
->   
->       memory_region_init_ram(&s->prom, OBJECT(dev),
->                              "dp8393x-prom", SONIC_PROM_SIZE, &local_err);
-> 
+It took some time (due to travel), but I was now able to do a setup
+based on the old 2.6.0 version [2.6.0 (7803-g6fc5f26eb-
+0ubuntu1~18.04.1)] for testing.
 
-Please fix in dp8393x_reset() instead:
+And with the combination:
 
--- >8 --
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index cdc2631c0c..65eb9c23a7 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -862,6 +862,7 @@ static void dp8393x_reset(DeviceState *dev)
-      timer_del(s->watchdog);
+$ apt-cache policy maas
+maas:
+  Installed: 2.6.0-7803-g6fc5f26eb-0ubuntu1~18.04.1
+  Candidate: 2.6.0-7803-g6fc5f26eb-0ubuntu1~18.04.1
+  Version table:
+ *** 2.6.0-7803-g6fc5f26eb-0ubuntu1~18.04.1 500
+        500 http://ppa.launchpad.net/maas-maintainers/testing/ubuntu bionic=
+/main s390x Packages
+        100 /var/lib/dpkg/status
+     2.4.2-7034-g2f5deb8b8-0ubuntu1 500
+        500 http://us.ports.ubuntu.com/ubuntu-ports bionic-updates/main s39=
+0x Packages
+     2.4.0~beta2-6865-gec43e47e6-0ubuntu1 500
+        500 http://us.ports.ubuntu.com/ubuntu-ports bionic/main s390x Packa=
+ges
+and:
+$ apt-cache policy qemu
+qemu:
+  Installed: (none)
+  Candidate: 1:2.11+dfsg-1ubuntu7.21
+  Version table:
+     1:2.11+dfsg-1ubuntu7.21 500
+        500 http://us.ports.ubuntu.com/ubuntu-ports bionic-updates/universe=
+ s390x Packages
+     1:2.11+dfsg-1ubuntu7.20 500
+        500 http://ports.ubuntu.com/ubuntu-ports bionic-security/universe s=
+390x Packages
+     1:2.11+dfsg-1ubuntu7 500
+        500 http://us.ports.ubuntu.com/ubuntu-ports bionic/universe s390x P=
+ackages
+the system seems to successful commissions, similar to the latest maas 2.6.=
+2 version (see above).
+But then the VM ends again in state Ready / off.
 
-      memset(s->regs, 0, sizeof(s->regs));
-+    s->regs[SONIC_SR] = 0x0004; /* only revision recognized by Linux */
-      s->regs[SONIC_CR] = SONIC_CR_RST | SONIC_CR_STP | SONIC_CR_RXDIS;
-      s->regs[SONIC_DCR] &= ~(SONIC_DCR_EXBUS | SONIC_DCR_LBR);
-      s->regs[SONIC_RCR] &= ~(SONIC_RCR_LB0 | SONIC_RCR_LB1 | 
-SONIC_RCR_BRD | SONIC_RCR_RNT);
-@@ -914,7 +915,6 @@ static void dp8393x_realize(DeviceState *dev, Error 
-**errp)
-      qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
+virsh shows the VM as shutoff:
+ubuntu@s1lp11:~$ sudo -H -u maas bash -c 'virsh -c qemu+ssh://ubuntu@192.16=
+8.122.1/system list --all'
+ubuntu@192.168.122.1's password: =
 
-      s->watchdog = timer_new_ns(QEMU_CLOCK_VIRTUAL, dp8393x_watchdog, s);
--    s->regs[SONIC_SR] = 0x0004; /* only revision recognized by Linux */
+ Id    Name                           State
+----------------------------------------------------
+ -     vm1                            shut off
 
-      memory_region_init_ram(&s->prom, OBJECT(dev),
-                             "dp8393x-prom", SONIC_PROM_SIZE, &local_err);
----
+The os element looks like this - with the two entries:
+  <os>
+    <type arch=3D's390x' machine=3D's390-ccw-virtio-bionic'>hvm</type>
+    <boot dev=3D'network'/>
+    <boot dev=3D'hd'/>
+  </os>
 
+A manual start (with the help of virsh, console enabled) shows that it
+network boots (see attachment).
+
+Removing the network entry and booting didn't work - looks like no OS
+deployed on disk yet.
+
+To sum it up - also not working on this 2.6.0 env. that I've just
+created.
+
+
+** Attachment added: "boot_console.txt"
+   https://bugs.launchpad.net/ubuntu-z-systems/+bug/1859656/+attachment/532=
+3507/+files/boot_console.txt
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859656
+
+Title:
+  [2.6] Unable to reboot s390x KVM machine after initial deploy
+
+Status in MAAS:
+  New
+Status in QEMU:
+  Incomplete
+Status in Ubuntu on IBM z Systems:
+  Triaged
+
+Bug description:
+  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
+  Arch: S390x
+
+  Appears that MAAS can not find the s390x bootloader to boot from the
+  disk, not sure how maas determines this.  However this was working in
+  the past. I had originally thought that if the maas machine was
+  deployed then it defaulted to boot from disk.
+
+  If I force the VM to book from disk, the VM starts up as expected.
+
+  Reproduce:
+
+  - Deploy Disco on S390x KVM instance
+  - Reboot it
+
+  on the KVM console...
+
+  Connected to domain s2lp6g001
+  Escape character is ^]
+  done
+  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
+  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
+  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
+  Trying pxelinux.cfg files...
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  Failed to load OS from network
+
+  =3D=3D> /var/log/maas/rackd.log <=3D=3D
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
+0x.bin requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
+5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+1-52-54-00-e5-d7-bb requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA0 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64B requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF6 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+A requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+ requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
+efault requested by 10.246.75.160
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
 
