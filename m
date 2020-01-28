@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69141C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C77FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B0B420CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D19172173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:51:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tJ3gtYng"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B0B420CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f0pZXWFn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D19172173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVx4-0002hm-Al
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:51:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35995)
+	id 1iwVxG-0002zG-0Z
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:51:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7R-0002zy-8x
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:46 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6K-0001b4-9Y
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7P-0007Fd-Tw
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:45 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38272)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6I-0004iL-Ue
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:36 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:46939)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV7P-0007Bk-EY
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:43 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id y17so17113534wrh.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:42 -0800 (PST)
+ id 1iwV6I-0004fQ-Ne
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:34 -0500
+Received: by mail-wr1-x432.google.com with SMTP id z7so17066804wrl.13
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=V7HQM6ZWCaBttTOQek/jXmWm+z3vGBaU4dKSv+ffCGg=;
- b=tJ3gtYngsrvJwfx0Sk0sabugYaQInlk8AUdNSLOVkF+h1OnJWcLss7ZejXMl8AVKd3
- x9UIHz2feTdWs1SlXlT2tntgiJsiohVuXvdqCBkLXoklOmxGA6BN7KYS3JOJPKmEuV4z
- bFBRmulM9fq0JRuHlcpuom0nuZu6OILLvsVmm5Zy2zPEKOObPmkd/Zw8f+I+gHMi4xDM
- OaH8etwLNkAHvwCVQIi8os2skL0z7yWzVTM/r2bE7e9eNnwe0UpmdC86EqPvOaWab1IW
- w4sVSkLD2z7IN3dK3KE6k6WKZ9MKOHiImyDP/W5l9YAifaNH/lSezZwuubfu/NeX4q+3
- d/2Q==
+ bh=eP2TeH3k4aghmGxxgRo9140T1AoNaykBBCsOV4MtnLA=;
+ b=f0pZXWFnppHhh16/xBuYKmOEDJ9gzUf1qxegkpmFGqYKn/JpAI1f/qCThXW6Rffo/R
+ SRAx+mmahW+rY2EeCBJW1bbNhMY1l9NVHoOIasNIVi4ylEpXs9E/la+dAkK9sM0xE34r
+ qpITC/ASUfoRhloJQ8RIOLCJyrStJitc6AhWhhbC6id0Y9Hl3/c5qwJLKdfsivbiDDwu
+ 4BDl27Vb6rQsVrS2JAbzHWL3KLSo/mJSkUEd9yjy41BUGBvdYEryjBq16OI8YRjbHIAd
+ IRr+ZUZEnrmMXSHQsq9IffqwObUTpKi15g3or5bl2/etFCiC3W3VwAdPysJt5QYWxQ9T
+ 4KFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=V7HQM6ZWCaBttTOQek/jXmWm+z3vGBaU4dKSv+ffCGg=;
- b=mpsYZUz6SO+R6M0WS37NLDVGvAdJ5F/a76698kF/LK6gR8rjaTnGge84YhF9SQNgQC
- 2UkihW7qxkYuXe9rA0mWg/7uHONZy39v9r9S90h9D7afkPMehdhHIOctOcOHtm1qngtm
- i8WjFquXwEQ7FakdjwPttmo6m2kXGAJ+iCi2S33ctT1IeqVffqYjlFURXHzSDFPT/5HR
- yqJ7IlyynwqR2deiPoDNbvUqaJEgybDCMoPiNmdBRR65byCfApRuPvQqbwQ1LuN7mMdl
- Ga+wmKwvOXADlbeLI1PK1ita7K2gucyKUwmM3+hFJ70e1mYtVwz3gyoIYvDCZspOozx9
- pbog==
-X-Gm-Message-State: APjAAAX1XsHdsZ3mVD87TEjPEjnccjcXRudk8wMFcMZransjSQNJaIR/
- JFVZCGcxq5docwJ96YlOkzDggDCZ
-X-Google-Smtp-Source: APXvYqzaqL2+n2+zkD6VSO9o0pmZ+t1zzRsNFYN122jVs1B8MwGDJgi5nQz3FCs94cFfWi8PNI69Aw==
-X-Received: by 2002:adf:e40f:: with SMTP id g15mr29409067wrm.223.1580234261044; 
- Tue, 28 Jan 2020 09:57:41 -0800 (PST)
+ bh=eP2TeH3k4aghmGxxgRo9140T1AoNaykBBCsOV4MtnLA=;
+ b=BZhC5Pdhs9KJ3L73aTZ4QZde0TJdvpz8V1edJ1t7vXSHPFN/ZlnoWt0Y6uOgkN7DhN
+ /ja72DmpuegIXGyTuxngk93oHd1dY4y+jQqEqcps/3Flkw9HwllNCotDXchVPAhw4buG
+ 5dBSYDSjzN03fGUdZKzKKeocq/EsTnv9AS0Or4SHnBjCNoxdGVqOmtz2JuLV+Sgpp2af
+ 9m8g6wZKiexgQ40q0bALodfFooaX//qmIyN9izav6PsLFNsZJDnQDPV14NO+ANZh9qgm
+ LEK1gXEuEXL9ym0/jealduQPg3I2+K5pXDRtinEimJV/Wx0YF0ppe8GjqlCVH8e6wOQn
+ ZRkg==
+X-Gm-Message-State: APjAAAW1vllAFIJmqR/EWYw3yRiYjomU5Wxnrfo865w0vxiUJEpPrqaT
+ Vg/ewOH5RMn9Na2yw/vhNpqTAKCg
+X-Google-Smtp-Source: APXvYqx14u/RepPQU3rPJiK630UeBt4ureTNvhDewFLWMuS+5doj14DDydVUNTuudV/jm6gb2dVQtQ==
+X-Received: by 2002:adf:e8ca:: with SMTP id k10mr28089244wrn.50.1580234193220; 
+ Tue, 28 Jan 2020 09:56:33 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.38
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:57:40 -0800 (PST)
+ Tue, 28 Jan 2020 09:56:32 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 099/142] meson: convert hw/i2c
-Date: Tue, 28 Jan 2020 18:52:59 +0100
-Message-Id: <20200128175342.9066-100-pbonzini@redhat.com>
+Subject: [PATCH 069/142] meson: convert hw/xen
+Date: Tue, 28 Jan 2020 18:52:29 +0100
+Message-Id: <20200128175342.9066-70-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,79 +103,118 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
+ configure            |  4 ++++
  hw/Makefile.objs     |  1 -
- hw/i2c/Makefile.objs | 13 -------------
- hw/i2c/meson.build   | 18 ++++++++++++++++++
  hw/meson.build       |  1 +
- 4 files changed, 19 insertions(+), 14 deletions(-)
- delete mode 100644 hw/i2c/Makefile.objs
- create mode 100644 hw/i2c/meson.build
+ hw/xen/Makefile.objs |  6 ------
+ hw/xen/meson.build   | 18 ++++++++++++++++++
+ meson.build          |  6 ++++++
+ 6 files changed, 29 insertions(+), 7 deletions(-)
+ create mode 100644 hw/meson.build
+ delete mode 100644 hw/xen/Makefile.objs
+ create mode 100644 hw/xen/meson.build
 
+diff --git a/configure b/configure
+index cfc7a5352c..aa51bb783c 100755
+--- a/configure
++++ b/configure
+@@ -2494,6 +2494,8 @@ if test "$xen" != "no" ; then
+     fi
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
++    xen_cflags="$($pkg_config --cflags $xen_pc)"
++    xen_libs="$($pkg_config --libs $xen_pc)"
+   else
+ 
+     xen_libs="-lxenstore -lxenctrl -lxenguest"
+@@ -7014,6 +7016,8 @@ fi
+ if test "$xen" = "yes" ; then
+   echo "CONFIG_XEN_BACKEND=y" >> $config_host_mak
+   echo "CONFIG_XEN_CTRL_INTERFACE_VERSION=$xen_ctrl_version" >> $config_host_mak
++  echo "XEN_CFLAGS=$xen_cflags" >> $config_host_mak
++  echo "XEN_LIBS=$xen_libs" >> $config_host_mak
+ fi
+ if test "$linux_aio" = "yes" ; then
+   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 545d7440b5..95c065d18f 100644
+index 660e2b4373..f0ca15595a 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -10,7 +10,6 @@ devices-dirs-y += display/
- devices-dirs-y += dma/
- devices-dirs-y += gpio/
- devices-dirs-$(CONFIG_HYPERV) += hyperv/
--devices-dirs-$(CONFIG_I2C) += i2c/
- endif
- 
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-deleted file mode 100644
-index d7073a401f..0000000000
---- a/hw/i2c/Makefile.objs
-+++ /dev/null
-@@ -1,13 +0,0 @@
--common-obj-$(CONFIG_I2C) += core.o smbus_slave.o smbus_master.o
--common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
--common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
--common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
--common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
--common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
--common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
--common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_i2c.o
--common-obj-$(CONFIG_NRF51_SOC) += microbit_i2c.o
--common-obj-$(CONFIG_MPC_I2C) += mpc_i2c.o
--obj-$(CONFIG_OMAP) += omap_i2c.o
--obj-$(CONFIG_PPC4XX) += ppc4xx_i2c.o
-diff --git a/hw/i2c/meson.build b/hw/i2c/meson.build
-new file mode 100644
-index 0000000000..43901e6f24
---- /dev/null
-+++ b/hw/i2c/meson.build
-@@ -0,0 +1,18 @@
-+i2c_ss = ss.source_set()
-+i2c_ss.add(when: 'CONFIG_ACPI_SMBUS', if_true: files('pm_smbus.c'))
-+i2c_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('smbus_ich9.c'))
-+i2c_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_BITBANG_I2C', if_true: files('bitbang_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_I2C', if_true: files('core.c', 'smbus_slave.c', 'smbus_master.c'))
-+i2c_ss.add(when: 'CONFIG_IMX_I2C', if_true: files('imx_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_MPC_I2C', if_true: files('mpc_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('microbit_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_SMBUS_EEPROM', if_true: files('smbus_eeprom.c'))
-+i2c_ss.add(when: 'CONFIG_VERSATILE_I2C', if_true: files('versatile_i2c.c'))
-+softmmu_ss.add_all(when: 'CONFIG_I2C', if_true: i2c_ss)
-+
-+specific_i2c_ss = ss.source_set()
-+specific_i2c_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_i2c.c'))
-+specific_i2c_ss.add(when: 'CONFIG_PPC4XX', if_true: files('ppc4xx_i2c.c'))
-+specific_ss.add_all(when: 'CONFIG_I2C', if_true: specific_i2c_ss)
+@@ -35,7 +35,6 @@ devices-dirs-y += usb/
+ devices-dirs-$(CONFIG_VFIO) += vfio/
+ devices-dirs-y += virtio/
+ devices-dirs-y += watchdog/
+-devices-dirs-y += xen/
+ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
+ devices-dirs-$(CONFIG_NUBUS) += nubus/
+ devices-dirs-y += semihosting/
 diff --git a/hw/meson.build b/hw/meson.build
-index 4d7c31c652..983edc1d47 100644
---- a/hw/meson.build
+new file mode 100644
+index 0000000000..08112a5e4b
+--- /dev/null
 +++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('i2c')
- subdir('ide')
- subdir('input')
- subdir('intc')
+@@ -0,0 +1 @@
++subdir('xen')
+diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+deleted file mode 100644
+index 84df60a928..0000000000
+--- a/hw/xen/Makefile.objs
++++ /dev/null
+@@ -1,6 +0,0 @@
+-# xen backend driver support
+-common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o xen-backend.o
+-
+-obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+-obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+-obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt_load_rom.o
+diff --git a/hw/xen/meson.build b/hw/xen/meson.build
+new file mode 100644
+index 0000000000..e9587b61ce
+--- /dev/null
++++ b/hw/xen/meson.build
+@@ -0,0 +1,18 @@
++softmmu_ss.add(when: ['CONFIG_XEN', xen], if_true: files(
++  'xen-backend.c',
++  'xen-bus-helper.c',
++  'xen-bus.c',
++  'xen-common.c',
++  'xen-legacy-backend.c',
++  'xen_devconfig.c',
++  'xen_pvdev.c',
++))
++
++specific_ss.add(when: 'CONFIG_XEN_PCI_PASSTHROUGH', if_true: files(
++  'xen-host-pci-device.c',
++  'xen_pt.c',
++  'xen_pt_config_init.c',
++  'xen_pt_graphics.c',
++  'xen_pt_load_rom.c',
++  'xen_pt_msi.c',
++))
+diff --git a/meson.build b/meson.build
+index 701f079345..583c42ccf5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -294,6 +294,11 @@ numa = declare_dependency()
+ if 'CONFIG_NUMA' in config_host
+   numa = declare_dependency(link_args: config_host['NUMA_LIBS'].split())
+ endif
++xen = declare_dependency()
++if 'CONFIG_XEN_BACKEND' in config_host
++  xen = declare_dependency(compile_args: config_host['XEN_CFLAGS'].split(),
++                           link_args: config_host['XEN_LIBS'].split())
++endif
+ 
+ create_config = find_program('scripts/create_config')
+ minikconf = find_program('scripts/minikconf.py')
+@@ -628,6 +633,7 @@ subdir('migration')
+ subdir('monitor')
+ subdir('net')
+ subdir('replay')
++subdir('hw')
+ 
+ mods = []
+ block_mods = []
 -- 
 2.21.0
 
