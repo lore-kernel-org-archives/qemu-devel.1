@@ -2,79 +2,83 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6E3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0E1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AC9320CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:51:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BAD421739
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 15:55:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PWImcM31"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AC9320CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NkoPrYsU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BAD421739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwT8l-0004Of-87
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 10:50:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39952)
+	id 1iwTDH-0007Jc-P8
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 10:55:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41411)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iwT80-0003uu-5b
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:50:13 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iwTCd-0006mD-Ic
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:55:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iwT7y-0003lD-8D
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:50:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46365
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iwT7y-0003l8-3m
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:50:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580226609;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hY05ihfHAmoi0CPELcwj5DvE7gz4gF7F8MHMS7nARcc=;
- b=PWImcM31lPmueexiTs97+kAMd3WMfJTOlBhEXDNlbXmUJbzrrCS5mg2gTCN3uyXD+tcQZo
- FrfhIxmkd0/2uoZrcCVUTnkpP7IrFoPqPCzLOslGRoelC6ecwOPnBjiDTfWCn9WTWX4y93
- AAm21qje2dZi3c1SGIyiD3Z3KwzHGVA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-lusBz8dGOUCrgivAkgLxHQ-1; Tue, 28 Jan 2020 10:50:05 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58E0B18A07CA;
- Tue, 28 Jan 2020 15:50:04 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B58935C290;
- Tue, 28 Jan 2020 15:49:59 +0000 (UTC)
-Date: Tue, 28 Jan 2020 16:49:58 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v3 04/18] hw/i386: Introduce initialize_topo_info to
- initialize X86CPUTopoInfo
-Message-ID: <20200128164958.6e97de19@redhat.com>
-In-Reply-To: <157541984181.46157.12341489595513709747.stgit@naples-babu.amd.com>
-References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
- <157541984181.46157.12341489595513709747.stgit@naples-babu.amd.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iwTCc-0005MA-9s
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:54:59 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50913)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iwTCc-00052P-2s
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 10:54:58 -0500
+Received: by mail-wm1-x344.google.com with SMTP id a5so3092062wmb.0
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 07:54:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=HB7SeHHUSQXQG4v7+wOM1mxRcavZ7ji8aB1K9EBg+O0=;
+ b=NkoPrYsUzFcushWd72ijYcW4u3SqxwaAUlYc+/iv0aBMSljewg+m5qKvqJiHvK9OAj
+ H/IzlThErDc7faJ0CsJruzZY9F/VZ/oeAdp2GHufgOTMHJlBnKmGqIyQ4Yn6WFke1tjU
+ WLqWrWP6rS+oOkas2WBbges4TWmVnKQPb518xHrFltNbErzPCwPpwnJ1LaNBCS+3kN9R
+ ZogLliFoXJlAd0coW0yVi6/o9/DKKLlTtNCne6d4gg5fs1kC0O5RDY1hpFxp41SI7A3o
+ l39QL8doBYdSjcbXKdF4acU3xSnk8tMxILsHlbU/O8mr7mIFqVUNwfgOESWg/mI0E0KD
+ oInQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=HB7SeHHUSQXQG4v7+wOM1mxRcavZ7ji8aB1K9EBg+O0=;
+ b=EvJy46Z5nmSmfW+uM9wD18cen636htraDVOowTFhS3IRDS2/4b8G46godUlzrHBqxo
+ HAhNPaeW3PZ2QqTdkkARh/JOeaP2zp1z3RzlL0vCr/GrJklz/Ctuhdjjgl/jrMt0rbgz
+ am2IFCNlGbP9Hc4IHjxnrkz0/TYfbECj+nFu/Xj2pB94r8+PDukk3UaEV1v/XJsatJ+E
+ xsKbtxhoKkQR4czJL8qdMMC6r5au4IaCw6P82PkmZVG3+rooaTjnlrQq3pBQTTA9NdLp
+ hGzbBmZZik0BlubiZcZc36RNa1ipXYX89WqY7ye4lpG7HJXN42KK2rnuBLPgmAn3gkuG
+ 2RVA==
+X-Gm-Message-State: APjAAAXO3pLAyDCUzbVJiki2gQgQYqDxBtwHq97zTFNChnd4zRY4YmAG
+ GkJFRJbU1s7BJ61UPdZ8lBb7q0Y4ps/1bmL5bME=
+X-Google-Smtp-Source: APXvYqw9AuOqIeCZTblvdb+5cJpQ7rh4PM9s82jewjXCfzfGdQG0WdRfyWEN4NxdysMg9sJwSVRh+j5uiPbmdOfz8Lw=
+X-Received: by 2002:a1c:9c87:: with SMTP id f129mr6089368wme.26.1580226896410; 
+ Tue, 28 Jan 2020 07:54:56 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: lusBz8dGOUCrgivAkgLxHQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20191219180205.25191-1-felipe@nutanix.com>
+ <CAJ+F1C+YmQFnMmWrJOZpKrqp9pEzUqLF7yP-yB2hwsz6h3L3cA@mail.gmail.com>
+ <A7FBEA28-7FDD-46BA-87DD-3EDB5B101571@nutanix.com>
+In-Reply-To: <A7FBEA28-7FDD-46BA-87DD-3EDB5B101571@nutanix.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 28 Jan 2020 16:54:44 +0100
+Message-ID: <CAJ+F1CKPnCBkyA5Ep98+ug0NG5wgfZFkt7vDe-FN_25S0hQm3w@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Improve default object property_add uint helpers
+To: Felipe Franciosi <felipe@nutanix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,106 +90,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Markus Armbruster <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Phillipe Mathieu-Daude <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 03 Dec 2019 18:37:21 -0600
-Babu Moger <babu.moger@amd.com> wrote:
+Hi Felipe,
 
-> Initialize all the parameters in one function initialize_topo_info.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/i386/pc.c |   28 +++++++++++++++-------------
->  1 file changed, 15 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 8c23b1e8c9..cafbdafa76 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -866,6 +866,15 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
->      x86_cpu_set_a20(cpu, level);
->  }
->  
-> +static inline void initialize_topo_info(X86CPUTopoInfo *topo_info,
-> +                                        PCMachineState *pcms,
+On Fri, Jan 24, 2020 at 11:49 AM Felipe Franciosi <felipe@nutanix.com> wrot=
+e:
+>
+> Hi Marc-Andre and Paolo,
+>
+> > On Dec 20, 2019, at 3:15 PM, Marc-Andr=C3=A9 Lureau <marcandre.lureau@g=
+mail.com> wrote:
+> >
+> > Hi
+> >
+> > On Thu, Dec 19, 2019 at 10:02 PM Felipe Franciosi <felipe@nutanix.com> =
+wrote:
+> >>
+> >> This improves the family of object_property_add_uintXX_ptr helpers by =
+enabling
+> >> a default getter/setter only when desired. To prevent an API behaviour=
+al change
+> >> (from clients that already used these helpers and did not want a sette=
+r), we
+> >> add a OBJ_PROP_FLAG_READ flag that allow clients to only have a getter=
+. Patch 1
+> >> enhances the API and modify current users.
+> >>
+> >> While modifying the clients of the API, a couple of improvement opport=
+unities
+> >> were observed in ich9. These were added in separate patches (2 and 3).
+> >>
+> >> Patch 3 cleans up a lot of existing code by moving various objects to =
+the
+> >> enhanced API. Previously, those objects had their own getters/setters =
+that only
+> >> updated the values without further checks. Some of them actually lacke=
+d a check
+> >> for setting overflows, which could have resulted in undesired values b=
+eing set.
+> >> The new default setters include a check for that, not updating the val=
+ues in
+> >> case of errors (and propagating them). If they did not provide an erro=
+r
+> >> pointer, then that behaviour was maintained.
+> >>
+> >> Felipe Franciosi (4):
+> >>  qom/object: enable setter for uint types
+> >>  ich9: fix getter type for sci_int property
+> >>  ich9: Simplify ich9_lpc_initfn
+> >>  qom/object: Use common get/set uint helpers
+> >>
+> >> hw/acpi/ich9.c       |  99 ++------------------
+> >> hw/acpi/pcihp.c      |   7 +-
+> >> hw/acpi/piix4.c      |  12 +--
+> >> hw/isa/lpc_ich9.c    |  27 ++----
+> >> hw/misc/edu.c        |  13 +--
+> >> hw/pci-host/q35.c    |  14 +--
+> >> hw/ppc/spapr.c       |  18 +---
+> >> hw/ppc/spapr_drc.c   |   3 +-
+> >> include/qom/object.h |  44 +++++++--
+> >> memory.c             |  15 +--
+> >> qom/object.c         | 216 ++++++++++++++++++++++++++++++++++++++-----
+> >> target/arm/cpu.c     |  22 +----
+> >> target/i386/sev.c    | 106 ++-------------------
+> >> ui/console.c         |   4 +-
+> >> 14 files changed, 282 insertions(+), 318 deletions(-)
+> >
+> > It conflicts with some recent changes, so you'll need to send a new
+> > version, but that one looks good to me:
+> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >
+> > Paolo, is it going through your queue?
+>
+> I didn't see any response after this. Did the series get lost?
 
-maybe use 'const'
+Can you send a rebased version?
 
-> +                                        const MachineState *ms)
-'ms' is the same thing as 'pcms', so why pass it around separately?
+thanks
 
-you can just do
-   MachineState *ms = MACHINE(pcms)
-inside of function
 
-> +{
-> +    topo_info->dies_per_pkg = pcms->smp_dies;
-> +    topo_info->cores_per_die = ms->smp.cores;
-> +    topo_info->threads_per_core = ms->smp.threads;
-> +}
-> +
->  /* Calculates initial APIC ID for a specific CPU index
->   *
->   * Currently we need to be able to calculate the APIC ID from the CPU index
-> @@ -882,9 +891,7 @@ static uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
->      uint32_t correct_id;
->      static bool warned;
->  
-> -    topo_info.dies_per_pkg = pcms->smp_dies;
-> -    topo_info.cores_per_die = ms->smp.cores;
-> -    topo_info.threads_per_core = ms->smp.threads;
-> +    initialize_topo_info(&topo_info, pcms, ms);
->  
->      correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
->      if (pcmc->compat_apic_id_mode) {
-> @@ -2231,9 +2238,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->          return;
->      }
->  
-> -    topo_info.dies_per_pkg = pcms->smp_dies;
-> -    topo_info.cores_per_die = smp_cores;
-> -    topo_info.threads_per_core = smp_threads;
-> +    initialize_topo_info(&topo_info, pcms, ms);
->  
->      env->nr_dies = pcms->smp_dies;
->  
-> @@ -2702,9 +2707,7 @@ static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int idx)
->     PCMachineState *pcms = PC_MACHINE(ms);
->     X86CPUTopoInfo topo_info;
->  
-> -   topo_info.dies_per_pkg = pcms->smp_dies;
-> -   topo_info.cores_per_die = ms->smp.cores;
-> -   topo_info.threads_per_core = ms->smp.threads;
-> +   initialize_topo_info(&topo_info, pcms, ms);
->  
->     assert(idx < ms->possible_cpus->len);
->     x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
-> @@ -2719,10 +2722,6 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
->      X86CPUTopoInfo topo_info;
->      int i;
->  
-> -    topo_info.dies_per_pkg = pcms->smp_dies;
-> -    topo_info.cores_per_die = ms->smp.cores;
-> -    topo_info.threads_per_core = ms->smp.threads;
-> -
->      if (ms->possible_cpus) {
->          /*
->           * make sure that max_cpus hasn't changed since the first use, i.e.
-> @@ -2734,6 +2733,9 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
->  
->      ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
->                                    sizeof(CPUArchId) * max_cpus);
-> +
-> +    initialize_topo_info(&topo_info, pcms, ms);
-> +
->      ms->possible_cpus->len = max_cpus;
->      for (i = 0; i < ms->possible_cpus->len; i++) {
->          X86CPUTopoIDs topo_ids;
-> 
 
+--=20
+Marc-Andr=C3=A9 Lureau
 
