@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB68AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02345C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 873DD2467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:53:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82DA52467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHzyAfmw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873DD2467E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqVPe/jE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82DA52467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVzm-0006vr-Oz
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:53:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33995)
+	id 1iwW0g-0008LU-DI
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:54:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6L-0001ed-U0
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:39 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7S-00033J-TD
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6K-0004m5-FV
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:37 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:39007)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7R-0007LG-QK
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:46 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53132)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV6K-0004kD-6F
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:36 -0500
-Received: by mail-wr1-x434.google.com with SMTP id y11so17090012wrt.6
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:36 -0800 (PST)
+ id 1iwV7R-0007EU-JT
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:45 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p9so3518340wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Hg/3yo5twaEsNTU2uJXGbIo5hUz72j4nbvEVGvGacGw=;
- b=UHzyAfmwGODENgptXqIC74/sQsRJW2jamgxjBP3OwGhJG/Vc4sjIMXVCx+i499D5aT
- TwbBdaJk1Q87NE5cq9u2wGPHparLZG1oZMDbDpAIAlsiOFwmFcd3NaIplwBg3C9AjGF3
- GZlyHsNSDDD7MB0AXbsNrKDMh/ZSRVj1F0M38ZyUpVq4k4m2UzT60gz9rd9z2/Gs23ZY
- rtXUNDc0tjbAj2AWE6C4PgWP/i8PL0JVfCloJ40cGydCbuorhvWwXOqdwjPDjTKv+0cX
- dOFqt++cz9d0zbzvUrlltrXAIuD2vh3hiEMKmgU7wgFML39YNlzXy0IB40dVFtlbwg6O
- m2sQ==
+ bh=q2jpfAnc2KRQsp1K1I4kxr6g0Wc0w9Jp+uUoDxrj7nQ=;
+ b=UqVPe/jEsahUQDM5q2dAvXAyelowN1aMVKwSHPoqJWfdGVDd7eWwkZJMEMdxMBZL5F
+ oRwepO/dic0yN1Cz2QG8QV/5EIwKK5LlnDA20y9jid29vqIakqow5tJ3fpxIgdT8R9Xi
+ c74gEA/ab9xmjEgs5+KezaseAwBwR5DdouLl6UIX0fXvdZAEKBNxe7QyJ9F0M8cVsWv1
+ WlX9jqyTkIA8A1o1/X2g6TmdQWBYlcl5Io/dGkWzKeZgQpQUzP8NjPJJqwjOW8u283FQ
+ 0/H/TizDFnSLql8LjM/kd4BwV7sC7AHL2U2Vn7swbsau3/LlHR5SuIuBfy1rgpnghDnn
+ eCcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Hg/3yo5twaEsNTU2uJXGbIo5hUz72j4nbvEVGvGacGw=;
- b=H1N/Xah/sPFhYfs4iQUaeQr/jHQ1PqB9nXCzgH+mgN8Wo29PERbuyVqTDf4TPI4VIJ
- +TSHza6JuIssPgOHGerZk8FNGUVXLB+wlEP/GGRFsv3kdeWWiiOuGWvRIx/hVC7hH91Q
- mhUnNwNw8xEJsKkux05HjCq4TaxMqXUb7n2b6SxiGwwj9EImz6ZR5iupJ4keioX2LDhV
- Be6RgxGxyiSFEkWE+/KJRQLppl1gyHS361pcuZwXN0/fbiPjj3PwoCoWV54GGpBnVlRh
- 68ll9YdBiGDFXCokBtDKdBgveYiE8KGW0GLhMnp4hnjAbI5hUdkt3cadhMSF2Aj3WLMI
- L9oQ==
-X-Gm-Message-State: APjAAAW8M8NzIXAaoJhuXl8MZa7D6kXsF5zZXbiW8nYGYn1+f3P/Eth7
- XmOyIFqhGPNZKOxO2EEsy529E0En
-X-Google-Smtp-Source: APXvYqxf6j+crG22rD7XsalW3wxqShD8wPm2id2c3ExbO7ueYbex4coi0BBz3qW5/nr0h1lmUppJwg==
-X-Received: by 2002:adf:ea51:: with SMTP id j17mr30134285wrn.83.1580234194963; 
- Tue, 28 Jan 2020 09:56:34 -0800 (PST)
+ bh=q2jpfAnc2KRQsp1K1I4kxr6g0Wc0w9Jp+uUoDxrj7nQ=;
+ b=d6xv6eawMKSddgD3sCvv2aJa2FlUgDK3JQ53GLPh7uo3HAq+yU7/0PW6LadieMBHW6
+ VKbT4sQnGTNM404cdCJPSbohEbLx5DR33GnSGL+HFC+L2ntoBaLFKhBZ9SY5oya1hot1
+ FUwEAOXU7MbgEsa6fgkENdQnyWrgzvjN/D8yBLcPTQTTWCVNjTCOdF9n3amufluqRlrA
+ zOxjwfIrAlM+HnmkKz8JynVDOQgcfBBEl3jVecpzz2c1rLNFX27evz7MrjAydxTyji5x
+ 3Kc0ZcY+BzG3h2jJVS3dZClt3K0mmzse5GxtLsSxjX33ZvG5m8stGyBSWVl7UcpOqtj+
+ 1SFQ==
+X-Gm-Message-State: APjAAAXHS5+irFnNgkhXtK+XND4TPJDk9sgV9HYilJoOx9+s/gqid/8F
+ FCS+vig0cA6CZRH24fyrQgyQFLyP
+X-Google-Smtp-Source: APXvYqxQfYFr6gY6EX9LWYkYBQKKjGI5tE/fjdzKyXIGavuYzf7X5Ul2xLQ56vmMDHLyfhQZptq1gA==
+X-Received: by 2002:a1c:bc08:: with SMTP id m8mr6649548wmf.189.1580234263230; 
+ Tue, 28 Jan 2020 09:57:43 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.33
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:56:34 -0800 (PST)
+ Tue, 28 Jan 2020 09:57:42 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 070/142] meson: convert hw/core
-Date: Tue, 28 Jan 2020 18:52:30 +0100
-Message-Id: <20200128175342.9066-71-pbonzini@redhat.com>
+Subject: [PATCH 100/142] meson: convert hw/hyperv
+Date: Tue, 28 Jan 2020 18:53:00 +0100
+Message-Id: <20200128175342.9066-101-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,111 +103,52 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/core/Makefile.objs | 30 ------------------------------
- hw/core/meson.build   | 39 +++++++++++++++++++++++++++++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 40 insertions(+), 31 deletions(-)
- delete mode 100644 hw/core/Makefile.objs
- create mode 100644 hw/core/meson.build
+ hw/Makefile.objs        | 1 -
+ hw/hyperv/Makefile.objs | 2 --
+ hw/hyperv/meson.build   | 2 ++
+ hw/meson.build          | 1 +
+ 4 files changed, 3 insertions(+), 3 deletions(-)
+ delete mode 100644 hw/hyperv/Makefile.objs
+ create mode 100644 hw/hyperv/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index f0ca15595a..3e3ac7fe79 100644
+index 95c065d18f..c9999a846b 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -1,4 +1,3 @@
--devices-dirs-y = core/
- ifeq ($(CONFIG_SOFTMMU), y)
- devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
- devices-dirs-y += acpi/
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+@@ -9,7 +9,6 @@ devices-dirs-y += cpu/
+ devices-dirs-y += display/
+ devices-dirs-y += dma/
+ devices-dirs-y += gpio/
+-devices-dirs-$(CONFIG_HYPERV) += hyperv/
+ endif
+ 
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/hyperv/Makefile.objs b/hw/hyperv/Makefile.objs
 deleted file mode 100644
-index fd0550d1d9..0000000000
---- a/hw/core/Makefile.objs
+index edaca2f763..0000000000
+--- a/hw/hyperv/Makefile.objs
 +++ /dev/null
-@@ -1,30 +0,0 @@
--# core qdev-related obj files, also used by *-user:
--common-obj-y += qdev.o qdev-properties.o
--common-obj-y += bus.o reset.o
--common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
--common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
--# irq.o needed for qdev GPIO handling:
--common-obj-y += irq.o
--common-obj-y += hotplug.o
--common-obj-$(CONFIG_SOFTMMU) += nmi.o
--common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
--common-obj-y += cpu.o
--
--common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
--common-obj-$(CONFIG_XILINX_AXI) += stream.o
--common-obj-$(CONFIG_PTIMER) += ptimer.o
--common-obj-$(CONFIG_SOFTMMU) += sysbus.o
--common-obj-$(CONFIG_SOFTMMU) += machine.o
--common-obj-$(CONFIG_SOFTMMU) += loader.o
--common-obj-$(CONFIG_FITLOADER) += loader-fit.o
--common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
--common-obj-$(CONFIG_REGISTER) += register.o
--common-obj-$(CONFIG_OR_IRQ) += or-irq.o
--common-obj-$(CONFIG_SPLIT_IRQ) += split-irq.o
--common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
--common-obj-$(CONFIG_GENERIC_LOADER) += generic-loader.o
--common-obj-$(CONFIG_SOFTMMU) += null-machine.o
--
--obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
--obj-$(CONFIG_SOFTMMU) += numa.o
--common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
-diff --git a/hw/core/meson.build b/hw/core/meson.build
+@@ -1,2 +0,0 @@
+-obj-y += hyperv.o
+-obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
 new file mode 100644
-index 0000000000..3b0d2af593
+index 0000000000..98663ece7a
 --- /dev/null
-+++ b/hw/core/meson.build
-@@ -0,0 +1,39 @@
-+common_ss.add(files(
-+  # core qdev-related obj files, also used by *-user:
-+  'bus.c',
-+  'cpu.c',
-+  'fw-path-provider.c',
-+  'hotplug.c',
-+  'qdev-properties.c',
-+  'qdev.c',
-+  'reset.c',
-+  # irq.c needed for qdev GPIO handling:
-+  'irq.c',
-+))
-+
-+common_ss.add(when: 'CONFIG_EMPTY_SLOT', if_true: files('empty_slot.c'))
-+common_ss.add(when: 'CONFIG_FITLOADER', if_true: files('loader-fit.c'))
-+common_ss.add(when: 'CONFIG_GENERIC_LOADER', if_true: files('generic-loader.c'))
-+common_ss.add(when: 'CONFIG_OR_IRQ', if_true: files('or-irq.c'))
-+common_ss.add(when: 'CONFIG_PLATFORM_BUS', if_true: files('platform-bus.c'))
-+common_ss.add(when: 'CONFIG_PTIMER', if_true: files('ptimer.c'))
-+common_ss.add(when: 'CONFIG_REGISTER', if_true: files('register.c'))
-+common_ss.add(when: 'CONFIG_SPLIT_IRQ', if_true: files('split-irq.c'))
-+common_ss.add(when: 'CONFIG_XILINX_AXI', if_true: files('stream.c'))
-+
-+softmmu_ss.add(files(
-+  'loader.c',
-+  'machine-hmp-cmds.c',
-+  'machine.c',
-+  'nmi.c',
-+  'null-machine.c',
-+  'qdev-fw.c',
-+  'qdev-properties-system.c',
-+  'sysbus.c',
-+  'vm-change-state-handler.c',
-+))
-+
-+specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
-+  'machine-qmp-cmds.c',
-+  'numa.c',
-+))
++++ b/hw/hyperv/meson.build
+@@ -0,0 +1,2 @@
++specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
++specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
 diff --git a/hw/meson.build b/hw/meson.build
-index 08112a5e4b..fe7c466460 100644
+index 983edc1d47..f9e5adfb48 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1 +1,2 @@
-+subdir('core')
- subdir('xen')
+@@ -1,4 +1,5 @@
+ subdir('core')
++subdir('hyperv')
+ subdir('i2c')
+ subdir('ide')
+ subdir('input')
 -- 
 2.21.0
 
