@@ -2,78 +2,78 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A90B6C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:22:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82AE0C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:22:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 663FC2467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:22:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54D3C2467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:22:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aHZ2MrnG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 663FC2467E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uMwp6bKK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54D3C2467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWRY-0001bX-Ca
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:22:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38890)
+	id 1iwWRb-0001iL-G6
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:22:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36707)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8z-0005TV-0R
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:23 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7o-0003g5-Mh
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8u-0002Fd-Ki
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:20 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:38625)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7n-00087K-GJ
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:08 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33897)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV8t-00029W-Tb
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:59:16 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id a9so3579023wmj.3
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:59:11 -0800 (PST)
+ id 1iwV7n-00083j-9a
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:07 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id t2so17106243wrr.1
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:58:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RcQrNFggeNmlSs35dyilD6GwcAP8H/A33YAOTncSaG8=;
- b=aHZ2MrnGj0VATVtHQaNncfCddzIc1sN2obewnbBhTjN+PDBY1/hgOhDZTDFqbVKfWV
- aJFBgxZUDTtNFf9g4N01N8ynBcx8NR7UdjmHNxb5J971YAk8UQKNFwxqyePrGdpbbslf
- s/H0R1vsoL8JrdPVumvW1O+yA2HlFX9n0HHwlvm3Qm8vdSJ8Oe94mYm4SsjjNcVmKIGz
- jzTRUeFvC+e0lVzW2wqQipyXACWnXIzQKjCtGLUqZTQlEeLZAmRO0IKYTOZe7NUZrY4O
- rI6GlzxAvFWpLk5lj2DPtFfChBmd582HPjSIA7x4RmV9MFPqHF7h3GHXC1Iasg1S9Mkv
- fpaw==
+ bh=UHvLFzmHTkjHMXmJaoCxJ0YHmI8i0R5/gsXric3VkuQ=;
+ b=uMwp6bKKAhuztyLDm0Jrv+IQqIqXmt6Edxg0Dx7UXbfd+zEfAdDBicLhgdbQs+wLXp
+ eBRBeUiKgbbyx1VroO7U0ZCoWgkRtxzBrRQILTvenH92S4+kXUajk9kxj5pOf1ihsWzK
+ AClec8/43Al+Mk97j1fcVf0sHtcz/YJSGpOtOc+GYW/rtrNNOY/x8esxb4UWTN8BCqci
+ XFwPAOuETV7LfVmNa0nxlEhv7DHgU7R5khLfnCZnqixEd/bsNVf9EkSi8U4jVRq6rDLG
+ PU/7rOcxjgnLu9rkiNeurj/64AOn6RPs1ni94ptg20IZF6y8nNP5tSZxRCKVKBEKChaN
+ a73A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=RcQrNFggeNmlSs35dyilD6GwcAP8H/A33YAOTncSaG8=;
- b=fiNJv5M5wRjJ+FVEN0JabedtMKSu4mjsINNn2/7gVXFyjJVltHsT6Wp7ndWZWSzqbg
- FVAtfWUs//nfiGc6ZPBV8xqRxlj310H4LMUZG9AjU45xjvaOcEgHxpewQNN9fXKOhgnC
- V1nY+xUuU34S2kQYlAE9p4DtFaWxl1Xfa2/oPR+H4FMtXwib6JHG5uiXyKmzJdOgRSxG
- 86JnYPuJCInBOs2aFVljEuyqBIpn8daaItWmQeL/aV79KMA6oldq5qlf75p/QyqrgprG
- yKlTcaApdegSOv7eN01hEFWofQVJ50SjoAHrYEDxlWILYmIczpHN5mfR2UA4kVb87Nd9
- /Ztw==
-X-Gm-Message-State: APjAAAVKsSS8JpP5vkmKVjm2P3Xfh2+i6wT9a4kLUi2YLMMTO2aPkRkM
- U7gQ7mSrJUyLUTCTYSxpckQ2s69U
-X-Google-Smtp-Source: APXvYqwTAUJydZBeLZtxUNs+wgvFvMhu03FNMlPcXt61W/UF+zBMlg86vINin6awhBTfthuxjnAxqQ==
-X-Received: by 2002:a1c:4e05:: with SMTP id g5mr6141221wmh.138.1580234349956; 
- Tue, 28 Jan 2020 09:59:09 -0800 (PST)
+ bh=UHvLFzmHTkjHMXmJaoCxJ0YHmI8i0R5/gsXric3VkuQ=;
+ b=KPWtEEig+s20ODX5i2yv/06DvASqePrXWXtDFRC6NRlm5afkoLmYlhqgPDb+4nFLXb
+ eFbmkTceI2IUX2+1ao5lfFEN9NXe/wZjGx6zojuYS6l6XeVFxOg1lsIJEwDI9/ZvEoTj
+ LmJBK+oPxIvnt2oeavX3oej5jCfkL1C2myHSHpEWWbOrk7F20wl/9TaguuBLa5k2u1le
+ DEWmR1mDJb0jKBlhUKLctgh64ZUBPBDJoRl7ox56LoKiroio7UWIdQEKWkWPf9Lu2Eon
+ 3VMmDDpayyJaK1XFArorIL5EfyCArmPYIymL3w8Sw4hUoBthNYCq9QAcBXfTjljInPTy
+ 3Yuw==
+X-Gm-Message-State: APjAAAU8U7PD3DI3lqeIiUs7IIPnzJLWHUMK5N3arKz6HsaoZUK5oKwn
+ hf6aDbGuW/eUOqIh8Gy9vJRUwSHB
+X-Google-Smtp-Source: APXvYqyVBxdrfBuLu6V6JoLkOsIEGT/iyuu2kCUM/T9rskOhS33dIAG9BTIW1aCZB66QnyjORuj5Aw==
+X-Received: by 2002:adf:f80b:: with SMTP id s11mr31555734wrp.12.1580234285054; 
+ Tue, 28 Jan 2020 09:58:05 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.59.07
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.58.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:59:09 -0800 (PST)
+ Tue, 28 Jan 2020 09:58:04 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 136/142] meson: convert pc-bios/s390-ccw
-Date: Tue, 28 Jan 2020 18:53:36 +0100
-Message-Id: <20200128175342.9066-137-pbonzini@redhat.com>
+Subject: [PATCH 109/142] meson: convert hw/acpi
+Date: Tue, 28 Jan 2020 18:53:09 +0100
+Message-Id: <20200128175342.9066-110-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32f
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,336 +103,92 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- configure                    |   8 --
- pc-bios/meson.build          |   5 +
- pc-bios/s390-ccw/Makefile    | 103 ---------------------
- pc-bios/s390-ccw/meson.build | 175 +++++++++++++++++++++++++++++++++++
- 4 files changed, 180 insertions(+), 111 deletions(-)
- delete mode 100644 pc-bios/s390-ccw/Makefile
- create mode 100644 pc-bios/s390-ccw/meson.build
+ hw/Makefile.objs      |  1 -
+ hw/acpi/Makefile.objs | 24 ------------------------
+ hw/acpi/meson.build   | 22 ++++++++++++++++++++++
+ hw/meson.build        |  1 +
+ 4 files changed, 23 insertions(+), 25 deletions(-)
+ delete mode 100644 hw/acpi/Makefile.objs
+ create mode 100644 hw/acpi/meson.build
 
-diff --git a/configure b/configure
-index 089bff7c37..64d52fa589 100755
---- a/configure
-+++ b/configure
-@@ -6331,14 +6331,6 @@ if { test "$cpu" = "i386" || test "$cpu" = "x86_64"; } && \
-     done
- fi
- 
--# Only build s390-ccw bios if we're on s390x and the compiler has -march=z900
--if test "$cpu" = "s390x" ; then
--  write_c_skeleton
--  if compile_prog "-march=z900" ""; then
--    roms="$roms s390-ccw"
--  fi
--fi
--
- # Probe for the need for relocating the user-only binary.
- if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ]; then
-   textseg_addr=
-diff --git a/pc-bios/meson.build b/pc-bios/meson.build
-index 62183506f7..013c75ce43 100644
---- a/pc-bios/meson.build
-+++ b/pc-bios/meson.build
-@@ -101,3 +101,8 @@ if dtc.found()
-   endforeach
-   alias_target('update-dtb', t)
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 5823867997..3dc4decfb5 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,6 +1,5 @@
+ ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+-devices-dirs-y += acpi/
  endif
-+
-+cc = meson.get_compiler('c')
-+if host_machine.cpu_family() == 's390x' and cc.has_argument('-march=z900')
-+  subdir('s390-ccw')
-+endif
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+ 
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
 deleted file mode 100644
-index b512074e3a..0000000000
---- a/pc-bios/s390-ccw/Makefile
+index 99253057e1..0000000000
+--- a/hw/acpi/Makefile.objs
 +++ /dev/null
-@@ -1,103 +0,0 @@
--CURRENT_MAKEFILE := $(realpath $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
--SRC_DIR := $(dir $(CURRENT_MAKEFILE))
--TOPSRC_DIR := $(SRC_DIR)/../..
--VPATH = $(SRC_DIR)
+@@ -1,24 +0,0 @@
+-ifeq ($(CONFIG_ACPI),y)
+-common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
+-common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
+-common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
+-common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+-common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+-common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+-common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+-common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+-common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+-common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
 -
--all:
--# Dummy command so that make thinks it has done something
--	@true
+-common-obj-y += acpi_interface.o
+-common-obj-y += bios-linker-loader.o
+-common-obj-y += aml-build.o utils.o
+-common-obj-$(CONFIG_ACPI_PCI) += pci.o
+-common-obj-$(CONFIG_TPM) += tpm.o
 -
--include ../../config-host.mak
--
--quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
--cc-option = $(if $(shell $(CC) $1 -S -o /dev/null -xc /dev/null >/dev/null 2>&1 && echo OK), $1, $2)
--
--override CFLAGS += $(filter -W%, $(QEMU_CFLAGS))
--override CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
--override CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
--override CFLAGS += -fno-asynchronous-unwind-tables
--override CFLAGS += $(call cc-option, -fno-stack-protector)
--LDFLAGS += -Wl,-pie -nostdlib
--
--OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
--	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o cio.o dasd-ipl.o
--
--STRIP ?= strip
--
--$(OBJECTS): Makefile
--
--SLOF_DIR := $(SRC_PATH)/roms/SLOF
--
--NETOBJS := start.o sclp.o cio.o virtio.o virtio-net.o jump2ipl.o netmain.o \
--	   libnet.a libc.a
--
--LIBC_INC := -nostdinc -I$(SLOF_DIR)/lib/libc/include
--LIBNET_INC := -I$(SLOF_DIR)/lib/libnet
--
--$(NETOBJS): QEMU_CFLAGS += $(LIBC_INC) $(LIBNET_INC)
--
--# libc files:
--
--LIBC_CFLAGS :=  $(QEMU_CFLAGS) $(CFLAGS) $(LIBC_INC) $(LIBNET_INC)
--
--CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
--$(CTYPE_OBJS) : %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
--	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
--
--STRING_OBJS = strcat.o strchr.o strrchr.o strcpy.o strlen.o strncpy.o \
--	      strcmp.o strncmp.o strcasecmp.o strncasecmp.o strstr.o \
--	      memset.o memcpy.o memmove.o memcmp.o
--$(STRING_OBJS) : %.o : $(SLOF_DIR)/lib/libc/string/%.c
--	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
--
--STDLIB_OBJS = atoi.o atol.o strtoul.o strtol.o rand.o malloc.o free.o
--$(STDLIB_OBJS) : %.o : $(SLOF_DIR)/lib/libc/stdlib/%.c
--	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
--
--STDIO_OBJS = sprintf.o snprintf.o vfprintf.o vsnprintf.o vsprintf.o fprintf.o \
--	     printf.o putc.o puts.o putchar.o stdchnls.o fileno.o
--$(STDIO_OBJS) : %.o : $(SLOF_DIR)/lib/libc/stdio/%.c
--	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
--
--sbrk.o: $(SLOF_DIR)/slof/sbrk.c
--	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
--
--LIBCOBJS := $(STRING_OBJS) $(CTYPE_OBJS) $(STDLIB_OBJS) $(STDIO_OBJS) sbrk.o
--
--libc.a: $(LIBCOBJS)
--	$(call quiet-command,$(AR) -rc $@ $^,"AR","$(TARGET_DIR)$@")
--
--# libnet files:
--
--LIBNETOBJS := args.o dhcp.o dns.o icmpv6.o ipv6.o tcp.o udp.o bootp.o \
--	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o pxelinux.o
--LIBNETCFLAGS := $(CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
--
--$(LIBNETOBJS) : %.o : $(SLOF_DIR)/lib/libnet/%.c
--	$(call quiet-command,$(CC) $(LIBNETCFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
--
--libnet.a: $(LIBNETOBJS)
--	$(call quiet-command,$(AR) -rc $@ $^,"AR","$(TARGET_DIR)$@")
--
--%.elf:
--	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $^,"BUILD","$(TARGET_DIR)$@")
--
--%.img: %.elf
--	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
--
--s390-ccw.elf: $(OBJECTS)
--s390-ccw.img: s390-ccw.elf
--all: s390-ccw.img
--
--ifneq ($(wildcard $(SLOF_DIR)/lib/libnet),)
--s390-netboot.elf: $(NETOBJS)
--s390-netboot.elf: LDFLAGS += -Ttext=0x7800000
--
--s390-netboot.img: s390-netboot.elf
--all: s390-netboot.img
+-common-obj-$(CONFIG_IPMI) += ipmi.o
+-common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+-else
+-common-obj-y += acpi-stub.o
 -endif
--
--clean:
--	rm -f *.o *.d *.img *.elf *~ *.a
--
--.PHONY : all clean
-diff --git a/pc-bios/s390-ccw/meson.build b/pc-bios/s390-ccw/meson.build
+-common-obj-$(CONFIG_ALL) += acpi-stub.o acpi-x86-stub.o ipmi-stub.o
+diff --git a/hw/acpi/meson.build b/hw/acpi/meson.build
 new file mode 100644
-index 0000000000..a4e0e3b7dd
+index 0000000000..356f50705f
 --- /dev/null
-+++ b/pc-bios/s390-ccw/meson.build
-@@ -0,0 +1,175 @@
-+strip = find_program('strip')
-+cc = meson.get_compiler('c')
-+link_args = ['-Wl,-pie', '-nostdlib']
-+
-+# FIXME: find a better way to check/enable slof
-+slof = '../../roms/SLOF'
-+has_slof = cc.has_header('libnet/tftp.h', args: '-I' + meson.current_source_dir() / slof / 'lib')
-+
-+s390_cargs = [
-+  '-ffreestanding',
-+  '-fno-delete-null-pointer-checks',
-+  '-msoft-float',
-+  '-march=z900',
-+  '-fPIE',
-+  '-fno-strict-aliasing',
-+  '-fno-asynchronous-unwind-tables',
-+  cc.get_supported_arguments('-fno-stack-protector')
-+]
-+
-+s390_incs = []
-+
-+s390_srcs = [
-+  'bootmap.c',
-+  'cio.c',
-+  'dasd-ipl.c',
-+  'jump2ipl.c',
-+  'libc.c',
-+  'main.c',
-+  'menu.c',
-+  'sclp.c',
-+  'start.S',
-+  'virtio-blkdev.c',
-+  'virtio-scsi.c',
-+  'virtio.c',
-+]
-+
-+if has_slof
-+  s390_srcs += [
-+    'netmain.c',
-+    'virtio-net.c',
-+  ]
-+  s390_incs += include_directories(slof / 'lib/libnet')
-+  s390_incs += include_directories(slof / 'lib/libc/include')
-+  s390_cargs += '-nostdinc'
-+endif
-+
-+s390_lib = static_library(
-+  's390', s390_srcs,
-+  c_args: s390_cargs,
-+  include_directories: s390_incs,
-+)
-+
-+s390_ccw_elf = executable(
-+  's390-ccw.elf',
-+  link_args: link_args,
-+  objects: s390_lib.extract_objects([
-+    'bootmap.c',
-+    'cio.c',
-+    'dasd-ipl.c',
-+    'jump2ipl.c',
-+    'libc.c',
-+    'main.c',
-+    'menu.c',
-+    'sclp.c',
-+    'start.S',
-+    'virtio-blkdev.c',
-+    'virtio-scsi.c',
-+    'virtio.c',
-+  ]),
-+)
-+
-+custom_target(
-+  's390-ccw.img',
-+  output: 's390-ccw.img',
-+  input: s390_ccw_elf,
-+  command: [strip, '--strip-unneeded', '@INPUT@', '-o', '@OUTPUT@'],
-+  build_by_default: true,
-+)
-+
-+if has_slof
-+  slof_ctype = slof / 'lib/libc/ctype'
-+  slof_str = slof / 'lib/libc/string'
-+  slof_stdlib = slof / 'lib/libc/stdlib'
-+  slof_stdio = slof / 'lib/libc/stdio'
-+
-+  s390_libc = static_library(
-+    's390-libc', files(
-+      slof_ctype / 'isdigit.c',
-+      slof_ctype / 'isxdigit.c',
-+      slof_ctype / 'toupper.c',
-+      slof_str / 'strcat.c',
-+      slof_str / 'strchr.c',
-+      slof_str / 'strrchr.c',
-+      slof_str / 'strcpy.c',
-+      slof_str / 'strlen.c',
-+      slof_str / 'strncpy.c',
-+      slof_str / 'strcmp.c',
-+      slof_str / 'strncmp.c',
-+      slof_str / 'strcasecmp.c',
-+      slof_str / 'strncasecmp.c',
-+      slof_str / 'strstr.c',
-+      slof_str / 'memset.c',
-+      slof_str / 'memcpy.c',
-+      slof_str / 'memmove.c',
-+      slof_str / 'memcmp.c',
-+      slof_stdlib / 'atoi.c',
-+      slof_stdlib / 'atol.c',
-+      slof_stdlib / 'strtoul.c',
-+      slof_stdlib / 'strtol.c',
-+      slof_stdlib / 'rand.c',
-+      slof_stdlib / 'malloc.c',
-+      slof_stdlib / 'free.c',
-+      slof_stdio / 'sprintf.c',
-+      slof_stdio / 'snprintf.c',
-+      slof_stdio / 'vfprintf.c',
-+      slof_stdio / 'vsnprintf.c',
-+      slof_stdio / 'vsprintf.c',
-+      slof_stdio / 'fprintf.c',
-+      slof_stdio / 'printf.c',
-+      slof_stdio / 'putc.c',
-+      slof_stdio / 'puts.c',
-+      slof_stdio / 'putchar.c',
-+      slof_stdio / 'stdchnls.c',
-+      slof_stdio / 'fileno.c',
-+      slof / 'slof/sbrk.c',
-+    ),
-+    c_args: s390_cargs,
-+    include_directories: s390_incs,
-+  )
-+
-+  slof_libnet = slof / 'lib/libnet'
-+  s390_libnet = static_library(
-+    's390-libnet', files(
-+      slof_libnet / 'args.c',
-+      slof_libnet / 'dhcp.c',
-+      slof_libnet / 'dns.c',
-+      slof_libnet / 'icmpv6.c',
-+      slof_libnet / 'ipv6.c',
-+      slof_libnet / 'tcp.c',
-+      slof_libnet / 'udp.c',
-+      slof_libnet / 'bootp.c',
-+      slof_libnet / 'dhcpv6.c',
-+      slof_libnet / 'ethernet.c',
-+      slof_libnet / 'ipv4.c',
-+      slof_libnet / 'ndp.c',
-+      slof_libnet / 'tftp.c',
-+      slof_libnet / 'pxelinux.c',
-+    ),
-+    c_args: [s390_cargs, '-DDHCPARCH=0x1F'],
-+    include_directories: s390_incs,
-+  )
-+
-+  s390_netboot_elf = executable(
-+    's390-netboot.elf',
-+    link_with: [s390_libc, s390_libnet],
-+    link_args: [link_args, '-Ttext=0x7800000'],
-+    objects: s390_lib.extract_objects([
-+      'cio.c',
-+      'jump2ipl.c',
-+      'netmain.c',
-+      'sclp.c',
-+      'start.S',
-+      'virtio-net.c',
-+      'virtio.c',
-+    ]),
-+  )
-+
-+  custom_target(
-+    's390-netboot.img',
-+    output: 's390-netboot.img',
-+    input: s390_netboot_elf,
-+    command: [strip, '--strip-unneeded', '@INPUT@', '-o', '@OUTPUT@'],
-+    build_by_default: true,
-+  )
-+endif
++++ b/hw/acpi/meson.build
+@@ -0,0 +1,22 @@
++acpi_ss = ss.source_set()
++acpi_ss.add(files(
++  'acpi_interface.c',
++  'aml-build.c',
++  'bios-linker-loader.c',
++  'utils.c',
++))
++acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu_hotplug.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_MEMORY_HOTPLUG', if_true: files('memory_hotplug.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_NVDIMM', if_true: files('nvdimm.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_PCI', if_true: files('pci.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_VMGENID', if_true: files('vmgenid.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_HW_REDUCED', if_true: files('generic_event_device.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_X86', if_true: files('core.c', 'piix4.c', 'pcihp.c'), if_false: files('acpi-stub.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('ich9.c', 'tco.c'))
++acpi_ss.add(when: 'CONFIG_IPMI', if_true: files('ipmi.c'), if_false: files('ipmi-stub.c'))
++acpi_ss.add(when: 'CONFIG_PC', if_false: files('acpi-x86-stub.c'))
++acpi_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
++softmmu_ss.add(when: 'CONFIG_ACPI', if_false: files('acpi-stub.c'))
++softmmu_ss.add_all(when: 'CONFIG_ACPI', if_true: acpi_ss)
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('acpi-stub.c', 'acpi-x86-stub.c', 'ipmi-stub.c'))
+diff --git a/hw/meson.build b/hw/meson.build
+index ffa3f06dc0..55ca2b2b61 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('acpi')
+ subdir('adc')
+ subdir('audio')
+ subdir('block')
 -- 
 2.21.0
 
