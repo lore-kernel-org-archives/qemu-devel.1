@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36306C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2A9C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0322820716
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:30:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B520207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:31:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYzkVFBA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0322820716
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bry2SMkg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B520207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVdL-0005jg-2k
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:30:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60356)
+	id 1iwVe5-0006qS-Bw
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:31:29 -0500
+Received: from [2001:470:142:3::10] (port=59770 helo=eggs.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5U-0000Jt-O7
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:45 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5A-0007zy-6c
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5T-0002f4-Ar
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:44 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38255)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV58-0001oU-Ut
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:24 -0500
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:37425)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV5T-0002Zy-4K
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:43 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id y17so17106112wrh.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:42 -0800 (PST)
+ id 1iwV58-0001jq-6x
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:22 -0500
+Received: by mail-wr1-x431.google.com with SMTP id w15so17137995wru.4
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0WZuivSgNMWl4zupYiqbOPHdPqehhCbji+b8xFoXYew=;
- b=WYzkVFBAO+8nAYhwphEgUwnB2a1AcUxO+qko2g393oyxhZ79NuMA8SbkcXN8HDbKMr
- TeDAF2vAb+WVtPU8Nq0Pz8Mnaq32byZrY0sCY3psg/8h3rlWF9VAVJLV0GA2eOA8Ijrn
- ZQMogTeqpo0ZA0cG6FcXawJbE/jrEXpzuCO8kvkVvuqK0yOwoyav/swegNdNqG6l8eeT
- wqkNFmYpgbWRpe2hUlLcHeacxYe5CtiPhEpVatuF6VKFdWqkdv0CikxhW7irioGUQqqN
- F2/bvEMGBTyuigVEJD+coemqzz2nXHSlarYj5BtAOmtXtzI5GivPMpC8JiX8Yn99CrsT
- /6Dw==
+ bh=LMZiYWum7K5FFftwGEHqxzP9jxnxtuhS2JjQK1I+4dg=;
+ b=bry2SMkg+aOeqbx9Wph87sODEbLIQjqukHRjPcqT4j1UST5ZE2jrWA/fr1YbwFce/0
+ bbAOOzQyU3ijQIHfNSSFqbLYsQLhae8cWFKLinEDlz/JV9BjkDQOeQowMVRk5sEI/EZ4
+ pzE0yG5w7bAPJ4h3c78J1Dd1W+PbgTC/BylBzbFRfNe67OQZlmN5DbjOrL7YVTMiAz9B
+ DjtmEsyBrcPQ7A7t188AlUje112v0Ira63YWrNodlbXkfjS0DoHUx3Y3nGB7Y9mzll38
+ IzbWgDwFb3Ss+3k+6EQhZyev+HnA3qQzUc3ldj+eAwMd5eQfCdbKy2EFB0XkLZyDLp0U
+ 1j/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=0WZuivSgNMWl4zupYiqbOPHdPqehhCbji+b8xFoXYew=;
- b=B05X0Syw6yRfchSl60jZnaWqvPkTN01kryOhxhQMCQhWpnr3/SIzKpmhhmAeanQ9l0
- drPVLOWnJqBkzCecsSKEYcwYvTu6tKinZ5XbSKD71ZjlOw2M3ZzwKPO6Stga7XZJrhu8
- fcqebGAVaVcRs/NHxV1Zz7zvMmFw3XJ0W0JaQ+TtcRmWNu3PJG1ugsGjBExWq8Yem+L6
- iSNd1/+XEhCuYvsiPWaYjkL7BYmnEz39Cy4qGpH41lrj/BjaeLCJLbxNJyXmo6PrHMk8
- b0UrXvcSLrJJNlv0s0Xu2Vcl0n7qyuMgpUANKcBw7BdamWEyM0kCsu2xSsCF2RUHW81H
- /Fjw==
-X-Gm-Message-State: APjAAAU4Hh2zQ956EhbkTVSETDfjk8fcA+x4eag2pUB1i8cRbXte6zGW
- eQm3MVi7nANyZW+XIHvhdoQyDJ/b
-X-Google-Smtp-Source: APXvYqxudE9x4FVupW+GHe8/jx6Qo817uCFsoKGv5HnZ3IqTqYMsr+I1igI/n0ahR6kCtEiQBY6B3g==
-X-Received: by 2002:a5d:4dc9:: with SMTP id f9mr29896992wru.297.1580234139985; 
- Tue, 28 Jan 2020 09:55:39 -0800 (PST)
+ bh=LMZiYWum7K5FFftwGEHqxzP9jxnxtuhS2JjQK1I+4dg=;
+ b=mpdXdEOT6FWWVj40LFg1kOjBWdNwJj4weUbPFxXAAI7u1CRoDLLYLESrm6k/Ds2qAA
+ txlceSc95vkpSUytlQxnseiH471UE+4nta5LVxYlcxy3coFEgMD/NZqspiRzzccuaTf6
+ 9vshSNIr4UteLf9dhoyHtaTloYQBr6rvMUrrWgp7zCs9pCOksC5vPdCjcwqiS96v+t5t
+ gz0GIHhf6cS4YO7AzkzINOSbBfblOM7D3Q9vpsnDIPVNteOadSWQK5OmVRs7fMGn5hny
+ cd1x9CqCpJ+VnCxncQTB2nE9qHYNz35s/d84XekHEZJG0nttKdjugCkQItPvl+Vtww0R
+ nqfw==
+X-Gm-Message-State: APjAAAVggc3qYIdRc1Xhy8wPwnD359vS7GfiLy3gsfDN1sW358zudj0o
+ bEx/usai2mEoF8pWnXajX1b9BOmp
+X-Google-Smtp-Source: APXvYqx3+wRRfJZFD7BZQuWnFHDOT2nBDB9//wros/hHAHW9VoA3I+a88+9EREtmn42itFj2QAp/Bw==
+X-Received: by 2002:a5d:44ca:: with SMTP id z10mr29998882wrr.266.1580234119833; 
+ Tue, 28 Jan 2020 09:55:19 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.37
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:55:39 -0800 (PST)
+ Tue, 28 Jan 2020 09:55:19 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 047/142] meson: convert chardev directory to Meson (tools part)
-Date: Tue, 28 Jan 2020 18:52:07 +0100
-Message-Id: <20200128175342.9066-48-pbonzini@redhat.com>
+Subject: [PATCH 038/142] build-sys hack: link with whole .fa archives
+Date: Tue, 28 Jan 2020 18:51:58 +0100
+Message-Id: <20200128175342.9066-39-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,146 +101,68 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+In order to link the *-obj-y files into tests, we will make static
+libraries of them in Meson, and then link them as whole archives
+into the tests.  To separate regular static libraries from link-whole
+libraries, give them a different file extension.
+
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile              |  1 -
- Makefile.objs         |  6 ++----
- Makefile.target       |  2 +-
- chardev/Makefile.objs | 19 -------------------
- chardev/meson.build   | 32 ++++++++++++++++++++++++++++++++
- meson.build           |  1 +
- 6 files changed, 36 insertions(+), 25 deletions(-)
- create mode 100644 chardev/meson.build
+ rules.mak | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 0152a2b397..3a83b178fc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -161,7 +161,6 @@ include $(SRC_PATH)/Makefile.objs
- endif
+diff --git a/rules.mak b/rules.mak
+index 52891849c8..a10a972521 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -39,6 +39,13 @@ find-symbols = $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
+ defined-symbols = $(call find-symbols,$1,awk '$$2!="U"{print $$1}')
+ undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
  
- dummy := $(call unnest-vars,, \
--                chardev-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-                 common-obj-y \
-diff --git a/Makefile.objs b/Makefile.objs
-index 407e14daaa..bc317060d7 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -1,7 +1,3 @@
--#######################################################################
--# chardev-obj-y is code used by both qemu system emulation and some tests
--chardev-obj-y = chardev/
--
- #######################################################################
- # block-obj-y is code used by both qemu system emulation and qemu-img
- 
-@@ -19,6 +15,8 @@ block-obj-m = block/
- authz-obj-y = authz/libauthz.fa
- authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
- 
-+chardev-obj-y = chardev/libchardev.fa
++WL := -Wl,
++ifdef CONFIG_DARWIN
++whole-archive = $(WL)-force_load,$1
++else
++whole-archive = $(WL)--whole-archive $1 $(WL)--no-whole-archive
++endif
 +
- crypto-obj-y = crypto/libcrypto.fa
+ # All the .mo objects in -m variables are also added into corresponding -y
+ # variable in unnest-vars, but filtered out here, when LINK is called.
+ #
+@@ -54,11 +61,12 @@ undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
+ # This is necessary because the exectuable itself may not use the function, in
+ # which case the function would not be linked in. Then the DSO loading will
+ # fail because of the missing symbol.
+-process-archive-undefs = $(filter-out %.a %.mo,$1) \
++process-archive-undefs = $(filter-out %.a %.fa %.mo,$1) \
+                 $(addprefix $(WL_U), \
+-                     $(filter $(call defined-symbols,$(filter %.a, $1)), \
++                     $(filter $(call defined-symbols,$(filter %.a %.fa, $1)), \
+                               $(call undefined-symbols,$(filter %.mo,$1)))) \
+-                $(filter %.a,$1)
++		$(foreach l,$(filter %.fa,$1),$(call whole-archive,$l)) \
++		$(filter %.a,$1)
  
- io-obj-y = io/libio.fa
-diff --git a/Makefile.target b/Makefile.target
-index acde7778f0..68ec8fd83e 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -186,13 +186,13 @@ all-obj-y := $(obj-y)
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call fix-paths,../,, \
-               authz-obj-y \
-+              chardev-obj-y \
-               crypto-obj-y \
-               io-obj-y \
-               qom-obj-y)
- dummy := $(call unnest-vars,.., \
-                block-obj-y \
-                block-obj-m \
--               chardev-obj-y \
-                common-obj-y \
-                common-obj-m)
- all-obj-y += $(common-obj-y)
-diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index d68e1347f9..8049d82077 100644
---- a/chardev/Makefile.objs
-+++ b/chardev/Makefile.objs
-@@ -1,22 +1,3 @@
--chardev-obj-y += char.o
--chardev-obj-$(CONFIG_WIN32) += char-console.o
--chardev-obj-$(CONFIG_POSIX) += char-fd.o
--chardev-obj-y += char-fe.o
--chardev-obj-y += char-file.o
--chardev-obj-y += char-io.o
--chardev-obj-y += char-mux.o
--chardev-obj-y += char-null.o
--chardev-obj-$(CONFIG_POSIX) += char-parallel.o
--chardev-obj-y += char-pipe.o
--chardev-obj-$(CONFIG_POSIX) += char-pty.o
--chardev-obj-y += char-ringbuf.o
--chardev-obj-y += char-serial.o
--chardev-obj-y += char-socket.o
--chardev-obj-y += char-stdio.o
--chardev-obj-y += char-udp.o
--chardev-obj-$(CONFIG_WIN32) += char-win.o
--chardev-obj-$(CONFIG_WIN32) += char-win-stdio.o
--
- common-obj-y += msmouse.o wctablet.o testdev.o
- common-obj-$(CONFIG_BRLAPI) += baum.o
- baum.o-cflags := $(SDL_CFLAGS)
-diff --git a/chardev/meson.build b/chardev/meson.build
-new file mode 100644
-index 0000000000..a2e671ddfc
---- /dev/null
-+++ b/chardev/meson.build
-@@ -0,0 +1,32 @@
-+chardev_ss = ss.source_set()
-+chardev_ss.add(files(
-+  'char-fe.c',
-+  'char-file.c',
-+  'char-io.c',
-+  'char-mux.c',
-+  'char-null.c',
-+  'char-pipe.c',
-+  'char-ringbuf.c',
-+  'char-serial.c',
-+  'char-socket.c',
-+  'char-stdio.c',
-+  'char-udp.c',
-+  'char.c',
-+))
-+chardev_ss.add(when: 'CONFIG_POSIX', if_true: files(
-+  'char-fd.c',
-+  'char-parallel.c',
-+  'char-pty.c',
-+))
-+chardev_ss.add(when: 'CONFIG_WIN32', if_true: files(
-+  'char-console.c',
-+  'char-win-stdio.c',
-+  'char-win.c',
-+))
-+
-+chardev_ss = chardev_ss.apply(config_host, strict: false)
-+libchardev = static_library('chardev', chardev_ss.sources(),
-+                            name_suffix: 'fa',
-+                            build_by_default: false)
-+
-+chardev = declare_dependency(link_whole: libchardev)
-diff --git a/meson.build b/meson.build
-index 1702133989..2406cc72eb 100644
---- a/meson.build
-+++ b/meson.build
-@@ -411,6 +411,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: version_res)
+ extract-libs = $(strip $(foreach o,$(filter-out %.mo,$1),$($o-libs)))
+ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+@@ -122,7 +130,7 @@ LD_REL := $(CC) -nostdlib $(LD_REL_FLAGS)
+ modules:
  
- subdir('io')
-+subdir('chardev')
- subdir('fsdev')
- subdir('target')
+ %$(EXESUF): %.o
+-	$(call LINK,$(filter %.o %.a %.mo, $^))
++	$(call LINK,$(filter %.o %.a %.mo %.fa, $^))
+ 
+ %.a:
+ 	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$(TARGET_DIR)$@")
+@@ -378,7 +386,7 @@ define unnest-vars
+                 $(error $o added in $v but $o-objs is not set)))
+         $(shell mkdir -p ./ $(sort $(dir $($v))))
+         # Include all the .d files
+-        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$($v))))
++        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$(filter %.o,$($v)))))
+         $(eval $v := $(filter-out %/,$($v))))
+ endef
  
 -- 
 2.21.0
