@@ -2,79 +2,56 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B083C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06656C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:38:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6451E2173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:36:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PhpCO83H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6451E2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF2802465B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:38:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF2802465B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwaPd-0005qD-JA
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 18:36:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34305)
+	id 1iwaR6-0007YK-3L
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 18:38:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iwaOa-00051Q-Dw
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:35:49 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iwaQO-0006xp-SC
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:37:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iwaOZ-0006Y4-6M
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:35:48 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:41457)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iwaOY-0006P1-ST; Tue, 28 Jan 2020 18:35:47 -0500
-Received: by mail-lf1-x142.google.com with SMTP id m30so10450194lfp.8;
- Tue, 28 Jan 2020 15:35:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1i7hsIzmCffF09mnyOMdgtFSyGxp4xB2YWtQQN6vT/4=;
- b=PhpCO83HDiwUlvnWb2RXxAsl0cfEpRFNMvUC2dmgUTknfjQ1bcpcsf9CZs8ZDbeldF
- xJjxvKj0DFXyTI8QXH21aoCMXpcogYAr4tOC6Y4rORPucH7sNgUtdfarvSAdapkzxkVk
- 4EoXQhg5MDqbjH+VV6Zx9aNcEvYRprci6F+R6UU0bnDFzaOOCIRmwVKykDtpurOzGUbm
- Cfz8IGVi68Ih5QB0hRjFnVMzHgC96IAgQuqGdEqik23rhq3EJ04zRET46sUMBJ0B7sjK
- pejcQ+bjeY26wcBqXXSiMMjevJGiBgkh04c4WhaC4D7H8rJgKxZ6RIm8ykARG0X58sFc
- pvLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1i7hsIzmCffF09mnyOMdgtFSyGxp4xB2YWtQQN6vT/4=;
- b=kOdLrWJgrr2HKZZ63lcZuxNse7mScedmph3kiwbyJi+AcvY7ql2+hkN4HWApzMMYZn
- JN+b5Yew1H4OWjXrKjjPJOcld8tSEFeHqHB1wdU6xiTShKCzS1ye81v1wX6eevFubkT2
- D9h0l/u7OiTcakswc6Z9v2knEa71WqZcFOy32KBpwk4x9Bu8FP8aUG/n5uwH2h74VnLq
- OWFAYn1fuBkbFjA28Uhq2HT33mlUusHBDtVUU6w25GeOCB5VntOO2NQmKDYT63N6kWx+
- 9Gq3D39a9vYd5Xps0UfpHOiYF7YhZD9YFYHehAHOmprBXvM30IBi3lxgUSecIHB0cv3P
- f0fg==
-X-Gm-Message-State: APjAAAXaMiqVq26GCRND+dcMIicwnGXW/5JL+Dm6zU184E0I53lv87Bh
- v9aePqbXDhVyT+Aoym9KCLksKjDnJoRWqnW/pAc=
-X-Google-Smtp-Source: APXvYqzAo6sOD+nSPatMT25Gujkb0/6PUi/rdhv9WVDK4jY8q+CpGi5LT/iOiBfPsodESHOt8FPiufOIt2ZND8/MFrY=
-X-Received: by 2002:ac2:5310:: with SMTP id c16mr3803854lfh.102.1580254544081; 
- Tue, 28 Jan 2020 15:35:44 -0800 (PST)
-MIME-Version: 1.0
-References: <20200128233216.515171-1-keithp@keithp.com>
-In-Reply-To: <20200128233216.515171-1-keithp@keithp.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 28 Jan 2020 15:35:17 -0800
-Message-ID: <CAKmqyKMN=3P7V=m+3na6zh_711gw2qDkosWxjgLG_DbUGm9sYQ@mail.gmail.com>
+ (envelope-from <no-reply@patchew.org>) id 1iwaQN-0002DX-FT
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:37:40 -0500
+Resent-Date: Tue, 28 Jan 2020 18:37:40 -0500
+Resent-Message-Id: <E1iwaQN-0002DX-FT@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21134)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iwaQN-00027U-88; Tue, 28 Jan 2020 18:37:39 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1580254644812732.4225024727649;
+ Tue, 28 Jan 2020 15:37:24 -0800 (PST)
+In-Reply-To: <20200128223955.464556-1-keithp@keithp.com>
 Subject: Re: [PATCH] riscv: Separate FPU register size from core register size
- in gdbstub [v2]
-To: Keith Packard <keithp@keithp.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::142
+ in gdbstub
+Message-ID: <158025464355.18399.14248917557467290837@f6d1ed32ca6b>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: qemu-devel@nongnu.org
+Date: Tue, 28 Jan 2020 15:37:24 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,108 +63,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: keithp@keithp.com, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ kbastian@mail.uni-paderborn.de, qemu-devel@nongnu.org,
+ Alistair.Francis@wdc.com, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 28, 2020 at 3:33 PM Keith Packard via <qemu-devel@nongnu.org> wrote:
->
-> The size of the FPU registers is dictated by the 'f' and 'd' features,
-> not the core processor register size. Processors with the 'd' feature
-> have 64-bit FPU registers. Processors without the 'd' feature but with
-> the 'f' feature have 32-bit FPU registers.
->
-> Signed-off-by: Keith Packard <keithp@keithp.com>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
->
-> ---
->
-> v2:
->     Fix checkpatch formatting complaints.
-> ---
->  configure              |  4 ++--
->  target/riscv/gdbstub.c | 20 +++++++++++---------
->  2 files changed, 13 insertions(+), 11 deletions(-)
->
-> diff --git a/configure b/configure
-> index a72a5def57..c21bff8d10 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7709,13 +7709,13 @@ case "$target_name" in
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
-> +    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
->    ;;
->    riscv64)
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml riscv-64bit-virtual.xml"
-> +    gdb_xml_files="riscv-64bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml riscv-64bit-virtual.xml"
->    ;;
->    sh4|sh4eb)
->      TARGET_ARCH=sh4
-> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-> index 1a7947e019..1a72f7be9c 100644
-> --- a/target/riscv/gdbstub.c
-> +++ b/target/riscv/gdbstub.c
-> @@ -303,7 +303,12 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
->  static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
->  {
->      if (n < 32) {
-> -        return gdb_get_reg64(mem_buf, env->fpr[n]);
-> +        if (env->misa & RVD) {
-> +            return gdb_get_reg64(mem_buf, env->fpr[n]);
-> +        }
-> +        if (env->misa & RVF) {
-> +            return gdb_get_reg32(mem_buf, env->fpr[n]);
-> +        }
->      /* there is hole between ft11 and fflags in fpu.xml */
->      } else if (n < 36 && n > 32) {
->          target_ulong val = 0;
-> @@ -403,23 +408,20 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
->  {
->      RISCVCPU *cpu = RISCV_CPU(cs);
->      CPURISCVState *env = &cpu->env;
-> -#if defined(TARGET_RISCV32)
-> -    if (env->misa & RVF) {
-> +    if (env->misa & RVD) {
-> +        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-> +                                 36, "riscv-64bit-fpu.xml", 0);
-> +    } else if (env->misa & RVF) {
->          gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
->                                   36, "riscv-32bit-fpu.xml", 0);
->      }
-> -
-> +#if defined(TARGET_RISCV32)
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               240, "riscv-32bit-csr.xml", 0);
->
->      gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
->                               1, "riscv-32bit-virtual.xml", 0);
->  #elif defined(TARGET_RISCV64)
-> -    if (env->misa & RVF) {
-> -        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-> -                                 36, "riscv-64bit-fpu.xml", 0);
-> -    }
-> -
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               240, "riscv-64bit-csr.xml", 0);
->
-> --
-> 2.25.0
->
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEyODIyMzk1NS40NjQ1
+NTYtMS1rZWl0aHBAa2VpdGhwLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwMTI4MjIzOTU1LjQ2NDU1
+Ni0xLWtlaXRocEBrZWl0aHAuY29tClN1YmplY3Q6IFtQQVRDSF0gcmlzY3Y6IFNlcGFyYXRlIEZQ
+VSByZWdpc3RlciBzaXplIGZyb20gY29yZSByZWdpc3RlciBzaXplIGluIGdkYnN0dWIKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rl
+di9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+YmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
+cHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMTU4MDI0MjE2MS0yMDMz
+My0xLWdpdC1zZW5kLWVtYWlsLWFsZWtzYW5kYXIubWFya292aWNAcnQtcmsuY29tIC0+IHBhdGNo
+ZXcvMTU4MDI0MjE2MS0yMDMzMy0xLWdpdC1zZW5kLWVtYWlsLWFsZWtzYW5kYXIubWFya292aWNA
+cnQtcmsuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDAxMjgyMjM5NTUuNDY0
+NTU2LTEta2VpdGhwQGtlaXRocC5jb20gLT4gcGF0Y2hldy8yMDIwMDEyODIyMzk1NS40NjQ1NTYt
+MS1rZWl0aHBAa2VpdGhwLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwMTI4
+MjMxODQwLjUwODk4Ni0xLWtlaXRocEBrZWl0aHAuY29tIC0+IHBhdGNoZXcvMjAyMDAxMjgyMzE4
+NDAuNTA4OTg2LTEta2VpdGhwQGtlaXRocC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hl
+dy8yMDIwMDEyODIzMzIxNi41MTUxNzEtMS1rZWl0aHBAa2VpdGhwLmNvbSAtPiBwYXRjaGV3LzIw
+MjAwMTI4MjMzMjE2LjUxNTE3MS0xLWtlaXRocEBrZWl0aHAuY29tClN3aXRjaGVkIHRvIGEgbmV3
+IGJyYW5jaCAndGVzdCcKYTJjMjc3YiByaXNjdjogU2VwYXJhdGUgRlBVIHJlZ2lzdGVyIHNpemUg
+ZnJvbSBjb3JlIHJlZ2lzdGVyIHNpemUgaW4gZ2Ric3R1YgoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
+RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
+bWVudAojNDU6IEZJTEU6IHRhcmdldC9yaXNjdi9nZGJzdHViLmM6MzA2OgorICAgICAgICBpZiAo
+ZW52LT5taXNhICYgUlZEKQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NCBs
+aW5lcyBjaGVja2VkCgpDb21taXQgYTJjMjc3YjhlYjM5IChyaXNjdjogU2VwYXJhdGUgRlBVIHJl
+Z2lzdGVyIHNpemUgZnJvbSBjb3JlIHJlZ2lzdGVyIHNpemUgaW4gZ2Ric3R1YikgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
+ZXcub3JnL2xvZ3MvMjAyMDAxMjgyMjM5NTUuNDY0NTU2LTEta2VpdGhwQGtlaXRocC5jb20vdGVz
+dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
