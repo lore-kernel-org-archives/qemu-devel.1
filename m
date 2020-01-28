@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6548BC3F68F
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:10:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7383C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E0A2468E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:10:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54BAF20708
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:10:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A/XLUxWN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E0A2468E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t043FL1c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54BAF20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWFT-0004s2-EK
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:10:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38203)
+	id 1iwWFz-00059N-E0
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:10:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8T-00053H-15
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:50 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7P-0002zL-TW
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8R-0001Oq-MP
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:48 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38281)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7N-00079T-1d
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:43 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38276)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV8R-0001M3-EA
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:47 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id y17so17117330wrh.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:58:47 -0800 (PST)
+ id 1iwV7L-00073N-Ki
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:40 -0500
+Received: by mail-wr1-x433.google.com with SMTP id y17so17113298wrh.5
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=p1Zihj/GqyEcMAsZS8ZsodZ02ptkYWUxedNuRcGDcM8=;
- b=A/XLUxWNA2oRXGV8vvn8CjNcdZ3odFrhrvniXPj3S6O4bsAjSB7MASdeHaOvOsaZXP
- dUnrW/wCiO65qvAv3RbCvd64qGe6bS+43vgnWtLNZteuibJZ9MftpmiY4O32Zm9BH4bd
- PAq4fGU3K529b+6eKy0LlvrtoMg5mkbVP6bhpynHzudY8xBt3d9DEHaz9MzrUIuNXf94
- QhhfqffCSa5H7atgH0zBvd78SG8OcE79fjhYcq8R+w4Xh0UzWsm+C2zQ/A5umxFJt00R
- oiuN5D4CM2rMDk5F1BFlOzEd1a3goUMcfrsm9NFE+hWJVgDVJSQAPNP5suHgSbUbICmx
- MjJg==
+ bh=opplYY2OR8Ra5A7Uw+5gUoNt1YQ9TY649PlQgkkOCII=;
+ b=t043FL1cLTzkhjHY33HdtcydFPMiJVmXWIxpRmbxNybj37R+6/XeBbg0WxVD/6QF0N
+ G4rPtTkBVh0pHt0iqIjwbAQipnbFe/QcNysTWzOa/t/m3fEpQ+3D32s4uIKrW5+qjmbY
+ UV4IUh7UluwxfKzeUYWbykXwjEDLdc5O8JaasUuRP8VoYx/LZV7aNlgWc10lNuajnM3Z
+ z21qFVrrsvHRyPXTikPfIcZqye8Tsp6YAfbkgKPtcgJSegPA+pLwTpiiefrEbdsJ05O0
+ isEdFr+fuIZ7fu/QWVZG5NNFsMsGuSitJO2ZwMBP+CKi5CsgeqxYsZyzqBO0mdM9AfR7
+ ImiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=p1Zihj/GqyEcMAsZS8ZsodZ02ptkYWUxedNuRcGDcM8=;
- b=JxiCvzipLef3pGzLbgBHmCmsK2CBHNR9AKI9+5laKDG+kpbH+Yg6MGq9WkxOOGfUgH
- +p2O4241Ajlrzqhf7HcdMPTabbQmiz8OOm9gFXQFr4/SyvKZ+pbroqNDbI/p6P+RqSOw
- s/xvabj5VLpwwQ1ae4prB0cDcxCFF8CpLherYo2X3BhokLuV/7hFVBjoM5xwxvC7rZ9e
- 09f41mg6hgYYT4QkWm6Zeko+vzyTcasB1EgzjH3u3do9zaM4EJBl0qAKUbMTnVZodMxK
- 6ee9vix2UldTg42zihKvzULRNO57SFRhII7GZHbI6Qb5Efsp1wCq4R6Q0cD93BpHUjJT
- L/3g==
-X-Gm-Message-State: APjAAAUGzlPWqeERGgLCBuD2zue2aiOHQdZIDOQzhAWr6k019cA/Kvps
- DloLOI9S/O7CqicMdLL+v51Dwo8C
-X-Google-Smtp-Source: APXvYqwK/HxSrMzaCXy70OWOusX0G7LaO25YIpoBovJxh3wHWX05rnPSpEq8an0icxkfWsUv5qrWbg==
-X-Received: by 2002:adf:b193:: with SMTP id q19mr29578702wra.78.1580234326266; 
- Tue, 28 Jan 2020 09:58:46 -0800 (PST)
+ bh=opplYY2OR8Ra5A7Uw+5gUoNt1YQ9TY649PlQgkkOCII=;
+ b=k1FT2XtMQVFOFIKWnKUAkluT01fGf6IK1cy9xR1FmmnIo9rcmKa2yTm1VTiPvGMB3U
+ wOmYrek5lWLwAkeNl7VcCkBvlCVaDBPLGldSwGysQ0Ulom5r5ohynDQ8EuMlzE65cZYX
+ 1cje0mL7W3WkdB9t4iEnfTusMopFzzcF4Lk0TLhNESJvrsdEjStgeRK3yrOXbdGbtgTE
+ H8TSRaoqiJG9wNA/0lwGztMvWoRv1LA/BuEamKDR8epAq4IBXZP4d+irEId32xpsfo0s
+ XBNx40irIMjTsEmVls8CR5S6HwyQskFVECblm4Kl+MuCqrUW3jeDfXToTBWa1QRMz3Zk
+ X6FQ==
+X-Gm-Message-State: APjAAAXgEDoqfNQimlzhJuq+eJw+vNSrY6IlxOr0w+yZS9CsrM37I6Z6
+ IZN18eI5viXS5TZPIEzmARf7GWUg
+X-Google-Smtp-Source: APXvYqwB/UNg61ZGkuOjxlhVPKjrqjZ18fkB53fRv4LWdYsHIzM48SDyqqLIuSxtox4kWiNsyIse6g==
+X-Received: by 2002:adf:fc4b:: with SMTP id e11mr31055382wrs.326.1580234257833; 
+ Tue, 28 Jan 2020 09:57:37 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.58.44
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:58:45 -0800 (PST)
+ Tue, 28 Jan 2020 09:57:37 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 126/142] meson: add NSIS building
-Date: Tue, 28 Jan 2020 18:53:26 +0100
-Message-Id: <20200128175342.9066-127-pbonzini@redhat.com>
+Subject: [PATCH 098/142] meson: convert hw/ide
+Date: Tue, 28 Jan 2020 18:52:58 +0100
+Message-Id: <20200128175342.9066-99-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,182 +103,76 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile        | 57 ------------------------------------------------
- meson.build     | 23 ++++++++++++++++++++
- scripts/nsis.sh | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 81 insertions(+), 57 deletions(-)
- create mode 100755 scripts/nsis.sh
+ hw/Makefile.objs     |  1 -
+ hw/ide/Makefile.objs | 14 --------------
+ hw/ide/meson.build   | 14 ++++++++++++++
+ hw/meson.build       |  1 +
+ 4 files changed, 15 insertions(+), 15 deletions(-)
+ delete mode 100644 hw/ide/Makefile.objs
+ create mode 100644 hw/ide/meson.build
 
-diff --git a/Makefile b/Makefile
-index e99d09c5ee..7c1e6d9e9c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -310,62 +310,6 @@ endif
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 52a99a8760..545d7440b5 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -11,7 +11,6 @@ devices-dirs-y += dma/
+ devices-dirs-y += gpio/
+ devices-dirs-$(CONFIG_HYPERV) += hyperv/
+ devices-dirs-$(CONFIG_I2C) += i2c/
+-devices-dirs-y += ide/
+ endif
  
--ifdef CONFIG_WIN32
--
--INSTALLER = qemu-setup-$(VERSION)$(EXESUF)
--
--nsisflags = -V2 -NOCD
--
--ifneq ($(wildcard $(SRC_PATH)/dll),)
--ifeq ($(ARCH),x86_64)
--# 64 bit executables
--DLL_PATH = $(SRC_PATH)/dll/w64
--nsisflags += -DW64
--else
--# 32 bit executables
--DLL_PATH = $(SRC_PATH)/dll/w32
--endif
--endif
--
--.PHONY: installer
--installer: $(INSTALLER)
--
--INSTDIR=/tmp/qemu-nsis
--
--$(INSTALLER): $(SRC_PATH)/qemu.nsi
--	$(MAKE) install prefix=${INSTDIR}
--ifdef SIGNCODE
--	(cd ${INSTDIR}; \
--         for i in *.exe; do \
--           $(SIGNCODE) $${i}; \
--         done \
--        )
--endif # SIGNCODE
--	(cd ${INSTDIR}; \
--         for i in qemu-system-*.exe; do \
--           arch=$${i%.exe}; \
--           arch=$${arch#qemu-system-}; \
--           echo Section \"$$arch\" Section_$$arch; \
--           echo SetOutPath \"\$$INSTDIR\"; \
--           echo File \"\$${BINDIR}\\$$i\"; \
--           echo SectionEnd; \
--         done \
--        ) >${INSTDIR}/system-emulations.nsh
--	makensis $(nsisflags) \
--                $(if $(BUILD_DOCS),-DCONFIG_DOCUMENTATION="y") \
--                $(if $(CONFIG_GTK),-DCONFIG_GTK="y") \
--                -DBINDIR="${INSTDIR}" \
--                $(if $(DLL_PATH),-DDLLDIR="$(DLL_PATH)") \
--                -DSRCDIR="$(SRC_PATH)" \
--                -DOUTFILE="$(INSTALLER)" \
--                -DDISPLAYVERSION="$(VERSION)" \
--                $(SRC_PATH)/qemu.nsi
--	rm -r ${INSTDIR}
--ifdef SIGNCODE
--	$(SIGNCODE) $(INSTALLER)
--endif # SIGNCODE
--endif # CONFIG_WIN
--
- # Add a dependency on the generated files, so that they are always
- # rebuilt before other object files
- ifneq ($(wildcard config-host.mak),)
-@@ -405,7 +349,6 @@ endif
- 	@echo  ''
- ifdef CONFIG_WIN32
- 	@echo  'Windows targets:'
--	@echo  '  installer       - Build NSIS-based installer for QEMU'
- ifdef QEMU_GA_MSI_ENABLED
- 	@echo  '  msi             - Build MSI-based installer for qemu-ga'
- endif
-diff --git a/meson.build b/meson.build
-index caf99f5082..6d1fc2fb19 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1064,3 +1064,26 @@ if pod2man.found() and build_docs
-                                   '--release=" "', '@INPUT@'])
-   endforeach
- endif
-+
-+if host_machine.system() == 'windows'
-+  nsis_cmd = [
-+    find_program('scripts/nsis.sh'),
-+    '@OUTPUT@',
-+    get_option('prefix'),
-+    meson.current_source_dir(),
-+    host_machine.cpu_family(),
-+    '-DDISPLAYVERSION=@0@'.format(config_host['VERSION']),
-+  ]
-+  if build_docs
-+    nsis_cmd += '-DCONFIG_DOCUMENTATION=y'
-+  endif
-+  if 'CONFIG_GTK' in config_host
-+    nsis_cmd += '-DCONFIG_GTK=y'
-+  endif
-+
-+  custom_target('nsis',
-+                output: 'qemu-setup-' + config_host['VERSION'] + '.exe',
-+                input: files('qemu.nsi'),
-+                build_always_stale: true,
-+                command: nsis_cmd + ['@INPUT@'])
-+endif
-diff --git a/scripts/nsis.sh b/scripts/nsis.sh
-new file mode 100755
-index 0000000000..ad23708724
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
+deleted file mode 100644
+index faf04e0209..0000000000
+--- a/hw/ide/Makefile.objs
++++ /dev/null
+@@ -1,14 +0,0 @@
+-common-obj-$(CONFIG_IDE_CORE) += core.o atapi.o
+-common-obj-$(CONFIG_IDE_QDEV) += qdev.o
+-common-obj-$(CONFIG_IDE_PCI) += pci.o
+-common-obj-$(CONFIG_IDE_ISA) += isa.o ioport.o
+-common-obj-$(CONFIG_IDE_PIIX) += piix.o ioport.o
+-common-obj-$(CONFIG_IDE_CMD646) += cmd646.o
+-common-obj-$(CONFIG_IDE_MACIO) += macio.o
+-common-obj-$(CONFIG_IDE_MMIO) += mmio.o
+-common-obj-$(CONFIG_IDE_VIA) += via.o
+-common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
+-common-obj-$(CONFIG_AHCI) += ahci.o
+-common-obj-$(CONFIG_AHCI_ICH9) += ich.o
+-common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
+-common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
+diff --git a/hw/ide/meson.build b/hw/ide/meson.build
+new file mode 100644
+index 0000000000..ddcb3b28d2
 --- /dev/null
-+++ b/scripts/nsis.sh
-@@ -0,0 +1,58 @@
-+#!/bin/bash
-+
-+OUTFILE="$1"
-+shift
-+PREFIX="$1"
-+shift
-+SRCDIR="$1"
-+shift
-+CPU="$1"
-+shift
-+
-+DESTDIR=$(mktemp -d)
-+trap "rm -rf $DESTDIR" EXIT
-+make DESTDIR="$DESTDIR" install
-+
-+signcode() {
-+    if [ -z "$SIGNCODE" ]; then
-+        return
-+    fi
-+    "$SIGNCODE" "$@"
-+}
-+
-+shopt -s nullglob
-+
-+(
-+    cd "$DESTDIR$PREFIX"
-+    for i in qemu-system-*.exe; do
-+        arch=${i%.exe}
-+        arch=${arch#qemu-system-}
-+        echo Section \"$arch\" Section_$arch
-+        echo SetOutPath \"\$INSTDIR\"
-+        echo File \"\${BINDIR}\\$i\"
-+        echo SectionEnd
-+    done
-+) > "$DESTDIR$PREFIX/system-emulations.nsh"
-+
-+(
-+    cd "$DESTDIR$PREFIX"
-+    for i in *.exe; do
-+        signcode "$i"
-+    done
-+)
-+
-+if [ "$CPU" = "x86_64" ]; then
-+    CPUARG="-DW64"
-+    DLLDIR="w64"
-+else
-+    DLLDIR="w32"
-+fi
-+
-+if [ -d "$SRCDIR/dll" ]; then
-+   DLLARG="-DDLLDIR=$SRCDIR/dll/$DLLDIR"
-+fi
-+
-+makensis -V2 -NOCD -DSRCDIR="$SRCDIR" -DBINDIR="$DESTDIR$PREFIX" \
-+         $CPUARG $DLLARG -DOUTFILE="$OUTFILE" "$@"
-+
-+signcode "$OUTFILE"
++++ b/hw/ide/meson.build
+@@ -0,0 +1,14 @@
++softmmu_ss.add(when: 'CONFIG_AHCI', if_true: files('ahci.c'))
++softmmu_ss.add(when: 'CONFIG_AHCI_ICH9', if_true: files('ich.c'))
++softmmu_ss.add(when: 'CONFIG_ALLWINNER_A10', if_true: files('ahci-allwinner.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_CMD646', if_true: files('cmd646.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_CORE', if_true: files('core.c', 'atapi.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_ISA', if_true: files('isa.c', 'ioport.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_MACIO', if_true: files('macio.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_MMIO', if_true: files('mmio.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_PCI', if_true: files('pci.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_PIIX', if_true: files('piix.c', 'ioport.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_QDEV', if_true: files('qdev.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_SII3112', if_true: files('sii3112.c'))
++softmmu_ss.add(when: 'CONFIG_IDE_VIA', if_true: files('via.c'))
++softmmu_ss.add(when: 'CONFIG_MICRODRIVE', if_true: files('microdrive.c'))
+diff --git a/hw/meson.build b/hw/meson.build
+index b15c8d0970..4d7c31c652 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,4 +1,5 @@
+ subdir('core')
++subdir('ide')
+ subdir('input')
+ subdir('intc')
+ subdir('ipack')
 -- 
 2.21.0
 
