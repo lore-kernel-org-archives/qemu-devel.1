@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4E7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B39C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F88920CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:08:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9949A20CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:08:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WzybVxbT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F88920CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ohl5c7ry"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9949A20CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35727 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWDR-0001N2-L2
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:08:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35755)
+	id 1iwWDZ-0001nD-RU
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:08:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34321)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7L-0002ui-9X
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:41 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6d-000237-0x
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7I-00070G-Kx
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:39 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37900)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV6b-0005JX-7g
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:54 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:38264)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV7H-0006wP-M8
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:36 -0500
-Received: by mail-wm1-x343.google.com with SMTP id a9so3573923wmj.3
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:34 -0800 (PST)
+ id 1iwV6Z-0005Ep-TG
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:52 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id y17so17110417wrh.5
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6CZgRzeTf93CnfWera+n4X1yroM8E/97xtIzeTdtrLw=;
- b=WzybVxbTRZ654sIKG/IQW3xQGS/7ldy+WF3CUxs77VhfLBASzldGO9nO2Wc/uwALii
- d33n2LU+xpAf5W8Fe3wP0accBopaxO29GG8zz2QfReIW9oq6Ca3Lg7nclETw7WTiO5Rd
- FIJ0ZnvsJN0n/znPxofqnQyk1rDGVxsG1Wyon8r9REf/4uVF8Ctx/g8F85omvWH/kKoK
- htezzoqryx882wzr0ByEQ9wabd7p03p18HCwbZ8V4NC58rG7yiR2uKVnIYfColWeSHDn
- YuDHVQma1/xds5Se6AUx5Da3x0vN0G4DYAE7U/YyjOBZ9a46gboEWZrrKXiFc7ISHI8I
- Mo1Q==
+ bh=B2Kr3drluyK87HV3/IspB7WASRbazRGk/3fqRIsRHd4=;
+ b=ohl5c7ryk2STGk3n8U9QD8/NYQmVRLd3GIv0R1ik4urjo2tDWOOMzWLrxcBcys5VOE
+ Q57zSu5iMEJ49PaXbB9YYk9/VELr7La3EJLsrKhzg1ullAd3EmIlFyxiyQ1BUaihU9i9
+ p12EmJsniTsu6rDOFXhdp3s9zcKNoizFPm43mXAGsnH6VFUjcgeKTfMU/r+F9SKSVSvM
+ y0QJ2obTfPexuFr3eQtrx1+y4L67mbbH1jQCS9Mk0gs9ofuagyIRCEXqCSc8/0pNcvGe
+ TxVolquY47pO7bVpM8oPA/GOvNvtlvbQMBIPASafLskKRnf4IjVT+iM5zIssloP/jbgd
+ 8fKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6CZgRzeTf93CnfWera+n4X1yroM8E/97xtIzeTdtrLw=;
- b=IsGkbX5t4folTP5nPCzL+6XK+PPkFvDG60/I5YudN6SzKuFMVxO7UfP1Jk+/ho4+ow
- JZyNvVewsoQtth0C/VGCnLJ7sb5MYFt2qKwzUOVX1vk+E0mcW4VGdjwGzl6UuHoc7P6h
- xlJnkE9Bclvyntq/pA4J+KwApd8pvmyh9gVcq14DzkBq2UIoC+UdRWD2oWignToJAnQy
- JN2xWDae52lwJ4OVSQTO0HRuVD11VKwFRyAqdJbgu5GSUSn5X2Ruhceb+LoYnVAgaQeN
- czCmuhi3bK059csBp0l9WOeT45UvC3YWT0UhxCLl4xwMmTa+nmY3A1DeJ5YL/Ei6paiM
- Z/0w==
-X-Gm-Message-State: APjAAAX++wbCL00weLv6QsF4j4URfmx8igN4dXYRDBeNOIeSdtrUg1XA
- LIvzLZmyxaUTBs3mkQhb0W35WHBx
-X-Google-Smtp-Source: APXvYqytDN3GlxK8Kx7dhQNeXEvrOsouXpuLUN04L+DG94C+B9dJzQE3o8H7jRsFhIzyUJmqfADi0A==
-X-Received: by 2002:a1c:4e05:: with SMTP id g5mr6135457wmh.138.1580234253424; 
- Tue, 28 Jan 2020 09:57:33 -0800 (PST)
+ bh=B2Kr3drluyK87HV3/IspB7WASRbazRGk/3fqRIsRHd4=;
+ b=dVXzQyF5N/sEIpQQAx2HDcchvxGLySwC/DYZNHMB3C6Y6Dqfc7TztszmYgfN/Mlyl9
+ leYQx6nvMbVX10wXaDJM13NxYrcLO20Vg54aNFOCpLQ2f+qcqQMsFzVclUszfvK710xf
+ n8Ei9GUXO6Y9M2x9pWJLYXiwt0Jli6sVbsW2e+uMJ5kcCDZ1pqCPodV7WrsbUMvaSSyh
+ tgF9iTOxrDqnzT6sUly8FP4ORrQuS6/opxlRNzX+09TNTsxyYErC3w7L2oD4bNz4bKkx
+ 9WFgCFGQeSjrYh7hY2X72Wuwf4MfMFdrhcY4EL7km4ynKDy0U1cyopW9UzbkU7oEq2jC
+ 0n0w==
+X-Gm-Message-State: APjAAAVMPWKBvuQHFMm1c2xioWXmKWNQGmKlvTInctrYm//1N7zNPEx7
+ sdMRmJ0r7eZ5ZFfshcNyMyTpHaFb
+X-Google-Smtp-Source: APXvYqxYZnqmqrTMEBA9y7aEIuLbscsymrUXmAiky0rPrv+GL5+O5XN1O6nm8VL2pI31aSV61r9q9Q==
+X-Received: by 2002:adf:f244:: with SMTP id b4mr28617311wrp.88.1580234208751; 
+ Tue, 28 Jan 2020 09:56:48 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.31
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:57:32 -0800 (PST)
+ Tue, 28 Jan 2020 09:56:48 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 096/142] meson: convert hw/intc
-Date: Tue, 28 Jan 2020 18:52:56 +0100
-Message-Id: <20200128175342.9066-97-pbonzini@redhat.com>
+Subject: [PATCH 076/142] meson: convert hw/virtio
+Date: Tue, 28 Jan 2020 18:52:36 +0100
+Message-Id: <20200128175342.9066-77-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,151 +103,134 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/intc/Makefile.objs | 51 ------------------------------------------
- hw/intc/meson.build   | 52 +++++++++++++++++++++++++++++++++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 53 insertions(+), 52 deletions(-)
- delete mode 100644 hw/intc/Makefile.objs
- create mode 100644 hw/intc/meson.build
+ hw/Makefile.objs        |  1 -
+ hw/meson.build          |  1 +
+ hw/virtio/Makefile.objs | 41 --------------------------------------
+ hw/virtio/meson.build   | 44 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 45 insertions(+), 42 deletions(-)
+ delete mode 100644 hw/virtio/Makefile.objs
+ create mode 100644 hw/virtio/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 7dee607489..1e52bc3b1a 100644
+index 9232919ac3..742b310f13 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -13,7 +13,6 @@ devices-dirs-$(CONFIG_HYPERV) += hyperv/
- devices-dirs-$(CONFIG_I2C) += i2c/
- devices-dirs-y += ide/
- devices-dirs-y += input/
--devices-dirs-y += intc/
+@@ -32,7 +32,6 @@ devices-dirs-y += timer/
+ devices-dirs-$(CONFIG_TPM) += tpm/
+ devices-dirs-y += usb/
+ devices-dirs-$(CONFIG_VFIO) += vfio/
+-devices-dirs-y += virtio/
  endif
  
  common-obj-y += $(devices-dirs-y)
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-deleted file mode 100644
-index f726d87532..0000000000
---- a/hw/intc/Makefile.objs
-+++ /dev/null
-@@ -1,51 +0,0 @@
--common-obj-$(CONFIG_HEATHROW_PIC) += heathrow_pic.o
--common-obj-$(CONFIG_I8259) += i8259_common.o i8259.o
--common-obj-$(CONFIG_PL190) += pl190.o
--common-obj-$(CONFIG_PUV3) += puv3_intc.o
--common-obj-$(CONFIG_XILINX) += xilinx_intc.o
--common-obj-$(CONFIG_XLNX_ZYNQMP_PMU) += xlnx-pmu-iomod-intc.o
--common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-ipi.o
--common-obj-$(CONFIG_ETRAXFS) += etraxfs_pic.o
--common-obj-$(CONFIG_IMX) += imx_avic.o imx_gpcv2.o
--common-obj-$(CONFIG_LM32) += lm32_pic.o
--common-obj-$(CONFIG_REALVIEW) += realview_gic.o
--common-obj-$(CONFIG_SLAVIO) += slavio_intctl.o
--common-obj-$(CONFIG_IOAPIC) += ioapic_common.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gic_common.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gic.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gicv2m.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_common.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gicv3.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_dist.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_redist.o
--common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_its_common.o
--common-obj-$(CONFIG_OPENPIC) += openpic.o
--common-obj-y += intc.o
--
--obj-$(CONFIG_APIC) += apic.o apic_common.o
--obj-$(CONFIG_ARM_GIC_KVM) += arm_gic_kvm.o
--obj-$(call land,$(CONFIG_ARM_GIC_KVM),$(TARGET_AARCH64)) += arm_gicv3_kvm.o
--obj-$(call land,$(CONFIG_ARM_GIC_KVM),$(TARGET_AARCH64)) += arm_gicv3_its_kvm.o
--obj-$(CONFIG_ARM_V7M) += armv7m_nvic.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_gic.o exynos4210_combiner.o
--obj-$(CONFIG_GRLIB) += grlib_irqmp.o
--obj-$(CONFIG_IOAPIC) += ioapic.o
--obj-$(CONFIG_OMAP) += omap_intc.o
--obj-$(CONFIG_OPENPIC_KVM) += openpic_kvm.o
--obj-$(CONFIG_RASPI) += bcm2835_ic.o bcm2836_control.o
--obj-$(CONFIG_SH4) += sh_intc.o
--obj-$(CONFIG_XICS) += xics.o
--obj-$(CONFIG_XICS_SPAPR) += xics_spapr.o
--obj-$(CONFIG_XICS_KVM) += xics_kvm.o
--obj-$(CONFIG_XIVE) += xive.o
--obj-$(CONFIG_XIVE_SPAPR) += spapr_xive.o
--obj-$(CONFIG_XIVE_KVM) += spapr_xive_kvm.o
--obj-$(CONFIG_POWERNV) += xics_pnv.o pnv_xive.o
--obj-$(CONFIG_ALLWINNER_A10_PIC) += allwinner-a10-pic.o
--obj-$(CONFIG_S390_FLIC) += s390_flic.o
--obj-$(CONFIG_S390_FLIC_KVM) += s390_flic_kvm.o
--obj-$(CONFIG_ASPEED_SOC) += aspeed_vic.o
--obj-$(CONFIG_ARM_GIC) += arm_gicv3_cpuif.o
--obj-$(CONFIG_MIPS_CPS) += mips_gic.o
--obj-$(CONFIG_NIOS2) += nios2_iic.o
--obj-$(CONFIG_OMPIC) += ompic.o
-diff --git a/hw/intc/meson.build b/hw/intc/meson.build
-new file mode 100644
-index 0000000000..a2e5314fd7
---- /dev/null
-+++ b/hw/intc/meson.build
-@@ -0,0 +1,52 @@
-+softmmu_ss.add(files('intc.c'))
-+softmmu_ss.add(when: 'CONFIG_ARM_GIC', if_true: files(
-+  'arm_gic.c',
-+  'arm_gic_common.c',
-+  'arm_gicv2m.c',
-+  'arm_gicv3.c',
-+  'arm_gicv3_common.c',
-+  'arm_gicv3_dist.c',
-+  'arm_gicv3_its_common.c',
-+  'arm_gicv3_redist.c',
-+))
-+softmmu_ss.add(when: 'CONFIG_ETRAXFS', if_true: files('etraxfs_pic.c'))
-+softmmu_ss.add(when: 'CONFIG_HEATHROW_PIC', if_true: files('heathrow_pic.c'))
-+softmmu_ss.add(when: 'CONFIG_I8259', if_true: files('i8259_common.c', 'i8259.c'))
-+softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_avic.c', 'imx_gpcv2.c'))
-+softmmu_ss.add(when: 'CONFIG_IOAPIC', if_true: files('ioapic_common.c'))
-+softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_pic.c'))
-+softmmu_ss.add(when: 'CONFIG_OPENPIC', if_true: files('openpic.c'))
-+softmmu_ss.add(when: 'CONFIG_PL190', if_true: files('pl190.c'))
-+softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_intc.c'))
-+softmmu_ss.add(when: 'CONFIG_REALVIEW', if_true: files('realview_gic.c'))
-+softmmu_ss.add(when: 'CONFIG_SLAVIO', if_true: files('slavio_intctl.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX', if_true: files('xilinx_intc.c'))
-+softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP', if_true: files('xlnx-zynqmp-ipi.c'))
-+softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP_PMU', if_true: files('xlnx-pmu-iomod-intc.c'))
-+
-+specific_ss.add(when: 'CONFIG_ALLWINNER_A10_PIC', if_true: files('allwinner-a10-pic.c'))
-+specific_ss.add(when: 'CONFIG_APIC', if_true: files('apic.c', 'apic_common.c'))
-+specific_ss.add(when: 'CONFIG_ARM_GIC', if_true: files('arm_gicv3_cpuif.c'))
-+specific_ss.add(when: 'CONFIG_ARM_GIC_KVM', if_true: files('arm_gic_kvm.c'))
-+specific_ss.add(when: ['CONFIG_ARM_GIC_KVM', 'TARGET_AARCH64'], if_true: files('arm_gicv3_kvm.c', 'arm_gicv3_its_kvm.c'))
-+specific_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('armv7m_nvic.c'))
-+specific_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_vic.c'))
-+specific_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_gic.c', 'exynos4210_combiner.c'))
-+specific_ss.add(when: 'CONFIG_GRLIB', if_true: files('grlib_irqmp.c'))
-+specific_ss.add(when: 'CONFIG_IOAPIC', if_true: files('ioapic.c'))
-+specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_gic.c'))
-+specific_ss.add(when: 'CONFIG_NIOS2', if_true: files('nios2_iic.c'))
-+specific_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_intc.c'))
-+specific_ss.add(when: 'CONFIG_OMPIC', if_true: files('ompic.c'))
-+specific_ss.add(when: 'CONFIG_OPENPIC_KVM', if_true: files('openpic_kvm.c'))
-+specific_ss.add(when: 'CONFIG_POWERNV', if_true: files('xics_pnv.c', 'pnv_xive.c'))
-+specific_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_ic.c', 'bcm2836_control.c'))
-+specific_ss.add(when: 'CONFIG_S390_FLIC', if_true: files('s390_flic.c'))
-+specific_ss.add(when: 'CONFIG_S390_FLIC_KVM', if_true: files('s390_flic_kvm.c'))
-+specific_ss.add(when: 'CONFIG_SH4', if_true: files('sh_intc.c'))
-+specific_ss.add(when: 'CONFIG_XICS', if_true: files('xics.c'))
-+specific_ss.add(when: 'CONFIG_XICS_KVM', if_true: files('xics_kvm.c'))
-+specific_ss.add(when: 'CONFIG_XICS_SPAPR', if_true: files('xics_spapr.c'))
-+specific_ss.add(when: 'CONFIG_XIVE', if_true: files('xive.c'))
-+specific_ss.add(when: 'CONFIG_XIVE_KVM', if_true: files('spapr_xive_kvm.c'))
-+specific_ss.add(when: 'CONFIG_XIVE_SPAPR', if_true: files('spapr_xive.c'))
 diff --git a/hw/meson.build b/hw/meson.build
-index ec4bb48a0f..986e710287 100644
+index f2209d900c..8338fc4408 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('intc')
- subdir('ipack')
- subdir('ipmi')
- subdir('isa')
+@@ -3,5 +3,6 @@ subdir('mem')
+ subdir('nubus')
+ subdir('semihosting')
+ subdir('smbios')
++subdir('virtio')
+ subdir('watchdog')
+ subdir('xen')
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+deleted file mode 100644
+index de0f5fc39b..0000000000
+--- a/hw/virtio/Makefile.objs
++++ /dev/null
+@@ -1,41 +0,0 @@
+-ifeq ($(CONFIG_VIRTIO),y)
+-common-obj-y += virtio-bus.o
+-obj-y += virtio.o
+-
+-obj-$(CONFIG_VHOST) += vhost.o vhost-backend.o
+-common-obj-$(call lnot,$(CONFIG_VHOST)) += vhost-stub.o
+-obj-$(CONFIG_VHOST_USER) += vhost-user.o
+-
+-common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
+-common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+-common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
+-obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+-obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+-obj-$(CONFIG_VHOST_USER_FS) += vhost-user-fs.o
+-obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+-obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pmem-pci.o
+-obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-pci.o
+-obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+-
+-ifeq ($(CONFIG_VIRTIO_PCI),y)
+-obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+-obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+-obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input-pci.o
+-obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+-obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-pci.o
+-obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+-obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
+-obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
+-obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
+-obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
+-obj-$(CONFIG_VIRTIO_NET) += virtio-net-pci.o
+-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-serial-pci.o
+-endif
+-else
+-common-obj-y += vhost-stub.o
+-endif
+-
+-common-obj-$(CONFIG_ALL) += vhost-stub.o
+diff --git a/hw/virtio/meson.build b/hw/virtio/meson.build
+new file mode 100644
+index 0000000000..561e5c9825
+--- /dev/null
++++ b/hw/virtio/meson.build
+@@ -0,0 +1,44 @@
++softmmu_virtio_ss = ss.source_set()
++softmmu_virtio_ss.add(files('virtio-bus.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_PCI', if_true: files('virtio-pci.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_MMIO', if_true: files('virtio-mmio.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VHOST', if_false: files('vhost-stub.c'))
++softmmu_virtio_ss.add(when: ['CONFIG_VIRTIO_PMEM', 'CONFIG_VIRTIO_PCI'], if_true: files('virtio-pmem-pci.c'))
++
++softmmu_ss.add_all(when: 'CONFIG_VIRTIO', if_true: softmmu_virtio_ss)
++softmmu_ss.add(when: 'CONFIG_VIRTIO', if_false: files('vhost-stub.c'))
++
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-stub.c'))
++
++virtio_ss = ss.source_set()
++virtio_ss.add(files('virtio.c'))
++virtio_ss.add(when: 'CONFIG_VHOST', if_true: files('vhost.c', 'vhost-backend.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_USER', if_true: files('vhost-user.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_CRYPTO', if_true: files('virtio-crypto.c'))
++virtio_ss.add(when: ['CONFIG_VIRTIO_CRYPTO', 'CONFIG_VIRTIO_PCI'], if_true: files('virtio-crypto-pci.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_USER_FS', if_true: files('vhost-user-fs.c'))
++virtio_ss.add(when: ['CONFIG_VHOST_USER_FS', 'CONFIG_VIRTIO_PCI'], if_true: files('vhost-user-fs-pci.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_PMEM', if_true: files('virtio-pmem.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock.c'))
++
++virtio_pci_ss = ss.source_set()
++virtio_pci_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_BLK', if_true: files('vhost-user-blk-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_INPUT', if_true: files('vhost-user-input-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_SCSI', if_true: files('vhost-user-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_SCSI', if_true: files('vhost-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT_HOST', if_true: files('virtio-input-host-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio-blk-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio-net-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-serial-pci.c'))
++
++virtio_ss.add_all(when: 'CONFIG_VIRTIO_PCI', if_true: virtio_pci_ss)
++
++specific_ss.add_all(when: 'CONFIG_VIRTIO', if_true: virtio_ss)
 -- 
 2.21.0
 
