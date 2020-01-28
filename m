@@ -2,101 +2,97 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E44FC33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 07:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FEB4C33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 08:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D7912173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 07:48:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3ABDA2467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 08:02:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ejXeXJNk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7912173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="An7Kt/jr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ABDA2467E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwLbo-0006C0-Gd
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 02:48:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39517)
+	id 1iwLpG-0001BJ-DZ
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 03:02:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david.edmondson@oracle.com>) id 1iwLaC-0005Gg-EQ
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:46:49 -0500
+ (envelope-from <armbru@redhat.com>) id 1iwLo6-0000js-AN
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:01:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david.edmondson@oracle.com>) id 1iwLaB-0007Yl-AO
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 02:46:48 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:34450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david.edmondson@oracle.com>)
- id 1iwLa2-0007II-Ev; Tue, 28 Jan 2020 02:46:38 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00S7XWTu137188;
- Tue, 28 Jan 2020 07:46:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=to : cc : subject :
- in-reply-to : references : sender : from : date : message-id :
- mime-version : content-type; s=corp-2019-08-05;
- bh=X438L84DasH+Sc/PilMQMTWr6Ph3ja4xJ64yUf9v4lI=;
- b=ejXeXJNkQ2tQEXSZCdMyl07NkfvBGkzjlExma6KGeE0jbGyjQp/A2geOmi8NwoPsClGn
- jAMfaK975e3BadFEYbpGgTBnTwfqUtAWf02EbC6SWa3/LukQUAPNiDTx6V654ON+pzgM
- Msk+i/7ZzTrW9ZmlnqmOjBovs4sAyIAjPQxZ8+DMdpsuaugxYG12RzZJ0hRdWMaoomy+
- WsO0WaiO0zzUIRuTghr/WfmXcvVTQZMR9vyuBW7CTonq2UvmixwzQGD4BTDvJ4/aUSJe
- 10WJyN5G7dpbFxHfREL53ledYPlO/Ok9txbYfUWhTZCueGDfGkbvvKU9OhlBo1HsuMk3 RA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2xrdmqc9jk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jan 2020 07:46:30 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00S7XcJp130901;
- Tue, 28 Jan 2020 07:46:29 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 2xry4w35jg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jan 2020 07:46:29 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00S7kSqu010093;
- Tue, 28 Jan 2020 07:46:28 GMT
-Received: from disaster-area.hh.sledj.net (/81.149.164.25)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 27 Jan 2020 23:46:28 -0800
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 0f3efdcd;
- Tue, 28 Jan 2020 07:46:26 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Subject: Re: [PATCH v2 1/2] qemu-img: Add --target-is-zero to convert
-In-Reply-To: <a689f9d9-a4b1-9201-1847-02a5afc255fd@redhat.com>
-References: <20200124103458.1525982-1-david.edmondson@oracle.com>
- <20200124103458.1525982-2-david.edmondson@oracle.com>
- <a689f9d9-a4b1-9201-1847-02a5afc255fd@redhat.com>
-X-HGTTG: gag-halfrunt
-From: David Edmondson <david.edmondson@oracle.com>
-Date: Tue, 28 Jan 2020 07:46:26 +0000
-Message-ID: <cuno8uo9g6l.fsf@gag-halfrunt.hh.sledj.net>
+ (envelope-from <armbru@redhat.com>) id 1iwLnz-0002S3-Rp
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:01:08 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39686
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iwLny-0002Nz-Ss
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:01:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580198461;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8m7G6b9pakRMsTMrEZbQW0ozU1PN6+An79UaMe5QIWM=;
+ b=An7Kt/jrLhzdxN/1LBkzilsMm98uLjtiDb8YXY65KdDAq3lzLFIjQKjzJdG6lrHMWkTcDh
+ 6aYUrKu1KUoEm56QUIqEbXCL4iQpPmHQBKZWlfPy4BKx1+Lokx82ifEo4siMoyTTNYUgfQ
+ ZU7CaQRUiYw1np9Qa+7qyzLFqCY22uw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-dtyWCDbfM9CIkiSSbRQxyQ-1; Tue, 28 Jan 2020 03:00:48 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17E33800D48;
+ Tue, 28 Jan 2020 08:00:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C213A8E9F2;
+ Tue, 28 Jan 2020 08:00:41 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3EA8B1138600; Tue, 28 Jan 2020 09:00:40 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: Integrating QOM into QAPI
+References: <87d0bmchq0.fsf@dusky.pond.sub.org>
+ <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200120100849.GB345995@stefanha-x1.localdomain>
+ <871rrtmkko.fsf@dusky.pond.sub.org>
+ <20200121113224.GD630615@stefanha-x1.localdomain>
+ <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
+ <87wo9lc4oe.fsf_-_@dusky.pond.sub.org>
+ <20200121143658.GB597037@redhat.com>
+ <871rrs97ld.fsf@dusky.pond.sub.org>
+ <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
+ <C4AB0E62-765F-45BC-A442-99C643CFFCCD@redhat.com>
+ <CAFEAcA9xtwNzZQS7biDy=LtZEiLDis3iQztOcP2+2NnCj80c0Q@mail.gmail.com>
+ <B442E0A6-E0C5-426A-8234-EE6491AE4BB0@redhat.com>
+Date: Tue, 28 Jan 2020 09:00:40 +0100
+In-Reply-To: <B442E0A6-E0C5-426A-8234-EE6491AE4BB0@redhat.com> (Christophe de
+ Dinechin's message of "Mon, 27 Jan 2020 20:05:36 +0100")
+Message-ID: <87a768j9hz.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9513
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001280062
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9513
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001280062
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: dtyWCDbfM9CIkiSSbRQxyQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,68 +104,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+Christophe de Dinechin <dinechin@redhat.com> writes:
 
-> On 1/24/20 4:34 AM, David Edmondson wrote:
->> In many cases the target of a convert operation is a newly provisioned
->> target that the user knows is blank (filled with zeroes). In this
->> situation there is no requirement for qemu-img to wastefully zero out
->> the entire device.
->> 
->> Add a new option, --target-is-zero, allowing the user to indicate that
->> an existing target device is already zero filled.
->> 
->> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
->> ---
->>   qemu-img-cmds.hx |  4 ++--
->>   qemu-img.c       | 25 ++++++++++++++++++++++---
->>   qemu-img.texi    |  4 ++++
->>   3 files changed, 28 insertions(+), 5 deletions(-)
+>> On 26 Jan 2020, at 16:04, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+>>=20
+>> On Sun, 26 Jan 2020 at 08:10, Christophe de Dinechin
+>> <dinechin@redhat.com> wrote:
+[...]
+>> You'd have more luck persuading me we should move to Rust:
+>> at least then we'd get some clear benefits (no more buffer
+>> overrun security bugs) for the upheaval :-)
 >
-> I'm working up a patch series that tries to auto-set this flag without 
-> user interaction where possible (for example, if lseek(fd, 0, SEEK_DATA) 
-> returns EOF, or if fstat() reports 0 blocks allocated, or if qcow2 sees 
-> no L2 tables allocated, or a proposed extension to NBD passes on the 
-> same...).  I may rebase my series on top of your patch and tweak things 
-> in yours accordingly.
->
-> But as it stands, the idea makes sense to me; even if we add ways for 
-> some images to efficiently report initial state (and our existing 
-> bdrv_has_zero_init() is NOT such a method), there are enough other 
-> scenarios where the knob will be the only way to let qemu-img know the 
-> intent.
+> This is largely a myth as soon as you need to do =E2=80=9Cyour own stuff=
+=E2=80=9D.
+> Example: CVE-2019-18960, https://seclists.org/oss-sec/2019/q4/141.
 
-Having qemu-img figure things out on its own is obviously desirable, but
-I agree that there are enough cases where this won't be possible and,
-given the resulting performance improvement, it will still be useful to
-allow the caller to force things.
+I think "largely a myth" is too harsh.  Yes, it's not a silver bullet to
+insta-slay all memory and concurrency safety vampires.  It does provide
+useful guarantees, though.  How useful exactly in practice time will
+tell.
 
->> +        case OPTION_TARGET_IS_ZERO:
->> +            /*
->> +             * The user asserting that the target is blank has the
->> +             * same effect as the target driver supporting zero
->> +             * initialisation.
->
-> Hmm. A git grep shows that 'initialization' has 200 hits, 
-> 'initialisation' has only 29. But I think it's a US vs. UK thing, so I 
-> don't care which spelling you use.
-
-Yes, it's British English spelling. It was unconscious - I'll switch if
-there is an existing policy.
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks.
-
-If the conversion of the documentation to rST is imminent then I'll wait
-for that before submitting a followup with corresponding changes applied
-to the new docs.
-
-dme.
--- 
-I'd come on over but I haven't got a raincoat.
 
