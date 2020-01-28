@@ -2,64 +2,67 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52DE4C33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 08:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ABF1C33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 08:31:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28AD62173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 08:25:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28AD62173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 515C124685
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 08:31:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515C124685
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwMBT-0008L4-Cb
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 03:25:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48269)
+	id 1iwMHp-0002KJ-IA
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 03:31:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iwMAr-0007n2-OD
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:24:42 -0500
+ (envelope-from <vr_qemu@t-online.de>) id 1iwMGs-0001t8-Oc
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:30:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iwMAq-0007Oj-Ie
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:24:41 -0500
-Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:54022)
+ (envelope-from <vr_qemu@t-online.de>) id 1iwMGr-0004SA-NQ
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:30:54 -0500
+Received: from mailout06.t-online.de ([194.25.134.19]:33800)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iwMAq-0007Mp-CF
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:24:40 -0500
-Received: from player692.ha.ovh.net (unknown [10.108.35.59])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id 3DF8026A17E
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:24:38 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player692.ha.ovh.net (Postfix) with ESMTPSA id 03B71E9186F7;
- Tue, 28 Jan 2020 08:24:28 +0000 (UTC)
-Subject: Re: [PATCH v3 1/5] hw/sd: Configure number of slots exposed by the
- ASPEED SDHCI model
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200114103433.30534-1-clg@kaod.org>
- <20200114103433.30534-2-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <149987eb-a657-b7e0-7ca8-198281ed1713@kaod.org>
-Date: Tue, 28 Jan 2020 09:24:28 +0100
+ (Exim 4.71) (envelope-from <vr_qemu@t-online.de>) id 1iwMGr-0004N0-H4
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 03:30:53 -0500
+Received: from fwd37.aul.t-online.de (fwd37.aul.t-online.de [172.20.27.137])
+ by mailout06.t-online.de (Postfix) with SMTP id 4A3D840C33D3;
+ Tue, 28 Jan 2020 09:30:51 +0100 (CET)
+Received: from [192.168.211.200]
+ (XNFcgOZCYhZubjZfJpllEZpnkKYCFJj-hieUG66izl5hg2WMThNXlKMeGefmMAXgnX@[93.236.147.123])
+ by fwd37.t-online.de
+ with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
+ esmtp id 1iwMGo-3KA0MS0; Tue, 28 Jan 2020 09:30:50 +0100
+From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
+Subject: Re: [PATCH v2] Implement the Screamer sound chip for the mac99
+ machine type
+To: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>,
+ Programmingkid <programmingkidx@gmail.com>,
+ qemu Developers <qemu-devel@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <43D423C6-78D4-4DCE-B97C-0658D3D2E3BD@gmail.com>
+ <4021690b-2380-3925-209e-d4cc66928773@gmail.com>
+Message-ID: <5314e860-dffe-3bc0-209f-bd2b937cd0c6@t-online.de>
+Date: Tue, 28 Jan 2020 09:30:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-In-Reply-To: <20200114103433.30534-2-clg@kaod.org>
+In-Reply-To: <4021690b-2380-3925-209e-d4cc66928773@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 17277215546196396864
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrfeefgdduudejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-ID: XNFcgOZCYhZubjZfJpllEZpnkKYCFJj-hieUG66izl5hg2WMThNXlKMeGefmMAXgnX
+X-TOI-MSGID: df9baa60-c1fe-41b7-9cb2-e3f926764a0f
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.121.55.239
+X-Received-From: 194.25.134.19
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,36 +74,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Peter, 
+> Hi,
+>
+> Unfortunately it's not that simple to simply revert the patch since the=
+ old backend api no longer exists.=C2=A0 Also I don't have a Mac so it's =
+almost impossible for me to test the results.=C2=A0 I looked at the speci=
+fied commit and I think I found a problem, could you please apply the att=
+ached patch on the current git master and check whether it solves the pro=
+blem?=C2=A0 If yes I'll turn it into a proper patch.
+>
+> Regards,
+> Zoltan
+>
 
-[ ... ]
+Hi Zolt=C3=A1n,
 
-> +static Property aspeed_sdhci_properties[] = {
-> +    DEFINE_PROP_UINT8("num-slots", AspeedSDHCIState, num_slots, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(classp);
-> @@ -181,6 +187,7 @@ static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
->      dc->realize = aspeed_sdhci_realize;
->      dc->reset = aspeed_sdhci_reset;
->      dc->vmsd = &vmstate_aspeed_sdhci;
-> +    dc->props = aspeed_sdhci_properties;
+I also don't have a Mac so I tested your patch with a slightly modified s=
+dlaudio version. I found two bugs in your patch. With the bugs fixed I ha=
+ve working SDL2 audio playback with float type samples. Now I wonder if t=
+he fixed patch also fixes coreaudio playback. Depending on how busy you a=
+re I can just write a review for your patch and let you handle the rest, =
+or may I send a modified version of your patch to the mailing list for te=
+sting?
 
-This will require a change to use device_class_set_props(). 
-
-Do you want a resend ?  
-
-Thanks,
-
-C.
+With best regards
+Volker
 
