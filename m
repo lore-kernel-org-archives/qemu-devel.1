@@ -2,79 +2,50 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9429CC32771
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 00:18:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED48EC32771
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 00:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6084E2173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 00:18:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nX3wPstb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6084E2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C2E4E22527
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 00:26:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2E4E22527
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwEaZ-0005OM-ID
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 19:18:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41397)
+	id 1iwEiF-0007wW-VQ
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jan 2020 19:26:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iwEZk-0004wz-Ri
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:17:53 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1iwEha-0007Ui-7r
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iwEZj-0003Yw-NV
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:17:52 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:46388)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iwEZj-0003Wj-EX
- for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:17:51 -0500
-Received: by mail-lj1-x243.google.com with SMTP id x14so10483665ljd.13
- for <qemu-devel@nongnu.org>; Mon, 27 Jan 2020 16:17:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=l9shY1FcVDYWjipBhk84QS7HbgTa6bQ4AdMWhW8BEwI=;
- b=nX3wPstb9/QLW3iZvpKqhAWoUNFkMZJG+/ZhuI1lpS+iu2sAGZKcWKOjFBUpxzy6XV
- a2FFQ6jNEZCI1Qm0csr/7OMZV5DyKSt+8qWujcCOhOkqttQtcQCdKzJ3iXRfP3ggjafZ
- 4SF0PxOg9GC1l/9JTzXIJ7GfpCAoNpIX1Tm/3oYjcI714BTSUAr6w1Pyfic2QYCLqYbO
- Qk2NA3m85JFq6F2zZhuc889xaKw2LkB4Bav+Zpm/OYKezuF+mDJ28e/YhUipgtIUucUk
- 4+ruY8+/8shu2Ds25IR0SibXMVlKnJTuXSuMqgqq0xhCnwKVSLhFB8NsFm8cssQ1OwMq
- Lb1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=l9shY1FcVDYWjipBhk84QS7HbgTa6bQ4AdMWhW8BEwI=;
- b=g8jbcGPBMIce7gJuTNest/HJRHxWat5xa9H+js5s4JoAWQUgFgzir/f+BJ/wbVKROu
- AiUBBUoLqGo0DwpwBfkPYy9dNRttVIpMHxE8+OtuMAPWjvqmzn90x+J33tDLNGgnlN5W
- baxhZavQX775nVqkN2IEkZ6hkP2FM+mLlwwXYUzOus5vzB8vJN2dDCsiI/wZ0FfHWb7M
- 9zka6lCwL7Knw3lVYmm0rKfLLDP5/ZCjvYFW1tzCZHaZ9HRvgbl07z7EjQaMorpsM+Kn
- 50M5qvA+PEwB2WInN9g2oHNFlBRY7sHwmEuiBv86S5RK7stL98edDNEBgZCzAnP6qHkS
- EhJw==
-X-Gm-Message-State: APjAAAXXVfVrHr2298uCSBeN1mT1EHxlTp0V32bupr8KgbZZpJMQJAWB
- BrpbauLUEyc1shea3bfpC4USMN5closOUgmWs+w=
-X-Google-Smtp-Source: APXvYqzotwvEbPdNBt/ay41Y7GNro98ZAwExZt0/dSYepJGKC7Bg+bxIzYOntKEKiCIGPHLyT2AYjpIbQ6x1u4eCfF4=
-X-Received: by 2002:a2e:a36a:: with SMTP id i10mr3618254ljn.107.1580170669433; 
- Mon, 27 Jan 2020 16:17:49 -0800 (PST)
+ (envelope-from <fthain@telegraphics.com.au>) id 1iwEhZ-0001Dk-3U
+ for qemu-devel@nongnu.org; Mon, 27 Jan 2020 19:25:58 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:56370)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <fthain@telegraphics.com.au>)
+ id 1iwEhZ-0001DV-0B; Mon, 27 Jan 2020 19:25:57 -0500
+Received: from localhost (localhost.localdomain [127.0.0.1])
+ by kvm5.telegraphics.com.au (Postfix) with ESMTP id 4DDD629982;
+ Mon, 27 Jan 2020 19:25:54 -0500 (EST)
+Date: Tue, 28 Jan 2020 11:25:54 +1100 (AEDT)
+From: Finn Thain <fthain@telegraphics.com.au>
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v3 00/14] Fixes for DP8393X SONIC device emulation
+In-Reply-To: <cover.1579474761.git.fthain@telegraphics.com.au>
+Message-ID: <alpine.LNX.2.21.1.2001281118360.16@nippy.intranet>
+References: <cover.1579474761.git.fthain@telegraphics.com.au>
 MIME-Version: 1.0
-References: <20200127141051.12543-1-ianjiang.ict@gmail.com>
-In-Reply-To: <20200127141051.12543-1-ianjiang.ict@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 27 Jan 2020 16:17:22 -0800
-Message-ID: <CAKmqyKOcCDqoM0_ORP6CDsMFMc9u7+gehnq62f0p+w1ARoNiow@mail.gmail.com>
-Subject: Re: [PATCH] riscv: Add helper to make NaN-boxing for FP register
-To: Ian Jiang <ianjiang.ict@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+Content-Type: text/plain; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,71 +57,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 27, 2020 at 6:11 AM Ian Jiang <ianjiang.ict@gmail.com> wrote:
->
-> The function that makes NaN-boxing when a 32-bit value is assigned
-> to a 64-bit FP register is split out to a helper gen_nanbox_fpr().
-> Then it is applied in translating of the FLW instruction.
->
-> This also applies for other instructions when the RVD extension is
-> present, such as FMV.W.W, FADD.S, FSUB.S and so on.
->
-> Signed-off-by: Ian Jiang <ianjiang.ict@gmail.com>
+On Mon, 20 Jan 2020, Finn Thain wrote:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Hi All,
+> 
+> There are bugs in the emulated dp8393x device that can stop packet
+> reception in a Linux/m68k guest (q800 machine).
+> 
+> With a Linux/mips guest (magnum machine), the driver fails to probe
+> the dp8393x device.
+> 
+> With a NetBSD/arc 5.1 guest (magnum machine), the bugs in the device
+> can be fatal to the guest kernel.
+> 
+> Whilst debugging the device, I found that the receiver algorithm
+> differs from the one described in the National Semiconductor
+> datasheet.
+> 
+> This patch series resolves these bugs.
+> 
 
-Alistair
+Ironically, given the recent driver fixes in the Linux kernel, the bugs in 
+stock QEMU make it possible to remotely trigger a kernel Oops (much like 
+the NetBSD crash). This patch series is needed to resolve those issues.
 
+> Note that the mainline Linux sonic driver also has bugs.
+> I have fixed the bugs that I know of in a series of patches at,
+> https://github.com/fthain/linux/commits/mac68k
 > ---
->  target/riscv/insn_trans/trans_rvf.inc.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
->
-> diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-> index e23cd639a6..3bfd8881e7 100644
-> --- a/target/riscv/insn_trans/trans_rvf.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvf.inc.c
-> @@ -23,6 +23,20 @@
->          return false;                       \
->  } while (0)
->
-> +/*
-> + * RISC-V requires NaN-boxing of narrower width floating
-> + * point values.  This applies when a 32-bit value is
-> + * assigned to a 64-bit FP register.  Thus this does not
-> + * apply when the RVD extension is not present.
-> + */
-> +static void gen_nanbox_fpr(DisasContext *ctx, int regno)
-> +{
-> +    if (has_ext(ctx, RVD)) {
-> +        tcg_gen_ori_i64(cpu_fpr[regno], cpu_fpr[regno],
-> +                        MAKE_64BIT_MASK(32, 32));
-> +    }
-> +}
-> +
->  static bool trans_flw(DisasContext *ctx, arg_flw *a)
->  {
->      TCGv t0 = tcg_temp_new();
-> @@ -32,8 +46,7 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
->      tcg_gen_addi_tl(t0, t0, a->imm);
->
->      tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
-> -    /* RISC-V requires NaN-boxing of narrower width floating point values */
-> -    tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd], 0xffffffff00000000ULL);
-> +    gen_nanbox_fpr(ctx, a->rd);
->
->      tcg_temp_free(t0);
->      mark_fs_dirty(ctx);
-> --
-> 2.17.1
->
->
+> Changed since v1:
+>  - Minor revisions as described in commit logs.
+>  - Dropped patches 4/10 and 7/10.
+>  - Added 5 new patches.
+> 
+> Changed since v2:
+>  - Minor revisions as described in commit logs.
+>  - Dropped patch 13/13.
+>  - Added 2 new patches.
+> 
+> 
+> Finn Thain (14):
+>   dp8393x: Mask EOL bit from descriptor addresses
+>   dp8393x: Always use 32-bit accesses
+>   dp8393x: Clean up endianness hacks
+>   dp8393x: Have dp8393x_receive() return the packet size
+>   dp8393x: Update LLFA and CRDA registers from rx descriptor
+>   dp8393x: Clear RRRA command register bit only when appropriate
+>   dp8393x: Implement packet size limit and RBAE interrupt
+>   dp8393x: Don't clobber packet checksum
+>   dp8393x: Use long-word-aligned RRA pointers in 32-bit mode
+>   dp8393x: Pad frames to word or long word boundary
+>   dp8393x: Clear descriptor in_use field to release packet
+>   dp8393x: Always update RRA pointers and sequence numbers
+>   dp8393x: Don't reset Silicon Revision register
+>   dp8393x: Don't stop reception upon RBE interrupt assertion
+> 
+>  hw/net/dp8393x.c | 205 +++++++++++++++++++++++++++++++----------------
+>  1 file changed, 137 insertions(+), 68 deletions(-)
+> 
+> 
 
