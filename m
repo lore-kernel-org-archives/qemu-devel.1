@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA2FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36306C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:30:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 908DC20716
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:29:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0322820716
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:30:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pdyIFjbB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 908DC20716
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYzkVFBA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0322820716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwVbq-0003Q3-P2
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:29:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59622)
+	id 1iwVdL-0005jg-2k
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:30:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV54-0007st-RK
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:20 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5U-0000Jt-O7
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV53-0001eb-49
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:18 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:36267)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5T-0002f4-Ar
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:44 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38255)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV52-0001WH-Np
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:16 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id p17so3577144wma.1
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:14 -0800 (PST)
+ id 1iwV5T-0002Zy-4K
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:55:43 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id y17so17106112wrh.5
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=o3TXGYGmV/MwP/W8uOvf4xhCM1C9M0jbEjzBD/qYMIs=;
- b=pdyIFjbBQDuaVMcefWHqyKtrmAvD+3hbC2uvjuXkc35MStGMIEbTnf7BT8m2nUarCa
- Z75czulP0HgXe+QSyyUo4aO7kNpJJmrapG/h40WXU/o1A3Bjv4PdzJIJX01U323GDfOX
- u78YCp0DhNS7V0VwDg7o+6CpZVQN2pS3+u4MdD0f5Xh4mq3GX7TZS73LMZSaeD8TuuNW
- 6xhqf75kI25eP0Bw6KHDYGdDTV8KHAMuA5zFOpsz+aDpd5Swaq1/9oVeF/leiSAaKoYu
- mqrGMXZBhhHQHr52lQSphkGd0nxLSWUIYmxxIaucL2nfvEfq1hnbAYzTDaZBkMJDt6k+
- cBCw==
+ bh=0WZuivSgNMWl4zupYiqbOPHdPqehhCbji+b8xFoXYew=;
+ b=WYzkVFBAO+8nAYhwphEgUwnB2a1AcUxO+qko2g393oyxhZ79NuMA8SbkcXN8HDbKMr
+ TeDAF2vAb+WVtPU8Nq0Pz8Mnaq32byZrY0sCY3psg/8h3rlWF9VAVJLV0GA2eOA8Ijrn
+ ZQMogTeqpo0ZA0cG6FcXawJbE/jrEXpzuCO8kvkVvuqK0yOwoyav/swegNdNqG6l8eeT
+ wqkNFmYpgbWRpe2hUlLcHeacxYe5CtiPhEpVatuF6VKFdWqkdv0CikxhW7irioGUQqqN
+ F2/bvEMGBTyuigVEJD+coemqzz2nXHSlarYj5BtAOmtXtzI5GivPMpC8JiX8Yn99CrsT
+ /6Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=o3TXGYGmV/MwP/W8uOvf4xhCM1C9M0jbEjzBD/qYMIs=;
- b=SOdA0GLkeYjx+aFAoFa02Np7+nwaFgfwjbx1tM9EPSgQjCmk254WF+iZ/IQDalHHH/
- hVdzd/4/Ai5ko6gpjDvttLaUqdk0M6UEBVgXtMIxPRgwy7Yiw30w0S72K4oJF8PKAUmf
- zNNV4L+xsYduFOiF6bekdc7LNT9MgEnyeHNlYyqF4neotwmcKn34Tt9oZETqu1hHUDdG
- xdexKdXXhotwL+Lb+OYynBmq2Qi+5CqX9KPTm5GEQDBRBgLuVBZ0RkBwmCyq/Ox93K+P
- OV3/6r1veHqvpdFAom380zqIaNCg6Fn5wfocpocvV2Z/l60N407F5y/v/GgofFeWLE0c
- r3LQ==
-X-Gm-Message-State: APjAAAXAe6q7f5sfn6tN+Xfb7+vxWOZzf2c7NvucyLgsCYWDUa1KKLc8
- lgRx8JkHV3nBDIv51THbEnd22uwG
-X-Google-Smtp-Source: APXvYqxBVns92yuyHHHTnTeqVvl82kmMkoWvnWn0mG2imUZSVOcD98sQjH2jY/X02I2o+tM/z0hoCg==
-X-Received: by 2002:a7b:c109:: with SMTP id w9mr6180827wmi.14.1580234113259;
- Tue, 28 Jan 2020 09:55:13 -0800 (PST)
+ bh=0WZuivSgNMWl4zupYiqbOPHdPqehhCbji+b8xFoXYew=;
+ b=B05X0Syw6yRfchSl60jZnaWqvPkTN01kryOhxhQMCQhWpnr3/SIzKpmhhmAeanQ9l0
+ drPVLOWnJqBkzCecsSKEYcwYvTu6tKinZ5XbSKD71ZjlOw2M3ZzwKPO6Stga7XZJrhu8
+ fcqebGAVaVcRs/NHxV1Zz7zvMmFw3XJ0W0JaQ+TtcRmWNu3PJG1ugsGjBExWq8Yem+L6
+ iSNd1/+XEhCuYvsiPWaYjkL7BYmnEz39Cy4qGpH41lrj/BjaeLCJLbxNJyXmo6PrHMk8
+ b0UrXvcSLrJJNlv0s0Xu2Vcl0n7qyuMgpUANKcBw7BdamWEyM0kCsu2xSsCF2RUHW81H
+ /Fjw==
+X-Gm-Message-State: APjAAAU4Hh2zQ956EhbkTVSETDfjk8fcA+x4eag2pUB1i8cRbXte6zGW
+ eQm3MVi7nANyZW+XIHvhdoQyDJ/b
+X-Google-Smtp-Source: APXvYqxudE9x4FVupW+GHe8/jx6Qo817uCFsoKGv5HnZ3IqTqYMsr+I1igI/n0ahR6kCtEiQBY6B3g==
+X-Received: by 2002:a5d:4dc9:: with SMTP id f9mr29896992wru.297.1580234139985; 
+ Tue, 28 Jan 2020 09:55:39 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.11
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.55.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:55:12 -0800 (PST)
+ Tue, 28 Jan 2020 09:55:39 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 035/142] meson: generate hxtool files
-Date: Tue, 28 Jan 2020 18:51:55 +0100
-Message-Id: <20200128175342.9066-36-pbonzini@redhat.com>
+Subject: [PATCH 047/142] meson: convert chardev directory to Meson (tools part)
+Date: Tue, 28 Jan 2020 18:52:07 +0100
+Message-Id: <20200128175342.9066-48-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,156 +104,144 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile        | 20 +-------------------
- Makefile.target |  6 ------
- meson.build     | 35 +++++++++++++++++++++++++++++++++++
- scripts/hxtool  |  2 +-
- 4 files changed, 37 insertions(+), 26 deletions(-)
- mode change 100644 => 100755 scripts/hxtool
+ Makefile              |  1 -
+ Makefile.objs         |  6 ++----
+ Makefile.target       |  2 +-
+ chardev/Makefile.objs | 19 -------------------
+ chardev/meson.build   | 32 ++++++++++++++++++++++++++++++++
+ meson.build           |  1 +
+ 6 files changed, 36 insertions(+), 25 deletions(-)
+ create mode 100644 chardev/meson.build
 
 diff --git a/Makefile b/Makefile
-index a1cddb8476..040bcad43a 100644
+index 0152a2b397..3a83b178fc 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -106,7 +106,7 @@ include $(SRC_PATH)/rules.mak
- # lor is defined in rules.mak
- CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
- 
--generated-files-y = config-host.h qemu-options.def
-+generated-files-y = config-host.h
- 
- generated-files-y += module_block.h
- 
-@@ -244,8 +244,6 @@ all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all mo
- 
- config-host.h: config-host.h-timestamp
- config-host.h-timestamp: config-host.mak
--qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
- 
- TARGET_DIRS_RULES := $(foreach t, all clean install, $(addsuffix /$(t), $(TARGET_DIRS)))
- 
-@@ -343,9 +341,6 @@ ifdef CONFIG_MPATH
- scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
+@@ -161,7 +161,6 @@ include $(SRC_PATH)/Makefile.objs
  endif
  
--qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+ dummy := $(call unnest-vars,, \
+-                chardev-obj-y \
+                 block-obj-y \
+                 block-obj-m \
+                 common-obj-y \
+diff --git a/Makefile.objs b/Makefile.objs
+index 407e14daaa..bc317060d7 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -1,7 +1,3 @@
+-#######################################################################
+-# chardev-obj-y is code used by both qemu system emulation and some tests
+-chardev-obj-y = chardev/
 -
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-@@ -363,7 +358,6 @@ clean: recurse-clean
- 	rm -f $(edk2-decompressed)
- 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
- 	rm -f fsdev/*.pod scsi/*.pod
--	rm -f qemu-img-cmds.h
- 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
- 	rm -f config-all-devices.mak
+ #######################################################################
+ # block-obj-y is code used by both qemu system emulation and qemu-img
  
-@@ -639,18 +633,6 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
- $(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
- 	$(call build-manual,interop,man)
+@@ -19,6 +15,8 @@ block-obj-m = block/
+ authz-obj-y = authz/libauthz.fa
+ authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
  
--qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
--qemu-monitor.texi: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
--qemu-monitor-info.texi: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
--qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
- docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
- 	@cp -p $< $@
++chardev-obj-y = chardev/libchardev.fa
++
+ crypto-obj-y = crypto/libcrypto.fa
  
+ io-obj-y = io/libio.fa
 diff --git a/Makefile.target b/Makefile.target
-index 7ffb46ef73..d94fa687bf 100644
+index acde7778f0..68ec8fd83e 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -212,12 +212,6 @@ endif
- gdbstub-xml.c: $(TARGET_XML_FILES) $(SRC_PATH)/scripts/feature_to_c.sh
- 	$(call quiet-command,rm -f $@ && $(SHELL) $(SRC_PATH)/scripts/feature_to_c.sh $@ $(TARGET_XML_FILES),"GEN","$(TARGET_DIR)$@")
- 
--hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$(TARGET_DIR)$@")
+@@ -186,13 +186,13 @@ all-obj-y := $(obj-y)
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call fix-paths,../,, \
+               authz-obj-y \
++              chardev-obj-y \
+               crypto-obj-y \
+               io-obj-y \
+               qom-obj-y)
+ dummy := $(call unnest-vars,.., \
+                block-obj-y \
+                block-obj-m \
+-               chardev-obj-y \
+                common-obj-y \
+                common-obj-m)
+ all-obj-y += $(common-obj-y)
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index d68e1347f9..8049d82077 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -1,22 +1,3 @@
+-chardev-obj-y += char.o
+-chardev-obj-$(CONFIG_WIN32) += char-console.o
+-chardev-obj-$(CONFIG_POSIX) += char-fd.o
+-chardev-obj-y += char-fe.o
+-chardev-obj-y += char-file.o
+-chardev-obj-y += char-io.o
+-chardev-obj-y += char-mux.o
+-chardev-obj-y += char-null.o
+-chardev-obj-$(CONFIG_POSIX) += char-parallel.o
+-chardev-obj-y += char-pipe.o
+-chardev-obj-$(CONFIG_POSIX) += char-pty.o
+-chardev-obj-y += char-ringbuf.o
+-chardev-obj-y += char-serial.o
+-chardev-obj-y += char-socket.o
+-chardev-obj-y += char-stdio.o
+-chardev-obj-y += char-udp.o
+-chardev-obj-$(CONFIG_WIN32) += char-win.o
+-chardev-obj-$(CONFIG_WIN32) += char-win-stdio.o
 -
--hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$(TARGET_DIR)$@")
--
- clean: clean-target
- 	rm -f *.a *~ $(PROGS)
- 	rm -f $(shell find . -name '*.[od]')
+ common-obj-y += msmouse.o wctablet.o testdev.o
+ common-obj-$(CONFIG_BRLAPI) += baum.o
+ baum.o-cflags := $(SDL_CFLAGS)
+diff --git a/chardev/meson.build b/chardev/meson.build
+new file mode 100644
+index 0000000000..a2e671ddfc
+--- /dev/null
++++ b/chardev/meson.build
+@@ -0,0 +1,32 @@
++chardev_ss = ss.source_set()
++chardev_ss.add(files(
++  'char-fe.c',
++  'char-file.c',
++  'char-io.c',
++  'char-mux.c',
++  'char-null.c',
++  'char-pipe.c',
++  'char-ringbuf.c',
++  'char-serial.c',
++  'char-socket.c',
++  'char-stdio.c',
++  'char-udp.c',
++  'char.c',
++))
++chardev_ss.add(when: 'CONFIG_POSIX', if_true: files(
++  'char-fd.c',
++  'char-parallel.c',
++  'char-pty.c',
++))
++chardev_ss.add(when: 'CONFIG_WIN32', if_true: files(
++  'char-console.c',
++  'char-win-stdio.c',
++  'char-win.c',
++))
++
++chardev_ss = chardev_ss.apply(config_host, strict: false)
++libchardev = static_library('chardev', chardev_ss.sources(),
++                            name_suffix: 'fa',
++                            build_by_default: false)
++
++chardev = declare_dependency(link_whole: libchardev)
 diff --git a/meson.build b/meson.build
-index c0122a1ab9..08e37fd677 100644
+index 1702133989..2406cc72eb 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -117,6 +117,7 @@ have_block = have_system or have_tools
+@@ -411,6 +411,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: version_res)
  
- # Generators
+ subdir('io')
++subdir('chardev')
+ subdir('fsdev')
+ subdir('target')
  
-+hxtool = find_program('scripts/hxtool')
- shaderinclude = find_program('scripts/shaderinclude.pl')
- qapi_gen = find_program('scripts/qapi-gen.py')
- qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/__init__.py',
-@@ -137,6 +138,40 @@ qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/__init__.py',
-                      meson.source_root() / 'scripts/qapi/doc.py',
- ]
- 
-+hxdep = []
-+hx_headers = [
-+  ['qemu-options.hx', 'qemu-options.def'],
-+  ['qemu-img-cmds.hx', 'qemu-img-cmds.h'],
-+]
-+if have_system
-+  hx_headers += [
-+    ['hmp-commands.hx', 'hmp-commands.h'],
-+    ['hmp-commands-info.hx', 'hmp-commands-info.h'],
-+  ]
-+endif
-+foreach d : hx_headers
-+  custom_target(d[1],
-+                input: files(d[0]),
-+                output: d[1],
-+                capture: true,
-+                build_by_default: true, # to be removed when added to a target
-+                command: [hxtool, '-h', '@INPUT0@'])
-+endforeach
-+
-+foreach d : [
-+  ['qemu-options.hx', 'qemu-options.texi'],
-+  ['hmp-commands.hx', 'qemu-monitor.texi'],
-+  ['hmp-commands-info.hx', 'qemu-monitor-info.texi'],
-+  ['qemu-img-cmds.hx', 'qemu-img-cmds.texi'],
-+]
-+  custom_target(d[1],
-+                input: files(d[0]),
-+                output: d[1],
-+                capture: true,
-+                build_by_default: true, # to be removed when added to a target
-+                command: [hxtool, '-t', '@INPUT0@'])
-+endforeach
-+
- # Collect sourcesets.
- 
- util_ss = ss.source_set()
-diff --git a/scripts/hxtool b/scripts/hxtool
-old mode 100644
-new mode 100755
-index 7d7c4289e3..27cbab59bf
---- a/scripts/hxtool
-+++ b/scripts/hxtool
-@@ -64,6 +64,6 @@ case "$1" in
- "-h") hxtoh ;;
- "-t") hxtotexi ;;
- *) exit 1 ;;
--esac
-+esac < "$2"
- 
- exit 0
 -- 
 2.21.0
 
