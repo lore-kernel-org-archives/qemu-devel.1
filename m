@@ -2,87 +2,113 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07505C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D29CAC33CB2
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:33:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2314214D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:32:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J3DI5E2Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2314214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A972B214D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:33:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A972B214D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWbW-0004im-Sc
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:32:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38223)
+	id 1iwWcA-0006Jl-Og
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:33:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42934)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8T-00053u-Aa
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:51 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwVSg-0006YA-LI
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:19:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV8Q-0001Lq-Q1
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:49 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53150)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV8Q-0001HL-FZ
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:46 -0500
-Received: by mail-wm1-x343.google.com with SMTP id p9so3521438wmc.2
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:58:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=D/DK8VQpigR6LqDpMI8lCYXI3QQOVMmBO7lwOM6akAY=;
- b=J3DI5E2Qmu6mcfhy4WIix0ZM027Ixwwjl3copCKSCp5h4DZPXHsMk7Io+bcU5CfenY
- IdK57sFOOPbQUtL8DO+YkjK/wfnnHnTYHBVwM+RZd3YxCeaSEukgmRC0VBb6J8Jfw3M4
- NP7SNffeXU2po1ycAjMlBKtkhofaN94GuwBi0z4alzBmQ/s4ZfZtwBFHrDXi5v/AylgU
- kF4zg4C+hKLMJ6zQ2m57p/AGXf78xRDwZv94V3vKrJ7bl9kx6kcshr6NnPdMiZryHjEE
- 6CQwj4kLZc+j+Jy4IOzgWAHPj9fIbrcrFMC0j8zcY3BCUM6ajemFkdr6ejOAtats6yB2
- gJCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=D/DK8VQpigR6LqDpMI8lCYXI3QQOVMmBO7lwOM6akAY=;
- b=Q8ySZ7mSCOU2rQF+bPDv0dTmlLfU/Lbjd34AHRTnVeJpdeMH5fC2Gn5EqHnaBcfQdQ
- xSxhFLWeLD6Gks+CifId9Ef7GPywxfC6e4WuJi1OT+O9nCRJ91m4G1pSqw+MBebgcrrm
- AatM5nOL3Ccqnwn8SbybOFUuWUn54MDI5qFuY+wPBssjEe04SPd2MIhkB5H9a70/6mKk
- pH47t22AAzNaRisOtOfOLfGvonilJLw0tZELmzwItOG4UIU4sMQS1js2h4OLSL77U4vX
- dhknq9W1KFVS33pU0qiNndlnEYmT+oOC0GcTCkT2yFTb1OVAPKLNH1Yx/6bPt1VygVr4
- eGwg==
-X-Gm-Message-State: APjAAAXrNaFc/pIaenjGtzvLX7hfi6PiWNKNUbWL+UG52ANI7kWCYSN6
- MrS+kDH+TcN0PVRNm+lr7KuM3AQM
-X-Google-Smtp-Source: APXvYqxNmkh4R4e2Lm51tOS78tQX4dIixEr1fjvmLWO918wolRwf/Zew7FhECmRP2KAfdDdj54JblQ==
-X-Received: by 2002:a1c:1b4d:: with SMTP id b74mr6523340wmb.33.1580234324154; 
- Tue, 28 Jan 2020 09:58:44 -0800 (PST)
-Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
- [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.58.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:58:43 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 125/142] meson: build texi doc
-Date: Tue, 28 Jan 2020 18:53:25 +0100
-Message-Id: <20200128175342.9066-126-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
-References: <20200128175342.9066-1-pbonzini@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1iwVSf-0000uc-70
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:19:42 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:41029)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwVSe-0000pv-PF
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:19:41 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MElhb-1imGi92Wmh-00GJKw; Tue, 28 Jan 2020 19:19:22 +0100
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1579227117-6310-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH 0/4] linux-user: Fix some issues in termbits.h files
+Message-ID: <994d96ac-ce43-9ff5-7212-eda6e12264fb@vivier.eu>
+Date: Tue, 28 Jan 2020 19:19:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1579227117-6310-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Provags-ID: V03:K1:nDvJHc227Wpfv1exZCsxDLhBA9GSI2Uuytp/pj+RTz8bTL3Yg8x
+ vPFbr0Ne+EqasmG4+RtHCtOrsONokgxGKY408Ii3D2DiGxbGcA5vjRmy2hzAxNUdnUPhX1i
+ zJQlBey0cBNBSQeqq4vjnERlSUbLfWtc9y8irCLq6VSNnPk/1mUPm9iSJpmJphMK5LuGsw8
+ wRvZ+1HrexfEOxjw5SNtg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:IzbYpwGHuUw=:9n9fm9tdPHyI3+tKIZdBfV
+ 7DgW9/MYAkZbQWs0qjfZ7K4yZXzM26IQSofW5Li00Z+jAQ+q0j20fKOp8LfwiCplKN6QJQTE0
+ yFEyWxc7r2AuJ9zUNrZmfzpo0ddqORmDRqGrbDwUwC25CVypXJGRH0aNpm87hN0fLoqykItoE
+ lUQqX+05eQYfyNEWYMW8PRmyReVv+saxBsKmV5xTzhHB/hljTE3meJkxKtqbm/AX4tcOa17rj
+ /JzJmnz6e1zdcIsE0k1TjEW9iuKGl/9y/7pYMnjQdCH5gm2nNEf/kXGeO9klz9Py70qS4Ws1z
+ wu+p5aK2v7yl88kwwBcA2w73goeWk7cun5NJM9M4R7fy0aws1yyNHrOJbhq5c4s2vYVkI9ufR
+ t6KC1dlxFd8NzNdA+wDTw7OA9h/H7sxNPXjNcK6BuRwZaK6LiOpoz/SVFAlaCh/7pwCLI7cGu
+ SEmkPzPoe733TzoAaIeAV1LJc9TP1PZ5dxofiERNya2s9rP7p1j/21y6grw/Q2RAC15+HX4KU
+ SplES+ROPxie7+R/WMt4oyATutBZQnhlp3ioPV8SWRnczn/uxKbxVNL5x3mSTnoTRVRcfe+i0
+ SVi1UjE1/wPol9899xCokyIOgsbBf6zdSZXDRhRSWOjvrMSq47W9ygtHWynFwLR1eq1TQy0yS
+ jIo6lDFcnEUx1fWlRtBgk1nPn5CNmUNXJOjMwZK/fPZ/OCNI+CLFFM2TjzCUyRT/obixEQamJ
+ pKo/CMcEkLKds8cjk+0aKkbI4KOrJnysbpBHQst3ECi3NmyXMS6kMSLf8gLIbto1eyBAP2NER
+ SKQ36oxAQw2rHvHS5c+JV0GTpytab/50sDW36T5xt4JWuna2G0/WDovB0AVgNeeSCllDzDs
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,436 +120,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Le 17/01/2020 à 03:11, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> This series is a spin-off of v5 of earlier series "linux-user: Misc
+> patches for 5.0", that became too large to manage. I will submit the
+> rest of that large series separately.
+> 
+> Files linux-user/<target>/termbits.h seem to be in a very bad shape:
+> unsynchronized with kernel, containing wrong elements expressed in
+> terms of host instead of target, many being updated wrt kernel
+> content at various times, and on top of that all contain visually
+> very ugly combinations of tabs and spaces.
+> 
+> This series attempts to fix great majority of issues in termbits.
+> 
+> Alpha's and mips' termbits.h were in the worst shape, missing large
+> bits and pieces, and for them as complete as possible synchronization
+> with kernel code is done - this constitutes the first two patches.
+> 
+> Xtensa's termbits.h contained the most elements wrongly expressed in
+> terms of host instead of target, and that is the reason the changes
+> in this file are placed in a separate, third, patch. Previous "R-B"
+> given by Max Filippov was transferred to this patch only.
+> 
+> The fourth patch fixes remaining elements wrongly expressed in
+> terms of host instead of target.
+> 
+> As an additional note, structures "serial_iso7816" and "serial_rs485"
+> (at times mentioned as the third argument of certain ioctls) are
+> platform-independant in kernel, and do not need "target_" variant
+> in QEMU. Also, structure "winsize" (also appearing as the third
+> ioctl's argument at times) is defined at multiple places in kernel
+> (for several architectures) in kernel, but all such definitions are
+> identical, and, therefore, it also does not need "target_" variant
+> in QEMU.
+> 
+> A checkpatch warning related to "#if 0" in patch 2 is benign, and
+> should be ignored.
+> 
+> Aleksandar Markovic (4):
+>   linux-user: alpha: Synchronize termbits.h with kernel
+>   linux-user: mips: Synchronize termbits.h with kernel
+>   linux-user: xtensa: Fix some constants in termbits.h
+>   linux-user: Fix some constants in remaining termbits.h
+> 
+>  linux-user/aarch64/termbits.h    |   4 +-
+>  linux-user/alpha/termbits.h      |  82 ++++++++++++++--
+>  linux-user/arm/termbits.h        |   4 +-
+>  linux-user/cris/termbits.h       |   4 +-
+>  linux-user/hppa/termbits.h       |   4 +-
+>  linux-user/i386/termbits.h       |   4 +-
+>  linux-user/m68k/termbits.h       |   4 +-
+>  linux-user/microblaze/termbits.h |   4 +-
+>  linux-user/mips/termbits.h       | 140 ++++++++++++++++----------
+>  linux-user/nios2/termbits.h      |   4 +-
+>  linux-user/openrisc/termbits.h   |  14 +--
+>  linux-user/ppc/termbits.h        |   4 +-
+>  linux-user/riscv/termbits.h      |   4 +-
+>  linux-user/s390x/termbits.h      |  26 ++---
+>  linux-user/sh4/termbits.h        |   4 +-
+>  linux-user/sparc/termbits.h      |   4 +-
+>  linux-user/sparc64/termbits.h    |   4 +-
+>  linux-user/tilegx/termbits.h     |  12 ++-
+>  linux-user/x86_64/termbits.h     |  26 +++--
+>  linux-user/xtensa/termbits.h     | 207 +++++++++++++++++++++------------------
+>  20 files changed, 353 insertions(+), 206 deletions(-)
+> 
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- Makefile                       | 138 ++-------------------------------
- docs/interop/qemu-ga-ref.texi  |   2 +-
- docs/interop/qemu-qmp-ref.texi |   2 +-
- docs/meson.build               |   1 +
- meson.build                    | 115 ++++++++++++++++++++++++++-
- rules.mak                      |  12 ---
- 6 files changed, 123 insertions(+), 147 deletions(-)
+I think we should first introduce a linux-user/generic/termbits.h as we
+have an asm-generic/termbits.h in the kernel and use it with all the
+targets except alpha, mips, hppa, sparc and xtensa.
 
-diff --git a/Makefile b/Makefile
-index 2614138f62..e99d09c5ee 100644
---- a/Makefile
-+++ b/Makefile
-@@ -11,7 +11,6 @@ BUILD_DIR=$(CURDIR)
- SRC_PATH=.
- 
- UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
--    html info pdf txt \
-     help check-help print-% \
-     docker docker-% vm-help vm-test vm-build-%
- 
-@@ -114,29 +113,13 @@ edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
- Makefile: ;
- configure: ;
- 
--.PHONY: all clean cscope distclean html info install install-doc \
--	pdf txt recurse-all dist msi FORCE
-+.PHONY: all clean cscope distclean install \
-+	recurse-all dist msi FORCE
- 
- $(call set-vpath, $(SRC_PATH))
- 
- LIBS+=-lz $(LIBS_TOOLS)
- 
--ifdef BUILD_DOCS
--DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8
--DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
--DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
--DOCS+=docs/qemu-block-drivers.7
--DOCS+=docs/qemu-cpu-models.7
--ifdef CONFIG_VIRTFS
--DOCS+=fsdev/virtfs-proxy-helper.1
--endif
--ifdef CONFIG_TRACE_SYSTEMTAP
--DOCS+=scripts/qemu-trace-stap.1
--endif
--else
--DOCS=
--endif
--
- SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
- 
- ifneq ($(wildcard config-host.mak),)
-@@ -145,7 +128,7 @@ endif
- 
- include $(SRC_PATH)/tests/Makefile.include
- 
--all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
-+all: recurse-all modules
- 
- DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_srcdir=$(SRC_PATH)/dtc/libfdt
- DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
-@@ -221,26 +204,14 @@ qemu-%.tar.bz2:
- 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
- 
- distclean: clean
--	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-options.texi qemu-img-cmds.texi qemu-monitor.texi qemu-monitor-info.texi
-+	rm -f config-host.mak config-host.h* config-host.ld
- 	rm -f tests/tcg/config-*.mak
- 	rm -f config-all-disas.mak config.status
- 	rm -f po/*.mo tests/qemu-iotests/common.env
- 	rm -f roms/seabios/config.mak roms/vgabios/config.mak
--	rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
--	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
--	rm -f qemu-doc.log qemu-doc.pdf qemu-doc.pg qemu-doc.toc qemu-doc.tp
--	rm -f qemu-doc.vr qemu-doc.txt
- 	rm -f qemu-plugins-ld.symbols qemu-plugins-ld64.symbols
- 	rm -f config.log
- 	rm -f linux-headers/asm
--	rm -f docs/version.texi
--	rm -f docs/interop/qemu-ga-qapi.texi docs/interop/qemu-qmp-qapi.texi
--	rm -f docs/interop/qemu-qmp-ref.7 docs/interop/qemu-ga-ref.7
--	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
--	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
--	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
--	rm -f docs/qemu-block-drivers.7
--	rm -f docs/qemu-cpu-models.7
- 	rm -Rf .sdk
- 	if test -f dtc/version_gen.h; then $(MAKE) $(DTC_MAKE_ARGS) clean; fi
- 
-@@ -280,38 +251,6 @@ BLOBS=
- DESCS=
- endif
- 
--install-doc: $(DOCS)
--	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
--	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
--	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
--	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir)"
--	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.txt "$(DESTDIR)$(qemu_docdir)"
--ifdef CONFIG_POSIX
--	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DATA) qemu.1 "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
--	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
--	$(INSTALL_DATA) docs/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
--	$(INSTALL_DATA) docs/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
--ifeq ($(CONFIG_TOOLS),y)
--	$(INSTALL_DATA) qemu-img.1 "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
--	$(INSTALL_DATA) qemu-nbd.8 "$(DESTDIR)$(mandir)/man8"
--endif
--ifdef CONFIG_TRACE_SYSTEMTAP
--	$(INSTALL_DATA) scripts/qemu-trace-stap.1 "$(DESTDIR)$(mandir)/man1"
--endif
--ifeq ($(CONFIG_GUEST_AGENT),y)
--	$(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_docdir)"
--	$(INSTALL_DATA) docs/interop/qemu-ga-ref.txt "$(DESTDIR)$(qemu_docdir)"
--	$(INSTALL_DATA) docs/interop/qemu-ga-ref.7 "$(DESTDIR)$(mandir)/man7"
--endif
--endif
--ifdef CONFIG_VIRTFS
--	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
--endif
--
- install-datadir:
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
- 
-@@ -324,8 +263,7 @@ endif
- 
- ICON_SIZES=16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
- 
--install: all $(if $(BUILD_DOCS),install-doc) \
--	install-datadir install-localstatedir \
-+install: all install-datadir install-localstatedir \
- 	$(if $(INSTALL_BLOBS),$(edk2-decompressed))
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
-@@ -372,66 +310,6 @@ endif
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
- 
--# documentation
--MAKEINFO=makeinfo
--MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
--MAKEINFOFLAGS=--no-split --number-sections $(MAKEINFOINCLUDES)
--TEXI2PODFLAGS=$(MAKEINFOINCLUDES) -DVERSION="$(VERSION)" -DCONFDIR="$(qemu_confdir)"
--TEXI2PDFFLAGS=$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
--
--%.html: %.texi docs/version.texi
--	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
--	--html $< -o $@,"GEN","$@")
--
--%.info: %.texi docs/version.texi
--	$(call quiet-command,$(MAKEINFO) $(MAKEINFOFLAGS) $< -o $@,"GEN","$@")
--
--%.txt: %.texi docs/version.texi
--	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
--	--plaintext $< -o $@,"GEN","$@")
--
--%.pdf: %.texi docs/version.texi
--	$(call quiet-command,texi2pdf $(TEXI2PDFFLAGS) $< -o $@,"GEN","$@")
--
--docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
--	@cp -p $< $@
--
--docs/interop/qemu-ga-qapi.texi: qga/qga-qapi-doc.texi
--	@cp -p $< $@
--
--qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
--qemu.1: qemu-option-trace.texi
--qemu-img.1: qemu-img.texi qemu-option-trace.texi qemu-img-cmds.texi
--fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
--qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
--docs/qemu-block-drivers.7: docs/qemu-block-drivers.texi
--docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
--scripts/qemu-trace-stap.1: scripts/qemu-trace-stap.texi
--
--html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html sphinxdocs
--info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
--pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
--txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
--
--qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
--	qemu-img.texi qemu-nbd.texi qemu-options.texi \
--	qemu-tech.texi qemu-option-trace.texi \
--	qemu-deprecated.texi qemu-monitor.texi qemu-img-cmds.texi \
--	qemu-monitor-info.texi docs/qemu-block-drivers.texi \
--	docs/qemu-cpu-models.texi docs/security.texi
--
--docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
--    docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
--    docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7: \
--	docs/interop/qemu-ga-ref.texi docs/interop/qemu-ga-qapi.texi
--
--docs/interop/qemu-qmp-ref.dvi docs/interop/qemu-qmp-ref.html \
--    docs/interop/qemu-qmp-ref.info docs/interop/qemu-qmp-ref.pdf \
--    docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7: \
--	docs/interop/qemu-qmp-ref.texi docs/interop/qemu-qmp-qapi.texi
--
--$(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
--
- ifdef CONFIG_WIN32
- 
- INSTALLER = qemu-setup-$(VERSION)$(EXESUF)
-@@ -454,7 +332,7 @@ installer: $(INSTALLER)
- 
- INSTDIR=/tmp/qemu-nsis
- 
--$(INSTALLER): install-doc $(SRC_PATH)/qemu.nsi
-+$(INSTALLER): $(SRC_PATH)/qemu.nsi
- 	$(MAKE) install prefix=${INSTDIR}
- ifdef SIGNCODE
- 	(cd ${INSTDIR}; \
-@@ -525,10 +403,6 @@ endif
- 	@echo  '  docker          - Help about targets running tests inside containers'
- 	@echo  '  vm-help         - Help about targets running tests inside VM'
- 	@echo  ''
--	@echo  'Documentation targets:'
--	@echo  '  html info pdf txt'
--	@echo  '                  - Build documentation in specified format'
--	@echo  ''
- ifdef CONFIG_WIN32
- 	@echo  'Windows targets:'
- 	@echo  '  installer       - Build NSIS-based installer for QEMU'
-diff --git a/docs/interop/qemu-ga-ref.texi b/docs/interop/qemu-ga-ref.texi
-index ddb76ce1c2..a23cc2ed7f 100644
---- a/docs/interop/qemu-ga-ref.texi
-+++ b/docs/interop/qemu-ga-ref.texi
-@@ -65,7 +65,7 @@ along with this manual.  If not, see http://www.gnu.org/licenses/.
- @c for texi2pod:
- @c man begin DESCRIPTION
- 
--@include qemu-ga-qapi.texi
-+@include qga/qga-qapi-doc.texi
- 
- @c man end
- 
-diff --git a/docs/interop/qemu-qmp-ref.texi b/docs/interop/qemu-qmp-ref.texi
-index bb25758bd0..ea1d7fe6c2 100644
---- a/docs/interop/qemu-qmp-ref.texi
-+++ b/docs/interop/qemu-qmp-ref.texi
-@@ -65,7 +65,7 @@ along with this manual.  If not, see http://www.gnu.org/licenses/.
- @c for texi2pod:
- @c man begin DESCRIPTION
- 
--@include qemu-qmp-qapi.texi
-+@include qapi/qapi-doc.texi
- 
- @c man end
- 
-diff --git a/docs/meson.build b/docs/meson.build
-index 124987dc57..020ac5173e 100644
---- a/docs/meson.build
-+++ b/docs/meson.build
-@@ -75,6 +75,7 @@ if sphinx.found()
-     'specs/ppc-xive.rst',
-   ]
-   specs = custom_target('sphinx-specs',
-+                build_by_default: build_docs,
-                 input: specs_rst,
-                 depend_files: [files('conf.py', 'specs/conf.py')],
-                 output: 'specs',
-diff --git a/meson.build b/meson.build
-index 04068fd765..caf99f5082 100644
---- a/meson.build
-+++ b/meson.build
-@@ -466,13 +466,32 @@ foreach d : hx_headers
-                 command: [hxtool, '-h', '@INPUT0@'])
- endforeach
- 
-+# meson makes it a bit difficult to refer to build targets
-+# and texi tools don't generate depfiles
-+# let's make doc generation depend on all texi
-+texi_deps = [
-+  'docs/interop/qemu-ga-ref.texi',
-+  'docs/interop/qemu-qmp-ref.texi',
-+  'docs/qemu-block-drivers.texi',
-+  'docs/qemu-cpu-models.texi',
-+  'docs/security.texi',
-+  'fsdev/virtfs-proxy-helper.texi',
-+  'qemu-deprecated.texi',
-+  'qemu-doc.texi',
-+  'qemu-img.texi',
-+  'qemu-nbd.texi',
-+  'qemu-option-trace.texi',
-+  'qemu-tech.texi',
-+  'scripts/qemu-trace-stap.texi',
-+]
-+
- foreach d : [
-   ['qemu-options.hx', 'qemu-options.texi'],
-   ['hmp-commands.hx', 'qemu-monitor.texi'],
-   ['hmp-commands-info.hx', 'qemu-monitor-info.texi'],
-   ['qemu-img-cmds.hx', 'qemu-img-cmds.texi'],
- ]
--  custom_target(d[1],
-+  texi_deps += custom_target(d[1],
-                 input: files(d[0]),
-                 output: d[1],
-                 capture: true,
-@@ -951,3 +970,97 @@ endif
- 
- subdir('pc-bios')
- subdir('docs')
-+
-+makeinfo = find_program('makeinfo', required: build_docs)
-+
-+docs_inc = [
-+  '-I', meson.current_source_dir(),
-+  '-I', meson.current_build_dir() / 'docs',
-+  '-I', '@OUTDIR@',
-+]
-+
-+texi = {
-+  'qemu-doc': files('qemu-doc.texi'),
-+  'qemu-qmp-ref': files('docs/interop/qemu-qmp-ref.texi'),
-+}
-+if 'CONFIG_GUEST_AGENT' in config_host
-+  texi += {'qemu-ga-ref': files('docs/interop/qemu-ga-ref.texi')}
-+endif
-+
-+if makeinfo.found() and build_docs
-+  foreach doc, input: texi
-+    cmd = [
-+      'env', 'LC_ALL=C', makeinfo, '--no-split', '--number-sections', docs_inc,
-+      '@INPUT0@', '-o', '@OUTPUT@',
-+    ]
-+    foreach ext, args: {
-+        'info': [],
-+        'html': ['--no-headers', '--html'],
-+        'txt': ['--no-headers', '--plaintext'],
-+    }
-+      output = doc + '.' + ext
-+      custom_target(output,
-+                    input: input + texi_deps,
-+                    output: output,
-+                    install: true,
-+                    install_dir: config_host['qemu_docdir'],
-+                    command: cmd + args)
-+    endforeach
-+  endforeach
-+endif
-+
-+texi2pdf = find_program('texi2pdf', required: false)
-+
-+if texi2pdf.found()
-+  foreach doc, input: texi
-+    output = doc + '.pdf'
-+    custom_target(output,
-+                  input: input + texi_deps,
-+                  output: output,
-+                  command: [texi2pdf, '-q', docs_inc, '@INPUT0@', '-o', '@OUTPUT@'])
-+  endforeach
-+endif
-+
-+texi2pod = find_program('scripts/texi2pod.pl')
-+pod2man = find_program('pod2man', required: build_docs)
-+
-+mans = {
-+  'qemu-block-drivers.7': files('docs/qemu-block-drivers.texi'),
-+  'qemu-cpu-models.7': files('docs/qemu-cpu-models.texi'),
-+  'qemu-qmp-ref.7': files('docs/interop/qemu-qmp-ref.texi'),
-+  'qemu.1': files('qemu-doc.texi'),
-+}
-+if 'CONFIG_GUEST_AGENT' in config_host
-+  mans += {'qemu-ga-ref.7': files('docs/interop/qemu-ga-ref.texi')}
-+endif
-+if 'CONFIG_TOOLS' in config_host
-+  mans += {'qemu-img.7': files('qemu-img.texi')}
-+  mans += {'qemu-nbd.8': files('qemu-nbd.texi')}
-+endif
-+if 'CONFIG_VIRTFS' in config_host
-+  mans += {'virtfs-proxy-helper.1': files('fsdev/virtfs-proxy-helper.texi')}
-+endif
-+if 'CONFIG_TRACE_SYSTEMTAP' in config_host
-+  mans += {'qemu-trace-stap.1': files('scripts/qemu-trace-stap.texi')}
-+endif
-+
-+if pod2man.found() and build_docs
-+  foreach man, input: mans
-+    pod = custom_target(man + '.pod',
-+                        input: input + texi_deps,
-+                        output: man + '.pod',
-+                        command: [texi2pod,
-+                                  '-DVERSION="' + config_host['VERSION'] + '"',
-+                                  '-DCONFDIR="' + config_host['qemu_confdir'] + '"',
-+                                  '@INPUT0@', '@OUTPUT@'])
-+    section = man[-1]
-+    man = custom_target(man,
-+                        input: pod,
-+                        output: man,
-+                        capture: true,
-+                        install: true,
-+                        install_dir: config_host['mandir'] / 'man' + section,
-+                        command: [pod2man, '--utf8', '--section=' + section, '--center=" "',
-+                                  '--release=" "', '@INPUT@'])
-+  endforeach
-+endif
-diff --git a/rules.mak b/rules.mak
-index 6c6b9098e7..92597864fe 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -378,15 +378,3 @@ define unnest-vars
-         $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$(filter %.o,$($v)))))
-         $(eval $v := $(filter-out %/,$($v))))
- endef
--
--TEXI2MAN = $(call quiet-command, \
--	perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $(TEXI2PODFLAGS) $< $@.pod && \
--	$(POD2MAN) --section=$(subst .,,$(suffix $@)) --center=" " --release=" " $@.pod > $@, \
--	"GEN","$@")
--
--%.1:
--	$(call TEXI2MAN)
--%.7:
--	$(call TEXI2MAN)
--%.8:
--	$(call TEXI2MAN)
--- 
-2.21.0
+I think this linux-user/generic/termbits.h could be copied from
+linux-user/openrisc/termbits.h (without the ioctl definitions)
 
+Then you could update the remaining ones.
 
+Thanks,
+Laurent
 
