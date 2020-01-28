@@ -2,77 +2,117 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E29F1C3F68F
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A390DC35240
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1F64207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:42:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V7Mu2MaM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F64207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D3E824686
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 14:43:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D3E824686
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwS4A-0002kI-0E
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 09:42:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53404)
+	id 1iwS50-0003tX-P8
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 09:43:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iwS3Q-00029B-PM
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:41:26 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwS4J-0003HO-2Y
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:42:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iwS3O-0007Ph-Mn
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:41:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35154
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <laurent@vivier.eu>) id 1iwS4H-0008R6-LF
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:42:19 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:40497)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iwS3O-0007Om-DM
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:41:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580222481;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YCe3+L7di9I3yalYd5A8ayFZkGHdC0vR0KLagp0ado8=;
- b=V7Mu2MaM3B1f2xjl9GCerubEcysRjShA1doS74i3IIY40AphRhCyIzb3uny6i9Oe0sjCPf
- B6aF4AzvrH+JeGo8FkmAkGrg2TbPJS5+QJKLRI7Mhz8pjtWoo4/9tHaVAoA2QiuKwhsSDy
- KuJC1cK/e0b87lN9iJSsSsH2TuQY7k4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-CC3YDS7aOpCiWWUZbRp6UQ-1; Tue, 28 Jan 2020 09:41:20 -0500
-X-MC-Unique: CC3YDS7aOpCiWWUZbRp6UQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B68F100726D;
- Tue, 28 Jan 2020 14:41:18 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7398310098FB;
- Tue, 28 Jan 2020 14:41:12 +0000 (UTC)
-Date: Tue, 28 Jan 2020 15:41:10 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v22 5/9] ACPI: Record the Generic Error Status Block
- address
-Message-ID: <20200128154110.04baa5bc@redhat.com>
-In-Reply-To: <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwS4H-0008Pi-Bc
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 09:42:17 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MA7b8-1iqQiB1sQE-00Bazm; Tue, 28 Jan 2020 15:41:53 +0100
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Taylor Simpson <tsimpson@quicinc.com>
+References: <20200116115700.127951-1-mkysel@tachyum.com>
+ <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
+ <BYAPR02MB4886C0D683ABE475CBC1F23BDE0A0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <CAFEAcA_v7MSfDEfUkBa3Gd2ChAcRvKXx4Z2oL7w7aNpQYt_Jnw@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH] Handling SIGSETXID used by glibc NPTL setuid/setgid
+Message-ID: <899cd001-04b8-9829-dc46-8482d6168208@vivier.eu>
+Date: Tue, 28 Jan 2020 15:41:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CAFEAcA_v7MSfDEfUkBa3Gd2ChAcRvKXx4Z2oL7w7aNpQYt_Jnw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:808Sk5UDZryDVil645phhhTAJikczXv6LkfIjnA04E8YwQLONB+
+ MwrgHnkESys3rAgROsp6eKryh0eU7hlyQur6lfFpZ5MnQNaj9fMrSxWdvbkprQd8Qgmayk5
+ WW8HREuLSIu+anweYCR0GLAiqxjDHqPUeg3SJT6YbBI4K1AVzh0T6IVMzwJ67yOrIcHaXVG
+ OJDeAsjY3TKo6lX1rz0wg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KLvJR57of/o=:lueilSZxrmd21uzSlnAGQI
+ laVukPLnmj1cRYlqOdHsXnsIpvFFpgXeyaOVjmns0bp1UFqvyVIowDuILEtksdeiS7BPILDVp
+ Ek4PU0offoHRpoPdwlusvaEMqn1ebd9W7JxsLiyQXpIQXq2E4daETG7a+xDPPSmM4PV73fKBj
+ mYLavnIAkfXZxd7BZm9l1962lDhWd2559fRkHPEAvCNuRYJRdfLqTOE7q0gqqzW/Rb19JkX2q
+ 4HaQvug/sS95Enm08jxNXSnsFKVeTWnLh6Rq1hjYCMw9wB3cLSad3nv22udVSjZEUbzBVbg/H
+ fo3e3eQE0Bv0P68rVg+XpErufj0+YwbHHiEYzK8ozBdP0EjqdLHBKZ6B2klvb8II0FpCHdyq3
+ At3EPj9X0f0DOLmEaaKLuVi3xcYAkTlb3Ze0M1Qgyx5BWbuL19o+Ftd9iAgPAkWJlPOZK3tn/
+ 8fhI5oaY5HSjmWFxy1A84vXbbRClruzcYQVpc6HxuPlsnR10IahF0pKtJoXukcg7p/QOmT23P
+ UCPUvQFxdllW4SfQklU2I0Qo0wLdjH7hLs9Zek+e/gGdfgNWwIOTsMWoIFVLQ3NgbOiVKIiNl
+ p78GFk/mVbijq0tonQPhOPQFhjEAC6uV9GjfB5/NQYsEgNWUjx5iELlQRt0cXOM+qXzkC+pZz
+ LRM3bKixGN63UT3mj4cV9mICKr1TIyDvMjy0CA9tU+fN4prGNbNEpDvyaDFYcMSSuRmM1IV49
+ 6pVRSIZCWGneAuXYtPty79JV1EBB0woDwC3DwBbTtpp6wRrXH+Tn9QYUuf6ZxBHSXCo4hsKbQ
+ xR0Ycp9/I5/sPXH6teVbqGkLIcqHnDKQBIaz0HoIMhqAMJ8UtSGEZlBieILRQtru0flI7SQ
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,201 +124,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com,
- kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
- qemu-devel@nongnu.org, linuxarm@huawei.com, shannon.zhaosl@gmail.com,
- zhengxiang9@huawei.com, qemu-arm@nongnu.org, james.morse@arm.com,
- xuwei5@huawei.com, jonathan.cameron@huawei.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: Josh Kunz <jkz@google.com>, Riku Voipio <riku.voipio@iki.fi>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Matus Kysel <mkysel@tachyum.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 19:32:19 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-
-in addition to comments of others:
-
-> Record the GHEB address via fw_cfg file, when recording
-> a error to CPER, it will use this address to find out
-> Generic Error Data Entries and write the error.
+Le 28/01/2020 à 13:45, Peter Maydell a écrit :
+> On Tue, 28 Jan 2020 at 12:33, Taylor Simpson <tsimpson@quicinc.com> wrote:
+>>
+>> I proposed a similar patch guarded by #ifdef TARGET_HEXAGON.  I understand we don't want to break things that are working, and we don't want to open the door for a bunch of #ifdef's here.  However, more than one scenario needs this capability.
+>>
+>> Would a suitable compromise be to provide a hook in linux-user/signal.c for the target to put in the changes they need?
 > 
-> Make the HEST GHES to a GED device.
+> No; this isn't target-specific, and we don't want
+> per-target different behaviour.
 
-It's hard to parse this even kno
-Pls rephrase/make commit message more verbose,
-so it would describe why and what patch is supposed to do
+So I guess the only way to fix the problem is to implement the signal
+multiplexing initiated by Milos [1] and tried again by Josh [2].
 
+Any volunteer?
 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> ---
->  hw/acpi/generic_event_device.c         | 15 ++++++++++++++-
->  hw/acpi/ghes.c                         | 16 ++++++++++++++++
->  hw/arm/virt-acpi-build.c               | 13 ++++++++++++-
->  include/hw/acpi/generic_event_device.h |  2 ++
->  include/hw/acpi/ghes.h                 |  6 ++++++
->  5 files changed, 50 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 9cee90c..9bf37e4 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -234,12 +234,25 @@ static const VMStateDescription vmstate_ged_state = {
->      }
->  };
->  
-> +static const VMStateDescription vmstate_ghes_state = {
-> +    .name = "acpi-ghes-state",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_UINT64(ghes_addr_le, AcpiGhesState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_acpi_ged = {
->      .name = "acpi-ged",
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .fields = (VMStateField[]) {
-> -        VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
-> +        VMSTATE_STRUCT(ged_state, AcpiGedState, 1,
-> +                       vmstate_ged_state, GEDState),
-> +        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
-> +                       vmstate_ghes_state, AcpiGhesState),
->          VMSTATE_END_OF_LIST(),
->      },
->      .subsections = (const VMStateDescription * []) {
-> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-> index 9d37798..68f4abf 100644
-> --- a/hw/acpi/ghes.c
-> +++ b/hw/acpi/ghes.c
-> @@ -23,6 +23,7 @@
->  #include "hw/acpi/acpi.h"
->  #include "hw/acpi/ghes.h"
->  #include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/generic_event_device.h"
->  #include "hw/nvram/fw_cfg.h"
->  #include "sysemu/sysemu.h"
->  #include "qemu/error-report.h"
-> @@ -208,3 +209,18 @@ void acpi_build_hest(GArray *table_data, GArray *hardware_errors,
->      build_header(linker, table_data, (void *)(table_data->data + hest_start),
->          "HEST", table_data->len - hest_start, 1, NULL, "");
->  }
-> +
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
-> +                            GArray *hardware_error)
+If not, I will try to find some time to do that...
 
-not aligned properly
+Thanks,
+Laurent
 
-> +{
-> +    size_t size = 2 * sizeof(uint64_t) + ACPI_GHES_MAX_RAW_DATA_LENGTH;
-> +    size_t request_block_size = ACPI_GHES_ERROR_SOURCE_COUNT * size;
-> +
-> +    /* Create a read-only fw_cfg file for GHES */
-> +    fw_cfg_add_file(s, ACPI_GHES_ERRORS_FW_CFG_FILE, hardware_error->data,
-> +                    request_block_size);
-> +
-> +    /* Create a read-write fw_cfg file for Address */
-> +    fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
-> +        NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
-> +}
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 837bbf9..c8aa94d 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -797,6 +797,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      unsigned dsdt, xsdt;
->      GArray *tables_blob = tables->table_data;
->      MachineState *ms = MACHINE(vms);
-> +    AcpiGedState *acpi_ged_state;
->  
->      table_offsets = g_array_new(false, true /* clear */,
->                                          sizeof(uint32_t));
-> @@ -831,7 +832,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      acpi_add_table(table_offsets, tables_blob);
->      build_spcr(tables_blob, tables->linker, vms);
->  
-> -    if (vms->ras) {
-> +    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-> +                                                       NULL));
-> +    if (acpi_ged_state &&  vms->ras) {
+[1] "[PATCH 0/5] linux-user: Support signal passing for targets having
+more signals than host"
 
-there is vms->acpi_dev which is GED, so you don't need to look it up
+https://patchew.org/QEMU/1558550785-20098-1-git-send-email-aleksandar.markovic@rt-rk.com/
 
-suggest:
- if (ras) {
-    assert(ged)
-    do other fun stuff ...
- }
-
->          acpi_add_table(table_offsets, tables_blob);
->          build_ghes_error_table(tables->hardware_errors, tables->linker);
->          acpi_build_hest(tables_blob, tables->hardware_errors,
-> @@ -925,6 +928,7 @@ void virt_acpi_setup(VirtMachineState *vms)
->  {
->      AcpiBuildTables tables;
->      AcpiBuildState *build_state;
-> +    AcpiGedState *acpi_ged_state;
->  
->      if (!vms->fw_cfg) {
->          trace_virt_acpi_setup();
-> @@ -955,6 +959,13 @@ void virt_acpi_setup(VirtMachineState *vms)
->      fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
->                      acpi_data_len(tables.tcpalog));
->  
-> +    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-> +                                                       NULL));
-> +    if (acpi_ged_state && vms->ras) {
-
-ditto
-
-> +        acpi_ghes_add_fw_cfg(&acpi_ged_state->ghes_state,
-> +                             vms->fw_cfg, tables.hardware_errors);
-> +    }
-> +
->      build_state->rsdp_mr = acpi_add_rom_blob(virt_acpi_build_update,
->                                               build_state, tables.rsdp,
->                                               ACPI_BUILD_RSDP_FILE, 0);
-> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-> index d157eac..037d2b5 100644
-> --- a/include/hw/acpi/generic_event_device.h
-> +++ b/include/hw/acpi/generic_event_device.h
-> @@ -61,6 +61,7 @@
->  
->  #include "hw/sysbus.h"
->  #include "hw/acpi/memory_hotplug.h"
-> +#include "hw/acpi/ghes.h"
->  
->  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
->  
-> @@ -95,6 +96,7 @@ typedef struct AcpiGedState {
->      GEDState ged_state;
->      uint32_t ged_event_bitmap;
->      qemu_irq irq;
-> +    AcpiGhesState ghes_state;
->  } AcpiGedState;
->  
->  void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
-> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-> index 09a7f86..a6761e6 100644
-> --- a/include/hw/acpi/ghes.h
-> +++ b/include/hw/acpi/ghes.h
-> @@ -60,7 +60,13 @@ enum {
->      ACPI_HEST_SRC_ID_RESERVED,
->  };
->  
-> +typedef struct AcpiGhesState {
-> +    uint64_t ghes_addr_le;
-> +} AcpiGhesState;
-> +
->  void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
->  void acpi_build_hest(GArray *table_data, GArray *hardware_error,
->                            BIOSLinker *linker);
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-> +                          GArray *hardware_errors);
->  #endif
-
+[2] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00738.html
 
