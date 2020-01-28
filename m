@@ -2,82 +2,84 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C19C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C07C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:00:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E97AB2467B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:00:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C41562467B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 11:00:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u/7fV+kE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E97AB2467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L3wxap78"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C41562467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwObf-0006Ae-0P
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:00:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54178)
+	id 1iwObw-0006pw-U8
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 06:00:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54252)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iwOaS-0004mN-7W
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:59:17 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iwOad-0005C1-I9
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iwOaR-0000qm-CV
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:59:16 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42671)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iwOaR-0000qE-6I
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:59:15 -0500
-Received: by mail-oi1-x242.google.com with SMTP id j132so8781870oih.9
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 02:59:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pf7eaZKLcykzv5YZVmlfAWZvxYouEa7qWG2IX0om23c=;
- b=u/7fV+kEc4082Xu/zXeBLxbhysD+bJv4HsWcQ2+Fn2havJmtvFrLBcGtEn2M/7dBPl
- 6W25JVEHawF9/KsmriQyjzuPAAS2edFOkO4rzAH5BdLtVm/F7pdOZVNkhr9IxjuYo4xp
- lCQmV3G+vDxdFoQy1btFrTpmms6LILufC9MZ94lOZZ42ljR9vdjbuOw3N8xwGldSEty6
- lT5zlr/ce3vPb0kuKD+CRiwE8R4mDmZoYroiUf2hRjEVBcj1lByoEcBORnEsSjo2oaMN
- pjVWQ8OOtFk1UfyFuv7LWDZ91lznED9NX+weWsB0/4FXRlM89VsF3OJurOZ5qi6SeGpN
- 266A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pf7eaZKLcykzv5YZVmlfAWZvxYouEa7qWG2IX0om23c=;
- b=nLmQVCnjSEkr93B6+nLiXT57ckT4DpL1H5ACE6RIKodT1Vx1sdrVpsg51OmCtHrEAA
- 99H6IY8TzaAlY9E6RPzKuLZZU8GCuk6+gqaVc8730/EHb0u38wC1T0nKJbgkG7IR/Uy3
- lI9xmo9rZfQzNA8Y/T5jnj61HjzUAMvBExojMgGLPI/J0GVFjYeVvovKywJmn81WHu1F
- 5gDpfgpoGdG4xcI4S2A+k3/56EqKuCvpFYYJJNG5SUZ2bTxv64mg8/nPbFbRVCalKlmX
- BsxikntIYfbW2fh6O4PIcAmrgryh/0KiLWv5SM1kC3oLSvd5hBk0xZcm0Je0tPRjSilX
- fEKA==
-X-Gm-Message-State: APjAAAVf+FjOAx9ZNlrtxHrY+80Su2vUrWGkbgl5GvaA1KwGSTX8tu6w
- yerTEg2pqQ/NKjrBEvcPptLdNUcKH0Zyxkmk6C/n+g==
-X-Google-Smtp-Source: APXvYqzl1M4z38mzLP9AqMmQGHlABQG0t5TqHhTQAjuwxYaYfceusIP3xA/K4zLHM/kcdWKNpXtWBMGqyS2QnTAmzX4=
-X-Received: by 2002:aca:3182:: with SMTP id x124mr2461998oix.170.1580209154191; 
- Tue, 28 Jan 2020 02:59:14 -0800 (PST)
+ (envelope-from <eric.auger@redhat.com>) id 1iwOac-0000ya-LR
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:59:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58994
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iwOac-0000y1-Hv
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 05:59:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580209166;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9dSYi4dvn0AY+/YeHWr7iYWeBW00lmhzZ7LvW95TaqA=;
+ b=L3wxap78vDfsk70tnJvbSRL0BUILKA/t99laARV0seKnpFk9G8LyEsB1SXeF+zS6cJT7Vx
+ 4JBLIfknpRGOFxTLHs6K5i86TT0kXq6xsVG5amOX6UVsr9AFRhu4wERoPMfkZrm9BTIVnb
+ ivSPJneYNKNztnJMiOFYtVaUIxorE1Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-tq_6zD0ZP6yVktb4oXzkmA-1; Tue, 28 Jan 2020 05:59:21 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A612100550E;
+ Tue, 28 Jan 2020 10:59:20 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C96578887E;
+ Tue, 28 Jan 2020 10:59:17 +0000 (UTC)
+Subject: Re: [question] hw/arm/virt: about the default gic-version in
+ accelerated mode
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <df1d6ae5-b734-ef64-4ef9-c661e8f797e8@redhat.com>
+ <CAFEAcA8hib-3YWuS-MajjvokOFCGKUHeuz+XQTBYf8LBz+PuFQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <516da1db-a959-95b4-2d24-cafcd7136bcd@redhat.com>
+Date: Tue, 28 Jan 2020 11:59:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20191219040612.28431-1-gshan@redhat.com>
- <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
- <1b718429-c74e-fbac-84b8-379f3291db40@redhat.com>
- <ff78ed012e7b8fbd656e7e4b477ee0a4@kernel.org>
- <3ae0557c-c289-8a23-d62f-3dc2a12c0623@redhat.com>
-In-Reply-To: <3ae0557c-c289-8a23-d62f-3dc2a12c0623@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jan 2020 10:59:03 +0000
-Message-ID: <CAFEAcA92URHhhm8TiGqijig_jM1=94PZz5Ptmfg1JrWSP7mSHQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
-To: Auger Eric <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <CAFEAcA8hib-3YWuS-MajjvokOFCGKUHeuz+XQTBYf8LBz+PuFQ@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: tq_6zD0ZP6yVktb4oXzkmA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,28 +91,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, Gavin Shan <gshan@redhat.com>,
- jthierry@redhat.com, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Marc Zyngier <maz@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Shan Gavin <shan.gavin@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu list <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jan 2020 at 10:56, Auger Eric <eric.auger@redhat.com> wrote:
-> On 1/28/20 10:25 AM, Marc Zyngier wrote:
-> > You *could* try something like SDEI [1], but that's a pretty terrible
-> > interface too.
->
-> Thank you for the pointer.
+Hi Peter,
 
-There was a patchset recently that had an SDEI implementation,
-but I would strongly prefer not to have QEMU itself take
-on the job of firmware API implementation, and the facilities
-provided are somewhere between awkward and impossible to
-implement from within a guest firmware blob :-/
+On 1/28/20 11:52 AM, Peter Maydell wrote:
+> On Tue, 28 Jan 2020 at 10:47, Auger Eric <eric.auger@redhat.com> wrote:
+>> When arm virt machine is run in accelerated mode with "-cpu host
+>> -machine virt", the default gic version is 2.
+>>
+>> I understand the rationale with TCG where we don't have MSI ITS
+>> emulation along with GICv3 so we need to choose GICv2 to get GICv2M
+>> functionality.
+>>
+>> However in KVM mode, I would have expected to see the host GIC probed to
+>> set the same version on guest. Indeed most of our HW now have GICv3
+>> without GICv2 compat mode so our default values lead to weird traces:
+>>
+>> "
+>> qemu-system-aarch64: PMU: KVM_SET_DEVICE_ATTR: Invalid argument
+>> qemu-system-aarch64: failed to set irq for PMU
+>> "
+>>
+>> I would like to propose a patch to improve those errors and also suggest
+>> a hint. But I also wanted to know whether you would accept to change the
+>> default value with KVM and choose the host version instead of 2. For TCG
+>> we would keep v2.
+> 
+> As with the -cpu option, the default is there for command
+> line backward compatibility primarily. Even if we had
+> better support for MSI ITS emulation we'd still leave
+> the default at GICv2.
+> 
+> If you want "do the best you can, regardless of accelerator"
+> that is "-cpu max -machine gic-version=max".
 
-thanks
--- PMM
+OK that's understood.
+
+So I will just try to improve the above traces.
+
+Thanks
+
+Eric
+> 
+> thanks
+> -- PMM
+> 
+
 
