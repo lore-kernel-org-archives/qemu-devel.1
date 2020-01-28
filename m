@@ -2,82 +2,87 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B32C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F74C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:21:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16B3C2173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BDFA2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 19:21:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STlVJlhX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16B3C2173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsluURyu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BDFA2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwWOp-0004Wi-9g
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:19:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58091)
+	id 1iwWQ6-0006Js-By
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 14:21:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iwVKt-0004o4-NV
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:11:42 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7k-0003Xa-R2
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iwVKr-0001N0-5z
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:11:38 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60453
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iwVKr-0001L9-2O
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 13:11:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580235096;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vB8bRgsl1wOabwuyBJiR1sNWzMD1CYoWuLVu6A4rM9c=;
- b=STlVJlhXMFjscH24NREfOjkXSXoNF4wC/HGpX4MzRZjTn5Fy8gL8yvWHf3kxdrnqlzsMqs
- xG+XYQZnnUyr5AEGiYBt+yeYZz0cbSFr+lLqz3adXwI/M1336rG/3WG2JwPhNvkIAn+61E
- 2Z06MFm4iAHkr4WjofQa+ccIoSGzO6c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-UwrE8JY9MwuPQpTABL7qjQ-1; Tue, 28 Jan 2020 13:11:30 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44E518010DB;
- Tue, 28 Jan 2020 18:11:29 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 31EBF83861;
- Tue, 28 Jan 2020 18:11:25 +0000 (UTC)
-Date: Tue, 28 Jan 2020 18:11:22 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v3 06/13] monitor/hmp: move hmp_block_job* to
- block-hmp-cmds.c
-Message-ID: <20200128181122.GY3215@work-vm>
-References: <20200127103647.17761-1-mlevitsk@redhat.com>
- <20200127103647.17761-7-mlevitsk@redhat.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7j-00080n-PX
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:04 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37488)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iwV7j-0007zi-IZ
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:58:03 -0500
+Received: by mail-wr1-x441.google.com with SMTP id w15so17147810wru.4
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:58:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=khzoAJC6EispDWMXJwbaG8Z6znk5PthJmXlB3/jTBZo=;
+ b=BsluURyuEg/SXDrxK5nrN+EQWg/bhHsHUKiFGTPsXE476blrlkj15qRC64oO5CqiXN
+ 9NZfg8hKi/5HGU2j2N4Fjuibohtd+8O1DXuwSE+7XElGIhVzw8b8xTXkMg7sdEfPldHq
+ kZbZsMSIt28xH6ezumlbOQg46+ZCULmb+dpkKfqEvJtF3EscYBNRDIv33SWxpJss6wtF
+ c7Xc5jkUyQ7RZrla+kRsYXG1aXziNjU7NltYo9xoLrGUBjv+jPlXVvczeqm38lxjl9P4
+ qDApqo/C+LVm8+lvFdoeUIW+ZABqrJkL81fcws04XbG7N0vs3XLCxNwdbnZA/Jn24vJA
+ J16g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=khzoAJC6EispDWMXJwbaG8Z6znk5PthJmXlB3/jTBZo=;
+ b=bRWx8NFIMzWf3g/t9Aondqe3x+qQPWF4s8yknAZ6cbkE4DCbxs3bobVY/Gy0+WSvf4
+ Ze2IMTeRVx7KSirVCHjyF3VwARPHBJU6ub5P8g3H43qyvt9vDeQnW7+c4wCvyh17KDGr
+ E500LRy4NA2adMpIJrWHHxtJhIn4nwMFrO/Pe3EcE47xFxfJj0S5u2hc6T4AB8tYl4Lh
+ ILYBQz4rfzkOIgYvar+r0xiSYBZsOxGlZWhYrgRsumUSbTV318TASKRUZgyIzdEwpLRX
+ LEvjHAu4AnkGmL3SMRF1+IeMTfNegLNw9C6alFZZHmAoUPhnsRYInYa0/oesEWQCEEfE
+ MnLA==
+X-Gm-Message-State: APjAAAUSZSXwBMam61JrPuM2sBvgqQuahw1VPRLpFjp55ZHChDk+Az0J
+ 1fyyQ5Lgtaz4N6rTp/bjDfVrhuaD
+X-Google-Smtp-Source: APXvYqwBuyNdf7CcZkt6WZDb94/hZpPXkxD0GV3HLK+sHrmsvPZC5KB5ewOkt6Wm4K89Vfj9xH7q2g==
+X-Received: by 2002:adf:b193:: with SMTP id q19mr29575709wra.78.1580234282338; 
+ Tue, 28 Jan 2020 09:58:02 -0800 (PST)
+Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
+ [93.36.56.206])
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.58.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Jan 2020 09:58:01 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 108/142] meson: convert hw/adc
+Date: Tue, 28 Jan 2020 18:53:08 +0100
+Message-Id: <20200128175342.9066-109-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
+References: <20200128175342.9066-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200127103647.17761-7-mlevitsk@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: UwrE8JY9MwuPQpTABL7qjQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,187 +94,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Maxim Levitsky (mlevitsk@redhat.com) wrote:
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ hw/Makefile.objs     | 1 -
+ hw/adc/Makefile.objs | 1 -
+ hw/adc/meson.build   | 1 +
+ hw/meson.build       | 1 +
+ 4 files changed, 2 insertions(+), 2 deletions(-)
+ delete mode 100644 hw/adc/Makefile.objs
+ create mode 100644 hw/adc/meson.build
 
-> ---
->  block/monitor/block-hmp-cmds.c     | 52 ++++++++++++++++++++++++++++++
->  include/block/block-hmp-commands.h |  6 ++++
->  include/monitor/hmp.h              |  5 ---
->  monitor/hmp-cmds.c                 | 52 ------------------------------
->  4 files changed, 58 insertions(+), 57 deletions(-)
->=20
-> diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmd=
-s.c
-> index ae3890aaab..ed3c350143 100644
-> --- a/block/monitor/block-hmp-cmds.c
-> +++ b/block/monitor/block-hmp-cmds.c
-> @@ -228,3 +228,55 @@ void hmp_drive_backup(Monitor *mon, const QDict *qdi=
-ct)
->      qmp_drive_backup(&backup, &err);
->      hmp_handle_error(mon, err);
->  }
-> +
-> +void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *error =3D NULL;
-> +    const char *device =3D qdict_get_str(qdict, "device");
-> +    int64_t value =3D qdict_get_int(qdict, "speed");
-> +
-> +    qmp_block_job_set_speed(device, value, &error);
-> +
-> +    hmp_handle_error(mon, error);
-> +}
-> +
-> +void hmp_block_job_cancel(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *error =3D NULL;
-> +    const char *device =3D qdict_get_str(qdict, "device");
-> +    bool force =3D qdict_get_try_bool(qdict, "force", false);
-> +
-> +    qmp_block_job_cancel(device, true, force, &error);
-> +
-> +    hmp_handle_error(mon, error);
-> +}
-> +
-> +void hmp_block_job_pause(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *error =3D NULL;
-> +    const char *device =3D qdict_get_str(qdict, "device");
-> +
-> +    qmp_block_job_pause(device, &error);
-> +
-> +    hmp_handle_error(mon, error);
-> +}
-> +
-> +void hmp_block_job_resume(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *error =3D NULL;
-> +    const char *device =3D qdict_get_str(qdict, "device");
-> +
-> +    qmp_block_job_resume(device, &error);
-> +
-> +    hmp_handle_error(mon, error);
-> +}
-> +
-> +void hmp_block_job_complete(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *error =3D NULL;
-> +    const char *device =3D qdict_get_str(qdict, "device");
-> +
-> +    qmp_block_job_complete(device, &error);
-> +
-> +    hmp_handle_error(mon, error);
-> +}
-> diff --git a/include/block/block-hmp-commands.h b/include/block/block-hmp=
--commands.h
-> index fcaf753118..ea6578a5f6 100644
-> --- a/include/block/block-hmp-commands.h
-> +++ b/include/block/block-hmp-commands.h
-> @@ -11,4 +11,10 @@ void hmp_drive_del(Monitor *mon, const QDict *qdict);
->  void hmp_drive_mirror(Monitor *mon, const QDict *qdict);
->  void hmp_drive_backup(Monitor *mon, const QDict *qdict);
-> =20
-> +void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
-> +void hmp_block_job_cancel(Monitor *mon, const QDict *qdict);
-> +void hmp_block_job_pause(Monitor *mon, const QDict *qdict);
-> +void hmp_block_job_resume(Monitor *mon, const QDict *qdict);
-> +void hmp_block_job_complete(Monitor *mon, const QDict *qdict);
-> +
->  #endif
-> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-> index c1b363ee57..592ce0ccfe 100644
-> --- a/include/monitor/hmp.h
-> +++ b/include/monitor/hmp.h
-> @@ -87,11 +87,6 @@ void hmp_eject(Monitor *mon, const QDict *qdict);
->  void hmp_change(Monitor *mon, const QDict *qdict);
->  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
->  void hmp_block_stream(Monitor *mon, const QDict *qdict);
-> -void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
-> -void hmp_block_job_cancel(Monitor *mon, const QDict *qdict);
-> -void hmp_block_job_pause(Monitor *mon, const QDict *qdict);
-> -void hmp_block_job_resume(Monitor *mon, const QDict *qdict);
-> -void hmp_block_job_complete(Monitor *mon, const QDict *qdict);
->  void hmp_migrate(Monitor *mon, const QDict *qdict);
->  void hmp_device_add(Monitor *mon, const QDict *qdict);
->  void hmp_device_del(Monitor *mon, const QDict *qdict);
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index a70bcb1d16..996ce96430 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -1975,58 +1975,6 @@ void hmp_block_stream(Monitor *mon, const QDict *q=
-dict)
->      hmp_handle_error(mon, error);
->  }
-> =20
-> -void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict)
-> -{
-> -    Error *error =3D NULL;
-> -    const char *device =3D qdict_get_str(qdict, "device");
-> -    int64_t value =3D qdict_get_int(qdict, "speed");
-> -
-> -    qmp_block_job_set_speed(device, value, &error);
-> -
-> -    hmp_handle_error(mon, error);
-> -}
-> -
-> -void hmp_block_job_cancel(Monitor *mon, const QDict *qdict)
-> -{
-> -    Error *error =3D NULL;
-> -    const char *device =3D qdict_get_str(qdict, "device");
-> -    bool force =3D qdict_get_try_bool(qdict, "force", false);
-> -
-> -    qmp_block_job_cancel(device, true, force, &error);
-> -
-> -    hmp_handle_error(mon, error);
-> -}
-> -
-> -void hmp_block_job_pause(Monitor *mon, const QDict *qdict)
-> -{
-> -    Error *error =3D NULL;
-> -    const char *device =3D qdict_get_str(qdict, "device");
-> -
-> -    qmp_block_job_pause(device, &error);
-> -
-> -    hmp_handle_error(mon, error);
-> -}
-> -
-> -void hmp_block_job_resume(Monitor *mon, const QDict *qdict)
-> -{
-> -    Error *error =3D NULL;
-> -    const char *device =3D qdict_get_str(qdict, "device");
-> -
-> -    qmp_block_job_resume(device, &error);
-> -
-> -    hmp_handle_error(mon, error);
-> -}
-> -
-> -void hmp_block_job_complete(Monitor *mon, const QDict *qdict)
-> -{
-> -    Error *error =3D NULL;
-> -    const char *device =3D qdict_get_str(qdict, "device");
-> -
-> -    qmp_block_job_complete(device, &error);
-> -
-> -    hmp_handle_error(mon, error);
-> -}
-> -
->  typedef struct HMPMigrationStatus
->  {
->      QEMUTimer *timer;
-> --=20
-> 2.17.2
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index c69c3aa4c5..5823867997 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,7 +1,6 @@
+ ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+ devices-dirs-y += acpi/
+-devices-dirs-y += adc/
+ endif
+ 
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/adc/Makefile.objs b/hw/adc/Makefile.objs
+deleted file mode 100644
+index 3f6dfdedae..0000000000
+--- a/hw/adc/Makefile.objs
++++ /dev/null
+@@ -1 +0,0 @@
+-obj-$(CONFIG_STM32F2XX_ADC) += stm32f2xx_adc.o
+diff --git a/hw/adc/meson.build b/hw/adc/meson.build
+new file mode 100644
+index 0000000000..2e7fea906e
+--- /dev/null
++++ b/hw/adc/meson.build
+@@ -0,0 +1 @@
++specific_ss.add(when: 'CONFIG_STM32F2XX_ADC', if_true: files('stm32f2xx_adc.c'))
+diff --git a/hw/meson.build b/hw/meson.build
+index 624335be90..ffa3f06dc0 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('adc')
+ subdir('audio')
+ subdir('block')
+ subdir('char')
+-- 
+2.21.0
+
 
 
