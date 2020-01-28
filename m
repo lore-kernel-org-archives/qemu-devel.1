@@ -2,79 +2,84 @@ Return-Path: <SRS0=Nty2=3R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD169C33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 16:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C22C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 16:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CFFD24683
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 16:31:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 834792465B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 16:31:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DA3Woqqg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CFFD24683
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tcb5dMno"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 834792465B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwTlk-0001Rj-Oo
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 11:31:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56203)
+	id 1iwTlx-00020e-LY
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 11:31:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iwTk8-0008MD-Bp
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 11:29:37 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iwTkG-000056-Ej
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 11:29:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iwTk6-0003sf-M1
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 11:29:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24213
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1iwTkF-0003yF-1m
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 11:29:44 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45557
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iwTk6-0003sL-HV
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 11:29:34 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iwTkE-0003xm-Tl
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 11:29:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580228973;
+ s=mimecast20190719; t=1580228981;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0e032N0zxF8tWpetCJKuDj40pVQJDqs5UqbuaRrX3BI=;
- b=DA3WoqqgK8qnjcbPI/sN45aFOKDONRmzs2uVRs2o2x0l6EprfQ8zYoJ9VycEN9jxfMsgCH
- WrfZqMi1P2P6c5bUhbWCMGW2yFVA4bvJF72qPn3bXdAcQtjuts+81DXfSXfqW+lbmC5EPQ
- BcFR9VB9q1JbjcP9K1yXS65PO97kI7Y=
+ bh=0RBgG3s3+2OLgkM+NH4BJ0IIorbtn/4HZcC76TvCg8o=;
+ b=Tcb5dMnocgW2sfDNX8cpWrZhyvEEXtT5z3WCKeHYKfJK0hvYBA4RTDZIMuiZWke7HREaUd
+ 00+AhFztW7w8ZALpEjdrpK30DfUUT+uyRwMSXBs5dkB/qnpxLV5JXWrK/8LzZjTDIQeGFk
+ slJ50RkOXfHgTNBu2Wg46xUCl0jqQfM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-YZR1c61XP0OBeq0yPp051w-1; Tue, 28 Jan 2020 11:29:26 -0500
+ us-mta-378-eBaupM4POgONd4LwjSnrMQ-1; Tue, 28 Jan 2020 11:29:34 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F3ED10BAD7C;
- Tue, 28 Jan 2020 16:29:25 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AF3F86E22;
- Tue, 28 Jan 2020 16:29:21 +0000 (UTC)
-Date: Tue, 28 Jan 2020 17:29:19 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v3 07/18] machine: Add a new function init_apicid_fn in
- MachineClass
-Message-ID: <20200128172919.4ecb5896@redhat.com>
-In-Reply-To: <157541986210.46157.5082551407581177819.stgit@naples-babu.amd.com>
-References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
- <157541986210.46157.5082551407581177819.stgit@naples-babu.amd.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 611ED12FFC6;
+ Tue, 28 Jan 2020 16:29:33 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9ECDC7C35A;
+ Tue, 28 Jan 2020 16:29:28 +0000 (UTC)
+Subject: Re: [PATCH v2 5/7] hw/arm/virt: Add nvdimm hotplug support
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, imammedo@redhat.com
+References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
+ <20200117174522.22044-6-shameerali.kolothum.thodi@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <85ff04da-c14d-5931-cf6d-e9f837c1b4c8@redhat.com>
+Date: Tue, 28 Jan 2020 17:29:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <20200117174522.22044-6-shameerali.kolothum.thodi@huawei.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: YZR1c61XP0OBeq0yPp051w-1
+X-MC-Unique: eBaupM4POgONd4LwjSnrMQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,54 +91,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, mst@redhat.com,
+ linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
+ lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 03 Dec 2019 18:37:42 -0600
-Babu Moger <babu.moger@amd.com> wrote:
-
-> Add a new function init_apicid_fn in MachineClass to initialize the mode
-> specific handlers to decode the apic ids.
+Hi Shameer,
+On 1/17/20 6:45 PM, Shameer Kolothum wrote:
+> This adds support for nvdimm hotplug events through GED
+> and enables nvdimm for the arm/virt. Now Guests with ACPI
+> can have both cold and hot plug of nvdimms.
 > 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> Hot removal functionality is not yet supported.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+
 > ---
->  include/hw/boards.h |    1 +
->  vl.c                |    3 +++
->  2 files changed, 4 insertions(+)
+>  docs/specs/acpi_hw_reduced_hotplug.rst |  1 +
+>  hw/acpi/generic_event_device.c         | 13 +++++++++++++
+>  hw/arm/virt.c                          | 16 +++++++++++-----
+>  include/hw/acpi/generic_event_device.h |  1 +
+>  4 files changed, 26 insertions(+), 5 deletions(-)
 > 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index d4fab218e6..ce5aa365cb 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -238,6 +238,7 @@ struct MachineClass {
->                                                           unsigned cpu_index);
->      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
->      int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
-> +    void (*init_apicid_fn)(MachineState *ms);
-it's x86 specific, so why it wasn put into PCMachineClass?
-
-
+> diff --git a/docs/specs/acpi_hw_reduced_hotplug.rst b/docs/specs/acpi_hw_reduced_hotplug.rst
+> index 911a98255b..e3abe975bf 100644
+> --- a/docs/specs/acpi_hw_reduced_hotplug.rst
+> +++ b/docs/specs/acpi_hw_reduced_hotplug.rst
+> @@ -63,6 +63,7 @@ GED IO interface (4 byte access)
+>      bits:
+>         0: Memory hotplug event
+>         1: System power down event
+> +       2: NVDIMM hotplug event
+>      2-31: Reserved
+>  
+>  **write_access:**
+> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+> index 9cee90cc70..ad1b684304 100644
+> --- a/hw/acpi/generic_event_device.c
+> +++ b/hw/acpi/generic_event_device.c
+> @@ -16,6 +16,7 @@
+>  #include "hw/acpi/generic_event_device.h"
+>  #include "hw/irq.h"
+>  #include "hw/mem/pc-dimm.h"
+> +#include "hw/mem/nvdimm.h"
+>  #include "hw/qdev-properties.h"
+>  #include "migration/vmstate.h"
+>  #include "qemu/error-report.h"
+> @@ -23,6 +24,7 @@
+>  static const uint32_t ged_supported_events[] = {
+>      ACPI_GED_MEM_HOTPLUG_EVT,
+>      ACPI_GED_PWR_DOWN_EVT,
+> +    ACPI_GED_NVDIMM_HOTPLUG_EVT,
 >  };
 >  
->  /**
-> diff --git a/vl.c b/vl.c
-> index a42c24a77f..b6af604e11 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4318,6 +4318,9 @@ int main(int argc, char **argv, char **envp)
->      current_machine->cpu_type = machine_class->default_cpu_type;
->      if (cpu_option) {
->          current_machine->cpu_type = parse_cpu_option(cpu_option);
-> +        if (machine_class->init_apicid_fn) {
-> +            machine_class->init_apicid_fn(current_machine);
-> +        }
->      }
->      parse_numa_opts(current_machine);
+>  /*
+> @@ -110,6 +112,11 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
+>                             aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
+>                                        aml_int(0x80)));
+>                  break;
+> +            case ACPI_GED_NVDIMM_HOTPLUG_EVT:
+> +                aml_append(if_ctx,
+> +                           aml_notify(aml_name("\\_SB.NVDR"),
+> +                                      aml_int(0x80)));
+> +                break;
+>              default:
+>                  /*
+>                   * Please make sure all the events in ged_supported_events[]
+> @@ -175,7 +182,11 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
+>      AcpiGedState *s = ACPI_GED(hotplug_dev);
 >  
-> 
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +        if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+> +            nvdimm_acpi_plug_cb(hotplug_dev, dev);
+> +        } else {
+>              acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
+> +        }
+>      } else {
+>          error_setg(errp, "virt: device plug request for unsupported device"
+>                     " type: %s", object_get_typename(OBJECT(dev)));
+> @@ -192,6 +203,8 @@ static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+>          sel = ACPI_GED_MEM_HOTPLUG_EVT;
+>      } else if (ev & ACPI_POWER_DOWN_STATUS) {
+>          sel = ACPI_GED_PWR_DOWN_EVT;
+> +    } else if (ev & ACPI_NVDIMM_HOTPLUG_STATUS) {
+> +        sel = ACPI_GED_NVDIMM_HOTPLUG_EVT;
+>      } else {
+>          /* Unknown event. Return without generating interrupt. */
+>          warn_report("GED: Unsupported event %d. No irq injected", ev);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 7987c8f5b8..5ea2584491 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -543,6 +543,10 @@ static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
+>          event |= ACPI_GED_MEM_HOTPLUG_EVT;
+>      }
+>  
+> +    if (ms->nvdimms_state->is_enabled) {
+> +        event |= ACPI_GED_NVDIMM_HOTPLUG_EVT;
+> +    }
+> +
+>      dev = qdev_create(NULL, TYPE_ACPI_GED);
+>      qdev_prop_set_uint32(dev, "ged-event", event);
+>  
+> @@ -1928,19 +1932,20 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                   Error **errp)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    const MachineState *ms = MACHINE(hotplug_dev);
+>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>  
+> -    if (is_nvdimm) {
+> -        error_setg(errp, "nvdimm is not yet supported");
+> -        return;
+> -    }
+> -
+>      if (!vms->acpi_dev) {
+>          error_setg(errp,
+>                     "memory hotplug is not enabled: missing acpi-ged device");
+>          return;
+>      }
+>  
+> +    if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
+> +        error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+> +        return;
+> +    }
+> +
+>      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
+>  }
+>  
+> @@ -2071,6 +2076,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      hc->plug = virt_machine_device_plug_cb;
+>      hc->unplug_request = virt_machine_device_unplug_request_cb;
+>      mc->numa_mem_supported = true;
+> +    mc->nvdimm_supported = true;
+>      mc->auto_enable_numa_with_memhp = true;
+>  }
+>  
+> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+> index d157eac088..9eb86ca4fd 100644
+> --- a/include/hw/acpi/generic_event_device.h
+> +++ b/include/hw/acpi/generic_event_device.h
+> @@ -82,6 +82,7 @@
+>   */
+>  #define ACPI_GED_MEM_HOTPLUG_EVT   0x1
+>  #define ACPI_GED_PWR_DOWN_EVT      0x2
+> +#define ACPI_GED_NVDIMM_HOTPLUG_EVT 0x4
+>  
+>  typedef struct GEDState {
+>      MemoryRegion io;
 > 
 
 
