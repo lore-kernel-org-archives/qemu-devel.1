@@ -6,79 +6,76 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B9EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBDDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:36:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E21E9207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75C412073A
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 23:36:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="agfYABxL";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="agfYABxL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E21E9207FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="AEbN6Yq5";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="UUxlameO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75C412073A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwaNn-0003pW-3o
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 18:34:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32770)
+	id 1iwaP0-0005Cv-Kw
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 18:36:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33613)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1iwaMP-0002Zg-4S
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:33:37 -0500
+ (envelope-from <keithp@keithp.com>) id 1iwaNf-0003vj-66
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1iwaMO-0000LJ-4L
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:33:32 -0500
-Received: from home.keithp.com ([63.227.221.253]:44634 helo=elaine.keithp.com)
+ (envelope-from <keithp@keithp.com>) id 1iwaNd-0003ne-9B
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 18:34:50 -0500
+Received: from home.keithp.com ([63.227.221.253]:44670 helo=elaine.keithp.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <keithp@keithp.com>)
- id 1iwaMN-0000Gk-Te; Tue, 28 Jan 2020 18:33:32 -0500
+ id 1iwaNd-0003ko-32; Tue, 28 Jan 2020 18:34:49 -0500
 Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 835CD3F2A89D;
- Tue, 28 Jan 2020 15:33:29 -0800 (PST)
+ by elaine.keithp.com (Postfix) with ESMTP id 2DFD83F2A89E;
+ Tue, 28 Jan 2020 15:34:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1580254409; bh=0/icW2R0xElBKWqbPW/bPBhWmuMOtQtHIR20kKLD03g=;
+ t=1580254488; bh=+p0k5tb8ZttMZ50WWyUz1i4/f41iRVLYEz/z8eBqkgM=;
  h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=agfYABxL+8XeLXPJyNtFERVlOtLD6NAZHw0DgnVZsF33zeO7au0TzBFDGLpuaHr//
- vzGmcRXmjcUqQS04PcaHUjXvo6YpUZ4K7BJS9Fe+EBuG+779zDiZFbjfTOgLTo9FK2
- uHuVy3EzKxFDT7h6KuCrlMPaLv8B6acU/VTswUT2o++jx6DCIQaPILk0UriO2105xa
- 1KMK46qicbQggG/+DosTX4XCEBnrepg14hGBEfbeTUpQDYRAWCPJLNobOjfzE1J+pv
- gLSEus9qRR0xIVDLlvJRxa49XqkcfYVmTSOkzIbSTQ1sz4gEER2KDNxnHMcRhDhNWd
- xn/x0mwO/kMAg==
+ b=AEbN6Yq5lKRHgvsG8JWBYqh9utmoz71CszaoOpNznRK9KM+Kd/JX93mzbV4JUTUz7
+ eosTdN8sMGWr1nquQtXPSzIWoA0BnarM1inDOwurO7IyxVkJQBTArRMDXymm71aZVK
+ Kb7XG6tWCRvO9psUbAmyQdiVXSsvHDc9C/ezsdTSQ7BmQTzxNXCo567dvDCYZljFFT
+ Cz9TH8w2C5RHkcvt8GW8uZ887m8wr0/yQkzE15Q1dISGw4PVcbQusN06rj+GQ4r36U
+ VcgmfDnRif7kuvHf8cTEyevhSeD6cKU7HGv9zVUcVoxwH1ZehfkEiMwy/VSYTGulat
+ RfIjJSnGBVfMQ==
 X-Virus-Scanned: Debian amavisd-new at keithp.com
 Received: from elaine.keithp.com ([127.0.0.1])
  by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id OOD6eP0GWAAl; Tue, 28 Jan 2020 15:33:29 -0800 (PST)
+ with LMTP id ZEzBFwehzoUJ; Tue, 28 Jan 2020 15:34:47 -0800 (PST)
 Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id 28D8A3F2A895;
- Tue, 28 Jan 2020 15:33:29 -0800 (PST)
+ by elaine.keithp.com (Postfix) with ESMTPSA id 9C7F23F2A895;
+ Tue, 28 Jan 2020 15:34:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1580254409; bh=0/icW2R0xElBKWqbPW/bPBhWmuMOtQtHIR20kKLD03g=;
+ t=1580254487; bh=+p0k5tb8ZttMZ50WWyUz1i4/f41iRVLYEz/z8eBqkgM=;
  h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=agfYABxL+8XeLXPJyNtFERVlOtLD6NAZHw0DgnVZsF33zeO7au0TzBFDGLpuaHr//
- vzGmcRXmjcUqQS04PcaHUjXvo6YpUZ4K7BJS9Fe+EBuG+779zDiZFbjfTOgLTo9FK2
- uHuVy3EzKxFDT7h6KuCrlMPaLv8B6acU/VTswUT2o++jx6DCIQaPILk0UriO2105xa
- 1KMK46qicbQggG/+DosTX4XCEBnrepg14hGBEfbeTUpQDYRAWCPJLNobOjfzE1J+pv
- gLSEus9qRR0xIVDLlvJRxa49XqkcfYVmTSOkzIbSTQ1sz4gEER2KDNxnHMcRhDhNWd
- xn/x0mwO/kMAg==
+ b=UUxlameO2nWHeXy/510P28tBe/S/lwhjgYrcTBCQFW295vNlWfgCs4jYc7VjxV7QD
+ IEDU15UEhyCz0Iu9Oq1yULtgXqP9+1t5lSmbVutx7WR69wQBKnVMtx4flnEsgflt94
+ xpqk2JHciY0CZqZo3C2R8gpRoQQE9pbpbuNx0hdvXDvdtTS3zV3JJEjUDXkqMcSlFc
+ mrArL7/9sT5DIYPmb6y/qLUtix/IR4MXRpkWnOvKnQH2wO9wtmvii5V8xAnGc8eDV8
+ h0yz/O7xO+akHoAcFsypX710nkzIQOZLHxenzd1qh+wDlLMfUhrlvxryk0gYbDDjmP
+ rkPBfx06g4YxA==
 Received: by keithp.com (Postfix, from userid 1000)
- id 1625A1582162; Tue, 28 Jan 2020 15:33:29 -0800 (PST)
-To: Alistair Francis <alistair23@gmail.com>
-Cc: "qemu-devel\@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ id 8832B1582162; Tue, 28 Jan 2020 15:34:47 -0800 (PST)
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
  Palmer Dabbelt <palmer@dabbelt.com>,
  Alistair Francis <Alistair.Francis@wdc.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "open list\:RISC-V" <qemu-riscv@nongnu.org>
-Subject: Re: [PATCH] riscv: Separate FPU register size from core register size
- in gdbstub
-In-Reply-To: <CAKmqyKOpG1QYD_w1EHEUEs-8J1RAx=k8xMqxRZ5H0nD2N7q_+w@mail.gmail.com>
-References: <20200128223955.464556-1-keithp@keithp.com>
- <CAKmqyKOpG1QYD_w1EHEUEs-8J1RAx=k8xMqxRZ5H0nD2N7q_+w@mail.gmail.com>
-Date: Tue, 28 Jan 2020 15:33:28 -0800
-Message-ID: <87o8unrwaf.fsf@keithp.org>
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-riscv@nongnu.org
+Subject: Re: [PATCH] riscv: Add semihosting support [v3]
+In-Reply-To: <20200128231840.508986-1-keithp@keithp.com>
+References: <20200128231840.508986-1-keithp@keithp.com>
+Date: Tue, 28 Jan 2020 15:34:47 -0800
+Message-ID: <87lfprrw88.fsf@keithp.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
  micalg=pgp-sha256; protocol="application/pgp-signature"
@@ -105,16 +102,13 @@ From: "Keith Packard" via <qemu-devel@nongnu.org>
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Alistair Francis <alistair23@gmail.com> writes:
+Keith Packard <keithp@keithp.com> writes:
 
-> You need brackets around all if statements, besides that:
+> Adapt the arm semihosting support code for RISCV. This implementation
+> is based on the standard for RISC-V semihosting as documented in
 
-Sorry for the noise; I caught that and sent another version of this
-patch.
-
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Thanks for your review!
+Sorry for the noise on the list; I failed to run checkpatch.pl before
+submitting. I've re-submittd [v4] with the formatting errors corrected.
 
 =2D-=20
 =2Dkeith
@@ -124,19 +118,19 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl4wxMgACgkQ2yIaaQAA
-ABGLmw//UdfL49nt27THQVkMeALI28cXeP31xY2GWXvrCjRBWhfAZYjITZeAAAMV
-BVvLoGaykJvjjWrwJdHo7anuKl0Oy3DTV8Bm/BZDImC2TNQU3jTaQRCxmkQkH5DA
-ad8bfhtgcfAtc+r2Z02e8ivjDkPrlFPetj10LaWXGqwO5c6Q/FQxcKNSyPYK02NX
-q63XH15evtUVnMszI6vGEnOorWkQKFIL45VeO5/s9jdPlyAPZtn/YJF1dtv4ZFJv
-tjo9Tnlzzj/+/ruZK0HpsEczn7oIFYxiZTagAR5FaAanuw20YcZpRLp0r+xlJxAk
-uXyaZiBoDENotH8RRUN8keTLRtCVfeuwLaGYgdZK7HzgUDSXZleaE88udR06e/xL
-t3ucvpDNeOdZehxJrjuy+9MnzEGiwUHzao7o4XvmM78bYHTrBFMFbH58FnOoQMnU
-XYA92c9Ebmk5tHLe8BdU0YnIKJqPbDnU4SFWiRN6z1UD3aOyE0z5Z+isCSMTkRZ6
-d84r1p1ULv9LijJsQzYMwFaax6YUw36sc9WA+e/G+dKza7816kH+eNehDcsXyynU
-wnsbLxkoNT6AnVhpU5bed5GILDkgoMqEFaAdVwstVptFK5qHG554SHNAf8vof/NX
-ULRLGw4nYZj8szMAZUplT4QT7NstfFHe56ZMlbhHN+wmJ+HR4Zs=
-=Tfcs
+iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl4wxRcACgkQ2yIaaQAA
+ABH7qg/9FVPgw6oQtuHRtcbrT+QXuzq4zJ9v2przHuXeLcGnuoKyvoaXG8Tr3XuK
+hthU80KlfwVx1OJ9aBGD2/cRxFxzggBmEeQthpxM2KIMFrMIv+r4/X8IcEXsD5tg
+pfzRGDs6JhxAd268TwPCQqlN7XUITMJEbZaERDkkiSKcEj5UZlhFflCKceccUWP3
+klgV/xIoMahHbgALzoeikUPSGenjQMyYH2Y/OfznH0ypJRl2E0vvKIrUYfrwrI3P
+P87HWXIYukTKxIJLAZKwEzp6AYpNiG2iAXac6c/zJBto/BSmiux83RzpROE41NrW
+zuYep4XISLS4IQ6OsyaaRdjJIyB22wOUhQs0HCa6OIWSowkzW+Xb/S/YpSF/0ISN
++chPFNobHSFuOAF9IJq3DtpzXQpQ0ByA+MmUaNgfPtzt8zmuLjSBS4QT+U+H+mvL
+rL/KM96pGNGjnHiCdzLSAShKfhIDSkofBg3Gv9ixVoXXEOm43f4HGdXU8STwheqS
+jYSD/RSGbdpCR4yqxWsO+soFI39z1/jgsrKn0XK9QGox/WcH7M1g9X9rDupP/WJn
+5DlgJKBcDnHPVcGVVky9/GS+3AkIpdd8hvgLWUOUrQ3IDath0MemQaR82hCimlNr
+zhyoPOdxcOUxS7czAjFWJHGur117oFdWOScBACjbkm8IlhTYz2A=
+=hemM
 -----END PGP SIGNATURE-----
 --=-=-=--
 
