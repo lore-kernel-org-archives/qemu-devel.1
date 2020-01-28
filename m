@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C1B4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C703C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:57:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19AF42467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 178B82467E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jan 2020 18:57:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Al0fLKeo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19AF42467E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WHnEj13F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 178B82467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwW32-0003Rh-9A
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:57:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36103)
+	id 1iwW3J-0003g6-53
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 13:57:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7V-00035y-0h
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:50 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5w-0000vL-PB
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iwV7S-0007NM-RA
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:47 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38564)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iwV5u-0003ea-Hl
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:12 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:38602)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iwV7S-0007LT-Ih
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:57:46 -0500
-Received: by mail-wr1-x442.google.com with SMTP id y17so17113755wrh.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:57:46 -0800 (PST)
+ id 1iwV5u-0003ce-AF
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 12:56:10 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id a9so3569673wmj.3
+ for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 09:56:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gDbjRY+sXEXuT2kbj6ue9gfCsmUR/yWoWCjqG6jN4gk=;
- b=Al0fLKeoxZO4apkLBy4ThiVlUth/eeVyOcrZNCYvpj0oxhD2EwVXzkqLpIgpzcgkHz
- PMNQiA42k9caGHUgDRWJ4iS/7p7Amplb5wBepWdGLSZOpvvMcJpx4xoIwPSOeRIyiGsM
- xnYJy6PoU0r3YJut2p/owI7oL64pYhiMEAPlI+XM38o0RIUcWyEUeRm/gc9nWfcSi6/r
- EszU6r7u14p7iI/u0NH/aHk1YtvhBNqRDgJkd9SQgtQqeqJsrt/R3LKyAMoh5Eg2ooJg
- kF4Q/k+4orwjmo+XlBp+Izvr/0QMSuRe3kP6Ar/36/qlPxxnwHALpNIXA7bgYIO7mIlZ
- Uk/Q==
+ bh=dwvuFVVrkbo9Wc98gZC3wbI0ZbeUVor6//1tXy84EAY=;
+ b=WHnEj13Fp24ZR6n2RVtIjb/FBqNnF2fFaZiCq0DdW8/7HIWZMvL2a6eCtjPspeU77Z
+ 3zw+Sz7ROK3Zpgkm0kfDExzvsNyT6JD6IdbGaeftMEkU1NoFTCd6LTj9mnUTpL8zgZvg
+ FcqES26mJLVoFEKcsW+2s4LRUq7GWE9khR/UgbD6PCXB3QwpWYr9y9oDFY9AbcGaxqHg
+ 636Jy3gKfXXeETMH9cxyhY+bM10p+CGxiBx6fIUdZccM86gPFdWeQkEmVcX7VUisaDa+
+ KvnQRbAGxSaSDGy4hCbLiKNwTliX8mDHVBD0jEjETrX+b80DI999bGGUz9ADfVW1MhkO
+ ih9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gDbjRY+sXEXuT2kbj6ue9gfCsmUR/yWoWCjqG6jN4gk=;
- b=TEdT3UBpEE1egUvZtV1CuYsZ4KF7DzOvEMyLoZvsTvZCe2lq0OS6WGQZfueslQshqJ
- pop4VFY/2Cg6jILV1Ez15U5vE2OPaOZx3c/YW+NHFzp5+Z4u05NHhNLI/+7IGdKIUIhv
- aN7JG8dMxc9ZdyQ8blKlkIKLgNZp7sB2qA3bqdkS5mTkxVUT++PsU8euBrOnroUjiuzo
- mmG6fMZzQu01DfXla9zCk5txef6fQOGswa9Gqp1kR9zcHePL6eshDeGYIxB6o+SSS/gj
- xk0sR5zk06BJDt2+VSN27X4uhDOP/tUjbwdpW7adOtj6PcOBRbf97MfwnPFNxdInDUFY
- QOzA==
-X-Gm-Message-State: APjAAAV2MY8hfCiXFXk1z5mTfNPzs7fT6cvMj1DslESnLGqVVNGrsF2N
- O9RLJMPQJIg+oFxwKAB+d9O20NTl
-X-Google-Smtp-Source: APXvYqxmF6NPPtRx9H+yBRmQpWC5DkdAjjA6r/au6CdU0qfj4q0CGqySoL7EDgjkhpJpBOqKw96bvA==
-X-Received: by 2002:adf:c746:: with SMTP id b6mr29684771wrh.298.1580234265285; 
- Tue, 28 Jan 2020 09:57:45 -0800 (PST)
+ bh=dwvuFVVrkbo9Wc98gZC3wbI0ZbeUVor6//1tXy84EAY=;
+ b=Gn2Zk1pj26hrwMnFR9kUIUymoFdjh5gMGwRlQMrSyHsv5qnp9A5LD9cwLAYYkuPIX/
+ aHF47WC3iN+hVV9ViKwA2dxFCyK2HenpKVJvJvAhVyKx1Q+p1PYNVL07FxKMToQJoYv6
+ QnlO6r4wCfRap3x8z0afHnhyMaP5aedOXvdnyDCAcI6vwz6520AWqsGnHbvNdl90JJic
+ 42gEWszLV0kaWr5lQCT2MBhTEKsrQXSk4ZDVk381eYAtCRbxC4Ej8ytzcb7ePJGmzIDq
+ Xx3Y+B2ImrYLXyQTnJTcRLRDYS6R0kRHqLXM5aVd6mbNfBbG1g3AriJQQ6BlIGxe8ICf
+ uIZA==
+X-Gm-Message-State: APjAAAWvh2wEJlNIqHkBmIjY+CASxuq2TJnvTKUf+ep5F8BJkayMhVXo
+ lJhZV4dphBYUWE6j/aMDdL/FJ8VI
+X-Google-Smtp-Source: APXvYqx/HYY8vvCt6aBI5YqPwLWKj3IzklXGlYjfoC4vYN7GvX9pLWZm18B7tL0Uc6CyDFlmByY3Uw==
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr6161000wmk.131.1580234169114; 
+ Tue, 28 Jan 2020 09:56:09 -0800 (PST)
 Received: from localhost.localdomain (93-36-56-206.ip58.fastwebnet.it.
  [93.36.56.206])
- by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.57.43
+ by smtp.gmail.com with ESMTPSA id o4sm27046968wrx.25.2020.01.28.09.56.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jan 2020 09:57:44 -0800 (PST)
+ Tue, 28 Jan 2020 09:56:08 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 101/142] meson: convert hw/gpio
-Date: Tue, 28 Jan 2020 18:53:01 +0100
-Message-Id: <20200128175342.9066-102-pbonzini@redhat.com>
+Subject: [PATCH 059/142] meson: convert dump/
+Date: Tue, 28 Jan 2020 18:52:19 +0100
+Message-Id: <20200128175342.9066-60-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200128175342.9066-1-pbonzini@redhat.com>
 References: <20200128175342.9066-1-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,72 +103,121 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/gpio/Makefile.objs | 12 ------------
- hw/gpio/meson.build   | 12 ++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 13 insertions(+), 13 deletions(-)
- delete mode 100644 hw/gpio/Makefile.objs
- create mode 100644 hw/gpio/meson.build
+ Makefile.objs      | 3 +--
+ Makefile.target    | 1 -
+ configure          | 4 ++++
+ dump/Makefile.objs | 3 ---
+ dump/meson.build   | 4 ++++
+ meson.build        | 9 +++++++++
+ 6 files changed, 18 insertions(+), 6 deletions(-)
+ delete mode 100644 dump/Makefile.objs
+ create mode 100644 dump/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index c9999a846b..d9b7d6b912 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -8,7 +8,6 @@ devices-dirs-y += char/
- devices-dirs-y += cpu/
- devices-dirs-y += display/
- devices-dirs-y += dma/
--devices-dirs-y += gpio/
- endif
+diff --git a/Makefile.objs b/Makefile.objs
+index 56d5e855da..6a99d750f6 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -35,8 +35,7 @@ qom-obj-y = qom/libqom.fa
+ # single QEMU executable should support all CPUs and machines.
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = dump/
+-common-obj-y += monitor/
++common-obj-y = monitor/
+ common-obj-y += net/
+ common-obj-$(CONFIG_LINUX) += fsdev/
+ 
+diff --git a/Makefile.target b/Makefile.target
+index 638e550530..06a5744f4a 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -155,7 +155,6 @@ endif #CONFIG_BSD_USER
+ ifdef CONFIG_SOFTMMU
+ obj-y += arch_init.o cpus.o gdbstub.o balloon.o ioport.o
+ obj-y += qtest.o
+-obj-y += dump/
+ obj-y += hw/
+ obj-y += monitor/
+ obj-y += qapi/
+diff --git a/configure b/configure
+index 1af0a73e39..3868d60222 100755
+--- a/configure
++++ b/configure
+@@ -2391,6 +2391,7 @@ int main(void) { lzo_version(); return 0; }
+ EOF
+     if compile_prog "" "-llzo2" ; then
+         libs_softmmu="$libs_softmmu -llzo2"
++        lzo_libs="-llzo2"
+         lzo="yes"
+     else
+         if test "$lzo" = "yes"; then
+@@ -2410,6 +2411,7 @@ int main(void) { snappy_max_compressed_length(4096); return 0; }
+ EOF
+     if compile_prog "" "-lsnappy" ; then
+         libs_softmmu="$libs_softmmu -lsnappy"
++        snappy_libs='-lsnappy'
+         snappy="yes"
+     else
+         if test "$snappy" = "yes"; then
+@@ -7150,10 +7152,12 @@ fi
+ 
+ if test "$lzo" = "yes" ; then
+   echo "CONFIG_LZO=y" >> $config_host_mak
++  echo "LZO_LIBS=$lzo_libs" >> $config_host_mak
+ fi
+ 
+ if test "$snappy" = "yes" ; then
+   echo "CONFIG_SNAPPY=y" >> $config_host_mak
++  echo "SNAPPY_LIBS=$snappy_libs" >> $config_host_mak
+ fi
+ 
+ if test "$bzip2" = "yes" ; then
+diff --git a/dump/Makefile.objs b/dump/Makefile.objs
 deleted file mode 100644
-index d305b3b24b..0000000000
---- a/hw/gpio/Makefile.objs
+index d2a5db3b81..0000000000
+--- a/dump/Makefile.objs
 +++ /dev/null
-@@ -1,12 +0,0 @@
--common-obj-$(CONFIG_MAX7310) += max7310.o
--common-obj-$(CONFIG_PL061) += pl061.o
--common-obj-$(CONFIG_PUV3) += puv3_gpio.o
--common-obj-$(CONFIG_ZAURUS) += zaurus.o
--common-obj-$(CONFIG_E500) += mpc8xxx.o
--common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
--
--obj-$(CONFIG_OMAP) += omap_gpio.o
--obj-$(CONFIG_IMX) += imx_gpio.o
--obj-$(CONFIG_RASPI) += bcm2835_gpio.o
--obj-$(CONFIG_NRF51_SOC) += nrf51_gpio.o
--obj-$(CONFIG_ASPEED_SOC) += aspeed_gpio.o
-diff --git a/hw/gpio/meson.build b/hw/gpio/meson.build
+@@ -1,3 +0,0 @@
+-obj-y += dump.o
+-common-obj-y += dump-hmp-cmds.o
+-obj-$(TARGET_X86_64) += win_dump.o
+diff --git a/dump/meson.build b/dump/meson.build
 new file mode 100644
-index 0000000000..5fc34b970c
+index 0000000000..2eff29c3ea
 --- /dev/null
-+++ b/hw/gpio/meson.build
-@@ -0,0 +1,12 @@
-+softmmu_ss.add(when: 'CONFIG_E500', if_true: files('mpc8xxx.c'))
-+softmmu_ss.add(when: 'CONFIG_GPIO_KEY', if_true: files('gpio_key.c'))
-+softmmu_ss.add(when: 'CONFIG_MAX7310', if_true: files('max7310.c'))
-+softmmu_ss.add(when: 'CONFIG_PL061', if_true: files('pl061.c'))
-+softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_gpio.c'))
-+softmmu_ss.add(when: 'CONFIG_ZAURUS', if_true: files('zaurus.c'))
++++ b/dump/meson.build
+@@ -0,0 +1,4 @@
++softmmu_ss.add(files('dump-hmp-cmds.c'))
 +
-+specific_ss.add(when: 'CONFIG_IMX', if_true: files('imx_gpio.c'))
-+specific_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_gpio.c'))
-+specific_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_gpio.c'))
-+specific_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_gpio.c'))
-+specific_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_gpio.c'))
-diff --git a/hw/meson.build b/hw/meson.build
-index f9e5adfb48..52577c3205 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('gpio')
- subdir('hyperv')
- subdir('i2c')
- subdir('ide')
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files('dump.c'), snappy, lzo])
++specific_ss.add(when: ['CONFIG_SOFTMMU', 'TARGET_X86_64'], if_true: files('win_dump.c'))
+diff --git a/meson.build b/meson.build
+index cac9c894f4..1ecc46d280 100644
+--- a/meson.build
++++ b/meson.build
+@@ -264,6 +264,14 @@ if 'CONFIG_FDT' in config_host
+   fdt = declare_dependency(compile_args: config_host['FDT_CFLAGS'].split(),
+                            link_args: config_host['FDT_LIBS'].split())
+ endif
++snappy = declare_dependency()
++if 'CONFIG_SNAPPY' in config_host
++  snappy = declare_dependency(link_args: config_host['SNAPPY_LIBS'].split())
++endif
++lzo = declare_dependency()
++if 'CONFIG_LZO' in config_host
++  lzo = declare_dependency(link_args: config_host['LZO_LIBS'].split())
++endif
+ 
+ create_config = find_program('scripts/create_config')
+ minikconf = find_program('scripts/minikconf.py')
+@@ -558,6 +566,7 @@ subdir('io')
+ subdir('chardev')
+ subdir('fsdev')
+ subdir('target')
++subdir('dump')
+ 
+ block_ss.add(files(
+   'block.c',
 -- 
 2.21.0
 
