@@ -2,59 +2,71 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A80C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C73E3C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A0DA20732
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:38:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0DA20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9C2602070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:52:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2602070E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwlfs-000823-HX
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:38:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40375)
+	id 1iwltA-0003Y3-PS
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:52:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iwlf7-0007Wj-Sr
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:37:39 -0500
+ (envelope-from <salil.mehta@huawei.com>) id 1iwlsS-00032e-Rv
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iwlf6-0002za-8U
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:37:37 -0500
-Received: from 7.mo7.mail-out.ovh.net ([46.105.43.131]:47042)
+ (envelope-from <salil.mehta@huawei.com>) id 1iwlsR-00075F-OP
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:51:24 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2068 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iwlf4-0002pO-Ca
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:37:34 -0500
-Received: from player772.ha.ovh.net (unknown [10.108.54.67])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 44B5114FCB3
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 12:37:32 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id 5A15AED17331;
- Wed, 29 Jan 2020 11:37:25 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH] ppc/pnv: change the PowerNV machine devices to be non user
- creatable
-Date: Wed, 29 Jan 2020 12:37:20 +0100
-Message-Id: <20200129113720.7404-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 7960956769324469222
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrfeeigddvlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+ (Exim 4.71) (envelope-from <salil.mehta@huawei.com>)
+ id 1iwlsO-0006y7-RJ; Wed, 29 Jan 2020 06:51:20 -0500
+Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.106])
+ by Forcepoint Email with ESMTP id E57DE94688458C62FB6F;
+ Wed, 29 Jan 2020 11:51:14 +0000 (GMT)
+Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
+ lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Wed, 29 Jan 2020 11:51:14 +0000
+Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
+ lhreml703-chm.china.huawei.com (10.201.108.52) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Wed, 29 Jan 2020 11:51:14 +0000
+Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
+ lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1713.004; 
+ Wed, 29 Jan 2020 11:51:14 +0000
+From: Salil Mehta <salil.mehta@huawei.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org"
+ <qemu-arm@nongnu.org>
+Subject: [Question] Regarding presence of duplicate ACPI CPU entries at two
+ nodes \\_SB.CXXX and \\_SB.CPUS.CXXX  of namespace
+Thread-Topic: [Question] Regarding presence of duplicate ACPI CPU entries at
+ two nodes \\_SB.CXXX and \\_SB.CPUS.CXXX  of namespace
+Thread-Index: AdXWmXYiOGpNwkpgSDKkSEKdULrKCQ==
+Date: Wed, 29 Jan 2020 11:51:14 +0000
+Message-ID: <590fb35353de473d9c689caead95c659@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.103]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.43.131
+ [fuzzy]
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,175 +78,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "drjones@redhat.com" <drjones@redhat.com>,
+ "sameo@linux.intel.com" <sameo@linux.intel.com>,
+ "mst@redhat.com" <mst@redhat.com>, Linuxarm <linuxarm@huawei.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ pbonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ "lersek@redhat.com" <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PowerNV machine emulates an OpenPOWER system and the PowerNV chip
-devices are models of the internal logic of the POWER processor. They
-can not be instantiated by the user on the QEMU command line.
+Hello,
 
-The PHB3/PHB4 devices could be an exception in the future after some
-rework on how the device tree is built. For the moment, exclude them
-also.
+Observation:
+If we launch Linux Guest VM using QEMU(running on any type host. I am using=
+ x86) with
+CPU based on any ARM64 architecture then I could see QEMU populating ACPI n=
+odes
+related to same CPU at 2 places of the ACPI namespace:
+1. \\_SB.CXXX
+2. \\_SB.CPUS.CXXX=20
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/pci-host/pnv_phb3.c      | 2 ++
- hw/pci-host/pnv_phb3_pbcq.c | 1 +
- hw/pci-host/pnv_phb4.c      | 3 ++-
- hw/pci-host/pnv_phb4_pec.c  | 2 ++
- hw/ppc/pnv_core.c           | 2 ++
- hw/ppc/pnv_homer.c          | 1 +
- hw/ppc/pnv_lpc.c            | 1 +
- hw/ppc/pnv_occ.c            | 1 +
- 8 files changed, 12 insertions(+), 1 deletion(-)
+Above results in Guest VM showing duplicate CPU entries in the sysfs for th=
+e same CPUS.
+I could make out the entries under \\_SB.CPUS.XXX are part of the container=
+.
 
-diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
-index f03399c40615..74618fadf085 100644
---- a/hw/pci-host/pnv_phb3.c
-+++ b/hw/pci-host/pnv_phb3.c
-@@ -1115,6 +1115,7 @@ static void pnv_phb3_class_init(ObjectClass *klass,=
- void *data)
-     dc->realize =3D pnv_phb3_realize;
-     device_class_set_props(dc, pnv_phb3_properties);
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo pnv_phb3_type_info =3D {
-@@ -1168,6 +1169,7 @@ static void pnv_phb3_root_port_class_init(ObjectCla=
-ss *klass, void *data)
-=20
-     device_class_set_parent_realize(dc, pnv_phb3_root_port_realize,
-                                     &rpc->parent_realize);
-+    dc->user_creatable =3D false;
-=20
-     k->vendor_id =3D PCI_VENDOR_ID_IBM;
-     k->device_id =3D 0x03dc;
-diff --git a/hw/pci-host/pnv_phb3_pbcq.c b/hw/pci-host/pnv_phb3_pbcq.c
-index 6f0c05be682a..f232228b0e28 100644
---- a/hw/pci-host/pnv_phb3_pbcq.c
-+++ b/hw/pci-host/pnv_phb3_pbcq.c
-@@ -335,6 +335,7 @@ static void pnv_pbcq_class_init(ObjectClass *klass, v=
-oid *data)
-     xdc->dt_xscom =3D pnv_pbcq_dt_xscom;
-=20
-     dc->realize =3D pnv_pbcq_realize;
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo pnv_pbcq_type_info =3D {
-diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
-index 61235d13a696..23cf093928ed 100644
---- a/hw/pci-host/pnv_phb4.c
-+++ b/hw/pci-host/pnv_phb4.c
-@@ -1290,7 +1290,7 @@ static void pnv_phb4_class_init(ObjectClass *klass,=
- void *data)
-     dc->realize         =3D pnv_phb4_realize;
-     device_class_set_props(dc, pnv_phb4_properties);
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--    dc->user_creatable  =3D true;
-+    dc->user_creatable  =3D false;
-     dc->reset           =3D pnv_phb4_reset;
-=20
-     xfc->notify         =3D pnv_phb4_xive_notify;
-@@ -1368,6 +1368,7 @@ static void pnv_phb4_root_port_class_init(ObjectCla=
-ss *klass, void *data)
-     PCIERootPortClass *rpc =3D PCIE_ROOT_PORT_CLASS(klass);
-=20
-     dc->desc     =3D "IBM PHB4 PCIE Root Port";
-+    dc->user_creatable =3D false;
-=20
-     device_class_set_parent_realize(dc, pnv_phb4_root_port_realize,
-                                     &rpc->parent_realize);
-diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
-index fd92041d69dc..68e1db3eac4f 100644
---- a/hw/pci-host/pnv_phb4_pec.c
-+++ b/hw/pci-host/pnv_phb4_pec.c
-@@ -490,6 +490,7 @@ static void pnv_pec_class_init(ObjectClass *klass, vo=
-id *data)
-=20
-     dc->realize =3D pnv_pec_realize;
-     device_class_set_props(dc, pnv_pec_properties);
-+    dc->user_creatable =3D false;
-=20
-     pecc->xscom_nest_base =3D pnv_pec_xscom_nest_base;
-     pecc->xscom_pci_base  =3D pnv_pec_xscom_pci_base;
-@@ -568,6 +569,7 @@ static void pnv_pec_stk_class_init(ObjectClass *klass=
-, void *data)
-=20
-     device_class_set_props(dc, pnv_pec_stk_properties);
-     dc->realize =3D pnv_pec_stk_realize;
-+    dc->user_creatable =3D false;
-=20
-     /* TODO: reset regs ? */
- }
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index f7247222bceb..234562040de3 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -325,6 +325,7 @@ static void pnv_core_class_init(ObjectClass *oc, void=
- *data)
-     dc->realize =3D pnv_core_realize;
-     dc->unrealize =3D pnv_core_unrealize;
-     device_class_set_props(dc, pnv_core_properties);
-+    dc->user_creatable =3D false;
- }
-=20
- #define DEFINE_PNV_CORE_TYPE(family, cpu_model) \
-@@ -423,6 +424,7 @@ static void pnv_quad_class_init(ObjectClass *oc, void=
- *data)
-=20
-     dc->realize =3D pnv_quad_realize;
-     device_class_set_props(dc, pnv_quad_properties);
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo pnv_quad_info =3D {
-diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
-index 93ae42f7e4d1..9a262629b73a 100644
---- a/hw/ppc/pnv_homer.c
-+++ b/hw/ppc/pnv_homer.c
-@@ -360,6 +360,7 @@ static void pnv_homer_class_init(ObjectClass *klass, =
-void *data)
-     dc->realize =3D pnv_homer_realize;
-     dc->desc =3D "PowerNV HOMER Memory";
-     device_class_set_props(dc, pnv_homer_properties);
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo pnv_homer_type_info =3D {
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index d1de98f04c08..5989d723c50c 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -762,6 +762,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
-id *data)
-     dc->realize =3D pnv_lpc_realize;
-     dc->desc =3D "PowerNV LPC Controller";
-     device_class_set_props(dc, pnv_lpc_properties);
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo pnv_lpc_info =3D {
-diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
-index 2173fac0e798..5a716c256edc 100644
---- a/hw/ppc/pnv_occ.c
-+++ b/hw/ppc/pnv_occ.c
-@@ -280,6 +280,7 @@ static void pnv_occ_class_init(ObjectClass *klass, vo=
-id *data)
-     dc->realize =3D pnv_occ_realize;
-     dc->desc =3D "PowerNV OCC Controller";
-     device_class_set_props(dc, pnv_occ_properties);
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo pnv_occ_type_info =3D {
---=20
-2.21.1
+estuary:/$ ls -al /sys/bus/acpi/devices/
+
+Observation 1: (belongs to \\_SB.C00X)
+ACPI0007:00 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:00=20
+ACPI0007:01 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:01
+ACPI0007:02 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:02
+ACPI0007:03 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:03
+ACPI0007:04 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:04
+ACPI0007:05 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:05
+
+Observation 2: (belongs to \\_SB.CPUS.C00X and under container ACPI0010:00 =
+part of \\_SB.CPUS)
+ACPI0007:06 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
+7:06 =20
+ACPI0007:07 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
+7:07=20
+ACPI0007:08 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
+7:08
+ACPI0007:09 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
+7:09
+ACPI0007:0a -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
+7:0a
+ACPI0007:0b -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
+7:0b
+ACPI0010:00 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00
+
+
+estuary:/$ cat /sys/bus/acpi/devices/ACPI0010\:00/path=20
+\_SB_.CPUS
+
+estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:00/uid=20
+0
+estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:00/path
+\_SB_.C000
+
+estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:06/uid=20
+0
+estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:06/path
+\_SB_.CPUS.C000
+
+
+
+QEMU Code Excerpt:
+I could trace with in QEMU AML code, the CPUS are being appended at 2 place=
+s:
+
+
+Code 1. File: hw/arm/virt-acpi-build.c (Cause of Observation 1 i.e. \\_SB.C=
+XXX )
+
+static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+{
+    uint16_t i;
+
+    for (i =3D 0; i < smp_cpus; i++) { --->{should be possible cpus anyways=
+}
+        Aml *dev =3D aml_device("C%.03X", i);
+        aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
+        aml_append(dev, aml_name_decl("_UID", aml_int(i)));
+        aml_append(scope, dev);
+    }
+}
+
+
+Code 2. File: hw/acpi/cpu.c (Cause of Observation 2 i.e. \\_SB.CPUS.CXXX)
+
+void build_cpus_aml(..)
+{
+[...]
+  cpus_dev =3D aml_device("\\_SB.CPUS");
+  {
+    [...]
+            /* build Processor object for each processor */
+        for (i =3D 0; i < arch_ids->len; i++) {
+            Aml *dev;
+            Aml *uid =3D aml_int(i);
+            GArray *madt_buf =3D g_array_new(0, 1, 1);
+            int arch_id =3D arch_ids->cpus[i].arch_id;
+
+            if (opts.acpi_1_compatible && arch_id < 255) {
+                dev =3D aml_processor(i, 0, 0, CPU_NAME_FMT, i);
+            } else {
+                dev =3D aml_device(CPU_NAME_FMT, i);
+                aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007"=
+)));
+                aml_append(dev, aml_name_decl("_UID", uid));
+            }
+    [...]
+  }   =20
+[...]
+}
+
+
+
+Questions:
+Q1. I could not understand the purpose of keeping acpi_dsdt_add_cpus() afte=
+r the code 2.
+     was introduced as part of the below change and which is already adding=
+ CPUS related
+     AML to \\_SB.CPUS namespace?
+
+acpi: cpuhp: add CPU devices AML with _STA method
+commit 5e1b5d93887b52eede156f846b6c4c5c8bbcfcdb
+
+Q2. Do we really require CPUs being added by acpi_dsdt_add_cpus() in \\_SB.=
+CXXX
+     Namespace OR is it a stray code left?
+
+
+
+Please help to correct if there is a gap in my understanding here and pleas=
+e
+forgive me if I have terribly missed out something very basic here.
+
+Many thanks!
+
+Best Regards
+Salil
+
+
+
+
+
+
+
 
 
