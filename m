@@ -2,92 +2,81 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9297C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB68C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:35:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99202206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3646C206F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:35:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OTEKiEVO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99202206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JR8JMcsD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3646C206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwpHq-0003bK-PK
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 10:29:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46818)
+	id 1iwpN0-0005CS-6h
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 10:35:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1iwpHG-00038Y-Tv
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:29:15 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iwpME-0004lU-5U
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:34:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1iwpHF-0008Pg-SX
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:29:14 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35259)
+ (envelope-from <mrolnik@gmail.com>) id 1iwpMB-0000sM-Bz
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:34:22 -0500
+Received: from mail-qk1-x72a.google.com ([2607:f8b0:4864:20::72a]:43774)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1iwpHF-0008MI-Kb
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:29:13 -0500
-Received: by mail-wr1-x443.google.com with SMTP id g17so20663499wro.2
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 07:29:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:subject:cc:from:to:in-reply-to:references:message-id
- :mime-version:content-transfer-encoding;
- bh=/OepjiM66bZe8KwsOgHG8bTCJYzjbGSZ/EkEmj4RXsc=;
- b=OTEKiEVOBmM8V1L4U7WPSvkW0qbL9igEx4jyxr1Po7mAQQ4RH5E/4GdzH9ngaexTFc
- uBbf+wHCRH1re131HKG6JHGHpZMFyPRizOqdAqRW2GMn267WswLUJt37C48tv0X0cQeC
- cQqsQEzSCER/NGKz7SMf5nqIWDr4TbslA/VWo0maCrGucS9l1OWQa23C/a7MZFCQ00bb
- vJeb8DvIJCbsUmt7NxrOVuHiUFjd6DUALeipPivQ2/jN1f3dmM1mdfHuE0LWTrecGY6z
- Tue51n8g0MqlxmhrInjgPEDj2sKP+ih9DAesQUQO4EXqZqO4BuiaHUjgBRdekulH9f3t
- t7WQ==
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iwpMB-0000q0-7C
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:34:19 -0500
+Received: by mail-qk1-x72a.google.com with SMTP id j20so17381604qka.10
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 07:34:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4qy8ST0BdalimhpIa5QN0/h5YE3vT29K+fjPkcYNBeE=;
+ b=JR8JMcsDgKSrb6shJ6v2++pe2BiForm6tdnRMNiXaHz9SVsEcM8Mu8M/DKnxBbidHl
+ TJrsk5WHdiAYlzp9l/QhNB2R5GzeMMTCBc4Pw6bdfeJAJCX3RcmWFXBrkm/B5CzoC1LA
+ OI5RGtUKN5ZCL3+HEFOmzwmqMa7s73W0tjMCIIhN5EW9oQdVuRNQnIwVVXzPN1bVHI4L
+ bOTdzeUf9xl/c6ZFnw825wwVVLEjKQcSGDyaRz3axQ+/jW/8w6Nd1qc0PtBdFMYc45XY
+ pKl3364yImUUutMWBQmqAuZfSx5LDkTYP32CpzSOeY++/byZ7HD1VYXQ3L1WZqJwHO3b
+ 4BBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:cc:from:to:in-reply-to:references
- :message-id:mime-version:content-transfer-encoding;
- bh=/OepjiM66bZe8KwsOgHG8bTCJYzjbGSZ/EkEmj4RXsc=;
- b=YuJKTXyrk70EQGmCBxZtEI+iPwY4/kY5oJHg5mlMDs8rvSoIEfnZiIRGE1qxJYbX6H
- sz2NOTXC1ecfft21BZoI/Qtbtfh9b8dt+BKp1qLBPcSUx12/af9KD4ANY67OaOCARAw0
- 36bmPZsysgG6/fPtRRBU/rhqnL7XDBptZu7i+J1s66GBbvuYY//8YDd4UnXW0EHKSc2f
- V/gwMdK+AsvVSAHipWhX6kNkX9PyFqshyYKannF8NlW44+yj3+NFwAtnmti5QER8DOf9
- 37BneEOrcRpHK9ly2pH0Pgay3llDRW8rXoNLCtb+eO/iv9EEnLOkntbFm1D9Z4UyLCji
- p2xQ==
-X-Gm-Message-State: APjAAAUG3L9wQ0ASllx/z9Wbi8rfuUAQgjovYc3ACfhj2vR1fDuPW50r
- MUF3LjXZpsFPEAXGvUPYLvuzqw==
-X-Google-Smtp-Source: APXvYqxSdv2Bu4x6KY+14S+ce+NFPS1gCqWJTTT3ubj5CcfxJtt6kaAOSD5gmao6t9a2I9gCXL8qVQ==
-X-Received: by 2002:a5d:4ec2:: with SMTP id s2mr33695170wrv.291.1580311751448; 
- Wed, 29 Jan 2020 07:29:11 -0800 (PST)
-Received: from localhost ([2a00:79e0:d:11:1da2:3fd4:a302:4fff])
- by smtp.gmail.com with ESMTPSA id b17sm3264260wrx.15.2020.01.29.07.29.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 07:29:11 -0800 (PST)
-Date: Wed, 29 Jan 2020 07:29:11 -0800 (PST)
-X-Google-Original-Date: Wed, 29 Jan 2020 15:28:50 GMT (+0000)
-Subject: Re: [PATCH] riscv: sifive_u: Add a "serial" property for board serial
- number
-CC: Alistair Francis <Alistair.Francis@wdc.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, sagark@eecs.berkeley.edu,
- qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-From: Palmer Dabbelt <palmerdabbelt@google.com>
-To: bmeng.cn@gmail.com
-In-Reply-To: <CAEUhbmXRaHqxNt2XCgsjUDfR+VoMOjb5f38V6Yu35HWV1nkKeQ@mail.gmail.com>
-References: <CAEUhbmXRaHqxNt2XCgsjUDfR+VoMOjb5f38V6Yu35HWV1nkKeQ@mail.gmail.com>
- <CAEUhbmUuCOzd_Y6ip_oh13gt83rM8EffdXWRCa=KybOjAvEN-A@mail.gmail.com>
- <mhng-b2e05f4a-7c3d-4be1-a843-a19b4054760a@palmerdabbelt.mtv.corp.google.com>
-Message-ID: <mhng-e3089574-e78c-4b6c-961e-cac55f0f23d4@palmerdabbelt-glaptop1>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4qy8ST0BdalimhpIa5QN0/h5YE3vT29K+fjPkcYNBeE=;
+ b=lEEPcE2rjx5PmQxRYwclNYiaYIfVE/REuU76zymMsboZJB8HvnTCkZB9Xhpf+lXppe
+ kNdSmAvNSvz4TCSGX/qCEKP+WKCWv2s4fvObkWBYjt57EgmKeb8JOQDYT0wyMAfvxywj
+ 8UU22o4SgAZHDShCWV/pvVXUsLl1ghtAH5XoGFnykNe9EvwTJaRh6iqYTHSSsl0cySV1
+ WlJH36BmjX1MXRPCV8WifbEpeLqz0kOW7FFJ8UNOkSVV+Mg1Kn3lAwXUTmhFP1BwM+tS
+ EHngIjMdPwEfrf23ORZLNvjEEifxh3PmupcL8c9ys0jJvWr9C4gE/3uCbBwHMlX+Z7w8
+ c5kg==
+X-Gm-Message-State: APjAAAVzsFxkH+ZxqlcA0+DPrZq2mspP3nzUtSKZLUJ5DnKCTIFqqNTO
+ zQNX4uLfknAMc1cNbrFiulMZVrraA9nd1aYqgn0=
+X-Google-Smtp-Source: APXvYqw2p0T4W5jxFmQ870WAOAMpUqegbh7BwGML3e6wdBC1TmHoG2/H8tW63PuOehFJHmE1Iz1dMYZPeLb99eXzJhs=
+X-Received: by 2002:ae9:f40b:: with SMTP id y11mr230636qkl.378.1580312058293; 
+ Wed, 29 Jan 2020 07:34:18 -0800 (PST)
+MIME-Version: 1.0
+References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1580079311-20447-3-git-send-email-aleksandar.markovic@rt-rk.com>
+ <20200129122058.3714c0c4195afc62fc0ce297@kent.ac.uk>
+ <CAL1e-=g=6zXB6pW4XYJ_NXYe4tu43N4DSUBPw=tJPqT1WvKCqg@mail.gmail.com>
+In-Reply-To: <CAL1e-=g=6zXB6pW4XYJ_NXYe4tu43N4DSUBPw=tJPqT1WvKCqg@mail.gmail.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Wed, 29 Jan 2020 17:34:06 +0200
+Message-ID: <CAK4993hnLhdapLxrwGVWYJ21Sr2tbMG1g4ye9h1LU0Pyg6VmVg@mail.gmail.com>
+Subject: Re: [PATCH rc3 02/30] target/avr: Introduce AVR CPU class object
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000de70f6059d491205"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::72a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,53 +88,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "S.Harris" <S.E.Harris@kent.ac.uk>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Sarah Harris <seh53@kent.ac.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 Jan 2020 07:52:05 GMT (+0000), bmeng.cn@gmail.com wrote:
-> Hi Palmer,
+--000000000000de70f6059d491205
+Content-Type: text/plain; charset="UTF-8"
+
+Sounds good.
+
+Sent from my cell phone, please ignore typos
+
+On Wed, Jan 29, 2020, 5:12 PM Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
+
+> On Wed, Jan 29, 2020 at 1:20 PM Sarah Harris <seh53@kent.ac.uk> wrote:
+> >
+> > Hi,
+> >
+> > I think I've found a minor bug: the stack pointer should be initialised
+> to the size of SRAM in some or most cases.
+> > Currently, SP is initialised to zero.
+> >
 >
-> On Fri, Nov 22, 2019 at 10:38 AM Palmer Dabbelt
-> <palmerdabbelt@google.com> wrote:
->>
->> On Thu, 21 Nov 2019 17:10:18 PST (-0800), bmeng.cn@gmail.com wrote:
->> > On Sat, Nov 16, 2019 at 11:08 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->> >>
->> >> At present the board serial number is hard-coded to 1, and passed
->> >> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
->> >> the serial number to generate a unique MAC address for the on-chip
->> >> ethernet controller. When multiple QEMU 'sifive_u' instances are
->> >> created and connected to the same subnet, they all have the same
->> >> MAC address hence it creates a unusable network.
->> >>
->> >> A new "serial" property is introduced to specify the board serial
->> >> number. When not given, the default serial number 1 is used.
->> >>
->> >> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->> >> ---
->> >>
->> >>  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
->> >>  include/hw/riscv/sifive_u.h |  1 +
->> >>  2 files changed, 21 insertions(+), 1 deletion(-)
->> >>
->> >
->> > ping?
->>
->> Sorry, it looks like I dropped this one.  I've put it in the queue for 5.0,
->> with a
->>
->> Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+> Very good (that you spotted the bug)!
 >
-> Has this been applied somewhere?
-
-Weird, not sure how I managed to screw this up again.  It's actually on for-master as 
-
-    * a828041ba6 - riscv: sifive_u: Add a "serial" property for board serial number (50 seconds ago) <Bin Meng>
-
-with any luck I'll manage to avoid screwing it up a third time.
-
+> > It seems modern AVRs set SP to the size of SRAM (RAMEND) at power-on,
+> though a few older ones initialise to zero.
+> > The ATmega328 (from 2009) [1], ATmega2560 (from 2005) [2], ATtiny2313
+> (from 2003) [6], and ATtiny85 (from 2005) [3] all use RAMEND.
+> > The ATmega8 (from 2001) [4], ATmega8535 (from 2002) [5], and AT90S8535
+> (from 1998) [7] use zero.
 >
-> Regards,
-> Bin
+> It looks we'll have tremendous "fun" dealing with huge variety of AVR SoCs.
+>
+> > I haven't found a list of which AVRs use which value (other than reading
+> every datasheet).
+>
+> Yes, I find this to be a big practical problem, this glaring lack of
+> some summary documentation, and, unfortunately, this affects not only
+> this particular case (SP initialization). It appears to me that for
+> many features and details (especially regarding SoC devices) one will
+> have to carefully examine multiple documents, as you did in this
+> email.
+>
+> >
+> > Given that GCC performs this initialisation in software anyway (so what
+> the hardware does doesn't matter), I think this is a minor issue.
+> > It will only affect hand written assembly programs that don't do their
+> own initialisation (which seems to be discouraged as not all resets are
+> power-on events).
+> > I'm not sure what, if anything, needs to be done about it but it might
+> be worth fixing now we're emulating specific chips.
+> >
+>
+> Let's think a little bit about it. In my honest opinion, this may be
+> handled after the series merge, and if you guys agree, there is no
+> rush.
+>
+> > Kind regards,
+> > Sarah Harris
+> >
+>
+> Thanks!
+> Aleksandar
+>
+> > [1]
+> http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
+> (section 6.5.1)
+> > [2]
+> http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2549-8-bit-AVR-Microcontroller-ATmega640-1280-1281-2560-2561_datasheet.pdf
+> (section 7.6)
+> > [3]
+> http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf
+> (section 4.6.1)
+> > [4]
+> http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf
+> (page 13)
+> > [5] http://ww1.microchip.com/downloads/en/DeviceDoc/doc2502.pdf (page
+> 12)
+> > [6]
+> http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2543-AVR-ATtiny2313_Datasheet.pdf
+> (page 11)
+> > [7] http://ww1.microchip.com/downloads/en/DeviceDoc/doc1041.pdf (page
+> 20)
+> >
+> > On Sun, 26 Jan 2020 23:54:43 +0100
+> > Aleksandar Markovic <aleksandar.markovic@rt-rk.com> wrote:
+> >
+> > > +static void avr_cpu_reset(CPUState *cs)
+> > > +{
+> > > +    AVRCPU *cpu = AVR_CPU(cs);
+> > > +    AVRCPUClass *mcc = AVR_CPU_GET_CLASS(cpu);
+> > > +    CPUAVRState *env = &cpu->env;
+> > > +
+> > > +    mcc->parent_reset(cs);
+> > > +
+> > > +    env->pc_w = 0;
+> > > +    env->sregI = 1;
+> > > +    env->sregC = 0;
+> > > +    env->sregZ = 0;
+> > > +    env->sregN = 0;
+> > > +    env->sregV = 0;
+> > > +    env->sregS = 0;
+> > > +    env->sregH = 0;
+> > > +    env->sregT = 0;
+> > > +
+> > > +    env->rampD = 0;
+> > > +    env->rampX = 0;
+> > > +    env->rampY = 0;
+> > > +    env->rampZ = 0;
+> > > +    env->eind = 0;
+> > > +    env->sp = 0;
+> > > +
+> > > +    env->skip = 0;
+> > > +
+> > > +    memset(env->r, 0, sizeof(env->r));
+> > > +
+> > > +    tlb_flush(cs);
+> > > +}
+>
+
+--000000000000de70f6059d491205
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto">Sounds good.<br><br><div data-smartmail=3D"gmail_signatur=
+e">Sent from my cell phone, please ignore typos </div></div><br><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Jan 29, 2020=
+, 5:12 PM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail=
+.com">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br></div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex">On Wed, Jan 29, 2020 at 1:20 PM Sarah Harris &lt;<a href=3D"m=
+ailto:seh53@kent.ac.uk" target=3D"_blank" rel=3D"noreferrer">seh53@kent.ac.=
+uk</a>&gt; wrote:<br>
+&gt;<br>
+&gt; Hi,<br>
+&gt;<br>
+&gt; I think I&#39;ve found a minor bug: the stack pointer should be initia=
+lised to the size of SRAM in some or most cases.<br>
+&gt; Currently, SP is initialised to zero.<br>
+&gt;<br>
+<br>
+Very good (that you spotted the bug)!<br>
+<br>
+&gt; It seems modern AVRs set SP to the size of SRAM (RAMEND) at power-on, =
+though a few older ones initialise to zero.<br>
+&gt; The ATmega328 (from 2009) [1], ATmega2560 (from 2005) [2], ATtiny2313 =
+(from 2003) [6], and ATtiny85 (from 2005) [3] all use RAMEND.<br>
+&gt; The ATmega8 (from 2001) [4], ATmega8535 (from 2002) [5], and AT90S8535=
+ (from 1998) [7] use zero.<br>
+<br>
+It looks we&#39;ll have tremendous &quot;fun&quot; dealing with huge variet=
+y of AVR SoCs.<br>
+<br>
+&gt; I haven&#39;t found a list of which AVRs use which value (other than r=
+eading every datasheet).<br>
+<br>
+Yes, I find this to be a big practical problem, this glaring lack of<br>
+some summary documentation, and, unfortunately, this affects not only<br>
+this particular case (SP initialization). It appears to me that for<br>
+many features and details (especially regarding SoC devices) one will<br>
+have to carefully examine multiple documents, as you did in this<br>
+email.<br>
+<br>
+&gt;<br>
+&gt; Given that GCC performs this initialisation in software anyway (so wha=
+t the hardware does doesn&#39;t matter), I think this is a minor issue.<br>
+&gt; It will only affect hand written assembly programs that don&#39;t do t=
+heir own initialisation (which seems to be discouraged as not all resets ar=
+e power-on events).<br>
+&gt; I&#39;m not sure what, if anything, needs to be done about it but it m=
+ight be worth fixing now we&#39;re emulating specific chips.<br>
+&gt;<br>
+<br>
+Let&#39;s think a little bit about it. In my honest opinion, this may be<br=
+>
+handled after the series merge, and if you guys agree, there is no<br>
+rush.<br>
+<br>
+&gt; Kind regards,<br>
+&gt; Sarah Harris<br>
+&gt;<br>
+<br>
+Thanks!<br>
+Aleksandar<br>
+<br>
+&gt; [1] <a href=3D"http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7=
+810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf" rel=3D"noreferrer=
+ noreferrer" target=3D"_blank">http://ww1.microchip.com/downloads/en/Device=
+Doc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf</a> (se=
+ction 6.5.1)<br>
+&gt; [2] <a href=3D"http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2=
+549-8-bit-AVR-Microcontroller-ATmega640-1280-1281-2560-2561_datasheet.pdf" =
+rel=3D"noreferrer noreferrer" target=3D"_blank">http://ww1.microchip.com/do=
+wnloads/en/DeviceDoc/Atmel-2549-8-bit-AVR-Microcontroller-ATmega640-1280-12=
+81-2560-2561_datasheet.pdf</a> (section 7.6)<br>
+&gt; [3] <a href=3D"http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2=
+586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf" rel=
+=3D"noreferrer noreferrer" target=3D"_blank">http://ww1.microchip.com/downl=
+oads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-AT=
+tiny85_Datasheet.pdf</a> (section 4.6.1)<br>
+&gt; [4] <a href=3D"http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2=
+486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf" rel=3D"noreferrer no=
+referrer" target=3D"_blank">http://ww1.microchip.com/downloads/en/DeviceDoc=
+/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf</a> (page 13)=
+<br>
+&gt; [5] <a href=3D"http://ww1.microchip.com/downloads/en/DeviceDoc/doc2502=
+.pdf" rel=3D"noreferrer noreferrer" target=3D"_blank">http://ww1.microchip.=
+com/downloads/en/DeviceDoc/doc2502.pdf</a> (page 12)<br>
+&gt; [6] <a href=3D"http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2=
+543-AVR-ATtiny2313_Datasheet.pdf" rel=3D"noreferrer noreferrer" target=3D"_=
+blank">http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2543-AVR-ATtin=
+y2313_Datasheet.pdf</a> (page 11)<br>
+&gt; [7] <a href=3D"http://ww1.microchip.com/downloads/en/DeviceDoc/doc1041=
+.pdf" rel=3D"noreferrer noreferrer" target=3D"_blank">http://ww1.microchip.=
+com/downloads/en/DeviceDoc/doc1041.pdf</a> (page 20)<br>
+&gt;<br>
+&gt; On Sun, 26 Jan 2020 23:54:43 +0100<br>
+&gt; Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.markovic@rt-rk.co=
+m" target=3D"_blank" rel=3D"noreferrer">aleksandar.markovic@rt-rk.com</a>&g=
+t; wrote:<br>
+&gt;<br>
+&gt; &gt; +static void avr_cpu_reset(CPUState *cs)<br>
+&gt; &gt; +{<br>
+&gt; &gt; +=C2=A0 =C2=A0 AVRCPU *cpu =3D AVR_CPU(cs);<br>
+&gt; &gt; +=C2=A0 =C2=A0 AVRCPUClass *mcc =3D AVR_CPU_GET_CLASS(cpu);<br>
+&gt; &gt; +=C2=A0 =C2=A0 CPUAVRState *env =3D &amp;cpu-&gt;env;<br>
+&gt; &gt; +<br>
+&gt; &gt; +=C2=A0 =C2=A0 mcc-&gt;parent_reset(cs);<br>
+&gt; &gt; +<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;pc_w =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregI =3D 1;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregC =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregZ =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregN =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregV =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregS =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregH =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sregT =3D 0;<br>
+&gt; &gt; +<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;rampD =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;rampX =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;rampY =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;rampZ =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;eind =3D 0;<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;sp =3D 0;<br>
+&gt; &gt; +<br>
+&gt; &gt; +=C2=A0 =C2=A0 env-&gt;skip =3D 0;<br>
+&gt; &gt; +<br>
+&gt; &gt; +=C2=A0 =C2=A0 memset(env-&gt;r, 0, sizeof(env-&gt;r));<br>
+&gt; &gt; +<br>
+&gt; &gt; +=C2=A0 =C2=A0 tlb_flush(cs);<br>
+&gt; &gt; +}<br>
+</blockquote></div>
+
+--000000000000de70f6059d491205--
 
