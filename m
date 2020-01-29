@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDEEC33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39B01C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 529302070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:59:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0B992070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:59:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeyF4ESO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 529302070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6SB291v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B992070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwlzz-0000gq-IF
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:59:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46915)
+	id 1iwm0J-0001G3-1N
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:59:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iwlxz-0004nB-0c
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:08 -0500
+ (envelope-from <quintela@redhat.com>) id 1iwly3-0004sZ-BQ
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iwlxx-0005z7-51
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40816
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1iwly1-0006BL-AO
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:11 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31289
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwlxx-0005y3-0v
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:05 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwly1-0006AA-5I
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580299024;
+ s=mimecast20190719; t=1580299028;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sz2ErEjETxM9vvYjf4vQKALEKkDjlVXzMEsK10uaj/0=;
- b=PeyF4ESOahPSoQstmawEgStG92uqrumyGeqql5Pzhd+IEeShDHCwTuLtWtGW0hgM9X9eet
- KPBKaXaZ61nWQFWMbG+j+FYBsv5zSEx1+NtqqNtumtgA6CKLRtEFREEZChTlW2CqH/gMsY
- QaVrYnbHIAVVfhjPVACu0QfTcDu61Ro=
+ bh=Uwl70PJ1+P3s7hPGiGd016ZaqlCo1LiYwGAwaFP93ws=;
+ b=T6SB291vr04nvxT6WWJcUS6wYfhiymz2wLRd/8ra9bmBje9ANaE4oQ6fi3gRnZ9AQ2ldOr
+ Kdb2rBfWjhru8c31mKgoEmzuYx/BjnXk26ZyrfHK0L8IdzeP4zmxkticGv+h+2ocl5icGR
+ asx9UPS7CvpLyeoUijhDbcRFabuxMjI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-dAOopKyKO4OtDSlOXibcHg-1; Wed, 29 Jan 2020 06:57:02 -0500
+ us-mta-209-RvI2Ec0rMP6dWcLfSr0cEQ-1; Wed, 29 Jan 2020 06:57:07 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15250477
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:57:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48F5E107ACC5
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:57:06 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-64.ams2.redhat.com [10.36.116.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9F8A18578F;
- Wed, 29 Jan 2020 11:56:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 05F8819E9C;
+ Wed, 29 Jan 2020 11:57:03 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 1/8] multifd: Add multifd-method parameter
-Date: Wed, 29 Jan 2020 12:56:48 +0100
-Message-Id: <20200129115655.10414-2-quintela@redhat.com>
+Subject: [PATCH v5 3/8] multifd: Make no compression operations into its own
+ structure
+Date: Wed, 29 Jan 2020 12:56:50 +0100
+Message-Id: <20200129115655.10414-4-quintela@redhat.com>
 In-Reply-To: <20200129115655.10414-1-quintela@redhat.com>
 References: <20200129115655.10414-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: dAOopKyKO4OtDSlOXibcHg-1
+X-MC-Unique: RvI2Ec0rMP6dWcLfSr0cEQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,331 +95,426 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will store the compression method to use.  We start with none.
+It will be used later.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/core/qdev-properties.c    | 13 +++++++++++++
- include/hw/qdev-properties.h |  3 +++
- migration/migration.c        | 13 +++++++++++++
- monitor/hmp-cmds.c           | 13 +++++++++++++
- qapi/migration.json          | 30 +++++++++++++++++++++++++++---
- tests/qtest/migration-test.c | 14 ++++++++++----
- 6 files changed, 79 insertions(+), 7 deletions(-)
+ migration/migration.c |   9 ++
+ migration/migration.h |   1 +
+ migration/multifd.c   | 185 ++++++++++++++++++++++++++++++++++++++++--
+ migration/multifd.h   |  25 ++++++
+ migration/ram.c       |   1 +
+ 5 files changed, 213 insertions(+), 8 deletions(-)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 7f93bfeb88..4442844d37 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -8,6 +8,7 @@
- #include "qapi/qmp/qerror.h"
- #include "qemu/ctype.h"
- #include "qemu/error-report.h"
-+#include "qapi/qapi-types-migration.h"
- #include "hw/block/block.h"
- #include "net/hub.h"
- #include "qapi/visitor.h"
-@@ -639,6 +640,18 @@ const PropertyInfo qdev_prop_fdc_drive_type =3D {
-     .set_default_value =3D set_default_value_enum,
- };
-=20
-+/* --- MultiFDMethod --- */
-+
-+const PropertyInfo qdev_prop_multifd_method =3D {
-+    .name =3D "MultiFDMethod",
-+    .description =3D "multifd_method values, "
-+                   "none",
-+    .enum_table =3D &MultiFDMethod_lookup,
-+    .get =3D get_enum,
-+    .set =3D set_enum,
-+    .set_default_value =3D set_default_value_enum,
-+};
-+
- /* --- pci address --- */
-=20
- /*
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 906e697c58..6871b075a6 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -20,6 +20,7 @@ extern const PropertyInfo qdev_prop_chr;
- extern const PropertyInfo qdev_prop_tpm;
- extern const PropertyInfo qdev_prop_macaddr;
- extern const PropertyInfo qdev_prop_on_off_auto;
-+extern const PropertyInfo qdev_prop_multifd_method;
- extern const PropertyInfo qdev_prop_losttickpolicy;
- extern const PropertyInfo qdev_prop_blockdev_on_error;
- extern const PropertyInfo qdev_prop_bios_chs_trans;
-@@ -184,6 +185,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
-     DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
- #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
-+#define DEFINE_PROP_MULTIFD_METHOD(_n, _s, _f, _d) \
-+    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_multifd_method, MultiFDMe=
-thod)
- #define DEFINE_PROP_LOSTTICKPOLICY(_n, _s, _f, _d) \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_losttickpolicy, \
-                         LostTickPolicy)
 diff --git a/migration/migration.c b/migration/migration.c
-index 3a21a4686c..cd72bb6e9a 100644
+index cd72bb6e9a..06f6c2d529 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -88,6 +88,7 @@
- /* The delay time (in ms) between two COLO checkpoints */
- #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
- #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
-+#define DEFAULT_MIGRATE_MULTIFD_METHOD MULTIFD_METHOD_NONE
-=20
- /* Background transfer rate for postcopy, 0 means unlimited, note
-  * that page requests can still exceed this limit.
-@@ -798,6 +799,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error=
- **errp)
-     params->block_incremental =3D s->parameters.block_incremental;
-     params->has_multifd_channels =3D true;
-     params->multifd_channels =3D s->parameters.multifd_channels;
-+    params->has_multifd_method =3D true;
-+    params->multifd_method =3D s->parameters.multifd_method;
-     params->has_xbzrle_cache_size =3D true;
-     params->xbzrle_cache_size =3D s->parameters.xbzrle_cache_size;
-     params->has_max_postcopy_bandwidth =3D true;
-@@ -1315,6 +1318,9 @@ static void migrate_params_test_apply(MigrateSetParam=
-eters *params,
-     if (params->has_multifd_channels) {
-         dest->multifd_channels =3D params->multifd_channels;
-     }
-+    if (params->has_multifd_method) {
-+        dest->multifd_method =3D params->multifd_method;
-+    }
-     if (params->has_xbzrle_cache_size) {
-         dest->xbzrle_cache_size =3D params->xbzrle_cache_size;
-     }
-@@ -1411,6 +1417,9 @@ static void migrate_params_apply(MigrateSetParameters=
- *params, Error **errp)
-     if (params->has_multifd_channels) {
-         s->parameters.multifd_channels =3D params->multifd_channels;
-     }
-+    if (params->has_multifd_method) {
-+        s->parameters.multifd_method =3D params->multifd_method;
-+    }
-     if (params->has_xbzrle_cache_size) {
-         s->parameters.xbzrle_cache_size =3D params->xbzrle_cache_size;
-         xbzrle_cache_resize(params->xbzrle_cache_size, errp);
-@@ -3515,6 +3524,9 @@ static Property migration_properties[] =3D {
-     DEFINE_PROP_UINT8("multifd-channels", MigrationState,
-                       parameters.multifd_channels,
-                       DEFAULT_MIGRATE_MULTIFD_CHANNELS),
-+    DEFINE_PROP_MULTIFD_METHOD("multifd-method", MigrationState,
-+                      parameters.multifd_method,
-+                      DEFAULT_MIGRATE_MULTIFD_METHOD),
-     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
-                       parameters.xbzrle_cache_size,
-                       DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
-@@ -3605,6 +3617,7 @@ static void migration_instance_init(Object *obj)
-     params->has_x_checkpoint_delay =3D true;
-     params->has_block_incremental =3D true;
-     params->has_multifd_channels =3D true;
-+    params->has_multifd_method =3D true;
-     params->has_xbzrle_cache_size =3D true;
-     params->has_max_postcopy_bandwidth =3D true;
-     params->has_max_cpu_throttle =3D true;
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index d0e0af893a..16f01d4244 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -39,6 +39,7 @@
- #include "qapi/qapi-commands-tpm.h"
- #include "qapi/qapi-commands-ui.h"
- #include "qapi/qapi-visit-net.h"
-+#include "qapi/qapi-visit-migration.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/string-input-visitor.h"
-@@ -447,6 +448,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QD=
-ict *qdict)
-         monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_CHANNELS),
-             params->multifd_channels);
-+        monitor_printf(mon, "%s: %s\n",
-+            MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_METHOD),
-+            MultiFDMethod_str(params->multifd_method));
-         monitor_printf(mon, "%s: %" PRIu64 "\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
-             params->xbzrle_cache_size);
-@@ -1738,6 +1742,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QD=
-ict *qdict)
-     MigrateSetParameters *p =3D g_new0(MigrateSetParameters, 1);
-     uint64_t valuebw =3D 0;
-     uint64_t cache_size;
-+    MultiFDMethod compress_type;
-     Error *err =3D NULL;
-     int val, ret;
-=20
-@@ -1823,6 +1828,14 @@ void hmp_migrate_set_parameter(Monitor *mon, const Q=
-Dict *qdict)
-         p->has_multifd_channels =3D true;
-         visit_type_int(v, param, &p->multifd_channels, &err);
-         break;
-+    case MIGRATION_PARAMETER_MULTIFD_METHOD:
-+        p->has_multifd_method =3D true;
-+        visit_type_MultiFDMethod(v, param, &compress_type, &err);
-+        if (err) {
-+            break;
-+        }
-+        p->multifd_method =3D compress_type;
-+        break;
-     case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
-         p->has_xbzrle_cache_size =3D true;
-         visit_type_size(v, param, &cache_size, &err);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index b7348d0c8b..96a126751c 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -488,6 +488,19 @@
- ##
- { 'command': 'query-migrate-capabilities', 'returns':   ['MigrationCapabil=
-ityStatus']}
-=20
-+##
-+# @MultiFDMethod:
-+#
-+# An enumeration of multifd compression.
-+#
-+# @none: no compression.
-+#
-+# Since: 5.0
-+#
-+##
-+{ 'enum': 'MultiFDMethod',
-+  'data': [ 'none' ] }
-+
- ##
- # @MigrationParameter:
- #
-@@ -586,6 +599,9 @@
- # @max-cpu-throttle: maximum cpu throttle percentage.
- #                    Defaults to 99. (Since 3.1)
- #
-+# @multifd-method: Which compression method to use.
-+#                  Defaults to none. (Since 5.0)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
-@@ -598,7 +614,7 @@
-            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-            'multifd-channels',
-            'xbzrle-cache-size', 'max-postcopy-bandwidth',
--           'max-cpu-throttle' ] }
-+           'max-cpu-throttle', 'multifd-method' ] }
-=20
- ##
- # @MigrateSetParameters:
-@@ -688,6 +704,9 @@
- # @max-cpu-throttle: maximum cpu throttle percentage.
- #                    The default value is 99. (Since 3.1)
- #
-+# @multifd-method: Which compression method to use.
-+#                  Defaults to none. (Since 5.0)
-+#
- # Since: 2.4
- ##
- # TODO either fuse back into MigrationParameters, or make
-@@ -713,7 +732,8 @@
-             '*multifd-channels': 'int',
-             '*xbzrle-cache-size': 'size',
-             '*max-postcopy-bandwidth': 'size',
--=09    '*max-cpu-throttle': 'int' } }
-+            '*max-cpu-throttle': 'int',
-+            '*multifd-method': 'MultiFDMethod' } }
-=20
- ##
- # @migrate-set-parameters:
-@@ -823,6 +843,9 @@
- #                    Defaults to 99.
- #                     (Since 3.1)
- #
-+# @multifd-method: Which compression method to use.
-+#                  Defaults to none. (Since 5.0)
-+#
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
-@@ -846,7 +869,8 @@
-             '*multifd-channels': 'uint8',
-             '*xbzrle-cache-size': 'size',
- =09    '*max-postcopy-bandwidth': 'size',
--            '*max-cpu-throttle':'uint8'} }
-+            '*max-cpu-throttle': 'uint8',
-+            '*multifd-method': 'MultiFDMethod' } }
-=20
- ##
- # @query-migrate-parameters:
-diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-index cf27ebbc9d..d2f9ef38f5 100644
---- a/tests/qtest/migration-test.c
-+++ b/tests/qtest/migration-test.c
-@@ -378,7 +378,6 @@ static void migrate_check_parameter_str(QTestState *who=
-, const char *parameter,
-     g_free(result);
+@@ -2245,6 +2245,15 @@ int migrate_multifd_channels(void)
+     return s->parameters.multifd_channels;
  }
 =20
--__attribute__((unused))
- static void migrate_set_parameter_str(QTestState *who, const char *paramet=
-er,
-                                       const char *value)
- {
-@@ -1251,7 +1250,7 @@ static void test_migrate_auto_converge(void)
-     test_migrate_end(from, to, true);
- }
-=20
--static void test_multifd_tcp(void)
-+static void test_multifd_tcp(const char *method)
- {
-     MigrateStart *args =3D migrate_start_new();
-     QTestState *from, *to;
-@@ -1275,6 +1274,9 @@ static void test_multifd_tcp(void)
-     migrate_set_parameter_int(from, "multifd-channels", 16);
-     migrate_set_parameter_int(to, "multifd-channels", 16);
-=20
-+    migrate_set_parameter_str(from, "multifd-method", method);
-+    migrate_set_parameter_str(to, "multifd-method", method);
-+
-     migrate_set_capability(from, "multifd", "true");
-     migrate_set_capability(to, "multifd", "true");
-=20
-@@ -1306,6 +1308,11 @@ static void test_multifd_tcp(void)
-     g_free(uri);
- }
-=20
-+static void test_multifd_tcp_none(void)
++MultiFDMethod migrate_multifd_method(void)
 +{
-+    test_multifd_tcp("none");
++    MigrationState *s;
++
++    s =3D migrate_get_current();
++
++    return s->parameters.multifd_method;
 +}
 +
- /*
-  * This test does:
-  *  source               target
-@@ -1317,7 +1324,6 @@ static void test_multifd_tcp(void)
-  *
-  *  And see that it works
-  */
--
- static void test_multifd_tcp_cancel(void)
+ int migrate_use_xbzrle(void)
  {
-     MigrateStart *args =3D migrate_start_new();
-@@ -1467,7 +1473,7 @@ int main(int argc, char **argv)
-                    test_validate_uuid_dst_not_set);
+     MigrationState *s;
+diff --git a/migration/migration.h b/migration/migration.h
+index 8473ddfc88..3d23a0852e 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -300,6 +300,7 @@ bool migrate_auto_converge(void);
+ bool migrate_use_multifd(void);
+ bool migrate_pause_before_switchover(void);
+ int migrate_multifd_channels(void);
++MultiFDMethod migrate_multifd_method(void);
 =20
-     qtest_add_func("/migration/auto_converge", test_migrate_auto_converge)=
+ int migrate_use_xbzrle(void);
+ int64_t migrate_xbzrle_cache_size(void);
+diff --git a/migration/multifd.c b/migration/multifd.c
+index b3e8ae9bcc..1c49c2a665 100644
+--- a/migration/multifd.c
++++ b/migration/multifd.c
+@@ -38,6 +38,134 @@ typedef struct {
+     uint64_t unused2[4];    /* Reserved for future use */
+ } __attribute__((packed)) MultiFDInit_t;
+=20
++/* Multifd without compression */
++
++/**
++ * nocomp_send_setup: setup send side
++ *
++ * For no compression this function does nothing.
++ *
++ * Returns 0 for success or -1 for error
++ *
++ * @p: Params for the channel that we are using
++ * @errp: pointer to an error
++ */
++static int nocomp_send_setup(MultiFDSendParams *p, Error **errp)
++{
++    return 0;
++}
++
++/**
++ * nocomp_send_cleanup: cleanup send side
++ *
++ * For no compression this function does nothing.
++ *
++ * @p: Params for the channel that we are using
++ */
++static void nocomp_send_cleanup(MultiFDSendParams *p, Error **errp)
++{
++    return;
++}
++
++/**
++ * nocomp_send_prepare: prepare date to be able to send
++ *
++ * For no compression we just have to calculate the size of the
++ * packet.
++ *
++ * Returns 0 for success or -1 for error
++ *
++ * @p: Params for the channel that we are using
++ * @used: number of pages used
++ * @errp: pointer to an error
++ */
++static int nocomp_send_prepare(MultiFDSendParams *p, uint32_t used,
++                               Error **errp)
++{
++    p->next_packet_size =3D used * qemu_target_page_size();
++    p->flags |=3D MULTIFD_FLAG_NOCOMP;
++    return 0;
++}
++
++/**
++ * nocomp_send_write: do the actual write of the data
++ *
++ * For no compression we just have to write the data.
++ *
++ * Returns 0 for success or -1 for error
++ *
++ * @p: Params for the channel that we are using
++ * @used: number of pages used
++ * @errp: pointer to an error
++ */
++static int nocomp_send_write(MultiFDSendParams *p, uint32_t used, Error **=
+errp)
++{
++    return qio_channel_writev_all(p->c, p->pages->iov, used, errp);
++}
++
++/**
++ * nocomp_recv_setup: setup receive side
++ *
++ * For no compression this function does nothing.
++ *
++ * Returns 0 for success or -1 for error
++ *
++ * @p: Params for the channel that we are using
++ * @errp: pointer to an error
++ */
++static int nocomp_recv_setup(MultiFDRecvParams *p, Error **errp)
++{
++    return 0;
++}
++
++/**
++ * nocomp_recv_cleanup: setup receive side
++ *
++ * For no compression this function does nothing.
++ *
++ * @p: Params for the channel that we are using
++ */
++static void nocomp_recv_cleanup(MultiFDRecvParams *p)
++{
++}
++
++/**
++ * nocomp_recv_pages: read the data from the channel into actual pages
++ *
++ * For no compression we just need to read things into the correct place.
++ *
++ * Returns 0 for success or -1 for error
++ *
++ * @p: Params for the channel that we are using
++ * @used: number of pages used
++ * @errp: pointer to an error
++ */
++static int nocomp_recv_pages(MultiFDRecvParams *p, uint32_t used, Error **=
+errp)
++{
++    uint32_t flags =3D p->flags & MULTIFD_FLAG_METHOD_MASK;
++
++    if (flags !=3D MULTIFD_FLAG_NOCOMP) {
++        error_setg(errp, "multifd %d: flags received %x flags expected %x"=
+,
++                   p->id, flags, MULTIFD_FLAG_NOCOMP);
++        return -1;
++    }
++    return qio_channel_readv_all(p->c, p->pages->iov, used, errp);
++}
++
++static MultiFDMethods multifd_nocomp_ops =3D {
++    .send_setup =3D nocomp_send_setup,
++    .send_cleanup =3D nocomp_send_cleanup,
++    .send_prepare =3D nocomp_send_prepare,
++    .send_write =3D nocomp_send_write,
++    .recv_setup =3D nocomp_recv_setup,
++    .recv_cleanup =3D nocomp_recv_cleanup,
++    .recv_pages =3D nocomp_recv_pages
++};
++
++static MultiFDMethods *multifd_ops[MULTIFD_METHOD__MAX] =3D {
++    [MULTIFD_METHOD_NONE] =3D &multifd_nocomp_ops,
++};
++
+ static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
+ {
+     MultiFDInit_t msg =3D {};
+@@ -246,6 +374,8 @@ struct {
+      * We will use atomic operations.  Only valid values are 0 and 1.
+      */
+     int exiting;
++    /* multifd ops */
++    MultiFDMethods *ops;
+ } *multifd_send_state;
+=20
+ /*
+@@ -397,6 +527,7 @@ void multifd_save_cleanup(void)
+     }
+     for (i =3D 0; i < migrate_multifd_channels(); i++) {
+         MultiFDSendParams *p =3D &multifd_send_state->params[i];
++        Error *local_err =3D NULL;
+=20
+         socket_send_channel_destroy(p->c);
+         p->c =3D NULL;
+@@ -410,6 +541,10 @@ void multifd_save_cleanup(void)
+         p->packet_len =3D 0;
+         g_free(p->packet);
+         p->packet =3D NULL;
++        multifd_send_state->ops->send_cleanup(p, &local_err);
++        if (local_err) {
++            migrate_set_error(migrate_get_current(), local_err);
++        }
+     }
+     qemu_sem_destroy(&multifd_send_state->channels_ready);
+     g_free(multifd_send_state->params);
+@@ -494,7 +629,14 @@ static void *multifd_send_thread(void *opaque)
+             uint64_t packet_num =3D p->packet_num;
+             flags =3D p->flags;
+=20
+-            p->next_packet_size =3D used * qemu_target_page_size();
++            if (used) {
++                ret =3D multifd_send_state->ops->send_prepare(p, used,
++                                                            &local_err);
++                if (ret !=3D 0) {
++                    qemu_mutex_unlock(&p->mutex);
++                    break;
++                }
++            }
+             multifd_send_fill_packet(p);
+             p->flags =3D 0;
+             p->num_packets++;
+@@ -513,8 +655,7 @@ static void *multifd_send_thread(void *opaque)
+             }
+=20
+             if (used) {
+-                ret =3D qio_channel_writev_all(p->c, p->pages->iov,
+-                                             used, &local_err);
++                ret =3D multifd_send_state->ops->send_write(p, used, &loca=
+l_err);
+                 if (ret !=3D 0) {
+                     break;
+                 }
+@@ -604,6 +745,7 @@ int multifd_save_setup(Error **errp)
+     multifd_send_state->pages =3D multifd_pages_init(page_count);
+     qemu_sem_init(&multifd_send_state->channels_ready, 0);
+     atomic_set(&multifd_send_state->exiting, 0);
++    multifd_send_state->ops =3D multifd_ops[migrate_multifd_method()];
+=20
+     for (i =3D 0; i < thread_count; i++) {
+         MultiFDSendParams *p =3D &multifd_send_state->params[i];
+@@ -623,6 +765,18 @@ int multifd_save_setup(Error **errp)
+         p->name =3D g_strdup_printf("multifdsend_%d", i);
+         socket_send_channel_create(multifd_new_send_channel_async, p);
+     }
++
++    for (i =3D 0; i < thread_count; i++) {
++        MultiFDSendParams *p =3D &multifd_send_state->params[i];
++        Error *local_err =3D NULL;
++        int ret;
++
++        ret =3D multifd_send_state->ops->send_setup(p, &local_err);
++        if (ret) {
++            error_propagate(errp, local_err);
++            return ret;
++        }
++    }
+     return 0;
+ }
+=20
+@@ -634,6 +788,8 @@ struct {
+     QemuSemaphore sem_sync;
+     /* global number of generated multifd packets */
+     uint64_t packet_num;
++    /* multifd ops */
++    MultiFDMethods *ops;
+ } *multifd_recv_state;
+=20
+ static void multifd_recv_terminate_threads(Error *err)
+@@ -673,7 +829,6 @@ static void multifd_recv_terminate_threads(Error *err)
+ int multifd_load_cleanup(Error **errp)
+ {
+     int i;
+-    int ret =3D 0;
+=20
+     if (!migrate_use_multifd()) {
+         return 0;
+@@ -706,6 +861,7 @@ int multifd_load_cleanup(Error **errp)
+         p->packet_len =3D 0;
+         g_free(p->packet);
+         p->packet =3D NULL;
++        multifd_recv_state->ops->recv_cleanup(p);
+     }
+     qemu_sem_destroy(&multifd_recv_state->sem_sync);
+     g_free(multifd_recv_state->params);
+@@ -713,7 +869,7 @@ int multifd_load_cleanup(Error **errp)
+     g_free(multifd_recv_state);
+     multifd_recv_state =3D NULL;
+=20
+-    return ret;
++    return 0;
+ }
+=20
+ void multifd_recv_sync_main(void)
+@@ -778,6 +934,8 @@ static void *multifd_recv_thread(void *opaque)
+=20
+         used =3D p->pages->used;
+         flags =3D p->flags;
++        /* recv methods don't know how to handle the SYNC flag */
++        p->flags &=3D ~MULTIFD_FLAG_SYNC;
+         trace_multifd_recv(p->id, p->packet_num, used, flags,
+                            p->next_packet_size);
+         p->num_packets++;
+@@ -785,8 +943,7 @@ static void *multifd_recv_thread(void *opaque)
+         qemu_mutex_unlock(&p->mutex);
+=20
+         if (used) {
+-            ret =3D qio_channel_readv_all(p->c, p->pages->iov,
+-                                        used, &local_err);
++            ret =3D multifd_recv_state->ops->recv_pages(p, used, &local_er=
+r);
+             if (ret !=3D 0) {
+                 break;
+             }
+@@ -825,6 +982,7 @@ int multifd_load_setup(Error **errp)
+     multifd_recv_state->params =3D g_new0(MultiFDRecvParams, thread_count)=
 ;
--    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
-+    qtest_add_func("/migration/multifd/tcp/none", test_multifd_tcp_none);
-     qtest_add_func("/migration/multifd/tcp/cancel", test_multifd_tcp_cance=
-l);
+     atomic_set(&multifd_recv_state->count, 0);
+     qemu_sem_init(&multifd_recv_state->sem_sync, 0);
++    multifd_recv_state->ops =3D multifd_ops[migrate_multifd_method()];
 =20
-     ret =3D g_test_run();
+     for (i =3D 0; i < thread_count; i++) {
+         MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
+@@ -839,6 +997,18 @@ int multifd_load_setup(Error **errp)
+         p->packet =3D g_malloc0(p->packet_len);
+         p->name =3D g_strdup_printf("multifdrecv_%d", i);
+     }
++
++    for (i =3D 0; i < thread_count; i++) {
++        MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
++        Error *local_err =3D NULL;
++        int ret;
++
++        ret =3D multifd_recv_state->ops->recv_setup(p, &local_err);
++        if (ret) {
++            error_propagate(errp, local_err);
++            return ret;
++        }
++    }
+     return 0;
+ }
+=20
+@@ -896,4 +1066,3 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Error *=
+*errp)
+     return atomic_read(&multifd_recv_state->count) =3D=3D
+            migrate_multifd_channels();
+ }
+-
+diff --git a/migration/multifd.h b/migration/multifd.h
+index d8b0205977..c7fea4914c 100644
+--- a/migration/multifd.h
++++ b/migration/multifd.h
+@@ -25,6 +25,10 @@ int multifd_queue_page(QEMUFile *f, RAMBlock *block, ram=
+_addr_t offset);
+=20
+ #define MULTIFD_FLAG_SYNC (1 << 0)
+=20
++/* We reserve 3 bits for METHODS */
++#define MULTIFD_FLAG_METHOD_MASK (7 << 1)
++#define MULTIFD_FLAG_NOCOMP (1 << 1)
++
+ /* This value needs to be a multiple of qemu_target_page_size() */
+ #define MULTIFD_PACKET_SIZE (512 * 1024)
+=20
+@@ -96,6 +100,8 @@ typedef struct {
+     uint64_t num_pages;
+     /* syncs main thread and channels */
+     QemuSemaphore sem_sync;
++    /* used for compression methods */
++    void *data;
+ }  MultiFDSendParams;
+=20
+ typedef struct {
+@@ -133,7 +139,26 @@ typedef struct {
+     uint64_t num_pages;
+     /* syncs main thread and channels */
+     QemuSemaphore sem_sync;
++    /* used for de-compression methods */
++    void *data;
+ } MultiFDRecvParams;
+=20
++typedef struct {
++    /* Setup for sending side */
++    int (*send_setup)(MultiFDSendParams *p, Error **errp);
++    /* Cleanup for sending side */
++    void (*send_cleanup)(MultiFDSendParams *p, Error **errp);
++    /* Prepare the send packet */
++    int (*send_prepare)(MultiFDSendParams *p, uint32_t used, Error **errp)=
+;
++    /* Write the send packet */
++    int (*send_write)(MultiFDSendParams *p, uint32_t used, Error **errp);
++    /* Setup for receiving side */
++    int (*recv_setup)(MultiFDRecvParams *p, Error **errp);
++    /* Cleanup for receiving side */
++    void (*recv_cleanup)(MultiFDRecvParams *p);
++    /* Read all pages */
++    int (*recv_pages)(MultiFDRecvParams *p, uint32_t used, Error **errp);
++} MultiFDMethods;
++
+ #endif
+=20
+diff --git a/migration/ram.c b/migration/ram.c
+index ed23ed1c7c..73a141bb60 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -43,6 +43,7 @@
+ #include "page_cache.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
++#include "qapi/qapi-types-migration.h"
+ #include "qapi/qapi-events-migration.h"
+ #include "qapi/qmp/qerror.h"
+ #include "trace.h"
 --=20
 2.24.1
 
