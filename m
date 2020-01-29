@@ -2,81 +2,92 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94564C3F68F
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B816C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 17:06:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 656DA20720
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AACE206F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 17:06:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkIwr+2d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 656DA20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gVrFXbRV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AACE206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwqg7-0005YR-Go
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:58:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48370)
+	id 1iwqnZ-0004K9-B9
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 12:06:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iwqfS-0004t2-J0
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:58:19 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iwqmj-0003hv-70
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 12:05:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iwqfR-0007jU-M1
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:58:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30473
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iwqfR-0007hf-IQ
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:58:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580317097;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zcedKwbQKirhf2xNz6xKw9zd6IjAink5bmFF/iOtFAA=;
- b=CkIwr+2d53kATfgJbDXzP9mBCpmA3Ekl2Tytb2asCiu2LkYKS9ROtmBmO5iYrBqBVgG9wY
- tJFW5bZBVLugwI+2QxbRnC88uka5DEiRoIHfJ8pMrWxxhO0K0RFaeXyUR8ySfkAIxxOUT/
- xIWzFkW6ONHbb4yGXKCvurU2k6CVIcA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-4t8ogeOjN_-e_S4WbRl6oQ-1; Wed, 29 Jan 2020 11:58:13 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A142B1080D6C;
- Wed, 29 Jan 2020 16:58:12 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-205.ams2.redhat.com [10.36.116.205])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 938B25C28C;
- Wed, 29 Jan 2020 16:58:11 +0000 (UTC)
-Date: Wed, 29 Jan 2020 17:58:10 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v3 2/4] qapi: Create module 'control'
-Message-ID: <20200129165810.GD5690@linux.fritz.box>
-References: <20200129102239.31435-1-kwolf@redhat.com>
- <20200129102239.31435-3-kwolf@redhat.com>
- <871rri2pb6.fsf@dusky.pond.sub.org>
+ (envelope-from <richard.henderson@linaro.org>) id 1iwqmh-0004xH-Cr
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 12:05:48 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33129)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iwqmh-0004w3-5f
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 12:05:47 -0500
+Received: by mail-pg1-x541.google.com with SMTP id 6so95602pgk.0
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 09:05:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=+zN1pkKq1oz2sKf5PNAJNK2rTWQFEmWAmYPEH0wv3RU=;
+ b=gVrFXbRVNJGayeDPpBuOXAOPifgiWF79Rfe9Tb+WaKcjbR/lKU475Wde9BWw1MUNWp
+ MPMWy3stGpOX/3iq5mY+C3am0H/EPzkn7vWUtxDxL3+Ot6IIaJ2N4fRVO5qk4LsQmUnu
+ no7DOKZEcOllI8/9XaEQf27ShGLi5CgCi1w3qlJt9JKpOu2EjC4RwwOiOnn+bmanG3xd
+ pxwu42EZHkuyAgg9kRqP1bvFHgmq4i4pZI2woNrGNpsIhltXVz9mAdkewfjFKLOJymt7
+ PYRj+vINiA63hI0vobRFRapNrgyAz/3/Wr+kVn0qUvhU7WqEpn1//3uUua8G4vuAqM/d
+ scAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+zN1pkKq1oz2sKf5PNAJNK2rTWQFEmWAmYPEH0wv3RU=;
+ b=FGKnGaS9xZKQFBusF39gUlot9y7He6EAV+SirIrG8ScRGZzxMBkJx73yR0OEhZWNRg
+ NCrL3RbhUdbF/fdgJzo/wqeo9oJGge7HpUJ2/k31eLi2gCiSOOf+4sWBkfY0vOmlmvHR
+ RS/G8C5kfmebeiP2bRgpnP3uLyWDgZPYbHv7mmI/vyp8loAUOK4LEk5g7R0Z6d3uY9Xq
+ vwjQmijcq7Kd/sAza9Nt87CSrlEwtriZPMySoPA6yooJLsBqj+1GQKHXYyn0uyuQ2Q8o
+ tgzUVUcE8GjHpf4EGeHYvGSTaAc1E0iJcrq6lGJOXNR5tPSNC97p+Wz1iIsW91QNKVo/
+ 0P8Q==
+X-Gm-Message-State: APjAAAUOBX6YiIxNfWNGBiPkK289iVTgWl9JVI2+FLtcGgRyGMLLfEfx
+ 7cliulDbox5UB4OcQ+zJ0SGN6A==
+X-Google-Smtp-Source: APXvYqwOWvxbFBS53cP9aXF5Nsgdf71oEAKtJGikLmtEdkvasFs2Pn5izI0Bu2PfDcccmxWoIZTCQA==
+X-Received: by 2002:a62:2a07:: with SMTP id q7mr510398pfq.153.1580317545925;
+ Wed, 29 Jan 2020 09:05:45 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ w4sm3237166pjt.23.2020.01.29.09.05.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 29 Jan 2020 09:05:45 -0800 (PST)
+Subject: Re: [PATCH v4 30/40] target/arm: Flush tlbs for E2&0 translation
+ regime
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-31-richard.henderson@linaro.org>
+ <CAFEAcA-=s0rd78PUQSLV3j0xM4RdynxGv6jUYaYUqMVExsZb8A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <768e2785-9336-0eeb-4296-4608fd541d9d@linaro.org>
+Date: Wed, 29 Jan 2020 09:05:43 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <871rri2pb6.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 4t8ogeOjN_-e_S4WbRl6oQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <CAFEAcA-=s0rd78PUQSLV3j0xM4RdynxGv6jUYaYUqMVExsZb8A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,32 +99,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 29.01.2020 um 17:35 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
->=20
-> > misc.json contains definitions that are related to the system emulator,
-> > so it can't be used for other tools like the storage daemon. This patch
-> > moves basic functionality that is shared between all tools (and mostly
-> > related to the monitor itself) into a new control.json, which could be
-> > used in tools as well.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
->=20
-> I'd like to retitle this patch and the next one:
->=20
->     qapi: Split control.json off misc.json
->     monitor: Collect "control" command handlers in qmp-cmds.control.c
->=20
-> Okay?
+On 12/6/19 9:14 AM, Peter Maydell wrote:
+>>  static void tlbi_aa64_alle2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>>                                    uint64_t value)
+>>  {
+>> -    ARMCPU *cpu = env_archcpu(env);
+>> -    CPUState *cs = CPU(cpu);
+>> +    CPUState *cs = env_cpu(env);
+>> +    int mask = vae2_tlbmask(env);
+> 
+> Why do we use the 'v' mask function for a non 'v' TLB op?
+> 
+>>
+>> -    tlb_flush_by_mmuidx(cs, ARMMMUIdxBit_E2);
+>> +    tlb_flush_by_mmuidx(cs, mask);
+> 
+> The spec fror TLBI ALLE2 doesn't say it depends on
+> what the E2H setting is. It says it flushes all entries
+> for either NS EL2 or NS EL2&0 translation regimes.
+> Wouldn't that be
+> ARMMMUIdxBit_EL20_0 | ARMMMUIdxBit_EL20_2 | ARMMMUIdxBit_E2
+> ?
+> 
+> Contrast TLBI VAE2, which does say that the entries it
+> flushes depend on the current setting of HCR_EL2.E2H.
 
-Sure, why not.
+Hmm.  True.  It would seem that ALLE1 has the same bug, because I confused
+matters in 4a354502869.  Will fix both.
 
-Kevin
 
+r~
 
