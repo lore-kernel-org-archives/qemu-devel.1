@@ -2,68 +2,71 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BBFC33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B283C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D09CC2070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 694742070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gnT2FGg+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09CC2070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPTvE+9e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694742070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwlym-00068H-UV
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:57:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46889)
+	id 1iwlyo-0006DW-GX
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:57:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iwlxx-0004n7-K9
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:06 -0500
+ (envelope-from <quintela@redhat.com>) id 1iwlxz-0004nF-3s
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iwlxv-0005vb-GJ
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:04 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41500
+ (envelope-from <quintela@redhat.com>) id 1iwlxy-00061f-6X
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:07 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40879
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwlxv-0005tK-60
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:03 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwlxy-000614-2n
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580299022;
+ s=mimecast20190719; t=1580299025;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=qlwRzw0lgVZNQBON/VubX+BQXhxwmR8b3bktfZ159uw=;
- b=gnT2FGg+s3a3xQRGDS4lFmOvl8OA+sJleng7FIK8Wuz3O6wr21biZWwezq7Y471WrGu/WE
- 7LPoPN3zWtIVQYXJmtJ0n7S34OGLLU4Hq5RUuOLvhNM9OysX2poDcUZWGkVQAN37TVPr7f
- rIMO2G0d+sLXtQyUMrU/KZ05tBe94aA=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PbBVwTwxgB7nPVUXFlKEK3auQkBLFXi2IJU563asPOQ=;
+ b=cPTvE+9eNo+knsIW8zJ/kcFwIsZePVWPx9Anm1yEIbWbPr7gE0c20fQqAwjZuFkZz2BRY2
+ Fq73rTe+vCqYuYn7KCJq5nm6FCfwGp+J2sg5CWOgDnydrKKbjSSVMpEzhG8wIWmLZKGxVt
+ 91DvT90kZY5nNPLy6SCPLiUTlvuKUe0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-zv_7_fUUPj2O8RokQcqkyg-1; Wed, 29 Jan 2020 06:56:59 -0500
+ us-mta-371-BFbyGoMhNeW4Ey45IR3Ikw-1; Wed, 29 Jan 2020 06:57:04 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 483CDDB3C
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:56:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A46E2189F770
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:57:03 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-64.ams2.redhat.com [10.36.116.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 02B7B19E9C;
- Wed, 29 Jan 2020 11:56:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 69F5919E9C;
+ Wed, 29 Jan 2020 11:57:01 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 0/8] Multifd Migration Compression
-Date: Wed, 29 Jan 2020 12:56:47 +0100
-Message-Id: <20200129115655.10414-1-quintela@redhat.com>
+Subject: [PATCH v5 2/8] migration: Add support for modules
+Date: Wed, 29 Jan 2020 12:56:49 +0100
+Message-Id: <20200129115655.10414-3-quintela@redhat.com>
+In-Reply-To: <20200129115655.10414-1-quintela@redhat.com>
+References: <20200129115655.10414-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: zv_7_fUUPj2O8RokQcqkyg-1
+X-MC-Unique: BFbyGoMhNeW4Ey45IR3Ikw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -91,99 +94,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: 20200129111536.9497-1-quintela@redhat.com
+So we don't have to compile everything in, or have ifdefs
 
-[v5]
-- rebased on top of latest pull request
-- check zlib/zstd return codes in loops (denis suggestions)
-- check that we do the right thing in error cases (I corrupted the
-  stream, make buffers too small, etc by hand)
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ include/qemu/module.h | 2 ++
+ vl.c                  | 1 +
+ 2 files changed, 3 insertions(+)
 
-[v4]
-- create new parameters: multifd-zlib-level & multifd-zstd-level
-- use proper "conditionals" for qapi (thanks markus)
-- more than half of the patches moved to the migration PULL request
-  that this series are based on
-- method type has moved to one int from a set of flags
-- fixed all reviews comments
-
-Please review.
-
-[v3]
-- rebased on top of upstream + previous multifd cancel series
-- split multifd code into its own file (multifd.[ch])
-- split zstd/zlib compression methods (multifd-zstd/zlib.c)
-- use qemu module feauture to avoid ifdefs
-  (my understanding is that zlib needs to be present, but
-  we setup zstd only if it is not there or is disabled)
-- multifd-method: none|zlib|zstd
-
-  As far as I can see, there is no easy way to convince qapi that zstd
-  option could/couldn't be there depending on compliation flags. I
-  ended just checking in migrate_parameters_check() if it is enabled
-  and giving an error message otherwise.
-
-Questions:
-- I am "reusing" the compress-level parameter for both zstd and zlib,
-  but it poses a problem:
-  * zlib values: 1-9 (default: 6?)
-  * zstd values: 1-19 (default: 3)
-So, what should I do:
-  * create multifd-zstd-level and multifd-zlib-level (easier)
-  * reuse compress-level, and change its maximum values depending on
-    multifd-method
-  * any other good option?
-
-Please, review.
-
-[v2] - rebase on top of previous arguments posted to the list -
-introduces zlib compression - introduces zstd compression
-
-Please help if you know anything about zstd/zlib compression.
-
-This puts compression on top of multifd. Advantages about current
-compression:
-
-- We copy all pages in a single packet and then compress the whole
-  thing.
-
-- We reuse the compression stream for all the packets sent through the
-  same channel.
-
-- We can select nocomp/zlib/zstd levels of compression.
-
-Please, review.
-
-Juan Quintela (8):
-  multifd: Add multifd-method parameter
-  migration: Add support for modules
-  multifd: Make no compression operations into its own structure
-  multifd: Add multifd-zlib-level parameter
-  multifd: Add zlib compression multifd support
-  configure: Enable test and libs for zstd
-  multifd: Add multifd-zstd-level parameter
-  multifd: Add zstd compression multifd support
-
- configure                    |  30 ++++
- hw/core/qdev-properties.c    |  13 ++
- include/hw/qdev-properties.h |   3 +
- include/qemu/module.h        |   2 +
- migration/Makefile.objs      |   2 +
- migration/migration.c        |  70 ++++++++
- migration/migration.h        |   3 +
- migration/multifd-zlib.c     | 325 +++++++++++++++++++++++++++++++++
- migration/multifd-zstd.c     | 337 +++++++++++++++++++++++++++++++++++
- migration/multifd.c          | 191 +++++++++++++++++++-
- migration/multifd.h          |  29 +++
- migration/ram.c              |   2 +-
- monitor/hmp-cmds.c           |  21 +++
- qapi/migration.json          |  80 ++++++++-
- tests/qtest/migration-test.c |  30 +++-
- vl.c                         |   1 +
- 16 files changed, 1123 insertions(+), 16 deletions(-)
- create mode 100644 migration/multifd-zlib.c
- create mode 100644 migration/multifd-zstd.c
-
+diff --git a/include/qemu/module.h b/include/qemu/module.h
+index 65ba596e46..907cb5c0a5 100644
+--- a/include/qemu/module.h
++++ b/include/qemu/module.h
+@@ -40,6 +40,7 @@ static void __attribute__((constructor)) do_qemu_init_ ##=
+ function(void)    \
+ #endif
+=20
+ typedef enum {
++    MODULE_INIT_MIGRATION,
+     MODULE_INIT_BLOCK,
+     MODULE_INIT_OPTS,
+     MODULE_INIT_QOM,
+@@ -56,6 +57,7 @@ typedef enum {
+ #define xen_backend_init(function) module_init(function, \
+                                                MODULE_INIT_XEN_BACKEND)
+ #define libqos_init(function) module_init(function, MODULE_INIT_LIBQOS)
++#define migration_init(function) module_init(function, MODULE_INIT_MIGRATI=
+ON)
+=20
+ #define block_module_load_one(lib) module_load_one("block-", lib)
+ #define ui_module_load_one(lib) module_load_one("ui-", lib)
+diff --git a/vl.c b/vl.c
+index b0f52c4d6e..9f8577955a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2890,6 +2890,7 @@ int main(int argc, char **argv, char **envp)
+     qemu_init_exec_dir(argv[0]);
+=20
+     module_call_init(MODULE_INIT_QOM);
++    module_call_init(MODULE_INIT_MIGRATION);
+=20
+     qemu_add_opts(&qemu_drive_opts);
+     qemu_add_drive_opts(&qemu_legacy_drive_opts);
 --=20
 2.24.1
 
