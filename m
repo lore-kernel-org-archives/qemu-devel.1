@@ -2,74 +2,89 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3826C33CB7
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC66C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:21:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4129206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:21:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4129206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0F022206F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:21:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cvWYpiFa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F022206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwrxr-0006K1-SH
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 13:21:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51114)
+	id 1iwryM-000766-9B
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 13:21:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51320)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iwrxE-0005s4-Vu
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:20:46 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iwrxc-0006B8-8W
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:21:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iwrxD-0007FR-LE
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:20:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40782)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iwrxD-0007Dh-Fd
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:20:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iwrxB-00008K-9X
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 18:20:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 341D12E80C8
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 18:20:41 +0000 (UTC)
+ (envelope-from <wainersm@redhat.com>) id 1iwrxa-00087w-9x
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:21:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27026
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iwrxa-00085t-5L
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:21:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580322065;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RkkUJNWNjNSk8IA3JDq8UQgoEpsrirxL5005cMBFP6Y=;
+ b=cvWYpiFaVZsVYmUX+sUnrJ5MtdxPm2oa/r99+7mrjPo4wC7i2UyAVkk8DR0VQBGV58gsVK
+ xsPkCQ3kSWMhBHcDoScHs1M2eysUMLpgGB9PAZ+KLd3/eGNaODQ36L1NgDfc62IN06Fomt
+ vP35xo3kU2dYSzC+3SdSm6E3K6Mmg0U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299--iv4DRlkO5KEIA8wqLkcXw-1; Wed, 29 Jan 2020 13:21:02 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9DDF800D41;
+ Wed, 29 Jan 2020 18:21:00 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-51.gru2.redhat.com
+ [10.97.116.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 75F195DA7B;
+ Wed, 29 Jan 2020 18:20:57 +0000 (UTC)
+Subject: Re: [PATCH 1/2] tests/boot_console: Send <carriage return> on serial
+ lines
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20191010122128.29000-1-f4bug@amsat.org>
+ <20191010122128.29000-2-f4bug@amsat.org>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <22ab02fc-0e2c-f684-c257-8a0734a9af0d@redhat.com>
+Date: Wed, 29 Jan 2020 16:20:54 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191010122128.29000-2-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: -iv4DRlkO5KEIA8wqLkcXw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Jan 2020 18:07:35 -0000
-From: Philippe Vaucher <philippe.vaucher@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philippe-vaucher pmaydell
-X-Launchpad-Bug-Reporter: Philippe Vaucher (philippe-vaucher)
-X-Launchpad-Bug-Modifier: Philippe Vaucher (philippe-vaucher)
-References: <158022582642.18726.3284794136336139049.malonedeb@gac.canonical.com>
-Message-Id: <158032125582.5376.11277721695720530499.malone@chaenomeles.canonical.com>
-Subject: [Bug 1861161] Re: qemu-arm-static stuck with 100% CPU when
- cross-compiling emacs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d074ffb2d4613836d0ea73e643046ebbe3e24c71
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,103 +93,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1861161 <1861161@bugs.launchpad.net>
+Cc: Helge Deller <deller@gmx.de>, Richard Henderson <rth@twiddle.net>,
+ Sven Schnelle <svens@stackframe.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Okay, currently testing XFS. Using newer version of glibc on alpine
-triggered other problems, like 0% CPU processes stuck on FUTEX_WAIT.
 
--- =
+On 10/10/19 9:21 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Some firmwares don't parse the <Newline> control character and
+> expect a <carriage return>.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>   tests/acceptance/boot_linux_console.py | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index 8a9a314ab4..f05452824e 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -51,7 +51,7 @@ class BootLinuxConsole(Test):
+>                   self.fail(fail)
+>  =20
+>       def exec_command_and_wait_for_pattern(self, command, success_messag=
+e):
+> -        command +=3D '\n'
+> +        command +=3D '\r\n'
+>           self.vm.console_socket.sendall(command.encode())
+>           self.wait_for_console_pattern(success_message)
+>  =20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1861161
+This doesn't apply anymore since exec_command_and_wait_for_pattern() is=20
+now part of the avocado_qemu module.
 
-Title:
-  qemu-arm-static stuck with 100% CPU when cross-compiling emacs
+I'm little worried about this breaking the current tests that use the=20
+method. Could you please run those tests before putting it on the pull=20
+request, Philippe?
 
-Status in QEMU:
-  New
+Besides that, this change looks good to me:
 
-Bug description:
-  Hello,
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-  I'm trying to build multi-arch docker images for
-  https://hub.docker.com/r/silex/emacs.
-
-  Here is the machine I'm building on (hetzner cloud machine):
-
-  root@ubuntu-4gb-fsn1-1:~# lsb_release -a
-  No LSB modules are available.
-  Distributor ID: Ubuntu
-  Description:    Ubuntu 18.04.3 LTS
-  Release:        18.04
-  Codename:       bionic
-  root@ubuntu-4gb-fsn1-1:~# uname -a
-  Linux ubuntu-4gb-fsn1-1 4.15.0-74-generic #84-Ubuntu SMP Thu Dec 19 08:06=
-:28 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
-
-  Whenever I try to build the following alpine Dockerfile
-  https://gitlab.com/Silex777/docker-
-  emacs/blob/master/26.3/alpine/3.9/dev/Dockerfile like this:
-
-  $ sysctl kernel.randomize_va_space=3D0
-  $ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-  $ docker build --pull -t test --platform arm .
-
-  It builds fine until this:
-
-  root@ubuntu-4gb-fsn1-1:~# ps -ef | grep qemu
-  root     26473 26465 99 14:26 pts/0    01:59:58 /usr/bin/qemu-arm-static =
-../src/bootstrap-emacs -batch --no-site-file --no-site-lisp --eval (setq lo=
-ad-prefer-newer t) -f batch-byte-compile emacs-lisp/macroexp.el
-
-  This is supposed to take a few seconds, but here it takes 100% CPU and
-  never ends. When I strace the process I see a never ending loop like
-  this:
-
-  getdents64(5, /* 0 entries */, 2048)    =3D 0
-  lseek(5, 0, SEEK_SET)                   =3D 0
-  getdents64(5, /* 5 entries */, 2048)    =3D 120
-  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  getdents64(5, /* 0 entries */, 2048)    =3D 0
-  lseek(5, 0, SEEK_SET)                   =3D 0
-  getdents64(5, /* 5 entries */, 2048)    =3D 120
-  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  getdents64(5, /* 0 entries */, 2048)    =3D 0
-  lseek(5, 0, SEEK_SET)                   =3D 0
-  getdents64(5, /* 5 entries */, 2048)    =3D 120
-  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  getdents64(5, /* 0 entries */, 2048)    =3D 0
-  lseek(5, 0, SEEK_SET)                   =3D 0
-  getdents64(5, /* 5 entries */, 2048)    =3D 120
-  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  getdents64(5, /* 0 entries */, 2048)    =3D 0
-  lseek(5, 0, SEEK_SET)                   =3D 0
-  getdents64(5, /* 5 entries */, 2048)    =3D 120
-  tgkill(5875, 5878, SIGRT_2)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-
-  It happens with all the QEMU versions I tested:
-  - 2.11.1 (OS version)
-  - 4.1.1-1 (from multiarch/qemu-user-static:4.1.1-1)
-  - 4.2.0-2 (from multiarch/qemu-user-static)
-
-  Any ideas of what I could do to debug it further?
-
-  Kind regards,
-  Philippe
-
-  p.s: Everything builds fine when the base image is ubuntu. I also had
-  similar hangs with basic commands like "apt-get install foo"
-  sometimes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1861161/+subscriptions
 
