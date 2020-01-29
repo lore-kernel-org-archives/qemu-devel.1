@@ -2,63 +2,61 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD1DC33C9E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 00:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB869C33C9E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 02:13:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0821C2467E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 00:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0821C2467E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3AC92073A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 02:13:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pkdinFM1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3AC92073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwbfL-00042Q-5G
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 19:57:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55122)
+	id 1iwcra-0007Oe-Ra
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jan 2020 21:13:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44494)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <arei@altlinux.org>) id 1iwbem-0003dp-BX
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 19:56:37 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iwcqu-0006Si-5f
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 21:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <arei@altlinux.org>) id 1iwbel-00025h-8G
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 19:56:36 -0500
-Received: from air.basealt.ru ([194.107.17.39]:52278)
+ (envelope-from <dgibson@ozlabs.org>) id 1iwcqs-0001VN-Bb
+ for qemu-devel@nongnu.org; Tue, 28 Jan 2020 21:13:11 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:57323)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <arei@altlinux.org>) id 1iwbel-000233-0o
- for qemu-devel@nongnu.org; Tue, 28 Jan 2020 19:56:35 -0500
-Received: by air.basealt.ru (Postfix, from userid 490)
- id 7F4C65895A1; Wed, 29 Jan 2020 00:56:32 +0000 (UTC)
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
- [209.85.128.52])
- by air.basealt.ru (Postfix) with ESMTPSA id A91D7589587
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 00:56:30 +0000 (UTC)
-Received: by mail-wm1-f52.google.com with SMTP id t14so4556189wmi.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jan 2020 16:56:30 -0800 (PST)
-X-Gm-Message-State: APjAAAVgXllQGcAI4Y/O0dd5YegiugUKIaa8DqvMZcXxq48Fa6ggdHfJ
- T6ppV8nhWz5sGAEt2naUXImN4V4m/3gONEFXbhM=
-X-Google-Smtp-Source: APXvYqxI+xFJyK23qWzgOnEGVBFvY8qrOqTAo8ro9IDlDGmLxPJdsbItU0HNjuG1mNvAscuFcalw+ZIF0niv+31MBqI=
-X-Received: by 2002:a1c:7907:: with SMTP id l7mr7576059wme.37.1580259390100;
- Tue, 28 Jan 2020 16:56:30 -0800 (PST)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iwcqr-0001UO-Is; Tue, 28 Jan 2020 21:13:10 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 486n7x6T9Xz9sNF; Wed, 29 Jan 2020 13:13:01 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1580263981;
+ bh=R4N9GXZEBf3haYG1LxyC5OVnr+vzfKSrG58Gk4iPkvs=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=pkdinFM1eZY9RLdOP4AU/ZXmMi5vGDYcPGPQ28Tl291TCvQq87kzyF0R3P9TTJQV6
+ H3J41m94mVUtwJPOLqCSdYvmBtikA5xDn+Ik2M0BydnGsR8XJLLFoQDbSFlGqiWqaK
+ UEzS4n5ZELCOE8AOicJfPQJTRkHt+PC8GkppQxCo=
+Date: Wed, 29 Jan 2020 13:04:50 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 0/3] ppc/pnv: Add a "hostboot" mode
+Message-ID: <20200129020450.GU42099@umbus.fritz.box>
+References: <20200127144154.10170-1-clg@kaod.org>
 MIME-Version: 1.0
-References: <CANA1cBJVuJ8Lx5KEQGFRb7trcnOsTbb26+K_efLM+26TB_KfCQ@mail.gmail.com>
- <CAKmqyKP45vT+se16sxj6NZRo2e5wck1oDuUPJw2m5papL-m4hg@mail.gmail.com>
-In-Reply-To: <CAKmqyKP45vT+se16sxj6NZRo2e5wck1oDuUPJw2m5papL-m4hg@mail.gmail.com>
-From: Nikita Ermakov <arei@altlinux.org>
-Date: Wed, 29 Jan 2020 03:55:54 +0300
-X-Gmail-Original-Message-ID: <CANA1cB+5C0Y3vgdJ_xNujexPTixWH8bfgt8mPkEQf0LBq=VJfg@mail.gmail.com>
-Message-ID: <CANA1cB+5C0Y3vgdJ_xNujexPTixWH8bfgt8mPkEQf0LBq=VJfg@mail.gmail.com>
-Subject: Re: Debugging heterogeneous SoC
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000999aeb059d3ccfb9"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 194.107.17.39
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="J9YdZykiGPT3Jhx7"
+Content-Disposition: inline
+In-Reply-To: <20200127144154.10170-1-clg@kaod.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,55 +68,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000999aeb059d3ccfb9
-Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 29 Jan 2020 at 03:43, Alistair Francis <alistair23@gmail.com> wrote:
-
-> Use these commands to attach GDB to QEMU:
->
->         target extended-remote :1234
->         add-inferior
->         inferior 2
->         attach 2
->         set schedule-multiple
->         info threads
->
-> Alistair
->
-Thank you! It is worked! :)
-
--- 
-Thanks,
-Nikita
-B8 00 4C CD 21
-
---000000000000999aeb059d3ccfb9
-Content-Type: text/html; charset="UTF-8"
+--J9YdZykiGPT3Jhx7
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, 29 Jan 2020 at 03:43, Alistai=
-r Francis &lt;<a href=3D"mailto:alistair23@gmail.com">alistair23@gmail.com<=
-/a>&gt; wrote:</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-Use these commands to attach GDB to QEMU:<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 target extended-remote :1234<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 add-inferior<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 inferior 2<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 attach 2<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 set schedule-multiple<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 info threads<br>
-<br>
-Alistair<br></blockquote><div>Thank you! It is worked! :)=C2=A0</div></div>=
-<div><br></div>-- <br><div dir=3D"ltr" class=3D"gmail_signature"><div dir=
-=3D"ltr">Thanks,<br>Nikita<br>B8 00 4C CD 21<br></div></div></div>
+On Mon, Jan 27, 2020 at 03:41:51PM +0100, C=E9dric Le Goater wrote:
+> Hello,
+>=20
+> The QEMU PowerNV machine was first designed to start with a skiboot
+> firmware at 0x0, which then loads a kernel and ramfs acting as a boot
+> loader. Support of the POWER processor improving in QEMU, it has been
+> possible to support other firmwares.
+>=20
+> These changes add support for firmwares mapped at a different address
+> than 0x0. First two patches are fixes/cleanups and the last one adds a
+> "hb-mode" option to the machine for this purpose. It needs some
+> discussion to see how we want to activate this new mode.
 
---000000000000999aeb059d3ccfb9--
+Applied to ppc-for-5.0, thanks.
+
+>=20
+> Thanks,
+>=20
+> C.
+>=20
+> C=E9dric Le Goater (3):
+>   ppc/pnv: Add support for HRMOR on Radix host
+>   ppc/pnv: remove useless "core-pir" property alias.
+>   ppc/pnv: Add support for "hostboot" mode
+>=20
+>  include/hw/ppc/pnv.h      |  2 ++
+>  include/hw/ppc/pnv_core.h |  1 +
+>  hw/ppc/pnv.c              | 28 +++++++++++++++++++++++++++-
+>  hw/ppc/pnv_core.c         | 31 ++++++++++++++++---------------
+>  hw/ppc/pnv_lpc.c          |  5 ++++-
+>  target/ppc/mmu-radix64.c  |  6 ++++++
+>  6 files changed, 56 insertions(+), 17 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--J9YdZykiGPT3Jhx7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4w6EAACgkQbDjKyiDZ
+s5I6LA/6Az0k1+X3JEYzVXEl5YFcB48bjcHnrwDIW74RWrwEpc66euSlpqe2j3uX
++WxJuj4S+Zb/uGilm8aXAe5kw4pfbykEEHNEgHjcx7VZ0V+yGTiXTp7BewtaOBKV
+YY6Nj8C+7D8bnKB7bNHdK/VXds9cm5n8XCQdU5nXJUyHbS+ynu23AOuL3v8bACSW
+O2m09+Rh3pJWvZpMx/7DAmwP4eDGPC++yzXGsB6t5NO42Eqlbu8NeedeCoYvFkE/
+1pDJFoo5r/vGEceeVjWdvd/73PWfPusMbI2dJ2d/StIUbPrJDRB+XgWDHkLGF2+p
+wlhH0zECgZIV9ma2Znwwz4DRiN0xxaO8uFx0laNEhwjxw9hvX0SxR9bonuOqDctX
+QMtgldCcGkc7RYMHygjHB46oXX9Lz43WTAaFz2BYXIgrCXukLmceETMeYZoqz+6e
+4cfTvN2ynn5aDPqH/qdkKad3HfZEbpTRNgJGvpbSKZ3XAcvd2iF6PF/hJiy7JHH6
+qYGsPZIbCOKoG3C3gh2e483BK8DfxRaXFyCBgQ7TYUSsRx563fWBBxBIk12m9+fd
+VBvahYF0lZVEIarXQnwrtcG1Fk4yFuMmAKKWcHs7pvHGxBqg1FuoZbVHgbv4dQP8
+RzkpNx50+cBSJwpvOee+RBdBoK0xslLWo9TYMX61TWK6kcaQ+po=
+=24JK
+-----END PGP SIGNATURE-----
+
+--J9YdZykiGPT3Jhx7--
 
