@@ -2,92 +2,64 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4B9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3AB1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C506D20678
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:10:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C506D20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C8FB620678
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:16:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8FB620678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwn6d-0004qk-0Z
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 08:10:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47545)
+	id 1iwnDE-0000hc-U8
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 08:16:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1iwn5a-0003ap-IH
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:09:03 -0500
+ (envelope-from <clg@kaod.org>) id 1iwnCF-0008Ho-Up
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1iwn5Z-0003DG-Lr
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:09:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40998
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1iwn5Z-0003Cf-GY
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:09:01 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00TD6BkE050755; Wed, 29 Jan 2020 08:09:00 -0500
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xtrmbacpe-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Jan 2020 08:09:00 -0500
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00TD5GfK014095;
- Wed, 29 Jan 2020 13:09:00 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma04wdc.us.ibm.com with ESMTP id 2xrda6j245-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Jan 2020 13:09:00 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00TD8vSI49086812
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 29 Jan 2020 13:08:57 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 03827124053;
- Wed, 29 Jan 2020 13:08:57 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E1415124052;
- Wed, 29 Jan 2020 13:08:56 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 29 Jan 2020 13:08:56 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v1 0/1] Merge tpm 2020/01/29 v1
-Date: Wed, 29 Jan 2020 08:08:44 -0500
-Message-Id: <20200129130845.1886915-1-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <clg@kaod.org>) id 1iwnCD-0005Xj-PR
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:15:55 -0500
+Received: from 9.mo6.mail-out.ovh.net ([87.98.171.146]:45750)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iwnCD-0005OC-K4
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:15:53 -0500
+Received: from player734.ha.ovh.net (unknown [10.108.35.215])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 76CED1FBB8B
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 14:15:42 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player734.ha.ovh.net (Postfix) with ESMTPSA id 44685EA24FD2;
+ Wed, 29 Jan 2020 13:15:37 +0000 (UTC)
+Subject: Re: [PATCH 0/2] ppc/pnv: Add models for PHB4 and PHB3 PCIe Host
+ bridges
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200127144506.11132-1-clg@kaod.org>
+ <20200129063103.GB42099@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ad66cad0-98ff-7ab1-9be9-8bc234279ff6@kaod.org>
+Date: Wed, 29 Jan 2020 14:15:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-01-29_02:2020-01-28,
- 2020-01-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0
- priorityscore=1501 suspectscore=1 mlxlogscore=727 bulkscore=0
- lowpriorityscore=0 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
- mlxscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001290107
+In-Reply-To: <20200129063103.GB42099@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 9619125855068064576
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrfeeigdeglecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeehnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id 00TD6BkE050755
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 87.98.171.146
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,41 +71,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, Oliver O'Halloran <oohall@gmail.com>,
+ qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch fixes a post-copy migration error due to an unaligned start ad=
-dress.
+On 1/29/20 7:31 AM, David Gibson wrote:
+> On Mon, Jan 27, 2020 at 03:45:04PM +0100, C=E9dric Le Goater wrote:
+>> Hello,
+>>
+>> These are models for the PCIe Host Bridges, PHB3 and PHB4, as found on
+>> POWER8 and POWER9 processors. It includes the PowerBus logic interface
+>> (PBCQ), IOMMU support, a single PCIe Gen.3/4 Root Complex, and support
+>> for MSI and LSI interrupt sources as found on each system depending on
+>> the interrupt controller: XICS or XIVE.
+>>
+>> No default device layout is provided and PCI devices can be added on
+>> any of the available PCIe Root Port (pcie.0 .. 2) with address 0x0 as
+>> the firwware (skiboot) only accepts a single device per root port. To
+>> run a simple system with a network and a storage adapters, use a
+>> command line options such as :
+>>
+>>   -device e1000e,netdev=3Dnet0,mac=3DC0:FF:EE:00:00:02,bus=3Dpcie.0,ad=
+dr=3D0x0
+>>   -netdev bridge,id=3Dnet0,helper=3D/usr/libexec/qemu-bridge-helper,br=
+=3Dvirbr0,id=3Dhostnet0
+>>
+>>   -device megasas,id=3Dscsi0,bus=3Dpcie.1,addr=3D0x0
+>>   -drive file=3D$disk,if=3Dnone,id=3Ddrive-scsi0-0-0-0,format=3Dqcow2,=
+cache=3Dnone
+>>   -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3D=
+drive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2
+>>
+>> If more are needed, include a bridge.
+>>
+>> Multi chip is supported, each chip adding its set of PHB controllers
+>> and its PCI busses. The model doesn't emulate the EEH error handling
+>> and cold plugging PHB devices still needs some work.
+>>
+>> XICS requires some adjustment to support the PHB3 MSI. The changes are
+>> provided in the PHB3 model but they could be decoupled in prereq
+>> patches.
+>=20
+> Applied to ppc-for-5.0, thanks.
 
-   Stefan
+Should we add a default set of devices on PHB1 like found on OpenPOWER=20
+system ? On a P8 we have  :
 
-The following changes since commit 4c60e3289875ae6c516a37523bcecb87f68ce6=
-7c:
+ +-[0001:00]---00.0-[01-07]----00.0-[02-07]--+-01.0-[03-04]----00.0-[04]-=
+---00.0  ASPEED Technology, Inc. ASPEED Graphics Family
+ |                                           +-02.0-[05]----00.0  Texas I=
+nstruments TUSB73x0 SuperSpeed USB 3.0 xHCI Host Controller
+ |                                           +-03.0-[06]--+-00.0  Broadco=
+m Inc. and subsidiaries NetXtreme BCM5718 Gigabit Ethernet PCIe
+ |                                           |            \-00.1  Broadco=
+m Inc. and subsidiaries NetXtreme BCM5718 Gigabit Ethernet PCIe
+ |                                           \-04.0-[07]----00.0  Marvell=
+ Technology Group Ltd. 88SE9235 PCIe 2.0 x2 4-port SATA 6 Gb/s Controller
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-pa-20200127' into s=
-taging (2020-01-28 15:11:04 +0000)
 
-are available in the Git repository at:
-
-  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2020-01-29-1
-
-for you to fetch changes up to 71e415c8a75c130875f14d6b2136825789feb297:
-
-  tpm-ppi: page-align PPI RAM (2020-01-29 07:27:07 -0500)
-
-----------------------------------------------------------------
-Merge tpm 2020/01/29 v1
-
-----------------------------------------------------------------
-Marc-Andr=C3=A9 Lureau (1):
-      tpm-ppi: page-align PPI RAM
-
- hw/tpm/tpm_ppi.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
---=20
-2.24.1
-
+C.
 
