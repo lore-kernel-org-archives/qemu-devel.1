@@ -2,75 +2,82 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D82C2C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6530C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:13:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A236F20716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76ABE20716
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:13:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqOXWxFZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A236F20716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8h/eccI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76ABE20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwp0c-00041h-Qr
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 10:12:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39287)
+	id 1iwp1b-00053M-M6
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 10:13:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iwozz-0003cH-Kg
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:11:25 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwp0g-0004Dh-VC
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:12:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iwozx-0003CR-54
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:11:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20394
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iwozw-00038t-TL
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:11:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580310680;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=teAOIYrByBYIAOdkaN5/tIV07QCaYYpeaFVdxqGKbCs=;
- b=OqOXWxFZvJQUBodOE6Obk47+Fm+QQhAJunW2tK6aJODOZlOj5BHkkenAqfeRQFoz1t7RDw
- Bir/CYD+gffM+tM9Di7cpB/uGYPCFAi4qyWbGXYZ16Xp0HNwFVRRbd6YT4r8i5x0r2JrHu
- kQ75tyjlPszFJr3dA/zkg+7NPuBIeXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-PdKs1jxtNqOwhFeholjMsA-1; Wed, 29 Jan 2020 10:11:17 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 282CE1005F73;
- Wed, 29 Jan 2020 15:11:16 +0000 (UTC)
-Received: from localhost (ovpn-117-180.ams2.redhat.com [10.36.117.180])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5EFF11059B60;
- Wed, 29 Jan 2020 15:11:13 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] docs: add virtiofsd(1) man page
-Date: Wed, 29 Jan 2020 15:11:12 +0000
-Message-Id: <20200129151112.156335-1-stefanha@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwp0e-0004FY-JI
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:12:06 -0500
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:44695)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iwp0e-0004EJ-ES
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:12:04 -0500
+Received: by mail-ot1-x336.google.com with SMTP id h9so15800428otj.11
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 07:12:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mn8OQEQfS5YThuazY6hWrbt3SGKdbXtJqISyUPCNmgI=;
+ b=K8h/eccIPEN2Wm9B8330KjGkQkPTaarLTFjNNEBYExSRv6uAHwsBTxFGVPJWQE5JaH
+ 5//z8RMl43iTh7MPXUBOkIYsM995/zNSy1qukBsOLfL1T4CoweLbHFYdK9bTFGbLefqn
+ 4HOYyD0/olrLCwll9Zmh4dAPg5SDv5OHt1HimEvB9eEqaI6fSP45KD0XNaqHdRlCQOEg
+ MgLc/PkTEthliTi0OWN6bnTkXJ0IUAXciCLWmbkiQQHIECgiInCuZtEfTYEkpM/DQTIb
+ FGNfZLSgX5bIg/FNtKdhC8wtmREBdQkY+DRIOYRuXzfdN46T44w/LENQONlXAOrjm0hR
+ pyXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mn8OQEQfS5YThuazY6hWrbt3SGKdbXtJqISyUPCNmgI=;
+ b=N7+9EYf3CIQlFSzkCornCK6pvLaeoe8Qot718QOxJSbjiJ6KzLzJHqV4M2xYiAdjuc
+ id5lZLSWZS51ZN50zER+MKxI9dBG+eji9SVl1rJ9FmH265syls0JfJKLtpkqf/ynID+K
+ tJdP4SefjoHIakE7BIfzD5NB4NegMsuikR5RKlTT66oTbXvqMY7hG63Qt3taq9Fjlbob
+ /99JSKRt8zx8YvalyGu5QWLgwOJ/FlrA243sHxdxl2Dnaz+wyKb/joY1330Tgg9rz/A/
+ IJ0S7i1zIIQASfD2O6UH1ORp5LI/lKqfPWUBdHvyi2gYk4/Zc/ijeJQWmbyKzZS8PNap
+ bSBg==
+X-Gm-Message-State: APjAAAWdVf1AIgzEwiN33oY+hgxtPyKG0Cfgrbb8TaTsaKDR7u6lg848
+ v10Znqj91zHDQQDhGsvqVL1cDgxpK4Ix/UkuGKM=
+X-Google-Smtp-Source: APXvYqzeGxBfZWS9BA0Jma4z3qrYrYJd8ILIEKFO4bxParr/64CMTpfiHJBJBsGlDg2Jq/NtFSGi/FU8iQjfxAesk74=
+X-Received: by 2002:a05:6830:1042:: with SMTP id
+ b2mr20607948otp.306.1580310722722; 
+ Wed, 29 Jan 2020 07:12:02 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: PdKs1jxtNqOwhFeholjMsA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1580079311-20447-3-git-send-email-aleksandar.markovic@rt-rk.com>
+ <20200129122058.3714c0c4195afc62fc0ce297@kent.ac.uk>
+In-Reply-To: <20200129122058.3714c0c4195afc62fc0ce297@kent.ac.uk>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 29 Jan 2020 16:11:51 +0100
+Message-ID: <CAL1e-=g=6zXB6pW4XYJ_NXYe4tu43N4DSUBPw=tJPqT1WvKCqg@mail.gmail.com>
+Subject: Re: [PATCH rc3 02/30] target/avr: Introduce AVR CPU class object
+To: Sarah Harris <seh53@kent.ac.uk>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,254 +89,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "S.Harris" <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document the virtiofsd(1) program and its command-line options.  This
-man page is a rST conversion of the original texi documentation that I
-wrote.
+On Wed, Jan 29, 2020 at 1:20 PM Sarah Harris <seh53@kent.ac.uk> wrote:
+>
+> Hi,
+>
+> I think I've found a minor bug: the stack pointer should be initialised to the size of SRAM in some or most cases.
+> Currently, SP is initialised to zero.
+>
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-Based-on: 20200124162606.8787-1-peter.maydell@linaro.org
-          ("[PATCH v2 0/8] qemu-img, qemu-trace-stap, virtfs-proxy-helper: =
-convert to rST")
-v2:
- * Fix mount -t virtio_fs -> virtiofs outdated doc [Liam]
- * Use memory-backend-memfd instead of memory-backend-file
----
- MAINTAINERS                |   1 +
- Makefile                   |   8 ++-
- docs/interop/conf.py       |   5 +-
- docs/interop/index.rst     |   1 +
- docs/interop/virtiofsd.rst | 123 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 136 insertions(+), 2 deletions(-)
- create mode 100644 docs/interop/virtiofsd.rst
+Very good (that you spotted the bug)!
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index daeaf25599..2ed39ecf4f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1605,6 +1605,7 @@ S: Supported
- F: tools/virtiofsd/*
- F: hw/virtio/vhost-user-fs*
- F: include/hw/virtio/vhost-user-fs.h
-+F: docs/interop/virtiofsd.rst
-=20
- virtio-input
- M: Gerd Hoffmann <kraxel@redhat.com>
-diff --git a/Makefile b/Makefile
-index 539f9ef079..ecd26044bc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -348,6 +348,9 @@ DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1
- DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-img.1
- DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-nbd.8
- DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-ga.8
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+DOCS+=3D$(MANUAL_BUILDDIR)/interop/virtiofsd.1
-+endif
- DOCS+=3D$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
- DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/=
-interop/qemu-qmp-ref.7
- DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/in=
-terop/qemu-ga-ref.7
-@@ -861,6 +864,9 @@ ifdef CONFIG_VIRTFS
- =09$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
- =09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1 "$(DES=
-TDIR)$(mandir)/man1"
- endif
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+=09$(INSTALL_DATA) docs/interop/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
-+endif
-=20
- install-datadir:
- =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
-@@ -1052,7 +1058,7 @@ $(MANUAL_BUILDDIR)/system/index.html: $(call manual-d=
-eps,system)
-=20
- $(call define-manpage-rule,interop,\
-        qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
--       virtfs-proxy-helper.1,\
-+       virtiofsd.1 virtfs-proxy-helper.1,\
-        $(SRC_PATH/qemu-img-cmds.hx))
-=20
- $(call define-manpage-rule,system,qemu-block-drivers.7)
-diff --git a/docs/interop/conf.py b/docs/interop/conf.py
-index b0f322207c..b3cda17042 100644
---- a/docs/interop/conf.py
-+++ b/docs/interop/conf.py
-@@ -27,5 +27,8 @@ man_pages =3D [
-      [], 1),
-     ('virtfs-proxy-helper', 'virtfs-proxy-helper',
-      u'QEMU 9p virtfs proxy filesystem helper',
--     ['M. Mohan Kumar'], 1)
-+     ['M. Mohan Kumar'], 1),
-+    ('virtiofsd', 'virtiofsd', u'QEMU virtio-fs shared file system daemon'=
-,
-+     ['Stefan Hajnoczi <stefanha@redhat.com>',
-+      'Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>'], 1),
- ]
-diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index 3b763b1eeb..e8455b4270 100644
---- a/docs/interop/index.rst
-+++ b/docs/interop/index.rst
-@@ -24,3 +24,4 @@ Contents:
-    vhost-user
-    vhost-user-gpu
-    virtfs-proxy-helper
-+   virtiofsd
-diff --git a/docs/interop/virtiofsd.rst b/docs/interop/virtiofsd.rst
-new file mode 100644
-index 0000000000..b1d7fa4cda
---- /dev/null
-+++ b/docs/interop/virtiofsd.rst
-@@ -0,0 +1,123 @@
-+QEMU virtio-fs shared file system daemon
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Synopsis
-+--------
-+
-+**virtiofsd** [*OPTIONS*]
-+
-+Description
-+-----------
-+
-+Share a host directory tree with a guest through a virtio-fs device.  This
-+program is a vhost-user backend that implements the virtio-fs device.  Eac=
-h
-+virtio-fs device instance requires its own virtiofsd process.
-+
-+This program is designed to work with QEMU's ``--device vhost-user-fs-pci`=
-`
-+but should work with any virtual machine monitor (VMM) that supports
-+vhost-user.  See the Examples section below.
-+
-+This program must be run as the root user.  Upon startup the program will
-+switch into a new file system namespace with the shared directory tree as =
-its
-+root.  This prevents "file system escapes" due to symlinks and other file
-+system objects that might lead to files outside the shared directory.  The
-+program also sandboxes itself using seccomp(2) to prevent ptrace(2) and ot=
-her
-+vectors that could allow an attacker to compromise the system after gainin=
-g
-+control of the virtiofsd process.
-+
-+Options
-+-------
-+
-+.. program:: virtiofsd
-+
-+.. option:: -h, --help
-+
-+  Print help.
-+
-+.. option:: -V, --version
-+
-+  Print version.
-+
-+.. option:: -d
-+
-+  Enable debug output.
-+
-+.. option:: --syslog
-+
-+  Print log messages to syslog instead of stderr.
-+
-+.. option:: -o OPTION
-+
-+  * debug -
-+    Enable debug output.
-+
-+  * flock|no_flock -
-+    Enable/disable flock.  The default is ``no_flock``.
-+
-+  * log_level=3DLEVEL -
-+    Print only log messages matching LEVEL or more severe.  LEVEL is one o=
-f
-+    ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
-+
-+  * norace -
-+    Disable racy fallback.  The default is false.
-+
-+  * posix_lock|no_posix_lock -
-+    Enable/disable remote POSIX locks.  The default is ``posix_lock``.
-+
-+  * readdirplus|no_readdirplus -
-+    Enable/disable readdirplus.  The default is ``readdirplus``.
-+
-+  * source=3DPATH -
-+    Share host directory tree located at PATH.  This option is required.
-+
-+  * timeout=3DTIMEOUT -
-+    I/O timeout in seconds.  The default depends on cache=3D option.
-+
-+  * vhost_user_socket=3DPATH -
-+    Listen on vhost-user UNIX domain socket at PATH.
-+
-+  * writeback|no_writeback -
-+    Enable/disable writeback cache. The cache alows the FUSE client to buf=
-fer
-+    and merge write requests.  The default is ``no_writeback``.
-+
-+  * xattr|no_xattr -
-+    Enable/disable extended attributes (xattr) on files and directories.  =
-The
-+    default is ``no_xattr``.
-+
-+.. option:: --socket-path=3DPATH
-+
-+  Listen on vhost-user UNIX domain socket at PATH.
-+
-+.. option:: --fd=3DFDNUM
-+
-+  Accept connections from vhost-user UNIX domain socket file descriptor FD=
-NUM.
-+  The file descriptor must already be listening for connections.
-+
-+.. option:: --thread-pool-size=3DNUM
-+
-+  Restrict the number of worker threads per request queue to NUM.  The def=
-ault
-+  is 64.
-+
-+.. option:: --cache=3Dnone|auto|always
-+
-+  Select the desired trade-off between coherency and performance.  ``none`=
-`
-+  forbids the FUSE client from caching to achieve best coherency at the co=
-st of
-+  performance.  ``auto`` acts similar to NFS with a 1 second metadata cach=
-e
-+  timeout.  ``always`` sets a long cache lifetime at the expense of cohere=
-ncy.
-+
-+Examples
-+--------
-+
-+Export ``/var/lib/fs/vm001/`` on vhost-user UNIX domain socket
-+``/var/run/vm001-vhost-fs.sock``:
-+
-+::
-+
-+  host# virtiofsd --socket-path=3D/var/run/vm001-vhost-fs.sock -o source=
-=3D/var/lib/fs/vm001
-+  host# qemu-system-x86_64 \
-+      -chardev socket,id=3Dchar0,path=3D/var/run/vm001-vhost-fs.sock \
-+      -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs \
-+      -object memory-backend-memfd,id=3Dmem,size=3D4G,share=3Don \
-+      -numa node,memdev=3Dmem \
-+      ...
-+  guest# mount -t virtiofs myfs /mnt
---=20
-2.24.1
+> It seems modern AVRs set SP to the size of SRAM (RAMEND) at power-on, though a few older ones initialise to zero.
+> The ATmega328 (from 2009) [1], ATmega2560 (from 2005) [2], ATtiny2313 (from 2003) [6], and ATtiny85 (from 2005) [3] all use RAMEND.
+> The ATmega8 (from 2001) [4], ATmega8535 (from 2002) [5], and AT90S8535 (from 1998) [7] use zero.
 
+It looks we'll have tremendous "fun" dealing with huge variety of AVR SoCs.
+
+> I haven't found a list of which AVRs use which value (other than reading every datasheet).
+
+Yes, I find this to be a big practical problem, this glaring lack of
+some summary documentation, and, unfortunately, this affects not only
+this particular case (SP initialization). It appears to me that for
+many features and details (especially regarding SoC devices) one will
+have to carefully examine multiple documents, as you did in this
+email.
+
+>
+> Given that GCC performs this initialisation in software anyway (so what the hardware does doesn't matter), I think this is a minor issue.
+> It will only affect hand written assembly programs that don't do their own initialisation (which seems to be discouraged as not all resets are power-on events).
+> I'm not sure what, if anything, needs to be done about it but it might be worth fixing now we're emulating specific chips.
+>
+
+Let's think a little bit about it. In my honest opinion, this may be
+handled after the series merge, and if you guys agree, there is no
+rush.
+
+> Kind regards,
+> Sarah Harris
+>
+
+Thanks!
+Aleksandar
+
+> [1] http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf (section 6.5.1)
+> [2] http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2549-8-bit-AVR-Microcontroller-ATmega640-1280-1281-2560-2561_datasheet.pdf (section 7.6)
+> [3] http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf (section 4.6.1)
+> [4] http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf (page 13)
+> [5] http://ww1.microchip.com/downloads/en/DeviceDoc/doc2502.pdf (page 12)
+> [6] http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2543-AVR-ATtiny2313_Datasheet.pdf (page 11)
+> [7] http://ww1.microchip.com/downloads/en/DeviceDoc/doc1041.pdf (page 20)
+>
+> On Sun, 26 Jan 2020 23:54:43 +0100
+> Aleksandar Markovic <aleksandar.markovic@rt-rk.com> wrote:
+>
+> > +static void avr_cpu_reset(CPUState *cs)
+> > +{
+> > +    AVRCPU *cpu = AVR_CPU(cs);
+> > +    AVRCPUClass *mcc = AVR_CPU_GET_CLASS(cpu);
+> > +    CPUAVRState *env = &cpu->env;
+> > +
+> > +    mcc->parent_reset(cs);
+> > +
+> > +    env->pc_w = 0;
+> > +    env->sregI = 1;
+> > +    env->sregC = 0;
+> > +    env->sregZ = 0;
+> > +    env->sregN = 0;
+> > +    env->sregV = 0;
+> > +    env->sregS = 0;
+> > +    env->sregH = 0;
+> > +    env->sregT = 0;
+> > +
+> > +    env->rampD = 0;
+> > +    env->rampX = 0;
+> > +    env->rampY = 0;
+> > +    env->rampZ = 0;
+> > +    env->eind = 0;
+> > +    env->sp = 0;
+> > +
+> > +    env->skip = 0;
+> > +
+> > +    memset(env->r, 0, sizeof(env->r));
+> > +
+> > +    tlb_flush(cs);
+> > +}
 
