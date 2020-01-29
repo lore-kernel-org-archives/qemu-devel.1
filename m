@@ -2,106 +2,59 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44163C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A80C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:38:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C09D20CC7
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:37:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="E5PW53bS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C09D20CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A0DA20732
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:38:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0DA20732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwlee-000737-AI
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:37:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39877)
+	id 1iwlfs-000823-HX
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:38:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <darren.kenny@oracle.com>) id 1iwldw-0006Sm-6i
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:36:25 -0500
+ (envelope-from <clg@kaod.org>) id 1iwlf7-0007Wj-Sr
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:37:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <darren.kenny@oracle.com>) id 1iwldv-0000jT-4d
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:36:24 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:37144)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
- id 1iwlds-0000Z8-7r; Wed, 29 Jan 2020 06:36:20 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00TBX7Wc148796;
- Wed, 29 Jan 2020 11:36:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=jgP2MBoawxu0v45uQoG0HdcSNOOBAku0cKZKrwZwBio=;
- b=E5PW53bSCG3a02+E2OEEYYwo4yjSfBXwcCvlNN6pRXdyWsU7xVRsdS5akdBcd3LVoBEA
- urSSFV0lVoSCDrN6nsgwk8vyqzL6qHFX1EPiRbbwlJW4qB4+x0LNnJoNxVxKzlgWBG2a
- o1MIR5FR4QT39lEb89E5u1VbzK5OtR1WS0LmrRCz1kebrcM0Qf5IKAGU/qzBnLdVotuL
- JnWd818WJcU4PSFnHuHmVP/Ep9zk8tZjpzkQnncGgeSnHy/LIzfm6BqKRz5pPF7/NDlG
- ohDjI2ql+lAp1ExzIhBJyO9jcOImWHQIMoBiae2ZcEJau6USabb9ZWlcIEae4QI+RYa+ Lw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2xrearcf63-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 29 Jan 2020 11:36:11 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00TBXlsq142379;
- Wed, 29 Jan 2020 11:36:10 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2xtg7x48d2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 29 Jan 2020 11:36:02 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00TBZxAU029756;
- Wed, 29 Jan 2020 11:35:59 GMT
-Received: from starbug-mbp.localdomain (/10.175.199.231)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 29 Jan 2020 03:35:59 -0800
-Received: from starbug-mbp (localhost [127.0.0.1])
- by starbug-mbp.localdomain (Postfix) with SMTP id C092657075D8;
- Wed, 29 Jan 2020 11:35:56 +0000 (GMT)
-Date: Wed, 29 Jan 2020 11:35:56 +0000
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] hw/i386/vmmouse: Fix crash when using the vmmouse on a
- machine without vmport
-Message-ID: <20200129113556.z3wzi6a25w4ffxk6@starbug-mbp>
-Mail-Followup-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin " <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20200129112954.4282-1-thuth@redhat.com>
+ (envelope-from <clg@kaod.org>) id 1iwlf6-0002za-8U
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:37:37 -0500
+Received: from 7.mo7.mail-out.ovh.net ([46.105.43.131]:47042)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iwlf4-0002pO-Ca
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:37:34 -0500
+Received: from player772.ha.ovh.net (unknown [10.108.54.67])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 44B5114FCB3
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 12:37:32 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 5A15AED17331;
+ Wed, 29 Jan 2020 11:37:25 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] ppc/pnv: change the PowerNV machine devices to be non user
+ creatable
+Date: Wed, 29 Jan 2020 12:37:20 +0100
+Message-Id: <20200129113720.7404-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200129112954.4282-1-thuth@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9514
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001290097
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9514
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001290097
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 7960956769324469222
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrfeeigddvlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.43.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,67 +66,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin " <mst@redhat.com>, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 29, 2020 at 12:29:54PM +0100, Thomas Huth wrote:
->QEMU currently crashes when the user tries to use the "vmmouse" on a
->machine without vmport, e.g.:
->
-> $ x86_64-softmmu/qemu-system-x86_64 -machine microvm -device vmmouse
-> Segmentation fault (core dumped)
->
->or:
->
-> $ x86_64-softmmu/qemu-system-x86_64 -device vmmouse -M pc,vmport=off
-> Segmentation fault (core dumped)
->
->Let's avoid the crash by checking for the vmport device first.
->
->Signed-off-by: Thomas Huth <thuth@redhat.com>
+The PowerNV machine emulates an OpenPOWER system and the PowerNV chip
+devices are models of the internal logic of the POWER processor. They
+can not be instantiated by the user on the QEMU command line.
 
-Makes sense.
+The PHB3/PHB4 devices could be an exception in the future after some
+rework on how the device tree is built. For the moment, exclude them
+also.
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/pci-host/pnv_phb3.c      | 2 ++
+ hw/pci-host/pnv_phb3_pbcq.c | 1 +
+ hw/pci-host/pnv_phb4.c      | 3 ++-
+ hw/pci-host/pnv_phb4_pec.c  | 2 ++
+ hw/ppc/pnv_core.c           | 2 ++
+ hw/ppc/pnv_homer.c          | 1 +
+ hw/ppc/pnv_lpc.c            | 1 +
+ hw/ppc/pnv_occ.c            | 1 +
+ 8 files changed, 12 insertions(+), 1 deletion(-)
 
-Thanks,
+diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+index f03399c40615..74618fadf085 100644
+--- a/hw/pci-host/pnv_phb3.c
++++ b/hw/pci-host/pnv_phb3.c
+@@ -1115,6 +1115,7 @@ static void pnv_phb3_class_init(ObjectClass *klass,=
+ void *data)
+     dc->realize =3D pnv_phb3_realize;
+     device_class_set_props(dc, pnv_phb3_properties);
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_phb3_type_info =3D {
+@@ -1168,6 +1169,7 @@ static void pnv_phb3_root_port_class_init(ObjectCla=
+ss *klass, void *data)
+=20
+     device_class_set_parent_realize(dc, pnv_phb3_root_port_realize,
+                                     &rpc->parent_realize);
++    dc->user_creatable =3D false;
+=20
+     k->vendor_id =3D PCI_VENDOR_ID_IBM;
+     k->device_id =3D 0x03dc;
+diff --git a/hw/pci-host/pnv_phb3_pbcq.c b/hw/pci-host/pnv_phb3_pbcq.c
+index 6f0c05be682a..f232228b0e28 100644
+--- a/hw/pci-host/pnv_phb3_pbcq.c
++++ b/hw/pci-host/pnv_phb3_pbcq.c
+@@ -335,6 +335,7 @@ static void pnv_pbcq_class_init(ObjectClass *klass, v=
+oid *data)
+     xdc->dt_xscom =3D pnv_pbcq_dt_xscom;
+=20
+     dc->realize =3D pnv_pbcq_realize;
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_pbcq_type_info =3D {
+diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
+index 61235d13a696..23cf093928ed 100644
+--- a/hw/pci-host/pnv_phb4.c
++++ b/hw/pci-host/pnv_phb4.c
+@@ -1290,7 +1290,7 @@ static void pnv_phb4_class_init(ObjectClass *klass,=
+ void *data)
+     dc->realize         =3D pnv_phb4_realize;
+     device_class_set_props(dc, pnv_phb4_properties);
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+-    dc->user_creatable  =3D true;
++    dc->user_creatable  =3D false;
+     dc->reset           =3D pnv_phb4_reset;
+=20
+     xfc->notify         =3D pnv_phb4_xive_notify;
+@@ -1368,6 +1368,7 @@ static void pnv_phb4_root_port_class_init(ObjectCla=
+ss *klass, void *data)
+     PCIERootPortClass *rpc =3D PCIE_ROOT_PORT_CLASS(klass);
+=20
+     dc->desc     =3D "IBM PHB4 PCIE Root Port";
++    dc->user_creatable =3D false;
+=20
+     device_class_set_parent_realize(dc, pnv_phb4_root_port_realize,
+                                     &rpc->parent_realize);
+diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
+index fd92041d69dc..68e1db3eac4f 100644
+--- a/hw/pci-host/pnv_phb4_pec.c
++++ b/hw/pci-host/pnv_phb4_pec.c
+@@ -490,6 +490,7 @@ static void pnv_pec_class_init(ObjectClass *klass, vo=
+id *data)
+=20
+     dc->realize =3D pnv_pec_realize;
+     device_class_set_props(dc, pnv_pec_properties);
++    dc->user_creatable =3D false;
+=20
+     pecc->xscom_nest_base =3D pnv_pec_xscom_nest_base;
+     pecc->xscom_pci_base  =3D pnv_pec_xscom_pci_base;
+@@ -568,6 +569,7 @@ static void pnv_pec_stk_class_init(ObjectClass *klass=
+, void *data)
+=20
+     device_class_set_props(dc, pnv_pec_stk_properties);
+     dc->realize =3D pnv_pec_stk_realize;
++    dc->user_creatable =3D false;
+=20
+     /* TODO: reset regs ? */
+ }
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index f7247222bceb..234562040de3 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -325,6 +325,7 @@ static void pnv_core_class_init(ObjectClass *oc, void=
+ *data)
+     dc->realize =3D pnv_core_realize;
+     dc->unrealize =3D pnv_core_unrealize;
+     device_class_set_props(dc, pnv_core_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ #define DEFINE_PNV_CORE_TYPE(family, cpu_model) \
+@@ -423,6 +424,7 @@ static void pnv_quad_class_init(ObjectClass *oc, void=
+ *data)
+=20
+     dc->realize =3D pnv_quad_realize;
+     device_class_set_props(dc, pnv_quad_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_quad_info =3D {
+diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
+index 93ae42f7e4d1..9a262629b73a 100644
+--- a/hw/ppc/pnv_homer.c
++++ b/hw/ppc/pnv_homer.c
+@@ -360,6 +360,7 @@ static void pnv_homer_class_init(ObjectClass *klass, =
+void *data)
+     dc->realize =3D pnv_homer_realize;
+     dc->desc =3D "PowerNV HOMER Memory";
+     device_class_set_props(dc, pnv_homer_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_homer_type_info =3D {
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index d1de98f04c08..5989d723c50c 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -762,6 +762,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
+id *data)
+     dc->realize =3D pnv_lpc_realize;
+     dc->desc =3D "PowerNV LPC Controller";
+     device_class_set_props(dc, pnv_lpc_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_lpc_info =3D {
+diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
+index 2173fac0e798..5a716c256edc 100644
+--- a/hw/ppc/pnv_occ.c
++++ b/hw/ppc/pnv_occ.c
+@@ -280,6 +280,7 @@ static void pnv_occ_class_init(ObjectClass *klass, vo=
+id *data)
+     dc->realize =3D pnv_occ_realize;
+     dc->desc =3D "PowerNV OCC Controller";
+     device_class_set_props(dc, pnv_occ_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_occ_type_info =3D {
+--=20
+2.21.1
 
-Darren
-
->---
-> hw/i386/vmmouse.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
->
->diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
->index 7c2a375527..e8e62bd96b 100644
->--- a/hw/i386/vmmouse.c
->+++ b/hw/i386/vmmouse.c
->@@ -23,6 +23,7 @@
->  */
->
-> #include "qemu/osdep.h"
->+#include "qapi/error.h"
-> #include "ui/console.h"
-> #include "hw/i386/pc.h"
-> #include "hw/input/i8042.h"
->@@ -269,6 +270,11 @@ static void vmmouse_realizefn(DeviceState *dev, Error **errp)
->
->     DPRINTF("vmmouse_init\n");
->
->+    if (!object_resolve_path_type("", TYPE_VMPORT, NULL)) {
->+        error_setg(errp, "vmmouse needs a machine with vmport");
->+        return;
->+    }
->+
->     vmport_register(VMMOUSE_STATUS, vmmouse_ioport_read, s);
->     vmport_register(VMMOUSE_COMMAND, vmmouse_ioport_read, s);
->     vmport_register(VMMOUSE_DATA, vmmouse_ioport_read, s);
->-- 
->2.18.1
->
->
 
