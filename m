@@ -2,64 +2,164 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51328C33CB7
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 22:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E84EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 22:58:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E7DA206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 22:28:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CD6A20702
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 22:58:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="W/18ripn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E7DA206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="13OEfVcI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CD6A20702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwvou-00035a-B4
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 17:28:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48931)
+	id 1iwwI3-0001Bv-8y
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 17:58:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iwvns-0001xt-LW
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 17:27:22 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1iwwHM-0000e6-Go
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 17:57:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iwvnq-0002sF-Vr
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 17:27:20 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38911 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iwvnp-0002my-Fq; Wed, 29 Jan 2020 17:27:18 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 487J4v6kQtz9sP6; Thu, 30 Jan 2020 09:27:11 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580336831;
- bh=oc22GZkS5CxQkD+w1PrD6nOoE5OZECmE6DZRtAK+0DY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=W/18ripnqtNe6Z4iWIAefl2iDaPNNS1anHJCNvXqU9s+voZ8srJYcZ7uaAI/C542j
- ss1vLfvQtD2Y6F8WhfrmUBxeSaqk9wkpGWaVGe37M92FndXrD+sUv4oNflqupD9fdY
- gg2jOvUZdkX3UWpy+iyykARbOX1nEo+wjY87Z79s=
-Date: Thu, 30 Jan 2020 09:14:44 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 0/2] ppc/pnv: Add models for PHB4 and PHB3 PCIe Host
- bridges
-Message-ID: <20200129221444.GA2640@umbus.fritz.box>
-References: <20200127144506.11132-1-clg@kaod.org>
- <20200129063103.GB42099@umbus.fritz.box>
- <ad66cad0-98ff-7ab1-9be9-8bc234279ff6@kaod.org>
+ (envelope-from <aik@ozlabs.ru>) id 1iwwHK-0006zN-1l
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 17:57:47 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:35558)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iwwHI-0006wa-Nj
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 17:57:45 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id q39so478693pjc.0
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 14:57:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ZFYjK626+3udnyqq3i/NwvcRCgozjAfSI5/EVK/QTfk=;
+ b=13OEfVcIHvL788Lp0jDL+S6mR+YdbBrCEI/6I9P5/3S/aKCMCU8vwjgNvmQi1ao7IB
+ ok6UQZ/rwdGoMV6A3tCwOulnTzYv/5j+N58asjTDOTXBWtsAp1N8ntBzHE8kdUjhA5DU
+ FfJN8ib+tHNhHQkJjgrsLtk+pIW+B3TiIeHNoy0Pu8J43l3WpmakqeMtBqV0KFi1WsEE
+ xu8qTR4FWjOf9OTM2Yyvbn+ALxw6YmP7opZT69MnIQkeBFt0yy1li+k89MsjFZGfeylN
+ 8mGtQtTbAJSb9ptkmgJmJR7FHr3M0XvK3ciVQJPOW9QUY8Z6YvqKzZSuYg9f+LvUEu5Z
+ Vbew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=ZFYjK626+3udnyqq3i/NwvcRCgozjAfSI5/EVK/QTfk=;
+ b=Iy5kCdY5amKlcQHNHCCmYtX/w9Xpmzd8GUt+/U5FHAg6Jrl8hByfC+W4B0S0H7XUSF
+ VSETyFMLNoE1s7e8MiH1Kwwb4o4SSkdVGRvd1ixIw3oKQLuzPIWD7Ket/QOdLd543TpE
+ IG0S+UuJopdFzuM9fRVikaO29lxljNL745pRMEy5X/+MlFou3TP1IJYepKPXrKNCRqGj
+ ZUykR/AirPvQnvOwplMFUFJmD4cTZ5X1Mg/URd5QXZOTf5QoZBx7Q8iZ93kH2VRG79aW
+ lt3tyCN68UFAiJe84rZP+6/vPfNf3Ypwu1W7PX0jcz1k1g92wHmzYd6X2Z2FJmIHpEgT
+ r2sA==
+X-Gm-Message-State: APjAAAUtizttuegICOS8kTN2VBmI+xd5jL0+OXAn1vLLpI7AGDIEp/rU
+ lWpBGRWMOgC87HKUraJwcGLth1DtMlg=
+X-Google-Smtp-Source: APXvYqxJOfhFTdNoBYahMxzPOHzc2N1M5Uc250BfEZPRITm3OzVruBmN4WOy2K0ed6ZpeqjuljV2dQ==
+X-Received: by 2002:a17:90a:be06:: with SMTP id
+ a6mr2261415pjs.73.1580338662483; 
+ Wed, 29 Jan 2020 14:57:42 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id 17sm3740248pfv.142.2020.01.29.14.57.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 29 Jan 2020 14:57:41 -0800 (PST)
+Subject: Re: [PATCH qemu] spapr_pci: Create assigned properties for bridges
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200129023111.1699-1-aik@ozlabs.ru>
+ <20200129033712.GY42099@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <14bb4668-89a8-3ae9-3ce6-3f433842dc88@ozlabs.ru>
+Date: Thu, 30 Jan 2020 09:57:38 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zhXaljGHf11kAtnf"
-Content-Disposition: inline
-In-Reply-To: <ad66cad0-98ff-7ab1-9be9-8bc234279ff6@kaod.org>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <20200129033712.GY42099@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,104 +171,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Oliver O'Halloran <oohall@gmail.com>,
- qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---zhXaljGHf11kAtnf
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 29, 2020 at 02:15:35PM +0100, C=E9dric Le Goater wrote:
-> On 1/29/20 7:31 AM, David Gibson wrote:
-> > On Mon, Jan 27, 2020 at 03:45:04PM +0100, C=E9dric Le Goater wrote:
-> >> Hello,
-> >>
-> >> These are models for the PCIe Host Bridges, PHB3 and PHB4, as found on
-> >> POWER8 and POWER9 processors. It includes the PowerBus logic interface
-> >> (PBCQ), IOMMU support, a single PCIe Gen.3/4 Root Complex, and support
-> >> for MSI and LSI interrupt sources as found on each system depending on
-> >> the interrupt controller: XICS or XIVE.
-> >>
-> >> No default device layout is provided and PCI devices can be added on
-> >> any of the available PCIe Root Port (pcie.0 .. 2) with address 0x0 as
-> >> the firwware (skiboot) only accepts a single device per root port. To
-> >> run a simple system with a network and a storage adapters, use a
-> >> command line options such as :
-> >>
-> >>   -device e1000e,netdev=3Dnet0,mac=3DC0:FF:EE:00:00:02,bus=3Dpcie.0,ad=
-dr=3D0x0
-> >>   -netdev bridge,id=3Dnet0,helper=3D/usr/libexec/qemu-bridge-helper,br=
-=3Dvirbr0,id=3Dhostnet0
-> >>
-> >>   -device megasas,id=3Dscsi0,bus=3Dpcie.1,addr=3D0x0
-> >>   -drive file=3D$disk,if=3Dnone,id=3Ddrive-scsi0-0-0-0,format=3Dqcow2,=
-cache=3Dnone
-> >>   -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=
-=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2
-> >>
-> >> If more are needed, include a bridge.
-> >>
-> >> Multi chip is supported, each chip adding its set of PHB controllers
-> >> and its PCI busses. The model doesn't emulate the EEH error handling
-> >> and cold plugging PHB devices still needs some work.
-> >>
-> >> XICS requires some adjustment to support the PHB3 MSI. The changes are
-> >> provided in the PHB3 model but they could be decoupled in prereq
-> >> patches.
-> >=20
-> > Applied to ppc-for-5.0, thanks.
->=20
-> Should we add a default set of devices on PHB1 like found on OpenPOWER=20
-> system ? On a P8 we have  :
+On 29/01/2020 14:37, David Gibson wrote:
+> On Wed, Jan 29, 2020 at 01:31:11PM +1100, Alexey Kardashevskiy wrote:
+>> QEMU assigns bus numbers so tell the guest about assigned values.
+>>
+>> This also adds an empty "ranges" to let the existing linux kernels proceed
+>> far enough to trigger resource reassignment (which is rather a
+>> hack).
+> 
+> That is rather a hack, but AIUI this makes things better than they
+> were before, so I've applied it to ppc-for-5.0.
+> 
+> What would a less hacky approach to this look like?
 
-I think that's kind of up to you.
 
->=20
->  +-[0001:00]---00.0-[01-07]----00.0-[02-07]--+-01.0-[03-04]----00.0-[04]-=
----00.0  ASPEED Technology, Inc. ASPEED Graphics Family
->  |                                           +-02.0-[05]----00.0  Texas I=
-nstruments TUSB73x0 SuperSpeed USB 3.0 xHCI Host Controller
->  |                                           +-03.0-[06]--+-00.0  Broadco=
-m Inc. and subsidiaries NetXtreme BCM5718 Gigabit Ethernet PCIe
->  |                                           |            \-00.1  Broadco=
-m Inc. and subsidiaries NetXtreme BCM5718 Gigabit Ethernet PCIe
->  |                                           \-04.0-[07]----00.0  Marvell=
- Technology Group Ltd. 88SE9235 PCIe 2.0 x2 4-port SATA 6 Gb/s Controller
->=20
->=20
-> C.
->=20
+Assigning the bridge resources in QEMU is the proper fix I suppose. Thanks,
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> 
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>
+>> This is a part of the "kill CAS reboot" effort, the SLOF's side of it was
+>> posted as "[PATCH slof] fdt: Fix creating new nodes at H_CAS"
+>>
+>> ---
+>>  hw/ppc/spapr_pci.c | 18 +++++++++++++++++-
+>>  1 file changed, 17 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+>> index 723373de732c..877ff1d0d5fa 100644
+>> --- a/hw/ppc/spapr_pci.c
+>> +++ b/hw/ppc/spapr_pci.c
+>> @@ -1336,7 +1336,23 @@ static int spapr_dt_pci_bus(SpaprPhbState *sphb, PCIBus *bus,
+>>      if (pci_bus_is_root(bus)) {
+>>          owner = OBJECT(sphb);
+>>      } else {
+>> -        owner = OBJECT(pci_bridge_get_device(bus));
+>> +        PCIDevice *pdev = pci_bridge_get_device(bus);
+>> +        uint8_t pri = pci_default_read_config(pdev, PCI_PRIMARY_BUS, 1);
+>> +        uint8_t sec  = pci_default_read_config(pdev, PCI_SECONDARY_BUS, 1);
+>> +        uint8_t sub  = pci_default_read_config(pdev, PCI_SUBORDINATE_BUS, 1);
+>> +        uint32_t range[] = { cpu_to_be32(sec), cpu_to_be32(sub) };
+>> +
+>> +        /*
+>> +         * Create these to get existing Linux kernels proceed far enough to
+>> +         * trigger resource reassignment. We creates these for vPHB already.
+>> +         */
+>> +        _FDT(fdt_setprop_cell(fdt, offset, "primary-bus", pri));
+>> +        _FDT(fdt_setprop_cell(fdt, offset, "secondary-bus", sec));
+>> +        _FDT(fdt_setprop_cell(fdt, offset, "subordinate-bus", sub));
+>> +        _FDT(fdt_setprop(fdt, offset, "bus-range", range, sizeof(range)));
+>> +        _FDT(fdt_setprop_string(fdt, offset, "device_type", "pci"));
+>> +        _FDT(fdt_setprop(fdt, offset, "ranges", NULL, 0));
+>> +        owner = OBJECT(pdev);
+>>      }
+>>  
+>>      ret = spapr_dt_drc(fdt, offset, owner,
+> 
 
---zhXaljGHf11kAtnf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4yA9IACgkQbDjKyiDZ
-s5LrABAA05+f5KfQAP3FnYkhSVcu8WBKPRsn6l5C0xd0Zh7I89kXUPaRTcCbVSaP
-Q5y9ODZcsg2y47sl4Gz/oWqJ88/lil9mnurybWQcF8iDuT3UTfSFd9Js/QBTmuuh
-2UL02n5vvWp/XD+krS1SETLQR5YW+ju2lA/gX1Umm+HlOZfHzuWEu67vctIlDAWX
-fuz9Bv/+36Wln0oYxiHM8xa2gXkJ6YNHnDElb5HbafBRkwZqiRMYzKSbZ6BHugE1
-xknFI6drp4ONMrtr5mRlbxA8bz5yBY+wwUOQ28ZBuI/x/lped1DJ6ynCbS+qXsS/
-uEUGtYlBhnXUtzT9WNC7yOrrwDc1IvKmpXr4dAyo8WdIwsTS3XXY8T3RHBa3GhAr
-a++6MHFlRguhXbgZ+pMTDj/n9OUfGA3NF82GGpIK2CruFvXTo7fIpfNxjUp40y9l
-olJYyNIrSVEnEMYBm9okJboooP9rcLCGft6gsJv2VVb6fCgd4FedqgGJ35Qpjhqs
-I6kLjQhgrpVIJzg3vxw/5DSh48JoI7io7ZRMs0+a2rbe01TM1bLPU/wLXMvbQLiG
-n3Kl2sgOBgfJsZm7taObxSXE/w9vuBtC/vnUAqwWD5B1204+Tbkzg+ln9DYl7aZk
-W6wgRRZUF5ifecK2roMX+atQ/LBv4kyFSegIQHdp0MjvezWCS0w=
-=N/B6
------END PGP SIGNATURE-----
-
---zhXaljGHf11kAtnf--
+-- 
+Alexey
 
