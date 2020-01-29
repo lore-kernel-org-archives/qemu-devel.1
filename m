@@ -2,87 +2,81 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 385A9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93918C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03F5820716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:57:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DB2D20716
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:01:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fe1luv6f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F5820716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hdY+xGBL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB2D20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwmuB-0004vW-66
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:57:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41357)
+	id 1iwmyF-0007KJ-HS
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 08:01:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43627)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iwmtL-0004FZ-6h
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:56:24 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iwmxW-0006mR-VJ
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:00:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iwmtJ-00027Q-1H
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:56:22 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31705
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iwmtI-00026U-UJ
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:56:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580302580;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=505e89Xe9veYwGr0Vs0Wdk32Nd+Nx0P4PmgWQuT7620=;
- b=Fe1luv6fNWaEyNXRlYfqhTHLKfInaNqKhShUmMq30xu1EIxeT4Fh0uYR0USHWMR96oRxHV
- FXpcCqNmozDwHyDNndd6IBoWx1sX2AotIG6vXzUs2tfEzwW7PU7CKPJDHJ6PC/+flH30uy
- ZNqqJ7VLvup1BfyUlIr2agxaAmzHD1k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-85-CprbglcmMkKZwZBFNyXgxA-1; Wed, 29 Jan 2020 07:56:12 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5520E107ACC5;
- Wed, 29 Jan 2020 12:56:10 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CDAEB60BE0;
- Wed, 29 Jan 2020 12:56:02 +0000 (UTC)
-Subject: Re: [PATCH v2 0/7] ARM virt: Add NVDIMM support
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "imammedo@redhat.com" <imammedo@redhat.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <7b338b7c-fd47-930b-53d5-894711c69941@redhat.com>
- <c0528fddc5424471969a7d41e02cce2b@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <1a4e3737-31cc-0d9f-8089-bb1048e736ec@redhat.com>
-Date: Wed, 29 Jan 2020 13:55:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <robert.foley@linaro.org>) id 1iwmxR-0000lE-Q2
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:00:42 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:43377)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iwmxR-0000hs-Hr
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:00:37 -0500
+Received: by mail-lf1-x142.google.com with SMTP id 9so11801625lfq.10
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 05:00:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NBvLAC906/+xeKraub2KwjpTFVIotFcTTE5aZ6YjSDk=;
+ b=hdY+xGBLG9ZTyzc5LdtqgJdMUA2cfa90LJ4tmCPP8SZ6/CaAc9MxA+8fGJOxEea2wb
+ X2RhwsNgYsAtY/TTijOBFq5eEpRz5uO9RAQ47lz4t97fKQ07rqyRiyZMQwAmjKLvu5vn
+ elCSbHD45/bbsevX7J7lAcRo2OG2dfHApSoRr5dy4y0XfFUmm2b1GNKwgCNjsoO2sK4t
+ /t3GZYZaf9WCecaYXktbOcm95nd3kRENsbmxpfGXBQO5aMseHEiKytWgiycYw0tcANzk
+ O0/SLD1D5g71u7G9vq0eBjyaDfVsB+95xjHHgpXAtBN1M563RF7ItXOVhp+xSAzijhzq
+ 0pnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NBvLAC906/+xeKraub2KwjpTFVIotFcTTE5aZ6YjSDk=;
+ b=jRBw1kZW9EeuY0v7XI+aac1v36WBpbBYbm0zUQGTdXvAUxs+Wwnpfqf2FqOd7fI0VD
+ gVcni7q3exU1VKYrRKPpC5nov1fTRuPpPhO07BbUq9O5j9RgMmS3GDDis9KYFBaSTf85
+ 6ED+Ziel0duw2qpj3Ig9YAOGOy5z7w1+L+PpGh2eDdIrig7KPD+VmZ5Zh9h7D47WRjyg
+ q0WxMJ1MKyq83JjFTii0l8F4DZfNePRSES8KBJdUmuV5UkNmHV32pQQT9lvCJ8MJC1LS
+ S9xOBpMafSNQ1f/r5Z5iAjKei5FKOQ8D7Zv7Qjc+02bYMfQrrPTgPBSIwpdqIc641FxO
+ /TDw==
+X-Gm-Message-State: APjAAAW2HMpf8xYB2mCgabkkFn+2T8vwwtPcbLjKQU3umfMuL2B6GgxK
+ vfJFo/Hu3JardTBayE0Q7qOmjCKj/JPMJxqugvU28w==
+X-Google-Smtp-Source: APXvYqztw2dI0XtrfeizLN4VpMtNlzKXfdykO+gLh2ORzVElSBF6+8XX14pYnN9GVKRv52w/qGDYbq+wmgNUycqDBV8=
+X-Received: by 2002:ac2:53b9:: with SMTP id j25mr5363412lfh.140.1580302835297; 
+ Wed, 29 Jan 2020 05:00:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c0528fddc5424471969a7d41e02cce2b@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: CprbglcmMkKZwZBFNyXgxA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200124165335.422-1-robert.foley@linaro.org>
+ <87wo9beaer.fsf@linaro.org>
+In-Reply-To: <87wo9beaer.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Wed, 29 Jan 2020 07:59:59 -0500
+Message-ID: <CAEyhzFsKxd0rBFYLHcpHS5fJg4=BnDP8VM8Y_kfoP7kJKgLi0Q@mail.gmail.com>
+Subject: Re: [PATCH 0/8] tests/vm: Add support for aarch64 VMs
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,151 +88,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, "lersek@redhat.com" <lersek@redhat.com>
+Cc: fam@euphon.net, Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Shameer,
+Thanks for the details on the failure.   I have not been able to
+reproduce it yet, but digging into it further.
 
-On 1/29/20 11:44 AM, Shameerali Kolothum Thodi wrote:
-> Hi Eric,
-> 
->> -----Original Message-----
->> From: Auger Eric [mailto:eric.auger@redhat.com]
->> Sent: 28 January 2020 15:29
->> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
->> qemu-devel@nongnu.org; qemu-arm@nongnu.org; imammedo@redhat.com
->> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com; mst@redhat.com;
->> xiaoguangrong.eric@gmail.com; xuwei (O) <xuwei5@huawei.com>;
->> lersek@redhat.com; Linuxarm <linuxarm@huawei.com>
->> Subject: Re: [PATCH v2 0/7] ARM virt: Add NVDIMM support
->>
->> Hi Shameer,
->>
->> On 1/17/20 6:45 PM, Shameer Kolothum wrote:
->>> This series adds NVDIMM support to arm/virt platform.
->>> The series reuses some of the patches posted by Eric
->>> in his earlier attempt here[1].
->>>
->>> Patch #1 is a fix to the Guest reboot issue on NVDIMM
->>> hot add case described here[2] and patch #2 is another
->>> fix to the nvdimm aml issue discussed here[3].
->>>
->>> I have done a basic sanity testing of NVDIMM deviecs
->>> with Guest booting with both ACPI and DT. Further testing
->>> is always welcome.
->>>
->>> Please let me know your feedback.
->>
->>
->> With this version, I do not get the former spurious warning reported on v1.
->>
->> I can see the nvdimm device topology using ndctl. So it looks fine to me.
-> 
-> Thanks for giving it a spin and confirming. 
-> 
->> Unfortunately we cannot test with DAX as kernel dependencies are not yet
->> resolved yet but this is an independent problem.
-> 
-> True. I did previously test DAX with "arm64/mm: Enable memory hot remove"
-> Patch series and that seems to work fine.
-
-Yes you're correct. I tested with v12 which unfortunately missed the
-next kernel merge window if I am not wrong
-(https://lkml.org/lkml/2020/1/21/1217). With that series we can
-effectovely test with DAX on guest.
-
-ndctl create-namespace --force --mode=fsdax  --reconfig=namespace0.0
-mkfs.xfs -f -m reflink=0 /dev/pmem0
-sudo mount -o dax /dev/pmem0 /mnt/mem0
-[  539.970608] XFS (pmem0): DAX enabled. Warning: EXPERIMENTAL, use at
-your own risk
-[  539.972947] XFS (pmem0): Mounting V5 Filesystem
-[  539.977978] XFS (pmem0): Ending clean mount
-[  539.979343] xfs filesystem being mounted at /mnt/mem0 supports
-timestamps until 2038 (0x7fffffff)
-
-
-It is useless for me to send my Tested-by at this point as you need to
-remove the tiny conflict. However as soon as you respin I will be
-pleased to send it.
-
-As for the 2 first patches, I do not feel sufficiently comfortable on
-that part to review them it in decent time and I cowardly leave it to
-experts :-(
-
-Thanks
-
-Eric
-
-
-
-> 
-> Cheers,
-> Shameer
-> 
-> 
->  
->> Thanks
->>
->> Eric
->>>
->>> Thanks,
->>> Shameer
->>>
->>> [1] https://patchwork.kernel.org/cover/10830777/
->>> [2] https://patchwork.kernel.org/patch/11154757/
->>> [3] https://patchwork.kernel.org/cover/11174959/
->>>
->>> v1 --> v2
->>>  -Reworked patch #1 and now fix is inside qemu_ram_resize().
->>>  -Added patch #2 to fix the nvdim aml issue.
->>>  -Dropped support to DT cold plug.
->>>  -Updated test_acpi_virt_tcg_memhp() with pc-dimm and nvdimms(patch
->> #7)
->>>
->>> Kwangwoo Lee (2):
->>>   nvdimm: Use configurable ACPI IO base and size
->>>   hw/arm/virt: Add nvdimm hot-plug infrastructure
->>>
->>> Shameer Kolothum (5):
->>>   exec: Fix for qemu_ram_resize() callback
->>>   hw/acpi/nvdimm: Fix for NVDIMM incorrect DSM output  buffer  length
->>>   hw/arm/virt: Add nvdimm hotplug support
->>>   tests: Update ACPI tables list for upcoming arm/virt test changes
->>>   tests/bios-tables-test: Update arm/virt memhp test
->>>
->>>  docs/specs/acpi_hw_reduced_hotplug.rst      |  1 +
->>>  exec.c                                      | 36 +++++++----
->>>  hw/acpi/generic_event_device.c              | 13 ++++
->>>  hw/acpi/nvdimm.c                            | 68
->> +++++++++++++++++----
->>>  hw/arm/Kconfig                              |  1 +
->>>  hw/arm/virt-acpi-build.c                    |  6 ++
->>>  hw/arm/virt.c                               | 35 +++++++++--
->>>  hw/i386/acpi-build.c                        |  6 ++
->>>  hw/i386/acpi-build.h                        |  3 +
->>>  hw/i386/pc_piix.c                           |  2 +
->>>  hw/i386/pc_q35.c                            |  2 +
->>>  hw/mem/Kconfig                              |  2 +-
->>>  include/exec/ram_addr.h                     |  5 +-
->>>  include/hw/acpi/generic_event_device.h      |  1 +
->>>  include/hw/arm/virt.h                       |  1 +
->>>  include/hw/mem/nvdimm.h                     |  3 +
->>>  tests/data/acpi/virt/NFIT.memhp             |  0
->>>  tests/data/acpi/virt/SSDT.memhp             |  0
->>>  tests/qtest/bios-tables-test-allowed-diff.h |  5 ++
->>>  tests/qtest/bios-tables-test.c              |  9 ++-
->>>  20 files changed, 163 insertions(+), 36 deletions(-)
->>>  create mode 100644 tests/data/acpi/virt/NFIT.memhp
->>>  create mode 100644 tests/data/acpi/virt/SSDT.memhp
->>>
-> 
-> 
-
+On Tue, 28 Jan 2020 at 12:52, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+>
+> Robert Foley <robert.foley@linaro.org> writes:
+>
+> > This patch adds support for 2 aarch64 VMs.
+> >  - Ubuntu 18.04 aarch64 VM
+> >  - CentOS 8 aarch64 VM
+> <snip>
+>
+> Another failure to note - under TCG:
+>
+>   make vm-build-ubuntu.aarch64 V=3D1 QEMU=3Daarch64-softmmu/qemu-system-a=
+arch64
+>
+> Gives:
+>
+> Not run: 172 186 192 220
+> Failures: 001 002 003 004 005 007 008 009 010 011 012 013 017 018 019 020=
+ 021 022 024 025 027 029 031 032 033 034 035 036 037 038 039 042 043 046 04=
+7 048 049 050 052 053 054 060 061 062 063 066 069 071 072 073 074 079 080 0=
+86 089 090 097 098 099 103 104 105 107 108 110 111 114 117 120 126 133 134 =
+137 138 140 141 143 150 154 156 158 159 161 170
+> 174 176 177 179 184 187 190 191 195 214 217 226 229 244 249 251 252 265 2=
+67 268
+> Failed 104 of 104 iotests
+> /tmp/tmp.EjcqWtvHwd/tests/Makefile.include:840: recipe for target 'check-=
+tests/check-block.sh' failed
+> make: *** [check-tests/check-block.sh] Error 1
+> rm tests/qemu-iotests/socket_scm_helper.o
+> Connection to 127.0.0.1 closed.
+> DEBUG:QMP:>>> {'execute': 'quit'}
+> DEBUG:QMP:<<< {'timestamp': {'seconds': 1580134315, 'microseconds': 21629=
+7}, 'event': 'NIC_RX_FILTER_CHANGED', 'data': {'path': '/machine/peripheral=
+-anon/device[0]/virtio-backend'}}
+> DEBUG:QMP:<<< {'return': {}}
+> /home/alex.bennee/lsrc/qemu.git/tests/vm/Makefile.include:63: recipe for =
+target 'vm-build-ubuntu.aarch64' failed
+> make: *** [vm-build-ubuntu.aarch64] Error 3
+>
+> With things like:
+>
+> --- /tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/063.out      2020-01-27 10:54:=
+38.000000000 +0000
+> +++ /tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/063.out.bad  2020-01-28 01:20:=
+28.563789323 +0000
+> @@ -1,3 +1,4 @@
+> +bash: warning: setlocale: LC_ALL: cannot change locale (en_GB.UTF-8)
+>  QA output created by 063
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4194304
+>  =3D=3D Testing conversion with -n fails with no target file =3D=3D
+>   TEST    iotest-qcow2: 066 [fail]
+> QEMU          -- "/tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/../../aarch64-so=
+ftmmu/qemu-system-aarch64" -nodefaults -display none -machine virt -accel q=
+test
+> QEMU_IMG      -- "/tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/../../qemu-img"
+> QEMU_IO       -- "/tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/../../qemu-io"  =
+--cache writeback -f qcow2
+> QEMU_NBD      -- "/tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/../../qemu-nbd"
+> IMGFMT        -- qcow2 (compat=3D1.1)
+> IMGPROTO      -- file
+> PLATFORM      -- Linux/aarch64 ubuntu-guest 4.15.0-74-generic
+> TEST_DIR      -- /tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/scratch
+> SOCK_DIR      -- /tmp/tmp.BJ9gTNMmv1
+> SOCKET_SCM_HELPER -- /tmp/tmp.EjcqWtvHwd/tests/qemu-iotests/socket_scm_he=
+lper
+>
+> So I suspect a locale issue is breaking things.
+>
+> --
+> Alex Benn=C3=A9e
 
