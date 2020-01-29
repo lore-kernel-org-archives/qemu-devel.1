@@ -2,54 +2,55 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2A8C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AEBC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:50:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18BDF206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76373206F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:50:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="f4asAL+K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18BDF206F0
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Lm7pjBKB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76373206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwv8o-0001o2-2H
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:44:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36605)
+	id 1iwvEO-0003CE-GW
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:50:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1iwv5U-0008QT-Jf
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:41:29 -0500
+ (envelope-from <deller@gmx.de>) id 1iwv62-0000Vi-Aq
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:42:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <deller@gmx.de>) id 1iwv5T-0002g8-Ec
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:41:28 -0500
-Received: from mout.gmx.net ([212.227.17.22]:56991)
+ (envelope-from <deller@gmx.de>) id 1iwv60-000338-FO
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:42:02 -0500
+Received: from mout.gmx.net ([212.227.17.22]:56809)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <deller@gmx.de>)
- id 1iwv5T-0002df-1t; Wed, 29 Jan 2020 16:41:27 -0500
+ id 1iwv5y-00031r-La; Wed, 29 Jan 2020 16:41:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1580334075;
- bh=NhiP/ciDVFAdLLRGiGXYwebc9iddMWYG9LAYhlbI8fk=;
+ s=badeba3b8450; t=1580334100;
+ bh=nnf7xTDUx7a4k4Dp/aAiOiKGIR16VjCeFOQGMR6PN/g=;
  h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=f4asAL+KqOZB0Jn2FkCKlbXuQQ14I3A2JnaAroKvAfVatYGBWoFjui/Ep0JuKdDjv
- cy8hopgfWC3Io7i/TgBxG5LxhuNCt/afRnuFzE5IDKyqpl1xEN+w/beyvI0JT0aLc1
- NM9Ysi3eTaic6lZMibFknilzfdJ3KbWtuN5maPs4=
+ b=Lm7pjBKBopTjw3MyWaJZB61EJ0hdXBdiJ7Eo3O2eMcLtn2vdbcAUBe6VThUUZv9xL
+ u/2KJ0ZYVC45BFwnjKj/tbn9eXdFoBL3vTh5iGcWfiB0JIVuK2QznEB3A5igxUT0Rd
+ 04c9b7pUC68h4SHsfHk5X27Ja1yJ83Grp3z5s8ZY=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from [192.168.20.60] ([92.116.131.63]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MzQkK-1jj5mk3ShE-00vOKZ; Wed, 29
- Jan 2020 22:41:14 +0100
-Subject: Re: [PATCH] hw/hppa/Kconfig: LASI chipset requires PARALLEL port
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N0XD2-1jkBou1K6O-00wUYc; Wed, 29
+ Jan 2020 22:41:40 +0100
+Subject: Re: [PATCH] MAINTAINERS: Cover hppa-softmmu.mak in the HP-PARISC
+ Machines section
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-References: <20200129192350.27143-1-philmd@redhat.com>
+References: <20200129190316.16901-1-philmd@redhat.com>
 From: Helge Deller <deller@gmx.de>
 Autocrypt: addr=deller@gmx.de; keydata=
  mQINBF3Ia3MBEAD3nmWzMgQByYAWnb9cNqspnkb2GLVKzhoH2QD4eRpyDLA/3smlClbeKkWT
@@ -108,38 +109,38 @@ Autocrypt: addr=deller@gmx.de; keydata=
  XzCscCr+pggvqX7kI33AQsxo1DT19sNYLU5dJ5Qxz1+zdNkB9kK9CcTVFXMYehKueBkk5MaU
  ou0ZH9LCDjtnOKxPuUWstxTXWzsinSpLDIpkP//4fN6asmPo2cSXMXE0iA5WsWAXcK8uZ4jD
  c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <ec1fed8a-c099-83bd-d64b-bc29a0b9eb2b@gmx.de>
-Date: Wed, 29 Jan 2020 22:41:12 +0100
+Message-ID: <874615ac-6149-7660-ed95-60483c0443af@gmx.de>
+Date: Wed, 29 Jan 2020 22:41:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200129192350.27143-1-philmd@redhat.com>
+In-Reply-To: <20200129190316.16901-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:H793ZEqi4Rf9raTPRKR9+LxtdyLsWNDfpxzVi0sbZis03T/LY9d
- l6SAqt2TPBaln+Qgox9jqd5FWz2Kzt5m88pFlzvnr5qq4ixQTh7sxAwUSImfMgkjsCnRwt4
- XVU1bqxwYD+L04hcvp+AwAas5IZs4eWeA5/GkrS5hKU9SwXEaYGmBW3OHhSpXV6bTe6Zt3A
- wetdJ0MqnSW3iB7tazEDg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:4yeS1p2UfOU=:+bQXoUsWtAomyr4rALaUNP
- ZLiYYPE041ZlFSCxVbAQx/yhmGWCEKjNvzxfON1BfGgQQr08vWZg9CzCIxXataSRT9U24NbVZ
- PtHiU8HU7NPavusbbgMGBX9wLf9OtmiQqfNZhqkrg+LJkJxzGDuSxiY+Ozx9cFbdJqq/pD9ds
- r82zJKeqXp8yk1dCbH2ISVCEj+rItRU4735FYMrq4XU/g+F3aYi0piChTIk0HwffuxL9Jerjf
- Eg+6G1il20cyUOyU5zKgvLxLL0bFpWrhAMfleHNTg+oO5hvI961blR/f0uC8O9z0yLNbnTL/S
- JNEHfd0aKAjUZaN3iyTEOdxU1GpXATdyIOv2DkhXaiKkfdCkhzVfrAhHTiaWzvtOmJHywyLy8
- 13wBaxNVbAP//pGJvioG45SUwSA9XS/NrglIrBRMjTDvKixfN5E436oiBXQlsJPwEQTmwOH+D
- 56ucetZLyjO1z4vnFjyMlmeD09dTq5KSaPH3QyvrrQNlb1kEamwjsP642UUcPcAvx2srlSWxj
- rQ7/VRNt+CsjVhl8h+97s+opoBl3Uqv966QL5qAIcAECt+T8p8rfPuW7Nesh553f5jLPg6pa9
- pPqCy1WMamTZtSC8bRpe32wZf7aVBqDkx5RYWJU5eqIeGco0uPNj/eexqsCn2lTGkV0zCJtz5
- WJlRID/bkLApgoozdZofJ5D7QeFfNKlNFjsDJDendJM3QuNQnciaO+uQCjs0YZIArnqGi8H4P
- IIOKGhe9tYHdionKX8YPeT9AcUzY7NnPL+/LJNx01M2t6+xJaGGCBJe1H0+EOOwBForIP7j2Q
- WifeEaUGfDiCuY9MZv/S4rUvvJs1Vrb+Fg2XJxDfnod0kgTuD0BNNCi3ljC8sjqWjnyOw82tm
- GiFo7PgLNHWBkJBKHbT2mALEFjvwCdK69LsyYx70ABbtd+GaIRRXlbpWPWIf8L688qrBDLXIQ
- J+EY8c1gxVxZzbvNfpTlLvfDrV59mhNcdbZK9PERs8DRkJ6DhQKPeNWlr2cAJW5azjtROIF0V
- okt0abP3EOk8V3AYXWMPpxdmXl/X0LDzoiShzSwMpToRVp7kcbxdD+bH1LrEEeM02oGO41rN4
- gmSdwnuR/Yt6iabcVkY/CyaU9lccrctYN9rFioVXcS/jLuzFijD2F5Je/8bMALezjHO0PruMG
- VjaW2VCMEDJqigm6LphtyGMnA59QDukt2uS8/qyntTSlkndfr91Gt2Rn3n6+CMckRYE4LoIqZ
- OY7QjGmzg6eM4UaqL
+X-Provags-ID: V03:K1:p7vzAnsDOniINOhuIdgHQ16Csit207DA/ybdZSjjxtGVzXVIe56
+ GX+ETITN6hFkoTJTMEX+1Rk3wbNww6eAhQoE2Av5i/Qg7shIrQCgoucGvAd/nV9kuCK0D3D
+ PVhYGVVnIyIriYWghx0spzDDR6Ey5S9oZtTeFhTnTw64A8Lz7Q+cV0xiJzqtE0j4IcS/VLk
+ 6+NSICskzzLeJP94OG0+Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:raPvCswBalQ=:y4VtWYcyxZJWzHArpMn0Rl
+ dacnVlAuBnN95RwsQlMc1gcsJSYncdrHKK4vX7O6RCJ2gWtnXTipURa4ywBezpa4hxHBoOtKF
+ JfCPJLmQwtPwi8SwJMPI+OwfOW90hvo36MPhvbJq5cGi0bnO9vZnZWMg8yWq0G6F/BGhzh8EI
+ DNlXif8hrNKSy3Roa/J51nSHqmr1PC3CYler57AHPpVzqgg2kmPTlW60sszoo7lTQ+BdVq0Wn
+ rB0fx27N5Pbx8nNAqth1JGfw98QMwhc3F+TY1p+XKL68AqbzK8eo297JQOQBjmPZZj0ZwOnit
+ LUSQJDHlrMfl4XErdw1h4N2zxMpbxgdMQ0KOr1gM8/WVHsw0E44Fr3VNuVw1XlqypM1f9kETy
+ 9TkqeBOA6ZmucPbeRxNxfgp+UvM/hPfMSV+iuZQbi2+QVkUGu79mMVCA5xFApbVyveFraPySa
+ IdtQdm6xvLsJ9LQs2nvlvIUjkVRgXsRQGtDJvEHgoNq8vNNF2io0SCCLSSTHgsF2zhY4tlgnc
+ 7htIdRBARC52vbTNqOkTUcUKiYunYzRbVXGMckSnd2D+UxXTEnHF2T0bQ5xcDKtDzo7O3BhBq
+ 2SY/ivy9ya0+dRDIEVIEzVEnOiog02RpDRlCPc4CcNwm9NMMuQf/7HEa1BgeLReNofKcm2c7V
+ 4JIQnhqS2QUZOt1wtP+z0vRsLAlcK+dsmsY1l0YsVz+jvkM0ZINMqk1Akp4s7c9yFSQwagJr+
+ GYH7+hKzThz/lY3ZmzZfsPK+hUNj6jrmhR5xPQsJlMzpxUofalAn+3Df5xxjWWeHkT4wX1TTm
+ Lb01jyOvf/RcP8ZA5so45VFNlgoHRipF0btLOqZTobbk7nYW2LqXXyyf2q/xsX1D4ZXArSoUA
+ zy5ahLwqUo6f7lPahusX+D3f9it+YmgdfD18ivW9D649CtVYtj3Hi96sCpCQlktuFAgm/sGny
+ 1eNPn24UeSFEzMmxwvw6WPzIi8/rde6ViTmBA8rL2YbHqA3m7DuA/euYJRfYNUfPXyAUlPOSn
+ nEAPG85Eviok71/u0zojjSsUYuW9T9OUp4GL7L9EqQXcig+6ceI6oFH07D85Hhe0yFgqE4L8l
+ nH2A/1JlMGt5B0Lr2dJ4mi+ROKghz9+GN16ljVTVkabdc619OJEpsOEWr84cFiM3pH2xZT7c/
+ Qez8WBrii8IIeCiHJ2aSTRql1R92tFwoz+7O2A0hERXHKxqzn9ll3wUbA8Sbwr1n0xx8gz/FU
+ w21Z0Jlu80luOHcTg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.17.22
 X-BeenThere: qemu-devel@nongnu.org
@@ -153,43 +154,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29.01.20 20:23, Philippe Mathieu-Daud=C3=A9 wrote:
-> The PARISC Lasi chipset emulation requires some of the common parallel
-> support and fails to build on a --without-default-devices:
+On 29.01.20 20:03, Philippe Mathieu-Daud=C3=A9 wrote:
+> Modifications to default-configs/hppa-softmmu.mak should be
+> reviewed by the hppa-softmmu users (currently a single machine).
 >
->     LINK    hppa-softmmu/qemu-system-hppa
->   /usr/bin/ld: hw/hppa/lasi.o: in function `lasi_init':
->   hw/hppa/lasi.c:324: undefined reference to `parallel_mm_init'
->   collect2: error: ld returned 1 exit status
->   make[1]: *** [Makefile:206: qemu-system-hppa] Error 1
->
-> Fixes: 376b851909d
-> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Acked-by: Helge Deller <deller@gmx.de>
 
 > ---
->  hw/hppa/Kconfig | 1 +
+>  MAINTAINERS | 1 +
 >  1 file changed, 1 insertion(+)
 >
-> diff --git a/hw/hppa/Kconfig b/hw/hppa/Kconfig
-> index 82178c7dcb..22948db025 100644
-> --- a/hw/hppa/Kconfig
-> +++ b/hw/hppa/Kconfig
-> @@ -12,4 +12,5 @@ config DINO
->      select LSI_SCSI_PCI
->      select LASI_82596
->      select LASIPS2
-> +    select PARALLEL
->      select ARTIST
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index efd3f3875f..2c00a49c42 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -896,6 +896,7 @@ HP B160L
+>  M: Richard Henderson <rth@twiddle.net>
+>  R: Helge Deller <deller@gmx.de>
+>  S: Odd Fixes
+> +F: default-configs/hppa-softmmu.mak
+>  F: hw/hppa/
+>  F: pc-bios/hppa-firmware.img
+>
 >
 
 
