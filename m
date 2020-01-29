@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC392C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 19:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44690C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 19:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD3BD206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 19:04:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E15720661
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 19:25:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HwPcEcjY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD3BD206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYRApkc8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E15720661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwsdJ-0004Ve-Ru
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 14:04:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38484)
+	id 1iwsxn-0002jd-5Q
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 14:25:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47875)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iwscZ-00046n-Uy
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:03:28 -0500
+ (envelope-from <philmd@redhat.com>) id 1iwswY-0001Rb-RY
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:24:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iwscY-0004Tj-6Z
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:03:27 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55679
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iwswW-0000lI-Sf
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:24:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22525
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwscY-0004T8-39
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:03:26 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwswS-0000hf-PY
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:24:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580324605;
+ s=mimecast20190719; t=1580325840;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=VvSpx654IyJy8qtmFIUaAm7UgZeOUHxjzj9bbM4ngkI=;
- b=HwPcEcjYVDoCcoic7jMkUx+AGVVBxCfDEMnOqgQnxfwEwglSFBpKdftsAjP+yRjWzmJBUz
- 29VshU+77vnyEMf9PkOSrrMI8ZoLj+NJre22n+vhLQbZmDLWiJ2PSW06b8N4Sywy9VjtHg
- J3MSb7mCgUnglb9s7e1Z09b9U8/0IsU=
+ bh=tTkbxdpiXNcnlMHHc333yZ2bsSyaISyk5IUhQts7x6w=;
+ b=ZYRApkc8B3k7niNiLfngiINCxwovb2GzR9mxheCFG5uYAsGDK//LHfIG0xEztIkmjDqUlX
+ 3dKDZEqnsrzPTCAfFPihxhMgMUA9rIQSZOP2edPvT3jzu1e90v9z56+vH+SHogixMvOHOv
+ 1WCwRtsV4BiRnYkiVTZC4i0yh4G9PYs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-5IbvbSKkNVWBwuP49FokyQ-1; Wed, 29 Jan 2020 14:03:23 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-27-xKGunpWLO66R-OAnNS7XcQ-1; Wed, 29 Jan 2020 14:23:58 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A8A0107ACC5;
- Wed, 29 Jan 2020 19:03:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F21311861AC8;
+ Wed, 29 Jan 2020 19:23:56 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FC9D87B06;
- Wed, 29 Jan 2020 19:03:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9ED0B7792C;
+ Wed, 29 Jan 2020 19:23:52 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] MAINTAINERS: Cover hppa-softmmu.mak in the HP-PARISC Machines
- section
-Date: Wed, 29 Jan 2020 20:03:16 +0100
-Message-Id: <20200129190316.16901-1-philmd@redhat.com>
+Subject: [PATCH] hw/hppa/Kconfig: LASI chipset requires PARALLEL port
+Date: Wed, 29 Jan 2020 20:23:50 +0100
+Message-Id: <20200129192350.27143-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 5IbvbSKkNVWBwuP49FokyQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: xKGunpWLO66R-OAnNS7XcQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,33 +83,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Helge Deller <deller@gmx.de>, richard.henderson@linaro.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Modifications to default-configs/hppa-softmmu.mak should be
-reviewed by the hppa-softmmu users (currently a single machine).
+The PARISC Lasi chipset emulation requires some of the common parallel
+support and fails to build on a --without-default-devices:
 
+    LINK    hppa-softmmu/qemu-system-hppa
+  /usr/bin/ld: hw/hppa/lasi.o: in function `lasi_init':
+  hw/hppa/lasi.c:324: undefined reference to `parallel_mm_init'
+  collect2: error: ld returned 1 exit status
+  make[1]: *** [Makefile:206: qemu-system-hppa] Error 1
+
+Fixes: 376b851909d
+Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- MAINTAINERS | 1 +
+ hw/hppa/Kconfig | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index efd3f3875f..2c00a49c42 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -896,6 +896,7 @@ HP B160L
- M: Richard Henderson <rth@twiddle.net>
- R: Helge Deller <deller@gmx.de>
- S: Odd Fixes
-+F: default-configs/hppa-softmmu.mak
- F: hw/hppa/
- F: pc-bios/hppa-firmware.img
-=20
+diff --git a/hw/hppa/Kconfig b/hw/hppa/Kconfig
+index 82178c7dcb..22948db025 100644
+--- a/hw/hppa/Kconfig
++++ b/hw/hppa/Kconfig
+@@ -12,4 +12,5 @@ config DINO
+     select LSI_SCSI_PCI
+     select LASI_82596
+     select LASIPS2
++    select PARALLEL
+     select ARTIST
 --=20
 2.21.1
 
