@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 706CAC33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE2F4C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:22:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 434112064C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:21:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434112064C
+	by mail.kernel.org (Postfix) with ESMTPS id 80BA22064C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:22:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80BA22064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwmLw-0007Ce-Ds
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:21:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52455)
+	id 1iwmMb-00006o-M3
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:22:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCi-0008Ih-6Y
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:21 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmCp-00008u-27
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCd-0002Xh-4S
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:20 -0500
-Received: from mga09.intel.com ([134.134.136.24]:58727)
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmCn-0003O9-KY
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:26 -0500
+Received: from mga09.intel.com ([134.134.136.24]:58712)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmCc-0001Rn-QA
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:15 -0500
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmCn-0001Pn-AW
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:25 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Jan 2020 04:11:50 -0800
+ 29 Jan 2020 04:11:51 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314071114"
+X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314071178"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:50 -0800
+ by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:51 -0800
 From: "Liu, Yi L" <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, pbonzini@redhat.com,
  alex.williamson@redhat.com, peterx@redhat.com
-Subject: [RFC v3 15/25] intel_iommu: process pasid cache invalidation
-Date: Wed, 29 Jan 2020 04:16:46 -0800
-Message-Id: <1580300216-86172-16-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v3 17/25] vfio: add bind stage-1 page table support
+Date: Wed, 29 Jan 2020 04:16:48 -0800
+Message-Id: <1580300216-86172-18-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
 References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
@@ -66,158 +66,183 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kevin.tian@intel.com, yi.l.liu@intel.com, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Richard Henderson <rth@twiddle.net>,
- hao.wu@intel.com
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, hao.wu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Liu Yi L <yi.l.liu@intel.com>
 
-This patch adds PASID cache invalidation handling. When guest enabled
-PASID usages (e.g. SVA), guest software should issue a proper PASID
-cache invalidation when caching-mode is exposed. This patch only adds
-the draft handling of pasid cache invalidation. Detailed handling will
-be added in subsequent patches.
+This patch adds bind_stage1_pgtbl() definition in DualStageIOMMUOops,
+also adds corresponding implementation in VFIO. This is to expose a
+way for vIOMMU to setup dual stage DMA translation for passthru devices
+on hardware.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c          | 66 ++++++++++++++++++++++++++++++++++++++----
- hw/i386/intel_iommu_internal.h | 12 ++++++++
- hw/i386/trace-events           |  3 ++
- 3 files changed, 76 insertions(+), 5 deletions(-)
+ hw/iommu/dual_stage_iommu.c         | 26 ++++++++++++++++++++
+ hw/vfio/common.c                    | 48 +++++++++++++++++++++++++++++++++++++
+ include/hw/iommu/dual_stage_iommu.h | 22 +++++++++++++++++
+ 3 files changed, 96 insertions(+)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 43a728f..58e7213 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2393,6 +2393,63 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
-     return true;
+diff --git a/hw/iommu/dual_stage_iommu.c b/hw/iommu/dual_stage_iommu.c
+index d5a7168..9d99e9e 100644
+--- a/hw/iommu/dual_stage_iommu.c
++++ b/hw/iommu/dual_stage_iommu.c
+@@ -47,6 +47,32 @@ int ds_iommu_pasid_free(DualStageIOMMUObject *dsi_obj, uint32_t pasid)
+     return -ENOENT;
  }
  
-+static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
++int ds_iommu_bind_stage1_pgtbl(DualStageIOMMUObject *dsi_obj,
++                               DualIOMMUStage1BindData *data)
 +{
-+    return 0;
++    if (!dsi_obj) {
++        return -ENOENT;
++    }
++
++    if (dsi_obj->ops && dsi_obj->ops->bind_stage1_pgtbl) {
++        return dsi_obj->ops->bind_stage1_pgtbl(dsi_obj, data);
++    }
++    return -ENOENT;
 +}
 +
-+static int vtd_pasid_cache_psi(IntelIOMMUState *s,
-+                               uint16_t domain_id, uint32_t pasid)
++int ds_iommu_unbind_stage1_pgtbl(DualStageIOMMUObject *dsi_obj,
++                                 DualIOMMUStage1BindData *data)
 +{
-+    return 0;
++    if (!dsi_obj) {
++        return -ENOENT;
++    }
++
++    if (dsi_obj->ops && dsi_obj->ops->unbind_stage1_pgtbl) {
++        return dsi_obj->ops->unbind_stage1_pgtbl(dsi_obj, data);
++    }
++    return -ENOENT;
 +}
 +
-+static int vtd_pasid_cache_gsi(IntelIOMMUState *s)
+ void ds_iommu_object_init(DualStageIOMMUObject *dsi_obj,
+                           DualStageIOMMUOps *ops,
+                           DualStageIOMMUInfo *uinfo)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 014f4e7..d84bdc9 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1219,9 +1219,57 @@ static int vfio_ds_iommu_pasid_free(DualStageIOMMUObject *dsi_obj,
+     return 0;
+ }
+ 
++static int vfio_ds_iommu_bind_stage1_pgtbl(DualStageIOMMUObject *dsi_obj,
++                                           DualIOMMUStage1BindData *bind_data)
 +{
-+    return 0;
-+}
-+
-+static bool vtd_process_pasid_desc(IntelIOMMUState *s,
-+                                   VTDInvDesc *inv_desc)
-+{
-+    uint16_t domain_id;
-+    uint32_t pasid;
++    VFIOContainer *container = container_of(dsi_obj, VFIOContainer, dsi_obj);
++    struct vfio_iommu_type1_bind *bind;
++    unsigned long argsz;
 +    int ret = 0;
 +
-+    if ((inv_desc->val[0] & VTD_INV_DESC_PASIDC_RSVD_VAL0) ||
-+        (inv_desc->val[1] & VTD_INV_DESC_PASIDC_RSVD_VAL1) ||
-+        (inv_desc->val[2] & VTD_INV_DESC_PASIDC_RSVD_VAL2) ||
-+        (inv_desc->val[3] & VTD_INV_DESC_PASIDC_RSVD_VAL3)) {
-+        error_report_once("non-zero-field-in-pc_inv_desc hi: 0x%" PRIx64
-+                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
-+        return false;
++    argsz = sizeof(*bind) + sizeof(bind_data->bind_data);
++    bind = g_malloc0(argsz);
++    bind->argsz = argsz;
++    bind->flags = VFIO_IOMMU_BIND_GUEST_PGTBL;
++    memcpy(&bind->data, &bind_data->bind_data, sizeof(bind_data->bind_data));
++
++    if (ioctl(container->fd, VFIO_IOMMU_BIND, bind)) {
++        error_report("%s: pasid (%u) bind failed: %d",
++                      __func__, bind_data->pasid, -errno);
++        ret = -errno;
 +    }
-+
-+    domain_id = VTD_INV_DESC_PASIDC_DID(inv_desc->val[0]);
-+    pasid = VTD_INV_DESC_PASIDC_PASID(inv_desc->val[0]);
-+
-+    switch (inv_desc->val[0] & VTD_INV_DESC_PASIDC_G) {
-+    case VTD_INV_DESC_PASIDC_DSI:
-+        ret = vtd_pasid_cache_dsi(s, domain_id);
-+        break;
-+
-+    case VTD_INV_DESC_PASIDC_PASID_SI:
-+        ret = vtd_pasid_cache_psi(s, domain_id, pasid);
-+        break;
-+
-+    case VTD_INV_DESC_PASIDC_GLOBAL:
-+        ret = vtd_pasid_cache_gsi(s);
-+        break;
-+
-+    default:
-+        error_report_once("invalid-inv-granu-in-pc_inv_desc hi: 0x%" PRIx64
-+                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
-+        return false;
-+    }
-+
-+    return (ret == 0) ? true : false;
++    g_free(bind);
++    return ret;
 +}
 +
- static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
-                                      VTDInvDesc *inv_desc)
- {
-@@ -2499,12 +2556,11 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
-         }
-         break;
- 
--    /*
--     * TODO: the entity of below two cases will be implemented in future series.
--     * To make guest (which integrates scalable mode support patch set in
--     * iommu driver) work, just return true is enough so far.
--     */
-     case VTD_INV_DESC_PC:
-+        trace_vtd_inv_desc("pasid-cache", inv_desc.val[1], inv_desc.val[0]);
-+        if (!vtd_process_pasid_desc(s, &inv_desc)) {
-+            return false;
-+        }
-         break;
- 
-     case VTD_INV_DESC_PIOTLB:
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index fb5fdc2..6c03560 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -448,6 +448,18 @@ typedef union VTDInvDesc VTDInvDesc;
-         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
-         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- 
-+#define VTD_INV_DESC_PASIDC_G          (3ULL << 4)
-+#define VTD_INV_DESC_PASIDC_PASID(val) (((val) >> 32) & 0xfffffULL)
-+#define VTD_INV_DESC_PASIDC_DID(val)   (((val) >> 16) & VTD_DOMAIN_ID_MASK)
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL0  0xfff000000000ffc0ULL
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL1  0xffffffffffffffffULL
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL2  0xffffffffffffffffULL
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL3  0xffffffffffffffffULL
++static int vfio_ds_iommu_unbind_stage1_pgtbl(DualStageIOMMUObject *dsi_obj,
++                                        DualIOMMUStage1BindData *bind_data)
++{
++    VFIOContainer *container = container_of(dsi_obj, VFIOContainer, dsi_obj);
++    struct vfio_iommu_type1_bind *bind;
++    unsigned long argsz;
++    int ret = 0;
 +
-+#define VTD_INV_DESC_PASIDC_DSI        (0ULL << 4)
-+#define VTD_INV_DESC_PASIDC_PASID_SI   (1ULL << 4)
-+#define VTD_INV_DESC_PASIDC_GLOBAL     (3ULL << 4)
++    argsz = sizeof(*bind) + sizeof(bind_data->bind_data);
++    bind = g_malloc0(argsz);
++    bind->argsz = argsz;
++    bind->flags = VFIO_IOMMU_UNBIND_GUEST_PGTBL;
++    memcpy(&bind->data, &bind_data->bind_data, sizeof(bind_data->bind_data));
 +
- /* Information about page-selective IOTLB invalidate */
- struct VTDIOTLBPageInvInfo {
-     uint16_t domain_id;
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 71536a7..f7cd4e5 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -22,6 +22,9 @@ vtd_inv_qi_head(uint16_t head) "read head %d"
- vtd_inv_qi_tail(uint16_t head) "write tail %d"
- vtd_inv_qi_fetch(void) ""
- vtd_context_cache_reset(void) ""
-+vtd_pasid_cache_gsi(void) ""
-+vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
-+vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
- vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
- vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
- vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
++    if (ioctl(container->fd, VFIO_IOMMU_BIND, bind)) {
++        error_report("%s: pasid (%u) unbind failed: %d",
++                      __func__, bind_data->pasid, -errno);
++        ret = -errno;
++    }
++    g_free(bind);
++    return ret;
++}
++
+ static struct DualStageIOMMUOps vfio_ds_iommu_ops = {
+     .pasid_alloc = vfio_ds_iommu_pasid_alloc,
+     .pasid_free = vfio_ds_iommu_pasid_free,
++    .bind_stage1_pgtbl = vfio_ds_iommu_bind_stage1_pgtbl,
++    .unbind_stage1_pgtbl = vfio_ds_iommu_unbind_stage1_pgtbl,
+ };
+ 
+ static int vfio_get_iommu_info(VFIOContainer *container,
+diff --git a/include/hw/iommu/dual_stage_iommu.h b/include/hw/iommu/dual_stage_iommu.h
+index c6100b4..0eb983c 100644
+--- a/include/hw/iommu/dual_stage_iommu.h
++++ b/include/hw/iommu/dual_stage_iommu.h
+@@ -31,6 +31,7 @@
+ typedef struct DualStageIOMMUObject DualStageIOMMUObject;
+ typedef struct DualStageIOMMUOps DualStageIOMMUOps;
+ typedef struct DualStageIOMMUInfo DualStageIOMMUInfo;
++typedef struct DualIOMMUStage1BindData DualIOMMUStage1BindData;
+ 
+ struct DualStageIOMMUOps {
+     /* Allocate pasid from DualStageIOMMU (a.k.a. host IOMMU) */
+@@ -41,6 +42,16 @@ struct DualStageIOMMUOps {
+     /* Reclaim a pasid from DualStageIOMMU (a.k.a. host IOMMU) */
+     int (*pasid_free)(DualStageIOMMUObject *dsi_obj,
+                       uint32_t pasid);
++    /*
++     * Bind stage-1 page table to a DualStageIOMMU (a.k.a. host
++     * IOMMU which has dual stage DMA translation capability.
++     * @bind_data specifies the bind configurations.
++     */
++    int (*bind_stage1_pgtbl)(DualStageIOMMUObject *dsi_obj,
++                            DualIOMMUStage1BindData *bind_data);
++    /* Undo a previous bind. @bind_data specifies the unbind info. */
++    int (*unbind_stage1_pgtbl)(DualStageIOMMUObject *dsi_obj,
++                              DualIOMMUStage1BindData *bind_data);
+ };
+ 
+ struct DualStageIOMMUInfo {
+@@ -55,9 +66,20 @@ struct DualStageIOMMUObject {
+     DualStageIOMMUInfo uinfo;
+ };
+ 
++struct DualIOMMUStage1BindData {
++    uint32_t pasid;
++    union {
++        struct iommu_gpasid_bind_data gpasid_bind;
++    } bind_data;
++};
++
+ int ds_iommu_pasid_alloc(DualStageIOMMUObject *dsi_obj, uint32_t min,
+                          uint32_t max, uint32_t *pasid);
+ int ds_iommu_pasid_free(DualStageIOMMUObject *dsi_obj, uint32_t pasid);
++int ds_iommu_bind_stage1_pgtbl(DualStageIOMMUObject *dsi_obj,
++                               DualIOMMUStage1BindData *bind_data);
++int ds_iommu_unbind_stage1_pgtbl(DualStageIOMMUObject *dsi_obj,
++                                 DualIOMMUStage1BindData *bind_data);
+ 
+ void ds_iommu_object_init(DualStageIOMMUObject *dsi_obj,
+                           DualStageIOMMUOps *ops,
 -- 
 2.7.4
 
