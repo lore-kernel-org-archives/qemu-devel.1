@@ -6,53 +6,49 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C457C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C31C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:36:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E2AB20678
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:35:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E2AB20678
+	by mail.kernel.org (Postfix) with ESMTPS id 454E120678
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:36:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 454E120678
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwsBw-0007Zl-EY
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 13:35:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55154)
+	id 1iwsC8-0008B4-E6
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 13:36:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iwsAl-00065n-Dz
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:44 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iwsAy-0006Ls-Tt
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iwsAg-0003d4-V9
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:43 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:32979 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iwsAx-00043V-Bd
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:56 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:33091 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iwsAg-0003bG-O1
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:38 -0500
+ id 1iwsAx-00040a-1B
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:55 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 874DB1A1FAD;
- Wed, 29 Jan 2020 19:34:36 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id B3B761A1FB9;
+ Wed, 29 Jan 2020 19:34:51 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 6EEF91A1CEF;
- Wed, 29 Jan 2020 19:34:36 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 97B2D1A1CEF;
+ Wed, 29 Jan 2020 19:34:51 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/6] target/mips: Rectify documentation on deprecating MIPS r4k
- machine
-Date: Wed, 29 Jan 2020 19:34:12 +0100
-Message-Id: <1580322857-14331-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PULL 5/6] target/mips: Amend CP0 WatchHi register implementation
+Date: Wed, 29 Jan 2020 19:34:16 +0100
+Message-Id: <1580322857-14331-6-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580322857-14331-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580322857-14331-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -66,42 +62,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+Cc: peter.maydell@linaro.org, Yongbok Kim <yongbok.kim@mips.com>,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Correct file qemu-deprecated.texi with respect to the release since
-MIPS r4k machine is deprecated from 4.2 to 5.0.
+WatchHi is extended by the field MemoryMapID with the GINVT instruction.
+The field is accessible by MTHC0/MFHC0 in 32-bit architectures and DMTC0/
+DMFC0 in 64-bit architectures.
 
-Fixes: d32dc61421b
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1579883929-1517-2-git-send-email-aleksandar.markovic@rt-rk.c=
-om>
+Message-Id: <1579883929-1517-4-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- qemu-deprecated.texi | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/mips/cpu.h       |  2 +-
+ target/mips/helper.h    |  3 +++
+ target/mips/machine.c   |  6 +++---
+ target/mips/op_helper.c | 23 +++++++++++++++++++++--
+ target/mips/translate.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 69 insertions(+), 7 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 0968d37..3d2a8ff 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -260,7 +260,7 @@ The 'scsi-disk' device is deprecated. Users should us=
-e 'scsi-hd' or
-=20
- @section System emulator machines
-=20
--@subsection mips r4k platform (since 4.2)
-+@subsection mips r4k platform (since 5.0)
-=20
- This machine type is very old and unmaintained. Users should use the 'ma=
-lta'
- machine type instead.
---=20
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index c218ccc..7cf1b49 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -961,7 +961,7 @@ struct CPUMIPSState {
+ /*
+  * CP0 Register 19
+  */
+-    int32_t CP0_WatchHi[8];
++    uint64_t CP0_WatchHi[8];
+ #define CP0WH_ASID 16
+ /*
+  * CP0 Register 20
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 7b8ad74..5b1f8bb 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -78,6 +78,7 @@ DEF_HELPER_1(mfc0_maar, tl, env)
+ DEF_HELPER_1(mfhc0_maar, tl, env)
+ DEF_HELPER_2(mfc0_watchlo, tl, env, i32)
+ DEF_HELPER_2(mfc0_watchhi, tl, env, i32)
++DEF_HELPER_2(mfhc0_watchhi, tl, env, i32)
+ DEF_HELPER_1(mfc0_debug, tl, env)
+ DEF_HELPER_1(mftc0_debug, tl, env)
+ #ifdef TARGET_MIPS64
+@@ -89,6 +90,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
+ DEF_HELPER_1(dmfc0_lladdr, tl, env)
+ DEF_HELPER_1(dmfc0_maar, tl, env)
+ DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
++DEF_HELPER_2(dmfc0_watchhi, tl, env, i32)
+ DEF_HELPER_1(dmfc0_saar, tl, env)
+ #endif /* TARGET_MIPS64 */
+ 
+@@ -159,6 +161,7 @@ DEF_HELPER_2(mthc0_maar, void, env, tl)
+ DEF_HELPER_2(mtc0_maari, void, env, tl)
+ DEF_HELPER_3(mtc0_watchlo, void, env, tl, i32)
+ DEF_HELPER_3(mtc0_watchhi, void, env, tl, i32)
++DEF_HELPER_3(mthc0_watchhi, void, env, tl, i32)
+ DEF_HELPER_2(mtc0_xcontext, void, env, tl)
+ DEF_HELPER_2(mtc0_framemask, void, env, tl)
+ DEF_HELPER_2(mtc0_debug, void, env, tl)
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index c139239..8d5b18b 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
+ 
+ const VMStateDescription vmstate_mips_cpu = {
+     .name = "cpu",
+-    .version_id = 18,
+-    .minimum_version_id = 18,
++    .version_id = 19,
++    .minimum_version_id = 19,
+     .post_load = cpu_post_load,
+     .fields = (VMStateField[]) {
+         /* Active TC */
+@@ -296,7 +296,7 @@ const VMStateDescription vmstate_mips_cpu = {
+         VMSTATE_INT32(env.CP0_MAARI, MIPSCPU),
+         VMSTATE_UINTTL(env.lladdr, MIPSCPU),
+         VMSTATE_UINTTL_ARRAY(env.CP0_WatchLo, MIPSCPU, 8),
+-        VMSTATE_INT32_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
++        VMSTATE_UINT64_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
+         VMSTATE_UINTTL(env.CP0_XContext, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Framemask, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Debug, MIPSCPU),
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 79d44da..7425a88 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -945,7 +945,12 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env, uint32_t sel)
+ 
+ target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
+ {
+-    return env->CP0_WatchHi[sel];
++    return (int32_t) env->CP0_WatchHi[sel];
++}
++
++target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
++{
++    return env->CP0_WatchHi[sel] >> 32;
+ }
+ 
+ target_ulong helper_mfc0_debug(CPUMIPSState *env)
+@@ -1016,6 +1021,11 @@ target_ulong helper_dmfc0_watchlo(CPUMIPSState *env, uint32_t sel)
+     return env->CP0_WatchLo[sel];
+ }
+ 
++target_ulong helper_dmfc0_watchhi(CPUMIPSState *env, uint32_t sel)
++{
++    return env->CP0_WatchHi[sel];
++}
++
+ target_ulong helper_dmfc0_saar(CPUMIPSState *env)
+ {
+     if ((env->CP0_SAARI & 0x3f) < 2) {
+@@ -1869,11 +1879,20 @@ void helper_mtc0_watchlo(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
+ 
+ void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
+ {
+-    int mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
++    uint64_t mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
++    if ((env->CP0_Config5 >> CP0C5_MI) & 1) {
++        mask |= 0xFFFFFFFF00000000ULL; /* MMID */
++    }
+     env->CP0_WatchHi[sel] = arg1 & mask;
+     env->CP0_WatchHi[sel] &= ~(env->CP0_WatchHi[sel] & arg1 & 0x7);
+ }
+ 
++void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
++{
++    env->CP0_WatchHi[sel] = ((uint64_t) (arg1) << 32) |
++                            (env->CP0_WatchHi[sel] & 0x00000000ffffffffULL);
++}
++
+ void helper_mtc0_xcontext(CPUMIPSState *env, target_ulong arg1)
+ {
+     target_ulong mask = (1ULL << (env->SEGBITS - 7)) - 1;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index efe75e6..d51330c 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -2547,6 +2547,7 @@ typedef struct DisasContext {
+     bool nan2008;
+     bool abs2008;
+     bool saar;
++    bool mi;
+ } DisasContext;
+ 
+ #define DISAS_STOP       DISAS_TARGET_0
+@@ -6783,6 +6784,25 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             goto cp0_unimplemented;
+         }
+         break;
++    case CP0_REGISTER_19:
++        switch (sel) {
++        case CP0_REG19__WATCHHI0:
++        case CP0_REG19__WATCHHI1:
++        case CP0_REG19__WATCHHI2:
++        case CP0_REG19__WATCHHI3:
++        case CP0_REG19__WATCHHI4:
++        case CP0_REG19__WATCHHI5:
++        case CP0_REG19__WATCHHI6:
++        case CP0_REG19__WATCHHI7:
++            /* upper 32 bits are only available when Config5MI != 0 */
++            CP0_CHECK(ctx->mi);
++            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, CP0_WatchHi[sel]), 0);
++            register_name = "WatchHi";
++            break;
++        default:
++            goto cp0_unimplemented;
++        }
++        break;
+     case CP0_REGISTER_28:
+         switch (sel) {
+         case 0:
+@@ -6869,6 +6889,25 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             goto cp0_unimplemented;
+         }
+         break;
++    case CP0_REGISTER_19:
++        switch (sel) {
++        case CP0_REG19__WATCHHI0:
++        case CP0_REG19__WATCHHI1:
++        case CP0_REG19__WATCHHI2:
++        case CP0_REG19__WATCHHI3:
++        case CP0_REG19__WATCHHI4:
++        case CP0_REG19__WATCHHI5:
++        case CP0_REG19__WATCHHI6:
++        case CP0_REG19__WATCHHI7:
++            /* upper 32 bits are only available when Config5MI != 0 */
++            CP0_CHECK(ctx->mi);
++            gen_helper_0e1i(mthc0_watchhi, arg, sel);
++            register_name = "WatchHi";
++            break;
++        default:
++            goto cp0_unimplemented;
++        }
++        break;
+     case CP0_REGISTER_28:
+         switch (sel) {
+         case 0:
+@@ -8922,7 +8961,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case CP0_REG19__WATCHHI6:
+         case CP0_REG19__WATCHHI7:
+             CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+-            gen_helper_1e0i(mfc0_watchhi, arg, sel);
++            gen_helper_1e0i(dmfc0_watchhi, arg, sel);
+             register_name = "WatchHi";
+             break;
+         default:
+@@ -30727,6 +30766,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
+     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
+     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
++    ctx->mi = (env->CP0_Config5 >> CP0C5_MI) & 1;
+     restore_cpu_state(env, ctx);
+ #ifdef CONFIG_USER_ONLY
+         ctx->mem_idx = MIPS_HFLAG_UM;
+-- 
 2.7.4
 
 
