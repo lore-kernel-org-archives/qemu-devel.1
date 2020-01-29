@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE08C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 706CAC33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:21:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5F0020716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:21:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F0020716
+	by mail.kernel.org (Postfix) with ESMTPS id 434112064C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:21:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434112064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwmLM-00063j-Sv
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:21:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52566)
+	id 1iwmLw-0007Ce-Ds
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:21:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCp-00009D-5S
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:28 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmCi-0008Ih-6Y
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCn-0003OK-LN
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:27 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmCd-0002Xh-4S
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:20 -0500
 Received: from mga09.intel.com ([134.134.136.24]:58727)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmCn-0001Rn-Bq
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:25 -0500
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmCc-0001Rn-QA
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:15 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Jan 2020 04:11:52 -0800
+ 29 Jan 2020 04:11:50 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314071216"
+X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314071114"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:51 -0800
+ by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:50 -0800
 From: "Liu, Yi L" <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, pbonzini@redhat.com,
  alex.williamson@redhat.com, peterx@redhat.com
-Subject: [RFC v3 18/25] intel_iommu: bind/unbind guest page table to host
-Date: Wed, 29 Jan 2020 04:16:49 -0800
-Message-Id: <1580300216-86172-19-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v3 15/25] intel_iommu: process pasid cache invalidation
+Date: Wed, 29 Jan 2020 04:16:46 -0800
+Message-Id: <1580300216-86172-16-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
 References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
@@ -76,13 +76,11 @@ Sender: "Qemu-devel"
 
 From: Liu Yi L <yi.l.liu@intel.com>
 
-This patch captures the guest PASID table entry modifications and
-propagates the changes to host to setup dual stage DMA translation.
-The guest page table is configured as 1st level page table (GVA->GPA)
-whose translation result would further go through host VT-d 2nd
-level page table(GPA->HPA) under nested translation mode. This is
-a key part of vSVA support, and also a key to support IOVA over 1st
-level page table for Intel VT-d in virtualization environment.
+This patch adds PASID cache invalidation handling. When guest enabled
+PASID usages (e.g. SVA), guest software should issue a proper PASID
+cache invalidation when caching-mode is exposed. This patch only adds
+the draft handling of pasid cache invalidation. Detailed handling will
+be added in subsequent patches.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -93,186 +91,133 @@ Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c          | 83 +++++++++++++++++++++++++++++++++++++++++-
- hw/i386/intel_iommu_internal.h | 26 +++++++++++++
- 2 files changed, 107 insertions(+), 2 deletions(-)
+ hw/i386/intel_iommu.c          | 66 ++++++++++++++++++++++++++++++++++++++----
+ hw/i386/intel_iommu_internal.h | 12 ++++++++
+ hw/i386/trace-events           |  3 ++
+ 3 files changed, 76 insertions(+), 5 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index c75cb7b..319b3df 100644
+index 43a728f..58e7213 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -41,6 +41,7 @@
- #include "migration/vmstate.h"
- #include "trace.h"
- #include "qemu/jhash.h"
-+#include <linux/iommu.h>
- 
- /* context entry operations */
- #define VTD_CE_GET_RID2PASID(ce) \
-@@ -695,6 +696,16 @@ static inline uint16_t vtd_pe_get_domain_id(VTDPASIDEntry *pe)
-     return VTD_SM_PASID_ENTRY_DID((pe)->val[1]);
+@@ -2393,6 +2393,63 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
+     return true;
  }
  
-+static inline uint32_t vtd_pe_get_fl_aw(VTDPASIDEntry *pe)
++static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
 +{
-+    return 48 + ((pe->val[2] >> 2) & VTD_SM_PASID_ENTRY_FLPM) * 9;
++    return 0;
 +}
 +
-+static inline dma_addr_t vtd_pe_get_flpt_base(VTDPASIDEntry *pe)
++static int vtd_pasid_cache_psi(IntelIOMMUState *s,
++                               uint16_t domain_id, uint32_t pasid)
 +{
-+    return pe->val[2] & VTD_SM_PASID_ENTRY_FLPTPTR;
++    return 0;
 +}
 +
- static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
- {
-     return pdire->val & 1;
-@@ -1854,6 +1865,68 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
-     vtd_iommu_replay_all(s);
- }
- 
-+static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
-+              int devfn, int pasid, VTDPASIDEntry *pe, VTDPASIDOp op)
++static int vtd_pasid_cache_gsi(IntelIOMMUState *s)
 +{
-+    VTDIOMMUContext *vtd_icx;
-+    DualIOMMUStage1BindData bind_data;
-+    struct iommu_gpasid_bind_data *g_bind_data;
-+    int ret = -1;
++    return 0;
++}
 +
-+    vtd_icx = vtd_bus->dev_icx[devfn];
-+    if (!vtd_icx) {
-+        return ret;
++static bool vtd_process_pasid_desc(IntelIOMMUState *s,
++                                   VTDInvDesc *inv_desc)
++{
++    uint16_t domain_id;
++    uint32_t pasid;
++    int ret = 0;
++
++    if ((inv_desc->val[0] & VTD_INV_DESC_PASIDC_RSVD_VAL0) ||
++        (inv_desc->val[1] & VTD_INV_DESC_PASIDC_RSVD_VAL1) ||
++        (inv_desc->val[2] & VTD_INV_DESC_PASIDC_RSVD_VAL2) ||
++        (inv_desc->val[3] & VTD_INV_DESC_PASIDC_RSVD_VAL3)) {
++        error_report_once("non-zero-field-in-pc_inv_desc hi: 0x%" PRIx64
++                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
++        return false;
 +    }
 +
-+    if (vtd_icx->dsi_obj->uinfo.pasid_format
-+             != IOMMU_PASID_FORMAT_INTEL_VTD)
-+    {
-+        error_report_once("Dual Stage IOMMU is not compatible!!\n");
-+    }
++    domain_id = VTD_INV_DESC_PASIDC_DID(inv_desc->val[0]);
++    pasid = VTD_INV_DESC_PASIDC_PASID(inv_desc->val[0]);
 +
-+    bind_data.pasid = pasid;
-+    g_bind_data = &bind_data.bind_data.gpasid_bind;
++    switch (inv_desc->val[0] & VTD_INV_DESC_PASIDC_G) {
++    case VTD_INV_DESC_PASIDC_DSI:
++        ret = vtd_pasid_cache_dsi(s, domain_id);
++        break;
 +
-+    g_bind_data->flags = 0;
-+    g_bind_data->vtd.flags = 0;
-+    switch (op) {
-+    case VTD_PASID_BIND:
-+    case VTD_PASID_UPDATE:
-+        g_bind_data->version = IOMMU_UAPI_VERSION;
-+        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-+        g_bind_data->gpgd = vtd_pe_get_flpt_base(pe);
-+        g_bind_data->addr_width = vtd_pe_get_fl_aw(pe);
-+        g_bind_data->hpasid = pasid;
-+        g_bind_data->gpasid = pasid;
-+        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
-+        g_bind_data->vtd.flags =
-+                             (VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_EAFE_BIT(pe->val[2]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_PCD_BIT(pe->val[1]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_PWT_BIT(pe->val[1]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_EMTE_BIT(pe->val[1]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_CD_BIT(pe->val[1]) ? 1 : 0);
-+        g_bind_data->vtd.pat = VTD_SM_PASID_ENTRY_PAT(pe->val[1]);
-+        g_bind_data->vtd.emt = VTD_SM_PASID_ENTRY_EMT(pe->val[1]);
-+        ret = ds_iommu_bind_stage1_pgtbl(vtd_icx->dsi_obj, &bind_data);
++    case VTD_INV_DESC_PASIDC_PASID_SI:
++        ret = vtd_pasid_cache_psi(s, domain_id, pasid);
 +        break;
-+    case VTD_PASID_UNBIND:
-+        g_bind_data->version = IOMMU_UAPI_VERSION;
-+        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-+        g_bind_data->gpgd = 0;
-+        g_bind_data->addr_width = 0;
-+        g_bind_data->hpasid = pasid;
-+        g_bind_data->gpasid = pasid;
-+        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
-+        ret = ds_iommu_unbind_stage1_pgtbl(vtd_icx->dsi_obj, &bind_data);
++
++    case VTD_INV_DESC_PASIDC_GLOBAL:
++        ret = vtd_pasid_cache_gsi(s);
 +        break;
++
 +    default:
-+        error_report_once("Unknown VTDPASIDOp!!\n");
-+        break;
++        error_report_once("invalid-inv-granu-in-pc_inv_desc hi: 0x%" PRIx64
++                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
++        return false;
 +    }
-+    return ret;
++
++    return (ret == 0) ? true : false;
 +}
 +
- /* Do a context-cache device-selective invalidation.
-  * @func_mask: FM field after shifting
-  */
-@@ -2532,18 +2605,20 @@ static gboolean vtd_flush_pasid(gpointer key, gpointer value,
-         /* pasid entry was updated, thus update the pasid cache */
-         pc_entry->pasid_entry = pe;
-         pc_entry->pasid_cache_gen = s->pasid_cache_gen;
-+        vtd_bind_guest_pasid(s, vtd_bus, devfn,
-+                             pasid, &pe, VTD_PASID_UPDATE);
-         /*
-          * TODO:
--         * - send pasid bind to host for passthru devices
-          * - when pasid-base-iotlb(piotlb) infrastructure is ready,
-          *   should invalidate QEMU piotlb togehter with this change.
-          */
-     }
-     return false;
- remove:
-+    vtd_bind_guest_pasid(s, vtd_bus, devfn,
-+                         pasid, NULL, VTD_PASID_UNBIND);
-     /*
-      * TODO:
--     * - send pasid unbind to host for passthru devices
-      * - when pasid-base-iotlb(piotlb) infrastructure is ready,
-      *   should invalidate QEMU piotlb togehter with this change.
-      */
-@@ -2634,6 +2709,10 @@ static inline void vtd_fill_in_pe_cache(
+ static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
+                                      VTDInvDesc *inv_desc)
+ {
+@@ -2499,12 +2556,11 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+         }
+         break;
  
-     pc_entry->pasid_entry = *pe;
-     pc_entry->pasid_cache_gen = s->pasid_cache_gen;
-+    vtd_bind_guest_pasid(s, vtd_pasid_as->vtd_bus,
-+                         vtd_pasid_as->devfn,
-+                         vtd_pasid_as->pasid,
-+                         pe, VTD_PASID_BIND);
- }
+-    /*
+-     * TODO: the entity of below two cases will be implemented in future series.
+-     * To make guest (which integrates scalable mode support patch set in
+-     * iommu driver) work, just return true is enough so far.
+-     */
+     case VTD_INV_DESC_PC:
++        trace_vtd_inv_desc("pasid-cache", inv_desc.val[1], inv_desc.val[0]);
++        if (!vtd_process_pasid_desc(s, &inv_desc)) {
++            return false;
++        }
+         break;
  
- static int vtd_pasid_cache_psi(IntelIOMMUState *s,
+     case VTD_INV_DESC_PIOTLB:
 diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 18a9e50..833c442 100644
+index fb5fdc2..6c03560 100644
 --- a/hw/i386/intel_iommu_internal.h
 +++ b/hw/i386/intel_iommu_internal.h
-@@ -486,6 +486,20 @@ struct VTDRootEntry {
- };
- typedef struct VTDRootEntry VTDRootEntry;
+@@ -448,6 +448,18 @@ typedef union VTDInvDesc VTDInvDesc;
+         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
+         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
  
-+enum VTD_DUAL_STAGE_UAPI {
-+    UAPI_BIND_GPASID,
-+    UAPI_NUM
-+};
-+typedef enum VTD_DUAL_STAGE_UAPI VTD_DUAL_STAGE_UAPI;
++#define VTD_INV_DESC_PASIDC_G          (3ULL << 4)
++#define VTD_INV_DESC_PASIDC_PASID(val) (((val) >> 32) & 0xfffffULL)
++#define VTD_INV_DESC_PASIDC_DID(val)   (((val) >> 16) & VTD_DOMAIN_ID_MASK)
++#define VTD_INV_DESC_PASIDC_RSVD_VAL0  0xfff000000000ffc0ULL
++#define VTD_INV_DESC_PASIDC_RSVD_VAL1  0xffffffffffffffffULL
++#define VTD_INV_DESC_PASIDC_RSVD_VAL2  0xffffffffffffffffULL
++#define VTD_INV_DESC_PASIDC_RSVD_VAL3  0xffffffffffffffffULL
 +
-+enum VTDPASIDOp {
-+    VTD_PASID_BIND,
-+    VTD_PASID_UNBIND,
-+    VTD_PASID_UPDATE,
-+    VTD_OP_NUM
-+};
-+typedef enum VTDPASIDOp VTDPASIDOp;
++#define VTD_INV_DESC_PASIDC_DSI        (0ULL << 4)
++#define VTD_INV_DESC_PASIDC_PASID_SI   (1ULL << 4)
++#define VTD_INV_DESC_PASIDC_GLOBAL     (3ULL << 4)
 +
- struct VTDPASIDCacheInfo {
- #define VTD_PASID_CACHE_GLOBAL   (1ULL << 0)
- #define VTD_PASID_CACHE_DOMSI    (1ULL << 1)
-@@ -556,6 +570,18 @@ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
- #define VTD_SM_PASID_ENTRY_AW          7ULL /* Adjusted guest-address-width */
- #define VTD_SM_PASID_ENTRY_DID(val)    ((val) & VTD_DOMAIN_ID_MASK)
- 
-+/* Adjusted guest-address-width */
-+#define VTD_SM_PASID_ENTRY_FLPM          3ULL
-+#define VTD_SM_PASID_ENTRY_FLPTPTR       (~0xfffULL)
-+#define VTD_SM_PASID_ENTRY_SRE_BIT(val)  (!!((val) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_EAFE_BIT(val) (!!(((val) >> 7) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_PCD_BIT(val)  (!!(((val) >> 31) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_PWT_BIT(val)  (!!(((val) >> 30) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_EMTE_BIT(val) (!!(((val) >> 26) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_CD_BIT(val)   (!!(((val) >> 25) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_PAT(val)      (((val) >> 32) & 0xFFFFFFFFULL)
-+#define VTD_SM_PASID_ENTRY_EMT(val)      (((val) >> 27) & 0x7ULL)
-+
- /* Second Level Page Translation Pointer*/
- #define VTD_SM_PASID_ENTRY_SLPTPTR     (~0xfffULL)
- 
+ /* Information about page-selective IOTLB invalidate */
+ struct VTDIOTLBPageInvInfo {
+     uint16_t domain_id;
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index 71536a7..f7cd4e5 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -22,6 +22,9 @@ vtd_inv_qi_head(uint16_t head) "read head %d"
+ vtd_inv_qi_tail(uint16_t head) "write tail %d"
+ vtd_inv_qi_fetch(void) ""
+ vtd_context_cache_reset(void) ""
++vtd_pasid_cache_gsi(void) ""
++vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
++vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
+ vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
+ vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
+ vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
 -- 
 2.7.4
 
