@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C7DCC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FE6C35240
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:17:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED655206A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FAC5206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OcphJvJo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED655206A2
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R6Z2/Uh3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FAC5206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwxWE-0003ze-09
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 19:17:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45497)
+	id 1iwxWF-00044v-EH
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 19:17:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxCV-0004D6-7R
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:52 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iwxCm-0004bs-R4
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxCT-0008HH-MW
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:51 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45634)
+ (envelope-from <richard.henderson@linaro.org>) id 1iwxCl-0000VP-KJ
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:08 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:34003)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iwxCT-0008Dg-ER
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:49 -0500
-Received: by mail-pl1-x641.google.com with SMTP id b22so580445pls.12
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:56:48 -0800 (PST)
+ id 1iwxCl-0000Se-4v
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:07 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id f2so1873201pjq.1
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:57:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=2bVSVEcKWqGNSiv8cYG9G0D1xK1dE0+YUqhMthCnato=;
- b=OcphJvJo+v9dBdSv5QUhghUR1bkoo5dY91VN0K/Ayem42CS2LMmC2EFIh6136OsMzJ
- 7fk+LbAhZ6D9ji/pdAarCERTpKmZTH2hLxg8p/o+/nsB2/w412uP7E1q5nAB2N/uP4XP
- EgY0F9COxMki/MTrBNMNhChfUB8syk1ryvDBLCacAussSHLQ3z5Ow3p8U9ateK9NVRLv
- slaVfDQTu5WmFTj/NIzKSWeA+/JWLzt/E+5Dtm8wlZ7i0I2YX1biTf+kRk2pG8LJe2zU
- LidXq3DYPiAEPFo20nXaDOrDyKNZmt08VvHZDjXd6/rvKFlJ0lH0QHnKJlx3C2AVxYC5
- 0EYg==
+ bh=6zsJ+64yBL0aQurnYOJJKrMClJ7E0x3WeYfXxBCipH4=;
+ b=R6Z2/Uh3qyJqgN5G1GXEY5OXmd8y/Kc8MJmNuPZ6fnbrOQicJ4e9LPiOa9ZnBLOsuO
+ Z84TuIs26ZkCmp3ExsYNSEb1Hf33oSM9aKF6n92l10sdHCqIf+58c0QTBf1t2HLtqwXe
+ L4dvASdYeoQiTBteNKMb8SsQMOuBWYs3i3z9lJ88adCbZ1oF/5yyuYrqHySd8gfpTkBJ
+ mJGeMzu7km1Qr21nYf8IeMOBA/Y65PjyKUgTAqjqyDJHY7yLSORyV0XawI4xbduwSbzb
+ B1Nkdbio5FtMQe2dqwoKCbF+NCRl8oH07VVpzXaIBmZSqIBtDPCqzdyLDMqIe5rwx0eN
+ 0gYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2bVSVEcKWqGNSiv8cYG9G0D1xK1dE0+YUqhMthCnato=;
- b=kTpzIjghBAGz6E1xVa95kxYsuYZTTEtTuQLod8QmzRG4+VX1BZ/y6OAKevv6Caw+9/
- YB31KCtvJcU5ue9PS7LZtZc9qi0Ai92jeOGB6RE2RIWRVIebDlY6fCylF5mnvlZP/FAh
- TNA0IzbR/xJaSYeZ4l1NeRo46riMv6uZnxK/4xk5PgObvTWmya8ShTsD5Mvaxo0ogK2A
- FjWf8yzKu/7HeabYUZ8l3b85pj9WsGow9F9hucNuCxcXtykBiKvSgnkOtgLKM+ekVrJE
- WUmzQQOZjmhib50kkNAnaBWmh8TKcowTltLttMs9YJlDVy7a1UnieDOK5fi04EzkmF+3
- 89pQ==
-X-Gm-Message-State: APjAAAXUTBpH+xB41Y9NHLtCa3f+ibnsaLs9eq5+ZNGBVU/JowbLQ3hg
- 0WMW6oEjRh/P9NDTXUTv++rJevks2wI=
-X-Google-Smtp-Source: APXvYqwLGA+oTJQbU7qYKhMacW86oNg/CDYEg4Q105PDczjBUal3wo7xL0OFELzzBm+4BWQC0vvJ/Q==
-X-Received: by 2002:a17:902:e789:: with SMTP id
- cp9mr1906497plb.85.1580342207536; 
- Wed, 29 Jan 2020 15:56:47 -0800 (PST)
+ bh=6zsJ+64yBL0aQurnYOJJKrMClJ7E0x3WeYfXxBCipH4=;
+ b=Kkg9aW1ydbs/x5fKUFw6DAPTB3BLHp+rtUXv6emAHhJpf2eGceda5m/YCDkR6am9NF
+ wILcZqUjAxyb/QSAIS2K9Ode1GzO3dUCvlA73NONxRC/+Iz54XpbtBwiTZC+9zkCOuW3
+ AcYZN20Sn1+WdH4roaiHYbsemwQ+x/0oyw5PVooHHe/E18wrJ6qG2CQ04OFOYgIpDcPI
+ 934l1kw+HS8Bs/p6vTrLtABIqrt4qAOK/Rq16+CPShcKKQDlEq7lPD92bRFCUj3g+IcZ
+ yu9aWOngBDR0/BCpirAdUdQLUAjUm2FsIrBEM0mKdWPHMX7zbvkyRkJePCpdG4B5clyq
+ ttLg==
+X-Gm-Message-State: APjAAAXPSuCOLcsN+2svpCnRKjnRkeqYj/YdZj54YyHxoInmdwMz56Ev
+ rWj36dbgLNzpn0ktAJTvmiz7SxNq3pU=
+X-Google-Smtp-Source: APXvYqyrPx3oTfb42A9UUE45BO6bLXABZgJ/UYtASHZmJOhA2FgYVWQWNHEEC7JgyJy8Ed7uF9a6ZQ==
+X-Received: by 2002:a17:90b:30c9:: with SMTP id
+ hi9mr1481025pjb.81.1580342225758; 
+ Wed, 29 Jan 2020 15:57:05 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id r3sm3953626pfg.145.2020.01.29.15.56.46
+ by smtp.gmail.com with ESMTPSA id r3sm3953626pfg.145.2020.01.29.15.57.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 15:56:46 -0800 (PST)
+ Wed, 29 Jan 2020 15:57:05 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 25/41] target/arm: Add the hypervisor virtual counter
-Date: Wed, 29 Jan 2020 15:55:58 -0800
-Message-Id: <20200129235614.29829-26-richard.henderson@linaro.org>
+Subject: [PATCH v5 39/41] target/arm: Pass more cpu state to arm_excp_unmasked
+Date: Wed, 29 Jan 2020 15:56:12 -0800
+Message-Id: <20200129235614.29829-40-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200129235614.29829-1-richard.henderson@linaro.org>
 References: <20200129235614.29829-1-richard.henderson@linaro.org>
@@ -83,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,171 +95,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Avoid redundant computation of cpu state by passing it in
+from the caller, which has already computed it for itself.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu-qom.h |  1 +
- target/arm/cpu.h     | 11 +++++----
- target/arm/cpu.c     |  3 ++-
- target/arm/helper.c  | 57 ++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 66 insertions(+), 6 deletions(-)
+ target/arm/cpu.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
-index 7f5b244bde..3a9d31ea9d 100644
---- a/target/arm/cpu-qom.h
-+++ b/target/arm/cpu-qom.h
-@@ -76,6 +76,7 @@ void arm_gt_ptimer_cb(void *opaque);
- void arm_gt_vtimer_cb(void *opaque);
- void arm_gt_htimer_cb(void *opaque);
- void arm_gt_stimer_cb(void *opaque);
-+void arm_gt_hvtimer_cb(void *opaque);
- 
- #define ARM_AFF0_SHIFT 0
- #define ARM_AFF0_MASK  (0xFFULL << ARM_AFF0_SHIFT)
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 703071bada..48a4603520 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -144,11 +144,12 @@ typedef struct ARMGenericTimer {
-     uint64_t ctl; /* Timer Control register */
- } ARMGenericTimer;
- 
--#define GTIMER_PHYS 0
--#define GTIMER_VIRT 1
--#define GTIMER_HYP  2
--#define GTIMER_SEC  3
--#define NUM_GTIMERS 4
-+#define GTIMER_PHYS     0
-+#define GTIMER_VIRT     1
-+#define GTIMER_HYP      2
-+#define GTIMER_SEC      3
-+#define GTIMER_HYPVIRT  4
-+#define NUM_GTIMERS     5
- 
- typedef struct {
-     uint64_t raw_tcr;
 diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 06907b36d7..0c530ffd29 100644
+index 114833bdba..d9cf625073 100644
 --- a/target/arm/cpu.c
 +++ b/target/arm/cpu.c
-@@ -1272,7 +1272,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         }
+@@ -411,14 +411,13 @@ static void arm_cpu_reset(CPUState *s)
+ }
+ 
+ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+-                                     unsigned int target_el)
++                                     unsigned int target_el,
++                                     unsigned int cur_el, bool secure,
++                                     uint64_t hcr_el2)
+ {
+     CPUARMState *env = cs->env_ptr;
+-    unsigned int cur_el = arm_current_el(env);
+-    bool secure = arm_is_secure(env);
+     bool pstate_unmasked;
+     int8_t unmasked = 0;
+-    uint64_t hcr_el2;
+ 
+     /*
+      * Don't take exceptions if they target a lower EL.
+@@ -429,8 +428,6 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+         return false;
      }
  
+-    hcr_el2 = arm_hcr_el2_eff(env);
 -
-     {
-         uint64_t scale;
- 
-@@ -1295,6 +1294,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-                                               arm_gt_htimer_cb, cpu);
-         cpu->gt_timer[GTIMER_SEC] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-                                               arm_gt_stimer_cb, cpu);
-+        cpu->gt_timer[GTIMER_HYPVIRT] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-+                                                  arm_gt_hvtimer_cb, cpu);
-     }
- #endif
- 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index e79237ea12..f633554678 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -2556,6 +2556,7 @@ static uint64_t gt_tval_read(CPUARMState *env, const ARMCPRegInfo *ri,
- 
-     switch (timeridx) {
-     case GTIMER_VIRT:
-+    case GTIMER_HYPVIRT:
-         offset = gt_virt_cnt_offset(env);
-         break;
-     }
-@@ -2572,6 +2573,7 @@ static void gt_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
- 
-     switch (timeridx) {
-     case GTIMER_VIRT:
-+    case GTIMER_HYPVIRT:
-         offset = gt_virt_cnt_offset(env);
-         break;
-     }
-@@ -2727,6 +2729,34 @@ static void gt_sec_ctl_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     gt_ctl_write(env, ri, GTIMER_SEC, value);
- }
- 
-+static void gt_hv_timer_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    gt_timer_reset(env, ri, GTIMER_HYPVIRT);
-+}
-+
-+static void gt_hv_cval_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
-+{
-+    gt_cval_write(env, ri, GTIMER_HYPVIRT, value);
-+}
-+
-+static uint64_t gt_hv_tval_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    return gt_tval_read(env, ri, GTIMER_HYPVIRT);
-+}
-+
-+static void gt_hv_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
-+{
-+    gt_tval_write(env, ri, GTIMER_HYPVIRT, value);
-+}
-+
-+static void gt_hv_ctl_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                            uint64_t value)
-+{
-+    gt_ctl_write(env, ri, GTIMER_HYPVIRT, value);
-+}
-+
- void arm_gt_ptimer_cb(void *opaque)
- {
-     ARMCPU *cpu = opaque;
-@@ -2755,6 +2785,13 @@ void arm_gt_stimer_cb(void *opaque)
-     gt_recalc_timer(cpu, GTIMER_SEC);
- }
- 
-+void arm_gt_hvtimer_cb(void *opaque)
-+{
-+    ARMCPU *cpu = opaque;
-+
-+    gt_recalc_timer(cpu, GTIMER_HYPVIRT);
-+}
-+
- static void arm_gt_cntfrq_reset(CPUARMState *env, const ARMCPRegInfo *opaque)
- {
-     ARMCPU *cpu = env_archcpu(env);
-@@ -7128,6 +7165,26 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-               .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 1,
-               .access = PL2_RW, .writefn = vmsa_tcr_ttbr_el2_write,
-               .fieldoffset = offsetof(CPUARMState, cp15.ttbr1_el[2]) },
-+#ifndef CONFIG_USER_ONLY
-+            { .name = "CNTHV_CVAL_EL2", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 2,
-+              .fieldoffset =
-+                offsetof(CPUARMState, cp15.c14_timer[GTIMER_HYPVIRT].cval),
-+              .type = ARM_CP_IO, .access = PL2_RW,
-+              .writefn = gt_hv_cval_write, .raw_writefn = raw_write },
-+            { .name = "CNTHV_TVAL_EL2", .state = ARM_CP_STATE_BOTH,
-+              .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 0,
-+              .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL2_RW,
-+              .resetfn = gt_hv_timer_reset,
-+              .readfn = gt_hv_tval_read, .writefn = gt_hv_tval_write },
-+            { .name = "CNTHV_CTL_EL2", .state = ARM_CP_STATE_BOTH,
-+              .type = ARM_CP_IO,
-+              .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 1,
-+              .access = PL2_RW,
-+              .fieldoffset =
-+                offsetof(CPUARMState, cp15.c14_timer[GTIMER_HYPVIRT].ctl),
-+              .writefn = gt_hv_ctl_write, .raw_writefn = raw_write },
-+#endif
-             REGINFO_SENTINEL
-         };
-         define_arm_cp_regs(cpu, vhe_reginfo);
+     switch (excp_idx) {
+     case EXCP_FIQ:
+         pstate_unmasked = !(env->daif & PSTATE_F);
+@@ -535,6 +532,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     CPUARMState *env = cs->env_ptr;
+     uint32_t cur_el = arm_current_el(env);
+     bool secure = arm_is_secure(env);
++    uint64_t hcr_el2 = arm_hcr_el2_eff(env);
+     uint32_t target_el;
+     uint32_t excp_idx;
+     bool ret = false;
+@@ -542,7 +540,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     if (interrupt_request & CPU_INTERRUPT_FIQ) {
+         excp_idx = EXCP_FIQ;
+         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
+-        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
++        if (arm_excp_unmasked(cs, excp_idx, target_el,
++                              cur_el, secure, hcr_el2)) {
+             cs->exception_index = excp_idx;
+             env->exception.target_el = target_el;
+             cc->do_interrupt(cs);
+@@ -552,7 +551,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     if (interrupt_request & CPU_INTERRUPT_HARD) {
+         excp_idx = EXCP_IRQ;
+         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
+-        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
++        if (arm_excp_unmasked(cs, excp_idx, target_el,
++                              cur_el, secure, hcr_el2)) {
+             cs->exception_index = excp_idx;
+             env->exception.target_el = target_el;
+             cc->do_interrupt(cs);
+@@ -562,7 +562,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     if (interrupt_request & CPU_INTERRUPT_VIRQ) {
+         excp_idx = EXCP_VIRQ;
+         target_el = 1;
+-        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
++        if (arm_excp_unmasked(cs, excp_idx, target_el,
++                              cur_el, secure, hcr_el2)) {
+             cs->exception_index = excp_idx;
+             env->exception.target_el = target_el;
+             cc->do_interrupt(cs);
+@@ -572,7 +573,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     if (interrupt_request & CPU_INTERRUPT_VFIQ) {
+         excp_idx = EXCP_VFIQ;
+         target_el = 1;
+-        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
++        if (arm_excp_unmasked(cs, excp_idx, target_el,
++                              cur_el, secure, hcr_el2)) {
+             cs->exception_index = excp_idx;
+             env->exception.target_el = target_el;
+             cc->do_interrupt(cs);
 -- 
 2.20.1
 
