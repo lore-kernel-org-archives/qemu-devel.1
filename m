@@ -2,89 +2,114 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C55AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D58ADC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:13:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17ECF2070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:11:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nw+tgT7D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17ECF2070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB4812070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:13:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4812070E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwpvq-0006II-2G
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:11:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60499)
+	id 1iwpyB-0007T4-TH
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:13:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dmitry.fleytman@gmail.com>) id 1iwpuV-00059J-9x
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:09:49 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iwpxZ-000712-7F
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dmitry.fleytman@gmail.com>) id 1iwpuU-0005QP-8u
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:09:47 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52467)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dmitry.fleytman@gmail.com>)
- id 1iwpuU-0005Or-2C
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:09:46 -0500
-Received: by mail-wm1-x342.google.com with SMTP id p9so311788wmc.2
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 08:09:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=7Bes8iH3GwfvjDi15qrVOynL/zOgsy2+VBm9XYKfcCY=;
- b=Nw+tgT7DKe+r1zziAr5P3OooT/NyIrPv10CS6Uc9VYpRF/ErpPpUXcXFTC/oqePxiA
- 7qG9O4NJ4TUuS4LAWj7RBbz58AOivP5NqzhyhKQIiXNITejGMxjL+7Qc23PCMQpVaWDp
- bfy/wM9zPtO+d+5IOo7RALaIZJF6/UzkGFMGIn4k5G3v35gpQHEbU/iq03FFKCXJNYM4
- Qx3ax0CFl8gggd6dL7WeFEjeq5yNmTT5MD8Lcduq3xKz9e0AUKbGMpvdlKlqcgBYZFwL
- nt4E6DDf5r+UWzMztdHYyjKQXwyFC3yA5O4Mh62cDLRjlRcfn8/tPnPo9jabVdMdpg6g
- 3sKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=7Bes8iH3GwfvjDi15qrVOynL/zOgsy2+VBm9XYKfcCY=;
- b=ZYFdmyX0z4PHFfARCOErzszFF5ZPHzTLCvtAPbwYpGNIwqfPyySS1kFHihCKJefBfv
- qiV/aCSqeBYdzT/BkwI6GjlVWvllmeWkjXQ8vBn9TNuGpTpqphNS8L2/maySYnU3WsE/
- kS5hZWi3X5U+9gpZuTY/nnM2B3MEsTmrlH97jUiQnKAcDkfEHR31j8zXehrKZ2AEUXBD
- q+lEc56/owInlt6cUumCfZ1Ptq1VIf0DqGJyAbOryTE7UQs/dN+khxxqljBODCnZ/3wR
- vidpgTlMSAhIGE9tdsXaFffKUu7atXij2tJCOegj4vQY8bd54Y/F8LyUwDf/ELZU/X6/
- IdjA==
-X-Gm-Message-State: APjAAAX+K+kNHDQPB2HiQhR8dbmBM1EqmX6YB3/281vlK21WJnb/jIR7
- w7FTvZJxeRBZNCrpJ1A+CVnHShpolEA=
-X-Google-Smtp-Source: APXvYqxJTDjm4N9cdebHr4OgslkyewV+R97FyeLqBXhhjypCodGro6LzvZxM4D0u9B4NfT5rg0uO1Q==
-X-Received: by 2002:a1c:1b4d:: with SMTP id b74mr12604198wmb.33.1580314185131; 
- Wed, 29 Jan 2020 08:09:45 -0800 (PST)
-Received: from [10.0.1.16] ([141.226.29.227])
- by smtp.gmail.com with ESMTPSA id o4sm3416167wrx.25.2020.01.29.08.09.43
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 29 Jan 2020 08:09:44 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH 2/2] NetRxPkt: fix hash calculation of IPV6 TCP
-From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-In-Reply-To: <20200127115405.13459-2-yuri.benditovich@daynix.com>
-Date: Wed, 29 Jan 2020 18:09:43 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F97F4F13-3C10-4F39-A91F-B3341CD65CE6@gmail.com>
-References: <20200127115405.13459-1-yuri.benditovich@daynix.com>
- <20200127115405.13459-2-yuri.benditovich@daynix.com>
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+ (envelope-from <laurent@vivier.eu>) id 1iwpxX-0005YB-Tv
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:12:56 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:58833)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwpxX-0005Mc-Jy
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:12:55 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mk0e8-1jPFoI12uO-00kN23; Wed, 29 Jan 2020 17:12:42 +0100
+Subject: Re: [PATCH] Handling SIGSETXID used by glibc NPTL setuid/setgid
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200116115700.127951-1-mkysel@tachyum.com>
+ <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b4ca6094-28a4-28a9-4e6f-315cfad2cf49@vivier.eu>
+Date: Wed, 29 Jan 2020 17:12:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:R9Kz3VDjysyru9LCgNjvE/0Hsi1tDpHdQilkV8sxbepashhMU6Y
+ zj+O0RKOkzzF0LJTGGRjcetZ/+Cdd0F9xMtEtOPCqBnWCuNQo86xXzJKJyaXKBqE5Q2OpEN
+ TEkvYOBUz/WCNG/APQPFrt/brflf2GFMt8j00UfPkUPtzI7WRZbiA/yfBE+6bPLfBZuhoTF
+ g+EquSpNhxeJCi7zw4mYg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:QTNvZkJWITk=:LhQTfHA/yQKFgqZnDbG8JN
+ 4bE9fCqHmz3PGDdu04zfN0Cicld39cM+g6c9Coniw7GQtFK6F5pPelGbITkbAle53lxG2EqCe
+ SbknDcZ/hAf2Mf35hS7nncLjl/P1m/6667i4Kb4Qu/6R2jloDEhY2kAoU0g+IRM2PidbMTXXK
+ RcSquPGyR2dxtFqeEEu/LjrHUqxFfVoEtW6e7S27BmhAd3PMN+N2WCW5F++Rduh+cHPOzLm4K
+ BqhWKqiZNl67B/9BN3iP1jAgNK5dJSOnz1OP6Acxu1e1bnWTVTn4ENt8BgnrtGzYOZW+D9iBN
+ FR3C73B/20eXGT8sw0i+d4b/Ib297kO+U6j6d3sJ6DChe0HkL5O/JN7BEaTtkEPJhuRn5FQq7
+ Z53rLOXJCVoeCKOWYV5t2AykZ9jQiVNScTRndlk7mdDY1OqFTB5+IroJ1KvhM5UY2p6z5EanD
+ mhg4P5iofs49YPEd65g7mip6zuVaOsKdqvuW/7kKDi6enBleIA/4np3Hng+r+soFy+109udHH
+ /JZvZSlNQ7usUICvoY079yT36uR18y66gGy7vWSUKVt4jGXEKe5a6E7y2wktX5UbBfPrVso+i
+ d2GmZyYy4xgF5Cx/Kx1Lc84fjNaf5gI9VccxzmnhJZLY5TRjDwythU8OIMS3ESOxgCRmQnjka
+ tfOW6FKrDPhBCN5ufJB606FP2r3ZVGjpiMn0RlUo4aP0YEmFZgW6QK3iC3lWFxuYUSruem9bP
+ 33//Iv7Wph9i/ssgQpFQ0s5Oglzjw1rg9iSu2erLiETf64PwxLbgbqspFvHInBSV3uoe5aZ/1
+ jF1sV3XYlfbfOCPjqRnEflKIeFRm2WVZJA9T/f/cNmsqYRzPFKu6ZktiTHOXMriKCw/sTof
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,64 +121,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Matus Kysel <mkysel@tachyum.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Le 28/01/2020 à 10:26, Peter Maydell a écrit :
+> On Thu, 16 Jan 2020 at 11:58, Matus Kysel <mkysel@tachyum.com> wrote:
+>>
+>> Used same style to handle another glibc reserved signal SIGSETXID (33),
+>> that is used by glibc NPTL setuid/setgid functions. This should fix problems
+>> with application using those functions and failing with error
+>> "qemu:handle_cpu_signal received signal outside vCPU context".
+>>
+>> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
+>> ---
+>>  linux-user/signal.c | 13 +++++++++----
+>>  1 file changed, 9 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/linux-user/signal.c b/linux-user/signal.c
+>> index 0128bde4d2..c59221fd0a 100644
+>> --- a/linux-user/signal.c
+>> +++ b/linux-user/signal.c
+>> @@ -66,11 +66,16 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
+>>      [SIGPWR] = TARGET_SIGPWR,
+>>      [SIGSYS] = TARGET_SIGSYS,
+>>      /* next signals stay the same */
+>> -    /* Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
+>> -       host libpthread signals.  This assumes no one actually uses SIGRTMAX :-/
+>> -       To fix this properly we need to do manual signal delivery multiplexed
+>> -       over a single host signal.  */
+>> +    /*
+>> +     * Nasty hack: Swap SIGRTMIN and SIGRTMIN + 1 with SIGRTMAX and SIGRTMAX - 1
+>> +     * to avoid overlap with host libpthread (NPTL glibc) signals.
+>> +     * This assumes no one actually uses SIGRTMAX and SIGRTMAX - 1 :-/
+>> +     * To fix this properly we need to do manual signal delivery multiplexed
+>> +     * over a single host signal.
+>> +     */
+>>      [__SIGRTMIN] = __SIGRTMAX,
+>> +    [__SIGRTMIN + 1] = __SIGRTMAX - 1,
+>> +    [__SIGRTMAX - 1] = __SIGRTMIN + 1,
+>>      [__SIGRTMAX] = __SIGRTMIN,
+>>  };
+>>  static uint8_t target_to_host_signal_table[_NSIG];
+>> --
+>> 2.17.1
+> 
+> This is a long-standing known problem, but doing this is likely
+> to break currently-working guest binaries (notably things written
+> in Go). See for example the discussion on this thread:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03804.html
 
+Peter,
 
-> On 27 Jan 2020, at 13:54, Yuri Benditovich =
-<yuri.benditovich@daynix.com> wrote:
->=20
-> When requested to calculate the hash for TCPV6 packet,
-> ignore overrides of source and destination addresses
-> in in extension headers.
-> Use these overrides when new hash type NetPktRssIpV6TcpEx
-> requested.
-> Use this type in e1000e hash calculation for IPv6 TCP, which
-> should take in account overrides of the addresses.
->=20
-> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+I try to fix this problem and I'd like to find a reproducer for the Go
+problem.
 
-Acked-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+I tried to write an "hello world" program and run it in an arm64/bionic
+chroot but there is no problem (with and without this patch).
 
-> ---
-> hw/net/e1000e_core.c | 2 +-
-> hw/net/net_rx_pkt.c  | 2 +-
-> 2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index 9b76f82db5..5b05c8ea8a 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -582,7 +582,7 @@ e1000e_rss_calc_hash(E1000ECore *core,
->         type =3D NetPktRssIpV4Tcp;
->         break;
->     case E1000_MRQ_RSS_TYPE_IPV6TCP:
-> -        type =3D NetPktRssIpV6Tcp;
-> +        type =3D NetPktRssIpV6TcpEx;
->         break;
->     case E1000_MRQ_RSS_TYPE_IPV6:
->         type =3D NetPktRssIpV6;
-> diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-> index b2a06bd27d..1e1c504e42 100644
-> --- a/hw/net/net_rx_pkt.c
-> +++ b/hw/net/net_rx_pkt.c
-> @@ -348,7 +348,7 @@ net_rx_pkt_calc_rss_hash(struct NetRxPkt *pkt,
->         assert(pkt->isip6);
->         assert(pkt->istcp);
->         trace_net_rx_pkt_rss_ip6_tcp();
-> -        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, =
-&rss_length);
-> +        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, false, =
-&rss_length);
->         _net_rx_rss_prepare_tcp(&rss_input[0], pkt, &rss_length);
->         break;
->     case NetPktRssIpV6:
-> --=20
-> 2.17.1
->=20
+Any hints?
 
+Thanks,
+Laurent
 
