@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B96ACC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFCFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8747320702
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E289120702
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hmZ6qyaI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8747320702
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fNhJAHRq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E289120702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwtuw-0006lw-O1
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 15:26:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41412)
+	id 1iwtv0-0006vo-2G
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 15:26:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <beata.michalska@linaro.org>) id 1iwttn-0005LI-VE
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:21 -0500
+ (envelope-from <beata.michalska@linaro.org>) id 1iwtts-0005TD-Ts
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <beata.michalska@linaro.org>) id 1iwttm-0001J7-Ti
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:19 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37879)
+ (envelope-from <beata.michalska@linaro.org>) id 1iwttr-0001QK-8g
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:24 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37966)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
- id 1iwttm-0001Hk-OA
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:18 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w15so1081971wru.4
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 12:25:18 -0800 (PST)
+ id 1iwttr-0001PP-2R
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:23 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a9so1459477wmj.3
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 12:25:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=+tZ0YBqhVEsxFXOR05MPD9ATHbI+tc6ggHRmtxE2t3s=;
- b=hmZ6qyaI6/s1G9fnfQJcUMPDpFu9Z3QQVzkxagMyyHwmFeewG3Pom3ubikvAIRvOBU
- VJBypdw++F73MZW0g1YdJR0bfVSWuO4AVnfKlAgdVI34ILKKBKySNiMaLQI/qLUoDIbi
- DgYv3OLEP4Vl3hNRWoYwKTcSl7BDaIuxkZCiw2/4knZX2Bz3RUP6PauRghFz28offnot
- oeuqe1k6Feq8WxWs3IT2hh2kDDJsKce6HlMVZ5+18n43TalBEpQ8OKRrrUgJIEIY0xmj
- 08MmPAG4ZH4tTTkxkIdhRy///qnucEDZuhyOzGPGR3c+SGxXMEGI3ZENZTHXDwZOuzFH
- 36RA==
+ bh=3PMJxyEZQKPRv3ChqMJ50kyAGa0z3Vg9tRNElquTZ/0=;
+ b=fNhJAHRq2EN91vTVf0CAQUgHY4DtJ/A/2LLb5mhJ0E05EIlyjL4YIVwyDmEJ7NlVto
+ SDscTPCbUKxTTv9/CODpREQcWCq74yLtZCsKd0AH/FgHyvEteIqm3LEm/XJ/yjxVaD9Y
+ sRN412CxoXboUeIRMxQPUFcvWozunecAdBaw5qFikas7hCvZfcnx9VXG55SsKUZ9t+6j
+ ro0kyF57Pbuu98dItwHupg8aK0aDD6mSyHXky9nbjUdyMDepkgMqRle+JPaVTF6pde1H
+ 5+tKN4c17vu8l0EMr3LHnEeWsjaqS6z3yEolmmb95g8geYSmoBOrFD30CLZc2HkqCN/l
+ +B8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=+tZ0YBqhVEsxFXOR05MPD9ATHbI+tc6ggHRmtxE2t3s=;
- b=d+beX0j+bIVcFvy22A2E8aG+KH11tDTZWkHtBjzohGzShDlVxOM7AYLKgpMWIFv5Y8
- N6rdvLk7ho/U4qU7Ue/Efk+cSkad2JRG7/Vhjx3Q07pphyGxQ4Drp1xZGQVCAAFjSU8d
- //u6ZmndPpS639aokPMoCQhIUPs+I84XaJx4WX0I+J4+UUW2/FhgysYG7ZN/r6ue8y72
- FUYDxks3pd+fUxsEIKXExTFmd/6hNxowSxW308L/XhHGyaLgC32vO9YG6Fx6OKSNz9OT
- otXh0YLPKvZqbRoAJ8pqBXzjbPghJjxO/7+ddr+NoxL89mAU55htyX5DYR2jcXSVP1iE
- XdJw==
-X-Gm-Message-State: APjAAAVETZrYhgibFsSS6TkvQgK8Dqj+VV6qO+DKsWQ1qGYN/8DC3VJ/
- tpd52tEyr+yMcAhfjy45wdoEduo3TRA=
-X-Google-Smtp-Source: APXvYqxeG+727dSd9hpflWUs37JO+uDRBt85YuaVw/2/qEYgkhJrgszDi4Osfq32YMA7sHZ23onsUw==
-X-Received: by 2002:adf:f18b:: with SMTP id h11mr711078wro.56.1580329517572;
- Wed, 29 Jan 2020 12:25:17 -0800 (PST)
+ bh=3PMJxyEZQKPRv3ChqMJ50kyAGa0z3Vg9tRNElquTZ/0=;
+ b=o3j66oCKCYBM1thiK6Mtf75HRnCx/NulPKt8RzUES+HLIaY7q8Ye5Adf7w8kcYpYM9
+ QHlERC3kGz+9tItE+/Fo2fv6OWMRMDDdPZeIXVCFJy8VQnu6G78kGfE0jLNZZ0P30SEh
+ YRnPddpEAT35qreCBgBFiWZlU0ZwFsyrhHpvsGY0c1attpcU6QoT5yLma3mPABZ9QXpM
+ tj6vX0pUho1K/akpUwpawpuu8anPcrwE19RtvBuhmc17psyNG5u0xAgJv+WjhhuuSZ1j
+ 51jDNAltWMFitGF4K3vqGTkJJrBRnWlIlMqGsfriV+ve0W0623YL5KVVKI0MZ0CzfyTn
+ w0Ow==
+X-Gm-Message-State: APjAAAWKPmFeqV2Y6eZpSGcqnvMYPFJFbbmOlFgPRDK8QQltEb0tbbhv
+ AtQjJRU78Jr/vI+yFM9rHyinZX7mWTM=
+X-Google-Smtp-Source: APXvYqz0g4iA87jEhRZKDy8rnbBNpe5mS1Sq4+hRJ+aen45gH8zyb+FOKLZALrAC49Oolhj9SDrc4w==
+X-Received: by 2002:a1c:1fc5:: with SMTP id f188mr1013034wmf.55.1580329521606; 
+ Wed, 29 Jan 2020 12:25:21 -0800 (PST)
 Received: from moi-limbo-9350.home
  (host86-131-78-194.range86-131.btcentralplus.com. [86.131.78.194])
- by smtp.gmail.com with ESMTPSA id h2sm4377518wrt.45.2020.01.29.12.25.16
+ by smtp.gmail.com with ESMTPSA id h2sm4377518wrt.45.2020.01.29.12.25.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 12:25:17 -0800 (PST)
+ Wed, 29 Jan 2020 12:25:21 -0800 (PST)
 From: Beata Michalska <beata.michalska@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] target/arm: kvm: Inject events at the last stage of
- sync
-Date: Wed, 29 Jan 2020 20:24:40 +0000
-Message-Id: <20200129202441.12745-2-beata.michalska@linaro.org>
+Subject: [PATCH v2 2/2] target/arm: kvm: Handle DABT with no valid ISS
+Date: Wed, 29 Jan 2020 20:24:41 +0000
+Message-Id: <20200129202441.12745-3-beata.michalska@linaro.org>
 In-Reply-To: <20200129202441.12745-1-beata.michalska@linaro.org>
 References: <20200129202441.12745-1-beata.michalska@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,118 +95,254 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-KVM_SET_VCPU_EVENTS might actually lead to vcpu registers being modified.
-As such this should be the last step of sync to avoid potential overwriting
-of whatever changes KVM might have done.
+On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate those instruction which is one of the
+(many) reasons why KVM will not even try to do so.
+
+Add support for handling those by requesting KVM to inject external
+dabt into the quest.
 
 Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
 ---
- target/arm/kvm32.c | 20 ++++++++++----------
- target/arm/kvm64.c | 20 ++++++++++----------
- 2 files changed, 20 insertions(+), 20 deletions(-)
+ target/arm/cpu.h     |  2 ++
+ target/arm/kvm.c     | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/kvm32.c   |  3 ++
+ target/arm/kvm64.c   |  3 ++
+ target/arm/kvm_arm.h | 19 +++++++++++
+ 5 files changed, 123 insertions(+)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index c1aedbe..e04a8d3 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -558,6 +558,8 @@ typedef struct CPUARMState {
+         uint8_t has_esr;
+         uint64_t esr;
+     } serror;
++    /* Status field for pending external dabt */
++    uint8_t ext_dabt_pending;
+ 
+     /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
+     uint32_t irq_line_state;
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 8d82889..e7bc9b7 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -37,6 +37,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+ 
+ static bool cap_has_mp_state;
+ static bool cap_has_inject_serror_esr;
++static bool cap_has_inject_ext_dabt; /* KVM_CAP_ARM_INJECT_EXT_DABT */
+ 
+ static ARMHostCPUFeatures arm_host_cpu_features;
+ 
+@@ -62,6 +63,12 @@ void kvm_arm_init_serror_injection(CPUState *cs)
+                                     KVM_CAP_ARM_INJECT_SERROR_ESR);
+ }
+ 
++void kvm_arm_init_ext_dabt_injection(CPUState *cs)
++{
++    cap_has_inject_ext_dabt = kvm_check_extension(cs->kvm_state,
++                                    KVM_CAP_ARM_INJECT_EXT_DABT);
++}
++
+ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+                                       int *fdarray,
+                                       struct kvm_vcpu_init *init)
+@@ -216,6 +223,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         ret = -EINVAL;
+     }
+ 
++    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER))
++        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
++            warn_report("Failed to enable DABT NISV cap");
++        }
++
+     return ret;
+ }
+ 
+@@ -598,6 +610,10 @@ int kvm_put_vcpu_events(ARMCPU *cpu)
+         events.exception.serror_esr = env->serror.esr;
+     }
+ 
++    if (cap_has_inject_ext_dabt) {
++        events.exception.ext_dabt_pending = env->ext_dabt_pending;
++    }
++
+     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
+     if (ret) {
+         error_report("failed to put vcpu events");
+@@ -627,6 +643,8 @@ int kvm_get_vcpu_events(ARMCPU *cpu)
+     env->serror.has_esr = events.exception.serror_has_esr;
+     env->serror.esr = events.exception.serror_esr;
+ 
++    env->ext_dabt_pending = events.exception.ext_dabt_pending;
++
+     return 0;
+ }
+ 
+@@ -634,6 +652,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+ {
+ }
+ 
++
+ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+ {
+     ARMCPU *cpu;
+@@ -699,6 +718,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+             ret = EXCP_DEBUG;
+         } /* otherwise return to guest */
+         break;
++    case KVM_EXIT_ARM_NISV:
++        /* External DABT with no valid iss to decode */
++        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
++                                       run->arm_nisv.fault_ipa);
++        break;
+     default:
+         qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
+                       __func__, run->exit_reason);
+@@ -833,3 +857,75 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+ {
+     return (data - 32) & 0xffff;
+ }
++
++int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
++                             uint64_t fault_ipa)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUARMState *env = &cpu->env;
++    uint32_t ins, ins_fetched;
++
++    /*
++     * Hacky workaround for kernels that for aarch32 guests, instead of expected
++     * external data abort, inject the IMPLEMENTATION DEFINED exception with the
++     * lock-down. This is actually handled by the guest which results in
++     * re-running the faulting instruction.
++     * This intends to break the vicious cycle.
++     */
++    if (!is_a64(env)) {
++        static uint8_t setback;
++
++        /*
++         * The state has not been synchronized yet, so if this is re-occurrence
++         * of the same abort triggered by guest, the status for pending external
++         * abort should not get cleared yet
++         */
++        if (unlikely(env->ext_dabt_pending)) {
++            if (setback) {
++                error_report("Most probably triggered kernel issue with"
++                             " injecting external data abort.");
++                error_printf("Giving up trying ...\n");
++                /* Here is where the fun comes to an end */
++                return -EINVAL;
++            }
++        }
++        setback = env->ext_dabt_pending;
++    }
++
++    kvm_cpu_synchronize_state(cs);
++   /*
++    * ISS [23:14] is invalid so there is a limited info
++    * on what has just happened so the only *useful* thing that can
++    * be retrieved from ISS is WnR & DFSC (though in some cases WnR
++    * might be less of a value as well)
++    */
++
++    /*
++     * Get current PC before it will get updated to exception vector entry
++     */
++    target_ulong ins_addr = is_a64(env) ? env->pc : env->regs[15];
++
++    /*
++     * Get the faulting instruction
++     * Instructions have a fixed length of 32 bits
++     * and are always little-endian
++     */
++    ins_fetched = !cpu_memory_rw_debug(cs, ins_addr, (uint8_t *) &ins,
++                                       sizeof(uint32_t), 0);
++
++    error_report("Data abort exception with no valid ISS generated by "
++                 "guest memory access at physical address: 0x" TARGET_FMT_lx,
++                 (target_ulong)fault_ipa);
++
++    error_printf(ins_fetched ? "%s : 0x%" PRIx32 " (ins encoded)\n"  : "%s\n",
++                 "KVM unable to emulate faulting instruction",
++                 (!ins_fetched ? 0 : ldl_le_p(&ins)));
++    error_printf("Injecting a data abort exception into guest.\n");
++    /*
++     * Set pending ext dabt and trigger SET_EVENTS so that
++     * KVM can inject the abort
++     */
++    env->ext_dabt_pending = 1;
++
++    return 0;
++}
 diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 32bf8d6..cf2b47f 100644
+index cf2b47f..177402e 100644
 --- a/target/arm/kvm32.c
 +++ b/target/arm/kvm32.c
-@@ -386,17 +386,17 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-         return ret;
-     }
+@@ -240,6 +240,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     /* Check whether userspace can specify guest syndrome value */
+     kvm_arm_init_serror_injection(cs);
  
--    ret = kvm_put_vcpu_events(cpu);
--    if (ret) {
--        return ret;
--    }
--
-     write_cpustate_to_list(cpu, true);
- 
-     if (!write_list_to_kvmstate(cpu, level)) {
-         return EINVAL;
-     }
- 
-+    ret = kvm_put_vcpu_events(cpu);
-+    if (ret) {
-+        return ret;
-+    }
++    /* Set status for supporting the external dabt injection */
++    kvm_arm_init_ext_dabt_injection(cs);
 +
-     kvm_arm_sync_mpstate_to_kvm(cpu);
+     return kvm_arm_init_cpreg_list(cpu);
+ }
  
-     return ret;
-@@ -462,11 +462,6 @@ int kvm_arch_get_registers(CPUState *cs)
-     }
-     vfp_set_fpscr(env, fpscr);
- 
--    ret = kvm_get_vcpu_events(cpu);
--    if (ret) {
--        return ret;
--    }
--
-     if (!write_kvmstate_to_list(cpu)) {
-         return EINVAL;
-     }
-@@ -475,6 +470,11 @@ int kvm_arch_get_registers(CPUState *cs)
-      */
-     write_list_to_cpustate(cpu);
- 
-+    ret = kvm_get_vcpu_events(cpu);
-+    if (ret) {
-+        return ret;
-+    }
-+
-     kvm_arm_sync_mpstate_to_qemu(cpu);
- 
-     return 0;
 diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 6344113..d06fd32 100644
+index d06fd32..a474369 100644
 --- a/target/arm/kvm64.c
 +++ b/target/arm/kvm64.c
-@@ -1043,17 +1043,17 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-         return ret;
-     }
+@@ -791,6 +791,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     /* Check whether user space can specify guest syndrome value */
+     kvm_arm_init_serror_injection(cs);
  
--    ret = kvm_put_vcpu_events(cpu);
--    if (ret) {
--        return ret;
--    }
--
-     write_cpustate_to_list(cpu, true);
- 
-     if (!write_list_to_kvmstate(cpu, level)) {
-         return -EINVAL;
-     }
- 
-+    ret = kvm_put_vcpu_events(cpu);
-+    if (ret) {
-+        return ret;
-+    }
++    /* Set status for supporting the external dabt injection */
++    kvm_arm_init_ext_dabt_injection(cs);
 +
-     kvm_arm_sync_mpstate_to_kvm(cpu);
+     return kvm_arm_init_cpreg_list(cpu);
+ }
  
-     return ret;
-@@ -1251,11 +1251,6 @@ int kvm_arch_get_registers(CPUState *cs)
-     }
-     vfp_set_fpcr(env, fpr);
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 8e14d40..fe019f2 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -144,6 +144,14 @@ void kvm_arm_reset_vcpu(ARMCPU *cpu);
+ void kvm_arm_init_serror_injection(CPUState *cs);
  
--    ret = kvm_get_vcpu_events(cpu);
--    if (ret) {
--        return ret;
--    }
--
-     if (!write_kvmstate_to_list(cpu)) {
-         return -EINVAL;
-     }
-@@ -1264,6 +1259,11 @@ int kvm_arch_get_registers(CPUState *cs)
-      */
-     write_list_to_cpustate(cpu);
- 
-+    ret = kvm_get_vcpu_events(cpu);
-+    if (ret) {
-+        return ret;
-+    }
+ /**
++ * kvm_arm_init_ext_dabt_injection
++ * @cs: CPUState
++ *
++ * Set status for KVM support for Ext DABT injection
++ */
++void kvm_arm_init_ext_dabt_injection(CPUState *cs);
 +
-     kvm_arm_sync_mpstate_to_qemu(cpu);
++/**
+  * kvm_get_vcpu_events:
+  * @cpu: ARMCPU
+  *
+@@ -372,6 +380,17 @@ static inline const char *gicv3_class_name(void)
+ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit);
  
-     /* TODO: other registers */
+ /**
++ * kvm_arm_handle_dabt_nisv
++ * @cs: CPUState
++ * @esr_iss: ISS encoding (limited) for the exception from Data Abort
++ *           ISV bit set to '0b0' -> no valid instruction syndrome
++ * @fault_ipa: faulting address for the synch data abort
++ *
++ * Returns: 0 if the exception has been handled
++ */
++int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
++                             uint64_t fault_ipa);
++/**
+  * kvm_arm_hw_debug_active:
+  * @cs: CPU State
+  *
 -- 
 2.7.4
 
