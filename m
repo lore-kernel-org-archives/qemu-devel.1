@@ -2,84 +2,80 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDF5C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 564C6C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:32:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9093E2063A
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C9BA20716
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:32:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FeNptHl7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9093E2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oAqb89EH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C9BA20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwjgP-0001mO-Qr
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 04:30:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48599)
+	id 1iwjhj-0002pB-Bm
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 04:32:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iwjfg-0001DH-VU
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:30:06 -0500
+ (envelope-from <hsp.cat7@gmail.com>) id 1iwjga-00023c-LU
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iwjff-0001Da-IL
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:30:04 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41723
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iwjff-0001Cd-FC
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:30:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580290203;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=D9f7QdvFboxwQ5TVJWf6be3JYQu7wrZQ2uymnn5sFPo=;
- b=FeNptHl7bDqh5sTDJKNjgkQU+v0bjjlhcOR8OGRFZjrVh1zXPI3AoAVTcjHqWDXob5Grss
- FOYMtvVaBTYKIktYSlIYMx0c0u82BFnLuSvzrQ1VEDmY4UDLYHpGLzSu3DHsgeQz8FRDf9
- ylxx4IfgW6yCVq8d+DWXIRS1voNqS3k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-eI79hYDfNj62FSq7pKOfoA-1; Wed, 29 Jan 2020 04:29:55 -0500
-X-MC-Unique: eI79hYDfNj62FSq7pKOfoA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DF45800D41;
- Wed, 29 Jan 2020 09:29:53 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1095D60BE0;
- Wed, 29 Jan 2020 09:29:47 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 12/14] arm/run: Allow Migration tests
-To: Thomas Huth <thuth@redhat.com>, eric.auger.pro@gmail.com, maz@kernel.org, 
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org, 
- qemu-arm@nongnu.org
-References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-13-eric.auger@redhat.com>
- <3962373a-0e03-5ab9-30cc-3b385fc55702@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <c00b26e8-5197-a977-963e-b0b9366ad6d0@redhat.com>
-Date: Wed, 29 Jan 2020 10:29:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <hsp.cat7@gmail.com>) id 1iwjgZ-00023j-Jq
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:31:00 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:39513)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>)
+ id 1iwjgX-000212-29; Wed, 29 Jan 2020 04:30:57 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id 77so14900043oty.6;
+ Wed, 29 Jan 2020 01:30:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1nidJn4TpMHPwHjg1Q8KqftSQN0wR/SmnvkXiE1Sje4=;
+ b=oAqb89EHzPEWa3J9wOS0b0rUmVr9eYzPNPKK7BXe3GE3cIpjzuXE+X06vwu9DXyq7g
+ h/+bQWI5K0T9UZ/TovfmEwYDE2N6wjlszbY2dQUD/IcXY9DvuslVcB2xbUNJuxexiEsv
+ MkmbRC18tfP1MCGMB0PnD1ewYZrFDDLH4AEoWCxD5pZN+wYkZdgPLviLJHdJvncO1R6w
+ GpGNsV0+WhK9OClWOvLz4tBIgamUbXrYvuveBfSZ8GP53opmRIhMQ8M9cqZv4mTSNVG5
+ Fo2gZelM19CQ24hIssA7S6r/Nc+sFW2mfp4FPD7Z9GC9++QlKkNGzaNYP5ALyYwI9Lce
+ ruWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1nidJn4TpMHPwHjg1Q8KqftSQN0wR/SmnvkXiE1Sje4=;
+ b=FX9BqG5QuMgaFiYAeXkmhY0cx16qcKP4XdK4hNr17Pb91fBZ09joTtt7DtyRj2jSqX
+ R+ziLFIalnpygF+fBtu/tO+G4K85OZsoLILEy/NUy6Fk5tgtWe5qUr1NIQmTKG9XR0u0
+ 4Sg22K/IIMPwUB11Wu5nZu2XUCrOyUdJ4AVdldaiEivSgz76u/IRTEeG6+rbqOJyt+y0
+ vfYjH4UcsPgZEAAgHOrx0eevJAGyCoGid0JUHz10Jrt4yUid04FM5g/V1yameS4ZRR4k
+ TRC/temDQ5H9bQjdDKigLvToovC+KLh+o/jFEhPX3DrgVhgwHmV98bQhmo+6UmC5tUi0
+ R97A==
+X-Gm-Message-State: APjAAAU94ViaQHld7GikSVZYN4OFgCLkX2nr0PqkZOHqKsXRqzuhlNzY
+ o9OQyHSJPMpXwQ8EuG3XhEXllFPN3H3hh1BNwIk=
+X-Google-Smtp-Source: APXvYqw6RtZyK3hvdBy7IZF8RFlr7p/RsdgJsdbtZhWH5VXIIXzCC3Pb5rio5JC23sBdQg9Dpn5C1lBM3ORwbX79SZU=
+X-Received: by 2002:a9d:4711:: with SMTP id a17mr20509122otf.233.1580290256126; 
+ Wed, 29 Jan 2020 01:30:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <3962373a-0e03-5ab9-30cc-3b385fc55702@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <CABLmASG93Fz-=XR45Z7pcaUkF8De3EdZbS_=901w_vhYUPiuXg@mail.gmail.com>
+ <331cc94e-38d0-9259-337a-ce759ed8edba@linaro.org>
+In-Reply-To: <331cc94e-38d0-9259-337a-ce759ed8edba@linaro.org>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Wed, 29 Jan 2020 10:30:45 +0100
+Message-ID: <CABLmASFOU7j=OCMVT9df5irSRNSHKxXYXo3dWrODOyZZp=Xp6w@mail.gmail.com>
+Subject: Re: Performance hit in qemu-system-ppc
+To: Richard Henderson <richard.henderson@linaro.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>
+Content-Type: multipart/alternative; boundary="0000000000005bc712059d43ff17"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,132 +87,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yuzenghui@huawei.com, andre.przywara@arm.com, drjones@redhat.com,
- alexandru.elisei@arm.com, peter.maydell@linaro.org
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Thomas,
+--0000000000005bc712059d43ff17
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/29/20 9:07 AM, Thomas Huth wrote:
-> On 28/01/2020 11.34, Eric Auger wrote:
->> Let's link getchar.o to use puts and getchar from the
->> tests.
->>
->> Then allow tests belonging to the migration group to
->> trigger the migration from the test code by putting
->> "migrate" into the uart. Then the code can wait for the
->> migration completion by using getchar().
->>
->> The __getchar implement is minimalist as it just reads the
->> data register. It is just meant to read the single character
->> emitted at the end of the migration by the runner script.
->>
->> It is not meant to read more data (FIFOs are not enabled).
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v2 -> v3:
->> - take the lock
->> - assert if more than 16 chars
->> - removed Thomas' R-b
->> ---
->>  arm/Makefile.common |  2 +-
->>  arm/run             |  2 +-
->>  lib/arm/io.c        | 28 ++++++++++++++++++++++++++++
->>  3 files changed, 30 insertions(+), 2 deletions(-)
->>
->> diff --git a/arm/Makefile.common b/arm/Makefile.common
->> index b8988f2..a123e85 100644
->> --- a/arm/Makefile.common
->> +++ b/arm/Makefile.common
->> @@ -32,7 +32,7 @@ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
->>  asm-offsets = lib/$(ARCH)/asm-offsets.h
->>  include $(SRCDIR)/scripts/asm-offsets.mak
->>  
->> -cflatobjs += lib/util.o
->> +cflatobjs += lib/util.o lib/getchar.o
->>  cflatobjs += lib/alloc_phys.o
->>  cflatobjs += lib/alloc_page.o
->>  cflatobjs += lib/vmalloc.o
->> diff --git a/arm/run b/arm/run
->> index 277db9b..a390ca5 100755
->> --- a/arm/run
->> +++ b/arm/run
->> @@ -61,6 +61,6 @@ fi
->>  M+=",accel=$ACCEL"
->>  command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
->>  command+=" -display none -serial stdio -kernel"
->> -command="$(timeout_cmd) $command"
->> +command="$(migration_cmd) $(timeout_cmd) $command"
->>  
->>  run_qemu $command "$@"
->> diff --git a/lib/arm/io.c b/lib/arm/io.c
->> index 99fd315..d8e7745 100644
->> --- a/lib/arm/io.c
->> +++ b/lib/arm/io.c
->> @@ -87,6 +87,34 @@ void puts(const char *s)
->>  	spin_unlock(&uart_lock);
->>  }
->>  
->> +static int ____getchar(void)
-> 
-> Three underscores? ... that's quite a lot already. I'd maybe rather name
-> the function "do_getchar" or something similar instead. Or simply merge
-> the code into the __getchar function below - it's just three lines.
-OK
-> 
->> +{
->> +	int c;
->> +
->> +	spin_lock(&uart_lock);
->> +	c = readb(uart0_base);
->> +	spin_unlock(&uart_lock);
->> +
->> +	return c ? : -1;
-> 
-> Just a matter of taste, but I prefer the elvis operator without space in
-> between.
-OK
-> 
->> +}
->> +
->> +/*
->> + * Minimalist implementation for migration completion detection.
->> + * Without FIFOs enabled on the QEMU UART device we just read
->> + * the data register: we cannot read more than 16 characters.
-> 
-> Where are the 16 bytes buffered if FIFOs are disabled?
-I think this is in the PL011 data register (UARTDR), 4 words.
-https://developer.arm.com/docs/ddi0183/latest/programmers-model/register-descriptions/data-register-uartdr
+On Tue, Jan 28, 2020 at 7:30 PM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-> 
->> + */
->> +int __getchar(void)
->> +{
->> +	int c = ____getchar();
->> +	static int count;
->> +
->> +	if (c != -1)
->> +		++count;
->> +
->> +	assert(count < 16);
->> +
->> +	return c;
->> +}
-> 
-> The above comments were only nits ... feel free to ignore them if you
-> don't want to respin the series just because of this.
-No Problem. Thank you for your time.
+> On 1/25/20 3:30 PM, Howard Spoelstra wrote:
+> > I noticed a considerable (~20%) slowdown in the cpu performance of
+> qemu-system-ppc.
+>
+> ENOINFO.
+>
+> For what test case?  This should not have been on any hot path.
+>
+>
+Hi,
+I tested Mac OS 9.2 and 10.3/4 with qemu-system-ppc built from 4.2 and
+current master like this:
 
-Thanks
+Command line:
+./qemu-system-ppc -L pc-bios -boot c -M mac99,via=pmu -m 512 \
+-serial stdio -sdl \
+-hda 9.2.img (10.3.img|10.4.img)
 
-Eric
-> 
->  Thomas
-> 
+Mac OS 9.2 MacBench 5.0 reports processor speed:
+4.2: ~190%
+Master: ~160%
 
+Mac OSX 10.3.9 Skidmarks 4.0.1 test: specific drop in performance of
+MPEG(INT) test:
+4.2: 118%
+Master: 100%
+
+Mac OS 10.4.11 Skidmarks 4.0.1 test: specific drop in performance of
+MPEG(INT) test:
+4.2: 117%
+Master: 99%
+
+Best,
+Howard
+
+--0000000000005bc712059d43ff17
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jan 28, 2020 at 7:30 PM Richa=
+rd Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org" target=3D"=
+_blank">richard.henderson@linaro.org</a>&gt; wrote:<br></div><blockquote cl=
+ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
+ rgb(204,204,204);padding-left:1ex">On 1/25/20 3:30 PM, Howard Spoelstra wr=
+ote:<br>
+&gt; I noticed a considerable (~20%) slowdown in the cpu performance of qem=
+u-system-ppc.<br>
+<br>
+ENOINFO.<br>
+<br>
+For what test case?=C2=A0 This should not have been on any hot path.<br>
+<br></blockquote><div><br></div><div>Hi, <br></div><div>I tested Mac OS 9.2=
+ and 10.3/4 with qemu-system-ppc built from 4.2 and current master like thi=
+s:<br><br>Command line:<br>./qemu-system-ppc -L pc-bios -boot c -M mac99,vi=
+a=3Dpmu -m 512 \<br>-serial stdio -sdl \<br>-hda 9.2.img (10.3.img|10.4.img=
+)<br><br>Mac OS 9.2 MacBench 5.0 reports processor speed:<br>4.2: ~190%<br>=
+Master: ~160%<br><br>Mac OSX 10.3.9 Skidmarks 4.0.1 test: specific drop in =
+performance of MPEG(INT) test:<br>4.2: 118% =C2=A0<br>Master: 100% <br><br>=
+Mac OS 10.4.11 Skidmarks 4.0.1 test: specific drop in performance of MPEG(I=
+NT) test:<br>4.2: 117%<br>Master: 99%</div><div><br> </div><div>Best,</div>=
+<div>Howard<br></div></div></div>
+
+--0000000000005bc712059d43ff17--
 
