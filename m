@@ -2,150 +2,73 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AEBC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F5AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:53:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76373206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:50:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Lm7pjBKB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76373206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	by mail.kernel.org (Postfix) with ESMTPS id EE14E20674
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:53:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE14E20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwvEO-0003CE-GW
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:50:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36715)
+	id 1iwvHR-0004Nh-53
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:53:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1iwv62-0000Vi-Aq
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:42:04 -0500
+ (envelope-from <bounces@canonical.com>) id 1iwuq8-0007fJ-GC
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <deller@gmx.de>) id 1iwv60-000338-FO
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:42:02 -0500
-Received: from mout.gmx.net ([212.227.17.22]:56809)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <deller@gmx.de>)
- id 1iwv5y-00031r-La; Wed, 29 Jan 2020 16:41:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1580334100;
- bh=nnf7xTDUx7a4k4Dp/aAiOiKGIR16VjCeFOQGMR6PN/g=;
- h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=Lm7pjBKBopTjw3MyWaJZB61EJ0hdXBdiJ7Eo3O2eMcLtn2vdbcAUBe6VThUUZv9xL
- u/2KJ0ZYVC45BFwnjKj/tbn9eXdFoBL3vTh5iGcWfiB0JIVuK2QznEB3A5igxUT0Rd
- 04c9b7pUC68h4SHsfHk5X27Ja1yJ83Grp3z5s8ZY=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.20.60] ([92.116.131.63]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N0XD2-1jkBou1K6O-00wUYc; Wed, 29
- Jan 2020 22:41:40 +0100
-Subject: Re: [PATCH] MAINTAINERS: Cover hppa-softmmu.mak in the HP-PARISC
- Machines section
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200129190316.16901-1-philmd@redhat.com>
-From: Helge Deller <deller@gmx.de>
-Autocrypt: addr=deller@gmx.de; keydata=
- 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
- c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <874615ac-6149-7660-ed95-60483c0443af@gmx.de>
-Date: Wed, 29 Jan 2020 22:41:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <bounces@canonical.com>) id 1iwuq7-0003DG-9f
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:36 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40050)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iwuq7-00039y-2d
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iwuq6-0001gS-27
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 21:25:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0A2852E80AD
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 21:25:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200129190316.16901-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:p7vzAnsDOniINOhuIdgHQ16Csit207DA/ybdZSjjxtGVzXVIe56
- GX+ETITN6hFkoTJTMEX+1Rk3wbNww6eAhQoE2Av5i/Qg7shIrQCgoucGvAd/nV9kuCK0D3D
- PVhYGVVnIyIriYWghx0spzDDR6Ey5S9oZtTeFhTnTw64A8Lz7Q+cV0xiJzqtE0j4IcS/VLk
- 6+NSICskzzLeJP94OG0+Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:raPvCswBalQ=:y4VtWYcyxZJWzHArpMn0Rl
- dacnVlAuBnN95RwsQlMc1gcsJSYncdrHKK4vX7O6RCJ2gWtnXTipURa4ywBezpa4hxHBoOtKF
- JfCPJLmQwtPwi8SwJMPI+OwfOW90hvo36MPhvbJq5cGi0bnO9vZnZWMg8yWq0G6F/BGhzh8EI
- DNlXif8hrNKSy3Roa/J51nSHqmr1PC3CYler57AHPpVzqgg2kmPTlW60sszoo7lTQ+BdVq0Wn
- rB0fx27N5Pbx8nNAqth1JGfw98QMwhc3F+TY1p+XKL68AqbzK8eo297JQOQBjmPZZj0ZwOnit
- LUSQJDHlrMfl4XErdw1h4N2zxMpbxgdMQ0KOr1gM8/WVHsw0E44Fr3VNuVw1XlqypM1f9kETy
- 9TkqeBOA6ZmucPbeRxNxfgp+UvM/hPfMSV+iuZQbi2+QVkUGu79mMVCA5xFApbVyveFraPySa
- IdtQdm6xvLsJ9LQs2nvlvIUjkVRgXsRQGtDJvEHgoNq8vNNF2io0SCCLSSTHgsF2zhY4tlgnc
- 7htIdRBARC52vbTNqOkTUcUKiYunYzRbVXGMckSnd2D+UxXTEnHF2T0bQ5xcDKtDzo7O3BhBq
- 2SY/ivy9ya0+dRDIEVIEzVEnOiog02RpDRlCPc4CcNwm9NMMuQf/7HEa1BgeLReNofKcm2c7V
- 4JIQnhqS2QUZOt1wtP+z0vRsLAlcK+dsmsY1l0YsVz+jvkM0ZINMqk1Akp4s7c9yFSQwagJr+
- GYH7+hKzThz/lY3ZmzZfsPK+hUNj6jrmhR5xPQsJlMzpxUofalAn+3Df5xxjWWeHkT4wX1TTm
- Lb01jyOvf/RcP8ZA5so45VFNlgoHRipF0btLOqZTobbk7nYW2LqXXyyf2q/xsX1D4ZXArSoUA
- zy5ahLwqUo6f7lPahusX+D3f9it+YmgdfD18ivW9D649CtVYtj3Hi96sCpCQlktuFAgm/sGny
- 1eNPn24UeSFEzMmxwvw6WPzIi8/rde6ViTmBA8rL2YbHqA3m7DuA/euYJRfYNUfPXyAUlPOSn
- nEAPG85Eviok71/u0zojjSsUYuW9T9OUp4GL7L9EqQXcig+6ceI6oFH07D85Hhe0yFgqE4L8l
- nH2A/1JlMGt5B0Lr2dJ4mi+ROKghz9+GN16ljVTVkabdc619OJEpsOEWr84cFiM3pH2xZT7c/
- Qez8WBrii8IIeCiHJ2aSTRql1R92tFwoz+7O2A0hERXHKxqzn9ll3wUbA8Sbwr1n0xx8gz/FU
- w21Z0Jlu80luOHcTg
+Date: Wed, 29 Jan 2020 21:18:59 -0000
+From: rinigus <rinigus.git@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: rinigus-git
+X-Launchpad-Bug-Reporter: rinigus (rinigus-git)
+X-Launchpad-Bug-Modifier: rinigus (rinigus-git)
+Message-Id: <158033273927.19447.5685950954198072756.malonedeb@gac.canonical.com>
+Subject: [Bug 1861341] [NEW] ARM QEMU: Unknown syscall 397
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: cdf84f6f1fe5969b4fb8d5d2397d62a9eda2bf4f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.22
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Wed, 29 Jan 2020 16:53:17 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -154,35 +77,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1861341 <1861341@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29.01.20 20:03, Philippe Mathieu-Daud=C3=A9 wrote:
-> Modifications to default-configs/hppa-softmmu.mak should be
-> reviewed by the hppa-softmmu users (currently a single machine).
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Public bug reported:
 
-Acked-by: Helge Deller <deller@gmx.de>
+QEMU is reporting
 
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index efd3f3875f..2c00a49c42 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -896,6 +896,7 @@ HP B160L
->  M: Richard Henderson <rth@twiddle.net>
->  R: Helge Deller <deller@gmx.de>
->  S: Odd Fixes
-> +F: default-configs/hppa-softmmu.mak
->  F: hw/hppa/
->  F: pc-bios/hppa-firmware.img
->
->
+```
+Unknown syscall 397
+```
 
+(statx if I read tables right) when used via flatpak for ARM images on
+x86_64. This has been reproduced on Fedora and Gentoo.
+
+To reproduce:
+
+- get flatpak KDE 5.12 for arm:
+
+flatpak install --user org.kde.Sdk/arm/5.12 org.kde.Platform/arm/5.12
+
+
+- run qmake inside Sdk:
+
+QEMU_STRACE=3D1 flatpak run --filesystem=3Dhost --command=3Dqmake
+org.kde.Sdk/arm/5.12 .
+
+
+You will get a host of messages with unknown syscall. In practice, qmake wi=
+ll fail to find .pro files if you have them in that folder and libraries in=
+ the system.
+
+As far as I understand, Flatpak images are built on AARCH64 hardware.
+
+My config on Gentoo:
+
+kernel: 4.19.86-gentoo x86_64
+app-emulation/qemu: ~4.2.0-r1 , same with 4.0.0
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1861341
+
+Title:
+  ARM QEMU: Unknown syscall 397
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU is reporting
+
+  ```
+  Unknown syscall 397
+  ```
+
+  (statx if I read tables right) when used via flatpak for ARM images on
+  x86_64. This has been reproduced on Fedora and Gentoo.
+
+  To reproduce:
+
+  - get flatpak KDE 5.12 for arm:
+
+  flatpak install --user org.kde.Sdk/arm/5.12 org.kde.Platform/arm/5.12
+
+  =
+
+  - run qmake inside Sdk:
+
+  QEMU_STRACE=3D1 flatpak run --filesystem=3Dhost --command=3Dqmake
+  org.kde.Sdk/arm/5.12 .
+
+  =
+
+  You will get a host of messages with unknown syscall. In practice, qmake =
+will fail to find .pro files if you have them in that folder and libraries =
+in the system.
+
+  As far as I understand, Flatpak images are built on AARCH64 hardware.
+
+  My config on Gentoo:
+
+  kernel: 4.19.86-gentoo x86_64
+  app-emulation/qemu: ~4.2.0-r1 , same with 4.0.0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1861341/+subscriptions
 
