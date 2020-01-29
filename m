@@ -2,57 +2,86 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 036E3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D85AAC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:47:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAD9C20716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:45:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAD9C20716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A2E3420716
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:47:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NtVo5HwB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E3420716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwnec-0001Hi-TI
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 08:45:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32776)
+	id 1iwnh5-0002Ma-Sh
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 08:47:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iwne4-0000fM-MU
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:44:41 -0500
+ (envelope-from <thuth@redhat.com>) id 1iwngW-0001uU-EV
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:47:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iwne3-00055j-6I
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:44:40 -0500
-Resent-Date: Wed, 29 Jan 2020 08:44:40 -0500
-Resent-Message-Id: <E1iwne3-00055j-6I@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21178)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iwne2-000505-UT
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:44:39 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1580305450158902.4365573341403;
- Wed, 29 Jan 2020 05:44:10 -0800 (PST)
-In-Reply-To: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
-Subject: Re: [RFC v3 00/25] intel_iommu: expose Shared Virtual Addressing to
- VMs
-Message-ID: <158030544868.2504.1674859271822373142@a1bbccc8075a>
+ (envelope-from <thuth@redhat.com>) id 1iwngU-0001Ir-V8
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:47:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33515
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iwngU-0001Hs-Ro
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:47:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580305629;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=QoNmuR8rS1RBuyQpIFLh80hUnXpIwcjTLltc9pG/1vc=;
+ b=NtVo5HwBBJ4wcastDGWdRGtTXRxsOTNm8bpo1RyLWjzbse3u5h06I0Gaj2VeBP0++LdnY0
+ KKHUJMjOBTsPKBqP1xt69LrKsvoxTgTx9ssXeGK1dBr+xMvkUTMKMzM5gmSJicqGkBlgnf
+ yNbVlfP6rLJX/urNfvXCp1Re/FDBnFs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-57-3zrNf25mN6y9hYPUJKNQgw-1; Wed, 29 Jan 2020 08:47:07 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7E1F1005510
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 13:47:06 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-210.ams2.redhat.com [10.36.116.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 95F065C54A;
+ Wed, 29 Jan 2020 13:47:03 +0000 (UTC)
+Subject: Re: [PATCH 001/142] minikconf: accept alnum identifiers
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+References: <20200128175342.9066-1-pbonzini@redhat.com>
+ <20200128175342.9066-2-pbonzini@redhat.com>
+ <81393799-e936-d5dc-1681-4317bfae510e@redhat.com>
+ <CAMxuvayx55=JaVCgtZew70jeoRSzpzuLDSe2sth91yiLb_kAXA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f076136b-d118-b502-25fb-d72cbd194833@redhat.com>
+Date: Wed, 29 Jan 2020 14:47:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: yi.l.liu@intel.com
-Date: Wed, 29 Jan 2020 05:44:10 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <CAMxuvayx55=JaVCgtZew70jeoRSzpzuLDSe2sth91yiLb_kAXA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 3zrNf25mN6y9hYPUJKNQgw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,53 +93,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, kvm@vger.kernel.org,
- mst@redhat.com, jun.j.tian@intel.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com,
- hao.wu@intel.com, yi.y.sun@intel.com, david@gibson.dropbear.id.au
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTgwMzAwMjE2LTg2MTcyLTEt
-Z2l0LXNlbmQtZW1haWwteWkubC5saXVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1h
-a2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
-ICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9ody9wY2kvcGNp
-X2J1cy5oOjQsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVk
-ZS9ody9wY2ktaG9zdC9pNDQwZnguaDoxNSwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAvcWVt
-dS10ZXN0L3NyYy9zdHVicy9wY2ktaG9zdC1waWl4LmM6MjoKL3RtcC9xZW11LXRlc3Qvc3JjL2lu
-Y2x1ZGUvaHcvaW9tbXUvZHVhbF9zdGFnZV9pb21tdS5oOjI2OjEwOiBmYXRhbCBlcnJvcjogbGlu
-dXgvaW9tbXUuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogI2luY2x1ZGUgPGxpbnV4L2lv
-bW11Lmg+CiAgICAgICAgICBefn5+fn5+fn5+fn5+fn4KY29tcGlsYXRpb24gdGVybWluYXRlZC4K
-bWFrZTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBzdHVicy9wY2ktaG9z
-dC1waWl4Lm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4u
-Li4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9j
-a2VyL2RvY2tlci5weSIsIGxpbmUgNjYyLCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxl
-ZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9y
-OiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2Nv
-bS5xZW11Lmluc3RhbmNlLnV1aWQ9OGE0MTUwNDM5ZGJjNGM2MmFiZGVlNDM2Njk2MGFjOWEnLCAn
-LXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1y
-bScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9Jywg
-Jy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5W
-PScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRj
-aGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
-Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1xZG93bXRkeC9zcmMvZG9ja2VyLXNyYy4yMDIw
-LTAxLTI5LTA4LjQyLjA0LjIxMDY0Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScs
-ICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4
-aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlk
-PThhNDE1MDQzOWRiYzRjNjJhYmRlZTQzNjY5NjBhYzlhCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1
-bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10
-ZXN0ZXItdG1wLXFkb3dtdGR4L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dA
-ZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDJtNS4yMzRzCnVzZXIgICAgMG03LjY2MnMKCgpUaGUg
-ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1ODAzMDAy
-MTYtODYxNzItMS1naXQtc2VuZC1lbWFpbC15aS5sLmxpdUBpbnRlbC5jb20vdGVzdGluZy5kb2Nr
-ZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 29/01/2020 14.41, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Wed, Jan 29, 2020 at 1:09 PM Thomas Huth <thuth@redhat.com> wrote:
+>>
+>>
+>> -EMISSINGPATCHDESCRIPTION
+>>
+>> Why is this required? Bug fix? New feature? ... please add some words he=
+re.
+>=20
+> This is required for later patch "meson: convert hw/9pfs", which adds
+> config 9PFS.
+>=20
+> You are right, several patches could use some comments. It's still
+> PoC. Otoh, a lot of them are quite mechanical or just what they are in
+> meson, there isn't much to say about it. We'll have to improve this
+> somehow.
+
+Sure, but with a proper patch description, this patch here could even be
+merged today already, shrinking this huge patch series by one at least...
+
+ Thomas
+
 
