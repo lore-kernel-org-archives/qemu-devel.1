@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4B7C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5265BC33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:18:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC11E2070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:17:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C02D2070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:18:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2iyHKCl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC11E2070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2pP2zA0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C02D2070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44461 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwlLF-0002Rs-S3
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:17:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59967)
+	id 1iwlMn-0005Pf-2C
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:18:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iwlK7-0000gH-93
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:15:56 -0500
+ (envelope-from <quintela@redhat.com>) id 1iwlKA-0000lk-2M
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:15:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iwlK6-00062j-7Y
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:15:55 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58657
+ (envelope-from <quintela@redhat.com>) id 1iwlK9-00068J-6N
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:15:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55837
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwlK6-000627-2g
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:15:54 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwlK8-00068B-VQ
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:15:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580296553;
+ s=mimecast20190719; t=1580296556;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NPAhdApyZw7Pw8aIc0Qv7AWFxjRLuYMEu1HxUbPm9hU=;
- b=H2iyHKClsS6nf37NOjCl2PE5Eyo+JyBw6a6X+knclPw6EjOdORpUXzhCLGz1QWc8/YMBsS
- MOS6VM7Km2SHfvu899UJb+mt/O/hVjlRzTxjvkiUhmerHe62ftHomJDuGQBzFYzQOp9McQ
- h9KKCkvgxmC5KAKsxZkP2qMVwRPSM1c=
+ bh=JCwYKiDZExftH/t5jOvpdjhb5wSHzgFLLxxsJOsl808=;
+ b=Q2pP2zA0bbIXPQaYiGHa+KgmqOoOJ5MwYRfxRX/8KhfkhsZCllnzrGo1neOiLGqO1fBCL0
+ xK4hBajFPoRfImGXIXkjiTqPTetPvqu/CIMOT7ONUoVhNOqOMiBScd/DDghBx5r2r9hZsQ
+ bD1Ke1oP8NGKB0t+zazxoMMRVrrw0Pc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-8rNl6XNxO2ibpgB8k8LA3w-1; Wed, 29 Jan 2020 06:15:52 -0500
+ us-mta-307-G5xuWC35PmS8zUIpPA0Jiw-1; Wed, 29 Jan 2020 06:15:55 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43B3E100550E
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:15:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69F52800D5C
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:15:54 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-64.ams2.redhat.com [10.36.116.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B4A9F89D2E;
- Wed, 29 Jan 2020 11:15:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99DD28E9E4;
+ Wed, 29 Jan 2020 11:15:51 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/18] qemu-file: Don't do IO after shutdown
-Date: Wed, 29 Jan 2020 12:15:21 +0100
-Message-Id: <20200129111536.9497-4-quintela@redhat.com>
+Subject: [PULL 04/18] migration: Don't send data if we have stopped
+Date: Wed, 29 Jan 2020 12:15:22 +0100
+Message-Id: <20200129111536.9497-5-quintela@redhat.com>
 In-Reply-To: <20200129111536.9497-1-quintela@redhat.com>
 References: <20200129111536.9497-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 8rNl6XNxO2ibpgB8k8LA3w-1
+X-MC-Unique: G5xuWC35PmS8zUIpPA0Jiw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -92,80 +92,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Be sure that we are not doing neither read/write after shutdown of the
-QEMUFile.
+If we do a cancel, we got out without one error, but we can't do the
+rest of the output as in a normal situation.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/qemu-file.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ migration/ram.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-index 26fb25ddc1..bbb2b63927 100644
---- a/migration/qemu-file.c
-+++ b/migration/qemu-file.c
-@@ -53,6 +53,8 @@ struct QEMUFile {
+diff --git a/migration/ram.c b/migration/ram.c
+index f95d656c26..3fd7fdffcf 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3524,7 +3524,8 @@ static int ram_save_iterate(QEMUFile *f, void *opaque=
+)
+     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
 =20
-     int last_error;
-     Error *last_error_obj;
-+    /* has the file has been shutdown */
-+    bool shutdown;
- };
-=20
- /*
-@@ -61,10 +63,18 @@ struct QEMUFile {
-  */
- int qemu_file_shutdown(QEMUFile *f)
- {
-+    int ret;
-+
-+    f->shutdown =3D true;
-     if (!f->ops->shut_down) {
-         return -ENOSYS;
-     }
--    return f->ops->shut_down(f->opaque, true, true, NULL);
-+    ret =3D f->ops->shut_down(f->opaque, true, true, NULL);
-+
-+    if (!f->last_error) {
-+        qemu_file_set_error(f, -EIO);
-+    }
-+    return ret;
- }
-=20
- /*
-@@ -214,6 +224,9 @@ void qemu_fflush(QEMUFile *f)
-         return;
-     }
-=20
-+    if (f->shutdown) {
-+        return;
-+    }
-     if (f->iovcnt > 0) {
-         expect =3D iov_size(f->iov, f->iovcnt);
-         ret =3D f->ops->writev_buffer(f->opaque, f->iov, f->iovcnt, f->pos=
-,
-@@ -328,6 +341,10 @@ static ssize_t qemu_fill_buffer(QEMUFile *f)
-     f->buf_index =3D 0;
-     f->buf_size =3D pending;
-=20
-+    if (f->shutdown) {
-+        return 0;
-+    }
-+
-     len =3D f->ops->get_buffer(f->opaque, f->buf + pending, f->pos,
-                              IO_BUF_SIZE - pending, &local_error);
-     if (len > 0) {
-@@ -642,6 +659,9 @@ int64_t qemu_ftell(QEMUFile *f)
-=20
- int qemu_file_rate_limit(QEMUFile *f)
- {
-+    if (f->shutdown) {
-+        return 1;
-+    }
-     if (qemu_file_get_error(f)) {
-         return 1;
-     }
+ out:
+-    if (ret >=3D 0) {
++    if (ret >=3D 0
++        && migration_is_setup_or_active(migrate_get_current()->state)) {
+         multifd_send_sync_main(rs);
+         qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+         qemu_fflush(f);
 --=20
 2.24.1
 
