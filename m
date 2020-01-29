@@ -2,56 +2,99 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA1DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB748C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 19:00:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1483A20708
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:38:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1483A20708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8104C20720
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 19:00:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWFW8F4Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8104C20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwsED-0003fv-5V
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 13:38:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55219)
+	id 1iwsZW-00037S-Il
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 14:00:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36361)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iwsAq-0006Bl-9M
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:49 -0500
+ (envelope-from <philmd@redhat.com>) id 1iwsYm-0002hd-24
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:59:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iwsAp-0003pu-5c
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:48 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:33059 helo=mail.rt-rk.com)
+ (envelope-from <philmd@redhat.com>) id 1iwsYi-0004qw-S2
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:59:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26123
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iwsAo-0003mp-Qa
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:34:47 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 9F7111A1FAE;
- Wed, 29 Jan 2020 19:34:44 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 837241A1CEF;
- Wed, 29 Jan 2020 19:34:44 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/6] target/mips: semihosting: Remove 'uhi_done' label in
- helper_do_semihosting()
-Date: Wed, 29 Jan 2020 19:34:14 +0100
-Message-Id: <1580322857-14331-4-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1580322857-14331-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1580322857-14331-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwsYi-0004q5-Ij
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:59:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580324368;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=m4Om27dMMc+MwDJO33ko3fPEMZ8mfK4CNT5yOi9uQV0=;
+ b=jWFW8F4YmgJrlmJSsPZnb6DkjUn2xRvlVeiz3nLoaofCEUDiBNEJmctHGth7UE5Ydvzt6u
+ vKyRqC+26j4NwauyoIFPpiLGYqby9i4sfEzgaeAk1rL2g2zznAuuMQ81Pj3Yg2kWtdWxsT
+ HJkVdLTml5mI9aTvd3ZaPUSfZSQTbDU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-qTBEPwB2M2e-AUB36JNkpg-1; Wed, 29 Jan 2020 13:59:20 -0500
+Received: by mail-wr1-f70.google.com with SMTP id w6so351018wrm.16
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 10:59:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3ZZ+IeHTC4FUkzKLbzuxzj4KT1R3XIan3G+l/tmpPIo=;
+ b=MqOOz0kGH/Lk6BCYLjZBNDhvLgqrv15zbxgeXS/iWF+NrBDLF1y8K0PYpIqffEIh59
+ nJgmtR2jCe5NmVbmbhMg+YDkM36P9V6mfjPySBaqw8axQpaCraxx7Lu+KTveppLMFR8K
+ 0/g/Lc2hT4KfiMmsE5h0On5Ct9rynI1q9nCQ+xOnNfFsIGesXb4VPqA+o52r4ctYLc2A
+ qy5zPPbnXUNQurWNGL73LeYojooZmSXXRh70++YYGFkgQw9WtDe2LCacHszxDhvoOab9
+ t2imFQqzp2tmp5NzeGghz2gh+k4WR7i7IJHaua7GXk70z8YFAKVl2VBaUOkDfQJDgNZA
+ srkQ==
+X-Gm-Message-State: APjAAAXs3wT4az8UpHIcle1f9aPI7vaEx5/I8quO+FZo0iNJGTqsoXWF
+ M/LJN7CqD/W8AFdYg1z1Jq1iiAyVKAAi4dUO1vafQte4cnl0XmdIB7O+uH1MugXqG3uIyKZH+Fy
+ OrUp1AXqBPGtPlxk=
+X-Received: by 2002:adf:f5cb:: with SMTP id k11mr265657wrp.71.1580324359055;
+ Wed, 29 Jan 2020 10:59:19 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx5snWWIuuHvNH4RE31xURvkW/qwtyl790Il40uv9J9jsvY3WMiwOCEBiTXUZ8GHD6H2jKy5w==
+X-Received: by 2002:adf:f5cb:: with SMTP id k11mr265643wrp.71.1580324358851;
+ Wed, 29 Jan 2020 10:59:18 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id c15sm3925182wrt.1.2020.01.29.10.59.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 29 Jan 2020 10:59:18 -0800 (PST)
+Subject: Re: [PATCH] default-configs: add CONFIG_PARALLEL to hppa-softmmu
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200129182804.19284-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ff7dbd5f-4b38-f53b-f688-1f6841ea7bf3@redhat.com>
+Date: Wed, 29 Jan 2020 19:59:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20200129182804.19284-1-alex.bennee@linaro.org>
+Content-Language: en-US
+X-MC-Unique: qTBEPwB2M2e-AUB36JNkpg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,102 +106,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Aurelien Jarno <aurelien@aurel32.net>, amarkovic@wavecomp.com
+Cc: richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Hi Alex,
 
-The label 'uhi_done' is a simple 'return' call and can
-be removed for a bit more clarity in the code.
+On 1/29/20 7:28 PM, Alex Benn=C3=A9e wrote:
+> The PARISC Lasi chipset emulation requires some of the common parallel
+> support and fails to build on a --without-default-devices. I am
+> assuming the chipset emulation is non-optional for the HPPA case.
+ >
 
-CC: Aurelien Jarno <aurelien@aurel32.net>
-CC: Aleksandar Markovic <amarkovic@wavecomp.com>
-CC: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200106182425.20312-7-danielhb413@gmail.com>
+Fixes: 376b851909d
+
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>   default-configs/hppa-softmmu.mak | 1 +
+>   1 file changed, 1 insertion(+)
+>=20
+> diff --git a/default-configs/hppa-softmmu.mak b/default-configs/hppa-soft=
+mmu.mak
+> index b64c5eb3ff..9083ce8634 100644
+> --- a/default-configs/hppa-softmmu.mak
+> +++ b/default-configs/hppa-softmmu.mak
+> @@ -3,6 +3,7 @@
+>   # Uncomment the following lines to disable these optional devices:
+>   #
+>   #CONFIG_PCI_DEVICES=3Dn
+> +CONFIG_PARALLEL=3Dy
+
+We now use Kconfig :)
+
+CONFIG_DINO=3Dy pulls from hw/hppa/Kconfig:
+
+config DINO
+     bool
+     imply PCI_DEVICES
+     imply E1000_PCI
+     imply VIRTIO_VGA
+     select PCI
+     select SERIAL
+     select ISA_BUS
+     select I8259
+     select IDE_CMD646
+     select MC146818RTC
+     select LSI_SCSI_PCI
+     select LASI_82596
+     select LASIPS2
+     select ARTIST
+
+The fix is:
+
+-- >8 --
+diff --git a/hw/hppa/Kconfig b/hw/hppa/Kconfig
+index 82178c7dcb..22948db025 100644
+--- a/hw/hppa/Kconfig
++++ b/hw/hppa/Kconfig
+@@ -12,4 +12,5 @@ config DINO
+      select LSI_SCSI_PCI
+      select LASI_82596
+      select LASIPS2
++    select PARALLEL
+      select ARTIST
 ---
- target/mips/mips-semi.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/target/mips/mips-semi.c b/target/mips/mips-semi.c
-index 35bdfd7..10a710c 100644
---- a/target/mips/mips-semi.c
-+++ b/target/mips/mips-semi.c
-@@ -218,7 +218,7 @@ static int copy_argn_to_target(CPUMIPSState *env, int arg_num,
-         if (!p) {                               \
-             gpr[2] = -1;                        \
-             gpr[3] = EFAULT;                    \
--            goto uhi_done;                      \
-+            return;                             \
-         }                                       \
-     } while (0)
- 
-@@ -228,14 +228,14 @@ static int copy_argn_to_target(CPUMIPSState *env, int arg_num,
-         if (!p) {                                       \
-             gpr[2] = -1;                                \
-             gpr[3] = EFAULT;                            \
--            goto uhi_done;                              \
-+            return;                                     \
-         }                                               \
-         p2 = lock_user_string(addr2);                   \
-         if (!p2) {                                      \
-             unlock_user(p, addr, 0);                    \
-             gpr[2] = -1;                                \
-             gpr[3] = EFAULT;                            \
--            goto uhi_done;                              \
-+            return;                                     \
-         }                                               \
-     } while (0)
- 
-@@ -272,7 +272,7 @@ void helper_do_semihosting(CPUMIPSState *env)
-         if (gpr[4] < 3) {
-             /* ignore closing stdin/stdout/stderr */
-             gpr[2] = 0;
--            goto uhi_done;
-+            return;
-         }
-         gpr[2] = close(gpr[4]);
-         gpr[3] = errno_mips(errno);
-@@ -302,7 +302,7 @@ void helper_do_semihosting(CPUMIPSState *env)
-             gpr[2] = fstat(gpr[4], &sbuf);
-             gpr[3] = errno_mips(errno);
-             if (gpr[2]) {
--                goto uhi_done;
-+                return;
-             }
-             gpr[2] = copy_stat_to_target(env, &sbuf, gpr[5]);
-             gpr[3] = errno_mips(errno);
-@@ -314,14 +314,14 @@ void helper_do_semihosting(CPUMIPSState *env)
-     case UHI_argnlen:
-         if (gpr[4] >= semihosting_get_argc()) {
-             gpr[2] = -1;
--            goto uhi_done;
-+            return;
-         }
-         gpr[2] = strlen(semihosting_get_arg(gpr[4]));
-         break;
-     case UHI_argn:
-         if (gpr[4] >= semihosting_get_argc()) {
-             gpr[2] = -1;
--            goto uhi_done;
-+            return;
-         }
-         gpr[2] = copy_argn_to_target(env, gpr[4], gpr[5]);
-         break;
-@@ -369,6 +369,5 @@ void helper_do_semihosting(CPUMIPSState *env)
-         fprintf(stderr, "Unknown UHI operation %d\n", op);
-         abort();
-     }
--uhi_done:
-     return;
- }
--- 
-2.7.4
+Btw I suggested Sven to use a different config for LASI:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg667945.html
 
 
