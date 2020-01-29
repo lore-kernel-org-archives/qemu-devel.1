@@ -2,86 +2,79 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ED4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FED3C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5870206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C624206F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:39:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctvexfqj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5870206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/xes4cT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C624206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwv30-0004yq-5H
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:38:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45002)
+	id 1iwv3s-0006OJ-M0
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:39:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60119)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jpewhacker@gmail.com>) id 1iwsqo-0000k5-9c
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:18:11 -0500
+ (envelope-from <philmd@redhat.com>) id 1iwuq1-0007OP-Bz
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jpewhacker@gmail.com>) id 1iwsqn-0008Sw-D2
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:18:10 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:36234)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jpewhacker@gmail.com>)
- id 1iwsqn-0008Rf-9U
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 14:18:09 -0500
-Received: by mail-io1-xd42.google.com with SMTP id d15so1042878iog.3
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:18:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JssBp+Af03CgiiTxeYvhyMv5hXNuQpZd/7qsT00yHQk=;
- b=ctvexfqjoGQ5T5Sn1vLgbpYvSzDPoj0uoS0TVohl3YJz2a5tiDMM2aGASlTNA4rsx2
- mpuudbsaV3AZLL6Vh7gIfijPEHoqBPgPhuesItEkbDDzOTIKd4fvn3Yqgma/MyRog04b
- f8kjNuD9QFnqMNCYEjSTQ7c+MMeFQ2TSwjFNPYL/wyAlJUXyim/H3XyhDo+kwxKCKuK+
- lkszu7Y7eYQt2l0h8qj5xS3BkelgIH1uCUFCZ4kD7Kyi/evF9lu5NIl0obgY1dZlIqA0
- RCJHQo4AmV8vG54JUEV37uDn4xUk18n91xqRk6gim7rZz73J/xzy2BwKCGJV2Lb7nnRq
- dw3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JssBp+Af03CgiiTxeYvhyMv5hXNuQpZd/7qsT00yHQk=;
- b=kRVzyOqrrYtk+tblnqVWoQsu02R+E/8Opm3jcn1JwF4wQ3VWktqZgYIN21n65Gssvs
- RIrnLoKxDo9QLM1wn+VgQqkxJmePJzJUjB26CHDbViJUZrMo6Y/KqcVXuppMbybpT/zU
- OtiebODkJk9dPlrFVPs8zsikHz3E0Gnta3gTmtulgjtfCBizuJacm6RyuK32FrE8ciYg
- HZVa+RWcLkyTqznXGjCJWgLGGxyp4YkX4CAhDWGDKbSkzbZx4nSsbbUwfHUdzyfL8VEw
- A+n9uMeObqBtdkFRtxkz1Fp2ZJWWp7lIjfkzxce8MKFNwK19NAEzksGgN5G9INOGwcug
- IusA==
-X-Gm-Message-State: APjAAAWymEUUsYUauCb61OMPnoWmkYrd0zC2ssnILXVC8jaqw6xrMWsB
- Vj/Gr6/5OD3xwpGY8OGNW9LlDd3mLJY=
-X-Google-Smtp-Source: APXvYqxuHq/oBv4epVwHoQWW9A0tiqDb88Ly6lD0S4ibzNEGAvMeRJlBG3wt4HVmpfBJUbFMirJsmQ==
-X-Received: by 2002:a5d:905a:: with SMTP id v26mr887540ioq.77.1580325487942;
- Wed, 29 Jan 2020 11:18:07 -0800 (PST)
-Received: from ola-842mrw1.ad.garmin.com ([204.77.163.55])
- by smtp.gmail.com with ESMTPSA id i13sm767646ioi.67.2020.01.29.11.18.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 11:18:07 -0800 (PST)
-From: Joshua Watt <jpewhacker@gmail.com>
-X-Google-Original-From: Joshua Watt <JPEWhacker@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] ui/gtk: Respect -show-cursor option
-Date: Wed, 29 Jan 2020 13:17:29 -0600
-Message-Id: <20200129191754.3578615-1-JPEWhacker@gmail.com>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <philmd@redhat.com>) id 1iwuq0-0002t3-E6
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59237
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwuq0-0002qI-9r
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580333127;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3RgfhbTdW/N69ju8x61MEPmXC48AqPEUH+WU3+4iKWA=;
+ b=R/xes4cT2J99tbAFb4FSjdqw1bpKnq833If/bRvshTh4wDv7b5jHccdLLEQwk8j1j6XoXG
+ pCx1YxNHgo2hNbggHu1lU49reyp9s1TpHkGqQpGKFWF/W/KX4jhqhXCripYGUKke03not1
+ iks3f3SdDF4gH8TcYWw5c/GmO7w0L3M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-ifms6K_HNY6hM2bHC8FTSQ-1; Wed, 29 Jan 2020 16:25:26 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EE678017CC;
+ Wed, 29 Jan 2020 21:25:25 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 39D9D60BF3;
+ Wed, 29 Jan 2020 21:25:23 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 27/29] tests/acceptance/migration: Default to -nodefaults
+Date: Wed, 29 Jan 2020 22:23:43 +0100
+Message-Id: <20200129212345.20547-28-philmd@redhat.com>
+In-Reply-To: <20200129212345.20547-1-philmd@redhat.com>
+References: <20200129212345.20547-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
-X-Mailman-Approved-At: Wed, 29 Jan 2020 16:37:05 -0500
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: ifms6K_HNY6hM2bHC8FTSQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,34 +86,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Joshua Watt <JPEWhacker@gmail.com>
+Cc: Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the user specifies the -show-cursor option, force the cursor to be
-shown even if it would not otherwise.
+We don't need the default options to run this test.
 
-Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+This fixes errors when running a binary built with
+--without-default-devices such:
+
+  ERROR: qemu-system-arm: Unsupported NIC model: virtio-net-pci
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- ui/gtk.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/acceptance/migration.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index d18892d1de..bdd1b53236 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -258,7 +258,8 @@ static void gd_update_cursor(VirtualConsole *vc)
-     }
- 
-     window = gtk_widget_get_window(GTK_WIDGET(vc->gfx.drawing_area));
--    if (s->full_screen || qemu_input_is_absolute() || s->ptr_owner == vc) {
-+    if (cursor_hide &&
-+        (s->full_screen || qemu_input_is_absolute() || s->ptr_owner == vc)) {
-         gdk_window_set_cursor(window, s->null_cursor);
-     } else {
-         gdk_window_set_cursor(window, NULL);
--- 
-2.24.1
+diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+index a44c1ae58f..d09e5d3fe7 100644
+--- a/tests/acceptance/migration.py
++++ b/tests/acceptance/migration.py
+@@ -32,10 +32,12 @@ class Migration(Test):
+=20
+=20
+     def test_migration_with_tcp_localhost(self):
+-        source_vm =3D self.get_vm()
+         dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
+         dest_vm =3D self.get_vm('-incoming', dest_uri)
++        dest_vm.add_args('-nodefaults')
+         dest_vm.launch()
++        source_vm =3D self.get_vm()
++        source_vm.add_args('-nodefaults')
+         source_vm.launch()
+         source_vm.qmp('migrate', uri=3Ddest_uri)
+         wait.wait_for(
+--=20
+2.21.1
 
 
