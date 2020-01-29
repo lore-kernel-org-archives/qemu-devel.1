@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47672C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D791C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:18:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6238206A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9A78206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:18:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sd1HmgEI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6238206A2
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nZhrTj5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A78206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwxWm-00051V-35
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 19:17:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45783)
+	id 1iwxXo-0006ZG-V7
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 19:18:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxCo-0004hq-Rq
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:14 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iwxCU-0004Bs-Od
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxCn-0000d9-Ox
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:10 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44507)
+ (envelope-from <richard.henderson@linaro.org>) id 1iwxCT-0008Gs-KR
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:50 -0500
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:50702)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iwxCn-0000aP-Ik
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:09 -0500
-Received: by mail-pl1-x643.google.com with SMTP id d9so583902plo.11
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:57:09 -0800 (PST)
+ id 1iwxCT-0008CE-Ci
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:49 -0500
+Received: by mail-pj1-x1043.google.com with SMTP id r67so508014pjb.0
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:56:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+IcLBVINlWFp15bwGPClMMXcW2UX7TXl5ScSRzLV8s8=;
- b=Sd1HmgEImCAPDy8h78uIk35Vaxeiaa4KHBkSf4wisaBIjRWQNfgP5fTH2vmu+18vVB
- mAhev6gG4KvT/4LuADmz0oAGLwNHvFmh+Y7TMl/dtJwTYBl3RLE7JTk8i72qS2qtr26h
- 8uaCzWLSgjG3d3RJi9xNPPiUsLlkIRueuOpN/3FFSqIJVq4r8X9EMjmA4aN0vNTfmgi+
- C3n6BlBCQOzaiHdCBBXZ9/x+KxrrZqFQHjKyFU41wf23K8J5MoUCiPnCfuSvPgW6UMiu
- Ae1wNnld3tjxT8ZelQ4pEVNMSqUt0gzq3rWORZDvmBiIFXGb6tJnObyjwsalAaF/mePK
- NSJA==
+ bh=B70lUsejZyqB+eYbfOUUmwYftosrBwYUJeBX3Yctqno=;
+ b=nZhrTj5CPpy36/NRxqphTe4VNUA/eJa7SViOdyFJCCyd9AvP9m/dJkslUcXh30bfqR
+ JJmburJ2oPLq5uz8qm41dTKXf+zbsBwxmrA1EOPWv9qD2pfLmvDmzHc6dv1BLAHJGVdM
+ pVMlSg0lDbwof3d5e/470xPAovxcY9Tqodirts/GaN32+qIWNNLKgup5c3KLgm4YrIFr
+ gMn+Eab8Ljj2wVuogOWFXrHi+bb0IBP/jTPAwWKS9XUeshb4cEwcOTNiqKEDm9Fsol8L
+ Q+KWPSTJFTsitVUuuQhZkMLEY9m92dnl5mouexOzFrCfgiL5pRwLCq+WmZ0h/VBrftiq
+ xneQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+IcLBVINlWFp15bwGPClMMXcW2UX7TXl5ScSRzLV8s8=;
- b=dtJN1V+GUejL1hKncWWuWAqw9udxlKUwJ5cQaPD0SH8MH7nMDub6xAJ1/D2UiOjgxO
- sDLhukr1/wx6R6KmUN4BL6u71STX22mk4Mwc/g6mqyCFZKpqooQxbUbZpNQqLaUItFGy
- 4S402iAnNgydiB+uaMKlEFZsP9xa0PXagtRbI5sUmEXeFyrsreQY27XhI6BMVa9RGHIj
- vbHyLxeVJU/y2B2YQi81uI/84aO8w0fuO36HaTb96qjU1mfoaONxiJRoQuCCgZxo9CK4
- 5WowR4i7zuSe7c8LB9Ij8NccGJfeTHD0nUxmJwiBiTPaHSeI54+JGLzuOyl+Nx30kl2J
- Pdmg==
-X-Gm-Message-State: APjAAAVF/QWgox6c+U74eTejpOsaYphl2GuG037mmSuZng7GI9WO2y9n
- 9pvk2ycGmZSHUvJ8VFA8LUPipCOjLRc=
-X-Google-Smtp-Source: APXvYqyY+eM9zx7RyztB5gEglyk5tdQ+U2ei8LZH/cPAc27IztaswG+AeZJKrDslokDk8Xa+ml/ifQ==
-X-Received: by 2002:a17:90b:3cc:: with SMTP id
- go12mr2480433pjb.89.1580342228315; 
- Wed, 29 Jan 2020 15:57:08 -0800 (PST)
+ bh=B70lUsejZyqB+eYbfOUUmwYftosrBwYUJeBX3Yctqno=;
+ b=PdepMMr94l5Ql9FKAOjLdqozhZYpRZii/2SqVi+tVTMoXOf5oi1Udx9RyF1fXhrNWD
+ sQX1zDsMEZRQtQ87gfR/uBlKVn9/aL4nDJLKqwsrD9QvyEsCBz8E/j5OLTB31vVAv3d6
+ lke7lt1g5AXYYYhyX7IfboVXsyUjPuasq7SXHz6SIlfrzxI9wDZgW+9dnUbRY87XX4c6
+ 7nVsMr41j0sLufTa8QhvYDxAGHMmDsz6zb6Y6qMSICPPvuVfu6guyYolkfPOXVaaOVyj
+ CDJ9eNKx6EkRiRO3Nq4vnt2V4xckgCUayY9+m1VRIDFbuWRN3Ys4NUfk3tAODPXcgyNP
+ dMIA==
+X-Gm-Message-State: APjAAAXwsKu0UptgEKigV5UoYwpDhOVXxWV8yVSe4mwKZqiaSjNnkV3a
+ ZEmCspB5a+x2kK6oqOqPl0nsRBraIHo=
+X-Google-Smtp-Source: APXvYqx6CAdRF0wntfuI3zXREzfGM+To6EK4CWrN3cyvxKygOXC/1WXjv8WyJPYmRqp7tKzuTdpzvw==
+X-Received: by 2002:a17:902:8ec9:: with SMTP id
+ x9mr1953139plo.182.1580342206210; 
+ Wed, 29 Jan 2020 15:56:46 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id r3sm3953626pfg.145.2020.01.29.15.57.07
+ by smtp.gmail.com with ESMTPSA id r3sm3953626pfg.145.2020.01.29.15.56.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 15:57:07 -0800 (PST)
+ Wed, 29 Jan 2020 15:56:45 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 41/41] target/arm: Raise only one interrupt in
- arm_cpu_exec_interrupt
-Date: Wed, 29 Jan 2020 15:56:14 -0800
-Message-Id: <20200129235614.29829-42-richard.henderson@linaro.org>
+Subject: [PATCH v5 24/41] target/arm: Update ctr_el0_access for EL2
+Date: Wed, 29 Jan 2020 15:55:57 -0800
+Message-Id: <20200129235614.29829-25-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200129235614.29829-1-richard.henderson@linaro.org>
 References: <20200129235614.29829-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,90 +100,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fall through organization of this function meant that we
-would raise an interrupt, then might overwrite that with another.
-Since interrupt prioritization is IMPLEMENTATION DEFINED, we
-can recognize these in any order we choose.
+Update to include checks against HCR_EL2.TID2.
 
-Unify the code to raise the interrupt in a block at the end.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c | 30 ++++++++++++------------------
- 1 file changed, 12 insertions(+), 18 deletions(-)
+ target/arm/helper.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 06d72ac9d6..3ce809306e 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -535,17 +535,15 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     uint64_t hcr_el2 = arm_hcr_el2_eff(env);
-     uint32_t target_el;
-     uint32_t excp_idx;
--    bool ret = false;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 33f4cbbc64..e79237ea12 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5264,11 +5264,27 @@ static const ARMCPRegInfo el3_cp_reginfo[] = {
+ static CPAccessResult ctr_el0_access(CPUARMState *env, const ARMCPRegInfo *ri,
+                                      bool isread)
+ {
+-    /* Only accessible in EL0 if SCTLR.UCT is set (and only in AArch64,
+-     * but the AArch32 CTR has its own reginfo struct)
+-     */
+-    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UCT)) {
+-        return CP_ACCESS_TRAP;
++    int cur_el = arm_current_el(env);
 +
-+    /* The prioritization of interrupts is IMPLEMENTATION DEFINED. */
++    if (cur_el < 2) {
++        uint64_t hcr = arm_hcr_el2_eff(env);
++
++        if (cur_el == 0) {
++            if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
++                if (!(env->cp15.sctlr_el[2] & SCTLR_UCT)) {
++                    return CP_ACCESS_TRAP_EL2;
++                }
++            } else {
++                if (!(env->cp15.sctlr_el[1] & SCTLR_UCT)) {
++                    return CP_ACCESS_TRAP;
++                }
++                if (hcr & HCR_TID2) {
++                    return CP_ACCESS_TRAP_EL2;
++                }
++            }
++        } else if (hcr & HCR_TID2) {
++            return CP_ACCESS_TRAP_EL2;
++        }
+     }
  
-     if (interrupt_request & CPU_INTERRUPT_FIQ) {
-         excp_idx = EXCP_FIQ;
-         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
-         if (arm_excp_unmasked(cs, excp_idx, target_el,
-                               cur_el, secure, hcr_el2)) {
--            cs->exception_index = excp_idx;
--            env->exception.target_el = target_el;
--            cc->do_interrupt(cs);
--            ret = true;
-+            goto found;
-         }
-     }
-     if (interrupt_request & CPU_INTERRUPT_HARD) {
-@@ -553,10 +551,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
-         if (arm_excp_unmasked(cs, excp_idx, target_el,
-                               cur_el, secure, hcr_el2)) {
--            cs->exception_index = excp_idx;
--            env->exception.target_el = target_el;
--            cc->do_interrupt(cs);
--            ret = true;
-+            goto found;
-         }
-     }
-     if (interrupt_request & CPU_INTERRUPT_VIRQ) {
-@@ -564,10 +559,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-         target_el = 1;
-         if (arm_excp_unmasked(cs, excp_idx, target_el,
-                               cur_el, secure, hcr_el2)) {
--            cs->exception_index = excp_idx;
--            env->exception.target_el = target_el;
--            cc->do_interrupt(cs);
--            ret = true;
-+            goto found;
-         }
-     }
-     if (interrupt_request & CPU_INTERRUPT_VFIQ) {
-@@ -575,14 +567,16 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-         target_el = 1;
-         if (arm_excp_unmasked(cs, excp_idx, target_el,
-                               cur_el, secure, hcr_el2)) {
--            cs->exception_index = excp_idx;
--            env->exception.target_el = target_el;
--            cc->do_interrupt(cs);
--            ret = true;
-+            goto found;
-         }
-     }
-+    return false;
- 
--    return ret;
-+ found:
-+    cs->exception_index = excp_idx;
-+    env->exception.target_el = target_el;
-+    cc->do_interrupt(cs);
-+    return true;
- }
- 
- #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+     if (arm_current_el(env) < 2 && arm_hcr_el2_eff(env) & HCR_TID2) {
 -- 
 2.20.1
 
