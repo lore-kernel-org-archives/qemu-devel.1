@@ -2,52 +2,51 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7DCC33CB7
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C77C35240
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:13:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3645220716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:13:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3645220716
+	by mail.kernel.org (Postfix) with ESMTPS id 1B1FB2071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:13:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B1FB2071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwmDT-0000wP-C3
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:13:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52225)
+	id 1iwmDU-0000yW-6s
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:13:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52192)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCI-0007cz-4u
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:11:55 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCG-0001Zg-OF
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmCH-0007cp-9t
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:11:54 -0500
-Received: from mga09.intel.com ([134.134.136.24]:58702)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmCG-0001Yk-7M
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:11:53 -0500
+Received: from mga09.intel.com ([134.134.136.24]:58712)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmCG-0001NW-FA
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmCF-0001Pn-UN
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:11:52 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Jan 2020 04:11:47 -0800
+ 29 Jan 2020 04:11:46 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314070960"
+X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314070885"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:47 -0800
+ by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:45 -0800
 From: "Liu, Yi L" <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, pbonzini@redhat.com,
  alex.williamson@redhat.com, peterx@redhat.com
-Subject: [RFC v3 09/25] vfio: check VFIO_TYPE1_NESTING_IOMMU support
-Date: Wed, 29 Jan 2020 04:16:40 -0800
-Message-Id: <1580300216-86172-10-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v3 06/25] scripts/update-linux-headers: Import iommu.h
+Date: Wed, 29 Jan 2020 04:16:37 -0800
+Message-Id: <1580300216-86172-7-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
 References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
@@ -67,67 +66,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kevin.tian@intel.com, yi.l.liu@intel.com, Yi Sun <yi.y.sun@linux.intel.com>,
  kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com,
+ Cornelia Huck <cohuck@redhat.com>, eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, hao.wu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Yi L <yi.l.liu@intel.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-VFIO needs to check VFIO_TYPE1_NESTING_IOMMU
-support with Kernel before further using it.
-e.g. requires to check IOMMU UAPI version.
+Update the script to import the new iommu.h uapi header.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/vfio/common.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ scripts/update-linux-headers.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 0cc7ff5..a5e70b1 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1157,12 +1157,21 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
- static int vfio_get_iommu_type(VFIOContainer *container,
-                                Error **errp)
- {
--    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
-+    int iommu_types[] = { VFIO_TYPE1_NESTING_IOMMU,
-+                          VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
-                           VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
--    int i;
-+    int i, version;
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index f76d773..dfdfdfd 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -141,7 +141,7 @@ done
  
-     for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
-         if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
-+            if (iommu_types[i] == VFIO_TYPE1_NESTING_IOMMU) {
-+                version = ioctl(container->fd,
-+                                VFIO_NESTING_GET_IOMMU_UAPI_VERSION);
-+                if (version < IOMMU_UAPI_VERSION) {
-+                    printf("IOMMU UAPI incompatible for nesting\n");
-+                    continue;
-+                }
-+            }
-             return iommu_types[i];
-         }
-     }
-@@ -1278,6 +1287,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     }
- 
-     switch (container->iommu_type) {
-+    case VFIO_TYPE1_NESTING_IOMMU:
-     case VFIO_TYPE1v2_IOMMU:
-     case VFIO_TYPE1_IOMMU:
-     {
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+-for header in kvm.h vfio.h vfio_ccw.h vhost.h \
++for header in kvm.h vfio.h vfio_ccw.h vhost.h iommu.h \
+               psci.h psp-sev.h userfaultfd.h mman.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
 -- 
 2.7.4
 
