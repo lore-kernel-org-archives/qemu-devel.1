@@ -2,75 +2,69 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B784C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 07:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4290CC35240
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 07:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6D0A2070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 07:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6D0A2070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1E03220720
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 07:10:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E03220720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwhMK-0003KI-Tr
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 02:01:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50426)
+	id 1iwhU8-0005SN-6N
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 02:10:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iwhLO-0002sk-80
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 02:00:59 -0500
+ (envelope-from <vr_qemu@t-online.de>) id 1iwhTb-00053l-Rn
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 02:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iwhLN-0005C1-5b
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 02:00:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44004)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iwhLM-00054K-Uc
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 02:00:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iwhLL-0007MP-9p
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 07:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 47B1F2E805B
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 07:00:55 +0000 (UTC)
+ (envelope-from <vr_qemu@t-online.de>) id 1iwhTa-0003YX-PT
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 02:09:27 -0500
+Received: from mailout01.t-online.de ([194.25.134.80]:38430)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vr_qemu@t-online.de>) id 1iwhTa-0003Y2-Jp
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 02:09:26 -0500
+Received: from fwd21.aul.t-online.de (fwd21.aul.t-online.de [172.20.27.66])
+ by mailout01.t-online.de (Postfix) with SMTP id 81DBC42719F7;
+ Wed, 29 Jan 2020 08:09:23 +0100 (CET)
+Received: from [192.168.211.200]
+ (GQZNNyZBQhXJwA3LQV9nDSTWG7wCPtiaTRAXA5q+Y0oxw+x5UT6Nm39MNLyMsyjZqA@[93.236.147.123])
+ by fwd21.t-online.de
+ with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
+ esmtp id 1iwhTU-4TcWMC0; Wed, 29 Jan 2020 08:09:20 +0100
+From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
+Subject: Re: [PATCH v2] Implement the Screamer sound chip for the mac99
+ machine type
+To: Howard Spoelstra <hsp.cat7@gmail.com>
+References: <43D423C6-78D4-4DCE-B97C-0658D3D2E3BD@gmail.com>
+ <4021690b-2380-3925-209e-d4cc66928773@gmail.com>
+ <5314e860-dffe-3bc0-209f-bd2b937cd0c6@t-online.de>
+ <CABLmASGcUVyASudNizcgPshEqahwYt-4m9Z1DXEhVe2vdko9cQ@mail.gmail.com>
+Message-ID: <54f5ddf3-5ea9-bd6d-8c71-edf4db527463@t-online.de>
+Date: Wed, 29 Jan 2020 08:09:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABLmASGcUVyASudNizcgPshEqahwYt-4m9Z1DXEhVe2vdko9cQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-ID: GQZNNyZBQhXJwA3LQV9nDSTWG7wCPtiaTRAXA5q+Y0oxw+x5UT6Nm39MNLyMsyjZqA
+X-TOI-MSGID: ada3df10-9e34-4789-89c8-9dfa6ce437e7
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Jan 2020 06:52:12 -0000
-From: Tobias Koch <1823790@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fritz-the-cat m-luescher pmaydell tobijk
-X-Launchpad-Bug-Reporter: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
-X-Launchpad-Bug-Modifier: Tobias Koch (tobijk)
-References: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158028073316.19366.664170740594000918.launchpad@gac.canonical.com>
-Subject: [Bug 1823790] Re: QEMU mishandling of SO_PEERSEC forces systemd into
- tight loop
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 148d699b6136c87cc3c3ae5fad404b1fa79e69ed
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 194.25.134.80
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,51 +73,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
+Cc: Programmingkid <programmingkidx@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
 
--- =
+>
+> Hi Volker,
+>
+> I can test for coreaudio. Can you let us know exactly what you fixed in=
+ the patch?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823790
+Hi Howard,
 
-Title:
-  QEMU mishandling of SO_PEERSEC forces systemd into tight loop
+I wrote a patch that tries to fix the problems in Zolt=C3=A1n's patch. Th=
+e changes in coreaudio.c are untested. I'll send it as a reply to this ma=
+il. Please apply Zoltan's patch and then my patch to qemu master.
 
-Status in QEMU:
-  Confirmed
+> While cross compiling for windows, I saw these errors (besides some cas=
+ting issues):
+> line 56: buffer2=C2=A0 (should be *buffer2?)
+> line 455: ret=C2=A0 (should be ret2?)
+>
+> audio/dsoundaudio.c:56:20: error: variable or field 'buffer2' declared =
+void
+> =C2=A0 =C2=A056 | =C2=A0 =C2=A0 void *buffer1, buffer2;
+> =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0^~~~~~~
+> audio/dsoundaudio.c: In function 'dsound_get_buffer_out':
 
-Bug description:
-  While building Debian images for embedded ARM target systems I
-  detected that QEMU seems to force newer systemd daemons into a tight
-  loop.
+I'm sorry, but I can't build and test on Windows.
 
-  My setup is the following:
-
-  Host machine: Ubuntu 18.04, amd64
-  LXD container: Debian Buster, arm64, systemd 241
-  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
-.1+dfsg-7)
-
-  To easily reproduce the issue I have created the following repository:
-  https://github.com/lueschem/edi-qemu
-
-  The call where systemd gets looping is the following:
-  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
-no=3D34 (Numerical result out of range)
-
-  Furthermore I also verified that the issue is not related to LXD.
-  The same behavior can be reproduced using systemd-nspawn.
-
-  This issue reported against systemd seems to be related:
-  https://github.com/systemd/systemd/issues/11557
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
+With best regards,
+Volker
 
