@@ -2,78 +2,82 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24763C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912E3C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E594720716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 15:59:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5534720716
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:06:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XlqQa1Yj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E594720716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xlsuo05/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5534720716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwpkq-00007z-5f
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 10:59:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56800)
+	id 1iwpr3-0002j2-FK
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:06:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59448)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iwpjS-0007R6-Us
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:58:24 -0500
+ (envelope-from <lersek@redhat.com>) id 1iwpqR-0002Jr-85
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:05:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iwpjR-0005XT-Ep
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:58:22 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46653)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iwpjR-0005Uw-7E
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 10:58:21 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a22so124079oid.13
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 07:58:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xREOXbAGrSczc9ttMRDemdVlY/CguXIIJAyyD1SVFlw=;
- b=XlqQa1Yjr0duEQyBW2haJk6+mOeD8eQofvemgcB+Qhw20fvWz6pSZuCfaZsk4lc5gM
- sLXXk/X1ZnhajFsyllCBOmbChvU5z2gn5wSLIDkGDZPj9aC0Py6nIQ6Xg23hoWspIxXZ
- CMFw+2kTFc3yxgD1dj8xK/WTRZEwbyC4FlraHBa57P+nSRMb6wm2kTZouf9JL57NWAds
- CUAdLYSNzSLo7NpK5jCCyyK5Mff+G/LY0QvvL1fuDfKbVVwlJh0j4rvCWi/lvs1xHr96
- aDUFgKPQ5U5u+eUuMDzOMT2eCpEMLKd22PGDkeGmlNKEGsoFKx6e4aDIa142i8GSXIOR
- 40dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xREOXbAGrSczc9ttMRDemdVlY/CguXIIJAyyD1SVFlw=;
- b=LXf6Y4WcA1H3i6hol4ihXXabO5IVNexELaWMqQ5Is7QGxzqg19Tre98NA+NGTLcZq8
- WqujIXBF+Tl0PJ+YKeCzOQSAJQkosVtq4gPPiuUq+PawEpPOr+k+BZNNyUWBZxxgFVw6
- L+hVRl9MfoDFebwyCO7XL2SyplgazyujaX51goHA5pBaD92fHQOW0OSGjk4jrS4dDOuF
- dK0wYrtPSp0epizH33UCa78NyHx2gClwljokaaVsBmau5RNz13fa47BShSRz7HkRaHUq
- kIdl4KL9K259mYPa6gG2tpuaz3vlYfZXuZjMJCAiA1A31W6R8zxnBHBZU8+ztUzh02Xl
- 3Eaw==
-X-Gm-Message-State: APjAAAUjTrJRLGzOCAVeOKDUKrYY5ZnCbyjlkYh8wlBcdyktaSkJY73p
- 0qkH8WWBF7jR3q5Mx59a/u4qBXpxdEz/fcCme0zZmw==
-X-Google-Smtp-Source: APXvYqxSjyTd1sHx3dlk1l6GRSfjlxkNfWlrrMceTItGFra1TSow2LVhKIOsGji21CA/xnORfFnq7aTz4lyh8dRubbs=
-X-Received: by 2002:aca:b2c5:: with SMTP id b188mr6887740oif.163.1580313499976; 
- Wed, 29 Jan 2020 07:58:19 -0800 (PST)
+ (envelope-from <lersek@redhat.com>) id 1iwpqO-0000uR-TR
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:05:33 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51957
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iwpqO-0000sw-PK
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:05:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580313931;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qOEJalbRfMF+AQ0jyI3isIBeHimF7sUNE7yAWsWhxH0=;
+ b=Xlsuo05/fzlrbYeU7zvlrJNr0YwA9j24pHQjsFR/3qPZdtQ462JAjzrR3LuG6tNDjsJ3pn
+ CCeW+bhQjVuXDX8w7jJm1FD9WHKxUzynWsYwN58fc/5QALkaCOs0N4yONMLdSSyQuBvWqm
+ OttH0Yy8vadP0bjqUFVv093Yuujctt8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-KQadFbzQNJ6o5BEZEQjNVA-1; Wed, 29 Jan 2020 11:05:27 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FDFA477
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 16:05:26 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-32.ams2.redhat.com
+ [10.36.116.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA7BC5C541;
+ Wed, 29 Jan 2020 16:05:19 +0000 (UTC)
+Subject: Re: [PATCH] acpi: cpuhp: document CPHP_GET_CPU_ID_CMD command
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <1580306781-228371-1-git-send-email-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2408eca1-2d2b-cf0d-d547-6d16f91a8c51@redhat.com>
+Date: Wed, 29 Jan 2020 17:05:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <20200128233224.515233-1-keithp@keithp.com>
-In-Reply-To: <20200128233224.515233-1-keithp@keithp.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 29 Jan 2020 15:58:08 +0000
-Message-ID: <CAFEAcA_dD3eAfKvOGOoXe3NWKg1PiW8=s2Xk41w19Tk67R-R4A@mail.gmail.com>
-Subject: Re: [PATCH] riscv: Add semihosting support [v4]
-To: Keith Packard <keithp@keithp.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <1580306781-228371-1-git-send-email-imammedo@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: KQadFbzQNJ6o5BEZEQjNVA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,100 +89,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: philmd@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jan 2020 at 23:34, Keith Packard via <qemu-devel@nongnu.org> wrote:
->
-> Adapt the arm semihosting support code for RISCV. This implementation
-> is based on the standard for RISC-V semihosting as documented in
->
->         https://riscv.org/specifications/
->
-> Signed-off-by: Keith Packard <keithp@keithp.com>
->
+On 01/29/20 15:06, Igor Mammedov wrote:
+> Commit 3a61c8db9d25 introduced CPHP_GET_CPU_ID_CMD command but
+> did not sufficiently describe it. Fix it by adding missing command
+> documentation.
+> 
+> Fixes: 3a61c8db9d25 ("acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command")
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 > ---
+>  docs/specs/acpi_cpu_hotplug.txt | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
+> index a8ce5e7..9bb22d1 100644
+> --- a/docs/specs/acpi_cpu_hotplug.txt
+> +++ b/docs/specs/acpi_cpu_hotplug.txt
+> @@ -94,6 +94,8 @@ write access:
+>                 register in QEMU
+>              2: following writes to 'Command data' register set OST status
+>                 register in QEMU
+> +            3: following reads from 'Command data' and 'Command data 2' return
+> +               architecture specific CPU ID value for currently selected CPU.
+>              other values: reserved
+>      [0x6-0x7] reserved
+>      [0x8] Command data: (DWORD access)
+> 
 
-> + *  ARM Semihosting is documented in:
-> + *     Semihosting for AArch32 and AArch64 Release 2.0
-> + *     https://static.docs.arm.com/100863/0200/semihosting.pdf
+Thanks!
 
-True but irrelevant. You need to refer to a proper
-risc-v specification for your semihosting.
-
-> +    case TARGET_SYS_EXIT:
-> +    case TARGET_SYS_EXIT_EXTENDED:
-> +        if (nr == TARGET_SYS_EXIT_EXTENDED || sizeof(target_ulong) == 0) {
-> +            /*
-> +             * The A64 version of SYS_EXIT takes a parameter block,
-> +             * so the application-exit type can return a subcode which
-> +             * is the exit status code from the application.
-> +             * SYS_EXIT_EXTENDED is an a new-in-v2.0 optional function
-> +             * which allows A32/T32 guests to also provide a status code.
-> +             */
-
-This code and comment describe Arm semihosting, where we
-made this bad decision about the API for 32-bit Arm, fixed
-it for 64-bit Arm and then put in an extension to add the more
-sensible API to 32-bit as a backwards-compatible new function.
-Nobody else should make this API choice from the start.
-What does RISC-V want to do here? This should be in
-your specification.
-
-> +            GET_ARG(0);
-> +            GET_ARG(1);
-> +
-> +            if (arg0 == ADP_Stopped_ApplicationExit) {
-> +                ret = arg1;
-> +            } else {
-> +                ret = 1;
-> +            }
-> +        } else {
-> +            /*
-> +             * The A32/T32 version of SYS_EXIT specifies only
-> +             * Stopped_ApplicationExit as normal exit, but does not
-> +             * allow the guest to specify the exit status code.
-> +             * Everything else is considered an error.
-> +             */
-> +            ret = (args == ADP_Stopped_ApplicationExit) ? 0 : 1;
-> +        }
-> +        gdb_exit(env, ret);
-> +        exit(ret);
-> +    case TARGET_SYS_SYNCCACHE:
-> +        /*
-> +         * Clean the D-cache and invalidate the I-cache for the specified
-> +         * virtual address range. This is a nop for us since we don't
-> +         * implement caches. This is only present on A64.
-> +         */
-> +        if (sizeof(target_ulong) == 8) {
-> +            return 0;
-> +        }
-> +        /* fall through -- invalid for A32/T32 */
-
-Again, this is an Arm-ism, where the old A32 ABI
-doesn't have this function but the new A64 one does. What
-does RISC-V want to specify here?
-
-> +    default:
-> +        fprintf(stderr, "qemu: Unsupported SemiHosting SWI 0x%02x\n", nr);
-> +        cpu_dump_state(cs, stderr, 0);
-> +        abort();
-
-This is repeating the Arm ABI mistake of allowing implementations
-to just crash and burn if they're handed a function call they don't
-recognize. Ideally it should be avoided in a new ABI.
-
-> +    }
-> +}
-
-thanks
--- PMM
 
