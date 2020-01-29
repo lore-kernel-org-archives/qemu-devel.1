@@ -2,82 +2,88 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912E3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1919C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:09:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5534720716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADC0A2070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:09:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xlsuo05/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5534720716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gj+sz8qd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC0A2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwpr3-0002j2-FK
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:06:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59448)
+	id 1iwpuC-0004Pa-Sv
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:09:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60251)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iwpqR-0002Jr-85
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:05:36 -0500
+ (envelope-from <dmitry.fleytman@gmail.com>) id 1iwptb-0003t0-77
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:08:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iwpqO-0000uR-TR
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:05:33 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51957
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iwpqO-0000sw-PK
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:05:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580313931;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qOEJalbRfMF+AQ0jyI3isIBeHimF7sUNE7yAWsWhxH0=;
- b=Xlsuo05/fzlrbYeU7zvlrJNr0YwA9j24pHQjsFR/3qPZdtQ462JAjzrR3LuG6tNDjsJ3pn
- CCeW+bhQjVuXDX8w7jJm1FD9WHKxUzynWsYwN58fc/5QALkaCOs0N4yONMLdSSyQuBvWqm
- OttH0Yy8vadP0bjqUFVv093Yuujctt8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-KQadFbzQNJ6o5BEZEQjNVA-1; Wed, 29 Jan 2020 11:05:27 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FDFA477
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 16:05:26 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-32.ams2.redhat.com
- [10.36.116.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA7BC5C541;
- Wed, 29 Jan 2020 16:05:19 +0000 (UTC)
-Subject: Re: [PATCH] acpi: cpuhp: document CPHP_GET_CPU_ID_CMD command
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1580306781-228371-1-git-send-email-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2408eca1-2d2b-cf0d-d547-6d16f91a8c51@redhat.com>
-Date: Wed, 29 Jan 2020 17:05:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <1580306781-228371-1-git-send-email-imammedo@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: KQadFbzQNJ6o5BEZEQjNVA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ (envelope-from <dmitry.fleytman@gmail.com>) id 1iwpta-0004Du-3B
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:08:51 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36328)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dmitry.fleytman@gmail.com>)
+ id 1iwptZ-0004DV-TP
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:08:50 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p17so378170wma.1
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 08:08:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=YaMZPWyvYYYyVLkWKGgdL3DN4EC0x930bl0+wSKDxNE=;
+ b=Gj+sz8qdRg9+m4SxWIb75Y1+mugF/xENl+1ZqwJmaYF1jjrTBUZObu3WQ1Tr6kr0eE
+ /2A6b3dfeAja5+VxSxlX1csL8tFXmCKFKAQuZ/bKdL1p/j4x+6OhdoFNjoEDgSl81PIm
+ s+xX0lnMRbX07+qN0bognN8dylJyVfHZO9gNvMlDRX1zx6zu/yhq5W6VjHdCvmYrjDJ8
+ SQhLNEJtNRjqaWIPp+Lt1C0BE88SGA5l/FPBNfHPmQHhAHME9wuafsYfLQ8rZNR9denY
+ KldruNm3sy/WBSJnhA/Oa/p5B6l8tdKVWNilb5OWgH9JaITZ34zn1g8QnZZslhNFjssE
+ W+nA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=YaMZPWyvYYYyVLkWKGgdL3DN4EC0x930bl0+wSKDxNE=;
+ b=VKOaf7FMD2PU3I03BwagTvHEhRPrzyPx5n5pTkNNxhbrf/iTSUsw58NKBHAl888tbW
+ 78tRaRzZQVbz48u1Kabz3n5IfIMoWlSg699JftNO86cyKdkBGJ/3RtRNFE4PtG1ExsAO
+ hisn99ORsQxQi1ZWHqTFwTujUtzs/4fxEq2TL9t/10ElP5w2XgehDwLTj29QEetEWsnp
+ EedB2W9eQLAlRc3KOVOIfC/njTM3pM6frEfV2OD6spHJhAMcsgjMMcbJ10bVMhbZQfHe
+ eH5n1l9f7YaTCfhEJ187uq+AfF3nkTmKaiKEKXiApO96NpUVKmx2dQmXd0RkFTpBu6An
+ RRXQ==
+X-Gm-Message-State: APjAAAWIU7GsCcVNdQaj0kqLCal6pjy37KQ29Fvb2arUgTTnEVHiLOc1
+ s5j0ygNki6s2a65ZM8ZoJ4U=
+X-Google-Smtp-Source: APXvYqx5UyQGEefvidIy5YhsTI+V2gvcSuqDmWYjvGzLd+5ohhLmPrHdoE3+tPwGsiH6QSGNefm3Tw==
+X-Received: by 2002:a7b:cc6a:: with SMTP id n10mr12306380wmj.170.1580314128537; 
+ Wed, 29 Jan 2020 08:08:48 -0800 (PST)
+Received: from [10.0.1.16] ([141.226.29.227])
+ by smtp.gmail.com with ESMTPSA id o4sm3416167wrx.25.2020.01.29.08.08.47
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 29 Jan 2020 08:08:47 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [PATCH] e1000e: Avoid hw_error if legacy mode used
+From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+In-Reply-To: <20200127160312.31367-1-yuri.benditovich@daynix.com>
+Date: Wed, 29 Jan 2020 18:08:46 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DA18299E-DAAB-4CAB-B702-FAF238DEF9CB@gmail.com>
+References: <20200127160312.31367-1-yuri.benditovich@daynix.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,38 +95,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, mst@redhat.com
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/29/20 15:06, Igor Mammedov wrote:
-> Commit 3a61c8db9d25 introduced CPHP_GET_CPU_ID_CMD command but
-> did not sufficiently describe it. Fix it by adding missing command
-> documentation.
-> 
-> Fixes: 3a61c8db9d25 ("acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command")
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> ---
->  docs/specs/acpi_cpu_hotplug.txt | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
-> index a8ce5e7..9bb22d1 100644
-> --- a/docs/specs/acpi_cpu_hotplug.txt
-> +++ b/docs/specs/acpi_cpu_hotplug.txt
-> @@ -94,6 +94,8 @@ write access:
->                 register in QEMU
->              2: following writes to 'Command data' register set OST status
->                 register in QEMU
-> +            3: following reads from 'Command data' and 'Command data 2' return
-> +               architecture specific CPU ID value for currently selected CPU.
->              other values: reserved
->      [0x6-0x7] reserved
->      [0x8] Command data: (DWORD access)
-> 
+> On 27 Jan 2020, at 18:03, Yuri Benditovich =
+<yuri.benditovich@daynix.com> wrote:
+>=20
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1787142
+> The emulation issues hw_error if PSRCTL register
+> is written, for example, with zero value.
+> Such configuration does not present any problem when
+> DTYP bits of RCTL register define legacy format of
+> transfer descriptors. Current commit discards check
+> for BSIZE0 and BSIZE1 when legacy mode used.
+>=20
+> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 
-Thanks!
+Acked-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+
+> ---
+> hw/net/e1000e_core.c | 13 ++++++++-----
+> 1 file changed, 8 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> index 5b05c8ea8a..94ea34dca5 100644
+> --- a/hw/net/e1000e_core.c
+> +++ b/hw/net/e1000e_core.c
+> @@ -2813,12 +2813,15 @@ e1000e_set_eitr(E1000ECore *core, int index, =
+uint32_t val)
+> static void
+> e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
+> {
+> -    if ((val & E1000_PSRCTL_BSIZE0_MASK) =3D=3D 0) {
+> -        hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
+> -    }
+> +    if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
+> +
+> +        if ((val & E1000_PSRCTL_BSIZE0_MASK) =3D=3D 0) {
+> +            hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
+> +        }
+>=20
+> -    if ((val & E1000_PSRCTL_BSIZE1_MASK) =3D=3D 0) {
+> -        hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
+> +        if ((val & E1000_PSRCTL_BSIZE1_MASK) =3D=3D 0) {
+> +            hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
+> +        }
+>     }
+>=20
+>     core->mac[PSRCTL] =3D val;
+> --=20
+> 2.17.1
+>=20
 
 
