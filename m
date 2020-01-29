@@ -2,116 +2,80 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 221DEC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BCEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:08:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8A37206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:02:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCB7F206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 18:08:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="MbzhVXBN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A37206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8epl+3d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCB7F206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwrfU-0000NH-3j
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 13:02:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42425)
+	id 1iwrlB-0002nw-Vr
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 13:08:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iwrej-0008Kr-6i
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:01:38 -0500
+ (envelope-from <fintelia@gmail.com>) id 1iwrkc-0002NX-Qt
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iwreh-0000EP-Tj
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:01:36 -0500
-Received: from mail-eopbgr60123.outbound.protection.outlook.com
- ([40.107.6.123]:37863 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iwreh-0000DB-1a; Wed, 29 Jan 2020 13:01:35 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AnhuMJ4NJPf9tJiami7XmlqOcomeUrlgGCLKAJIBJTidTu7dGEKj2vRcm0Iz00l+JaHt9dRvnsc4H4Qxk+Y9G2+z/6kfRQgpBUKwPnkzqVhHcI9Wwx0XP/BR4BXt1Id8GggvK0MULsL6fEiC7URLuZfQa8+YyTdF/Efby1ocKiqHfaaPckQNDmrWWnQPfUdvFK8aZZUYhFoCDaUr+tnqZfjiFuHqEly9Y2mlVSX4X01MM+A4eCfyFS+x//hzcLV1/Pvef1pCvb1nCM9P3e+cvy8ESGMF876sr7kwH5OOdUByJI1Wni96F1hjtXLzhVzfHM0XzZZY6MKwedesQur1Hw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TkM8Y79RwuVHuVPixJrx+pwdKeTFYSvrHvFAWonJJ2M=;
- b=Stdjx2MD9c+b0TSzsjRsHrf07OoDXF1bdYQInacFZzt9ASHbxi4fvUkqKm/s5lmRnTt2uPezmVwr3icVF8Win+x/IDwtFqs36Cqj4F6WpX4mDd711t68Li/ZIyY+J9Bu5Y0egUrodK+ZmInuNOLc12tfEw946x0w4o+YKz0mkm9ZQjEvy24Fcg0GdsK0n5NxEe83LwoiiQCv7qUDEg0tOlNsfVrCjTOC9xwgFk3tCFr+8vH2BYOvtei5PDnPLaA6D+shvvsVgBGLl8PTjxzE2XO+SWdL6qb2SYX4llfFqnGJB9FMdNhka8nOzHkfxuT5iw1LVJm84xat5uKnKGWyuw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TkM8Y79RwuVHuVPixJrx+pwdKeTFYSvrHvFAWonJJ2M=;
- b=MbzhVXBNeaqr9huZe/OFiDpQ9D1EJqQ6VygDiiby35nT44kRa42bKEe+ivdGoxXH95zy+ROBCWy2oUNgihZqMkiMDBngxDV3k0SSHrbuh0kA+jPvSVL1p5anW2P0fYQGgZPVcg1GAwnu1lCH/MfYrVIdKbIpnvOvYe44S6+InNw=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3528.eurprd08.prod.outlook.com (20.177.114.209) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.24; Wed, 29 Jan 2020 18:01:31 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2665.027; Wed, 29 Jan 2020
- 18:01:31 +0000
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0401CA0073.eurprd04.prod.outlook.com (2603:10a6:3:19::41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.21 via Frontend Transport; Wed, 29 Jan 2020 18:01:31 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu block <qemu-block@nongnu.org>
-Subject: request_alignment vs file size, how to fix crash?
-Thread-Topic: request_alignment vs file size, how to fix crash?
-Thread-Index: AQHV1s4i+bWYuR7nLUu+qtunrio2PA==
-Date: Wed, 29 Jan 2020 18:01:31 +0000
-Message-ID: <2ca46523-44a2-1a48-dfa3-11bda9eef8e8@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0401CA0073.eurprd04.prod.outlook.com
- (2603:10a6:3:19::41) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 006a07b9-4ef6-444e-5ba7-08d7a4e54551
-x-ms-traffictypediagnostic: AM6PR08MB3528:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB35289E3483603C0009C23F82C1050@AM6PR08MB3528.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 02973C87BC
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(39850400004)(366004)(396003)(136003)(346002)(199004)(189003)(6486002)(8676002)(66476007)(64756008)(66446008)(81166006)(81156014)(66946007)(66556008)(316002)(71200400001)(4326008)(6916009)(8936002)(186003)(107886003)(16576012)(26005)(16526019)(2906002)(36756003)(52116002)(5660300002)(31696002)(86362001)(54906003)(2616005)(31686004)(956004)(478600001)(4744005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3528;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: jsGApDaW1zGFYhKp1KOvz78ZAh8FePGSjOW7gaVvXOb8ZckeAz+DmC4836ErGZ4MyxKRJNXHcJlXo2ukxGNg2h5ww4LPvDDYbnsunfORElw9y+NgEboRcR+p5QxT+DJYQ6+SfF78wSZCff+nH6+UcgDK0wwnMzWbHt5j9GHvtXyqvflcVdE2/Z+bcMoxyj3188qtJwkusJjYxSk5xvLQP9eymxAJB429DLPrIs26mFs7LFtaduTur5h8AjuOIMYV0djjlA+80sIpsJY3Q4BzFagSG0z9EtNwSha7yzHFHQdKxCIty0LCvcJzyDZql+vOHTg9hSnXaOu5QJFV6u3OooIa5PB7JNQRo+BxahVtXkMBCMsNIAngMLAFm54m6YYFYx/VNL5vhdH6+BJpttGK6CjAlfF9rS//6sXexnPtmQb9nBmvxshbA0c48nlHdK67
-x-ms-exchange-antispam-messagedata: URyQLfsdu+nI66vSAyCBvYO2TZntM8Zzh0z4yGPiDFvf20HdeDuMEh/WaYfJXJzFzDPKkGCyvDVpjtcCJnWqxGvjcWDygoMvcGL9LkRYOkXUH5AyNerJS+nYgoGvb5yZBWGkGwf9v0ms4DWtBXcGDg==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2CC71CBA87E49841A147284A04793529@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <fintelia@gmail.com>) id 1iwrkb-0002iQ-J8
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 13:07:42 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38242)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <fintelia@gmail.com>)
+ id 1iwrkb-0002h2-B1; Wed, 29 Jan 2020 13:07:41 -0500
+Received: by mail-lj1-x243.google.com with SMTP id w1so355928ljh.5;
+ Wed, 29 Jan 2020 10:07:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=46JFxFrxdqcmsGAe6aUXjC3g01hxO0+G9hBRQ5spp+g=;
+ b=Q8epl+3dXxlSnro/s0h9/jB32S7xjCi9VNrYLBthrLXZyVoQ9akKTWuxtKUYF58PQI
+ LctVbAvnyc62V0ZiM4dHaK0uldzf2l++m67+z087lphLiLvS05gVOORd0iSf1KEw+nnd
+ h1C8LBcGAM/1KuC0pvyCYTuCJe0b48HkKLynicmFYMFyAylgsJPjKb69/nNOWQ8DavYQ
+ v3dOTOkTFMHqatsKFH0H1/T7sVnqHl5kvueZ/0PNimJVqasiy5EHqniNdERFMC6dDHVY
+ wUAZs/0OmD2CXikyweFPpTxN+JyInfLfVgxA3oVHuV65gVvNtXuKGl87pTypQlvK9uTl
+ jswQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=46JFxFrxdqcmsGAe6aUXjC3g01hxO0+G9hBRQ5spp+g=;
+ b=VkJukF7qti818YOnTyZH/Oxlp9Qs3t9Ladl2NXqi8Jiq1KadTnYuLDdDMh0bilKoR9
+ J1CXgwGjxe/k8Nxryba1AWMqnX01rXhvA1g4zTJoVinjdyNpn/wWeU1z09y3G7BH6H1y
+ DMqcE2ctjfxz5HPtfNiCBuT6UqWn9LJP2w0J2ytNig/4DxgLRy55KuivoFGGd/kJfR/V
+ JnSPgLxqUc/QmRodmVEaUg7PXDn0yBI/Sx+95uZv9pd0aeLh9u9Ij26UfqfYKv2sXpHN
+ ++G2LzizhmRHqqYeoZfqL7ATrz4Hb0kUML+Lrd+Po+pZvv9283eDv+4luefuMDRCWF3H
+ yA+w==
+X-Gm-Message-State: APjAAAVLMIs4HL3dq/WGJq9glgEtLp6Nt5hiPQS2nhRdlLtG69K54gBS
+ umeSWwKwng/DScvkRJp9dXhrnv8zeoBKiXrN29g=
+X-Google-Smtp-Source: APXvYqzNeIiLWwLNSAYsZOxzav1SbFf8BoK5IgIkGnhak4kmilG+s/vCzf1FOokberBsucJGc+J5sgOVUGkbAOnPZow=
+X-Received: by 2002:a2e:7009:: with SMTP id l9mr239244ljc.96.1580321259499;
+ Wed, 29 Jan 2020 10:07:39 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 006a07b9-4ef6-444e-5ba7-08d7a4e54551
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2020 18:01:31.4999 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wEcyywMIPA9KEDk1mZ0TGr0vW2stBKoqYQEGW/6dq3baUzCJenlH+3yD9WNsFwE6t+0loOLmk2j51IuVcmNUIdOuCTjsi2lHha4WqWrcxrM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3528
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.123
+References: <20200128233224.515233-1-keithp@keithp.com>
+ <CAFEAcA_dD3eAfKvOGOoXe3NWKg1PiW8=s2Xk41w19Tk67R-R4A@mail.gmail.com>
+ <877e1arz2w.fsf@keithp.org>
+In-Reply-To: <877e1arz2w.fsf@keithp.org>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Wed, 29 Jan 2020 13:06:11 -0500
+Message-ID: <CANnJOVHkNN2+dnd6UJF3MpU1uLTEoCk2tnJrNzowh3UX4u3mfw@mail.gmail.com>
+Subject: Re: [PATCH] riscv: Add semihosting support [v4]
+To: Keith Packard <keithp@keithp.com>
+Content-Type: multipart/alternative; boundary="0000000000004db680059d4b3770"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,27 +87,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkhDQoNCkkgZm91bmQgYSBjcmFzaCwgd2hpY2ggbWF5IGJlIHNpbXBseSB0cmlnZ2VyZWQgZm9y
-IGltYWdlcyB1bmFsaWduZWQgdG8gcmVxdWVzdF9hbGlnbm1lbnQ6DQoNCiMgLi9xZW11LWlvIC0t
-aW1hZ2Utb3B0cyAtYyAnd3JpdGUgMCA1MTInIGRyaXZlcj1ibGtkZWJ1ZyxhbGlnbj00MDk2LGlt
-YWdlLmRyaXZlcj1udWxsLWNvLGltYWdlLnNpemU9NTEyDQpxZW11LWlvOiBibG9jay9pby5jOjE1
-MDU6IGJkcnZfYWxpZ25lZF9wd3JpdGV2OiBBc3NlcnRpb24gYGVuZF9zZWN0b3IgPD0gYnMtPnRv
-dGFsX3NlY3RvcnMgfHwgY2hpbGQtPnBlcm0gJiBCTEtfUEVSTV9SRVNJWkUnIGZhaWxlZC4NCkFi
-b3J0ZWQgKGNvcmUgZHVtcGVkKQ0KDQpUaGUgcHJvYmxlbSBpcyBvYnZpb3VzOiA1MTIgaXMgYWxp
-Z25lZCB0byA0MDk2IGFuZCBiZWNvbWVzIGxhcmdlciB0aGFuIGZpbGUgc2l6ZS4NCg0KSSBmYWNl
-ZCBpdCBhZnRlciByZWJhc2luZyBvdXIgZG93bnN0cmVhbSBicmFuY2hlcyB0byBuZXdlciBSaGVs
-IHZlcnNpb25zLiBTZWVtcyB0aGF0IGFmdGVyIHNvbWUgdXBkYXRlcyBvZiBhbGlnbm1lbnQgZGV0
-ZWN0aW9uIGluIGZpbGUtcG9zaXguYywgaXQgc3RhcnRlZCB0byBkZXRlY3QgNDA5NiBhbGlnbm1l
-bnQgaW4gb3VyIGJ1aWxkIGVudmlyb25tZW50LCBhbmQgaW90ZXN0IDE1MiBzdGFydGVkIHRvIGNy
-YXNoIChhcyBpdCBvcGVyYXRlcyBvbiBmaWxlIG9mIDUxMiBieXRlcykuDQoNCk15IHF1ZXN0aW9u
-IGlzOg0KDQpXaGF0IGlzIHdyb25nPyBTaG91bGQgd2UgcmVzdHJpY3QgaW1hZ2VzIHRvIGJlIGFs
-aWduZWQgdG8gcmVxdWVzdF9hbGlnbm1lbnQsIG9yIGFsbG93IHVuYWxpZ25lZCBvcGVyYXRpb25z
-IGF0IEVPRiwgaWYgZmlsZSBpcyB1bmFsaWduZWQgaXRzZWxmPw0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+--0000000000004db680059d4b3770
+Content-Type: text/plain; charset="UTF-8"
+
+The text you are referencing (the couple italic paragraphs below section
+2.8 in the unprivileged ISA) is non-normative and "can be skipped if the
+reader is only interested in the specification itself". This convention of
+making indented italic text non-normative is described at the bottom of
+page 1 of the linked document.
+
+Jonathan
+
+On Wed, Jan 29, 2020 at 11:45 AM Keith Packard via <qemu-riscv@nongnu.org>
+wrote:
+
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+> > True but irrelevant. You need to refer to a proper
+> > risc-v specification for your semihosting.
+>
+> The RISC-V Foundation defined semihosting as relative to the existing
+> ARM specification, so using a link to that is appropriate here.
+>
+> Here's the current specification of the unprivileged ISA, which includes
+> the definition of semihosting
+>
+>         https://riscv.org/specifications/
+>
+> While it may be nice in some abstract sense to create a "better"
+> semihosting spec, that's not what the RISC-V foundation has decided to
+> do.
+>
+> --
+> -keith
+>
+
+--0000000000004db680059d4b3770
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>The text you are referencing (the couple italic parag=
+raphs below section 2.8 in the unprivileged ISA) is non-normative and &quot=
+;can be skipped if the reader is only interested in the specification itsel=
+f&quot;. This convention of making indented italic text non-normative is de=
+scribed at the bottom of page 1 of the linked document.<br></div><div><br><=
+/div><div>Jonathan<br></div></div><br><div class=3D"gmail_quote"><div dir=
+=3D"ltr" class=3D"gmail_attr">On Wed, Jan 29, 2020 at 11:45 AM Keith Packar=
+d via &lt;<a href=3D"mailto:qemu-riscv@nongnu.org">qemu-riscv@nongnu.org</a=
+>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Pet=
+er Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank=
+">peter.maydell@linaro.org</a>&gt; writes:<br>
+<br>
+&gt; True but irrelevant. You need to refer to a proper<br>
+&gt; risc-v specification for your semihosting.<br>
+<br>
+The RISC-V Foundation defined semihosting as relative to the existing<br>
+ARM specification, so using a link to that is appropriate here.<br>
+<br>
+Here&#39;s the current specification of the unprivileged ISA, which include=
+s<br>
+the definition of semihosting<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://riscv.org/specifications/" r=
+el=3D"noreferrer" target=3D"_blank">https://riscv.org/specifications/</a><b=
+r>
+<br>
+While it may be nice in some abstract sense to create a &quot;better&quot;<=
+br>
+semihosting spec, that&#39;s not what the RISC-V foundation has decided to<=
+br>
+do.<br>
+<br>
+-- <br>
+-keith<br>
+</blockquote></div>
+
+--0000000000004db680059d4b3770--
 
