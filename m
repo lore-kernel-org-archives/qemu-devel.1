@@ -2,76 +2,85 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2FFC33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E84BC33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:38:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4201E20708
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:36:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4201E20708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D7DDC20708
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:38:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUD1eVoy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7DDC20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwki9-00029z-F4
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 05:36:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47257)
+	id 1iwkkF-0003C6-2r
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 05:38:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iwkhU-0001b7-6L
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:36:01 -0500
+ (envelope-from <armbru@redhat.com>) id 1iwkjd-0002gc-SY
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:38:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iwkhT-0004rH-1K
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:36:00 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2066 helo=huawei.com)
+ (envelope-from <armbru@redhat.com>) id 1iwkjc-0006HQ-Pc
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:38:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32674
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iwkhP-0004Y7-Vt; Wed, 29 Jan 2020 05:35:56 -0500
-Received: from LHREML714-CAH.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id 8A3F61A824328CE5C8EF;
- Wed, 29 Jan 2020 10:35:49 +0000 (GMT)
-Received: from lhreml702-chm.china.huawei.com (10.201.108.51) by
- LHREML714-CAH.china.huawei.com (10.201.108.37) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Wed, 29 Jan 2020 10:35:48 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml702-chm.china.huawei.com (10.201.108.51) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 29 Jan 2020 10:35:48 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Wed, 29 Jan 2020 10:35:48 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "imammedo@redhat.com" <imammedo@redhat.com>
-Subject: RE: [PATCH v2 7/7] tests/bios-tables-test: Update arm/virt memhp test
-Thread-Topic: [PATCH v2 7/7] tests/bios-tables-test: Update arm/virt memhp test
-Thread-Index: AQHVzV5G+cQh10jGFkuymacLK0srHqgAVXcAgAEtZFA=
-Date: Wed, 29 Jan 2020 10:35:48 +0000
-Message-ID: <77db9c11b6f248208ce50bb6a267bf16@huawei.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <20200117174522.22044-8-shameerali.kolothum.thodi@huawei.com>
- <6cdba6ae-928d-696b-19b2-f4f81f341f3a@redhat.com>
-In-Reply-To: <6cdba6ae-928d-696b-19b2-f4f81f341f3a@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iwkjc-0006HG-M8
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:38:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580294292;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1mtaauwAc0HhOVmkKft0gVgYWNQqGiC5BAH6rk7KsD4=;
+ b=PUD1eVoyQrgd0ofGktbU2p5EH5cVeeUyYytfjGzroF8ZS2qYR0oe26Gf7+Ejg9bZB36t1I
+ UnqcnQH3EEoa4+2Axtg1lQwSh5+thAZhy4qhddg+6FtIyj5s42U4X6uDHuxsfGEJkPaa32
+ LYMzeBeXQ1A7n+bXaGpuCHGXKsNSqBs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-V4vfM1YxP-exZKNIPF58wg-1; Wed, 29 Jan 2020 05:38:09 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D774B107ACC7;
+ Wed, 29 Jan 2020 10:38:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2157838A;
+ Wed, 29 Jan 2020 10:38:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7D2001138404; Wed, 29 Jan 2020 11:38:04 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v3 12/13] add 'error' prefix to vreport
+References: <20200127103647.17761-1-mlevitsk@redhat.com>
+ <20200127103647.17761-13-mlevitsk@redhat.com>
+ <cc410f54aeb01a517b74283a497e7ce861c92dab.camel@redhat.com>
+Date: Wed, 29 Jan 2020 11:38:04 +0100
+In-Reply-To: <cc410f54aeb01a517b74283a497e7ce861c92dab.camel@redhat.com>
+ (Maxim Levitsky's message of "Tue, 28 Jan 2020 21:30:52 +0200")
+Message-ID: <87o8um5z03.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: V4vfM1YxP-exZKNIPF58wg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,101 +92,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "xuwei
- \(O\)" <xuwei5@huawei.com>, "lersek@redhat.com" <lersek@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-> -----Original Message-----
-> From: Qemu-devel
-> [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=3Dhuawei.com@nongn
-> u.org] On Behalf Of Auger Eric
-> Sent: 28 January 2020 16:29
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> qemu-devel@nongnu.org; qemu-arm@nongnu.org; imammedo@redhat.com
-> Cc: peter.maydell@linaro.org; xiaoguangrong.eric@gmail.com;
-> mst@redhat.com; Linuxarm <linuxarm@huawei.com>; xuwei (O)
-> <xuwei5@huawei.com>; shannon.zhaosl@gmail.com; lersek@redhat.com
-> Subject: Re: [PATCH v2 7/7] tests/bios-tables-test: Update arm/virt memhp
-> test
->=20
-> Hi Shameer,
->=20
-> On 1/17/20 6:45 PM, Shameer Kolothum wrote:
-> > Since we now have both pc-dimm and nvdimm support, update
-> > test_acpi_virt_tcg_memhp() to include those.
-> >
-> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  tests/data/acpi/virt/NFIT.memhp | 0
-> >  tests/data/acpi/virt/SSDT.memhp | 0
-> Is it normal to have those 2 above void files? I lost track about the
-> process.
+> On Mon, 2020-01-27 at 12:36 +0200, Maxim Levitsky wrote:
+>> This changes most of qemu's error messages,
+>> but it feels like the right thing to do.
+>>=20
+>> This is WIP patch, since I updated most of iotests but not all of them,
+>> and will be updated if this patch is accepeted in the review.
+>> Also few error message already have 'error' prefix, which should be remo=
+ved.
+>>=20
+>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+>
+> Since Peter Krempa pointed out that libvirt doesn't need the error prefix=
+es any more
+> (this wasn't the case when I developed this sadly) I guess I'll drop that=
+ patch,
+> although to me it looks just better to have errors cleanly prefixed to be=
+ honest.
 
-I guess so :). From tests/qtest/bios-tables-test.c,
+The "libvirt needs this" justification is gone.  But perhaps we want it
+anyway.  It's hardly an "HMP monitor handlers cleanups", though.
+Suggest to split it off this series, so it can't hold it back.  Posting
+it separately should also give it a better chance to be noticed.
 
-/*
- * How to add or update the tests:
- * Contributor:
- * 1. add empty files for new tables, if any, under tests/data/acpi
- * 2. list any changed files in tests/bios-tables-test-allowed-diff.h
- * 3. commit the above *before* making changes that affect the tables
- ...
-
-After reading that again, I am not sure those empty files can be in this
-Patch or not. I can move it to 6/7.
-
-> >  tests/qtest/bios-tables-test.c  | 9 +++++++--
-> >  3 files changed, 7 insertions(+), 2 deletions(-)
-> >  create mode 100644 tests/data/acpi/virt/NFIT.memhp
-> >  create mode 100644 tests/data/acpi/virt/SSDT.memhp
-> >
-> > diff --git a/tests/data/acpi/virt/NFIT.memhp
-> b/tests/data/acpi/virt/NFIT.memhp
-> > new file mode 100644
-> > index 0000000000..e69de29bb2
-> > diff --git a/tests/data/acpi/virt/SSDT.memhp
-> b/tests/data/acpi/virt/SSDT.memhp
-> > new file mode 100644
-> > index 0000000000..e69de29bb2
-> > diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-t=
-est.c
-> > index f1ac2d7e96..695d2e7fac 100644
-> > --- a/tests/qtest/bios-tables-test.c
-> > +++ b/tests/qtest/bios-tables-test.c
-> > @@ -913,12 +913,17 @@ static void test_acpi_virt_tcg_memhp(void)
-> >      };
-> >
-> >      data.variant =3D ".memhp";
-> > -    test_acpi_one(" -cpu cortex-a57"
-> > +    test_acpi_one(" -machine nvdimm=3Don"
-> nit: maybe keep the same order as before ...
-> > +                  " -cpu cortex-a57"
-> >                    " -m 256M,slots=3D3,maxmem=3D1G"
-> and simply add ,nvdimm=3Don to above line.
-> >                    " -object memory-backend-ram,id=3Dram0,size=3D128M"
-> >                    " -object memory-backend-ram,id=3Dram1,size=3D128M"
-> >                    " -numa node,memdev=3Dram0 -numa
-> node,memdev=3Dram1"
-> > -                  " -numa dist,src=3D0,dst=3D1,val=3D21",
-> > +                  " -numa dist,src=3D0,dst=3D1,val=3D21"
-> > +                  " -object memory-backend-ram,id=3Dram2,size=3D128M"
-> > +                  " -object memory-backend-ram,id=3Dnvm0,size=3D128M"
-> > +                  " -device pc-dimm,id=3Ddimm0,memdev=3Dram2,node=3D0"
-> > +                  " -device nvdimm,id=3Ddimm1,memdev=3Dnvm0,node=3D1",
-> >                    &data);
-> >
-> >      free_test_data(&data);
-> >
-
-Ok. Noted.
-
-Thanks,
-Shameer
 
