@@ -2,102 +2,83 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E357C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD1CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBAC0206D5
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D901D206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:52:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CGbu2YHw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBAC0206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zjfKNlhj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D901D206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwwjy-0000Wv-5S
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 18:27:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35415)
+	id 1iwx7w-0007FY-Vs
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 18:52:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iwwix-000898-Ra
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:26:21 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iwx6b-0005yb-Oh
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iwwiw-00043S-HD
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:26:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29682
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwwiw-00042x-EG
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:26:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580340377;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JKsIym+21Q6XwBYINKkF4dvPTUCiZoZDpJo6RCpkqS4=;
- b=CGbu2YHwdJHOH2sH6rTk3Q0IWQCgZz0UqpTsRjNvzGwc7puwVR47d+DdtH5uLPNeQHDYXd
- v10fM9JXqGtEs0S3HxhNCyPElWPG9Td/zamflIC9BYdO6iRxyMPTUehBmmuzsWkwmHgFHk
- IPplyEeZ0vJvFMpEvJCWAnszsqeS0MI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-Svw0WaNlO0ioIzz9stgLNA-1; Wed, 29 Jan 2020 18:26:14 -0500
-Received: by mail-wr1-f69.google.com with SMTP id v17so764699wrm.17
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:26:14 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1iwx6a-0001og-J8
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:45 -0500
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:37566)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iwx6a-0001na-Cn
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:44 -0500
+Received: by mail-pf1-x42c.google.com with SMTP id p14so492764pfn.4
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:50:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Porl5wHKMsrkKEwhwV0RaIA5+WTtb1IXZ5cuVd/BzoI=;
+ b=zjfKNlhjDpxW/tAWQ9ttPcufDKoPfGdWlCxHC1447Dh8wnwIq0W7pjWEEaoqXd1QgC
+ 9wYf8h7An01hGP1hlPMAxUm00ND5hJNOw9YbkRWMo9+mAmGGcMs1al2mo94eEagV2KiF
+ i+IKr8HMDpHQlKkd7C1GVifuM8pG6glrhx3MwHcCkcWLZIXz+w7juex5awAqhjrc6EQc
+ bFcLXe33lsseo8oW5H2Rya6GrCdFPG7d7RG0W25Todd0BNYeab/6l1E+exwkrprBSmm7
+ QjLv5hOPSCzJ5XTaXbsRsI4yLQPGsZ9mI05p3GSgNv+/0btGcnbJBvxrzcOSglp5HQBO
+ mLWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=PbrkYSnwiU3DoSTlouGRF5c1IXa/nXTFES9duMFGTrY=;
- b=lEhHcYx6Rq4eGKFcMPd8ueStx5UqJzr3SkqEr79NM8cw8+eo6vsHLwVpt30ipRUkY6
- Oa+/+smEZy/jOQfTUZ1c8Kjkkierx91eAOT/IJDwMJ9/aSG0jcQflzi1m8clYcYjnw6a
- kofwl+Iu1FhEJfoNPEWtY+39Tb9xcGM5UbU6BAe7FtIwURnqyc06pbuJ1UKSUFnWSIM+
- KguxHtiWivrOIPfOjOlEeKIJ9MCjBqe41VwVXaPJ8K2NA/aXG0nLUrIS/Z6HDQA6MzZq
- a8nfqEHyRLX9lWyalTazrVz3K+rsX/WG+HObdaOfgqA5M+RL0hAL77SH3kCP573tOd77
- fJzQ==
-X-Gm-Message-State: APjAAAW/qDs+FmrSRCSAdBF1bGbirhZ8zYNi/HAdjD0yxSosQjsc5ofc
- bVQZbIEggl8g5M5EPjwbHuejzoJUgLprFaQMvYESJYX+//sIyvKqXlgcx/9nxBgLjMm0aTcXUJK
- 9gtSGwNViLZoHTcE=
-X-Received: by 2002:a1c:1fd0:: with SMTP id f199mr1495626wmf.113.1580340373651; 
- Wed, 29 Jan 2020 15:26:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx1n3IrgMfgqQ1+WQSEwVMHqN3A2wGQOOdLb1aNBc1ubEoCeFvHflpJZ5uUYXoQA2MJVuazzw==
-X-Received: by 2002:a1c:1fd0:: with SMTP id f199mr1495613wmf.113.1580340373428; 
- Wed, 29 Jan 2020 15:26:13 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id 5sm5107649wrh.5.2020.01.29.15.26.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Jan 2020 15:26:12 -0800 (PST)
-Subject: Re: [PATCH] qemu-deprecated: Remove text about Python 2
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20200109095116.18201-1-thuth@redhat.com>
- <CAL1e-=jnAMtpNNHO1rqG-63K_5uM-QfVYoMcj0NZeHwKCWG4uQ@mail.gmail.com>
- <af4485d4-1706-c464-2320-dff3b5f29fd7@redhat.com>
- <CAL1e-=iT9Ve7nVFHeMpcfNzwxtLK8Q5C2hbLRSv4PreLfR+3pQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <957baaa5-f160-09de-c101-8873b73aea7b@redhat.com>
-Date: Thu, 30 Jan 2020 00:26:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=Porl5wHKMsrkKEwhwV0RaIA5+WTtb1IXZ5cuVd/BzoI=;
+ b=RwbfPqJ4e1DxJt9RyGeexmcOYgbxeBJKdFTR5pJ7kbM06VzyrhRyOdgI0uGMW3U9xg
+ g/5F4reE7ct8spFjWKREMJvXbYtoHSIRMMdkcvrltD3ZHy6bfcy8AWTa1EiaJ2iCmhRx
+ P1PeXltzNdsDYc3UhRVh6RAToUVyrUCP4YZol4lUX6+pl9p8vc8ANohHR/wHyWVRqDpv
+ cl76XrOqkD0izBHYqBdvCFsZJEXz6ir54bEf+0PNUhhXOuNR/PCSzij8OOtW+7q5PPSt
+ ZitxoYYkgEthbu6quSWeu3b3ecKS3MH6kpeH0kR+JoktcCXN3ER0oTyuSnqlTHghHjEZ
+ en6A==
+X-Gm-Message-State: APjAAAV018wXMLIIe+dEW9lZ8FklGTr2s5ok0dLNtKpEG4g8bFh+YzPK
+ 5L9vqZNaAtm/NlOrszKZG9CPb2/UcE0=
+X-Google-Smtp-Source: APXvYqxgw1O4JZSMgsITxEDg3W/KfWeetovn9ask4NvIsoDHg8DEkdQQYfUWMUWqi4tdBpxM0D644Q==
+X-Received: by 2002:a63:7843:: with SMTP id t64mr1698391pgc.144.1580341842946; 
+ Wed, 29 Jan 2020 15:50:42 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id 13sm3740195pfi.78.2020.01.29.15.50.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jan 2020 15:50:42 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] target/ppc: Use probe_access
+Date: Wed, 29 Jan 2020 15:50:36 -0800
+Message-Id: <20200129235040.24022-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=iT9Ve7nVFHeMpcfNzwxtLK8Q5C2hbLRSv4PreLfR+3pQ@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: Svw0WaNlO0ioIzz9stgLNA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,109 +90,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Thomas Huth <thuth@redhat.com>,
- John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: hsp.cat7@gmail.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/30/20 12:18 AM, Aleksandar Markovic wrote:
-> 23:14 Sre, 29.01.2020. Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=20
-> <mailto:philmd@redhat.com>> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
-=D0=B0=D0=BE/=D0=BB=D0=B0:
->  >
->  > Hi Aleksandar,
->  >
->  > On 1/9/20 1:49 PM, Aleksandar Markovic wrote:
->  > >
->  > >
->  > > On Thursday, January 9, 2020, Thomas Huth <thuth@redhat.com=20
-> <mailto:thuth@redhat.com>
->  > > <mailto:thuth@redhat.com <mailto:thuth@redhat.com>>> wrote:
->  > >
->  > >=C2=A0 =C2=A0 =C2=A0Python 2 support has been removed, so we should n=
-ow also remove
->  > >=C2=A0 =C2=A0 =C2=A0the announcement text for the deprecation.
->  > >
->  > >=C2=A0 =C2=A0 =C2=A0Signed-off-by: Thomas Huth <thuth@redhat.com=20
-> <mailto:thuth@redhat.com> <mailto:thuth@redhat.com=20
-> <mailto:thuth@redhat.com>>>
->  > >=C2=A0 =C2=A0 =C2=A0---
->  > >=C2=A0 =C2=A0 =C2=A0 =C2=A0qemu-deprecated.texi | 8 --------
->  > >=C2=A0 =C2=A0 =C2=A0 =C2=A01 file changed, 8 deletions(-)
->  > >
->  > >
->  > > Reviewed by: Aleksandar Markovic <amarkovic@wavecomp.com=20
-> <mailto:amarkovic@wavecomp.com>
->  > > <mailto:amarkovic@wavecomp.com <mailto:amarkovic@wavecomp.com>>>
->  >
->  > I use pwclient to collect patchwork patches, this one is:
->  > https://patchwork.kernel.org/patch/11325373/
->  > Your comment is listed, but your tag is ignored... I am not sure why.
->  >
->  > John used:
->  > Content-Transfer-Encoding: 7bit
->  >
->  > You:
->  > Content-Transfer-Encoding: quoted-printable
->  >
->  > This might be why? I have no clue.
->  >
->=20
-> It could be. I use a variety of mail clients. Not all provide the same=20
-> level of control of sent mails format. Almost sure they have different=20
-> settings. I may do some experimentation on a suitable patch series.=20
-> Thanks for noticing it.
->=20
-> OR: I wrote "Reviewed by:" without hyphen.
+The first two address the performance regression noticed
+by Howard Spoelstra.  The last two are just something I
+noticed at the same time.
 
-Oh you are right, I didn't notice.
 
->=20
-> Reviewed-by: Aleksandar Markovic=C2=A0 <amarkovic@wavecomp.com=20
-> <mailto:amarkovic@wavecomp.com>>
->=20
-> Is now patchwork picking it up?
+r~
 
-Yes (1 extra space after your name).
 
-Thanks.
+Richard Henderson (4):
+  target/ppc: Use probe_access for LSW, STSW
+  target/ppc: Use probe_access for LMW, STMW
+  target/ppc: Remove redundant mask in DCBZ
+  target/ppc: Use probe_write for DCBZ
 
->=20
->  > >
->  > >=C2=A0 =C2=A0 =C2=A0diff --git a/qemu-deprecated.texi b/qemu-deprecat=
-ed.texi
->  > >=C2=A0 =C2=A0 =C2=A0index 7033e531de..8b23e98474 100644
->  > >=C2=A0 =C2=A0 =C2=A0--- a/qemu-deprecated.texi
->  > >=C2=A0 =C2=A0 =C2=A0+++ b/qemu-deprecated.texi
->  > >=C2=A0 =C2=A0 =C2=A0@@ -341,14 +341,6 @@ they have no effect when use=
-d with @option{-n}
->  > >=C2=A0 =C2=A0 =C2=A0to skip image creation.
->  > >=C2=A0 =C2=A0 =C2=A0 =C2=A0Silently ignored options can be confusing,=
- so this combination of
->  > >=C2=A0 =C2=A0 =C2=A0 =C2=A0options will be made an error in future ve=
-rsions.
->  > >
->  > >=C2=A0 =C2=A0 =C2=A0-@section Build system
->  > >=C2=A0 =C2=A0 =C2=A0-
->  > >=C2=A0 =C2=A0 =C2=A0-@subsection Python 2 support (since 4.1.0)
->  > >=C2=A0 =C2=A0 =C2=A0-
->  > >=C2=A0 =C2=A0 =C2=A0-In the future, QEMU will require Python 3 to be =
-available at
->  > >=C2=A0 =C2=A0 =C2=A0-build time.=C2=A0 Support for Python 2 in script=
-s shipped with QEMU
->  > >=C2=A0 =C2=A0 =C2=A0-is deprecated.
->  > >=C2=A0 =C2=A0 =C2=A0-
->  > >=C2=A0 =C2=A0 =C2=A0 =C2=A0@section Backwards compatibility
->  > >
->  > >=C2=A0 =C2=A0 =C2=A0 =C2=A0@subsection Runnability guarantee of CPU m=
-odels (since 4.1.0)
->  > >=C2=A0 =C2=A0 =C2=A0--
->  > >=C2=A0 =C2=A0 =C2=A02.18.1
->  > >
->  > >
->  >
->=20
+ target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 162 insertions(+), 35 deletions(-)
+
+-- 
+2.20.1
 
 
