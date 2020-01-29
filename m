@@ -2,84 +2,103 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE5BC33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59497C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:43:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4571C2070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25BE32070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:43:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Snx9KIME"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4571C2070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aI66YyeL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25BE32070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwmc9-0005bh-GG
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:38:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35167)
+	id 1iwmgS-0007s3-Ap
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:43:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36636)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iwmbP-0005AJ-Jv
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:37:52 -0500
+ (envelope-from <dinechin@redhat.com>) id 1iwmfs-0007TV-EK
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:42:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iwmbO-0005Dv-54
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:37:51 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25109
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dinechin@redhat.com>) id 1iwmfr-0001Pt-2p
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:42:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29222
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iwmbN-0005Cy-WE
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:37:50 -0500
+ (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1iwmfq-0001PF-UI
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:42:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580301469;
+ s=mimecast20190719; t=1580301746;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=aXnz4UVHxcA3voNYldnUeckvXG9YGaNC5L0JGyd6Qug=;
- b=Snx9KIME0rpWXJwPUZGPRJ/v8fP+9y/dnfuDtGAYqJn4hBPF++M9Q7v2pX9hufAVca3Tb5
- Qf7CUv8ob+/15OBZMcRLuNFfJtRWChaZELrkkl0nZYjUNkBm2bA7pcTPKVTELhi4C20DG1
- dNwAReJvTUBDwkGlDq4NVuWrPB+QcBg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-twg4ZeKCMfK5TOSR-dq1rA-1; Wed, 29 Jan 2020 07:37:44 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63DA4800D48;
- Wed, 29 Jan 2020 12:37:43 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-210.ams2.redhat.com [10.36.116.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 447988ECE2;
- Wed, 29 Jan 2020 12:37:39 +0000 (UTC)
-Subject: Re: [PATCH] net: Remove deprecated [hub_id name] tuple of
- 'hostfwd_add' / 'hostfwd_remove'
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
-References: <20191205104109.18680-1-thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <bbddf264-bc62-0832-f268-c189e143d040@redhat.com>
-Date: Wed, 29 Jan 2020 13:37:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191205104109.18680-1-thuth@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: twg4ZeKCMfK5TOSR-dq1rA-1
+ in-reply-to:in-reply-to:references:references;
+ bh=aY1sWr4irpfzVsn1QLhKIPpO5PJ/ND1arLb9MahDEwk=;
+ b=aI66YyeL6TGoE+SUrTVhiFPnQBMNqUORtfHsLgXmOIbDdjwcScaeTSW+RgSN8MxZzYwXMf
+ All8EZaBjSBKAP3YtjKxjJfbl8Q1xSCEO5EXF9sOrAUj65+upKD09GhfvNeXdDmlrZgkPi
+ dIwyuyS0pzvnnqLq6HPdxYEzRuvLRAc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-eBK_D0P5Og2azg1KN-pjrw-1; Wed, 29 Jan 2020 07:42:21 -0500
+Received: by mail-wr1-f69.google.com with SMTP id c6so9906482wrm.18
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 04:42:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=yJBYgakaPu3h3vluFvcgbuWgcqDmE1VEiR1wFSkRqxc=;
+ b=BhWgNI8MzcDVWivxWffjUHwoD5PAKKa1xNlM4F3iv18XA5JyxkVLlpxGdauWnvh1TC
+ Dq7Ka3OqqJDlhBfd3ni6iWOTFRQ6SnZlGU4vFR0q7QKvsjJe3pXndo1AsoKRfVsFHaLZ
+ rMvjQUkjAco2crOv3eBbSfE1mJKYOxva2xaOZePOAp3JNt/UX/dYCdb2L0rl5o3aM1Ry
+ CI8RJsKKAfYAGTcIwV3pCltKdPtwXGFUuP+/dIac1Wh7nBi55fRJqf+OkKx5NxpZpCpd
+ iacOhnI5tZGt4oBFD/yV6bKqdrmc8LMzIXdEldIkC7tPAEgrzZ3wOxh84Cslq3i1RrW1
+ PMQg==
+X-Gm-Message-State: APjAAAWo1SJX/CIAQkxx4vXWzTRqVdWVrNbGPesZYYQzJbCxOfwJocAN
+ 8sYnRZS9j8MFXhGmg9dYyIhIM15Akbx3IoxWOvR6WCP7UrSXIVkvRYn93/un9N3eYS+Uxt2NMbD
+ xFGii+wFELP1FPew=
+X-Received: by 2002:adf:806c:: with SMTP id 99mr939942wrk.328.1580301740493;
+ Wed, 29 Jan 2020 04:42:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxlkemR0hATfq9l8Pw6FkvD5f7xoECb8LMP91WxmgAf+c24zDZjNcIzgK+EeF/37Jh1jFVyNA==
+X-Received: by 2002:adf:806c:: with SMTP id 99mr939915wrk.328.1580301740127;
+ Wed, 29 Jan 2020 04:42:20 -0800 (PST)
+Received: from [10.43.2.11] (nat-pool-brq-t.redhat.com. [213.175.37.10])
+ by smtp.gmail.com with ESMTPSA id q130sm2180555wme.19.2020.01.29.04.42.19
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 29 Jan 2020 04:42:19 -0800 (PST)
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: Integrating QOM into QAPI
+From: Christophe de Dinechin <dinechin@redhat.com>
+In-Reply-To: <20200128100356.GF1446339@redhat.com>
+Date: Wed, 29 Jan 2020 13:42:18 +0100
+Message-Id: <2DCB83EB-D123-487D-9173-0260B73F60D6@redhat.com>
+References: <871rrtmkko.fsf@dusky.pond.sub.org>
+ <20200121113224.GD630615@stefanha-x1.localdomain>
+ <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
+ <87wo9lc4oe.fsf_-_@dusky.pond.sub.org> <20200121143658.GB597037@redhat.com>
+ <871rrs97ld.fsf@dusky.pond.sub.org>
+ <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
+ <C4AB0E62-765F-45BC-A442-99C643CFFCCD@redhat.com>
+ <CAFEAcA9xtwNzZQS7biDy=LtZEiLDis3iQztOcP2+2NnCj80c0Q@mail.gmail.com>
+ <B442E0A6-E0C5-426A-8234-EE6491AE4BB0@redhat.com>
+ <20200128100356.GF1446339@redhat.com>
+To: =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
+X-MC-Unique: eBK_D0P5Og2azg1KN-pjrw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,210 +110,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Samuel Thibault <samuel.thibault@ens-lyon.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/12/2019 11.41, Thomas Huth wrote:
-> It's been deprecated since QEMU v3.1.0. Time to finally remove it now.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hmp-commands.hx      |  8 ++++----
->  net/hub.c            | 23 -----------------------
->  net/hub.h            |  2 --
->  net/slirp.c          | 44 ++++++++++++--------------------------------
->  qemu-deprecated.texi | 13 ++++++++-----
->  5 files changed, 24 insertions(+), 66 deletions(-)
-> 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index cfcc044ce4..14ccc685d7 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1463,8 +1463,8 @@ ETEXI
->  #ifdef CONFIG_SLIRP
->      {
->          .name       = "hostfwd_add",
-> -        .args_type  = "arg1:s,arg2:s?,arg3:s?",
-> -        .params     = "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport",
-> +        .args_type  = "arg1:s,arg2:s?",
-> +        .params     = "[netdev_id] [tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport",
->          .help       = "redirect TCP or UDP connections from host to guest (requires -net user)",
->          .cmd        = hmp_hostfwd_add,
->      },
-> @@ -1478,8 +1478,8 @@ ETEXI
->  #ifdef CONFIG_SLIRP
->      {
->          .name       = "hostfwd_remove",
-> -        .args_type  = "arg1:s,arg2:s?,arg3:s?",
-> -        .params     = "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr]:hostport",
-> +        .args_type  = "arg1:s,arg2:s?",
-> +        .params     = "[netdev_id] [tcp|udp]:[hostaddr]:hostport",
->          .help       = "remove host-to-guest TCP or UDP redirection",
->          .cmd        = hmp_hostfwd_remove,
->      },
-> diff --git a/net/hub.c b/net/hub.c
-> index 5795a678ed..88cfb876f3 100644
-> --- a/net/hub.c
-> +++ b/net/hub.c
-> @@ -193,29 +193,6 @@ NetClientState *net_hub_add_port(int hub_id, const char *name,
->      return &port->nc;
->  }
->  
-> -/**
-> - * Find a specific client on a hub
-> - */
-> -NetClientState *net_hub_find_client_by_name(int hub_id, const char *name)
-> -{
-> -    NetHub *hub;
-> -    NetHubPort *port;
-> -    NetClientState *peer;
-> -
-> -    QLIST_FOREACH(hub, &hubs, next) {
-> -        if (hub->id == hub_id) {
-> -            QLIST_FOREACH(port, &hub->ports, next) {
-> -                peer = port->nc.peer;
-> -
-> -                if (peer && strcmp(peer->name, name) == 0) {
-> -                    return peer;
-> -                }
-> -            }
-> -        }
-> -    }
-> -    return NULL;
-> -}
-> -
->  /**
->   * Find a available port on a hub; otherwise create one new port
->   */
-> diff --git a/net/hub.h b/net/hub.h
-> index 66d3322fac..ce45f7b399 100644
-> --- a/net/hub.h
-> +++ b/net/hub.h
-> @@ -15,10 +15,8 @@
->  #ifndef NET_HUB_H
->  #define NET_HUB_H
->  
-> -
->  NetClientState *net_hub_add_port(int hub_id, const char *name,
->                                   NetClientState *hubpeer);
-> -NetClientState *net_hub_find_client_by_name(int hub_id, const char *name);
->  void net_hub_info(Monitor *mon);
->  void net_hub_check_clients(void);
->  bool net_hub_flush(NetClientState *nc);
-> diff --git a/net/slirp.c b/net/slirp.c
-> index c4334ee876..77042e6df7 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -610,25 +610,13 @@ error:
->      return -1;
->  }
->  
-> -static SlirpState *slirp_lookup(Monitor *mon, const char *hub_id,
-> -                                const char *name)
-> +static SlirpState *slirp_lookup(Monitor *mon, const char *id)
->  {
-> -    if (name) {
-> -        NetClientState *nc;
-> -        if (hub_id) {
-> -            nc = net_hub_find_client_by_name(strtol(hub_id, NULL, 0), name);
-> -            if (!nc) {
-> -                monitor_printf(mon, "unrecognized (hub-id, stackname) pair\n");
-> -                return NULL;
-> -            }
-> -            warn_report("Using 'hub-id' is deprecated, specify the netdev id "
-> -                        "directly instead");
-> -        } else {
-> -            nc = qemu_find_netdev(name);
-> -            if (!nc) {
-> -                monitor_printf(mon, "unrecognized netdev id '%s'\n", name);
-> -                return NULL;
-> -            }
-> +    if (id) {
-> +        NetClientState *nc = qemu_find_netdev(id);
-> +        if (!nc) {
-> +            monitor_printf(mon, "unrecognized netdev id '%s'\n", id);
-> +            return NULL;
->          }
->          if (strcmp(nc->model, "user")) {
->              monitor_printf(mon, "invalid device specified\n");
-> @@ -655,16 +643,12 @@ void hmp_hostfwd_remove(Monitor *mon, const QDict *qdict)
->      int err;
->      const char *arg1 = qdict_get_str(qdict, "arg1");
->      const char *arg2 = qdict_get_try_str(qdict, "arg2");
-> -    const char *arg3 = qdict_get_try_str(qdict, "arg3");
->  
-> -    if (arg3) {
-> -        s = slirp_lookup(mon, arg1, arg2);
-> -        src_str = arg3;
-> -    } else if (arg2) {
-> -        s = slirp_lookup(mon, NULL, arg1);
-> +    if (arg2) {
-> +        s = slirp_lookup(mon, arg1);
->          src_str = arg2;
->      } else {
-> -        s = slirp_lookup(mon, NULL, NULL);
-> +        s = slirp_lookup(mon, NULL);
->          src_str = arg1;
->      }
->      if (!s) {
-> @@ -784,16 +768,12 @@ void hmp_hostfwd_add(Monitor *mon, const QDict *qdict)
->      SlirpState *s;
->      const char *arg1 = qdict_get_str(qdict, "arg1");
->      const char *arg2 = qdict_get_try_str(qdict, "arg2");
-> -    const char *arg3 = qdict_get_try_str(qdict, "arg3");
->  
-> -    if (arg3) {
-> -        s = slirp_lookup(mon, arg1, arg2);
-> -        redir_str = arg3;
-> -    } else if (arg2) {
-> -        s = slirp_lookup(mon, NULL, arg1);
-> +    if (arg2) {
-> +        s = slirp_lookup(mon, arg1);
->          redir_str = arg2;
->      } else {
-> -        s = slirp_lookup(mon, NULL, NULL);
-> +        s = slirp_lookup(mon, NULL);
->          redir_str = arg1;
->      }
->      if (s) {
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 66d2b22a94..e407cc085e 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -206,11 +206,6 @@ the 'wait' field, which is only applicable to sockets in server mode
->  
->  @section Human Monitor Protocol (HMP) commands
->  
-> -@subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (since 3.1)
-> -
-> -The @option{[hub_id name]} parameter tuple of the 'hostfwd_add' and
-> -'hostfwd_remove' HMP commands has been replaced by @option{netdev_id}.
-> -
->  @subsection cpu-add (since 4.0)
->  
->  Use ``device_add'' for hotplugging vCPUs instead of ``cpu-add''.  See
-> @@ -376,6 +371,14 @@ What follows is a record of recently removed, formerly deprecated
->  features that serves as a record for users who have encountered
->  trouble after a recent upgrade.
->  
-> +@section Human Monitor Protocol (HMP) commands
-> +
-> +@subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (removed in 5.0)
-> +
-> +The @option{[hub_id name]} parameter tuple of the 'hostfwd_add' and
-> +'hostfwd_remove' HMP commands has been replaced by the single option
-> +@option{netdev_id}.
-> +
->  @section QEMU Machine Protocol (QMP) commands
->  
->  @subsection block-dirty-bitmap-add "autoload" parameter (since 4.2.0)
-> 
 
-Ping?
 
- Thomas
+> On 28 Jan 2020, at 11:03, Daniel P. Berrang=C3=A9 <berrange@redhat.com> w=
+rote:
+>=20
+> On Mon, Jan 27, 2020 at 08:05:36PM +0100, Christophe de Dinechin wrote:
+>>=20
+>>=20
+>>> On 26 Jan 2020, at 16:04, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>>>=20
+>>> On Sun, 26 Jan 2020 at 08:10, Christophe de Dinechin
+>>> <dinechin@redhat.com> wrote:
+>>>> I=E2=80=99m still puzzled as to why anybody would switch to something =
+like
+>>>> GObject when there is C++.
+>>>=20
+>>> I'm fairly strongly against using C++.
+>>=20
+>> Just to be clear, so am I ;-)
+>>=20
+>>> C++'s language design
+>>> is an "everything including the kitchen sink, lots of "this
+>>> is here for back compat but it's a bear trap", lots of new
+>>> stuff arriving all the time.
+>>=20
+>> Actually, the new stuff is not that bad, overall.
+>>=20
+>> I do agree C++ is an overly complicated language, and that in
+>> practice, there is zero chance of qemu moving to it. But that does
+>> not invalidate my point that creating a class in C++ is easier
+>> than creating a class in any C-based macro-heavy reinvention
+>> of basic OO concepts.
+>>=20
+>> (I write this after having read Paolo=E2=80=99s response, which points
+>> out IMO better reasons for GObject, which I will discuss there).
+>>=20
+>>> It's just too big to keep in
+>>> your head all at once. C has its faults, absolutely, but at
+>>> least it tries to be a reasonably sized vaguely coherent
+>>> language.
+>>>=20
+>>> You'd have more luck persuading me we should move to Rust:
+>>> at least then we'd get some clear benefits (no more buffer
+>>> overrun security bugs) for the upheaval :-)
+>>=20
+>> This is largely a myth as soon as you need to do =E2=80=9Cyour own stuff=
+=E2=80=9D.
+>> Example: CVE-2019-18960, https://seclists.org/oss-sec/2019/q4/141.
+>=20
+> Calling it a "myth" from from that one data point is not really credible.
+
+A single failure is enough to credibly counter any =E2=80=9Cno more X=E2=80=
+=9D claim ;-)
+
+Also, I carefully qualified that as for =E2=80=9Cyour own stuff=E2=80=9D. I=
+OW, if you write
+your own buffer management, Rust does not help. Well, dealing with
+guest memory forces us to have our own buffer management.
+
+>=20
+> No language is perfect & such that it can eliminate all possible CVEs.
+> Rust *can*, however, eliminate a very large set of bugs which lead to=20
+> memory corruption in unchecked languages like C/C++.
+
+The Rust hype today eerily reminds me so strongly of the C++ hype
+20 years ago. C++ too was supposed to be a safer C. And indeed,
+if you stick to the standard library, you _do_ eliminate a very large set
+of bugs which lead to memory corruption, leaks, etc in C. So the
+claim C++ made was not wrong. The claim Rust makes is not wrong
+either. The false sense of safety that some people get from it is.
+
+
+>  You'll still have
+> CVEs to deal with, but they'll be different classes of bugs, or rare
+> edge cases like the one you show above.
+
+How exactly was it an =E2=80=9Cedge case=E2=80=9D? From what I saw, it was =
+the most
+basic kind of range check, exactly the kind that you see in 99.9% of all
+range checks.
+
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+>=20
 
 
