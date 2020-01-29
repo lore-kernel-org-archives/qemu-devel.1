@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35911C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 05:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61828C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 05:39:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E601D2071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 05:38:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E2262071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 05:39:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="KwXb+HuI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E601D2071E
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="DzEyENu+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E2262071E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwg3x-000841-4C
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 00:38:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44845)
+	id 1iwg4Z-0000e5-AA
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 00:39:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44847)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1iwfze-000819-KC
+ (envelope-from <alxndr@bu.edu>) id 1iwfze-00081W-MX
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 00:34:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alxndr@bu.edu>) id 1iwfzc-00022Z-AC
+ (envelope-from <alxndr@bu.edu>) id 1iwfzc-00023a-QS
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 00:34:26 -0500
 Received: from mail-mw2nam10on2098.outbound.protection.outlook.com
  ([40.107.94.98]:3168 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1iwfzb-0001yv-WE
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1iwfzc-0001yv-JW
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 00:34:24 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NcPKEU0Pa//+UFowzcLLUrzjFIQ4OOzpSvWxQ7E6iVkeov9LNMCrOQEp1ibT04Qg7JrRJOw9J9yJda+nXYmgwVkdcP06hSlX/cfgEtBo9viXGiRdPg8hYwl8LA1k7PVCtvCCdzrY28F/PGLwSbS+3LL4T7Ir5UX3t7rY8v0ABNqfEGUe7dGyOIHC6ITWmWxJ0GH7laTqQEIcFHqE7uUGoIs8UN2BhPSaTLbrC7mq2aPTlgyxqQYh2eCx2UjAz08SLK7SgyUQ7Ac23lR7RXuGbHpAIGE/U2tSCcRzUQPo9ziw/8IRcg/xoB6cWcsH57F+GFYk7EeL0t2GVPw4RlV/mg==
+ b=nPlAx+3u/Qh61qwje6BhAOkmqls4oQYFGAF8Brp5XgGALwoeVbhsCx45vay9vrVWZ7DlNU+jeVpMKWiSIkE41dqRJDbnWIVgT4CAlKOjme3NJFdCFIj56Ker/Nrnw6Gv2BWmg/UyjA6IHCwxzOeJrBLu1uJ4f9rDHYFAGHX6bC22FlxPOusJkofztVeGrwgqZGfEOe2Z3JNqNXXrPypyaM8wZf3661da13KI/9lf64CPEYJ1AjJliBo5rL6sBV0JAY/lIGsofToQNm3KoXfJSirpYKpMc0y+OTF3RFfP0ly1SW7iePg2DJeaIXXvXD5Kdh6+7jXrJTEppPJWmmc6tQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=49GVKtTIgUjuixnUf8vORi2GFXwASfbxwKcP1ZNS+Oc=;
- b=P0fyh4hxU4/mX/zBYWmfuVJ9i1ItzHVO9/S87w4I6+HWkcd8fb4C5gYoz+LIvHuFpbX9BNxe7n1oSLz+8Mz0NkxOmdSfp28L1afca26Vhc/RKpm1osIZgIPOg3oXiH1Cod+cCsyGYZPQLTTEjuVS96AQZ/2JjNORRpif54eizNvmXqP28tQC45CY8yx7vwgpRv8g0qIJCLK5eTXIOBBapoop8nRsRxEVHgF4QxzVkcVPZFYu/+x0dA/CCe4EQ8N9KphLu8JLuJmN9DMt5tuZzbFCuv3UDakyXlvKhUtYfJgm1qBo5W/TO5tGFKLnaxHFl4CasRVyfc1Ao9JxMHSBWw==
+ bh=toT/WI9KXvNf9J/kQU+FipO7JDB1RCpX0zle0UZW2mc=;
+ b=lhBxsXeEeM05A8QInXUx3AGF9oHglcp06DtCcmukqhggp6OQv/WKe/vOlk122IWbmmFcfPNAhuYSoOTsD0tursIW/nAbXd/XOZgKDuq9BFdgVam2nGl4r6bt2KL02QTFWMOgL85DD82F6AL5l5QSjq4HQW4UaSMnlbJel1jSkOmmxlAoQJwHV1EWIVFdKJsS5lT28vV8dIgLFVv9sLWV9DtWUJN4dwLCL3KBoB8WH3NTlWeBu2jo2dU0qPhgSdUSOJyGs/yYzHFDGZW54iWEzObdL/h5o+CkTbnwLOgDIxewkdHceJXsiJnIDxyeYNXjRSwLVKkuWQiSugS1bh+YeQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=49GVKtTIgUjuixnUf8vORi2GFXwASfbxwKcP1ZNS+Oc=;
- b=KwXb+HuITlfdkaRtgNBXoYEALt+ebMfL2On8NnZBdHhXtuSDwIx53lONUfqxuipCXttIFye4PbGHFgMI8zXgLd8Y57bEc5Al/5ZUKqnvzaejj9Y7Y5IRpJ0371qKQPlaYPg0nYwvni5ij2bwxymY9ALc3J7vENuqsfioHnRRp64=
+ bh=toT/WI9KXvNf9J/kQU+FipO7JDB1RCpX0zle0UZW2mc=;
+ b=DzEyENu+baG3O1fLffbulJCuu1YjgQKO5AkV0ZeeuKwVQ/TcOr5zVzK5t4io/3pthh0aIV9nB/EPwqKSW40KsDrcNlRw1G1fMN3fIm/b1ovtOgaGre+JlOPgci14aAznBzW7Ojay7Cj2NzhG3v57vZd3OC1FnfD2aAyEZhDzv4o=
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (52.135.102.32) by
  SN6PR03MB4206.namprd03.prod.outlook.com (52.135.110.13) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.20; Wed, 29 Jan 2020 05:34:21 +0000
+ 15.20.2665.20; Wed, 29 Jan 2020 05:34:22 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::9c11:10cd:6e97:bbe8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::9c11:10cd:6e97:bbe8%7]) with mapi id 15.20.2665.026; Wed, 29 Jan 2020
- 05:34:21 +0000
+ 05:34:22 +0000
 Received: from mozz.bu.edu (128.197.127.33) by
  MN2PR05CA0029.namprd05.prod.outlook.com (2603:10b6:208:c0::42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.19 via Frontend Transport; Wed, 29 Jan 2020 05:34:19 +0000
+ 15.20.2686.19 via Frontend Transport; Wed, 29 Jan 2020 05:34:20 +0000
 From: "Bulekov, Alexander" <alxndr@bu.edu>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: [PATCH v8 10/21] libqos: move useful qos-test funcs to qos_external
-Thread-Topic: [PATCH v8 10/21] libqos: move useful qos-test funcs to
- qos_external
-Thread-Index: AQHV1mXBkr+O31XT3kCIlTrgxyNRoQ==
-Date: Wed, 29 Jan 2020 05:34:19 +0000
-Message-ID: <20200129053357.27454-11-alxndr@bu.edu>
+Subject: [PATCH v8 11/21] fuzz: add fuzzer skeleton
+Thread-Topic: [PATCH v8 11/21] fuzz: add fuzzer skeleton
+Thread-Index: AQHV1mXBODJcqzH0AEWyTrehxjp55A==
+Date: Wed, 29 Jan 2020 05:34:20 +0000
+Message-ID: <20200129053357.27454-12-alxndr@bu.edu>
 References: <20200129053357.27454-1-alxndr@bu.edu>
 In-Reply-To: <20200129053357.27454-1-alxndr@bu.edu>
 Accept-Language: en-US
@@ -85,14 +84,14 @@ x-clientproxiedby: MN2PR05CA0029.namprd05.prod.outlook.com
 authentication-results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
 x-ms-exchange-messagesentrepresentingtype: 1
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 84a92889-8b91-4a35-070d-08d7a47ce39b
+x-ms-office365-filtering-correlation-id: f3ed7b38-703d-43a6-7d32-08d7a47ce415
 x-ms-traffictypediagnostic: SN6PR03MB4206:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR03MB4206950A01B0FE41B38286B0BA050@SN6PR03MB4206.namprd03.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2887;
+x-microsoft-antispam-prvs: <SN6PR03MB42069E6EC48916DABD42C6E8BA050@SN6PR03MB4206.namprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2512;
 x-forefront-prvs: 02973C87BC
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(376002)(136003)(366004)(346002)(396003)(39860400002)(189003)(199004)(478600001)(30864003)(75432002)(36756003)(316002)(6916009)(2906002)(786003)(4326008)(54906003)(26005)(186003)(956004)(2616005)(6486002)(7696005)(52116002)(16526019)(1076003)(5660300002)(71200400001)(86362001)(66446008)(66556008)(66946007)(66476007)(8936002)(81156014)(81166006)(64756008)(8676002)(2004002);
+ SFS:(10019020)(4636009)(376002)(136003)(366004)(346002)(396003)(39860400002)(189003)(199004)(478600001)(75432002)(36756003)(316002)(6916009)(2906002)(786003)(4326008)(54906003)(26005)(186003)(956004)(2616005)(6486002)(7696005)(52116002)(16526019)(1076003)(5660300002)(71200400001)(86362001)(66446008)(66556008)(66946007)(66476007)(8936002)(81156014)(81166006)(64756008)(8676002);
  DIR:OUT; SFP:1102; SCL:1; SRVR:SN6PR03MB4206;
  H:SN6PR03MB3871.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; MX:1; A:1; 
@@ -100,19 +99,18 @@ received-spf: None (protection.outlook.com: bu.edu does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pMMdCD6u7AcTXwY7pyExQ1AUCwDkO7JpbFBeo6kLJxyQddQEH4SEuG7Mdwwf+y9sue+rbWlcSGdHkGCi7/IZi38Bhr0gYTNOZ+B/YpMZsnHYnvguiZXShMw07Yr/xl7qj9myFgQLj82SbB8pBGgOIW6kWXcw14G56XhbdjE3Jn7+BmmXhtXFOjQ7+alsGoC2XrtZ6KLte1N/XJaARrkSas/plu3rtvBZsDkP2HQEsfYJH+4RpNGFJ0UJyk23h4Diljz5H2yf8ty325p2qszkLq/BwV0TPxU8oMmoVTukdWdxGglOZhIkJOZXMQBQ+dAM4LmTTBxu3MF13T87TMuPINtsc9INtm4xIpNZyKibKE4E/YBNrg0Bd3CvqGFuoA18QNCpoBeCt7/v181Zfn5PE7X2g7/BP1Wr9ZjHYQESg165gcaQEmHMmpVFH1sKejBr/7aGHEsBfzLp3mPNQHSjs6j1iGL27aABp0h/bVMWmR6kl9/fHGKqp8Az7iCHmVHcXPNkJ43tg4vsviLh0LypGz8rcLeY4r3JLgzk59ufIiKQ0jxJ1HVhPIgiSy99vHz1
-x-ms-exchange-antispam-messagedata: 7yq+g/Br0MM3M1BnS4bdUWUFBZb0esdGzmSGFjqKWOOSzDOt7BAxa/WwXnd+rrDb1jF6wi5MSUer+I0Zxt0cezPeMkGwBebvav1ftwjI2tRdXQyv24dHOf3YryGSTzTPjF6men0R4NCQUjensr6yNQ==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4E17D5ACD73EB84EB483552F5CF5290B@namprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+x-microsoft-antispam-message-info: 0DHIsM1jWTp8xt3tlNtbarET4kzdIQUNnAW7UQ+qvA+fG+PKw5TTGl9FlJYSmPNO1BLGj/j3rN/Hb41/PKHz6fJxbEDDweDAMqnaBBMtSBVtB3J/2Sr8hmVB9L9FD89684EOI+5xt2uvTIdkNpmP4JUvF5ihxinMrOriDkRpIzg/2xBuSqn8euigwLIn+tzLHBlf+SF96z2uI5gDan36f0DytIlrmsnDTfnqUdHfh1ihS0fLkuekwPp/nE0GiyVvJQiYp0p1c2bfaJpjFKdlXMZR2COPL0ZApFma757crmqXzLc7xdBHLT1ejlyyue+i3HLTXhrMunzN0b0Lcupk/lKqTEwKvoE71viDJR0/TMOcE/366DTTMfzQhafZZbSPJois8hFwYmZ8UXVZWxqMKsb32thqOhLejT4Ap3hqk9u7X94LzcYG+ZIEBvAmD6aH
+x-ms-exchange-antispam-messagedata: Ta8QyhesrFuNIJNFDrHKDmGQ9plWk98NWXCGixPaWEmoT3+6QECIGm3IHj+5Bmqs9t5c15W6D6Y5PTD+YVSRU+3hqUV15EEpfCslv4Hh7bFhiYCWvATJ+fzwxP+2jLkxtFrt1RKm6Mu3ZmRitmJDxg==
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84a92889-8b91-4a35-070d-08d7a47ce39b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2020 05:34:19.9611 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3ed7b38-703d-43a6-7d32-08d7a47ce415
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2020 05:34:20.7876 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0vfQ+DH86T3kH5pAxwWtWSA6RD8hB0HLd1EmG+CEornJt9iuwdWvl8mciKCf0ZOH
+X-MS-Exchange-CrossTenant-userprincipalname: DXNDHDVWbzYfMTUVbqpYZfn71M6ZL7KjMBANYVmUscx7zpN8Xe6etOonyaIF/sAo
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB4206
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
 X-Received-From: 40.107.94.98
@@ -130,246 +128,336 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  "Bulekov, Alexander" <alxndr@bu.edu>, "bsd@redhat.com" <bsd@redhat.com>,
  "stefanha@redhat.com" <stefanha@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhlIG1vdmVkIGZ1bmN0aW9ucyBhcmUgbm90IHNwZWNpZmljIHRvIHFvcy10ZXN0IGFuZCBtaWdo
-dCBiZSB1c2VmdWwNCmVsc2V3aGVyZS4gRm9yIGV4YW1wbGUgdGhlIHZpcnR1YWwtZGV2aWNlIGZ1
-enplciBtYWtlcyB1c2Ugb2YgdGhlbSBmb3INCnFvcy1hc3Npc3RlZCBmdXp6LXRhcmdldHMuDQoN
-ClNpZ25lZC1vZmYtYnk6IEFsZXhhbmRlciBCdWxla292IDxhbHhuZHJAYnUuZWR1Pg0KUmV2aWV3
-ZWQtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4NClJldmlld2VkLWJ5
-OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5jb20+DQotLS0NCiB0ZXN0
-cy9xdGVzdC9NYWtlZmlsZS5pbmNsdWRlICAgICAgfCAgIDEgKw0KIHRlc3RzL3F0ZXN0L2xpYnFv
-cy9xb3NfZXh0ZXJuYWwuYyB8IDE2OCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCiB0
-ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmggfCAgMjggKysrKysNCiB0ZXN0cy9xdGVz
-dC9xb3MtdGVzdC5jICAgICAgICAgICAgfCAxMzIgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiA0
-IGZpbGVzIGNoYW5nZWQsIDE5OCBpbnNlcnRpb25zKCspLCAxMzEgZGVsZXRpb25zKC0pDQogY3Jl
-YXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3F0ZXN0L2xpYnFvcy9xb3NfZXh0ZXJuYWwuYw0KIGNyZWF0
-ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmgNCg0KZGlmZiAt
-LWdpdCBhL3Rlc3RzL3F0ZXN0L01ha2VmaWxlLmluY2x1ZGUgYi90ZXN0cy9xdGVzdC9NYWtlZmls
-ZS5pbmNsdWRlDQppbmRleCAwOGE0OGMxMjUyLi5iZGM5M2QzODY2IDEwMDY0NA0KLS0tIGEvdGVz
-dHMvcXRlc3QvTWFrZWZpbGUuaW5jbHVkZQ0KKysrIGIvdGVzdHMvcXRlc3QvTWFrZWZpbGUuaW5j
-bHVkZQ0KQEAgLTE3Miw2ICsxNzIsNyBAQCBsaWJxb3MtdXNiLW9iai15ID0gJChsaWJxb3Mtc3Bh
-cHItb2JqLXkpICQobGlicW9zLXBjLW9iai15KSB0ZXN0cy9xdGVzdC9saWJxb3MvdQ0KICMgcW9z
-IGRldmljZXM6DQogbGlicW9zLW9iai15ID0gICQobGlicWdyYXBoLW9iai15KQ0KIGxpYnFvcy1v
-YmoteSArPSAkKGxpYnFvcy1wYy1vYmoteSkgJChsaWJxb3Mtc3BhcHItb2JqLXkpDQorbGlicW9z
-LW9iai15ICs9IHRlc3RzL3F0ZXN0L2xpYnFvcy9xb3NfZXh0ZXJuYWwubw0KIGxpYnFvcy1vYmot
-eSArPSB0ZXN0cy9xdGVzdC9saWJxb3MvZTEwMDBlLm8NCiBsaWJxb3Mtb2JqLXkgKz0gdGVzdHMv
-cXRlc3QvbGlicW9zL2kyYy5vDQogbGlicW9zLW9iai15ICs9IHRlc3RzL3F0ZXN0L2xpYnFvcy9p
-MmMtaW14Lm8NCmRpZmYgLS1naXQgYS90ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmMg
-Yi90ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmMNCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-DQppbmRleCAwMDAwMDAwMDAwLi4zOTg1NTZkZGUwDQotLS0gL2Rldi9udWxsDQorKysgYi90ZXN0
-cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmMNCkBAIC0wLDAgKzEsMTY4IEBADQorLyoNCisg
-KiBsaWJxb3MgZHJpdmVyIGZyYW1ld29yaw0KKyAqDQorICogQ29weXJpZ2h0IChjKSAyMDE4IEVt
-YW51ZWxlIEdpdXNlcHBlIEVzcG9zaXRvIDxlLmVtYW51ZWxlZ2l1c2VwcGVAZ21haWwuY29tPg0K
-KyAqDQorICogVGhpcyBsaWJyYXJ5IGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4gcmVkaXN0cmli
-dXRlIGl0IGFuZC9vcg0KKyAqIG1vZGlmeSBpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBM
-ZXNzZXIgR2VuZXJhbCBQdWJsaWMNCisgKiBMaWNlbnNlIHZlcnNpb24gMiBhcyBwdWJsaXNoZWQg
-YnkgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbi4NCisgKg0KKyAqIFRoaXMgbGlicmFyeSBp
-cyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLA0KKyAqIGJ1
-dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5
-IG9mDQorICogTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQ
-T1NFLiAgU2VlIHRoZSBHTlUNCisgKiBMZXNzZXIgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBmb3Ig
-bW9yZSBkZXRhaWxzLg0KKyAqDQorICogWW91IHNob3VsZCBoYXZlIHJlY2VpdmVkIGEgY29weSBv
-ZiB0aGUgR05VIExlc3NlciBHZW5lcmFsIFB1YmxpYw0KKyAqIExpY2Vuc2UgYWxvbmcgd2l0aCB0
-aGlzIGxpYnJhcnk7IGlmIG5vdCwgc2VlIDxodHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPg0K
-KyAqLw0KKw0KKyNpbmNsdWRlICJxZW11L29zZGVwLmgiDQorI2luY2x1ZGUgPGdldG9wdC5oPg0K
-KyNpbmNsdWRlICJsaWJxdGVzdC5oIg0KKyNpbmNsdWRlICJxYXBpL3FtcC9xZGljdC5oIg0KKyNp
-bmNsdWRlICJxYXBpL3FtcC9xYm9vbC5oIg0KKyNpbmNsdWRlICJxYXBpL3FtcC9xc3RyaW5nLmgi
-DQorI2luY2x1ZGUgInFlbXUvbW9kdWxlLmgiDQorI2luY2x1ZGUgInFhcGkvcW1wL3FsaXN0Lmgi
-DQorI2luY2x1ZGUgImxpYnFvcy9tYWxsb2MuaCINCisjaW5jbHVkZSAibGlicW9zL3FncmFwaC5o
-Ig0KKyNpbmNsdWRlICJsaWJxb3MvcWdyYXBoX2ludGVybmFsLmgiDQorI2luY2x1ZGUgImxpYnFv
-cy9xb3NfZXh0ZXJuYWwuaCINCisNCisNCisNCit2b2lkIGFwcGx5X3RvX25vZGUoY29uc3QgY2hh
-ciAqbmFtZSwgYm9vbCBpc19tYWNoaW5lLCBib29sIGlzX2Fic3RyYWN0KQ0KK3sNCisgICAgY2hh
-ciAqbWFjaGluZV9uYW1lID0gTlVMTDsNCisgICAgaWYgKGlzX21hY2hpbmUpIHsNCisgICAgICAg
-IGNvbnN0IGNoYXIgKmFyY2ggPSBxdGVzdF9nZXRfYXJjaCgpOw0KKyAgICAgICAgbWFjaGluZV9u
-YW1lID0gZ19zdHJjb25jYXQoYXJjaCwgIi8iLCBuYW1lLCBOVUxMKTsNCisgICAgICAgIG5hbWUg
-PSBtYWNoaW5lX25hbWU7DQorICAgIH0NCisgICAgcW9zX2dyYXBoX25vZGVfc2V0X2F2YWlsYWJp
-bGl0eShuYW1lLCB0cnVlKTsNCisgICAgaWYgKGlzX2Fic3RyYWN0KSB7DQorICAgICAgICBxb3Nf
-ZGVsZXRlX2NtZF9saW5lKG5hbWUpOw0KKyAgICB9DQorICAgIGdfZnJlZShtYWNoaW5lX25hbWUp
-Ow0KK30NCisNCisvKioNCisgKiBhcHBseV90b19xbGlzdCgpOiB1c2luZyBRTVAgcXVlcmllcyBR
-RU1VIGZvciBhIGxpc3Qgb2YNCisgKiBtYWNoaW5lcyBhbmQgZGV2aWNlcyBhdmFpbGFibGUsIGFu
-ZCBzZXRzIHRoZSByZXNwZWN0aXZlIG5vZGUNCisgKiBhcyB0cnVlLiBJZiBhIG5vZGUgaXMgZm91
-bmQsIGFsc28gYWxsIGl0cyBwcm9kdWNlZCBhbmQgY29udGFpbmVkDQorICogY2hpbGQgYXJlIG1h
-cmtlZCBhdmFpbGFibGUuDQorICoNCisgKiBTZWUgcW9zX2dyYXBoX25vZGVfc2V0X2F2YWlsYWJp
-bGl0eSgpIGZvciBtb3JlIGluZm8NCisgKi8NCit2b2lkIGFwcGx5X3RvX3FsaXN0KFFMaXN0ICps
-aXN0LCBib29sIGlzX21hY2hpbmUpDQorew0KKyAgICBjb25zdCBRTGlzdEVudHJ5ICpwOw0KKyAg
-ICBjb25zdCBjaGFyICpuYW1lOw0KKyAgICBib29sIGFic3RyYWN0Ow0KKyAgICBRRGljdCAqbWlu
-Zm87DQorICAgIFFPYmplY3QgKnFvYmo7DQorICAgIFFTdHJpbmcgKnFzdHI7DQorICAgIFFCb29s
-ICpxYm9vbDsNCisNCisgICAgZm9yIChwID0gcWxpc3RfZmlyc3QobGlzdCk7IHA7IHAgPSBxbGlz
-dF9uZXh0KHApKSB7DQorICAgICAgICBtaW5mbyA9IHFvYmplY3RfdG8oUURpY3QsIHFsaXN0X2Vu
-dHJ5X29iaihwKSk7DQorICAgICAgICBxb2JqID0gcWRpY3RfZ2V0KG1pbmZvLCAibmFtZSIpOw0K
-KyAgICAgICAgcXN0ciA9IHFvYmplY3RfdG8oUVN0cmluZywgcW9iaik7DQorICAgICAgICBuYW1l
-ID0gcXN0cmluZ19nZXRfc3RyKHFzdHIpOw0KKw0KKyAgICAgICAgcW9iaiA9IHFkaWN0X2dldCht
-aW5mbywgImFic3RyYWN0Iik7DQorICAgICAgICBpZiAocW9iaikgew0KKyAgICAgICAgICAgIHFi
-b29sID0gcW9iamVjdF90byhRQm9vbCwgcW9iaik7DQorICAgICAgICAgICAgYWJzdHJhY3QgPSBx
-Ym9vbF9nZXRfYm9vbChxYm9vbCk7DQorICAgICAgICB9IGVsc2Ugew0KKyAgICAgICAgICAgIGFi
-c3RyYWN0ID0gZmFsc2U7DQorICAgICAgICB9DQorDQorICAgICAgICBhcHBseV90b19ub2RlKG5h
-bWUsIGlzX21hY2hpbmUsIGFic3RyYWN0KTsNCisgICAgICAgIHFvYmogPSBxZGljdF9nZXQobWlu
-Zm8sICJhbGlhcyIpOw0KKyAgICAgICAgaWYgKHFvYmopIHsNCisgICAgICAgICAgICBxc3RyID0g
-cW9iamVjdF90byhRU3RyaW5nLCBxb2JqKTsNCisgICAgICAgICAgICBuYW1lID0gcXN0cmluZ19n
-ZXRfc3RyKHFzdHIpOw0KKyAgICAgICAgICAgIGFwcGx5X3RvX25vZGUobmFtZSwgaXNfbWFjaGlu
-ZSwgYWJzdHJhY3QpOw0KKyAgICAgICAgfQ0KKyAgICB9DQorfQ0KKw0KK1FHdWVzdEFsbG9jYXRv
-ciAqZ2V0X21hY2hpbmVfYWxsb2NhdG9yKFFPU0dyYXBoT2JqZWN0ICpvYmopDQorew0KKyAgICBy
-ZXR1cm4gb2JqLT5nZXRfZHJpdmVyKG9iaiwgIm1lbW9yeSIpOw0KK30NCisNCisvKioNCisgKiBh
-bGxvY2F0ZV9vYmplY3RzKCk6IGdpdmVuIGFuIGFycmF5IG9mIG5vZGVzIEBhcmcsDQorICogd2Fs
-a3MgdGhlIHBhdGggaW52b2tpbmcgYWxsIGNvbnN0cnVjdG9ycyBhbmQNCisgKiBwYXNzaW5nIHRo
-ZSBjb3JyZXNwb25kaW5nIHBhcmFtZXRlciBpbiBvcmRlciB0bw0KKyAqIGNvbnRpbnVlIHRoZSBv
-YmplY3RzIGFsbG9jYXRpb24uDQorICogT25jZSB0aGUgdGVzdCBpcyByZWFjaGVkLCByZXR1cm4g
-dGhlIG9iamVjdCBpdCBjb25zdW1lcy4NCisgKg0KKyAqIFNpbmNlIHRoZSBtYWNoaW5lIGFuZCBR
-RURHRV9DT05TVU1FRF9CWSBub2RlcyBhbGxvY2F0ZQ0KKyAqIG1lbW9yeSBpbiB0aGUgY29uc3Ry
-dWN0b3IsIGdfdGVzdF9xdWV1ZV9kZXN0cm95IGlzIHVzZWQgc28NCisgKiB0aGF0IGFmdGVyIGV4
-ZWN1dGlvbiB0aGV5IGNhbiBiZSBzYWZlbHkgZnJlZSdkLiAgKFRoZSB0ZXN0J3MNCisgKiAtPmJl
-Zm9yZSBjYWxsYmFjayBpcyBhbHNvIHdlbGNvbWUgdG8gdXNlIGdfdGVzdF9xdWV1ZV9kZXN0cm95
-KS4NCisgKg0KKyAqIE5vdGU6IGFzIHNwZWNpZmllZCBpbiB3YWxrX3BhdGgoKSB0b28sIEBhcmcg
-aXMgYW4gYXJyYXkgb2YNCisgKiBjaGFyICosIHdoZXJlIGFyZ1swXSBpcyBhIHBvaW50ZXIgdG8g
-dGhlIGNvbW1hbmQgbGluZQ0KKyAqIHN0cmluZyB0aGF0IHdpbGwgYmUgdXNlZCB0byBwcm9wZXJs
-eSBzdGFydCBRRU1VIHdoZW4gZXhlY3V0aW5nDQorICogdGhlIHRlc3QsIGFuZCB0aGUgcmVtYWlu
-aW5nIGVsZW1lbnRzIHJlcHJlc2VudCB0aGUgYWN0dWFsIG9iamVjdHMNCisgKiB0aGF0IHdpbGwg
-YmUgYWxsb2NhdGVkLg0KKyAqLw0KK3ZvaWQgKmFsbG9jYXRlX29iamVjdHMoUVRlc3RTdGF0ZSAq
-cXRzLCBjaGFyICoqcGF0aCwgUUd1ZXN0QWxsb2NhdG9yICoqcF9hbGxvYykNCit7DQorICAgIGlu
-dCBjdXJyZW50ID0gMDsNCisgICAgUUd1ZXN0QWxsb2NhdG9yICphbGxvYzsNCisgICAgUU9TR3Jh
-cGhPYmplY3QgKnBhcmVudCA9IE5VTEw7DQorICAgIFFPU0dyYXBoRWRnZSAqZWRnZTsNCisgICAg
-UU9TR3JhcGhOb2RlICpub2RlOw0KKyAgICB2b2lkICplZGdlX2FyZzsNCisgICAgdm9pZCAqb2Jq
-Ow0KKw0KKyAgICBub2RlID0gcW9zX2dyYXBoX2dldF9ub2RlKHBhdGhbY3VycmVudF0pOw0KKyAg
-ICBnX2Fzc2VydChub2RlLT50eXBlID09IFFOT0RFX01BQ0hJTkUpOw0KKw0KKyAgICBvYmogPSBx
-b3NfbWFjaGluZV9uZXcobm9kZSwgcXRzKTsNCisgICAgcW9zX29iamVjdF9xdWV1ZV9kZXN0cm95
-KG9iaik7DQorDQorICAgIGFsbG9jID0gZ2V0X21hY2hpbmVfYWxsb2NhdG9yKG9iaik7DQorICAg
-IGlmIChwX2FsbG9jKSB7DQorICAgICAgICAqcF9hbGxvYyA9IGFsbG9jOw0KKyAgICB9DQorDQor
-ICAgIGZvciAoOzspIHsNCisgICAgICAgIGlmIChub2RlLT50eXBlICE9IFFOT0RFX0lOVEVSRkFD
-RSkgew0KKyAgICAgICAgICAgIHFvc19vYmplY3Rfc3RhcnRfaHcob2JqKTsNCisgICAgICAgICAg
-ICBwYXJlbnQgPSBvYmo7DQorICAgICAgICB9DQorDQorICAgICAgICAvKiBmb2xsb3cgZWRnZSBh
-bmQgZ2V0IG9iamVjdCBmb3IgbmV4dCBub2RlIGNvbnN0cnVjdG9yICovDQorICAgICAgICBjdXJy
-ZW50Kys7DQorICAgICAgICBlZGdlID0gcW9zX2dyYXBoX2dldF9lZGdlKHBhdGhbY3VycmVudCAt
-IDFdLCBwYXRoW2N1cnJlbnRdKTsNCisgICAgICAgIG5vZGUgPSBxb3NfZ3JhcGhfZ2V0X25vZGUo
-cGF0aFtjdXJyZW50XSk7DQorDQorICAgICAgICBpZiAobm9kZS0+dHlwZSA9PSBRTk9ERV9URVNU
-KSB7DQorICAgICAgICAgICAgZ19hc3NlcnQocW9zX2dyYXBoX2VkZ2VfZ2V0X3R5cGUoZWRnZSkg
-PT0gUUVER0VfQ09OU1VNRURfQlkpOw0KKyAgICAgICAgICAgIHJldHVybiBvYmo7DQorICAgICAg
-ICB9DQorDQorICAgICAgICBzd2l0Y2ggKHFvc19ncmFwaF9lZGdlX2dldF90eXBlKGVkZ2UpKSB7
-DQorICAgICAgICBjYXNlIFFFREdFX1BST0RVQ0VTOg0KKyAgICAgICAgICAgIG9iaiA9IHBhcmVu
-dC0+Z2V0X2RyaXZlcihwYXJlbnQsIHBhdGhbY3VycmVudF0pOw0KKyAgICAgICAgICAgIGJyZWFr
-Ow0KKw0KKyAgICAgICAgY2FzZSBRRURHRV9DT05TVU1FRF9CWToNCisgICAgICAgICAgICBlZGdl
-X2FyZyA9IHFvc19ncmFwaF9lZGdlX2dldF9hcmcoZWRnZSk7DQorICAgICAgICAgICAgb2JqID0g
-cW9zX2RyaXZlcl9uZXcobm9kZSwgb2JqLCBhbGxvYywgZWRnZV9hcmcpOw0KKyAgICAgICAgICAg
-IHFvc19vYmplY3RfcXVldWVfZGVzdHJveShvYmopOw0KKyAgICAgICAgICAgIGJyZWFrOw0KKw0K
-KyAgICAgICAgY2FzZSBRRURHRV9DT05UQUlOUzoNCisgICAgICAgICAgICBvYmogPSBwYXJlbnQt
-PmdldF9kZXZpY2UocGFyZW50LCBwYXRoW2N1cnJlbnRdKTsNCisgICAgICAgICAgICBicmVhazsN
-CisgICAgICAgIH0NCisgICAgfQ0KK30NCisNCmRpZmYgLS1naXQgYS90ZXN0cy9xdGVzdC9saWJx
-b3MvcW9zX2V4dGVybmFsLmggYi90ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmgNCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0DQppbmRleCAwMDAwMDAwMDAwLi43YjQ0OTMwYzU1DQotLS0gL2Rl
-di9udWxsDQorKysgYi90ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmgNCkBAIC0wLDAg
-KzEsMjggQEANCisvKg0KKyAqIGxpYnFvcyBkcml2ZXIgZnJhbWV3b3JrDQorICoNCisgKiBDb3B5
-cmlnaHQgKGMpIDIwMTggRW1hbnVlbGUgR2l1c2VwcGUgRXNwb3NpdG8gPGUuZW1hbnVlbGVnaXVz
-ZXBwZUBnbWFpbC5jb20+DQorICoNCisgKiBUaGlzIGxpYnJhcnkgaXMgZnJlZSBzb2Z0d2FyZTsg
-eW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yDQorICogbW9kaWZ5IGl0IHVuZGVyIHRoZSB0
-ZXJtcyBvZiB0aGUgR05VIExlc3NlciBHZW5lcmFsIFB1YmxpYw0KKyAqIExpY2Vuc2UgdmVyc2lv
-biAyIGFzIHB1Ymxpc2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uLg0KKyAqDQor
-ICogVGhpcyBsaWJyYXJ5IGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRoYXQgaXQgd2lsbCBi
-ZSB1c2VmdWwsDQorICogYnV0IFdJVEhPVVQgQU5ZIFdBUlJBTlRZOyB3aXRob3V0IGV2ZW4gdGhl
-IGltcGxpZWQgd2FycmFudHkgb2YNCisgKiBNRVJDSEFOVEFCSUxJVFkgb3IgRklUTkVTUyBGT1Ig
-QSBQQVJUSUNVTEFSIFBVUlBPU0UuICBTZWUgdGhlIEdOVQ0KKyAqIExlc3NlciBHZW5lcmFsIFB1
-YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuDQorICoNCisgKiBZb3Ugc2hvdWxkIGhhdmUg
-cmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgTGVzc2VyIEdlbmVyYWwgUHVibGljDQorICogTGlj
-ZW5zZSBhbG9uZyB3aXRoIHRoaXMgbGlicmFyeTsgaWYgbm90LCBzZWUgPGh0dHA6Ly93d3cuZ251
-Lm9yZy9saWNlbnNlcy8+DQorICovDQorDQorI2lmbmRlZiBRT1NfRVhURVJOQUxfSA0KKyNkZWZp
-bmUgUU9TX0VYVEVSTkFMX0gNCisjaW5jbHVkZSAibGlicW9zL3FncmFwaC5oIg0KKw0KK3ZvaWQg
-YXBwbHlfdG9fbm9kZShjb25zdCBjaGFyICpuYW1lLCBib29sIGlzX21hY2hpbmUsIGJvb2wgaXNf
-YWJzdHJhY3QpOw0KK3ZvaWQgYXBwbHlfdG9fcWxpc3QoUUxpc3QgKmxpc3QsIGJvb2wgaXNfbWFj
-aGluZSk7DQorUUd1ZXN0QWxsb2NhdG9yICpnZXRfbWFjaGluZV9hbGxvY2F0b3IoUU9TR3JhcGhP
-YmplY3QgKm9iaik7DQordm9pZCAqYWxsb2NhdGVfb2JqZWN0cyhRVGVzdFN0YXRlICpxdHMsIGNo
-YXIgKipwYXRoLCBRR3Vlc3RBbGxvY2F0b3IgKipwX2FsbG9jKTsNCisNCisjZW5kaWYNCmRpZmYg
-LS1naXQgYS90ZXN0cy9xdGVzdC9xb3MtdGVzdC5jIGIvdGVzdHMvcXRlc3QvcW9zLXRlc3QuYw0K
-aW5kZXggZmQ3MGQ3M2VhNS4uYWQxOTNmNDNhNSAxMDA2NDQNCi0tLSBhL3Rlc3RzL3F0ZXN0L3Fv
-cy10ZXN0LmMNCisrKyBiL3Rlc3RzL3F0ZXN0L3Fvcy10ZXN0LmMNCkBAIC0yNyw2NSArMjcsMTEg
-QEANCiAjaW5jbHVkZSAibGlicW9zL21hbGxvYy5oIg0KICNpbmNsdWRlICJsaWJxb3MvcWdyYXBo
-LmgiDQogI2luY2x1ZGUgImxpYnFvcy9xZ3JhcGhfaW50ZXJuYWwuaCINCisjaW5jbHVkZSAibGli
-cW9zL3Fvc19leHRlcm5hbC5oIg0KIA0KIHN0YXRpYyBjaGFyICpvbGRfcGF0aDsNCiANCi1zdGF0
-aWMgdm9pZCBhcHBseV90b19ub2RlKGNvbnN0IGNoYXIgKm5hbWUsIGJvb2wgaXNfbWFjaGluZSwg
-Ym9vbCBpc19hYnN0cmFjdCkNCi17DQotICAgIGNoYXIgKm1hY2hpbmVfbmFtZSA9IE5VTEw7DQot
-ICAgIGlmIChpc19tYWNoaW5lKSB7DQotICAgICAgICBjb25zdCBjaGFyICphcmNoID0gcXRlc3Rf
-Z2V0X2FyY2goKTsNCi0gICAgICAgIG1hY2hpbmVfbmFtZSA9IGdfc3RyY29uY2F0KGFyY2gsICIv
-IiwgbmFtZSwgTlVMTCk7DQotICAgICAgICBuYW1lID0gbWFjaGluZV9uYW1lOw0KLSAgICB9DQot
-ICAgIHFvc19ncmFwaF9ub2RlX3NldF9hdmFpbGFiaWxpdHkobmFtZSwgdHJ1ZSk7DQotICAgIGlm
-IChpc19hYnN0cmFjdCkgew0KLSAgICAgICAgcW9zX2RlbGV0ZV9jbWRfbGluZShuYW1lKTsNCi0g
-ICAgfQ0KLSAgICBnX2ZyZWUobWFjaGluZV9uYW1lKTsNCi19DQogDQotLyoqDQotICogYXBwbHlf
-dG9fcWxpc3QoKTogdXNpbmcgUU1QIHF1ZXJpZXMgUUVNVSBmb3IgYSBsaXN0IG9mDQotICogbWFj
-aGluZXMgYW5kIGRldmljZXMgYXZhaWxhYmxlLCBhbmQgc2V0cyB0aGUgcmVzcGVjdGl2ZSBub2Rl
-DQotICogYXMgdHJ1ZS4gSWYgYSBub2RlIGlzIGZvdW5kLCBhbHNvIGFsbCBpdHMgcHJvZHVjZWQg
-YW5kIGNvbnRhaW5lZA0KLSAqIGNoaWxkIGFyZSBtYXJrZWQgYXZhaWxhYmxlLg0KLSAqDQotICog
-U2VlIHFvc19ncmFwaF9ub2RlX3NldF9hdmFpbGFiaWxpdHkoKSBmb3IgbW9yZSBpbmZvDQotICov
-DQotc3RhdGljIHZvaWQgYXBwbHlfdG9fcWxpc3QoUUxpc3QgKmxpc3QsIGJvb2wgaXNfbWFjaGlu
-ZSkNCi17DQotICAgIGNvbnN0IFFMaXN0RW50cnkgKnA7DQotICAgIGNvbnN0IGNoYXIgKm5hbWU7
-DQotICAgIGJvb2wgYWJzdHJhY3Q7DQotICAgIFFEaWN0ICptaW5mbzsNCi0gICAgUU9iamVjdCAq
-cW9iajsNCi0gICAgUVN0cmluZyAqcXN0cjsNCi0gICAgUUJvb2wgKnFib29sOw0KLQ0KLSAgICBm
-b3IgKHAgPSBxbGlzdF9maXJzdChsaXN0KTsgcDsgcCA9IHFsaXN0X25leHQocCkpIHsNCi0gICAg
-ICAgIG1pbmZvID0gcW9iamVjdF90byhRRGljdCwgcWxpc3RfZW50cnlfb2JqKHApKTsNCi0gICAg
-ICAgIHFvYmogPSBxZGljdF9nZXQobWluZm8sICJuYW1lIik7DQotICAgICAgICBxc3RyID0gcW9i
-amVjdF90byhRU3RyaW5nLCBxb2JqKTsNCi0gICAgICAgIG5hbWUgPSBxc3RyaW5nX2dldF9zdHIo
-cXN0cik7DQotDQotICAgICAgICBxb2JqID0gcWRpY3RfZ2V0KG1pbmZvLCAiYWJzdHJhY3QiKTsN
-Ci0gICAgICAgIGlmIChxb2JqKSB7DQotICAgICAgICAgICAgcWJvb2wgPSBxb2JqZWN0X3RvKFFC
-b29sLCBxb2JqKTsNCi0gICAgICAgICAgICBhYnN0cmFjdCA9IHFib29sX2dldF9ib29sKHFib29s
-KTsNCi0gICAgICAgIH0gZWxzZSB7DQotICAgICAgICAgICAgYWJzdHJhY3QgPSBmYWxzZTsNCi0g
-ICAgICAgIH0NCi0NCi0gICAgICAgIGFwcGx5X3RvX25vZGUobmFtZSwgaXNfbWFjaGluZSwgYWJz
-dHJhY3QpOw0KLSAgICAgICAgcW9iaiA9IHFkaWN0X2dldChtaW5mbywgImFsaWFzIik7DQotICAg
-ICAgICBpZiAocW9iaikgew0KLSAgICAgICAgICAgIHFzdHIgPSBxb2JqZWN0X3RvKFFTdHJpbmcs
-IHFvYmopOw0KLSAgICAgICAgICAgIG5hbWUgPSBxc3RyaW5nX2dldF9zdHIocXN0cik7DQotICAg
-ICAgICAgICAgYXBwbHlfdG9fbm9kZShuYW1lLCBpc19tYWNoaW5lLCBhYnN0cmFjdCk7DQotICAg
-ICAgICB9DQotICAgIH0NCi19DQogDQogLyoqDQogICogcW9zX3NldF9tYWNoaW5lc19kZXZpY2Vz
-X2F2YWlsYWJsZSgpOiBzZXRzIGF2YWlsYWJpbGl0eSBvZiBxZ3JhcGgNCkBAIC0xMjksMTAgKzc1
-LDYgQEAgc3RhdGljIHZvaWQgcW9zX3NldF9tYWNoaW5lc19kZXZpY2VzX2F2YWlsYWJsZSh2b2lk
-KQ0KICAgICBxb2JqZWN0X3VucmVmKHJlc3BvbnNlKTsNCiB9DQogDQotc3RhdGljIFFHdWVzdEFs
-bG9jYXRvciAqZ2V0X21hY2hpbmVfYWxsb2NhdG9yKFFPU0dyYXBoT2JqZWN0ICpvYmopDQotew0K
-LSAgICByZXR1cm4gb2JqLT5nZXRfZHJpdmVyKG9iaiwgIm1lbW9yeSIpOw0KLX0NCiANCiBzdGF0
-aWMgdm9pZCByZXN0YXJ0X3FlbXVfb3JfY29udGludWUoY2hhciAqcGF0aCkNCiB7DQpAQCAtMTU5
-LDc4ICsxMDEsNiBAQCB2b2lkIHFvc19pbnZhbGlkYXRlX2NvbW1hbmRfbGluZSh2b2lkKQ0KICAg
-ICBvbGRfcGF0aCA9IE5VTEw7DQogfQ0KIA0KLS8qKg0KLSAqIGFsbG9jYXRlX29iamVjdHMoKTog
-Z2l2ZW4gYW4gYXJyYXkgb2Ygbm9kZXMgQGFyZywNCi0gKiB3YWxrcyB0aGUgcGF0aCBpbnZva2lu
-ZyBhbGwgY29uc3RydWN0b3JzIGFuZA0KLSAqIHBhc3NpbmcgdGhlIGNvcnJlc3BvbmRpbmcgcGFy
-YW1ldGVyIGluIG9yZGVyIHRvDQotICogY29udGludWUgdGhlIG9iamVjdHMgYWxsb2NhdGlvbi4N
-Ci0gKiBPbmNlIHRoZSB0ZXN0IGlzIHJlYWNoZWQsIHJldHVybiB0aGUgb2JqZWN0IGl0IGNvbnN1
-bWVzLg0KLSAqDQotICogU2luY2UgdGhlIG1hY2hpbmUgYW5kIFFFREdFX0NPTlNVTUVEX0JZIG5v
-ZGVzIGFsbG9jYXRlDQotICogbWVtb3J5IGluIHRoZSBjb25zdHJ1Y3RvciwgZ190ZXN0X3F1ZXVl
-X2Rlc3Ryb3kgaXMgdXNlZCBzbw0KLSAqIHRoYXQgYWZ0ZXIgZXhlY3V0aW9uIHRoZXkgY2FuIGJl
-IHNhZmVseSBmcmVlJ2QuICAoVGhlIHRlc3Qncw0KLSAqIC0+YmVmb3JlIGNhbGxiYWNrIGlzIGFs
-c28gd2VsY29tZSB0byB1c2UgZ190ZXN0X3F1ZXVlX2Rlc3Ryb3kpLg0KLSAqDQotICogTm90ZTog
-YXMgc3BlY2lmaWVkIGluIHdhbGtfcGF0aCgpIHRvbywgQGFyZyBpcyBhbiBhcnJheSBvZg0KLSAq
-IGNoYXIgKiwgd2hlcmUgYXJnWzBdIGlzIGEgcG9pbnRlciB0byB0aGUgY29tbWFuZCBsaW5lDQot
-ICogc3RyaW5nIHRoYXQgd2lsbCBiZSB1c2VkIHRvIHByb3Blcmx5IHN0YXJ0IFFFTVUgd2hlbiBl
-eGVjdXRpbmcNCi0gKiB0aGUgdGVzdCwgYW5kIHRoZSByZW1haW5pbmcgZWxlbWVudHMgcmVwcmVz
-ZW50IHRoZSBhY3R1YWwgb2JqZWN0cw0KLSAqIHRoYXQgd2lsbCBiZSBhbGxvY2F0ZWQuDQotICov
-DQotc3RhdGljIHZvaWQgKmFsbG9jYXRlX29iamVjdHMoUVRlc3RTdGF0ZSAqcXRzLCBjaGFyICoq
-cGF0aCwgUUd1ZXN0QWxsb2NhdG9yICoqcF9hbGxvYykNCi17DQotICAgIGludCBjdXJyZW50ID0g
-MDsNCi0gICAgUUd1ZXN0QWxsb2NhdG9yICphbGxvYzsNCi0gICAgUU9TR3JhcGhPYmplY3QgKnBh
-cmVudCA9IE5VTEw7DQotICAgIFFPU0dyYXBoRWRnZSAqZWRnZTsNCi0gICAgUU9TR3JhcGhOb2Rl
-ICpub2RlOw0KLSAgICB2b2lkICplZGdlX2FyZzsNCi0gICAgdm9pZCAqb2JqOw0KLQ0KLSAgICBu
-b2RlID0gcW9zX2dyYXBoX2dldF9ub2RlKHBhdGhbY3VycmVudF0pOw0KLSAgICBnX2Fzc2VydChu
-b2RlLT50eXBlID09IFFOT0RFX01BQ0hJTkUpOw0KLQ0KLSAgICBvYmogPSBxb3NfbWFjaGluZV9u
-ZXcobm9kZSwgcXRzKTsNCi0gICAgcW9zX29iamVjdF9xdWV1ZV9kZXN0cm95KG9iaik7DQotDQot
-ICAgIGFsbG9jID0gZ2V0X21hY2hpbmVfYWxsb2NhdG9yKG9iaik7DQotICAgIGlmIChwX2FsbG9j
-KSB7DQotICAgICAgICAqcF9hbGxvYyA9IGFsbG9jOw0KLSAgICB9DQotDQotICAgIGZvciAoOzsp
-IHsNCi0gICAgICAgIGlmIChub2RlLT50eXBlICE9IFFOT0RFX0lOVEVSRkFDRSkgew0KLSAgICAg
-ICAgICAgIHFvc19vYmplY3Rfc3RhcnRfaHcob2JqKTsNCi0gICAgICAgICAgICBwYXJlbnQgPSBv
-Ymo7DQotICAgICAgICB9DQotDQotICAgICAgICAvKiBmb2xsb3cgZWRnZSBhbmQgZ2V0IG9iamVj
-dCBmb3IgbmV4dCBub2RlIGNvbnN0cnVjdG9yICovDQotICAgICAgICBjdXJyZW50Kys7DQotICAg
-ICAgICBlZGdlID0gcW9zX2dyYXBoX2dldF9lZGdlKHBhdGhbY3VycmVudCAtIDFdLCBwYXRoW2N1
-cnJlbnRdKTsNCi0gICAgICAgIG5vZGUgPSBxb3NfZ3JhcGhfZ2V0X25vZGUocGF0aFtjdXJyZW50
-XSk7DQotDQotICAgICAgICBpZiAobm9kZS0+dHlwZSA9PSBRTk9ERV9URVNUKSB7DQotICAgICAg
-ICAgICAgZ19hc3NlcnQocW9zX2dyYXBoX2VkZ2VfZ2V0X3R5cGUoZWRnZSkgPT0gUUVER0VfQ09O
-U1VNRURfQlkpOw0KLSAgICAgICAgICAgIHJldHVybiBvYmo7DQotICAgICAgICB9DQotDQotICAg
-ICAgICBzd2l0Y2ggKHFvc19ncmFwaF9lZGdlX2dldF90eXBlKGVkZ2UpKSB7DQotICAgICAgICBj
-YXNlIFFFREdFX1BST0RVQ0VTOg0KLSAgICAgICAgICAgIG9iaiA9IHBhcmVudC0+Z2V0X2RyaXZl
-cihwYXJlbnQsIHBhdGhbY3VycmVudF0pOw0KLSAgICAgICAgICAgIGJyZWFrOw0KLQ0KLSAgICAg
-ICAgY2FzZSBRRURHRV9DT05TVU1FRF9CWToNCi0gICAgICAgICAgICBlZGdlX2FyZyA9IHFvc19n
-cmFwaF9lZGdlX2dldF9hcmcoZWRnZSk7DQotICAgICAgICAgICAgb2JqID0gcW9zX2RyaXZlcl9u
-ZXcobm9kZSwgb2JqLCBhbGxvYywgZWRnZV9hcmcpOw0KLSAgICAgICAgICAgIHFvc19vYmplY3Rf
-cXVldWVfZGVzdHJveShvYmopOw0KLSAgICAgICAgICAgIGJyZWFrOw0KLQ0KLSAgICAgICAgY2Fz
-ZSBRRURHRV9DT05UQUlOUzoNCi0gICAgICAgICAgICBvYmogPSBwYXJlbnQtPmdldF9kZXZpY2Uo
-cGFyZW50LCBwYXRoW2N1cnJlbnRdKTsNCi0gICAgICAgICAgICBicmVhazsNCi0gICAgICAgIH0N
-Ci0gICAgfQ0KLX0NCiANCiAvKiBUaGUgYXJndW1lbnQgdG8gcnVuX29uZV90ZXN0LCB3aGljaCBp
-cyB0aGUgdGVzdCBmdW5jdGlvbiB0aGF0IGlzIHJlZ2lzdGVyZWQNCiAgKiB3aXRoIEdUZXN0LCBp
-cyBhIHZlY3RvciBvZiBzdHJpbmdzLiAgVGhlIGZpcnN0IGl0ZW0gaXMgdGhlIGluaXRpYWwgY29t
-bWFuZA0KLS0gDQoyLjIzLjANCg0K
+tests/fuzz/fuzz.c serves as the entry point for the virtual-device
+fuzzer. Namely, libfuzzer invokes the LLVMFuzzerInitialize and
+LLVMFuzzerTestOneInput functions, both of which are defined in this
+file. This change adds a "FuzzTarget" struct, along with the
+fuzz_add_target function, which should be used to define new fuzz
+targets.
+
+Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/qtest/fuzz/Makefile.include |   6 +
+ tests/qtest/fuzz/fuzz.c           | 179 ++++++++++++++++++++++++++++++
+ tests/qtest/fuzz/fuzz.h           |  95 ++++++++++++++++
+ 3 files changed, 280 insertions(+)
+ create mode 100644 tests/qtest/fuzz/Makefile.include
+ create mode 100644 tests/qtest/fuzz/fuzz.c
+ create mode 100644 tests/qtest/fuzz/fuzz.h
+
+diff --git a/tests/qtest/fuzz/Makefile.include b/tests/qtest/fuzz/Makefile.=
+include
+new file mode 100644
+index 0000000000..8632bb89f4
+--- /dev/null
++++ b/tests/qtest/fuzz/Makefile.include
+@@ -0,0 +1,6 @@
++QEMU_PROG_FUZZ=3Dqemu-fuzz-$(TARGET_NAME)$(EXESUF)
++
++fuzz-obj-y +=3D tests/qtest/libqtest.o
++fuzz-obj-y +=3D tests/qtest/fuzz/fuzz.o # Fuzzer skeleton
++
++FUZZ_CFLAGS +=3D -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
+diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+new file mode 100644
+index 0000000000..0d78ac8d36
+--- /dev/null
++++ b/tests/qtest/fuzz/fuzz.c
+@@ -0,0 +1,179 @@
++/*
++ * fuzzing driver
++ *
++ * Copyright Red Hat Inc., 2019
++ *
++ * Authors:
++ *  Alexander Bulekov   <alxndr@bu.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++
++#include <wordexp.h>
++
++#include "sysemu/qtest.h"
++#include "sysemu/runstate.h"
++#include "sysemu/sysemu.h"
++#include "qemu/main-loop.h"
++#include "tests/qtest/libqtest.h"
++#include "tests/qtest/libqos/qgraph.h"
++#include "fuzz.h"
++
++#define MAX_EVENT_LOOPS 10
++
++typedef struct FuzzTargetState {
++        FuzzTarget *target;
++        QSLIST_ENTRY(FuzzTargetState) target_list;
++} FuzzTargetState;
++
++typedef QSLIST_HEAD(, FuzzTargetState) FuzzTargetList;
++
++static const char *fuzz_arch =3D TARGET_NAME;
++
++static FuzzTargetList *fuzz_target_list;
++static FuzzTarget *fuzz_target;
++static QTestState *fuzz_qts;
++
++
++
++void flush_events(QTestState *s)
++{
++    int i =3D MAX_EVENT_LOOPS;
++    while (g_main_context_pending(NULL) && i-- > 0) {
++        main_loop_wait(false);
++    }
++}
++
++static QTestState *qtest_setup(void)
++{
++    qtest_server_set_send_handler(&qtest_client_inproc_recv, &fuzz_qts);
++    return qtest_inproc_init(&fuzz_qts, false, fuzz_arch,
++            &qtest_server_inproc_recv);
++}
++
++void fuzz_add_target(const FuzzTarget *target)
++{
++    FuzzTargetState *tmp;
++    FuzzTargetState *target_state;
++    if (!fuzz_target_list) {
++        fuzz_target_list =3D g_new0(FuzzTargetList, 1);
++    }
++
++    QSLIST_FOREACH(tmp, fuzz_target_list, target_list) {
++        if (g_strcmp0(tmp->target->name, target->name) =3D=3D 0) {
++            fprintf(stderr, "Error: Fuzz target name %s already in use\n",
++                    target->name);
++            abort();
++        }
++    }
++    target_state =3D g_new0(FuzzTargetState, 1);
++    target_state->target =3D g_new0(FuzzTarget, 1);
++    *(target_state->target) =3D *target;
++    QSLIST_INSERT_HEAD(fuzz_target_list, target_state, target_list);
++}
++
++
++
++static void usage(char *path)
++{
++    printf("Usage: %s --fuzz-target=3DFUZZ_TARGET [LIBFUZZER ARGUMENTS]\n"=
+, path);
++    printf("where FUZZ_TARGET is one of:\n");
++    FuzzTargetState *tmp;
++    if (!fuzz_target_list) {
++        fprintf(stderr, "Fuzz target list not initialized\n");
++        abort();
++    }
++    QSLIST_FOREACH(tmp, fuzz_target_list, target_list) {
++        printf(" * %s  : %s\n", tmp->target->name,
++                tmp->target->description);
++    }
++    exit(0);
++}
++
++static FuzzTarget *fuzz_get_target(char* name)
++{
++    FuzzTargetState *tmp;
++    if (!fuzz_target_list) {
++        fprintf(stderr, "Fuzz target list not initialized\n");
++        abort();
++    }
++
++    QSLIST_FOREACH(tmp, fuzz_target_list, target_list) {
++        if (strcmp(tmp->target->name, name) =3D=3D 0) {
++            return tmp->target;
++        }
++    }
++    return NULL;
++}
++
++
++/* Executed for each fuzzing-input */
++int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size)
++{
++    /*
++     * Do the pre-fuzz-initialization before the first fuzzing iteration,
++     * instead of before the actual fuzz loop. This is needed since libfuz=
+zer
++     * may fork off additional workers, prior to the fuzzing loop, and if
++     * pre_fuzz() sets up e.g. shared memory, this should be done for the
++     * individual worker processes
++     */
++    static int pre_fuzz_done;
++    if (!pre_fuzz_done && fuzz_target->pre_fuzz) {
++        fuzz_target->pre_fuzz(fuzz_qts);
++        pre_fuzz_done =3D true;
++    }
++
++    fuzz_target->fuzz(fuzz_qts, Data, Size);
++    return 0;
++}
++
++/* Executed once, prior to fuzzing */
++int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
++{
++
++    char *target_name;
++
++    /* Initialize qgraph and modules */
++    qos_graph_init();
++    module_call_init(MODULE_INIT_FUZZ_TARGET);
++    module_call_init(MODULE_INIT_QOM);
++    module_call_init(MODULE_INIT_LIBQOS);
++
++    if (*argc <=3D 1) {
++        usage(**argv);
++    }
++
++    /* Identify the fuzz target */
++    target_name =3D (*argv)[1];
++    if (!strstr(target_name, "--fuzz-target=3D")) {
++        usage(**argv);
++    }
++
++    target_name +=3D strlen("--fuzz-target=3D");
++
++    fuzz_target =3D fuzz_get_target(target_name);
++    if (!fuzz_target) {
++        usage(**argv);
++    }
++
++    fuzz_qts =3D qtest_setup();
++
++    if (fuzz_target->pre_vm_init) {
++        fuzz_target->pre_vm_init();
++    }
++
++    /* Run QEMU's softmmu main with the fuzz-target dependent arguments */
++    const char *init_cmdline =3D fuzz_target->get_init_cmdline(fuzz_target=
+);
++
++    /* Split the runcmd into an argv and argc */
++    wordexp_t result;
++    wordexp(init_cmdline, &result, 0);
++
++    qemu_init(result.we_wordc, result.we_wordv, NULL);
++
++    return 0;
++}
+diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
+new file mode 100644
+index 0000000000..03901d414e
+--- /dev/null
++++ b/tests/qtest/fuzz/fuzz.h
+@@ -0,0 +1,95 @@
++/*
++ * fuzzing driver
++ *
++ * Copyright Red Hat Inc., 2019
++ *
++ * Authors:
++ *  Alexander Bulekov   <alxndr@bu.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef FUZZER_H_
++#define FUZZER_H_
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "qapi/error.h"
++
++#include "tests/qtest/libqtest.h"
++
++/**
++ * A libfuzzer fuzzing target
++ *
++ * The QEMU fuzzing binary is built with all available targets, each
++ * with a unique @name that can be specified on the command-line to
++ * select which target should run.
++ *
++ * A target must implement ->fuzz() to process a random input.  If QEMU
++ * crashes in ->fuzz() then libfuzzer will record a failure.
++ *
++ * Fuzzing targets are registered with fuzz_add_target():
++ *
++ *   static const FuzzTarget fuzz_target =3D {
++ *       .name =3D "my-device-fifo",
++ *       .description =3D "Fuzz the FIFO buffer registers of my-device",
++ *       ...
++ *   };
++ *
++ *   static void register_fuzz_target(void)
++ *   {
++ *       fuzz_add_target(&fuzz_target);
++ *   }
++ *   fuzz_target_init(register_fuzz_target);
++ */
++typedef struct FuzzTarget {
++    const char *name;         /* target identifier (passed to --fuzz-targe=
+t=3D)*/
++    const char *description;  /* help text */
++
++
++    /*
++     * returns the arg-list that is passed to qemu/softmmu init()
++     * Cannot be NULL
++     */
++    const char* (*get_init_cmdline)(struct FuzzTarget *);
++
++    /*
++     * will run once, prior to running qemu/softmmu init.
++     * eg: set up shared-memory for communication with the child-process
++     * Can be NULL
++     */
++    void(*pre_vm_init)(void);
++
++    /*
++     * will run once, after QEMU has been initialized, prior to the fuzz-l=
+oop.
++     * eg: detect the memory map
++     * Can be NULL
++     */
++    void(*pre_fuzz)(QTestState *);
++
++    /*
++     * accepts and executes an input from libfuzzer. this is repeatedly
++     * executed during the fuzzing loop. Its should handle setup, input
++     * execution and cleanup.
++     * Cannot be NULL
++     */
++    void(*fuzz)(QTestState *, const unsigned char *, size_t);
++
++} FuzzTarget;
++
++void flush_events(QTestState *);
++void reboot(QTestState *);
++
++/*
++ * makes a copy of *target and adds it to the target-list.
++ * i.e. fine to set up target on the caller's stack
++ */
++void fuzz_add_target(const FuzzTarget *target);
++
++int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size);
++int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp);
++
++#endif
++
+--=20
+2.23.0
+
 
