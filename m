@@ -2,49 +2,46 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96596C35240
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F36C33CB7
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:08:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 701112070E
+	by mail.kernel.org (Postfix) with ESMTPS id D1E1B2070E
 	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:08:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 701112070E
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1E1B2070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwo0t-0002hn-KL
+	id 1iwo0t-0002j6-TX
 	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 09:08:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40526)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40531)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo09-0001Kp-Kt
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo09-0001Kr-JW
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo08-0001D4-E2
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo08-0001DJ-GL
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:07:29 -0500
-Received: from relay.sw.ru ([185.231.240.75]:53598)
+Received: from relay.sw.ru ([185.231.240.75]:53606)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iwo08-00013U-78; Wed, 29 Jan 2020 09:07:28 -0500
+ id 1iwo08-00013R-8y; Wed, 29 Jan 2020 09:07:28 -0500
 Received: from dptest2.qa.sw.ru ([10.94.4.71])
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iwnzt-0003j6-Dl; Wed, 29 Jan 2020 17:07:13 +0300
+ id 1iwnzs-0003j6-US; Wed, 29 Jan 2020 17:07:13 +0300
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 4/4] tests: rename virtio_seg_max_adjust to
- virtio_check_params
-Date: Wed, 29 Jan 2020 17:07:02 +0300
-Message-Id: <20200129140702.5411-5-dplotnikov@virtuozzo.com>
+Subject: [PATCH v1 0/4] Increase default virtqueue size to improve performance
+Date: Wed, 29 Jan 2020 17:06:58 +0300
+Message-Id: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
-References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
@@ -65,20 +62,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since, virtio_seg_max_adjust checks not only seg_max, but also
-virtqueue_size parameter, let's make the test more general and
-add new parameters to be checked there in the future.
+The goal is to increase the performance of the block layer on
+1M reads/writes up to 4% by reducing the amount of requests issued by a guest
+using virtio-scsi or virtio-blk devices.
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- .../{virtio_seg_max_adjust.py => virtio_check_params.py}          | 0
- 1 file changed, 0 insertions(+), 0 deletions(-)
- rename tests/acceptance/{virtio_seg_max_adjust.py => virtio_check_params.py} (100%)
+Original problem description:
+https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.html
 
-diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance/virtio_check_params.py
-similarity index 100%
-rename from tests/acceptance/virtio_seg_max_adjust.py
-rename to tests/acceptance/virtio_check_params.py
+
+Denis Plotnikov (4):
+  virtio: introduce VIRTQUEUE_DEFUALT_SIZE instead of hardcoded
+    constants
+  virtio: increase virtuqueue size for virtio-scsi and virtio-blk
+  tests: add virtuqueue size checking to virtio_seg_max_adjust test
+  tests: rename virtio_seg_max_adjust to virtio_check_params
+
+ hw/block/virtio-blk.c                         |  6 ++--
+ hw/core/machine.c                             |  3 ++
+ hw/scsi/virtio-scsi.c                         |  5 +--
+ include/hw/virtio/virtio.h                    |  1 +
+ ...g_max_adjust.py => virtio_check_params.py} | 33 ++++++++++++-------
+ 5 files changed, 32 insertions(+), 16 deletions(-)
+ rename tests/acceptance/{virtio_seg_max_adjust.py => virtio_check_params.py} (79%)
+
 -- 
 2.17.0
 
