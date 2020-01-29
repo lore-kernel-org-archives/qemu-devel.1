@@ -2,73 +2,88 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F5AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEB5C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:55:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE14E20674
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:53:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE14E20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA85A206D5
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:55:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dzKKYgBd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA85A206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwvHR-0004Nh-53
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:53:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60184)
+	id 1iwvJV-0005e1-3f
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:55:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39654)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iwuq8-0007fJ-GC
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:37 -0500
+ (envelope-from <gshan@redhat.com>) id 1iwvIS-0004x1-Ni
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iwuq7-0003DG-9f
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40050)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iwuq7-00039y-2d
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iwuq6-0001gS-27
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 21:25:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0A2852E80AD
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 21:25:34 +0000 (UTC)
+ (envelope-from <gshan@redhat.com>) id 1iwvIQ-0001MZ-Nu
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:54:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47746
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1iwvIQ-0001M3-JK
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:54:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580334889;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2caJ/6uS2IIJxFpAJghqrpPksPreFo/O+EejdndpHkc=;
+ b=dzKKYgBdJHwnLgmy34eweXMezbUPQ7ZyYC6s7k4465vuoA08gJsAmUEtj/wQq7Ymj6eqru
+ mPwty/nrbZXTdSQs9RCx9XP6DO/+28942Aatnt1OsB1whKqa1V/DLRwHABm/DJQFZvFh08
+ RodWC1ntDnuq+uIi8N6NNSr4f3g5mYg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-OvNL_kj3OkSqqFG-cnZIwQ-1; Wed, 29 Jan 2020 16:54:48 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13B8A1882CC9;
+ Wed, 29 Jan 2020 21:54:47 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-25.bne.redhat.com [10.64.54.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 78D8884BB8;
+ Wed, 29 Jan 2020 21:54:41 +0000 (UTC)
+Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
+To: Julien Thierry <jthierry@redhat.com>, qemu-arm@nongnu.org
+References: <20191219040612.28431-1-gshan@redhat.com>
+ <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
+ <f4699b81-26ac-fcd4-d3fc-f6e055beeb65@redhat.com>
+ <9f82206e-0852-ae17-8c77-01d2a5cea97d@redhat.com>
+ <51a83889-f2ef-5403-6661-710cfa1ffe01@redhat.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <4a517e53-9a7c-903a-9fbc-e1aab1cccefb@redhat.com>
+Date: Thu, 30 Jan 2020 08:54:37 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Jan 2020 21:18:59 -0000
-From: rinigus <rinigus.git@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: rinigus-git
-X-Launchpad-Bug-Reporter: rinigus (rinigus-git)
-X-Launchpad-Bug-Modifier: rinigus (rinigus-git)
-Message-Id: <158033273927.19447.5685950954198072756.malonedeb@gac.canonical.com>
-Subject: [Bug 1861341] [NEW] ARM QEMU: Unknown syscall 397
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: cdf84f6f1fe5969b4fb8d5d2397d62a9eda2bf4f
+In-Reply-To: <51a83889-f2ef-5403-6661-710cfa1ffe01@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: OvNL_kj3OkSqqFG-cnZIwQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Wed, 29 Jan 2020 16:53:17 -0500
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,98 +92,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1861341 <1861341@bugs.launchpad.net>
+Reply-To: Gavin Shan <gshan@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, aik@ozlabs.ru, maz@kernel.org,
+ qemu-devel@nongnu.org, eric.auger@redhat.com, shan.gavin@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 1/29/20 6:57 PM, Julien Thierry wrote:
+> On 1/29/20 3:46 AM, Gavin Shan wrote:
+>> On 1/28/20 7:29 PM, Julien Thierry wrote:
 
-QEMU is reporting
+.../...
 
-```
-Unknown syscall 397
-```
+>>
+>> Julien, thanks for the explanation. The question we're not sure if NMI should
+>> be injected on receiving HMP/QMP "nmi" command. It means it's not clear what
+>> behavior we should have for this command on ARM. However, I have one more
+>> unrelated question: "pseudo" NMI on ARM64 should be PPI? I mean SPI can't
+>> be "pseudo" NMI.
+>>
+> 
+> I'm not sure I understand why you say "SPI can't be "pseudo" NMI". Currently both PPI and SPI are supported in the "pseudo" NMI scheme. Do you think that should not be the case? If so, can you elaborate?
+> 
+> Thanks,
+> 
 
-(statx if I read tables right) when used via flatpak for ARM images on
-x86_64. This has been reproduced on Fedora and Gentoo.
+Julien, NMI interrupt is connected to the system by request_nmi() where we have
+a check as below. -EINVAL will be returned from request_nmi() on those interrupts
+whose descriptors aren't marked with IRQ_NOAUTOEN. SPI falls into this category.
+Please refer to below code snippet extracted from gic_irq_domain_map() for more
+details.
 
-To reproduce:
+kernel/irq/manage.c::request_nmi()
 
-- get flatpak KDE 5.12 for arm:
+int request_nmi(unsigned int irq, irq_handler_t handler,
+                 unsigned long irqflags, const char *name, void *dev_id)
+{
+	:
+         if (!desc || irq_settings_can_autoenable(desc) ||
+             !irq_settings_can_request(desc) ||
+             WARN_ON(irq_settings_is_per_cpu_devid(desc)) ||
+             !irq_supports_nmi(desc))
+		return -EINVAL;
+	:
+}
 
-flatpak install --user org.kde.Sdk/arm/5.12 org.kde.Platform/arm/5.12
 
+acpi_register_gsi
+    irq_create_fwspec_mapping
+       irq_domain_alloc_irqs
+          __irq_domain_alloc_irqs
+             irq_domain_alloc_irqs_hierarchy
+                gic_irq_domain_alloc                  # irq_domain_ops::alloc
+                   gic_irq_domain_map
 
-- run qmake inside Sdk:
+drivers/irqchip/irq-gic-v3.c::gic_irq_domain_map()
 
-QEMU_STRACE=3D1 flatpak run --filesystem=3Dhost --command=3Dqmake
-org.kde.Sdk/arm/5.12 .
+static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq,
+                               irq_hw_number_t hw)
+{
+	:
+        switch (__get_intid_range(hw)) {
+         case PPI_RANGE:
+         case EPPI_RANGE:
+                 irq_set_percpu_devid(irq);
+                 irq_domain_set_info(d, irq, hw, chip, d->host_data,
+                                     handle_percpu_devid_irq, NULL, NULL);
+                 irq_set_status_flags(irq, IRQ_NOAUTOEN);                      <<<< this flag
+                 break;
 
+         case SPI_RANGE:
+         case ESPI_RANGE:
+                 irq_domain_set_info(d, irq, hw, chip, d->host_data,
+                                     handle_fasteoi_irq, NULL, NULL);
+                 irq_set_probe(irq);
+                 irqd_set_single_target(irq_desc_get_irq_data(irq_to_desc(irq)));
+                 break;
+            :
+	}
+         :
+}
 
-You will get a host of messages with unknown syscall. In practice, qmake wi=
-ll fail to find .pro files if you have them in that folder and libraries in=
- the system.
+Thanks,
+Gavin
 
-As far as I understand, Flatpak images are built on AARCH64 hardware.
-
-My config on Gentoo:
-
-kernel: 4.19.86-gentoo x86_64
-app-emulation/qemu: ~4.2.0-r1 , same with 4.0.0
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1861341
-
-Title:
-  ARM QEMU: Unknown syscall 397
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU is reporting
-
-  ```
-  Unknown syscall 397
-  ```
-
-  (statx if I read tables right) when used via flatpak for ARM images on
-  x86_64. This has been reproduced on Fedora and Gentoo.
-
-  To reproduce:
-
-  - get flatpak KDE 5.12 for arm:
-
-  flatpak install --user org.kde.Sdk/arm/5.12 org.kde.Platform/arm/5.12
-
-  =
-
-  - run qmake inside Sdk:
-
-  QEMU_STRACE=3D1 flatpak run --filesystem=3Dhost --command=3Dqmake
-  org.kde.Sdk/arm/5.12 .
-
-  =
-
-  You will get a host of messages with unknown syscall. In practice, qmake =
-will fail to find .pro files if you have them in that folder and libraries =
-in the system.
-
-  As far as I understand, Flatpak images are built on AARCH64 hardware.
-
-  My config on Gentoo:
-
-  kernel: 4.19.86-gentoo x86_64
-  app-emulation/qemu: ~4.2.0-r1 , same with 4.0.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1861341/+subscriptions
 
