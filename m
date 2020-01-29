@@ -2,51 +2,52 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3175C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7473EC33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:25:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7636B2064C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:24:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7636B2064C
+	by mail.kernel.org (Postfix) with ESMTPS id 4815320663
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 12:25:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4815320663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwmOI-0003p5-NJ
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:24:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52668)
+	id 1iwmPo-0006Sh-F1
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 07:25:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCz-0000Pk-Ks
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:39 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmDA-0000qs-1U
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iwmCy-0003ne-8Z
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:37 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iwmD8-0004VU-QS
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:47 -0500
 Received: from mga09.intel.com ([134.134.136.24]:58727)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmCx-0001Rn-Ss
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:36 -0500
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iwmD8-0001Rn-Ge
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 07:12:46 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Jan 2020 04:11:53 -0800
+ 29 Jan 2020 04:11:54 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314071296"
+X-IronPort-AV: E=Sophos;i="5.70,377,1574150400"; d="scan'208";a="314071341"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:53 -0800
+ by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 04:11:54 -0800
 From: "Liu, Yi L" <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, pbonzini@redhat.com,
  alex.williamson@redhat.com, peterx@redhat.com
-Subject: [RFC v3 21/25] intel_iommu: do not pass down pasid bind for PASID #0
-Date: Wed, 29 Jan 2020 04:16:52 -0800
-Message-Id: <1580300216-86172-22-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v3 23/25] intel_iommu: process PASID-based iotlb invalidation
+Date: Wed, 29 Jan 2020 04:16:54 -0800
+Message-Id: <1580300216-86172-24-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
 References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
@@ -75,29 +76,10 @@ Sender: "Qemu-devel"
 
 From: Liu Yi L <yi.l.liu@intel.com>
 
-RID_PASID field was introduced in VT-d 3.0 spec, it is used
-for DMA requests w/o PASID in scalable mode VT-d. It is also
-known as IOVA. And in VT-d 3.1 spec, there is definition on it:
-
-"Implementations not supporting RID_PASID capability
-(ECAP_REG.RPS is 0b), use a PASID value of 0 to perform
-address translation for requests without PASID."
-
-This patch adds a check against the PASIDs which are going to be
-bound to device. For PASID #0, it is not necessary to pass down
-pasid bind request for it since PASID #0 is used as RID_PASID for
-DMA requests without pasid. Further reason is current Intel vIOMMU
-supports gIOVA by shadowing guest 2nd level page table. However,
-in future, if guest IOMMU driver uses 1st level page table to store
-IOVA mappings, then guest IOVA support will also be done via nested
-translation. When gIOVA is over FLPT, then vIOMMU should pass down
-the pasid bind request for PASID #0 to host, host needs to bind the
-guest IOVA page table to a proper PASID. e.g PASID value in RID_PASID
-field for PF/VF if ECAP_REG.RPS is clear or default PASID for ADI
-(Assignable Device Interface in Scalable IOV solution).
-
-IOVA over FLPT support on Intel VT-d:
-https://lkml.org/lkml/2019/9/23/297
+This patch adds the basic PASID-based iotlb (piotlb) invalidation
+support. piotlb is used during walking Intel VT-d 1st level page
+table. This patch only adds the basic processing. Detailed handling
+will be added in next patch.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -108,30 +90,109 @@ Cc: Richard Henderson <rth@twiddle.net>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/i386/intel_iommu.c          | 57 ++++++++++++++++++++++++++++++++++++++++++
+ hw/i386/intel_iommu_internal.h | 13 ++++++++++
+ 2 files changed, 70 insertions(+)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 6422add..a511289 100644
+index a511289..1fe8257 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -1883,6 +1883,16 @@ static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
-     struct iommu_gpasid_bind_data *g_bind_data;
-     int ret = -1;
+@@ -3102,6 +3102,59 @@ static bool vtd_process_pasid_desc(IntelIOMMUState *s,
+     return (ret == 0) ? true : false;
+ }
  
-+    if (pasid < VTD_MIN_HPASID) {
-+        /*
-+         * If pasid < VTD_HPASID_MIN, this pasid is not allocated
-+         * from host. No need to pass down the changes on it to host.
-+         * TODO: when IOVA over FLPT is ready, this switch should be
-+         * refined.
-+         */
-+        return 0;
++static void vtd_piotlb_pasid_invalidate(IntelIOMMUState *s,
++                                        uint16_t domain_id,
++                                        uint32_t pasid)
++{
++}
++
++static void vtd_piotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
++                             uint32_t pasid, hwaddr addr, uint8_t am, bool ih)
++{
++}
++
++static bool vtd_process_piotlb_desc(IntelIOMMUState *s,
++                                    VTDInvDesc *inv_desc)
++{
++    uint16_t domain_id;
++    uint32_t pasid;
++    uint8_t am;
++    hwaddr addr;
++
++    if ((inv_desc->val[0] & VTD_INV_DESC_PIOTLB_RSVD_VAL0) ||
++        (inv_desc->val[1] & VTD_INV_DESC_PIOTLB_RSVD_VAL1)) {
++        error_report_once("non-zero-field-in-piotlb_inv_desc hi: 0x%" PRIx64
++                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
++        return false;
 +    }
 +
-     vtd_icx = vtd_bus->dev_icx[devfn];
-     if (!vtd_icx) {
-         return ret;
++    domain_id = VTD_INV_DESC_PIOTLB_DID(inv_desc->val[0]);
++    pasid = VTD_INV_DESC_PIOTLB_PASID(inv_desc->val[0]);
++    switch (inv_desc->val[0] & VTD_INV_DESC_IOTLB_G) {
++    case VTD_INV_DESC_PIOTLB_ALL_IN_PASID:
++        vtd_piotlb_pasid_invalidate(s, domain_id, pasid);
++        break;
++
++    case VTD_INV_DESC_PIOTLB_PSI_IN_PASID:
++        am = VTD_INV_DESC_PIOTLB_AM(inv_desc->val[1]);
++        addr = (hwaddr) VTD_INV_DESC_PIOTLB_ADDR(inv_desc->val[1]);
++        if (am > VTD_MAMV) {
++            error_report_once("Invalid am, > max am value, hi: 0x%" PRIx64
++                    " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
++            return false;
++        }
++        vtd_piotlb_page_invalidate(s, domain_id, pasid,
++             addr, am, VTD_INV_DESC_PIOTLB_IH(inv_desc->val[1]));
++        break;
++
++    default:
++        error_report_once("Invalid granularity in P-IOTLB desc hi: 0x%" PRIx64
++                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
++        return false;
++    }
++    return true;
++}
++
+ static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
+                                      VTDInvDesc *inv_desc)
+ {
+@@ -3216,6 +3269,10 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+         break;
+ 
+     case VTD_INV_DESC_PIOTLB:
++        trace_vtd_inv_desc("p-iotlb", inv_desc.val[1], inv_desc.val[0]);
++        if (!vtd_process_piotlb_desc(s, &inv_desc)) {
++            return false;
++        }
+         break;
+ 
+     case VTD_INV_DESC_WAIT:
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index a487b30..7f4db04 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -461,6 +461,19 @@ typedef union VTDInvDesc VTDInvDesc;
+ #define VTD_INV_DESC_PASIDC_PASID_SI   (1ULL << 4)
+ #define VTD_INV_DESC_PASIDC_GLOBAL     (3ULL << 4)
+ 
++#define VTD_INV_DESC_PIOTLB_ALL_IN_PASID  (2ULL << 4)
++#define VTD_INV_DESC_PIOTLB_PSI_IN_PASID  (3ULL << 4)
++
++#define VTD_INV_DESC_PIOTLB_RSVD_VAL0     0xfff000000000ffc0ULL
++#define VTD_INV_DESC_PIOTLB_RSVD_VAL1     0xf80ULL
++
++#define VTD_INV_DESC_PIOTLB_PASID(val)    (((val) >> 32) & 0xfffffULL)
++#define VTD_INV_DESC_PIOTLB_DID(val)      (((val) >> 16) & \
++                                             VTD_DOMAIN_ID_MASK)
++#define VTD_INV_DESC_PIOTLB_ADDR(val)     ((val) & ~0xfffULL)
++#define VTD_INV_DESC_PIOTLB_AM(val)       ((val) & 0x3fULL)
++#define VTD_INV_DESC_PIOTLB_IH(val)       (((val) >> 6) & 0x1)
++
+ /* Information about page-selective IOTLB invalidate */
+ struct VTDIOTLBPageInvInfo {
+     uint16_t domain_id;
 -- 
 2.7.4
 
