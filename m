@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A50C35240
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B426C33CB7
 	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA9C4207FD
+	by mail.kernel.org (Postfix) with ESMTPS id F321120CC7
 	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:36:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA9C4207FD
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F321120CC7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwjm9-0005KG-Ua
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 04:36:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51378)
+	id 1iwjmA-0005No-42
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 04:36:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1iwjl3-0003bT-9k
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:35:38 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1iwjl3-0003bV-TS
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1iwjl2-0000lX-Ak
+ (envelope-from <fthain@telegraphics.com.au>) id 1iwjl1-0000k9-RS
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:35:37 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:50074)
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:50046)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1iwjl2-0000kr-6x; Wed, 29 Jan 2020 04:35:36 -0500
+ id 1iwjl1-0000jY-N6; Wed, 29 Jan 2020 04:35:35 -0500
 Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
- id 8B0F2299C2; Wed, 29 Jan 2020 04:35:35 -0500 (EST)
+ id 57278299BE; Wed, 29 Jan 2020 04:35:35 -0500 (EST)
 To: Jason Wang <jasowang@redhat.com>,
     qemu-devel@nongnu.org
-Message-Id: <c06cf1aa63738215c514cc80cc1bfee5361b6ff9.1580290069.git.fthain@telegraphics.com.au>
+Message-Id: <1753b927c867d25e87da8d5d20fa0b9d60f938cb.1580290069.git.fthain@telegraphics.com.au>
 In-Reply-To: <cover.1580290069.git.fthain@telegraphics.com.au>
 References: <cover.1580290069.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v4 08/14] dp8393x: Don't clobber packet checksum
+Subject: [PATCH v4 04/14] dp8393x: Have dp8393x_receive() return the packet
+ size
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Date: Wed, 29 Jan 2020 20:27:49 +1100
@@ -66,32 +67,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A received packet consumes pkt_size bytes in the buffer and the frame
-checksum that's appended to it consumes another 4 bytes. The Receive
-Buffer Address register takes the former quantity into account but
-not the latter. So the next packet written to the buffer overwrites
-the frame checksum. Fix this.
+This function re-uses its 'size' argument as a scratch variable.
+Instead, declare a local 'size' variable for that purpose so that the
+function result doesn't get messed up.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/net/dp8393x.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/net/dp8393x.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 0309365fda..947ceef37c 100644
+index 2d2ace2549..ece72cbf42 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -816,6 +816,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
+@@ -757,20 +757,21 @@ static int dp8393x_receive_filter(dp8393xState *s, =
+const uint8_t * buf,
+ }
+=20
+ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+-                               size_t size)
++                               size_t pkt_size)
+ {
+     dp8393xState *s =3D qemu_get_nic_opaque(nc);
+     int packet_type;
+     uint32_t available, address;
+-    int width, rx_len =3D size;
++    int width, rx_len =3D pkt_size;
+     uint32_t checksum;
++    int size;
+=20
+     width =3D (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
+=20
+     s->regs[SONIC_RCR] &=3D ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_=
+FAER |
+         SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC);
+=20
+-    packet_type =3D dp8393x_receive_filter(s, buf, size);
++    packet_type =3D dp8393x_receive_filter(s, buf, pkt_size);
+     if (packet_type < 0) {
+         DPRINTF("packet not for netcard\n");
+         return -1;
+@@ -864,7 +865,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
 nst uint8_t * buf,
-     address +=3D rx_len;
-     address_space_rw(&s->as, address,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, 4, 1);
-+    address +=3D 4;
-     rx_len +=3D 4;
-     s->regs[SONIC_CRBA1] =3D address >> 16;
-     s->regs[SONIC_CRBA0] =3D address & 0xffff;
+     /* Done */
+     dp8393x_update_irq(s);
+=20
+-    return size;
++    return pkt_size;
+ }
+=20
+ static void dp8393x_reset(DeviceState *dev)
 --=20
 2.24.1
 
