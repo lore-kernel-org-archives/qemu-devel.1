@@ -2,71 +2,75 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C73E3C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BBFC33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C2602070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:52:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2602070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D09CC2070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gnT2FGg+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09CC2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwltA-0003Y3-PS
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:52:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44963)
+	id 1iwlym-00068H-UV
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:57:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <salil.mehta@huawei.com>) id 1iwlsS-00032e-Rv
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:51:26 -0500
+ (envelope-from <quintela@redhat.com>) id 1iwlxx-0004n7-K9
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <salil.mehta@huawei.com>) id 1iwlsR-00075F-OP
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:51:24 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2068 helo=huawei.com)
+ (envelope-from <quintela@redhat.com>) id 1iwlxv-0005vb-GJ
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:04 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41500
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <salil.mehta@huawei.com>)
- id 1iwlsO-0006y7-RJ; Wed, 29 Jan 2020 06:51:20 -0500
-Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.106])
- by Forcepoint Email with ESMTP id E57DE94688458C62FB6F;
- Wed, 29 Jan 2020 11:51:14 +0000 (GMT)
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Wed, 29 Jan 2020 11:51:14 +0000
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml703-chm.china.huawei.com (10.201.108.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 29 Jan 2020 11:51:14 +0000
-Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
- lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1713.004; 
- Wed, 29 Jan 2020 11:51:14 +0000
-From: Salil Mehta <salil.mehta@huawei.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org"
- <qemu-arm@nongnu.org>
-Subject: [Question] Regarding presence of duplicate ACPI CPU entries at two
- nodes \\_SB.CXXX and \\_SB.CPUS.CXXX  of namespace
-Thread-Topic: [Question] Regarding presence of duplicate ACPI CPU entries at
- two nodes \\_SB.CXXX and \\_SB.CPUS.CXXX  of namespace
-Thread-Index: AdXWmXYiOGpNwkpgSDKkSEKdULrKCQ==
-Date: Wed, 29 Jan 2020 11:51:14 +0000
-Message-ID: <590fb35353de473d9c689caead95c659@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.103]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwlxv-0005tK-60
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580299022;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=qlwRzw0lgVZNQBON/VubX+BQXhxwmR8b3bktfZ159uw=;
+ b=gnT2FGg+s3a3xQRGDS4lFmOvl8OA+sJleng7FIK8Wuz3O6wr21biZWwezq7Y471WrGu/WE
+ 7LPoPN3zWtIVQYXJmtJ0n7S34OGLLU4Hq5RUuOLvhNM9OysX2poDcUZWGkVQAN37TVPr7f
+ rIMO2G0d+sLXtQyUMrU/KZ05tBe94aA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-zv_7_fUUPj2O8RokQcqkyg-1; Wed, 29 Jan 2020 06:56:59 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 483CDDB3C
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:56:58 +0000 (UTC)
+Received: from secure.mitica (ovpn-116-64.ams2.redhat.com [10.36.116.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02B7B19E9C;
+ Wed, 29 Jan 2020 11:56:55 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 0/8] Multifd Migration Compression
+Date: Wed, 29 Jan 2020 12:56:47 +0100
+Message-Id: <20200129115655.10414-1-quintela@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: zv_7_fUUPj2O8RokQcqkyg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,157 +82,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "drjones@redhat.com" <drjones@redhat.com>,
- "sameo@linux.intel.com" <sameo@linux.intel.com>,
- "mst@redhat.com" <mst@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- pbonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+Based-on: 20200129111536.9497-1-quintela@redhat.com
 
-Observation:
-If we launch Linux Guest VM using QEMU(running on any type host. I am using=
- x86) with
-CPU based on any ARM64 architecture then I could see QEMU populating ACPI n=
-odes
-related to same CPU at 2 places of the ACPI namespace:
-1. \\_SB.CXXX
-2. \\_SB.CPUS.CXXX=20
+[v5]
+- rebased on top of latest pull request
+- check zlib/zstd return codes in loops (denis suggestions)
+- check that we do the right thing in error cases (I corrupted the
+  stream, make buffers too small, etc by hand)
 
-Above results in Guest VM showing duplicate CPU entries in the sysfs for th=
-e same CPUS.
-I could make out the entries under \\_SB.CPUS.XXX are part of the container=
-.
+[v4]
+- create new parameters: multifd-zlib-level & multifd-zstd-level
+- use proper "conditionals" for qapi (thanks markus)
+- more than half of the patches moved to the migration PULL request
+  that this series are based on
+- method type has moved to one int from a set of flags
+- fixed all reviews comments
 
-estuary:/$ ls -al /sys/bus/acpi/devices/
+Please review.
 
-Observation 1: (belongs to \\_SB.C00X)
-ACPI0007:00 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:00=20
-ACPI0007:01 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:01
-ACPI0007:02 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:02
-ACPI0007:03 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:03
-ACPI0007:04 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:04
-ACPI0007:05 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0007:05
+[v3]
+- rebased on top of upstream + previous multifd cancel series
+- split multifd code into its own file (multifd.[ch])
+- split zstd/zlib compression methods (multifd-zstd/zlib.c)
+- use qemu module feauture to avoid ifdefs
+  (my understanding is that zlib needs to be present, but
+  we setup zstd only if it is not there or is disabled)
+- multifd-method: none|zlib|zstd
 
-Observation 2: (belongs to \\_SB.CPUS.C00X and under container ACPI0010:00 =
-part of \\_SB.CPUS)
-ACPI0007:06 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
-7:06 =20
-ACPI0007:07 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
-7:07=20
-ACPI0007:08 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
-7:08
-ACPI0007:09 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
-7:09
-ACPI0007:0a -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
-7:0a
-ACPI0007:0b -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00/ACPI000=
-7:0b
-ACPI0010:00 -> ../../../devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0010:00
-
-
-estuary:/$ cat /sys/bus/acpi/devices/ACPI0010\:00/path=20
-\_SB_.CPUS
-
-estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:00/uid=20
-0
-estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:00/path
-\_SB_.C000
-
-estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:06/uid=20
-0
-estuary:/$ cat /sys/bus/acpi/devices/ACPI0007\:06/path
-\_SB_.CPUS.C000
-
-
-
-QEMU Code Excerpt:
-I could trace with in QEMU AML code, the CPUS are being appended at 2 place=
-s:
-
-
-Code 1. File: hw/arm/virt-acpi-build.c (Cause of Observation 1 i.e. \\_SB.C=
-XXX )
-
-static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
-{
-    uint16_t i;
-
-    for (i =3D 0; i < smp_cpus; i++) { --->{should be possible cpus anyways=
-}
-        Aml *dev =3D aml_device("C%.03X", i);
-        aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
-        aml_append(dev, aml_name_decl("_UID", aml_int(i)));
-        aml_append(scope, dev);
-    }
-}
-
-
-Code 2. File: hw/acpi/cpu.c (Cause of Observation 2 i.e. \\_SB.CPUS.CXXX)
-
-void build_cpus_aml(..)
-{
-[...]
-  cpus_dev =3D aml_device("\\_SB.CPUS");
-  {
-    [...]
-            /* build Processor object for each processor */
-        for (i =3D 0; i < arch_ids->len; i++) {
-            Aml *dev;
-            Aml *uid =3D aml_int(i);
-            GArray *madt_buf =3D g_array_new(0, 1, 1);
-            int arch_id =3D arch_ids->cpus[i].arch_id;
-
-            if (opts.acpi_1_compatible && arch_id < 255) {
-                dev =3D aml_processor(i, 0, 0, CPU_NAME_FMT, i);
-            } else {
-                dev =3D aml_device(CPU_NAME_FMT, i);
-                aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007"=
-)));
-                aml_append(dev, aml_name_decl("_UID", uid));
-            }
-    [...]
-  }   =20
-[...]
-}
-
-
+  As far as I can see, there is no easy way to convince qapi that zstd
+  option could/couldn't be there depending on compliation flags. I
+  ended just checking in migrate_parameters_check() if it is enabled
+  and giving an error message otherwise.
 
 Questions:
-Q1. I could not understand the purpose of keeping acpi_dsdt_add_cpus() afte=
-r the code 2.
-     was introduced as part of the below change and which is already adding=
- CPUS related
-     AML to \\_SB.CPUS namespace?
+- I am "reusing" the compress-level parameter for both zstd and zlib,
+  but it poses a problem:
+  * zlib values: 1-9 (default: 6?)
+  * zstd values: 1-19 (default: 3)
+So, what should I do:
+  * create multifd-zstd-level and multifd-zlib-level (easier)
+  * reuse compress-level, and change its maximum values depending on
+    multifd-method
+  * any other good option?
 
-acpi: cpuhp: add CPU devices AML with _STA method
-commit 5e1b5d93887b52eede156f846b6c4c5c8bbcfcdb
+Please, review.
 
-Q2. Do we really require CPUs being added by acpi_dsdt_add_cpus() in \\_SB.=
-CXXX
-     Namespace OR is it a stray code left?
+[v2] - rebase on top of previous arguments posted to the list -
+introduces zlib compression - introduces zstd compression
 
+Please help if you know anything about zstd/zlib compression.
 
+This puts compression on top of multifd. Advantages about current
+compression:
 
-Please help to correct if there is a gap in my understanding here and pleas=
-e
-forgive me if I have terribly missed out something very basic here.
+- We copy all pages in a single packet and then compress the whole
+  thing.
 
-Many thanks!
+- We reuse the compression stream for all the packets sent through the
+  same channel.
 
-Best Regards
-Salil
+- We can select nocomp/zlib/zstd levels of compression.
 
+Please, review.
 
+Juan Quintela (8):
+  multifd: Add multifd-method parameter
+  migration: Add support for modules
+  multifd: Make no compression operations into its own structure
+  multifd: Add multifd-zlib-level parameter
+  multifd: Add zlib compression multifd support
+  configure: Enable test and libs for zstd
+  multifd: Add multifd-zstd-level parameter
+  multifd: Add zstd compression multifd support
 
+ configure                    |  30 ++++
+ hw/core/qdev-properties.c    |  13 ++
+ include/hw/qdev-properties.h |   3 +
+ include/qemu/module.h        |   2 +
+ migration/Makefile.objs      |   2 +
+ migration/migration.c        |  70 ++++++++
+ migration/migration.h        |   3 +
+ migration/multifd-zlib.c     | 325 +++++++++++++++++++++++++++++++++
+ migration/multifd-zstd.c     | 337 +++++++++++++++++++++++++++++++++++
+ migration/multifd.c          | 191 +++++++++++++++++++-
+ migration/multifd.h          |  29 +++
+ migration/ram.c              |   2 +-
+ monitor/hmp-cmds.c           |  21 +++
+ qapi/migration.json          |  80 ++++++++-
+ tests/qtest/migration-test.c |  30 +++-
+ vl.c                         |   1 +
+ 16 files changed, 1123 insertions(+), 16 deletions(-)
+ create mode 100644 migration/multifd-zlib.c
+ create mode 100644 migration/multifd-zstd.c
 
-
-
-
+--=20
+2.24.1
 
 
