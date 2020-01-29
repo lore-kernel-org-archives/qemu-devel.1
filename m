@@ -8,82 +8,82 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1919C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88874C35240
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:10:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADC0A2070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:09:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5250F2070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:10:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gj+sz8qd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC0A2070E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t3mu4HSJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5250F2070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwpuC-0004Pa-Sv
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:09:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60251)
+	id 1iwpuu-0005FV-GA
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:10:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60342)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dmitry.fleytman@gmail.com>) id 1iwptb-0003t0-77
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:08:52 -0500
+ (envelope-from <dmitry.fleytman@gmail.com>) id 1iwpu1-0004Nk-8V
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dmitry.fleytman@gmail.com>) id 1iwpta-0004Du-3B
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:08:51 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36328)
+ (envelope-from <dmitry.fleytman@gmail.com>) id 1iwpu0-0004ey-0I
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:09:17 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36204)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dmitry.fleytman@gmail.com>)
- id 1iwptZ-0004DV-TP
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:08:50 -0500
-Received: by mail-wm1-x342.google.com with SMTP id p17so378170wma.1
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 08:08:49 -0800 (PST)
+ id 1iwptz-0004eR-Pa
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:09:15 -0500
+Received: by mail-wr1-x442.google.com with SMTP id z3so20886302wru.3
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 08:09:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:subject:from:in-reply-to:date:cc
  :content-transfer-encoding:message-id:references:to;
- bh=YaMZPWyvYYYyVLkWKGgdL3DN4EC0x930bl0+wSKDxNE=;
- b=Gj+sz8qdRg9+m4SxWIb75Y1+mugF/xENl+1ZqwJmaYF1jjrTBUZObu3WQ1Tr6kr0eE
- /2A6b3dfeAja5+VxSxlX1csL8tFXmCKFKAQuZ/bKdL1p/j4x+6OhdoFNjoEDgSl81PIm
- s+xX0lnMRbX07+qN0bognN8dylJyVfHZO9gNvMlDRX1zx6zu/yhq5W6VjHdCvmYrjDJ8
- SQhLNEJtNRjqaWIPp+Lt1C0BE88SGA5l/FPBNfHPmQHhAHME9wuafsYfLQ8rZNR9denY
- KldruNm3sy/WBSJnhA/Oa/p5B6l8tdKVWNilb5OWgH9JaITZ34zn1g8QnZZslhNFjssE
- W+nA==
+ bh=vunn4jij/PwSumUgbYGVfxlwmCM6KvyqwiShPczqBXY=;
+ b=t3mu4HSJXw3GW904wYzhoI+X9JtHvFzzJ+BsmUID0NybxczduhDmIvFkO9MNd2X6Na
+ QdKtkpvRPG0GD+ST520O/PleEXvEYoWHE+a4vYnY22eWvQlM5ZPhsj7CncYlpTLled7M
+ kD/F9Y8dUjsdQMRgrX+gz8GnaRuIT9RPamJbuc9dHzCkwigPcXQurw7DiPBLzShcgKzQ
+ 8xZvBnqbZHbQB1gIXwSORj0V1fi6y8PTjy6moc/0RlyxD0Z+blbvTts3+AHlyVa4+LjT
+ VOVkbpjp8sfYMCa5FcAxarteBgS42sMLEtRJH+b2qmXdImh4z8FMkigBC9fpONf5Nv71
+ 9mmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
  :content-transfer-encoding:message-id:references:to;
- bh=YaMZPWyvYYYyVLkWKGgdL3DN4EC0x930bl0+wSKDxNE=;
- b=VKOaf7FMD2PU3I03BwagTvHEhRPrzyPx5n5pTkNNxhbrf/iTSUsw58NKBHAl888tbW
- 78tRaRzZQVbz48u1Kabz3n5IfIMoWlSg699JftNO86cyKdkBGJ/3RtRNFE4PtG1ExsAO
- hisn99ORsQxQi1ZWHqTFwTujUtzs/4fxEq2TL9t/10ElP5w2XgehDwLTj29QEetEWsnp
- EedB2W9eQLAlRc3KOVOIfC/njTM3pM6frEfV2OD6spHJhAMcsgjMMcbJ10bVMhbZQfHe
- eH5n1l9f7YaTCfhEJ187uq+AfF3nkTmKaiKEKXiApO96NpUVKmx2dQmXd0RkFTpBu6An
- RRXQ==
-X-Gm-Message-State: APjAAAWIU7GsCcVNdQaj0kqLCal6pjy37KQ29Fvb2arUgTTnEVHiLOc1
- s5j0ygNki6s2a65ZM8ZoJ4U=
-X-Google-Smtp-Source: APXvYqx5UyQGEefvidIy5YhsTI+V2gvcSuqDmWYjvGzLd+5ohhLmPrHdoE3+tPwGsiH6QSGNefm3Tw==
-X-Received: by 2002:a7b:cc6a:: with SMTP id n10mr12306380wmj.170.1580314128537; 
- Wed, 29 Jan 2020 08:08:48 -0800 (PST)
+ bh=vunn4jij/PwSumUgbYGVfxlwmCM6KvyqwiShPczqBXY=;
+ b=t6f/FW+0KuhZGmNlWs0AC+ytz4I1nP/SrHhtjjtzqNvLdCRvHTal8OrNOmCXkeXNpF
+ cpzusNKl7oMcmNdTPlDgRh+7jo52OPKrHF5NcDb31GZlzyh7orvwzLNlCIOPAwpYQq7Z
+ fF1SHy6P6aKmNnHjrypLfs/1LbMhVmsgyt+L8FxK5GZsRp4nE3vITukheeC51oDusCAT
+ +RL1gLZO74CJemZ9Zndql+/JiyO41LFfsqnghjf18HIfcvykrtITXTg9WFz93xQQMOQ0
+ e8W2sz+DXNsfnc3xie0NDkMQ4xH3FHNOr9vww0YmiIYaNf0nvRhnz23BU/CmIYnLuLkw
+ kJfQ==
+X-Gm-Message-State: APjAAAVaQWtr3B8Ipyw+81qTWDZli+PZjUhnXlkHd8hdJ9je0LQrEisz
+ girYjO9Vzk/3f5/vek1u1gw=
+X-Google-Smtp-Source: APXvYqwoHt4hldBIfQtoX5onSQ+N9RPbMIaCT2BOGRm3EhXO2aRTtbwPNUqe82w9uFRF/mgE1i9aGQ==
+X-Received: by 2002:adf:df03:: with SMTP id y3mr36357718wrl.260.1580314154790; 
+ Wed, 29 Jan 2020 08:09:14 -0800 (PST)
 Received: from [10.0.1.16] ([141.226.29.227])
- by smtp.gmail.com with ESMTPSA id o4sm3416167wrx.25.2020.01.29.08.08.47
+ by smtp.gmail.com with ESMTPSA id o4sm3416167wrx.25.2020.01.29.08.09.13
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 29 Jan 2020 08:08:47 -0800 (PST)
+ Wed, 29 Jan 2020 08:09:14 -0800 (PST)
 Content-Type: text/plain;
 	charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH] e1000e: Avoid hw_error if legacy mode used
+Subject: Re: [PATCH 1/2] NetRxPkt: Introduce support for additional hash types
 From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-In-Reply-To: <20200127160312.31367-1-yuri.benditovich@daynix.com>
-Date: Wed, 29 Jan 2020 18:08:46 +0200
+In-Reply-To: <20200127115405.13459-1-yuri.benditovich@daynix.com>
+Date: Wed, 29 Jan 2020 18:09:13 +0200
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <DA18299E-DAAB-4CAB-B702-FAF238DEF9CB@gmail.com>
-References: <20200127160312.31367-1-yuri.benditovich@daynix.com>
+Message-Id: <DDDADB15-A1C8-40E6-A595-6A516F6E5831@gmail.com>
+References: <20200127115405.13459-1-yuri.benditovich@daynix.com>
 To: Yuri Benditovich <yuri.benditovich@daynix.com>
 X-Mailer: Apple Mail (2.3608.40.2.2.4)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,56 +96,136 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> On 27 Jan 2020, at 18:03, Yuri Benditovich =
+
+
+> On 27 Jan 2020, at 13:54, Yuri Benditovich =
 <yuri.benditovich@daynix.com> wrote:
 >=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1787142
-> The emulation issues hw_error if PSRCTL register
-> is written, for example, with zero value.
-> Such configuration does not present any problem when
-> DTYP bits of RCTL register define legacy format of
-> transfer descriptors. Current commit discards check
-> for BSIZE0 and BSIZE1 when legacy mode used.
+> Add support for following hash types:
+> IPV6 TCP with extension headers
+> IPV4 UDP
+> IPV6 UDP
+> IPV6 UDP with extension headers
 >=20
 > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 
+
 Acked-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
+
 > ---
-> hw/net/e1000e_core.c | 13 ++++++++-----
-> 1 file changed, 8 insertions(+), 5 deletions(-)
+> hw/net/net_rx_pkt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+> hw/net/net_rx_pkt.h |  6 +++++-
+> hw/net/trace-events |  4 ++++
+> 3 files changed, 51 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index 5b05c8ea8a..94ea34dca5 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -2813,12 +2813,15 @@ e1000e_set_eitr(E1000ECore *core, int index, =
-uint32_t val)
-> static void
-> e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
-> {
-> -    if ((val & E1000_PSRCTL_BSIZE0_MASK) =3D=3D 0) {
-> -        hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-> -    }
-> +    if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
+> diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+> index 98a5030ace..b2a06bd27d 100644
+> --- a/hw/net/net_rx_pkt.c
+> +++ b/hw/net/net_rx_pkt.c
+> @@ -307,6 +307,20 @@ _net_rx_rss_prepare_tcp(uint8_t *rss_input,
+>                           &tcphdr->th_dport, sizeof(uint16_t));
+> }
+>=20
+> +static inline void
+> +_net_rx_rss_prepare_udp(uint8_t *rss_input,
+> +                        struct NetRxPkt *pkt,
+> +                        size_t *bytes_written)
+> +{
+> +    struct udp_header *udphdr =3D &pkt->l4hdr_info.hdr.udp;
 > +
-> +        if ((val & E1000_PSRCTL_BSIZE0_MASK) =3D=3D 0) {
-> +            hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-> +        }
+> +    _net_rx_rss_add_chunk(rss_input, bytes_written,
+> +                          &udphdr->uh_sport, sizeof(uint16_t));
+> +
+> +    _net_rx_rss_add_chunk(rss_input, bytes_written,
+> +                          &udphdr->uh_dport, sizeof(uint16_t));
+> +}
+> +
+> uint32_t
+> net_rx_pkt_calc_rss_hash(struct NetRxPkt *pkt,
+>                          NetRxPktRssType type,
+> @@ -347,6 +361,34 @@ net_rx_pkt_calc_rss_hash(struct NetRxPkt *pkt,
+>         trace_net_rx_pkt_rss_ip6_ex();
+>         _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, =
+&rss_length);
+>         break;
+> +    case NetPktRssIpV6TcpEx:
+> +        assert(pkt->isip6);
+> +        assert(pkt->istcp);
+> +        trace_net_rx_pkt_rss_ip6_ex_tcp();
+> +        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, =
+&rss_length);
+> +        _net_rx_rss_prepare_tcp(&rss_input[0], pkt, &rss_length);
+> +        break;
+> +    case NetPktRssIpV4Udp:
+> +        assert(pkt->isip4);
+> +        assert(pkt->isudp);
+> +        trace_net_rx_pkt_rss_ip4_udp();
+> +        _net_rx_rss_prepare_ip4(&rss_input[0], pkt, &rss_length);
+> +        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
+> +        break;
+> +    case NetPktRssIpV6Udp:
+> +        assert(pkt->isip6);
+> +        assert(pkt->isudp);
+> +        trace_net_rx_pkt_rss_ip6_udp();
+> +        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, false, =
+&rss_length);
+> +        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
+> +        break;
+> +    case NetPktRssIpV6UdpEx:
+> +        assert(pkt->isip6);
+> +        assert(pkt->isudp);
+> +        trace_net_rx_pkt_rss_ip6_ex_udp();
+> +        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, =
+&rss_length);
+> +        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
+> +        break;
+>     default:
+>         assert(false);
+>         break;
+> diff --git a/hw/net/net_rx_pkt.h b/hw/net/net_rx_pkt.h
+> index 7adf0fad51..048e3461f0 100644
+> --- a/hw/net/net_rx_pkt.h
+> +++ b/hw/net/net_rx_pkt.h
+> @@ -133,7 +133,11 @@ typedef enum {
+>     NetPktRssIpV4Tcp,
+>     NetPktRssIpV6Tcp,
+>     NetPktRssIpV6,
+> -    NetPktRssIpV6Ex
+> +    NetPktRssIpV6Ex,
+> +    NetPktRssIpV6TcpEx,
+> +    NetPktRssIpV4Udp,
+> +    NetPktRssIpV6Udp,
+> +    NetPktRssIpV6UdpEx,
+> } NetRxPktRssType;
 >=20
-> -    if ((val & E1000_PSRCTL_BSIZE1_MASK) =3D=3D 0) {
-> -        hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
-> +        if ((val & E1000_PSRCTL_BSIZE1_MASK) =3D=3D 0) {
-> +            hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
-> +        }
->     }
+> /**
+> diff --git a/hw/net/trace-events b/hw/net/trace-events
+> index 6f990ede87..73d4558f7e 100644
+> --- a/hw/net/trace-events
+> +++ b/hw/net/trace-events
+> @@ -92,9 +92,13 @@ net_rx_pkt_l3_csum_validate_csum(size_t l3hdr_off, =
+uint32_t csl, uint32_t cntr,
 >=20
->     core->mac[PSRCTL] =3D val;
+> net_rx_pkt_rss_ip4(void) "Calculating IPv4 RSS  hash"
+> net_rx_pkt_rss_ip4_tcp(void) "Calculating IPv4/TCP RSS  hash"
+> +net_rx_pkt_rss_ip4_udp(void) "Calculating IPv4/UDP RSS  hash"
+> net_rx_pkt_rss_ip6_tcp(void) "Calculating IPv6/TCP RSS  hash"
+> +net_rx_pkt_rss_ip6_udp(void) "Calculating IPv6/UDP RSS  hash"
+> net_rx_pkt_rss_ip6(void) "Calculating IPv6 RSS  hash"
+> net_rx_pkt_rss_ip6_ex(void) "Calculating IPv6/EX RSS  hash"
+> +net_rx_pkt_rss_ip6_ex_tcp(void) "Calculating IPv6/EX/TCP RSS  hash"
+> +net_rx_pkt_rss_ip6_ex_udp(void) "Calculating IPv6/EX/UDP RSS  hash"
+> net_rx_pkt_rss_hash(size_t rss_length, uint32_t rss_hash) "RSS hash =
+for %zu bytes: 0x%X"
+> net_rx_pkt_rss_add_chunk(void* ptr, size_t size, size_t input_offset) =
+"Add RSS chunk %p, %zu bytes, RSS input offset %zu bytes"
+>=20
 > --=20
 > 2.17.1
 >=20
