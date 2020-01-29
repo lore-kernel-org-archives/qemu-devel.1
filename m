@@ -2,83 +2,86 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD1CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A16FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:52:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D901D206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23853206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:52:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zjfKNlhj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D901D206D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PnSPkNOs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23853206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwx7w-0007FY-Vs
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 18:52:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42976)
+	id 1iwx82-0007Qt-AV
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 18:52:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iwx6b-0005yb-Oh
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:46 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iwx6e-0005zf-35
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iwx6a-0001og-J8
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:45 -0500
-Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:37566)
+ (envelope-from <richard.henderson@linaro.org>) id 1iwx6c-0001t7-VD
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:48 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42309)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iwx6a-0001na-Cn
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:44 -0500
-Received: by mail-pf1-x42c.google.com with SMTP id p14so492764pfn.4
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:50:44 -0800 (PST)
+ id 1iwx6c-0001s3-PZ
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:50:46 -0500
+Received: by mail-pg1-x542.google.com with SMTP id s64so627574pgb.9
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:50:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Porl5wHKMsrkKEwhwV0RaIA5+WTtb1IXZ5cuVd/BzoI=;
- b=zjfKNlhjDpxW/tAWQ9ttPcufDKoPfGdWlCxHC1447Dh8wnwIq0W7pjWEEaoqXd1QgC
- 9wYf8h7An01hGP1hlPMAxUm00ND5hJNOw9YbkRWMo9+mAmGGcMs1al2mo94eEagV2KiF
- i+IKr8HMDpHQlKkd7C1GVifuM8pG6glrhx3MwHcCkcWLZIXz+w7juex5awAqhjrc6EQc
- bFcLXe33lsseo8oW5H2Rya6GrCdFPG7d7RG0W25Todd0BNYeab/6l1E+exwkrprBSmm7
- QjLv5hOPSCzJ5XTaXbsRsI4yLQPGsZ9mI05p3GSgNv+/0btGcnbJBvxrzcOSglp5HQBO
- mLWg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=42DTzkxwIkIPw/1LzUPJIt4v8UUQuVZ50M1s+EwARmU=;
+ b=PnSPkNOso8gryQy6Y4ADutI8RnPNerJgzp3bLA6jxVTlI1k5tXZOOMLmG4LurRMT6v
+ dZjS1O2pYiMfo9Rsm/QVeF9+Z+Opo7Y+mvMnfuPZCzvlJaNi5PinwvJc68lX6gOuaF0h
+ TgWuf2TdHK9aOrObogca7YMI97dELWFiRCBJX9y6VgxhLI4qUwS5/I1z7GML5VZ5xWY+
+ C5OfgHkusqzeAwcAv9EQfRx4V7mpIaRHrd4SFXWYAn+ozb5ii/6OOtZBBjEa4HGb/cfs
+ LAIqgVEKAAtQjuHFVpB4Nq+EHRYhgBaViujKtvk7GSQoWqurmf+qeAWDuUIgi3yZK69H
+ NSPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Porl5wHKMsrkKEwhwV0RaIA5+WTtb1IXZ5cuVd/BzoI=;
- b=RwbfPqJ4e1DxJt9RyGeexmcOYgbxeBJKdFTR5pJ7kbM06VzyrhRyOdgI0uGMW3U9xg
- g/5F4reE7ct8spFjWKREMJvXbYtoHSIRMMdkcvrltD3ZHy6bfcy8AWTa1EiaJ2iCmhRx
- P1PeXltzNdsDYc3UhRVh6RAToUVyrUCP4YZol4lUX6+pl9p8vc8ANohHR/wHyWVRqDpv
- cl76XrOqkD0izBHYqBdvCFsZJEXz6ir54bEf+0PNUhhXOuNR/PCSzij8OOtW+7q5PPSt
- ZitxoYYkgEthbu6quSWeu3b3ecKS3MH6kpeH0kR+JoktcCXN3ER0oTyuSnqlTHghHjEZ
- en6A==
-X-Gm-Message-State: APjAAAV018wXMLIIe+dEW9lZ8FklGTr2s5ok0dLNtKpEG4g8bFh+YzPK
- 5L9vqZNaAtm/NlOrszKZG9CPb2/UcE0=
-X-Google-Smtp-Source: APXvYqxgw1O4JZSMgsITxEDg3W/KfWeetovn9ask4NvIsoDHg8DEkdQQYfUWMUWqi4tdBpxM0D644Q==
-X-Received: by 2002:a63:7843:: with SMTP id t64mr1698391pgc.144.1580341842946; 
- Wed, 29 Jan 2020 15:50:42 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=42DTzkxwIkIPw/1LzUPJIt4v8UUQuVZ50M1s+EwARmU=;
+ b=avX2SiHAejiTkEv4u9Naitgrhl+OnAppLILIw6I+y7XJCFKcb9ILCHt636P344157i
+ vwm3nPdkv5qh5DJWwe42nmaFLAxRONW1/t9a293h4nHTzXBKCES1QCLR3s6G1ybwyjZg
+ zFdRymaiNl1XWL1+pqQ3g82SGPyI+Zna1zFtvEKM1LprqkHgtypuCJjDUytIg5zQ2CYo
+ ArDXsPVJLEGpA2/rMTVdcHFY4xFyOxNoPaR8hUTPFuQgmj/ELX3WkJKVf5XeBVss2Vqa
+ 8FGCeGJx563u5xDO0ReaEilvrfyQA15/1s9PvX/hvWpWOmhkTqZ7qS8Wj1g9cinFGsCe
+ n9Vw==
+X-Gm-Message-State: APjAAAVBXkWpAkT8MBAdqJIFgXRwbm2onQSpEWlGjvpSGxIkY2M8cujl
+ jT/moU2nKTzzjgWgdncmNCL36zvKYMA=
+X-Google-Smtp-Source: APXvYqyse4L2CD8eq+DLjlpGRNQvOPf5WQZlst9bMrT5X44hr9LiFBjwTXNciyy4zHdDI5z4QAJICw==
+X-Received: by 2002:a63:3e05:: with SMTP id l5mr1660915pga.293.1580341845530; 
+ Wed, 29 Jan 2020 15:50:45 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id 13sm3740195pfi.78.2020.01.29.15.50.41
+ by smtp.gmail.com with ESMTPSA id 13sm3740195pfi.78.2020.01.29.15.50.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 15:50:42 -0800 (PST)
+ Wed, 29 Jan 2020 15:50:44 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] target/ppc: Use probe_access
-Date: Wed, 29 Jan 2020 15:50:36 -0800
-Message-Id: <20200129235040.24022-1-richard.henderson@linaro.org>
+Subject: [PATCH 2/4] target/ppc: Use probe_access for LMW, STMW
+Date: Wed, 29 Jan 2020 15:50:38 -0800
+Message-Id: <20200129235040.24022-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200129235040.24022-1-richard.henderson@linaro.org>
+References: <20200129235040.24022-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::42c
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,23 +98,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The first two address the performance regression noticed
-by Howard Spoelstra.  The last two are just something I
-noticed at the same time.
+Use a minimum number of mmu lookups for the contiguous bytes
+that are accessed.  If the lookup succeeds, we can finish the
+operation with host addresses only.
 
+Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/ppc/mem_helper.c | 45 +++++++++++++++++++++++++++++------------
+ 1 file changed, 32 insertions(+), 13 deletions(-)
 
-r~
-
-
-Richard Henderson (4):
-  target/ppc: Use probe_access for LSW, STSW
-  target/ppc: Use probe_access for LMW, STMW
-  target/ppc: Remove redundant mask in DCBZ
-  target/ppc: Use probe_write for DCBZ
-
- target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 162 insertions(+), 35 deletions(-)
-
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index 508d472a2f..e7d3a79d96 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -84,26 +84,45 @@ static void *probe_contiguous(CPUPPCState *env, target_ulong addr, uint32_t nb,
+ 
+ void helper_lmw(CPUPPCState *env, target_ulong addr, uint32_t reg)
+ {
+-    for (; reg < 32; reg++) {
+-        if (needs_byteswap(env)) {
+-            env->gpr[reg] = bswap32(cpu_ldl_data_ra(env, addr, GETPC()));
+-        } else {
+-            env->gpr[reg] = cpu_ldl_data_ra(env, addr, GETPC());
++    uintptr_t raddr = GETPC();
++    int mmu_idx = cpu_mmu_index(env, false);
++    void *host = probe_contiguous(env, addr, (32 - reg) * 4,
++                                  MMU_DATA_LOAD, mmu_idx, raddr);
++
++    if (likely(host)) {
++        /* Fast path -- the entire operation is in RAM at host.  */
++        for (; reg < 32; reg++) {
++            env->gpr[reg] = (uint32_t)ldl_be_p(host);
++            host += 4;
++        }
++    } else {
++        /* Slow path -- at least some of the operation requires i/o.  */
++        for (; reg < 32; reg++) {
++            env->gpr[reg] = cpu_ldl_mmuidx_ra(env, addr, mmu_idx, raddr);
++            addr = addr_add(env, addr, 4);
+         }
+-        addr = addr_add(env, addr, 4);
+     }
+ }
+ 
+ void helper_stmw(CPUPPCState *env, target_ulong addr, uint32_t reg)
+ {
+-    for (; reg < 32; reg++) {
+-        if (needs_byteswap(env)) {
+-            cpu_stl_data_ra(env, addr, bswap32((uint32_t)env->gpr[reg]),
+-                                                   GETPC());
+-        } else {
+-            cpu_stl_data_ra(env, addr, (uint32_t)env->gpr[reg], GETPC());
++    uintptr_t raddr = GETPC();
++    int mmu_idx = cpu_mmu_index(env, false);
++    void *host = probe_contiguous(env, addr, (32 - reg) * 4,
++                                  MMU_DATA_STORE, mmu_idx, raddr);
++
++    if (likely(host)) {
++        /* Fast path -- the entire operation is in RAM at host.  */
++        for (; reg < 32; reg++) {
++            stl_be_p(host, env->gpr[reg]);
++            host += 4;
++        }
++    } else {
++        /* Slow path -- at least some of the operation requires i/o.  */
++        for (; reg < 32; reg++) {
++            cpu_stl_mmuidx_ra(env, addr, env->gpr[reg], mmu_idx, raddr);
++            addr = addr_add(env, addr, 4);
+         }
+-        addr = addr_add(env, addr, 4);
+     }
+ }
+ 
 -- 
 2.20.1
 
