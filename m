@@ -2,83 +2,74 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5378AC33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2890AC33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:59:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D6E02070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:45:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3DE320708
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 09:59:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PY21q9GI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D6E02070E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h9fHxYaQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3DE320708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwjuc-0002fQ-9z
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 04:45:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53830)
+	id 1iwk8R-0006hn-5N
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 04:59:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iwjqR-0006pY-UG
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:41:13 -0500
+ (envelope-from <ovoshcha@redhat.com>) id 1iwk7t-00069b-Oc
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:59:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iwjqQ-0007FL-GV
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:41:11 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38152
+ (envelope-from <ovoshcha@redhat.com>) id 1iwk7r-0000wj-Kd
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:59:12 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26062
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iwjqQ-0007Ex-CZ
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:41:10 -0500
+ (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1iwk7r-0000ra-Ao
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 04:59:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580290869;
+ s=mimecast20190719; t=1580291950;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=snFbLWDvlubWL+bO0Tgjrxd0VHp864cc8e54N8CIccA=;
- b=PY21q9GIqxEJnnyXRbY2U2+aZMxeL3ASHumD2m+C99Dz3OJF5Zl0SyDVPmYylIyQBj0VMt
- fqw9TRk9bnK11n59ls4tu3KOf+oY62z4VGvH6Xhqxyxrfph+TG3AfhCMMEij5HBROrDHoG
- sllVz+kzPcgQMgD0sBwJ/QsIGfWmRdY=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=PDVxPjuC7jT4w6utz8WE10HyfB7pyQRiFWwGFWpseg0=;
+ b=h9fHxYaQ+pGuRrdQSIZDXHNnne7TbJ7/G7ZrEneFG+n/fM9vQi05zwRzjQKSavX7zzGlQl
+ IMps//cef6DnZ2Z+1r4M5pdOBerMC45LAhXqZx/Cq9so2if944jCbHQT9dh/+bfjMF2iOv
+ AI2r7bV1/r+fKFhqiNMm/A2XhmcqgjM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-_5MxlMndPdisLNYlbYv6VQ-1; Wed, 29 Jan 2020 04:41:06 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-230-cBRXG5-dOH2-2ZkG4LIknQ-1; Wed, 29 Jan 2020 04:59:08 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8933A13E1;
- Wed, 29 Jan 2020 09:41:05 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 327B08EA03;
- Wed, 29 Jan 2020 09:41:05 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B59351138404; Wed, 29 Jan 2020 10:41:03 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2 2/4] qapi: Create module 'control'
-References: <20200128175211.30007-1-kwolf@redhat.com>
- <20200128175211.30007-3-kwolf@redhat.com>
- <8736by4q3m.fsf@dusky.pond.sub.org>
- <20200129090953.GA5690@linux.fritz.box>
-Date: Wed, 29 Jan 2020 10:41:03 +0100
-In-Reply-To: <20200129090953.GA5690@linux.fritz.box> (Kevin Wolf's message of
- "Wed, 29 Jan 2020 10:09:53 +0100")
-Message-ID: <87sgjy1txs.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD962DB21
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 09:59:07 +0000 (UTC)
+Received: from kh066.redhat.com (unknown [10.36.118.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9312A8578F;
+ Wed, 29 Jan 2020 09:59:04 +0000 (UTC)
+From: Oksana Vohchana <ovoshcha@redhat.com>
+To: qemu-devel@nongnu.org,
+	wainersm@redhat.com
+Subject: [PATCH v2] Acceptance test: provides to use different transport for
+ migration
+Date: Wed, 29 Jan 2020 11:59:03 +0200
+Message-Id: <20200129095903.31088-1-ovoshcha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: _5MxlMndPdisLNYlbYv6VQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: cBRXG5-dOH2-2ZkG4LIknQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
@@ -93,177 +84,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: ovoshcha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Along with VM migration via TCP, we can use migration through EXEC
+and UNIX transport protocol
+---
+ tests/acceptance/migration.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> Am 29.01.2020 um 09:35 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->>=20
->> > misc.json contains definitions that are related to the system emulator=
-,
->> > so it can't be used for other tools like the storage daemon. This patc=
-h
->> > moves basic functionality that is shared between all tools (and mostly
->> > related to the monitor itself) into a new control.json, which could be
->> > used in tools as well.
->> >
->> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> > ---
->> >  qapi/control.json          | 218 ++++++++++++++++++++++++++++++++++++=
+diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+index 8bbe28d52d..1f6a674843 100644
+--- a/tests/acceptance/migration.py
++++ b/tests/acceptance/migration.py
+@@ -12,11 +12,11 @@
+=20
+ import tempfile
+ from avocado_qemu import Test
+-from avocado import skipUnless\
++from avocado import skipUnless
+=20
+ from avocado.utils import network
+ from avocado.utils import wait
+-from avocado.utils.path import find_command, CmdNotFoundError
++from avocado.utils.path import find_command
+=20
+=20
+ class Migration(Test):
+@@ -62,6 +62,7 @@ class Migration(Test):
+         with tempfile.TemporaryDirectory(prefix=3D'socket_') as socket_pat=
+h:
+             dest_uri =3D 'unix:%s/qemu-test.sock' % socket_path
+             self.do_migrate(dest_uri)
 +
->> >  qapi/misc.json             | 212 ------------------------------------
->> >  qapi/qapi-schema.json      |   1 +
->> >  monitor/monitor-internal.h |   1 +
->> >  monitor/hmp-cmds.c         |   1 +
->> >  monitor/misc.c             |   1 +
->> >  monitor/qmp-cmds.c         |   1 +
->> >  monitor/qmp.c              |   2 +-
->> >  tests/qtest/qmp-test.c     |   2 +-
->> >  ui/gtk.c                   |   1 +
->> >  qapi/Makefile.objs         |   6 +-
->> >  11 files changed, 229 insertions(+), 217 deletions(-)
->> >  create mode 100644 qapi/control.json
->> >
->> > diff --git a/qapi/control.json b/qapi/control.json
->> > new file mode 100644
->> > index 0000000000..a82a18da1a
->> > --- /dev/null
->> > +++ b/qapi/control.json
->> > @@ -0,0 +1,218 @@
->> > +# -*- Mode: Python -*-
->> > +#
->> > +
->>=20
->> Let's add a copyright notice:
->>=20
->>    # Copyright (C) 2011-2020 Red Hat, Inc.
->>    #
->>    # This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
->>    # See the COPYING file in the top-level directory.
->
-> I'm not adding anything new, but just moving code from a file that
-> doesn't have a copyright notice. In fact, almost none of the schema
-> files have a copyright notice. I'm not comfortable adding legal
-> assertions without verifying that they are correct, and certainly not as
-> a side-effect of a code movement patch. This would be an unrelated
-> change.
->
-> I suggest that we leave this patch as is, and if you think copyright
-> notices should be added, the correct information can be tracked down
-> and added consistently for all schema files in a separate series.
-
-There is nothing to be tracked down.  Anything that lacks an explicit
-copyright notice is under GPLv2+, as per LICENSE.
-
->> > +##
->> > +# =3D Monitor definitions (shared between system emulator and tools)
->> > +##
->>=20
->> This comment does double-duty: it's for readers of this source file, and
->> for readers of generated docs/interop/qemu-qmp-ref.*.  It's okay for
->> the former, but not the latter, as the resulting table of contents
->> shows:
->> [...]
->
->> Proposed header:
->>=20
->>     # =3D QMP monitor control
->
-> Works for me.
->
->> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
->> > index 9751b11f8f..61fd91ede7 100644
->> > --- a/qapi/qapi-schema.json
->> > +++ b/qapi/qapi-schema.json
->> > @@ -103,6 +103,7 @@
->> >  { 'include': 'qdev.json' }
->> >  { 'include': 'machine.json' }
->> >  { 'include': 'machine-target.json' }
->> > +{ 'include': 'control.json' }
->> >  { 'include': 'misc.json' }
->> >  { 'include': 'misc-target.json' }
->> >  { 'include': 'audio.json' }
->>=20
->> This determines position within docs/interop/qemu-qmp-ref.*.  Next to
->> misc.json is the least change.  Perhaps putting it next to
->> introspect.json would be better.
->>=20
->> If we split @quit off control.json, then we could include the .json
->> providing @quit next to @stop & friends.  Again, I'm not demanding such
->> a split.
->
-> I'll put it before introspect.json for now.
->
-> I don't think the whole order is overly meaningful and it could use some
-> rearrangement in general. Again, unrelated to this series.
-
-Yes, the order could use some love.
-
->> > diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
->> > index d78f5ca190..4d402ded85 100644
->> > --- a/monitor/monitor-internal.h
->> > +++ b/monitor/monitor-internal.h
->> > @@ -27,6 +27,7 @@
->> > =20
->> >  #include "chardev/char-fe.h"
->> >  #include "monitor/monitor.h"
->> > +#include "qapi/qapi-types-control.h"
->> >  #include "qapi/qmp/dispatch.h"
->> >  #include "qapi/qmp/json-parser.h"
->> >  #include "qemu/readline.h"
->> > diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
->> > index d0e0af893a..abb052836b 100644
->> > --- a/monitor/hmp-cmds.c
->> > +++ b/monitor/hmp-cmds.c
->> > @@ -33,6 +33,7 @@
->> >  #include "qapi/qapi-commands-char.h"
->> >  #include "qapi/qapi-commands-migration.h"
->> >  #include "qapi/qapi-commands-misc.h"
->> > +#include "qapi/qapi-commands-control.h"
->> >  #include "qapi/qapi-commands-net.h"
->> >  #include "qapi/qapi-commands-rocker.h"
->> >  #include "qapi/qapi-commands-run-state.h"
->>=20
->> Please keep the qapi/qapi-commands-* sorted, like you do ...
->
-> It is sorted! It's exactly where you would expect "-monitor"... *sigh*
->
-> /me goes back to finding each #include and moving it.
-> /me hates renaming header files.
->
->> > diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
->> > index a8f1f4c35e..20fcc37c2c 100644
->> > --- a/qapi/Makefile.objs
->> > +++ b/qapi/Makefile.objs
->> > @@ -5,9 +5,9 @@ util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
->> >  util-obj-y +=3D qmp-event.o
->> >  util-obj-y +=3D qapi-util.o
->> > =20
->> > -QAPI_COMMON_MODULES =3D audio authz block-core block char common cryp=
-to
->> > -QAPI_COMMON_MODULES +=3D dump error introspect job machine migration =
-misc net
->> > -QAPI_COMMON_MODULES +=3D qdev qom rdma rocker run-state sockets tpm
->> > +QAPI_COMMON_MODULES =3D audio authz block-core block char common cont=
-rol crypto
->> > +QAPI_COMMON_MODULES +=3D dump error introspect job machine migration =
-misc
->> > +QAPI_COMMON_MODULES +=3D net qdev qom rdma rocker run-state sockets t=
-pm
->> >  QAPI_COMMON_MODULES +=3D trace transaction ui
->> >  QAPI_TARGET_MODULES =3D machine-target misc-target
->> >  QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
->>=20
->> With the comments and the include directives tidied up:
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
-> Thanks. (I assume this means even without the copyright header.)
-
-I'd prefer with, but I'll accept without.
+     @skipUnless(find_command('nc', default=3DFalse), "nc command not found=
+ on the system")
+     def test_migration_with_exec(self):
+         free_port =3D self._get_free_port()
+--=20
+2.21.1
 
 
