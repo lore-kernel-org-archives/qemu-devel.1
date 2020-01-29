@@ -4,71 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FED3C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 753C2C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:40:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C624206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41A7B206F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 21:40:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/xes4cT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C624206F0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0A2knKN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41A7B206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwv3s-0006OJ-M0
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:39:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60119)
+	id 1iwv4j-0007Js-Fv
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 16:40:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60232)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iwuq1-0007OP-Bz
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:30 -0500
+ (envelope-from <philmd@redhat.com>) id 1iwuqD-0007uP-Gd
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iwuq0-0002t3-E6
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59237
+ (envelope-from <philmd@redhat.com>) id 1iwuqC-0003NW-Gb
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58647
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwuq0-0002qI-9r
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:28 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iwuqC-0003Mg-CY
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 16:25:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580333127;
+ s=mimecast20190719; t=1580333140;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3RgfhbTdW/N69ju8x61MEPmXC48AqPEUH+WU3+4iKWA=;
- b=R/xes4cT2J99tbAFb4FSjdqw1bpKnq833If/bRvshTh4wDv7b5jHccdLLEQwk8j1j6XoXG
- pCx1YxNHgo2hNbggHu1lU49reyp9s1TpHkGqQpGKFWF/W/KX4jhqhXCripYGUKke03not1
- iks3f3SdDF4gH8TcYWw5c/GmO7w0L3M=
+ bh=z0U47tvFxOBzjdEvYY6tVm4z3s5nPc5bzYEYKuKCinc=;
+ b=U0A2knKNPytK90pIBOTWxbu8eq4HoQFIEoWuZBJpZ7yVZrLpSEEop6JBd3HrgcgRL9AWS7
+ vFX+3ohKS5FohkoIJZTkIc5a0AVDswHw2Wr6A9rEC9Q7wSA7e8sAE039rOvnPT/NjePQoQ
+ 6TArVce7ZlIfo/bt9zu8gkuQS6calu4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-ifms6K_HNY6hM2bHC8FTSQ-1; Wed, 29 Jan 2020 16:25:26 -0500
+ us-mta-316-q-10GR83OHOIhk3muljHnw-1; Wed, 29 Jan 2020 16:25:36 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EE678017CC;
- Wed, 29 Jan 2020 21:25:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38B6218A6EC1;
+ Wed, 29 Jan 2020 21:25:35 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 39D9D60BF3;
- Wed, 29 Jan 2020 21:25:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AD0D60BF3;
+ Wed, 29 Jan 2020 21:25:33 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Denis Plotnikov <dplotnikov@virtuozzo.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 27/29] tests/acceptance/migration: Default to -nodefaults
-Date: Wed, 29 Jan 2020 22:23:43 +0100
-Message-Id: <20200129212345.20547-28-philmd@redhat.com>
+Subject: [PATCH v2 29/29] MAINTAINERS: Add Acceptance tests reviewers
+Date: Wed, 29 Jan 2020 22:23:45 +0100
+Message-Id: <20200129212345.20547-30-philmd@redhat.com>
 In-Reply-To: <20200129212345.20547-1-philmd@redhat.com>
 References: <20200129212345.20547-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: ifms6K_HNY6hM2bHC8FTSQ-1
+X-MC-Unique: q-10GR83OHOIhk3muljHnw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -95,36 +94,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need the default options to run this test.
+Acceptance tests can test any piece of the QEMU codebase.
+As such, the directory holding them does not belong to a specific
+subsystem with designated maintainers.
 
-This fixes errors when running a binary built with
---without-default-devices such:
+Each subsystem covered by a test is welcomed to add the test path
+to its section.
+See for example commits 71b290e70, b11785ca2 or 5d480ddde.
 
-  ERROR: qemu-system-arm: Unsupported NIC model: virtio-net-pci
+Since Eduardo, Cleber and Philippe have been reviewing the patches
+on the list, add them as reviewers.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/acceptance/migration.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Wainer do you want to be listed?
+---
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
-index a44c1ae58f..d09e5d3fe7 100644
---- a/tests/acceptance/migration.py
-+++ b/tests/acceptance/migration.py
-@@ -32,10 +32,12 @@ class Migration(Test):
+diff --git a/MAINTAINERS b/MAINTAINERS
+index efd3f3875f..4a3cc3f137 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2733,6 +2733,12 @@ S: Maintained
+ F: tests/tcg/Makefile
+ F: tests/tcg/Makefile.include
 =20
-=20
-     def test_migration_with_tcp_localhost(self):
--        source_vm =3D self.get_vm()
-         dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
-         dest_vm =3D self.get_vm('-incoming', dest_uri)
-+        dest_vm.add_args('-nodefaults')
-         dest_vm.launch()
-+        source_vm =3D self.get_vm()
-+        source_vm.add_args('-nodefaults')
-         source_vm.launch()
-         source_vm.qmp('migrate', uri=3Ddest_uri)
-         wait.wait_for(
++Acceptance Tests
++R: Eduardo Habkost <ehabkost@redhat.com>
++R: Cleber Rosa <crosa@redhat.com>
++R: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
++F: tests/acceptance/
++
+ Documentation
+ -------------
+ Build system architecture
 --=20
 2.21.1
 
