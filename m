@@ -2,114 +2,119 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D58ADC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAE14C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB4812070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:13:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4812070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 755662070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 16:18:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="eQbsImVK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 755662070E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwpyB-0007T4-TH
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:13:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34023)
+	id 1iwq2d-0000Nq-Jp
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 11:18:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iwpxZ-000712-7F
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:12:58 -0500
+ (envelope-from <Babu.Moger@amd.com>) id 1iwq1m-0008Nq-OH
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:17:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iwpxX-0005YB-Tv
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:12:56 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:58833)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iwpxX-0005Mc-Jy
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:12:55 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mk0e8-1jPFoI12uO-00kN23; Wed, 29 Jan 2020 17:12:42 +0100
-Subject: Re: [PATCH] Handling SIGSETXID used by glibc NPTL setuid/setgid
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200116115700.127951-1-mkysel@tachyum.com>
- <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b4ca6094-28a4-28a9-4e6f-315cfad2cf49@vivier.eu>
-Date: Wed, 29 Jan 2020 17:12:40 +0100
+ (envelope-from <Babu.Moger@amd.com>) id 1iwq1l-0004hl-CU
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:17:18 -0500
+Received: from mail-dm6nam11on2055.outbound.protection.outlook.com
+ ([40.107.223.55]:26961 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1iwq1l-0004gK-44
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 11:17:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g+TaKH1tT8oGe3WJTzX8RnGvRLlfC3q0GmnpVqlg7L5g6y4bxNYGqtPYaEwhCXDC0mVAuBzjnLQm7Iv8wh8AXRnV7IP4qHmBREVUUbNQpUJETdSe+nMgkN610OraYFu/V1YzHbYOI/ac1zLWHursU6aJnOaHvA/MP5F1oGqlWYmevLqkSU7m3BwhfGtg2bSQLtLoUsdOKRZoqM5C+yjMmWrvpgiLJqQaNTjOP5bTCUM6kbe/LPUkMFb5gvErdvfgsNW6fhjqwXERh6rkBuZsSTd7eh57abudGCfCuPRyrT6aTpaeqTVQjklxvMQvpAnMdWx6AmtEW404n3IbDJIk5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qMzf5KaQ2Q/A3Pk7dLseHW7q29XHt3IsYzxy84uvFsQ=;
+ b=Y7zCUnE/OdtFHs1orA3GcqjTZvu1Hj/iWDxspYX9uBstryE4NhZbU/7AR/TAx3YD2qLfX0/ALOUs49t1N4PsZyR9xra3VHlDGKghaiwwvjR7kgNfwKPSxTOPopi2m7pulEPmmj3daQhI5mt0g6qQb+Mu1v3yLk2+riAZDz9bIip+iXFoxetaWSpVhxo+DIN7vOyOuWaqKeF8UtqMxVCH6rNxaTyqiRLEzLx3PtnM7Ke4ml1v8rD6mPDKuHi+hHxqnb3X0MZnUTd4pHEbxwNFR3CIS2sovVXGwPxA4ql9RBVQZkBEzv9r17hL2bK0kb+7bUcGGBa4XBqOO7+gyBHDCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qMzf5KaQ2Q/A3Pk7dLseHW7q29XHt3IsYzxy84uvFsQ=;
+ b=eQbsImVKXSOX+khjRybB9cXWCsAlqrpJBKfvHJexDlPUJRCW0DJTMoRVmfHgv2jZqgxoBVD9Ux/SR5+m+FulgXk8Eu8zAyKALdE8qzpj6oaa87GYv1oXAXY7lRchLZY8iLR+fLh9T+guDlgvL6InCvmdieL4g+OyQlpv5zZ/Eic=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
+ CY4PR12MB1496.namprd12.prod.outlook.com (10.172.72.8) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.24; Wed, 29 Jan 2020 16:17:14 +0000
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd]) by CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd%7]) with mapi id 15.20.2665.026; Wed, 29 Jan 2020
+ 16:17:14 +0000
+Subject: Re: [PATCH v3 07/18] machine: Add a new function init_apicid_fn in
+ MachineClass
+To: Igor Mammedov <imammedo@redhat.com>
+References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
+ <157541986210.46157.5082551407581177819.stgit@naples-babu.amd.com>
+ <20200128172919.4ecb5896@redhat.com>
+ <e5271e1c-55bc-e3d2-eb4c-2329eef07c9f@amd.com>
+ <20200129101458.6a108431@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <b75928ec-c062-7edf-bc24-8dc0ccd7439b@amd.com>
+Date: Wed, 29 Jan 2020 10:17:11 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
+ Thunderbird/68.2.2
+In-Reply-To: <20200129101458.6a108431@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:R9Kz3VDjysyru9LCgNjvE/0Hsi1tDpHdQilkV8sxbepashhMU6Y
- zj+O0RKOkzzF0LJTGGRjcetZ/+Cdd0F9xMtEtOPCqBnWCuNQo86xXzJKJyaXKBqE5Q2OpEN
- TEkvYOBUz/WCNG/APQPFrt/brflf2GFMt8j00UfPkUPtzI7WRZbiA/yfBE+6bPLfBZuhoTF
- g+EquSpNhxeJCi7zw4mYg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QTNvZkJWITk=:LhQTfHA/yQKFgqZnDbG8JN
- 4bE9fCqHmz3PGDdu04zfN0Cicld39cM+g6c9Coniw7GQtFK6F5pPelGbITkbAle53lxG2EqCe
- SbknDcZ/hAf2Mf35hS7nncLjl/P1m/6667i4Kb4Qu/6R2jloDEhY2kAoU0g+IRM2PidbMTXXK
- RcSquPGyR2dxtFqeEEu/LjrHUqxFfVoEtW6e7S27BmhAd3PMN+N2WCW5F++Rduh+cHPOzLm4K
- BqhWKqiZNl67B/9BN3iP1jAgNK5dJSOnz1OP6Acxu1e1bnWTVTn4ENt8BgnrtGzYOZW+D9iBN
- FR3C73B/20eXGT8sw0i+d4b/Ib297kO+U6j6d3sJ6DChe0HkL5O/JN7BEaTtkEPJhuRn5FQq7
- Z53rLOXJCVoeCKOWYV5t2AykZ9jQiVNScTRndlk7mdDY1OqFTB5+IroJ1KvhM5UY2p6z5EanD
- mhg4P5iofs49YPEd65g7mip6zuVaOsKdqvuW/7kKDi6enBleIA/4np3Hng+r+soFy+109udHH
- /JZvZSlNQ7usUICvoY079yT36uR18y66gGy7vWSUKVt4jGXEKe5a6E7y2wktX5UbBfPrVso+i
- d2GmZyYy4xgF5Cx/Kx1Lc84fjNaf5gI9VccxzmnhJZLY5TRjDwythU8OIMS3ESOxgCRmQnjka
- tfOW6FKrDPhBCN5ufJB606FP2r3ZVGjpiMn0RlUo4aP0YEmFZgW6QK3iC3lWFxuYUSruem9bP
- 33//Iv7Wph9i/ssgQpFQ0s5Oglzjw1rg9iSu2erLiETf64PwxLbgbqspFvHInBSV3uoe5aZ/1
- jF1sV3XYlfbfOCPjqRnEflKIeFRm2WVZJA9T/f/cNmsqYRzPFKu6ZktiTHOXMriKCw/sTof
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: BN6PR17CA0049.namprd17.prod.outlook.com
+ (2603:10b6:405:75::38) To CY4PR12MB1574.namprd12.prod.outlook.com
+ (2603:10b6:910:e::23)
+MIME-Version: 1.0
+Received: from [10.236.30.87] (165.204.77.1) by
+ BN6PR17CA0049.namprd17.prod.outlook.com (2603:10b6:405:75::38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.23 via Frontend Transport; Wed, 29 Jan 2020 16:17:13 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: fa77c3f4-fdb8-469f-3ec9-08d7a4d6b3ed
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1496:
+X-Microsoft-Antispam-PRVS: <CY4PR12MB14966DBED97BCF044307C49D95050@CY4PR12MB1496.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 02973C87BC
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(136003)(39860400002)(346002)(376002)(396003)(199004)(189003)(16526019)(186003)(478600001)(5660300002)(81166006)(81156014)(16576012)(44832011)(6916009)(316002)(31686004)(52116002)(31696002)(53546011)(66556008)(6486002)(66476007)(66946007)(8676002)(36756003)(2616005)(86362001)(966005)(26005)(2906002)(956004)(8936002)(4326008);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR12MB1496;
+ H:CY4PR12MB1574.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bKRJyUX+k/HIzC83XVxKPPmqkSf8tXZCYg5cm7U+aieRGcVCI81Krohm79HRrMP3kPqxqoW0TovspFrfukV7P/HtiTe4UcRIkWWK0D0y+hdXo7S+7I5bdfEPGiBdgEWQIFRMxa/hXwo5DdoZvndm/QmIpOEJFCOSfiP33O8UcdZ+Bn4/BGE1LJcFjtAludp5Q+qKNlTKVraxswpqr9QZRsiuY415p6RFAh1IolKiQUwNqt4IjOu8ybp9lVYy+qc5sQleHL60GHG9Fz593EgUrsUrfaVhi84T62V6XONtpeKT1HBPX/IZk/X+ZKXN79kdED1xxREAVIHwrPacvl8hlZHiaS4X2xONNPcnBcmt8rYbfNYEn3T+IbPD6XVO9R321EF3pP1WPPjwUjc+x8fZ5wyt5eZdHXZHEHjVRypKhx+z7uIIwEGU6LP8pbhh6xEt2PTuTIw1Nqh8QIGQs9H3hHVS54G0nLAhcxpKnTGvp9ZMX0zYtYhxa/ISmIjkPV/DQFLLRH1Wi8o9QxxTByqJoQ==
+X-MS-Exchange-AntiSpam-MessageData: HFG8xaOflqkfBELPWhJmcw6bMGF/9gimnGL5edGfrHUUnA4fYhyRIH+hQNzCok6c8H0gqxkv4jVx4IdADzebDyWjyPu7+5tEX87uOATiUSsr7WM6wJwvwqIqT0orhu4xsDt2bhO0x/PwM9GIc450Nw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa77c3f4-fdb8-469f-3ec9-08d7a4d6b3ed
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2020 16:17:14.7159 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1gk2K/FHU3EwkC6dr4/zYp0khBx8SkmAP0lNEe2slHu0VdTrbV68JmQqry8SzpYv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1496
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.223.55
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,69 +126,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Matus Kysel <mkysel@tachyum.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 28/01/2020 à 10:26, Peter Maydell a écrit :
-> On Thu, 16 Jan 2020 at 11:58, Matus Kysel <mkysel@tachyum.com> wrote:
+
+
+On 1/29/20 3:14 AM, Igor Mammedov wrote:
+> On Tue, 28 Jan 2020 13:45:31 -0600
+> Babu Moger <babu.moger@amd.com> wrote:
+>=20
+>> On 1/28/20 10:29 AM, Igor Mammedov wrote:
+>>> On Tue, 03 Dec 2019 18:37:42 -0600
+>>> Babu Moger <babu.moger@amd.com> wrote:
+>>>  =20
+>>>> Add a new function init_apicid_fn in MachineClass to initialize the mo=
+de
+>>>> specific handlers to decode the apic ids.
+>>>>
+>>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+>>>> ---
+>>>>  include/hw/boards.h |    1 +
+>>>>  vl.c                |    3 +++
+>>>>  2 files changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>>>> index d4fab218e6..ce5aa365cb 100644
+>>>> --- a/include/hw/boards.h
+>>>> +++ b/include/hw/boards.h
+>>>> @@ -238,6 +238,7 @@ struct MachineClass {
+>>>>                                                           unsigned cpu=
+_index);
+>>>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machi=
+ne);
+>>>>      int64_t (*get_default_cpu_node_id)(const MachineState *ms, int id=
+x);
+>>>> +    void (*init_apicid_fn)(MachineState *ms); =20
+>>> it's x86 specific, so why it wasn put into PCMachineClass? =20
 >>
->> Used same style to handle another glibc reserved signal SIGSETXID (33),
->> that is used by glibc NPTL setuid/setgid functions. This should fix problems
->> with application using those functions and failing with error
->> "qemu:handle_cpu_signal received signal outside vCPU context".
+>> Yes. It is x86 specific for now. I tried to make it generic function so
+>> other OSes can use it if required(like we have done in
+>> possible_cpu_arch_ids). It initializes functions required to build the
+>> apicid for each CPUs. We need these functions much early in the
+>> initialization. It should be initialized before parse_numa_opts or
+>> machine_run_board_init(in v1.c) which are called from generic context. W=
+e
+>> cannot use PCMachineClass at this time.
+>=20
+> could you point to specific patches in this series that require
+> apic ids being initialized before parse_numa_opts and elaborate why?
+>=20
+> we already have possible_cpu_arch_ids() which could be called very
+> early and calculates APIC IDs in x86 case, so why not reuse it?
+
+
+The current code(before this series) parses the numa information and then
+sequentially builds the apicid. Both are done together.
+
+But this series separates the numa parsing and apicid generation. Numa
+parsing is done first and after that the apicid is generated. Reason is we
+need to know the number of numa nodes in advance to decode the apicid.
+
+Look at this patch.
+https://lore.kernel.org/qemu-devel/157541988471.46157.6587693720990965800.s=
+tgit@naples-babu.amd.com/
+
+static inline apic_id_t apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info=
+,
++                                                  const X86CPUTopoIDs
+*topo_ids)
++{
++    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
++           (topo_ids->llc_id << apicid_llc_offset_epyc(topo_info)) |
++           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
++           (topo_ids->core_id << apicid_core_offset(topo_info)) |
++           topo_ids->smt_id;
++}
+
+
+The function apicid_from_topo_ids_epyc builds the apicid. New decode adds
+llc_id(which is numa id here) to the current decoding. Other fields are
+mostly remains same.
+
+
+Details from the bug https://bugzilla.redhat.com/show_bug.cgi?id=3D1728166
+
+Processor Programming Reference (PPR) for AMD Family 17h Model 01h,
+Revision B1 Processors:
+
+"""
+2.1.10.2.1.3
+ApicId Enumeration Requirements
+Operating systems are expected to use
+Core::X86::Cpuid::SizeId[ApicIdCoreIdSize], the number of least
+significant bits in the Initial APIC ID that indicate core ID within a
+processor, in constructing per-core CPUID
+masks. Core::X86::Cpuid::SizeId[ApicIdCoreIdSize] determines the maximum
+number of cores (MNC) that the
+processor could theoretically support, not the actual number of cores that
+are actually implemented or enabled on
+the processor, as indicated by Core::X86::Cpuid::SizeId[NC].
+Each Core::X86::Apic::ApicId[ApicId] register is preset as follows:
+=E2=80=A2 ApicId[6] =3D Socket ID.
+=E2=80=A2 ApicId[5:4] =3D Node ID.
+=E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID
+=E2=80=A2 ApicId[2:0]=3D (SMT) ? {LogicalCoreID[1:0],ThreadId} :
+{1'b0,LogicalCoreID[1:0]}.
+"""
+
+>=20
 >>
->> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
->> ---
->>  linux-user/signal.c | 13 +++++++++----
->>  1 file changed, 9 insertions(+), 4 deletions(-)
+>>>
+>>>  =20
+>>>>  };
+>>>> =20
+>>>>  /**
+>>>> diff --git a/vl.c b/vl.c
+>>>> index a42c24a77f..b6af604e11 100644
+>>>> --- a/vl.c
+>>>> +++ b/vl.c
+>>>> @@ -4318,6 +4318,9 @@ int main(int argc, char **argv, char **envp)
+>>>>      current_machine->cpu_type =3D machine_class->default_cpu_type;
+>>>>      if (cpu_option) {
+>>>>          current_machine->cpu_type =3D parse_cpu_option(cpu_option);
+>>>> +        if (machine_class->init_apicid_fn) {
+>>>> +            machine_class->init_apicid_fn(current_machine);
+>>>> +        }
+>>>>      }
+>>>>      parse_numa_opts(current_machine);
+>>>> =20
+>>>>
+>>>> =20
+>>>  =20
 >>
->> diff --git a/linux-user/signal.c b/linux-user/signal.c
->> index 0128bde4d2..c59221fd0a 100644
->> --- a/linux-user/signal.c
->> +++ b/linux-user/signal.c
->> @@ -66,11 +66,16 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
->>      [SIGPWR] = TARGET_SIGPWR,
->>      [SIGSYS] = TARGET_SIGSYS,
->>      /* next signals stay the same */
->> -    /* Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
->> -       host libpthread signals.  This assumes no one actually uses SIGRTMAX :-/
->> -       To fix this properly we need to do manual signal delivery multiplexed
->> -       over a single host signal.  */
->> +    /*
->> +     * Nasty hack: Swap SIGRTMIN and SIGRTMIN + 1 with SIGRTMAX and SIGRTMAX - 1
->> +     * to avoid overlap with host libpthread (NPTL glibc) signals.
->> +     * This assumes no one actually uses SIGRTMAX and SIGRTMAX - 1 :-/
->> +     * To fix this properly we need to do manual signal delivery multiplexed
->> +     * over a single host signal.
->> +     */
->>      [__SIGRTMIN] = __SIGRTMAX,
->> +    [__SIGRTMIN + 1] = __SIGRTMAX - 1,
->> +    [__SIGRTMAX - 1] = __SIGRTMIN + 1,
->>      [__SIGRTMAX] = __SIGRTMIN,
->>  };
->>  static uint8_t target_to_host_signal_table[_NSIG];
->> --
->> 2.17.1
-> 
-> This is a long-standing known problem, but doing this is likely
-> to break currently-working guest binaries (notably things written
-> in Go). See for example the discussion on this thread:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03804.html
-
-Peter,
-
-I try to fix this problem and I'd like to find a reproducer for the Go
-problem.
-
-I tried to write an "hello world" program and run it in an arm64/bionic
-chroot but there is no problem (with and without this patch).
-
-Any hints?
-
-Thanks,
-Laurent
+>=20
 
