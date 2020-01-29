@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CF7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF76C33CB7
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:09:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 669612070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:09:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669612070E
+	by mail.kernel.org (Postfix) with ESMTPS id A3BDB2070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:09:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3BDB2070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwo22-0005Jl-Jb
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 09:09:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40533)
+	id 1iwo23-0005NB-Rg
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 09:09:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo09-0001Kt-JW
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo09-0001Ku-NN
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo08-0001Ct-DF
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo08-0001Cz-Dm
  for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:07:29 -0500
-Received: from relay.sw.ru ([185.231.240.75]:53604)
+Received: from relay.sw.ru ([185.231.240.75]:53602)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iwo08-00013Q-68; Wed, 29 Jan 2020 09:07:28 -0500
+ id 1iwo08-00013P-5d; Wed, 29 Jan 2020 09:07:28 -0500
 Received: from dptest2.qa.sw.ru ([10.94.4.71])
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iwnzt-0003j6-4s; Wed, 29 Jan 2020 17:07:13 +0300
+ id 1iwnzt-0003j6-AZ; Wed, 29 Jan 2020 17:07:13 +0300
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 2/4] virtio: increase virtuqueue size for virtio-scsi and
- virtio-blk
-Date: Wed, 29 Jan 2020 17:07:00 +0300
-Message-Id: <20200129140702.5411-3-dplotnikov@virtuozzo.com>
+Subject: [PATCH v1 3/4] tests: add virtuqueue size checking to
+ virtio_seg_max_adjust test
+Date: Wed, 29 Jan 2020 17:07:01 +0300
+Message-Id: <20200129140702.5411-4-dplotnikov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
 References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
@@ -65,55 +65,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The goal is to reduce the amount of requests issued by a guest on
-1M reads/writes. This rises the performance up to 4% on that kind of
-disk access pattern.
+This is due to the change in the default virtqueue_size in the
+latest machine type to improve guest disks performance.
 
-The maximum chunk size to be used for the guest disk accessing is
-limited with seg_max parameter, which represents the max amount of
-pices in the scatter-geather list in one guest disk request.
-
-Since seg_max is virqueue_size dependent, increasing the virtqueue
-size increases seg_max, which, in turn, increases the maximum size
-of data to be read/write from guest disk.
-
-More details in the original problem statment:
-https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.html
-
-Suggested-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- hw/core/machine.c          | 3 +++
- include/hw/virtio/virtio.h | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ tests/acceptance/virtio_seg_max_adjust.py | 33 ++++++++++++++---------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 3e288bfceb..8bc401d8b7 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -28,6 +28,9 @@
- #include "hw/mem/nvdimm.h"
+diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance/virtio_seg_max_adjust.py
+index 5458573138..645d69b313 100755
+--- a/tests/acceptance/virtio_seg_max_adjust.py
++++ b/tests/acceptance/virtio_seg_max_adjust.py
+@@ -27,8 +27,10 @@ from qemu.machine import QEMUMachine
+ from avocado_qemu import Test
  
- GlobalProperty hw_compat_4_2[] = {
-+    { "virtio-blk-device", "queue-size", "128"},
-+    { "virtio-scsi-device", "virtqueue_size", "128"},
-+    { "vhost-blk-device", "virtqueue_size", "128"},
-     { "virtio-blk-device", "x-enable-wce-if-config-wce", "off" },
-     { "virtio-blk-device", "seg-max-adjust", "off"},
-     { "virtio-scsi-device", "seg_max_adjust", "off"},
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index a66ea2368b..16d540e390 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -48,7 +48,7 @@ size_t virtio_feature_get_config_size(VirtIOFeature *features,
- typedef struct VirtQueue VirtQueue;
+ #list of machine types and virtqueue properties to test
+-VIRTIO_SCSI_PROPS = {'seg_max_adjust': 'seg_max_adjust'}
+-VIRTIO_BLK_PROPS = {'seg_max_adjust': 'seg-max-adjust'}
++VIRTIO_SCSI_PROPS = {'seg_max_adjust': 'seg_max_adjust',
++                     'queue_size': 'virtqueue_size'}
++VIRTIO_BLK_PROPS = {'seg_max_adjust': 'seg-max-adjust',
++                    'queue_size': 'queue-size'}
  
- #define VIRTQUEUE_MAX_SIZE 1024
--#define VIRTQUEUE_DEFAULT_SIZE 128
-+#define VIRTQUEUE_DEFAULT_SIZE 256
+ DEV_TYPES = {'virtio-scsi-pci': VIRTIO_SCSI_PROPS,
+              'virtio-blk-pci': VIRTIO_BLK_PROPS}
+@@ -40,7 +42,7 @@ VM_DEV_PARAMS = {'virtio-scsi-pci': ['-device', 'virtio-scsi-pci,id=scsi0'],
+                                     'driver=null-co,id=drive0,if=none']}
  
- typedef struct VirtQueueElement
- {
+ 
+-class VirtioMaxSegSettingsCheck(Test):
++class VirtioPramsCheck(Test):
+     @staticmethod
+     def make_pattern(props):
+         pattern_items = ['{0} = \w+'.format(prop) for prop in props]
+@@ -72,20 +74,24 @@ class VirtioMaxSegSettingsCheck(Test):
+                 props[p[0]] = p[1]
+         return query_ok, props, error
+ 
+-    def check_mt(self, mt, dev_type_name):
++    def check_mt(self, mt, expected_props, dev_type_name):
+         with QEMUMachine(self.qemu_bin) as vm:
+-            vm.set_machine(mt["name"])
++            vm.set_machine(mt)
+             for s in VM_DEV_PARAMS[dev_type_name]:
+                 vm.add_args(s)
+             vm.launch()
+             query_ok, props, error = self.query_virtqueue(vm, dev_type_name)
+ 
+         if not query_ok:
+-            self.fail('machine type {0}: {1}'.format(mt['name'], error))
++            self.fail('machine type {0}: {1}'.format(mt, error))
+ 
+         for prop_name, prop_val in props.items():
+-            expected_val = mt[prop_name]
+-            self.assertEqual(expected_val, prop_val)
++            expected_val = expected_props[prop_name]
++            msg = 'Property value mismatch for (MT: {0}, '\
++                  'property name: {1}): expected value: "{2}" '\
++                  'actual value: "{3}"'\
++                  .format(mt, prop_name, expected_val, prop_val)
++            self.assertEqual(expected_val, prop_val, msg)
+ 
+     @staticmethod
+     def seg_max_adjust_enabled(mt):
+@@ -120,15 +126,18 @@ class VirtioMaxSegSettingsCheck(Test):
+ 
+         for dev_type in DEV_TYPES:
+             # create the list of machine types and their parameters.
+-            mtypes = list()
++            mtypes = dict()
+             for m in machines:
+                 if self.seg_max_adjust_enabled(m):
+                     enabled = 'true'
++                    queue_size = '256'
+                 else:
+                     enabled = 'false'
+-                mtypes.append({'name': m,
+-                               DEV_TYPES[dev_type]['seg_max_adjust']: enabled})
++                    queue_size = '128'
++                mtypes[m] = {
++                    DEV_TYPES[dev_type]['seg_max_adjust']: enabled,
++                    DEV_TYPES[dev_type]['queue_size']: queue_size }
+ 
+             # test each machine type for a device type
+             for mt in mtypes:
+-                self.check_mt(mt, dev_type)
++                self.check_mt(mt, mtypes[mt], dev_type)
 -- 
 2.17.0
 
