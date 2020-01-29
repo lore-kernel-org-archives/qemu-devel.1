@@ -2,84 +2,87 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25457C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B986C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:59:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3B0820658
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:59:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 640D020658
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 23:59:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t4FnqgBt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B0820658
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tw/Tp0r1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 640D020658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwxEu-0008IB-3b
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 18:59:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45039)
+	id 1iwxFA-000051-JS
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 18:59:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxC0-0003VV-IA
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:21 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iwxC9-0003gs-33
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxBy-0006YF-BU
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:19 -0500
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:54658)
+ (envelope-from <richard.henderson@linaro.org>) id 1iwxC7-0007Cn-NT
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:28 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37890)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iwxBy-0006UU-48
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:18 -0500
-Received: by mail-pj1-x102e.google.com with SMTP id dw13so497319pjb.4
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:56:17 -0800 (PST)
+ id 1iwxC7-0007AL-H2
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:56:27 -0500
+Received: by mail-pg1-x543.google.com with SMTP id a33so648001pgm.5
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:56:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=oixdmiGNiYR4A87wyzZ9gvtOTzjdyaM42/ZisE5MzRg=;
- b=t4FnqgBtCn05kJh1sp5fhFEzlVTC8keFzloD3JnrunNcVEF4fGVX66qtdQb4NBorYj
- Ik9HGAzezwQ6qipPrXN02YuEB8yLrpaTD/4Z+dq7+M8/L7PjOhAmD4QHPHm9ukHDjEoK
- 2NK3sjL6lB3+5YF6Di2eD4kqRahXWkrPEGoo7jCcm3q6VD9vCzl3/umE8MOAzKypdOEX
- 5FvYMIByRTN9JG+o2pyDyD6oFbbLJz4YEpkYAS7RUz+zN4BG9OEHeZWE7tYklnfv3Fa0
- kNEFa/O7wk3bcxTOiT78aAWe/l2eX6RAthMCneiVpGgWIc8FNzjTll3pPuLRZgvvnT+L
- YiMA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=uqXtEboFX1Y8RculjLF7qqNO1NcFp6bsZn0DtNh5d9I=;
+ b=tw/Tp0r15OTwDsSvZTTGVC79yeyD+fSxEhWWuzeBbukd3XYNjAGIo0sA73hRAgKF4P
+ SJt0InbT62v2k+IlkoCA4uJKF2EMvsFD1oVR4hbzwi737Qv0F7n6zHy4jpALkjRn82Si
+ Ivxc8YGcGi9fSaoGLbqaQqMSPNlpvCnGejkKQ/iVbLvlJm3RPJXBBHKLYitl1rwrdHtT
+ kYOCR/dU7OM2uu5+gNbMaOr9I0id5XtKIzaUJZL8h27h7XwSoa1SShCi37KkjwcLRH70
+ NcWPosL/c+kw4dIeylvXFwzJZlc0Ix0Y7S5LmuzjH2cW/H4OpaznCM3hU+kl4PW7fGTQ
+ 5X8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=oixdmiGNiYR4A87wyzZ9gvtOTzjdyaM42/ZisE5MzRg=;
- b=Qv2C97ixlXcrZJ4aYmMfBGxW1IHvXNWQM6Okc+/apbpPXd27KNu+lj1AEnl61WC34i
- RqnADPlUsKfo5gYXPzrnJKh0djB/7A28sFuWm67EiK4W77Kuq/NyVH7xjnoIoh63HvLP
- x8LAfbrYnFle9mqPpDrlAY0l39UnztKiR1zmnlMw55syf2SNdTszBjH1fEMIHUL5dQhO
- Ymo94UEttQt1N071Lhiry+VkzObaiohj5w9e9VMzqfABM/x83nbGjWs+fkjLdF+W3DQc
- vbUeP6NcEU8/EdjaJ8Fy1XluRFatWWZv3orbiehdpUeZ1iy9ZsdvwgJOU0m3fZRtFwqx
- nKDA==
-X-Gm-Message-State: APjAAAVdqUGBE/jY0e8biYuGYaysb9yWKnjETUtuTJw06gatTSt/wBBu
- v/AVEQeDHSj4lxZ3jwDV5Cykaoyr6bw=
-X-Google-Smtp-Source: APXvYqwLhAEW3VKIiKMJyAuFgruskVvM1QASOlGGMPfAA79vdIlXcml4E93qBKHMIglYTU5TRtWy9g==
-X-Received: by 2002:a17:90a:109:: with SMTP id b9mr2506626pjb.77.1580342176237; 
- Wed, 29 Jan 2020 15:56:16 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=uqXtEboFX1Y8RculjLF7qqNO1NcFp6bsZn0DtNh5d9I=;
+ b=pr3YegGVC/CCemlL00DsVSS/XcNwcMopHe9BjbAAX+46j2AwMNmuWg+k9ei2U9K//L
+ ymK/sXcoahmTpVzvpzmnqJT6dhCONAgILskBEcmV0CAORM17tbOvUpOWyzZqVCQkAI/U
+ TS/OsaN0yzW5U1F9Q2MZVLEHnCjBsvLVDbs5qxaAuOdZOw66hmRZu1sc0Im6xjT8pZH0
+ fTSwL2ngR6wvOkENpPvMW+uObyy0545WlL+w1Wu3K3JImOsbhTLIE0VDT8UlLAAcJ1to
+ Cv3CVU5eZfmSi1jAsw59TltDXCtnhbufsCCdUGQFj+IKUy+PuJW9TXZmKE3OOCMPfA/p
+ K5xQ==
+X-Gm-Message-State: APjAAAWQLOxaBKxnKnQC9TD0bUcCgN0NonAb7y5xOLSLwTQwOMjxqRxB
+ 2RR0JpD5SOlRTFZZqr3REi6sCeZ+bi0=
+X-Google-Smtp-Source: APXvYqxjUAOsBLYj1VE+vu/rrUIgqWJNJ0Rzmi/vNAaU+jbtQjrOuipYkq48tdTUGYnsB9PlQLtcTA==
+X-Received: by 2002:a63:2ad8:: with SMTP id q207mr1683414pgq.45.1580342186273; 
+ Wed, 29 Jan 2020 15:56:26 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id r3sm3953626pfg.145.2020.01.29.15.56.15
+ by smtp.gmail.com with ESMTPSA id r3sm3953626pfg.145.2020.01.29.15.56.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 15:56:15 -0800 (PST)
+ Wed, 29 Jan 2020 15:56:25 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/41] target/arm: Implement ARMv8.1-VHE
-Date: Wed, 29 Jan 2020 15:55:33 -0800
-Message-Id: <20200129235614.29829-1-richard.henderson@linaro.org>
+Subject: [PATCH v5 08/41] target/arm: Simplify tlb_force_broadcast alternatives
+Date: Wed, 29 Jan 2020 15:55:41 -0800
+Message-Id: <20200129235614.29829-9-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200129235614.29829-1-richard.henderson@linaro.org>
+References: <20200129235614.29829-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::102e
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,78 +99,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Version 5 applies the feedback given vs version 4, back in December.
-There was quite a bit (thanks) and I believe I've gotten it all.
+Rather than call to a separate function and re-compute any
+parameters for the flush, simply use the correct flush
+function directly.
 
-FWIW, the patches without review are:
-   0028-target-arm-Add-VHE-system-register-redirection-an.patch
-   0030-target-arm-Flush-tlb-for-ASID-changes-in-EL2-0-tr.patch
-   0031-target-arm-Flush-tlbs-for-E2-0-translation-regime.patch
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.c | 52 +++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 28 deletions(-)
 
-
-r~
-
-
-Alex Bennée (1):
-  target/arm: check TGE and E2H flags for EL0 pauth traps
-
-Richard Henderson (40):
-  target/arm: Define isar_feature_aa64_vh
-  target/arm: Enable HCR_E2H for VHE
-  target/arm: Add CONTEXTIDR_EL2
-  target/arm: Add TTBR1_EL2
-  target/arm: Update CNTVCT_EL0 for VHE
-  target/arm: Split out vae1_tlbmask
-  target/arm: Split out alle1_tlbmask
-  target/arm: Simplify tlb_force_broadcast alternatives
-  target/arm: Rename ARMMMUIdx*_S12NSE* to ARMMMUIdx*_E10_*
-  target/arm: Rename ARMMMUIdx_S2NS to ARMMMUIdx_Stage2
-  target/arm: Rename ARMMMUIdx_S1NSE* to ARMMMUIdx_Stage1_E*
-  target/arm: Rename ARMMMUIdx_S1SE[01] to ARMMMUIdx_SE10_[01]
-  target/arm: Rename ARMMMUIdx*_S1E3 to ARMMMUIdx*_SE3
-  target/arm: Rename ARMMMUIdx_S1E2 to ARMMMUIdx_E2
-  target/arm: Recover 4 bits from TBFLAGs
-  target/arm: Expand TBFLAG_ANY.MMUIDX to 4 bits
-  target/arm: Rearrange ARMMMUIdxBit
-  target/arm: Tidy ARMMMUIdx m-profile definitions
-  target/arm: Reorganize ARMMMUIdx
-  target/arm: Add regime_has_2_ranges
-  target/arm: Update arm_mmu_idx for VHE
-  target/arm: Update arm_sctlr for VHE
-  target/arm: Update aa64_zva_access for EL2
-  target/arm: Update ctr_el0_access for EL2
-  target/arm: Add the hypervisor virtual counter
-  target/arm: Update timer access for VHE
-  target/arm: Update define_one_arm_cp_reg_with_opaque for VHE
-  target/arm: Add VHE system register redirection and aliasing
-  target/arm: Add VHE timer register redirection and aliasing
-  target/arm: Flush tlb for ASID changes in EL2&0 translation regime
-  target/arm: Flush tlbs for E2&0 translation regime
-  target/arm: Update arm_phys_excp_target_el for TGE
-  target/arm: Update {fp,sve}_exception_el for VHE
-  target/arm: Update get_a64_user_mem_index for VHE
-  target/arm: Update arm_cpu_do_interrupt_aarch64 for VHE
-  target/arm: Enable ARMv8.1-VHE in -cpu max
-  target/arm: Move arm_excp_unmasked to cpu.c
-  target/arm: Pass more cpu state to arm_excp_unmasked
-  target/arm: Use bool for unmasked in arm_excp_unmasked
-  target/arm: Raise only one interrupt in arm_cpu_exec_interrupt
-
- target/arm/cpu-param.h     |    2 +-
- target/arm/cpu-qom.h       |    1 +
- target/arm/cpu.h           |  423 +++++--------
- target/arm/internals.h     |   73 ++-
- target/arm/translate.h     |    4 +-
- target/arm/cpu.c           |  162 ++++-
- target/arm/cpu64.c         |    1 +
- target/arm/debug_helper.c  |   50 +-
- target/arm/helper-a64.c    |    2 +-
- target/arm/helper.c        | 1230 +++++++++++++++++++++++++++---------
- target/arm/pauth_helper.c  |   14 +-
- target/arm/translate-a64.c |   47 +-
- target/arm/translate.c     |   74 ++-
- 13 files changed, 1402 insertions(+), 681 deletions(-)
-
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 00b770813f..d23d1dd6ef 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -614,56 +614,54 @@ static void tlbiall_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                           uint64_t value)
+ {
+     /* Invalidate all (TLBIALL) */
+-    ARMCPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
+ 
+     if (tlb_force_broadcast(env)) {
+-        tlbiall_is_write(env, NULL, value);
+-        return;
++        tlb_flush_all_cpus_synced(cs);
++    } else {
++        tlb_flush(cs);
+     }
+-
+-    tlb_flush(CPU(cpu));
+ }
+ 
+ static void tlbimva_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                           uint64_t value)
+ {
+     /* Invalidate single TLB entry by MVA and ASID (TLBIMVA) */
+-    ARMCPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
+ 
++    value &= TARGET_PAGE_MASK;
+     if (tlb_force_broadcast(env)) {
+-        tlbimva_is_write(env, NULL, value);
+-        return;
++        tlb_flush_page_all_cpus_synced(cs, value);
++    } else {
++        tlb_flush_page(cs, value);
+     }
+-
+-    tlb_flush_page(CPU(cpu), value & TARGET_PAGE_MASK);
+ }
+ 
+ static void tlbiasid_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                            uint64_t value)
+ {
+     /* Invalidate by ASID (TLBIASID) */
+-    ARMCPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
+ 
+     if (tlb_force_broadcast(env)) {
+-        tlbiasid_is_write(env, NULL, value);
+-        return;
++        tlb_flush_all_cpus_synced(cs);
++    } else {
++        tlb_flush(cs);
+     }
+-
+-    tlb_flush(CPU(cpu));
+ }
+ 
+ static void tlbimvaa_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                            uint64_t value)
+ {
+     /* Invalidate single entry by MVA, all ASIDs (TLBIMVAA) */
+-    ARMCPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
+ 
++    value &= TARGET_PAGE_MASK;
+     if (tlb_force_broadcast(env)) {
+-        tlbimvaa_is_write(env, NULL, value);
+-        return;
++        tlb_flush_page_all_cpus_synced(cs, value);
++    } else {
++        tlb_flush_page(cs, value);
+     }
+-
+-    tlb_flush_page(CPU(cpu), value & TARGET_PAGE_MASK);
+ }
+ 
+ static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -3965,11 +3963,10 @@ static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     int mask = vae1_tlbmask(env);
+ 
+     if (tlb_force_broadcast(env)) {
+-        tlbi_aa64_vmalle1is_write(env, NULL, value);
+-        return;
++        tlb_flush_by_mmuidx_all_cpus_synced(cs, mask);
++    } else {
++        tlb_flush_by_mmuidx(cs, mask);
+     }
+-
+-    tlb_flush_by_mmuidx(cs, mask);
+ }
+ 
+ static int alle1_tlbmask(CPUARMState *env)
+@@ -4091,11 +4088,10 @@ static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+ 
+     if (tlb_force_broadcast(env)) {
+-        tlbi_aa64_vae1is_write(env, NULL, value);
+-        return;
++        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr, mask);
++    } else {
++        tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
+     }
+-
+-    tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
+ }
+ 
+ static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
 -- 
 2.20.1
 
