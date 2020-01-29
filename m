@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B283C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6D6C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:58:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 694742070E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:57:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B96982070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 11:58:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPTvE+9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694742070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DgtxzFVp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96982070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwlyo-0006DW-GX
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:57:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46917)
+	id 1iwlyx-0006cG-T3
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 06:58:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iwlxz-0004nF-3s
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:07 -0500
+ (envelope-from <quintela@redhat.com>) id 1iwly7-0004zV-IM
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iwlxy-00061f-6X
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:07 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40879
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1iwly6-0006Jq-90
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50211
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwlxy-000614-2n
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:06 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iwly6-0006IY-5H
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 06:57:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580299025;
+ s=mimecast20190719; t=1580299033;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PbBVwTwxgB7nPVUXFlKEK3auQkBLFXi2IJU563asPOQ=;
- b=cPTvE+9eNo+knsIW8zJ/kcFwIsZePVWPx9Anm1yEIbWbPr7gE0c20fQqAwjZuFkZz2BRY2
- Fq73rTe+vCqYuYn7KCJq5nm6FCfwGp+J2sg5CWOgDnydrKKbjSSVMpEzhG8wIWmLZKGxVt
- 91DvT90kZY5nNPLy6SCPLiUTlvuKUe0=
+ bh=bh/FIRwBnOtySDetKn7Tt0sK/mF/BVwJ/xp7qo9LFwE=;
+ b=DgtxzFVpqQ60vJ90XtLT3CW9f2QqNTTzhPFbH0eaRJnF3dx5h1O9cBZI9fgwR4QbC/NSc3
+ +hwppTAlWjEBY6+T0Lu5GL45p7T/JB56R2+LASmnq/i0T4ZxCzoCIDrNHk5M5oS0KJzuTV
+ gwvRVvs6SDCCRoQt+gM48dK7E5ELvOo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-BFbyGoMhNeW4Ey45IR3Ikw-1; Wed, 29 Jan 2020 06:57:04 -0500
+ us-mta-20-IhNCxoHXPcq-omDKvjhpXA-1; Wed, 29 Jan 2020 06:57:11 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A46E2189F770
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:57:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B71FDB22
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 11:57:11 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-64.ams2.redhat.com [10.36.116.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 69F5919E9C;
- Wed, 29 Jan 2020 11:57:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9DE3E8578F;
+ Wed, 29 Jan 2020 11:57:06 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 2/8] migration: Add support for modules
-Date: Wed, 29 Jan 2020 12:56:49 +0100
-Message-Id: <20200129115655.10414-3-quintela@redhat.com>
+Subject: [PATCH v5 4/8] multifd: Add multifd-zlib-level parameter
+Date: Wed, 29 Jan 2020 12:56:51 +0100
+Message-Id: <20200129115655.10414-5-quintela@redhat.com>
 In-Reply-To: <20200129115655.10414-1-quintela@redhat.com>
 References: <20200129115655.10414-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: BFbyGoMhNeW4Ey45IR3Ikw-1
+X-MC-Unique: IhNCxoHXPcq-omDKvjhpXA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,48 +93,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-So we don't have to compile everything in, or have ifdefs
+It will indicate which level use for compression.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/qemu/module.h | 2 ++
- vl.c                  | 1 +
- 2 files changed, 3 insertions(+)
+ migration/migration.c | 15 +++++++++++++++
+ monitor/hmp-cmds.c    |  4 ++++
+ qapi/migration.json   | 30 +++++++++++++++++++++++++++---
+ 3 files changed, 46 insertions(+), 3 deletions(-)
 
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 65ba596e46..907cb5c0a5 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -40,6 +40,7 @@ static void __attribute__((constructor)) do_qemu_init_ ##=
- function(void)    \
- #endif
+diff --git a/migration/migration.c b/migration/migration.c
+index 06f6c2d529..4f88f8e958 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -89,6 +89,8 @@
+ #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+ #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+ #define DEFAULT_MIGRATE_MULTIFD_METHOD MULTIFD_METHOD_NONE
++/*0: means nocompress, 1: best speed, ... 9: best compress ratio */
++#define DEFAULT_MIGRATE_MULTIFD_ZLIB_LEVEL 1
 =20
- typedef enum {
-+    MODULE_INIT_MIGRATION,
-     MODULE_INIT_BLOCK,
-     MODULE_INIT_OPTS,
-     MODULE_INIT_QOM,
-@@ -56,6 +57,7 @@ typedef enum {
- #define xen_backend_init(function) module_init(function, \
-                                                MODULE_INIT_XEN_BACKEND)
- #define libqos_init(function) module_init(function, MODULE_INIT_LIBQOS)
-+#define migration_init(function) module_init(function, MODULE_INIT_MIGRATI=
-ON)
+ /* Background transfer rate for postcopy, 0 means unlimited, note
+  * that page requests can still exceed this limit.
+@@ -801,6 +803,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error=
+ **errp)
+     params->multifd_channels =3D s->parameters.multifd_channels;
+     params->has_multifd_method =3D true;
+     params->multifd_method =3D s->parameters.multifd_method;
++    params->has_multifd_zlib_level =3D true;
++    params->multifd_zlib_level =3D s->parameters.multifd_zlib_level;
+     params->has_xbzrle_cache_size =3D true;
+     params->xbzrle_cache_size =3D s->parameters.xbzrle_cache_size;
+     params->has_max_postcopy_bandwidth =3D true;
+@@ -1208,6 +1212,13 @@ static bool migrate_params_check(MigrationParameters=
+ *params, Error **errp)
+         return false;
+     }
 =20
- #define block_module_load_one(lib) module_load_one("block-", lib)
- #define ui_module_load_one(lib) module_load_one("ui-", lib)
-diff --git a/vl.c b/vl.c
-index b0f52c4d6e..9f8577955a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2890,6 +2890,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_init_exec_dir(argv[0]);
++    if (params->has_multifd_zlib_level &&
++        (params->multifd_zlib_level > 9)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "multifd_zlib_level=
+",
++                   "is invalid, it should be in the range of 0 to 9");
++        return false;
++    }
++
+     if (params->has_xbzrle_cache_size &&
+         (params->xbzrle_cache_size < qemu_target_page_size() ||
+          !is_power_of_2(params->xbzrle_cache_size))) {
+@@ -3536,6 +3547,9 @@ static Property migration_properties[] =3D {
+     DEFINE_PROP_MULTIFD_METHOD("multifd-method", MigrationState,
+                       parameters.multifd_method,
+                       DEFAULT_MIGRATE_MULTIFD_METHOD),
++    DEFINE_PROP_UINT8("multifd-zlib-level", MigrationState,
++                      parameters.multifd_zlib_level,
++                      DEFAULT_MIGRATE_MULTIFD_ZLIB_LEVEL),
+     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+                       parameters.xbzrle_cache_size,
+                       DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
+@@ -3627,6 +3641,7 @@ static void migration_instance_init(Object *obj)
+     params->has_block_incremental =3D true;
+     params->has_multifd_channels =3D true;
+     params->has_multifd_method =3D true;
++    params->has_multifd_zlib_level =3D true;
+     params->has_xbzrle_cache_size =3D true;
+     params->has_max_postcopy_bandwidth =3D true;
+     params->has_max_cpu_throttle =3D true;
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 16f01d4244..7f11866446 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -1836,6 +1836,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const Q=
+Dict *qdict)
+         }
+         p->multifd_method =3D compress_type;
+         break;
++    case MIGRATION_PARAMETER_MULTIFD_ZLIB_LEVEL:
++        p->has_multifd_zlib_level =3D true;
++        visit_type_int(v, param, &p->multifd_zlib_level, &err);
++        break;
+     case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
+         p->has_xbzrle_cache_size =3D true;
+         visit_type_size(v, param, &cache_size, &err);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 96a126751c..289dce0da7 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -602,6 +602,13 @@
+ # @multifd-method: Which compression method to use.
+ #                  Defaults to none. (Since 5.0)
+ #
++# @multifd-zlib-level: Set the compression level to be used in live
++#          migration, the compression level is an integer between 0
++#          and 9, where 0 means no compression, 1 means the best
++#          compression speed, and 9 means best compression ratio which
++#          will consume more CPU.
++#          Defaults to 1. (Since 5.0)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+@@ -614,7 +621,8 @@
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+            'multifd-channels',
+            'xbzrle-cache-size', 'max-postcopy-bandwidth',
+-           'max-cpu-throttle', 'multifd-method' ] }
++           'max-cpu-throttle', 'multifd-method',
++           'multifd-zlib-level' ] }
 =20
-     module_call_init(MODULE_INIT_QOM);
-+    module_call_init(MODULE_INIT_MIGRATION);
+ ##
+ # @MigrateSetParameters:
+@@ -707,6 +715,13 @@
+ # @multifd-method: Which compression method to use.
+ #                  Defaults to none. (Since 5.0)
+ #
++# @multifd-zlib-level: Set the compression level to be used in live
++#          migration, the compression level is an integer between 0
++#          and 9, where 0 means no compression, 1 means the best
++#          compression speed, and 9 means best compression ratio which
++#          will consume more CPU.
++#          Defaults to 1. (Since 5.0)
++#
+ # Since: 2.4
+ ##
+ # TODO either fuse back into MigrationParameters, or make
+@@ -733,7 +748,8 @@
+             '*xbzrle-cache-size': 'size',
+             '*max-postcopy-bandwidth': 'size',
+             '*max-cpu-throttle': 'int',
+-            '*multifd-method': 'MultiFDMethod' } }
++            '*multifd-method': 'MultiFDMethod',
++            '*multifd-zlib-level': 'int' } }
 =20
-     qemu_add_opts(&qemu_drive_opts);
-     qemu_add_drive_opts(&qemu_legacy_drive_opts);
+ ##
+ # @migrate-set-parameters:
+@@ -846,6 +862,13 @@
+ # @multifd-method: Which compression method to use.
+ #                  Defaults to none. (Since 5.0)
+ #
++# @multifd-zlib-level: Set the compression level to be used in live
++#          migration, the compression level is an integer between 0
++#          and 9, where 0 means no compression, 1 means the best
++#          compression speed, and 9 means best compression ratio which
++#          will consume more CPU.
++#          Defaults to 1. (Since 5.0)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+@@ -870,7 +893,8 @@
+             '*xbzrle-cache-size': 'size',
+ =09    '*max-postcopy-bandwidth': 'size',
+             '*max-cpu-throttle': 'uint8',
+-            '*multifd-method': 'MultiFDMethod' } }
++            '*multifd-method': 'MultiFDMethod',
++            '*multifd-zlib-level': 'uint8' } }
+=20
+ ##
+ # @query-migrate-parameters:
 --=20
 2.24.1
 
