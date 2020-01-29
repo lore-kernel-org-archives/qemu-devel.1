@@ -2,84 +2,83 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D90C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B96ACC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82F9820702
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8747320702
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 20:26:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InSHptbe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82F9820702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hmZ6qyaI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8747320702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwtuX-0005u4-Jt
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 15:26:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41104)
+	id 1iwtuw-0006lw-O1
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 15:26:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41412)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iwttR-0004zt-0A
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:24:58 -0500
+ (envelope-from <beata.michalska@linaro.org>) id 1iwttn-0005LI-VE
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iwttO-0000LS-Sy
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:24:56 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40452
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iwttN-0000GI-EQ
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:24:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580329491;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=msn+4JuMETfwAU/0a7q3M3ZdaHSQK44bFRghDrNmLL4=;
- b=InSHptbe9j485O9d8G+HNHsEv9zKIunEtNMtF0vVAtPEFI3pQ8rJ9z9GgbpArwWActYqv/
- EWjcTit43RW6Ss+TapVyM7RG1aGui3292zK/vjoOFYIu4ByTrBFL1uBz2MUqtRh2fws4+Y
- qPNdZS5qI+Zmgj+KJBgokHZ2mKBySV4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-j_QhJbJ0OZC9B-d_5j0xjg-1; Wed, 29 Jan 2020 15:24:49 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0349318C35A3
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 20:24:48 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-51.gru2.redhat.com
- [10.97.116.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8DB69100194E;
- Wed, 29 Jan 2020 20:24:44 +0000 (UTC)
-Subject: Re: [PATCH] python: Treat None-return of greeting cmd
-To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200120071202.30646-1-ldoktor@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <ba9c2d1b-d4d9-340c-0e6a-66afa4765d76@redhat.com>
-Date: Wed, 29 Jan 2020 18:24:42 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200120071202.30646-1-ldoktor@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: j_QhJbJ0OZC9B-d_5j0xjg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <beata.michalska@linaro.org>) id 1iwttm-0001J7-Ti
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:19 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37879)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
+ id 1iwttm-0001Hk-OA
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 15:25:18 -0500
+Received: by mail-wr1-x444.google.com with SMTP id w15so1081971wru.4
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 12:25:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=+tZ0YBqhVEsxFXOR05MPD9ATHbI+tc6ggHRmtxE2t3s=;
+ b=hmZ6qyaI6/s1G9fnfQJcUMPDpFu9Z3QQVzkxagMyyHwmFeewG3Pom3ubikvAIRvOBU
+ VJBypdw++F73MZW0g1YdJR0bfVSWuO4AVnfKlAgdVI34ILKKBKySNiMaLQI/qLUoDIbi
+ DgYv3OLEP4Vl3hNRWoYwKTcSl7BDaIuxkZCiw2/4knZX2Bz3RUP6PauRghFz28offnot
+ oeuqe1k6Feq8WxWs3IT2hh2kDDJsKce6HlMVZ5+18n43TalBEpQ8OKRrrUgJIEIY0xmj
+ 08MmPAG4ZH4tTTkxkIdhRy///qnucEDZuhyOzGPGR3c+SGxXMEGI3ZENZTHXDwZOuzFH
+ 36RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=+tZ0YBqhVEsxFXOR05MPD9ATHbI+tc6ggHRmtxE2t3s=;
+ b=d+beX0j+bIVcFvy22A2E8aG+KH11tDTZWkHtBjzohGzShDlVxOM7AYLKgpMWIFv5Y8
+ N6rdvLk7ho/U4qU7Ue/Efk+cSkad2JRG7/Vhjx3Q07pphyGxQ4Drp1xZGQVCAAFjSU8d
+ //u6ZmndPpS639aokPMoCQhIUPs+I84XaJx4WX0I+J4+UUW2/FhgysYG7ZN/r6ue8y72
+ FUYDxks3pd+fUxsEIKXExTFmd/6hNxowSxW308L/XhHGyaLgC32vO9YG6Fx6OKSNz9OT
+ otXh0YLPKvZqbRoAJ8pqBXzjbPghJjxO/7+ddr+NoxL89mAU55htyX5DYR2jcXSVP1iE
+ XdJw==
+X-Gm-Message-State: APjAAAVETZrYhgibFsSS6TkvQgK8Dqj+VV6qO+DKsWQ1qGYN/8DC3VJ/
+ tpd52tEyr+yMcAhfjy45wdoEduo3TRA=
+X-Google-Smtp-Source: APXvYqxeG+727dSd9hpflWUs37JO+uDRBt85YuaVw/2/qEYgkhJrgszDi4Osfq32YMA7sHZ23onsUw==
+X-Received: by 2002:adf:f18b:: with SMTP id h11mr711078wro.56.1580329517572;
+ Wed, 29 Jan 2020 12:25:17 -0800 (PST)
+Received: from moi-limbo-9350.home
+ (host86-131-78-194.range86-131.btcentralplus.com. [86.131.78.194])
+ by smtp.gmail.com with ESMTPSA id h2sm4377518wrt.45.2020.01.29.12.25.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jan 2020 12:25:17 -0800 (PST)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/2] target/arm: kvm: Inject events at the last stage of
+ sync
+Date: Wed, 29 Jan 2020 20:24:40 +0000
+Message-Id: <20200129202441.12745-2-beata.michalska@linaro.org>
+In-Reply-To: <20200129202441.12745-1-beata.michalska@linaro.org>
+References: <20200129202441.12745-1-beata.michalska@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,38 +90,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- ehabkost@redhat.com, crosa@redhat.com
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+ Christoffer.Dall@arm.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+KVM_SET_VCPU_EVENTS might actually lead to vcpu registers being modified.
+As such this should be the last step of sync to avoid potential overwriting
+of whatever changes KVM might have done.
 
-On 1/20/20 5:12 AM, Luk=C3=A1=C5=A1 Doktor wrote:
-> In case qemu process dies the "monitor.cmd" returns None which gets
-> passed to the "__negotiate_capabilities" and leads to unhandled
-> exception. Let's only check the resp in case it has a value.
->
-> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> ---
->   python/qemu/qmp.py | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+---
+ target/arm/kvm32.c | 20 ++++++++++----------
+ target/arm/kvm64.c | 20 ++++++++++----------
+ 2 files changed, 20 insertions(+), 20 deletions(-)
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
->
-> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-> index 5c8cf6a056..a3e5de718a 100644
-> --- a/python/qemu/qmp.py
-> +++ b/python/qemu/qmp.py
-> @@ -73,7 +73,7 @@ class QEMUMonitorProtocol(object):
->               raise QMPConnectError
->           # Greeting seems ok, negotiate capabilities
->           resp =3D self.cmd('qmp_capabilities')
-> -        if "return" in resp:
-> +        if resp and "return" in resp:
->               return greeting
->           raise QMPCapabilitiesError
->  =20
+diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+index 32bf8d6..cf2b47f 100644
+--- a/target/arm/kvm32.c
++++ b/target/arm/kvm32.c
+@@ -386,17 +386,17 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         return ret;
+     }
+ 
+-    ret = kvm_put_vcpu_events(cpu);
+-    if (ret) {
+-        return ret;
+-    }
+-
+     write_cpustate_to_list(cpu, true);
+ 
+     if (!write_list_to_kvmstate(cpu, level)) {
+         return EINVAL;
+     }
+ 
++    ret = kvm_put_vcpu_events(cpu);
++    if (ret) {
++        return ret;
++    }
++
+     kvm_arm_sync_mpstate_to_kvm(cpu);
+ 
+     return ret;
+@@ -462,11 +462,6 @@ int kvm_arch_get_registers(CPUState *cs)
+     }
+     vfp_set_fpscr(env, fpscr);
+ 
+-    ret = kvm_get_vcpu_events(cpu);
+-    if (ret) {
+-        return ret;
+-    }
+-
+     if (!write_kvmstate_to_list(cpu)) {
+         return EINVAL;
+     }
+@@ -475,6 +470,11 @@ int kvm_arch_get_registers(CPUState *cs)
+      */
+     write_list_to_cpustate(cpu);
+ 
++    ret = kvm_get_vcpu_events(cpu);
++    if (ret) {
++        return ret;
++    }
++
+     kvm_arm_sync_mpstate_to_qemu(cpu);
+ 
+     return 0;
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 6344113..d06fd32 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -1043,17 +1043,17 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         return ret;
+     }
+ 
+-    ret = kvm_put_vcpu_events(cpu);
+-    if (ret) {
+-        return ret;
+-    }
+-
+     write_cpustate_to_list(cpu, true);
+ 
+     if (!write_list_to_kvmstate(cpu, level)) {
+         return -EINVAL;
+     }
+ 
++    ret = kvm_put_vcpu_events(cpu);
++    if (ret) {
++        return ret;
++    }
++
+     kvm_arm_sync_mpstate_to_kvm(cpu);
+ 
+     return ret;
+@@ -1251,11 +1251,6 @@ int kvm_arch_get_registers(CPUState *cs)
+     }
+     vfp_set_fpcr(env, fpr);
+ 
+-    ret = kvm_get_vcpu_events(cpu);
+-    if (ret) {
+-        return ret;
+-    }
+-
+     if (!write_kvmstate_to_list(cpu)) {
+         return -EINVAL;
+     }
+@@ -1264,6 +1259,11 @@ int kvm_arch_get_registers(CPUState *cs)
+      */
+     write_list_to_cpustate(cpu);
+ 
++    ret = kvm_get_vcpu_events(cpu);
++    if (ret) {
++        return ret;
++    }
++
+     kvm_arm_sync_mpstate_to_qemu(cpu);
+ 
+     /* TODO: other registers */
+-- 
+2.7.4
 
 
