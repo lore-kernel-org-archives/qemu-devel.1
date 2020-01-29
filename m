@@ -2,88 +2,95 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D141C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38557C33CB2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:13:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2451020716
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:10:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E994520716
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 10:13:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tRt4vK4l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2451020716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELaANGR5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E994520716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwkIO-0002ky-6z
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 05:10:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37592)
+	id 1iwkLu-0004e7-53
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 05:13:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39695)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwkHi-0002MQ-SR
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:09:25 -0500
+ (envelope-from <mst@redhat.com>) id 1iwkL9-0004Cm-SC
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwkHg-0002UI-2V
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:09:22 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38160)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iwkHf-0002RT-Nc
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:09:19 -0500
-Received: by mail-oi1-x241.google.com with SMTP id l9so13410019oii.5
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 02:09:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Yvymi94t1wmmfiof2rC6SA1q1XHdJPvop3KA6eldLNs=;
- b=tRt4vK4lCXAwOG7DZm/SN6/mkwy4KECy9E3OGP2Ps6LV/d0YUMr7SEKkrLAwIvJxkB
- wJsr8AjZwy1gBcAMyE8qIRmBgzR7g1FlOyldifNfHyD2/d9vv2XuMtv2ql80Gaz1FY93
- CjmM8Hg9rUiSAr8WVCTG3En9fbg9EeLJLiMiHdfdQT3QlBbeMIhFhKtTKJdZkGFEsB2V
- 29sF9GfvtSYncbotWhYXuWOUbe6DQBURLS5GDAWLS/ZtqB7ydX6DYIeCpR+93Gargk/j
- 1uPJumej5cbT1fouSzNlY6alb8598JH8diEEBG1A/uqHearh1QMoPBItKI4otIEuesQx
- Gqhg==
+ (envelope-from <mst@redhat.com>) id 1iwkL6-0002Yf-0k
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:12:55 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50737
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iwkL5-0002TZ-JL
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 05:12:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580292768;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WFv34zPokDmQe4miEmV/vCHSsftJjS+7ML/8RZHKRzQ=;
+ b=ELaANGR5WEMJkCEBK9/bqIGbvij3wfFE408p1yP3CFzfXV7aMwi/68te3QPd4iKnxHxuOw
+ 8T3rkMO3mhJy6o34R4ufPKGNo4VdmFJz6NiH4jYtiDZLqerUY54kWuDwbquLo9actUa8uj
+ 4mS5gUX9lDmloM+S0YtTPaGaJ1eqi0M=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-F2DYEgTYO9myJKRhye3lrA-1; Wed, 29 Jan 2020 05:12:45 -0500
+Received: by mail-qt1-f198.google.com with SMTP id r9so10489197qtc.4
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 02:12:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Yvymi94t1wmmfiof2rC6SA1q1XHdJPvop3KA6eldLNs=;
- b=Cw95yw63Zk+3Sf73j/HX3Gb70Mh994T4nKV6ONFIslervT5i29NJNM1x8414BPl9IQ
- qh00ZHhiK305okbIScgC+t4wnYiahEE3q2vUw2q2ddfbIBRH+KQp4cyQw3x7GqS2KmCt
- wmFp1WqURYMrOT+CuSsMwXrEMU441V/zHHxkC18MYBNtEfbRWWv15icU3+Cqu7Qfh3n5
- cOPqxqwV0TvkfaSPC7pGDMim1GjgIYr6VP6UW1wEbmrrHoXPZpIy63TllCvUeUFTf3Oa
- 7ddWpFxJOPyLe6KUk+BRWhRBc5QMo/rphAp0d2Qugos4t+a9NhuO0K6svTHSm0MXuK5u
- 5uwg==
-X-Gm-Message-State: APjAAAU+XmEjzSliK5YBtun5vJ1PFrhVafwf07G2f6LApLZsJ0BeWI8B
- RP61/u1nuH6zEpRCuGMky0hIe8MTlJiwH7Dh4ko=
-X-Google-Smtp-Source: APXvYqwgupT/y0DfArRDBp7d4FlYEffV2jc2kHvlM7TsMNSfY9Rv3ageUqLO0GSHPkcv+k5gz96Cpx7p3kQ+YCLN61U=
-X-Received: by 2002:aca:5844:: with SMTP id m65mr5979180oib.136.1580292558760; 
- Wed, 29 Jan 2020 02:09:18 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=mB15bcSS1+9wToP/4V851ez/NpDYolnlJSkxIQhHUfM=;
+ b=YuLUsDv+X44BSdNJQ9BJUANvHw9MxyPhvSPlsCC4hpcENx9ownukbuN9QyB3ysWRJX
+ Ny9PGY3WP+cVuuXA4W0AWxPhL1wmZ6GWxKLRT+YbMGjgg2NV7B7QrI44G3nYxsUoVaMw
+ ByrsypgD9jL8v7G3aYcFIEFNjCKbpi3+AvEqzhCil3dEuLigi8Z47/ncl+pOVKWcEb/h
+ EEnW7Adm1FrG2NU6QFcccbPaPrv3BaJRiM64ht7C5H97pBIwMeVu6e6UwpGl+qkbsPqH
+ 9YvpKfslDUbjNd0N2rOzgCRgWHJDTE6OrJrUfe80ClpO4ZtJQ3BcA1I5FGxO27d76Rbz
+ /EcA==
+X-Gm-Message-State: APjAAAXXpJW3xBmnHguGec77LWpXenpV7fQKEHRjbIb9YWYVrMDOed3t
+ kgXJY7UdSlRMZfxmj2YTxFMp2byTNwJLa3BUAiCQnusqTfsZybx75hXA0tY99BE/tyZ82f92gKy
+ lkP8sJzOQ0mCfD1U=
+X-Received: by 2002:a37:6292:: with SMTP id w140mr27865108qkb.65.1580292764938; 
+ Wed, 29 Jan 2020 02:12:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwwAUx/KsP1PhEUG8vlmwKOKv2NV+8JdzpSrvGpOKuShPyiwUHW4zdi2JXEvQB0tphbgjSQMg==
+X-Received: by 2002:a37:6292:: with SMTP id w140mr27865076qkb.65.1580292764463; 
+ Wed, 29 Jan 2020 02:12:44 -0800 (PST)
+Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
+ by smtp.gmail.com with ESMTPSA id i28sm842769qtc.57.2020.01.29.02.12.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jan 2020 02:12:43 -0800 (PST)
+Date: Wed, 29 Jan 2020 05:12:38 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jing Liu <jing2.liu@linux.intel.com>
+Subject: Re: [virtio-dev] [PATCH v2 4/5] virtio-mmio: Introduce MSI details
+Message-ID: <20200129050656-mutt-send-email-mst@kernel.org>
+References: <1579614873-21907-1-git-send-email-jing2.liu@linux.intel.com>
+ <1579614873-21907-5-git-send-email-jing2.liu@linux.intel.com>
 MIME-Version: 1.0
-References: <1580079311-20447-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1580079311-20447-2-git-send-email-aleksandar.markovic@rt-rk.com>
- <CAK4993itnp5EyT8g-zGcMY6Oud9pC9GRv1Aa2dvofrH8mLWnOQ@mail.gmail.com>
- <CAK4993hTqhuZArVNbNs8M8MJkdQbneq0fCsW2b2-fEKaAtCuOQ@mail.gmail.com>
- <CAL1e-=jeQAqQ3GrVg2z9Y9qW+5KXvOURhpX6ApM5SJ2aJ8oDMQ@mail.gmail.com>
- <CAK4993jy-nPPANFW9aFW7Kk=B7EpOqdq8Pf9qStn5g+gevNHYg@mail.gmail.com>
- <CAL1e-=hn3kJw6hVkDeP=-45WxMUVZfdrj=_DyAGJGFTTMJQp6w@mail.gmail.com>
- <3ea8b187-e425-d7ac-bc91-6d36b3eaba69@redhat.com>
-In-Reply-To: <3ea8b187-e425-d7ac-bc91-6d36b3eaba69@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 29 Jan 2020 11:09:02 +0100
-Message-ID: <CAL1e-=h=N4zfCDh1bQ1hxQdmAm8JyTMasWtK44ZwhotrFHMa_A@mail.gmail.com>
-Subject: Re: [PATCH rc3 01/30] target/avr: Add basic parameters for new AVR
- platform
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000009b2d40059d448859"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <1579614873-21907-5-git-send-email-jing2.liu@linux.intel.com>
+X-MC-Unique: F2DYEgTYO9myJKRhye3lrA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,638 +102,372 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Michael Rolnik <mrolnik@gmail.com>
+Cc: virtio-dev@lists.oasis-open.org, Zha Bin <zhabin@linux.alibaba.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
+ Chao Peng <chao.p.peng@linux.intel.com>, Liu Jiang <gerry@linux.alibaba.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000009b2d40059d448859
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 21, 2020 at 09:54:32PM +0800, Jing Liu wrote:
+> With VIRTIO_F_MMIO_MSI feature bit offered, the Message Signal
+> Interrupts (MSI) is supported as first priority. For any reason it
+> fails to use MSI, it need use the single dedicated interrupt as before.
+>=20
+> For MSI vectors and events mapping relationship, introduce in next patch.
+>=20
+> Co-developed-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Co-developed-by: Liu Jiang <gerry@linux.alibaba.com>
+> Signed-off-by: Liu Jiang <gerry@linux.alibaba.com>
+> Co-developed-by: Zha Bin <zhabin@linux.alibaba.com>
+> Signed-off-by: Zha Bin <zhabin@linux.alibaba.com>
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
 
-08:38 Sre, 29.01.2020. Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =D1=
-=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On 1/28/20 7:01 PM, Aleksandar Markovic wrote:
-> > Works for me too.
-> >
-> >
-> > 16:10 Uto, 28.01.2020. Michael Rolnik <mrolnik@gmail.com
-> > <mailto:mrolnik@gmail.com>> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
-=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >
-> >     Sounds good to me.
-> >
-> >     On Tue, Jan 28, 2020 at 3:49 PM Aleksandar Markovic
-> >     <aleksandar.m.mail@gmail.com <mailto:aleksandar.m.mail@gmail.com>>
-> >     wrote:
-> >
-> >
-> >
-> >         On Tuesday, January 28, 2020, Michael Rolnik <mrolnik@gmail.com
-> >         <mailto:mrolnik@gmail.com>> wrote:
-> >
-> >             Hi all.
-> >
-> >             I am totally lost in the email.
-> >             Are there any action items for me / someone else ?
-> >
-> >             Regards,
-> >             Michael Rolnik
-> >
-> >
-> >         I think it would be helpful if we have rc4 with two action
-items:
-> >
-> >             - remove CONFIG_USER_ONLY references, and all dead code tha=
-y
-> >         may have come with it + add check in cpu.h that Philippe
-suggested.
-> >             - remove "Atmel" word from all elements of the series (patc=
-h
-> >         names, messages, filenames, structure names, ...)
-> >
-> >         Needless to say that this must be done with extreme care.
-> >
-> >         I propose that Philippe do rc4.
->
-> I won't have time to work on AVR this week-end and the next one (family
-> plans). If I find time I prefer prioritize the raspi machine because I
-> want to see some work merged before Igor "use memdev for RAM" series get
-> in. So if you guys have time & motivation, go for it!
->
 
-OK, I am going to do and send rc4.
+So we have a concept of "MSI vectors" here, which can be
+selected and configured and which in the
+following patch are mapped to VQs either 1:1 or dynamically.
 
-Yours,
-Aleksandar
 
-> >
-> >         Sincerely,
-> >         Aleksandar
-> >
-> >
-> >             On Mon, Jan 27, 2020 at 10:54 AM Michael Rolnik
-> >             <mrolnik@gmail.com <mailto:mrolnik@gmail.com>> wrote:
-> >
-> >                 Thanks for you help guys.
-> >
-> >                 On Mon, Jan 27, 2020 at 12:55 AM Aleksandar Markovic
-> >                 <aleksandar.markovic@rt-rk.com
-> >                 <mailto:aleksandar.markovic@rt-rk.com>> wrote:
-> >
-> >                     From: Michael Rolnik <mrolnik@gmail.com
-> >                     <mailto:mrolnik@gmail.com>>
-> >
-> >                     This includes definitions of various basic
-> >                     parameters needed
-> >                     for integration of a new platform into QEMU.
-> >
-> >                     Co-developed-by: Michael Rolnik <mrolnik@gmail.com
-> >                     <mailto:mrolnik@gmail.com>>
-> >                     Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.u=
-k
-> >                     <mailto:S.E.Harris@kent.ac.uk>>
-> >                     Signed-off-by: Michael Rolnik <mrolnik@gmail.com
-> >                     <mailto:mrolnik@gmail.com>>
-> >                     Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk
-> >                     <mailto:S.E.Harris@kent.ac.uk>>
-> >                     Signed-off-by: Michael Rolnik <mrolnik@gmail.com
-> >                     <mailto:mrolnik@gmail.com>>
-> >                     Acked-by: Igor Mammedov <imammedo@redhat.com
-> >                     <mailto:imammedo@redhat.com>>
-> >                     Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redh=
-at.com
-> >                     <mailto:philmd@redhat.com>>
-> >                     Signed-off-by: Richard Henderson
-> >                     <richard.henderson@linaro.org
-> >                     <mailto:richard.henderson@linaro.org>>
-> >                     Signed-off-by: Aleksandar Markovic
-> >                     <aleksandar.m.mail@gmail.com
-> >                     <mailto:aleksandar.m.mail@gmail.com>>
-> >                     ---
-> >                       target/avr/cpu-param.h | 37
-++++++++++++++++++++++++++
-> >                       target/avr/cpu.h       | 72
-> >                     ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >                       2 files changed, 109 insertions(+)
-> >                       create mode 100644 target/avr/cpu-param.h
-> >                       create mode 100644 target/avr/cpu.h
-> >
-> >                     diff --git a/target/avr/cpu-param.h
-> >                     b/target/avr/cpu-param.h
-> >                     new file mode 100644
-> >                     index 0000000..0c29ce4
-> >                     --- /dev/null
-> >                     +++ b/target/avr/cpu-param.h
-> >                     @@ -0,0 +1,37 @@
-> >                     +/*
-> >                     + * QEMU AVR CPU
-> >                     + *
-> >                     + * Copyright (c) 2019 Michael Rolnik
-> >                     + *
-> >                     + * This library is free software; you can
-> >                     redistribute it and/or
-> >                     + * modify it under the terms of the GNU Lesser
-> >                     General Public
-> >                     + * License as published by the Free Software
-> >                     Foundation; either
-> >                     + * version 2.1 of the License, or (at your option)
-> >                     any later version.
-> >                     + *
-> >                     + * This library is distributed in the hope that it
-> >                     will be useful,
-> >                     + * but WITHOUT ANY WARRANTY; without even the
-> >                     implied warranty of
-> >                     + * MERCHANTABILITY or FITNESS FOR A PARTICULAR
-> >                     PURPOSE.  See the GNU
-> >                     + * Lesser General Public License for more details.
-> >                     + *
-> >                     + * You should have received a copy of the GNU
-> >                     Lesser General Public
-> >                     + * License along with this library; if not, see
-> >                     + * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> >                     + */
-> >                     +
-> >                     +#ifndef AVR_CPU_PARAM_H
-> >                     +#define AVR_CPU_PARAM_H
-> >                     +
-> >                     +#define TARGET_LONG_BITS 32
-> >                     +/*
-> >                     + * TARGET_PAGE_BITS cannot be more than 8 bits
-because
-> >                     + * 1.  all IO registers occupy [0x0000 .. 0x00ff]
-> >                     address range, and they
-> >                     + *     should be implemented as a device and not
-memory
-> >                     + * 2.  SRAM starts at the address 0x0100
-> >                     + */
-> >                     +#define TARGET_PAGE_BITS 8
-> >                     +#define TARGET_PHYS_ADDR_SPACE_BITS 24
-> >                     +#define TARGET_VIRT_ADDR_SPACE_BITS 24
-> >                     +#define NB_MMU_MODES 2
-> >                     +
-> >                     +
-> >                     +#endif
-> >                     diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-> >                     new file mode 100644
-> >                     index 0000000..d122611
-> >                     --- /dev/null
-> >                     +++ b/target/avr/cpu.h
-> >                     @@ -0,0 +1,72 @@
-> >                     +/*
-> >                     + * QEMU AVR CPU
-> >                     + *
-> >                     + * Copyright (c) 2019 Michael Rolnik
-> >                     + *
-> >                     + * This library is free software; you can
-> >                     redistribute it and/or
-> >                     + * modify it under the terms of the GNU Lesser
-> >                     General Public
-> >                     + * License as published by the Free Software
-> >                     Foundation; either
-> >                     + * version 2.1 of the License, or (at your option)
-> >                     any later version.
-> >                     + *
-> >                     + * This library is distributed in the hope that it
-> >                     will be useful,
-> >                     + * but WITHOUT ANY WARRANTY; without even the
-> >                     implied warranty of
-> >                     + * MERCHANTABILITY or FITNESS FOR A PARTICULAR
-> >                     PURPOSE.  See the GNU
-> >                     + * Lesser General Public License for more details.
-> >                     + *
-> >                     + * You should have received a copy of the GNU
-> >                     Lesser General Public
-> >                     + * License along with this library; if not, see
-> >                     + * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> >                     + */
-> >                     +
-> >                     +#ifndef QEMU_AVR_CPU_H
-> >                     +#define QEMU_AVR_CPU_H
-> >                     +
-> >                     +#include "cpu-qom.h"
-> >                     +#include "exec/cpu-defs.h"
-> >                     +
-> >                     +#define TCG_GUEST_DEFAULT_MO 0
-> >                     +#define AVR_CPU_TYPE_SUFFIX "-" TYPE_AVR_CPU
-> >                     +#define AVR_CPU_TYPE_NAME(name) (name
-> >                     AVR_CPU_TYPE_SUFFIX)
-> >                     +#define CPU_RESOLVING_TYPE TYPE_AVR_CPU
-> >                     +
-> >                     +/*
-> >                     + * AVR has two memory spaces, data & code.
-> >                     + * e.g. both have 0 address
-> >                     + * ST/LD instructions access data space
-> >                     + * LPM/SPM and instruction fetching access code
-> >                     memory space
-> >                     + */
-> >                     +#define MMU_CODE_IDX 0
-> >                     +#define MMU_DATA_IDX 1
-> >                     +
-> >                     +#define EXCP_RESET 1
-> >                     +#define EXCP_INT(n) (EXCP_RESET + (n) + 1)
-> >                     +
-> >                     +/* Number of CPU registers */
-> >                     +#define NUMBER_OF_CPU_REGISTERS 32
-> >                     +/* Number of IO registers accessible by
-ld/st/in/out */
-> >                     +#define NUMBER_OF_IO_REGISTERS 64
-> >                     +
-> >                     +/*
-> >                     + * Offsets of AVR memory regions in host memory
-space.
-> >                     + *
-> >                     + * This is needed because the AVR has separate cod=
-e
-> >                     and data address
-> >                     + * spaces that both have start from zero but have
-> >                     to go somewhere in
-> >                     + * host memory.
-> >                     + *
-> >                     + * It's also useful to know where some things are,
-> >                     like the IO registers.
-> >                     + */
-> >                     +/* Flash program memory */
-> >                     +#define OFFSET_CODE 0x00000000
-> >                     +/* CPU registers, IO registers, and SRAM */
-> >                     +#define OFFSET_DATA 0x00800000
-> >                     +/* CPU registers specifically, these are mapped at
-> >                     the start of data */
-> >                     +#define OFFSET_CPU_REGISTERS OFFSET_DATA
-> >                     +/*
-> >                     + * IO registers, including status register, stack
-> >                     pointer, and memory
-> >                     + * mapped peripherals, mapped just after CPU
-registers
-> >                     + */
-> >                     +#define OFFSET_IO_REGISTERS (OFFSET_DATA +
-> >                     NUMBER_OF_CPU_REGISTERS)
-> >                     +
-> >                     +#define EF_AVR_MACH 0x7F
-> >                     +
-> >                     +#endif /* !defined (QEMU_AVR_CPU_H) */
-> >                     --
-> >                     2.7.4
-> >
-> >
-> >
-> >                 --
-> >                 Best Regards,
-> >                 Michael Rolnik
-> >
-> >
-> >
-> >             --
-> >             Best Regards,
-> >             Michael Rolnik
-> >
-> >
-> >
-> >     --
-> >     Best Regards,
-> >     Michael Rolnik
-> >
->
+My question is, do we need this indirection?
 
---0000000000009b2d40059d448859
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: base64
+In fact an MSI vector is just an address/data pair.
 
-PHAgZGlyPSJsdHIiPjwvcD4NCjxwIGRpcj0ibHRyIj4wODozOCBTcmUsIDI5LjAxLjIwMjAuIFBo
-aWxpcHBlIE1hdGhpZXUtRGF1ZMOpICZsdDs8YSBocmVmPSJtYWlsdG86cGhpbG1kQHJlZGhhdC5j
-b20iPnBoaWxtZEByZWRoYXQuY29tPC9hPiZndDsg0ZjQtSDQvdCw0L/QuNGB0LDQvi/Qu9CwOjxi
-cj4NCiZndDs8YnI+DQomZ3Q7IE9uIDEvMjgvMjAgNzowMSBQTSwgQWxla3NhbmRhciBNYXJrb3Zp
-YyB3cm90ZTo8YnI+DQomZ3Q7ICZndDsgV29ya3MgZm9yIG1lIHRvby48YnI+DQomZ3Q7ICZndDsg
-PGJyPg0KJmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0OyAxNjoxMCBVdG8sIDI4LjAxLjIwMjAuIE1p
-Y2hhZWwgUm9sbmlrICZsdDs8YSBocmVmPSJtYWlsdG86bXJvbG5pa0BnbWFpbC5jb20iPm1yb2xu
-aWtAZ21haWwuY29tPC9hPiA8YnI+DQomZ3Q7ICZndDsgJmx0O21haWx0bzo8YSBocmVmPSJtYWls
-dG86bXJvbG5pa0BnbWFpbC5jb20iPm1yb2xuaWtAZ21haWwuY29tPC9hPiZndDsmZ3Q7INGY0LUg
-0L3QsNC/0LjRgdCw0L4v0LvQsDo8YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAg
-wqBTb3VuZHMgZ29vZCB0byBtZS48YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAg
-wqBPbiBUdWUsIEphbiAyOCwgMjAyMCBhdCAzOjQ5IFBNIEFsZWtzYW5kYXIgTWFya292aWM8YnI+
-DQomZ3Q7ICZndDvCoCDCoCDCoCZsdDs8YSBocmVmPSJtYWlsdG86YWxla3NhbmRhci5tLm1haWxA
-Z21haWwuY29tIj5hbGVrc2FuZGFyLm0ubWFpbEBnbWFpbC5jb208L2E+ICZsdDttYWlsdG86PGEg
-aHJlZj0ibWFpbHRvOmFsZWtzYW5kYXIubS5tYWlsQGdtYWlsLmNvbSI+YWxla3NhbmRhci5tLm1h
-aWxAZ21haWwuY29tPC9hPiZndDsmZ3Q7PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqB3cm90ZTo8YnI+
-DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0OyA8YnI+DQomZ3Q7ICZn
-dDvCoCDCoCDCoCDCoCDCoE9uIFR1ZXNkYXksIEphbnVhcnkgMjgsIDIwMjAsIE1pY2hhZWwgUm9s
-bmlrICZsdDs8YSBocmVmPSJtYWlsdG86bXJvbG5pa0BnbWFpbC5jb20iPm1yb2xuaWtAZ21haWwu
-Y29tPC9hPjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgJmx0O21haWx0bzo8YSBocmVmPSJt
-YWlsdG86bXJvbG5pa0BnbWFpbC5jb20iPm1yb2xuaWtAZ21haWwuY29tPC9hPiZndDsmZ3Q7IHdy
-b3RlOjxicj4NCiZndDsgJmd0OyA8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoEhp
-IGFsbC48YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqBJ
-IGFtIHRvdGFsbHkgbG9zdCBpbiB0aGUgZW1haWwuPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAg
-wqAgwqAgwqBBcmUgdGhlcmUgYW55IGFjdGlvbiBpdGVtcyBmb3IgbWUgLyBzb21lb25lwqBlbHNl
-ID88YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqBSZWdh
-cmRzLDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgTWljaGFlbCBSb2xuaWs8YnI+
-DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKg
-SSB0aGluayBpdCB3b3VsZCBiZSBoZWxwZnVsIGlmIHdlIGhhdmUgcmM0IHdpdGggdHdvIGFjdGlv
-biBpdGVtczo8YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqAtIHJlbW92ZSBDT05GSUdfVVNFUl9PTkxZIHJlZmVyZW5jZXMsIGFuZCBhbGwgZGVhZCBjb2Rl
-IHRoYXk8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoG1heSBoYXZlIGNvbWUgd2l0aCBpdCAr
-IGFkZCBjaGVjayBpbiBjcHUuaCB0aGF0IFBoaWxpcHBlIHN1Z2dlc3RlZC48YnI+DQomZ3Q7ICZn
-dDvCoCDCoCDCoCDCoCDCoCDCoCDCoC0gcmVtb3ZlICZxdW90O0F0bWVsJnF1b3Q7IHdvcmQgZnJv
-bSBhbGwgZWxlbWVudHMgb2YgdGhlIHNlcmllcyAocGF0Y2g8YnI+DQomZ3Q7ICZndDvCoCDCoCDC
-oCDCoCDCoG5hbWVzLCBtZXNzYWdlcywgZmlsZW5hbWVzLCBzdHJ1Y3R1cmUgbmFtZXMsIC4uLik8
-YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqBOZWVkbGVzcyB0byBz
-YXkgdGhhdCB0aGlzIG11c3QgYmUgZG9uZSB3aXRoIGV4dHJlbWUgY2FyZS48YnI+DQomZ3Q7ICZn
-dDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqBJIHByb3Bvc2UgdGhhdCBQaGlsaXBwZSBk
-byByYzQuPGJyPg0KJmd0Ozxicj4NCiZndDsgSSB3b24mIzM5O3QgaGF2ZSB0aW1lIHRvIHdvcmsg
-b24gQVZSIHRoaXMgd2Vlay1lbmQgYW5kIHRoZSBuZXh0IG9uZSAoZmFtaWx5IDxicj4NCiZndDsg
-cGxhbnMpLiBJZiBJIGZpbmQgdGltZSBJIHByZWZlciBwcmlvcml0aXplIHRoZSByYXNwaSBtYWNo
-aW5lIGJlY2F1c2UgSSA8YnI+DQomZ3Q7IHdhbnQgdG8gc2VlIHNvbWUgd29yayBtZXJnZWQgYmVm
-b3JlIElnb3IgJnF1b3Q7dXNlIG1lbWRldiBmb3IgUkFNJnF1b3Q7IHNlcmllcyBnZXQgPGJyPg0K
-Jmd0OyBpbi4gU28gaWYgeW91IGd1eXMgaGF2ZSB0aW1lICZhbXA7IG1vdGl2YXRpb24sIGdvIGZv
-ciBpdCE8YnI+DQomZ3Q7PC9wPg0KPHAgZGlyPSJsdHIiPk9LLCBJIGFtIGdvaW5nIHRvIGRvIGFu
-ZCBzZW5kIHJjNC48L3A+DQo8cCBkaXI9Imx0ciI+WW91cnMsPGJyPg0KQWxla3NhbmRhcjxicj48
-L3A+DQo8cCBkaXI9Imx0ciI+Jmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKg
-U2luY2VyZWx5LDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgQWxla3NhbmRhcjxicj4NCiZn
-dDsgJmd0OyA8YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqBPbiBNb24sIEphbiAyNywgMjAyMCBhdCAxMDo1NCBBTSBNaWNoYWVsIFJvbG5pazxicj4NCiZn
-dDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgJmx0OzxhIGhyZWY9Im1haWx0bzptcm9sbmlrQGdt
-YWlsLmNvbSI+bXJvbG5pa0BnbWFpbC5jb208L2E+ICZsdDttYWlsdG86PGEgaHJlZj0ibWFpbHRv
-Om1yb2xuaWtAZ21haWwuY29tIj5tcm9sbmlrQGdtYWlsLmNvbTwvYT4mZ3Q7Jmd0OyB3cm90ZTo8
-YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBU
-aGFua3MgZm9yIHlvdSBoZWxwIGd1eXMuPGJyPg0KJmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0O8Kg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgT24gTW9uLCBKYW4gMjcsIDIwMjAgYXQgMTI6NTUgQU0g
-QWxla3NhbmRhciBNYXJrb3ZpYzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgJmx0OzxhIGhyZWY9Im1haWx0bzphbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbSI+YWxl
-a3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb208L2E+PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0bzphbGVrc2FuZGFyLm1hcmtv
-dmljQHJ0LXJrLmNvbSI+YWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb208L2E+Jmd0OyZndDsg
-d3JvdGU6PGJyPg0KJmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgRnJvbTogTWljaGFlbCBSb2xuaWsgJmx0OzxhIGhyZWY9Im1haWx0bzptcm9s
-bmlrQGdtYWlsLmNvbSI+bXJvbG5pa0BnbWFpbC5jb208L2E+PGJyPg0KJmd0OyAmZ3Q7wqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0bzptcm9s
-bmlrQGdtYWlsLmNvbSI+bXJvbG5pa0BnbWFpbC5jb208L2E+Jmd0OyZndDs8YnI+DQomZ3Q7ICZn
-dDsgPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBUaGlzIGlu
-Y2x1ZGVzIGRlZmluaXRpb25zIG9mIHZhcmlvdXMgYmFzaWM8YnI+DQomZ3Q7ICZndDvCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHBhcmFtZXRlcnMgbmVlZGVkPGJyPg0KJmd0OyAmZ3Q7
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBmb3IgaW50ZWdyYXRpb24gb2YgYSBuZXcg
-cGxhdGZvcm0gaW50byBRRU1VLjxicj4NCiZndDsgJmd0OyA8YnI+DQomZ3Q7ICZndDvCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoENvLWRldmVsb3BlZC1ieTogTWljaGFlbCBSb2xuaWsg
-Jmx0OzxhIGhyZWY9Im1haWx0bzptcm9sbmlrQGdtYWlsLmNvbSI+bXJvbG5pa0BnbWFpbC5jb208
-L2E+PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAmbHQ7bWFp
-bHRvOjxhIGhyZWY9Im1haWx0bzptcm9sbmlrQGdtYWlsLmNvbSI+bXJvbG5pa0BnbWFpbC5jb208
-L2E+Jmd0OyZndDs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oENvLWRldmVsb3BlZC1ieTogU2FyYWggSGFycmlzICZsdDs8YSBocmVmPSJtYWlsdG86Uy5FLkhh
-cnJpc0BrZW50LmFjLnVrIj5TLkUuSGFycmlzQGtlbnQuYWMudWs8L2E+PGJyPg0KJmd0OyAmZ3Q7
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0
-bzpTLkUuSGFycmlzQGtlbnQuYWMudWsiPlMuRS5IYXJyaXNAa2VudC5hYy51azwvYT4mZ3Q7Jmd0
-Ozxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgU2lnbmVkLW9m
-Zi1ieTogTWljaGFlbCBSb2xuaWsgJmx0OzxhIGhyZWY9Im1haWx0bzptcm9sbmlrQGdtYWlsLmNv
-bSI+bXJvbG5pa0BnbWFpbC5jb208L2E+PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0bzptcm9sbmlrQGdtYWlsLmNv
-bSI+bXJvbG5pa0BnbWFpbC5jb208L2E+Jmd0OyZndDs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoFNpZ25lZC1vZmYtYnk6IFNhcmFoIEhhcnJpcyAmbHQ7PGEg
-aHJlZj0ibWFpbHRvOlMuRS5IYXJyaXNAa2VudC5hYy51ayI+Uy5FLkhhcnJpc0BrZW50LmFjLnVr
-PC9hPjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgJmx0O21h
-aWx0bzo8YSBocmVmPSJtYWlsdG86Uy5FLkhhcnJpc0BrZW50LmFjLnVrIj5TLkUuSGFycmlzQGtl
-bnQuYWMudWs8L2E+Jmd0OyZndDs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoFNpZ25lZC1vZmYtYnk6IE1pY2hhZWwgUm9sbmlrICZsdDs8YSBocmVmPSJtYWls
-dG86bXJvbG5pa0BnbWFpbC5jb20iPm1yb2xuaWtAZ21haWwuY29tPC9hPjxicj4NCiZndDsgJmd0
-O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgJmx0O21haWx0bzo8YSBocmVmPSJtYWls
-dG86bXJvbG5pa0BnbWFpbC5jb20iPm1yb2xuaWtAZ21haWwuY29tPC9hPiZndDsmZ3Q7PGJyPg0K
-Jmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBBY2tlZC1ieTogSWdvciBN
-YW1tZWRvdiAmbHQ7PGEgaHJlZj0ibWFpbHRvOmltYW1tZWRvQHJlZGhhdC5jb20iPmltYW1tZWRv
-QHJlZGhhdC5jb208L2E+PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0bzppbWFtbWVkb0ByZWRoYXQuY29tIj5pbWFt
-bWVkb0ByZWRoYXQuY29tPC9hPiZndDsmZ3Q7PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqBUZXN0ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpICZsdDs8
-YSBocmVmPSJtYWlsdG86cGhpbG1kQHJlZGhhdC5jb20iPnBoaWxtZEByZWRoYXQuY29tPC9hPjxi
-cj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgJmx0O21haWx0bzo8
-YSBocmVmPSJtYWlsdG86cGhpbG1kQHJlZGhhdC5jb20iPnBoaWxtZEByZWRoYXQuY29tPC9hPiZn
-dDsmZ3Q7PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBTaWdu
-ZWQtb2ZmLWJ5OiBSaWNoYXJkIEhlbmRlcnNvbjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgJmx0OzxhIGhyZWY9Im1haWx0bzpyaWNoYXJkLmhlbmRlcnNvbkBs
-aW5hcm8ub3JnIj5yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnPC9hPjxicj4NCiZndDsgJmd0
-O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgJmx0O21haWx0bzo8YSBocmVmPSJtYWls
-dG86cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyI+cmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZzwvYT4mZ3Q7Jmd0Ozxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgU2lnbmVkLW9mZi1ieTogQWxla3NhbmRhciBNYXJrb3ZpYzxicj4NCiZndDsgJmd0O8Kg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgJmx0OzxhIGhyZWY9Im1haWx0bzphbGVrc2Fu
-ZGFyLm0ubWFpbEBnbWFpbC5jb20iPmFsZWtzYW5kYXIubS5tYWlsQGdtYWlsLmNvbTwvYT48YnI+
-DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCZsdDttYWlsdG86PGEg
-aHJlZj0ibWFpbHRvOmFsZWtzYW5kYXIubS5tYWlsQGdtYWlsLmNvbSI+YWxla3NhbmRhci5tLm1h
-aWxAZ21haWwuY29tPC9hPiZndDsmZ3Q7PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAtLS08YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoHRhcmdldC9hdnIvY3B1LXBhcmFtLmggfCAzNyArKysrKysrKysrKysrKysrKysr
-KysrKysrKzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-dGFyZ2V0L2F2ci9jcHUuaMKgIMKgIMKgIMKgfCA3Mjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKys8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoDIgZmlsZXMgY2hhbmdlZCwgMTA5IGluc2VydGlvbnMoKyk8YnI+DQomZ3Q7ICZndDvC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJn
-ZXQvYXZyL2NwdS1wYXJhbS5oPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqBjcmVhdGUgbW9kZSAxMDA2NDQgdGFyZ2V0L2F2ci9jcHUuaDxicj4NCiZndDsg
-Jmd0OyA8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGRpZmYg
-LS1naXQgYS90YXJnZXQvYXZyL2NwdS1wYXJhbS5oPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqBiL3RhcmdldC9hdnIvY3B1LXBhcmFtLmg8YnI+DQomZ3Q7ICZn
-dDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoG5ldyBmaWxlIG1vZGUgMTAwNjQ0PGJy
-Pg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBpbmRleCAwMDAwMDAw
-Li4wYzI5Y2U0PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAt
-LS0gL2Rldi9udWxsPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqArKysgYi90YXJnZXQvYXZyL2NwdS1wYXJhbS5oPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqBAQCAtMCwwICsxLDM3IEBAPGJyPg0KJmd0OyAmZ3Q7wqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArLyo8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBRRU1VIEFWUiBDUFU8YnI+DQomZ3Q7ICZndDvCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgKyAqIENvcHlyaWdodCAoYykgMjAxOSBNaWNoYWVsIFJvbG5pazxi
-cj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqPGJyPg0KJmd0
-OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICogVGhpcyBsaWJyYXJ5IGlz
-IGZyZWUgc29mdHdhcmU7IHlvdSBjYW48YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3I8YnI+DQomZ3Q7ICZndDvCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBtb2RpZnkgaXQgdW5kZXIgdGhlIHRlcm1zIG9m
-IHRoZSBHTlUgTGVzc2VyPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqBHZW5lcmFsIFB1YmxpYzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgKyAqIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3YXJlPGJy
-Pg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBGb3VuZGF0aW9uOyBl
-aXRoZXI8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiB2
-ZXJzaW9uIDIuMSBvZiB0aGUgTGljZW5zZSwgb3IgKGF0IHlvdXIgb3B0aW9uKTxicj4NCiZndDsg
-Jmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgYW55IGxhdGVyIHZlcnNpb24uPGJy
-Pg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICo8YnI+DQomZ3Q7
-ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBUaGlzIGxpYnJhcnkgaXMg
-ZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgd2lsbCBiZSB1c2VmdWwsPGJyPg0KJmd0OyAmZ3Q7wqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICogYnV0IFdJVEhPVVQgQU5ZIFdBUlJBTlRZOyB3
-aXRob3V0IGV2ZW4gdGhlPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqBpbXBsaWVkIHdhcnJhbnR5IG9mPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqArICogTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElD
-VUxBUjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgUFVSUE9T
-RS7CoCBTZWUgdGhlIEdOVTxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgKyAqIExlc3NlciBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMu
-PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICo8YnI+DQom
-Z3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBZb3Ugc2hvdWxkIGhh
-dmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlU8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoExlc3NlciBHZW5lcmFsIFB1YmxpYzxicj4NCiZndDsgJmd0O8Kg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqIExpY2Vuc2UgYWxvbmcgd2l0aCB0aGlz
-IGxpYnJhcnk7IGlmIG5vdCwgc2VlPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqArICogJmx0OzxhIGhyZWY9Imh0dHA6Ly93d3cuZ251Lm9yZy9saWNlbnNlcy9s
-Z3BsLTIuMS5odG1sIj5odHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvbGdwbC0yLjEuaHRtbDwv
-YT4mZ3Q7PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICov
-PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArPGJyPg0KJmd0
-OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArI2lmbmRlZiBBVlJfQ1BVX1BB
-UkFNX0g8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsjZGVm
-aW5lIEFWUl9DUFVfUEFSQU1fSDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgKzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-KyNkZWZpbmUgVEFSR0VUX0xPTkdfQklUUyAzMjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgKy8qPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqArICogVEFSR0VUX1BBR0VfQklUUyBjYW5ub3QgYmUgbW9yZSB0aGFuIDggYml0
-cyBiZWNhdXNlPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAr
-ICogMS7CoCBhbGwgSU8gcmVnaXN0ZXJzIG9jY3VweSBbMHgwMDAwIC4uIDB4MDBmZl08YnI+DQom
-Z3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGFkZHJlc3MgcmFuZ2UsIGFu
-ZCB0aGV5PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICrC
-oCDCoCDCoHNob3VsZCBiZSBpbXBsZW1lbnRlZCBhcyBhIGRldmljZSBhbmQgbm90IG1lbW9yeTxi
-cj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqIDIuwqAgU1JB
-TSBzdGFydHMgYXQgdGhlIGFkZHJlc3MgMHgwMTAwPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqArICovPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqArI2RlZmluZSBUQVJHRVRfUEFHRV9CSVRTIDg8YnI+DQomZ3Q7ICZndDvC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsjZGVmaW5lIFRBUkdFVF9QSFlTX0FERFJf
-U1BBQ0VfQklUUyAyNDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgKyNkZWZpbmUgVEFSR0VUX1ZJUlRfQUREUl9TUEFDRV9CSVRTIDI0PGJyPg0KJmd0OyAmZ3Q7
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArI2RlZmluZSBOQl9NTVVfTU9ERVMgMjxi
-cj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKzxicj4NCiZndDsg
-Jmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKzxicj4NCiZndDsgJmd0O8KgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyNlbmRpZjxicj4NCiZndDsgJmd0O8KgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgZGlmZiAtLWdpdCBhL3RhcmdldC9hdnIvY3B1LmggYi90
-YXJnZXQvYXZyL2NwdS5oPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqBuZXcgZmlsZSBtb2RlIDEwMDY0NDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgaW5kZXggMDAwMDAwMC4uZDEyMjYxMTxicj4NCiZndDsgJmd0O8KgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgLS0tIC9kZXYvbnVsbDxicj4NCiZndDsgJmd0O8Kg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKysrIGIvdGFyZ2V0L2F2ci9jcHUuaDxicj4N
-CiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgQEAgLTAsMCArMSw3MiBA
-QDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKy8qPGJyPg0K
-Jmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICogUUVNVSBBVlIgQ1BV
-PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICo8YnI+DQom
-Z3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBDb3B5cmlnaHQgKGMp
-IDIwMTkgTWljaGFlbCBSb2xuaWs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCsgKjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgKyAqIFRoaXMgbGlicmFyeSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuPGJyPg0KJmd0OyAm
-Z3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqByZWRpc3RyaWJ1dGUgaXQgYW5kL29y
-PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICogbW9kaWZ5
-IGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIExlc3Nlcjxicj4NCiZndDsgJmd0O8KgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgR2VuZXJhbCBQdWJsaWM8YnI+DQomZ3Q7ICZndDvC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBi
-eSB0aGUgRnJlZSBTb2Z0d2FyZTxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgRm91bmRhdGlvbjsgZWl0aGVyPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqArICogdmVyc2lvbiAyLjEgb2YgdGhlIExpY2Vuc2UsIG9yIChhdCB5
-b3VyIG9wdGlvbik8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oGFueSBsYXRlciB2ZXJzaW9uLjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgKyAqPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqArICogVGhpcyBsaWJyYXJ5IGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRoYXQgaXQ8YnI+
-DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHdpbGwgYmUgdXNlZnVs
-LDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqIGJ1dCBX
-SVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZTxicj4NCiZndDsgJmd0O8KgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgaW1wbGllZCB3YXJyYW50eSBvZjxicj4NCiZndDsg
-Jmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqIE1FUkNIQU5UQUJJTElUWSBv
-ciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVI8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoFBVUlBPU0UuwqAgU2VlIHRoZSBHTlU8YnI+DQomZ3Q7ICZndDvCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBMZXNzZXIgR2VuZXJhbCBQdWJsaWMgTGlj
-ZW5zZSBmb3IgbW9yZSBkZXRhaWxzLjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgKyAqPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqArICogWW91IHNob3VsZCBoYXZlIHJlY2VpdmVkIGEgY29weSBvZiB0aGUgR05VPGJyPg0K
-Jmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBMZXNzZXIgR2VuZXJhbCBQ
-dWJsaWM8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBM
-aWNlbnNlIGFsb25nIHdpdGggdGhpcyBsaWJyYXJ5OyBpZiBub3QsIHNlZTxicj4NCiZndDsgJmd0
-O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqICZsdDs8YSBocmVmPSJodHRwOi8v
-d3d3LmdudS5vcmcvbGljZW5zZXMvbGdwbC0yLjEuaHRtbCI+aHR0cDovL3d3dy5nbnUub3JnL2xp
-Y2Vuc2VzL2xncGwtMi4xLmh0bWw8L2E+Jmd0Ozxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgKyAqLzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgKzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgKyNpZm5kZWYgUUVNVV9BVlJfQ1BVX0g8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCsjZGVmaW5lIFFFTVVfQVZSX0NQVV9IPGJyPg0KJmd0OyAmZ3Q7wqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqArI2luY2x1ZGUgJnF1b3Q7Y3B1LXFvbS5oJnF1b3Q7PGJyPg0K
-Jmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArI2luY2x1ZGUgJnF1b3Q7
-ZXhlYy9jcHUtZGVmcy5oJnF1b3Q7PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqArPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqArI2RlZmluZSBUQ0dfR1VFU1RfREVGQVVMVF9NTyAwPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArI2RlZmluZSBBVlJfQ1BVX1RZUEVfU1VGRklYICZxdW90
-Oy0mcXVvdDsgVFlQRV9BVlJfQ1BVPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqArI2RlZmluZSBBVlJfQ1BVX1RZUEVfTkFNRShuYW1lKSAobmFtZTxicj4NCiZn
-dDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgQVZSX0NQVV9UWVBFX1NVRkZJ
-WCk8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsjZGVmaW5l
-IENQVV9SRVNPTFZJTkdfVFlQRSBUWVBFX0FWUl9DUFU8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCsvKjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgKyAqIEFWUiBoYXMgdHdvIG1lbW9yeSBzcGFjZXMsIGRhdGEgJmFtcDsgY29kZS48YnI+
-DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBlLmcuIGJvdGgg
-aGF2ZSAwIGFkZHJlc3M8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCsgKiBTVC9MRCBpbnN0cnVjdGlvbnMgYWNjZXNzIGRhdGEgc3BhY2U8YnI+DQomZ3Q7ICZn
-dDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsgKiBMUE0vU1BNIGFuZCBpbnN0cnVj
-dGlvbiBmZXRjaGluZyBhY2Nlc3MgY29kZTxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgbWVtb3J5IHNwYWNlPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqArICovPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqArI2RlZmluZSBNTVVfQ09ERV9JRFggMDxicj4NCiZndDsgJmd0O8KgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyNkZWZpbmUgTU1VX0RBVEFfSURYIDE8YnI+DQomZ3Q7
-ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCs8YnI+DQomZ3Q7ICZndDvCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsjZGVmaW5lIEVYQ1BfUkVTRVQgMTxicj4NCiZn
-dDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyNkZWZpbmUgRVhDUF9JTlQo
-bikgKEVYQ1BfUkVTRVQgKyAobikgKyAxKTxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgKzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgKy8qIE51bWJlciBvZiBDUFUgcmVnaXN0ZXJzICovPGJyPg0KJmd0OyAmZ3Q7wqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArI2RlZmluZSBOVU1CRVJfT0ZfQ1BVX1JFR0lTVEVS
-UyAzMjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKy8qIE51
-bWJlciBvZiBJTyByZWdpc3RlcnMgYWNjZXNzaWJsZSBieSBsZC9zdC9pbi9vdXQgKi88YnI+DQom
-Z3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsjZGVmaW5lIE5VTUJFUl9P
-Rl9JT19SRUdJU1RFUlMgNjQ8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsv
-Kjxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqIE9mZnNl
-dHMgb2YgQVZSIG1lbW9yeSByZWdpb25zIGluIGhvc3QgbWVtb3J5IHNwYWNlLjxicj4NCiZndDsg
-Jmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKyAqPGJyPg0KJmd0OyAmZ3Q7wqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICogVGhpcyBpcyBuZWVkZWQgYmVjYXVzZSB0
-aGUgQVZSIGhhcyBzZXBhcmF0ZSBjb2RlPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqBhbmQgZGF0YSBhZGRyZXNzPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqArICogc3BhY2VzIHRoYXQgYm90aCBoYXZlIHN0YXJ0IGZyb20g
-emVybyBidXQgaGF2ZTxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgdG8gZ28gc29tZXdoZXJlIGluPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqArICogaG9zdCBtZW1vcnkuPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqArICo8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCsgKiBJdCYjMzk7cyBhbHNvIHVzZWZ1bCB0byBrbm93IHdoZXJlIHNvbWUgdGhp
-bmdzIGFyZSw8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGxp
-a2UgdGhlIElPIHJlZ2lzdGVycy48YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCsgKi88YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCsvKiBGbGFzaCBwcm9ncmFtIG1lbW9yeSAqLzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgKyNkZWZpbmUgT0ZGU0VUX0NPREUgMHgwMDAwMDAwMDxicj4N
-CiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKy8qIENQVSByZWdpc3Rl
-cnMsIElPIHJlZ2lzdGVycywgYW5kIFNSQU0gKi88YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCsjZGVmaW5lIE9GRlNFVF9EQVRBIDB4MDA4MDAwMDA8YnI+DQom
-Z3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsvKiBDUFUgcmVnaXN0ZXJz
-IHNwZWNpZmljYWxseSwgdGhlc2UgYXJlIG1hcHBlZCBhdDxicj4NCiZndDsgJmd0O8KgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgdGhlIHN0YXJ0IG9mIGRhdGEgKi88YnI+DQomZ3Q7ICZn
-dDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCsjZGVmaW5lIE9GRlNFVF9DUFVfUkVH
-SVNURVJTIE9GRlNFVF9EQVRBPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqArLyo8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCsgKiBJTyByZWdpc3RlcnMsIGluY2x1ZGluZyBzdGF0dXMgcmVnaXN0ZXIsIHN0YWNrPGJyPg0K
-Jmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBwb2ludGVyLCBhbmQgbWVt
-b3J5PGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICogbWFw
-cGVkIHBlcmlwaGVyYWxzLCBtYXBwZWQganVzdCBhZnRlciBDUFUgcmVnaXN0ZXJzPGJyPg0KJmd0
-OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArICovPGJyPg0KJmd0OyAmZ3Q7
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqArI2RlZmluZSBPRkZTRVRfSU9fUkVHSVNU
-RVJTIChPRkZTRVRfREFUQSArPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqBOVU1CRVJfT0ZfQ1BVX1JFR0lTVEVSUyk8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCsjZGVmaW5lIEVGX0FWUl9NQUNIIDB4N0Y8YnI+DQomZ3Q7ICZndDvCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCs8YnI+DQomZ3Q7ICZndDvCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCsjZW5kaWYgLyogIWRlZmluZWQgKFFFTVVfQVZSX0NQVV9IKSAq
-Lzxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgLS0gPGJyPg0K
-Jmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAyLjcuNDxicj4NCiZndDsg
-Jmd0OyA8YnI+DQomZ3Q7ICZndDsgPGJyPg0KJmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0O8KgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgLS0gPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqBCZXN0IFJlZ2FyZHMsPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqBNaWNoYWVsIFJvbG5pazxicj4NCiZndDsgJmd0OyA8YnI+DQomZ3Q7ICZndDsgPGJyPg0K
-Jmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0O8KgIMKgIMKgIMKgIMKgIMKgIMKgLS0gPGJyPg0KJmd0
-OyAmZ3Q7wqAgwqAgwqAgwqAgwqAgwqAgwqBCZXN0IFJlZ2FyZHMsPGJyPg0KJmd0OyAmZ3Q7wqAg
-wqAgwqAgwqAgwqAgwqAgwqBNaWNoYWVsIFJvbG5pazxicj4NCiZndDsgJmd0OyA8YnI+DQomZ3Q7
-ICZndDsgPGJyPg0KJmd0OyAmZ3Q7IDxicj4NCiZndDsgJmd0O8KgIMKgIMKgLS0gPGJyPg0KJmd0
-OyAmZ3Q7wqAgwqAgwqBCZXN0IFJlZ2FyZHMsPGJyPg0KJmd0OyAmZ3Q7wqAgwqAgwqBNaWNoYWVs
-IFJvbG5pazxicj4NCiZndDsgJmd0OyA8YnI+DQomZ3Q7PGJyPg0KPC9wPg0K
---0000000000009b2d40059d448859--
+So it seems that instead, we could just have commands specifying
+MSI address/data pairs for each VQ, and separately for config changes.
+
+It is useful to have hypervisor hint to guest how many different
+pairs should be allocated, and that could be the RO max value.
+
+
+> ---
+>  content.tex | 171 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+------
+>  msi-state.c |   4 ++
+>  2 files changed, 159 insertions(+), 16 deletions(-)
+>  create mode 100644 msi-state.c
+>=20
+> diff --git a/content.tex b/content.tex
+> index ff151ba..dcf6c71 100644
+> --- a/content.tex
+> +++ b/content.tex
+> @@ -1687,7 +1687,8 @@ \subsection{MMIO Device Register Layout}\label{sec:=
+Virtio Transport Options / Vi
+>    \hline=20
+>    \mmioreg{InterruptStatus}{Interrupt status}{0x60}{R}{%
+>      Reading from this register returns a bit mask of events that
+> -    caused the device interrupt to be asserted.
+> +    caused the device interrupt to be asserted. This is only used
+> +    when MSI is not enabled.
+>      The following events are possible:
+>      \begin{description}
+>        \item[Used Buffer Notification] - bit 0 - the interrupt was assert=
+ed
+> @@ -1701,7 +1702,7 @@ \subsection{MMIO Device Register Layout}\label{sec:=
+Virtio Transport Options / Vi
+>    \mmioreg{InterruptACK}{Interrupt acknowledge}{0x064}{W}{%
+>      Writing a value with bits set as defined in \field{InterruptStatus}
+>      to this register notifies the device that events causing
+> -    the interrupt have been handled.
+> +    the interrupt have been handled. This is only used when MSI is not e=
+nabled.
+>    }
+>    \hline=20
+>    \mmioreg{Status}{Device status}{0x070}{RW}{%
+> @@ -1760,6 +1761,47 @@ \subsection{MMIO Device Register Layout}\label{sec=
+:Virtio Transport Options / Vi
+>      \field{SHMSel} is unused) results in a base address of
+>      0xffffffffffffffff.
+>    }
+> +  \hline
+> +  \mmioreg{MsiVecNum}{MSI max vector number}{0x0c0}{R}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, reading
+> +    from this register returns the maximum MSI vector number
+> +    that device supports.
+> +  }
+> +  \hline
+> +  \mmioreg{MsiState}{MSI state}{0x0c4}{R}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, reading
+> +    from this register returns the global MSI enable/disable status.
+> +    \lstinputlisting{msi-state.c}
+> +  }
+> +  \hline
+> +  \mmioreg{MsiCmd}{MSI command}{0x0c8}{W}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to this register executes the corresponding command to device.
+> +    Part of this applies to the MSI vector selected by writing to \field=
+{MsiVecSel}.
+> +    See \ref{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-spec=
+ific Initialization And Device Operation / Device Initialization / MSI Vect=
+or Configuration}
+> +    for using details.
+> +  }
+> +  \hline
+> +  \mmioreg{MsiVecSel}{MSI vector index}{0x0d0}{W}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to this register selects the MSI vector index that the following ope=
+rations
+> +    on \field{MsiAddrLow}, \field{MsiAddrHigh}, \field{MsiData} and part=
+ of
+> +    \field{MsiCmd} commands specified in \ref{sec:Virtio Transport Optio=
+ns / Virtio Over MMIO / MMIO-specific Initialization And Device Operation /=
+ Device Initialization / MSI Vector Configuration}
+> +    apply to. The index number of the first vector is zero (0x0).
+> +  }
+> +  \hline
+> +  \mmiodreg{MsiAddrLow}{MsiAddrHigh}{MSI 64 bit address}{0x0d4}{0x0d8}{W=
+}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to these two registers (lower 32 bits of the address to \field{MsiAd=
+drLow},
+> +    higher 32 bits to \field{MsiAddrHigh}) notifies the device about the
+> +    MSI address. This applies to the MSI vector selected by writing to \=
+field{MsiVecSel}.
+> +  }
+> +  \hline
+> +  \mmioreg{MsiData}{MSI 32 bit data}{0x0dc}{W}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to this register notifies the device about the MSI data.
+> +    This applies to the MSI vector selected by writing to \field{MsiVecS=
+el}.
+> +  }
+>    \hline=20
+>    \mmioreg{ConfigGeneration}{Configuration atomicity value}{0x0fc}{R}{
+>      Reading from this register returns a value describing a version of t=
+he device-specific configuration space (see \field{Config}).
+> @@ -1783,10 +1825,16 @@ \subsection{MMIO Device Register Layout}\label{se=
+c:Virtio Transport Options / Vi
+> =20
+>  The device MUST return value 0x2 in \field{Version}.
+> =20
+> -The device MUST present each event by setting the corresponding bit in \=
+field{InterruptStatus} from the
+> +When MSI is disabled, the device MUST present each event by setting the
+> +corresponding bit in \field{InterruptStatus} from the
+>  moment it takes place, until the driver acknowledges the interrupt
+> -by writing a corresponding bit mask to the \field{InterruptACK} register=
+.  Bits which
+> -do not represent events which took place MUST be zero.
+> +by writing a corresponding bit mask to the \field{InterruptACK} register=
+.
+> +Bits which do not represent events which took place MUST be zero.
+> +
+> +When MSI is enabled, the device MUST NOT set \field{InterruptStatus} and=
+ MUST
+> +ignore \field{InterruptACK}.
+> +
+> +Upon reset, the device MUST clear \field{msi_enabled} bit in \field{MsiS=
+tate}.
+> =20
+>  Upon reset, the device MUST clear all bits in \field{InterruptStatus} an=
+d ready bits in the
+>  \field{QueueReady} register for all queues in the device.
+> @@ -1835,7 +1883,12 @@ \subsection{MMIO Device Register Layout}\label{sec=
+:Virtio Transport Options / Vi
+> =20
+>  The driver MUST ignore undefined bits in \field{InterruptStatus}.
+> =20
+> -The driver MUST write a value with a bit mask describing events it handl=
+ed into \field{InterruptACK} when
+> +The driver MUST ignore undefined bits in the return value of reading \fi=
+eld{MsiState}.
+> +
+> +When MSI is enabled, the driver MUST NOT access \field{InterruptStatus} =
+and MUST NOT write to \field{InterruptACK}.
+> +
+> +When MSI is disabled, the driver MUST write a value with a bit mask
+> +describing events it handled into \field{InterruptACK} when
+>  it finishes handling an interrupt and MUST NOT set any of the undefined =
+bits in the value.
+> =20
+>  \subsection{MMIO-specific Initialization And Device Operation}\label{sec=
+:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization=
+ And Device Operation}
+> @@ -1856,6 +1909,63 @@ \subsubsection{Device Initialization}\label{sec:Vi=
+rtio Transport Options / Virti
+>  Further initialization MUST follow the procedure described in
+>  \ref{sec:General Initialization And Device Operation / Device Initializa=
+tion}~\nameref{sec:General Initialization And Device Operation / Device Ini=
+tialization}.
+> =20
+> +\paragraph{MSI Vector Configuration}\label{sec:Virtio Transport Options =
+/ Virtio Over MMIO / MMIO-specific Initialization And Device Operation / De=
+vice Initialization / MSI Vector Configuration}
+> +The VIRTIO_F_MMIO_MSI feature bit offered by device shows the capability
+> +using MSI vectors for virtqueue and configuration events.
+> +
+> +When VIRTIO_F_MMIO_MSI has been negotiated,
+> +writing \field{MsiCmd} executes a corresponding command to the device:
+> +
+> +VIRTIO_MMIO_MSI_CMD_ENABLE and VIRTIO_MMIO_MSI_CMD_DISABLE commands set =
+global
+> +MSI enable and disable status.
+> +
+> +VIRTIO_MMIO_MSI_CMD_CONFIGURE is used to configure the MSI vector
+> +applying to the one selected by writing to \field{MsiVecSel}.
+> +
+> +VIRTIO_MMIO_MSI_CMD_MASK and VIRTIO_MMIO_MSI_CMD_UNMASK commands are use=
+d to
+> +mask and unmask the MSI vector applying to the one selected by writing
+> +to \field{MsiVecSel}.
+> +
+> +\begin{lstlisting}
+> +#define  VIRTIO_MMIO_MSI_CMD_ENABLE           0x1
+> +#define  VIRTIO_MMIO_MSI_CMD_DISABLE          0x2
+> +#define  VIRTIO_MMIO_MSI_CMD_CONFIGURE        0x3
+> +#define  VIRTIO_MMIO_MSI_CMD_MASK             0x4
+> +#define  VIRTIO_MMIO_MSI_CMD_UNMASK           0x5
+> +\end{lstlisting}
+> +
+> +Setting a special NO_VECTOR value means disabling an interrupt for an ev=
+ent type.
+> +
+> +\begin{lstlisting}
+> +/* Vector value used to disable MSI for event */
+> +#define VIRTIO_MMIO_MSI_NO_VECTOR             0xffffffff
+> +\end{lstlisting}
+> +
+> +\drivernormative{\subparagraph}{MSI Vector Configuration}{Virtio Transpo=
+rt Options / Virtio Over MMIO / MMIO-specific Initialization And Device Ope=
+ration / MSI Vector Configuration}
+> +When VIRTIO_F_MMIO_MSI has been negotiated, driver should try to configu=
+re
+> +and enable MSI.
+> +
+> +To configure MSI vector, driver SHOULD firstly specify the MSI vector in=
+dex by
+> +writing to \field{MsiVecSel}.
+> +Then notify the MSI address and data by writing to \field{MsiAddrLow}, \=
+field{MsiAddrHigh},
+> +and \field{MsiData}, and immediately follow a \field{MsiCmd} write opera=
+tion
+> +using VIRTIO_MMIO_MSI_CMD_CONFIGURE to device for configuring an event t=
+o
+> +this MSI vector.
+> +
+> +After all MSI vectors are configured, driver SHOULD set global MSI enabl=
+ed
+> +by writing to \field{MsiCmd} using VIRTIO_MMIO_MSI_CMD_ENABLE.
+> +
+> +Driver should use VIRTIO_MMIO_MSI_CMD_DISABLE when disabling MSI.
+> +
+> +Driver should use VIRTIO_MMIO_MSI_CMD_MASK with an MSI index \field{MsiV=
+ecSel}
+> +to prohibit the event from the corresponding interrupt source.
+> +
+> +Driver should use VIRTIO_MMIO_MSI_CMD_UNMASK with an MSI index \field{Ms=
+iVecSel}
+> +to recover the event from the corresponding interrupt source.
+> +
+> +If driver fails to setup any event with a vector,
+> +it MUST disable MSI by \field{MsiCmd} and use the single dedicated inter=
+rupt for device.
+> +
+>  \subsubsection{Notification Structure Layout}\label{sec:Virtio Transport=
+ Options / Virtio Over MMIO / MMIO-specific Initialization And Device Opera=
+tion / Notification Structure Layout}
+> =20
+>  When VIRTIO_F_MMIO_NOTIFICATION has been negotiated, the notification lo=
+cation is calculated
+> @@ -1908,6 +2018,12 @@ \subsubsection{Virtqueue Configuration}\label{sec:=
+Virtio Transport Options / Vir
+>     \field{QueueDriverLow}/\field{QueueDriverHigh} and
+>     \field{QueueDeviceLow}/\field{QueueDeviceHigh} register pairs.
+> =20
+> +\item Write MSI address \field{MsiAddrLow}/\field{MsiAddrHigh},
+> +MSI data \field{MsiData} and MSI update command \field{MsiCtrlStat} with=
+ corresponding
+> +virtqueue index to update
+> +MSI configuration for device requesting interrupts triggered by
+> +virtqueue events.
+> +
+>  \item Write 0x1 to \field{QueueReady}.
+>  \end{enumerate}
+> =20
+> @@ -1932,20 +2048,43 @@ \subsubsection{Available Buffer Notifications}\la=
+bel{sec:Virtio Transport Option
+> =20
+>  \subsubsection{Notifications From The Device}\label{sec:Virtio Transport=
+ Options / Virtio Over MMIO / MMIO-specific Initialization And Device Opera=
+tion / Notifications From The Device}
+> =20
+> -The memory mapped virtio device is using a single, dedicated
+> +If MSI is enabled, the memory mapped virtio
+> +device uses appropriate MSI interrupt message
+> +for configuration change notification and used buffer notification which=
+ are
+> +configured by \field{MsiAddrLow}, \field{MsoAddrHigh} and \field{MsiData=
+}.
+> +
+> +If MSI is not enabled, the memory mapped virtio device
+> +uses a single, dedicated
+>  interrupt signal, which is asserted when at least one of the
+>  bits described in the description of \field{InterruptStatus}
+> -is set. This is how the device sends a used buffer notification
+> -or a configuration change notification to the device.
+> +is set.
+> =20
+>  \drivernormative{\paragraph}{Notifications From The Device}{Virtio Trans=
+port Options / Virtio Over MMIO / MMIO-specific Initialization And Device O=
+peration / Notifications From The Device}
+> -After receiving an interrupt, the driver MUST read
+> -\field{InterruptStatus} to check what caused the interrupt (see the
+> -register description).  The used buffer notification bit being set
+> -SHOULD be interpreted as a used buffer notification for each active
+> -virtqueue.  After the interrupt is handled, the driver MUST acknowledge
+> -it by writing a bit mask corresponding to the handled events to the
+> -InterruptACK register.
+> +A driver MUST handle the case where MSI is disabled, which uses the same=
+ interrupt indicating both device configuration
+> +space change and one or more virtqueues being used.
+> +
+> +\subsubsection{Driver Handling Interrupts}\label{sec:Virtio Transport Op=
+tions / Virtio Over MMIO / MMIO-specific Initialization And Device Operatio=
+n / Driver Handling Interrupts}
+> +
+> +The driver interrupt handler would typically:
+> +
+> +\begin{itemize}
+> +  \item If MSI is enabled:
+> +    \begin{itemize}
+> +      \item
+> +        Figure out the virtqueue mapped to that MSI vector for the
+> +        device, to see if any progress has been made by the device
+> +        which requires servicing.
+> +      \item
+> +        If the interrupt belongs to configuration space changing signal,
+> +        re-examine the configuration space to see what changed.
+> +    \end{itemize}
+> +  \item If MSI is disabled:
+> +    \begin{itemize}
+> +      \item Read \field{InterruptStatus} to check what caused the interr=
+upt.
+> +      \item Acknowledge the interrupt by writing a bit mask correspondin=
+g
+> +            to the handled events to the InterruptACK register.
+> +    \end{itemize}
+> +\end{itemize}
+> =20
+>  \subsection{Legacy interface}\label{sec:Virtio Transport Options / Virti=
+o Over MMIO / Legacy interface}
+> =20
+> diff --git a/msi-state.c b/msi-state.c
+> new file mode 100644
+> index 0000000..b1fa0c1
+> --- /dev/null
+> +++ b/msi-state.c
+> @@ -0,0 +1,4 @@
+> +le32 {
+> +    msi_enabled : 1;
+> +    reserved : 31;
+> +};
+> --=20
+> 2.7.4
+>=20
+>=20
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+
 
