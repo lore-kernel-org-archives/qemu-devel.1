@@ -2,85 +2,51 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CA7C33CB7
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FAD5C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34EC9206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:05:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ram8Ek8t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34EC9206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5C3BE2070E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 14:08:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C3BE2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwnyB-0000gP-Bv
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 09:05:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39343)
+	id 1iwo0s-0002gF-Hq
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 09:08:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iwnxS-0008Sq-P8
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:04:43 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo09-0001Ks-LR
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iwnxR-0004Bf-PN
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:04:42 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36031)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iwnxR-00049I-If
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:04:41 -0500
-Received: by mail-wr1-x444.google.com with SMTP id z3so20349461wru.3
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 06:04:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xe1a8G6J/Tx3k1rkyKQ5Wsh4Wm+zZS5gLho6P0MA8U4=;
- b=ram8Ek8tRsWlJVU3kmU5FDtlykeaqrovvESvw0WfhswlBzRq0sHPAq8MAMRSI/l4Bj
- TprGRXciYeGqm/toBbYK+Wq1gH+QchO0RxKo4e6TBXWaIvlTeJy63ypwLlB7uHb3nEeq
- mRG85kmMQrTQbSSuG+Gcc+oFd0dBxTjzcKLhJRJGyqc5JBKnzLz6+Ode6BZBYIqZsFnd
- Fi0XDyKjBE0ehq1whMJnhxDRZLcpzIcUILmLaliddYQ++m131RMP92udf7CjNA20moB0
- DrLqPP38SMrLqUwvPt04f9rzOyBO1VQHV1kLb2tNNmaIyUrIe+NOUHEu1+gok3Vp0WGF
- 4Xzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xe1a8G6J/Tx3k1rkyKQ5Wsh4Wm+zZS5gLho6P0MA8U4=;
- b=ASulWBA1gtIrqG0bH/1zFPedxOZLP78DenhIxvu0k6xcC0jy1awwJau7R+NiqYtiQm
- I6YB6DaJps1PSIgraJLH99dqPPrvbA4wo06QshrWbAe/P8mUN++2PaDrTk9Abm96W9uc
- k40rIMjaj7C4OsbQB5yjsKDzC0ZySXpehKcpvwtnBK3uMpfN5qYYB+1KPMAEfuFA14Gs
- OyEnUbvNuXrWlFvx2YMupY4lFAcrk2m4zQOZhXhZwcIln+t9nNKgxAs4YpjGoJ6bwyVt
- 66etU0WMqxRKTzmYq4FN2a3ZCrkLdi6Tt+bsvKZAPrkqnlZCtnqEmkDw1NAY6cMdPsBz
- x8qw==
-X-Gm-Message-State: APjAAAVSZ520x3oba0TCTk+JLFJvA8IfG9RhPqkCaRyth+JdsJkv5Daq
- BFzTU6xgXDLqVe23k5gDtcz92kgFjFBn67By+R4=
-X-Google-Smtp-Source: APXvYqzZU54TmKNO9Hyyv7+vD0+Zr1DEYIZuvRt9AQhZWtKGZIV+eortGOVzypl+2dOvp60Fos22cLU3E6KL/cqDZQ0=
-X-Received: by 2002:a5d:438c:: with SMTP id i12mr35111338wrq.196.1580306680506; 
- Wed, 29 Jan 2020 06:04:40 -0800 (PST)
-MIME-Version: 1.0
-References: <20200128175342.9066-1-pbonzini@redhat.com>
- <20200128175342.9066-2-pbonzini@redhat.com>
- <81393799-e936-d5dc-1681-4317bfae510e@redhat.com>
- <CAMxuvayx55=JaVCgtZew70jeoRSzpzuLDSe2sth91yiLb_kAXA@mail.gmail.com>
- <f076136b-d118-b502-25fb-d72cbd194833@redhat.com>
-In-Reply-To: <f076136b-d118-b502-25fb-d72cbd194833@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 29 Jan 2020 15:04:28 +0100
-Message-ID: <CAJ+F1CLXQMTvc2VgvV6kfydrt80TqjrDsr9-4PJqq81X_Kgdug@mail.gmail.com>
-Subject: Re: [PATCH 001/142] minikconf: accept alnum identifiers
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iwo08-0001Cm-CB
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 09:07:29 -0500
+Received: from relay.sw.ru ([185.231.240.75]:53592)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iwo08-00013L-4x; Wed, 29 Jan 2020 09:07:28 -0500
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iwnzt-0003j6-1e; Wed, 29 Jan 2020 17:07:13 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 1/4] virtio: introduce VIRTQUEUE_DEFUALT_SIZE instead of
+ hardcoded constants
+Date: Wed, 29 Jan 2020 17:06:59 +0300
+Message-Id: <20200129140702.5411-2-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
+References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,42 +58,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, mst@redhat.com,
+ stefanha@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ hw/block/virtio-blk.c      | 6 ++++--
+ hw/scsi/virtio-scsi.c      | 5 +++--
+ include/hw/virtio/virtio.h | 1 +
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-On Wed, Jan 29, 2020 at 2:47 PM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 29/01/2020 14.41, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Wed, Jan 29, 2020 at 1:09 PM Thomas Huth <thuth@redhat.com> wrote:
-> >>
-> >>
-> >> -EMISSINGPATCHDESCRIPTION
-> >>
-> >> Why is this required? Bug fix? New feature? ... please add some words =
-here.
-> >
-> > This is required for later patch "meson: convert hw/9pfs", which adds
-> > config 9PFS.
-> >
-> > You are right, several patches could use some comments. It's still
-> > PoC. Otoh, a lot of them are quite mechanical or just what they are in
-> > meson, there isn't much to say about it. We'll have to improve this
-> > somehow.
->
-> Sure, but with a proper patch description, this patch here could even be
-> merged today already, shrinking this huge patch series by one at least...
->
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 09f46ed85f..72f935033f 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -914,7 +914,8 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
+     memset(&blkcfg, 0, sizeof(blkcfg));
+     virtio_stq_p(vdev, &blkcfg.capacity, capacity);
+     virtio_stl_p(vdev, &blkcfg.seg_max,
+-                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 : 128 - 2);
++                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 :
++                                          VIRTQUEUE_DEFAULT_SIZE - 2);
+     virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
+     virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
+     virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
+@@ -1272,7 +1273,8 @@ static Property virtio_blk_properties[] = {
+     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
+                     true),
+     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
+-    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
++    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size,
++                       VIRTQUEUE_DEFAULT_SIZE),
+     DEFINE_PROP_BOOL("seg-max-adjust", VirtIOBlock, conf.seg_max_adjust, true),
+     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+                      IOThread *),
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 3b61563609..36f66046ae 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -660,7 +660,8 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
+ 
+     virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
+     virtio_stl_p(vdev, &scsiconf->seg_max,
+-                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 : 128 - 2);
++                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 :
++                                          VIRTQUEUE_DEFAULT_SIZE - 2);
+     virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
+     virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
+     virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEvent));
+@@ -965,7 +966,7 @@ static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
+ static Property virtio_scsi_properties[] = {
+     DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
+     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
+-                                         parent_obj.conf.virtqueue_size, 128),
++                       parent_obj.conf.virtqueue_size, VIRTQUEUE_DEFAULT_SIZE),
+     DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
+                       parent_obj.conf.seg_max_adjust, true),
+     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index b69d517496..a66ea2368b 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -48,6 +48,7 @@ size_t virtio_feature_get_config_size(VirtIOFeature *features,
+ typedef struct VirtQueue VirtQueue;
+ 
+ #define VIRTQUEUE_MAX_SIZE 1024
++#define VIRTQUEUE_DEFAULT_SIZE 128
+ 
+ typedef struct VirtQueueElement
+ {
+-- 
+2.17.0
 
-Paolo has been merging many preliminary patches already. I am not sure
-why that one wasn't. We have also done some preliminary work in meson
-too, and continue to do.
-
---=20
-Marc-Andr=C3=A9 Lureau
 
