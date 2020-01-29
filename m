@@ -2,64 +2,76 @@ Return-Path: <SRS0=192v=3S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3AB1C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 720BFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:21:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8FB620678
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:16:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8FB620678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3E9B320678
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jan 2020 13:21:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dnEG2liQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9B320678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwnDE-0000hc-U8
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 08:16:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51656)
+	id 1iwnHL-0002eL-FN
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 08:21:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iwnCF-0008Ho-Up
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:15:57 -0500
+ (envelope-from <thuth@redhat.com>) id 1iwnFs-0001SJ-FO
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:19:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iwnCD-0005Xj-PR
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:15:55 -0500
-Received: from 9.mo6.mail-out.ovh.net ([87.98.171.146]:45750)
+ (envelope-from <thuth@redhat.com>) id 1iwnFp-0002Cm-H1
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:19:39 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33815
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iwnCD-0005OC-K4
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:15:53 -0500
-Received: from player734.ha.ovh.net (unknown [10.108.35.215])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 76CED1FBB8B
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 14:15:42 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player734.ha.ovh.net (Postfix) with ESMTPSA id 44685EA24FD2;
- Wed, 29 Jan 2020 13:15:37 +0000 (UTC)
-Subject: Re: [PATCH 0/2] ppc/pnv: Add models for PHB4 and PHB3 PCIe Host
- bridges
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200127144506.11132-1-clg@kaod.org>
- <20200129063103.GB42099@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ad66cad0-98ff-7ab1-9be9-8bc234279ff6@kaod.org>
-Date: Wed, 29 Jan 2020 14:15:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <20200129063103.GB42099@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-X-Ovh-Tracer-Id: 9619125855068064576
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrfeeigdeglecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeehnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iwnFo-0002CJ-Sp
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 08:19:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580303976;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=KmeI+7oXvqzalvY4bsXXeKKa/FeDHGMNqU98zZjgdbY=;
+ b=dnEG2liQRo8ici/Rz6VL4HQHp6GOf9vMI59eY8WoJ27NmmDkFv4shC6UEqMv30IV2f4ZHV
+ PJohcgFehlcdiAGsYXl6HVP8lZQGEODWRikhRIqeLsjhPT7Tfi1gxAS/390wZPLddTdjXN
+ BWMngxtCOVAYtDuzRDTxnCfrxwHV1Is=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-LD7z4yD7P4SWLyxDKyGWvQ-1; Wed, 29 Jan 2020 08:19:29 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26E9518C43C3;
+ Wed, 29 Jan 2020 13:19:28 +0000 (UTC)
+Received: from thuth.com (ovpn-116-210.ams2.redhat.com [10.36.116.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9184D5DA66;
+ Wed, 29 Jan 2020 13:19:23 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH] tests/acceptance: Add a test for the N800 and N810 arm
+ machines
+Date: Wed, 29 Jan 2020 14:19:20 +0100
+Message-Id: <20200129131920.22302-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: LD7z4yD7P4SWLyxDKyGWvQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.171.146
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,65 +83,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Oliver O'Halloran <oohall@gmail.com>,
- qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/29/20 7:31 AM, David Gibson wrote:
-> On Mon, Jan 27, 2020 at 03:45:04PM +0100, C=E9dric Le Goater wrote:
->> Hello,
->>
->> These are models for the PCIe Host Bridges, PHB3 and PHB4, as found on
->> POWER8 and POWER9 processors. It includes the PowerBus logic interface
->> (PBCQ), IOMMU support, a single PCIe Gen.3/4 Root Complex, and support
->> for MSI and LSI interrupt sources as found on each system depending on
->> the interrupt controller: XICS or XIVE.
->>
->> No default device layout is provided and PCI devices can be added on
->> any of the available PCIe Root Port (pcie.0 .. 2) with address 0x0 as
->> the firwware (skiboot) only accepts a single device per root port. To
->> run a simple system with a network and a storage adapters, use a
->> command line options such as :
->>
->>   -device e1000e,netdev=3Dnet0,mac=3DC0:FF:EE:00:00:02,bus=3Dpcie.0,ad=
-dr=3D0x0
->>   -netdev bridge,id=3Dnet0,helper=3D/usr/libexec/qemu-bridge-helper,br=
-=3Dvirbr0,id=3Dhostnet0
->>
->>   -device megasas,id=3Dscsi0,bus=3Dpcie.1,addr=3D0x0
->>   -drive file=3D$disk,if=3Dnone,id=3Ddrive-scsi0-0-0-0,format=3Dqcow2,=
-cache=3Dnone
->>   -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3D=
-drive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2
->>
->> If more are needed, include a bridge.
->>
->> Multi chip is supported, each chip adding its set of PHB controllers
->> and its PCI busses. The model doesn't emulate the EEH error handling
->> and cold plugging PHB devices still needs some work.
->>
->> XICS requires some adjustment to support the PHB3 MSI. The changes are
->> provided in the PHB3 model but they could be decoupled in prereq
->> patches.
->=20
-> Applied to ppc-for-5.0, thanks.
+Old kernels from the Meego project can be used to check that Linux
+is at least starting on these machines.
 
-Should we add a default set of devices on PHB1 like found on OpenPOWER=20
-system ? On a P8 we have  :
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ The serial console is written to the second UART, so this needs Phil's
+ "Allow to use other serial consoles than default" patch as a prerequisite:
+ Based-on: <20200120235159.18510-5-f4bug@amsat.org>
 
- +-[0001:00]---00.0-[01-07]----00.0-[02-07]--+-01.0-[03-04]----00.0-[04]-=
----00.0  ASPEED Technology, Inc. ASPEED Graphics Family
- |                                           +-02.0-[05]----00.0  Texas I=
-nstruments TUSB73x0 SuperSpeed USB 3.0 xHCI Host Controller
- |                                           +-03.0-[06]--+-00.0  Broadco=
-m Inc. and subsidiaries NetXtreme BCM5718 Gigabit Ethernet PCIe
- |                                           |            \-00.1  Broadco=
-m Inc. and subsidiaries NetXtreme BCM5718 Gigabit Ethernet PCIe
- |                                           \-04.0-[07]----00.0  Marvell=
- Technology Group Ltd. 88SE9235 PCIe 2.0 x2 4-port SATA 6 Gb/s Controller
+ MAINTAINERS                          |  1 +
+ tests/acceptance/machine_arm_n8x0.py | 49 ++++++++++++++++++++++++++++
+ 2 files changed, 50 insertions(+)
+ create mode 100644 tests/acceptance/machine_arm_n8x0.py
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ddf6fe0794..560507e821 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -672,6 +672,7 @@ F: hw/rtc/twl92230.c
+ F: include/hw/display/blizzard.h
+ F: include/hw/input/tsc2xxx.h
+ F: include/hw/misc/cbus.h
++F: tests/acceptance/machine_arm_n8x0.py
+=20
+ Palm
+ M: Andrzej Zaborowski <balrogg@gmail.com>
+diff --git a/tests/acceptance/machine_arm_n8x0.py b/tests/acceptance/machin=
+e_arm_n8x0.py
+new file mode 100644
+index 0000000000..e5741f2d8d
+--- /dev/null
++++ b/tests/acceptance/machine_arm_n8x0.py
+@@ -0,0 +1,49 @@
++# Functional test that boots a Linux kernel and checks the console
++#
++# Copyright (c) 2020 Red Hat, Inc.
++#
++# Author:
++#  Thomas Huth <thuth@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++
++import os
++
++from avocado import skipUnless
++from avocado_qemu import Test
++from avocado_qemu import wait_for_console_pattern
++
++class N8x0Machine(Test):
++    """Boots the Linux kernel and checks that the console is operational""=
+"
++
++    timeout =3D 90
++
++    def __do_test_n8x0(self):
++        kernel_url =3D ('http://stskeeps.subnetmask.net/meego-n8x0/'
++                      'meego-arm-n8x0-1.0.80.20100712.1431-'
++                      'vmlinuz-2.6.35~rc4-129.1-n8x0')
++        kernel_hash =3D 'e9d5ab8d7548923a0061b6fbf601465e479ed269'
++        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel_h=
+ash)
++
++        self.vm.set_console(console_index=3D1)
++        self.vm.add_args('-kernel', kernel_path,
++                         '-append', 'printk.time=3D0 console=3DttyS1')
++        self.vm.launch()
++        wait_for_console_pattern(self, 'TSC2005 driver initializing')
++
++    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code=
+')
++    def test_n800(self):
++        """
++        :avocado: tags=3Darch:arm
++        :avocado: tags=3Dmachine:n800
++        """
++        self.__do_test_n8x0()
++
++    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code=
+')
++    def test_n810(self):
++        """
++        :avocado: tags=3Darch:arm
++        :avocado: tags=3Dmachine:n810
++        """
++        self.__do_test_n8x0()
+--=20
+2.18.1
 
-C.
 
