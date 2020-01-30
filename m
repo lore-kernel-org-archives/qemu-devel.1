@@ -2,99 +2,97 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A316C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF25C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:12:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3CB72083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:06:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43A022083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:12:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+FvP8vE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3CB72083E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="adp276Ot"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A022083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixItU-0003aW-7u
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 18:06:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35449)
+	id 1ixIyo-0007N5-GK
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 18:12:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37672)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixIsg-00037t-1d
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:05:51 -0500
+ (envelope-from <philmd@redhat.com>) id 1ixIxn-0006cW-RZ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:11:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixIsd-0005Rm-M4
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:05:48 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40532
+ (envelope-from <philmd@redhat.com>) id 1ixIxm-0005Bv-0N
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:11:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58853
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixIsd-0005Pi-Cn
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:05:47 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixIxl-0005BI-TK
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:11:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580425546;
+ s=mimecast20190719; t=1580425865;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=U/JDRoMbGek0RCwAK8Pd/m/Ev9S+PgWpxfc3qhLKI10=;
- b=D+FvP8vEsQ1Zv1LtC1JqYLqCoWOFNC1+1LEBNsJD4ZeL0W9w2CTYZu8ertSvSK0zT8MJrQ
- Q8Uu1g2CBBJZ0BgpX48/nKMrjW9HqeK+AIsllRwpYL7YWMYXOBBwAbWmsFd0uRtb10d+Ed
- E68FRkrKQetLV6bmZMSgrmd3QVL/GxI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-C44y9arsPDSto8Gzc_kVVw-1; Thu, 30 Jan 2020 18:05:42 -0500
-Received: by mail-wm1-f72.google.com with SMTP id g26so1989270wmk.6
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 15:05:41 -0800 (PST)
+ bh=iGYgBklM21RGCI4ogN6CiAlVDJv+ayxsnimdT5Pw9BE=;
+ b=adp276OtFi1k8IK76n9n35vW3NcFDHAJQoi5K/bFdGx+9w7LGGIE84ZfzAdYJwDIFpDq8S
+ fFnDgSsojYCcreOSnqrcCMhh+oh5nO/DVKUUzvAQ8DMp80sQpfCTsY4rSrdTVBe14//9Pf
+ rR/0Fln25fUj5EMnBjp0AYla7YHRKH8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-154-FazIMy1oNQqupYoI3M8_zA-1; Thu, 30 Jan 2020 18:11:00 -0500
+Received: by mail-wm1-f70.google.com with SMTP id m18so1346872wmc.4
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 15:11:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ur+w0jUopoIunxAKwBr76Kpn1lCXiiboEj0g9srd5SE=;
- b=Txkp8muh2Jype0E7VnKlDh/kTxCcAJTeefpwtSLcwPLC5ZYgfxULk5S7VqCYUauN4h
- Xox5QTXvP3ZShvhJ3SvwRHfDltNYKrvAM+gipnCGOClotpzYz2DyfDXL+8Srm7aip4ot
- x60cdolHAxsmi6CpvKUfjWs86TPf21l/b+LZ8+O/r+rO1joYUsbzYMEqlJ2x0yr87uYv
- fd3LeG/vFdmnS9sD3rT9rTvzdlN+ZgIw10aQg3y66bI0/rQ1QQnDBGCAu7iIHnILeh5R
- 5P2n/ALQPiYnvBQE+AthsJ8tKPaSR3HmHJGvPTC26HIvtV9CMVU1VjYFq4WjKVxmdWbf
- 4aOg==
-X-Gm-Message-State: APjAAAXq8cS+gPVL834aDTxwA0BatDHQWFdvj20s2+V4MUBqDsFKACaY
- x8Ds6gFhCUJGst3nY8Jrjc4y9feddonxh7bQX3wrAJVUMbWtK+896CRzNW39aJXseRbsTjxOYhW
- NlVtY1snZVRESriI=
-X-Received: by 2002:a05:600c:291d:: with SMTP id
- i29mr8312931wmd.39.1580425541008; 
- Thu, 30 Jan 2020 15:05:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwPi2/hw++uYxSilPY8vwDc3HdMU/t0+Pb0Yvob7YE7gsf+ag4y9UvbPKhbYIGL/IrFLeFPOQ==
-X-Received: by 2002:a05:600c:291d:: with SMTP id
- i29mr8312906wmd.39.1580425540767; 
- Thu, 30 Jan 2020 15:05:40 -0800 (PST)
+ bh=iGYgBklM21RGCI4ogN6CiAlVDJv+ayxsnimdT5Pw9BE=;
+ b=d+Lh7S1mLPPzwOZY275F0pSDbjrX3nm4e3XmQmAwxWh3pJeKgyv+n/uT35vsSV7hLg
+ HvytUgOa+VehhsH6AVQE7z+f8mpkN0gff5AaVYpGEv63Sh2P2DUpq9aEovot/46nZhAP
+ C8VIcq3svgTbLf2A5/vB7UbgzoNSHMzVV8UAJjPYarVzcxQGApPOvL75KCWLpw4V5SC7
+ ZDjXT1IgFv6s2XbZqFJ0hlnxuw80IwOwPfX0l5CjztszmQsl1YsDs6MKK2GtK3EUoWVw
+ jHKKq3LZnwlEzcWFgGAsgv9pkfUp7XGB4NuurGm82S7HxYrVxjkotlttHrKeIl5aJXyR
+ XSMQ==
+X-Gm-Message-State: APjAAAVfBxoF8XJH1XT0rF+sMnzzpVNC6/VAyixGgVzWtjCAxlH1Wale
+ NOmKrg78E9/x8yUV7nth5QFphw4cnTmWkm6o8LTHlPfQGWwCAzfqCZ9YRm+rsRtCo8DBHKvo2Wt
+ T1UBldLgPbjdCa7M=
+X-Received: by 2002:a7b:cf01:: with SMTP id l1mr7914447wmg.86.1580425858406;
+ Thu, 30 Jan 2020 15:10:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwgHMRYbV5VkTZS1PAnCszQHNt6GTjhHOZdLx3Q7ClFNKWEG7e30g9ligjaIb/2I2fuwTSYTQ==
+X-Received: by 2002:a7b:cf01:: with SMTP id l1mr7914429wmg.86.1580425858179;
+ Thu, 30 Jan 2020 15:10:58 -0800 (PST)
 Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id w20sm8194560wmk.34.2020.01.30.15.05.39
+ by smtp.gmail.com with ESMTPSA id z11sm9245907wrt.82.2020.01.30.15.10.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jan 2020 15:05:40 -0800 (PST)
-Subject: Re: [PATCH v2 REPOST] Acceptance test: provides to use different
- transport for migration
-To: Oksana Vohchana <ovoshcha@redhat.com>, qemu-devel@nongnu.org
-References: <20200130164235.12306-1-ovoshcha@redhat.com>
+ Thu, 30 Jan 2020 15:10:57 -0800 (PST)
+Subject: Re: [PATCH] tests/acceptance: Add boot tests for some of the QEMU
+ advent calendar images
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200124170325.30072-1-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e06902f6-e8ba-c7e7-e11b-c59acee11966@redhat.com>
-Date: Fri, 31 Jan 2020 00:05:39 +0100
+Message-ID: <2e4ed23c-01f4-3bb5-d7c2-d1b74751ecf1@redhat.com>
+Date: Fri, 31 Jan 2020 00:10:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200130164235.12306-1-ovoshcha@redhat.com>
+In-Reply-To: <20200124170325.30072-1-thuth@redhat.com>
 Content-Language: en-US
-X-MC-Unique: C44y9arsPDSto8Gzc_kVVw-1
+X-MC-Unique: FazIMy1oNQqupYoI3M8_zA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,130 +106,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wainersm@redhat.com, crosa@redhat.com
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Oksana,
-
-On 1/30/20 5:42 PM, Oksana Vohchana wrote:
-> Along with VM migration via TCP, we can use migration through EXEC
-> and UNIX transport protocol
->=20
-> Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
+On 1/24/20 6:03 PM, Thomas Huth wrote:
+> The 2018 edition of the QEMU advent calendar 2018 featured Linux images
+> for various non-x86 machines. We can use them for a boot tests in our
+> acceptance test suite.
+> 
+> Let's also make sure that we build the corresponding machines in Travis,
+> and while we're there, drop the superfluous --python parameter (python3
+> is now the only supported version anyway).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> v2:
->    - Removes unnecessary symbols and unused method
-> ---
->   tests/acceptance/migration.py | 51 ++++++++++++++++++++++++-----------
->   1 file changed, 36 insertions(+), 15 deletions(-)
->=20
-> diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.p=
-y
-> index a44c1ae58f..1f6a674843 100644
-> --- a/tests/acceptance/migration.py
-> +++ b/tests/acceptance/migration.py
-> @@ -10,10 +10,13 @@
->   # later.  See the COPYING file in the top-level directory.
->  =20
->  =20
-> +import tempfile
->   from avocado_qemu import Test
-> +from avocado import skipUnless
->  =20
->   from avocado.utils import network
->   from avocado.utils import wait
-> +from avocado.utils.path import find_command
->  =20
->  =20
->   class Migration(Test):
-> @@ -24,6 +27,26 @@ class Migration(Test):
->       def migration_finished(vm):
->           return vm.command('query-migrate')['status'] in ('completed', '=
-failed')
->  =20
-
-It is easier to read if you declare assert_migration() before do_migrate().
-
-> +    def do_migrate(self, dest_uri, src_uri=3DNone):
-> +        source_vm =3D self.get_vm()
-> +        dest_vm =3D self.get_vm('-incoming', dest_uri)
-> +        dest_vm.launch()
-> +        if src_uri is None:
-> +            src_uri =3D dest_uri
-> +        source_vm.launch()
-> +        source_vm.qmp('migrate', uri=3Dsrc_uri)
-> +        self.assert_migration(source_vm, dest_vm)
+>   .travis.yml                            |  2 +-
+>   tests/acceptance/boot_linux_console.py | 96 ++++++++++++++++++++++++++
+>   2 files changed, 97 insertions(+), 1 deletion(-)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index 6c1038a0f1..73ca12c921 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -268,7 +268,7 @@ matrix:
+>   
+>       # Acceptance (Functional) tests
+>       - env:
+> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
+> +        - CONFIG="--target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
+>           - TEST_CMD="make check-acceptance"
+>         after_script:
+>           - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index e03add2989..f7ac2a3a59 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -584,3 +584,99 @@ class BootLinuxConsole(Test):
+>           self.wait_for_console_pattern(console_pattern)
+>           console_pattern = 'No filesystem could mount root'
+>           self.wait_for_console_pattern(console_pattern)
 > +
-> +    def assert_migration(self, source_vm, dest_vm):
-> +        wait.wait_for(self.migration_finished,
-> +                      timeout=3Dself.timeout,
-> +                      step=3D0.1,
-> +                      args=3D(source_vm,))
-> +        self.assertEqual(source_vm.command('query-migrate')['status'], '=
-completed')
-> +        self.assertEqual(dest_vm.command('query-migrate')['status'], 'co=
-mpleted')
-> +        self.assertEqual(dest_vm.command('query-status')['status'], 'run=
-ning')
-> +        self.assertEqual(source_vm.command('query-status')['status'], 'p=
-ostmigrate')
+> +    def do_test_advcal_2018(self, day, tar_hash, kernel_name):
+> +        tar_url = ('https://www.qemu-advent-calendar.org'
+> +                   '/2018/download/day' + day + '.tar.xz')
+> +        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
+> +        archive.extract(file_path, self.workdir)
+> +        self.vm.set_console()
+> +        self.vm.add_args('-kernel',
+> +                         self.workdir + '/day' + day + '/' + kernel_name)
+> +        self.vm.launch()
+> +        self.wait_for_console_pattern('QEMU advent calendar')
 > +
->       def _get_free_port(self):
->           port =3D network.find_free_port()
->           if port is None:
-> @@ -32,19 +55,17 @@ class Migration(Test):
->  =20
->  =20
->       def test_migration_with_tcp_localhost(self):
-> -        source_vm =3D self.get_vm()
->           dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
-> -        dest_vm =3D self.get_vm('-incoming', dest_uri)
-> -        dest_vm.launch()
-> -        source_vm.launch()
-> -        source_vm.qmp('migrate', uri=3Ddest_uri)
-> -        wait.wait_for(
-> -            self.migration_finished,
-> -            timeout=3Dself.timeout,
-> -            step=3D0.1,
-> -            args=3D(source_vm,)
-> -        )
-> -        self.assertEqual(dest_vm.command('query-migrate')['status'], 'co=
-mpleted')
-> -        self.assertEqual(source_vm.command('query-migrate')['status'], '=
-completed')
-> -        self.assertEqual(dest_vm.command('query-status')['status'], 'run=
-ning')
-> -        self.assertEqual(source_vm.command('query-status')['status'], 'p=
-ostmigrate')
-> +        self.do_migrate(dest_uri)
-
-I would split this patch in 2:
-- Extract assert_migration() and do_migrate(),
-- Add 'unix' socket test
-- Add 'exec' test
-
+> +    def test_arm_vexpressa9(self):
+> +        """
+> +        :avocado: tags=arch:arm
+> +        :avocado: tags=machine:vexpress-a9
+> +        """
+> +        tar_hash = '32b7677ce8b6f1471fb0059865f451169934245b'
+> +        self.vm.add_args('-dtb', self.workdir + '/day16/vexpress-v2p-ca9.dtb')
+> +        self.do_test_advcal_2018('16', tar_hash, 'winter.zImage')
 > +
-> +    def test_migration_with_unix(self):
-> +        with tempfile.TemporaryDirectory(prefix=3D'socket_') as socket_p=
-ath:
-> +            dest_uri =3D 'unix:%s/qemu-test.sock' % socket_path
-> +            self.do_migrate(dest_uri)
+> +    def test_m68k_mcf5208evb(self):
+> +        """
+> +        :avocado: tags=arch:m68k
+> +        :avocado: tags=machine:mcf5208evb
+> +        """
+> +        tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
+> +        self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
 > +
-> +    @skipUnless(find_command('nc', default=3DFalse), "nc command not fou=
-nd on the system")
-> +    def test_migration_with_exec(self):
-> +        free_port =3D self._get_free_port()
-> +        dest_uri =3D 'exec:nc -l localhost %u' % free_port
+> +    def test_microblaze_s3adsp1800(self):
+> +        """
+> +        :avocado: tags=arch:microblaze
+> +        :avocado: tags=machine:petalogix-s3adsp1800
+> +        """
+> +        tar_hash = '08bf3e3bfb6b6c7ce1e54ab65d54e189f2caf13f'
+> +        self.do_test_advcal_2018('17', tar_hash, 'ballerina.bin')
+> +
+> +    def test_or1k_sim(self):
+> +        """
+> +        :avocado: tags=arch:or1k
+> +        :avocado: tags=machine:or1k-sim
+> +        """
+> +        tar_hash = '20334cdaf386108c530ff0badaecc955693027dd'
+> +        self.do_test_advcal_2018('20', tar_hash, 'vmlinux')
+> +
+> +    def test_nios2_10m50(self):
+> +        """
+> +        :avocado: tags=arch:nios2
+> +        :avocado: tags=machine:10m50-ghrd
+> +        """
+> +        tar_hash = 'e4251141726c412ac0407c5a6bceefbbff018918'
+> +        self.do_test_advcal_2018('14', tar_hash, 'vmlinux.elf')
+> +
+> +    def test_ppc64_e500(self):
+> +        """
+> +        :avocado: tags=arch:ppc64
+> +        :avocado: tags=machine:ppce500
+> +        """
+> +        tar_hash = '6951d86d644b302898da2fd701739c9406527fe1'
+> +        self.vm.add_args('-cpu', 'e5500')
+> +        self.do_test_advcal_2018('19', tar_hash, 'uImage')
+> +
+> +    def test_ppc_g3beige(self):
+> +        """
+> +        :avocado: tags=arch:ppc
+> +        :avocado: tags=machine:g3beige
+> +        """
+> +        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
+> +        self.vm.add_args('-M', 'graphics=off')
+> +        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
+> +
+> +    def test_ppc_mac99(self):
+> +        """
+> +        :avocado: tags=arch:ppc
+> +        :avocado: tags=machine:mac99
+> +        """
+> +        tar_hash = 'e0b872a5eb8fdc5bed19bd43ffe863900ebcedfc'
+> +        self.vm.add_args('-M', 'graphics=off')
+> +        self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
+> +
+> +    def test_sparc_ss20(self):
+> +        """
+> +        :avocado: tags=arch:sparc
+> +        :avocado: tags=machine:SS-20
+> +        """
+> +        tar_hash = 'b18550d5d61c7615d989a06edace051017726a9f'
+> +        self.do_test_advcal_2018('11', tar_hash, 'zImage.elf')
+> +
+> +    def test_xtensa_lx60(self):
+> +        """
+> +        :avocado: tags=arch:xtensa
+> +        :avocado: tags=machine:lx60
+> +        """
+> +        tar_hash = '49e88d9933742f0164b60839886c9739cb7a0d34'
+> +        self.vm.add_args('-cpu', 'dc233c')
+> +        self.do_test_advcal_2018('02', tar_hash, 'santas-sleigh-ride.elf')
+> 
 
-Can you check and add a comment that the argument used is handled=20
-similarly by both netcat-traditional / netcat-openbsd packages?
-
-> +        src_uri =3D 'exec:nc localhost %u' % free_port
-> +        self.do_migrate(dest_uri, src_uri)
->=20
-
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Thanks, applied to my python-next tree:
+https://gitlab.com/philmd/qemu/commits/python-next
 
 
