@@ -2,84 +2,80 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DD9C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EE4C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:59:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44A02206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:59:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50929206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:59:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxKrVjtv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44A02206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OeHyUUzR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50929206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix7XS-0003lH-HU
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 05:59:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48808)
+	id 1ix7Y7-0004gt-Im
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 05:59:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1ix7Wg-0003Gf-CC
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:58:23 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ix7XI-0003ku-IE
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1ix7Wf-0007Hx-CM
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:58:22 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37576)
+ (envelope-from <kwolf@redhat.com>) id 1ix7XG-0007Ua-De
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:59:00 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20236
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>)
- id 1ix7Wd-0007Gm-0Z; Thu, 30 Jan 2020 05:58:19 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ix7XF-0007UC-5W
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:58:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580381936;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UAn/BK9a8a0TPlwxOUlMkc1UiazTkKEzUjQ0RIxKVpY=;
+ b=OeHyUUzRlsprFp49LwhidCHtNkJ9h/z0GOgVFvKB72BVg5Q/suBx0Xznu9GWI/8lJM6F3/
+ S9PSCOhaDc6V33c92ILRB5bD5r6YO7UU6I+M0qPWqmP1kOb+PP4bQ3WhJJqA05nhH7HCHC
+ vsnUC94ZZJkmi+R+MJTm5Wfh6GhHmtQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-hYOj0MC_MoqOZLuHm6YUYQ-1; Thu, 30 Jan 2020 05:58:55 -0500
+X-MC-Unique: hYOj0MC_MoqOZLuHm6YUYQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 2EA25206F0;
- Thu, 30 Jan 2020 10:58:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1580381897;
- bh=kueMvnSGUBryO7p/5gsplqvX6z/AIMTx3S0mVvQvfpA=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=kxKrVjtv75cIYpf9SLjtx+boIm5yaqAukoaSm6ctTK3Tp95iE3XWRlTSsfwKoPIrC
- DXIAswgYP+xuviMf2r6ujtZ8Mksu6w3xucpa3+tbbfZ4zB/rfyOmej7lSnVVvNod+F
- hFUh0JeTqhpyB/4OYcE1izcNAa5u+OHc7zY3kG2g=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1ix7WZ-002APm-Fh; Thu, 30 Jan 2020 10:58:15 +0000
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F18B2800D48;
+ Thu, 30 Jan 2020 10:58:53 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-25.ams2.redhat.com [10.36.117.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A3E3977927;
+ Thu, 30 Jan 2020 10:58:41 +0000 (UTC)
+Date: Thu, 30 Jan 2020 11:58:39 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 10/10] tests/qemu-iotests/check: Update to match Python 3
+ interpreter
+Message-ID: <20200130105839.GB6438@linux.fritz.box>
+References: <20200129231402.23384-1-philmd@redhat.com>
+ <20200129231402.23384-11-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Thu, 30 Jan 2020 10:58:15 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
-In-Reply-To: <4a517e53-9a7c-903a-9fbc-e1aab1cccefb@redhat.com>
-References: <20191219040612.28431-1-gshan@redhat.com>
- <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
- <f4699b81-26ac-fcd4-d3fc-f6e055beeb65@redhat.com>
- <9f82206e-0852-ae17-8c77-01d2a5cea97d@redhat.com>
- <51a83889-f2ef-5403-6661-710cfa1ffe01@redhat.com>
- <4a517e53-9a7c-903a-9fbc-e1aab1cccefb@redhat.com>
-Message-ID: <503f32a53fb1a81e2612bcf3eff965da@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: gshan@redhat.com, jthierry@redhat.com, qemu-arm@nongnu.org,
- peter.maydell@linaro.org, pbonzini@redhat.com, drjones@redhat.com,
- eric.auger@redhat.com, aik@ozlabs.ru, shan.gavin@gmail.com,
- qemu-devel@nongnu.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20200129231402.23384-11-philmd@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.145.29.99
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,62 +87,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- Julien Thierry <jthierry@redhat.com>, aik@ozlabs.ru, qemu-devel@nongnu.org,
- eric.auger@redhat.com, qemu-arm@nongnu.org, shan.gavin@gmail.com,
- pbonzini@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Gavin,
+Am 30.01.2020 um 00:14 hat Philippe Mathieu-Daud=E9 geschrieben:
+> All the iotests Python scripts have been converted to search for
+> the Python 3 interpreter. Update the ./check script accordingly.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-On 2020-01-29 21:54, Gavin Shan wrote:
-> On 1/29/20 6:57 PM, Julien Thierry wrote:
->> On 1/29/20 3:46 AM, Gavin Shan wrote:
->>> On 1/28/20 7:29 PM, Julien Thierry wrote:
-> 
-> .../...
-> 
->>> 
->>> Julien, thanks for the explanation. The question we're not sure if 
->>> NMI should
->>> be injected on receiving HMP/QMP "nmi" command. It means it's not 
->>> clear what
->>> behavior we should have for this command on ARM. However, I have one 
->>> more
->>> unrelated question: "pseudo" NMI on ARM64 should be PPI? I mean SPI 
->>> can't
->>> be "pseudo" NMI.
->>> 
->> 
->> I'm not sure I understand why you say "SPI can't be "pseudo" NMI". 
->> Currently both PPI and SPI are supported in the "pseudo" NMI scheme. 
->> Do you think that should not be the case? If so, can you elaborate?
->> 
->> Thanks,
->> 
-> 
-> Julien, NMI interrupt is connected to the system by request_nmi() where 
-> we have
-> a check as below. -EINVAL will be returned from request_nmi() on those
-> interrupts
-> whose descriptors aren't marked with IRQ_NOAUTOEN. SPI falls into this 
-> category.
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index 2890785a10..2e7d29d570 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -825,7 +825,7 @@ do
+> =20
+>          start=3D$(_wallclock)
+> =20
+> -        if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/=
+env python" ]; then
+> +        if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/=
+env python3" ]; then
+>              if $python_usable; then
+>                  run_command=3D"$PYTHON $seq"
+>              else
 
-The IRQ_NOAUTOEN is set on PPIs because you can't enable them all at 
-once,
-for obvious reasons.
+Changing some test cases in patch 2 and only updating ./check now breaks
+bisectability.
 
-This doesn't mean you cannot set it on other interrupt classes, 
-including SPIs.
-It is actually a fairly common thing to do when you want to decouple 
-requesting
-the interrupt from the enabling, if you do not want the interrupt to be 
-able to
-fire right away.
+I'm not sure why you separated patch 2 and 8. I think the easiest way
+would be to change all qemu-iotests cases in the same patch and also
+update ./check in that patch.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Otherwise, you'd have to change ./check in patch 2 to accept both
+versions and could possibly remove the "python" version again here.
+
+Kevin
+
 
