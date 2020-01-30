@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E51BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E357C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:45:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 143F82083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CACE62083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:45:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOScTWY1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143F82083E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elL0X1Yb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CACE62083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixHcO-00048N-53
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:44:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59073)
+	id 1ixHcz-0004tF-VU
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:45:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ixHWY-0002Lp-3N
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:57 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ixHR5-0000e1-DF
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:33:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ixHWI-0000lW-41
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:43 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29195
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1ixHQz-0007IA-Sl
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:33:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58223
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ixHWI-0000lO-07
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:38 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ixHQw-0007GF-Sq
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:33:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580420317;
+ s=mimecast20190719; t=1580419985;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aY59D12iK9EuHf67AzITwqwSdm0FUzPT3g3NX2Qq8xQ=;
- b=JOScTWY18MRerETozS+PUeHZVxoV1Boq57uOc/IiwYsh3aIDcSWswfqOi/nCEZtnCaShzO
- e5nWBh57nfib5kXCX98WYVXkb1DnReabP8DtXX4en4kd4Y/FXSZgw36j1GZkpKYROCVTOi
- /w2Ca//O+tPstpSKxOX/YygYMAl8bgg=
+ bh=/HGmUHjCPxCFbKBVxQL3WgeKYD6TdAhjbnQqC/l5sfA=;
+ b=elL0X1YbNcjpmcsuwiKGI33lNc0zrWBC2YqD84NxXk7gP+4Y5gAv/Hl18eTILU1JNe/p0o
+ uyulF1TlNoBc0w3wim/jJH2/mQe43G3YS9v4kvJhhBEf1JLimbFIqGcsHU9ZVaaEhO9k7Z
+ vyPBNBTxcNkS1GkqfJDJm7dckDrCilw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-zykWt2SkPCGM92aN8gdr3w-1; Thu, 30 Jan 2020 16:38:33 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-438-vGnvEmcJP1Wnz7GY_Ps10g-1; Thu, 30 Jan 2020 16:33:03 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EC8018A6EC0;
- Thu, 30 Jan 2020 21:38:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 498E2100550E;
+ Thu, 30 Jan 2020 21:33:02 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3380A84BCE;
- Thu, 30 Jan 2020 21:38:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85B6460BE0;
+ Thu, 30 Jan 2020 21:32:56 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/5] docs/devel/tracing.txt: Recommend only
- trace_event_get_state_backends()
-Date: Thu, 30 Jan 2020 21:38:11 +0000
-Message-Id: <20200130213814.334195-3-stefanha@redhat.com>
-In-Reply-To: <20200130213814.334195-1-stefanha@redhat.com>
-References: <20200130213814.334195-1-stefanha@redhat.com>
+Subject: [PULL 17/18] tests/qemu-iotests: enable testing with aio options
+Date: Thu, 30 Jan 2020 21:31:13 +0000
+Message-Id: <20200130213114.325157-18-stefanha@redhat.com>
+In-Reply-To: <20200130213114.325157-1-stefanha@redhat.com>
+References: <20200130213114.325157-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: zykWt2SkPCGM92aN8gdr3w-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: vGnvEmcJP1Wnz7GY_Ps10g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,73 +84,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Julia Suvorova <jusual@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
-Instead of recommending checking the TRACE_FOO_ENABLED macro to
-skip expensive computations needed only for tracing, recommend
-only using trace_event_get_state_backends(). This works for both
-compile-time and run-time disabling of events, and has no extra
-performance impact if the event is compile-time disabled.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200120151142.18954-2-peter.maydell@linaro.org
-Message-Id: <20200120151142.18954-2-peter.maydell@linaro.org>
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20200120141858.587874-15-stefanha@redhat.com
+Message-Id: <20200120141858.587874-15-stefanha@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/devel/tracing.txt | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/check      | 15 ++++++++++++++-
+ tests/qemu-iotests/common.rc  | 14 ++++++++++++++
+ tests/qemu-iotests/iotests.py | 12 ++++++++++--
+ 3 files changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-index 8c0376fefa..cb5f685de9 100644
---- a/docs/devel/tracing.txt
-+++ b/docs/devel/tracing.txt
-@@ -342,8 +342,10 @@ edit the "trace-events-all" file).
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 2890785a10..39ed5bc1be 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -137,6 +137,7 @@ sortme=3Dfalse
+ expunge=3Dtrue
+ have_test_arg=3Dfalse
+ cachemode=3Dfalse
++aiomode=3Dfalse
 =20
- In addition, there might be cases where relatively complex computations mu=
-st be
- performed to generate values that are only used as arguments for a trace
--function. In these cases you can use the macro 'TRACE_${EVENT_NAME}_ENABLE=
-D' to
--guard such computations and avoid its compilation when the event is disabl=
-ed:
-+function. In these cases you can use 'trace_event_get_state_backends()' to
-+guard such computations, so they are skipped if the event has been either
-+compile-time disabled or run-time disabled. If the event is compile-time
-+disabled, this check will have no performance impact.
+ tmp=3D"${TEST_DIR}"/$$
+ rm -f $tmp.list $tmp.tmp $tmp.sed
+@@ -146,6 +147,7 @@ export IMGFMT_GENERIC=3Dtrue
+ export IMGPROTO=3Dfile
+ export IMGOPTS=3D""
+ export CACHEMODE=3D"writeback"
++export AIOMODE=3D"threads"
+ export QEMU_IO_OPTIONS=3D""
+ export QEMU_IO_OPTIONS_NO_FMT=3D""
+ export CACHEMODE_IS_DEFAULT=3Dtrue
+@@ -230,6 +232,11 @@ s/ .*//p
+         CACHEMODE_IS_DEFAULT=3Dfalse
+         cachemode=3Dfalse
+         continue
++    elif $aiomode
++    then
++        AIOMODE=3D"$r"
++        aiomode=3Dfalse
++        continue
+     fi
 =20
-     #include "trace.h"  /* needed for trace event prototype */
-    =20
-@@ -356,7 +358,7 @@ guard such computations and avoid its compilation when =
-the event is disabled:
-             align =3D getpagesize();
-         }
-         ptr =3D qemu_memalign(align, size);
--        if (TRACE_QEMU_VMALLOC_ENABLED) { /* preprocessor macro */
-+        if (trace_event_get_state_backends(TRACE_QEMU_VMALLOC)) {
-             void *complex;
-             /* some complex computations to produce the 'complex' value */
-             trace_qemu_vmalloc(size, ptr, complex);
-@@ -364,10 +366,6 @@ guard such computations and avoid its compilation when=
- the event is disabled:
-         return ptr;
-     }
+     xpand=3Dtrue
+@@ -274,6 +281,7 @@ other options
+     -n                  show me, do not run tests
+     -o options          -o options to pass to qemu-img create/convert
+     -c mode             cache mode
++    -i mode             AIO mode
+     -makecheck          pretty print output for make check
 =20
--You can check both if the event has been disabled and is dynamically enabl=
-ed at
--the same time using the 'trace_event_get_state_backends' routine (see head=
-er
--"trace/control.h" for more information).
+ testlist options
+@@ -438,10 +446,13 @@ testlist options
+             cachemode=3Dtrue
+             xpand=3Dfalse
+             ;;
++        -i)
++            aiomode=3Dtrue
++            xpand=3Dfalse
++            ;;
+         -T)        # deprecated timestamp option
+             xpand=3Dfalse
+             ;;
 -
- =3D=3D=3D "tcg" =3D=3D=3D
+         -v)
+             verbose=3Dtrue
+             xpand=3Dfalse
+@@ -520,6 +531,8 @@ done
 =20
- Guest code generated by TCG can be traced by defining an event with the "t=
-cg"
+ # Set qemu-io cache mode with $CACHEMODE we have
+ QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --cache $CACHEMODE"
++# Set qemu-io aio mode with $AIOMODE we have
++QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --aio $AIOMODE"
+=20
+ QEMU_IO_OPTIONS_NO_FMT=3D"$QEMU_IO_OPTIONS"
+ if [ "$IMGOPTSSYNTAX" !=3D "true" ]; then
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index d088392ab6..9ccde32634 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -645,6 +645,20 @@ _default_cache_mode()
+         return
+     fi
+ }
++_supported_aio_modes()
++{
++    for mode; do
++        if [ "$mode" =3D "$AIOMODE" ]; then
++            return
++        fi
++    done
++    _notrun "not suitable for aio mode: $AIOMODE"
++}
++_default_aio_mode()
++{
++    AIOMODE=3D"$1"
++    QEMU_IO=3D"$QEMU_IO --aio $1"
++}
+=20
+ _unsupported_imgopts()
+ {
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 0b62c42851..89aa2df2f3 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -65,6 +65,7 @@ test_dir =3D os.environ.get('TEST_DIR')
+ sock_dir =3D os.environ.get('SOCK_DIR')
+ output_dir =3D os.environ.get('OUTPUT_DIR', '.')
+ cachemode =3D os.environ.get('CACHEMODE')
++aiomode =3D os.environ.get('AIOMODE')
+ qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
+=20
+ socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_help=
+er')
+@@ -495,6 +496,7 @@ class VM(qtest.QEMUQtestMachine):
+             options.append('file=3D%s' % path)
+             options.append('format=3D%s' % format)
+             options.append('cache=3D%s' % cachemode)
++            options.append('aio=3D%s' % aiomode)
+=20
+         if opts:
+             options.append(opts)
+@@ -937,6 +939,10 @@ def verify_cache_mode(supported_cache_modes=3D[]):
+     if supported_cache_modes and (cachemode not in supported_cache_modes):
+         notrun('not suitable for this cache mode: %s' % cachemode)
+=20
++def verify_aio_mode(supported_aio_modes=3D[]):
++    if supported_aio_modes and (aiomode not in supported_aio_modes):
++        notrun('not suitable for this aio mode: %s' % aiomode)
++
+ def supports_quorum():
+     return 'quorum' in qemu_img_pipe('--help')
+=20
+@@ -1023,8 +1029,9 @@ def execute_unittest(output, verbosity, debug):
+=20
+ def execute_test(test_function=3DNone,
+                  supported_fmts=3D[], supported_oses=3D['linux'],
+-                 supported_cache_modes=3D[], unsupported_fmts=3D[],
+-                 supported_protocols=3D[], unsupported_protocols=3D[]):
++                 supported_cache_modes=3D[], supported_aio_modes=3D{},
++                 unsupported_fmts=3D[], supported_protocols=3D[],
++                 unsupported_protocols=3D[]):
+     """Run either unittest or script-style tests."""
+=20
+     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
+@@ -1041,6 +1048,7 @@ def execute_test(test_function=3DNone,
+     verify_protocol(supported_protocols, unsupported_protocols)
+     verify_platform(supported_oses)
+     verify_cache_mode(supported_cache_modes)
++    verify_aio_mode(supported_aio_modes)
+=20
+     if debug:
+         output =3D sys.stdout
 --=20
 2.24.1
 
