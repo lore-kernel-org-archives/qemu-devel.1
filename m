@@ -2,105 +2,77 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C6BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95C84C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:39:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F03D020674
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:39:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FD0020674
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:39:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EHKdgp9w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03D020674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QzFPoieS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FD0020674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixCqR-0000ZA-6a
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:39:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49601)
+	id 1ixCqY-0000gX-FJ
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:39:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1ixChw-0005Ls-2H
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:30:21 -0500
+ (envelope-from <philmd@redhat.com>) id 1ixCl3-0008HH-Lz
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1ixChu-0004cX-Ks
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:30:19 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:49950)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1ixChu-0004bD-B1
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:30:18 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00UGSF7d194782;
- Thu, 30 Jan 2020 16:30:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=oUB5i7LGFHKpTQgigjjZPBJpO1xkpbU2Q2d4TNXGdJQ=;
- b=EHKdgp9wGvajX2QDBPWpH70QiHjHV/tpdmkuap9zoasc0FDFllV+DJ0iy4qZBo6GOr6Q
- tLY6zfR5BcVjENwwObJE5t2Pq/lkD1+sZtZK3j8i23WNBewYBCrCimWxcNIQZuv1dk/J
- hrV71OlTIB/gkxIGnGGyetdgGVxKI0ll1LABB8dz9ZumTKvf+Jk52078iAxBsZzdQ2I7
- k8mdqP2dY1DAH66ev+1AedoPBmqftMrM030h0YjAAmzbvK869wQ3rm82cT46AmrE6lnV
- Szn8V4uTEhM2MtFPz42Q9m+mEbRRWjDaFgIyGokLlhXeJSZnozZzjzRcLdL8dcilg1ku RQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2xrdmqw9uv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jan 2020 16:30:08 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00UGTgjH094193;
- Thu, 30 Jan 2020 16:30:07 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 2xuemwqhed-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jan 2020 16:29:59 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00UGSuJe032128;
- Thu, 30 Jan 2020 16:28:56 GMT
-Received: from [10.175.206.58] (/10.175.206.58)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 30 Jan 2020 08:28:55 -0800
-Subject: Re: [PATCH 2/6] tests/boot_linux_console: add BIOS acceptance test
-From: Liam Merwick <liam.merwick@oracle.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-3-git-send-email-liam.merwick@oracle.com>
- <20200130112721.vm5u5zv7bifjremw@steredhat>
- <ce5b024f-8fd6-d325-a9f7-fbea4ffeff0f@oracle.com>
-Message-ID: <525a194e-131a-56e2-2870-e8709a214135@oracle.com>
-Date: Thu, 30 Jan 2020 16:28:52 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <philmd@redhat.com>) id 1ixCl0-0007tV-Ey
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26145
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixCl0-0007lS-3N
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580402005;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=btIG2Fs04Sea/rckERtd/RgbC06coOumAnRdO8Zinws=;
+ b=QzFPoieS46xJLXcypJ23im6FOswPDoO+MLMAdtUgeH9M8InGLimIcM9j2K8EuVIpwLC7+h
+ 36FTDPTBsK+GLamvX0GSgZt1jnwLtu0JeV0HCAs7+ek9b3DndrkeF3qsaehwiNZc+snBCr
+ aZoaW7pijwLkDNw1gRQyUWt4x1cfIOU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-0vRbD3OhNRi8uRCQmqFMkg-1; Thu, 30 Jan 2020 11:33:19 -0500
+X-MC-Unique: 0vRbD3OhNRi8uRCQmqFMkg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 843991005510;
+ Thu, 30 Jan 2020 16:33:16 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82B025DE53;
+ Thu, 30 Jan 2020 16:33:11 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 03/12] tests/qemu-iotests: Explicit usage of Python 3
+ (scripts with __main__)
+Date: Thu, 30 Jan 2020 17:32:23 +0100
+Message-Id: <20200130163232.10446-4-philmd@redhat.com>
+In-Reply-To: <20200130163232.10446-1-philmd@redhat.com>
+References: <20200130163232.10446-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ce5b024f-8fd6-d325-a9f7-fbea4ffeff0f@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001300115
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001300115
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- 00UGSF7d194782
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,87 +84,425 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, slp@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org,
- wainersm@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, kvm@vger.kernel.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/01/2020 15:34, Liam Merwick wrote:
-> On 30/01/2020 11:27, Stefano Garzarella wrote:
->> Hi Liam,
->>
->> On Mon, Jan 27, 2020 at 04:36:30PM +0000, Liam Merwick wrote:
->>> Add tests to use qboot with the 'pc' and 'microvm' machine classes
->>> by adding the '-bios' option via self.vm.add_args() before calling
->>> do_test_x86_64_machine().
->>>
->>> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
->>> ---
->>> =C2=A0 tests/acceptance/boot_linux_console.py | 15 ++++++++++++++-
->>> =C2=A0 1 file changed, 14 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/tests/acceptance/boot_linux_console.py=20
->>> b/tests/acceptance/boot_linux_console.py
->>> index aa5b07b1c609..8daf6461ffac 100644
->>> --- a/tests/acceptance/boot_linux_console.py
->>> +++ b/tests/acceptance/boot_linux_console.py
->=20
-> ...
->=20
->>> +=C2=A0=C2=A0=C2=A0 def test_x86_64_microvm_qboot(self):
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Dmachine:=
-microvm
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.add_args('-bios',=
- 'pc-bios/bios-microvm.bin')
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.do_test_x86_64_machi=
-ne()
->>> +
->>
->> Reading the docs/microvm.rst, microvm should use qboot as default, so
->> the test_x86_64_microvm() and test_x86_64_microvm_qboot() maybe are th=
-e
->> same (I didn't test them).
->=20
-> I traced loader_write_rom() and in both cases bios-microvm.bin got
-> loaded. While there may be a slight benefit in verifying that usage of
-> an explicit -bios works, I think I'll just drop the unnecessary test
-> case in patches 2 and 6 in v2.
->=20
+Use the program search path to find the Python 3 interpreter.
 
-When making that change to remove the test case from Patch2, it dawned
-on me that it might be worth testing microvm with a different bios=20
-instead...
+Patch created mechanically by running:
 
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -87,6 +87,13 @@ class BootLinuxConsole(Test):
-          """
-          self.do_test_x86_64_machine()
+  $ sed -i "s,^#\!/usr/bin/\(env\ \)\?python$,#\!/usr/bin/env python3," \
+       $(git grep -l 'if __name__.*__main__')
 
-+    def test_x86_64_microvm_seabios(self):
-+        """
-+        :avocado: tags=3Dmachine:microvm
-+        """
-+        self.vm.add_args('-bios', 'pc-bios/bios.bin')
-+        self.do_test_x86_64_machine()
-+
+Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/qemu-iotests/030                   | 2 +-
+ tests/qemu-iotests/040                   | 2 +-
+ tests/qemu-iotests/041                   | 2 +-
+ tests/qemu-iotests/044                   | 2 +-
+ tests/qemu-iotests/045                   | 2 +-
+ tests/qemu-iotests/055                   | 2 +-
+ tests/qemu-iotests/056                   | 2 +-
+ tests/qemu-iotests/057                   | 2 +-
+ tests/qemu-iotests/065                   | 2 +-
+ tests/qemu-iotests/093                   | 2 +-
+ tests/qemu-iotests/096                   | 2 +-
+ tests/qemu-iotests/118                   | 2 +-
+ tests/qemu-iotests/124                   | 2 +-
+ tests/qemu-iotests/129                   | 2 +-
+ tests/qemu-iotests/132                   | 2 +-
+ tests/qemu-iotests/136                   | 2 +-
+ tests/qemu-iotests/139                   | 2 +-
+ tests/qemu-iotests/147                   | 2 +-
+ tests/qemu-iotests/148                   | 2 +-
+ tests/qemu-iotests/151                   | 2 +-
+ tests/qemu-iotests/152                   | 2 +-
+ tests/qemu-iotests/155                   | 2 +-
+ tests/qemu-iotests/163                   | 2 +-
+ tests/qemu-iotests/165                   | 2 +-
+ tests/qemu-iotests/169                   | 2 +-
+ tests/qemu-iotests/196                   | 2 +-
+ tests/qemu-iotests/199                   | 2 +-
+ tests/qemu-iotests/205                   | 2 +-
+ tests/qemu-iotests/245                   | 2 +-
+ tests/qemu-iotests/257                   | 2 +-
+ tests/qemu-iotests/258                   | 2 +-
+ tests/qemu-iotests/281                   | 2 +-
+ tests/qemu-iotests/nbd-fault-injector.py | 2 +-
+ tests/qemu-iotests/qcow2.py              | 2 +-
+ tests/qemu-iotests/qed.py                | 2 +-
+ 35 files changed, 35 insertions(+), 35 deletions(-)
 
-
->>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def test_mips_malta(self):
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=
-=3Darch:mips
->>
->> Thanks for doing these tests!
->=20
-> And thanks for reviewing the series.
->=20
-> Regards,
-> Liam
->=20
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 0990681c1e..aa911d266a 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for image streaming.
+ #
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index 74f62c3c4a..2e7ee0e84f 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for image block commit.
+ #
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index c07437fda1..219b120b57 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for image mirroring.
+ #
+diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
+index 8b2afa2a11..7e99ea7c68 100755
+--- a/tests/qemu-iotests/044
++++ b/tests/qemu-iotests/044
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests growing a large refcount table.
+ #
+diff --git a/tests/qemu-iotests/045 b/tests/qemu-iotests/045
+index 01cc038884..5acc89099c 100755
+--- a/tests/qemu-iotests/045
++++ b/tests/qemu-iotests/045
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for fdsets and getfd.
+ #
+diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+index c732a112d6..82b9f5f47d 100755
+--- a/tests/qemu-iotests/055
++++ b/tests/qemu-iotests/055
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for drive-backup and blockdev-backup
+ #
+diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+index f39287c162..f73fc74457 100755
+--- a/tests/qemu-iotests/056
++++ b/tests/qemu-iotests/056
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for drive-backup
+ #
+diff --git a/tests/qemu-iotests/057 b/tests/qemu-iotests/057
+index 9fbba759b6..a8b4bb60e0 100755
+--- a/tests/qemu-iotests/057
++++ b/tests/qemu-iotests/057
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for internal snapshot.
+ #
+diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
+index 5b21eb96bd..6426474271 100755
+--- a/tests/qemu-iotests/065
++++ b/tests/qemu-iotests/065
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test for additional information emitted by qemu-img info on qcow2
+ # images
+diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+index f03fa24a07..32ded11430 100755
+--- a/tests/qemu-iotests/093
++++ b/tests/qemu-iotests/093
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for IO throttling
+ #
+diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
+index ab9cb47822..5915f92786 100755
+--- a/tests/qemu-iotests/096
++++ b/tests/qemu-iotests/096
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test that snapshots move the throttling configuration to the active
+ # layer
+diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
+index e20080e9a6..adc8a848b5 100755
+--- a/tests/qemu-iotests/118
++++ b/tests/qemu-iotests/118
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test case for the QMP 'change' command and all other associated
+ # commands
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+index d3e851e1ae..3705cbb6b3 100755
+--- a/tests/qemu-iotests/124
++++ b/tests/qemu-iotests/124
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for incremental drive-backup
+ #
+diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
+index cd6b9e9ce7..b0da4a5541 100755
+--- a/tests/qemu-iotests/129
++++ b/tests/qemu-iotests/129
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests that "bdrv_drain_all" doesn't drain block jobs
+ #
+diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
+index 0f2a106c81..39ea43067e 100755
+--- a/tests/qemu-iotests/132
++++ b/tests/qemu-iotests/132
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test mirror with unmap
+ #
+diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+index 012ea111ac..d59400c9fc 100755
+--- a/tests/qemu-iotests/136
++++ b/tests/qemu-iotests/136
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for block device statistics
+ #
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+index cbb5a76530..6b1a444364 100755
+--- a/tests/qemu-iotests/139
++++ b/tests/qemu-iotests/139
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test cases for the QMP 'blockdev-del' command
+ #
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index 03fc2fabcf..51290829cd 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test case for NBD's blockdev-add interface
+ #
+diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
+index 8c11c53cba..90931948e3 100755
+--- a/tests/qemu-iotests/148
++++ b/tests/qemu-iotests/148
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test the rate limit of QMP events
+ #
+diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
+index 76ae265cc1..f2df72c29c 100755
+--- a/tests/qemu-iotests/151
++++ b/tests/qemu-iotests/151
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for active mirroring
+ #
+diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
+index 732bf5f062..cc2ea09654 100755
+--- a/tests/qemu-iotests/152
++++ b/tests/qemu-iotests/152
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for drive-mirror with source size unaligned to granularity
+ #
+diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
+index e19485911c..e35b1d534b 100755
+--- a/tests/qemu-iotests/155
++++ b/tests/qemu-iotests/155
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test whether the backing BDSs are correct after completion of a
+ # mirror block job; in "existing" modes (drive-mirror with
+diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+index d94728e080..5a3cc840a5 100755
+--- a/tests/qemu-iotests/163
++++ b/tests/qemu-iotests/163
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for shrinking images
+ #
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+index 951ea011a2..b60a803dae 100755
+--- a/tests/qemu-iotests/165
++++ b/tests/qemu-iotests/165
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for persistent dirty bitmaps.
+ #
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index 9656a7f620..2c5a132aa3 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for dirty bitmaps migration.
+ #
+diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
+index 92fe9244f8..e8fcf37273 100755
+--- a/tests/qemu-iotests/196
++++ b/tests/qemu-iotests/196
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test clearing unknown autoclear_features flag by qcow2 after
+ # migration. This test mimics migration to older qemu.
+diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
+index a2c8ecab5a..40774eed74 100755
+--- a/tests/qemu-iotests/199
++++ b/tests/qemu-iotests/199
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for dirty bitmaps postcopy migration.
+ #
+diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
+index 4bb2c21e8b..43432cb599 100755
+--- a/tests/qemu-iotests/205
++++ b/tests/qemu-iotests/205
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for qmp command nbd-server-remove.
+ #
+diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+index d12b253065..489bf78bd0 100644
+--- a/tests/qemu-iotests/245
++++ b/tests/qemu-iotests/245
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test cases for the QMP 'x-blockdev-reopen' command
+ #
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index a9828251cf..004a433b8b 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test bitmap-sync backups (incremental, differential, and partials)
+ #
+diff --git a/tests/qemu-iotests/258 b/tests/qemu-iotests/258
+index b84cf02254..091755a45c 100755
+--- a/tests/qemu-iotests/258
++++ b/tests/qemu-iotests/258
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Very specific tests for adjacent commit/stream block jobs
+ #
+diff --git a/tests/qemu-iotests/281 b/tests/qemu-iotests/281
+index 269d583b2c..0bf973bca6 100755
+--- a/tests/qemu-iotests/281
++++ b/tests/qemu-iotests/281
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test cases for blockdev + IOThread interactions
+ #
+diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotest=
+s/nbd-fault-injector.py
+index 7e2dab6ea4..b158dd65a2 100755
+--- a/tests/qemu-iotests/nbd-fault-injector.py
++++ b/tests/qemu-iotests/nbd-fault-injector.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # NBD server - fault injection utility
+ #
+ # Configuration file syntax:
+diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
+index 91e4420b9f..1c4fa2b09f 100755
+--- a/tests/qemu-iotests/qcow2.py
++++ b/tests/qemu-iotests/qcow2.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+=20
+ from __future__ import print_function
+ import sys
+diff --git a/tests/qemu-iotests/qed.py b/tests/qemu-iotests/qed.py
+index 8adaaf46c4..36bca1de23 100755
+--- a/tests/qemu-iotests/qed.py
++++ b/tests/qemu-iotests/qed.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tool to manipulate QED image files
+ #
+--=20
+2.21.1
 
 
