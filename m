@@ -2,169 +2,79 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 908EDC33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 05:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 634A5C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 07:09:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C4DB2067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 05:58:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E8072083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 07:09:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="UF5xqnQr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C4DB2067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o+PxyYQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E8072083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix2q6-0007mS-CR
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 00:58:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44649)
+	id 1ix3xU-0000NU-BF
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 02:09:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1ix2pL-0007FI-D6
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 00:57:20 -0500
+ (envelope-from <hsp.cat7@gmail.com>) id 1ix3wo-0008HZ-5s
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 02:09:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1ix2pK-0007em-1v
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 00:57:18 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:36808)
+ (envelope-from <hsp.cat7@gmail.com>) id 1ix3wm-0007mH-WB
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 02:09:05 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46636)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ix2pJ-0007a4-LL
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 00:57:18 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id gv17so871072pjb.1
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 21:57:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=uqTejDPIt4aY+3Us2F7rPfDrwPTo8vRyf3xet1Q0KGc=;
- b=UF5xqnQrP/xuLXay2z11DsAJm8i4EIi1BWXA2v8lSQKxDxSkPe3tjrUQ25zO3gzcDz
- n2JmDevEBMlf3zZVGMx9dMClha1IQNkQeso8BSaQ0OorxHfrmHQGQx4PrXGAbV/W7hp4
- Xw0gCHVulESeM8COmkbJXS3r0sWK1EEyq5KoamanMkUPFFYxId2bzfxfR0ZvFq008wmF
- tDy815CIOLzTnO5+HeIIAkcncVjAftIBvVti9Bc4tNuONley6MR2wnf5nWtrfdGAunuT
- E7M8DEIB0eBLuDYr5bDpma9MHWHD6SelRjS2U3EFfcyoRQXHe1V2PIFCn7YfQAQafhTU
- 1eng==
+ (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>)
+ id 1ix3wm-0007gf-PW; Thu, 30 Jan 2020 02:09:04 -0500
+Received: by mail-ot1-x342.google.com with SMTP id g64so2130919otb.13;
+ Wed, 29 Jan 2020 23:09:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/ZL3yrFImByXTRvvSQXEo/9Z3roN9PdOZ3/H9+MjK0w=;
+ b=o+PxyYQ+6cNm8q/UtXMENC5UAXJa4NcAfLAEJl0PuIQk+DrEYJAsOdm0KvLilWNnh7
+ 7OAreNvmJ9vh21U4j4UXcU7TaTgCTdtYavF2YYWKRpfBeh1+Pr/TGVnF1gs5l7aEvIj1
+ ug1trJ3OKNxU+v9sqND61mrrsz5KmS53JfFMzd92km2OIXB3LEta3E29obU3IWgFl2aD
+ /9hzAQx4WZOBIqya5zJKNBeGwKE32GtvZTEIVSteZx/zuG8O9nI9hdXfAPxrQB76LoBK
+ RiHBhCXpcwpm885LjwwOpjv5MizFvVXTkLscsJA5RtqD9pjS576Uu0EPn3y9dWwc1Ysa
+ bJaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=uqTejDPIt4aY+3Us2F7rPfDrwPTo8vRyf3xet1Q0KGc=;
- b=MmTKMZHhMMILtIRdvrOq/SKGzoWZvR8OGrq0IToJL1k5tSL9t4xhuk095UzCIrjV63
- Nd9xylcc/aNsljKs14lJyf0kl5JCyCw8GIRIpl7L64OSt3LGWLHbTI4/5lwsEl/yv1Th
- Ib/UXA/YEdcKngsLtI9EVlLXVpY1F2OPPGZ9Jl8o7IsSPc+7w8gc3h+416E5QfhFM5Wk
- FLsAS78KSWniZxs3iog4SiK0JEv+k139fHgEbUz0N9/zyPhlmRF+UA8pGphI7VEY3ds6
- f92I3OSV+s/a521PhDigB+MQSeJPN0pL9xXbPZZAMHcUkZ7XArbq7XtBQLOZDlSfNZdk
- Yy6w==
-X-Gm-Message-State: APjAAAWnhpTEh4TXxLjus07OAQVg+IhUEXbY3RzdHzw7eDR65i5puYIr
- v+ceqL0x3clFlLTayajtvEQOnMfmnpk=
-X-Google-Smtp-Source: APXvYqxF/EP1TxiM9AD1EYvF3Ocy8om/PwF+21EH3ycuRfosvMI6ap/albaAw4rVWkN7NsFqGWHPGQ==
-X-Received: by 2002:a17:90a:858c:: with SMTP id
- m12mr3796778pjn.127.1580363835407; 
- Wed, 29 Jan 2020 21:57:15 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id r187sm4898743pgr.56.2020.01.29.21.57.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Jan 2020 21:57:14 -0800 (PST)
-Subject: Re: [PATCH qemu v5] spapr: Kill SLOF
-To: Andrea Bolognani <abologna@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20200110020925.98711-1-aik@ozlabs.ru>
- <20200121051100.GG265522@umbus.fritz.box>
- <2aee3928-0acb-65ee-de54-de2e8106a6ba@ozlabs.ru>
- <20200122063222.GJ2347@umbus.fritz.box>
- <6ccbb008-9300-0e4d-bfc2-873d8562cb68@ozlabs.ru>
- <20200123051156.GO2347@umbus.fritz.box>
- <f8c6e5cccc0dfc6a02cc6746808c023a4a4ff238.camel@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <e9ce0b0b-2edf-ddd8-c05e-2556d1bff0cc@ozlabs.ru>
-Date: Thu, 30 Jan 2020 16:57:10 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/ZL3yrFImByXTRvvSQXEo/9Z3roN9PdOZ3/H9+MjK0w=;
+ b=HkPgdTCKL5JU+FJw05bo6qqVRGg4PS5qz8CPfN3qa5K33bXTf+Iu3vEX06E+A5bf4R
+ ItP4TiIjPEqT5UDRgg2bPw2flZVPjVLNEYP6KtHn7P5Y9bGY18J251aV97pd/GSUnBzX
+ V21+4wpnun5aVn/1iU11pu0qiD1lQACIwmN0QMF0xvaH+JBioKEYh1yQ7X47ebKTS3tw
+ O/KclQgWDbjrptN6EqCZKArEmfgujG9NV5VB/OWh65LsJS1MERcpiSfBLihshN5GOAAf
+ SLAydkErqrfO6Q81In4FHX5RmSxfs+jS8FKotkv3ysJSTSKwD2AQP0ptLN/HAIKmrZ8k
+ IEQg==
+X-Gm-Message-State: APjAAAVeDywc32tBOXS1eEnZBKmtTFPrXR/b/jTzahBllMKxh8EDTfV7
+ Y83N1ujlQsBJt5m/7n55BIWHpsdHwD6dzLH9dsA=
+X-Google-Smtp-Source: APXvYqyU+XPBRk7CIczGYvDnn+95GfO+NWQ8Ab+4YKzXnrdRYOuJxbqVt1v7gta5mGJ+YS89t8Q6Rm5VwAi+j2ujuk8=
+X-Received: by 2002:a05:6830:139a:: with SMTP id
+ d26mr2545819otq.75.1580368141292; 
+ Wed, 29 Jan 2020 23:09:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f8c6e5cccc0dfc6a02cc6746808c023a4a4ff238.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200129235040.24022-1-richard.henderson@linaro.org>
+In-Reply-To: <20200129235040.24022-1-richard.henderson@linaro.org>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Thu, 30 Jan 2020 08:08:50 +0100
+Message-ID: <CABLmASGt_mSiqZYNWu3DLK6DDhRZs+WD4Ch+EphgVh6TFPW+xA@mail.gmail.com>
+Subject: Re: [PATCH 0/4] target/ppc: Use probe_access
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000ad192d059d5621e1"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -176,39 +86,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-ppc <qemu-ppc@nongnu.org>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--000000000000ad192d059d5621e1
+Content-Type: text/plain; charset="UTF-8"
 
+On Thu, Jan 30, 2020 at 12:50 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-On 28/01/2020 22:31, Andrea Bolognani wrote:
-> On Thu, 2020-01-23 at 16:11 +1100, David Gibson wrote:
->> On Wed, Jan 22, 2020 at 06:14:37PM +1100, Alexey Kardashevskiy wrote:
->>> On 22/01/2020 17:32, David Gibson wrote:
->>>> I'm not thinking of "grub" as a separate option - that would be the
->>>> same as "vof".  Using vof + no -kernel we'd need to scan the disks in
->>>> the same way SLOF does, and look for a boot partition, which will
->>>> probably contain a GRUB image. 
->>>
->>> I was hoping we can avoid that by allowing
->>> "-kernel grub" and let grub do filesystems and MBR/GPT.
->>
->> I don't want that to be the only way, because I want the GRUB
->> installed by the OS installer to be the GRUB we use.
-> 
-> Agreed, the bootloader and the kernel should live inside the guest
-> image and not on the host's filesystem.
+> The first two address the performance regression noticed
+> by Howard Spoelstra.  The last two are just something I
+> noticed at the same time.
+>
+>
+> r~
+>
+>
+> Richard Henderson (4):
+>   target/ppc: Use probe_access for LSW, STSW
+>   target/ppc: Use probe_access for LMW, STMW
+>   target/ppc: Remove redundant mask in DCBZ
+>   target/ppc: Use probe_write for DCBZ
+>
+>  target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++-------
+>  1 file changed, 162 insertions(+), 35 deletions(-)
+>
+> --
+> 2.20.1
+>
+> Hi,
 
+I can confirm these patches fix the performance issue I reported.
 
-Well, I tried. Added simple MBR+GPT parser, loaded ELF and discovered
-that load_elf32/64 does not parse ELFs from memory, only from files.
-Anyone keen on fixing that? :) My current workaround is to load grub
-from the disk, then store it /tmp and load this as it was passed via
--kernel which is ugly..
+Thanks,
+Howard
 
+--000000000000ad192d059d5621e1
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Alexey
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jan 30, 2020 at 12:50 AM Rich=
+ard Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.h=
+enderson@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
+;padding-left:1ex">The first two address the performance regression noticed=
+<br>
+by Howard Spoelstra.=C2=A0 The last two are just something I<br>
+noticed at the same time.<br>
+<br>
+<br>
+r~<br>
+<br>
+<br>
+Richard Henderson (4):<br>
+=C2=A0 target/ppc: Use probe_access for LSW, STSW<br>
+=C2=A0 target/ppc: Use probe_access for LMW, STMW<br>
+=C2=A0 target/ppc: Remove redundant mask in DCBZ<br>
+=C2=A0 target/ppc: Use probe_write for DCBZ<br>
+<br>
+=C2=A0target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++------=
+-<br>
+=C2=A01 file changed, 162 insertions(+), 35 deletions(-)<br>
+<br>
+-- <br>
+2.20.1<br>
+<br></blockquote><div>Hi, <br></div><div><br></div><div>I can confirm these=
+ patches fix the performance issue I reported.</div><div><br></div><div>Tha=
+nks,</div><div>Howard<br></div><div>=C2=A0</div></div></div>
+
+--000000000000ad192d059d5621e1--
 
