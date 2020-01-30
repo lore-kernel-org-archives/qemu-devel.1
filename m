@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45969C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C709C33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 191DF206D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:21:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 191DF206D3
+	by mail.kernel.org (Postfix) with ESMTPS id 232702082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:21:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 232702082E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix9lQ-0004ki-9Z
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 08:21:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43572)
+	id 1ix9lW-0004nV-De
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 08:21:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ix9kT-0003va-JX
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:20:46 -0500
+ (envelope-from <bounces@canonical.com>) id 1ix9kT-0003vb-Qv
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:20:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ix9kS-0007Ai-56
+ (envelope-from <bounces@canonical.com>) id 1ix9kS-0007Az-FQ
  for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:20:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47168)
+Received: from indium.canonical.com ([91.189.90.7]:47180)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ix9kR-00079g-Va
+ id 1ix9kS-0007AM-A9
  for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:20:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ix9kQ-0001XM-TR
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 13:20:42 +0000
+ id 1ix9kR-0001YM-Hx
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 13:20:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DC7512E8030
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 13:20:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 7F8642E80C8
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 13:20:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jan 2020 13:06:05 -0000
+Date: Thu, 30 Jan 2020 13:09:13 -0000
 From: Stevie Lavern <1861404@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,8 +54,9 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: stvlvrn
 X-Launchpad-Bug-Reporter: Stevie Lavern (stvlvrn)
 X-Launchpad-Bug-Modifier: Stevie Lavern (stvlvrn)
-Message-Id: <158038956597.5319.13308249814127344774.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1861404] [NEW] AVX instruction VMOVDQU implementation error for
+References: <158038956597.5319.13308249814127344774.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158038975340.5485.5008002064521352253.malone@soybean.canonical.com>
+Subject: [Bug 1861404] Re: AVX instruction VMOVDQU implementation error for
  YMM registers
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -63,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 38a93ce91f71ac7d57dce83be150c00870ebdafe
+X-Launchpad-Hash: 0ab8e96ebce84b0ba51ffbcc0a280918b5cd7f6e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,76 +82,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Hi,
-
-Tested with Qemu 4.2.0, and with git version
-bddff6f6787c916b0e9d63ef9e4d442114257739.
-
-The x86 AVX instruction VMOVDQU doesn't work properly with YMM registers (3=
-2 bytes).
-It works with XMM registers (16 bytes) though.
-
-See the attached test case `ymm.c`: when copying from memory-to-ymm0 and
-then back from ymm0-to-memory using VMOVDQU, Qemu only copies the first
-16 of the total 32 bytes.
-
+Note: Qemu has been built with the following commands:
 ```
-user@ubuntu ~/Qemu % gcc -o ymm ymm.c -Wall -Wextra -Werror
-
-user@ubuntu ~/Qemu % ./ymm
-00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 18 =
-19 1A 1B 1C 1D 1E 1F
-
-user@ubuntu ~/Qemu % ./x86_64-linux-user/qemu-x86_64 -cpu max ymm
-00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 00 00 00 00 00 00 00 00 00 =
-00 00 00 00 00 00 00
+% ./configure --target-list=3Dx86_64-linux-user && make
+OR
+% ./configure --target-list=3Dx86_64-linux-user --enable-avx2 && make
 ```
-
-This seems to be because in `translate.c > gen_sse()`, the case handling
-the VMOVDQU instruction calls `gen_ldo_env_A0` which always performs a
-16 bytes copy using two 8 bytes load and store operations (with
-`tcg_gen_qemu_ld_i64` and `tcg_gen_st_i64`).
-
-Instead, the `gen_ldo_env_A0` function should generate a copy with a
-size corresponding to the used register.
-
-
-```
-static void gen_sse(CPUX86State *env, DisasContext *s, int b,
-                    target_ulong pc_start, int rex_r)
-{
-        [...]
-        case 0x26f: /* movdqu xmm, ea */
-            if (mod !=3D 3) {
-                gen_lea_modrm(env, s, modrm);
-                gen_ldo_env_A0(s, offsetof(CPUX86State, xmm_regs[reg]));
-            } else { =
-
-        [...]
-```
-
-```
-static inline void gen_ldo_env_A0(DisasContext *s, int offset)
-{
-    int mem_index =3D s->mem_index;
-    tcg_gen_qemu_ld_i64(s->tmp1_i64, s->A0, mem_index, MO_LEQ);
-    tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg, ZMM_Q(0)=
-));
-    tcg_gen_addi_tl(s->tmp0, s->A0, 8);
-    tcg_gen_qemu_ld_i64(s->tmp1_i64, s->tmp0, mem_index, MO_LEQ);
-    tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg, ZMM_Q(1)=
-));
-}
-```
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "VMOVDQU YMM test case"
-   https://bugs.launchpad.net/bugs/1861404/+attachment/5324176/+files/ymm.c
 
 -- =
 
