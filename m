@@ -2,86 +2,82 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DD0C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B35CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:34:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9014B206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:34:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59393206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z09bGIAJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9014B206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvUPzou3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59393206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixClW-0008Ik-MA
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:34:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43325)
+	id 1ixClv-0000PB-8B
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:34:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50267)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCUA-0005nf-St
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:07 -0500
+ (envelope-from <berrange@redhat.com>) id 1ixCjK-0006sB-TF
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCU9-0003Eb-IV
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:06 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52508)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ixCU9-0003Cn-Cm
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:05 -0500
-Received: by mail-wm1-x343.google.com with SMTP id p9so4410870wmc.2
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:16:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=mqPGs4XNEvxPX2EtaQrvJmfPijwJDTsAZANFfzH5G5A=;
- b=Z09bGIAJlfDJyyCxeXyPnMAWgPDWnxxCZGqs7adw5mR42gBukizBXxo3obb7DaLjtv
- t8CHNvZfJ5u23CCOwZXJrMP9Lw99ts/XTm69gJC7wwQTHIOq+nWVHNRpr++QimFkYvSH
- kI4pzFyq+rU4RCJj2RANhYWIgChmHN1VHrSX7oGn3XROJr+egPuk0+cMNi2w6nkAvTiz
- Lp3N52wdWOBq97nYKyKfvcpJwn7qcy7iA9juH8Xqcrbjeuxeun3JvbK54qOav64sstvU
- zIFl6NYtEoaeMatzlpd1jlGEyMTAxF+/w4dL2ORB7oVOjUrMct4fbKpknZrrnmRpiNKJ
- p1Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mqPGs4XNEvxPX2EtaQrvJmfPijwJDTsAZANFfzH5G5A=;
- b=YjpzQii47IrXUKqiXTmOQT7gCN2bTdl03EKHq6y2GflXRvsBOR3mMTBnehdyc0XPQr
- gCuBCrqHKDFt/0w+R+3rrgdj3GceIYfO7m86nmJShX7uoWzCySFnc3mjUt0Vfo83c3CP
- PaQUOCKepNBkIXklMSK3jW0jmUoB43yg95v7WwZs5Pm8PDpom6IWUeBeGIAZ2k5j3mh4
- GNYYYTKE5kxn5J1PhIUHlI7zDyzA1J+x4tbA2BhdKd/B6tnVZidEDhddgU4G9MZoBKLC
- w69xerXQPzbHfY97bIMevQuF72kXcOBzkQt2ba0bAenuvcs15gE6+uNfAk80uN9F7G8F
- dr9Q==
-X-Gm-Message-State: APjAAAXKT79YzbbgrnLCNsYth61GVBCycccNRyc8/GyD1hoZ1n1SdRUA
- KouxisUzVSqssQSie2HKW7vWamsULy1lYw==
-X-Google-Smtp-Source: APXvYqxOT6QHWq6RX8rKssGjkiRCfY4N4IO4Z7d4GVJyurrViQorWpC4D5AWUmSKBPZ7EcaHglyCYw==
-X-Received: by 2002:a1c:7317:: with SMTP id d23mr6601607wmb.165.1580400963959; 
- Thu, 30 Jan 2020 08:16:03 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a22sm6994442wmd.20.2020.01.30.08.16.02
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 08:16:03 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 23/26] target/arm/kvm64: kvm64 cpus have timer registers
-Date: Thu, 30 Jan 2020 16:15:30 +0000
-Message-Id: <20200130161533.8180-24-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200130161533.8180-1-peter.maydell@linaro.org>
-References: <20200130161533.8180-1-peter.maydell@linaro.org>
+ (envelope-from <berrange@redhat.com>) id 1ixCjJ-0006OE-KX
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:31:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36190
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ixCjJ-0006L1-FR
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:31:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580401902;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JB9ldd1TbM97bscB88eIEyMKF4rBCSiTIs2gH1McC7E=;
+ b=DvUPzou3YcmSGwgJowBZnyXup8fI7VYVRy2wOBZfHxmpWVKhWPUd6wW5ct4mnPPi31XF6Z
+ 3eC4x+Yg2bcJhESsvaGOHGpZqKQlgeE7U5suBFnY9VVFPohGzlkPGeeCjnubbH5+GYC1WA
+ 0FZrYvmbic9++9pqryDLErS6mM3UJAI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-UqznFZHLMkqGvqCrkVeDyw-1; Thu, 30 Jan 2020 11:31:25 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A20A21851FC2
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 16:31:24 +0000 (UTC)
+Received: from redhat.com (ovpn-112-54.ams2.redhat.com [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8118687B38;
+ Thu, 30 Jan 2020 16:31:23 +0000 (UTC)
+Date: Thu, 30 Jan 2020 16:31:20 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v2] git: Make submodule check only needed modules
+Message-ID: <20200130163120.GR1891831@redhat.com>
+References: <20200130162810.14503-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <20200130162810.14503-1-quintela@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: UqznFZHLMkqGvqCrkVeDyw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,43 +89,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Jones <drjones@redhat.com>
+On Thu, Jan 30, 2020 at 05:28:10PM +0100, Juan Quintela wrote:
+> If one is compiling more than one tree from the same source, it is
+> possible that they need different submodules.  Change the check to see
+> that all modules that we are interested in are updated, discarding the
+> ones that we don't care about.
+>=20
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>=20
+> ---
+>=20
+> v1->v2:
+> patchw insists in not using tabs
+> ---
+>  scripts/git-submodule.sh | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+> index 98ca0f2737..65ed877aef 100755
+> --- a/scripts/git-submodule.sh
+> +++ b/scripts/git-submodule.sh
+> @@ -59,10 +59,14 @@ status)
+>      fi
+> =20
+>      test -f "$substat" || exit 1
+> -    CURSTATUS=3D$($GIT submodule status $modules)
+> -    OLDSTATUS=3D$(cat $substat)
+> -    test "$CURSTATUS" =3D "$OLDSTATUS"
+> -    exit $?
+> +    for module in $modules; do
+> +        CURSTATUS=3D$($GIT submodule status $module)
+> +        OLDSTATUS=3D$(cat $substat | grep $module)
+> +        if test "$CURSTATUS" !=3D "$OLDSTATUS"; then
+> +            exit 1
+> +        fi
+> +    done
+> +    exit 0
+>      ;;
+>  update)
+>      if test -z "$maybe_modules"
 
-Add the missing GENERIC_TIMER feature to kvm64 cpus.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-We don't currently use these registers when KVM is enabled, but it's
-probably best we add the feature flag for consistency and potential
-future use. There's also precedent, as we add the PMU feature flag to
-KVM enabled guests, even though we don't use those registers either.
 
-This change was originally posted as a hunk of a different, never
-merged patch from Bijan Mottahedeh.
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200120101023.16030-4-drjones@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/kvm64.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 6344113a680..8955d23affd 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -604,6 +604,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     set_feature(&features, ARM_FEATURE_NEON);
-     set_feature(&features, ARM_FEATURE_AARCH64);
-     set_feature(&features, ARM_FEATURE_PMU);
-+    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
- 
-     ahcf->features = features;
- 
--- 
-2.20.1
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
